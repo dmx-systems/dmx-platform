@@ -2,7 +2,7 @@
 DeepaMehta 3
 ============
 
-DeepaMehta is a platform for collaboration and knowledge management.
+DeepaMehta 3 is a platform for collaboration and knowledge management.
 
 Technologically DeepaMehta is made of Java, Neo4j, Apache Lucene, Apache Felix, Javascript/AJAX, jQuery, jQuery-UI, and HTML 5 Canvas.
 DeepaMehta 3 is a complete rewrite of DeepaMehta 2.
@@ -22,12 +22,10 @@ Requirements
 Install
 -------
 
-1. Download latest release from here:
-
+1. Download latest release from here:  
    <http://github.com/jri/deepamehta3-parent/downloads/>
 
-2. Unpack zip archive.
-
+2. Unpack zip archive.  
    A folder 'deepamehta3' is created.
 
 
@@ -39,15 +37,14 @@ Start
         cd deepamehta3
         java -jar bin/felix.jar
 
-2. Open DeepaMehta in webbrowser:
-
+2. Open DeepaMehta in webbrowser:  
    <http://localhost:8080/de.deepamehta.3-client/index.html>
 
 
 Stop
 ----
 
-Go to the terminal from where you started and type
+Go to the terminal from where you started and type:
 
     exit 0
 
@@ -59,16 +56,15 @@ Update
 
 1. Start DeepaMehta (if not running)
 
-2. Open Felix Web Console:
-
+2. Open Felix Web Console:  
    <http://localhost:8080/system/console/>
 
+   Login with "admin" / "admin".  
    You see a list of bundles.
 
 3. Update all 'DeepaMehta 3' bundles by clicking their 'Update' button.
 
-4. Re-open DeepaMehta (resp. click webbrowser's 'Reload' button):
-
+4. Re-open DeepaMehta (resp. click webbrowser's 'Reload' button):  
    <http://localhost:8080/de.deepamehta.3-client/index.html>
 
 
@@ -117,4 +113,4 @@ Version History
 
 ------------
 Jörg Richter  
-July 8, 2010
+July 9, 2010
