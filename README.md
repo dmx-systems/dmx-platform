@@ -23,7 +23,7 @@ Install
 -------
 
 1. Download latest release from here:  
-   <http://github.com/jri/deepamehta3-parent/downloads/>
+   <http://github.com/jri/deepamehta3/downloads/>
 
 2. Unpack zip archive.  
    A folder 'deepamehta3' is created.
