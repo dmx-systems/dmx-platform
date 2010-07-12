@@ -1,0 +1,148 @@
+
+DeepaMehta is build to be extendable through plugins.
+
+h1. What a plugin can do
+
+* Provide new topic types or extending extisting ones.
+* Provide application logic.
+** React upon server-side events.
+** Provide REST resources.
+* Extending the graphical client.
+** React upon client-side events.
+** Extend the REST client.
+
+A DeepaMehta plugin is an OSGi bundle. The user can install a plugin by means of the OSGi console.
+
+DeepaMehta provides a framework for the plugin developer which provides:
+
+* Access to the DeepaMehta Core service.
+* OSGi handling. 
+* Migration management.
+
+h1. Setting up the development environment
+
+1. Install Git and Maven.
+2. Create a directory where your DeepaMehta development takes place and go there, e.g.:
+
+bc. mkdir deepamehta-dev
+cd deepamehta-dev
+
+3. Clone the deepamehta3 project
+
+bc. git clone git://github.com/jri/deepamehta3.git
+
+deepamehta3 is a Maven parent project. Besides a README it contains nothing more than the parent POM (pom.xml). The parent POM declares dependencies and configurations that apply to all DeepaMehta sub-projects, e.g. the plugins you're developing.
+
+bc. deepamehta-dev/       # Your DeepaMehta development directory
+  deepamehta3/          # The parent project
+    pom.xml             # The parent POM
+    README.md
+
+h1. Beginning a plugin project
+
+Inside your DeepaMehta development directory create another directory for your plugin project. The structure within your plugin project directory is determined by a mix of both, Maven conventions and DeepaMehta conventions.
+
+As an example lets look at the file layout of the deepamehta-topicmaps plugin (despite the deepamehta-topicmaps plugin is contained in the DeepaMehta binary distribution it is an self-contained project just like your plugin project):
+
+bc. deepamehta-dev/
+  deepamehta3/
+    pom.xml
+    README.md
+    deepamehta3-topicmaps/                  # Plugin project directory.
+      pom.xml                               # The projects POM (mandatory). 
+      README.md                             # 
+      src/                                  # Server-side Java code goes into src/main/java.
+        main/                               # Server-side Java code is optional.
+          java/                             #
+            de/                             # de/deepamehta/plugins/topicmaps is the root 
+              deepamehta/                   # package of your Java classes. The package name
+                plugins/                    # is under your choice.
+                  topicmaps/
+                    migrations/             # Migrations go into this directory and have a 
+                      Migration1.java       # fixed name. Migrations are optional.
+                    model/
+                      Topicmap.java
+                      ...
+                    resources/              # REST resource classes go into this directory.
+                      TopicmapResource.java # REST resource classes are optional.
+                    TopicmapsPlugin.java    # The plugin's "main" class (optional).
+          resources/                        # additional (non-Java) files (optional).
+            plugin.properties               # Plugin configuration properties (optional).
+            types.json                      # Declarative topic type definitions (optional).
+            web/                            # Content is web-accessible (optional).
+              images/                       # 
+                network.png
+              script/                       # Client-side JavaScipt goes here (optional).
+                dm3_topicmaps.js            # Client-side "main" file begins with "dm3_".
+              style/
+                dm3-topicmaps.css
+
+As you see, all possible plugin constituents are optional (besides the POM). Obviously an useful plugin will provide some (or all) constituents. Which one these are depends on the nature of your plugin.
+
+h1. Writing a POM
+
+A lot of configuration is done already by the parent POM. However, you must supply some settings individual to your plugin project. These comprise of:
+
+* Human-readable Project name.
+* Project identification in the Maven space (group ID, artifact ID, and version number).
+* Instructions for the OSGi bundle packager.
+
+Write a POM (pom.xml) and store it in your plugin's project directory. Example:
+
+bc.. <project>
+
+  <modelVersion>4.0.0</modelVersion>              # Required by Maven. Copy it as is.
+
+  <name>DeepaMehta 3 Topicmaps</name>             # Human-readable Project name.
+  <groupId>de.deepamehta</groupId>                # Identify your project in the Maven space.
+  <artifactId>deepamehta3-topicmaps</artifactId>  # Choose a reasonable group ID,
+  <version>0.4-SNAPSHOT</version>                 # artifact ID, and version number.
+  <packaging>bundle</packaging>                   # The packaging type must be "bundle".
+
+  <parent>                                        # Relates to the parent POM.
+    <groupId>de.deepamehta</groupId>              # Copy this declaration as is.
+    <artifactId>deepamehta3-parent</artifactId>   # Just update the version number, if there
+    <version>0.4-SNAPSHOT</version>               # is a newer DeepaMehta version meanwhile.
+  </parent>
+
+  <dependencies>                                  # Every DeepaMehta 3 plugin project
+    <dependency>                                  # depends on the DeepaMehta 3 Core module.
+      <groupId>de.deepamehta</groupId>            # Copy this declaration as is.
+      <artifactId>deepamehta3-core</artifactId>   # Just update the version number, if there
+      <version>0.4-SNAPSHOT</version>             # is a newer DeepaMehta version meanwhile.
+    </dependency>
+  </dependencies>
+
+  <build>                                         # Instructs the OSGi bundle packager.
+    <plugins>                                     # See below.
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Export-Package>
+              de.deepamehta.plugins.topicmaps.migrations,
+              de.deepamehta.plugins.topicmaps.resources
+            </Export-Package>
+            <Private-Package>
+              de.deepamehta.plugins.topicmaps.*
+            </Private-Package>
+            <Bundle-Activator>
+              de.deepamehta.plugins.topicmaps.TopicmapsPlugin
+            </Bundle-Activator>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
+
+p. If your plugin contains migrations or REST resource classes put the respective package name(s) in the @<Export-Package>@ element. If your plugin contains neither migrations nor REST resource classes the @<Export-Package>@ element is not needed.
+
+Put all other package names (neither migrations nor resources) in the @<Private-Package>@ element. This is achieved best by the * notation. If your plugin contains no Java classes at all the @<Private-Package>@ element is not needed.
+
+Put the fully qualified name of your plugin's "main" class in the @</Bundle-Activator>@ Element.<br />
+*Important:* if your plugin has no "main" class you must specify @de.deepamehta.core.service.Plugin@ in the @</Bundle-Activator>@ Element.
+
