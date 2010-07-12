@@ -19,37 +19,48 @@ DeepaMehta provides a framework for the plugin developer which provides:
 * OSGi handling. 
 * Migration management.
 
-h1. Setting up the development environment
+h1. Set up the development environment
 
 1. Install Git and Maven.
-2. Create a directory where your DeepaMehta development takes place and go there, e.g.:
+2. Install the DeepaMehta binary distribution[1] as described here:
 
-bc. mkdir deepamehta-dev
-cd deepamehta-dev
+"http://github.com/jri/deepamehta3":http://github.com/jri/deepamehta3
 
-3. Clone the deepamehta3 project
+3. Create a directory where your DeepaMehta development takes place and go there, e.g.:
 
-bc. git clone git://github.com/jri/deepamehta3.git
+bc. $ mkdir deepamehta3-dev
+$ cd deepamehta3-dev
 
-deepamehta3 is a Maven parent project. Besides a README it contains nothing more than the parent POM (pom.xml). The parent POM declares dependencies and configurations that apply to all DeepaMehta sub-projects, e.g. the plugins you're developing.
+4. Clone the deepamehta3 project, and go there:
 
-bc. deepamehta-dev/       # Your DeepaMehta development directory
+bc. $ git clone git://github.com/jri/deepamehta3.git
+$ cd deepamehta3
+
+"deepamehta3" is a Maven parent project. Besides documentation it contains nothing more than the parent POM (pom.xml). The parent POM declares dependencies and configurations that apply to all DeepaMehta sub-projects, e.g. the plugins you're developing.
+
+bc. deepamehta3-dev/        # Your DeepaMehta development directory
   deepamehta3/          # The parent project
-    pom.xml             # The parent POM
     README.md
+    doc/
+    pom.xml             # The DeepaMehta 3 parent POM
 
-h1. Beginning a plugin project
+h1. Begin a plugin project
 
-Inside your DeepaMehta development directory create another directory for your plugin project. The structure within your plugin project directory is determined by a mix of both, Maven conventions and DeepaMehta conventions.
+Create a directory for your plugin project *inside the DeepaMehta parent project* and go there. As an example we create a plugin project named "deepamehta3-topicmaps" here:
 
-As an example lets look at the file layout of the deepamehta-topicmaps plugin (despite the deepamehta-topicmaps plugin is contained in the DeepaMehta binary distribution it is an self-contained project just like your plugin project):
+bc. $ mkdir deepamehta3-topicmaps               # Create the plugin project directory
+$ cd deepamehta3-topicmaps
 
-bc. deepamehta-dev/
+The structure within your plugin project directory is determined by a mix of both, Maven conventions and DeepaMehta conventions.
+
+As an example lets look at the file layout of the actual "deepamehta3-topicmaps" plugin that is bundled with the DeepaMehta binary distribution[2][3]:
+
+bc. deepamehta3-dev/
   deepamehta3/
     pom.xml
     README.md
     deepamehta3-topicmaps/                  # Plugin project directory.
-      pom.xml                               # The projects POM (mandatory). 
+      pom.xml                               # The POM of your plugin project (mandatory). 
       README.md                             # 
       src/                                  # Server-side Java code goes into src/main/java.
         main/                               # Server-side Java code is optional.
@@ -79,7 +90,7 @@ bc. deepamehta-dev/
 
 As you see, all possible plugin constituents are optional (besides the POM). Obviously an useful plugin will provide some (or all) constituents. Which one these are depends on the nature of your plugin.
 
-h1. Writing a POM
+h1. Write the plugin POM
 
 A lot of configuration is done already by the parent POM. However, you must supply some settings individual to your plugin project. These comprise of:
 
@@ -87,7 +98,7 @@ A lot of configuration is done already by the parent POM. However, you must supp
 * Project identification in the Maven space (group ID, artifact ID, and version number).
 * Instructions for the OSGi bundle packager.
 
-Write a POM (pom.xml) and store it in your plugin's project directory. Example:
+Write a POM (pom.xml) and store it in your plugin project directory. Example:
 
 bc.. <project>
 
@@ -145,4 +156,71 @@ Put all other package names (neither migrations nor resources) in the @<Private-
 
 Put the fully qualified name of your plugin's "main" class in the @</Bundle-Activator>@ Element.<br />
 *Important:* if your plugin has no "main" class you must specify @de.deepamehta.core.service.Plugin@ in the @</Bundle-Activator>@ Element.
+
+h1. Build the plugin
+
+Inside the plugin project directory:
+
+bc. $ mvn package
+
+This builds the jar file, an OSGi bundle. The jar is placed in the directory @target@ (next to @src@).
+
+bc. deepamehta3-topicmaps/                        # Plugin project directory.
+  src/
+  target/                                     # Contains artifacts build by Maven.
+    deepamehta3-topicmaps-0.4-SNAPSHOT.jar    # The jar ready for deployment in OSGi console.
+
+h1. Deploy the plugin
+
+1. Start DeepaMehta (if not running) as described here:
+
+"http://github.com/jri/deepamehta3":http://github.com/jri/deepamehta3
+
+2. In the OSGi text console[4]:
+
+bc. g! start file:/home/terry/deepamehta3-dev/deepamehta3/deepamehta3-topicmaps/target/deepamehta3-topicmaps-0.4-SNAPSHOT.jar
+
+The start commando installs and starts a bundle into the OSGi runtime. The bundle is specified as an absolute URL.
+
+Note: You need to specifiy the URL only once. Once the plugin is installed, updating it is less verbose (see section below)
+
+h1. Run the plugin
+
+In the DeepaMehta browser window: press reload and check if your plugin works as intended.
+
+h1. Update the plugin
+
+1. Once you've done changes in plugin code or resource files: build the plugin again as decribed in the section above.
+
+2. In the OSGi text console:
+
+bc. g! update 42        # 42 is the bundle ID assigned to your plugin while it is first installed
+
+To tell your plugin's bundle ID, use the OSGi text console's @lb@ command:
+
+bc. g! lb               # lists all installed bundles along their IDs
+
+Note: the bundle ID remains constant over the entire lifetime of your OSGi instance.
+
+h1. Distribute your plugin
+
+Upload your plugin, namely the jar file, to a webserver and advertise the jar file's URL.
+
+h1. Install 3rd party plugins
+
+Just like installing your local plugins, but using the public URL as advertised by the plugin vendor. Example:
+
+bc. g! start http://www.example.com/deepamehta3-plugins/cool-deepamehta3-plugin.jar
+
+h1. Footnotes
+
+fn1. An alternative is to build DeepaMehta from sources, however this is not yet documented. Using the binary distribution is the most easy setup for developers as it provides a pre-configured OSGi runtime environment, including all (3rd party) bundle dependencies.
+
+fn2. Despite the "deepamehta3-topicmaps" plugin is contained in the DeepaMehta binary distribution it is an self-contained plugin project just like your own plugin project.
+
+fn3. If you want try out the build-lifecycle now, you could setup the actual "deepamehta3-topicmaps" plugin as an example: Go back to the DeepaMehta parent project (@$ cd ..@), then
+@$ git clone git://github.com/jri/deepamehta3-topicmaps.git@
+@$ cd deepamehta3-topicmaps@
+
+fn4. If you've build the actual "deepamehta3-topicmaps" plugin you must uninstall the version bundled with the DeepaMehta binary distribution first. In the OSGi text console: @g! uninstall 26@ (26 is supposed to be the bundle ID of the "DeepaMehta 3 Topicmaps" bundle. Check out with @g! lb@ command).
 
