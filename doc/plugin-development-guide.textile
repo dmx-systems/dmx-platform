@@ -19,14 +19,14 @@ DeepaMehta provides a framework for the plugin developer which provides:
 * OSGi handling. 
 * Migration management.
 
-h1. Set up the development environment
+h1. Setting up the development environment
 
 1. Install Git and Maven.
 2. Install the DeepaMehta binary distribution[1] as described here:
 
 "http://github.com/jri/deepamehta3":http://github.com/jri/deepamehta3
 
-3. Create a directory where your DeepaMehta development takes place and go there, e.g.:
+3. Create a directory where your DeepaMehta development should take place and go there, e.g.:
 
 bc. $ mkdir deepamehta3-dev
 $ cd deepamehta3-dev
@@ -44,16 +44,16 @@ bc. deepamehta3-dev/        # Your DeepaMehta development directory
     doc/
     pom.xml             # The DeepaMehta 3 parent POM
 
-h1. Begin a plugin project
+h1. Starting a plugin project
 
 Create a directory for your plugin project *inside the DeepaMehta parent project* and go there. As an example we create a plugin project named "deepamehta3-topicmaps" here:
 
 bc. $ mkdir deepamehta3-topicmaps               # Create the plugin project directory
 $ cd deepamehta3-topicmaps
 
-The structure within your plugin project directory is determined by a mix of both, Maven conventions and DeepaMehta conventions.
+The structure within your plugin project directory is determined by a combination of both, Maven conventions and DeepaMehta conventions.
 
-As an example lets look at the file layout of the actual "deepamehta3-topicmaps" plugin that is bundled with the DeepaMehta binary distribution[2][3]:
+As an example lets look at the file layout of the actual "deepamehta3-topicmaps" plugin that is bundled with the DeepaMehta binary distribution[2] [3]:
 
 bc. deepamehta3-dev/
   deepamehta3/
@@ -84,13 +84,13 @@ bc. deepamehta3-dev/
               images/                       # 
                 network.png
               script/                       # Client-side JavaScipt goes here (optional).
-                dm3_topicmaps.js            # Client-side "main" file begins with "dm3_".
+                dm3_topicmaps.js            # Client-side "main" file starts with "dm3_".
               style/
                 dm3-topicmaps.css
 
 As you see, all possible plugin constituents are optional (besides the POM). Obviously an useful plugin will provide some (or all) constituents. Which one these are depends on the nature of your plugin.
 
-h1. Write the plugin POM
+h1. Writing the plugin POM
 
 A lot of configuration is done already by the parent POM. However, you must supply some settings individual to your plugin project. These comprise of:
 
@@ -157,7 +157,7 @@ Put all other package names (neither migrations nor resources) in the @<Private-
 Put the fully qualified name of your plugin's "main" class in the @</Bundle-Activator>@ Element.<br />
 *Important:* if your plugin has no "main" class you must specify @de.deepamehta.core.service.Plugin@ in the @</Bundle-Activator>@ Element.
 
-h1. Build the plugin
+h1. Building the plugin
 
 Inside the plugin project directory:
 
@@ -170,7 +170,7 @@ bc. deepamehta3-topicmaps/                        # Plugin project directory.
   target/                                     # Contains artifacts build by Maven.
     deepamehta3-topicmaps-0.4-SNAPSHOT.jar    # The jar ready for deployment in OSGi console.
 
-h1. Deploy the plugin
+h1. Deploying the plugin
 
 1. Start DeepaMehta (if not running) as described here:
 
@@ -184,11 +184,11 @@ The start commando installs and starts a bundle into the OSGi runtime. The bundl
 
 Note: You need to specifiy the URL only once. Once the plugin is installed, updating it is less verbose (see section below)
 
-h1. Run the plugin
+h1. Running the plugin
 
 In the DeepaMehta browser window: press reload and check if your plugin works as intended.
 
-h1. Update the plugin
+h1. Updating the plugin
 
 1. Once you've done changes in plugin code or resource files: build the plugin again as decribed in the section above.
 
@@ -202,11 +202,11 @@ bc. g! lb               # lists all installed bundles along their IDs
 
 Note: the bundle ID remains constant over the entire lifetime of your OSGi instance.
 
-h1. Distribute your plugin
+h1. Distributing your plugin
 
 Upload your plugin, namely the jar file, to a webserver and advertise the jar file's URL.
 
-h1. Install 3rd party plugins
+h1. Installing 3rd party plugins
 
 Just like installing your local plugins, but using the public URL as advertised by the plugin vendor. Example:
 
