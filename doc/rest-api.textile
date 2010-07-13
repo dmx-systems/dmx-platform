@@ -1,0 +1,220 @@
+
+The DeepaMehta application service is accessible via a REST API.
+
+h1. Topics
+
+h2(#get-topic-by-id). Get topic by ID
+
+h3. Request
+
+bc. GET /core/topic/61
+
+h3. Response
+
+The response is the requested topic.
+For details about the data format see [[Data Format]]#topic.
+
+bc. {
+    "id": 61,
+    "type_uri": "de/deepamehta/core/topictype/Note",
+    "label": "DeepaMehta 3",
+    "properties": {
+        "de/deepamehta/core/property/Title": "DeepaMehta 3",
+        "de/deepamehta/core/property/Text":
+            "<p>DeepaMehta 3 is a platform for collaboration and knowledge management.</p>
+             <p>A complete rewrite of DeepaMehta 2.</p>",
+        "de/deepamehta/core/property/DateCreated":  1278980093803,
+        "de/deepamehta/core/property/DateModified": 1278980093803
+    }
+}
+
+If the topic doesn't exist an error 500 ("Topic can't be retrieved") is returned.
+
+h2. Get related topics
+
+h3. Request
+
+bc. GET /core/topic/61/related_topics?include_topic_types=de/deepamehta/core/topictype/Note&
+                                  include_rel_types=&
+                                  exclude_rel_types=SEARCH_RESULT;OUTGOING
+
+|_. Parameter   |_. Meaning       |_. Format / Possible values    |_. Mandatory / Optional |
+^.| @include_topic_types@
+  | Topic type include filter.
+    <br>
+    Include only topics of certain types in the result.
+  | One or more topic type URIs.
+    <br>
+    To specify more than one topic type URI, use several @include_topic_types@ parameters.
+  | Optional.
+    <br>
+    If not specified the result is not filtered by topic type.                             |
+^.| @include_rel_types@
+  | Relation type include filter.
+    <br>
+    Include only topics in the result which are related via relations of certain types and directions.
+  | One or more relation specification of the form @<relation type>[;<direction>]@.
+    <br>
+    Direction is optional and, when given, is eiter @INCOMING@ or @OUTGOING@. The direction is from the perspective of the related topic.
+    <br>
+    To make more than one relation specification, use several @include_rel_types@ parameters.
+  | Optional.
+    <br>
+    If not specified the result is not filtered by relation type.                          |
+^.| @exclude_rel_types@
+  | Relation type exclude filter.
+    <br>
+    Excludes topics from the result which are related via relations of certain types and directions.
+  | One or more relation specification of the form @<relation type>[;<direction>]@.
+    <br>
+    Direction is optional and, when given, is eiter @INCOMING@ or @OUTGOING@. The direction is from the perspective of the related topic.
+    <br>
+    To make more than one relation specification, use several @exclude_rel_types@ parameters.
+  | Optional.
+    <br>
+    If not specified the result is not filtered by relation type.                          |
+
+*Note:* You can't use the @include_rel_types@ and @exclude_rel_types@ filters at the same time. (Whereas you can use a topic type filter and a relation type filter at the same time.)
+
+h3. Response
+
+The response is an array of topics, possibly empty.
+For details about the topic's data format see [[Data Format]]#topic.
+
+bc. [
+        {
+            "id": 3,
+            "type_uri": "de/deepamehta/core/topictype/TopicType",
+            "label": "Note",
+            "properties": {
+                "de/deepamehta/core/property/DateModified": null
+            }
+        },
+        {
+            "id": 39,
+            "type_uri": "de/deepamehta/core/topictype/Workspace",
+            "label": "Default",
+            "properties": {
+                "de/deepamehta/core/property/DateModified": 1278736430568
+            }
+        },
+        {
+            "id": 42,
+            "type_uri": "de/deepamehta/core/topictype/Note",
+            "label": "Jörg Richter",
+            "properties": {
+                "de/deepamehta/core/property/DateModified": 1278736576165
+            }
+        },
+        {
+            "id": 56,
+            "type_uri": "de/deepamehta/core/topictype/Topicmap",
+            "label": "My Topicmap",
+            "properties": {
+                "de/deepamehta/core/property/DateModified": 1278987701199
+            }
+        }
+    ]
+
+*Note:* The response doesn't contain all of the topic's properties. (This would possibly make a large response which is possibly not needed by the client. To get a topic along with all of its properties use the "Get topic by ID":#get-topic-by-id request described above.) Which properties are returned depends on the installed plugins.
+
+h2. Get topics by type
+
+h3. Request
+
+bc. 
+
+h3. Response
+
+bc. 
+
+h2. Search topics
+
+h3. Request
+
+bc. 
+
+h3. Response
+
+bc. 
+
+h2. Create topic
+
+h3. Request
+
+bc. 
+
+h3. Response
+
+bc. 
+
+h2. Update topic
+
+h3. Request
+
+bc. 
+
+h3. Response
+
+bc. 
+
+h2. Delete topic
+
+h3. Request
+
+bc. 
+
+h3. Response
+
+bc. 
+
+h1. Relations
+
+h2. Get relation by topics
+
+h2. Create relation
+
+h2. Update relation
+
+h2. Delete relation
+
+h1. Topic Types
+
+h2. Get topic type IDs
+
+h2. Get topic type by ID
+
+h2. Create topic type
+
+h2. Add data field
+
+h2. Update data field
+
+h2. Set data field order
+
+h2. Remove data field
+
+h1. Topic Maps
+
+*Note:* The topicmap requests are available only, if the _DeepaMehta 3 Topicmaps_ plugin is installed (that is part of the DeepaMehta binary distribution). The topicmap requests are processed by this plugin. That's the reason why the request path doesn't start with @/core@, like the other requests described here.
+
+h2(#get-topic-map-by-id). Get topic map by ID
+
+h3. Request
+
+bc. GET /topicmap/56
+
+h3. Response
+
+The response is the requested topic map.
+For details about the data format see [[Data Format]]#topic-map.
+
+*Note:* The response doesn't contain all of the topic's and relation's properties. (This would possibly make a large response which is possibly not needed by the client. To get a topic along with all of its properties use the "Get topic by ID":#get-topic-by-id request described above.) Which properties are returned depends on the installed plugins.
+
+h2. Add topic/relation to topic map
+
+h2. Remove topic/relation from topic map
+
+h1. Plugins
+
+h2. Get installed plugins

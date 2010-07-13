@@ -96,7 +96,7 @@ Structurally a topic type definition consist of 4 attributes: @uri@, @fields@, @
 Further implementations can be provided by DeepaMehta 3 plugins.                                                  | mandatory |
 
 <br><br>
-Note: when requesting a topic type via the DeepaMehta REST service 2 additional attributes are returned in the response topic type: @id@, and @type_uri@.
+*Note:* when a topic type is requested via the DeepaMehta REST API 2 additional attributes are returned in the response topic type: @id@, and @type_uri@.
 
 |_. Attribute        |_. Meaning                                  |_. Format / Possible values                          |
 ^.| @id@             | The topic ID of this topic type in the DB. | A number (long).                                    |
@@ -180,6 +180,8 @@ bc. {
 
 h1(#topic-map). Topic Map
 
+When a topic map is requested via the DeepaMehta [[REST API]]#get-topic-map-by-id, the response looks like this:
+
 bc. {
     "topics": [
         {
@@ -190,8 +192,8 @@ bc. {
                 "de/deepamehta/core/property/DateModified": 1278987883338
             },
             "visualization": {
-              "visibility": true,
-              "x": 230.2720206072554, "y": 397.7343209804967
+              "x": 230.2720206072554, "y": 397.7343209804967,
+              "visibility": true
             },
             "ref_id": 240
         },
@@ -203,8 +205,8 @@ bc. {
                 "de/deepamehta/core/property/DateModified": 1278736576165
             },
             "visualization": {
-                "visibility": true,
-                "x": 436.61296997382306, "y": 314.2628641165793
+                "x": 436.61296997382306, "y": 314.2628641165793,
+                "visibility": true
             },
             "ref_id": 243
         },
@@ -216,8 +218,8 @@ bc. {
                 "de/deepamehta/core/property/DateModified": 1278980093803
             },
             "visualization": {
-                "visibility": true,
-                "x": 501.99434025678784, "y": 511.70696080848575
+                "x": 501.99434025678784, "y": 511.70696080848575,
+                "visibility": true
             },
             "ref_id": 246
         }
@@ -239,6 +241,17 @@ bc. {
         }
     ]
 }
+
+A topic map consist of an array of @topics@ and an array of @relations@. The format of a "Topic":#topic resp. "Relation":#relation is basically as described above, with 2 additions:
+
+1. A topic has a @visualization@ object with 3 attributes:
+
+|_. Attribute       |_. Meaning                                         |
+^.| @x@, @y@        | Coordinates of the topic within the topic map.    |
+^.| @visibility@    | Is the topic visible (@true@) or invisible (@false@) in the topic map?
+                      Setting a topic to invisible allows the topic to keep its coordinates within the topic map.                                                              |
+
+2. A topic and a relation have an additional @ref_id@ attribute which is required when updating the topic resp. relation references (e.g. when moving a topic on the topic map or removing a relation from the topic map).
 
 
 h1(#footnotes). Footnotes
