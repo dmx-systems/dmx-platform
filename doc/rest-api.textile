@@ -1,7 +1,38 @@
 
 The DeepaMehta application service is accessible via a REST API.
 
-h1. Topics
+* "Topics":#topics
+** "Get topic by ID":#get-topic-by-id
+** "Get related topics":#get-related-topics
+** "Get topics by type":#get-topics-by-type
+** "Search topics":#search-topics
+** "Create topic":#create-topic
+** "Update topic":#update-topic
+** "Delete topic":#delete-topic
+* "Relations":#relations
+** "Get relation by topics":#get-relation-by-topics
+** "Create relation":#create-relation
+** "Update relation":#update-relation
+** "Delete relation":#delete-relation
+* "Topic Types":#topic-types
+** "Get topic type IDs":#get-topic-type-ids
+** "Get topic type by ID":#get-topic-type-by-id
+** "Create topic type":#create-topic-type
+** "Add data field":#add-data-field
+** "Update data field":#update-data-field
+** "Set data field order":#set-data-field-order
+** "Remove data field":#remove-data-field
+* "Topic Maps":#topic-maps
+** "Get topic map by ID":#get-topic-map-by-id
+** "Add topic to topic map":#add-topic-to-topic-map
+** "Add relation to topic map":#add-relation-to-topic-map
+** "Remove topic from topic map":#remove-topic-from-topic-map
+** "Remove relation from topic map":#remove-relation-from-topic-map
+* "Plugins":#plugins
+** "Get installed plugins":#get-installed-plugins
+
+
+h1(#topics). Topics
 
 h2(#get-topic-by-id). Get topic by ID
 
@@ -11,8 +42,7 @@ bc. GET /core/topic/61
 
 h3. Response
 
-The response is the requested topic.
-For details about the data format see [[Data Format]]#topic.
+The response is the requested topic:
 
 bc. {
     "id": 61,
@@ -28,9 +58,11 @@ bc. {
     }
 }
 
+For details about the data format see [[Data Format]]#topic.
+
 If the topic doesn't exist an error 500 ("Topic can't be retrieved") is returned.
 
-h2. Get related topics
+h2(#get-related-topics). Get related topics
 
 h3. Request
 
@@ -118,7 +150,7 @@ bc. [
 
 *Note:* The response doesn't contain all of the topic's properties. (This would possibly make a large response which is possibly not needed by the client. To get a topic along with all of its properties use the "Get topic by ID":#get-topic-by-id request described above.) Which properties are returned depends on the installed plugins.
 
-h2. Get topics by type
+h2(#get-topics-by-type). Get topics by type
 
 h3. Request
 
@@ -128,7 +160,7 @@ h3. Response
 
 bc. 
 
-h2. Search topics
+h2(#search-topics). Search topics
 
 h3. Request
 
@@ -138,7 +170,7 @@ h3. Response
 
 bc. 
 
-h2. Create topic
+h2(#create-topic). Create topic
 
 h3. Request
 
@@ -148,7 +180,7 @@ h3. Response
 
 bc. 
 
-h2. Update topic
+h2(#update-topic). Update topic
 
 h3. Request
 
@@ -158,7 +190,7 @@ h3. Response
 
 bc. 
 
-h2. Delete topic
+h2(#delete-topic). Delete topic
 
 h3. Request
 
@@ -168,33 +200,33 @@ h3. Response
 
 bc. 
 
-h1. Relations
+h1(#relations). Relations
 
-h2. Get relation by topics
+h2(#get-relation-by-topics). Get relation by topics
 
-h2. Create relation
+h2(#create-relation). Create relation
 
-h2. Update relation
+h2(#update-relation). Update relation
 
-h2. Delete relation
+h2(#delete-relation). Delete relation
 
-h1. Topic Types
+h1(#topic-types). Topic Types
 
-h2. Get topic type IDs
+h2(#get-topic-type-ids). Get topic type IDs
 
-h2. Get topic type by ID
+h2(#get-topic-type-by-id). Get topic type by ID
 
-h2. Create topic type
+h2(#create-topic-type). Create topic type
 
-h2. Add data field
+h2(#add-data-field). Add data field
 
-h2. Update data field
+h2(#update-data-field). Update data field
 
-h2. Set data field order
+h2(#set-data-field-order). Set data field order
 
-h2. Remove data field
+h2(#remove-data-field). Remove data field
 
-h1. Topic Maps
+h1(#topic-maps). Topic Maps
 
 *Note:* The topicmap requests are available only, if the _DeepaMehta 3 Topicmaps_ plugin is installed (that is part of the DeepaMehta binary distribution). The topicmap requests are processed by this plugin. That's the reason why the request path doesn't start with @/core@, like the other requests described here.
 
@@ -206,15 +238,112 @@ bc. GET /topicmap/56
 
 h3. Response
 
-The response is the requested topic map.
+The response is the requested topic map:
+
+bc. {
+    "topics": [
+        {
+            "id": 67,
+            "type_uri": "de/deepamehta/core/topictype/SearchResult",
+            "label": "Richter",
+            "properties": {
+                "de/deepamehta/core/property/DateModified": 1278987883338
+            },
+            "visualization": {
+              "x": 230.2720206072554, "y": 397.7343209804967,
+              "visibility": true
+            },
+            "ref_id": 240
+        },
+        {
+            "id": 42,
+            "type_uri": "de/deepamehta/core/topictype/Note",
+            "label": "Jörg Richter",
+            "properties": {
+                "de/deepamehta/core/property/DateModified": 1278736576165
+            },
+            "visualization": {
+                "x": 436.61296997382306, "y": 314.2628641165793,
+                "visibility": true
+            },
+            "ref_id": 243
+        },
+        {
+            "id": 61,
+            "type_uri": "de/deepamehta/core/topictype/Note",
+            "label": "DeepaMehta 3",
+            "properties": {
+                "de/deepamehta/core/property/DateModified": 1278980093803
+            },
+            "visualization": {
+                "x": 501.99434025678784, "y": 511.70696080848575,
+                "visibility": true
+            },
+            "ref_id": 246
+        }
+    ],
+    "relations":[
+        {
+            "id": 238,
+            "type_id": "SEARCH_RESULT",
+            "src_topic_id": 67, "dst_topic_id": 42,
+            "properties": {},
+            "ref_id": 68
+        },
+        {
+            "id": 206,
+            "type_id": "RELATION",
+            "src_topic_id": 42, "dst_topic_id": 61,
+            "properties": {},
+            "ref_id": 69
+        }
+    ]
+}
+
 For details about the data format see [[Data Format]]#topic-map.
 
 *Note:* The response doesn't contain all of the topic's and relation's properties. (This would possibly make a large response which is possibly not needed by the client. To get a topic along with all of its properties use the "Get topic by ID":#get-topic-by-id request described above.) Which properties are returned depends on the installed plugins.
 
-h2. Add topic/relation to topic map
+h2(#add-topic-to-topic-map). Add topic to topic map
 
-h2. Remove topic/relation from topic map
+h3. Request
 
-h1. Plugins
+bc. PUT /topicmap/56
 
-h2. Get installed plugins
+bc. {
+    topic_id: 82,
+    x: 384,
+    y: 527
+}
+
+Adds topic 82 to topic map 56.
+
+h3. Response
+
+bc. {ref_id: 220}
+
+The ref_id is needed when updating the topic on the topic map later on, e.g. when moving or hiding it.
+
+h2(#add-relation-to-topic-map). Add relation to topic map
+
+h3. Request
+
+bc. PUT /topicmap/56
+
+bc. {relation_id: 281}
+
+Adds relation 281 to topic map 56.
+
+h3. Response
+
+bc. {ref_id: 72}
+
+The ref_id is needed when updating the relation on the topic map later on, e.g. when removing it.
+
+h2(#remove-topic-from-topic-map). Remove topic from topic map
+
+h2(#remove-relation-from-topic-map). Remove relation from topic map
+
+h1(#plugins). Plugins
+
+h2(#get-installed-plugins). Get installed plugins

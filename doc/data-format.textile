@@ -96,7 +96,7 @@ Structurally a topic type definition consist of 4 attributes: @uri@, @fields@, @
 Further implementations can be provided by DeepaMehta 3 plugins.                                                  | mandatory |
 
 <br><br>
-*Note:* when a topic type is requested via the DeepaMehta REST API 2 additional attributes are returned in the response topic type: @id@, and @type_uri@.
+*Note:* when a topic type is requested via the DeepaMehta [[REST API]]#get-topic-type-by-id 2 additional attributes are returned in the response topic type: @id@, and @type_uri@.
 
 |_. Attribute        |_. Meaning                                  |_. Format / Possible values                          |
 ^.| @id@             | The topic ID of this topic type in the DB. | A number (long).                                    |
@@ -180,7 +180,7 @@ bc. {
 
 h1(#topic-map). Topic Map
 
-When a topic map is requested via the DeepaMehta [[REST API]]#get-topic-map-by-id, the response looks like this:
+When a topic map is requested via the DeepaMehta [[REST API]]#get-topic-map-by-id the response looks like this:
 
 bc. {
     "topics": [
@@ -251,10 +251,9 @@ A topic map consist of an array of @topics@ and an array of @relations@. The for
 ^.| @visibility@    | Is the topic visible (@true@) or invisible (@false@) in the topic map?
                       Setting a topic to invisible allows the topic to keep its coordinates within the topic map.                                                              |
 
-2. A topic and a relation have an additional @ref_id@ attribute which is required when updating the topic resp. relation references (e.g. when moving a topic on the topic map or removing a relation from the topic map).
+2. A topic and a relation have an additional @ref_id@ attribute which is needed when updating the topic resp. relation references (e.g. when moving a topic on the topic map or removing a relation from the topic map).
 
 
 h1(#footnotes). Footnotes
 
 fn1. Formally this format actually isn't an URI, e.g. a scheme is missing. From an URI the @uri@ attribute here just inherits the notion of a "globally unique identifier". The @uri@ attribute should be renamed.
-
