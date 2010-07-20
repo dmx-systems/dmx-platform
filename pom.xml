@@ -111,7 +111,7 @@
     <distributionManagement>
         <repository>
             <id>deepamehta-public-repository</id>
-            <url>scp://www.deepamehta.de/var/lib/tomcat-6/webapps/ROOT/maven2/</url>
+            <url>scp://www.deepamehta.de/var/lib/tomcat-6/webapps/ROOT/maven2</url>
         </repository>
     </distributionManagement>
 

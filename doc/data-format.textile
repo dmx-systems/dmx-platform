@@ -47,135 +47,206 @@ bc. {
 
 h1(#topic-type). Topic Type
 
-Example of a topic type "Note" which consist of 2 data fields, "Title" and "Text".
+Use the following format when declaring topic types. Topic type declarations are usually made in the plugin's "types.json" file (see [[Plugin Development Guide]]).
 
-Use this format for declarative topic type definitions, usually in file "types.json" of your plugin.
+Example of a topic type "Note" with 4 data fields, "Title", "Text", "Date Modified", and "Workspaces":
 
 bc. {
     uri: "de/deepamehta/core/topictype/Note",
     fields: [
         {
+            label: "Title",
             uri: "de/deepamehta/core/property/Title",
-            model: {type: "text"},
-            view: {label: "Title"},
+            data_type: "text",
+            editor: "single line",
+            renderer_class: "TextFieldRenderer",
             indexing_mode: "FULLTEXT"
         },
         {
+            label: "Text",
             uri: "de/deepamehta/core/property/Text",
-            model: {type: "html"},
-            view: {label: "Text", editor: "multi line"},
+            data_type: "html",
+            renderer_class: "HTMLFieldRenderer",
             indexing_mode: "FULLTEXT"
+        },
+        {
+          label: "Date Modified",
+          uri: "de/deepamehta/core/property/DateModified",
+          data_type: "number",
+          renderer_class: "NumberFieldRenderer",
+          indexing_mode: "FULLTEXT_KEY"
+        },
+        {
+          label: "Workspaces",
+          uri: "de/deepamehta/core/property/Workspaces",
+          data_type: "relation",
+          related_type_uri: "de/deepamehta/core/topictype/Workspace",
+          editor: "checkboxes",
+          renderer_class: "ReferenceFieldRenderer",
+          indexing_mode: "OFF"
         }
     ],
-    view: {label: "Note", icon_src: "/de.deepamehta.3-client/images/pencil.png"},
+    view: {
+        label: "Note",
+        icon_src: "/de.deepamehta.3-client/images/pencil.png"
+    },
     implementation: "PlainDocument"
 }
 
 Structurally a topic type definition consist of 4 attributes: @uri@, @fields@, @view@, and @implementation@.
 
-|_. Attribute        |_. Meaning                                  |_. Format / Possible values                    |_. mandatory / optional |
-^.| @uri@            | A globally unique identifier for the topic type. | By convention: a slash separated path of the form &lt;vendor name>/&lt;project name>/topictype/&lt;type name>[1].
-                                                                  <br>
-                                                                  In the example above the vendor name is "de/deepamehta", the project name is "core". "topictype" is a literal.
-                                                                  <br>
-                                                                  Vendor name and project name are lower-case. The Type name is camel-case. Usually the type name is a no-spaces variant of the type label (see @label@ attribute below).
-                                                                  <br>
-                                                                  The URI must contain no spaces and no special characters. 2 consecutive slashes are prohibited.                                                                                                   | mandatory |
-^.| @fields@         | Data field definitions.                    | Array of data fields, see "Data Field".       | mandatory |
-^.| @view@           | Hints for rendering topics of this type.   | An object with 3 possible attributes:
-                       <br>
-                       @label@ - the label used to display the topic type in human-readable form e.g. in a menu (mandatory).
-                       <br>
-                       @icon_src@ - the icon to render a topic of this type (optional).
-                       Usually an absolute path that starts with the symbolic name of the plugin that provides the icon file. If not specified a generic icon (gray dot) is used. The the symbolic name is derived from the Maven group ID and artifact ID of the plugin.
-                       <br>
-                       @label_field@ _not yet implemented_ - the URI of the data field used to render the topic title (optional).
-                       If not specified the first data field is used.                                             | mandatory |
-^.| @implementation@ | JavaScipt class that implements the look & feel of topics of this type. | The DM3 core provides only one implementation: @PlainDocument@.
-<br>
-Further implementations can be provided by DeepaMehta 3 plugins.                                                  | mandatory |
+|_. Attribute           |_. Meaning             |_. Format / Possible values            |_. Mandatory / Optional |
+^.| @uri@
+  | A globally unique identifier for the topic type.
+  | By convention: a slash separated path of the form &lt;vendor name>/&lt;project name>/topictype/&lt;type name>[1].
+    <br>
+    In the example above the vendor name is "de/deepamehta", the project name is "core". "topictype" is a literal.
+    <br>
+    Vendor name and project name are lower-case. The Type name is camel-case. Usually the type name is a no-spaces variant of the type label (see @label@ attribute below).
+    <br>
+    The URI must contain no spaces and no special characters. 2 consecutive slashes are prohibited.
+  | Mandatory |
+^.| @fields@
+  | Data field definitions.
+  | Array of data fields (see "Data Field":#data-field below).
+  | Mandatory |
+^.| @view@
+  | Hints for rendering topics of this type.
+  | An object with 3 possible attributes:
+    <br>
+    @label@ - the label used to display the topic type in human-readable form e.g. in a menu (mandatory).
+    <br>
+    @icon_src@ - the icon to render a topic of this type (optional).
+    Usually an absolute path that starts with the symbolic name of the plugin that provides the icon file. If not specified a generic icon (gray dot) is used. The symbolic name is derived from the Maven group ID and artifact ID of the plugin.
+    <br>
+    @label_field@ _not yet implemented_ - the URI of the data field used to render the topic title (optional).
+    If not specified the first data field is used.
+  | Mandatory |
+^.| @implementation@
+  | JavaScipt class that implements the look & feel of topics of this type.
+  | The DM3 core provides only one implementation: @PlainDocument@.
+    <br>
+    Further implementations can be provided by DeepaMehta 3 plugins.
+  | Mandatory |
 
 <br><br>
 *Note:* when a topic type is requested via the DeepaMehta [[REST API]]#get-topic-type-by-id 2 additional attributes are returned in the response topic type: @id@, and @type_uri@.
 
-|_. Attribute        |_. Meaning                                  |_. Format / Possible values                          |
-^.| @id@             | The topic ID of this topic type in the DB. | A number (long).                                    |
-^.| @type_uri@       | The topic type of this topic type.         | Is always "de/deepamehta/core/topictype/TopicType". |
+|_. Attribute      |_. Meaning                                  |_. Format / Possible values                          |
+^.| @id@           | The topic ID of this topic type in the DB. | A number (long).                                    |
+^.| @type_uri@     | The topic type of this topic type.         | Is always @de/deepamehta/core/topictype/TopicType@. |
 
 
 h2(#data-field). Data Field
 
-A data field definition consist of 4 possible attributes: @uri@, @model@, @view@, and @indexing_mode@.
-
-|_. Attribute |_. Meaning                                        |_. Format / Possible values                     |_. mandatory / optional |
-^.| @uri@     | A globally unique identifier for the data field. | By convention: a slash separated path of the form &lt;vendor name>/&lt;project name>/property/&lt;property name>[1].
-                                                                  <br>
-                                                                  In the example above the vendor name is "de/deepamehta", the project name is "core". "property" is a literal.
-                                                                  <br>
-                                                                  Vendor name and project name are lower-case. The property name is camel-case. Usually the property name is a no-spaces variant of the property label (see @view@ / @label@ attribute below).
-                                                                  <br>
-                                                                  The URI must contain no spaces and no special characters. 2 consecutive slashes are prohibited.                                                   
-                                                                  <br>
-                                                                  All data field URIs within a topic type definition must be different. | mandatory |
-^.| @model@   | Hints about the field's data model. | An object with the following attributes:
-                <br>
-                @type@ - the data field type (optional). The DeepaMehta 3 core provides 5 data field types:
-                    @text@,     the field holds arbitrary (plain) text.
-                    @number@,   the field holds a number.
-                    @date@,     the field holds a date.
-                    @html@,     the field holds arbitrary styled text.
-                    @relation@, the field holds relations to other topics of a certain type.
-                    In case of "relation" another attribute must be provided: @related_type_uri@, the URI of the related topic type.
-                    <br>
-                    If not specified "text" is used.
-                    <br>
-                    Further data types can be provided by DeepaMehta 3 plugins.                                   | optional |
-^.| @view@    | Hints for rendering and editing the field content. | An object with the following attributes:
-                <br>
-                @label@ - the label used to display the property in human-readable form e.g. on an input field of a form (mandatory).
-                <br>
-                @editor@ - Controls the rendering of the field in a form (optional). Possible values depend on the "model" (above).
-                    *text*     fields: @single line@ or @multi line@. In case of "multi line", another attribute might be provided: @lines@, the number of lines of the edit field (default is 30).
-                    *number*   fields: "editor" is ignored.
-                    *date*     fields: "editor" is ignored. A datepicker widget is utilized.
-                    *html*     fields: "editor" is ignored. A WYSIWYG editor widget is utilitzed. "multi line" is asserted. @lines@ can be used to set the (vertical) size of the editor area.
-                    *relation* fields: "editor" must be set to @checkboxes@. More possible values in the future.
-                                                                                | mandatory |
-^.| @indexing_mode@ | Controls how the data field's values are indexed. | @OFF@ (default)
-                                                                          @KEY@
-                                                                          @FULLTEXT@
-                                                                          @FULLTEXT_KEY@                          | optional |
+|_. Attribute           |_. Meaning             |_. Format / Possible values            |_. Mandatory / Optional |
+^.| @uri@
+  | A globally unique identifier for the data field.
+  | By convention: a slash separated path of the form &lt;vendor name>/&lt;project name>/property/&lt;property name>[1].
+    <br>
+    In the example above the vendor name is "de/deepamehta", the project name is "core". "property" is a literal.
+    <br>
+    Vendor name and project name are lower-case. The property name is camel-case. Usually the property name is a no-spaces variant of the property label (see @view@ / @label@ attribute below).
+    <br>
+    The URI must contain no spaces and no special characters. 2 consecutive slashes are prohibited.                                                   
+    <br>
+    All data field URIs within a topic type definition must be different.
+  | Mandatory. |
+^.| @data_type@
+  | The data field's type.
+  | The DeepaMehta 3 core provides 5 data types:
+        @text@,     the field holds arbitrary (plain) text.
+        @number@,   the field holds a number.
+        @date@,     the field holds a date.
+        @html@,     the field holds arbitrary styled text.
+        @relation@, the field holds relations to other topics of a certain type. The related topic type is specified by the *related_type_uri* attribute.
+    <br>
+    Further data types can be provided by DeepaMehta 3 plugins.
+  | Optional.
+    <br>
+    Default is @text@. |
+^.| @related_type_uri@
+  | The related topic type.
+    <br>
+    Applicable only to data fields of type *relation*.
+  | A topic type URI (see "Topic Type":#topic-type above).
+  | Mandatory for data fields of type *relation*. |
+^.| @label@
+  | The label used to display the property in human-readable form e.g. on an input field of a form.
+  | A string.
+  | Mandatory. |
+^.| @editor@
+  | Customizes the rendering of the data field in a form.
+    <br>
+    Applicable only to data fields of type *text* or *relation*.
+  | For *text* fields: @single line@ (default) or @multi line@. In case of "multi line" another attribute may be provided: *lines*.
+    <br>
+    For *relation* fields: @checkboxes@. More possible values in the future.
+  | Optional. |
+^.| @lines@
+  | The vertical size of text input fields.
+    <br>
+    Applicable only to *html* or multi-line *text* data fields.
+  | A number.
+  | Optional.
+    <br>
+    Default is @30@ lines. |
+^.| @renderer_class@
+  | The JavaScript class the DeepaMehta 3 client uses to render the data field.
+  | For each of the 5 core data types the DeepaMehta 3 client provides a corresponding data field renderer:
+    @TextFieldRenderer@
+    @NumberFieldRenderer@
+    @DateFieldRenderer@
+    @HTMLFieldRenderer@
+    @ReferenceFieldRenderer@
+    <br>
+    Further data field renderers can be provided by DeepaMehta 3 plugins.
+  | Optional.
+    <br>
+    Depending on the data field's type the respective default renderer is used. |
+^.| @indexing_mode@
+  | Controls how the data field's value is indexed.
+  | @OFF@
+    @KEY@
+    @FULLTEXT@
+    @FULLTEXT_KEY@
+  | Optional.
+    <br>
+    Default is @OFF@. |
 
 
 h3(#auto-completion). Auto-Completion
 
 _not yet implemented_
 
-Data fields feature auto-completion by declaration. To activate auto-completion add the @autocomplete_indexes@ and @autocomplete_style@ attributes to the data field's *view* component.
-Note: auto-completion is only supported for *single line* text fields
+Data fields feature auto-completion by declaration. To activate auto-completion add the @autocomplete_indexes@ and @autocomplete_style@ attributes to the data field definition.
+Note: auto-completion is supported only for *single line* text fields
 
 Example:
 
 bc. {
-    "id": ...,
-    "model": ...,
-    "view": {
-        "editor": "single line",
-        "autocomplete_indexes": ["dm3-contacts", "dm3-workspaces"],
-        "autocomplete_style": "item list"},
-    "content": ...
+    uri: ...,
+    data_type: "text",
+    editor: "single line",
+    autocomplete_indexes: ["dm3-contacts", "dm3-workspaces"],
+    autocomplete_style: "item list"
 },
 
-|_. Attribute                 |_. Meaning                                    |_. Format / Possible values |_. mandatory / optional |
-^.| @autocomplete_indexes@    | The Lucene fulltext indexes to be searched.  | An array of fulltext index function names.
-                                <br>
-                                Note: fulltext index functions are provided by DeepaMehta 3 plugins. The "DM3 Contacts" plugin e.g. provides the fulltext index function "dm3-contacts". | To activate auto-completion this attribute is mandatory. |
-^.| @autocomplete_style@      | Controls how the selected suggestion is inserted into the data field.
-                                    | 2 possible values:
-                                      <br>
-                                      @default@ - The selected suggestion replaces the field's content.
-                                      <br>
-                                      @item list@ - The selected suggestion is appended to the field's content (using a comma as separator) | optional |
+|_. Attribute                 |_. Meaning               |_. Format / Possible values    |_. Mandatory / Optional |
+^.| @autocomplete_indexes@
+  | The Lucene fulltext indexes to be searched.
+  | An array of fulltext index function names.
+    <br>
+    Note: fulltext index functions are provided by DeepaMehta 3 plugins. The "DM3 Contacts" plugin e.g. provides the fulltext index function "dm3-contacts".
+  | To activate auto-completion this attribute is mandatory. |
+^.| @autocomplete_style@
+  | Controls how the selected suggestion is inserted into the data field.
+  | 2 possible values:
+    <br>
+    @default@ - The selected suggestion replaces the field's content.
+    <br>
+    @item list@ - The selected suggestion is appended to the field's content (using a comma as separator)
+  | Optional. |
 
 
 h1(#topic-map). Topic Map
