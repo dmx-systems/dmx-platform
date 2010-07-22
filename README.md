@@ -32,10 +32,13 @@ Install
 Start
 -----
 
-1. In a terminal:
+1. Open the 'deepamehta3' folder and double-click the respective starter script for your platform:
 
-        cd deepamehta3
-        java -jar bin/felix.jar
+        deepamehta-linux.sh
+        deepamehta-mac.command
+        deepamehta-windows.bat
+
+   A terminal window opens and you see some information logged.
 
 2. Open DeepaMehta in webbrowser:  
    <http://localhost:8080/de.deepamehta.3-client/index.html>
@@ -44,11 +47,12 @@ Start
 Stop
 ----
 
-Go to the terminal from where you started and type:
+Go to the terminal window that opened while startup and type:
 
     exit 0
 
-This puts the database in a consistent state.
+This puts the database in a consistent state.  
+You can close the terminal window now.
 
 
 Update
@@ -113,4 +117,4 @@ Version History
 
 ------------
 Jörg Richter  
-July 9, 2010
+July 22, 2010

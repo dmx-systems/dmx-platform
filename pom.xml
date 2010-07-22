@@ -8,6 +8,33 @@
     <version>0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <modules>
+        <module>
+            deepamehta3-core
+        </module>
+        <module>
+            deepamehta3-server
+        </module>
+        <module>
+            deepamehta3-client
+        </module>
+        <module>
+            deepamehta3-iconpicker
+        </module>
+        <module>
+            deepamehta3-time
+        </module>
+        <module>
+            deepamehta3-topicmaps
+        </module>
+        <module>
+            deepamehta3-typeeditor
+        </module>
+        <module>
+            deepamehta3-workspaces
+        </module>
+    </modules>
+
     <repositories>
         <repository>
             <id>deepamehta-public-repository</id>
