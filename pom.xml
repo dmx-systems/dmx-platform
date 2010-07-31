@@ -19,10 +19,16 @@
             deepamehta3-client
         </module>
         <module>
+            deepamehta3-contacts
+        </module>
+        <module>
             deepamehta3-iconpicker
         </module>
         <module>
             deepamehta3-importer
+        </module>
+        <module>
+            deepamehta3-projects
         </module>
         <module>
             deepamehta3-time
@@ -32,6 +38,9 @@
         </module>
         <module>
             deepamehta3-typeeditor
+        </module>
+        <module>
+            deepamehta3-typesearch
         </module>
         <module>
             deepamehta3-workspaces

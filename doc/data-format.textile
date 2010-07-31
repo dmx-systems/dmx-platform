@@ -63,8 +63,8 @@ Example of a topic type "Note" with 4 data fields:
 bc. {
     label: "Note",
     uri: "de/deepamehta/core/topictype/Note",
-    icon_src: "/de.deepamehta.3-client/images/pencil.png"
-    js_renderer_class: "PlainDocument"
+    icon_src: "/de.deepamehta.3-client/images/pencil.png",
+    js_renderer_class: "PlainDocument",
     fields: [
         {
             label: "Title",
