@@ -2,6 +2,7 @@
 * "Relation":#relation
 * "Topic Type":#topic-type
 ** "Data Field":#data-field
+*** "Indexing":#indexing
 *** "Auto-Completion":#auto-completion
 * "Topic Map":#topic-map
 * "Footnotes":#footnotes
@@ -230,6 +231,48 @@ h2(#data-field). Data Field
     @FULLTEXT@
     @FULLTEXT_KEY@
   | Optional. |
+
+
+h3(#indexing). Indexing
+
+The data field's indexing mode controls how the data field's value is indexed.
+
+|_. Indexing mode   |_. What is indexed / When to use / Query possibilities   |
+^.| @OFF@
+  | The property value is not indexed.
+    <br>
+    Use this mode for properties which are not needed in queries. |
+^.| @KEY@
+  | The exact property value is indexed under the property's key (the data field URI).
+    <br>
+    Use this mode if you want retrieve an unique topic by property value.
+    <br>
+    Topics indexed this way can be retrieved by the "getTopic" service call:
+    @Topic getTopic(String key, Object value)@.
+    <br>
+    Example: @getTopic("de/deepamehta/core/property/PluginID", "de.deepamehta.3-time")@ finds the topic with a the value "de.deepamehta.3-time" in its "PluginID" field. |
+^.| @FULLTEXT@
+  | The property value is tokenized and each token is indexed under no particular key.
+    <br>
+    Use this mode if you want fulltext index a topic. E.g. when you want find an article containg the word "summer" regardless weather it appears in the "heading" field or in the "body text" field.
+    <br>
+    Topics indexed this way can be retrieved by the "searchTopics" service call:
+    @List searchTopics(String searchTerm, String fieldUri, boolean wholeWord)@.
+    <br>
+    Example: @searchTopics("summer", null, false)@ finds all topics which have "summer" somewhere in _any_ field that is indexed with FULLTEXT mode. The search term is case-insenstitive. Setting @wholeWord@ to false, will also find "summertime". (The second parameter is always null.)
+    <br>
+    The @searchTerm@ parameter features the "Lucene query language":http://lucene.apache.org/java/2_9_3/queryparsersyntax.html. |
+^.| @FULLTEXT_KEY@
+  | The property value is tokenized and each token is indexed under the property's key (the data field URI).
+    <br>
+    Topics indexed this way can be retrieved by the "searchTopics" service call:
+    @List searchTopics(String searchTerm, String fieldUri, boolean wholeWord)@.
+    <br>
+    The @searchTerm@ parameter features the "Lucene query language":http://lucene.apache.org/java/2_9_3/queryparsersyntax.html.
+    <br>
+    Use this mode if you want apply the Lucene query language to a particular field. E.g. the DeepaMehta 3 Time plugin indexes the "Date Modified" field this way in order to enable range queries.
+    <br>
+    Example: @searchTopics("[1280096677367 TO 1280701477367]", "de/deepamehta/core/property/DateModified", true)@ finds all topics with a modification date within the given range. |
 
 
 h3(#auto-completion). Auto-Completion

@@ -136,8 +136,8 @@ bc.. <project>
       <groupId>de.deepamehta</groupId>            # Copy this declaration as is.
       <artifactId>deepamehta3-core</artifactId>   # Just update the version number, if a
       <version>0.4-SNAPSHOT</version>             # newer version of DeepaMehta is available.
-    </dependency>                                 # If your plugin contains no Java code at
-  </dependencies>                                 # all, the dependencies element is not needed.
+    </dependency>                                 # If your plugin has no Java code at all,
+  </dependencies>                                 # the dependencies element is not needed.
 
   <build>                                         # Instructs the OSGi bundle packager.
     <plugins>                                     # See below.
