@@ -32,11 +32,11 @@ Install
 Start
 -----
 
-1. Open the 'deepamehta3' folder and double-click the respective starter script for your platform:
+1. Open the 'deepamehta3' folder and use the respective starter script for your platform:
 
-        deepamehta-linux.sh
-        deepamehta-mac.command
-        deepamehta-windows.bat
+        deepamehta-linux.sh         # choose "Run in terminal"
+        deepamehta-mac.command      # double-click it
+        deepamehta-windows.bat      # double-click it
 
    A terminal window opens and you see some information logged.
 
@@ -117,4 +117,4 @@ Version History
 
 ------------
 Jörg Richter  
-July 22, 2010
+Aug 1, 2010

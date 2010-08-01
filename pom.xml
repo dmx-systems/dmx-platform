@@ -34,6 +34,9 @@
             deepamehta3-time
         </module>
         <module>
+            deepamehta3-topicimporter
+        </module>
+        <module>
             deepamehta3-topicmaps
         </module>
         <module>
