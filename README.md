@@ -82,17 +82,18 @@ This removes DeepaMehta completely from your system, including the database.
 Version History
 ---------------
 
-**v0.4** -- upcoming
+**v0.4** -- Aug 4, 2010
 
-* Fundamental under the hood changes:
-    * CouchDB is replaced by Neo4j
-    * Storage layer abstraction to easify future DB replacements
-    * Application service is accessible via REST interface
-    * All DeepaMehta modules are OSGi bundles
-    * Plugins can contain both, application logic (server-side Java) and presentation logic (client-side Javascript)
-* Also non-Firefox browsers are supported
-* Easy local installation
-* Better performance
+* Completely new backend architecture:
+    * CouchDB is replaced by Neo4j. Storage layer abstraction.
+    * Application server in the middle-tier (Java), accessable via REST API.
+    * All DeepaMehta modules are OSGi bundles.
+    * Plugins can contain both, application logic (server-side Java) and presentation logic (client-side Javascript).
+    * DB migration facility.
+* Bulk creation tool.
+* Hot deployment: install and update plugins on a running system.
+* More browsers supported: Firefox, Chrome, and Safari.
+* Easy local installation, updating, and deinstallation.
 
 **v0.3** -- Mar 5, 2010
 
@@ -117,4 +118,4 @@ Version History
 
 ------------
 Jörg Richter  
-Aug 1, 2010
+Aug 4, 2010
