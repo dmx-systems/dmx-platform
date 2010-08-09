@@ -85,22 +85,22 @@ bc. {
             indexing_mode: "FULLTEXT"
         },
         {
-          label: "Date Modified",
-          uri: "de/deepamehta/core/property/DateModified",
-          data_type: "number",
-          editable: false,
-          js_renderer_class: "NumberFieldRenderer",
-          indexing_mode: "FULLTEXT_KEY"
+            label: "Date Modified",
+            uri: "de/deepamehta/core/property/DateModified",
+            data_type: "number",
+            editable: false,
+            js_renderer_class: "NumberFieldRenderer",
+            indexing_mode: "FULLTEXT_KEY"
         },
         {
-          label: "Workspaces",
-          uri: "de/deepamehta/core/property/Workspaces",
-          data_type: "reference",
-          ref_topic_type_uri: "de/deepamehta/core/topictype/Workspace",
-          editable: true,
-          editor: "checkboxes",
-          js_renderer_class: "ReferenceFieldRenderer",
-          indexing_mode: "OFF"
+            label: "Workspaces",
+            uri: "de/deepamehta/core/property/Workspaces",
+            data_type: "reference",
+            ref_topic_type_uri: "de/deepamehta/core/topictype/Workspace",
+            editable: true,
+            editor: "checkboxes",
+            js_renderer_class: "ReferenceFieldRenderer",
+            indexing_mode: "OFF"
         }
     ]
 }
@@ -127,7 +127,6 @@ A topic type definition consist of the @label@, @uri@, @icon_src@ (optional), @t
   | Usually an absolute path that starts with the symbolic name of the plugin that provides the icon file. If not specified a generic icon (gray dot) is used. The symbolic name is derived from the Maven group ID and artifact ID of the plugin.
   | Optional. |
 ^.| @topic_label_field_uri@
-    _not yet implemented_
   | The data field whose value is used when displaying a topic of this type, e.g. on the canvas.
   | The data field's URI (default is the topic type's first data field).
   | Optional. |
