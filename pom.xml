@@ -13,6 +13,9 @@
             deepamehta3-core
         </module>
         <module>
+            deepamehta3-coretypes
+        </module>
+        <module>
             deepamehta3-server
         </module>
         <module>
