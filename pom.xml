@@ -5,7 +5,7 @@
     <name>DeepaMehta 3 Parent Project</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-parent</artifactId>
-    <version>0.4.1-SNAPSHOT</version>
+    <version>${parent-version}</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -45,9 +45,11 @@
         <module>
             deepamehta3-time
         </module>
+<!--
         <module>
             deepamehta3-topicimporter
         </module>
+-->
         <module>
             deepamehta3-topicmaps
         </module>
@@ -63,10 +65,10 @@
     </modules>
 
     <repositories>
-        <repository>
+        <!--repository>
             <id>deepamehta-public-repository</id>
             <url>http://www.deepamehta.de/maven2/</url>
-        </repository>
+        </repository-->
         <repository>
             <id>neo4j-public-repository</id>
             <url>http://m2.neo4j.org</url>
@@ -134,6 +136,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <parent-version>0.4.1-SNAPSHOT</parent-version>
+        <core-version>0.4.1-SNAPSHOT</core-version>
     </properties>
 
     <build>
