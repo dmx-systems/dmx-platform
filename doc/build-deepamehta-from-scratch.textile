@@ -1,0 +1,111 @@
+<br>
+"1. Requirements":#requirements
+"2. Clone the parent project":#clone-the-parent-project
+"3. Clone all other DeepaMehta 3 modules":#clone-all-other-deepamehta3-modules
+"4. Build all modules":#build-all-modules
+"5. Install 3rd party libraries":#install-3rd-party-libraries
+"6. Install DeepaMehta 3 modules":#install-deepamehta3-modules
+"7. Footnotes":#footnotes
+<br>
+
+h3(#requirements). 1. Requirements
+
+* Java 1.6 [1]
+* Git 1.7 [2]
+* Maven 2 [3]
+* Apache Felix 3 [4]
+
+h3(#clone-the-parent-project). 2. Clone the parent project
+
+bc. git clone git://github.com/jri/deepamehta3.git
+
+All the other DeepaMehta 3 modules must be located _inside_ the parent project directory.
+
+bc. cd deepamehta3
+
+h3(#clone-all-other-deepamehta3-modules). 3. Clone all other DeepaMehta 3 modules
+
+bc.. git clone git://github.com/jri/deepamehta3-core.git
+git clone git://github.com/jri/deepamehta3-coretypes.git
+git clone git://github.com/jri/deepamehta3-server.git
+git clone git://github.com/jri/deepamehta3-client.git
+git clone git://github.com/jri/deepamehta3-time.git
+git clone git://github.com/jri/deepamehta3-workspaces.git
+git clone git://github.com/jri/deepamehta3-topicmaps.git
+git clone git://github.com/jri/deepamehta3-typeeditor.git
+git clone git://github.com/jri/deepamehta3-iconpicker.git
+git clone git://github.com/jri/deepamehta3-contacts.git
+git clone git://github.com/jri/deepamehta3-projects.git
+git clone git://github.com/jri/deepamehta3-typesearch.git
+git clone git://github.com/jri/deepamehta3-files.git
+git clone git://github.com/jri/deepamehta3-filemanager.git
+git clone git://github.com/mukil/deepamehta3-topicimporter.git
+
+git clone git://github.com/jri/deepamehta3-foldercanvas.git
+git clone git://github.com/jri/deepamehta3-importer.git
+
+p. *Note:* The last two modules are not part of the DeepaMehta 3 standard installation described here. However, they must be cloned as well.
+
+h3(#build-all-modules). 4. Build all modules
+
+bc. mvn package
+
+h3(#install-3rd-party-libraries). 5. Install 3rd party libraries
+
+In the Apache Felix shell:
+
+bc.. start http://www.apache.org/dist/felix/org.apache.felix.configadmin-1.2.4.jar
+start http://www.apache.org/dist/felix/org.apache.felix.http.jetty-2.0.4.jar
+start http://www.apache.org/dist/felix/org.apache.felix.webconsole-3.1.2.jar
+
+start http://www.deepamehta.de/maven2/org/apache/lucene/lucene-core/2.9.2/lucene.core-2.9.2.jar
+start http://www.deepamehta.de/maven2/org/objectweb/asm/asm/3.2/asm-3.2.jar
+
+start http://repo1.maven.org/maven2/org/codehaus/jettison/jettison/1.1/jettison-1.1.jar
+start http://repo1.maven.org/maven2/org/codehaus/jackson/jackson-core-asl/1.1.1/jackson-core-asl-1.1.1.jar
+start http://repo1.maven.org/maven2/org/apache/geronimo/specs/geronimo-jta_1.1_spec/1.1.1/geronimo-jta_1.1_spec-1.1.1.jar
+
+start http://download.java.net/maven/2/org/jvnet/mimepull/1.4/mimepull-1.4.jar
+start http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1.1/jsr311-api-1.1.1.jar
+start http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.3/jersey-core-1.3.jar
+start http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.3/jersey-server-1.3.jar
+start http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.3/jersey-json-1.3.jar
+start http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-multipart/1.3/jersey-multipart-1.3.jar
+
+start http://m2.neo4j.org/org/neo4j/neo4j-kernel/1.1/neo4j-kernel-1.1.jar
+start http://m2.neo4j.org/org/neo4j/neo4j-index/1.1/neo4j-index-1.1.jar
+start http://m2.neo4j.org/org/neo4j/neo4j-utils/1.1/neo4j-utils-1.1.jar
+start http://m2.neo4j.org/org/neo4j/neo4j-meta-model/0.9-SNAPSHOT/neo4j-meta-model-0.9-20100804.080135-13.jar
+
+h3(#install-deepamehta3-modules). 6. Install DeepaMehta 3 modules
+
+*Note:* This example assumes you have cloned the DeepaMehta 3 parent project (step 2) in /home/terry/dev
+
+bc. start file:/home/terry/dev/deepamehta3/deepamehta3-core/target/deepamehta3-core-0.4.1-SNAPSHOT.jar
+start file:/home/terry/dev/deepamehta3/deepamehta3-coretypes/target/deepamehta3-coretypes-0.4.1-SNAPSHOT.jar
+start file:/home/terry/dev/deepamehta3/deepamehta3-server/target/deepamehta3-server-0.4.1-SNAPSHOT.jar
+start file:/home/terry/dev/deepamehta3/deepamehta3-client/target/deepamehta3-client-0.4.1-SNAPSHOT.jar
+start file:/home/terry/dev/deepamehta3/deepamehta3-time/target/deepamehta3-time-0.4.jar
+start file:/home/terry/dev/deepamehta3/deepamehta3-workspaces/target/deepamehta3-workspaces-0.4.1-SNAPSHOT.jar
+start file:/home/terry/dev/deepamehta3/deepamehta3-topicmaps/target/deepamehta3-topicmaps-0.4.1-SNAPSHOT.jar
+start file:/home/terry/dev/deepamehta3/deepamehta3-typeeditor/target/deepamehta3-typeeditor-0.4.1-SNAPSHOT.jar
+start file:/home/terry/dev/deepamehta3/deepamehta3-iconpicker/target/deepamehta3-iconpicker-0.4.1-SNAPSHOT.jar
+start file:/home/terry/dev/deepamehta3/deepamehta3-contacts/target/deepamehta3-contacts-0.4.1-SNAPSHOT.jar
+start file:/home/terry/dev/deepamehta3/deepamehta3-projects/target/deepamehta3-projects-0.4.1-SNAPSHOT.jar
+start file:/home/terry/dev/deepamehta3/deepamehta3-typesearch/target/deepamehta3-typesearch-0.4.jar
+start file:/home/terry/dev/deepamehta3/deepamehta3-files/target/deepamehta3-files-0.4.1-SNAPSHOT.jar
+start file:/home/terry/dev/deepamehta3/deepamehta3-filemanager/target/deepamehta3-filemanager-0.4.1-SNAPSHOT.jar
+start file:/home/terry/dev/deepamehta3/deepamehta3-topicimporter/target/deepamehta3-topicimporter-0.4.jar
+
+Now you are ready to start DeepaMehta 3:
+"http://localhost:8080/de.deepamehta.3-client/index.html":http://localhost:8080/de.deepamehta.3-client/index.html
+
+h3(#footnotes). 7. Footnotes
+
+fn1. DeepaMehta 3 can be build and run also with Java 1.5. However, for certain features to work Java 1.6 is required. Does _not_ build/run with Java 1.4
+
+fn2. Most likely builds with other Git versions (older and newer) as well.
+
+fn3. Does _not_ build with Maven 1.
+
+fn4. Most likely runs in Felix 2 as well.
