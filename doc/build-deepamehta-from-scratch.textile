@@ -25,30 +25,13 @@ bc. cd deepamehta3
 
 h3(#clone-all-other-deepamehta3-modules). 3. Clone all other DeepaMehta 3 modules
 
-bc.. git clone git://github.com/jri/deepamehta3-core.git
-git clone git://github.com/jri/deepamehta3-coretypes.git
-git clone git://github.com/jri/deepamehta3-server.git
-git clone git://github.com/jri/deepamehta3-client.git
-git clone git://github.com/jri/deepamehta3-time.git
-git clone git://github.com/jri/deepamehta3-workspaces.git
-git clone git://github.com/jri/deepamehta3-topicmaps.git
-git clone git://github.com/jri/deepamehta3-typeeditor.git
-git clone git://github.com/jri/deepamehta3-iconpicker.git
-git clone git://github.com/jri/deepamehta3-contacts.git
-git clone git://github.com/jri/deepamehta3-projects.git
-git clone git://github.com/jri/deepamehta3-typesearch.git
-git clone git://github.com/jri/deepamehta3-files.git
-git clone git://github.com/jri/deepamehta3-filemanager.git
-git clone git://github.com/mukil/deepamehta3-topicimporter.git
-
-git clone git://github.com/jri/deepamehta3-foldercanvas.git
-git clone git://github.com/jri/deepamehta3-importer.git
-
-p. *Note:* The last two modules are not part of the DeepaMehta 3 standard installation described here. However, they must be cloned as well.
+bc. ./scripts/clone-modules.sh
 
 h3(#build-all-modules). 4. Build all modules
 
-bc. mvn package
+bc. mvn install
+
+This builds all modules and installs them in the local Maven repository.
 
 h3(#install-3rd-party-libraries). 5. Install 3rd party libraries
 
@@ -79,23 +62,23 @@ start http://m2.neo4j.org/org/neo4j/neo4j-meta-model/0.9-SNAPSHOT/neo4j-meta-mod
 
 h3(#install-deepamehta3-modules). 6. Install DeepaMehta 3 modules
 
-*Note:* This example assumes you have cloned the DeepaMehta 3 parent project (step 2) in /home/terry/dev
+*Note:* This example assumes you have cloned the DeepaMehta 3 parent project (step 2) in /home/terry/develop
 
-bc. start file:/home/terry/dev/deepamehta3/deepamehta3-core/target/deepamehta3-core-0.4.1-SNAPSHOT.jar
-start file:/home/terry/dev/deepamehta3/deepamehta3-coretypes/target/deepamehta3-coretypes-0.4.1-SNAPSHOT.jar
-start file:/home/terry/dev/deepamehta3/deepamehta3-server/target/deepamehta3-server-0.4.1-SNAPSHOT.jar
-start file:/home/terry/dev/deepamehta3/deepamehta3-client/target/deepamehta3-client-0.4.1-SNAPSHOT.jar
-start file:/home/terry/dev/deepamehta3/deepamehta3-time/target/deepamehta3-time-0.4.jar
-start file:/home/terry/dev/deepamehta3/deepamehta3-workspaces/target/deepamehta3-workspaces-0.4.1-SNAPSHOT.jar
-start file:/home/terry/dev/deepamehta3/deepamehta3-topicmaps/target/deepamehta3-topicmaps-0.4.1-SNAPSHOT.jar
-start file:/home/terry/dev/deepamehta3/deepamehta3-typeeditor/target/deepamehta3-typeeditor-0.4.1-SNAPSHOT.jar
-start file:/home/terry/dev/deepamehta3/deepamehta3-iconpicker/target/deepamehta3-iconpicker-0.4.1-SNAPSHOT.jar
-start file:/home/terry/dev/deepamehta3/deepamehta3-contacts/target/deepamehta3-contacts-0.4.1-SNAPSHOT.jar
-start file:/home/terry/dev/deepamehta3/deepamehta3-projects/target/deepamehta3-projects-0.4.1-SNAPSHOT.jar
-start file:/home/terry/dev/deepamehta3/deepamehta3-typesearch/target/deepamehta3-typesearch-0.4.jar
-start file:/home/terry/dev/deepamehta3/deepamehta3-files/target/deepamehta3-files-0.4.1-SNAPSHOT.jar
-start file:/home/terry/dev/deepamehta3/deepamehta3-filemanager/target/deepamehta3-filemanager-0.4.1-SNAPSHOT.jar
-start file:/home/terry/dev/deepamehta3/deepamehta3-topicimporter/target/deepamehta3-topicimporter-0.4.jar
+bc. start file:/home/terry/develop/deepamehta3/deepamehta3-core/target/deepamehta3-core-0.4.1-SNAPSHOT.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-coretypes/target/deepamehta3-coretypes-0.4.1-SNAPSHOT.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-server/target/deepamehta3-server-0.4.1-SNAPSHOT.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-client/target/deepamehta3-client-0.4.1-SNAPSHOT.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-time/target/deepamehta3-time-0.4.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-workspaces/target/deepamehta3-workspaces-0.4.1-SNAPSHOT.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-topicmaps/target/deepamehta3-topicmaps-0.4.1-SNAPSHOT.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-typeeditor/target/deepamehta3-typeeditor-0.4.1-SNAPSHOT.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-iconpicker/target/deepamehta3-iconpicker-0.4.1-SNAPSHOT.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-contacts/target/deepamehta3-contacts-0.4.1-SNAPSHOT.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-projects/target/deepamehta3-projects-0.4.1-SNAPSHOT.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-typesearch/target/deepamehta3-typesearch-0.4.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-files/target/deepamehta3-files-0.4.1-SNAPSHOT.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-filemanager/target/deepamehta3-filemanager-0.4.1-SNAPSHOT.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-topicimporter/target/deepamehta3-topicimporter-0.4.jar
 
 Now you are ready to start DeepaMehta 3:
 "http://localhost:8080/de.deepamehta.3-client/index.html":http://localhost:8080/de.deepamehta.3-client/index.html
