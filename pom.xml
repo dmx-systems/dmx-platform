@@ -8,6 +8,13 @@
     <version>${parent-version}</version>
     <packaging>pom</packaging>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <parent-version>0.4.1-SNAPSHOT</parent-version>
+        <core-version>0.4.1-SNAPSHOT</core-version>
+        <topicmaps-version>0.4.1-SNAPSHOT</topicmaps-version>
+    </properties>
+
     <modules>
         <module>
             deepamehta3-core
@@ -149,12 +156,6 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <parent-version>0.4.1-SNAPSHOT</parent-version>
-        <core-version>0.4.1-SNAPSHOT</core-version>
-    </properties>
 
     <build>
         <plugins>
