@@ -7,16 +7,21 @@ DeepaMehta 3 is a platform for collaboration and knowledge management.
 Technologically DeepaMehta is made of Java, Neo4j, Apache Lucene, Apache Felix, Javascript/AJAX, jQuery, jQuery-UI, and HTML 5 Canvas.
 DeepaMehta 3 is a complete rewrite of DeepaMehta 2.
 
+Project website:  
 <http://www.deepamehta.de/>
+
+User and developer discussion:  
+<http://groups.google.com/group/deepamehta3>
 
 
 Requirements
 ------------
 
-* Java 1.5 or higher.  
+* Java 1.6  
+  Works also with Java 1.5 but advanced features are not available then.
 
 * A "modern" webbrowser.  
-  Tested with Firefox 3.6, Safari 4, Safari 5.
+  Works fine with Firefox 3.6, Safari 4, Safari 5. Works mostly fine with Chrome 5. Doesn't work with IE8.
 
 
 Install
