@@ -68,17 +68,17 @@ bc. start file:/home/terry/develop/deepamehta3/deepamehta3-core/target/deepameht
 start file:/home/terry/develop/deepamehta3/deepamehta3-coretypes/target/deepamehta3-coretypes-0.4.1-SNAPSHOT.jar
 start file:/home/terry/develop/deepamehta3/deepamehta3-server/target/deepamehta3-server-0.4.1-SNAPSHOT.jar
 start file:/home/terry/develop/deepamehta3/deepamehta3-client/target/deepamehta3-client-0.4.1-SNAPSHOT.jar
-start file:/home/terry/develop/deepamehta3/deepamehta3-time/target/deepamehta3-time-0.4.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-time/target/deepamehta3-time-0.4.1-SNAPSHOT.jar
 start file:/home/terry/develop/deepamehta3/deepamehta3-workspaces/target/deepamehta3-workspaces-0.4.1-SNAPSHOT.jar
 start file:/home/terry/develop/deepamehta3/deepamehta3-topicmaps/target/deepamehta3-topicmaps-0.4.1-SNAPSHOT.jar
 start file:/home/terry/develop/deepamehta3/deepamehta3-typeeditor/target/deepamehta3-typeeditor-0.4.1-SNAPSHOT.jar
 start file:/home/terry/develop/deepamehta3/deepamehta3-iconpicker/target/deepamehta3-iconpicker-0.4.1-SNAPSHOT.jar
 start file:/home/terry/develop/deepamehta3/deepamehta3-contacts/target/deepamehta3-contacts-0.4.1-SNAPSHOT.jar
 start file:/home/terry/develop/deepamehta3/deepamehta3-projects/target/deepamehta3-projects-0.4.1-SNAPSHOT.jar
-start file:/home/terry/develop/deepamehta3/deepamehta3-typesearch/target/deepamehta3-typesearch-0.4.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-typesearch/target/deepamehta3-typesearch-0.4.1-SNAPSHOT.jar
 start file:/home/terry/develop/deepamehta3/deepamehta3-files/target/deepamehta3-files-0.4.1-SNAPSHOT.jar
 start file:/home/terry/develop/deepamehta3/deepamehta3-filemanager/target/deepamehta3-filemanager-0.4.1-SNAPSHOT.jar
-start file:/home/terry/develop/deepamehta3/deepamehta3-topicimporter/target/deepamehta3-topicimporter-0.4.jar
+start file:/home/terry/develop/deepamehta3/deepamehta3-topicimporter/target/deepamehta3-topicimporter-0.4.1-SNAPSHOT.jar
 
 Now you are ready to start DeepaMehta 3:
 "http://localhost:8080/de.deepamehta.3-client/index.html":http://localhost:8080/de.deepamehta.3-client/index.html

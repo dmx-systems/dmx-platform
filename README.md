@@ -100,7 +100,7 @@ Version History
 * More browsers supported: Firefox, Chrome, and Safari.
 * Easy local installation, updating, and deinstallation.
 
-**v0.3** -- Mar 5, 2010
+**v0.3** -- Mar 6, 2010
 
 * Persistent topicmaps (plugin *DM3 Topicmaps*)
 * Type editor (plugin *DM3 Type Editor*)
