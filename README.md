@@ -4,7 +4,8 @@ DeepaMehta 3
 
 DeepaMehta 3 is a platform for collaboration and knowledge management.
 
-Technologically DeepaMehta is made of Java, Neo4j, Apache Lucene, Apache Felix, Jersey, Javascript/AJAX, jQuery, jQuery-UI, and HTML 5 Canvas.
+Technologically DeepaMehta is made of Java, Neo4j, Apache Lucene, Apache Felix, Jersey, Javascript/AJAX, jQuery, jQuery-UI, and HTML5 Canvas.
+
 DeepaMehta 3 is a complete rewrite of DeepaMehta 2.
 
 Project website:  
@@ -21,7 +22,7 @@ Requirements
   Works also with Java 1.5 but advanced features are not available then.
 
 * A "modern" webbrowser.  
-  Works fine with Firefox 3.6, Safari 4, Safari 5. Works mostly fine with Chrome 5. Doesn't work with IE8.
+  Works fine with Firefox 3.6, Safari 4, Safari 5. Works mostly fine with Chrome 5 and Chrome 6. Doesn't work with IE8.
 
 
 Install
@@ -43,9 +44,10 @@ Start
         deepamehta-mac.command      # double-click it
         deepamehta-windows.bat      # double-click it
 
-   A terminal window opens and you see some information logged.
+   A terminal window opens and you see some information logged.  
+   Wait until the logging has finished.
 
-2. Open DeepaMehta in webbrowser:  
+2. Visit DeepaMehta in your webbrowser:  
    <http://localhost:8080/de.deepamehta.3-client/index.html>
 
 
@@ -63,29 +65,52 @@ You can close the terminal window now.
 Update
 ------
 
-1. Start DeepaMehta (if not running)
+To update a previous DeepaMehta installation and keep all your data:
 
-2. Open Felix Web Console:  
-   <http://localhost:8080/system/console/>
+1. Stop old DeepaMehta (if running).
 
-   Login with "admin" / "admin".  
-   You see a list of bundles.
+2. Download and unpack new DeepaMehta at another location (or rename the old DeepaMehta folder before).
 
-3. Update all 'DeepaMehta 3' bundles by clicking their 'Update' button.
+3. Replace the new "deepamehta-db" folder with a copy of your old one.
 
-4. Re-open DeepaMehta (resp. click webbrowser's 'Reload' button):  
+4. Start the new DeepaMehta (by using the respective starter script).  
+   DeepaMehta now automatically migrates your old data to the new format.
+   Wait until the logging has finished.
+
+5. **IMPORTANT:** now stop DeepaMehta and start it again (only now the memory cache is up-to-date).  
+   Sorry for this extra step!
+
+6. You're done. Visit DeepaMehta in your webbrowser:  
    <http://localhost:8080/de.deepamehta.3-client/index.html>
+
+Please Note:
+
+* **You can only update a DeepaMehta end user installation.** Updating a snapshot release is not supported.  
+  The first updatable version is DeepaMehta 3 v0.4. Updating v0.3 is not suppported.
+
+* Keep your old "deepamehta-db" folder at a safe place.  
+  You'll need it as a backup when something went wrong while migration.
 
 
 Uninstall
 ---------
 
 Stop DeepaMehta and delete the 'deepamehta3' folder.  
-This removes DeepaMehta completely from your system, including the database.
+This removes DeepaMehta completely from your computer, including the database with all your data.
 
 
 Version History
 ---------------
+
+**v0.4.1** -- Oct 16, 2010
+
+* Main features:
+    * File handling: Representing local files as topics.
+      View/play file contents (text, image, audio, video, PDF) right inside DeepaMehta.
+    * *Folder Canvas* plugin (optional installation): Representing a local folder as a synchronizable topicmap.
+    * *Nautilus* plugin (optional installation): Put a folder under DeepaMehta control right from the GNOME desktop.
+* GUI: canvas size is adjustable by the means of a split pane.
+* Bug fixes, e.g. menus are closed when clicked elsewhere.
 
 **v0.4** -- Aug 4, 2010
 
@@ -123,4 +148,4 @@ Version History
 
 ------------
 Jörg Richter  
-Aug 4, 2010
+Oct 16, 2010
