@@ -4,7 +4,7 @@ DeepaMehta 3
 
 DeepaMehta 3 is a platform for collaboration and knowledge management.
 
-Technologically DeepaMehta is made of Java, Neo4j, Apache Lucene, Apache Felix, Jersey, Javascript/AJAX, jQuery, jQuery-UI, and HTML5 Canvas.
+Technologically DeepaMehta is made of Java, Neo4j, Apache Lucene, Apache Felix, Jersey, Javascript/AJAX, jQuery, jQuery-UI, TinyMCE, and HTML5 Canvas.
 
 DeepaMehta 3 is a complete rewrite of DeepaMehta 2.
 
@@ -18,11 +18,11 @@ User and developer discussion:
 Requirements
 ------------
 
-* Java 1.6  
-  Works also with Java 1.5 but advanced features are not available then.
+* Java 1.6
 
 * A "modern" webbrowser.  
-  Works fine with Firefox 3.6, Safari 4, Safari 5. Works mostly fine with Chrome 5 and Chrome 6. Doesn't work with IE8.
+  Works fine with Firefox 3.6 and Safari 5. Works mostly fine with Chrome 5 or higher.  
+  Doesn't work with IE8. Potentially works with IE9.
 
 
 Install
@@ -32,13 +32,13 @@ Install
    <http://github.com/jri/deepamehta3/downloads/>
 
 2. Unpack zip archive.  
-   A folder 'deepamehta3' is created.
+   A folder *deepamehta3* is created.
 
 
 Start
 -----
 
-1. Open the 'deepamehta3' folder and use the respective starter script for your platform:
+1. Open the *deepamehta3* folder and use the respective starter script for your platform:
 
         deepamehta-linux.sh         # choose "Run in terminal"
         deepamehta-mac.command      # double-click it
@@ -71,10 +71,10 @@ To update a previous DeepaMehta installation and keep all your data:
 
 2. Download and unpack new DeepaMehta at another location (or rename the old DeepaMehta folder before).
 
-3. Replace the new "deepamehta-db" folder with a copy of your old one.
+3. Replace the new *deepamehta-db* folder with a copy of your old one.
 
 4. Start the new DeepaMehta (by using the respective starter script).  
-   DeepaMehta now automatically migrates your old data to the new format.
+   DeepaMehta now automatically migrates your old data to the new format.  
    Wait until the logging has finished.
 
 5. **IMPORTANT:** now stop DeepaMehta and start it again (only now the memory cache is up-to-date).  
@@ -85,22 +85,26 @@ To update a previous DeepaMehta installation and keep all your data:
 
 Please Note:
 
-* **You can only update a DeepaMehta end user installation.** Updating a snapshot release is not supported.  
-  The first updatable version is DeepaMehta 3 v0.4. Updating v0.3 is not suppported.
+* **You can only update a stable DeepaMehta release.** Updating a snapshot release is not supported.  
+  The first updatable version is DeepaMehta 3 v0.4. Updating DeepaMehta v0.3 is not suppported.
 
-* Keep your old "deepamehta-db" folder at a safe place.  
+* Keep your old *deepamehta-db* folder at a safe place.  
   You'll need it as a backup when something went wrong while migration.
 
 
 Uninstall
 ---------
 
-Stop DeepaMehta and delete the 'deepamehta3' folder.  
+Stop DeepaMehta and delete the *deepamehta3* folder.  
 This removes DeepaMehta completely from your computer, including the database with all your data.
 
 
 Version History
 ---------------
+
+**v0.4.2** -- Oct 26, 2010
+
+* Bug fix: The fulltext search works.
 
 **v0.4.1** -- Oct 16, 2010
 
@@ -130,7 +134,7 @@ Version History
 * Persistent topicmaps (plugin *DM3 Topicmaps*)
 * Type editor (plugin *DM3 Type Editor*)
 * Icon picker (plugin *DM3 Icons*)
-* New topic type "To Do" (plugin *DM3 Project*)
+* New topic type *To Do* (plugin *DM3 Project*)
 * More flexible plugin developer framework
 
 **v0.2** -- Dec 1, 2009
@@ -148,4 +152,4 @@ Version History
 
 ------------
 Jörg Richter  
-Oct 16, 2010
+Oct 26, 2010
