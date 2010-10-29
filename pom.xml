@@ -10,8 +10,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <parent-version>0.4.2</parent-version>
-        <core-version>0.4.2</core-version>
+        <parent-version>0.4.3-SNAPSHOT</parent-version>
+        <core-version>0.4.3-SNAPSHOT</core-version>
         <topicmaps-version>0.4.1</topicmaps-version>
         <files-version>0.4.1</files-version>
     </properties>
@@ -28,6 +28,9 @@
         </module>
         <module>
             deepamehta3-client
+        </module>
+        <module>
+            deepamehta3-accesscontrol
         </module>
         <module>
             deepamehta3-contacts
