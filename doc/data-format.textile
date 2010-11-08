@@ -188,7 +188,12 @@ h2(#data-field). Data Field
   | A topic type URI (see "Topic Type":#topic-type above).
   | Mandatory for data fields of type *reference*. |
 ^.| @editable@
-  | Is the data field's value editable by the user?
+  | Is the data field's value editable by the user (on form pages)?
+  | @true@ (default)
+    @false@
+  | Optional. |
+^.| @viewable@
+  | Is the data field's value visible to the user (on info pages)?
   | @true@ (default)
     @false@
   | Optional. |
@@ -244,10 +249,11 @@ The data field's indexing mode controls how the data field's value is indexed.
 ^.| @KEY@
   | The exact property value is indexed under the property's key (the data field URI).
     <br>
-    Use this mode if you want retrieve an unique topic by property value.
+    Use this mode if you want retrieve topics by property value.
     <br>
-    Topics indexed this way can be retrieved by the "getTopic" service call:
-    @Topic getTopic(String key, Object value)@.
+    Topics indexed this way can be retrieved by the "getTopic" and "getTopics" core service calls:
+    @Topic getTopic(String key, Object value)@ (suitable for retrieving an unique topic)
+    @List<Topic> getTopics(String key, Object value)@
     <br>
     Example: @getTopic("de/deepamehta/core/property/PluginID", "de.deepamehta.3-time")@ finds the topic with a the value "de.deepamehta.3-time" in its "PluginID" field. |
 ^.| @FULLTEXT@
@@ -255,8 +261,8 @@ The data field's indexing mode controls how the data field's value is indexed.
     <br>
     Use this mode if you want fulltext index a topic. E.g. when you want find an article containg the word "summer" regardless weather it appears in the "heading" field or in the "body text" field.
     <br>
-    Topics indexed this way can be retrieved by the "searchTopics" service call:
-    @List searchTopics(String searchTerm, String fieldUri, boolean wholeWord)@.
+    Topics indexed this way can be retrieved by the "searchTopics" core service call:
+    @List searchTopics(String searchTerm, String fieldUri, boolean wholeWord)@
     <br>
     Example: @searchTopics("summer", null, false)@ finds all topics which have "summer" somewhere in _any_ field that is indexed with FULLTEXT mode. The search term is case-insenstitive. Setting @wholeWord@ to false, will also find "summertime". (The second parameter is always null.)
     <br>
@@ -264,8 +270,8 @@ The data field's indexing mode controls how the data field's value is indexed.
 ^.| @FULLTEXT_KEY@
   | The property value is tokenized and each token is indexed under the property's key (the data field URI).
     <br>
-    Topics indexed this way can be retrieved by the "searchTopics" service call:
-    @List searchTopics(String searchTerm, String fieldUri, boolean wholeWord)@.
+    Topics indexed this way can be retrieved by the "searchTopics" core service call:
+    @List searchTopics(String searchTerm, String fieldUri, boolean wholeWord)@
     <br>
     The @searchTerm@ parameter features the "Lucene query language":http://lucene.apache.org/java/2_9_3/queryparsersyntax.html.
     <br>
