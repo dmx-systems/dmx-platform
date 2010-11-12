@@ -14,6 +14,7 @@
         <core-version>0.4.3-SNAPSHOT</core-version>
         <topicmaps-version>0.4.2-SNAPSHOT</topicmaps-version>
         <files-version>0.4.2-SNAPSHOT</files-version>
+        <accesscontrol-version>0.4-SNAPSHOT</accesscontrol-version>
     </properties>
 
     <modules>
