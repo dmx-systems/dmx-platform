@@ -4,15 +4,22 @@ DeepaMehta 3
 
 DeepaMehta 3 is a platform for collaboration and knowledge management.
 
-Technologically DeepaMehta is made of Java, Neo4j, Apache Lucene, Apache Felix, Jersey, Javascript/AJAX, jQuery, jQuery-UI, TinyMCE, and HTML5 Canvas.
+Technically DeepaMehta 3 is made of  
+Java, Neo4j, Apache Lucene, Apache Felix, Jetty, Jersey (server-side),  
+Javascript/AJAX, jQuery, jQuery-UI, HTML5 Canvas, and TinyMCE (client-side).
 
-DeepaMehta 3 is a complete rewrite of DeepaMehta 2.
+DeepaMehta 3 is a rewrite of DeepaMehta 2.
 
 Project website:  
 <http://www.deepamehta.de/>
 
+Downloads, wiki, issue tracker, source code:  
+<http://github.com/jri/deepamehta3>
+
 User and developer discussion:  
 <http://groups.google.com/group/deepamehta3>
+
+Licensed under GNU General Public License Version 3.
 
 
 Requirements
@@ -20,13 +27,14 @@ Requirements
 
 * Java 1.6
 
-* A "modern" webbrowser.  
+* A "modern" webbrowser.
+
   Works fine with Firefox 3.6 and Safari 5. Works mostly fine with Chrome 5 or higher.  
   Doesn't work with IE8. Potentially works with IE9.
 
 
-Install
--------
+Installing
+----------
 
 1. Download latest release from here:  
    <http://github.com/jri/deepamehta3/downloads/>
@@ -35,8 +43,8 @@ Install
    A folder *deepamehta3* is created.
 
 
-Start
------
+Starting
+--------
 
 1. Open the *deepamehta3* folder and use the respective starter script for your platform:
 
@@ -44,43 +52,43 @@ Start
         deepamehta-mac.command      # double-click it
         deepamehta-windows.bat      # double-click it
 
-   A terminal window opens and you see some information logged.  
-   Wait until the logging has finished.
+   While the server starts a terminal window opens and you see some information logged.  
+   Then a browser window opens and DeepaMehta is ready to use.
 
-2. Visit DeepaMehta in your webbrowser:  
+   Note: to open the DeepaMehta browser window manually use this address:  
    <http://localhost:8080/de.deepamehta.3-client/index.html>
 
 
-Stop
-----
+Stopping
+--------
 
-Go to the terminal window that opened while startup and type:
+1. Go to the terminal window that opened while startup and type:
 
-    exit 0
+        exit 0
 
-This puts the database in a consistent state.  
-You can close the terminal window now.
+   This puts the database in a consistent state.  
+   You can close the terminal window now.
 
 
-Update
-------
+Updating
+--------
 
 To update a previous DeepaMehta installation and keep all your data:
 
-1. Stop old DeepaMehta (if running).
+1. Stop DeepaMehta (if running).
 
-2. Download and unpack new DeepaMehta at another location (or rename the old DeepaMehta folder before).
+2. Download and unpack new DeepaMehta at another location (or rename your DeepaMehta folder before).
 
-3. Replace the new *deepamehta-db* folder with a copy of your old one.
+3. Replace the new *deepamehta-db* folder with a copy of your one.
 
 4. Start the new DeepaMehta (by using the respective starter script).  
-   DeepaMehta now automatically migrates your old data to the new format.  
+   DeepaMehta now automatically migrates your data to the new format.  
    Wait until the logging has finished.
 
 5. **IMPORTANT:** now stop DeepaMehta and start it again (only now the memory cache is up-to-date).  
    Sorry for this extra step!
 
-6. You're done. Visit DeepaMehta in your webbrowser:  
+6. You're done. Open the DeepaMehta browser window (resp. press reload):  
    <http://localhost:8080/de.deepamehta.3-client/index.html>
 
 Please Note:
@@ -92,8 +100,8 @@ Please Note:
   You'll need it as a backup when something went wrong while migration.
 
 
-Uninstall
----------
+Uninstalling
+------------
 
 Stop DeepaMehta and delete the *deepamehta3* folder.  
 This removes DeepaMehta completely from your computer, including the database with all your data.
@@ -101,6 +109,13 @@ This removes DeepaMehta completely from your computer, including the database wi
 
 Version History
 ---------------
+
+**v0.4.3** -- Nov 25, 2010
+
+* Client starts automatically.
+* GUI improvement: Create topics on-the-spot via canvas context menu.
+* Better search result rendering: Result topics are shown in a dedicated "Search Result" field.
+* Better form layout: Text input/editor fields use the entire detail panel's width.
 
 **v0.4.2** -- Oct 26, 2010
 
@@ -152,4 +167,4 @@ Version History
 
 ------------
 Jörg Richter  
-Oct 26, 2010
+Nov 25, 2010

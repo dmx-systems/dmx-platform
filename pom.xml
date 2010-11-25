@@ -10,13 +10,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <parent-version>0.4.3-SNAPSHOT</parent-version>
-        <core-version>0.4.3-SNAPSHOT</core-version>
-        <topicmaps-version>0.4.2-SNAPSHOT</topicmaps-version>
-        <files-version>0.4.2-SNAPSHOT</files-version>
-        <accesscontrol-version>0.4-SNAPSHOT</accesscontrol-version>
+        <parent-version>0.4.3</parent-version>
+        <core-version>0.4.3</core-version>
+        <topicmaps-version>0.4.2</topicmaps-version>
+        <files-version>0.4.2</files-version>
+        <accesscontrol-version>0.4</accesscontrol-version>
     </properties>
 
+    <!-- All modules that belong to the DeepaMehta 3 standard installation. -->
+    <!-- Do not put optional modules here.                                  -->
     <modules>
         <module>
             deepamehta3-core
@@ -43,13 +45,7 @@
             deepamehta3-filemanager
         </module>
         <module>
-            deepamehta3-foldercanvas
-        </module>
-        <module>
             deepamehta3-iconpicker
-        </module>
-        <module>
-            deepamehta3-importer
         </module>
         <module>
             deepamehta3-notes
@@ -151,24 +147,6 @@
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
-                </configuration>
-            </plugin>
-            <!-- Configuration for the deploy-file goal.
-                 We use this goal to suppress the timestamp in SNAPSHOT versions.
-                 This allows easy updating from the OSGI console. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <file>target/${project.artifactId}-${project.version}.jar</file>
-                    <repositoryId>${project.distributionManagement.repository.id}</repositoryId>
-                    <url>${project.distributionManagement.repository.url}</url>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>${project.artifactId}</artifactId>
-                    <version>${project.version}</version>
-                    <packaging>${project.packaging}</packaging>
-                    <uniqueVersion>false</uniqueVersion>
-                    <generatePom>false</generatePom>
                 </configuration>
             </plugin>
         </plugins>
