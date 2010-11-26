@@ -40,13 +40,13 @@ Installing
    <http://github.com/jri/deepamehta3/downloads/>
 
 2. Unpack zip archive.  
-   A folder *deepamehta3* is created.
+   A folder *deepamehta3-v0.4.3* is created.
 
 
 Starting
 --------
 
-1. Open the *deepamehta3* folder and use the respective starter script for your platform:
+1. Open the *deepamehta3-v0.4.3* folder and use the respective starter script for your platform:
 
         deepamehta-linux.sh         # choose "Run in terminal"
         deepamehta-mac.command      # double-click it
@@ -73,23 +73,22 @@ Stopping
 Updating
 --------
 
-To update a previous DeepaMehta installation and keep all your data:
+To update a previous DeepaMehta installation and keep your database:
 
 1. Stop DeepaMehta (if running).
 
-2. Download and unpack new DeepaMehta at another location (or rename your DeepaMehta folder before).
+2. Download and unpack the new DeepaMehta version.
 
-3. Replace the new *deepamehta-db* folder with a copy of your one.
+3. Replace its *deepamehta-db* folder with a copy of your current one.
 
-4. Start the new DeepaMehta (by using the respective starter script).  
-   DeepaMehta now automatically migrates your data to the new format.  
+4. Start the new DeepaMehta (as described above).  
+   Your database automatically migrates to the new format.  
    Wait until the logging has finished.
 
-5. **IMPORTANT:** now stop DeepaMehta and start it again (only now the memory cache is up-to-date).  
-   Sorry for this extra step!
+5. **IMPORTANT:** stop DeepaMehta and start it again (as described above).  
+   (Now the memory cache is up-to-date.) Sorry for this extra step!
 
-6. You're done. Open the DeepaMehta browser window (resp. press reload):  
-   <http://localhost:8080/de.deepamehta.3-client/index.html>
+6. You're done. The DeepaMehta browser window opens automatically.
 
 Please Note:
 
@@ -103,8 +102,8 @@ Please Note:
 Uninstalling
 ------------
 
-Stop DeepaMehta and delete the *deepamehta3* folder.  
-This removes DeepaMehta completely from your computer, including the database with all your data.
+Stop DeepaMehta and delete the *deepamehta3-v0.4.3* folder.  
+This removes DeepaMehta completely from your computer, including your database.
 
 
 Version History
@@ -112,6 +111,7 @@ Version History
 
 **v0.4.3** -- Nov 25, 2010
 
+* Access Control (early state): configurable access privilegs for users and groups.
 * Client starts automatically.
 * GUI improvement: Create topics on-the-spot via canvas context menu.
 * Better search result rendering: Result topics are shown in a dedicated "Search Result" field.
