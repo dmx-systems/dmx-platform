@@ -10,12 +10,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <parent-version>0.4.4-SNAPSHOT</parent-version>
-        <core-version>0.4.4-SNAPSHOT</core-version>
-        <topicmaps-version>0.4.3-SNAPSHOT</topicmaps-version>
-        <workspaces-version>0.4.3-SNAPSHOT</workspaces-version>
+        <parent-version>0.4.4</parent-version>
+        <core-version>0.4.4</core-version>
+        <topicmaps-version>0.4.3</topicmaps-version>
+        <workspaces-version>0.4.3</workspaces-version>
         <files-version>0.4.2</files-version>
-        <accesscontrol-version>0.4.1-SNAPSHOT</accesscontrol-version>
+        <accesscontrol-version>0.4.1</accesscontrol-version>
     </properties>
 
     <!-- All modules that belong to the DeepaMehta 3 standard installation. -->
@@ -90,7 +90,7 @@
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
-            <version>3.0.5</version>
+            <version>3.0.6</version>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>

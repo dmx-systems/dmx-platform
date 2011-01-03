@@ -40,13 +40,13 @@ Installing
    <http://github.com/jri/deepamehta3/downloads/>
 
 2. Unpack zip archive.  
-   A folder *deepamehta3-v0.4.3* is created.
+   A folder *deepamehta3-v0.4.4* is created.
 
 
 Starting
 --------
 
-1. Open the *deepamehta3-v0.4.3* folder and use the respective starter script for your platform:
+1. Open the *deepamehta3-v0.4.4* folder and use the respective starter script for your platform:
 
         deepamehta-linux.sh         # choose "Run in terminal"
         deepamehta-mac.command      # double-click it
@@ -102,12 +102,16 @@ Please Note:
 Uninstalling
 ------------
 
-Stop DeepaMehta and delete the *deepamehta3-v0.4.3* folder.  
+Stop DeepaMehta and delete the *deepamehta3-v0.4.4* folder.  
 This removes DeepaMehta completely from your computer, including your database.
 
 
 Version History
 ---------------
+
+**v0.4.4** -- Jan 3, 2011
+
+* Internal changes only (required by dm3-freifunk-geomap 0.3)
 
 **v0.4.3** -- Nov 25, 2010
 
@@ -167,4 +171,4 @@ Version History
 
 ------------
 Jörg Richter  
-Nov 25, 2010
+Jan 3, 2011
