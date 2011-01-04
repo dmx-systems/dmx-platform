@@ -111,7 +111,7 @@ Version History
 
 **v0.4.4** -- Jan 3, 2011
 
-* Internal changes only (required by dm3-freifunk-geomap 0.3)
+* Internal changes only (required to run [DM3 Freifunk Geomap](http://github.com/jri/dm3-freifunk-geomap) 0.3)
 
 **v0.4.3** -- Nov 25, 2010
 
