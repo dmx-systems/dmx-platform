@@ -49,7 +49,7 @@ Starting
 1. Open the *deepamehta3-v0.4.4* folder and use the respective starter script for your platform:
 
         deepamehta-linux.sh         # choose "Run in terminal"
-        deepamehta-mac.command      # double-click it
+        deepamehta-macosx.command   # double-click it
         deepamehta-windows.bat      # double-click it
 
    While the server starts a terminal window opens and you see some information logged.  
@@ -171,4 +171,4 @@ Version History
 
 ------------
 Jörg Richter  
-Jan 3, 2011
+Jan 5, 2011
