@@ -1,0 +1,25 @@
+{
+    topic_types: [
+        {
+            label: "Search Result",
+            uri: "de/deepamehta/core/topictype/SearchResult",
+            icon_src: "/de.deepamehta.3-coretypes/images/bucket.png",
+            js_renderer_class: "PlainDocument",
+            fields: [
+                {
+                    label: "Search Term",
+                    uri: "de/deepamehta/core/property/SearchTerm",
+                    data_type: "text",
+                    editor: "single line"
+                },
+                {
+                    label: "Search Result",
+                    uri: "de/deepamehta/core/property/search_result",
+                    data_type: "reference",
+                    ref_relation_type_id: "SEARCH_RESULT",
+                    editor: "checkboxes"
+                }
+            ]
+        }
+    ]
+}

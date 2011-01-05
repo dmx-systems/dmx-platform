@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>DeepaMehta 3 v0.4.4</title>
+        <!-- jQuery -->
+        <link rel="stylesheet" href="script/vendor/jquery/css/smoothness/jquery-ui-1.8.2.custom.css" type="text/css">
+        <script type="text/javascript" src="script/vendor/jquery/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="script/vendor/jquery/jquery-ui-1.8.2.custom.min.js"></script>
+        <!-- TinyMCE -->
+        <script type="text/javascript" src="script/vendor/tiny_mce/tiny_mce.js"></script>
+        <!-- DeepaMehta 3 -->
+        <link rel="stylesheet" href="style/main.css" type="text/css">
+        <link rel="stylesheet" href="style/jquery-ui-overrides.css" type="text/css">
+        <script type="text/javascript" src="script/js_utils.js"></script>
+        <script type="text/javascript" src="script/rest_client.js"></script>
+        <script type="text/javascript" src="script/ui_helper.js"></script>
+        <script type="text/javascript" src="script/render_helper.js"></script>
+        <script type="text/javascript" src="script/type_cache.js"></script>
+        <script type="text/javascript" src="script/topicmap_renderer.js"></script>
+        <script type="text/javascript" src="script/topicmap-renderers/canvas.js"></script>
+        <script type="text/javascript" src="script/document-renderers/plain_document.js"></script>
+        <script type="text/javascript" src="script/deepamehta3.js"></script>
+    </head>
+    <body>
+        <div id="upper-toolbar" class="dm-toolbar">
+            <form action="#" id="search-form">
+                <div id="searchmode-select-placeholder"></div>
+                <span id="search-widget">
+                    <input id="search_field" type="text">
+                </span>
+                <button id="search-button" type="button"></button>
+            </form>
+            <div id="create-widget">
+                <div id="create-type-menu-placeholder"></div>
+                <button id="create-button" type="button"></button>
+            </div>
+            <div id="special_form">
+                <div id="special-menu-placeholder"></div>
+            </div>
+        </div>
+        <table id="split-panel">
+            <tr>
+                <td>
+                    <div id="canvas-panel">
+                    </div>
+                </td>
+                <td>
+                    <form action="#" id="document-form">
+                        <div id="detail-panel"></div>
+                        <div id="lower-toolbar" class="dm-toolbar"></div>
+                    </form>
+                </td>
+            </tr>
+        </table>
+        <div id="upload-dialog" title="Upload File">
+            File:
+            <form action="/core/command" method="post" enctype="multipart/form-data" target="upload-target">
+                <input type="file" name="file" size="60">
+                <input type="hidden" name="command" id="upload-dialog-command">
+                <input type="submit" value="Upload">
+            </form>
+        </div>
+        <iframe id="upload-target" name="upload-target"></iframe>
+    </body>
+</html>

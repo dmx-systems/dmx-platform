@@ -1,0 +1,30 @@
+#field-editors {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.field-editor {
+    padding: 0.4em 0.7em;
+    margin-top: 0.4em;
+    margin-right: 0.4em;
+}
+
+.field-editor-menu {
+    margin-right: 0.7em;
+}
+
+.field-editor-label {
+    margin-right: 0.7em;
+}
+
+.field-editor-lines-input {
+    width: 2em !important;  /* would be overridden by main.css */
+}
+
+.add-field-button {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.delete-field-button {
+}

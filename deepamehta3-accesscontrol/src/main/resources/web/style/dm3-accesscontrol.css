@@ -1,0 +1,25 @@
+#login-dialog {
+    padding-top: 1.5em;
+}
+
+#login-username {
+    margin-top: 0.2em;
+    margin-bottom: 1.2em;
+}
+
+#login-password {
+    margin-top: 0.2em;
+    margin-bottom: 1.4em;
+}
+
+#login-message {
+    font-weight: bold;
+}
+
+.login-ok {
+    color: green;
+}
+
+.login-failed {
+    color: red;
+}

@@ -1,0 +1,31 @@
+{
+    topic_types: [
+        {
+            label: "To Do",
+            uri: "de/deepamehta/core/topictype/ToDo",
+            icon_src: "/de.deepamehta.3-projects/images/shovel.png",
+            js_renderer_class: "PlainDocument",
+            fields: [
+                {
+                    label: "Summary",
+                    uri: "de/deepamehta/core/property/Summary",
+                    data_type: "text",
+                    editor: "single line",
+                    js_renderer_class: "TitleRenderer"
+                },
+                {
+                    label: "Due Date",
+                    uri: "de/deepamehta/core/property/DueDate",
+                    data_type: "date"
+                },
+                {
+                    label: "Notes",
+                    uri: "de/deepamehta/core/property/Notes",
+                    data_type: "html",
+                    lines: 10,
+                    indexing_mode: "FULLTEXT"
+                }
+            ]
+        }
+    ]
+}

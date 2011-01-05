@@ -1,5 +1,12 @@
-*
-!.gitignore
-!pom.xml
-!README.md
-!LICENSE*.txt
+.DS_Store
+commit-message.txt
+DeepaMehta 3.tmproj
+
+target/
+deepamehta3.wiki/
+felix-framework-*/
+
+deepamehta3-foldercanvas/
+deepamehta3-importer/
+deepamehta3-topicimporter/
+dm3-freifunk-geomap/

@@ -1,0 +1,185 @@
+body {
+    font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+}
+
+/*** Main Layout ***/
+
+#upper-toolbar {
+    margin-bottom: 0.4em;
+    padding: 0.3em;
+}
+
+#search-form {
+    float: left;
+    margin-right: 3em;
+}
+
+#create-widget {
+    float: left;
+    margin-right: 3em;
+}
+
+/*** Split Panel ***/
+
+#split-panel {
+    border-spacing: 0;
+}
+
+#split-panel > tbody > tr > td {
+    padding: 0;
+    vertical-align: top;
+}
+
+#canvas-panel {
+    margin-right: 1.2em;
+}
+
+#canvas {
+    background: #eee;
+}
+
+#document-form {
+    line-height: 1.6em;
+}
+
+#detail-panel {
+    width: 33em;
+    overflow: auto;
+}
+
+#detail-panel input[type=text],
+#detail-panel textarea {
+    width: 97%;
+    font-size: 1em;
+}
+
+#detail-panel textarea {
+    /* Firefox: default font in textarea is courier */
+    font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+    line-height: 1.6em;
+}
+
+/*** Detail Panel ***/
+
+.title {
+    margin-top: 1em;
+    margin-bottom: 0.6em;
+    font-size: 170%;
+    font-weight: bold;
+    line-height: 1.1em;
+}
+
+.field-name {
+    font-size: 75%;
+    font-weight: bold;
+    color: gray;
+}
+
+.field-value {
+    margin-bottom: 1em;
+}
+
+.field-value p {
+    margin-top: 0;
+}
+
+.field-value ul {
+    margin-top: 0;
+}
+
+.field-value pre {
+    font-size: 100%;
+    line-height: 1.3em;
+}
+
+.field-value label {
+    display: block;
+}
+
+/*** Topic Lists ***/
+
+.topic-icon {
+    width: 50px;
+    text-align: center;
+}
+
+.topic-label {
+    line-height: 1.1em;
+    padding-bottom: 0.6em;
+}
+
+.last-topic {
+    padding-bottom: 0;
+}
+
+/*** Icons ***/
+
+.type-icon {
+    border-style: none;
+}
+
+.menu-icon {
+    border-style: none;
+    vertical-align: middle;
+    padding-right: 12px;
+}
+
+/*** Contextmenu ***/
+
+.contextmenu {
+    background: white;
+    border: 1px solid darkgray;
+    font-size: 85%;
+    font-weight: bold;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+    z-index: 1000;
+}
+
+.contextmenu a {
+    color: black;
+    text-decoration: none;
+    display: block;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+}
+
+.contextmenu a:hover {
+    color: white;
+    background: #555;
+}
+
+.contextmenu hr {
+    margin-top: 0.3em;
+    margin-bottom: 0.3em;
+}
+
+/*** Autocomplete List ***/
+
+.autocomplete-list {
+    position: absolute;
+    background: white;
+    border: 1px solid darkgray;
+    display: none;
+}
+
+.autocomplete-list a {
+    color: black;
+    text-decoration: none;
+    display: block;
+    padding-left: 0.6em;
+    padding-right: 0.6em;
+}
+
+.autocomplete-list .active {
+    color: white;
+    background: #555;
+}
+
+/*** Upload Target ***/
+
+#upload-target {
+    display: none;
+}
