@@ -10,7 +10,6 @@ import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.storage.Storage;
 import de.deepamehta.core.storage.Transaction;
-import de.deepamehta.core.storage.neo4j.Neo4jStorage;
 import de.deepamehta.core.util.JSONHelper;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -45,7 +44,6 @@ public class EmbeddedService implements CoreService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String DATABASE_PATH = "deepamehta-db";
     private static final String CORE_MIGRATIONS_PACKAGE = "de.deepamehta.core.migrations";
     private static final int REQUIRED_CORE_MIGRATION = 1;
 
@@ -105,36 +103,23 @@ public class EmbeddedService implements CoreService {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public EmbeddedService() {
-        try {
-            openDB();
-        } catch (Exception e) {
-            throw new RuntimeException("Database can't be opened", e);
-        }
-        //
-        RuntimeException ex = null;
+    public EmbeddedService(Storage storage) {
+        this.storage = storage;
         Transaction tx = storage.beginTx();
         try {
             boolean isCleanInstall = initDB();
             runCoreMigrations(isCleanInstall);
             tx.success();
+            tx.finish();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            ex = new RuntimeException("Database can't be initialized", e);
-        } finally {
             tx.finish();
-            if (ex != null) {
-                closeDB();
-                throw ex;
-            }
+            shutdown();
+            throw new RuntimeException("Database can't be initialized", e);
         }
     }
 
-    public EmbeddedService(boolean b) {
-        // TODO inject storage, instead of inner init
-    }
-
-    public void setStorage(Storage storage) {
+    public EmbeddedService(Storage storage, boolean isMock) {
         this.storage = storage;
     }
 
@@ -699,10 +684,6 @@ public class EmbeddedService implements CoreService {
     }
 
     // === DB ===
-
-    private void openDB() {
-        storage = new Neo4jStorage(DATABASE_PATH);
-    }
 
     /**
      * @return  <code>true</code> if this is a clean install, <code>false</code> otherwise.

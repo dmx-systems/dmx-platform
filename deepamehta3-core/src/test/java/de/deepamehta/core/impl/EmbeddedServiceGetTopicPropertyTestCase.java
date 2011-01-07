@@ -8,10 +8,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.deepamehta.core.storage.Storage;
 import de.deepamehta.core.storage.Transaction;
+
+
 
 public class EmbeddedServiceGetTopicPropertyTestCase {
 
@@ -26,11 +29,9 @@ public class EmbeddedServiceGetTopicPropertyTestCase {
     
     @Before
     public void setup() {
-        cut = new EmbeddedService(true); // dummy constructor call
-
         storageMock = createMock(Storage.class);
         transactionMock = createMock(Transaction.class);
-        cut.setStorage(storageMock);
+        cut = new EmbeddedService(storageMock, true);   // dummy constructor call
     }
 
     @Test
@@ -40,7 +41,7 @@ public class EmbeddedServiceGetTopicPropertyTestCase {
         expect(storageMock.getTopicProperty(topicId, key)).andReturn(value);
         transactionMock.success();
         transactionMock.finish();
-
+        //
         replay(storageMock, transactionMock);
         assertEquals(value, cut.getTopicProperty(topicId, key));
         verify(storageMock, transactionMock);
@@ -53,15 +54,15 @@ public class EmbeddedServiceGetTopicPropertyTestCase {
         expect(storageMock.beginTx()).andReturn(transactionMock);
         expect(storageMock.getTopicProperty(topicId, key)).andThrow(throwable);
         transactionMock.finish();
-
+        //
         replay(storageMock, transactionMock);
-
+        //
         try {
             cut.getTopicProperty(topicId, key);
         } catch (Exception e) {
             assertSame(throwable, e.getCause());
         }
-
+        //
         verify(storageMock, transactionMock);
     }
 
@@ -69,14 +70,13 @@ public class EmbeddedServiceGetTopicPropertyTestCase {
     public void beginTransactionError() {
         expect(storageMock.beginTx()).andThrow(throwable);
         replay(storageMock);
-
+        //
         try {
             cut.getTopicProperty(1, "foo");
         } catch (Exception e) {
             assertSame(throwable, e);
         }
-
+        //
         verify(storageMock);
     }
-
 }

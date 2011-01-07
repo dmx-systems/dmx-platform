@@ -2,9 +2,13 @@
 commit-message.txt
 DeepaMehta 3.tmproj
 
+bin/
+bundle/
+conf/config.properties
+deepamehta-db/
+felix-cache/
 target/
 deepamehta3.wiki/
-felix-framework-*/
 
 deepamehta3-foldercanvas/
 deepamehta3-importer/

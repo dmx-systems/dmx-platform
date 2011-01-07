@@ -2,7 +2,7 @@ cd bundle
 
 curl -O http://www.apache.org/dist/felix/org.apache.felix.configadmin-1.2.8.jar
 curl -O http://www.apache.org/dist/felix/org.apache.felix.http.jetty-2.0.4.jar
-curl -O http://www.apache.org/dist/felix/org.apache.felix.fileinstall-3.1.2.jar
+curl -O http://www.apache.org/dist/felix/org.apache.felix.fileinstall-3.1.4.jar
 
 curl -O http://www.deepamehta.de/maven2/org/apache/lucene/lucene-core/2.9.2/lucene.core-2.9.2.jar
 curl -O http://www.deepamehta.de/maven2/org/objectweb/asm/asm/3.2/asm-3.2.jar

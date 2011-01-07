@@ -75,12 +75,16 @@ public class Neo4jStorage implements Storage {
         SEQUENCE_START, SEQUENCE
     }
 
+    // ---------------------------------------------------------------------------------------------------- Constructors
+
     public Neo4jStorage(String dbPath) {
         logger.info("Creating DB and indexing services");
         this.typeCache = new TypeCache(this);
         //
         graphDb = new EmbeddedGraphDatabase(dbPath);
     }
+
+    // -------------------------------------------------------------------------------------------------- Public Methods
 
 
 

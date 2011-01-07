@@ -1,7 +1,9 @@
 package de.deepamehta.core.osgi;
 
-import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.impl.EmbeddedService;
+import de.deepamehta.core.service.CoreService;
+import de.deepamehta.core.storage.Storage;
+import de.deepamehta.core.storage.neo4j.Neo4jStorage;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -16,6 +18,10 @@ import java.util.logging.Logger;
 
 
 public class Activator implements BundleActivator, FrameworkListener {
+
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String DATABASE_PATH = "deepamehta-db";
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 
@@ -39,9 +45,9 @@ public class Activator implements BundleActivator, FrameworkListener {
     public void start(BundleContext context) {
         try {
             logger.info("========== Starting bundle \"DeepaMehta 3 Core\" ==========");
-            dms = new EmbeddedService();
+            dms = new EmbeddedService(openDB());
             //
-            logger.info("Registering DeepaMehta core service");
+            logger.info("Registering DeepaMehta core service at OSGi framework");
             context.registerService(CoreService.class.getName(), dms, null);
             //
             context.addFrameworkListener(this);
@@ -95,5 +101,17 @@ public class Activator implements BundleActivator, FrameworkListener {
             throw new RuntimeException("DeepaMehta core service is currently not available");
         }
         return dms;
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private Storage openDB() {
+        try {
+            return new Neo4jStorage(DATABASE_PATH);
+        } catch (Exception e) {
+            throw new RuntimeException("Database can't be opened", e);
+        }
     }
 }
