@@ -130,6 +130,10 @@ public class DataField {
         return (String) getProperty(KEY_URI);
     }
 
+    public String getLabel() {
+        return (String) getProperty(KEY_LABEL);
+    }
+
     public String getDataType() {
         return (String) getProperty(KEY_DATA_TYPE);
     }

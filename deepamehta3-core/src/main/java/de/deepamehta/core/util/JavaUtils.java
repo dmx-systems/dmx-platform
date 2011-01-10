@@ -1,20 +1,16 @@
 package de.deepamehta.core.util;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.security.Security;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-
 import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
 
@@ -96,5 +92,18 @@ public class JavaUtils {
             out[j++] = DIGITS.charAt(0x0F & data[i]);
         }
         return out;
+    }
+    
+    public static String createTempDirectory(String prefix) {
+        try {
+            File f = File.createTempFile(prefix, ".dir");
+            String n = f.getAbsolutePath();
+            f.delete();
+            new File(n).mkdir();
+            return n;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 }
