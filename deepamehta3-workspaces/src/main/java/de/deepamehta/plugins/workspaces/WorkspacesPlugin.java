@@ -96,6 +96,9 @@ public class WorkspacesPlugin extends Plugin {
         dms.createRelation(RelationType.WORKSPACE_TYPE.name(), workspaceId, typeId, null);      // properties=null
     }
 
+    /**
+     * Returns the workspaces a type is assigned to.
+     */
     public List<RelatedTopic> getWorkspaces(long typeId) {
         // Note: takes a type ID instead of a type URI to avoid endless recursion through dms.getTopicType().
         // Consider the Access Control plugin: determining the permissions for a type with MEMBER role would involve

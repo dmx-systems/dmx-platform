@@ -338,28 +338,29 @@ public class Plugin implements BundleActivator {
     // ---
 
     private void registerWebResources() {
+        String namespace = "/" + pluginId;
         try {
-            logger.info("Registering web resources of plugin \"" + pluginName + "\" at /" + pluginId);
-            httpService.registerResources("/" + pluginId, "/web", null);
+            logger.info("Registering web resources of plugin \"" + pluginName + "\" at namespace " + namespace);
+            httpService.registerResources(namespace, "/web", null);
         } catch (NamespaceException e) {
-            throw new RuntimeException("Web resources of plugin \"" + pluginName + "\" can't be registered at /" +
-                pluginId, e);
+            throw new RuntimeException("Web resources of plugin \"" + pluginName + "\" can't be registered " +
+                "at namespace " + namespace, e);
         }
     }
 
     private void unregisterWebResources() {
+        String namespace = "/" + pluginId;
         logger.info("Unregistering web resources of plugin \"" + pluginName + "\"");
-        httpService.unregister("/" + pluginId);
+        httpService.unregister(namespace);
     }
 
     // ---
 
     private void registerRestResources() {
+        String namespace = getConfigProperty("restResourcesNamespace");
         try {
-            String namespace = getConfigProperty("restResourcesNamespace");
             if (namespace != null) {
-                logger.info("Registering REST resources of plugin \"" + pluginName + "\" at namespace \"" +
-                    namespace + "\"");
+                logger.info("Registering REST resources of plugin \"" + pluginName + "\" at namespace " + namespace);
                 // Generic plugins (plugin bundles not containing a Plugin subclass) which provide resource classes
                 // must set the "pluginPackage" config property. Otherwise the resource classes can't be located.
                 if (pluginPackage.equals("de.deepamehta.core.service")) {
@@ -373,7 +374,8 @@ public class Plugin implements BundleActivator {
                 httpService.registerServlet(namespace, new ServletContainer(), initParams, null);
             }
         } catch (Exception e) {
-            throw new RuntimeException("REST resources of plugin \"" + pluginName + "\" can't be registered", e);
+            throw new RuntimeException("REST resources of plugin \"" + pluginName + "\" can't be registered " +
+                "at namespace " + namespace, e);
         }
     }
 
@@ -411,7 +413,6 @@ public class Plugin implements BundleActivator {
     // ---
 
     private void initPlugin() {
-        RuntimeException ex = null;
         Transaction tx = dms.beginTx();
         try {
             logger.info("----- Initializing plugin \"" + pluginName + "\" -----");
@@ -423,14 +424,11 @@ public class Plugin implements BundleActivator {
             }
             registerPlugin();
             tx.success();
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            ex = new RuntimeException("Plugin \"" + pluginName + "\" can't be activated. Reason:", e);
+            throw new RuntimeException("Plugin \"" + pluginName + "\" can't be activated. Reason:", e);
         } finally {
             tx.finish();
-            if (ex != null) {
-                throw ex;
-            }
         }
     }
 
