@@ -1,4 +1,4 @@
-package de.deepamehta.server.resources;
+package de.deepamehta.plugins.server.resources;
 
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.Topic;

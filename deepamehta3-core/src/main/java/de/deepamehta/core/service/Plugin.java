@@ -339,10 +339,11 @@ public class Plugin implements BundleActivator {
 
     private void registerWebResources() {
         try {
-            logger.info("Registering web resources of plugin \"" + pluginName + "\" at \"/" + pluginId + "\"");
+            logger.info("Registering web resources of plugin \"" + pluginName + "\" at /" + pluginId);
             httpService.registerResources("/" + pluginId, "/web", null);
         } catch (NamespaceException e) {
-            throw new RuntimeException("Web resources of plugin \"" + pluginName + "\" can't be registered", e);
+            throw new RuntimeException("Web resources of plugin \"" + pluginName + "\" can't be registered at /" +
+                pluginId, e);
         }
     }
 
@@ -362,8 +363,8 @@ public class Plugin implements BundleActivator {
                 // Generic plugins (plugin bundles not containing a Plugin subclass) which provide resource classes
                 // must set the "pluginPackage" config property. Otherwise the resource classes can't be located.
                 if (pluginPackage.equals("de.deepamehta.core.service")) {
-                    throw new RuntimeException("Resource classes can't be located because plugin package is unknown " +
-                        "(there is neither a Plugin subclass nor a \"pluginPackage\" config property)");
+                    throw new RuntimeException("Resource classes can't be located (plugin package is unknown). " +
+                        "You must implement a Plugin subclass OR configure \"pluginPackage\" in plugin.properties");
                 }
                 //
                 Dictionary initParams = new Hashtable();

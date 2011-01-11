@@ -26,7 +26,7 @@ public class EmbeddedServiceGetTopicPropertyTestCase {
     private String key = "key";
     private String value = "value";
     private RuntimeException throwable = new RuntimeException("error");
-    
+
     @Before
     public void setup() {
         storageMock = createMock(Storage.class);
