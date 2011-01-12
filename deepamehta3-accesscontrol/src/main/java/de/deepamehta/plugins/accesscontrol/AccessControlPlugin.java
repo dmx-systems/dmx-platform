@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.accesscontrol;
 
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
+import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.workspaces.WorkspacesPlugin;
 
 import de.deepamehta.core.model.DataField;
@@ -24,7 +25,7 @@ import java.util.logging.Logger;
 
 
 
-public class AccessControlPlugin extends Plugin {
+public class AccessControlPlugin extends Plugin implements AccessControlService {
 
     private static final String DEFAULT_USER = "admin";
     private static final String DEFAULT_PASSWORD = "";
@@ -157,15 +158,16 @@ public class AccessControlPlugin extends Plugin {
 
 
 
-    // ******************
-    // *** Public API ***
-    // ******************
+    // *******************************************
+    // *** AccessControlService Implementation ***
+    // *******************************************
 
 
 
     /**
      * Returns the user that is represented by the client context, or <code>null</code> if no user is logged in.
      */
+    @Override
     public Topic getUser(Map<String, String> clientContext) {
         if (clientContext == null) {    // some callers to dms.getTopic() doesn't pass a client context
             return null;
@@ -177,6 +179,7 @@ public class AccessControlPlugin extends Plugin {
         return getUser(username);
     }
 
+    @Override
     public Topic getTopicByOwner(long userId, String typeUri) {
         List<RelatedTopic> topics = dms.getRelatedTopics(userId, asList(typeUri),
             asList(RelationType.TOPIC_OWNER.name() + ";OUTGOING"), null);
@@ -193,16 +196,19 @@ public class AccessControlPlugin extends Plugin {
 
     // ---
 
+    @Override
     public void setOwner(long topicId, long userId) {
         dms.createRelation(RelationType.TOPIC_OWNER.name(), topicId, userId, null);
     }
 
+    @Override
     public void createACLEntry(long topicId, Role role, Permissions permissions) {
         dms.createRelation(RelationType.ACCESS_CONTROL.name(), topicId, getRoleTopic(role).id, permissions);
     }
 
     // ---
 
+    @Override
     public void joinWorkspace(long workspaceId, long userId) {
         dms.createRelation(RelationType.WORKSPACE_MEMBER.name(), workspaceId, userId, null);    // properties=null
     }

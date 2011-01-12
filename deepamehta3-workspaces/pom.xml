@@ -30,10 +30,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Export-Package>
-                            de.deepamehta.plugins.workspaces,
-                            de.deepamehta.plugins.workspaces.migrations
-                        </Export-Package>
                         <Bundle-Activator>
                             de.deepamehta.plugins.workspaces.WorkspacesPlugin
                         </Bundle-Activator>

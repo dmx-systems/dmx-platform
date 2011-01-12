@@ -14,11 +14,23 @@ import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import java.util.Map;
 import java.util.Scanner;
 
 
 
 public class JavaUtils {
+
+    public static Object findKeyByValue(Map map, Object value) {
+        for (Object key : map.keySet()) {
+            if (map.get(key).equals(value)) {
+                return key;
+            }
+        }
+        return null;
+    }
+
+    // ---
 
     private static FileNameMap fileTypeMap = URLConnection.getFileNameMap();
 

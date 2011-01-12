@@ -13,9 +13,9 @@
         <parent-version>0.5-SNAPSHOT</parent-version>
         <core-version>0.5-SNAPSHOT</core-version>
         <topicmaps-version>0.4.3</topicmaps-version>
-        <workspaces-version>0.4.3</workspaces-version>
+        <workspaces-version>0.4.4-SNAPSHOT</workspaces-version>
         <files-version>0.4.2</files-version>
-        <accesscontrol-version>0.4.1</accesscontrol-version>
+        <accesscontrol-version>0.4.2-SNAPSHOT</accesscontrol-version>
     </properties>
 
     <!-- All modules that belong to the DeepaMehta 3 standard installation. -->
