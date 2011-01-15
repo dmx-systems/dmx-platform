@@ -78,12 +78,11 @@ public class Activator implements BundleActivator, FrameworkListener {
     public void frameworkEvent(FrameworkEvent event) {
         switch (event.getType()) {
         case FrameworkEvent.STARTED:
-            logger.info("########## OSGi framework STARTED ##########");
+            logger.info("########## OSGi framework STARTED");
             dms.startup();
             break;
-        case FrameworkEvent.STOPPED:
-            logger.info("########## OSGi framework STOPPED ##########");
-            break;
+        default:
+            logger.info("########## OSGi framework event: " + event);
         }
     }
 

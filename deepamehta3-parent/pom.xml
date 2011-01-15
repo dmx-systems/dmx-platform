@@ -1,0 +1,239 @@
+<project>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>DeepaMehta 3 Parent</name>
+    <groupId>de.deepamehta</groupId>
+    <artifactId>deepamehta3-parent</artifactId>
+    <version>0.5-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi_R4_core</artifactId>
+        </dependency>
+    </dependencies>
+
+    <!-- All modules that belong to the DeepaMehta 3 standard installation. -->
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- core -->
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-core</artifactId>
+                <version>0.5-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-coretypes</artifactId>
+                <version>0.4.2</version>
+            </dependency>
+
+            <!-- REST server / client -->
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-server</artifactId>
+                <version>0.4.3</version>
+            </dependency>
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-client</artifactId>
+                <version>0.4.4</version>
+            </dependency>
+
+            <!-- distribution -->
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-accesscontrol</artifactId>
+                <version>0.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-contacts</artifactId>
+                <version>0.4.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-files</artifactId>
+                <version>0.4.2</version>
+            </dependency>
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-filemanager</artifactId>
+                <version>0.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-iconpicker</artifactId>
+                <version>0.4.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-notes</artifactId>
+                <version>0.4.2</version>
+            </dependency>
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-projects</artifactId>
+                <version>0.4.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-time</artifactId>
+                <version>0.4.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-topicmaps</artifactId>
+                <version>0.4.3</version>
+            </dependency>
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-typeeditor</artifactId>
+                <version>0.4.3</version>
+            </dependency>
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-typesearch</artifactId>
+                <version>0.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-workspaces</artifactId>
+                <version>0.4.3</version>
+            </dependency>
+
+            <!-- osgi -->
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>osgi_R4_core</artifactId>
+                <version>1.0</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
+
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>osgi_R4_compendium</artifactId>
+                <version>1.0</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
+
+            <!-- Felix -->
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.framework</artifactId>
+                <version>3.0.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.http.jetty</artifactId>
+                <version>2.0.4</version>
+            </dependency>
+
+            <!-- Neo4J -->
+            <dependency>
+                <groupId>org.neo4j</groupId>
+                <artifactId>neo4j-kernel</artifactId>
+                <version>1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.neo4j</groupId>
+                <artifactId>neo4j-index</artifactId>
+                <version>1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.neo4j</groupId>
+                <artifactId>neo4j-meta-model</artifactId>
+                <version>0.9-SNAPSHOT</version>
+            </dependency>
+
+            <!-- JAX RS -->
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-server</artifactId>
+                <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-json</artifactId>
+                <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey.contribs</groupId>
+                <artifactId>jersey-multipart</artifactId>
+                <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jettison</groupId>
+                <artifactId>jettison</artifactId>
+                <version>1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>2.5</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- test -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.8.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymock</artifactId>
+                <version>3.0</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>neo4j-public-repository</id>
+            <url>http://m2.neo4j.org</url>
+        </repository>
+        <repository>
+            <id>maven2-repository.dev.java.net</id>
+            <name>Java.net Repository for Maven</name>
+            <url>http://download.java.net/maven/2/</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>deepamehta-public-repository</id>
+            <url>scp://www.deepamehta.de/var/lib/tomcat-6/webapps/ROOT/maven2</url>
+        </repository>
+    </distributionManagement>
+
+</project>
