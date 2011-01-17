@@ -133,7 +133,8 @@ public class Plugin implements BundleActivator {
     public CoreService getService() {
         // CoreService dms = (CoreService) deepamehtaServiceTracker.getService();
         if (dms == null) {
-            throw new RuntimeException("DeepaMehta core service is currently not available");
+            throw new RuntimeException("DeepaMehta core service is currently not available " +
+                "for plugin \"" + pluginName + "\"");
         }
         return dms;
     }
@@ -154,12 +155,10 @@ public class Plugin implements BundleActivator {
             pluginName = (String) pluginBundle.getHeaders().get("Bundle-Name");
             pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
             //
-            logger.info("========== Starting DeepaMehta plugin bundle \"" + pluginName + "\" ==========");
+            logger.info("========== Starting DeepaMehta plugin \"" + pluginName + "\" ==========");
             //
             configProperties = readConfigFile();
             pluginPackage = getConfigProperty("pluginPackage", getClass().getPackage().getName());
-            //
-            registerOsgiService(context);
             //
             deepamehtaServiceTracker = createDeepamehtaServiceTracker(context);
             deepamehtaServiceTracker.open();
@@ -177,7 +176,7 @@ public class Plugin implements BundleActivator {
 
     @Override
     public void stop(BundleContext context) {
-        logger.info("========== Stopping DeepaMehta plugin bundle \"" + pluginName + "\" ==========");
+        logger.info("========== Stopping DeepaMehta plugin \"" + pluginName + "\" ==========");
         //
         deepamehtaServiceTracker.close();
         httpServiceTracker.close();
@@ -195,6 +194,14 @@ public class Plugin implements BundleActivator {
     }
 
     public void allPluginsReadyHook() {
+    }
+
+    // ---
+
+    public void serviceArrived(PluginService service) {
+    }
+
+    public void serviceGone(PluginService service) {
     }
 
     // ---
@@ -277,28 +284,7 @@ public class Plugin implements BundleActivator {
 
 
 
-    // ----------------------------------------------------------------------------------------------- Protected Methods
-
-    protected Object getService(String serviceInterface) {
-        Object service = consumedServices.get(serviceInterface);
-        if (service == null) {
-            throw new RuntimeException("Service \"" + serviceInterface + "\" is not available");
-        }
-        return service;
-    }
-
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private void registerOsgiService(BundleContext context) {
-        String serviceInterface = getConfigProperty("providedServiceInterface");
-        if (serviceInterface != null) {
-            logger.info("########## Registering service \"" + serviceInterface +
-                "\" of plugin \"" + pluginName + "\" at OSGi framework");
-            context.registerService(serviceInterface, this, null);
-        }
-    }
-
-    // ---
 
     private ServiceTracker createDeepamehtaServiceTracker(BundleContext context) {
         return new ServiceTracker(context, CoreService.class.getName(), null) {
@@ -307,7 +293,7 @@ public class Plugin implements BundleActivator {
             public Object addingService(ServiceReference serviceRef) {
                 logger.info("Adding DeepaMehta core service to plugin \"" + pluginName + "\"");
                 dms = (CoreService) super.addingService(serviceRef);
-                initPlugin();
+                initPlugin(context);
                 return dms;
             }
 
@@ -361,27 +347,44 @@ public class Plugin implements BundleActivator {
     }
 
     private void createServiceTracker(final String serviceInterface, BundleContext context) {
-        logger.info("########## Creating service tracker \"" + serviceInterface + "\" for plugin \"" + pluginName + "\"");
+        logger.info("### Creating service tracker \"" + serviceInterface + "\" for plugin \"" + pluginName + "\"");
         new ServiceTracker(context, serviceInterface, null) {
 
             @Override
             public Object addingService(ServiceReference serviceRef) {
-                logger.info("########## Adding service \"" + serviceInterface + "\" to plugin \"" + pluginName + "\"");
-                Object serviceObject = super.addingService(serviceRef);
-                consumedServices.put(serviceInterface, serviceObject);
-                return serviceObject;
+                logger.info("### Adding service \"" + serviceInterface + "\" to plugin \"" + pluginName + "\"");
+                Object service = super.addingService(serviceRef);
+                consumedServices.put(serviceInterface, service);
+                // trigger hook
+                serviceArrived((PluginService) service);
+                //
+                return service;
             }
 
             @Override
             public void removedService(ServiceReference ref, Object service) {
                 String serviceInterface = (String) JavaUtils.findKeyByValue(consumedServices, service);
                 if (serviceInterface != null) {
-                    logger.info("########## Removing service \"" + serviceInterface + "\" from plugin \"" + pluginName + "\"");
+                    logger.info("### Removing service \"" + serviceInterface + "\" from plugin \"" + pluginName + "\"");
                     consumedServices.remove(serviceInterface);
+                    // trigger hook
+                    serviceGone((PluginService) service);
+                    //
                 }
                 super.removedService(ref, service);
             }
-        };
+        }.open();
+    }
+
+    // ---
+
+    private void registerPluginService(BundleContext context) {
+        String serviceInterface = getConfigProperty("providedServiceInterface");
+        if (serviceInterface != null) {
+            logger.info("### Registering service \"" + serviceInterface +
+                "\" of plugin \"" + pluginName + "\" at OSGi framework");
+            context.registerService(serviceInterface, this, null);
+        }
     }
 
     // ---
@@ -476,7 +479,7 @@ public class Plugin implements BundleActivator {
 
     // ---
 
-    private void initPlugin() {
+    private void initPlugin(BundleContext context) {
         Transaction tx = dms.beginTx();
         try {
             logger.info("----- Initializing plugin \"" + pluginName + "\" -----");
@@ -486,6 +489,7 @@ public class Plugin implements BundleActivator {
                 postInstallPluginHook();  // trigger hook
                 introduceTypesToPlugin();
             }
+            registerPluginService(context);
             registerPlugin();
             tx.success();
         } catch (Exception e) {

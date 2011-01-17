@@ -92,7 +92,8 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     public Topic createWorkspace(String name) {
         Map properties = new HashMap();
         properties.put("de/deepamehta/core/property/Name", name);
-        return dms.createTopic("de/deepamehta/core/topictype/Workspace", properties, null);     // clientContext=null
+        // clientContext=null
+        return getService().createTopic("de/deepamehta/core/topictype/Workspace", properties, null);
     }
 
     @Override
