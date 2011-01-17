@@ -19,14 +19,6 @@ public class CoreTypesPlugin extends Plugin {
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    // ---------------------------------------------------------------------------------------------------- Constructors
-
-    // FIXME: is this constructor still needed?
-    // Probably it is a relict from a time when we had "internal core plugins".
-    public CoreTypesPlugin() {
-        configProperties = new Properties();
-    }
-
     // -------------------------------------------------------------------------------------------------- Public Methods
 
 

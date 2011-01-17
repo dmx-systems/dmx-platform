@@ -8,6 +8,7 @@ import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.storage.Storage;
 import de.deepamehta.core.storage.Transaction;
 import de.deepamehta.core.util.JSONHelper;
@@ -23,10 +24,7 @@ import java.io.InputStream;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -64,6 +62,15 @@ public class EmbeddedService implements CoreService {
         // It is declared here for documentation purpose only.
         POST_INSTALL_PLUGIN("postInstallPluginHook"),
         ALL_PLUGINS_READY("allPluginsReadyHook"),
+
+        // Note: this hook is triggered only by the plugin itself
+        // (see {@link de.deepamehta.core.service.Plugin#createServiceTracker}).
+        // It is declared here for documentation purpose only.
+        SERVICE_ARRIVED("serviceArrived", PluginService.class),
+        // Note: this hook is triggered only by the plugin itself
+        // (see {@link de.deepamehta.core.service.Plugin#createServiceTracker}).
+        // It is declared here for documentation purpose only.
+        SERVICE_GONE("serviceGone", PluginService.class),
 
          PRE_CREATE_TOPIC("preCreateHook",  Topic.class, Map.class),
         POST_CREATE_TOPIC("postCreateHook", Topic.class, Map.class),
@@ -650,6 +657,9 @@ public class EmbeddedService implements CoreService {
 
     // === Plugins ===
 
+    /**
+     * Triggers a hook for all installed plugins.
+     */
     private Set triggerHook(Hook hook, Object... params) {
         try {
             Set resultSet = new HashSet();

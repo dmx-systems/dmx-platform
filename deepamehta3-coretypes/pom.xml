@@ -5,7 +5,7 @@
     <name>DeepaMehta 3 Core Types</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-coretypes</artifactId>
-    <version>0.4.2</version>
+    <version>0.4.3-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>

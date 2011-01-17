@@ -12,7 +12,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
@@ -23,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -54,15 +54,12 @@ public class Plugin implements BundleActivator {
 
     private boolean isActivated;
 
-    protected Properties configProperties;      // Read from file "plugin.properties"
+    private Properties configProperties;        // Read from file "plugin.properties"
 
     protected CoreService dms;
-
-    private ServiceTracker deepamehtaServiceTracker;
-    private ServiceTracker httpServiceTracker;
     private HttpService httpService;
 
-    private HashMap<String, Object> consumedServices = new HashMap();   // key: interface name, value: service object
+    private List<ServiceTracker> serviceTrackers = new ArrayList();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -160,12 +157,8 @@ public class Plugin implements BundleActivator {
             configProperties = readConfigFile();
             pluginPackage = getConfigProperty("pluginPackage", getClass().getPackage().getName());
             //
-            deepamehtaServiceTracker = createDeepamehtaServiceTracker(context);
-            deepamehtaServiceTracker.open();
-            //
-            httpServiceTracker = createHttpServiceTracker(context);
-            httpServiceTracker.open();
-            //
+            createServiceTracker(CoreService.class.getName(), context);
+            createServiceTracker(HttpService.class.getName(), context);
             createServiceTrackers(context);
         } catch (RuntimeException e) {
             logger.severe("Plugin \"" + pluginName + "\" can't be activated. Reason:");
@@ -178,8 +171,9 @@ public class Plugin implements BundleActivator {
     public void stop(BundleContext context) {
         logger.info("========== Stopping DeepaMehta plugin \"" + pluginName + "\" ==========");
         //
-        deepamehtaServiceTracker.close();
-        httpServiceTracker.close();
+        for (ServiceTracker serviceTracker : serviceTrackers) {
+            serviceTracker.close();
+        }
     }
 
 
@@ -286,56 +280,6 @@ public class Plugin implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private ServiceTracker createDeepamehtaServiceTracker(BundleContext context) {
-        return new ServiceTracker(context, CoreService.class.getName(), null) {
-
-            @Override
-            public Object addingService(ServiceReference serviceRef) {
-                logger.info("Adding DeepaMehta core service to plugin \"" + pluginName + "\"");
-                dms = (CoreService) super.addingService(serviceRef);
-                initPlugin(context);
-                return dms;
-            }
-
-            @Override
-            public void removedService(ServiceReference ref, Object service) {
-                if (service == dms) {
-                    logger.info("Removing DeepaMehta core service from plugin \"" + pluginName + "\"");
-                    unregisterPlugin();
-                    dms = null;
-                }
-                super.removedService(ref, service);
-            }
-        };
-    }
-
-    private ServiceTracker createHttpServiceTracker(BundleContext context) {
-        return new ServiceTracker(context, HttpService.class.getName(), null) {
-
-            @Override
-            public Object addingService(ServiceReference serviceRef) {
-                logger.info("Adding HTTP service to plugin \"" + pluginName + "\"");
-                httpService = (HttpService) super.addingService(serviceRef);
-                registerWebResources();
-                registerRestResources();
-                return httpService;
-            }
-
-            @Override
-            public void removedService(ServiceReference ref, Object service) {
-                if (service == httpService) {
-                    logger.info("Removing HTTP service from plugin \"" + pluginName + "\"");
-                    unregisterWebResources();
-                    unregisterRestResources();
-                    httpService = null;
-                }
-                super.removedService(ref, service);
-            }
-        };
-    }
-
-    // ---
-
     private void createServiceTrackers(BundleContext context) {
         String consumedServiceInterfaces = getConfigProperty("consumedServiceInterfaces");
         if (consumedServiceInterfaces != null) {
@@ -347,33 +291,52 @@ public class Plugin implements BundleActivator {
     }
 
     private void createServiceTracker(final String serviceInterface, BundleContext context) {
-        logger.info("### Creating service tracker \"" + serviceInterface + "\" for plugin \"" + pluginName + "\"");
-        new ServiceTracker(context, serviceInterface, null) {
+        ServiceTracker serviceTracker = new ServiceTracker(context, serviceInterface, null) {
 
             @Override
             public Object addingService(ServiceReference serviceRef) {
-                logger.info("### Adding service \"" + serviceInterface + "\" to plugin \"" + pluginName + "\"");
                 Object service = super.addingService(serviceRef);
-                consumedServices.put(serviceInterface, service);
-                // trigger hook
-                serviceArrived((PluginService) service);
+                if (service instanceof CoreService) {
+                    logger.info("Adding DeepaMehta core service to plugin \"" + pluginName + "\"");
+                    dms = (CoreService) service;
+                    initPlugin(context);
+                } else if (service instanceof HttpService) {
+                    logger.info("Adding HTTP service to plugin \"" + pluginName + "\"");
+                    httpService = (HttpService) service;
+                    registerWebResources();
+                    registerRestResources();
+                } else {
+                    logger.info("### Adding plugin service \"" + serviceInterface + "\" to plugin \"" +
+                        pluginName + "\"");
+                    // trigger hook
+                    serviceArrived((PluginService) service);
+                }
                 //
                 return service;
             }
 
             @Override
             public void removedService(ServiceReference ref, Object service) {
-                String serviceInterface = (String) JavaUtils.findKeyByValue(consumedServices, service);
-                if (serviceInterface != null) {
-                    logger.info("### Removing service \"" + serviceInterface + "\" from plugin \"" + pluginName + "\"");
-                    consumedServices.remove(serviceInterface);
+                if (service == dms) {
+                    logger.info("Removing DeepaMehta core service from plugin \"" + pluginName + "\"");
+                    unregisterPlugin();
+                    dms = null;
+                } else if (service == httpService) {
+                    logger.info("Removing HTTP service from plugin \"" + pluginName + "\"");
+                    unregisterWebResources();
+                    unregisterRestResources();
+                    httpService = null;
+                } else if (service instanceof PluginService) {
+                    logger.info("### Removing plugin service \"" + serviceInterface + "\" from plugin \"" +
+                        pluginName + "\"");
                     // trigger hook
                     serviceGone((PluginService) service);
-                    //
                 }
                 super.removedService(ref, service);
             }
-        }.open();
+        };
+        serviceTrackers.add(serviceTracker);
+        serviceTracker.open();
     }
 
     // ---
