@@ -2,7 +2,7 @@ package de.deepamehta.plugins.accesscontrol;
 
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
-import de.deepamehta.plugins.workspaces.WorkspacesPlugin;
+import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.RelatedTopic;
@@ -10,12 +10,8 @@ import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.util.JavaUtils;
-import de.deepamehta.core.util.JSONHelper;
-
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 import static java.util.Arrays.asList;
 import java.util.HashMap;
@@ -68,6 +64,8 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         DEFAULT_CREATOR_PERMISSIONS.add(Permission.CREATE, true);
     }
 
+    private WorkspacesService wsService;
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -83,6 +81,20 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     @Override
     public void postInstallPluginHook() {
         createUser(DEFAULT_USER, DEFAULT_PASSWORD);
+    }
+
+    @Override
+    public void serviceArrived(PluginService service) {
+        if (service instanceof WorkspacesService) {
+            wsService = (WorkspacesService) service;
+        }
+    }
+
+    @Override
+    public void serviceGone(PluginService service) {
+        if (service instanceof WorkspacesService) {
+            wsService = null;
+        }
     }
 
     // Note: we must use the postCreateHook to create the relation because at pre_create the document has no ID yet.
@@ -359,11 +371,10 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
      * @param   topic   actually a topic type.
      */
     private boolean userIsMember(Topic user, Topic topic) {
-        WorkspacesPlugin workspaces = (WorkspacesPlugin) dms.getPlugin("de.deepamehta.3-workspaces");
         String typeUri = (String) topic.getProperty("de/deepamehta/core/property/TypeURI");
         // String typeUri = topic.typeUri;
         //
-        List<RelatedTopic> relTopics = workspaces.getWorkspaces(topic.id);
+        List<RelatedTopic> relTopics = wsService.getWorkspaces(topic.id);
         logger.fine("Topic type " + typeUri + " is assigned to " + relTopics.size() + " workspaces");
         for (RelatedTopic relTopic : relTopics) {
             long workspaceId = relTopic.getTopic().id;
