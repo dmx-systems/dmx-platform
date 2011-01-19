@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.files;
 
+import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.service.Plugin;
@@ -38,7 +39,7 @@ public class FilesPlugin extends Plugin {
 
 
     @Override
-    public JSONObject executeCommandHook(String command, Map params, Map<String, String> clientContext) {
+    public JSONObject executeCommandHook(String command, Map params, ClientContext clientContext) {
         if (command.equals("deepamehta3-files.open-file")) {
             long fileTopicId = (Integer) params.get("topic_id");
             return openFile(fileTopicId);

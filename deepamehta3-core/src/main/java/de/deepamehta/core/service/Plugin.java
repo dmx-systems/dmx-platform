@@ -1,5 +1,6 @@
 package de.deepamehta.core.service;
 
+import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -200,10 +201,10 @@ public class Plugin implements BundleActivator {
 
     // ---
 
-    public void preCreateHook(Topic topic, Map<String, String> clientContext) {
+    public void preCreateHook(Topic topic, ClientContext clientContext) {
     }
 
-    public void postCreateHook(Topic topic, Map<String, String> clientContext) {
+    public void postCreateHook(Topic topic, ClientContext clientContext) {
     }
 
     public void preUpdateHook(Topic topic, Map<String, Object> newProperties) {
@@ -230,10 +231,10 @@ public class Plugin implements BundleActivator {
 
     // ---
 
-    public void enrichTopicHook(Topic topic, Map<String, String> clientContext) {
+    public void enrichTopicHook(Topic topic, ClientContext clientContext) {
     }
 
-    public void enrichTopicTypeHook(TopicType topicType, Map<String, String> clientContext) {
+    public void enrichTopicTypeHook(TopicType topicType, ClientContext clientContext) {
     }
 
     // ---
@@ -267,12 +268,12 @@ public class Plugin implements BundleActivator {
      *                      particular the underlying type topic has an ID already. That is, the type is ready for
      *                      e.g. being related to other topics.
      */
-    public void modifyTopicTypeHook(TopicType topicType, Map<String, String> clientContext) {
+    public void modifyTopicTypeHook(TopicType topicType, ClientContext clientContext) {
     }
 
     // ---
 
-    public JSONObject executeCommandHook(String command, Map params, Map<String, String> clientContext) {
+    public JSONObject executeCommandHook(String command, Map params, ClientContext clientContext) {
         return null;
     }
 

@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -72,8 +73,8 @@ public class EmbeddedService implements CoreService {
         // It is declared here for documentation purpose only.
         SERVICE_GONE("serviceGone", PluginService.class),
 
-         PRE_CREATE_TOPIC("preCreateHook",  Topic.class, Map.class),
-        POST_CREATE_TOPIC("postCreateHook", Topic.class, Map.class),
+         PRE_CREATE_TOPIC("preCreateHook",  Topic.class, ClientContext.class),
+        POST_CREATE_TOPIC("postCreateHook", Topic.class, ClientContext.class),
          PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, Map.class),
         POST_UPDATE_TOPIC("postUpdateHook", Topic.class, Map.class),
 
@@ -83,15 +84,15 @@ public class EmbeddedService implements CoreService {
         PROVIDE_TOPIC_PROPERTIES("providePropertiesHook", Topic.class),
         PROVIDE_RELATION_PROPERTIES("providePropertiesHook", Relation.class),
 
-        ENRICH_TOPIC("enrichTopicHook", Topic.class, Map.class),
-        ENRICH_TOPIC_TYPE("enrichTopicTypeHook", TopicType.class, Map.class),
+        ENRICH_TOPIC("enrichTopicHook", Topic.class, ClientContext.class),
+        ENRICH_TOPIC_TYPE("enrichTopicTypeHook", TopicType.class, ClientContext.class),
 
         // Note: besides regular triggering (see {@link #createTopicType})
         // this hook is triggered by the plugin itself
         // (see {@link de.deepamehta.core.service.Plugin#introduceTypesToPlugin}).
-        MODIFY_TOPIC_TYPE("modifyTopicTypeHook", TopicType.class, Map.class),
+        MODIFY_TOPIC_TYPE("modifyTopicTypeHook", TopicType.class, ClientContext.class),
 
-        EXECUTE_COMMAND("executeCommandHook", String.class, Map.class, Map.class);
+        EXECUTE_COMMAND("executeCommandHook", String.class, Map.class, ClientContext.class);
 
         private final String methodName;
         private final Class[] paramClasses;
@@ -143,7 +144,7 @@ public class EmbeddedService implements CoreService {
     // === Topics ===
 
     @Override
-    public Topic getTopic(long id, Map clientContext) {
+    public Topic getTopic(long id, ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             Topic topic = storage.getTopic(id);
@@ -273,7 +274,8 @@ public class EmbeddedService implements CoreService {
     }
 
     @Override
-    public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, Map clientContext) {
+    public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord,
+                                                                        ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             List<Topic> searchResult = storage.searchTopics(searchTerm, fieldUri, wholeWord);
@@ -289,7 +291,7 @@ public class EmbeddedService implements CoreService {
     }
 
     @Override
-    public Topic createTopic(String typeUri, Map properties, Map clientContext) {
+    public Topic createTopic(String typeUri, Map properties, ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             Topic t = new Topic(-1, typeUri, null, initProperties(properties, typeUri));
@@ -466,7 +468,7 @@ public class EmbeddedService implements CoreService {
     }
 
     @Override
-    public TopicType getTopicType(String typeUri, Map clientContext) {
+    public TopicType getTopicType(String typeUri, ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             TopicType topicType = storage.getTopicType(typeUri);
@@ -482,7 +484,7 @@ public class EmbeddedService implements CoreService {
     }
 
     @Override
-    public TopicType createTopicType(Map properties, List dataFields, Map clientContext) {
+    public TopicType createTopicType(Map properties, List dataFields, ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             TopicType topicType = storage.createTopicType(properties, dataFields);
@@ -564,7 +566,7 @@ public class EmbeddedService implements CoreService {
     // === Commands ===
 
     @Override
-    public JSONObject executeCommand(String command, Map params, Map clientContext) {
+    public JSONObject executeCommand(String command, Map params, ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             Iterator<JSONObject> i = triggerHook(Hook.EXECUTE_COMMAND, command, params, clientContext).iterator();

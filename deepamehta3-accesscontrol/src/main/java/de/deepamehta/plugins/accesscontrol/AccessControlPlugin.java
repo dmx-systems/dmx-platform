@@ -4,6 +4,7 @@ import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
+import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
@@ -72,9 +73,9 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
 
 
-    // ************************
-    // *** Overriding Hooks ***
-    // ************************
+    // *********************************************
+    // *** Hooks (called from DeepaMehta 3 Core) ***
+    // *********************************************
 
 
 
@@ -99,7 +100,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     // Note: we must use the postCreateHook to create the relation because at pre_create the document has no ID yet.
     @Override
-    public void postCreateHook(Topic topic, Map<String, String> clientContext) {
+    public void postCreateHook(Topic topic, ClientContext clientContext) {
         /* check precondition 4
         if (topic.id == user.id) {
             logger.warning(topic + " can't be related to user \"" + username + "\" (the topic is the user itself!)");
@@ -123,7 +124,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     }
 
     @Override
-    public void modifyTopicTypeHook(TopicType topicType, Map<String, String> clientContext) {
+    public void modifyTopicTypeHook(TopicType topicType, ClientContext clientContext) {
         addCreatorFieldToType(topicType);
         addOwnerFieldToType(topicType);
         //
@@ -153,14 +154,14 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     // ---
 
     @Override
-    public void enrichTopicHook(Topic topic, Map<String, String> clientContext) {
+    public void enrichTopicHook(Topic topic, ClientContext clientContext) {
         Map permissions = new HashMap();
         permissions.put("write", hasPermission(topic, getUser(clientContext), Permission.WRITE));
         topic.setEnrichment("permissions", permissions);
     }
 
     @Override
-    public void enrichTopicTypeHook(TopicType topicType, Map<String, String> clientContext) {
+    public void enrichTopicTypeHook(TopicType topicType, ClientContext clientContext) {
         Topic user = getUser(clientContext);
         Map permissions = new HashMap();
         permissions.put("write",  hasPermission(topicType, user, Permission.WRITE));
@@ -180,7 +181,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
      * Returns the user that is represented by the client context, or <code>null</code> if no user is logged in.
      */
     @Override
-    public Topic getUser(Map<String, String> clientContext) {
+    public Topic getUser(ClientContext clientContext) {
         if (clientContext == null) {    // some callers to dms.getTopic() doesn't pass a client context
             return null;
         }
@@ -283,7 +284,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     // ---
 
-    private void setCreator(Topic topic, Map<String, String> clientContext) {
+    private void setCreator(Topic topic, ClientContext clientContext) {
         Topic user = getUser(clientContext);
         if (user == null) {
             logger.warning("No user is logged in. \"admin\" is set as the creator of " + topic);

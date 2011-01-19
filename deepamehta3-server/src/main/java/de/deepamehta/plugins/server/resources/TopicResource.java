@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.server.resources;
 
+import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.osgi.Activator;
@@ -41,8 +42,7 @@ public class TopicResource {
 
     @GET
     @Path("/{id}")
-    public JSONObject getTopic(@PathParam("id") long id, @HeaderParam("Cookie") String cookie) {
-        Map clientContext = JSONHelper.cookieToMap(cookie);
+    public JSONObject getTopic(@PathParam("id") long id, @HeaderParam("Cookie") ClientContext clientContext) {
         logger.info("Cookie: " + clientContext);
         return Activator.getService().getTopic(id, clientContext).toJSON();
     }
@@ -65,8 +65,7 @@ public class TopicResource {
     public JSONArray searchTopics(@QueryParam("search") String searchTerm,
                                   @QueryParam("field")  String fieldUri,
                                   @QueryParam("wholeword") boolean wholeWord,
-                                  @HeaderParam("Cookie") String cookie) {
-        Map clientContext = JSONHelper.cookieToMap(cookie);
+                                  @HeaderParam("Cookie") ClientContext clientContext) {
         logger.info("searchTerm=" + searchTerm + ", fieldUri=" + fieldUri + ", wholeWord=" + wholeWord +
             ", cookie=" + clientContext);
         List searchResult = Activator.getService().searchTopics(searchTerm, fieldUri, wholeWord, clientContext);
@@ -106,10 +105,10 @@ public class TopicResource {
     }
 
     @POST
-    public JSONObject createTopic(JSONObject topic, @HeaderParam("Cookie") String cookie) throws JSONException {
+    public JSONObject createTopic(JSONObject topic, @HeaderParam("Cookie") ClientContext clientContext)
+                                                                                            throws JSONException {
         String typeUri = topic.getString("type_uri");                           // throws JSONException
         Map properties = JSONHelper.toMap(topic.getJSONObject("properties"));   // throws JSONException
-        Map clientContext = JSONHelper.cookieToMap(cookie);
         logger.info("Cookie: " + clientContext);
         //
         return Activator.getService().createTopic(typeUri, properties, clientContext).toJSON();

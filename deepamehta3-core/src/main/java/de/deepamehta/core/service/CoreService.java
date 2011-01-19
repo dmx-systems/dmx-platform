@@ -1,5 +1,6 @@
 package de.deepamehta.core.service;
 
+import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -34,7 +35,7 @@ public interface CoreService {
 
     // === Topics ===
 
-    public Topic getTopic(long id, Map clientContext);
+    public Topic getTopic(long id, ClientContext clientContext);
 
     /**
      * Looks up a single topic by exact property value.
@@ -100,9 +101,9 @@ public interface CoreService {
      * @param   wholeWord   If true the searchTerm is regarded as whole word.
      *                      If false the searchTerm is regarded as begin-of-word substring.
      */
-    public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, Map clientContext);
+    public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, ClientContext clientContext);
 
-    public Topic createTopic(String typeUri, Map properties, Map clientContext);
+    public Topic createTopic(String typeUri, Map properties, ClientContext clientContext);
 
     public void setTopicProperties(long id, Map properties);
 
@@ -141,9 +142,9 @@ public interface CoreService {
 
     public Set<String> getTopicTypeUris();
 
-    public TopicType getTopicType(String typeUri, Map clientContext);
+    public TopicType getTopicType(String typeUri, ClientContext clientContext);
 
-    public TopicType createTopicType(Map properties, List dataFields, Map clientContext);
+    public TopicType createTopicType(Map properties, List dataFields, ClientContext clientContext);
 
     public void addDataField(String typeUri, DataField dataField);
 
@@ -155,7 +156,7 @@ public interface CoreService {
 
     // === Commands ===
 
-    public JSONObject executeCommand(String command, Map params, Map clientContext);
+    public JSONObject executeCommand(String command, Map params, ClientContext clientContext);
 
     // === Plugins ===
 

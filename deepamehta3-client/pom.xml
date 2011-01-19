@@ -5,7 +5,7 @@
     <name>DeepaMehta 3 Client</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-client</artifactId>
-    <version>0.4.4</version>
+    <version>0.4.5-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>

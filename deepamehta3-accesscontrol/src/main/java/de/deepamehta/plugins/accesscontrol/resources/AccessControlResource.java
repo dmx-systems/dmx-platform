@@ -4,6 +4,7 @@ import de.deepamehta.plugins.accesscontrol.AccessControlPlugin;
 import de.deepamehta.plugins.accesscontrol.AccessControlPlugin.Role;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
 
+import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.osgi.Activator;
@@ -48,8 +49,7 @@ public class AccessControlResource {
 
     @GET
     @Path("/user")
-    public JSONObject getUser(@HeaderParam("Cookie") String cookie) {
-        Map clientContext = JSONHelper.cookieToMap(cookie);
+    public JSONObject getUser(@HeaderParam("Cookie") ClientContext clientContext) {
         logger.info("Cookie: " + clientContext);
         return accessControl.getUser(clientContext).toJSON();
     }

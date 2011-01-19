@@ -10,11 +10,11 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <parent-version>0.5-SNAPSHOT</parent-version>
-        <core-version>0.5-SNAPSHOT</core-version>
+        <parent-version>0.4.5-SNAPSHOT</parent-version>
+        <core-version>0.4.5-SNAPSHOT</core-version>
         <topicmaps-version>0.4.3</topicmaps-version>
         <workspaces-version>0.4.4-SNAPSHOT</workspaces-version>
-        <files-version>0.4.2</files-version>
+        <files-version>0.4.3-SNAPSHOT</files-version>
         <accesscontrol-version>0.4.2-SNAPSHOT</accesscontrol-version>
     </properties>
 
