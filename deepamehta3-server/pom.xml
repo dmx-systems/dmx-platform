@@ -30,9 +30,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Export-Package>
-                            de.deepamehta.plugins.server.resources
-                        </Export-Package>
                         <Bundle-Activator>
                             de.deepamehta.core.service.Plugin
                         </Bundle-Activator>

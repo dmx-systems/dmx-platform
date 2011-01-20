@@ -43,6 +43,7 @@ public class Plugin implements BundleActivator {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
+    private static final String GLOBAL_PROVIDER_PACKAGE = "de.deepamehta.plugins.server.provider";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -400,7 +401,8 @@ public class Plugin implements BundleActivator {
                 }
                 //
                 Dictionary initParams = new Hashtable();
-                initParams.put("com.sun.jersey.config.property.packages", pluginPackage + ".resources");
+                initParams.put("com.sun.jersey.config.property.packages",
+                    pluginPackage + ".resources;" + GLOBAL_PROVIDER_PACKAGE);
                 //
                 httpService.registerServlet(namespace, new ServletContainer(), initParams, null);
             }

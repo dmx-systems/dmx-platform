@@ -49,9 +49,9 @@ public class AccessControlResource {
 
     @GET
     @Path("/user")
-    public JSONObject getUser(@HeaderParam("Cookie") ClientContext clientContext) {
+    public Topic getUser(@HeaderParam("Cookie") ClientContext clientContext) {
         logger.info("Cookie: " + clientContext);
-        return accessControl.getUser(clientContext).toJSON();
+        return accessControl.getUser(clientContext);
     }
 
     @GET
