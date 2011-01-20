@@ -1,8 +1,8 @@
 package de.deepamehta.plugins.accesscontrol.resources;
 
 import de.deepamehta.plugins.accesscontrol.AccessControlPlugin;
-import de.deepamehta.plugins.accesscontrol.AccessControlPlugin.Role;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
+import de.deepamehta.plugins.accesscontrol.model.Role;
 
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Topic;
@@ -56,8 +56,8 @@ public class AccessControlResource {
 
     @GET
     @Path("/owner/{userId}/{typeUri}")
-    public JSONObject getTopicByOwner(@PathParam("userId") long userId, @PathParam("typeUri") String typeUri) {
-        return accessControl.getTopicByOwner(userId, typeUri).toJSON();
+    public Topic getTopicByOwner(@PathParam("userId") long userId, @PathParam("typeUri") String typeUri) {
+        return accessControl.getTopicByOwner(userId, typeUri);
     }
 
     @POST

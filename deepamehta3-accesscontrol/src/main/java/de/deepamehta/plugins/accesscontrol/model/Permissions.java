@@ -1,6 +1,5 @@
 package de.deepamehta.plugins.accesscontrol.model;
 
-import de.deepamehta.plugins.accesscontrol.AccessControlPlugin.Permission;
 import de.deepamehta.core.util.JSONHelper;
 
 import org.codehaus.jettison.json.JSONObject;

@@ -1,6 +1,8 @@
 package de.deepamehta.plugins.accesscontrol;
 
+import de.deepamehta.plugins.accesscontrol.model.Permission;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
+import de.deepamehta.plugins.accesscontrol.model.Role;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
@@ -36,28 +38,6 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     }
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    public enum Role {
-
-        CREATOR, OWNER, MEMBER, EVERYONE;
-        
-        private String s() {
-            return name().toLowerCase();
-        }
-
-        private boolean is(String name) {
-            return s().equals(name);
-        }
-    }
-
-    public enum Permission {
-
-        WRITE, CREATE;
-
-        public String s() {
-            return name().toLowerCase();
-        }
-    }
 
     private static final Permissions DEFAULT_CREATOR_PERMISSIONS = new Permissions();
     static {
