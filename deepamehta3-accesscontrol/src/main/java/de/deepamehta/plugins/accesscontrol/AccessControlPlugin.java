@@ -16,6 +16,20 @@ import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.util.JavaUtils;
 
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Cookie;
+
 import static java.util.Arrays.asList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +38,9 @@ import java.util.logging.Logger;
 
 
 
+@Path("/")
+@Consumes("application/json")
+@Produces("application/json")
 public class AccessControlPlugin extends Plugin implements AccessControlService {
 
     private static final String DEFAULT_USER = "admin";
@@ -160,8 +177,10 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     /**
      * Returns the user that is represented by the client context, or <code>null</code> if no user is logged in.
      */
+    @GET
+    @Path("/user")
     @Override
-    public Topic getUser(ClientContext clientContext) {
+    public Topic getUser(@HeaderParam("Cookie") ClientContext clientContext) {
         if (clientContext == null) {    // some callers to dms.getTopic() doesn't pass a client context
             return null;
         }
@@ -172,8 +191,10 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         return getUser(username);
     }
 
+    @GET
+    @Path("/owner/{userId}/{typeUri}")
     @Override
-    public Topic getTopicByOwner(long userId, String typeUri) {
+    public Topic getTopicByOwner(@PathParam("userId") long userId, @PathParam("typeUri") String typeUri) {
         List<RelatedTopic> topics = dms.getRelatedTopics(userId, asList(typeUri),
             asList(RelationType.TOPIC_OWNER.name() + ";OUTGOING"), null);
         //
@@ -189,20 +210,27 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     // ---
 
+    @POST
+    @Path("/topic/{topicId}/owner/{userId}")
     @Override
-    public void setOwner(long topicId, long userId) {
+    public void setOwner(@PathParam("topicId") long topicId, @PathParam("userId") long userId) {
         dms.createRelation(RelationType.TOPIC_OWNER.name(), topicId, userId, null);
     }
 
+    @POST
+    @Path("/topic/{topicId}/role/{role}")
     @Override
-    public void createACLEntry(long topicId, Role role, Permissions permissions) {
+    public void createACLEntry(@PathParam("topicId") long topicId,
+                               @PathParam("role") Role role, Permissions permissions) {
         dms.createRelation(RelationType.ACCESS_CONTROL.name(), topicId, getRoleTopic(role).id, permissions);
     }
 
     // ---
 
+    @POST
+    @Path("/user/{userId}/{workspaceId}")
     @Override
-    public void joinWorkspace(long workspaceId, long userId) {
+    public void joinWorkspace(@PathParam("userId") long workspaceId, @PathParam("workspaceId") long userId) {
         dms.createRelation(RelationType.WORKSPACE_MEMBER.name(), workspaceId, userId, null);    // properties=null
     }
 

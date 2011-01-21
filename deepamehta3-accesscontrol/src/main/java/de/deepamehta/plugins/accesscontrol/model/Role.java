@@ -10,7 +10,7 @@ public enum Role {
         return name().toLowerCase();
     }
 
-    // Called by Jersey to create a Role from a @PathParam or @QueryParam
+    // Called by JAX-RS container to create a Role from a @PathParam or @QueryParam
     public static Role fromString(String role) {
         return valueOf(role.toUpperCase());
     }

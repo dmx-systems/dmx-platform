@@ -401,7 +401,11 @@ public class Plugin implements BundleActivator {
                 }
                 //
                 Dictionary initParams = new Hashtable();
-                initParams.put("com.sun.jersey.config.property.packages", packagesToScan());
+                if (loadClass(pluginPackage + ".Application") != null) {
+                    initParams.put("javax.ws.rs.Application", pluginPackage + ".Application");
+                } else {
+                    initParams.put("com.sun.jersey.config.property.packages", packagesToScan());
+                }
                 //
                 httpService.registerServlet(namespace, new ServletContainer(), initParams, null);
             }
