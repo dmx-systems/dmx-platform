@@ -19,7 +19,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class TopicProvider implements MessageBodyWriter {
+public class TopicProvider implements MessageBodyWriter<Topic> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -36,26 +36,28 @@ public class TopicProvider implements MessageBodyWriter {
 
 
     @Override
-    public boolean isWriteable(Class type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
         return type == Topic.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
+    
     @Override
-    public long getSize(Object entity, Class type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+    public long getSize(Topic t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(Object entity, Class type, Type genericType, Annotation[] annotations, MediaType mediaType,
-                    MultivaluedMap httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+    public void writeTo(Topic t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+            MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException,
+            WebApplicationException {
         try {
             // logger.info("Writing " + entity + " to response stream");
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            ((Topic) entity).toJSON().write(writer);
+            t.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Error while writing " + entity + " to response stream", e);
+            throw new IOException("Error while writing " + t + " to response stream", e);
         }
     }
 }

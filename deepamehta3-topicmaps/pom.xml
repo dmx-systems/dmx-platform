@@ -5,20 +5,19 @@
     <name>DeepaMehta 3 Topicmaps</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-topicmaps</artifactId>
-    <version>${topicmaps-version}</version>
+    <version>0.4.3</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta3-parent</artifactId>
-        <version>${parent-version}</version>
+        <version>0.4.5-SNAPSHOT</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-core</artifactId>
-            <version>${core-version}</version>
         </dependency>
     </dependencies>
 

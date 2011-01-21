@@ -286,9 +286,9 @@ public class Plugin implements BundleActivator {
         String consumedServiceInterfaces = getConfigProperty("consumedServiceInterfaces");
         if (consumedServiceInterfaces != null) {
             String[] serviceInterfaces = consumedServiceInterfaces.split(", *");
-        	for (int i = 0; i < serviceInterfaces.length; i++) {
-        	    createServiceTracker(serviceInterfaces[i], context);
-        	}
+            for (int i = 0; i < serviceInterfaces.length; i++) {
+                createServiceTracker(serviceInterfaces[i], context);
+            }
         }
     }
 
@@ -307,7 +307,7 @@ public class Plugin implements BundleActivator {
                     httpService = (HttpService) service;
                     registerWebResources();
                     registerRestResources();
-                } else {
+                } else if (service instanceof PluginService) {
                     logger.info("### Adding plugin service \"" + serviceInterface + "\" to plugin \"" +
                         pluginName + "\"");
                     // trigger hook
