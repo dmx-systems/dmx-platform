@@ -5,27 +5,19 @@
     <name>DeepaMehta 3 Client</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-client</artifactId>
-    <version>0.4.4</version>
+    <version>0.4.5-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta3-parent</artifactId>
-        <version>0.5-SNAPSHOT</version>
+        <version>0.4.5-SNAPSHOT</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta3-coretypes</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta3-topicmaps</artifactId>
         </dependency>
     </dependencies>
 

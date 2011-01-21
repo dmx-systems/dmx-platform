@@ -1,9 +1,10 @@
 package de.deepamehta.plugins.accesscontrol.resources;
 
 import de.deepamehta.plugins.accesscontrol.AccessControlPlugin;
-import de.deepamehta.plugins.accesscontrol.AccessControlPlugin.Role;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
+import de.deepamehta.plugins.accesscontrol.model.Role;
 
+import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.osgi.Activator;
@@ -48,16 +49,15 @@ public class AccessControlResource {
 
     @GET
     @Path("/user")
-    public JSONObject getUser(@HeaderParam("Cookie") String cookie) {
-        Map clientContext = JSONHelper.cookieToMap(cookie);
+    public Topic getUser(@HeaderParam("Cookie") ClientContext clientContext) {
         logger.info("Cookie: " + clientContext);
-        return accessControl.getUser(clientContext).toJSON();
+        return accessControl.getUser(clientContext);
     }
 
     @GET
     @Path("/owner/{userId}/{typeUri}")
-    public JSONObject getTopicByOwner(@PathParam("userId") long userId, @PathParam("typeUri") String typeUri) {
-        return accessControl.getTopicByOwner(userId, typeUri).toJSON();
+    public Topic getTopicByOwner(@PathParam("userId") long userId, @PathParam("typeUri") String typeUri) {
+        return accessControl.getTopicByOwner(userId, typeUri);
     }
 
     @POST
@@ -67,10 +67,10 @@ public class AccessControlResource {
     }
 
     @POST
-    @Path("/acl/{topicId}")
-    public void createACLEntry(@PathParam("topicId") long topicId, JSONObject aclEntry) throws JSONException {
-        Role role = Role.valueOf(aclEntry.getString("role").toUpperCase());
-        Permissions permissions = new Permissions(aclEntry.getJSONObject("permissions"));
+    @Path("/topic/{topicId}/role/{role}")
+    public void createACLEntry(@PathParam("topicId") long topicId,
+                               @PathParam("role") Role role, Permissions permissions) {
+        logger.info("topicId=" + topicId + ", role=" + role + ", permissions=" + permissions);
         accessControl.createACLEntry(topicId, role, permissions);
     }
 

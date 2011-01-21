@@ -2,12 +2,13 @@ package de.deepamehta.plugins.workspaces.service;
 
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.service.PluginService;
 
 import java.util.List;
 
 
 
-public interface WorkspacesService {
+public interface WorkspacesService extends PluginService {
 
     public Topic createWorkspace(String name);
 

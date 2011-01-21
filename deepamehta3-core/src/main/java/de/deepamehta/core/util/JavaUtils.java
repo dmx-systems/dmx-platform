@@ -21,17 +21,6 @@ import java.util.Scanner;
 
 public class JavaUtils {
 
-    public static Object findKeyByValue(Map map, Object value) {
-        for (Object key : map.keySet()) {
-            if (map.get(key).equals(value)) {
-                return key;
-            }
-        }
-        return null;
-    }
-
-    // ---
-
     private static FileNameMap fileTypeMap = URLConnection.getFileNameMap();
 
     public static String getFileType(String fileName) {
@@ -56,13 +45,13 @@ public class JavaUtils {
 
     public static String readTextFile(File file) {
         try {
-            return readTextFile(new FileInputStream(file));
+            return readText(new FileInputStream(file));
         } catch (FileNotFoundException e) {
             throw new RuntimeException("Error wile reading text file " + file, e);
         }
     }
 
-    public static String readTextFile(InputStream in) {
+    public static String readText(InputStream in) {
         StringBuilder text = new StringBuilder();
         Scanner scanner = new Scanner(in);
         while (scanner.hasNextLine()) {

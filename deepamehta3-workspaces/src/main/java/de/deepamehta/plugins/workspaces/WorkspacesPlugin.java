@@ -2,6 +2,7 @@ package de.deepamehta.plugins.workspaces;
 
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
+import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
@@ -38,7 +39,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
     // Note: we must use the postCreateHook to create the relation because at pre_create the document has no ID yet.
     @Override
-    public void postCreateHook(Topic topic, Map<String, String> clientContext) {
+    public void postCreateHook(Topic topic, ClientContext clientContext) {
         // check precondition 1
         if (topic.typeUri.equals("de/deepamehta/core/topictype/SearchResult") ||
             topic.typeUri.equals("de/deepamehta/core/topictype/Workspace")) {
@@ -70,7 +71,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
      * Adds "Workspaces" data field to all topic types.
      */
     @Override
-    public void modifyTopicTypeHook(TopicType topicType, Map<String, String> clientContext) {
+    public void modifyTopicTypeHook(TopicType topicType, ClientContext clientContext) {
         //
         DataField workspacesField = new DataField("Workspaces", "reference");
         workspacesField.setUri("de/deepamehta/core/property/Workspaces");
@@ -92,7 +93,8 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     public Topic createWorkspace(String name) {
         Map properties = new HashMap();
         properties.put("de/deepamehta/core/property/Name", name);
-        return dms.createTopic("de/deepamehta/core/topictype/Workspace", properties, null);     // clientContext=null
+        // clientContext=null
+        return getService().createTopic("de/deepamehta/core/topictype/Workspace", properties, null);
     }
 
     @Override

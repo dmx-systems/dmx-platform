@@ -8,6 +8,8 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <!-- All modules that belong to the DeepaMehta 3 standard installation. -->
+    <!-- Do not put optional modules here.                                  -->
     <modules>
         <module>
             deepamehta3-parent

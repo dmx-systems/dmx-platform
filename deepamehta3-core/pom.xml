@@ -5,43 +5,44 @@
     <name>DeepaMehta 3 Core</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-core</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.4.5-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta3-parent</artifactId>
-        <version>0.5-SNAPSHOT</version>
+        <version>0.4.5-SNAPSHOT</version>
     </parent>
 
     <dependencies>
 
         <!-- jax rs -->
+
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-json</artifactId>
-            <scope>compile</scope>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <scope>compile</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        
 
         <!-- osgi -->
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi_R4_compendium</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>compile</scope>
         </dependency>
 
         <!-- storage -->

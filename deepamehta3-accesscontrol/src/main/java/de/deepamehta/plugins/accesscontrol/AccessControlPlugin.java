@@ -1,21 +1,34 @@
 package de.deepamehta.plugins.accesscontrol;
 
+import de.deepamehta.plugins.accesscontrol.model.Permission;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
+import de.deepamehta.plugins.accesscontrol.model.Role;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
-import de.deepamehta.plugins.workspaces.WorkspacesPlugin;
+import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
+import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.util.JavaUtils;
-import de.deepamehta.core.util.JSONHelper;
 
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Cookie;
 
 import static java.util.Arrays.asList;
 import java.util.HashMap;
@@ -25,6 +38,9 @@ import java.util.logging.Logger;
 
 
 
+@Path("/")
+@Consumes("application/json")
+@Produces("application/json")
 public class AccessControlPlugin extends Plugin implements AccessControlService {
 
     private static final String DEFAULT_USER = "admin";
@@ -40,33 +56,13 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    public enum Role {
-
-        CREATOR, OWNER, MEMBER, EVERYONE;
-        
-        private String s() {
-            return name().toLowerCase();
-        }
-
-        private boolean is(String name) {
-            return s().equals(name);
-        }
-    }
-
-    public enum Permission {
-
-        WRITE, CREATE;
-
-        public String s() {
-            return name().toLowerCase();
-        }
-    }
-
     private static final Permissions DEFAULT_CREATOR_PERMISSIONS = new Permissions();
     static {
         DEFAULT_CREATOR_PERMISSIONS.add(Permission.WRITE, true);
         DEFAULT_CREATOR_PERMISSIONS.add(Permission.CREATE, true);
     }
+
+    private WorkspacesService wsService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -74,9 +70,9 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
 
 
-    // ************************
-    // *** Overriding Hooks ***
-    // ************************
+    // *********************************************
+    // *** Hooks (called from DeepaMehta 3 Core) ***
+    // *********************************************
 
 
 
@@ -85,9 +81,23 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         createUser(DEFAULT_USER, DEFAULT_PASSWORD);
     }
 
+    @Override
+    public void serviceArrived(PluginService service) {
+        if (service instanceof WorkspacesService) {
+            wsService = (WorkspacesService) service;
+        }
+    }
+
+    @Override
+    public void serviceGone(PluginService service) {
+        if (service instanceof WorkspacesService) {
+            wsService = null;
+        }
+    }
+
     // Note: we must use the postCreateHook to create the relation because at pre_create the document has no ID yet.
     @Override
-    public void postCreateHook(Topic topic, Map<String, String> clientContext) {
+    public void postCreateHook(Topic topic, ClientContext clientContext) {
         /* check precondition 4
         if (topic.id == user.id) {
             logger.warning(topic + " can't be related to user \"" + username + "\" (the topic is the user itself!)");
@@ -111,7 +121,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     }
 
     @Override
-    public void modifyTopicTypeHook(TopicType topicType, Map<String, String> clientContext) {
+    public void modifyTopicTypeHook(TopicType topicType, ClientContext clientContext) {
         addCreatorFieldToType(topicType);
         addOwnerFieldToType(topicType);
         //
@@ -141,14 +151,14 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     // ---
 
     @Override
-    public void enrichTopicHook(Topic topic, Map<String, String> clientContext) {
+    public void enrichTopicHook(Topic topic, ClientContext clientContext) {
         Map permissions = new HashMap();
         permissions.put("write", hasPermission(topic, getUser(clientContext), Permission.WRITE));
         topic.setEnrichment("permissions", permissions);
     }
 
     @Override
-    public void enrichTopicTypeHook(TopicType topicType, Map<String, String> clientContext) {
+    public void enrichTopicTypeHook(TopicType topicType, ClientContext clientContext) {
         Topic user = getUser(clientContext);
         Map permissions = new HashMap();
         permissions.put("write",  hasPermission(topicType, user, Permission.WRITE));
@@ -167,8 +177,10 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     /**
      * Returns the user that is represented by the client context, or <code>null</code> if no user is logged in.
      */
+    @GET
+    @Path("/user")
     @Override
-    public Topic getUser(Map<String, String> clientContext) {
+    public Topic getUser(@HeaderParam("Cookie") ClientContext clientContext) {
         if (clientContext == null) {    // some callers to dms.getTopic() doesn't pass a client context
             return null;
         }
@@ -179,8 +191,10 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         return getUser(username);
     }
 
+    @GET
+    @Path("/owner/{userId}/{typeUri}")
     @Override
-    public Topic getTopicByOwner(long userId, String typeUri) {
+    public Topic getTopicByOwner(@PathParam("userId") long userId, @PathParam("typeUri") String typeUri) {
         List<RelatedTopic> topics = dms.getRelatedTopics(userId, asList(typeUri),
             asList(RelationType.TOPIC_OWNER.name() + ";OUTGOING"), null);
         //
@@ -196,20 +210,27 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     // ---
 
+    @POST
+    @Path("/topic/{topicId}/owner/{userId}")
     @Override
-    public void setOwner(long topicId, long userId) {
+    public void setOwner(@PathParam("topicId") long topicId, @PathParam("userId") long userId) {
         dms.createRelation(RelationType.TOPIC_OWNER.name(), topicId, userId, null);
     }
 
+    @POST
+    @Path("/topic/{topicId}/role/{role}")
     @Override
-    public void createACLEntry(long topicId, Role role, Permissions permissions) {
+    public void createACLEntry(@PathParam("topicId") long topicId,
+                               @PathParam("role") Role role, Permissions permissions) {
         dms.createRelation(RelationType.ACCESS_CONTROL.name(), topicId, getRoleTopic(role).id, permissions);
     }
 
     // ---
 
+    @POST
+    @Path("/user/{userId}/{workspaceId}")
     @Override
-    public void joinWorkspace(long workspaceId, long userId) {
+    public void joinWorkspace(@PathParam("userId") long workspaceId, @PathParam("workspaceId") long userId) {
         dms.createRelation(RelationType.WORKSPACE_MEMBER.name(), workspaceId, userId, null);    // properties=null
     }
 
@@ -271,7 +292,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     // ---
 
-    private void setCreator(Topic topic, Map<String, String> clientContext) {
+    private void setCreator(Topic topic, ClientContext clientContext) {
         Topic user = getUser(clientContext);
         if (user == null) {
             logger.warning("No user is logged in. \"admin\" is set as the creator of " + topic);
@@ -359,11 +380,10 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
      * @param   topic   actually a topic type.
      */
     private boolean userIsMember(Topic user, Topic topic) {
-        WorkspacesPlugin workspaces = (WorkspacesPlugin) dms.getPlugin("de.deepamehta.3-workspaces");
         String typeUri = (String) topic.getProperty("de/deepamehta/core/property/TypeURI");
         // String typeUri = topic.typeUri;
         //
-        List<RelatedTopic> relTopics = workspaces.getWorkspaces(topic.id);
+        List<RelatedTopic> relTopics = wsService.getWorkspaces(topic.id);
         logger.fine("Topic type " + typeUri + " is assigned to " + relTopics.size() + " workspaces");
         for (RelatedTopic relTopic : relTopics) {
             long workspaceId = relTopic.getTopic().id;

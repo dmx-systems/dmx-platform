@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.client.resources;
 
+import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.osgi.Activator;
@@ -49,8 +50,7 @@ public class ClientSearchResource {
     public JSONObject searchTopics(@QueryParam("search") String searchTerm,
                                    @QueryParam("field")  String fieldUri,
                                    @QueryParam("wholeword") boolean wholeWord,
-                                   @HeaderParam("Cookie") String cookie) throws JSONException {
-        Map clientContext = JSONHelper.cookieToMap(cookie);
+                                   @HeaderParam("Cookie") ClientContext clientContext) throws JSONException {
         logger.info("searchTerm=" + searchTerm + ", fieldUri=" + fieldUri + ", wholeWord=" + wholeWord +
             ", cookie=" + clientContext);
         List<Topic> searchResult = dms.searchTopics(searchTerm, fieldUri, wholeWord, clientContext);
@@ -72,7 +72,7 @@ public class ClientSearchResource {
     /**
      * Creates a search result topic (a bucket).
      */
-    private Topic createResultTopic(String searchTerm, List<Topic> topics, Map clientContext) {
+    private Topic createResultTopic(String searchTerm, List<Topic> topics, ClientContext clientContext) {
         Map properties = new HashMap();
         properties.put("de/deepamehta/core/property/SearchTerm", searchTerm);
         Topic resultTopic = dms.createTopic("de/deepamehta/core/topictype/SearchResult", properties, clientContext);

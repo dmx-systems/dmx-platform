@@ -82,7 +82,7 @@ function accesscontrol_plugin() {
                 return this.request("POST", "/accesscontrol/topic/" + topic_id + "/owner/" + user_id)
             }
             dm3c.restc.create_acl_entry = function(topic_id, role, permissions) {
-                return this.request("POST", "/accesscontrol/acl/" + topic_id, {role: role, permissions: permissions})
+                return this.request("POST", "/accesscontrol/topic/" + topic_id + "/role/" + role, permissions)
             }
             dm3c.restc.join_workspace = function(workspace_id, user_id) {
                 return this.request("POST", "/accesscontrol/user/" + user_id + "/" + workspace_id)

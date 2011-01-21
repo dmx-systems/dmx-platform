@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.time;
 
+import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -32,7 +33,7 @@ public class TimePlugin extends Plugin {
      * Sets a timestamp at every topic being created.
      */
     @Override
-    public void preCreateHook(Topic topic, Map<String, String> clientContext) {
+    public void preCreateHook(Topic topic, ClientContext clientContext) {
         logger.info("Setting timestamp of " + topic);
         long time = System.currentTimeMillis();
         TopicType type = dms.getTopicType(topic.typeUri, null);   // clientContext=null
@@ -68,7 +69,7 @@ public class TimePlugin extends Plugin {
      * Adds "Date Created" and "Date Modified" data fields to all topic types.
      */
     @Override
-    public void modifyTopicTypeHook(TopicType topicType, Map<String, String> clientContext) {
+    public void modifyTopicTypeHook(TopicType topicType, ClientContext clientContext) {
         //
         DataField dateCreatedField = new DataField("Date Created", "number");
         dateCreatedField.setUri("de/deepamehta/core/property/DateCreated");

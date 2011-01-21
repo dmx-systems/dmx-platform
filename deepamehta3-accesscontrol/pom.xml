@@ -5,13 +5,13 @@
     <name>DeepaMehta 3 Access Control</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-accesscontrol</artifactId>
-    <version>0.4.1</version>
+    <version>0.4.2-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta3-parent</artifactId>
-        <version>0.5-SNAPSHOT</version>
+        <version>0.4.5-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -22,6 +22,10 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-workspaces</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta3-server</artifactId>
         </dependency>
     </dependencies>
 

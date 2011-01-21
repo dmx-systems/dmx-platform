@@ -98,7 +98,7 @@ public class JSONHelper {
     public static void readMigrationFile(InputStream is, String migrationFileName, CoreService dms) {
         try {
             logger.info("Reading migration file \"" + migrationFileName + "\"");
-            String fileContent = JavaUtils.readTextFile(is);
+            String fileContent = JavaUtils.readText(is);
             //
             JSONObject o = new JSONObject(fileContent);
             JSONArray types = o.optJSONArray("topic_types");
@@ -126,22 +126,5 @@ public class JSONHelper {
             Topic topic = new Topic(topics.getJSONObject(i));
             dms.createTopic(topic.typeUri, topic.getProperties(), null);                        // clientContext=null
         }
-    }
-
-    // ---
-
-    /**
-      * Converts a "Cookie" header value (String) to a map (key=String, value=String).
-      * E.g. "user=jri; workspace_id=123" => {"user"="jri", "workspace_id"="123"}
-      */
-    public static Map<String, String> cookieToMap(String cookie) {
-        Map cookieValues = new HashMap();
-        if (cookie != null) {
-            for (String value : cookie.split("; ")) {
-                String[] val = value.split("=");
-                cookieValues.put(val[0], val[1]);
-            }
-        }
-        return cookieValues;
     }
 }

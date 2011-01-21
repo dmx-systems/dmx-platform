@@ -4,6 +4,7 @@
     <id>distribution</id>
     <formats>
         <format>zip</format>
+        <format>tar.gz</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
 
@@ -12,6 +13,10 @@
             <source>${project.basedir}/runner/felix/config.ini</source>
             <outputDirectory>conf</outputDirectory>
             <destName>config.properties</destName>
+        </file>
+        <file>
+            <source>${project.basedir}/../conf/logging.properties</source>
+            <outputDirectory>conf</outputDirectory>
         </file>
     </files>
 
@@ -30,6 +35,17 @@
             <outputDirectory>bundles</outputDirectory>
             <includes>
                 <include>*.jar</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.basedir}/../</directory>
+            <includes>
+                <include>deepamehta-linux.sh</include>
+                <include>deepamehta-macosx.command</include>
+                <include>deepamehta-windows.bat</include>
+                <include>LICENSE.txt</include>
+                <include>README.md</include>
             </includes>
         </fileSet>
 

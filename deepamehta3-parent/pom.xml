@@ -5,7 +5,7 @@
     <name>DeepaMehta 3 Parent</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-parent</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.4.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -29,12 +29,12 @@
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-core</artifactId>
-                <version>0.5-SNAPSHOT</version>
+                <version>0.4.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-coretypes</artifactId>
-                <version>0.4.2</version>
+                <version>0.4.3-SNAPSHOT</version>
             </dependency>
 
             <!-- REST server / client -->
@@ -46,14 +46,14 @@
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-client</artifactId>
-                <version>0.4.4</version>
+                <version>0.4.5-SNAPSHOT</version>
             </dependency>
 
             <!-- distribution -->
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-accesscontrol</artifactId>
-                <version>0.4.1</version>
+                <version>0.4.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.deepamehta</groupId>
@@ -64,7 +64,7 @@
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-files</artifactId>
-                <version>0.4.2</version>
+                <version>0.4.3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.deepamehta</groupId>
