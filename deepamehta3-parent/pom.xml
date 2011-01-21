@@ -10,6 +10,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jersey.version>1.5</jersey.version>
+        <neo4j.version>1.1</neo4j.version>
     </properties>
 
     <dependencies>
@@ -113,13 +115,12 @@
                 <version>0.4.3</version>
             </dependency>
 
-            <!-- osgi -->
+            <!-- OSGi -->
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>osgi_R4_core</artifactId>
                 <version>1.0</version>
                 <scope>provided</scope>
-                <optional>true</optional>
             </dependency>
 
             <dependency>
@@ -127,58 +128,59 @@
                 <artifactId>osgi_R4_compendium</artifactId>
                 <version>1.0</version>
                 <scope>provided</scope>
-                <optional>true</optional>
-            </dependency>
-
-            <!-- Felix -->
-            <dependency>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>org.apache.felix.framework</artifactId>
-                <version>3.0.7</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>org.apache.felix.http.jetty</artifactId>
-                <version>2.0.4</version>
             </dependency>
 
             <!-- Neo4J -->
             <dependency>
                 <groupId>org.neo4j</groupId>
                 <artifactId>neo4j-kernel</artifactId>
-                <version>1.1</version>
+                <version>${neo4j.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.neo4j</groupId>
                 <artifactId>neo4j-index</artifactId>
-                <version>1.1</version>
+                <version>${neo4j.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.neo4j</groupId>
                 <artifactId>neo4j-meta-model</artifactId>
                 <version>0.9-SNAPSHOT</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- JAX RS -->
             <dependency>
+                <groupId>org.codehaus.jettison</groupId>
+                <artifactId>jettison</artifactId>
+                <version>1.2</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-core</artifactId>
+                <version>${jersey.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-server</artifactId>
-                <version>1.4</version>
+                <version>${jersey.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-json</artifactId>
-                <version>1.4</version>
+                <version>${jersey.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>com.sun.jersey.contribs</groupId>
                 <artifactId>jersey-multipart</artifactId>
-                <version>1.4</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.jettison</groupId>
-                <artifactId>jettison</artifactId>
-                <version>1.2</version>
+                <version>${jersey.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -218,6 +220,11 @@
     </build>
 
     <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Repository Switchboard</name>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
         <repository>
             <id>neo4j-public-repository</id>
             <url>http://m2.neo4j.org</url>

@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta3-core</artifactId>
+            <artifactId>deepamehta3-server</artifactId>
         </dependency>
     </dependencies>
 
