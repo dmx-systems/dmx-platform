@@ -1,5 +1,7 @@
 package de.deepamehta.plugins.workspaces;
 
+import de.deepamehta.plugins.workspaces.service.WorkspacesService;
+
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
@@ -14,7 +16,7 @@ import java.util.logging.Logger;
 
 
 
-public class WorkspacesPlugin extends Plugin {
+public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
     private static enum RelationType {
         WORKSPACE_TYPE      // A type assigned to a workspace. Direction is from workspace to type.
@@ -80,22 +82,28 @@ public class WorkspacesPlugin extends Plugin {
 
 
 
-    // ******************
-    // *** Public API ***
-    // ******************
+    // ****************************************
+    // *** WorkspacesService Implementation ***
+    // ****************************************
 
 
 
+    @Override
     public Topic createWorkspace(String name) {
         Map properties = new HashMap();
         properties.put("de/deepamehta/core/property/Name", name);
         return dms.createTopic("de/deepamehta/core/topictype/Workspace", properties, null);     // clientContext=null
     }
 
+    @Override
     public void assignType(long workspaceId, long typeId) {
         dms.createRelation(RelationType.WORKSPACE_TYPE.name(), workspaceId, typeId, null);      // properties=null
     }
 
+    /**
+     * Returns the workspaces a type is assigned to.
+     */
+    @Override
     public List<RelatedTopic> getWorkspaces(long typeId) {
         // Note: takes a type ID instead of a type URI to avoid endless recursion through dms.getTopicType().
         // Consider the Access Control plugin: determining the permissions for a type with MEMBER role would involve

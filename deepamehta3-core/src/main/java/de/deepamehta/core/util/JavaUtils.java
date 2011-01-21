@@ -6,16 +6,31 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+
 import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import java.util.Map;
 import java.util.Scanner;
 
 
 
 public class JavaUtils {
+
+    public static Object findKeyByValue(Map map, Object value) {
+        for (Object key : map.keySet()) {
+            if (map.get(key).equals(value)) {
+                return key;
+            }
+        }
+        return null;
+    }
+
+    // ---
 
     private static FileNameMap fileTypeMap = URLConnection.getFileNameMap();
 
@@ -58,6 +73,21 @@ public class JavaUtils {
 
     // ---
 
+    public static String createTempDirectory(String prefix) {
+        try {
+            File f = File.createTempFile(prefix, ".dir");
+            String n = f.getAbsolutePath();
+            f.delete();
+            new File(n).mkdir();
+            return n;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    // ---
+
     public static String encodeURIComponent(String uriComp) throws UnsupportedEncodingException {
         return URLEncoder.encode(uriComp, "UTF-8").replaceAll("\\+", "%20");
     }
@@ -92,18 +122,5 @@ public class JavaUtils {
             out[j++] = DIGITS.charAt(0x0F & data[i]);
         }
         return out;
-    }
-    
-    public static String createTempDirectory(String prefix) {
-        try {
-            File f = File.createTempFile(prefix, ".dir");
-            String n = f.getAbsolutePath();
-            f.delete();
-            new File(n).mkdir();
-            return n;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
     }
 }

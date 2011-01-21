@@ -4,6 +4,7 @@ import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.storage.Transaction;
+import de.deepamehta.core.util.JavaUtils;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
@@ -60,6 +61,8 @@ public class Plugin implements BundleActivator {
     private ServiceTracker deepamehtaServiceTracker;
     private ServiceTracker httpServiceTracker;
     private HttpService httpService;
+
+    private HashMap<String, Object> consumedServices = new HashMap();   // key: interface name, value: service object
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -156,11 +159,15 @@ public class Plugin implements BundleActivator {
             configProperties = readConfigFile();
             pluginPackage = getConfigProperty("pluginPackage", getClass().getPackage().getName());
             //
+            registerOsgiService(context);
+            //
             deepamehtaServiceTracker = createDeepamehtaServiceTracker(context);
             deepamehtaServiceTracker.open();
             //
             httpServiceTracker = createHttpServiceTracker(context);
             httpServiceTracker.open();
+            //
+            createServiceTrackers(context);
         } catch (RuntimeException e) {
             logger.severe("Plugin \"" + pluginName + "\" can't be activated. Reason:");
             e.printStackTrace();
@@ -270,7 +277,28 @@ public class Plugin implements BundleActivator {
 
 
 
+    // ----------------------------------------------------------------------------------------------- Protected Methods
+
+    protected Object getService(String serviceInterface) {
+        Object service = consumedServices.get(serviceInterface);
+        if (service == null) {
+            throw new RuntimeException("Service \"" + serviceInterface + "\" is not available");
+        }
+        return service;
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void registerOsgiService(BundleContext context) {
+        String serviceInterface = getConfigProperty("providedServiceInterface");
+        if (serviceInterface != null) {
+            logger.info("########## Registering service \"" + serviceInterface +
+                "\" of plugin \"" + pluginName + "\" at OSGi framework");
+            context.registerService(serviceInterface, this, null);
+        }
+    }
+
+    // ---
 
     private ServiceTracker createDeepamehtaServiceTracker(BundleContext context) {
         return new ServiceTracker(context, CoreService.class.getName(), null) {
@@ -322,6 +350,42 @@ public class Plugin implements BundleActivator {
 
     // ---
 
+    private void createServiceTrackers(BundleContext context) {
+        String consumedServiceInterfaces = getConfigProperty("consumedServiceInterfaces");
+        if (consumedServiceInterfaces != null) {
+            String[] serviceInterfaces = consumedServiceInterfaces.split(", *");
+        	for (int i = 0; i < serviceInterfaces.length; i++) {
+        	    createServiceTracker(serviceInterfaces[i], context);
+        	}
+        }
+    }
+
+    private void createServiceTracker(final String serviceInterface, BundleContext context) {
+        logger.info("########## Creating service tracker \"" + serviceInterface + "\" for plugin \"" + pluginName + "\"");
+        new ServiceTracker(context, serviceInterface, null) {
+
+            @Override
+            public Object addingService(ServiceReference serviceRef) {
+                logger.info("########## Adding service \"" + serviceInterface + "\" to plugin \"" + pluginName + "\"");
+                Object serviceObject = super.addingService(serviceRef);
+                consumedServices.put(serviceInterface, serviceObject);
+                return serviceObject;
+            }
+
+            @Override
+            public void removedService(ServiceReference ref, Object service) {
+                String serviceInterface = (String) JavaUtils.findKeyByValue(consumedServices, service);
+                if (serviceInterface != null) {
+                    logger.info("########## Removing service \"" + serviceInterface + "\" from plugin \"" + pluginName + "\"");
+                    consumedServices.remove(serviceInterface);
+                }
+                super.removedService(ref, service);
+            }
+        };
+    }
+
+    // ---
+
     private void registerPlugin() {
         logger.info("Registering plugin \"" + pluginName + "\" at DeepaMehta core service");
         dms.registerPlugin(this);
@@ -338,32 +402,34 @@ public class Plugin implements BundleActivator {
     // ---
 
     private void registerWebResources() {
+        String namespace = "/" + pluginId;
         try {
-            logger.info("Registering web resources of plugin \"" + pluginName + "\" at \"/" + pluginId + "\"");
-            httpService.registerResources("/" + pluginId, "/web", null);
+            logger.info("Registering web resources of plugin \"" + pluginName + "\" at namespace " + namespace);
+            httpService.registerResources(namespace, "/web", null);
         } catch (NamespaceException e) {
-            throw new RuntimeException("Web resources of plugin \"" + pluginName + "\" can't be registered", e);
+            throw new RuntimeException("Web resources of plugin \"" + pluginName + "\" can't be registered " +
+                "at namespace " + namespace, e);
         }
     }
 
     private void unregisterWebResources() {
+        String namespace = "/" + pluginId;
         logger.info("Unregistering web resources of plugin \"" + pluginName + "\"");
-        httpService.unregister("/" + pluginId);
+        httpService.unregister(namespace);
     }
 
     // ---
 
     private void registerRestResources() {
+        String namespace = getConfigProperty("restResourcesNamespace");
         try {
-            String namespace = getConfigProperty("restResourcesNamespace");
             if (namespace != null) {
-                logger.info("Registering REST resources of plugin \"" + pluginName + "\" at namespace \"" +
-                    namespace + "\"");
+                logger.info("Registering REST resources of plugin \"" + pluginName + "\" at namespace " + namespace);
                 // Generic plugins (plugin bundles not containing a Plugin subclass) which provide resource classes
                 // must set the "pluginPackage" config property. Otherwise the resource classes can't be located.
                 if (pluginPackage.equals("de.deepamehta.core.service")) {
-                    throw new RuntimeException("Resource classes can't be located because plugin package is unknown " +
-                        "(there is neither a Plugin subclass nor a \"pluginPackage\" config property)");
+                    throw new RuntimeException("Resource classes can't be located (plugin package is unknown). " +
+                        "You must implement a Plugin subclass OR configure \"pluginPackage\" in plugin.properties");
                 }
                 //
                 Dictionary initParams = new Hashtable();
@@ -372,7 +438,8 @@ public class Plugin implements BundleActivator {
                 httpService.registerServlet(namespace, new ServletContainer(), initParams, null);
             }
         } catch (Exception e) {
-            throw new RuntimeException("REST resources of plugin \"" + pluginName + "\" can't be registered", e);
+            throw new RuntimeException("REST resources of plugin \"" + pluginName + "\" can't be registered " +
+                "at namespace " + namespace, e);
         }
     }
 
@@ -410,7 +477,6 @@ public class Plugin implements BundleActivator {
     // ---
 
     private void initPlugin() {
-        RuntimeException ex = null;
         Transaction tx = dms.beginTx();
         try {
             logger.info("----- Initializing plugin \"" + pluginName + "\" -----");
@@ -422,14 +488,11 @@ public class Plugin implements BundleActivator {
             }
             registerPlugin();
             tx.success();
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            ex = new RuntimeException("Plugin \"" + pluginName + "\" can't be activated. Reason:", e);
+            throw new RuntimeException("Plugin \"" + pluginName + "\" can't be initialzed", e);
         } finally {
             tx.finish();
-            if (ex != null) {
-                throw ex;
-            }
         }
     }
 
