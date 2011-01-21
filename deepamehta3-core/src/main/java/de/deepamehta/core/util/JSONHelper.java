@@ -98,7 +98,7 @@ public class JSONHelper {
     public static void readMigrationFile(InputStream is, String migrationFileName, CoreService dms) {
         try {
             logger.info("Reading migration file \"" + migrationFileName + "\"");
-            String fileContent = JavaUtils.readTextFile(is);
+            String fileContent = JavaUtils.readText(is);
             //
             JSONObject o = new JSONObject(fileContent);
             JSONArray types = o.optJSONArray("topic_types");

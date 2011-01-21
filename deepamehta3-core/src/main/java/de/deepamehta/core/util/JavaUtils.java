@@ -45,13 +45,13 @@ public class JavaUtils {
 
     public static String readTextFile(File file) {
         try {
-            return readTextFile(new FileInputStream(file));
+            return readText(new FileInputStream(file));
         } catch (FileNotFoundException e) {
             throw new RuntimeException("Error wile reading text file " + file, e);
         }
     }
 
-    public static String readTextFile(InputStream in) {
+    public static String readText(InputStream in) {
         StringBuilder text = new StringBuilder();
         Scanner scanner = new Scanner(in);
         while (scanner.hasNextLine()) {

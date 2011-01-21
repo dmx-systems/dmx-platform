@@ -12,12 +12,16 @@ public class Permissions extends HashMap {
 
     // private Map<String, Boolean> permissions = new HashMap();
 
+    // ---------------------------------------------------------------------------------------------------- Constructors
+
     public Permissions() {
     }
 
     public Permissions(JSONObject permissions) {
         JSONHelper.toMap(permissions, this);
     }
+
+    // -------------------------------------------------------------------------------------------------- Public Methods
 
     public void add(Permission permission, boolean value) {
         put(permission.s(), value);

@@ -67,10 +67,10 @@ public class AccessControlResource {
     }
 
     @POST
-    @Path("/acl/{topicId}")
-    public void createACLEntry(@PathParam("topicId") long topicId, JSONObject aclEntry) throws JSONException {
-        Role role = Role.valueOf(aclEntry.getString("role").toUpperCase());
-        Permissions permissions = new Permissions(aclEntry.getJSONObject("permissions"));
+    @Path("/topic/{topicId}/role/{role}")
+    public void createACLEntry(@PathParam("topicId") long topicId,
+                               @PathParam("role") Role role, Permissions permissions) {
+        logger.info("topicId=" + topicId + ", role=" + role + ", permissions=" + permissions);
         accessControl.createACLEntry(topicId, role, permissions);
     }
 

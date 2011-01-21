@@ -37,7 +37,8 @@ public class TopicProvider implements MessageBodyWriter {
 
     @Override
     public boolean isWriteable(Class type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return type == Topic.class && mediaType.equals(MediaType.APPLICATION_JSON_TYPE);
+        // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
+        return type == Topic.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Override

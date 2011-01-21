@@ -43,7 +43,7 @@ public class Plugin implements BundleActivator {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
-    private static final String GLOBAL_PROVIDER_PACKAGE = "de.deepamehta.plugins.server.provider";
+    private static final String STANDARD_PROVIDER_PACKAGE = "de.deepamehta.plugins.server.provider";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -401,8 +401,7 @@ public class Plugin implements BundleActivator {
                 }
                 //
                 Dictionary initParams = new Hashtable();
-                initParams.put("com.sun.jersey.config.property.packages",
-                    pluginPackage + ".resources;" + GLOBAL_PROVIDER_PACKAGE);
+                initParams.put("com.sun.jersey.config.property.packages", packagesToScan());
                 //
                 httpService.registerServlet(namespace, new ServletContainer(), initParams, null);
             }
@@ -418,6 +417,27 @@ public class Plugin implements BundleActivator {
             logger.info("Unregistering REST resources of plugin \"" + pluginName + "\"");
             httpService.unregister(namespace);
         }
+    }
+
+    /**
+     * Returns the packages Jersey have to scan (for root resource and provider classes) for this plugin.
+     * These comprise:
+     * 1) The plugin's "resource" package.
+     * 2) The plugin's "provider" package.
+     * 3) The deepamehta3-server's "provider" package.
+     *    This contains providers for DeepaMehta's core model classes, e.g. "Topic".
+     */
+    private String packagesToScan() {
+        StringBuilder packages = new StringBuilder(pluginPackage + ".resources;");
+        //
+        String pluginProviderPackage = pluginPackage + ".provider";
+        if (!pluginProviderPackage.equals(STANDARD_PROVIDER_PACKAGE)) {
+            packages.append(pluginProviderPackage + ";");
+        }
+        // The standard provider classes of the deepamehta3-server module are available to every plugin
+        packages.append(STANDARD_PROVIDER_PACKAGE);
+        //
+        return packages.toString();
     }
 
     // --- Config Properties ---
