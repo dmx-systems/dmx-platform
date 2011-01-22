@@ -62,6 +62,9 @@
         <module>
             deepamehta3-workspaces
         </module>
+        <module>
+            deepamehta3-delivery
+        </module>
     </modules>
 
 </project>
