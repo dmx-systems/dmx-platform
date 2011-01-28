@@ -1,0 +1,147 @@
+<project>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>DeepaMehta 3 Plugin Parent</name>
+    <groupId>de.deepamehta</groupId>
+    <artifactId>deepamehta3-plugin-parent</artifactId>
+    <version>0.4.5-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <obr.repository.url>file:${user.home}/.m2/repository/repository.xml</obr.repository.url>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta3-core</artifactId>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>development</id>
+            <!-- hot deploy actual plugin bundle -->
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.fileinstall</artifactId>
+                    <version>3.1.2</version>
+                </dependency>
+            </dependencies>
+            <properties>
+                <felix.fileinstall.dir>${project.basedir}/target</felix.fileinstall.dir>
+                <felix.fileinstall.filter>.*\\.jar</felix.fileinstall.filter>
+                <felix.fileinstall.log.level>2</felix.fileinstall.log.level>
+                <felix.log.level>1</felix.log.level>
+            </properties>
+        </profile>
+    </profiles>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-parent</artifactId>
+                <version>0.4.5-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack poms</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>de.deepamehta</groupId>
+                                    <artifactId>deepamehta3-distribution</artifactId>
+                                    <version>0.4.5-SNAPSHOT</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>de.deepamehta</groupId>
+                                    <artifactId>deepamehta3-third-party</artifactId>
+                                    <version>0.4.5-SNAPSHOT</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>de.deepamehta</groupId>
+                                    <artifactId>deepamehta3-felix</artifactId>
+                                    <version>0.4.5-SNAPSHOT</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <includes>**/pom.xml</includes>
+                            <outputDirectory>${project.build.directory}/poms</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.ops4j</groupId>
+                <artifactId>maven-pax-plugin</artifactId>
+                <version>1.4</version>
+                <configuration>
+                    <!-- <noDependencies>true</noDependencies> -->
+                    <widenScope>true</widenScope>
+                    <provision>
+                        <param>--autoWrap</param>
+                        <param>mvn:org.apache.lucene/lucene-core/2.9.2</param>
+                        <param>mvn:asm/asm/3.2</param>
+                        <!--
+                            HINT: versions from dependencyManagement of parent
+                            pom actually not resolved by provision element
+                        -->
+                        <!-- <noDependencies>true</noDependencies> -->
+                        <!-- <widenScope>true</widenScope> -->
+                        <!-- <provision> -->
+                        <!--
+                            <provision>mvn:de.deepamehta/deepamehta3-felix/0.4.5-SNAPSHOT/pom</provision>
+                        -->
+                        <!-- </provision> -->
+                    </provision>
+                    <deployPoms><![CDATA[
+                        target/poms/META-INF/maven/de.deepamehta/deepamehta3-distribution/pom.xml,
+                        target/poms/META-INF/maven/de.deepamehta/deepamehta3-third-party/pom.xml,
+                        target/poms/META-INF/maven/de.deepamehta/deepamehta3-felix/pom.xml
+                    ]]></deployPoms>
+                </configuration>
+            </plugin>
+
+            <!-- use core plugin implementation as default -->
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-Activator>
+                            de.deepamehta.core.service.Plugin
+                        </Bundle-Activator>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

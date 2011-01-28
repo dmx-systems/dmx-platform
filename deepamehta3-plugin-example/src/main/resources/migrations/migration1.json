@@ -1,0 +1,20 @@
+{
+    topic_types: [
+        {
+            label: "Example",
+            uri: "de/deepamehta/example/topictype/Example",
+            icon_src: "/de.deepamehta.3-coretypes/images/bucket.png",
+            js_renderer_class: "PlainDocument",
+            fields: [
+                {
+                    label: "Name",
+                    uri: "de/deepamehta/core/property/Name",
+                    data_type: "text",
+                    editor: "single line",
+                    js_renderer_class: "TitleRenderer",
+                    indexing_mode: "FULLTEXT"
+                }
+            ]
+        }
+    ]
+}
