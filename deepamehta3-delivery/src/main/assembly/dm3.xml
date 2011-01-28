@@ -4,7 +4,6 @@
     <id>distribution</id>
     <formats>
         <format>zip</format>
-        <format>tar.gz</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
 
@@ -32,6 +31,7 @@
 
         <fileSet>
             <directory>${project.basedir}/runner/bundles</directory>
+            <fileMode>0444</fileMode>
             <outputDirectory>bundles</outputDirectory>
             <includes>
                 <include>*.jar</include>
@@ -44,9 +44,16 @@
                 <include>deepamehta-linux.sh</include>
                 <include>deepamehta-macosx.command</include>
                 <include>deepamehta-windows.bat</include>
+            </includes>
+            <fileMode>0555</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../</directory>
+            <includes>
                 <include>LICENSE.txt</include>
                 <include>README.md</include>
             </includes>
+            <fileMode>0444</fileMode>
         </fileSet>
 
     </fileSets>
