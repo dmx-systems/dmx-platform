@@ -91,7 +91,7 @@
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-time</artifactId>
-                <version>0.4.2</version>
+                <version>0.4.3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -112,7 +112,7 @@
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-workspaces</artifactId>
-                <version>0.4.3</version>
+                <version>0.4.4-SNAPSHOT</version>
             </dependency>
 
             <!-- OSGi -->

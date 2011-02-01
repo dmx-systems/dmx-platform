@@ -5,7 +5,7 @@
     <name>DeepaMehta 3 Workspaces</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-workspaces</artifactId>
-    <version>0.4.3</version>
+    <version>0.4.4-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>

@@ -46,8 +46,9 @@ public class PermissionsProvider implements MessageBodyReader<Permissions> {
     }
 
     @Override
-    public Permissions readFrom(Class<Permissions> type, Type genericType, Annotation[] annotations, MediaType mediaType, 
-            MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
+    public Permissions readFrom(Class<Permissions> type, Type genericType, Annotation[] annotations,
+            MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
+                                                                throws IOException, WebApplicationException {
         try {
             // logger.info("Reading Permissions object from request stream");
             String json = JavaUtils.readText(entityStream);
