@@ -3,14 +3,18 @@ commit-message.txt
 DeepaMehta 3.tmproj
 
 bin/
-bundle/
-conf/config.properties
 deepamehta-db/
-felix-cache/
+runner/
 target/
-deepamehta3.wiki/
 
+deepamehta3.wiki/
 deepamehta3-foldercanvas/
 deepamehta3-importer/
 deepamehta3-topicimporter/
 dm3-freifunk-geomap/
+
+*~
+.project
+.classpath
+.settings
+

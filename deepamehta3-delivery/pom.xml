@@ -17,6 +17,8 @@
     <properties>
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
         <obr.repository.url>file:${user.home}/.m2/repository/repository.xml</obr.repository.url>
+        <java.util.logging.config.file>${project.basedir}/conf/logging.properties</java.util.logging.config.file>
+        <file.encoding>UTF-8</file.encoding>
     </properties>
 
     <profiles>
@@ -37,6 +39,8 @@
 
             <properties>
                 <obr.repository.url>http://felix.apache.org/obr/releases.xml</obr.repository.url>
+                <java.util.logging.config.file>conf/logging.properties</java.util.logging.config.file>
+                <deepamehta3.database.path>deepamehta-db</deepamehta3.database.path>
             </properties>
 
             <build>
@@ -122,10 +126,11 @@
                 <dependency>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>org.apache.felix.fileinstall</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.1.10</version>
                 </dependency>
             </dependencies>
             <properties>
+                <deepamehta3.database.path>${project.basedir}/../deepamehta-db</deepamehta3.database.path>
                 <felix.fileinstall.dir><![CDATA[
                   ${project.basedir}/../deepamehta3-core/target,
                   ${project.basedir}/../deepamehta3-coretypes/target,
@@ -188,11 +193,6 @@
                     <filesets>
                         <fileset>
                             <directory>runner</directory>
-                            <includes>
-                                <include>bundles/*</include>
-                                <include>felix/*</include>
-                                <include>deploy-pom.xml</include>
-                            </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                     </filesets>
