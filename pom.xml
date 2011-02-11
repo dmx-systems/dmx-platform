@@ -65,6 +65,12 @@
         <module>
             deepamehta3-delivery
         </module>
-    </modules>
+        <module>
+            deepamehta3-plugin-parent
+        </module>
+        <module>
+            deepamehta3-plugin-example
+        </module>
+     </modules>
 
 </project>

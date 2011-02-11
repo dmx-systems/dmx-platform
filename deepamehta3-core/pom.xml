@@ -39,6 +39,11 @@
         <!-- OSGi -->
         <dependency>
             <groupId>org.osgi</groupId>
+            <artifactId>osgi_R4_core</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
             <artifactId>osgi_R4_compendium</artifactId>
         </dependency>
 
@@ -92,5 +97,17 @@
             </plugin>
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>neo4j-public-repository</id>
+            <url>http://m2.neo4j.org</url>
+            <snapshots>
+                <!-- TODO use released Neo4J meta model -->
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
 
 </project>

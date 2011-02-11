@@ -21,7 +21,7 @@ public class Activator implements BundleActivator, FrameworkListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String DATABASE_PATH = "deepamehta-db";
+    private static final String DATABASE_PATH = System.getProperty("deepamehta3.database.path");
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 
