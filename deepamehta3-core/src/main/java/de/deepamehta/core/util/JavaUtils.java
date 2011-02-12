@@ -77,8 +77,12 @@ public class JavaUtils {
 
     // ---
 
-    public static String encodeURIComponent(String uriComp) throws UnsupportedEncodingException {
-        return URLEncoder.encode(uriComp, "UTF-8").replaceAll("\\+", "%20");
+    public static String encodeURIComponent(String uriComp) {
+        try {
+            return URLEncoder.encode(uriComp, "UTF-8").replaceAll("\\+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Encoding of URI component \"" + uriComp + "\" failed", e);
+        }
     }
 
     // ---
