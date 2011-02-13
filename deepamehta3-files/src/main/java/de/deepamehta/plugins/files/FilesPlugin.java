@@ -34,9 +34,9 @@ public class FilesPlugin extends Plugin implements FilesService {
 
 
 
-    // ************************
-    // *** Overriding Hooks ***
-    // ************************
+    // *********************************************
+    // *** Hooks (called from DeepaMehta 3 Core) ***
+    // *********************************************
 
 
 
