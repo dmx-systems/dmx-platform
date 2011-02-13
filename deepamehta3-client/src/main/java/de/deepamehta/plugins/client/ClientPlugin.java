@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/search")
+@Path("/")
 @Consumes("application/json")
 @Produces("application/json")
 public class ClientPlugin extends Plugin {
@@ -58,9 +58,9 @@ public class ClientPlugin extends Plugin {
 
 
 
-    // ************************
-    // *** Provided Service ***
-    // ************************
+    // **********************
+    // *** Plugin Service ***
+    // **********************
 
     // Note: the client service is provided as REST service only (OSGi service not required for the moment).
 
@@ -70,6 +70,7 @@ public class ClientPlugin extends Plugin {
      * Performs a fulltext search and creates a search result topic (a bucket).
      */
     @GET
+    @Path("/search")
     public Topic searchTopics(@QueryParam("search") String searchTerm,
                               @QueryParam("field")  String fieldUri,
                               @QueryParam("wholeword") boolean wholeWord,
@@ -88,7 +89,7 @@ public class ClientPlugin extends Plugin {
      * another namespace again) or make the Type Search plugin an integral part of the Client plugin.
      */
     @GET
-    @Path("/by_type/{typeUri}")
+    @Path("/search/by_type/{typeUri}")
     public Topic getTopics(@PathParam("typeUri") String typeUri) {
         logger.info("typeUri=" + typeUri);
         return createResultTopic(typeUri, dms.getTopics(typeUri), null);
