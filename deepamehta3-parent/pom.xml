@@ -62,7 +62,7 @@
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-filemanager</artifactId>
-                <version>0.4.1</version>
+                <version>0.4.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.deepamehta</groupId>
@@ -90,7 +90,7 @@
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-topicmaps</artifactId>
-                <version>0.4.3</version>
+                <version>0.4.4-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.deepamehta</groupId>

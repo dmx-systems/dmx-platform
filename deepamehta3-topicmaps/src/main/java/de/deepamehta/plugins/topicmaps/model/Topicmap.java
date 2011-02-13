@@ -82,6 +82,11 @@ public class Topicmap {
         return topicmap;
     }
 
+    @Override
+    public String toString() {
+        return "topicmap " + topicmapId;
+    }
+
     // -------------------------------------------------------------------------------------------- Public Inner Classes
 
     // Note: there is a client-side equivalent in canvas.js (deepamehta-client plugin)

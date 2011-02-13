@@ -1,5 +1,7 @@
 package de.deepamehta.plugins.files;
 
+import de.deepamehta.plugins.files.service.FilesService;
+
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.Relation;
@@ -22,7 +24,7 @@ import java.util.logging.Logger;
 
 
 
-public class FilesPlugin extends Plugin {
+public class FilesPlugin extends Plugin implements FilesService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -32,9 +34,9 @@ public class FilesPlugin extends Plugin {
 
 
 
-    // ************************
-    // *** Overriding Hooks ***
-    // ************************
+    // *********************************************
+    // *** Hooks (called from DeepaMehta 3 Core) ***
+    // *********************************************
 
 
 
@@ -85,13 +87,16 @@ public class FilesPlugin extends Plugin {
         }
     }
 
-    // ---
 
-    /**
-     * Creates a File topic for a given path.
-     * If a File topic for that path exists already that topic is returned.
-     */
-    public Topic createFileTopic(String path) throws Exception {
+
+    // ***********************************
+    // *** FilesService Implementation ***
+    // ***********************************
+
+
+
+    @Override
+    public Topic createFileTopic(String path) {
         Topic topic = dms.getTopic("de/deepamehta/core/property/Path", path);
         if (topic != null) {
             return topic;
@@ -116,10 +121,7 @@ public class FilesPlugin extends Plugin {
         return dms.createTopic("de/deepamehta/core/topictype/File", properties, null);
     }
 
-    /**
-     * Creates a Folder topic for a given path.
-     * If a Folder topic for that path exists already that topic is returned.
-     */
+    @Override
     public Topic createFolderTopic(String path) {
         Topic topic = dms.getTopic("de/deepamehta/core/property/Path", path);
         if (topic != null) {
@@ -133,9 +135,11 @@ public class FilesPlugin extends Plugin {
         return dms.createTopic("de/deepamehta/core/topictype/Folder", properties, null);
     }
 
+
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private String renderFileContent(File file, String fileType, long fileSize) throws Exception {
+    private String renderFileContent(File file, String fileType, long fileSize) {
         // Note: for unknown file types fileType is null
         if (fileType == null) {
             return null;
@@ -163,7 +167,7 @@ public class FilesPlugin extends Plugin {
         return content;
     }
 
-    private String localResourceURI(String path, String type, long size) throws UnsupportedEncodingException {
+    private String localResourceURI(String path, String type, long size) {
         return "/resource/file:" + JavaUtils.encodeURIComponent(path) + "?type=" + type + "&size=" + size;
     }
 }

@@ -110,7 +110,7 @@ public class Activator implements BundleActivator, FrameworkListener {
         try {
             return new Neo4jStorage(DATABASE_PATH);
         } catch (Exception e) {
-            throw new RuntimeException("Database can't be opened", e);
+            throw new RuntimeException("Database can't be opened (path=" + DATABASE_PATH + ")", e);
         }
     }
 }
