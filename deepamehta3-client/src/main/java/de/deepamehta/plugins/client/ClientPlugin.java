@@ -10,8 +10,6 @@ import java.util.logging.Logger;
 
 public class ClientPlugin extends Plugin {
 
-    private static final String CLIENT_URL = "http://localhost:8080/de.deepamehta.3-client/index.html";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -28,14 +26,17 @@ public class ClientPlugin extends Plugin {
 
     @Override
     public void allPluginsReadyHook() {
+        String webclientUrl = null;
         try {
-            logger.info("### Launching webclient (" + CLIENT_URL + ")");
+            String port = System.getProperty("org.osgi.service.http.port");
+            webclientUrl = "http://localhost:" + port + "/de.deepamehta.3-client/index.html";
+            logger.info("### Launching webclient (" + webclientUrl + ")");
             //
-            Desktop.getDesktop().browse(new URI(CLIENT_URL));
+            Desktop.getDesktop().browse(new URI(webclientUrl));
             //
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.warning("### Webclient can't be launched automatically (" + e + ")");
-            logger.info("### Please launch webclient manually: " + CLIENT_URL);
+            logger.info("### Please launch webclient manually: " + webclientUrl);
         }
     }
 }
