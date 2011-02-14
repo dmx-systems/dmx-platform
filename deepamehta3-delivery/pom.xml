@@ -161,6 +161,24 @@
             <properties>
                 <framework>equinox</framework>
             </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.ops4j</groupId>
+                        <artifactId>maven-pax-plugin</artifactId>
+                        <version>1.4</version>
+                        <configuration>
+                            <deployPoms>third-party/pom.xml,dm3-distribution/pom.xml</deployPoms>
+                            <provision>
+                                <param>--autoWrap</param>
+                                <param>mvn:javax.servlet/servlet-api/2.5</param>
+                                <param>mvn:org.apache.lucene/lucene-core/2.9.2</param>
+                                <param>mvn:asm/asm/3.2</param>
+                            </provision>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
         <profile>

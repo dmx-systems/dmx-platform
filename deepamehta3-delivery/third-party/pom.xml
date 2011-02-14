@@ -2,6 +2,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <packaging>pom</packaging>
     <name>DeepaMehta 3 Third Party Dependencies</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-third-party</artifactId>
@@ -13,19 +14,25 @@
         <version>0.4.5-SNAPSHOT</version>
     </parent>
 
-    <!-- All third party libraries that belong to the DeepaMehta 3 standard installation. -->
+    <!--
+        All third party libraries that belong to the DeepaMehta 3 standard
+        installation.
+    -->
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>
+            <version>1.5</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
+            <version>1.5</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
+            <version>1.5</version>
         </dependency>
         <dependency>
             <groupId>org.jvnet</groupId>
@@ -35,10 +42,12 @@
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-multipart</artifactId>
+            <version>1.5</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
+            <version>1.2</version>
         </dependency>
 
         <dependency>
@@ -67,10 +76,12 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-kernel</artifactId>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-index</artifactId>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
@@ -80,6 +91,20 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-meta-model</artifactId>
+            <version>0.9-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>3.2</version>
+        </dependency>
+
     </dependencies>
 </project>

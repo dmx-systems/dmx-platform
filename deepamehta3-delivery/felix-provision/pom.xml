@@ -7,6 +7,8 @@
     <artifactId>deepamehta3-felix</artifactId>
     <version>0.4.5-SNAPSHOT</version>
 
+    <packaging>pom</packaging>
+
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta3-parent</artifactId>
