@@ -410,6 +410,7 @@ public class Plugin implements BundleActivator {
                 httpService.registerServlet(namespace, new ServletContainer(), initParams, null);
             }
         } catch (Exception e) {
+            unregisterWebResources();
             throw new RuntimeException("REST resources of plugin \"" + pluginName + "\" can't be registered " +
                 "at namespace " + namespace, e);
         }
