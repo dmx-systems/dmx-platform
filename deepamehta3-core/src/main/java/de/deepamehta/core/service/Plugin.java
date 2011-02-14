@@ -1,6 +1,7 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -516,7 +517,7 @@ public class Plugin implements BundleActivator {
     }
 
     private Topic findPluginTopic() {
-        return dms.getTopic("de/deepamehta/core/property/PluginID", pluginId);
+        return dms.getTopic("de/deepamehta/core/property/PluginID", new PropValue(pluginId));
     }
 
     /**

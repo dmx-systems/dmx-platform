@@ -8,6 +8,7 @@ import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
@@ -251,7 +252,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
      * Returns the user (topic) by username, or <code>null</code> if no such user exists.
      */
     private Topic getUser(String username) {
-        return dms.getTopic("de/deepamehta/core/property/username", username);
+        return dms.getTopic("de/deepamehta/core/property/username", new PropValue(username));
     }
 
     private Topic getAdminUser() {
@@ -308,7 +309,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     // === ACL Entries ===
 
     private Topic getRoleTopic(Role role) {
-        Topic roleTopic = dms.getTopic("de/deepamehta/core/property/rolename", role.s());
+        Topic roleTopic = dms.getTopic("de/deepamehta/core/property/rolename", new PropValue(role.s()));
         if (roleTopic == null) {
             throw new RuntimeException("Role topic \"" + role.s() + "\" doesn't exist");
         }

@@ -2,6 +2,7 @@ package de.deepamehta.core.service;
 
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.RelatedTopic;
@@ -48,9 +49,9 @@ public interface CoreService {
      * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
      * (for dynamically created data fields, typically in migration classes).
      */
-    public Topic getTopic(String key, Object value);
+    public Topic getTopic(String key, PropValue value);
 
-    public Topic getTopic(String typeUri, String key, Object value);
+    public Topic getTopic(String typeUri, String key, PropValue value);
 
     public Object getTopicProperty(long topicId, String key);
 

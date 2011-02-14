@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.RelatedTopic;
@@ -181,7 +182,7 @@ public class EmbeddedService implements CoreService {
     @GET
     @Path("/topic/by_property/{key}/{value}")
     @Override
-    public Topic getTopic(@PathParam("key") String key, @PathParam("value") Object value) {
+    public Topic getTopic(@PathParam("key") String key, @PathParam("value") PropValue value) {
         Transaction tx = storage.beginTx();
         try {
             Topic topic = storage.getTopic(key, value);
@@ -200,7 +201,7 @@ public class EmbeddedService implements CoreService {
     @Override
     public Topic getTopic(@PathParam("typeUri") String typeUri,
                           @PathParam("key")     String key,
-                          @PathParam("value")   Object value) {
+                          @PathParam("value")   PropValue value) {
         Transaction tx = storage.beginTx();
         try {
             Topic topic = storage.getTopic(typeUri, key, value);

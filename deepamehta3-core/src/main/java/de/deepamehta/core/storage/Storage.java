@@ -1,6 +1,7 @@
 package de.deepamehta.core.storage;
 
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
@@ -32,9 +33,9 @@ public interface Storage {
      * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
      * (for dynamically created data fields, typically in migration classes).
      */
-    public Topic getTopic(String key, Object value);
+    public Topic getTopic(String key, PropValue value);
 
-    public Topic getTopic(String typeUri, String key, Object value);
+    public Topic getTopic(String typeUri, String key, PropValue value);
 
     /**
      * Returns a property value of a topic, or <code>null</code> if the topic doesn't have such a property.

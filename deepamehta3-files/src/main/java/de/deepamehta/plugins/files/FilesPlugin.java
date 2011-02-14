@@ -3,6 +3,7 @@ package de.deepamehta.plugins.files;
 import de.deepamehta.plugins.files.service.FilesService;
 
 import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.service.Plugin;
@@ -97,7 +98,7 @@ public class FilesPlugin extends Plugin implements FilesService {
 
     @Override
     public Topic createFileTopic(String path) {
-        Topic topic = dms.getTopic("de/deepamehta/core/property/Path", path);
+        Topic topic = dms.getTopic("de/deepamehta/core/property/Path", new PropValue(path));
         if (topic != null) {
             return topic;
         }
@@ -123,7 +124,7 @@ public class FilesPlugin extends Plugin implements FilesService {
 
     @Override
     public Topic createFolderTopic(String path) {
-        Topic topic = dms.getTopic("de/deepamehta/core/property/Path", path);
+        Topic topic = dms.getTopic("de/deepamehta/core/property/Path", new PropValue(path));
         if (topic != null) {
             return topic;
         }

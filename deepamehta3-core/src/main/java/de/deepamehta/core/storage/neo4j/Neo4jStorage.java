@@ -1,6 +1,7 @@
 package de.deepamehta.core.storage.neo4j;
 
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.RelatedTopic;
@@ -103,16 +104,16 @@ public class Neo4jStorage implements Storage {
     }
 
     @Override
-    public Topic getTopic(String key, Object value) {
+    public Topic getTopic(String key, PropValue value) {
         logger.info("Getting node by property (" + key + "=" + value + ")");
-        Node node = index.getSingleNode(key, value);
+        Node node = index.getSingleNode(key, value.value());
         return node != null ? buildTopic(node, true) : null;
     }
 
     @Override
-    public Topic getTopic(String typeUri, String key, Object value) {
+    public Topic getTopic(String typeUri, String key, PropValue value) {
         logger.info("Getting node (typeUri=" + typeUri + ", " + key + "=" + value + ")");
-        IndexHits<Node> nodes = fulltextIndex.getNodesExactMatch(key, value);
+        IndexHits<Node> nodes = fulltextIndex.getNodesExactMatch(key, value.value());
         Node resultNode = null;
         // apply type filter
         for (Node node : nodes) {

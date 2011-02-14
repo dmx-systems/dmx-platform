@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.iconpicker.migrations;
 
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -66,7 +67,7 @@ public class Migration2 extends Migration {
     }
 
     private Topic getIconTopic(String iconSrc) {
-        return dms.getTopic("de/deepamehta/core/property/IconSource", iconSrc);
+        return dms.getTopic("de/deepamehta/core/property/IconSource", new PropValue(iconSrc));
     }
 
     private Topic createIconTopic(String iconSrc) {

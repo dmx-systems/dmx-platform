@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.server;
 
 import de.deepamehta.plugins.server.provider.TopicProvider;
+import de.deepamehta.plugins.server.provider.TopicListProvider;
 import de.deepamehta.plugins.server.resources.RelationResource;
 import de.deepamehta.plugins.server.resources.TopicTypeResource;
 import de.deepamehta.plugins.server.resources.PluginResource;
@@ -25,6 +26,7 @@ public class Application extends javax.ws.rs.core.Application {
         classes.add(CommandResource.class);
         // provider classes
         classes.add(TopicProvider.class);
+        classes.add(TopicListProvider.class);
         return classes;
     }
 
