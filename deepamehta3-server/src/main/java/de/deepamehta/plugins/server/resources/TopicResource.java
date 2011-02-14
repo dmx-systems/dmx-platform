@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 
 
 
+// TODO: drop this class once EmbeddedService has been annotated
 @Path("/topic")
 @Consumes("application/json")
 @Produces("application/json")

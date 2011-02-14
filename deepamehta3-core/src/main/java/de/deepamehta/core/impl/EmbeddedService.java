@@ -18,6 +18,19 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 
@@ -39,6 +52,9 @@ import java.util.logging.Logger;
 /**
  * Implementation of the DeepaMehta core service. Embeddable into Java applications.
  */
+@Path("/")
+@Consumes("application/json")
+@Produces("application/json")
 public class EmbeddedService implements CoreService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -127,6 +143,7 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    // TODO: drop this
     public EmbeddedService(Storage storage, boolean isMock) {
         this.storage = storage;
     }
@@ -143,8 +160,10 @@ public class EmbeddedService implements CoreService {
 
     // === Topics ===
 
+    @GET
+    @Path("/topic/{id}")
     @Override
-    public Topic getTopic(long id, ClientContext clientContext) {
+    public Topic getTopic(@PathParam("id") long id, @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             Topic topic = storage.getTopic(id);
@@ -159,8 +178,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/topic/by_property/{key}/{value}")
     @Override
-    public Topic getTopic(String key, Object value) {
+    public Topic getTopic(@PathParam("key") String key, @PathParam("value") Object value) {
         Transaction tx = storage.beginTx();
         try {
             Topic topic = storage.getTopic(key, value);
@@ -174,8 +195,12 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/topic/{typeUri}/{key}/{value}")
     @Override
-    public Topic getTopic(String typeUri, String key, Object value) {
+    public Topic getTopic(@PathParam("typeUri") String typeUri,
+                          @PathParam("key")     String key,
+                          @PathParam("value")   Object value) {
         Transaction tx = storage.beginTx();
         try {
             Topic topic = storage.getTopic(typeUri, key, value);
@@ -205,8 +230,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/topic/by_type/{typeUri}")
     @Override
-    public List<Topic> getTopics(String typeUri) {
+    public List<Topic> getTopics(@PathParam("typeUri") String typeUri) {
         Transaction tx = storage.beginTx();
         try {
             List<Topic> topics = storage.getTopics(typeUri);
@@ -240,10 +267,13 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/topic/{id}/related_topics")
     @Override
-    public List<RelatedTopic> getRelatedTopics(long topicId, List<String> includeTopicTypes,
-                                                             List<String> includeRelTypes,
-                                                             List<String> excludeRelTypes) {
+    public List<RelatedTopic> getRelatedTopics(@PathParam("id")                   long         topicId,
+                                               @QueryParam("include_topic_types") List<String> includeTopicTypes,
+                                               @QueryParam("include_rel_types")   List<String> includeRelTypes,
+                                               @QueryParam("exclude_rel_types")   List<String> excludeRelTypes) {
         // set defaults
         if (includeTopicTypes == null) includeTopicTypes = new ArrayList();
         if (includeRelTypes   == null) includeRelTypes   = new ArrayList();
@@ -273,9 +303,13 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/topic")
     @Override
-    public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord,
-                                                                        ClientContext clientContext) {
+    public List<Topic> searchTopics(@QueryParam("search")    String searchTerm,
+                                    @QueryParam("field")     String fieldUri,
+                                    @QueryParam("wholeword") boolean wholeWord,
+                                    @HeaderParam("Cookie")   ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             List<Topic> searchResult = storage.searchTopics(searchTerm, fieldUri, wholeWord);
@@ -290,8 +324,11 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @POST
+    @Path("/topic/{typeUri}")
     @Override
-    public Topic createTopic(String typeUri, Map properties, ClientContext clientContext) {
+    public Topic createTopic(@PathParam("typeUri") String typeUri, Map properties,
+                             @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             Topic t = new Topic(-1, typeUri, null, initProperties(properties, typeUri));
@@ -313,8 +350,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @PUT
+    @Path("/topic/{id}")
     @Override
-    public void setTopicProperties(long id, Map properties) {
+    public void setTopicProperties(@PathParam("id") long id, Map properties) {
         Transaction tx = storage.beginTx();
         try {
             Topic topic = getTopic(id, null);   // clientContext=null
@@ -336,8 +375,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @DELETE
+    @Path("/topic/{id}")
     @Override
-    public void deleteTopic(long id) {
+    public void deleteTopic(@PathParam("id") long id) {
         Transaction tx = storage.beginTx();
         try {
             // delete all the topic's relationships
