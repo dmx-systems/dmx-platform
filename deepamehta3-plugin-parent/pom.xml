@@ -9,6 +9,7 @@
     <packaging>pom</packaging>
 
     <properties>
+        <deepamehta3.database.path>${project.basedir}/../deepamehta-db</deepamehta3.database.path>
         <obr.repository.url>file:${user.home}/.m2/repository/repository.xml</obr.repository.url>
     </properties>
 
@@ -68,7 +69,7 @@
                 <executions>
                     <execution>
                         <id>unpack poms</id>
-                        <phase>package</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
