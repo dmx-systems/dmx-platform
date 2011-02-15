@@ -39,7 +39,8 @@ public interface Storage {
     public Topic getTopic(String typeUri, String key, PropValue value);
 
     /**
-     * Returns a property value of a topic, or <code>null</code> if the topic doesn't have such a property.
+     * Returns a property value of a topic.
+     * If the topic has no such property a "no-value" representing {@link PropValue} object is returned.
      */
     public PropValue getTopicProperty(long topicId, String key);
 

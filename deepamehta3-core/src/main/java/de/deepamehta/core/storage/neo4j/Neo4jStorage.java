@@ -513,7 +513,7 @@ public class Neo4jStorage implements Storage {
             PropValue value = properties.get(key);
             Object oldValue = container.getProperty(key, null);     // null for newly created topics
             // 1) update DB
-            container.setProperty(key, value);
+            container.setProperty(key, value.value());
             // 2) update index
             if (container instanceof Node) {
                 // Note: we only index node properties.

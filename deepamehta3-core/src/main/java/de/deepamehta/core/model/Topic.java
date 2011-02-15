@@ -59,6 +59,10 @@ public class Topic {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    /**
+     * Returns the property value for a key.
+     * If there is no property for that key an exception is thrown.
+     */
     public PropValue getProperty(String key) {
         PropValue value = properties.get(key);
         if (value == null) {
@@ -69,9 +73,17 @@ public class Topic {
         return value;
     }
 
+    /**
+     * Returns the property value for a key.
+     * If there is no property for that key a default value is returned.
+     * This method never returns <code>null</code>.
+     *
+     * @param   the default value. May be <code>null</code>. In this case a "no-value" respresenting
+     *          <code>PropValue</code> object is used as the default value.
+     */
     public PropValue getProperty(String key, PropValue defaultValue) {
         PropValue value = properties.get(key);
-        return value != null ? value : defaultValue;
+        return value != null ? value : defaultValue != null ? defaultValue : new PropValue();
     }
 
     public Properties getProperties() {

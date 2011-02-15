@@ -54,6 +54,10 @@ public interface CoreService {
 
     public Topic getTopic(String typeUri, String key, PropValue value);
 
+    /**
+     * Returns a property value of a topic.
+     * If the topic has no such property a "no-value" representing {@link PropValue} object is returned.
+     */
     public PropValue getTopicProperty(long topicId, String key);
 
     public List<Topic> getTopics(String typeUri);

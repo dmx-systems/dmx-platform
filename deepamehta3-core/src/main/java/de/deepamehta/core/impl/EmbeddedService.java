@@ -370,7 +370,7 @@ public class EmbeddedService implements CoreService {
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Properties of topic " + id + " can't be set (" + properties + ")", e);
+            throw new RuntimeException("Setting properties of topic " + id + " failed\n" + properties, e);
         } finally {
             tx.finish();
         }

@@ -107,4 +107,9 @@ public class Properties {
         }
         return map;
     }
+
+    @Override
+    public String toString() {
+        return values.toString();
+    }
 }

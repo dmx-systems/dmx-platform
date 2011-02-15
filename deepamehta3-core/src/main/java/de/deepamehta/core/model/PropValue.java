@@ -5,6 +5,11 @@ import java.util.Map;
 
 
 
+/**
+ * A polymorph property value. Supported types are String, int, long, boolean.
+ * <p>
+ * A PropValue object may also represent "no-value".
+ */
 public class PropValue {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -14,8 +19,14 @@ public class PropValue {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     /**
-      * Called by JAX-RS container to create a PropValue from a @PathParam or @QueryParam
-      */
+     * Constructs a "no-value" respresenting value.
+     */
+    public PropValue() {
+    }
+
+    /**
+     * Called by JAX-RS container to create a PropValue from a @PathParam or @QueryParam
+     */
     public PropValue(String value) {
         this.value = value;
     }
@@ -40,7 +51,7 @@ public class PropValue {
 
     @Override
     public String toString() {
-        return value.toString();
+        return value != null ? value.toString() : null;
     }
 
     public int intValue() {
