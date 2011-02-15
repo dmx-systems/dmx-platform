@@ -2,6 +2,7 @@ package de.deepamehta.core.service;
 
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -53,7 +54,7 @@ public interface CoreService {
 
     public Topic getTopic(String typeUri, String key, PropValue value);
 
-    public Object getTopicProperty(long topicId, String key);
+    public PropValue getTopicProperty(long topicId, String key);
 
     public List<Topic> getTopics(String typeUri);
 
@@ -104,9 +105,9 @@ public interface CoreService {
      */
     public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, ClientContext clientContext);
 
-    public Topic createTopic(String typeUri, Map properties, ClientContext clientContext);
+    public Topic createTopic(String typeUri, Properties properties, ClientContext clientContext);
 
-    public void setTopicProperties(long id, Map properties);
+    public void setTopicProperties(long id, Properties properties);
 
     public void deleteTopic(long id);
 
@@ -133,9 +134,9 @@ public interface CoreService {
      */
     public List<Relation> getRelations(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
 
-    public Relation createRelation(String typeId, long srcTopicId, long dstTopicId, Map properties);
+    public Relation createRelation(String typeId, long srcTopicId, long dstTopicId, Properties properties);
 
-    public void setRelationProperties(long id, Map properties);
+    public void setRelationProperties(long id, Properties properties);
 
     public void deleteRelation(long id);
 
@@ -145,7 +146,7 @@ public interface CoreService {
 
     public TopicType getTopicType(String typeUri, ClientContext clientContext);
 
-    public TopicType createTopicType(Map properties, List dataFields, ClientContext clientContext);
+    public TopicType createTopicType(Properties properties, List dataFields, ClientContext clientContext);
 
     public void addDataField(String typeUri, DataField dataField);
 

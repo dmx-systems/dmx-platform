@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.server.resources;
 
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.osgi.Activator;
@@ -62,10 +63,10 @@ public class RelationResource {
     @POST
     public JSONObject createRelation(JSONObject relation) throws JSONException {
         //
-        String typeId = relation.getString("type_id");                              // throws JSONException
-        long srcTopicId = relation.getLong("src_topic_id");                         // throws JSONException
-        long dstTopicId = relation.getLong("dst_topic_id");                         // throws JSONException
-        Map properties = JSONHelper.toMap(relation.getJSONObject("properties"));    // throws JSONException
+        String typeId = relation.getString("type_id");                                  // throws JSONException
+        long srcTopicId = relation.getLong("src_topic_id");                             // throws JSONException
+        long dstTopicId = relation.getLong("dst_topic_id");                             // throws JSONException
+        Properties properties = new Properties(relation.getJSONObject("properties"));   // throws JSONException
         //
         return Activator.getService().createRelation(typeId, srcTopicId, dstTopicId, properties).toJSON();
     }
@@ -73,7 +74,7 @@ public class RelationResource {
     @PUT
     @Path("/{id}")
     public void setTopicProperties(@PathParam("id") long id, JSONObject properties) {
-        Activator.getService().setRelationProperties(id, JSONHelper.toMap(properties));
+        Activator.getService().setRelationProperties(id, new Properties(properties));
     }
 
     @DELETE

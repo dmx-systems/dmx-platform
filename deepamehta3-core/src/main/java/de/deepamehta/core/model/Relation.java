@@ -30,16 +30,16 @@ public class Relation {
     public long srcTopicId;
     public long dstTopicId;
 
-    protected Map<String, Object> properties;
+    protected Properties properties;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public Relation(long id, String typeId, long srcTopicId, long dstTopicId, Map properties) {
+    public Relation(long id, String typeId, long srcTopicId, long dstTopicId, Properties properties) {
         this.id = id;
         this.typeId = typeId;
         this.srcTopicId = srcTopicId;
         this.dstTopicId = dstTopicId;
-        this.properties = properties != null ? properties : new HashMap();
+        this.properties = properties != null ? properties : new Properties();
     }
 
     public Relation(Relation relation) {
@@ -48,8 +48,8 @@ public class Relation {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public Object getProperty(String key) {
-        Object value = properties.get(key);
+    public PropValue getProperty(String key) {
+        PropValue value = properties.get(key);
         if (value == null) {
             throw new RuntimeException("Property \"" + key + "\" of " + this + " is not initialized. " +
                 "Remember: relations obtained by getRelatedTopics() provide no properties. " +
@@ -58,21 +58,39 @@ public class Relation {
         return value;
     }
 
-    public Map<String, Object> getProperties() {
+    public Properties getProperties() {
         return properties;
     }
 
     // ---
 
-    public void setProperty(String key, Object value) {
+    public void setProperty(String key, String value) {
         properties.put(key, value);
     }
+
+    public void setProperty(String key, int value) {
+        properties.put(key, value);
+    }
+
+    public void setProperty(String key, long value) {
+        properties.put(key, value);
+    }
+
+    public void setProperty(String key, boolean value) {
+        properties.put(key, value);
+    }
+
+    public void setProperty(String key, PropValue value) {
+        properties.put(key, value);
+    }
+
+    // ---
 
     /**
      * Sets various properties at once.
      * Same as consecutive {@link setProperty} calls.
      */
-    public void setProperties(Map<String, Object> properties) {
+    public void setProperties(Properties properties) {
         this.properties.putAll(properties);
     }
 
@@ -85,10 +103,10 @@ public class Relation {
             o.put("type_id", typeId);
             o.put("src_topic_id", srcTopicId);
             o.put("dst_topic_id", dstTopicId);
-            o.put("properties", properties);
+            o.put("properties", properties.toJSON());
             return o;
         } catch (JSONException e) {
-            throw new RuntimeException("Error while serializing " + this, e);
+            throw new RuntimeException("Serializing " + this + " failed", e);
         }
     }
 

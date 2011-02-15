@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -44,7 +45,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -92,8 +92,8 @@ public class EmbeddedService implements CoreService {
 
          PRE_CREATE_TOPIC("preCreateHook",  Topic.class, ClientContext.class),
         POST_CREATE_TOPIC("postCreateHook", Topic.class, ClientContext.class),
-         PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, Map.class),
-        POST_UPDATE_TOPIC("postUpdateHook", Topic.class, Map.class),
+         PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, Properties.class),
+        POST_UPDATE_TOPIC("postUpdateHook", Topic.class, Properties.class),
 
          PRE_DELETE_RELATION("preDeleteRelationHook",  Long.TYPE),
         POST_DELETE_RELATION("postDeleteRelationHook", Long.TYPE),
@@ -217,10 +217,10 @@ public class EmbeddedService implements CoreService {
     }
 
     @Override
-    public Object getTopicProperty(long topicId, String key) {
+    public PropValue getTopicProperty(long topicId, String key) {
         Transaction tx = storage.beginTx();
         try {
-            Object value = storage.getTopicProperty(topicId, key);
+            PropValue value = storage.getTopicProperty(topicId, key);
             tx.success();
             return value;
         } catch (Exception e) {
@@ -328,7 +328,7 @@ public class EmbeddedService implements CoreService {
     @POST
     @Path("/topic/{typeUri}")
     @Override
-    public Topic createTopic(@PathParam("typeUri") String typeUri, Map properties,
+    public Topic createTopic(@PathParam("typeUri") String typeUri, Properties properties,
                              @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
@@ -354,11 +354,11 @@ public class EmbeddedService implements CoreService {
     @PUT
     @Path("/topic/{id}")
     @Override
-    public void setTopicProperties(@PathParam("id") long id, Map properties) {
+    public void setTopicProperties(@PathParam("id") long id, Properties properties) {
         Transaction tx = storage.beginTx();
         try {
             Topic topic = getTopic(id, null);   // clientContext=null
-            Map oldProperties = new HashMap(topic.getProperties()); // copy old properties for comparison with new ones
+            Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             //
             triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
@@ -447,7 +447,7 @@ public class EmbeddedService implements CoreService {
     }
 
     @Override
-    public Relation createRelation(String typeId, long srcTopicId, long dstTopicId, Map properties) {
+    public Relation createRelation(String typeId, long srcTopicId, long dstTopicId, Properties properties) {
         Transaction tx = storage.beginTx();
         try {
             Relation rel = new Relation(-1, typeId, srcTopicId, dstTopicId, properties);
@@ -463,7 +463,7 @@ public class EmbeddedService implements CoreService {
     }
 
     @Override
-    public void setRelationProperties(long id, Map properties) {
+    public void setRelationProperties(long id, Properties properties) {
         Transaction tx = storage.beginTx();
         try {
             storage.setRelationProperties(id, properties);
@@ -526,7 +526,7 @@ public class EmbeddedService implements CoreService {
     }
 
     @Override
-    public TopicType createTopicType(Map properties, List dataFields, ClientContext clientContext) {
+    public TopicType createTopicType(Properties properties, List dataFields, ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             TopicType topicType = storage.createTopicType(properties, dataFields);
@@ -687,9 +687,9 @@ public class EmbeddedService implements CoreService {
     // FIXME: method to be dropped. Missing properties are regarded as normal state.
     // Otherwise all instances would be required to be updated once a data field has been added to the type definition.
     // Application logic (server-side) and also the client should cope with missing properties.
-    private Map initProperties(Map properties, String typeUri) {
+    private Properties initProperties(Properties properties, String typeUri) {
         if (properties == null) {
-            properties = new HashMap();
+            properties = new Properties();
         }
         for (DataField dataField : getTopicType(typeUri, null).getDataFields()) {   // clientContext=null
             if (!dataField.getDataType().equals("reference") && properties.get(dataField.getUri()) == null) {
@@ -732,7 +732,7 @@ public class EmbeddedService implements CoreService {
     // ---
 
     private void setPluginMigrationNr(Plugin plugin, int migrationNr) {
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/PluginMigrationNr", migrationNr);
         setTopicProperties(plugin.getPluginTopic().id, properties);
     }
@@ -881,7 +881,7 @@ public class EmbeddedService implements CoreService {
 
         private void readMigrationConfigFile(InputStream in, String configFile) {
             try {
-                Properties migrationConfig = new Properties();
+                java.util.Properties migrationConfig = new java.util.Properties();
                 if (in != null) {
                     logger.info("Reading migration config file \"" + configFile + "\"");
                     migrationConfig.load(in);

@@ -1,6 +1,7 @@
 package de.deepamehta.core.storage.neo4j;
 
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -19,16 +20,13 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.ReturnableEvaluator;
 import org.neo4j.graphdb.StopEvaluator;
 import org.neo4j.graphdb.TraversalPosition;
-// import org.neo4j.graphdb.Traverser;
 import org.neo4j.graphdb.Traverser.Order;
-// import org.neo4j.graphdb.traversal.Position;
 import org.neo4j.graphdb.traversal.PruneEvaluator;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Traverser;
 import org.neo4j.helpers.Predicate;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.Traversal;
-// import org.neo4j.kernel.TraversalFactory;
 import org.neo4j.index.IndexHits;
 import org.neo4j.index.IndexService;
 import org.neo4j.index.lucene.LuceneIndexService;
@@ -130,8 +128,8 @@ public class Neo4jStorage implements Storage {
     }
 
     @Override
-    public Object getTopicProperty(long topicId, String key) {
-        return graphDb.getNodeById(topicId).getProperty(key, null);
+    public PropValue getTopicProperty(long topicId, String key) {
+        return new PropValue(graphDb.getNodeById(topicId).getProperty(key, null));
     }
 
     @Override
@@ -209,7 +207,7 @@ public class Neo4jStorage implements Storage {
     }
 
     @Override
-    public Topic createTopic(String typeUri, Map properties) {
+    public Topic createTopic(String typeUri, Properties properties) {
         Node node = graphDb.createNode();
         logger.info("Creating node => ID=" + node.getId());
         getMetaClass(typeUri).getDirectInstances().add(node);       // set topic type
@@ -218,7 +216,7 @@ public class Neo4jStorage implements Storage {
     }
 
     @Override
-    public void setTopicProperties(long id, Map properties) {
+    public void setTopicProperties(long id, Properties properties) {
         logger.info("Setting properties of node " + id + ": " + properties);
         Node node = graphDb.getNodeById(id);
         setProperties(node, properties);
@@ -302,7 +300,7 @@ public class Neo4jStorage implements Storage {
     }
 
     @Override
-    public Relation createRelation(String typeId, long srcTopicId, long dstTopicId, Map properties) {
+    public Relation createRelation(String typeId, long srcTopicId, long dstTopicId, Properties properties) {
         logger.info("Creating \"" + typeId + "\" relationship from node " + srcTopicId + " to " + dstTopicId);
         Node srcNode = graphDb.getNodeById(srcTopicId);
         Node dstNode = graphDb.getNodeById(dstTopicId);
@@ -312,7 +310,7 @@ public class Neo4jStorage implements Storage {
     }
 
     @Override
-    public void setRelationProperties(long id, Map properties) {
+    public void setRelationProperties(long id, Properties properties) {
         logger.info("Setting properties of relationship " + id + ": " + properties);
         Relationship relationship = graphDb.getRelationshipById(id);
         setProperties(relationship, properties);
@@ -341,7 +339,7 @@ public class Neo4jStorage implements Storage {
     }
 
     @Override
-    public TopicType createTopicType(Map<String, Object> properties, List<DataField> dataFields) {
+    public TopicType createTopicType(Properties properties, List<DataField> dataFields) {
         TopicType topicType = new Neo4jTopicType(properties, dataFields, this);
         typeCache.put(topicType);
         return topicType;
@@ -439,7 +437,7 @@ public class Neo4jStorage implements Storage {
         // 2) calculate label
         String label;
         TopicType topicType = getTopicType(typeUri);
-        String topicLabelFieldUri = (String) topicType.getProperty("topic_label_field_uri", null);
+        String topicLabelFieldUri = topicType.getProperty("topic_label_field_uri", null).toString();
         if (topicLabelFieldUri != null) {
             label = node.getProperty(topicLabelFieldUri).toString();    // Note: property value can be a number as well
         } else {
@@ -453,7 +451,7 @@ public class Neo4jStorage implements Storage {
             }
         }
         //
-        Map properties = includeProperties ? getProperties(node) : null;
+        Properties properties = includeProperties ? getProperties(node) : null;
         return new Topic(node.getId(), typeUri, label, properties);
     }
 
@@ -465,7 +463,7 @@ public class Neo4jStorage implements Storage {
      * @param   includeProperties   if true, the relation properties are fetched.
      */
     private Relation buildRelation(Relationship rel, boolean includeProperties) {
-        Map properties = includeProperties ? getProperties(rel) : null;
+        Properties properties = includeProperties ? getProperties(rel) : null;
         return new Relation(rel.getId(), rel.getType().name(),
             rel.getStartNode().getId(), rel.getEndNode().getId(), properties);
     }
@@ -491,15 +489,15 @@ public class Neo4jStorage implements Storage {
 
     // --- Properties ---
 
-    Map getProperties(PropertyContainer container) {
-        Map properties = new HashMap();
+    Properties getProperties(PropertyContainer container) {
+        Properties properties = new Properties();
         for (String key : container.getPropertyKeys()) {
-            properties.put(key, container.getProperty(key));
+            properties.put(key, new PropValue(container.getProperty(key)));
         }
         return properties;
     }
 
-    private void setProperties(PropertyContainer container, Map<String, Object> properties) {
+    private void setProperties(PropertyContainer container, Properties properties) {
         String typeUri = null;
         if (container instanceof Node) {
             typeUri = getTypeUri((Node) container);
@@ -507,12 +505,12 @@ public class Neo4jStorage implements Storage {
         setProperties(container, properties, typeUri);
     }
 
-    private void setProperties(PropertyContainer container, Map<String, Object> properties, String typeUri) {
+    private void setProperties(PropertyContainer container, Properties properties, String typeUri) {
         if (properties == null) {
             throw new NullPointerException("setProperties() called with properties=null");
         }
         for (String key : properties.keySet()) {
-            Object value = properties.get(key);
+            PropValue value = properties.get(key);
             Object oldValue = container.getProperty(key, null);     // null for newly created topics
             // 1) update DB
             container.setProperty(key, value);

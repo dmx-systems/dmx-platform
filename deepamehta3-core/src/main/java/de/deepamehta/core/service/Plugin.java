@@ -1,6 +1,7 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
@@ -26,7 +27,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import java.io.InputStream;
@@ -48,16 +48,16 @@ public class Plugin implements BundleActivator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String pluginId;                    // This bundle's symbolic name.
-    private String pluginName;                  // This bundle's name = POM project name.
+    private String pluginId;                        // This bundle's symbolic name.
+    private String pluginName;                      // This bundle's name = POM project name.
     private String pluginClass;
     private String pluginPackage;
     private Bundle pluginBundle;
-    private Topic  pluginTopic;                 // Represents this plugin in DB. Holds plugin migration number.
+    private Topic  pluginTopic;                     // Represents this plugin in DB. Holds plugin migration number.
 
     private boolean isActivated;
 
-    private Properties configProperties;        // Read from file "plugin.properties"
+    private java.util.Properties configProperties;  // Read from file "plugin.properties"
 
     protected CoreService dms;
     private HttpService httpService;
@@ -209,10 +209,10 @@ public class Plugin implements BundleActivator {
     public void postCreateHook(Topic topic, ClientContext clientContext) {
     }
 
-    public void preUpdateHook(Topic topic, Map<String, Object> newProperties) {
+    public void preUpdateHook(Topic topic, Properties newProperties) {
     }
 
-    public void postUpdateHook(Topic topic, Map<String, Object> oldProperties) {
+    public void postUpdateHook(Topic topic, Properties oldProperties) {
     }
 
     // ---
@@ -448,9 +448,9 @@ public class Plugin implements BundleActivator {
 
     // --- Config Properties ---
 
-    private Properties readConfigFile() {
+    private java.util.Properties readConfigFile() {
         try {
-            Properties properties = new Properties();
+            java.util.Properties properties = new java.util.Properties();
             InputStream in = getResourceAsStream(PLUGIN_CONFIG_FILE);
             if (in != null) {
                 logger.info("Reading plugin config file \"" + PLUGIN_CONFIG_FILE + "\"");
@@ -507,7 +507,7 @@ public class Plugin implements BundleActivator {
             return false;
         } else {
             logger.info("Creating topic for plugin \"" + pluginName + "\" -- this is a plugin clean install");
-            Map properties = new HashMap();
+            Properties properties = new Properties();
             properties.put("de/deepamehta/core/property/PluginID", pluginId);
             properties.put("de/deepamehta/core/property/PluginMigrationNr", 0);
             // FIXME: clientContext=null
@@ -524,7 +524,7 @@ public class Plugin implements BundleActivator {
      * Determines the migrations to be run for this plugin and run them.
      */
     private void runPluginMigrations(boolean isCleanInstall) {
-        int migrationNr = (Integer) pluginTopic.getProperty("de/deepamehta/core/property/PluginMigrationNr");
+        int migrationNr = pluginTopic.getProperty("de/deepamehta/core/property/PluginMigrationNr").intValue();
         int requiredMigrationNr = Integer.parseInt(getConfigProperty("requiredPluginMigrationNr", "0"));
         int migrationsToRun = requiredMigrationNr - migrationNr;
         logger.info("migrationNr=" + migrationNr + ", requiredMigrationNr=" + requiredMigrationNr +

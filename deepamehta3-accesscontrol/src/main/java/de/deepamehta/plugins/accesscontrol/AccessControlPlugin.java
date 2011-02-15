@@ -8,6 +8,7 @@ import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
@@ -71,9 +72,9 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
 
 
-    // *********************************************
-    // *** Hooks (called from DeepaMehta 3 Core) ***
-    // *********************************************
+    // **************************************************
+    // *** Core Hooks (called from DeepaMehta 3 Core) ***
+    // **************************************************
 
 
 
@@ -110,11 +111,11 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     }
 
     @Override
-    public void preUpdateHook(Topic topic, Map<String, Object> newProperties) {
+    public void preUpdateHook(Topic topic, Properties newProperties) {
         // encrypt password of new users
         if (topic.typeUri.equals("de/deepamehta/core/topictype/user")) {
             // we recognize a new user (or changed password) if password doesn't begin with ENCRYPTED_PASSWORD_PREFIX
-            String password = (String) newProperties.get("de/deepamehta/core/property/password");
+            String password = newProperties.get("de/deepamehta/core/property/password").toString();
             if (!password.startsWith(ENCRYPTED_PASSWORD_PREFIX)) {
                 newProperties.put("de/deepamehta/core/property/password", encryptPassword(password));
             }
@@ -135,7 +136,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     @Override
     public void providePropertiesHook(Topic topic) {
         if (topic.typeUri.equals("de/deepamehta/core/topictype/role")) {
-            String roleName = (String) dms.getTopicProperty(topic.id, "de/deepamehta/core/property/rolename");
+            String roleName = dms.getTopicProperty(topic.id, "de/deepamehta/core/property/rolename").toString();
             topic.setProperty("de/deepamehta/core/property/rolename", roleName);
         }
     }
@@ -144,7 +145,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     public void providePropertiesHook(Relation relation) {
         if (relation.typeId.equals(RelationType.ACCESS_CONTROL.name())) {
             // transfer all relation properties
-            Map properties = dms.getRelation(relation.id).getProperties();
+            Properties properties = dms.getRelation(relation.id).getProperties();
             relation.setProperties(properties);
         }
     }
@@ -169,9 +170,9 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
 
 
-    // *******************************************
-    // *** AccessControlService Implementation ***
-    // *******************************************
+    // **********************
+    // *** Plugin Service ***
+    // **********************
 
 
 
@@ -221,9 +222,10 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     @POST
     @Path("/topic/{topicId}/role/{role}")
     @Override
-    public void createACLEntry(@PathParam("topicId") long topicId,
-                               @PathParam("role") Role role, Permissions permissions) {
-        dms.createRelation(RelationType.ACCESS_CONTROL.name(), topicId, getRoleTopic(role).id, permissions);
+    public void createACLEntry(@PathParam("topicId") long topicId, @PathParam("role") Role role,
+                                                                                      Permissions permissions) {
+        dms.createRelation(RelationType.ACCESS_CONTROL.name(), topicId, getRoleTopic(role).id,
+                           new Properties(permissions));
     }
 
     // ---
@@ -240,7 +242,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Topic createUser(String username, String password) {
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/username", username);
         properties.put("de/deepamehta/core/property/password", encryptPassword(password));
         return dms.createTopic("de/deepamehta/core/topictype/user", properties, null);     // clientContext=null
@@ -326,10 +328,10 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         try {
             logger.fine("Determining permission of user " + user + " to " + permission + " " + topic);
             for (RelatedTopic relTopic : getACLEntries(topic.id)) {
-                roleName = (String) relTopic.getTopic().getProperty("de/deepamehta/core/property/rolename");
+                roleName = relTopic.getTopic().getProperty("de/deepamehta/core/property/rolename").toString();
                 Role role = Role.valueOf(roleName.toUpperCase());   // throws IllegalArgumentException
                 logger.fine("There is an ACL entry for role " + role);
-                boolean allowedForRole = (Boolean) relTopic.getRelation().getProperty(permission.s());
+                boolean allowedForRole = relTopic.getRelation().getProperty(permission.s()).booleanValue();
                 logger.fine("value=" + allowedForRole);
                 if (allowedForRole && userOccupiesRole(topic, user, role)) {
                     logger.fine("=> ALLOWED");
@@ -381,7 +383,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
      * @param   topic   actually a topic type.
      */
     private boolean userIsMember(Topic user, Topic topic) {
-        String typeUri = (String) topic.getProperty("de/deepamehta/core/property/TypeURI");
+        String typeUri = topic.getProperty("de/deepamehta/core/property/TypeURI").toString();
         // String typeUri = topic.typeUri;
         //
         List<RelatedTopic> relTopics = wsService.getWorkspaces(topic.id);

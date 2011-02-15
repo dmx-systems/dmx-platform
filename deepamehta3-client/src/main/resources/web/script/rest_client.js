@@ -60,7 +60,7 @@ function RESTClient(core_service_uri) {
     }
 
     this.create_topic = function(topic) {
-        return request("POST", "/topic", topic)
+        return request("POST", "/topic/" + encodeURIComponent(topic.type_uri), topic.properties)
     }
 
     this.set_topic_properties = function(topic_id, properties) {

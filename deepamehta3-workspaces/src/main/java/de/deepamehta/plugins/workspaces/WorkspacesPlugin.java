@@ -4,6 +4,7 @@ import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -31,9 +32,9 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
 
 
-    // ************************
-    // *** Overriding Hooks ***
-    // ************************
+    // **************************************************
+    // *** Core Hooks (called from DeepaMehta 3 Core) ***
+    // **************************************************
 
 
 
@@ -83,18 +84,17 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
 
 
-    // ****************************************
-    // *** WorkspacesService Implementation ***
-    // ****************************************
+    // **********************
+    // *** Plugin Service ***
+    // **********************
 
 
 
     @Override
     public Topic createWorkspace(String name) {
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/Name", name);
-        // clientContext=null
-        return getService().createTopic("de/deepamehta/core/topictype/Workspace", properties, null);
+        return dms.createTopic("de/deepamehta/core/topictype/Workspace", properties, null);     // clientContext=null
     }
 
     @Override

@@ -3,6 +3,7 @@ package de.deepamehta.plugins.files;
 import de.deepamehta.plugins.files.service.FilesService;
 
 import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.Relation;
@@ -35,9 +36,9 @@ public class FilesPlugin extends Plugin implements FilesService {
 
 
 
-    // *********************************************
-    // *** Hooks (called from DeepaMehta 3 Core) ***
-    // *********************************************
+    // **************************************************
+    // *** Core Hooks (called from DeepaMehta 3 Core) ***
+    // **************************************************
 
 
 
@@ -75,7 +76,7 @@ public class FilesPlugin extends Plugin implements FilesService {
     public JSONObject openFile(long fileTopicId) {
         String path = null;
         try {
-            path = (String) dms.getTopicProperty(fileTopicId, "de/deepamehta/core/property/Path");
+            path = dms.getTopicProperty(fileTopicId, "de/deepamehta/core/property/Path").toString();
             logger.info("### Opening file \"" + path + "\"");
             //
             Desktop.getDesktop().open(new File(path));
@@ -90,9 +91,9 @@ public class FilesPlugin extends Plugin implements FilesService {
 
 
 
-    // ***********************************
-    // *** FilesService Implementation ***
-    // ***********************************
+    // **********************
+    // *** Plugin Service ***
+    // **********************
 
 
 
@@ -108,7 +109,7 @@ public class FilesPlugin extends Plugin implements FilesService {
         String fileType = JavaUtils.getFileType(fileName);
         long fileSize = file.length();
         //
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/FileName", fileName);
         properties.put("de/deepamehta/core/property/Path", path);
         properties.put("de/deepamehta/core/property/MediaType", fileType);
@@ -129,7 +130,7 @@ public class FilesPlugin extends Plugin implements FilesService {
             return topic;
         }
         //
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/FolderName", new File(path).getName());
         properties.put("de/deepamehta/core/property/Path", path);
         //

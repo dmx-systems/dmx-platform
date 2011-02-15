@@ -43,7 +43,7 @@ public class JSONHelper {
             }
             return map;
         } catch (JSONException e) {
-            throw new RuntimeException("Error while converting JSONObject to Map", e);
+            throw new RuntimeException("Converting JSONObject to Map failed", e);
         }
     }
 
@@ -57,7 +57,7 @@ public class JSONHelper {
             }
             return list;
         } catch (JSONException e) {
-            throw new RuntimeException("Error while converting JSONArray to Map", e);
+            throw new RuntimeException("Converting JSONArray to Map failed", e);
         }
     }
 
@@ -110,7 +110,7 @@ public class JSONHelper {
                 createTopics(topics, dms);
             }
         } catch (Throwable e) {
-            throw new RuntimeException("Error while reading migration file \"" + migrationFileName + "\"", e);
+            throw new RuntimeException("Reading migration file \"" + migrationFileName + "\" failed", e);
         }
     }
 

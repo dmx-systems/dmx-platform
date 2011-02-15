@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.iconpicker.migrations;
 
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
@@ -40,7 +41,7 @@ public class Migration2 extends Migration {
         for (String typeURI : dms.getTopicTypeUris()) {
             logger.info("### Handling icon topic for type " + typeURI + " ...");
             TopicType type = dms.getTopicType(typeURI, null);   // clientContext=null
-            String iconSrc = (String) type.getProperty("icon_src", null);
+            String iconSrc = type.getProperty("icon_src", null).toString();
             if (iconSrc == null) {
                 logger.info("  # Type has no icon_src declaration -> no icon topic needed");
                 continue;
@@ -71,7 +72,7 @@ public class Migration2 extends Migration {
     }
 
     private Topic createIconTopic(String iconSrc) {
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/IconSource", iconSrc);
         return dms.createTopic("de/deepamehta/core/topictype/Icon", properties, null);
     }

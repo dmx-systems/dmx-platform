@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.client;
 
 import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.service.Plugin;
 
@@ -35,9 +36,9 @@ public class ClientPlugin extends Plugin {
 
 
 
-    // *********************************************
-    // *** Hooks (called from DeepaMehta 3 Core) ***
-    // *********************************************
+    // **************************************************
+    // *** Core Hooks (called from DeepaMehta 3 Core) ***
+    // **************************************************
 
 
 
@@ -104,14 +105,14 @@ public class ClientPlugin extends Plugin {
      * Creates a search result topic (a bucket).
      */
     private Topic createResultTopic(String searchTerm, List<Topic> topics, ClientContext clientContext) {
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/SearchTerm", searchTerm);
         Topic resultTopic = dms.createTopic("de/deepamehta/core/topictype/SearchResult", properties, clientContext);
         // associate result topics
         logger.fine("Relating " + topics.size() + " result topics");
         for (Topic topic : topics) {
             logger.fine("Relating " + topic);
-            dms.createRelation("SEARCH_RESULT", resultTopic.id, topic.id, new HashMap());
+            dms.createRelation("SEARCH_RESULT", resultTopic.id, topic.id, null);
         }
         return resultTopic;
     }

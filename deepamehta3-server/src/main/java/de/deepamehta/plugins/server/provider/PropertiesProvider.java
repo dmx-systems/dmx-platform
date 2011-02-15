@@ -1,7 +1,7 @@
-package de.deepamehta.plugins.accesscontrol.provider;
+package de.deepamehta.plugins.server.provider;
 
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.util.JavaUtils;
-import de.deepamehta.plugins.accesscontrol.model.Permissions;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -20,7 +20,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class PermissionsProvider implements MessageBodyReader<Permissions> {
+public class PropertiesProvider implements MessageBodyReader<Properties> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -40,18 +40,18 @@ public class PermissionsProvider implements MessageBodyReader<Permissions> {
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         // logger.info("### mediaType=" + mediaType);
         // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
-        return type == Permissions.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
+        return type == Properties.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Override
-    public Permissions readFrom(Class<Permissions> type, Type genericType, Annotation[] annotations,
+    public Properties readFrom(Class<Properties> type, Type genericType, Annotation[] annotations,
             MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
                                                                 throws IOException, WebApplicationException {
         try {
             String json = JavaUtils.readText(entityStream);
-            return new Permissions(new JSONObject(json));
+            return new Properties(new JSONObject(json));
         } catch (Exception e) {
-            throw new IOException("Reading a Permissions object from request stream failed", e);
+            throw new IOException("Reading a Properties object from request stream failed", e);
         }
     }
 }

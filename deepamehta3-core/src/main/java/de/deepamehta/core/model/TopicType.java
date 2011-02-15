@@ -30,7 +30,7 @@ public class TopicType extends Topic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TopicType(Map properties, List dataFields) {
+    public TopicType(Properties properties, List dataFields) {
         // id and label remain uninitialized
         super(-1, "de/deepamehta/core/topictype/TopicType", null, properties);  // label=null
         this.dataFields = dataFields;

@@ -3,8 +3,10 @@ package de.deepamehta.plugins.topicmaps;
 import de.deepamehta.plugins.topicmaps.model.Topicmap;
 import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
-import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.Properties;
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Relation;
+import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.service.Plugin;
 
 import javax.ws.rs.GET;
@@ -60,7 +62,7 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
     @Override
     public void providePropertiesHook(Topic topic) {
         if (topic.typeUri.equals("de/deepamehta/core/topictype/TopicmapRelationRef")) {
-            Object relation_id = dms.getTopicProperty(topic.id, "de/deepamehta/core/property/RelationID");
+            PropValue relation_id = dms.getTopicProperty(topic.id, "de/deepamehta/core/property/RelationID");
             topic.setProperty("de/deepamehta/core/property/RelationID", relation_id);
         }
     }
@@ -69,7 +71,7 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
     public void providePropertiesHook(Relation relation) {
         if (relation.typeId.equals("TOPICMAP_TOPIC")) {
             // transfer all relation properties
-            Map<String, Object> properties = dms.getRelation(relation.id).getProperties();
+            Properties properties = dms.getRelation(relation.id).getProperties();
             for (String key : properties.keySet()) {
                 relation.setProperty(key, properties.get(key));
             }
@@ -96,7 +98,7 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
     @Override
     public long addTopicToTopicmap(@PathParam("id") long topicmapId,
                                    @PathParam("topicId") long topicId, @PathParam("x") int x, @PathParam("y") int y) {
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put("x", x);
         properties.put("y", y);
         properties.put("visibility", true);
@@ -108,8 +110,8 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
     @Path("/{id}/relation/{relationId}")
     @Override
     public long addRelationToTopicmap(@PathParam("id") long topicmapId, @PathParam("relationId") long relationId) {
-        // TODO: do this in a transaction. Extend the core service to let the caller begin a transaction.
-        Map properties = new HashMap();
+        // FIME: do this in a transaction.
+        Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/RelationID", relationId);
         Topic refTopic = dms.createTopic("de/deepamehta/core/topictype/TopicmapRelationRef", properties, null);
         dms.createRelation("RELATION", topicmapId, refTopic.id, null);

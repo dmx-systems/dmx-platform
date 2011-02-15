@@ -155,7 +155,7 @@ public class Topicmap {
         List<RelatedTopic> relTopics = dms.getRelatedTopics(topicmapId, null, asList("TOPICMAP_TOPIC;INCOMING"), null);
         for (RelatedTopic relTopic : relTopics) {
             Relation refRelation = relTopic.getRelation();
-            addTopic(new TopicmapTopic(relTopic.getTopic(), refRelation.getProperties(), refRelation.id));
+            addTopic(new TopicmapTopic(relTopic.getTopic(), refRelation.getProperties().toMap(), refRelation.id));
         }
     }
 
@@ -165,7 +165,7 @@ public class Topicmap {
             asList("RELATION;INCOMING"), null);
         for (RelatedTopic relTopic : relTopics) {
             Topic refTopic = relTopic.getTopic();
-            long relationId = (Long) refTopic.getProperty("de/deepamehta/core/property/RelationID");
+            long relationId = refTopic.getProperty("de/deepamehta/core/property/RelationID").longValue();
             addRelation(new TopicmapRelation(dms.getRelation(relationId), refTopic.id));
         }
     }

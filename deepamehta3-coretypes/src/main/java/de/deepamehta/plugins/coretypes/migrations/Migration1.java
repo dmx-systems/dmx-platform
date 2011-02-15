@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.coretypes.migrations;
 
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.service.Migration;
 
 import java.util.HashMap;
@@ -54,7 +55,7 @@ public class Migration1 extends Migration {
             logger.info("Do NOT create topic type \"Topic Type\" -- already exists");
             // update icon_src
             long typeId = dms.getTopicType("de/deepamehta/core/topictype/TopicType", null).id;     // clientContext=null
-            Map properties = new HashMap();
+            Properties properties = new Properties();
             logger.info("Updating icon_src of topic type \"Topic Type\" (topic " + typeId + ")");
             properties.put("icon_src", "/de.deepamehta.3-coretypes/images/drawer.png");
             dms.setTopicProperties(typeId, properties);
@@ -66,7 +67,7 @@ public class Migration1 extends Migration {
             logger.info("Do NOT create topic type \"Search Result\" -- already exists");
             // update icon_src
             long typeId = dms.getTopicType("de/deepamehta/core/topictype/SearchResult", null).id;  // clientContext=null
-            Map properties = new HashMap();
+            Properties properties = new Properties();
             logger.info("Updating icon_src of topic type \"Search Result\" (topic " + typeId + ")");
             properties.put("icon_src", "/de.deepamehta.3-coretypes/images/bucket.png");
             dms.setTopicProperties(typeId, properties);

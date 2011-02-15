@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.notes.migrations;
 
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.service.Migration;
 
@@ -44,8 +45,8 @@ public class Migration1 extends Migration {
             logger.info("Do NOT create topic type \"Note\" -- already exists");
             // update icon_src
             TopicType noteType = dms.getTopicType("de/deepamehta/core/topictype/Note", null);   // clientContext=null
-            Map properties = new HashMap();
             logger.info("Updating icon_src of topic type \"Note\" (topic " + noteType.id + ")");
+            Properties properties = new Properties();
             properties.put("icon_src", "/de.deepamehta.3-notes/images/pencil.png");
             dms.setTopicProperties(noteType.id, properties);
             // update fields
