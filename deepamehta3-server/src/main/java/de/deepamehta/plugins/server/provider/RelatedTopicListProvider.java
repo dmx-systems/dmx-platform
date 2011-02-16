@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.server.provider;
 
-import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.util.JSONHelper;
 
 import java.io.BufferedWriter;
@@ -23,7 +23,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class TopicListProvider implements MessageBodyWriter<List<Topic>> {
+public class RelatedTopicListProvider implements MessageBodyWriter<List<RelatedTopic>> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -49,11 +49,11 @@ public class TopicListProvider implements MessageBodyWriter<List<Topic>> {
                   "      ########## owner type=" + pt.getOwnerType() + "\n" +
                   "      ########## number of type args=" + typeArgs.length + "\n" +
                   "      ########## type arg[0]=" + typeArgs[0]);
-            if (pt.getRawType() == List.class && typeArgs.length == 1 && typeArgs[0] == Topic.class) {
+            if (pt.getRawType() == List.class && typeArgs.length == 1 && typeArgs[0] == RelatedTopic.class) {
                 // Note: unlike equals() isCompatible() ignores parameters
                 // like "charset" in "application/json;charset=UTF-8"
                 if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
-                    logger.info("########## => TopicListProvider feels responsible!!!");
+                    logger.fine("########## => RelatedTopicListProvider feels responsible!!!");
                     return true;
                 }
             }
@@ -62,22 +62,22 @@ public class TopicListProvider implements MessageBodyWriter<List<Topic>> {
     }
 
     @Override
-    public long getSize(List<Topic> topics, Class<?> type, Type genericType, Annotation[] annotations,
+    public long getSize(List<RelatedTopic> relTopics, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(List<Topic> topics, Class<?> type, Type genericType, Annotation[] annotations,
+    public void writeTo(List<RelatedTopic> relTopics, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {
             // logger.info("Writing " + entity + " to response stream");
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            JSONHelper.topicsToJson(topics).write(writer);
+            JSONHelper.relatedTopicsToJson(relTopics).write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + topics + " to response stream failed", e);
+            throw new IOException("Writing " + relTopics + " to response stream failed", e);
         }
     }
 }

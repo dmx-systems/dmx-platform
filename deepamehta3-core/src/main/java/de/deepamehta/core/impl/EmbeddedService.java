@@ -271,7 +271,7 @@ public class EmbeddedService implements CoreService {
     @GET
     @Path("/topic/{id}/related_topics")
     @Override
-    public List<RelatedTopic> getRelatedTopics(@PathParam("id")                   long         topicId,
+    public List<RelatedTopic> getRelatedTopics(@PathParam("id") long topicId,
                                                @QueryParam("include_topic_types") List<String> includeTopicTypes,
                                                @QueryParam("include_rel_types")   List<String> includeRelTypes,
                                                @QueryParam("exclude_rel_types")   List<String> excludeRelTypes) {
