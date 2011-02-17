@@ -51,7 +51,6 @@ public class TopicProvider implements MessageBodyWriter<Topic> {
             MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException,
             WebApplicationException {
         try {
-            // logger.info("Writing " + entity + " to response stream");
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
             topic.toJSON().write(writer);
             writer.flush();

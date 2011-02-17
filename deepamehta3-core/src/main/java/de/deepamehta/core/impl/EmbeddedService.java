@@ -414,8 +414,11 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/relation")
     @Override
-    public Relation getRelation(long srcTopicId, long dstTopicId, String typeId, boolean isDirected) {
+    public Relation getRelation(@QueryParam("src") long srcTopicId, @QueryParam("dst") long dstTopicId,
+                                @QueryParam("type") String typeId, @QueryParam("directed") boolean isDirected) {
         Transaction tx = storage.beginTx();
         try {
             Relation relation = storage.getRelation(srcTopicId, dstTopicId, typeId, isDirected);
@@ -430,8 +433,11 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/relation/multiple")
     @Override
-    public List<Relation> getRelations(long srcTopicId, long dstTopicId, String typeId, boolean isDirected) {
+    public List<Relation> getRelations(@QueryParam("src") long srcTopicId, @QueryParam("dst") long dstTopicId,
+                                       @QueryParam("type") String typeId, @QueryParam("directed") boolean isDirected) {
         Transaction tx = storage.beginTx();
         try {
             List<Relation> relations = storage.getRelations(srcTopicId, dstTopicId, typeId, isDirected);
@@ -446,8 +452,11 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @POST
+    @Path("/relation/{src}/{dst}/{typeId}")
     @Override
-    public Relation createRelation(String typeId, long srcTopicId, long dstTopicId, Properties properties) {
+    public Relation createRelation(@PathParam("typeId") String typeId, @PathParam("src") long srcTopicId,
+                                   @PathParam("dst") long dstTopicId, Properties properties) {
         Transaction tx = storage.beginTx();
         try {
             Relation rel = new Relation(-1, typeId, srcTopicId, dstTopicId, properties);
@@ -462,8 +471,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @PUT
+    @Path("/relation/{id}")
     @Override
-    public void setRelationProperties(long id, Properties properties) {
+    public void setRelationProperties(@PathParam("id") long id, Properties properties) {
         Transaction tx = storage.beginTx();
         try {
             storage.setRelationProperties(id, properties);
@@ -476,8 +487,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @DELETE
+    @Path("/relation/{id}")
     @Override
-    public void deleteRelation(long id) {
+    public void deleteRelation(@PathParam("id") long id) {
         Transaction tx = storage.beginTx();
         try {
             triggerHook(Hook.PRE_DELETE_RELATION, id);

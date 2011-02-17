@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.server.provider;
 
-import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.util.JSONHelper;
 
 import java.io.BufferedWriter;
@@ -23,7 +23,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class TopicListProvider implements MessageBodyWriter<List<Topic>> {
+public class RelationListProvider implements MessageBodyWriter<List<Relation>> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -44,7 +44,7 @@ public class TopicListProvider implements MessageBodyWriter<List<Topic>> {
         if (genericType instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) genericType;
             Type[] typeArgs = pt.getActualTypeArguments();
-            if (pt.getRawType() == List.class && typeArgs.length == 1 && typeArgs[0] == Topic.class) {
+            if (pt.getRawType() == List.class && typeArgs.length == 1 && typeArgs[0] == Relation.class) {
                 // Note: unlike equals() isCompatible() ignores parameters
                 // like "charset" in "application/json;charset=UTF-8"
                 if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
@@ -56,21 +56,21 @@ public class TopicListProvider implements MessageBodyWriter<List<Topic>> {
     }
 
     @Override
-    public long getSize(List<Topic> topics, Class<?> type, Type genericType, Annotation[] annotations,
+    public long getSize(List<Relation> relations, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(List<Topic> topics, Class<?> type, Type genericType, Annotation[] annotations,
+    public void writeTo(List<Relation> relations, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            JSONHelper.topicsToJson(topics).write(writer);
+            JSONHelper.relationsToJson(relations).write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + topics + " to response stream failed", e);
+            throw new IOException("Writing " + relations + " to response stream failed", e);
         }
     }
 }

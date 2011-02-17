@@ -4,7 +4,8 @@ import de.deepamehta.plugins.server.provider.PropertiesProvider;
 import de.deepamehta.plugins.server.provider.TopicProvider;
 import de.deepamehta.plugins.server.provider.TopicListProvider;
 import de.deepamehta.plugins.server.provider.RelatedTopicListProvider;
-import de.deepamehta.plugins.server.resources.RelationResource;
+import de.deepamehta.plugins.server.provider.RelationProvider;
+import de.deepamehta.plugins.server.provider.RelationListProvider;
 import de.deepamehta.plugins.server.resources.TopicTypeResource;
 import de.deepamehta.plugins.server.resources.PluginResource;
 import de.deepamehta.plugins.server.resources.CommandResource;
@@ -22,7 +23,6 @@ public class Application extends javax.ws.rs.core.Application {
     public Set<Class<?>> getClasses() {
         Set classes = new HashSet();
         // root resource classes
-        classes.add(RelationResource.class);
         classes.add(TopicTypeResource.class);
         classes.add(PluginResource.class);
         classes.add(CommandResource.class);
@@ -30,6 +30,8 @@ public class Application extends javax.ws.rs.core.Application {
         classes.add(TopicProvider.class);
         classes.add(TopicListProvider.class);
         classes.add(RelatedTopicListProvider.class);
+        classes.add(RelationProvider.class);
+        classes.add(RelationListProvider.class);
         classes.add(PropertiesProvider.class);
         return classes;
     }

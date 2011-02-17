@@ -105,7 +105,8 @@ function RESTClient(core_service_uri) {
     }
 
     this.create_relation = function(relation) {
-        return request("POST", "/relation", relation)
+        return request("POST", "/relation/" + relation.src_topic_id + "/" + relation.dst_topic_id + "/" +
+            relation.type_id, relation.properties)
     }
 
     this.set_relation_properties = function(relation_id, properties) {
