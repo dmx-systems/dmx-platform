@@ -39,27 +39,19 @@ public class EmbeddedServiceIndexingTestCase {
 
     @Test
     public void indexing() {
-        createTopicType();                  // ### Operation 1
-        //
-        // Note: if createTopic() and retrieveTopicByProperty() are wrapped by an outer transaction
-        // the retrieving fails (result is null)!! Without outer transaction everything runs fine.
-        // Hint 1: both of the corresponding core service calls opens a transaction on its own.
-        // Hint 2: createTopic() together with retrieveTopicById() in an outer transaction runs fine.
-        // The case described first is the only problem case, that is an outer transaction consisting of 2
-        // nested transactions (one Neo4j operation and one Lucene operation).
-        //
-        Transaction tx = dms.beginTx();     // outer transaction
-        try {
+        // Transaction tx = dms.beginTx();  // enable to test nested transactions
+        // try {
+            createTopicType();              // ### Operation 1
             createTopic();                  // ### Operation 2
             retrieveTopicById();            // ### Operation 3 (doesn't involve Lucene index)
-            tx.success();
+            retrieveTopicByProperty();      // ### Operation 4 (involves Lucene index)
+        /*  tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Test indexing() failed", e);
         } finally {
             tx.finish();
-        }
-        retrieveTopicByProperty();          // ### Operation 4 (involves Lucene index), fails if in outer transaction
+        } */
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

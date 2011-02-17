@@ -510,10 +510,10 @@ public class Neo4jStorage implements Storage {
             throw new NullPointerException("setProperties() called with properties=null");
         }
         for (String key : properties.keySet()) {
-            PropValue value = properties.get(key);
+            Object value = properties.get(key).value();
             Object oldValue = container.getProperty(key, null);     // null for newly created topics
             // 1) update DB
-            container.setProperty(key, value.value());
+            container.setProperty(key, value);
             // 2) update index
             if (container instanceof Node) {
                 // Note: we only index node properties.

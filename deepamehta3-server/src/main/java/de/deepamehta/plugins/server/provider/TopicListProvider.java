@@ -53,7 +53,7 @@ public class TopicListProvider implements MessageBodyWriter<List<Topic>> {
                 // Note: unlike equals() isCompatible() ignores parameters
                 // like "charset" in "application/json;charset=UTF-8"
                 if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
-                    logger.info("########## => TopicListProvider feels responsible!!!");
+                    logger.fine("########## => TopicListProvider feels responsible!!!");
                     return true;
                 }
             }
