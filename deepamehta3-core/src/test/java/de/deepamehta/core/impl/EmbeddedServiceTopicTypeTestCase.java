@@ -34,9 +34,15 @@ public class EmbeddedServiceTopicTypeTestCase {
     }
 
     @Test
-    public void createOK() {
-        logger.info("### Running test createOK() ###");
-        //
+    public void testTopicType() {
+        createTopicType();
+        readTopicType();
+        modifyTopicType();
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void createTopicType() {
         DataField nameField = new DataField("Name", "text");
         nameField.setUri("de/deepamehta/core/property/Name");
         nameField.setRendererClass("TitleRenderer");
@@ -60,20 +66,18 @@ public class EmbeddedServiceTopicTypeTestCase {
         TopicType topicType = dms.createTopicType(properties, dataFields, null);  // clientContext=null
         //
         assertEquals("de.deepamehta.core.storage.neo4j.Neo4jTopicType", topicType.getClass().getName());
-        //
-        //
-        logger.info("### Running test readOK() ###");
-        //
-        topicType = dms.getTopicType("de/deepamehta/core/topictype/Workspace", null);
+    }
+
+    private void readTopicType() {
+        TopicType topicType = dms.getTopicType("de/deepamehta/core/topictype/Workspace", null);
         assertEquals("de.deepamehta.core.storage.neo4j.Neo4jTopicType", topicType.getClass().getName());
         assertEquals(2, topicType.getDataFields().size());
         //
         String typeUri = topicType.getProperty("de/deepamehta/core/property/TypeURI").toString();
         assertEquals("de/deepamehta/core/topictype/Workspace", typeUri);
-        //
-        //
-        logger.info("### Running test modifyOK() ###");
-        //
+    }
+
+    private void modifyTopicType() {
         DataField dateCreatedField = new DataField("Date Created", "number");
         dateCreatedField.setUri("de/deepamehta/core/property/DateCreated");
         dateCreatedField.setEditable(false);
@@ -86,6 +90,9 @@ public class EmbeddedServiceTopicTypeTestCase {
         dateModifiedField.setRendererClass("TimestampFieldRenderer");
         dateModifiedField.setIndexingMode("FULLTEXT_KEY");
         //
+        TopicType topicType = dms.getTopicType("de/deepamehta/core/topictype/Workspace", null);
+        //
+        // FIXME: let topicType.addDataField() open an transaction
         Transaction tx = dms.beginTx();
         try {
             topicType.addDataField(dateCreatedField);
@@ -99,9 +106,5 @@ public class EmbeddedServiceTopicTypeTestCase {
         }
         //
         assertEquals(4, topicType.getDataFields().size());
-    }
-
-    @Test
-    public void readOK() {
     }
 }
