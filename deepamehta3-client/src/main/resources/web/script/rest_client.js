@@ -160,6 +160,8 @@ function RESTClient(core_service_uri) {
         return request("GET", "/plugin")
     }
 
+    // === Utilities for plugin developers ===
+
     /**
      * Sends an AJAX request. The URI is interpreted as an absolute URI.
      *
@@ -221,7 +223,8 @@ function RESTClient(core_service_uri) {
         if (status == "success") {
             return responseData
         } else {
-            throw "AJAX request failed (" + responseCode + "): " + responseMessage + " (exception: " + exception + ")"
+            throw "AJAX " + method + " request failed, server response: " + responseCode +
+                " (" + responseMessage + "), exception: " + exception
         }
     }
 

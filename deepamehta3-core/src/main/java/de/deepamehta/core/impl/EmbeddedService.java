@@ -20,17 +20,18 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import java.lang.reflect.Method;
@@ -507,6 +508,8 @@ public class EmbeddedService implements CoreService {
 
     // === Types ===
 
+    @GET
+    @Path("/topictype")
     @Override
     public Set<String> getTopicTypeUris() {
         Transaction tx = storage.beginTx();
@@ -522,8 +525,11 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/topictype/{typeUri}")
     @Override
-    public TopicType getTopicType(String typeUri, ClientContext clientContext) {
+    public TopicType getTopicType(@PathParam("typeUri") String typeUri,
+                                  @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             TopicType topicType = storage.getTopicType(typeUri);
@@ -538,8 +544,12 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @POST
+    @Path("/topictype")
     @Override
-    public TopicType createTopicType(Properties properties, List dataFields, ClientContext clientContext) {
+    public TopicType createTopicType(@FormParam("properties") Properties properties,
+                                     @FormParam("datafields") List dataFields,
+                                     @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             TopicType topicType = storage.createTopicType(properties, dataFields);
@@ -559,8 +569,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @POST
+    @Path("/topictype/{typeUri}")
     @Override
-    public void addDataField(String typeUri, DataField dataField) {
+    public void addDataField(@PathParam("typeUri") String typeUri, DataField dataField) {
         Transaction tx = storage.beginTx();
         try {
             storage.addDataField(typeUri, dataField);
@@ -574,8 +586,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @PUT
+    @Path("/topictype/{typeUri}")
     @Override
-    public void updateDataField(String typeUri, DataField dataField) {
+    public void updateDataField(@PathParam("typeUri") String typeUri, DataField dataField) {
         Transaction tx = storage.beginTx();
         try {
             storage.updateDataField(typeUri, dataField);
@@ -589,8 +603,26 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @PUT
+    @Path("/topictype/{typeUri}/field_order")
     @Override
-    public void removeDataField(String typeUri, String fieldUri) {
+    public void setDataFieldOrder(@PathParam("typeUri") String typeUri, List<String> fieldUris) {
+        Transaction tx = storage.beginTx();
+        try {
+            storage.setDataFieldOrder(typeUri, fieldUris);
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Data field order of topic type \"" + typeUri + "\" can't be set", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @DELETE
+    @Path("/topictype/{typeUri}/field/{fieldUri}")
+    @Override
+    public void removeDataField(@PathParam("typeUri") String typeUri, @PathParam("fieldUri") String fieldUri) {
         Transaction tx = storage.beginTx();
         try {
             storage.removeDataField(typeUri, fieldUri);
@@ -599,20 +631,6 @@ public class EmbeddedService implements CoreService {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Data field \"" + fieldUri + "\" of topic type \"" +
                 typeUri + "\" can't be removed", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
-    @Override
-    public void setDataFieldOrder(String typeUri, List fieldUris) {
-        Transaction tx = storage.beginTx();
-        try {
-            storage.setDataFieldOrder(typeUri, fieldUris);
-            tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Data field order of topic type \"" + typeUri + "\" can't be set", e);
         } finally {
             tx.finish();
         }

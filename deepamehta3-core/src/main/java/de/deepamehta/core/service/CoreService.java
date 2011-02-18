@@ -156,9 +156,9 @@ public interface CoreService {
 
     public void updateDataField(String typeUri, DataField dataField);
 
-    public void removeDataField(String typeUri, String fieldUri);
+    public void setDataFieldOrder(String typeUri, List<String> fieldUris);
 
-    public void setDataFieldOrder(String typeUri, List fieldUris);
+    public void removeDataField(String typeUri, String fieldUri);
 
     // === Commands ===
 

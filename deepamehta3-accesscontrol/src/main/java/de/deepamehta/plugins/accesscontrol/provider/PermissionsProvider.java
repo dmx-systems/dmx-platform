@@ -38,7 +38,6 @@ public class PermissionsProvider implements MessageBodyReader<Permissions> {
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        // logger.info("### mediaType=" + mediaType);
         // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
         return type == Permissions.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }

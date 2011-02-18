@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 
 
@@ -15,6 +16,8 @@ public class Properties {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Map<String, PropValue> values = new HashMap();
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -42,6 +45,13 @@ public class Properties {
         } catch (JSONException e) {
             throw new RuntimeException("Constructing Properties from JSONObject failed", e);
         }
+    }
+
+    /**
+     * Called by JAX-RS container to create Properties from a @FormParam
+     */
+    public Properties(String json) {
+        logger.info("########## Create Properties from this string:\n" + json);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

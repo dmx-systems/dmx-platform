@@ -1,14 +1,16 @@
 package de.deepamehta.plugins.server.provider;
 
-import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.util.JavaUtils;
+import de.deepamehta.core.util.JSONHelper;
 
-import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONArray;
 
 import java.io.InputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
@@ -20,7 +22,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class PropertiesProvider implements MessageBodyReader<Properties> {
+public class StringListProvider implements MessageBodyReader<List<String>> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -38,19 +40,29 @@ public class PropertiesProvider implements MessageBodyReader<Properties> {
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
-        return type == Properties.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
+        if (genericType instanceof ParameterizedType) {
+            ParameterizedType pt = (ParameterizedType) genericType;
+            Type[] typeArgs = pt.getActualTypeArguments();
+            if (pt.getRawType() == List.class && typeArgs.length == 1 && typeArgs[0] == String.class) {
+                // Note: unlike equals() isCompatible() ignores parameters
+                // like "charset" in "application/json;charset=UTF-8"
+                if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
-    public Properties readFrom(Class<Properties> type, Type genericType, Annotation[] annotations,
+    public List<String> readFrom(Class<List<String>> type, Type genericType, Annotation[] annotations,
             MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
                                                                 throws IOException, WebApplicationException {
         try {
             String json = JavaUtils.readText(entityStream);
-            return new Properties(new JSONObject(json));
+            return JSONHelper.toList(new JSONArray(json));
         } catch (Exception e) {
-            throw new IOException("Reading a Properties object from request stream failed", e);
+            throw new IOException("Reading a list of strings from request stream failed", e);
         }
     }
 }

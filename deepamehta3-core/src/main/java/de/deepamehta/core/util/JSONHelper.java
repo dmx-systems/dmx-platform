@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -57,8 +58,18 @@ public class JSONHelper {
             }
             return list;
         } catch (JSONException e) {
-            throw new RuntimeException("Converting JSONArray to Map failed", e);
+            throw new RuntimeException("Converting JSONArray to List failed", e);
         }
+    }
+
+    // ---
+
+    public static JSONArray stringsToJson(Set<String> strings) {
+        JSONArray array = new JSONArray();
+        for (String string : strings) {
+            array.put(string);
+        }
+        return array;
     }
 
     // === DeepaMehta specific ===
