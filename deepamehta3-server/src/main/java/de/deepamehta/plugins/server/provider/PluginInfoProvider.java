@@ -66,7 +66,7 @@ public class PluginInfoProvider implements MessageBodyWriter<Set<PluginInfo>> {
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            JSONHelper.pluginInfoToJson(pluginInfo).write(writer);
+            PluginInfo.pluginInfoToJson(pluginInfo).write(writer);
             writer.flush();
         } catch (Exception e) {
             throw new IOException("Writing " + pluginInfo + " to response stream failed", e);

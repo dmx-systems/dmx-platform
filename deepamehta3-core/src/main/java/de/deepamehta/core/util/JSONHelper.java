@@ -75,42 +75,6 @@ public class JSONHelper {
 
     // === DeepaMehta specific ===
 
-    public static JSONArray topicsToJson(List<Topic> topics) {
-        JSONArray array = new JSONArray();
-        for (Topic topic : topics) {
-            array.put(topic.toJSON());
-        }
-        return array;
-    }
-
-    public static JSONArray relationsToJson(List<Relation> relations) {
-        JSONArray array = new JSONArray();
-        for (Relation relation : relations) {
-            array.put(relation.toJSON());
-        }
-        return array;
-    }
-
-    public static JSONArray relatedTopicsToJson(List<RelatedTopic> relTopics) {
-        JSONArray array = new JSONArray();
-        for (RelatedTopic relTopic : relTopics) {
-            // FIXME: for the moment it is sufficient to serialize the topics only.
-            // The respective relations are omitted.
-            array.put(relTopic.getTopic().toJSON());
-        }
-        return array;
-    }
-
-    public static JSONArray pluginInfoToJson(Set<PluginInfo> pluginInfoSet) {
-        JSONArray array = new JSONArray();
-        for (PluginInfo pluginInfo : pluginInfoSet) {
-            array.put(pluginInfo.toJSON());
-        }
-        return array;
-    }
-
-    // ---
-
     /**
      * Creates types and topics from a JSON formatted input stream.
      *

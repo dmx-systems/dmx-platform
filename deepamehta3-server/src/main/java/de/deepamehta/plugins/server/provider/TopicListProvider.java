@@ -67,7 +67,7 @@ public class TopicListProvider implements MessageBodyWriter<List<Topic>> {
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            JSONHelper.topicsToJson(topics).write(writer);
+            Topic.topicsToJson(topics).write(writer);
             writer.flush();
         } catch (Exception e) {
             throw new IOException("Writing " + topics + " to response stream failed", e);

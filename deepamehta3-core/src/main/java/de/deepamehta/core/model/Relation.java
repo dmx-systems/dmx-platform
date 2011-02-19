@@ -1,9 +1,11 @@
 package de.deepamehta.core.model;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -108,6 +110,14 @@ public class Relation {
         } catch (JSONException e) {
             throw new RuntimeException("Serializing " + this + " failed", e);
         }
+    }
+
+    public static JSONArray relationsToJson(List<Relation> relations) {
+        JSONArray array = new JSONArray();
+        for (Relation relation : relations) {
+            array.put(relation.toJSON());
+        }
+        return array;
     }
 
     // ---

@@ -916,7 +916,7 @@ var dm3c = new function() {
 
             dm3c.restc.search_topics_and_create_bucket = function(text, field_uri, whole_word) {
                 var params = this.createRequestParameter({search: text, field: field_uri, wholeword: whole_word})
-                return this.request("GET", "/client/search" + params.to_query_string())
+                return this.request("GET", "/client/search?" + params.to_query_string())
             }
 
             // Note: this method is actually part of the Type Search plugin.

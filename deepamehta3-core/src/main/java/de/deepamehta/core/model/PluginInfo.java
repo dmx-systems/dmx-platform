@@ -1,5 +1,6 @@
 package de.deepamehta.core.model;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONException;
 
@@ -38,5 +39,13 @@ public class PluginInfo {
         } catch (JSONException e) {
             throw new RuntimeException("Serializing " + this + " failed", e);
         }
+    }
+
+    public static JSONArray pluginInfoToJson(Set<PluginInfo> pluginInfoSet) {
+        JSONArray array = new JSONArray();
+        for (PluginInfo pluginInfo : pluginInfoSet) {
+            array.put(pluginInfo.toJSON());
+        }
+        return array;
     }
 }

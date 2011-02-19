@@ -2,10 +2,12 @@ package de.deepamehta.core.model;
 
 import de.deepamehta.core.util.JSONHelper;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -142,6 +144,14 @@ public class Topic {
         } catch (JSONException e) {
             throw new RuntimeException("Serializing " + this + " failed", e);
         }
+    }
+
+    public static JSONArray topicsToJson(List<Topic> topics) {
+        JSONArray array = new JSONArray();
+        for (Topic topic : topics) {
+            array.put(topic.toJSON());
+        }
+        return array;
     }
 
     // ---

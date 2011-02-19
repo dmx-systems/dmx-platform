@@ -67,7 +67,7 @@ public class RelatedTopicListProvider implements MessageBodyWriter<List<RelatedT
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            JSONHelper.relatedTopicsToJson(relTopics).write(writer);
+            RelatedTopic.relatedTopicsToJson(relTopics).write(writer);
             writer.flush();
         } catch (Exception e) {
             throw new IOException("Writing " + relTopics + " to response stream failed", e);

@@ -156,7 +156,7 @@ function files_plugin() {
          */
         dm3c.restc.get_resource = function(uri, type, size) {
             var params = this.createRequestParameter({type: type, size: size})
-            return this.request("GET", "/resource/" + encodeURIComponent(uri) + params.to_query_string())
+            return this.request("GET", "/resource/" + encodeURIComponent(uri) + "?" + params.to_query_string())
         }
 
         /**
