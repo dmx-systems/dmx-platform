@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Topic;
@@ -691,6 +692,18 @@ public class EmbeddedService implements CoreService {
         return plugin;
     }
 
+    @GET
+    @Path("/plugin")
+    @Override
+    public Set<PluginInfo> getPluginInfo() {
+        Set info = new HashSet();
+        for (String pluginId : getPluginIds()) {
+            String pluginFile = getPlugin(pluginId).getConfigProperty("clientSidePluginFile");
+            info.add(new PluginInfo(pluginId, pluginFile));
+        }
+        return info;
+    }
+
     @Override
     public void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall) {
         runMigration(migrationNr, plugin, isCleanInstall);
@@ -715,6 +728,8 @@ public class EmbeddedService implements CoreService {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
 
     // === Topics ===
 

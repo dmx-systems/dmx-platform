@@ -2,6 +2,7 @@ package de.deepamehta.core.service;
 
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Topic;
@@ -173,6 +174,8 @@ public interface CoreService {
     public Set<String> getPluginIds();
 
     public Plugin getPlugin(String pluginId);
+    
+    public Set<PluginInfo> getPluginInfo();
 
     public void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall);
 

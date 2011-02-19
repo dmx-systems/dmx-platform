@@ -1,5 +1,6 @@
 package de.deepamehta.core.util;
 
+import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
@@ -90,11 +91,20 @@ public class JSONHelper {
         return array;
     }
 
-    // FIXME: for the moment it is sufficient to serialize the topics only. The respective relations are omitted.
     public static JSONArray relatedTopicsToJson(List<RelatedTopic> relTopics) {
         JSONArray array = new JSONArray();
         for (RelatedTopic relTopic : relTopics) {
+            // FIXME: for the moment it is sufficient to serialize the topics only.
+            // The respective relations are omitted.
             array.put(relTopic.getTopic().toJSON());
+        }
+        return array;
+    }
+
+    public static JSONArray pluginInfoToJson(Set<PluginInfo> pluginInfoSet) {
+        JSONArray array = new JSONArray();
+        for (PluginInfo pluginInfo : pluginInfoSet) {
+            array.put(pluginInfo.toJSON());
         }
         return array;
     }
