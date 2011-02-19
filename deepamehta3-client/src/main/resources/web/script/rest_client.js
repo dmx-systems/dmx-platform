@@ -50,13 +50,13 @@ function RESTClient(core_service_uri) {
         params.add_list("include_topic_types", include_topic_types)
         params.add_list("include_rel_types", include_rel_types)
         params.add_list("exclude_rel_types", exclude_rel_types)
-        return request("GET", "/topic/" + topic_id + "/related_topics" + params.to_query_string())
+        return request("GET", "/topic/" + topic_id + "/related_topics?" + params.to_query_string())
     }
 
     // FIXME: index parameter not used
     this.search_topics = function(index, text, field_uri, whole_word) {
         var params = new RequestParameter({search: text, field: field_uri, wholeword: whole_word})
-        return request("GET", "/topic" + params.to_query_string())
+        return request("GET", "/topic?" + params.to_query_string())
     }
 
     this.create_topic = function(topic) {
@@ -86,7 +86,7 @@ function RESTClient(core_service_uri) {
      */
     this.get_relation = function(src_topic_id, dst_topic_id, type_id, is_directed) {
         var params = new RequestParameter({src: src_topic_id, dst: dst_topic_id, type: type_id, directed: is_directed})
-        return request("GET", "/relation" + params.to_query_string())
+        return request("GET", "/relation?" + params.to_query_string())
     }
 
     /**
@@ -101,7 +101,7 @@ function RESTClient(core_service_uri) {
      */
     this.get_relations = function(src_topic_id, dst_topic_id, type_id, is_directed) {
         var params = new RequestParameter({src: src_topic_id, dst: dst_topic_id, type: type_id, directed: is_directed})
-        return request("GET", "/relation/multiple" + params.to_query_string())
+        return request("GET", "/relation/multiple?" + params.to_query_string())
     }
 
     this.create_relation = function(relation) {
@@ -127,8 +127,10 @@ function RESTClient(core_service_uri) {
         return request("GET", "/topictype/" + encodeURIComponent(type_uri))
     }
 
-    this.create_topic_type = function(topic_type) {
-        return request("POST", "/topictype", topic_type)
+    this.create_topic_type = function(properties, data_fields) {
+        var params = new RequestParameter({properties: properties})
+        params.add_list("data_fields", data_fields)
+        return request("POST", "/topictype", params.to_query_string(), "application/x-www-form-urlencoded")
     }
 
     this.add_data_field = function(type_uri, field) {
@@ -169,8 +171,8 @@ function RESTClient(core_service_uri) {
      * namespace (server-side) and add corresponding service calls to the REST client instance.
      * For example, see the DeepaMehta 3 Topicmaps plugin.
      */
-    this.request = function(method, uri, data) {
-        return request(method, uri, data, true)
+    this.request = function(method, uri, data, content_type) {
+        return request(method, uri, data, content_type, true)
     }
 
     /**
@@ -188,7 +190,7 @@ function RESTClient(core_service_uri) {
      * @param   is_absolute_uri     If true, the URI is interpreted as relative to the DeepaMehta core service URI.
      *                              If false, the URI is interpreted as an absolute URI.
      */
-    function request(method, uri, data, is_absolute_uri) {
+    function request(method, uri, data, content_type, is_absolute_uri) {
         var status                  // "success" if request was successful
         var responseCode            // HTTP response code, e.g. 304
         var responseMessage         // HTTP response message, e.g. "Not Modified"
@@ -196,12 +198,17 @@ function RESTClient(core_service_uri) {
         var exception               // in case of unsuccessful request: possibly an exception
         //
         if (LOG_AJAX_REQUESTS) dm3c.log(method + " " + uri + "\n..... " + JSON.stringify(data))
+        // 
+        content_type = content_type || "application/json"       // set default
+        if (content_type == "application/json") {
+            data = JSON.stringify(data)
+        }
         //
         $.ajax({
             type: method,
             url: is_absolute_uri ? uri : core_service_uri + uri,
-            contentType: "application/json",
-            data: JSON.stringify(data),
+            contentType: content_type,
+            data: data,
             processData: false,
             async: false,
             success: function(data, textStatus, xhr) {
@@ -253,14 +260,13 @@ function RESTClient(core_service_uri) {
         }
 
         this.to_query_string = function() {
-            var query_string = param_array.join("&")
-            if (query_string) {
-                query_string = "?" + query_string
-            }
-            return encodeURI(query_string)
+            return encodeURI(param_array.join("&"))
         }
 
         function add(param_name, value) {
+            if (typeof(value) == "object") {
+                value = JSON.stringify(value)
+            }
             param_array.push(param_name + "=" + value)
         }
     }

@@ -150,7 +150,7 @@ public interface CoreService {
 
     public TopicType getTopicType(String typeUri, ClientContext clientContext);
 
-    public TopicType createTopicType(Properties properties, List dataFields, ClientContext clientContext);
+    public TopicType createTopicType(Properties properties, List<DataField> dataFields, ClientContext clientContext);
 
     public void addDataField(String typeUri, DataField dataField);
 

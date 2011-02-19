@@ -546,12 +546,15 @@ public class EmbeddedService implements CoreService {
 
     @POST
     @Path("/topictype")
+    @Consumes("application/x-www-form-urlencoded")
     @Override
     public TopicType createTopicType(@FormParam("properties") Properties properties,
-                                     @FormParam("datafields") List dataFields,
+                                     @FormParam("data_fields") List<DataField> dataFields,
                                      @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
+            logger.info("### properties=" + properties);
+            logger.info("### dataFields=" + dataFields);
             TopicType topicType = storage.createTopicType(properties, dataFields);
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.

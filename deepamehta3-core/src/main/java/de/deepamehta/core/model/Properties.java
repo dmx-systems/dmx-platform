@@ -34,6 +34,18 @@ public class Properties {
         }
     }
 
+    /**
+     * Called by JAX-RS container to create Properties from a @FormParam
+     */
+    public Properties(String json) throws JSONException {
+        this(new JSONObject(json));
+        logger.info("### Create Properties from a JSON string:\n" + json);
+        // FIXME: this conversion is very crude. Compare with TopicType(JSONObject type) constructor.
+        // FIXME: this conversion applies to types only whereas Properties is used also for topics.
+        put("de/deepamehta/core/property/TypeURI", remove("uri"));
+        put("de/deepamehta/core/property/TypeLabel", remove("label"));
+    }
+
     public Properties(JSONObject properties) {
         try {
             Iterator<String> i = properties.keys();
@@ -45,13 +57,6 @@ public class Properties {
         } catch (JSONException e) {
             throw new RuntimeException("Constructing Properties from JSONObject failed", e);
         }
-    }
-
-    /**
-     * Called by JAX-RS container to create Properties from a @FormParam
-     */
-    public Properties(String json) {
-        logger.info("########## Create Properties from this string:\n" + json);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -91,6 +96,10 @@ public class Properties {
     }
 
     // ---
+
+    public PropValue remove(String key) {
+        return values.remove(key);
+    }
 
     public Set<String> keySet() {
         return values.keySet();

@@ -187,19 +187,14 @@ var dm3c = new function() {
 
     /**
      * Creates a topic type in the DB.
-     *
-     * @param   type_uri        The topic type URI, e.g. "de/deepamehta/core/topictype/Note".        FIXME: update docu
-     * @param   properties      Optional: topic properties (object, key: field URI, value: content). FIXME: update docu
-     *
-     * @return  The topic view of the created topic type.                                            FIXME: update docu
      */
-    this.create_topic_type = function(topic_type) {
+    this.create_topic_type = function(properties, data_fields) {
         // update DB
-        var tt = dm3c.restc.create_topic_type(topic_type);
+        var topic_type = dm3c.restc.create_topic_type(properties, data_fields);
         // trigger hook
-        dm3c.trigger_hook("post_create_topic", tt)
+        dm3c.trigger_hook("post_create_topic", topic_type)
         //
-        return tt
+        return topic_type
     }
 
 
