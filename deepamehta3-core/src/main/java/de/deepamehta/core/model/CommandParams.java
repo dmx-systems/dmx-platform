@@ -1,5 +1,7 @@
 package de.deepamehta.core.model;
 
+import de.deepamehta.core.util.UploadedFile;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -22,9 +24,19 @@ public class CommandParams {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public Object get(String key) {
-        return params.get(key);
+    public String getString(String key) {
+        return (String) params.get(key);
     }
+
+    public int getInt(String key) {
+        return (Integer) params.get(key);
+    }
+
+    public UploadedFile getFile(String key) {
+        return (UploadedFile) params.get(key);
+    }
+
+    // ---
 
     @Override
     public String toString() {

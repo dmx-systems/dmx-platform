@@ -47,18 +47,18 @@ public class FilesPlugin extends Plugin implements FilesService {
     @Override
     public CommandResult executeCommandHook(String command, CommandParams params, ClientContext clientContext) {
         if (command.equals("deepamehta3-files.open-file")) {
-            long fileTopicId = (Integer) params.get("topic_id");    // topic_id deserializes as Integer (not Long)
+            long fileTopicId = params.getInt("topic_id");    // topic_id deserializes as Integer (not Long)
             openFile(fileTopicId);
             return new CommandResult("message", "OK");
         } else if (command.equals("deepamehta3-files.create-file-topic")) {
-            String path = (String) params.get("path");
+            String path = params.getString("path");
             try {
                 return new CommandResult(createFileTopic(path).toJSON());
             } catch (Throwable e) {
                 throw new RuntimeException("Error while creating file topic for \"" + path + "\"", e);
             }
         } else if (command.equals("deepamehta3-files.create-folder-topic")) {
-            String path = (String) params.get("path");
+            String path = (String) params.getString("path");
             try {
                 return new CommandResult(createFolderTopic(path).toJSON());
             } catch (Throwable e) {
