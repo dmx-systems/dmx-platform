@@ -1,14 +1,7 @@
 package de.deepamehta.core.model;
 
-import de.deepamehta.core.util.JSONHelper;
-
-import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONException;
-
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -23,8 +16,8 @@ public class CommandParams {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public CommandParams(JSONObject params) {
-        this.params = JSONHelper.toMap(params);
+    public CommandParams(Map<String, Object> params) {
+        this.params = params;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

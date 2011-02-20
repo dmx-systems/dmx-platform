@@ -498,7 +498,7 @@ var dm3c = new function() {
      *                      (server-side) executeCommandHook.
      */
     this.show_upload_dialog = function(command, callback) {
-        $("#upload-dialog-command").attr("value", command)
+        $("#upload-dialog form").attr("action", "/core/command/" + command)
         $("#upload-dialog").dialog("open")
         // bind callback function, using artifact ID as event namespace
         $("#upload-target").unbind("load.deepamehta3-client")
@@ -512,7 +512,7 @@ var dm3c = new function() {
                 try {
                     callback(JSON.parse(result))
                 } catch (e) {
-                    alert("No valid server response: " + result + "\n(" + JSON.stringify(e) + ")")
+                    alert("No valid server response: \"" + result + "\"\n\nException=" + JSON.stringify(e))
                 }
             }
         }

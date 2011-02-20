@@ -642,6 +642,7 @@ public class EmbeddedService implements CoreService {
 
     @POST
     @Path("/command/{command}")
+    @Consumes("application/json, multipart/form-data")
     @Override
     public CommandResult executeCommand(@PathParam("command") String command, CommandParams params,
                                         @HeaderParam("Cookie") ClientContext clientContext) {
