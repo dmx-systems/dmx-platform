@@ -659,7 +659,7 @@ public class EmbeddedService implements CoreService {
             return result;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Command \"" + command + "\" can't be executed " + params, e);
+            throw new RuntimeException("Command \"" + command + "\" can't be executed, params=" + params, e);
         } finally {
             tx.finish();
         }

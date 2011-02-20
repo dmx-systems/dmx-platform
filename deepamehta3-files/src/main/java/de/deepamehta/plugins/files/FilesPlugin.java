@@ -47,7 +47,7 @@ public class FilesPlugin extends Plugin implements FilesService {
     @Override
     public CommandResult executeCommandHook(String command, CommandParams params, ClientContext clientContext) {
         if (command.equals("deepamehta3-files.open-file")) {
-            long fileTopicId = (Long) params.get("topic_id");
+            long fileTopicId = (Integer) params.get("topic_id");    // topic_id deserializes as Integer (not Long)
             openFile(fileTopicId);
             return new CommandResult("message", "OK");
         } else if (command.equals("deepamehta3-files.create-file-topic")) {

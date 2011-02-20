@@ -32,4 +32,9 @@ public class CommandParams {
     public Object get(String key) {
         return params.get(key);
     }
+
+    @Override
+    public String toString() {
+        return params.toString();
+    }
 }

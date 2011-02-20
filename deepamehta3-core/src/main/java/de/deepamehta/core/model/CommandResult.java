@@ -31,6 +31,7 @@ public class CommandResult {
     }
 
     public CommandResult(String key, Object value) {
+        this();
         put(key, value);
     }
 
