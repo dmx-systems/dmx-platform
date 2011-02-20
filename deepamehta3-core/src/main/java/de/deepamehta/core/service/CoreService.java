@@ -1,6 +1,8 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.CommandParams;
+import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.Properties;
@@ -163,7 +165,7 @@ public interface CoreService {
 
     // === Commands ===
 
-    public JSONObject executeCommand(String command, Map params, ClientContext clientContext);
+    public CommandResult executeCommand(String command, CommandParams params, ClientContext clientContext);
 
     // === Plugins ===
 

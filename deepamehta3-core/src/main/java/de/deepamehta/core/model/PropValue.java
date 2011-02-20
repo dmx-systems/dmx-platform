@@ -6,7 +6,7 @@ import java.util.Map;
 
 
 /**
- * A polymorph property value. Supported types are String, int, long, boolean.
+ * A wrapper for a property value. Supported property types are String, int, long, boolean.
  * <p>
  * A PropValue object may also represent "no-value".
  */

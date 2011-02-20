@@ -3,6 +3,8 @@ package de.deepamehta.plugins.files;
 import de.deepamehta.plugins.files.service.FilesService;
 
 import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.CommandParams;
+import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Topic;
@@ -43,21 +45,22 @@ public class FilesPlugin extends Plugin implements FilesService {
 
 
     @Override
-    public JSONObject executeCommandHook(String command, Map params, ClientContext clientContext) {
+    public CommandResult executeCommandHook(String command, CommandParams params, ClientContext clientContext) {
         if (command.equals("deepamehta3-files.open-file")) {
-            long fileTopicId = (Integer) params.get("topic_id");
-            return openFile(fileTopicId);
+            long fileTopicId = (Long) params.get("topic_id");
+            openFile(fileTopicId);
+            return new CommandResult("message", "OK");
         } else if (command.equals("deepamehta3-files.create-file-topic")) {
             String path = (String) params.get("path");
             try {
-                return createFileTopic(path).toJSON();
+                return new CommandResult(createFileTopic(path).toJSON());
             } catch (Throwable e) {
                 throw new RuntimeException("Error while creating file topic for \"" + path + "\"", e);
             }
         } else if (command.equals("deepamehta3-files.create-folder-topic")) {
             String path = (String) params.get("path");
             try {
-                return createFolderTopic(path).toJSON();
+                return new CommandResult(createFolderTopic(path).toJSON());
             } catch (Throwable e) {
                 throw new RuntimeException("Error while creating folder topic for \"" + path + "\"", e);
             }
@@ -73,17 +76,12 @@ public class FilesPlugin extends Plugin implements FilesService {
 
 
 
-    public JSONObject openFile(long fileTopicId) {
+    public void openFile(long fileTopicId) {
         String path = null;
         try {
             path = dms.getTopicProperty(fileTopicId, "de/deepamehta/core/property/Path").toString();
             logger.info("### Opening file \"" + path + "\"");
-            //
             Desktop.getDesktop().open(new File(path));
-            //
-            JSONObject result = new JSONObject();
-            result.put("message", "OK");
-            return result;
         } catch (Throwable e) {
             throw new RuntimeException("Error while opening file \"" + path + "\"", e);
         }
@@ -112,7 +110,9 @@ public class FilesPlugin extends Plugin implements FilesService {
         Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/FileName", fileName);
         properties.put("de/deepamehta/core/property/Path", path);
-        properties.put("de/deepamehta/core/property/MediaType", fileType);
+        if (fileType != null) {
+            properties.put("de/deepamehta/core/property/MediaType", fileType);
+        }
         properties.put("de/deepamehta/core/property/Size", fileSize);
         //
         String content = renderFileContent(file, fileType, fileSize);

@@ -1,6 +1,8 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.CommandParams;
+import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.Properties;
@@ -16,10 +18,6 @@ import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.storage.Storage;
 import de.deepamehta.core.storage.Transaction;
 import de.deepamehta.core.util.JSONHelper;
-
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -111,7 +109,7 @@ public class EmbeddedService implements CoreService {
         // (see {@link de.deepamehta.core.service.Plugin#introduceTypesToPlugin}).
         MODIFY_TOPIC_TYPE("modifyTopicTypeHook", TopicType.class, ClientContext.class),
 
-        EXECUTE_COMMAND("executeCommandHook", String.class, Map.class, ClientContext.class);
+        EXECUTE_COMMAND("executeCommandHook", String.class, CommandParams.class, ClientContext.class);
 
         private final String methodName;
         private final Class[] paramClasses;
@@ -642,15 +640,18 @@ public class EmbeddedService implements CoreService {
 
     // === Commands ===
 
+    @POST
+    @Path("/command/{command}")
     @Override
-    public JSONObject executeCommand(String command, Map params, ClientContext clientContext) {
+    public CommandResult executeCommand(@PathParam("command") String command, CommandParams params,
+                                        @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
-            Iterator<JSONObject> i = triggerHook(Hook.EXECUTE_COMMAND, command, params, clientContext).iterator();
+            Iterator<CommandResult> i = triggerHook(Hook.EXECUTE_COMMAND, command, params, clientContext).iterator();
             if (!i.hasNext()) {
                 throw new RuntimeException("Command is not handled by any plugin");
             }
-            JSONObject result = i.next();
+            CommandResult result = i.next();
             if (i.hasNext()) {
                 throw new RuntimeException("Ambiguity: more than one plugin returned a result");
             }

@@ -1,6 +1,8 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.CommandParams;
+import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Relation;
@@ -275,7 +277,7 @@ public class Plugin implements BundleActivator {
 
     // ---
 
-    public JSONObject executeCommandHook(String command, Map params, ClientContext clientContext) {
+    public CommandResult executeCommandHook(String command, CommandParams params, ClientContext clientContext) {
         return null;
     }
 

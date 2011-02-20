@@ -68,6 +68,9 @@ public class Properties {
     // ---
 
     public void put(String key, String value) {
+        if (value == null) {
+            throw new NullPointerException("Tried to put null value for key \"" + key +"\"");
+        }
         values.put(key, new PropValue(value));
     }
 
