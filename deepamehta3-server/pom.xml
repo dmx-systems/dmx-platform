@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
+            <artifactId>jersey-core</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>

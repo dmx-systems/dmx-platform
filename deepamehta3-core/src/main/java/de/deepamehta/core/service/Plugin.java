@@ -21,8 +21,6 @@ import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
 
-import org.codehaus.jettison.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;

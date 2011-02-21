@@ -18,7 +18,7 @@
     <dependencyManagement>
         <dependencies>
 
-            <!-- core -->
+            <!-- DeepaMehta -->
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-core</artifactId>
@@ -29,8 +29,6 @@
                 <artifactId>deepamehta3-coretypes</artifactId>
                 <version>0.4.3-SNAPSHOT</version>
             </dependency>
-
-            <!-- REST server / client -->
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-server</artifactId>
@@ -41,8 +39,6 @@
                 <artifactId>deepamehta3-client</artifactId>
                 <version>0.4.5-SNAPSHOT</version>
             </dependency>
-
-            <!-- distribution -->
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-accesscontrol</artifactId>
@@ -53,7 +49,6 @@
                 <artifactId>deepamehta3-contacts</artifactId>
                 <version>0.4.2</version>
             </dependency>
-
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-files</artifactId>
@@ -69,7 +64,6 @@
                 <artifactId>deepamehta3-iconpicker</artifactId>
                 <version>0.4.2</version>
             </dependency>
-
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-notes</artifactId>
@@ -80,13 +74,11 @@
                 <artifactId>deepamehta3-projects</artifactId>
                 <version>0.4.2</version>
             </dependency>
-
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-time</artifactId>
                 <version>0.4.3-SNAPSHOT</version>
             </dependency>
-
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-topicmaps</artifactId>
@@ -116,7 +108,6 @@
                 <scope>provided</scope>
                 <optional>true</optional>
             </dependency>
-
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>osgi_R4_compendium</artifactId>
@@ -125,7 +116,7 @@
                 <optional>true</optional>
             </dependency>
 
-            <!-- Neo4J -->
+            <!-- Neo4j -->
             <dependency>
                 <groupId>org.neo4j</groupId>
                 <artifactId>neo4j-kernel</artifactId>
@@ -145,14 +136,7 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- JAX RS -->
-            <dependency>
-                <groupId>org.codehaus.jettison</groupId>
-                <artifactId>jettison</artifactId>
-                <version>1.2</version>
-                <scope>provided</scope>
-            </dependency>
-
+            <!-- JAX-RS -->
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-core</artifactId>
@@ -165,19 +149,16 @@
                 <version>${jersey.version}</version>
                 <scope>provided</scope>
             </dependency>
+
+            <!-- JSON -->
             <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-json</artifactId>
-                <version>${jersey.version}</version>
+                <groupId>org.codehaus.jettison</groupId>
+                <artifactId>jettison</artifactId>
+                <version>1.2</version>
                 <scope>provided</scope>
             </dependency>
 
-            <dependency>
-                <groupId>commons-fileupload</groupId>
-                <artifactId>commons-fileupload</artifactId>
-                <version>1.2.2</version>
-                <scope>provided</scope>
-            </dependency>
+            <!-- Servlet -->
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
@@ -185,7 +166,15 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- test -->
+            <!-- multipart/form-data -->
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>1.2.2</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Testing -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>

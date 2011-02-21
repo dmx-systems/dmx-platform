@@ -1,5 +1,8 @@
 package de.deepamehta.plugins.files.resources;
 
+import de.deepamehta.plugins.files.model.DirectoryListing;
+import de.deepamehta.plugins.files.model.ResourceInfo;
+
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -9,6 +12,7 @@ import org.codehaus.jettison.json.JSONObject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -29,21 +33,22 @@ public class ResourceResource {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private @Context HttpServletRequest request;
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @GET
     @Path("/{uri}")
-    public Response getResource(@PathParam("uri") URL uri, @Context HttpServletRequest request,
-                                                           @QueryParam("type") String type,
+    public Response getResource(@PathParam("uri") URL uri, @QueryParam("type") String type,
                                                            @QueryParam("size") long size) throws Exception {
         logger.info("Requesting resource " + uri + " (type=\"" + type + "\", size=" + size + ")");
         if (isRequestAllowed(request)) {
             if (uri.getProtocol().equals("file")) {
                 File file = new File(uri.getPath());
                 if (file.isDirectory()) {
-                    return directoryResource(file);
+                    return Response.ok(new DirectoryListing(file), "application/json").build();
                 }
             }
             return resource(uri, type, size);
@@ -54,10 +59,11 @@ public class ResourceResource {
 
     @GET
     @Path("/{uri}/info")
-    public Response getResourceInfo(@PathParam("uri") URL uri, @Context HttpServletRequest request) throws Exception {
+    @Produces("application/json")
+    public Response getResourceInfo(@PathParam("uri") URL uri) throws Exception {
         logger.info("Requesting resource info for " + uri);
         if (isRequestAllowed(request)) {
-            return resourceInfo(uri);
+            return Response.ok(new ResourceInfo(uri)).build();
         } else {
             return Response.status(Status.FORBIDDEN).build();
         }
@@ -75,47 +81,6 @@ public class ResourceResource {
             builder.header("Content-Length", size);
         }
         return builder.build();
-    }
-
-    private Response directoryResource(File directory) throws Exception {
-        JSONObject dir = new JSONObject();
-        JSONArray items = new JSONArray();
-        dir.put("kind", "directory");
-        dir.put("name", directory.getName());
-        dir.put("path", directory.getPath());
-        dir.put("items", items);
-        //
-        for (File file : directory.listFiles()) {
-            JSONObject item = new JSONObject();
-            item.put("name", file.getName());
-            item.put("path", file.getPath());
-            if (file.isDirectory()) {
-                item.put("kind", "directory");
-            } else {
-                item.put("kind", "file");
-                item.put("size", file.length());
-                item.put("type", JavaUtils.getFileType(file.getName()));
-            }
-            items.put(item);
-        }
-        return Response.ok(dir, "application/json").build();
-    }
-
-    private Response resourceInfo(URL uri) throws Exception {
-        JSONObject info = new JSONObject();
-        if (uri.getProtocol().equals("file")) {
-            File file = new File(uri.getPath());
-            if (!file.exists()) {
-                info.put("error", "not found");
-            } else if (file.isDirectory()) {
-                info.put("kind", "directory");
-            } else {
-                info.put("kind", "file");
-            }
-        } else {
-            info.put("kind", "remote");
-        }
-        return Response.ok(info).build();
     }
 
     // ---
