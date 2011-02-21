@@ -42,7 +42,7 @@ public class ResourceResource {
     @GET
     @Path("/{uri}")
     public Response getResource(@PathParam("uri") URL uri, @QueryParam("type") String type,
-                                                           @QueryParam("size") long size) throws Exception {
+                                                           @QueryParam("size") long size) {
         logger.info("Requesting resource " + uri + " (type=\"" + type + "\", size=" + size + ")");
         if (isRequestAllowed(request)) {
             if (uri.getProtocol().equals("file")) {
@@ -60,7 +60,7 @@ public class ResourceResource {
     @GET
     @Path("/{uri}/info")
     @Produces("application/json")
-    public Response getResourceInfo(@PathParam("uri") URL uri) throws Exception {
+    public Response getResourceInfo(@PathParam("uri") URL uri) {
         logger.info("Requesting resource info for " + uri);
         if (isRequestAllowed(request)) {
             return Response.ok(new ResourceInfo(uri)).build();
@@ -71,16 +71,20 @@ public class ResourceResource {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private Response resource(URL uri, String type, long size) throws Exception {
-        InputStream in = uri.openStream();
-        ResponseBuilder builder = Response.ok(in);
-        if (type != null) {
-            builder.type(type);
+    private Response resource(URL uri, String type, long size) {
+        try {
+            InputStream in = uri.openStream();  // throws IOException
+            ResponseBuilder builder = Response.ok(in);
+            if (type != null) {
+                builder.type(type);
+            }
+            if (size != 0) {
+                builder.header("Content-Length", size);
+            }
+            return builder.build();
+        } catch (Exception e) {
+            throw new RuntimeException("Retrieving resource from \"" + uri + "\" failed", e);
         }
-        if (size != 0) {
-            builder.header("Content-Length", size);
-        }
-        return builder.build();
     }
 
     // ---
