@@ -19,7 +19,18 @@ import java.util.Scanner;
 
 
 
+/**
+ * Generic Java utilities.
+ */
 public class JavaUtils {
+
+
+
+    // *************
+    // *** Files ***
+    // *************
+
+
 
     private static FileNameMap fileTypeMap = URLConnection.getFileNameMap();
 
@@ -75,7 +86,13 @@ public class JavaUtils {
         }
     }
 
-    // ---
+
+
+    // ************
+    // *** URLs ***
+    // ************
+
+
 
     public static String encodeURIComponent(String uriComp) {
         try {
@@ -85,7 +102,13 @@ public class JavaUtils {
         }
     }
 
-    // ---
+
+
+    // ******************
+    // *** Encryption ***
+    // ******************
+
+
 
     /* static {
         for (Provider p : Security.getProviders()) {
