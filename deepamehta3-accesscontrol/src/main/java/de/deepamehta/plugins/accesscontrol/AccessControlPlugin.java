@@ -80,7 +80,8 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     @Override
     public void postInstallPluginHook() {
-        createUser(DEFAULT_USER, DEFAULT_PASSWORD);
+        Topic user = createUser(DEFAULT_USER, DEFAULT_PASSWORD);
+        logger.info("########## Creating \"admin\" user => ID=" + user.id);
     }
 
     @Override
@@ -298,7 +299,8 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     private void setCreator(Topic topic, ClientContext clientContext) {
         Topic user = getUser(clientContext);
         if (user == null) {
-            logger.warning("No user is logged in. \"admin\" is set as the creator of " + topic);
+            logger.warning("Assigning a creator to " + topic + " failed (no user is logged in). " +
+                "Assigning user \"admin\" instead.");
             user = getAdminUser();
         }
         setCreator(topic.id, user.id);

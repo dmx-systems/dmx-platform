@@ -483,10 +483,11 @@ public class Plugin implements BundleActivator {
             }
             registerPluginService(context);
             registerPlugin();
+            logger.info("----- Initialization of plugin \"" + pluginName + "\" complete -----");
             tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Plugin \"" + pluginName + "\" can't be initialzed", e);
+            logger.warning("ROLLBACK! (plugin \"" + pluginName + "\")");
+            throw new RuntimeException("Initialization of plugin \"" + pluginName + "\" failed", e);
         } finally {
             tx.finish();
         }

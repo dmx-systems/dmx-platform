@@ -756,18 +756,18 @@ public class EmbeddedService implements CoreService {
      * Triggers a hook for all installed plugins.
      */
     private Set triggerHook(Hook hook, Object... params) {
-        try {
-            Set resultSet = new HashSet();
-            for (Plugin plugin : plugins.values()) {
+        Set resultSet = new HashSet();
+        for (Plugin plugin : plugins.values()) {
+            try {
                 Object result = triggerHook(plugin, hook, params);
                 if (result != null) {
                     resultSet.add(result);
                 }
+            } catch (Exception e) {
+                throw new RuntimeException("Triggering hook " + hook + " failed", e);
             }
-            return resultSet;
-        } catch (Exception e) {
-            throw new RuntimeException("Error while triggering hook " + hook, e);
         }
+        return resultSet;
     }
 
     /**
