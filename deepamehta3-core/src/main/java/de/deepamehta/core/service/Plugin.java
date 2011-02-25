@@ -133,7 +133,7 @@ public class Plugin implements BundleActivator {
     public CoreService getService() {
         // CoreService dms = (CoreService) deepamehtaServiceTracker.getService();
         if (dms == null) {
-            throw new RuntimeException("DeepaMehta core service is currently not available " +
+            throw new RuntimeException("DeepaMehta core service is not yet available " +
                 "for plugin \"" + pluginName + "\"");
         }
         return dms;
@@ -302,12 +302,11 @@ public class Plugin implements BundleActivator {
                 if (service instanceof CoreService) {
                     logger.info("Adding DeepaMehta core service to plugin \"" + pluginName + "\"");
                     dms = (CoreService) service;
-                    initPlugin(context);
+                    checkServiceAvailability(context);
                 } else if (service instanceof HttpService) {
                     logger.info("Adding HTTP service to plugin \"" + pluginName + "\"");
                     httpService = (HttpService) service;
-                    registerWebResources();
-                    registerRestResources();
+                    checkServiceAvailability(context);
                 } else if (service instanceof PluginService) {
                     logger.info("### Adding plugin service \"" + serviceInterface + "\" to plugin \"" +
                         pluginName + "\"");
@@ -337,6 +336,17 @@ public class Plugin implements BundleActivator {
                 }
                 super.removedService(ref, service);
             }
+
+            /**
+             * Initializes this plugin if both required OSGi services (CoreService and HttpService) are available.
+             */
+            private void checkServiceAvailability(BundleContext context) {
+                if (dms != null && httpService != null) {
+                    initPlugin(context);        // relies on CoreService
+                    registerWebResources();     // relies on HttpService
+                    registerRestResources();    // relies on HttpService and CoreService
+                }
+            }
         };
         serviceTrackers.add(serviceTracker);
         serviceTracker.open();
@@ -347,7 +357,7 @@ public class Plugin implements BundleActivator {
     private void registerPluginService(BundleContext context) {
         String serviceInterface = getConfigProperty("providedServiceInterface");
         if (serviceInterface != null) {
-            logger.info("### Registering service \"" + serviceInterface +
+            logger.info("Registering service \"" + serviceInterface +
                 "\" of plugin \"" + pluginName + "\" at OSGi framework");
             context.registerService(serviceInterface, this, null);
         }

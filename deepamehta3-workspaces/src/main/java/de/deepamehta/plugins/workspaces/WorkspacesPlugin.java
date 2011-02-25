@@ -140,8 +140,6 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-
-
     private void checkWorkspaceId(long workspaceId) {
         String typeUri = dms.getTopic(workspaceId, null).typeUri;
         if (!typeUri.equals("de/deepamehta/core/topictype/Workspace")) {

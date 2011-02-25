@@ -97,7 +97,7 @@ public class Activator implements BundleActivator, FrameworkListener {
     public static CoreService getService() {
         // CoreService dms = (CoreService) deepamehtaServiceTracker.getService();
         if (dms == null) {
-            throw new RuntimeException("DeepaMehta core service is currently not available");
+            throw new RuntimeException("DeepaMehta core service is not yet available");
         }
         return dms;
     }
