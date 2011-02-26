@@ -173,8 +173,6 @@ public interface CoreService {
 
     public void unregisterPlugin(String pluginId);
 
-    public Set<String> getPluginIds();
-
     public Plugin getPlugin(String pluginId);
     
     public Set<PluginInfo> getPluginInfo();

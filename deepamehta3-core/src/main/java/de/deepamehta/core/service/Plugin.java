@@ -55,8 +55,6 @@ public class Plugin implements BundleActivator {
     private Bundle pluginBundle;
     private Topic  pluginTopic;                     // Represents this plugin in DB. Holds plugin migration number.
 
-    private boolean isActivated;
-
     private java.util.Properties configProperties;  // Read from file "plugin.properties"
 
     protected CoreService dms;
@@ -155,7 +153,7 @@ public class Plugin implements BundleActivator {
             pluginName = (String) pluginBundle.getHeaders().get("Bundle-Name");
             pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
             //
-            logger.info("========== Starting DeepaMehta plugin \"" + pluginName + "\" ==========");
+            logger.info("========== Starting plugin \"" + pluginName + "\" ==========");
             //
             configProperties = readConfigFile();
             pluginPackage = getConfigProperty("pluginPackage", getClass().getPackage().getName());
@@ -164,7 +162,7 @@ public class Plugin implements BundleActivator {
             createServiceTracker(HttpService.class.getName(), context);
             createServiceTrackers(context);
         } catch (RuntimeException e) {
-            logger.severe("Plugin \"" + pluginName + "\" can't be activated. Reason:");
+            logger.severe("Starting plugin \"" + pluginName + "\" failed. Reason:");
             e.printStackTrace();
             throw e;
         }
@@ -172,7 +170,7 @@ public class Plugin implements BundleActivator {
 
     @Override
     public void stop(BundleContext context) {
-        logger.info("========== Stopping DeepaMehta plugin \"" + pluginName + "\" ==========");
+        logger.info("========== Stopping plugin \"" + pluginName + "\" ==========");
         //
         for (ServiceTracker serviceTracker : serviceTrackers) {
             serviceTracker.close();
@@ -302,14 +300,13 @@ public class Plugin implements BundleActivator {
                 if (service instanceof CoreService) {
                     logger.info("Adding DeepaMehta core service to plugin \"" + pluginName + "\"");
                     dms = (CoreService) service;
-                    checkServiceAvailability(context);
+                    checkServiceAvailability();
                 } else if (service instanceof HttpService) {
                     logger.info("Adding HTTP service to plugin \"" + pluginName + "\"");
                     httpService = (HttpService) service;
-                    checkServiceAvailability(context);
+                    checkServiceAvailability();
                 } else if (service instanceof PluginService) {
-                    logger.info("### Adding plugin service \"" + serviceInterface + "\" to plugin \"" +
-                        pluginName + "\"");
+                    logger.info("Adding plugin service \"" + serviceInterface + "\" to plugin \"" + pluginName + "\"");
                     // trigger hook
                     serviceArrived((PluginService) service);
                 }
@@ -329,7 +326,7 @@ public class Plugin implements BundleActivator {
                     unregisterRestResources();
                     httpService = null;
                 } else if (service instanceof PluginService) {
-                    logger.info("### Removing plugin service \"" + serviceInterface + "\" from plugin \"" +
+                    logger.info("Removing plugin service \"" + serviceInterface + "\" from plugin \"" +
                         pluginName + "\"");
                     // trigger hook
                     serviceGone((PluginService) service);
@@ -338,13 +335,12 @@ public class Plugin implements BundleActivator {
             }
 
             /**
-             * Initializes this plugin if both required OSGi services (CoreService and HttpService) are available.
+             * Checks if both required OSGi services (CoreService and HttpService) are available,
+             * and if so, initializes the plugin.
              */
-            private void checkServiceAvailability(BundleContext context) {
+            private void checkServiceAvailability() {
                 if (dms != null && httpService != null) {
-                    initPlugin(context);        // relies on CoreService
-                    registerWebResources();     // relies on HttpService
-                    registerRestResources();    // relies on HttpService and CoreService
+                    initPlugin(context);
                 }
             }
         };
@@ -353,6 +349,49 @@ public class Plugin implements BundleActivator {
     }
 
     // ---
+
+    /**
+     * Initializes the plugin. This comprises:
+     * - install the plugin in the database
+     * - register the plugin at the DeepaMehta core service
+     * - register the plugin's OSGi service at the OSGi framework
+     * - register the plugin's static web resources at the OSGi HTTP service
+     * - register the plugin's REST resources at the OSGi HTTP service
+     */
+    private void initPlugin(BundleContext context) {
+        logger.info("----- Initializing plugin \"" + pluginName + "\" -----");
+        installPlugin(context);             // relies on CoreService
+        registerPlugin();                   // relies on CoreService
+        registerPluginService(context);
+        registerWebResources();             // relies on HttpService
+        registerRestResources();            // relies on HttpService and CoreService
+        logger.info("----- Initialization of plugin \"" + pluginName + "\" complete -----");
+    }
+
+    /**
+     * Installs the plugin in the database. This comprises:
+     * - create topic of type "Plugin"
+     * - run migrations
+     * - trigger POST_INSTALL_PLUGIN hook
+     * - trigger MODIFY_TOPIC_TYPE hook (multiple times)
+     */
+    private void installPlugin(BundleContext context) {
+        Transaction tx = dms.beginTx();
+        try {
+            boolean isCleanInstall = initPluginTopic();
+            runPluginMigrations(isCleanInstall);
+            if (isCleanInstall) {
+                postInstallPluginHook();  // trigger hook
+                introduceTypesToPlugin();
+            }
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK! (plugin \"" + pluginName + "\")");
+            throw new RuntimeException("Installation of plugin \"" + pluginName + "\" in the database failed", e);
+        } finally {
+            tx.finish();
+        }
+    }
 
     private void registerPluginService(BundleContext context) {
         String serviceInterface = getConfigProperty("providedServiceInterface");
@@ -365,17 +404,18 @@ public class Plugin implements BundleActivator {
 
     // ---
 
+    /**
+     * Registers the plugin at the DeepaMehta core service. From that moment the plugin takes part of the
+     * core service control flow, that is the plugin's hooks are triggered.
+     */
     private void registerPlugin() {
         logger.info("Registering plugin \"" + pluginName + "\" at DeepaMehta core service");
         dms.registerPlugin(this);
-        isActivated = true;
     }
 
     private void unregisterPlugin() {
-        if (isActivated) {
-            logger.info("Unregistering plugin \"" + pluginName + "\" at DeepaMehta core service");
-            dms.unregisterPlugin(pluginId);
-        }
+        logger.info("Unregistering plugin \"" + pluginName + "\" at DeepaMehta core service");
+        dms.unregisterPlugin(pluginId);
     }
 
     // ---
@@ -480,28 +520,6 @@ public class Plugin implements BundleActivator {
     }
 
     // ---
-
-    private void initPlugin(BundleContext context) {
-        Transaction tx = dms.beginTx();
-        try {
-            logger.info("----- Initializing plugin \"" + pluginName + "\" -----");
-            boolean isCleanInstall = initPluginTopic();
-            runPluginMigrations(isCleanInstall);
-            if (isCleanInstall) {
-                postInstallPluginHook();  // trigger hook
-                introduceTypesToPlugin();
-            }
-            registerPluginService(context);
-            registerPlugin();
-            logger.info("----- Initialization of plugin \"" + pluginName + "\" complete -----");
-            tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK! (plugin \"" + pluginName + "\")");
-            throw new RuntimeException("Initialization of plugin \"" + pluginName + "\" failed", e);
-        } finally {
-            tx.finish();
-        }
-    }
 
     /**
      * Creates a Plugin topic in the DB, if not already exists.

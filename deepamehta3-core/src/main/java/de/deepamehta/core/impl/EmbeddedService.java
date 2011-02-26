@@ -65,11 +65,7 @@ public class EmbeddedService implements CoreService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    /**
-     * Registered plugins.
-     * Hashed by plugin bundle's symbolic name, e.g. "de.deepamehta.3-topicmaps".
-     */
-    private Map<String, Plugin> plugins = new HashMap();
+    private PluginCache pluginCache = new PluginCache();
 
     private Storage storage;
 
@@ -552,8 +548,6 @@ public class EmbeddedService implements CoreService {
                                      @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
-            logger.info("### properties=" + properties);
-            logger.info("### dataFields=" + dataFields);
             TopicType topicType = storage.createTopicType(properties, dataFields);
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
@@ -670,39 +664,31 @@ public class EmbeddedService implements CoreService {
 
     @Override
     public void registerPlugin(Plugin plugin) {
-        plugins.put(plugin.getId(), plugin);
+        pluginCache.put(plugin);
     }
 
     @Override
     public void unregisterPlugin(String pluginId) {
-        if (plugins.remove(pluginId) == null) {
-            throw new RuntimeException("Plugin " + pluginId + " is not registered");
-        }
-    }
-
-    @Override
-    public Set<String> getPluginIds() {
-        return plugins.keySet();
+        pluginCache.remove(pluginId);
     }
 
     @Override
     public Plugin getPlugin(String pluginId) {
-        Plugin plugin = plugins.get(pluginId);
-        if (plugin == null) {
-            throw new RuntimeException("Plugin \"" + pluginId + "\" is unknown.");
-        }
-        return plugin;
+        return pluginCache.get(pluginId);
     }
 
     @GET
     @Path("/plugin")
     @Override
     public Set<PluginInfo> getPluginInfo() {
-        Set info = new HashSet();
-        for (String pluginId : getPluginIds()) {
-            String pluginFile = getPlugin(pluginId).getConfigProperty("clientSidePluginFile");
-            info.add(new PluginInfo(pluginId, pluginFile));
-        }
+        final Set info = new HashSet();
+        new PluginCache.Iterator() {
+            @Override
+            void body(Plugin plugin) {
+                String pluginFile = plugin.getConfigProperty("clientSidePluginFile");
+                info.add(new PluginInfo(plugin.getId(), pluginFile));
+            }
+        };
         return info;
     }
 
@@ -755,18 +741,21 @@ public class EmbeddedService implements CoreService {
     /**
      * Triggers a hook for all installed plugins.
      */
-    private Set triggerHook(Hook hook, Object... params) {
-        Set resultSet = new HashSet();
-        for (Plugin plugin : plugins.values()) {
-            try {
-                Object result = triggerHook(plugin, hook, params);
-                if (result != null) {
-                    resultSet.add(result);
+    private Set triggerHook(final Hook hook, final Object... params) {
+        final Set resultSet = new HashSet();
+        new PluginCache.Iterator() {
+            @Override
+            void body(Plugin plugin) {
+                try {
+                    Object result = triggerHook(plugin, hook, params);
+                    if (result != null) {
+                        resultSet.add(result);
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException("Triggering hook " + hook + " failed", e);
                 }
-            } catch (Exception e) {
-                throw new RuntimeException("Triggering hook " + hook + " failed", e);
             }
-        }
+        };
         return resultSet;
     }
 
