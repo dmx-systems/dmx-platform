@@ -552,8 +552,6 @@ public class EmbeddedService implements CoreService {
                                      @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
-            logger.info("### properties=" + properties);
-            logger.info("### dataFields=" + dataFields);
             TopicType topicType = storage.createTopicType(properties, dataFields);
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
@@ -675,9 +673,7 @@ public class EmbeddedService implements CoreService {
 
     @Override
     public void unregisterPlugin(String pluginId) {
-        if (plugins.remove(pluginId) == null) {
-            throw new RuntimeException("Plugin " + pluginId + " is not registered");
-        }
+        plugins.remove(pluginId);
     }
 
     @Override
