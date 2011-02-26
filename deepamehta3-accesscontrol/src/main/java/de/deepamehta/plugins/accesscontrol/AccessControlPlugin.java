@@ -81,7 +81,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     @Override
     public void postInstallPluginHook() {
         Topic user = createUser(DEFAULT_USER, DEFAULT_PASSWORD);
-        logger.info("########## Creating \"admin\" user => ID=" + user.id);
+        logger.info("Creating \"admin\" user => ID=" + user.id);
     }
 
     @Override
