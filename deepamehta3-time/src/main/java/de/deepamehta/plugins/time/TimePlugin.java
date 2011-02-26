@@ -2,6 +2,7 @@ package de.deepamehta.plugins.time;
 
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.service.Plugin;
@@ -23,9 +24,9 @@ public class TimePlugin extends Plugin {
 
 
 
-    // ************************
-    // *** Overriding Hooks ***
-    // ************************
+    // **************************************************
+    // *** Core Hooks (called from DeepaMehta 3 Core) ***
+    // **************************************************
 
 
 
@@ -50,7 +51,7 @@ public class TimePlugin extends Plugin {
      * Updates the timestamp for every topic being modified.
      */
     @Override
-    public void preUpdateHook(Topic topic, Map<String, Object> newProperties) {
+    public void preUpdateHook(Topic topic, Properties newProperties) {
         long time = System.currentTimeMillis();
         topic.setProperty("de/deepamehta/core/property/DateModified", time);
     }

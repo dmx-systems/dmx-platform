@@ -61,8 +61,8 @@ function Canvas() {
                     x = pos.x
                     y = pos.y
                 } else {
-                    x = self.canvas_width  * Math.random() - trans_x
-                    y = self.canvas_height * Math.random() - trans_y
+                    x = Math.floor(self.canvas_width  * Math.random()) - trans_x
+                    y = Math.floor(self.canvas_height * Math.random()) - trans_y
                 }
             }
             // update model

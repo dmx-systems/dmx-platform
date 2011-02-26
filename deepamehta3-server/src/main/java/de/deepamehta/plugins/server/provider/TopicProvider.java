@@ -41,23 +41,21 @@ public class TopicProvider implements MessageBodyWriter<Topic> {
         return type == Topic.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
-    
     @Override
-    public long getSize(Topic t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+    public long getSize(Topic topic, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(Topic t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+    public void writeTo(Topic topic, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
             MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException,
             WebApplicationException {
         try {
-            // logger.info("Writing " + entity + " to response stream");
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            t.toJSON().write(writer);
+            topic.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Error while writing " + t + " to response stream", e);
+            throw new IOException("Writing " + topic + " to response stream failed", e);
         }
     }
 }

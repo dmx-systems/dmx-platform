@@ -12,29 +12,32 @@
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta3-parent</artifactId>
         <version>0.4.5-SNAPSHOT</version>
+        <relativePath>../deepamehta3-parent/pom.xml</relativePath>
     </parent>
 
     <dependencies>
 
-        <!-- jax rs -->
+        <!-- JAX-RS -->
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
         </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
+
+        <!-- JSON -->
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <scope>compile</scope>
         </dependency>
 
+        <!-- Servlet -->
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-json</artifactId>
-            <scope>compile</scope>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
         </dependency>
 
         <!-- OSGi -->
@@ -43,13 +46,12 @@
             <artifactId>osgi_R4_core</artifactId>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi_R4_compendium</artifactId>
         </dependency>
 
-        <!-- storage -->
+        <!-- Neo4j -->
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-kernel</artifactId>
@@ -63,7 +65,7 @@
             <artifactId>neo4j-meta-model</artifactId>
         </dependency>
 
-        <!-- test -->
+        <!-- Testing -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -79,7 +81,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
                 <configuration>
                     <instructions>
                         <Export-Package>
@@ -105,7 +106,7 @@
             <id>neo4j-public-repository</id>
             <url>http://m2.neo4j.org</url>
             <snapshots>
-                <!-- TODO use released Neo4J meta model -->
+                <!-- TODO use released Neo4j meta model -->
                 <enabled>true</enabled>
             </snapshots>
             <releases>

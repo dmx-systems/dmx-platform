@@ -4,10 +4,16 @@ function dm3_typeeditor() {
     dm3c.css_stylesheet("/de.deepamehta.3-typeeditor/style/dm3-typeeditor.css")
 
     // The type definition used for newly created topic types
+    // Note: the "properties" attribute is an auxiliary container here to easify serialization.
+    // It is not contained in the topic type's serialzed representation.
+    // The serialized representation contains the "label", "uri", ... attributes at top-level.
+    // See https://github.com/jri/deepamehta3/wiki/Data-Format#topic-type
     var DEFAULT_TYPE_DEFINITION = {
-        label: "Unnamed",
-        uri: "de/deepamehta/core/topictype/UnnamedTopicType",
-        js_renderer_class: "PlainDocument",
+        properties: {
+            label: "Unnamed",
+            uri: "de/deepamehta/core/topictype/UnnamedTopicType",
+            js_renderer_class: "PlainDocument"
+        },
         fields: [
             {
                 label: "Name",
@@ -66,7 +72,7 @@ function dm3_typeeditor() {
 
     this.custom_create_topic = function(type_uri) {
         if (type_uri == "de/deepamehta/core/topictype/TopicType") {
-            var topic_type = dm3c.create_topic_type(DEFAULT_TYPE_DEFINITION)
+            var topic_type = dm3c.create_topic_type(DEFAULT_TYPE_DEFINITION.properties, DEFAULT_TYPE_DEFINITION.fields)
             return dm3c.restc.get_topic_by_id(topic_type.id)     // return the topic perspective of the type
         }
     }

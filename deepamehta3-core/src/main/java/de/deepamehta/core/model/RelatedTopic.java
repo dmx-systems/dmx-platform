@@ -1,5 +1,8 @@
 package de.deepamehta.core.model;
 
+import org.codehaus.jettison.json.JSONArray;
+
+import java.util.List;
 
 
 /**
@@ -42,5 +45,17 @@ public class RelatedTopic {
 
     public void setRelation(Relation relation) {
         this.relation = relation;
+    }
+
+    // ---
+
+    public static JSONArray relatedTopicsToJson(List<RelatedTopic> relTopics) {
+        JSONArray array = new JSONArray();
+        for (RelatedTopic relTopic : relTopics) {
+            // FIXME: for the moment it is sufficient to serialize the topics only.
+            // The respective relations are omitted.
+            array.put(relTopic.getTopic().toJSON());
+        }
+        return array;
     }
 }

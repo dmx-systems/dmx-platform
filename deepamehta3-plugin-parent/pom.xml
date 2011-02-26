@@ -13,11 +13,44 @@
         <obr.repository.url>file:${user.home}/.m2/repository/repository.xml</obr.repository.url>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta3-parent</artifactId>
+                <version>0.4.5-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-core</artifactId>
+            <version>0.4.5-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta3-distribution</artifactId>
+            <version>0.4.5-SNAPSHOT</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta3-third-party</artifactId>
+            <version>0.4.5-SNAPSHOT</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta3-felix</artifactId>
+            <version>0.4.5-SNAPSHOT</version>
+            <type>pom</type>
+        </dependency>
+
     </dependencies>
 
     <profiles>
@@ -40,58 +73,39 @@
         </profile>
     </profiles>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-parent</artifactId>
-                <version>0.4.5-SNAPSHOT</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
                 </configuration>
             </plugin>
 
+            <!--
+                versions from dependencyManagement of parent POM actually not
+                resolved by Pax provision
+                <provision>mvn:de.deepamehta/deepamehta3-felix/0.4.5-SNAPSHOT/pom</provision>
+                => use unpacked destribution versioning POMs as deployPoms in
+                PaxRunner configuration
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.1</version>
                 <executions>
                     <execution>
                         <id>unpack poms</id>
                         <phase>generate-resources</phase>
                         <goals>
-                            <goal>unpack</goal>
+                            <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>de.deepamehta</groupId>
-                                    <artifactId>deepamehta3-distribution</artifactId>
-                                    <version>0.4.5-SNAPSHOT</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>de.deepamehta</groupId>
-                                    <artifactId>deepamehta3-third-party</artifactId>
-                                    <version>0.4.5-SNAPSHOT</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>de.deepamehta</groupId>
-                                    <artifactId>deepamehta3-felix</artifactId>
-                                    <version>0.4.5-SNAPSHOT</version>
-                                </artifactItem>
-                            </artifactItems>
-                            <includes>**/pom.xml</includes>
+                            <excludeTransitive>true</excludeTransitive>
+                            <excludeTypes>jar</excludeTypes>
                             <outputDirectory>${project.build.directory}/poms</outputDirectory>
                         </configuration>
                     </execution>
@@ -109,30 +123,21 @@
                         <param>--autoWrap</param>
                         <param>mvn:org.apache.lucene/lucene-core/2.9.2</param>
                         <param>mvn:asm/asm/3.2</param>
-                        <!--
-                            HINT: versions from dependencyManagement of parent
-                            pom actually not resolved by provision element
-                        -->
-                        <!-- <noDependencies>true</noDependencies> -->
-                        <!-- <widenScope>true</widenScope> -->
-                        <!-- <provision> -->
-                        <!--
-                            <provision>mvn:de.deepamehta/deepamehta3-felix/0.4.5-SNAPSHOT/pom</provision>
-                        -->
-                        <!-- </provision> -->
+                        <param>mvn:commons-io/commons-io/1.3.2</param>
                     </provision>
                     <deployPoms><![CDATA[
-                        target/poms/META-INF/maven/de.deepamehta/deepamehta3-distribution/pom.xml,
-                        target/poms/META-INF/maven/de.deepamehta/deepamehta3-third-party/pom.xml,
-                        target/poms/META-INF/maven/de.deepamehta/deepamehta3-felix/pom.xml
+                        target/poms/deepamehta3-felix-0.4.5-SNAPSHOT.pom,
+                        target/poms/deepamehta3-third-party-0.4.5-SNAPSHOT.pom,
+                        target/poms/deepamehta3-distribution-0.4.5-SNAPSHOT.pom
                     ]]></deployPoms>
                 </configuration>
             </plugin>
 
-            <!-- use core plugin implementation as default -->
+            <!-- use core plugin implementation as default activator -->
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.1.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>

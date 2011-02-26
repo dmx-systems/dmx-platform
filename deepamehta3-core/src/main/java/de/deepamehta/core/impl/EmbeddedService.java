@@ -1,7 +1,12 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.CommandParams;
+import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.PluginInfo;
+import de.deepamehta.core.model.Properties;
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.RelatedTopic;
@@ -14,9 +19,19 @@ import de.deepamehta.core.storage.Storage;
 import de.deepamehta.core.storage.Transaction;
 import de.deepamehta.core.util.JSONHelper;
 
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
@@ -30,7 +45,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -39,6 +53,9 @@ import java.util.logging.Logger;
 /**
  * Implementation of the DeepaMehta core service. Embeddable into Java applications.
  */
+@Path("/")
+@Consumes("application/json")
+@Produces("application/json")
 public class EmbeddedService implements CoreService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -75,8 +92,8 @@ public class EmbeddedService implements CoreService {
 
          PRE_CREATE_TOPIC("preCreateHook",  Topic.class, ClientContext.class),
         POST_CREATE_TOPIC("postCreateHook", Topic.class, ClientContext.class),
-         PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, Map.class),
-        POST_UPDATE_TOPIC("postUpdateHook", Topic.class, Map.class),
+         PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, Properties.class),
+        POST_UPDATE_TOPIC("postUpdateHook", Topic.class, Properties.class),
 
          PRE_DELETE_RELATION("preDeleteRelationHook",  Long.TYPE),
         POST_DELETE_RELATION("postDeleteRelationHook", Long.TYPE),
@@ -92,7 +109,7 @@ public class EmbeddedService implements CoreService {
         // (see {@link de.deepamehta.core.service.Plugin#introduceTypesToPlugin}).
         MODIFY_TOPIC_TYPE("modifyTopicTypeHook", TopicType.class, ClientContext.class),
 
-        EXECUTE_COMMAND("executeCommandHook", String.class, Map.class, ClientContext.class);
+        EXECUTE_COMMAND("executeCommandHook", String.class, CommandParams.class, ClientContext.class);
 
         private final String methodName;
         private final Class[] paramClasses;
@@ -127,6 +144,7 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    // TODO: drop this
     public EmbeddedService(Storage storage, boolean isMock) {
         this.storage = storage;
     }
@@ -143,8 +161,10 @@ public class EmbeddedService implements CoreService {
 
     // === Topics ===
 
+    @GET
+    @Path("/topic/{id}")
     @Override
-    public Topic getTopic(long id, ClientContext clientContext) {
+    public Topic getTopic(@PathParam("id") long id, @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             Topic topic = storage.getTopic(id);
@@ -159,8 +179,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/topic/by_property/{key}/{value}")
     @Override
-    public Topic getTopic(String key, Object value) {
+    public Topic getTopic(@PathParam("key") String key, @PathParam("value") PropValue value) {
         Transaction tx = storage.beginTx();
         try {
             Topic topic = storage.getTopic(key, value);
@@ -174,8 +196,12 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/topic/{typeUri}/{key}/{value}")
     @Override
-    public Topic getTopic(String typeUri, String key, Object value) {
+    public Topic getTopic(@PathParam("typeUri") String typeUri,
+                          @PathParam("key")     String key,
+                          @PathParam("value")   PropValue value) {
         Transaction tx = storage.beginTx();
         try {
             Topic topic = storage.getTopic(typeUri, key, value);
@@ -191,10 +217,10 @@ public class EmbeddedService implements CoreService {
     }
 
     @Override
-    public Object getTopicProperty(long topicId, String key) {
+    public PropValue getTopicProperty(long topicId, String key) {
         Transaction tx = storage.beginTx();
         try {
-            Object value = storage.getTopicProperty(topicId, key);
+            PropValue value = storage.getTopicProperty(topicId, key);
             tx.success();
             return value;
         } catch (Exception e) {
@@ -205,8 +231,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/topic/by_type/{typeUri}")
     @Override
-    public List<Topic> getTopics(String typeUri) {
+    public List<Topic> getTopics(@PathParam("typeUri") String typeUri) {
         Transaction tx = storage.beginTx();
         try {
             List<Topic> topics = storage.getTopics(typeUri);
@@ -240,10 +268,13 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/topic/{id}/related_topics")
     @Override
-    public List<RelatedTopic> getRelatedTopics(long topicId, List<String> includeTopicTypes,
-                                                             List<String> includeRelTypes,
-                                                             List<String> excludeRelTypes) {
+    public List<RelatedTopic> getRelatedTopics(@PathParam("id") long topicId,
+                                               @QueryParam("include_topic_types") List<String> includeTopicTypes,
+                                               @QueryParam("include_rel_types")   List<String> includeRelTypes,
+                                               @QueryParam("exclude_rel_types")   List<String> excludeRelTypes) {
         // set defaults
         if (includeTopicTypes == null) includeTopicTypes = new ArrayList();
         if (includeRelTypes   == null) includeRelTypes   = new ArrayList();
@@ -273,9 +304,13 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/topic")
     @Override
-    public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord,
-                                                                        ClientContext clientContext) {
+    public List<Topic> searchTopics(@QueryParam("search")    String searchTerm,
+                                    @QueryParam("field")     String fieldUri,
+                                    @QueryParam("wholeword") boolean wholeWord,
+                                    @HeaderParam("Cookie")   ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             List<Topic> searchResult = storage.searchTopics(searchTerm, fieldUri, wholeWord);
@@ -290,8 +325,11 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @POST
+    @Path("/topic/{typeUri}")
     @Override
-    public Topic createTopic(String typeUri, Map properties, ClientContext clientContext) {
+    public Topic createTopic(@PathParam("typeUri") String typeUri, Properties properties,
+                             @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             Topic t = new Topic(-1, typeUri, null, initProperties(properties, typeUri));
@@ -313,12 +351,14 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @PUT
+    @Path("/topic/{id}")
     @Override
-    public void setTopicProperties(long id, Map properties) {
+    public void setTopicProperties(@PathParam("id") long id, Properties properties) {
         Transaction tx = storage.beginTx();
         try {
             Topic topic = getTopic(id, null);   // clientContext=null
-            Map oldProperties = new HashMap(topic.getProperties()); // copy old properties for comparison with new ones
+            Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             //
             triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
@@ -330,14 +370,16 @@ public class EmbeddedService implements CoreService {
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Properties of topic " + id + " can't be set (" + properties + ")", e);
+            throw new RuntimeException("Setting properties of topic " + id + " failed\n" + properties, e);
         } finally {
             tx.finish();
         }
     }
 
+    @DELETE
+    @Path("/topic/{id}")
     @Override
-    public void deleteTopic(long id) {
+    public void deleteTopic(@PathParam("id") long id) {
         Transaction tx = storage.beginTx();
         try {
             // delete all the topic's relationships
@@ -372,8 +414,11 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/relation")
     @Override
-    public Relation getRelation(long srcTopicId, long dstTopicId, String typeId, boolean isDirected) {
+    public Relation getRelation(@QueryParam("src") long srcTopicId, @QueryParam("dst") long dstTopicId,
+                                @QueryParam("type") String typeId, @QueryParam("directed") boolean isDirected) {
         Transaction tx = storage.beginTx();
         try {
             Relation relation = storage.getRelation(srcTopicId, dstTopicId, typeId, isDirected);
@@ -388,8 +433,11 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/relation/multiple")
     @Override
-    public List<Relation> getRelations(long srcTopicId, long dstTopicId, String typeId, boolean isDirected) {
+    public List<Relation> getRelations(@QueryParam("src") long srcTopicId, @QueryParam("dst") long dstTopicId,
+                                       @QueryParam("type") String typeId, @QueryParam("directed") boolean isDirected) {
         Transaction tx = storage.beginTx();
         try {
             List<Relation> relations = storage.getRelations(srcTopicId, dstTopicId, typeId, isDirected);
@@ -404,8 +452,11 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @POST
+    @Path("/relation/{src}/{dst}/{typeId}")
     @Override
-    public Relation createRelation(String typeId, long srcTopicId, long dstTopicId, Map properties) {
+    public Relation createRelation(@PathParam("typeId") String typeId, @PathParam("src") long srcTopicId,
+                                   @PathParam("dst") long dstTopicId, Properties properties) {
         Transaction tx = storage.beginTx();
         try {
             Relation rel = new Relation(-1, typeId, srcTopicId, dstTopicId, properties);
@@ -420,8 +471,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @PUT
+    @Path("/relation/{id}")
     @Override
-    public void setRelationProperties(long id, Map properties) {
+    public void setRelationProperties(@PathParam("id") long id, Properties properties) {
         Transaction tx = storage.beginTx();
         try {
             storage.setRelationProperties(id, properties);
@@ -434,8 +487,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @DELETE
+    @Path("/relation/{id}")
     @Override
-    public void deleteRelation(long id) {
+    public void deleteRelation(@PathParam("id") long id) {
         Transaction tx = storage.beginTx();
         try {
             triggerHook(Hook.PRE_DELETE_RELATION, id);
@@ -452,6 +507,8 @@ public class EmbeddedService implements CoreService {
 
     // === Types ===
 
+    @GET
+    @Path("/topictype")
     @Override
     public Set<String> getTopicTypeUris() {
         Transaction tx = storage.beginTx();
@@ -467,8 +524,11 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @GET
+    @Path("/topictype/{typeUri}")
     @Override
-    public TopicType getTopicType(String typeUri, ClientContext clientContext) {
+    public TopicType getTopicType(@PathParam("typeUri") String typeUri,
+                                  @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             TopicType topicType = storage.getTopicType(typeUri);
@@ -483,10 +543,17 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @POST
+    @Path("/topictype")
+    @Consumes("application/x-www-form-urlencoded")
     @Override
-    public TopicType createTopicType(Map properties, List dataFields, ClientContext clientContext) {
+    public TopicType createTopicType(@FormParam("properties") Properties properties,
+                                     @FormParam("data_fields") List<DataField> dataFields,
+                                     @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
+            logger.info("### properties=" + properties);
+            logger.info("### dataFields=" + dataFields);
             TopicType topicType = storage.createTopicType(properties, dataFields);
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
@@ -504,8 +571,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @POST
+    @Path("/topictype/{typeUri}")
     @Override
-    public void addDataField(String typeUri, DataField dataField) {
+    public void addDataField(@PathParam("typeUri") String typeUri, DataField dataField) {
         Transaction tx = storage.beginTx();
         try {
             storage.addDataField(typeUri, dataField);
@@ -519,8 +588,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @PUT
+    @Path("/topictype/{typeUri}")
     @Override
-    public void updateDataField(String typeUri, DataField dataField) {
+    public void updateDataField(@PathParam("typeUri") String typeUri, DataField dataField) {
         Transaction tx = storage.beginTx();
         try {
             storage.updateDataField(typeUri, dataField);
@@ -534,8 +605,26 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    @PUT
+    @Path("/topictype/{typeUri}/field_order")
     @Override
-    public void removeDataField(String typeUri, String fieldUri) {
+    public void setDataFieldOrder(@PathParam("typeUri") String typeUri, List<String> fieldUris) {
+        Transaction tx = storage.beginTx();
+        try {
+            storage.setDataFieldOrder(typeUri, fieldUris);
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Data field order of topic type \"" + typeUri + "\" can't be set", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @DELETE
+    @Path("/topictype/{typeUri}/field/{fieldUri}")
+    @Override
+    public void removeDataField(@PathParam("typeUri") String typeUri, @PathParam("fieldUri") String fieldUri) {
         Transaction tx = storage.beginTx();
         try {
             storage.removeDataField(typeUri, fieldUri);
@@ -549,31 +638,21 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    @Override
-    public void setDataFieldOrder(String typeUri, List fieldUris) {
-        Transaction tx = storage.beginTx();
-        try {
-            storage.setDataFieldOrder(typeUri, fieldUris);
-            tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Data field order of topic type \"" + typeUri + "\" can't be set", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
     // === Commands ===
 
+    @POST
+    @Path("/command/{command}")
+    @Consumes("application/json, multipart/form-data")
     @Override
-    public JSONObject executeCommand(String command, Map params, ClientContext clientContext) {
+    public CommandResult executeCommand(@PathParam("command") String command, CommandParams params,
+                                        @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
-            Iterator<JSONObject> i = triggerHook(Hook.EXECUTE_COMMAND, command, params, clientContext).iterator();
+            Iterator<CommandResult> i = triggerHook(Hook.EXECUTE_COMMAND, command, params, clientContext).iterator();
             if (!i.hasNext()) {
                 throw new RuntimeException("Command is not handled by any plugin");
             }
-            JSONObject result = i.next();
+            CommandResult result = i.next();
             if (i.hasNext()) {
                 throw new RuntimeException("Ambiguity: more than one plugin returned a result");
             }
@@ -581,7 +660,7 @@ public class EmbeddedService implements CoreService {
             return result;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Command \"" + command + "\" can't be executed " + params, e);
+            throw new RuntimeException("Command \"" + command + "\" can't be executed, params=" + params, e);
         } finally {
             tx.finish();
         }
@@ -615,6 +694,18 @@ public class EmbeddedService implements CoreService {
         return plugin;
     }
 
+    @GET
+    @Path("/plugin")
+    @Override
+    public Set<PluginInfo> getPluginInfo() {
+        Set info = new HashSet();
+        for (String pluginId : getPluginIds()) {
+            String pluginFile = getPlugin(pluginId).getConfigProperty("clientSidePluginFile");
+            info.add(new PluginInfo(pluginId, pluginFile));
+        }
+        return info;
+    }
+
     @Override
     public void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall) {
         runMigration(migrationNr, plugin, isCleanInstall);
@@ -640,14 +731,16 @@ public class EmbeddedService implements CoreService {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+
+
     // === Topics ===
 
     // FIXME: method to be dropped. Missing properties are regarded as normal state.
     // Otherwise all instances would be required to be updated once a data field has been added to the type definition.
     // Application logic (server-side) and also the client should cope with missing properties.
-    private Map initProperties(Map properties, String typeUri) {
+    private Properties initProperties(Properties properties, String typeUri) {
         if (properties == null) {
-            properties = new HashMap();
+            properties = new Properties();
         }
         for (DataField dataField : getTopicType(typeUri, null).getDataFields()) {   // clientContext=null
             if (!dataField.getDataType().equals("reference") && properties.get(dataField.getUri()) == null) {
@@ -663,18 +756,18 @@ public class EmbeddedService implements CoreService {
      * Triggers a hook for all installed plugins.
      */
     private Set triggerHook(Hook hook, Object... params) {
-        try {
-            Set resultSet = new HashSet();
-            for (Plugin plugin : plugins.values()) {
+        Set resultSet = new HashSet();
+        for (Plugin plugin : plugins.values()) {
+            try {
                 Object result = triggerHook(plugin, hook, params);
                 if (result != null) {
                     resultSet.add(result);
                 }
+            } catch (Exception e) {
+                throw new RuntimeException("Triggering hook " + hook + " failed", e);
             }
-            return resultSet;
-        } catch (Exception e) {
-            throw new RuntimeException("Error while triggering hook " + hook, e);
         }
+        return resultSet;
     }
 
     /**
@@ -690,7 +783,7 @@ public class EmbeddedService implements CoreService {
     // ---
 
     private void setPluginMigrationNr(Plugin plugin, int migrationNr) {
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/PluginMigrationNr", migrationNr);
         setTopicProperties(plugin.getPluginTopic().id, properties);
     }
@@ -839,7 +932,7 @@ public class EmbeddedService implements CoreService {
 
         private void readMigrationConfigFile(InputStream in, String configFile) {
             try {
-                Properties migrationConfig = new Properties();
+                java.util.Properties migrationConfig = new java.util.Properties();
                 if (in != null) {
                     logger.info("Reading migration config file \"" + configFile + "\"");
                     migrationConfig.load(in);

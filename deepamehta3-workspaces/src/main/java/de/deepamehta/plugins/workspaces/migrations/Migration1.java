@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.workspaces.migrations;
 
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.service.Migration;
 
@@ -38,7 +39,7 @@ public class Migration1 extends Migration {
         dataFields.add(nameField);
         dataFields.add(descriptionField);
         //
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/TypeURI", "de/deepamehta/core/topictype/Workspace");
         properties.put("de/deepamehta/core/property/TypeLabel", "Workspace");
         properties.put("icon_src", "/de.deepamehta.3-workspaces/images/star.png");

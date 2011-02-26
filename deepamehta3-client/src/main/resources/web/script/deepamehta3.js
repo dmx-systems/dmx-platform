@@ -187,19 +187,14 @@ var dm3c = new function() {
 
     /**
      * Creates a topic type in the DB.
-     *
-     * @param   type_uri        The topic type URI, e.g. "de/deepamehta/core/topictype/Note".        FIXME: update docu
-     * @param   properties      Optional: topic properties (object, key: field URI, value: content). FIXME: update docu
-     *
-     * @return  The topic view of the created topic type.                                            FIXME: update docu
      */
-    this.create_topic_type = function(topic_type) {
+    this.create_topic_type = function(properties, data_fields) {
         // update DB
-        var tt = dm3c.restc.create_topic_type(topic_type);
+        var topic_type = dm3c.restc.create_topic_type(properties, data_fields);
         // trigger hook
-        dm3c.trigger_hook("post_create_topic", tt)
+        dm3c.trigger_hook("post_create_topic", topic_type)
         //
-        return tt
+        return topic_type
     }
 
 
@@ -503,7 +498,7 @@ var dm3c = new function() {
      *                      (server-side) executeCommandHook.
      */
     this.show_upload_dialog = function(command, callback) {
-        $("#upload-dialog-command").attr("value", command)
+        $("#upload-dialog form").attr("action", "/core/command/" + command)
         $("#upload-dialog").dialog("open")
         // bind callback function, using artifact ID as event namespace
         $("#upload-target").unbind("load.deepamehta3-client")
@@ -517,7 +512,7 @@ var dm3c = new function() {
                 try {
                     callback(JSON.parse(result))
                 } catch (e) {
-                    alert("No valid server response: " + result + "\n(" + JSON.stringify(e) + ")")
+                    alert("No valid server response: \"" + result + "\"\n\nException=" + JSON.stringify(e))
                 }
             }
         }
@@ -921,7 +916,7 @@ var dm3c = new function() {
 
             dm3c.restc.search_topics_and_create_bucket = function(text, field_uri, whole_word) {
                 var params = this.createRequestParameter({search: text, field: field_uri, wholeword: whole_word})
-                return this.request("GET", "/client/search" + params.to_query_string())
+                return this.request("GET", "/client/search?" + params.to_query_string())
             }
 
             // Note: this method is actually part of the Type Search plugin.

@@ -31,14 +31,14 @@ function topicmaps_plugin() {
             dm3c.restc.get_topicmap = function(topicmap_id) {
                 return this.request("GET", "/topicmap/" + topicmap_id)
             }
-            dm3c.restc.add_topic_to_topicmap = function(topic_id, x, y, topicmap_id) {
-                return this.request("PUT", "/topicmap/" + topicmap_id, {topic_id: topic_id, x: x, y: y})
+            dm3c.restc.add_topic_to_topicmap = function(topicmap_id, topic_id, x, y) {
+                return this.request("PUT", "/topicmap/" + topicmap_id + "/topic/" + topic_id + "/" + x + "/" + y)
             }
-            dm3c.restc.add_relation_to_topicmap = function(relation_id, topicmap_id) {
-                return this.request("PUT", "/topicmap/" + topicmap_id, {relation_id: relation_id})
+            dm3c.restc.add_relation_to_topicmap = function(topicmap_id, relation_id) {
+                return this.request("PUT", "/topicmap/" + topicmap_id + "/relation/" + relation_id)
             }
-            dm3c.restc.remove_relation_from_topicmap = function(relation_id, ref_id, topicmap_id) {
-                return this.request("DELETE", "/topicmap/" + topicmap_id, {relation_id: relation_id, ref_id: ref_id})
+            dm3c.restc.remove_relation_from_topicmap = function(topicmap_id, relation_id, ref_id) {
+                return this.request("DELETE", "/topicmap/" + topicmap_id + "/relation/" + relation_id + "/" + ref_id)
             }
         }
 
@@ -420,7 +420,7 @@ function topicmaps_plugin() {
             if (!topic) {
                 if (LOG_TOPICMAPS) dm3c.log("Adding topic " + id + " (\"" + label + "\") to topicmap " + topicmap_id)
                 // update DB
-                var response = dm3c.restc.add_topic_to_topicmap(id, x, y, topicmap_id)
+                var response = dm3c.restc.add_topic_to_topicmap(topicmap_id, id, x, y)
                 // update model
                 topics[id] = new TopicmapTopic(id, type, label, x, y, true, response.ref_id)
             } else if (!topic.visibility) {
@@ -438,7 +438,7 @@ function topicmaps_plugin() {
             if (!relations[id]) {
                 if (LOG_TOPICMAPS) dm3c.log("Adding relation " + id + " to topicmap " + topicmap_id)
                 // update DB
-                var response = dm3c.restc.add_relation_to_topicmap(id, topicmap_id)
+                var response = dm3c.restc.add_relation_to_topicmap(topicmap_id, id)
                 // update model
                 relations[id] = new TopicmapRelation(id, doc1_id, doc2_id, response.ref_id)
             } else {
@@ -553,7 +553,7 @@ function topicmaps_plugin() {
 
             this.remove = function() {
                 // update DB
-                dm3c.restc.remove_relation_from_topicmap(id, ref_id, topicmap_id)
+                dm3c.restc.remove_relation_from_topicmap(topicmap_id, id, ref_id)
                 // update model
                 delete relations[id]
             }

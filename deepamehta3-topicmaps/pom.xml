@@ -5,19 +5,25 @@
     <name>DeepaMehta 3 Topicmaps</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-topicmaps</artifactId>
-    <version>0.4.3</version>
+    <version>0.4.4-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta3-parent</artifactId>
         <version>0.4.5-SNAPSHOT</version>
+        <relativePath>../deepamehta3-parent/pom.xml</relativePath>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-core</artifactId>
+            <version>0.4.5-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
         </dependency>
     </dependencies>
 
@@ -29,11 +35,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Export-Package>
-                            de.deepamehta.plugins.topicmaps,
-                            de.deepamehta.plugins.topicmaps.model,
-                            de.deepamehta.plugins.topicmaps.resources
-                        </Export-Package>
                         <Bundle-Activator>
                             de.deepamehta.plugins.topicmaps.TopicmapsPlugin
                         </Bundle-Activator>

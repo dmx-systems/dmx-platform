@@ -97,7 +97,7 @@ public class Activator implements BundleActivator, FrameworkListener {
     public static CoreService getService() {
         // CoreService dms = (CoreService) deepamehtaServiceTracker.getService();
         if (dms == null) {
-            throw new RuntimeException("DeepaMehta core service is currently not available");
+            throw new RuntimeException("DeepaMehta core service is not yet available");
         }
         return dms;
     }
@@ -110,7 +110,7 @@ public class Activator implements BundleActivator, FrameworkListener {
         try {
             return new Neo4jStorage(DATABASE_PATH);
         } catch (Exception e) {
-            throw new RuntimeException("Database can't be opened", e);
+            throw new RuntimeException("Database can't be opened (path=" + DATABASE_PATH + ")", e);
         }
     }
 }

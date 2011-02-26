@@ -2,10 +2,12 @@ package de.deepamehta.core.model;
 
 import de.deepamehta.core.util.JSONHelper;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -31,16 +33,16 @@ public class Topic {
     public String typeUri;
     public String label;
 
-    protected Map<String, Object> properties;
+    protected Properties properties;
     private   Map<String, Object> enrichment;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public Topic(long id, String typeUri, String label, Map properties) {
+    public Topic(long id, String typeUri, String label, Properties properties) {
         this.id = id;
         this.typeUri = typeUri;
         this.label = label;
-        this.properties = properties != null ? properties : new HashMap();
+        this.properties = properties != null ? properties : new Properties();
         this.enrichment = new HashMap();
     }
 
@@ -51,16 +53,20 @@ public class Topic {
     public Topic(JSONObject topic) {
         try {
             typeUri = topic.getString("type_uri");
-            properties = JSONHelper.toMap(topic.getJSONObject("properties"));
-        } catch (Throwable e) {
-            throw new RuntimeException("Error while parsing " + this, e);
+            properties = new Properties(topic.getJSONObject("properties"));
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing " + this + " failed", e);
         }
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public Object getProperty(String key) {
-        Object value = properties.get(key);
+    /**
+     * Returns the property value for a key.
+     * If there is no property for that key an exception is thrown.
+     */
+    public PropValue getProperty(String key) {
+        PropValue value = properties.get(key);
         if (value == null) {
             throw new RuntimeException("Property \"" + key + "\" of " + this + " is not initialized. " +
                 "Remember: topics obtained by getRelatedTopics() provide no properties. " +
@@ -69,26 +75,52 @@ public class Topic {
         return value;
     }
 
-    public Object getProperty(String key, Object defaultValue) {
-        Object value = properties.get(key);
-        return value != null ? value : defaultValue;
+    /**
+     * Returns the property value for a key.
+     * If there is no property for that key a default value is returned.
+     * This method never returns <code>null</code>.
+     *
+     * @param   the default value. May be <code>null</code>. In this case a "no-value" respresenting
+     *          <code>PropValue</code> object is used as the default value.
+     */
+    public PropValue getProperty(String key, PropValue defaultValue) {
+        PropValue value = properties.get(key);
+        return value != null ? value : defaultValue != null ? defaultValue : new PropValue();
     }
 
-    public Map<String, Object> getProperties() {
+    public Properties getProperties() {
         return properties;
     }
 
     // ---
 
-    public void setProperty(String key, Object value) {
+    public void setProperty(String key, String value) {
         properties.put(key, value);
     }
+
+    public void setProperty(String key, int value) {
+        properties.put(key, value);
+    }
+
+    public void setProperty(String key, long value) {
+        properties.put(key, value);
+    }
+
+    public void setProperty(String key, boolean value) {
+        properties.put(key, value);
+    }
+
+    public void setProperty(String key, PropValue value) {
+        properties.put(key, value);
+    }
+
+    // ---
 
     /**
      * Sets various properties at once.
      * Same as consecutive {@link setProperty} calls.
      */
-    public void setProperties(Map<String, Object> properties) {
+    public void setProperties(Properties properties) {
         this.properties.putAll(properties);
     }
 
@@ -106,14 +138,20 @@ public class Topic {
             o.put("id", id);
             o.put("type_uri", typeUri);
             o.put("label", label);
-            o.put("properties", properties);
-            //
+            o.put("properties", properties.toJSON());
             serializeEnrichment(o);
-            //
             return o;
         } catch (JSONException e) {
-            throw new RuntimeException("Error while serializing " + this, e);
+            throw new RuntimeException("Serializing " + this + " failed", e);
         }
+    }
+
+    public static JSONArray topicsToJson(List<Topic> topics) {
+        JSONArray array = new JSONArray();
+        for (Topic topic : topics) {
+            array.put(topic.toJSON());
+        }
+        return array;
     }
 
     // ---

@@ -9,8 +9,7 @@ import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.autoWrap;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.cleanCaches;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.scanPom;
 
-import java.util.HashMap;
-import java.util.Map;
+import de.deepamehta.core.model.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +63,7 @@ public abstract class CoreServiceTest {
     public void crudExample() throws Exception {
         ClientContext ctx = null;
 
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put(PROPERTY, "IntegrationTestContact");
 
         // create
@@ -75,14 +74,14 @@ public abstract class CoreServiceTest {
         Topic readed = sut.getTopic(id, ctx);
         // TODO implement equals()
         assertEquals(id, readed.id);
-        assertEquals(created.getProperties(), readed.getProperties());
+        assertEquals(created.getProperties().toMap(), readed.getProperties().toMap());
 
         // update
         String newValue = "ChangedTestContact";
         properties.put(PROPERTY, newValue);
         sut.setTopicProperties(id, properties);
         Topic updated = sut.getTopic(id, ctx);
-        assertEquals(newValue, updated.getProperty(PROPERTY));
+        assertEquals(newValue, updated.getProperty(PROPERTY).toString());
 
         // delete
         sut.deleteTopic(id);

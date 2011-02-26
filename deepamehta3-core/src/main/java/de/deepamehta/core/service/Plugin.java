@@ -1,6 +1,10 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.CommandParams;
+import de.deepamehta.core.model.CommandResult;
+import de.deepamehta.core.model.Properties;
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -17,15 +21,12 @@ import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
 
-import org.codehaus.jettison.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import java.io.InputStream;
@@ -47,16 +48,16 @@ public class Plugin implements BundleActivator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String pluginId;                    // This bundle's symbolic name.
-    private String pluginName;                  // This bundle's name = POM project name.
+    private String pluginId;                        // This bundle's symbolic name.
+    private String pluginName;                      // This bundle's name = POM project name.
     private String pluginClass;
     private String pluginPackage;
     private Bundle pluginBundle;
-    private Topic  pluginTopic;                 // Represents this plugin in DB. Holds plugin migration number.
+    private Topic  pluginTopic;                     // Represents this plugin in DB. Holds plugin migration number.
 
     private boolean isActivated;
 
-    private Properties configProperties;        // Read from file "plugin.properties"
+    private java.util.Properties configProperties;  // Read from file "plugin.properties"
 
     protected CoreService dms;
     private HttpService httpService;
@@ -132,7 +133,7 @@ public class Plugin implements BundleActivator {
     public CoreService getService() {
         // CoreService dms = (CoreService) deepamehtaServiceTracker.getService();
         if (dms == null) {
-            throw new RuntimeException("DeepaMehta core service is currently not available " +
+            throw new RuntimeException("DeepaMehta core service is not yet available " +
                 "for plugin \"" + pluginName + "\"");
         }
         return dms;
@@ -208,10 +209,10 @@ public class Plugin implements BundleActivator {
     public void postCreateHook(Topic topic, ClientContext clientContext) {
     }
 
-    public void preUpdateHook(Topic topic, Map<String, Object> newProperties) {
+    public void preUpdateHook(Topic topic, Properties newProperties) {
     }
 
-    public void postUpdateHook(Topic topic, Map<String, Object> oldProperties) {
+    public void postUpdateHook(Topic topic, Properties oldProperties) {
     }
 
     // ---
@@ -274,7 +275,7 @@ public class Plugin implements BundleActivator {
 
     // ---
 
-    public JSONObject executeCommandHook(String command, Map params, ClientContext clientContext) {
+    public CommandResult executeCommandHook(String command, CommandParams params, ClientContext clientContext) {
         return null;
     }
 
@@ -301,12 +302,11 @@ public class Plugin implements BundleActivator {
                 if (service instanceof CoreService) {
                     logger.info("Adding DeepaMehta core service to plugin \"" + pluginName + "\"");
                     dms = (CoreService) service;
-                    initPlugin(context);
+                    checkServiceAvailability(context);
                 } else if (service instanceof HttpService) {
                     logger.info("Adding HTTP service to plugin \"" + pluginName + "\"");
                     httpService = (HttpService) service;
-                    registerWebResources();
-                    registerRestResources();
+                    checkServiceAvailability(context);
                 } else if (service instanceof PluginService) {
                     logger.info("### Adding plugin service \"" + serviceInterface + "\" to plugin \"" +
                         pluginName + "\"");
@@ -336,6 +336,17 @@ public class Plugin implements BundleActivator {
                 }
                 super.removedService(ref, service);
             }
+
+            /**
+             * Initializes this plugin if both required OSGi services (CoreService and HttpService) are available.
+             */
+            private void checkServiceAvailability(BundleContext context) {
+                if (dms != null && httpService != null) {
+                    initPlugin(context);        // relies on CoreService
+                    registerWebResources();     // relies on HttpService
+                    registerRestResources();    // relies on HttpService and CoreService
+                }
+            }
         };
         serviceTrackers.add(serviceTracker);
         serviceTracker.open();
@@ -346,7 +357,7 @@ public class Plugin implements BundleActivator {
     private void registerPluginService(BundleContext context) {
         String serviceInterface = getConfigProperty("providedServiceInterface");
         if (serviceInterface != null) {
-            logger.info("### Registering service \"" + serviceInterface +
+            logger.info("Registering service \"" + serviceInterface +
                 "\" of plugin \"" + pluginName + "\" at OSGi framework");
             context.registerService(serviceInterface, this, null);
         }
@@ -410,6 +421,7 @@ public class Plugin implements BundleActivator {
                 httpService.registerServlet(namespace, new ServletContainer(), initParams, null);
             }
         } catch (Exception e) {
+            unregisterWebResources();
             throw new RuntimeException("REST resources of plugin \"" + pluginName + "\" can't be registered " +
                 "at namespace " + namespace, e);
         }
@@ -446,9 +458,9 @@ public class Plugin implements BundleActivator {
 
     // --- Config Properties ---
 
-    private Properties readConfigFile() {
+    private java.util.Properties readConfigFile() {
         try {
-            Properties properties = new Properties();
+            java.util.Properties properties = new java.util.Properties();
             InputStream in = getResourceAsStream(PLUGIN_CONFIG_FILE);
             if (in != null) {
                 logger.info("Reading plugin config file \"" + PLUGIN_CONFIG_FILE + "\"");
@@ -481,10 +493,11 @@ public class Plugin implements BundleActivator {
             }
             registerPluginService(context);
             registerPlugin();
+            logger.info("----- Initialization of plugin \"" + pluginName + "\" complete -----");
             tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Plugin \"" + pluginName + "\" can't be initialzed", e);
+            logger.warning("ROLLBACK! (plugin \"" + pluginName + "\")");
+            throw new RuntimeException("Initialization of plugin \"" + pluginName + "\" failed", e);
         } finally {
             tx.finish();
         }
@@ -505,7 +518,7 @@ public class Plugin implements BundleActivator {
             return false;
         } else {
             logger.info("Creating topic for plugin \"" + pluginName + "\" -- this is a plugin clean install");
-            Map properties = new HashMap();
+            Properties properties = new Properties();
             properties.put("de/deepamehta/core/property/PluginID", pluginId);
             properties.put("de/deepamehta/core/property/PluginMigrationNr", 0);
             // FIXME: clientContext=null
@@ -515,14 +528,14 @@ public class Plugin implements BundleActivator {
     }
 
     private Topic findPluginTopic() {
-        return dms.getTopic("de/deepamehta/core/property/PluginID", pluginId);
+        return dms.getTopic("de/deepamehta/core/property/PluginID", new PropValue(pluginId));
     }
 
     /**
      * Determines the migrations to be run for this plugin and run them.
      */
     private void runPluginMigrations(boolean isCleanInstall) {
-        int migrationNr = (Integer) pluginTopic.getProperty("de/deepamehta/core/property/PluginMigrationNr");
+        int migrationNr = pluginTopic.getProperty("de/deepamehta/core/property/PluginMigrationNr").intValue();
         int requiredMigrationNr = Integer.parseInt(getConfigProperty("requiredPluginMigrationNr", "0"));
         int migrationsToRun = requiredMigrationNr - migrationNr;
         logger.info("migrationNr=" + migrationNr + ", requiredMigrationNr=" + requiredMigrationNr +

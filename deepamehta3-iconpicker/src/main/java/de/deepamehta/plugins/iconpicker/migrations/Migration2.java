@@ -1,5 +1,7 @@
 package de.deepamehta.plugins.iconpicker.migrations;
 
+import de.deepamehta.core.model.Properties;
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -37,40 +39,40 @@ public class Migration2 extends Migration {
 
     private void createIconTopics() {
         for (String typeURI : dms.getTopicTypeUris()) {
-            logger.info("### Handling icon topic for type " + typeURI + " ...");
+            logger.fine("### Handling icon topic for type " + typeURI + " ...");
             TopicType type = dms.getTopicType(typeURI, null);   // clientContext=null
-            String iconSrc = (String) type.getProperty("icon_src", null);
+            String iconSrc = type.getProperty("icon_src", null).toString();
             if (iconSrc == null) {
-                logger.info("  # Type has no icon_src declaration -> no icon topic needed");
+                logger.fine("  # Type has no icon_src declaration -> no icon topic needed");
                 continue;
             } else {
-                logger.info("  # Type has icon_src declaration: \"" + iconSrc + "\" -> icon topic is needed");
+                logger.fine("  # Type has icon_src declaration: \"" + iconSrc + "\" -> icon topic is needed");
             }
             // create icon topic
             Topic iconTopic = getIconTopic(iconSrc);
             if (iconTopic == null) {
                 iconTopic = createIconTopic(iconSrc);
-                logger.info("  # Creating icon topic for that source -> ID=" + iconTopic.id);
+                logger.fine("  # Creating icon topic for that source -> ID=" + iconTopic.id);
             } else {
-                logger.info("  # Icon topic for that source exists already (ID=" + iconTopic.id + ")");
+                logger.fine("  # Icon topic for that source exists already (ID=" + iconTopic.id + ")");
             }
             // relate type to icon
             Relation relation = dms.getRelation(type.id, iconTopic.id, "RELATION", true);
             if (relation == null) {
                 relateTypeToIcon(type.id, iconTopic.id);
-                logger.info("  # Creating relation between type and icon topic");
+                logger.fine("  # Creating relation between type and icon topic");
             } else {
-                logger.info("  # Relation between type and icon topic exists already");
+                logger.fine("  # Relation between type and icon topic exists already");
             }
         }
     }
 
     private Topic getIconTopic(String iconSrc) {
-        return dms.getTopic("de/deepamehta/core/property/IconSource", iconSrc);
+        return dms.getTopic("de/deepamehta/core/property/IconSource", new PropValue(iconSrc));
     }
 
     private Topic createIconTopic(String iconSrc) {
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/IconSource", iconSrc);
         return dms.createTopic("de/deepamehta/core/topictype/Icon", properties, null);
     }

@@ -12,6 +12,8 @@ public interface WorkspacesService extends PluginService {
 
     public Topic createWorkspace(String name);
 
+    public void assignTopic(long workspaceId, long topicId);
+
     public void assignType(long workspaceId, long typeId);
 
     /**

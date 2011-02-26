@@ -74,6 +74,14 @@ public class DataField {
     }
 
     /**
+     * Called by JAX-RS container to create a DataField from a @FormParam
+     */
+    public DataField(String json) throws JSONException {
+        this(new JSONObject(json));
+        logger.info("### Create DataField from a JSON string:\n" + json);
+    }
+
+    /**
      * Used when a data field is constructed from a JSON file (declarative migration) or
      * through the wire (addDataField() and updateDataField() core service calls).
      */

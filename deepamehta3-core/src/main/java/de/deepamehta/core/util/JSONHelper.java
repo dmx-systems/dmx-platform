@@ -1,5 +1,6 @@
 package de.deepamehta.core.util;
 
+import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -43,7 +45,7 @@ public class JSONHelper {
             }
             return map;
         } catch (JSONException e) {
-            throw new RuntimeException("Error while converting JSONObject to Map", e);
+            throw new RuntimeException("Converting JSONObject to Map failed", e);
         }
     }
 
@@ -57,38 +59,21 @@ public class JSONHelper {
             }
             return list;
         } catch (JSONException e) {
-            throw new RuntimeException("Error while converting JSONArray to Map", e);
+            throw new RuntimeException("Converting JSONArray to List failed", e);
         }
-    }
-
-    // === DeepaMehta specific ===
-
-    public static JSONArray topicsToJson(List<Topic> topics) {
-        JSONArray array = new JSONArray();
-        for (Topic topic : topics) {
-            array.put(topic.toJSON());
-        }
-        return array;
-    }
-
-    public static JSONArray relationsToJson(List<Relation> relations) {
-        JSONArray array = new JSONArray();
-        for (Relation relation : relations) {
-            array.put(relation.toJSON());
-        }
-        return array;
-    }
-
-    // FIXME: for the moment it is sufficient to serialize the topics only. The respective relations are omitted.
-    public static JSONArray relatedTopicsToJson(List<RelatedTopic> relTopics) {
-        JSONArray array = new JSONArray();
-        for (RelatedTopic relTopic : relTopics) {
-            array.put(relTopic.getTopic().toJSON());
-        }
-        return array;
     }
 
     // ---
+
+    public static JSONArray stringsToJson(Set<String> strings) {
+        JSONArray array = new JSONArray();
+        for (String string : strings) {
+            array.put(string);
+        }
+        return array;
+    }
+
+    // === DeepaMehta specific ===
 
     /**
      * Creates types and topics from a JSON formatted input stream.
@@ -110,7 +95,7 @@ public class JSONHelper {
                 createTopics(topics, dms);
             }
         } catch (Throwable e) {
-            throw new RuntimeException("Error while reading migration file \"" + migrationFileName + "\"", e);
+            throw new RuntimeException("Reading migration file \"" + migrationFileName + "\" failed", e);
         }
     }
 

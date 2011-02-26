@@ -4,6 +4,7 @@ import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -20,7 +21,8 @@ import java.util.logging.Logger;
 public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
     private static enum RelationType {
-        WORKSPACE_TYPE      // A type assigned to a workspace. Direction is from workspace to type.
+        RELATION,       // A topic assigned to a workspace. Direction is from topic to workspace.
+        WORKSPACE_TYPE  // A type assigned to a workspace. Direction is from workspace to type.
     }
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -31,40 +33,51 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
 
 
-    // ************************
-    // *** Overriding Hooks ***
-    // ************************
+    // **************************************************
+    // *** Core Hooks (called from DeepaMehta 3 Core) ***
+    // **************************************************
 
 
 
-    // Note: we must use the postCreateHook to create the relation because at pre_create the document has no ID yet.
+    /**
+     * Assigns a newly created topic to the current workspace.
+     * <p>
+     * Note: we must use the postCreateHook to create the relation because at pre_create the topic has no ID yet.
+     */
     @Override
     public void postCreateHook(Topic topic, ClientContext clientContext) {
-        // check precondition 1
-        if (topic.typeUri.equals("de/deepamehta/core/topictype/SearchResult") ||
-            topic.typeUri.equals("de/deepamehta/core/topictype/Workspace")) {
-            // Note 1: we do not relate search results to a workspace. Otherwise the search result would appear
-            // as relation when displaying the workspace. That's because a "SEARCH_RESULT" relation is not be
-            // created if there is another relation already.
-            // Note 2: we do not relate workspaces to a workspace. This would be contra-intuitive.
-            logger.info(topic + " is deliberately not assigned to any workspace");
-            return;
+        long workspaceId = -1;
+        try {
+            // check precondition 1
+            if (topic.typeUri.equals("de/deepamehta/core/topictype/SearchResult") ||
+                topic.typeUri.equals("de/deepamehta/core/topictype/Workspace")) {
+                // Note 1: we do not relate search results to a workspace. Otherwise the search result would appear
+                // as relation when displaying the workspace. That's because a "SEARCH_RESULT" relation is not be
+                // created if there is another relation already.
+                // Note 2: we do not relate workspaces to a workspace. This would be contra-intuitive.
+                logger.info(topic + " is deliberately not assigned to any workspace");
+                return;
+            }
+            // check precondition 2
+            if (clientContext == null) {
+                logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +
+                    "(client context is not initialzed))");
+                return;
+            }
+            // check precondition 3
+            String wsId = clientContext.get("dm3_workspace_id");
+            if (wsId == null) {
+                logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +
+                    "(no setting found in client context))");
+                return;
+            }
+            // assign topic to workspace
+            workspaceId = Long.parseLong(wsId);
+            assignTopic(workspaceId, topic.id);
+        } catch (Exception e) {
+            logger.warning("Assigning " + topic + " to workspace " + workspaceId + " failed (" + e + "). " +
+                "This can happen if there is a stale \"dm3_workspace_id\" cookie.");
         }
-        // check precondition 2
-        if (clientContext == null) {
-            logger.warning(topic + " can't be related to a workspace because current workspace is unknown " +
-                "(client context is not initialzed)");
-            return;
-        }
-        // check precondition 3
-        String workspaceId = clientContext.get("dm3_workspace_id");
-        if (workspaceId == null) {
-            logger.warning(topic + " can't be related to a workspace because current workspace is unknown " +
-                "(no setting found in client context)");
-            return;
-        }
-        // relate topic to workspace
-        dms.createRelation("RELATION", topic.id, Long.parseLong(workspaceId), null);
     }
 
     /**
@@ -83,22 +96,28 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
 
 
-    // ****************************************
-    // *** WorkspacesService Implementation ***
-    // ****************************************
+    // **********************
+    // *** Plugin Service ***
+    // **********************
 
 
 
     @Override
     public Topic createWorkspace(String name) {
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/Name", name);
-        // clientContext=null
-        return getService().createTopic("de/deepamehta/core/topictype/Workspace", properties, null);
+        return dms.createTopic("de/deepamehta/core/topictype/Workspace", properties, null);     // clientContext=null
+    }
+
+    @Override
+    public void assignTopic(long workspaceId, long topicId) {
+        checkWorkspaceId(workspaceId);
+        dms.createRelation(RelationType.RELATION.name(), topicId, workspaceId, null);           // properties=null
     }
 
     @Override
     public void assignType(long workspaceId, long typeId) {
+        checkWorkspaceId(workspaceId);
         dms.createRelation(RelationType.WORKSPACE_TYPE.name(), workspaceId, typeId, null);      // properties=null
     }
 
@@ -115,5 +134,17 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
         // long typeId = dms.getTopicType(typeUri, null).id;
         return dms.getRelatedTopics(typeId, asList("de/deepamehta/core/topictype/Workspace"),
             asList(RelationType.WORKSPACE_TYPE.name() + ";OUTGOING"), null);
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void checkWorkspaceId(long workspaceId) {
+        String typeUri = dms.getTopic(workspaceId, null).typeUri;
+        if (!typeUri.equals("de/deepamehta/core/topictype/Workspace")) {
+            throw new IllegalArgumentException("Topic " + workspaceId + " is not a workspace (but of type \"" +
+                typeUri + "\")");
+        }
     }
 }

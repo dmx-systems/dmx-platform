@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.storage.Storage;
 import de.deepamehta.core.storage.Transaction;
 
@@ -24,7 +25,7 @@ public class EmbeddedServiceGetTopicPropertyTestCase {
 
     private long topicId = 1L;
     private String key = "key";
-    private String value = "value";
+    private PropValue value = new PropValue("value");
     private RuntimeException throwable = new RuntimeException("error");
 
     @Before

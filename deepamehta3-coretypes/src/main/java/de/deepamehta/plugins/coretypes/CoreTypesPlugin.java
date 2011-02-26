@@ -1,14 +1,9 @@
 package de.deepamehta.plugins.coretypes;
 
-import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.Topic;
-import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.service.Plugin;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 
@@ -30,18 +25,18 @@ public class CoreTypesPlugin extends Plugin {
 
 
     @Override
-    public void postUpdateHook(Topic topic, Map<String, Object> oldProperties) {
+    public void postUpdateHook(Topic topic, Properties oldProperties) {
         if (topic.typeUri.equals("de/deepamehta/core/topictype/TopicType")) {
             // update type URI
-            String oldTypeUri = (String) oldProperties.get("de/deepamehta/core/property/TypeURI");
-            String newTypeUri = (String) topic.getProperty("de/deepamehta/core/property/TypeURI");
+            String oldTypeUri = oldProperties.get("de/deepamehta/core/property/TypeURI").toString();
+            String newTypeUri = topic.getProperty("de/deepamehta/core/property/TypeURI").toString();
             if (!oldTypeUri.equals(newTypeUri)) {
                 logger.info("### Changing type URI from \"" + oldTypeUri + "\" to \"" + newTypeUri + "\"");
                 dms.getTopicType(oldTypeUri, null).setTypeUri(newTypeUri);  // clientContext=null
             }
             // update type label
-            String oldTypeLabel = (String) oldProperties.get("de/deepamehta/core/property/TypeLabel");
-            String newTypeLabel = (String) topic.getProperty("de/deepamehta/core/property/TypeLabel");
+            String oldTypeLabel = oldProperties.get("de/deepamehta/core/property/TypeLabel").toString();
+            String newTypeLabel = topic.getProperty("de/deepamehta/core/property/TypeLabel").toString();
             if (!oldTypeLabel.equals(newTypeLabel)) {
                 logger.info("### Changing type label from \"" + oldTypeLabel + "\" to \"" + newTypeLabel + "\"");
                 dms.getTopicType(newTypeUri, null).setLabel(newTypeLabel);  // clientContext=null

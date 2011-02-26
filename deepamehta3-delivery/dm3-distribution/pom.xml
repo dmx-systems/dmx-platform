@@ -8,12 +8,6 @@
     <artifactId>deepamehta3-distribution</artifactId>
     <version>0.4.5-SNAPSHOT</version>
 
-    <parent>
-        <groupId>de.deepamehta</groupId>
-        <artifactId>deepamehta3-parent</artifactId>
-        <version>0.4.5-SNAPSHOT</version>
-    </parent>
-
     <!-- All modules that belong to the DeepaMehta 3 standard installation. -->
     <dependencies>
         <!-- core -->
@@ -50,7 +44,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-contacts</artifactId>
-            <version>0.4.2</version>
+            <version>0.4.3-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -61,24 +55,24 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-filemanager</artifactId>
-            <version>0.4.1</version>
+            <version>0.4.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-iconpicker</artifactId>
-            <version>0.4.2</version>
+            <version>0.4.3-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-notes</artifactId>
-            <version>0.4.2</version>
+            <version>0.4.3-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-projects</artifactId>
-            <version>0.4.2</version>
+            <version>0.4.3-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -90,17 +84,17 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-topicmaps</artifactId>
-            <version>0.4.3</version>
+            <version>0.4.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-typeeditor</artifactId>
-            <version>0.4.3</version>
+            <version>0.4.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-typesearch</artifactId>
-            <version>0.4.1</version>
+            <version>0.4.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>

@@ -1,30 +1,46 @@
 package de.deepamehta.plugins.files;
 
+import de.deepamehta.plugins.files.model.DirectoryListing;
+import de.deepamehta.plugins.files.model.Resource;
+import de.deepamehta.plugins.files.model.ResourceInfo;
+import de.deepamehta.plugins.files.service.FilesService;
+
 import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.CommandParams;
+import de.deepamehta.core.model.CommandResult;
+import de.deepamehta.core.model.Properties;
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.util.JavaUtils;
 
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response.Status;
+
+import javax.servlet.http.HttpServletRequest;
 
 import java.awt.Desktop;
-
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.logging.Logger;
 
 
 
-public class FilesPlugin extends Plugin {
+@Path("/")
+public class FilesPlugin extends Plugin implements FilesService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    private @Context HttpServletRequest request;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -32,28 +48,29 @@ public class FilesPlugin extends Plugin {
 
 
 
-    // ************************
-    // *** Overriding Hooks ***
-    // ************************
+    // **************************************************
+    // *** Core Hooks (called from DeepaMehta 3 Core) ***
+    // **************************************************
 
 
 
     @Override
-    public JSONObject executeCommandHook(String command, Map params, ClientContext clientContext) {
+    public CommandResult executeCommandHook(String command, CommandParams params, ClientContext clientContext) {
         if (command.equals("deepamehta3-files.open-file")) {
-            long fileTopicId = (Integer) params.get("topic_id");
-            return openFile(fileTopicId);
+            long fileTopicId = params.getInt("topic_id");    // topic_id deserializes as Integer (not Long)
+            openFile(fileTopicId);
+            return new CommandResult("message", "OK");
         } else if (command.equals("deepamehta3-files.create-file-topic")) {
-            String path = (String) params.get("path");
+            String path = params.getString("path");
             try {
-                return createFileTopic(path).toJSON();
+                return new CommandResult(createFileTopic(path).toJSON());
             } catch (Throwable e) {
                 throw new RuntimeException("Error while creating file topic for \"" + path + "\"", e);
             }
         } else if (command.equals("deepamehta3-files.create-folder-topic")) {
-            String path = (String) params.get("path");
+            String path = (String) params.getString("path");
             try {
-                return createFolderTopic(path).toJSON();
+                return new CommandResult(createFolderTopic(path).toJSON());
             } catch (Throwable e) {
                 throw new RuntimeException("Error while creating folder topic for \"" + path + "\"", e);
             }
@@ -69,30 +86,28 @@ public class FilesPlugin extends Plugin {
 
 
 
-    public JSONObject openFile(long fileTopicId) {
+    public void openFile(long fileTopicId) {
         String path = null;
         try {
-            path = (String) dms.getTopicProperty(fileTopicId, "de/deepamehta/core/property/Path");
+            path = dms.getTopicProperty(fileTopicId, "de/deepamehta/core/property/Path").toString();
             logger.info("### Opening file \"" + path + "\"");
-            //
             Desktop.getDesktop().open(new File(path));
-            //
-            JSONObject result = new JSONObject();
-            result.put("message", "OK");
-            return result;
         } catch (Throwable e) {
             throw new RuntimeException("Error while opening file \"" + path + "\"", e);
         }
     }
 
-    // ---
 
-    /**
-     * Creates a File topic for a given path.
-     * If a File topic for that path exists already that topic is returned.
-     */
-    public Topic createFileTopic(String path) throws Exception {
-        Topic topic = dms.getTopic("de/deepamehta/core/property/Path", path);
+
+    // **********************
+    // *** Plugin Service ***
+    // **********************
+
+
+
+    @Override
+    public Topic createFileTopic(String path) {
+        Topic topic = dms.getTopic("de/deepamehta/core/property/Path", new PropValue(path));
         if (topic != null) {
             return topic;
         }
@@ -102,10 +117,12 @@ public class FilesPlugin extends Plugin {
         String fileType = JavaUtils.getFileType(fileName);
         long fileSize = file.length();
         //
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/FileName", fileName);
         properties.put("de/deepamehta/core/property/Path", path);
-        properties.put("de/deepamehta/core/property/MediaType", fileType);
+        if (fileType != null) {
+            properties.put("de/deepamehta/core/property/MediaType", fileType);
+        }
         properties.put("de/deepamehta/core/property/Size", fileSize);
         //
         String content = renderFileContent(file, fileType, fileSize);
@@ -116,26 +133,57 @@ public class FilesPlugin extends Plugin {
         return dms.createTopic("de/deepamehta/core/topictype/File", properties, null);
     }
 
-    /**
-     * Creates a Folder topic for a given path.
-     * If a Folder topic for that path exists already that topic is returned.
-     */
+    @Override
     public Topic createFolderTopic(String path) {
-        Topic topic = dms.getTopic("de/deepamehta/core/property/Path", path);
+        Topic topic = dms.getTopic("de/deepamehta/core/property/Path", new PropValue(path));
         if (topic != null) {
             return topic;
         }
         //
-        Map properties = new HashMap();
+        Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/FolderName", new File(path).getName());
         properties.put("de/deepamehta/core/property/Path", path);
         //
         return dms.createTopic("de/deepamehta/core/topictype/Folder", properties, null);
     }
 
+    // ---
+
+    @GET
+    @Path("/{uri}")
+    public Resource getResource(@PathParam("uri") URL uri, @QueryParam("type") String mediaType,
+                                                           @QueryParam("size") long size) {
+        logger.info("Retrieving resource " + uri + " (mediaType=\"" + mediaType + "\", size=" + size + ")");
+        if (isRequestAllowed(request)) {
+            if (uri.getProtocol().equals("file")) {
+                File file = new File(uri.getPath());
+                if (file.isDirectory()) {
+                    return new Resource(new DirectoryListing(file));
+                }
+            }
+            return new Resource(uri, mediaType, size);
+        } else {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
+    }
+
+    @GET
+    @Path("/{uri}/info")
+    @Produces("application/json")
+    public ResourceInfo getResourceInfo(@PathParam("uri") URL uri) {
+        logger.info("Requesting resource info for " + uri);
+        if (isRequestAllowed(request)) {
+            return new ResourceInfo(uri);
+        } else {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
+    }
+
+
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private String renderFileContent(File file, String fileType, long fileSize) throws Exception {
+    private String renderFileContent(File file, String fileType, long fileSize) {
         // Note: for unknown file types fileType is null
         if (fileType == null) {
             return null;
@@ -163,7 +211,18 @@ public class FilesPlugin extends Plugin {
         return content;
     }
 
-    private String localResourceURI(String path, String type, long size) throws UnsupportedEncodingException {
+    private String localResourceURI(String path, String type, long size) {
         return "/resource/file:" + JavaUtils.encodeURIComponent(path) + "?type=" + type + "&size=" + size;
+    }
+
+    // ---
+
+    private boolean isRequestAllowed(HttpServletRequest request) {
+        String localAddr = request.getLocalAddr();
+        String remoteAddr = request.getRemoteAddr();
+        boolean allowed = localAddr.equals(remoteAddr);
+        logger.info(request.getRequestURL() + "\nlocal address: " + localAddr + ", remote address: " + remoteAddr +
+            " => " + (allowed ? "ALLOWED" : "FORBIDDEN"));
+        return allowed;
     }
 }
