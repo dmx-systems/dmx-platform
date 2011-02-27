@@ -41,6 +41,7 @@ public abstract class CoreServiceTest {
     @Configuration
     public static Option[] configuration() {
         return options(cleanCaches(), autoWrap(), //
+                systemProperty("org.osgi.service.http.port").value("8086"), //
                 systemProperty("deepamehta3.database.path").value("dm3-db"), //
                 scanPom("mvn:de.deepamehta/deepamehta3-third-party/0.4.5-SNAPSHOT/pom"), //
                 scanPom("mvn:de.deepamehta/deepamehta3-distribution/0.4.5-SNAPSHOT/pom"));

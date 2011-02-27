@@ -1,4 +1,6 @@
-<project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -10,6 +12,7 @@
 
     <properties>
         <deepamehta3.database.path>${project.basedir}/../deepamehta-db</deepamehta3.database.path>
+        <org.osgi.service.http.port>8085</org.osgi.service.http.port>
         <obr.repository.url>file:${user.home}/.m2/repository/repository.xml</obr.repository.url>
     </properties>
 
@@ -32,31 +35,43 @@
             <version>0.4.5-SNAPSHOT</version>
         </dependency>
 
+        <!-- Testing -->
         <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta3-distribution</artifactId>
-            <version>0.4.5-SNAPSHOT</version>
-            <type>pom</type>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
         <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta3-third-party</artifactId>
-            <version>0.4.5-SNAPSHOT</version>
-            <type>pom</type>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+        </dependency>
+
+        <!-- PAX integration test -->
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam</artifactId>
+            <version>1.2.3</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta3-felix</artifactId>
-            <version>0.4.5-SNAPSHOT</version>
-            <type>pom</type>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-container-default</artifactId>
+            <version>1.2.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-junit</artifactId>
+            <version>1.2.3</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
 
     <profiles>
+
+        <!-- hot deploy actual plugin bundle -->
         <profile>
             <id>development</id>
-            <!-- hot deploy actual plugin bundle -->
             <dependencies>
                 <dependency>
                     <groupId>org.apache.felix</groupId>
@@ -101,12 +116,35 @@
                         <id>unpack poms</id>
                         <phase>generate-resources</phase>
                         <goals>
-                            <goal>copy-dependencies</goal>
+                            <goal>copy</goal>
                         </goals>
                         <configuration>
                             <excludeTransitive>true</excludeTransitive>
                             <excludeTypes>jar</excludeTypes>
                             <outputDirectory>${project.build.directory}/poms</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>de.deepamehta</groupId>
+                                    <artifactId>deepamehta3-distribution</artifactId>
+                                    <version>0.4.5-SNAPSHOT</version>
+                                    <type>pom</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>de.deepamehta</groupId>
+                                    <artifactId>deepamehta3-third-party</artifactId>
+                                    <version>0.4.5-SNAPSHOT</version>
+                                    <type>pom</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>de.deepamehta</groupId>
+                                    <artifactId>deepamehta3-felix</artifactId>
+                                    <version>0.4.5-SNAPSHOT</version>
+                                    <type>pom</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
@@ -130,6 +168,21 @@
                         target/poms/deepamehta3-third-party-0.4.5-SNAPSHOT.pom,
                         target/poms/deepamehta3-distribution-0.4.5-SNAPSHOT.pom
                     ]]></deployPoms>
+                </configuration>
+            </plugin>
+
+            <!-- clean goal deletes bundles and container configuration -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.4.1</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>runner</directory>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
                 </configuration>
             </plugin>
 

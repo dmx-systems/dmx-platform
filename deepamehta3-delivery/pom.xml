@@ -1,4 +1,6 @@
-<project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -161,53 +163,7 @@
         </profile>
 
         <profile>
-            <id>equinox</id>
-            <properties>
-                <framework>equinox</framework>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.ops4j</groupId>
-                        <artifactId>maven-pax-plugin</artifactId>
-                        <version>1.4</version>
-                        <configuration>
-                            <deployPoms>third-party/pom.xml,dm3-distribution/pom.xml</deployPoms>
-                            <provision>
-                                <param>--autoWrap</param>
-                                <param>mvn:javax.servlet/servlet-api/2.5</param>
-                                <param>mvn:org.apache.lucene/lucene-core/2.9.2</param>
-                                <param>mvn:asm/asm/3.2</param>
-                            </provision>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>knopflerfish</id>
-            <properties>
-                <framework>kf</framework>
-            </properties>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.ops4j</groupId>
-                        <artifactId>maven-pax-plugin</artifactId>
-                        <version>1.4</version>
-                        <configuration>
-                            <profiles>knopflerfish.gui,knopflerfish.log,web</profiles>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
             <id>neo4j</id>
-
             <build>
                 <plugins>
                     <plugin>
@@ -253,7 +209,9 @@
         <plugins>
             <!-- clean goal deletes bundles and container configuration -->
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
+                <version>2.4.1</version>
                 <configuration>
                     <filesets>
                         <fileset>

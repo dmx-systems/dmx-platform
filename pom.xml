@@ -1,4 +1,6 @@
-<project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -11,66 +13,33 @@
     <!-- All modules that belong to the DeepaMehta 3 standard installation. -->
     <!-- Do not put optional modules here.                                  -->
     <modules>
-        <module>
-            deepamehta3-parent
-        </module>
-        <module>
-            deepamehta3-core
-        </module>
-        <module>
-            deepamehta3-coretypes
-        </module>
-        <module>
-            deepamehta3-server
-        </module>
-        <module>
-            deepamehta3-client
-        </module>
-        <module>
-            deepamehta3-accesscontrol
-        </module>
-        <module>
-            deepamehta3-contacts
-        </module>
-        <module>
-            deepamehta3-files
-        </module>
-        <module>
-            deepamehta3-filemanager
-        </module>
-        <module>
-            deepamehta3-iconpicker
-        </module>
-        <module>
-            deepamehta3-notes
-        </module>
-        <module>
-            deepamehta3-projects
-        </module>
-        <module>
-            deepamehta3-time
-        </module>
-        <module>
-            deepamehta3-topicmaps
-        </module>
-        <module>
-            deepamehta3-typeeditor
-        </module>
-        <module>
-            deepamehta3-typesearch
-        </module>
-        <module>
-            deepamehta3-workspaces
-        </module>
-        <module>
-            deepamehta3-delivery
-        </module>
-        <module>
-            deepamehta3-plugin-parent
-        </module>
-        <module>
-            deepamehta3-plugin-example
-        </module>
-     </modules>
+        <module>deepamehta3-parent</module>
+        <module>deepamehta3-core</module>
+        <module>deepamehta3-coretypes</module>
+
+        <module>deepamehta3-server</module>
+
+        <module>deepamehta3-typeeditor</module>
+        <module>deepamehta3-typesearch</module>
+
+        <module>deepamehta3-time</module>
+        <module>deepamehta3-topicmaps</module>
+        <module>deepamehta3-workspaces</module>
+        <module>deepamehta3-accesscontrol</module>
+
+        <module>deepamehta3-files</module>
+        <module>deepamehta3-filemanager</module>
+        <module>deepamehta3-iconpicker</module>
+
+        <module>deepamehta3-contacts</module>
+        <module>deepamehta3-projects</module>
+        <module>deepamehta3-notes</module>
+
+        <module>deepamehta3-client</module>
+        <module>deepamehta3-delivery</module>
+
+        <module>deepamehta3-plugin-parent</module>
+	<!--<module>deepamehta3-plugin-example</module>-->
+    </modules>
 
 </project>
