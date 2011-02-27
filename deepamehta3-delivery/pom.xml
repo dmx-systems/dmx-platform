@@ -1,4 +1,6 @@
-<project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -12,6 +14,7 @@
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta3-parent</artifactId>
         <version>0.4.5-SNAPSHOT</version>
+        <relativePath>../deepamehta3-parent/pom.xml</relativePath>
     </parent>
 
     <properties>
@@ -19,6 +22,7 @@
         <obr.repository.url>file:${user.home}/.m2/repository/repository.xml</obr.repository.url>
         <java.util.logging.config.file>${project.basedir}/conf/logging.properties</java.util.logging.config.file>
         <file.encoding>UTF-8</file.encoding>
+        <deepamehta3.database.path>${project.basedir}/../deepamehta-db</deepamehta3.database.path>
     </properties>
 
     <profiles>
@@ -131,8 +135,8 @@
                     <version>3.1.10</version>
                 </dependency>
             </dependencies>
+
             <properties>
-                <deepamehta3.database.path>${project.basedir}/../deepamehta-db</deepamehta3.database.path>
                 <felix.fileinstall.dir><![CDATA[
                   ${project.basedir}/../deepamehta3-core/target,
                   ${project.basedir}/../deepamehta3-coretypes/target,
@@ -159,30 +163,45 @@
         </profile>
 
         <profile>
-            <id>equinox</id>
-            <properties>
-                <framework>equinox</framework>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>knopflerfish</id>
-            <properties>
-                <framework>kf</framework>
-            </properties>
-
+            <id>neo4j</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.ops4j</groupId>
-                        <artifactId>maven-pax-plugin</artifactId>
-                        <version>1.4</version>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.2</version>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
                         <configuration>
-                            <profiles>knopflerfish.gui,knopflerfish.log,web</profiles>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <mainClass>org.neo4j.shell.StartClient</mainClass>
+                            <arguments>
+                                <argument>-path=${deepamehta3.database.path}</argument>
+                                <argument>-v</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                 </plugins>
             </build>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-shell</artifactId>
+                    <version>1.1</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-kernel</artifactId>
+                    <version>1.1</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-index</artifactId>
+                    <version>1.1</version>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 
@@ -190,7 +209,9 @@
         <plugins>
             <!-- clean goal deletes bundles and container configuration -->
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
+                <version>2.4.1</version>
                 <configuration>
                     <filesets>
                         <fileset>

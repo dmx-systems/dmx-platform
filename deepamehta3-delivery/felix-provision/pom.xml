@@ -7,11 +7,7 @@
     <artifactId>deepamehta3-felix</artifactId>
     <version>0.4.5-SNAPSHOT</version>
 
-    <parent>
-        <groupId>de.deepamehta</groupId>
-        <artifactId>deepamehta3-parent</artifactId>
-        <version>0.4.5-SNAPSHOT</version>
-    </parent>
+    <packaging>pom</packaging>
 
     <!-- All modules that belong to the Apache Felix 3 installation. -->
     <dependencies>

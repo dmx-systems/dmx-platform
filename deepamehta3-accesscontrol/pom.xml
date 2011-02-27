@@ -1,4 +1,6 @@
-<project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -12,24 +14,24 @@
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta3-parent</artifactId>
         <version>0.4.5-SNAPSHOT</version>
+        <relativePath>../deepamehta3-parent/pom.xml</relativePath>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-core</artifactId>
+            <version>0.4.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
+            <version>0.4.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-workspaces</artifactId>
+            <version>0.4.4-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -38,7 +40,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
                 <configuration>
                     <instructions>
                         <Bundle-Activator>

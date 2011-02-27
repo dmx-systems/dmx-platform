@@ -1,4 +1,6 @@
-<project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -12,66 +14,73 @@
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta3-parent</artifactId>
         <version>0.4.5-SNAPSHOT</version>
+        <relativePath>../deepamehta3-parent/pom.xml</relativePath>
     </parent>
 
     <dependencies>
-
-        <!-- JAX-RS -->
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-        </dependency>
-
-        <!-- JSON -->
-        <dependency>
-            <groupId>org.codehaus.jettison</groupId>
-            <artifactId>jettison</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- Servlet -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
 
         <!-- OSGi -->
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi_R4_core</artifactId>
-            <scope>compile</scope>
+            <scope>compile</scope> <!-- to be inherited as provided -->
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi_R4_compendium</artifactId>
         </dependency>
 
+        <!--
+            JAX-RS jersey-core exports javax.ws.rs,version=0.0.0 but jsr311-api
+            1.1.1 needs javax.ws.rs,version=1.1 => use core instead of api
+        -->
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+            <version>1.5</version>
+            <scope>compile</scope> <!-- to be inherited as provided -->
+        </dependency>
+
+        <!-- JSON -->
+        <dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+            <version>1.2</version>
+            <scope>compile</scope> <!-- to be inherited as provided -->
+        </dependency>
+
         <!-- Neo4j -->
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-kernel</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-index</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-meta-model</artifactId>
+            <version>0.9-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
 
-        <!-- Testing -->
+        <!-- servlet container for plugin -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>1.5</version>
+            <scope>provided</scope>
         </dependency>
+
+        <!-- Servlet -->
         <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
         </dependency>
     </dependencies>
 
@@ -80,7 +89,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
                 <configuration>
                     <instructions>
                         <Export-Package>
@@ -109,8 +117,10 @@
                 <!-- TODO use released Neo4j meta model -->
                 <enabled>true</enabled>
             </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
         </repository>
     </repositories>
-
 
 </project>

@@ -1,4 +1,6 @@
-<project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -10,95 +12,11 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jersey.version>1.5</jersey.version>
-        <neo4j.version>1.1</neo4j.version>
     </properties>
 
     <!-- All modules that belong to the DeepaMehta 3 standard installation. -->
     <dependencyManagement>
         <dependencies>
-
-            <!-- DeepaMehta -->
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-core</artifactId>
-                <version>0.4.5-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-coretypes</artifactId>
-                <version>0.4.3-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-server</artifactId>
-                <version>0.4.4-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-client</artifactId>
-                <version>0.4.5-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-accesscontrol</artifactId>
-                <version>0.4.2-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-contacts</artifactId>
-                <version>0.4.2</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-files</artifactId>
-                <version>0.4.3-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-filemanager</artifactId>
-                <version>0.4.2-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-iconpicker</artifactId>
-                <version>0.4.2</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-notes</artifactId>
-                <version>0.4.2</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-projects</artifactId>
-                <version>0.4.2</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-time</artifactId>
-                <version>0.4.3-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-topicmaps</artifactId>
-                <version>0.4.4-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-typeeditor</artifactId>
-                <version>0.4.3</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-typesearch</artifactId>
-                <version>0.4.1</version>
-            </dependency>
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta3-workspaces</artifactId>
-                <version>0.4.4-SNAPSHOT</version>
-            </dependency>
 
             <!-- OSGi -->
             <dependency>
@@ -116,46 +34,13 @@
                 <optional>true</optional>
             </dependency>
 
-            <!-- Neo4j -->
-            <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>neo4j-kernel</artifactId>
-                <version>${neo4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>neo4j-index</artifactId>
-                <version>${neo4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>neo4j-meta-model</artifactId>
-                <version>0.9-SNAPSHOT</version>
-                <scope>provided</scope>
-            </dependency>
-
             <!-- JAX-RS -->
             <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-core</artifactId>
-                <version>${jersey.version}</version>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>jsr311-api</artifactId>
+                <version>1.1.1</version>
                 <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-server</artifactId>
-                <version>${jersey.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <!-- JSON -->
-            <dependency>
-                <groupId>org.codehaus.jettison</groupId>
-                <artifactId>jettison</artifactId>
-                <version>1.2</version>
-                <scope>provided</scope>
+                <optional>true</optional>
             </dependency>
 
             <!-- Servlet -->
@@ -164,14 +49,7 @@
                 <artifactId>servlet-api</artifactId>
                 <version>2.5</version>
                 <scope>provided</scope>
-            </dependency>
-
-            <!-- multipart/form-data -->
-            <dependency>
-                <groupId>commons-fileupload</groupId>
-                <artifactId>commons-fileupload</artifactId>
-                <version>1.2.2</version>
-                <scope>provided</scope>
+                <optional>true</optional>
             </dependency>
 
             <!-- Testing -->
@@ -190,16 +68,68 @@
         </dependencies>
     </dependencyManagement>
 
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+        </dependency>
+    </dependencies>
+
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3.2</version>
+                    <configuration>
+                        <source>1.6</source>
+                        <target>1.6</target>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.1.2</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- use core plugin implementation as default activator -->
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>2.1.0</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <instructions>
+                            <Bundle-Activator>
+                                de.deepamehta.core.service.Plugin
+                            </Bundle-Activator>
+                        </instructions>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

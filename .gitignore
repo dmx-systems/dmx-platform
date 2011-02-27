@@ -17,4 +17,5 @@ dm3-freifunk-geomap/
 .project
 .classpath
 .settings
+.shell_history
 
