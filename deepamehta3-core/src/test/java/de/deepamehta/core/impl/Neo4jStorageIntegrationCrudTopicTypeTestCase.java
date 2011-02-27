@@ -28,7 +28,7 @@ public class Neo4jStorageIntegrationCrudTopicTypeTestCase {
         String f = JavaUtils.createTempDirectory("neo4j");
         cut = new Neo4jStorage(f);
         // initialize storage
-        new EmbeddedService(cut); // TODO move db-init into storage impl
+        new EmbeddedService(cut).setupDB();
     }
 
     @Test

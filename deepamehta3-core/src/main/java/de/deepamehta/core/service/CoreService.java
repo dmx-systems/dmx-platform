@@ -181,9 +181,31 @@ public interface CoreService {
 
     // === Misc ===
 
-    public void startup();
-
-    public void shutdown();
-
     public Transaction beginTx();
+
+    /**
+     * Triggers the ALL_PLUGINS_READY hook.
+     * Called once all bundles are activated.
+     * <p>
+     * Called from the OSGi framework.
+     * Not meant to be called by a plugin developer.
+     */
+    public void pluginsReady();
+
+    /**
+     * Setups the database to be compatible with this core service.
+     * <p>
+     * Called from the core activator.
+     * Not meant to be called by a plugin developer.
+     */
+    public void setupDB();
+
+    /**
+     * Shuts down the database.
+     * Called when the core service stops.
+     * <p>
+     * Called from the core activator.
+     * Not meant to be called by a plugin developer.
+     */
+    public void shutdown();
 }

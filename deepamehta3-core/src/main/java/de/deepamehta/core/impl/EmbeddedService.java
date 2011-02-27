@@ -126,23 +126,6 @@ public class EmbeddedService implements CoreService {
 
     public EmbeddedService(Storage storage) {
         this.storage = storage;
-        Transaction tx = storage.beginTx();
-        try {
-            boolean isCleanInstall = initDB();
-            runCoreMigrations(isCleanInstall);
-            tx.success();
-            tx.finish();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            tx.finish();
-            shutdown();
-            throw new RuntimeException("Database can't be initialized", e);
-        }
-    }
-
-    // TODO: drop this
-    public EmbeddedService(Storage storage, boolean isMock) {
-        this.storage = storage;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -701,18 +684,35 @@ public class EmbeddedService implements CoreService {
     // === Misc ===
 
     @Override
-    public void startup() {
+    public Transaction beginTx() {
+        return storage.beginTx();
+    }
+
+    @Override
+    public void pluginsReady() {
         triggerHook(Hook.ALL_PLUGINS_READY);
+    }
+
+    @Override
+    public void setupDB() {
+        Transaction tx = storage.beginTx();
+        try {
+            boolean isCleanInstall = initDB();
+            runCoreMigrations(isCleanInstall);
+            tx.success();
+            tx.finish();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            tx.finish();
+            shutdown();
+            throw new RuntimeException("Setting up the database failed", e);
+        }
+        // Note: we use no finally clause here because in case of error the core service has to be shut down.
     }
 
     @Override
     public void shutdown() {
         closeDB();
-    }
-
-    @Override
-    public Transaction beginTx() {
-        return storage.beginTx();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

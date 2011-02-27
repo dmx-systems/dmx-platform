@@ -35,6 +35,7 @@ public class EmbeddedServiceIndexingTestCase {
         String dbPath = JavaUtils.createTempDirectory("neo4j");
         logger.info("Creating temporary test database at " + dbPath);
         dms = new EmbeddedService(new Neo4jStorage(dbPath));
+        dms.setupDB();
     }
 
     @Test

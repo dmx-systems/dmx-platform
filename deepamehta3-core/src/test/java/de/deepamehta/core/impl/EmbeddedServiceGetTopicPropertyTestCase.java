@@ -32,7 +32,7 @@ public class EmbeddedServiceGetTopicPropertyTestCase {
     public void setup() {
         storageMock = createMock(Storage.class);
         transactionMock = createMock(Transaction.class);
-        cut = new EmbeddedService(storageMock, true);   // dummy constructor call
+        cut = new EmbeddedService(storageMock);
     }
 
     @Test

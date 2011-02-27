@@ -46,6 +46,7 @@ public class Activator implements BundleActivator, FrameworkListener {
         try {
             logger.info("========== Starting bundle \"DeepaMehta 3 Core\" ==========");
             dms = new EmbeddedService(openDB());
+            dms.setupDB();
             //
             logger.info("Registering DeepaMehta core service at OSGi framework");
             context.registerService(CoreService.class.getName(), dms, null);
@@ -76,13 +77,9 @@ public class Activator implements BundleActivator, FrameworkListener {
 
     @Override
     public void frameworkEvent(FrameworkEvent event) {
-        switch (event.getType()) {
-        case FrameworkEvent.STARTED:
-            logger.info("########## OSGi framework STARTED");
-            dms.startup();
-            break;
-        default:
-            logger.info("########## OSGi framework event: " + event);
+        if (event.getType() == FrameworkEvent.STARTED) {
+            logger.info("########## OSGi framework STARTED ##########");
+            dms.pluginsReady();
         }
     }
 
