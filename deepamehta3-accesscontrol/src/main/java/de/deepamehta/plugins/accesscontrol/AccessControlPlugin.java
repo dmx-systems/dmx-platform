@@ -234,7 +234,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     @POST
     @Path("/user/{userId}/{workspaceId}")
     @Override
-    public void joinWorkspace(@PathParam("userId") long workspaceId, @PathParam("workspaceId") long userId) {
+    public void joinWorkspace(@PathParam("workspaceId") long workspaceId, @PathParam("userId") long userId) {
         dms.createRelation(RelationType.WORKSPACE_MEMBER.name(), workspaceId, userId, null);    // properties=null
     }
 
