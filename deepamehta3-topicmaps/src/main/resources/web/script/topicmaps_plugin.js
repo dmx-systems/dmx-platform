@@ -53,7 +53,11 @@ function topicmaps_plugin() {
             var topicmap_label = $("<span>").attr("id", "topicmap-label").text("Topicmap")
             var topicmap_menu = $("<div>").attr("id", "topicmap-menu")
             var topicmap_form = $("<div>").attr("id", "topicmap-form").append(topicmap_label).append(topicmap_menu)
-            $("#workspace-form").after(topicmap_form)   // TODO: make topicmaps plugin independant from workspace plugin
+            if ($("#workspace-form").size()) {
+                $("#workspace-form").after(topicmap_form)
+            } else {
+                $("#upper-toolbar").prepend(topicmap_form)
+            }
             dm3c.ui.menu("topicmap-menu", do_select_topicmap)
             rebuild_topicmap_menu(undefined, topicmaps)
         }
