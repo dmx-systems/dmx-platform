@@ -18,10 +18,10 @@
     </parent>
 
     <properties>
-        <org.osgi.service.http.port>8080</org.osgi.service.http.port>
-        <obr.repository.url>file:${user.home}/.m2/repository/repository.xml</obr.repository.url>
-        <java.util.logging.config.file>${project.basedir}/conf/logging.properties</java.util.logging.config.file>
         <file.encoding>UTF-8</file.encoding>
+        <org.osgi.service.http.port>8080</org.osgi.service.http.port>
+
+        <java.util.logging.config.file>${project.basedir}/conf/logging.properties</java.util.logging.config.file>
         <deepamehta3.database.path>${project.basedir}/../deepamehta-db</deepamehta3.database.path>
     </properties>
 
@@ -42,7 +42,6 @@
             <id>distribution</id>
 
             <properties>
-                <obr.repository.url>http://felix.apache.org/obr/releases.xml</obr.repository.url>
                 <java.util.logging.config.file>conf/logging.properties</java.util.logging.config.file>
                 <deepamehta3.database.path>deepamehta-db</deepamehta3.database.path>
             </properties>
@@ -134,6 +133,39 @@
                     <artifactId>org.apache.felix.fileinstall</artifactId>
                     <version>3.1.10</version>
                 </dependency>
+
+                <dependency>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.bundlerepository</artifactId>
+                    <version>1.6.4</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.webconsole</artifactId>
+                    <version>3.1.8</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.log</artifactId>
+                    <version>1.0.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.metatype</artifactId>
+                    <version>1.0.4</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.shell</artifactId>
+                    <version>1.4.2</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.scr</artifactId>
+                    <version>1.6.0</version>
+                </dependency>
+
             </dependencies>
 
             <properties>
@@ -159,6 +191,7 @@
                 <felix.fileinstall.filter>.*\\.jar</felix.fileinstall.filter>
                 <felix.fileinstall.log.level>1</felix.fileinstall.log.level>
                 <felix.log.level>2</felix.log.level>
+                <obr.repository.url>file:${user.home}/.m2/repository/repository.xml</obr.repository.url>
             </properties>
         </profile>
 

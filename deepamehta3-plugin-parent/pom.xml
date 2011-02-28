@@ -11,9 +11,11 @@
     <packaging>pom</packaging>
 
     <properties>
+        <file.encoding>UTF-8</file.encoding>
+        <org.osgi.service.http.port>8080</org.osgi.service.http.port>
+
         <deepamehta3.database.path>${project.basedir}/../deepamehta-db</deepamehta3.database.path>
-        <org.osgi.service.http.port>8085</org.osgi.service.http.port>
-        <obr.repository.url>file:${user.home}/.m2/repository/repository.xml</obr.repository.url>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencyManagement>
