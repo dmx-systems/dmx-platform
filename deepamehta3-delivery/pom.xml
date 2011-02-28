@@ -251,6 +251,10 @@
                             <directory>runner</directory>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
+                        <fileset>
+                            <directory>bin</directory>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
                     </filesets>
                 </configuration>
             </plugin>
