@@ -31,12 +31,6 @@ import org.neo4j.index.IndexHits;
 import org.neo4j.index.IndexService;
 import org.neo4j.index.lucene.LuceneIndexService;
 import org.neo4j.index.lucene.LuceneFulltextQueryIndexService;
-import org.neo4j.meta.model.MetaModel;
-import org.neo4j.meta.model.MetaModelClass;
-import org.neo4j.meta.model.MetaModelImpl;
-import org.neo4j.meta.model.MetaModelNamespace;
-import org.neo4j.meta.model.MetaModelProperty;
-import org.neo4j.meta.model.MetaModelRelTypes;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,16 +46,16 @@ import java.util.logging.Logger;
 
 public class Neo4jStorage implements Storage {
 
+    private static final String META_MODEL_KEY = "meta_model_name";
+    private static final long NAMESPACE_NODE_ID = 2;
+
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     private GraphDatabaseService graphDb;
     private IndexService index;
     private LuceneFulltextQueryIndexService fulltextIndex;
 
-    // Note: the meta-model namespace is package private in order to let a Neo4jTopicType rename itself when its
-    // URI changes. See Neo4jTopicType.setTypeUri().
-    // We do it this way because we don't want extend the core service resp. the storage interfaces.
-    MetaModelNamespace namespace;
+    private Node namespaceNode;
 
     // Note: the type cache is package private in order to let a Neo4jTopicType re-hash itself when its URI changes.
     // See Neo4jTopicType.setTypeUri().
@@ -71,7 +65,8 @@ public class Neo4jStorage implements Storage {
     // SEARCH_RESULT relations are not part of the knowledge base but help to visualize / navigate result sets.
     static enum RelType implements RelationshipType {
         RELATION, SEARCH_RESULT,
-        SEQUENCE_START, SEQUENCE
+        SEQUENCE_START, SEQUENCE,
+        META_CLASS, META_PROPERTY, META_HAS_INSTANCE, META_HAS_PROPERTY, META_NAMESPACE, REF_TO_META_SUBREF
     }
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -135,7 +130,7 @@ public class Neo4jStorage implements Storage {
     @Override
     public List<Topic> getTopics(String typeUri) {
         List topics = new ArrayList();
-        for (Node node : getMetaClass(typeUri).getDirectInstances()) {
+        for (Node node : getDirectInstances(getMetaClass(typeUri))) {
             // Note: the topic properties remain uninitialzed here.
             // It is up to the plugins to provide selected properties (see providePropertiesHook()).
             topics.add(buildTopic(node, false));
@@ -210,7 +205,7 @@ public class Neo4jStorage implements Storage {
     public Topic createTopic(String typeUri, Properties properties) {
         Node node = graphDb.createNode();
         logger.info("Creating node => ID=" + node.getId());
-        getMetaClass(typeUri).getDirectInstances().add(node);       // set topic type
+        getMetaClass(typeUri).createRelationshipTo(node, RelType.META_HAS_INSTANCE);    // set topic type
         setProperties(node, properties, typeUri);
         return new Topic(node.getId(), typeUri, null, properties);  // FIXME: label remains uninitialized
     }
@@ -327,8 +322,8 @@ public class Neo4jStorage implements Storage {
     @Override
     public Set<String> getTopicTypeUris() {
         Set typeUris = new HashSet();
-        for (MetaModelClass metaClass : getAllMetaClasses()) {
-            typeUris.add(metaClass.getName());
+        for (Node typeNode : getAllMetaClasses()) {
+            typeUris.add(typeNode.getProperty(META_MODEL_KEY));
         }
         return typeUris;
     }
@@ -380,14 +375,14 @@ public class Neo4jStorage implements Storage {
         // 1) init indexing services
         index = new LuceneIndexService(graphDb);
         fulltextIndex = new LuceneFulltextQueryIndexService(graphDb);
-        // 2) init meta model
-        MetaModel model = new MetaModelImpl(graphDb, index);
-        namespace = model.getGlobalNamespace();
-        // 3) init migration number
+        // 2) init migration number and meta model
         if (!graphDb.getReferenceNode().hasProperty("core_migration_nr")) {
             logger.info("Starting with a fresh DB -- Setting migration number to 0");
             setMigrationNr(0);
+            initMetaModel();
             return true;
+        } else {
+            namespaceNode = graphDb.getNodeById(NAMESPACE_NODE_ID);
         }
         return false;
     }
@@ -586,7 +581,7 @@ public class Neo4jStorage implements Storage {
         // Old Neo4j API:
         // Iterator<Node> i = node.expand(MetaModelRelTypes.META_HAS_INSTANCE, Direction.INCOMING).nodes().iterator();
         //
-        Relationship relation = node.getSingleRelationship(MetaModelRelTypes.META_HAS_INSTANCE, Direction.INCOMING);
+        Relationship relation = node.getSingleRelationship(RelType.META_HAS_INSTANCE, Direction.INCOMING);
         // error check
         if (relation == null) {
             throw new RuntimeException("Type of " + node + " is unknown " +
@@ -595,12 +590,6 @@ public class Neo4jStorage implements Storage {
         //
         return relation.getOtherNode(node);
     }
-
-    /* FIXME: not in use
-    private boolean isMetaNode(Node node) {
-        return node.hasRelationship(MetaModelRelTypes.META_CLASS,    Direction.INCOMING) ||
-               node.hasRelationship(MetaModelRelTypes.META_PROPERTY, Direction.INCOMING);
-    } */
 
     // ---
 
@@ -623,36 +612,86 @@ public class Neo4jStorage implements Storage {
 
     // --- Meta Model ---
 
-    MetaModelClass getMetaClass(String typeUri) {
-        MetaModelClass metaClass = namespace.getMetaClass(typeUri, false);
-        if (metaClass == null) {
+    private void initMetaModel() {
+        Node refNode = graphDb.getReferenceNode();
+        Node metaNode = graphDb.createNode();
+        namespaceNode = graphDb.createNode();
+        if (namespaceNode.getId() != NAMESPACE_NODE_ID) {
+            throw new RuntimeException("Namespace node not created with ID " +
+                NAMESPACE_NODE_ID + " but " + namespaceNode.getId());
+        }
+        refNode.createRelationshipTo(metaNode, RelType.REF_TO_META_SUBREF);
+        metaNode.createRelationshipTo(namespaceNode, RelType.META_NAMESPACE);
+    }
+
+    Node getMetaClass(String typeUri) {
+        Node node = index.getSingleNode(META_MODEL_KEY, typeUri);
+        if (node == null) {
             throw new RuntimeException("Topic type \"" + typeUri + "\" is unknown");
         }
-        return metaClass;
+        return node;
     }
 
-    // FIXME: to be dropped
-    MetaModelClass getMetaModelClass(String typeUri) {
-        return namespace.getMetaClass(typeUri, false);
+    Iterable<Node> getDirectInstances(Node typeNode) {
+        TraversalDescription desc = Traversal.description();
+        desc = desc.relationships(RelType.META_HAS_INSTANCE, Direction.OUTGOING);
+        desc = desc.filter(new StartNodeFilter());
+        return desc.traverse(typeNode).nodes();
     }
 
-    Collection<MetaModelClass> getAllMetaClasses() {
-        return namespace.getMetaClasses();
+    Iterable<Node> getDirectProperties(Node typeNode) {
+        TraversalDescription desc = Traversal.description();
+        desc = desc.relationships(RelType.META_HAS_PROPERTY, Direction.OUTGOING);
+        desc = desc.filter(new StartNodeFilter());
+        return desc.traverse(typeNode).nodes();
     }
 
-    MetaModelClass createMetaClass(String typeUri) {
-        MetaModelClass metaClass = namespace.getMetaClass(typeUri, false);
-        if (metaClass != null) {
+    Iterable<Node> getAllMetaClasses() {
+        TraversalDescription desc = Traversal.description();
+        desc = desc.relationships(RelType.META_CLASS, Direction.OUTGOING);
+        desc = desc.filter(new StartNodeFilter());
+        return desc.traverse(namespaceNode).nodes();
+    }
+
+    Node createMetaClass(String typeUri) {
+        Node node = index.getSingleNode(META_MODEL_KEY, typeUri);
+        if (node != null) {
             throw new RuntimeException("Topic type with URI \"" + typeUri + "\" already exists");
         }
-        return namespace.getMetaClass(typeUri, true);
+        node = graphDb.createNode();
+        node.setProperty(META_MODEL_KEY, typeUri);
+        index.index(node, META_MODEL_KEY, typeUri);
+        namespaceNode.createRelationshipTo(node, RelType.META_CLASS);
+        return node;
     }
 
-    MetaModelProperty createMetaProperty(String fieldUri) {
-        return namespace.getMetaProperty(fieldUri, true);
+    Node createMetaProperty(String fieldUri) {
+        Node node = index.getSingleNode(META_MODEL_KEY, fieldUri);
+        if (node != null) {
+            return node;
+        }
+        node = graphDb.createNode();
+        node.setProperty(META_MODEL_KEY, fieldUri);
+        index.index(node, META_MODEL_KEY, fieldUri);
+        namespaceNode.createRelationshipTo(node, RelType.META_PROPERTY);
+        return node;
+    }
+
+    void renameMetaClass(String oldTypeUri, String typeUri) {
+        Node typeNode = getMetaClass(oldTypeUri);
+        typeNode.setProperty(META_MODEL_KEY, typeUri);
+        index.removeIndex(typeNode, META_MODEL_KEY);
+        index.index(typeNode, META_MODEL_KEY, typeUri);
     }
 
     // --- Traversal ---
+
+    private class StartNodeFilter implements Predicate<Path> {
+        @Override
+        public boolean accept(Path path) {
+            return path.length() > 0;
+        }
+    }
 
     private Traverser createRelatedTopicsTraverser(Node node, List<String> includeTopicTypes,
                                                               List<String> includeRelTypes,

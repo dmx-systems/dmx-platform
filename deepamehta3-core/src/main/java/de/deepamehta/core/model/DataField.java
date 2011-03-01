@@ -78,7 +78,6 @@ public class DataField {
      */
     public DataField(String json) throws JSONException {
         this(new JSONObject(json));
-        logger.info("### Create DataField from a JSON string:\n" + json);
     }
 
     /**
