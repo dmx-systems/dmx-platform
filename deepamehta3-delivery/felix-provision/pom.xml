@@ -6,10 +6,16 @@
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-felix</artifactId>
     <version>0.4.5-SNAPSHOT</version>
-
     <packaging>pom</packaging>
 
-    <!-- All modules that belong to the Apache Felix 3 installation. -->
+    <!--
+        All modules that belong to the Apache Felix 3 installation.
+        
+        These dependencies are deployed as bundles in Felix when
+            - running pax:run from the deepamehta3-delivery directory
+            - running pax:run from an external plugin directory
+            - running the deepamehta3-plugin-example tests
+    -->
     <dependencies>
 
         <dependency>
@@ -17,11 +23,17 @@
             <artifactId>org.apache.felix.configadmin</artifactId>
             <version>1.2.8</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.http.jetty</artifactId>
             <version>2.2.0</version>
+        </dependency>
+
+        <!-- Required by the deepamehta3-plugin-example tests -->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.log</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
     </dependencies>
