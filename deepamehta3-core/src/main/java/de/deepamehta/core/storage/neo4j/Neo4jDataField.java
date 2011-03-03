@@ -3,7 +3,6 @@ package de.deepamehta.core.storage.neo4j;
 import de.deepamehta.core.model.DataField;
 
 import org.neo4j.graphdb.Node;
-import org.neo4j.meta.model.MetaModelProperty;
 
 import java.util.Map;
 import java.util.logging.Logger;
@@ -19,7 +18,6 @@ class Neo4jDataField extends DataField {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    MetaModelProperty metaProperty;
     Node node;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -51,8 +49,7 @@ class Neo4jDataField extends DataField {
      * Constructs a data field and writes it to the database.
      */
     Neo4jDataField(DataField dataField, Neo4jStorage storage) {
-        this.metaProperty = storage.createMetaProperty(dataField.getUri());
-        this.node = metaProperty.node();
+        this.node = storage.createDataFieldNode(dataField.getUri());
         logger.info("Creating data field " + dataField + " => ID=" + node.getId());
         setProperties(dataField.getProperties());
     }
@@ -89,10 +86,6 @@ class Neo4jDataField extends DataField {
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    MetaModelProperty getMetaProperty() {
-        return metaProperty;
-    }
 
     Node getNode() {
         return node;

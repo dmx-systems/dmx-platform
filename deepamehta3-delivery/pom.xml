@@ -18,11 +18,10 @@
     </parent>
 
     <properties>
-        <file.encoding>UTF-8</file.encoding>
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
-
-        <java.util.logging.config.file>${project.basedir}/conf/logging.properties</java.util.logging.config.file>
         <deepamehta3.database.path>${project.basedir}/../deepamehta-db</deepamehta3.database.path>
+        <file.encoding>UTF-8</file.encoding>
+        <java.util.logging.config.file>${project.basedir}/conf/logging.properties</java.util.logging.config.file>
     </properties>
 
     <profiles>
@@ -126,8 +125,8 @@
                 </plugins>
             </build>
 
-            <!-- hot deploy distribution bundles from target -->
             <dependencies>
+                <!-- hot deploy distribution bundles from target -->
                 <dependency>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>org.apache.felix.fileinstall</artifactId>

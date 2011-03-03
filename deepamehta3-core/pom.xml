@@ -62,12 +62,6 @@
             <version>1.1</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-meta-model</artifactId>
-            <version>0.9-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
 
         <!-- servlet container for plugin -->
         <dependency>

@@ -39,7 +39,6 @@ public class Properties {
      */
     public Properties(String json) throws JSONException {
         this(new JSONObject(json));
-        logger.info("### Create Properties from a JSON string:\n" + json);
         // FIXME: this conversion is very crude. Compare with TopicType(JSONObject type) constructor.
         // FIXME: this conversion applies to types only whereas Properties is used also for topics.
         put("de/deepamehta/core/property/TypeURI", remove("uri"));

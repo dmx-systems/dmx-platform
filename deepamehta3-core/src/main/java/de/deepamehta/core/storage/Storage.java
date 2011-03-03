@@ -127,6 +127,8 @@ public interface Storage {
     public Transaction beginTx();
 
     /**
+     * Performs storage layer initialization. Runs in a transaction.
+     *
      * @return  <code>true</code> if this is a clean install, <code>false</code> otherwise.
      */
     public boolean init();
