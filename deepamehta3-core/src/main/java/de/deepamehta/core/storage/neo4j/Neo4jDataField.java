@@ -49,7 +49,7 @@ class Neo4jDataField extends DataField {
      * Constructs a data field and writes it to the database.
      */
     Neo4jDataField(DataField dataField, Neo4jStorage storage) {
-        this.node = storage.createMetaProperty(dataField.getUri());
+        this.node = storage.createDataFieldNode(dataField.getUri());
         logger.info("Creating data field " + dataField + " => ID=" + node.getId());
         setProperties(dataField.getProperties());
     }

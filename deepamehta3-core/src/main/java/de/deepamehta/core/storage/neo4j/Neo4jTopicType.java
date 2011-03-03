@@ -49,7 +49,7 @@ class Neo4jTopicType extends TopicType {
         // create type
         String typeUri = properties.get("de/deepamehta/core/property/TypeURI").toString();
         this.storage = storage;
-        this.typeNode = storage.createMetaClass(typeUri);
+        this.typeNode = storage.createTypeNode(typeUri);
         this.id = typeNode.getId();
         logger.info("Creating topic type \"" + typeUri + "\" => ID=" + id);
         // set properties
@@ -68,7 +68,7 @@ class Neo4jTopicType extends TopicType {
     Neo4jTopicType(String typeUri, Neo4jStorage storage) {
         super(null, null);
         this.storage = storage;
-        this.typeNode = storage.getMetaClass(typeUri);
+        this.typeNode = storage.getTypeNode(typeUri);
         this.properties = storage.getProperties(typeNode);
         this.dataFields = readDataFields();
         this.id = typeNode.getId();
@@ -85,7 +85,7 @@ class Neo4jTopicType extends TopicType {
         storage.typeCache.put(this);
         // 2) update DB
         typeNode.setProperty("de/deepamehta/core/property/TypeURI", typeUri);
-        storage.renameMetaClass(oldTypeUri, typeUri);
+        storage.changeTypeUri(oldTypeUri, typeUri);
         // reassign data field sequence to new URI
         reassignFieldSequence(oldTypeUri, typeUri);
     }
@@ -111,7 +111,7 @@ class Neo4jTopicType extends TopicType {
         String typeUri = getProperty("de/deepamehta/core/property/TypeURI").toString();
         // create data field
         Neo4jDataField field = new Neo4jDataField(dataField, storage);
-        storage.getMetaClass(typeUri).createRelationshipTo(field.getNode(), Neo4jStorage.RelType.META_HAS_PROPERTY);
+        storage.addDataFieldNode(typeUri, field.getNode());
         // put in sequence
         putInFieldSequence(field.node, dataFields.size());
         // 2) update memory
@@ -216,8 +216,8 @@ class Neo4jTopicType extends TopicType {
         String typeUri = getProperty("de/deepamehta/core/property/TypeURI").toString();
         // use as control group
         List propNodes = new ArrayList();
-        for (Node metaProp : storage.getDirectProperties(storage.getMetaClass(typeUri))) {
-            propNodes.add(metaProp);
+        for (Node propNode : storage.getDataFieldNodes(typeUri)) {
+            propNodes.add(propNode);
         }
         //
         List dataFields = new ArrayList();

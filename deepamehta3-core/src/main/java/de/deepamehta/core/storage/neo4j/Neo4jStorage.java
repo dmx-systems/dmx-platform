@@ -46,16 +46,13 @@ import java.util.logging.Logger;
 
 public class Neo4jStorage implements Storage {
 
-    private static final String META_MODEL_KEY = "meta_model_name";
-    private static final long NAMESPACE_NODE_ID = 2;
-
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     private GraphDatabaseService graphDb;
     private IndexService index;
     private LuceneFulltextQueryIndexService fulltextIndex;
 
-    private Node namespaceNode;
+    private MetaModel metaModel;
 
     // Note: the type cache is package private in order to let a Neo4jTopicType re-hash itself when its URI changes.
     // See Neo4jTopicType.setTypeUri().
@@ -65,8 +62,7 @@ public class Neo4jStorage implements Storage {
     // SEARCH_RESULT relations are not part of the knowledge base but help to visualize / navigate result sets.
     static enum RelType implements RelationshipType {
         RELATION, SEARCH_RESULT,
-        SEQUENCE_START, SEQUENCE,
-        META_CLASS, META_PROPERTY, META_HAS_INSTANCE, META_HAS_PROPERTY, META_NAMESPACE, REF_TO_META_SUBREF
+        SEQUENCE_START, SEQUENCE
     }
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -130,7 +126,7 @@ public class Neo4jStorage implements Storage {
     @Override
     public List<Topic> getTopics(String typeUri) {
         List topics = new ArrayList();
-        for (Node node : getDirectInstances(getMetaClass(typeUri))) {
+        for (Node node : metaModel.getInstances(typeUri)) {
             // Note: the topic properties remain uninitialzed here.
             // It is up to the plugins to provide selected properties (see providePropertiesHook()).
             topics.add(buildTopic(node, false));
@@ -203,9 +199,8 @@ public class Neo4jStorage implements Storage {
 
     @Override
     public Topic createTopic(String typeUri, Properties properties) {
-        Node node = graphDb.createNode();
+        Node node = metaModel.createInstance(typeUri);
         logger.info("Creating node => ID=" + node.getId());
-        getMetaClass(typeUri).createRelationshipTo(node, RelType.META_HAS_INSTANCE);    // set topic type
         setProperties(node, properties, typeUri);
         return new Topic(node.getId(), typeUri, null, properties);  // FIXME: label remains uninitialized
     }
@@ -322,8 +317,8 @@ public class Neo4jStorage implements Storage {
     @Override
     public Set<String> getTopicTypeUris() {
         Set typeUris = new HashSet();
-        for (Node typeNode : getAllMetaClasses()) {
-            typeUris.add(typeNode.getProperty(META_MODEL_KEY));
+        for (Node typeNode : metaModel.getAllClasses()) {
+            typeUris.add(typeNode.getProperty("de/deepamehta/core/property/TypeURI"));
         }
         return typeUris;
     }
@@ -367,24 +362,22 @@ public class Neo4jStorage implements Storage {
         return new Neo4jTransaction(graphDb);
     }
 
-    /**
-     * Performs storage layer initialization which is required to run in a transaction.
-     */
     @Override
     public boolean init() {
         // 1) init indexing services
         index = new LuceneIndexService(graphDb);
         fulltextIndex = new LuceneFulltextQueryIndexService(graphDb);
-        // 2) init migration number and meta model
+        // 2) init migration number
+        boolean isCleanInstall = false;
         if (!graphDb.getReferenceNode().hasProperty("core_migration_nr")) {
             logger.info("Starting with a fresh DB -- Setting migration number to 0");
             setMigrationNr(0);
-            initMetaModel();
-            return true;
-        } else {
-            namespaceNode = graphDb.getNodeById(NAMESPACE_NODE_ID);
+            isCleanInstall = true;
         }
-        return false;
+        // 3) init meta model
+        metaModel = new MetaModel(graphDb, index, isCleanInstall);
+        //
+        return isCleanInstall;
     }
 
     @Override
@@ -482,6 +475,23 @@ public class Neo4jStorage implements Storage {
         return true;
     }
 
+    private RelationshipType getRelationshipType(String typeId) {
+        try {
+            // 1st try: static types are returned directly
+            return RelType.valueOf(typeId);
+        } catch (IllegalArgumentException e) {
+            // 2nd try: search through dynamic types
+            for (RelationshipType relType : graphDb.getRelationshipTypes()) {
+                if (relType.name().equals(typeId)) {
+                    return relType;
+                }
+            }
+            // Last resort: create new type
+            logger.info("### Relation type \"" + typeId + "\" does not exist -- Creating it dynamically");
+            return DynamicRelationshipType.withName(typeId);
+        }
+    }
+
     // --- Properties ---
 
     Properties getProperties(PropertyContainer container) {
@@ -560,7 +570,7 @@ public class Neo4jStorage implements Storage {
         fulltextIndex.removeIndex(node, "default");
     }
 
-    // --- Types ---
+    // --- Meta-Model ---
 
     private String getTypeUri(Node node) {
         // FIXME: meta-types must be detected manually
@@ -568,130 +578,34 @@ public class Neo4jStorage implements Storage {
             // FIXME: a more elaborated criteria is required, e.g. an incoming TOPIC_TYPE relation
             return "de/deepamehta/core/topictype/TopicType";
         }
-        return (String) getTypeNode(node).getProperty("de/deepamehta/core/property/TypeURI");
+        return (String) metaModel.getClass(node).getProperty("de/deepamehta/core/property/TypeURI");
     }
 
-    private Node getTypeNode(Node node) {
-        // Old Neo4j API:
-        // TraversalDescription desc = TraversalFactory.createTraversalDescription();
-        // desc = desc.relationships(MetaModelRelTypes.META_HAS_INSTANCE, Direction.INCOMING);
-        // desc = desc.filter(ReturnFilter.ALL_BUT_START_NODE);
-        // Iterator<Node> i = desc.traverse(node).nodes().iterator();
-        //
-        // Old Neo4j API:
-        // Iterator<Node> i = node.expand(MetaModelRelTypes.META_HAS_INSTANCE, Direction.INCOMING).nodes().iterator();
-        //
-        Relationship relation = node.getSingleRelationship(RelType.META_HAS_INSTANCE, Direction.INCOMING);
-        // error check
-        if (relation == null) {
-            throw new RuntimeException("Type of " + node + " is unknown " +
-                "(there is no incoming META_HAS_INSTANCE relationship)");
-        }
-        //
-        return relation.getOtherNode(node);
+    Node getTypeNode(String typeUri) {
+        return metaModel.getClass(typeUri);
     }
 
-    // ---
-
-    private RelationshipType getRelationshipType(String typeId) {
-        try {
-            // 1st try: static types are returned directly
-            return RelType.valueOf(typeId);
-        } catch (IllegalArgumentException e) {
-            // 2nd try: search through dynamic types
-            for (RelationshipType relType : graphDb.getRelationshipTypes()) {
-                if (relType.name().equals(typeId)) {
-                    return relType;
-                }
-            }
-            // Last resort: create new type
-            logger.info("### Relation type \"" + typeId + "\" does not exist -- Creating it dynamically");
-            return DynamicRelationshipType.withName(typeId);
-        }
+    Iterable<Node> getDataFieldNodes(String typeUri) {
+        return metaModel.getProperties(typeUri);
     }
 
-    // --- Meta Model ---
-
-    private void initMetaModel() {
-        Node refNode = graphDb.getReferenceNode();
-        Node metaNode = graphDb.createNode();
-        namespaceNode = graphDb.createNode();
-        if (namespaceNode.getId() != NAMESPACE_NODE_ID) {
-            throw new RuntimeException("Namespace node not created with ID " +
-                NAMESPACE_NODE_ID + " but " + namespaceNode.getId());
-        }
-        refNode.createRelationshipTo(metaNode, RelType.REF_TO_META_SUBREF);
-        metaNode.createRelationshipTo(namespaceNode, RelType.META_NAMESPACE);
+    Node createTypeNode(String typeUri) {
+        return metaModel.createClass(typeUri);
     }
 
-    Node getMetaClass(String typeUri) {
-        Node node = index.getSingleNode(META_MODEL_KEY, typeUri);
-        if (node == null) {
-            throw new RuntimeException("Topic type \"" + typeUri + "\" is unknown");
-        }
-        return node;
+    Node createDataFieldNode(String fieldUri) {
+        return metaModel.createProperty(fieldUri);
     }
 
-    Iterable<Node> getDirectInstances(Node typeNode) {
-        TraversalDescription desc = Traversal.description();
-        desc = desc.relationships(RelType.META_HAS_INSTANCE, Direction.OUTGOING);
-        desc = desc.filter(new StartNodeFilter());
-        return desc.traverse(typeNode).nodes();
+    void addDataFieldNode(String typeUri, Node fieldNode) {
+        metaModel.addProperty(typeUri, fieldNode);
     }
 
-    Iterable<Node> getDirectProperties(Node typeNode) {
-        TraversalDescription desc = Traversal.description();
-        desc = desc.relationships(RelType.META_HAS_PROPERTY, Direction.OUTGOING);
-        desc = desc.filter(new StartNodeFilter());
-        return desc.traverse(typeNode).nodes();
-    }
-
-    Iterable<Node> getAllMetaClasses() {
-        TraversalDescription desc = Traversal.description();
-        desc = desc.relationships(RelType.META_CLASS, Direction.OUTGOING);
-        desc = desc.filter(new StartNodeFilter());
-        return desc.traverse(namespaceNode).nodes();
-    }
-
-    Node createMetaClass(String typeUri) {
-        Node node = index.getSingleNode(META_MODEL_KEY, typeUri);
-        if (node != null) {
-            throw new RuntimeException("Topic type with URI \"" + typeUri + "\" already exists");
-        }
-        node = graphDb.createNode();
-        node.setProperty(META_MODEL_KEY, typeUri);
-        index.index(node, META_MODEL_KEY, typeUri);
-        namespaceNode.createRelationshipTo(node, RelType.META_CLASS);
-        return node;
-    }
-
-    Node createMetaProperty(String fieldUri) {
-        Node node = index.getSingleNode(META_MODEL_KEY, fieldUri);
-        if (node != null) {
-            return node;
-        }
-        node = graphDb.createNode();
-        node.setProperty(META_MODEL_KEY, fieldUri);
-        index.index(node, META_MODEL_KEY, fieldUri);
-        namespaceNode.createRelationshipTo(node, RelType.META_PROPERTY);
-        return node;
-    }
-
-    void renameMetaClass(String oldTypeUri, String typeUri) {
-        Node typeNode = getMetaClass(oldTypeUri);
-        typeNode.setProperty(META_MODEL_KEY, typeUri);
-        index.removeIndex(typeNode, META_MODEL_KEY);
-        index.index(typeNode, META_MODEL_KEY, typeUri);
+    void changeTypeUri(String oldTypeUri, String typeUri) {
+        metaModel.renameClass(oldTypeUri, typeUri);
     }
 
     // --- Traversal ---
-
-    private class StartNodeFilter implements Predicate<Path> {
-        @Override
-        public boolean accept(Path path) {
-            return path.length() > 0;
-        }
-    }
 
     private Traverser createRelatedTopicsTraverser(Node node, List<String> includeTopicTypes,
                                                               List<String> includeRelTypes,
