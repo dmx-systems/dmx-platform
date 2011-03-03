@@ -88,20 +88,20 @@ public class Neo4jStorage implements Storage {
 
     @Override
     public Topic getTopic(long id) {
-        logger.info("Getting node " + id);
+        logger.fine("Getting node " + id);
         return buildTopic(graphDb.getNodeById(id), true);
     }
 
     @Override
     public Topic getTopic(String key, PropValue value) {
-        logger.info("Getting node by property (" + key + "=" + value + ")");
+        logger.fine("Getting node by property (" + key + "=" + value + ")");
         Node node = index.getSingleNode(key, value.value());
         return node != null ? buildTopic(node, true) : null;
     }
 
     @Override
     public Topic getTopic(String typeUri, String key, PropValue value) {
-        logger.info("Getting node (typeUri=" + typeUri + ", " + key + "=" + value + ")");
+        logger.fine("Getting node (typeUri=" + typeUri + ", " + key + "=" + value + ")");
         IndexHits<Node> nodes = fulltextIndex.getNodesExactMatch(key, value.value());
         Node resultNode = null;
         // apply type filter
@@ -137,7 +137,7 @@ public class Neo4jStorage implements Storage {
     @Override
     public List<Topic> getTopics(String key, Object value) {
         IndexHits<Node> nodes = index.getNodes(key, value);
-        logger.info("Getting nodes by property (" + key + "=" + value + ") => " + nodes.size() + " nodes");
+        logger.fine("Getting nodes by property (" + key + "=" + value + ") => " + nodes.size() + " nodes");
         List topics = new ArrayList();
         for (Node node : nodes) {
             topics.add(buildTopic(node, false));    // properties remain uninitialized
@@ -172,7 +172,7 @@ public class Neo4jStorage implements Storage {
             //
             relTopics.add(relTopic);
         }
-        logger.info("=> " + relTopics.size() + " related nodes");
+        logger.fine("=> " + relTopics.size() + " related nodes");
         return relTopics;
     }
 
@@ -181,10 +181,10 @@ public class Neo4jStorage implements Storage {
         if (fieldUri == null) fieldUri = "default";
         if (!wholeWord) searchTerm += "*";
         IndexHits<Node> nodes = fulltextIndex.getNodes(fieldUri, searchTerm);
-        logger.info("Searching \"" + searchTerm + "\" in field \"" + fieldUri + "\" => " + nodes.size() + " nodes");
+        logger.fine("Searching \"" + searchTerm + "\" in field \"" + fieldUri + "\" => " + nodes.size() + " nodes");
         List topics = new ArrayList();
         for (Node node : nodes) {
-            logger.fine("Adding node " + node.getId());
+            logger.finer("Adding node " + node.getId());
             // Filter result set. Note: a search should not find other searches.
             //
             // TODO: drop this filter. Items not intended for being find should not be indexed at all. Model change
@@ -193,21 +193,21 @@ public class Neo4jStorage implements Storage {
                 topics.add(buildTopic(node, false));    // properties remain uninitialized
             }
         }
-        logger.info("After filtering => " + topics.size() + " nodes");
+        logger.fine("After filtering => " + topics.size() + " nodes");
         return topics;
     }
 
     @Override
     public Topic createTopic(String typeUri, Properties properties) {
         Node node = metaModel.createInstance(typeUri);
-        logger.info("Creating node => ID=" + node.getId());
+        logger.fine("Creating node => ID=" + node.getId());
         setProperties(node, properties, typeUri);
         return new Topic(node.getId(), typeUri, null, properties);  // FIXME: label remains uninitialized
     }
 
     @Override
     public void setTopicProperties(long id, Properties properties) {
-        logger.info("Setting properties of node " + id + ": " + properties);
+        logger.fine("Setting properties of node " + id + ": " + properties);
         Node node = graphDb.getNodeById(id);
         setProperties(node, properties);
     }
@@ -216,7 +216,7 @@ public class Neo4jStorage implements Storage {
     public void deleteTopic(long id) {
         // Note: when this is called all the topic's relations are already deleted.
         // So we can't determine the topic's type anymore (and thus can't determine the index modes).
-        logger.info("Deleting node " + id);
+        logger.fine("Deleting node " + id);
         Node node = graphDb.getNodeById(id);
         // update index
         removeFromIndex(node);
@@ -228,7 +228,7 @@ public class Neo4jStorage implements Storage {
 
     @Override
     public Relation getRelation(long id) {
-        logger.info("Getting relationship " + id);
+        logger.fine("Getting relationship " + id);
         Relationship relationship = graphDb.getRelationshipById(id);
         return buildRelation(relationship, true);
     }
@@ -245,7 +245,7 @@ public class Neo4jStorage implements Storage {
 
     @Override
     public Relation getRelation(long srcTopicId, long dstTopicId, String typeId, boolean isDirected) {
-        logger.info("Getting relationship between nodes " + srcTopicId + " and " + dstTopicId);
+        logger.fine("Getting relationship between nodes " + srcTopicId + " and " + dstTopicId);
         Relationship relationship = null;
         Node node = graphDb.getNodeById(srcTopicId);
         for (Relationship rel : node.getRelationships()) {
@@ -261,16 +261,16 @@ public class Neo4jStorage implements Storage {
             relationship = rel;
         }
         if (relationship != null) {
-            logger.info("=> relationship found (ID=" + relationship.getId() + ")");
+            logger.fine("=> relationship found (ID=" + relationship.getId() + ")");
             return buildRelation(relationship, true);
         }
-        logger.info("=> no such relationship");
+        logger.fine("=> no such relationship");
         return null;
     }
 
     @Override
     public List<Relation> getRelations(long srcTopicId, long dstTopicId, String typeId, boolean isDirected) {
-        logger.info("Getting relationships between nodes " + srcTopicId + " and " + dstTopicId);
+        logger.fine("Getting relationships between nodes " + srcTopicId + " and " + dstTopicId);
         List<Relation> relations = new ArrayList();
         Node node = graphDb.getNodeById(srcTopicId);
         for (Relationship rel : node.getRelationships()) {
@@ -281,9 +281,9 @@ public class Neo4jStorage implements Storage {
         }
         //
         if (!relations.isEmpty()) {
-            logger.info("=> " + relations.size() + " relationships found");
+            logger.fine("=> " + relations.size() + " relationships found");
         } else {
-            logger.info("=> no such relationship");
+            logger.fine("=> no such relationship");
         }
         //
         return relations;
@@ -291,7 +291,7 @@ public class Neo4jStorage implements Storage {
 
     @Override
     public Relation createRelation(String typeId, long srcTopicId, long dstTopicId, Properties properties) {
-        logger.info("Creating \"" + typeId + "\" relationship from node " + srcTopicId + " to " + dstTopicId);
+        logger.fine("Creating \"" + typeId + "\" relationship from node " + srcTopicId + " to " + dstTopicId);
         Node srcNode = graphDb.getNodeById(srcTopicId);
         Node dstNode = graphDb.getNodeById(dstTopicId);
         Relationship relationship = srcNode.createRelationshipTo(dstNode, getRelationshipType(typeId));
@@ -301,14 +301,14 @@ public class Neo4jStorage implements Storage {
 
     @Override
     public void setRelationProperties(long id, Properties properties) {
-        logger.info("Setting properties of relationship " + id + ": " + properties);
+        logger.fine("Setting properties of relationship " + id + ": " + properties);
         Relationship relationship = graphDb.getRelationshipById(id);
         setProperties(relationship, properties);
     }
 
     @Override
     public void deleteRelation(long id) {
-        logger.info("Deleting relationship " + id);
+        logger.fine("Deleting relationship " + id);
         graphDb.getRelationshipById(id).delete();
     }
 
