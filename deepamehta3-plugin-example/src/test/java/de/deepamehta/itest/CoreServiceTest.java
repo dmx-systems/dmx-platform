@@ -2,6 +2,7 @@ package de.deepamehta.itest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
@@ -9,9 +10,8 @@ import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.autoWrap;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.cleanCaches;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.scanPom;
 
-import de.deepamehta.core.model.Properties;
-
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Inject;
@@ -22,8 +22,17 @@ import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
 import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.Properties;
+import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.service.CoreService;
+
+import org.codehaus.jettison.json.JSONObject;
+
+import java.util.logging.Logger;
+
+
 
 @RunWith(JUnit4TestRunner.class)
 public abstract class CoreServiceTest {
@@ -32,6 +41,7 @@ public abstract class CoreServiceTest {
     private BundleContext bundleContext;
 
     private CoreService sut;
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     @Before
     public void setup() throws Exception {
@@ -93,5 +103,25 @@ public abstract class CoreServiceTest {
         } catch (Exception e) {
             assertEquals("Node[" + updated.id + "]", e.getCause().getMessage());
         }
+    }
+
+    private static final String COPIED_TOPICTYPE_URI = "de/deepamehta/core/topictype/PersonCopy";
+    private static final String COPIED_TOPICTYPE_LABEL = "Person Copy";
+
+    @Test
+    @Ignore
+    public void copyTopicType() {
+        ClientContext ctx = null;
+        TopicType srcTopicType = sut.getTopicType(TOPICTYPE, ctx);
+        PropValue value = srcTopicType.getProperty("topic_label_field_uri", null);
+        //
+        assertNull("topic_label_field_uri of type Person is expected to be null but is " + value, value.toString());
+        //
+        JSONObject json = srcTopicType.toJSON();
+        logger.info("### Copying topic type: " + json.toString());
+        TopicType dstTopicType = new TopicType(json);
+        dstTopicType.setTypeUri(COPIED_TOPICTYPE_URI);
+        dstTopicType.setLabel(COPIED_TOPICTYPE_LABEL);
+        sut.createTopicType(dstTopicType.getProperties(), dstTopicType.getDataFields(), ctx);
     }
 }
