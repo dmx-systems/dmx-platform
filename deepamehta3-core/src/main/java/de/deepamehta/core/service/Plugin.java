@@ -131,10 +131,14 @@ public class Plugin implements BundleActivator {
     public CoreService getService() {
         // CoreService dms = (CoreService) deepamehtaServiceTracker.getService();
         if (dms == null) {
-            throw new RuntimeException("DeepaMehta core service is not yet available " +
-                "for plugin \"" + pluginName + "\"");
+            throw new RuntimeException("DeepaMehta core service is not yet available for " + this);
         }
         return dms;
+    }
+
+    @Override
+    public String toString() {
+        return "plugin \"" + pluginName + "\"";
     }
 
 
@@ -153,7 +157,7 @@ public class Plugin implements BundleActivator {
             pluginName = (String) pluginBundle.getHeaders().get("Bundle-Name");
             pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
             //
-            logger.info("========== Starting plugin \"" + pluginName + "\" ==========");
+            logger.info("========== Starting " + this + " ==========");
             //
             configProperties = readConfigFile();
             pluginPackage = getConfigProperty("pluginPackage", getClass().getPackage().getName());
@@ -162,7 +166,7 @@ public class Plugin implements BundleActivator {
             createServiceTracker(HttpService.class.getName(), context);
             createServiceTrackers(context);
         } catch (RuntimeException e) {
-            logger.severe("Starting plugin \"" + pluginName + "\" failed. Reason:");
+            logger.severe("Starting " + this + " failed. Reason:");
             e.printStackTrace();
             throw e;
         }
@@ -170,7 +174,7 @@ public class Plugin implements BundleActivator {
 
     @Override
     public void stop(BundleContext context) {
-        logger.info("========== Stopping plugin \"" + pluginName + "\" ==========");
+        logger.info("========== Stopping " + this + " ==========");
         //
         for (ServiceTracker serviceTracker : serviceTrackers) {
             serviceTracker.close();
@@ -359,13 +363,13 @@ public class Plugin implements BundleActivator {
      * - register the plugin's REST resources at the OSGi HTTP service
      */
     private void initPlugin(BundleContext context) {
-        logger.info("----- Initializing plugin \"" + pluginName + "\" -----");
+        logger.info("----- Initializing " + this + " -----");
         installPlugin(context);             // relies on CoreService
         registerPlugin();                   // relies on CoreService
         registerPluginService(context);
         registerWebResources();             // relies on HttpService
         registerRestResources();            // relies on HttpService and CoreService
-        logger.info("----- Initialization of plugin \"" + pluginName + "\" complete -----");
+        logger.info("----- Initialization of " + this + " complete -----");
     }
 
     /**
@@ -386,8 +390,8 @@ public class Plugin implements BundleActivator {
             }
             tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK! (plugin \"" + pluginName + "\")");
-            throw new RuntimeException("Installation of plugin \"" + pluginName + "\" in the database failed", e);
+            logger.warning("ROLLBACK! (" + this + ")");
+            throw new RuntimeException("Installation of " + this + " in the database failed", e);
         } finally {
             tx.finish();
         }
@@ -396,8 +400,7 @@ public class Plugin implements BundleActivator {
     private void registerPluginService(BundleContext context) {
         String serviceInterface = getConfigProperty("providedServiceInterface");
         if (serviceInterface != null) {
-            logger.info("Registering service \"" + serviceInterface +
-                "\" of plugin \"" + pluginName + "\" at OSGi framework");
+            logger.info("Registering service \"" + serviceInterface + "\" of " + this + " at OSGi framework");
             context.registerService(serviceInterface, this, null);
         }
     }
@@ -409,12 +412,12 @@ public class Plugin implements BundleActivator {
      * core service control flow, that is the plugin's hooks are triggered.
      */
     private void registerPlugin() {
-        logger.info("Registering plugin \"" + pluginName + "\" at DeepaMehta core service");
+        logger.info("Registering " + this + " at DeepaMehta core service");
         dms.registerPlugin(this);
     }
 
     private void unregisterPlugin() {
-        logger.info("Unregistering plugin \"" + pluginName + "\" at DeepaMehta core service");
+        logger.info("Unregistering " + this + " at DeepaMehta core service");
         dms.unregisterPlugin(pluginId);
     }
 
@@ -423,17 +426,17 @@ public class Plugin implements BundleActivator {
     private void registerWebResources() {
         String namespace = "/" + pluginId;
         try {
-            logger.info("Registering web resources of plugin \"" + pluginName + "\" at namespace " + namespace);
+            logger.info("Registering web resources of " + this + " at namespace " + namespace);
             httpService.registerResources(namespace, "/web", null);
         } catch (NamespaceException e) {
-            throw new RuntimeException("Web resources of plugin \"" + pluginName + "\" can't be registered " +
+            throw new RuntimeException("Web resources of " + this + " can't be registered " +
                 "at namespace " + namespace, e);
         }
     }
 
     private void unregisterWebResources() {
         String namespace = "/" + pluginId;
-        logger.info("Unregistering web resources of plugin \"" + pluginName + "\"");
+        logger.info("Unregistering web resources of " + this);
         httpService.unregister(namespace);
     }
 
@@ -443,7 +446,7 @@ public class Plugin implements BundleActivator {
         String namespace = getConfigProperty("restResourcesNamespace");
         try {
             if (namespace != null) {
-                logger.info("Registering REST resources of plugin \"" + pluginName + "\" at namespace " + namespace);
+                logger.info("Registering REST resources of " + this + " at namespace " + namespace);
                 // Generic plugins (plugin bundles not containing a Plugin subclass) which provide resource classes
                 // must set the "pluginPackage" config property. Otherwise the resource classes can't be located.
                 if (pluginPackage.equals("de.deepamehta.core.service")) {
@@ -462,7 +465,7 @@ public class Plugin implements BundleActivator {
             }
         } catch (Exception e) {
             unregisterWebResources();
-            throw new RuntimeException("REST resources of plugin \"" + pluginName + "\" can't be registered " +
+            throw new RuntimeException("REST resources of " + this + " can't be registered " +
                 "at namespace " + namespace, e);
         }
     }
@@ -470,7 +473,7 @@ public class Plugin implements BundleActivator {
     private void unregisterRestResources() {
         String namespace = getConfigProperty("restResourcesNamespace");
         if (namespace != null) {
-            logger.info("Unregistering REST resources of plugin \"" + pluginName + "\"");
+            logger.info("Unregistering REST resources of " + this);
             httpService.unregister(namespace);
         }
     }
@@ -532,10 +535,10 @@ public class Plugin implements BundleActivator {
     private boolean initPluginTopic() {
         pluginTopic = findPluginTopic();
         if (pluginTopic != null) {
-            logger.info("Do NOT create topic for plugin \"" + pluginName + "\" -- already exists");
+            logger.info("Do NOT create topic for " + this + " -- already exists");
             return false;
         } else {
-            logger.info("Creating topic for plugin \"" + pluginName + "\" -- this is a plugin clean install");
+            logger.info("Creating topic for " + this + " -- this is a plugin clean install");
             Properties properties = new Properties();
             properties.put("de/deepamehta/core/property/PluginID", pluginId);
             properties.put("de/deepamehta/core/property/PluginMigrationNr", 0);

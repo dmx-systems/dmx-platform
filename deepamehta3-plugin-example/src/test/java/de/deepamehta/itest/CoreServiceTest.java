@@ -109,19 +109,22 @@ public abstract class CoreServiceTest {
     private static final String COPIED_TOPICTYPE_LABEL = "Person Copy";
 
     @Test
-    @Ignore
     public void copyTopicType() {
         ClientContext ctx = null;
         TopicType srcTopicType = sut.getTopicType(TOPICTYPE, ctx);
         PropValue value = srcTopicType.getProperty("topic_label_field_uri", null);
-        //
         assertNull("topic_label_field_uri of type Person is expected to be null but is " + value, value.toString());
         //
+        int fieldCount = srcTopicType.getDataFields().size();
+        logger.info("### " + srcTopicType + " has " + fieldCount + " data fields");
+        //
         JSONObject json = srcTopicType.toJSON();
-        logger.info("### Copying topic type: " + json.toString());
         TopicType dstTopicType = new TopicType(json);
         dstTopicType.setTypeUri(COPIED_TOPICTYPE_URI);
         dstTopicType.setLabel(COPIED_TOPICTYPE_LABEL);
         sut.createTopicType(dstTopicType.getProperties(), dstTopicType.getDataFields(), ctx);
+        //
+        TopicType readType = sut.getTopicType(COPIED_TOPICTYPE_URI, ctx);
+        assertEquals(fieldCount, readType.getDataFields().size());
     }
 }

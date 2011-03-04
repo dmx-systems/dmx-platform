@@ -107,15 +107,25 @@ class Neo4jTopicType extends TopicType {
      */
     @Override
     public void addDataField(DataField dataField) {
-        // 1) update DB
-        String typeUri = getProperty("de/deepamehta/core/property/TypeURI").toString();
-        // create data field
-        Neo4jDataField field = new Neo4jDataField(dataField, storage);
-        storage.addDataFieldNode(typeUri, field.getNode());
-        // put in sequence
-        putInFieldSequence(field.node, dataFields.size());
-        // 2) update memory
-        super.addDataField(field);
+        try {
+            // Abort if the data field has been added already. This happens if a topic type is created by copying
+            // (as in Torsten Ziegler's plugin). The plugins, e.g. Workspaces, must not add their data fields again.
+            if (hasDataField(dataField.getUri())) {
+                logger.warning("### Adding " + dataField + " to " + this + " aborted (already added)");
+                return;
+            }
+            // 1) update DB
+            String typeUri = getProperty("de/deepamehta/core/property/TypeURI").toString();
+            // create data field
+            Neo4jDataField field = new Neo4jDataField(dataField, storage);
+            storage.addDataFieldNode(typeUri, field.getNode());
+            // put in sequence
+            putInFieldSequence(field.node, dataFields.size());
+            // 2) update memory
+            super.addDataField(field);
+        } catch (Exception e) {
+            throw new RuntimeException("Adding " + dataField + " to " + this + " failed", e);
+        }
     }
 
     @Override

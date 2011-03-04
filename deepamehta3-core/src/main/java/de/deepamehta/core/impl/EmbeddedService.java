@@ -752,7 +752,7 @@ public class EmbeddedService implements CoreService {
                         resultSet.add(result);
                     }
                 } catch (Exception e) {
-                    throw new RuntimeException("Triggering hook " + hook + " failed", e);
+                    throw new RuntimeException("Triggering hook " + hook + " of " + plugin + " failed", e);
                 }
             }
         };

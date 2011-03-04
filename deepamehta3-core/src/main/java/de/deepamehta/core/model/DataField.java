@@ -89,7 +89,7 @@ public class DataField {
             JSONHelper.toMap(dataField, properties);
             initDefaults();
         } catch (Throwable e) {
-            throw new RuntimeException("Error while parsing data field " + this, e);
+            throw new RuntimeException("Error while parsing " + this, e);
         }
     }
 
@@ -125,7 +125,7 @@ public class DataField {
             }
         }
         if (log.length() > 0) {
-            logger.warning("### Overriding properties of data field " + this + ":" + log);
+            logger.warning("### Overriding properties of " + this + ":" + log);
         }
         //
         this.properties = properties;   // FIXME: use putAll() instead?
@@ -227,7 +227,7 @@ public class DataField {
 
     @Override
     public String toString() {
-        return "\"" + getProperty(KEY_LABEL) + "\" (uri=\"" + getProperty(KEY_URI) + "\")";
+        return "data field \"" + getProperty(KEY_LABEL) + "\" (uri=\"" + getProperty(KEY_URI) + "\")";
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -259,7 +259,7 @@ public class DataField {
             if (rendererClass != null) {
                 setRendererClass(rendererClass);
             } else {
-                logger.warning("No renderer declared for data field " + this +
+                logger.warning("No renderer declared for " + this +
                     " (there is no default renderer for data type \"" + dataType + "\")");
             }
         }
