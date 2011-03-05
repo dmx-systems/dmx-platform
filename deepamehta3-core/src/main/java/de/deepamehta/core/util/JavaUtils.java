@@ -73,13 +73,14 @@ public class JavaUtils {
 
     // ---
 
-    public static String createTempDirectory(String prefix) {
+    public static File createTempDirectory(String prefix) {
         try {
             File f = File.createTempFile(prefix, ".dir");
             String n = f.getAbsolutePath();
             f.delete();
-            new File(n).mkdir();
-            return n;
+            f = new File(n);
+            f.mkdir();
+            return f;
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

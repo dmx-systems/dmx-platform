@@ -39,7 +39,7 @@
         <module>deepamehta3-delivery</module>
 
         <module>deepamehta3-plugin-parent</module>
-	<!--<module>deepamehta3-plugin-example</module>-->
+        <module>deepamehta3-plugin-example</module>
     </modules>
 
 </project>
