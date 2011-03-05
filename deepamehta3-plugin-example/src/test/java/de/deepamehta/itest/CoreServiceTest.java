@@ -85,7 +85,7 @@ public abstract class CoreServiceTest {
         Topic readed = sut.getTopic(id, ctx);
         // TODO implement equals()
         assertEquals(id, readed.id);
-        assertEquals(created.getProperties().toMap(), readed.getProperties().toMap());
+        assertEquals(created.getProperties(), readed.getProperties());
 
         // update
         String newValue = "ChangedTestContact";

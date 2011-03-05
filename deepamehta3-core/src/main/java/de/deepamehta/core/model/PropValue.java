@@ -2,6 +2,7 @@ package de.deepamehta.core.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 
@@ -15,6 +16,8 @@ public class PropValue {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Object value;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -68,5 +71,21 @@ public class PropValue {
 
     public Object value() {
         return value;
+    }
+
+    // ---
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof PropValue)) {
+            return false;
+        }
+        PropValue v = (PropValue) o;
+        return v.value == null ? value == null : value == null ? false : v.value.equals(value);
+    }
+
+    @Override
+    public int hashCode() {
+        return value != null ? value.hashCode() : 0;
     }
 }
