@@ -74,10 +74,10 @@ public class TopicType extends Topic {
             o.put("label", getProperty("de/deepamehta/core/property/TypeLabel"));
             o.put("uri",   getProperty("de/deepamehta/core/property/TypeURI"));
             if (getProperty("icon_src", null).toString() != null) {                 // optional property
-                o.put("icon_src", getProperty("icon_src"));
+                o.put("icon_src", getProperty("icon_src").toString());
             }
             if (getProperty("topic_label_field_uri", null).toString() != null) {    // optional property
-                o.put("topic_label_field_uri", getProperty("topic_label_field_uri"));
+                o.put("topic_label_field_uri", getProperty("topic_label_field_uri").toString());
             }
             o.put("js_renderer_class", getProperty("js_renderer_class"));
             //

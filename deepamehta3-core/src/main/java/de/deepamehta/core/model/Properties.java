@@ -129,8 +129,20 @@ public class Properties {
         return map;
     }
 
+    // ---
+
     @Override
     public String toString() {
         return values.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return ((Properties) o).values.equals(values);
+    }
+
+    @Override
+    public int hashCode() {
+        return values.hashCode();
     }
 }
