@@ -48,10 +48,10 @@ public class PropertiesTestCase {
         p2.put("int", 123);
         p2.put("long", 456L);
         p2.put("boolean", true);
-        p2.put("stringvalue", new PropValue("you"));
-        p2.put("intvalue", new PropValue(789));
-        p2.put("longvalue", new PropValue(101112L));
-        p2.put("booleanvalue", new PropValue(false));
+        p2.put("stringvalue", "you");
+        p2.put("intvalue", 789);
+        p2.put("longvalue", 101112L);
+        p2.put("booleanvalue", false);
         //
         assertEquals(p, p2);
     }
