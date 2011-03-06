@@ -1,0 +1,38 @@
+{
+    topic_types: [
+        {
+            uri: "dm3.core.plugin",
+            value: "Plugin",
+            data_type: "dm3.core.composite"
+        },
+        {
+            uri: "dm3.core.plugin_id",
+            value: "Plugin ID",
+            data_type: "dm3.core.text"
+        },
+        {
+            uri: "dm3.core.plugin_migration_nr",
+            value: "Plugin Migration Nr.",
+            data_type: "dm3.core.number"
+        }
+    ]
+
+    associations: [
+        {
+            assoc_type: "dm3.core.composition",
+            topics: [
+                {topic: "dm3.core.plugin",              role_type: "dm3.core.whole"},
+                {topic: "dm3.core.plugin_id",           role_type: "dm3.core.part"},
+                {topic: "dm3.core.one",                 role_type: "dm3.core.part_cardinality"}
+            ]
+        },
+        {
+            assoc_type: "dm3.core.composition",
+            topics: [
+                {topic: "dm3.core.plugin",              role_type: "dm3.core.whole"},
+                {topic: "dm3.core.plugin_migration_nr", role_type: "dm3.core.part"},
+                {topic: "dm3.core.one",                 role_type: "dm3.core.part_cardinality"}
+            ]
+        }
+    ]
+}

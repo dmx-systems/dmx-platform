@@ -1,23 +1,85 @@
 {
     topic_types: [
         {
-            label: "Plugin",
-            uri: "de/deepamehta/core/topictype/Plugin",
-            js_renderer_class: "PlainDocument",
-            fields: [
-                {
-                    label: "Plugin ID",
-                    uri: "de/deepamehta/core/property/PluginID",
-                    data_type: "text",
-                    editor: "single line",
-                    indexing_mode: "KEY"
-                },
-                {
-                    label: "Plugin Migration Nr",
-                    uri: "de/deepamehta/core/property/PluginMigrationNr",
-                    data_type: "number"
-                }
-            ]
+            uri: "dm3.core.data_type",
+            value: "Data Type",
+            data_type: "dm3.core.text"
+        },
+        {
+            uri: "dm3.core.cardinality",
+            value: "Cardinality",
+            data_type: "dm3.core.text"
+        }
+    ]
+
+    assoc_types: [
+        {
+            uri: "dm3.core.association",
+            value: "Association"
+        },
+        {
+            uri: "dm3.core.aggregation",
+            value: "Aggregation"
+        },
+        {
+            uri: "dm3.core.composition",
+            value: "Composition"
+        }
+    ]
+
+    role_types: [
+        {
+            uri: "dm3.core.whole",
+            value: "Whole"
+        },
+        {
+            uri: "dm3.core.part",
+            value: "Part"
+        },
+        {
+            uri: "dm3.core.whole_cardinality",
+            value: "Whole Cardinality"
+        },
+        {
+            uri: "dm3.core.part_cardinality",
+            value: "Part Cardinality"
+        },
+        {
+            uri: "dm3.core.whole_role_type",
+            value: "Whole Role Type"
+        },
+        {
+            uri: "dm3.core.part_role_type",
+            value: "Part Role Type"
+        }
+    ]
+
+    topics: [
+        {
+            topic_type: "dm3.core.data_type",
+            uri: "dm3.core.text",
+            value: "Text"
+        },
+        {
+            topic_type: "dm3.core.data_type",
+            uri: "dm3.core.number",
+            value: "Number"
+        },
+        {
+            topic_type: "dm3.core.data_type",
+            uri: "dm3.core.composite",
+            value: "Composite"
+        },
+
+        {
+            topic_type: "dm3.core.cardinality",
+            uri: "dm3.core.one",
+            value: "One"
+        },
+        {
+            topic_type: "dm3.core.cardinality",
+            uri: "dm3.core.many",
+            value: "Many"
         }
     ]
 }
