@@ -1,0 +1,86 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+    <id>distribution</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+
+    <!-- felix and logging porperties -->
+    <files>
+        <file>
+            <source>${project.basedir}/config.properties</source>
+            <outputDirectory>conf</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>${project.basedir}/logging.properties</source>
+            <outputDirectory>conf</outputDirectory>
+        </file>
+    </files>
+
+    <dependencySets>
+
+        <!-- felix main jar to bin -->
+        <dependencySet>
+            <includes>
+                <include>org.apache.felix:org.apache.felix.main</include>
+            </includes>
+            <fileMode>0444</fileMode>
+            <outputDirectory>bin</outputDirectory>
+            <outputFileNameMapping>felix.jar</outputFileNameMapping>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <!-- copy bundles -->
+        <dependencySet>
+            <includes>
+                <include>de.deepamehta:*:jar</include>
+
+                <include>com.sun.jersey:*</include>
+                <include>commons-fileupload:*</include>
+
+                <include>org.apache.felix:org.apache.felix.configadmin</include>
+                <include>org.apache.felix:org.apache.felix.gogo.*</include>
+                <include>org.apache.felix:org.apache.felix.http.jetty</include>
+                <include>org.apache.geronimo.specs:*</include>
+                <include>org.apache.servicemix.bundles:*</include>
+                <include>org.codehaus.jettison:*</include>
+                <include>org.neo4j:*</include>
+            </includes>
+            <fileMode>0444</fileMode>
+            <outputDirectory>bundle</outputDirectory>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+    </dependencySets>
+
+    <!-- start scripts, license and readme -->
+    <fileSets>
+
+        <fileSet>
+            <directory>${project.basedir}</directory>
+            <fileMode>0555</fileMode>
+            <includes>
+                <include>deepamehta-linux.sh</include>
+                <include>deepamehta-macosx.command</include>
+                <include>deepamehta-windows.bat</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}</directory>
+            <fileMode>0444</fileMode>
+            <includes>
+                <include>LICENSE.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.parent.basedir}/..</directory>
+            <fileMode>0444</fileMode>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>README.md</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+
+</assembly>

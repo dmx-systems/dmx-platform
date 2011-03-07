@@ -25,15 +25,24 @@
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.http.jetty</artifactId>
-            <version>2.2.0</version>
+            <artifactId>org.apache.felix.gogo.command</artifactId>
+            <version>0.6.1</version>
         </dependency>
-
-        <!-- Required by the deepamehta3-plugin-example tests -->
         <dependency>
             <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.log</artifactId>
-            <version>1.0.0</version>
+            <artifactId>org.apache.felix.gogo.runtime</artifactId>
+            <version>0.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.gogo.shell</artifactId>
+            <version>0.6.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.http.jetty</artifactId>
+            <version>2.2.0</version>
         </dependency>
 
     </dependencies>

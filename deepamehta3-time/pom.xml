@@ -13,7 +13,7 @@
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta3-parent</artifactId>
-        <version>0.4.5-SNAPSHOT</version>
+        <version>0.1-SNAPSHOT</version>
         <relativePath>../deepamehta3-parent/pom.xml</relativePath>
     </parent>
 
