@@ -1,6 +1,22 @@
 {
     topic_types: [
         {
+            uri: "dm3.core.topic_type",
+            value: "Topic Type",
+            data_type: "dm3.core.text"
+        },
+        {
+            uri: "dm3.core.assoc_type",
+            value: "Association Type",
+            data_type: "dm3.core.text"
+        },
+        {
+            uri: "dm3.core.role_type",
+            value: "Role Type",
+            data_type: "dm3.core.text"
+        },
+
+        {
             uri: "dm3.core.data_type",
             value: "Data Type",
             data_type: "dm3.core.text"
@@ -13,6 +29,11 @@
     ]
 
     assoc_types: [
+        {
+            uri: "dm3.core.instantiation",
+            value: "Instance"
+        },
+
         {
             uri: "dm3.core.association",
             value: "Association"
@@ -28,6 +49,15 @@
     ]
 
     role_types: [
+        {
+            uri: "dm3.core.type",
+            value: "Type"
+        },
+        {
+            uri: "dm3.core.instance",
+            value: "Instance"
+        },
+
         {
             uri: "dm3.core.whole",
             value: "Whole"
