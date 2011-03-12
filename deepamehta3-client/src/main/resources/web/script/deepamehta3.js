@@ -221,22 +221,12 @@ var dm3c = new function() {
      *                          If not given loading is performed synchronously.
      */
     this.javascript_source = function(script_url, callback) {
-        // Note: both techniques (<script> element / XHR request) are used here because of
-        // a Firefox issue with synchronous loading.
-        if (callback) {
-            var head = document.getElementsByTagName("head")[0]
-            var script = document.createElement("script")
-            script.type = "text/javascript"
-            script.onload = callback
-            script.src = script_url
-            head.appendChild(script)
-        } else {
-            $.ajax({
-                url: script_url,
-                dataType: "script",
-                async: false
-            })
-        }
+        $.ajax({
+            url: script_url,
+            dataType: "script",
+            success: callback,
+            async: callback != undefined
+        })
     }
 
     // ---
