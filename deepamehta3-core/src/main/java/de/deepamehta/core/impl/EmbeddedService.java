@@ -6,7 +6,7 @@ import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.Properties;
-import de.deepamehta.core.model.PropValue;
+import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.RelatedTopic;
@@ -15,9 +15,10 @@ import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.storage.Storage;
-import de.deepamehta.core.storage.Transaction;
 import de.deepamehta.core.util.JSONHelper;
+
+import de.deepamehta.hypergraph.HyperGraph;
+import de.deepamehta.hypergraph.Transaction;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -67,7 +68,7 @@ public class EmbeddedService implements CoreService {
 
     private PluginCache pluginCache = new PluginCache();
 
-    private Storage storage;
+    private HyperGraph storage;
 
     private enum Hook {
 
@@ -124,7 +125,7 @@ public class EmbeddedService implements CoreService {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public EmbeddedService(Storage storage) {
+    public EmbeddedService(HyperGraph storage) {
         this.storage = storage;
     }
 
@@ -140,7 +141,7 @@ public class EmbeddedService implements CoreService {
 
     // === Topics ===
 
-    @GET
+    /* @GET
     @Path("/topic/{id}")
     @Override
     public Topic getTopic(@PathParam("id") long id, @HeaderParam("Cookie") ClientContext clientContext) {
@@ -161,7 +162,7 @@ public class EmbeddedService implements CoreService {
     @GET
     @Path("/topic/by_property/{key}/{value}")
     @Override
-    public Topic getTopic(@PathParam("key") String key, @PathParam("value") PropValue value) {
+    public Topic getTopic(@PathParam("key") String key, @PathParam("value") TopicValue value) {
         Transaction tx = storage.beginTx();
         try {
             Topic topic = storage.getTopic(key, value);
@@ -180,7 +181,7 @@ public class EmbeddedService implements CoreService {
     @Override
     public Topic getTopic(@PathParam("typeUri") String typeUri,
                           @PathParam("key")     String key,
-                          @PathParam("value")   PropValue value) {
+                          @PathParam("value")   TopicValue value) {
         Transaction tx = storage.beginTx();
         try {
             Topic topic = storage.getTopic(typeUri, key, value);
@@ -196,10 +197,10 @@ public class EmbeddedService implements CoreService {
     }
 
     @Override
-    public PropValue getTopicProperty(long topicId, String key) {
+    public TopicValue getTopicProperty(long topicId, String key) {
         Transaction tx = storage.beginTx();
         try {
-            PropValue value = storage.getTopicProperty(topicId, key);
+            TopicValue value = storage.getTopicProperty(topicId, key);
             tx.success();
             return value;
         } catch (Exception e) {
@@ -374,11 +375,11 @@ public class EmbeddedService implements CoreService {
         } finally {
             tx.finish();
         }
-    }
+    } */
 
     // === Relations ===
 
-    @Override
+    /* @Override
     public Relation getRelation(long id) {
         Transaction tx = storage.beginTx();
         try {
@@ -482,11 +483,11 @@ public class EmbeddedService implements CoreService {
         } finally {
             tx.finish();
         }
-    }
+    } */
 
     // === Types ===
 
-    @GET
+    /* @GET
     @Path("/topictype")
     @Override
     public Set<String> getTopicTypeUris() {
@@ -526,9 +527,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topictype")
     @Consumes("application/x-www-form-urlencoded")
     @Override
-    public TopicType createTopicType(@FormParam("properties") Properties properties,
-                                     @FormParam("data_fields") List<DataField> dataFields,
-                                     @HeaderParam("Cookie") ClientContext clientContext) {
+    public TopicType createTopicType(TopicType topicType, @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
             TopicType topicType = storage.createTopicType(properties, dataFields);
@@ -613,7 +612,7 @@ public class EmbeddedService implements CoreService {
         } finally {
             tx.finish();
         }
-    }
+    } */
 
     // === Commands ===
 

@@ -3,13 +3,13 @@ package de.deepamehta.core.service;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
-import de.deepamehta.core.model.Properties;
-import de.deepamehta.core.model.PropValue;
+import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
-import de.deepamehta.core.storage.Transaction;
 import de.deepamehta.core.util.JavaUtils;
+
+import de.deepamehta.hypergraph.Transaction;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import java.io.InputStream;
@@ -48,14 +49,14 @@ public class Plugin implements BundleActivator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String pluginId;                        // This bundle's symbolic name.
-    private String pluginName;                      // This bundle's name = POM project name.
+    private String pluginId;                // This bundle's symbolic name.
+    private String pluginName;              // This bundle's name = POM project name.
     private String pluginClass;
     private String pluginPackage;
     private Bundle pluginBundle;
-    private Topic  pluginTopic;                     // Represents this plugin in DB. Holds plugin migration number.
+    private Topic  pluginTopic;             // Represents this plugin in DB. Holds plugin migration number.
 
-    private java.util.Properties configProperties;  // Read from file "plugin.properties"
+    private Properties configProperties;    // Read from file "plugin.properties"
 
     protected CoreService dms;
     private HttpService httpService;
@@ -211,11 +212,11 @@ public class Plugin implements BundleActivator {
     public void postCreateHook(Topic topic, ClientContext clientContext) {
     }
 
-    public void preUpdateHook(Topic topic, Properties newProperties) {
+    /* public void preUpdateHook(Topic topic, Properties newProperties) {
     }
 
     public void postUpdateHook(Topic topic, Properties oldProperties) {
-    }
+    } */
 
     // ---
 
@@ -501,9 +502,9 @@ public class Plugin implements BundleActivator {
 
     // --- Config Properties ---
 
-    private java.util.Properties readConfigFile() {
+    private Properties readConfigFile() {
         try {
-            java.util.Properties properties = new java.util.Properties();
+            Properties properties = new Properties();
             InputStream in = getResourceAsStream(PLUGIN_CONFIG_FILE);
             if (in != null) {
                 logger.info("Reading plugin config file \"" + PLUGIN_CONFIG_FILE + "\"");
@@ -549,7 +550,7 @@ public class Plugin implements BundleActivator {
     }
 
     private Topic findPluginTopic() {
-        return dms.getTopic("de/deepamehta/core/property/PluginID", new PropValue(pluginId));
+        return dms.getTopic("de/deepamehta/core/property/PluginID", new TopicValue(pluginId));
     }
 
     /**

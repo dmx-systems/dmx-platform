@@ -9,9 +9,9 @@ import java.util.logging.Logger;
 /**
  * A wrapper for a property value. Supported property types are String, int, long, boolean.
  * <p>
- * A PropValue object may also represent "no-value".
+ * A TopicValue object may also represent "no-value".
  */
-public class PropValue {
+public class TopicValue {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -24,29 +24,29 @@ public class PropValue {
     /**
      * Constructs a "no-value" respresenting value.
      */
-    public PropValue() {
+    public TopicValue() {
     }
 
     /**
-     * Called by JAX-RS container to create a PropValue from a @PathParam or @QueryParam
+     * Called by JAX-RS container to create a TopicValue from a @PathParam or @QueryParam
      */
-    public PropValue(String value) {
+    public TopicValue(String value) {
         this.value = value;
     }
 
-    public PropValue(int value) {
+    public TopicValue(int value) {
         this.value = value;
     }
 
-    public PropValue(long value) {
+    public TopicValue(long value) {
         this.value = value;
     }
 
-    public PropValue(boolean value) {
+    public TopicValue(boolean value) {
         this.value = value;
     }
 
-    public PropValue(Object value) {
+    public TopicValue(Object value) {
         this.value = value;
     }
 
@@ -77,10 +77,10 @@ public class PropValue {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof PropValue)) {
+        if (!(o instanceof TopicValue)) {
             return false;
         }
-        PropValue v = (PropValue) o;
+        TopicValue v = (TopicValue) o;
         return v.value == null ? value == null : value == null ? false : v.value.equals(value);
     }
 

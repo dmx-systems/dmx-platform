@@ -86,23 +86,23 @@ public class JSONHelper {
             String fileContent = JavaUtils.readText(is);
             //
             JSONObject o = new JSONObject(fileContent);
-            JSONArray types = o.optJSONArray("topic_types");
-            if (types != null) {
-                createTypes(types, dms);
+            JSONArray topicTypes = o.optJSONArray("topic_types");
+            if (topicTypes != null) {
+                createTopicTypes(topicTypes, dms);
             }
             JSONArray topics = o.optJSONArray("topics");
             if (topics != null) {
                 createTopics(topics, dms);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new RuntimeException("Reading migration file \"" + migrationFileName + "\" failed", e);
         }
     }
 
-    public static void createTypes(JSONArray types, CoreService dms) throws JSONException {
-        for (int i = 0; i < types.length(); i++) {
-            TopicType topicType = new TopicType(types.getJSONObject(i));
-            dms.createTopicType(topicType.getProperties(), topicType.getDataFields(), null);    // clientContext=null
+    public static void createTopicTypes(JSONArray topicTypes, CoreService dms) throws JSONException {
+        for (int i = 0; i < topicTypes.length(); i++) {
+            TopicType topicType = new TopicType(topicTypes.getJSONObject(i));
+            dms.createTopicType(topicType, null);    // clientContext=null
         }
     }
 

@@ -29,31 +29,35 @@ public class Topic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    public long id;
-    public String typeUri;
-    public String label;
+    protected long id;
+    protected String uri;
+    protected TopicValue value;
 
-    protected Properties properties;
+    protected String typeUri;
+    protected String label;
+
     private   Map<String, Object> enrichment;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public Topic(long id, String typeUri, String label, Properties properties) {
+    public Topic(long id, String uri, TopicValue value, String typeUri, String label) {
         this.id = id;
+        this.uri = uri;
+        this.value = value;
         this.typeUri = typeUri;
         this.label = label;
-        this.properties = properties != null ? properties : new Properties();
         this.enrichment = new HashMap();
     }
 
     public Topic(Topic topic) {
-        this(topic.id, topic.typeUri, topic.label, topic.properties);
+        this(topic.id, topic.uri, topic.value, topic.typeUri, topic.label);
     }
 
     public Topic(JSONObject topic) {
         try {
-            typeUri = topic.getString("type_uri");
-            properties = new Properties(topic.getJSONObject("properties"));
+            this.uri = topic.getString("uri");
+            this.value = new TopicValue(topic.get("value"));
+            this.typeUri = topic.getString("topic_type");
         } catch (Exception e) {
             throw new RuntimeException("Parsing " + this + " failed", e);
         }
@@ -61,67 +65,24 @@ public class Topic {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    /**
-     * Returns the property value for a key.
-     * If there is no property for that key an exception is thrown.
-     */
-    public PropValue getProperty(String key) {
-        PropValue value = properties.get(key);
-        if (value == null) {
-            throw new RuntimeException("Property \"" + key + "\" of " + this + " is not initialized. " +
-                "Remember: topics obtained by getRelatedTopics() provide no properties. " +
-                "Use the providePropertiesHook() to initialize the properties you need.");
-        }
-        return value;
+    public void setValue(String value) {
+        setValue(new TopicValue(value));
     }
 
-    /**
-     * Returns the property value for a key.
-     * If there is no property for that key a default value is returned.
-     * This method never returns <code>null</code>.
-     *
-     * @param   the default value. May be <code>null</code>. In this case a "no-value" respresenting
-     *          <code>PropValue</code> object is used as the default value.
-     */
-    public PropValue getProperty(String key, PropValue defaultValue) {
-        PropValue value = properties.get(key);
-        return value != null ? value : defaultValue != null ? defaultValue : new PropValue();
+    public void setValue(int value) {
+        setValue(new TopicValue(value));
     }
 
-    public Properties getProperties() {
-        return properties;
+    public void setValue(long value) {
+        setValue(new TopicValue(value));
     }
 
-    // ---
-
-    public void setProperty(String key, String value) {
-        properties.put(key, value);
+    public void setValue(boolean value) {
+        setValue(new TopicValue(value));
     }
 
-    public void setProperty(String key, int value) {
-        properties.put(key, value);
-    }
-
-    public void setProperty(String key, long value) {
-        properties.put(key, value);
-    }
-
-    public void setProperty(String key, boolean value) {
-        properties.put(key, value);
-    }
-
-    public void setProperty(String key, PropValue value) {
-        properties.put(key, value);
-    }
-
-    // ---
-
-    /**
-     * Sets various properties at once.
-     * Same as consecutive {@link setProperty} calls.
-     */
-    public void setProperties(Properties properties) {
-        this.properties.putAll(properties);
+    public void setValue(PropValue value) {
+        this.value = value;
     }
 
     // ---
@@ -136,9 +97,10 @@ public class Topic {
         try {
             JSONObject o = new JSONObject();
             o.put("id", id);
-            o.put("type_uri", typeUri);
+            o.put("uri", uri);
+            o.put("value", value.value());
+            o.put("topic_type", typeUri);
             o.put("label", label);
-            o.put("properties", properties.toJSON());
             serializeEnrichment(o);
             return o;
         } catch (JSONException e) {

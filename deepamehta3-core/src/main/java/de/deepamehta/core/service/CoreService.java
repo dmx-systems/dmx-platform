@@ -5,13 +5,13 @@ import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.PluginInfo;
-import de.deepamehta.core.model.Properties;
-import de.deepamehta.core.model.PropValue;
+import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
-import de.deepamehta.core.storage.Transaction;
+
+import de.deepamehta.hypergraph.Transaction;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -40,7 +40,7 @@ public interface CoreService {
 
     // === Topics ===
 
-    public Topic getTopic(long id, ClientContext clientContext);
+    // public Topic getTopic(long id, ClientContext clientContext);
 
     /**
      * Looks up a single topic by exact property value.
@@ -53,17 +53,17 @@ public interface CoreService {
      * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
      * (for dynamically created data fields, typically in migration classes).
      */
-    public Topic getTopic(String key, PropValue value);
+    // public Topic getTopic(String key, TopicValue value);
 
-    public Topic getTopic(String typeUri, String key, PropValue value);
+    // public Topic getTopic(String typeUri, String key, TopicValue value);
 
     /**
      * Returns a property value of a topic.
-     * If the topic has no such property a "no-value" representing {@link PropValue} object is returned.
+     * If the topic has no such property a "no-value" representing {@link TopicValue} object is returned.
      */
-    public PropValue getTopicProperty(long topicId, String key);
+    // public TopicValue getTopicProperty(long topicId);
 
-    public List<Topic> getTopics(String typeUri);
+    // public List<Topic> getTopics(String typeUri);
 
     /**
      * Looks up topics by exact property value.
@@ -75,7 +75,7 @@ public interface CoreService {
      * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
      * (for dynamically created data fields, typically in migration classes).
      */
-    public List<Topic> getTopics(String key, Object value);
+    // public List<Topic> getTopics(String key, Object value);
 
     /**
      * Retrieves topics and relationships that are directly connected to the given topic, optionally filtered
@@ -99,9 +99,9 @@ public interface CoreService {
      * @return  The related topics, each one as a pair: the topic (a Topic object), and the connecting relation
      *          (a Relation object).
      */
-    public List<RelatedTopic> getRelatedTopics(long topicId, List<String> includeTopicTypes,
-                                                             List<String> includeRelTypes,
-                                                             List<String> excludeRelTypes);
+    // public List<RelatedTopic> getRelatedTopics(long topicId, List<String> includeTopicTypes,
+    //                                                         List<String> includeRelTypes,
+    //                                                         List<String> excludeRelTypes);
 
     /**
      * Performs a fulltext search.
@@ -110,17 +110,17 @@ public interface CoreService {
      * @param   wholeWord   If true the searchTerm is regarded as whole word.
      *                      If false the searchTerm is regarded as begin-of-word substring.
      */
-    public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, ClientContext clientContext);
+    // public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, ClientContext clientContext);
 
-    public Topic createTopic(String typeUri, Properties properties, ClientContext clientContext);
+    // public Topic createTopic(String typeUri, Properties properties, ClientContext clientContext);
 
-    public void setTopicProperties(long id, Properties properties);
+    // public void setTopicProperties(long id, Properties properties);
 
-    public void deleteTopic(long id);
+    // public void deleteTopic(long id);
 
     // === Relations ===
 
-    public Relation getRelation(long id);
+    // public Relation getRelation(long id);
 
     /**
      * Returns the relation between two topics. If no such relation exists null is returned.
@@ -130,7 +130,7 @@ public interface CoreService {
      * @param   isDirected  Direction filter. Pass <code>true</code> if direction matters. In this case the relation
      *                      is expected to be directed <i>from</i> source topic <i>to</i> destination topic.
      */
-    public Relation getRelation(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
+    // public Relation getRelation(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
 
     /**
      * Returns the relations between two topics. If no such relation exists an empty list is returned.
@@ -139,29 +139,29 @@ public interface CoreService {
      * @param   isDirected  Direction filter. Pass <code>true</code> if direction matters. In this case the relation
      *                      is expected to be directed <i>from</i> source topic <i>to</i> destination topic.
      */
-    public List<Relation> getRelations(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
+    // public List<Relation> getRelations(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
 
-    public Relation createRelation(String typeId, long srcTopicId, long dstTopicId, Properties properties);
+    // public Relation createRelation(String typeId, long srcTopicId, long dstTopicId, Properties properties);
 
-    public void setRelationProperties(long id, Properties properties);
+    // public void setRelationProperties(long id, Properties properties);
 
-    public void deleteRelation(long id);
+    // public void deleteRelation(long id);
 
     // === Types ===
 
-    public Set<String> getTopicTypeUris();
+    // public Set<String> getTopicTypeUris();
 
-    public TopicType getTopicType(String typeUri, ClientContext clientContext);
+    // public TopicType getTopicType(String typeUri, ClientContext clientContext);
 
-    public TopicType createTopicType(Properties properties, List<DataField> dataFields, ClientContext clientContext);
+    // public TopicType createTopicType(TopicType topicType, ClientContext clientContext);
 
-    public void addDataField(String typeUri, DataField dataField);
+    // public void addDataField(String typeUri, DataField dataField);
 
-    public void updateDataField(String typeUri, DataField dataField);
+    // public void updateDataField(String typeUri, DataField dataField);
 
-    public void setDataFieldOrder(String typeUri, List<String> fieldUris);
+    // public void setDataFieldOrder(String typeUri, List<String> fieldUris);
 
-    public void removeDataField(String typeUri, String fieldUri);
+    // public void removeDataField(String typeUri, String fieldUri);
 
     // === Commands ===
 

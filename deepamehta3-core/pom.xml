@@ -49,6 +49,13 @@
             <scope>compile</scope> <!-- to be inherited as provided -->
         </dependency>
 
+        <!-- Persistence Layer -->
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>neo4j-hypergraph</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
+
         <!-- Neo4j -->
         <dependency>
             <groupId>org.neo4j</groupId>
