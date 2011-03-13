@@ -13,7 +13,7 @@
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta3-parent</artifactId>
-        <version>0.4.5-SNAPSHOT</version>
+        <version>0.1-SNAPSHOT</version>
         <relativePath>../deepamehta3-parent/pom.xml</relativePath>
     </parent>
 
@@ -109,19 +109,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>neo4j-public-repository</id>
-            <url>http://m2.neo4j.org</url>
-            <snapshots>
-                <!-- TODO use released Neo4j meta model -->
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
 
 </project>

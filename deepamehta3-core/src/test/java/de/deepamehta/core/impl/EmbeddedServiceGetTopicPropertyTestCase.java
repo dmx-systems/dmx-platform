@@ -1,5 +1,9 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.model.PropValue;
+import de.deepamehta.core.storage.Storage;
+import de.deepamehta.core.storage.Transaction;
+
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -8,12 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-
-import de.deepamehta.core.model.PropValue;
-import de.deepamehta.core.storage.Storage;
-import de.deepamehta.core.storage.Transaction;
 
 
 

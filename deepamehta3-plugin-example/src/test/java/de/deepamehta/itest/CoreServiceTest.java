@@ -1,5 +1,12 @@
 package de.deepamehta.itest;
 
+import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.PropValue;
+import de.deepamehta.core.model.Properties;
+import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.service.CoreService;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -10,8 +17,8 @@ import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.autoWrap;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.cleanCaches;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.scanPom;
 
+import org.codehaus.jettison.json.JSONObject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Inject;
@@ -21,18 +28,7 @@ import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
-import de.deepamehta.core.model.ClientContext;
-import de.deepamehta.core.model.Properties;
-import de.deepamehta.core.model.PropValue;
-import de.deepamehta.core.model.Topic;
-import de.deepamehta.core.model.TopicType;
-import de.deepamehta.core.service.CoreService;
-
-import org.codehaus.jettison.json.JSONObject;
-
 import java.util.logging.Logger;
-
-
 
 @RunWith(JUnit4TestRunner.class)
 public abstract class CoreServiceTest {
@@ -54,7 +50,7 @@ public abstract class CoreServiceTest {
                 systemProperty("org.osgi.service.http.port").value("8086"), //
                 systemProperty("deepamehta3.database.path").value("dm3-db"), //
                 scanPom("mvn:de.deepamehta/deepamehta3-third-party/0.4.5-SNAPSHOT/pom"), //
-                scanPom("mvn:de.deepamehta/deepamehta3-distribution/0.4.5-SNAPSHOT/pom"));
+                scanPom("mvn:de.deepamehta/deepamehta3-bundles/0.4.5-SNAPSHOT/pom"));
     }
 
     private CoreService retrieveCoreService() throws InterruptedException {

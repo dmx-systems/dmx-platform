@@ -1,42 +1,24 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.DataField;
-import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
+import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
-import de.deepamehta.core.storage.Transaction;
-import de.deepamehta.core.storage.neo4j.Neo4jStorage;
-import de.deepamehta.core.util.JavaUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import org.junit.Before;
+
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 
 
-public class EmbeddedServiceIndexingTestCase {
+public class EmbeddedServiceIndexingTestCase extends EmbeddedServiceTestEnvironment {
 
-    private EmbeddedService dms;
     private long topicId;
-
-    private Logger logger = Logger.getLogger(getClass().getName());
-
-    @Before
-    public void setup() {
-        String dbPath = JavaUtils.createTempDirectory("neo4j");
-        logger.info("Creating temporary test database at " + dbPath);
-        dms = new EmbeddedService(new Neo4jStorage(dbPath));
-        dms.setupDB();
-    }
 
     @Test
     public void indexing() {
@@ -65,7 +47,7 @@ public class EmbeddedServiceIndexingTestCase {
         DataField passwordField = new DataField("Password", "text");
         passwordField.setUri("de/deepamehta/core/property/password");
         //
-        List dataFields = new ArrayList();
+        List<DataField> dataFields = new ArrayList<DataField>();
         dataFields.add(usernameField);
         dataFields.add(passwordField);
         //
