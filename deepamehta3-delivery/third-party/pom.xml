@@ -69,7 +69,13 @@
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.lucene</artifactId>
-            <version>3.0.1_2</version>
+            <version>3.0.0_1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>neo4j-hypergraph</artifactId>
+            <version>0.2-SNAPSHOT</version>
         </dependency>
 
         <!-- asm for jersey-core -->
