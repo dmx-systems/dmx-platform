@@ -3,13 +3,13 @@ package de.deepamehta.core.service;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
+import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.util.JavaUtils;
-
-import de.deepamehta.hypergraph.Transaction;
+import de.deepamehta.core.storage.Transaction;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
@@ -212,11 +212,11 @@ public class Plugin implements BundleActivator {
     public void postCreateHook(Topic topic, ClientContext clientContext) {
     }
 
-    /* public void preUpdateHook(Topic topic, Properties newProperties) {
+    /* ### public void preUpdateHook(Topic topic, Properties newProperties) {
     }
 
     public void postUpdateHook(Topic topic, Properties oldProperties) {
-    } */
+    } ### */
 
     // ---
 
@@ -384,10 +384,10 @@ public class Plugin implements BundleActivator {
         Transaction tx = dms.beginTx();
         try {
             boolean isCleanInstall = initPluginTopic();
-            runPluginMigrations(isCleanInstall);
+            // ### runPluginMigrations(isCleanInstall);
             if (isCleanInstall) {
                 postInstallPluginHook();  // trigger hook
-                introduceTypesToPlugin();
+                // ### introduceTypesToPlugin();
             }
             tx.success();
         } catch (Exception e) {
@@ -540,23 +540,20 @@ public class Plugin implements BundleActivator {
             return false;
         } else {
             logger.info("Creating topic for " + this + " -- this is a plugin clean install");
-            Properties properties = new Properties();
-            properties.put("de/deepamehta/core/property/PluginID", pluginId);
-            properties.put("de/deepamehta/core/property/PluginMigrationNr", 0);
-            // FIXME: clientContext=null
-            pluginTopic = dms.createTopic("de/deepamehta/core/topictype/Plugin", properties, null);
+            pluginTopic = dms.createTopic(new Topic(pluginId, new TopicValue(pluginName), "dm3.core.plugin",
+                new Composite("{dm3.core.plugin_migration_nr: 0}")), null);     // FIXME: clientContext=null
             return true;
         }
     }
 
     private Topic findPluginTopic() {
-        return dms.getTopic("de/deepamehta/core/property/PluginID", new TopicValue(pluginId));
+        return dms.getTopic("uri", new TopicValue(pluginId));
     }
 
     /**
      * Determines the migrations to be run for this plugin and run them.
      */
-    private void runPluginMigrations(boolean isCleanInstall) {
+    /* ### private void runPluginMigrations(boolean isCleanInstall) {
         int migrationNr = pluginTopic.getProperty("de/deepamehta/core/property/PluginMigrationNr").intValue();
         int requiredMigrationNr = Integer.parseInt(getConfigProperty("requiredPluginMigrationNr", "0"));
         int migrationsToRun = requiredMigrationNr - migrationNr;
@@ -565,12 +562,12 @@ public class Plugin implements BundleActivator {
         for (int i = migrationNr + 1; i <= requiredMigrationNr; i++) {
             dms.runPluginMigration(this, i, isCleanInstall);
         }
-    }
+    } */
 
-    private void introduceTypesToPlugin() {
+    /* ### private void introduceTypesToPlugin() {
         for (String typeUri : dms.getTopicTypeUris()) {
             // trigger hook
             modifyTopicTypeHook(dms.getTopicType(typeUri, null), null);   // clientContext=null
         }
-    }
+    } */
 }

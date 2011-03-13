@@ -102,14 +102,14 @@ public class JSONHelper {
     public static void createTopicTypes(JSONArray topicTypes, CoreService dms) throws JSONException {
         for (int i = 0; i < topicTypes.length(); i++) {
             TopicType topicType = new TopicType(topicTypes.getJSONObject(i));
-            dms.createTopicType(topicType, null);    // clientContext=null
+            dms.createTopicType(topicType, null);   // clientContext=null
         }
     }
 
     public static void createTopics(JSONArray topics, CoreService dms) throws JSONException {
         for (int i = 0; i < topics.length(); i++) {
             Topic topic = new Topic(topics.getJSONObject(i));
-            dms.createTopic(topic.typeUri, topic.getProperties(), null);                        // clientContext=null
+            dms.createTopic(topic, null);           // clientContext=null
         }
     }
 }

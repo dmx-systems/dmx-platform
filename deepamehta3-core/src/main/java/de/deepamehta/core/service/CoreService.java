@@ -10,8 +10,7 @@ import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
-
-import de.deepamehta.hypergraph.Transaction;
+import de.deepamehta.core.storage.Transaction;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -53,7 +52,7 @@ public interface CoreService {
      * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
      * (for dynamically created data fields, typically in migration classes).
      */
-    // public Topic getTopic(String key, TopicValue value);
+    public Topic getTopic(String key, TopicValue value);
 
     // public Topic getTopic(String typeUri, String key, TopicValue value);
 
@@ -112,7 +111,7 @@ public interface CoreService {
      */
     // public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, ClientContext clientContext);
 
-    // public Topic createTopic(String typeUri, Properties properties, ClientContext clientContext);
+    public Topic createTopic(Topic topic, ClientContext clientContext);
 
     // public void setTopicProperties(long id, Properties properties);
 
@@ -153,7 +152,7 @@ public interface CoreService {
 
     // public TopicType getTopicType(String typeUri, ClientContext clientContext);
 
-    // public TopicType createTopicType(TopicType topicType, ClientContext clientContext);
+    public TopicType createTopicType(TopicType topicType, ClientContext clientContext);
 
     // public void addDataField(String typeUri, DataField dataField);
 

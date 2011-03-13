@@ -5,7 +5,6 @@ import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.PluginInfo;
-import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -15,10 +14,11 @@ import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.storage.Storage;
+import de.deepamehta.core.storage.Transaction;
 import de.deepamehta.core.util.JSONHelper;
 
 import de.deepamehta.hypergraph.HyperGraph;
-import de.deepamehta.hypergraph.Transaction;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -46,6 +46,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -68,7 +69,7 @@ public class EmbeddedService implements CoreService {
 
     private PluginCache pluginCache = new PluginCache();
 
-    private HyperGraph storage;
+    private Storage storage;
 
     private enum Hook {
 
@@ -89,8 +90,8 @@ public class EmbeddedService implements CoreService {
 
          PRE_CREATE_TOPIC("preCreateHook",  Topic.class, ClientContext.class),
         POST_CREATE_TOPIC("postCreateHook", Topic.class, ClientContext.class),
-         PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, Properties.class),
-        POST_UPDATE_TOPIC("postUpdateHook", Topic.class, Properties.class),
+        // ### PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, Properties.class),
+        // ### POST_UPDATE_TOPIC("postUpdateHook", Topic.class, Properties.class),
 
          PRE_DELETE_RELATION("preDeleteRelationHook",  Long.TYPE),
         POST_DELETE_RELATION("postDeleteRelationHook", Long.TYPE),
@@ -125,8 +126,8 @@ public class EmbeddedService implements CoreService {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public EmbeddedService(HyperGraph storage) {
-        this.storage = storage;
+    public EmbeddedService(HyperGraph hg) {
+        this.storage = new DeepaMehtaStorage(hg);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -157,7 +158,7 @@ public class EmbeddedService implements CoreService {
         } finally {
             tx.finish();
         }
-    }
+    } */
 
     @GET
     @Path("/topic/by_property/{key}/{value}")
@@ -170,13 +171,13 @@ public class EmbeddedService implements CoreService {
             return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Error while retrieving topic by property (\"" + key + "\"=" + value + ")", e);
+            throw new RuntimeException("Retrieving topic by value failed (\"" + key + "\"=" + value + ")", e);
         } finally {
             tx.finish();
         }
     }
 
-    @GET
+    /* @GET
     @Path("/topic/{typeUri}/{key}/{value}")
     @Override
     public Topic getTopic(@PathParam("typeUri") String typeUri,
@@ -303,20 +304,17 @@ public class EmbeddedService implements CoreService {
         } finally {
             tx.finish();
         }
-    }
+    } */
 
     @POST
-    @Path("/topic/{typeUri}")
+    @Path("/topic")
     @Override
-    public Topic createTopic(@PathParam("typeUri") String typeUri, Properties properties,
-                             @HeaderParam("Cookie") ClientContext clientContext) {
+    public Topic createTopic(Topic topic, @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
-            Topic t = new Topic(-1, typeUri, null, initProperties(properties, typeUri));
+            triggerHook(Hook.PRE_CREATE_TOPIC, topic, clientContext);
             //
-            triggerHook(Hook.PRE_CREATE_TOPIC, t, clientContext);
-            //
-            Topic topic = storage.createTopic(t.typeUri, t.getProperties());
+            topic = storage.createTopic(topic);
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
@@ -325,13 +323,13 @@ public class EmbeddedService implements CoreService {
             return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Topic of type \"" + typeUri + "\" can't be created", e);
+            throw new RuntimeException("Creating " + topic + " failed", e);
         } finally {
             tx.finish();
         }
     }
 
-    @PUT
+    /* @PUT
     @Path("/topic/{id}")
     @Override
     public void setTopicProperties(@PathParam("id") long id, Properties properties) {
@@ -521,7 +519,7 @@ public class EmbeddedService implements CoreService {
         } finally {
             tx.finish();
         }
-    }
+    } */
 
     @POST
     @Path("/topictype")
@@ -530,7 +528,7 @@ public class EmbeddedService implements CoreService {
     public TopicType createTopicType(TopicType topicType, @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
-            TopicType topicType = storage.createTopicType(properties, dataFields);
+            topicType = storage.createTopicType(topicType);
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
             triggerHook(Hook.MODIFY_TOPIC_TYPE, topicType, clientContext);
@@ -540,14 +538,13 @@ public class EmbeddedService implements CoreService {
             return topicType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Topic type \"" +
-                properties.get("de/deepamehta/core/property/TypeURI") + "\" can't be created", e);
+            throw new RuntimeException("Creation of " + topicType + " failed", e);
         } finally {
             tx.finish();
         }
     }
 
-    @POST
+    /* @POST
     @Path("/topictype/{typeUri}")
     @Override
     public void addDataField(@PathParam("typeUri") String typeUri, DataField dataField) {
@@ -677,7 +674,7 @@ public class EmbeddedService implements CoreService {
     @Override
     public void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall) {
         runMigration(migrationNr, plugin, isCleanInstall);
-        setPluginMigrationNr(plugin, migrationNr);
+        // ### setPluginMigrationNr(plugin, migrationNr);
     }
 
     // === Misc ===
@@ -716,25 +713,6 @@ public class EmbeddedService implements CoreService {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-
-
-    // === Topics ===
-
-    // FIXME: method to be dropped. Missing properties are regarded as normal state.
-    // Otherwise all instances would be required to be updated once a data field has been added to the type definition.
-    // Application logic (server-side) and also the client should cope with missing properties.
-    private Properties initProperties(Properties properties, String typeUri) {
-        if (properties == null) {
-            properties = new Properties();
-        }
-        for (DataField dataField : getTopicType(typeUri, null).getDataFields()) {   // clientContext=null
-            if (!dataField.getDataType().equals("reference") && properties.get(dataField.getUri()) == null) {
-                properties.put(dataField.getUri(), "");
-            }
-        }
-        return properties;
-    }
-
     // === Plugins ===
 
     /**
@@ -770,11 +748,11 @@ public class EmbeddedService implements CoreService {
 
     // ---
 
-    private void setPluginMigrationNr(Plugin plugin, int migrationNr) {
+    /* ### private void setPluginMigrationNr(Plugin plugin, int migrationNr) {
         Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/PluginMigrationNr", migrationNr);
         setTopicProperties(plugin.getPluginTopic().id, properties);
-    }
+    } */
 
     // === DB ===
 
@@ -920,7 +898,7 @@ public class EmbeddedService implements CoreService {
 
         private void readMigrationConfigFile(InputStream in, String configFile) {
             try {
-                java.util.Properties migrationConfig = new java.util.Properties();
+                Properties migrationConfig = new Properties();
                 if (in != null) {
                     logger.info("Reading migration config file \"" + configFile + "\"");
                     migrationConfig.load(in);

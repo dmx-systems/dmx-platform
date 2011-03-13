@@ -27,7 +27,7 @@ public class Relation {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    public long id;
+    /* public long id;
     public String typeId;
     public long srcTopicId;
     public long dstTopicId;
@@ -84,7 +84,7 @@ public class Relation {
 
     public void setProperty(String key, PropValue value) {
         properties.put(key, value);
-    }
+    } */
 
     // ---
 
@@ -92,7 +92,7 @@ public class Relation {
      * Sets various properties at once.
      * Same as consecutive {@link setProperty} calls.
      */
-    public void setProperties(Properties properties) {
+    /* public void setProperties(Properties properties) {
         this.properties.putAll(properties);
     }
 
@@ -126,5 +126,5 @@ public class Relation {
     public String toString() {
         return "relation " + id + ", connecting topics " + srcTopicId + " and " + dstTopicId +
             " (typeId=" + typeId + ")";
-    }
+    } */
 }

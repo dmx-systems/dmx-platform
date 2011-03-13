@@ -51,12 +51,12 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-kernel</artifactId>
-            <version>1.1</version>
+            <version>1.2-1.2</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-index</artifactId>
-            <version>1.1</version>
+            <artifactId>neo4j-lucene-index</artifactId>
+            <version>0.2-1.2</version>
         </dependency>
 
         <dependency>

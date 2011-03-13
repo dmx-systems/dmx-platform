@@ -34,23 +34,30 @@ public class Topic {
     protected TopicValue value;
 
     protected String typeUri;
-    protected String label;
+    protected Composite composite;
 
     private   Map<String, Object> enrichment;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public Topic(long id, String uri, TopicValue value, String typeUri, String label) {
+    Topic() {
+    }
+
+    public Topic(String uri, TopicValue value, String typeUri, Composite composite) {
+        this(-1, uri, value, typeUri, composite);
+    }
+
+    public Topic(long id, String uri, TopicValue value, String typeUri, Composite composite) {
         this.id = id;
         this.uri = uri;
         this.value = value;
         this.typeUri = typeUri;
-        this.label = label;
+        this.composite = composite;
         this.enrichment = new HashMap();
     }
 
     public Topic(Topic topic) {
-        this(topic.id, topic.uri, topic.value, topic.typeUri, topic.label);
+        this(topic.id, topic.uri, topic.value, topic.typeUri, topic.composite);
     }
 
     public Topic(JSONObject topic) {
@@ -64,6 +71,24 @@ public class Topic {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    public long getId() {
+        return id;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public Object getValue() {
+        return value.value();
+    }
+
+    public String getTypeUri() {
+        return typeUri;
+    }
+
+    // ---
 
     public void setValue(String value) {
         setValue(new TopicValue(value));
@@ -81,7 +106,7 @@ public class Topic {
         setValue(new TopicValue(value));
     }
 
-    public void setValue(PropValue value) {
+    public void setValue(TopicValue value) {
         this.value = value;
     }
 
@@ -100,7 +125,7 @@ public class Topic {
             o.put("uri", uri);
             o.put("value", value.value());
             o.put("topic_type", typeUri);
-            o.put("label", label);
+            o.put("composite", composite);
             serializeEnrichment(o);
             return o;
         } catch (JSONException e) {
@@ -120,7 +145,7 @@ public class Topic {
 
     @Override
     public String toString() {
-        return "topic " + id + " \"" + label + "\" (typeUri=" + typeUri + ")";
+        return "topic " + id + " \"" + value + "\" (uri=\"" + uri + "\", typeUri=\"" + typeUri + "\")";
     }
 
     // ----------------------------------------------------------------------------------------------- Protected Methods
