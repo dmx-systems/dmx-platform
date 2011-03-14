@@ -62,6 +62,7 @@ public class Topic {
 
     public Topic(JSONObject topic) {
         try {
+            this.id = -1;
             this.uri = topic.getString("uri");
             this.value = new TopicValue(topic.get("value"));
             this.typeUri = topic.getString("topic_type");

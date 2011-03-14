@@ -1,5 +1,6 @@
 package de.deepamehta.core.util;
 
+import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
@@ -8,7 +9,6 @@ import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.service.CoreService;
 
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -44,7 +44,7 @@ public class JSONHelper {
                 map.put(key, o.get(key));   // throws JSONException
             }
             return map;
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Converting JSONObject to Map failed", e);
         }
     }
@@ -58,7 +58,7 @@ public class JSONHelper {
                 list.add(o.get(i));         // throws JSONException
             }
             return list;
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Converting JSONArray to List failed", e);
         }
     }
@@ -86,6 +86,10 @@ public class JSONHelper {
             String fileContent = JavaUtils.readText(is);
             //
             JSONObject o = new JSONObject(fileContent);
+            JSONArray metaTypes = o.optJSONArray("meta_types");
+            if (metaTypes != null) {
+                createMetaTypes(metaTypes, dms);
+            }
             JSONArray topicTypes = o.optJSONArray("topic_types");
             if (topicTypes != null) {
                 createTopicTypes(topicTypes, dms);
@@ -99,14 +103,21 @@ public class JSONHelper {
         }
     }
 
-    public static void createTopicTypes(JSONArray topicTypes, CoreService dms) throws JSONException {
+    public static void createMetaTypes(JSONArray metaTypes, CoreService dms) throws Exception {
+        for (int i = 0; i < metaTypes.length(); i++) {
+            MetaType metaType = new MetaType(metaTypes.getJSONObject(i));
+            dms.createMetaType(metaType);
+        }
+    }
+
+    public static void createTopicTypes(JSONArray topicTypes, CoreService dms) throws Exception {
         for (int i = 0; i < topicTypes.length(); i++) {
             TopicType topicType = new TopicType(topicTypes.getJSONObject(i));
             dms.createTopicType(topicType, null);   // clientContext=null
         }
     }
 
-    public static void createTopics(JSONArray topics, CoreService dms) throws JSONException {
+    public static void createTopics(JSONArray topics, CoreService dms) throws Exception {
         for (int i = 0; i < topics.length(); i++) {
             Topic topic = new Topic(topics.getJSONObject(i));
             dms.createTopic(topic, null);           // clientContext=null

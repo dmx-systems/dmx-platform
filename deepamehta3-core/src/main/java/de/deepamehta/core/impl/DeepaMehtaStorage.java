@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicValue;
@@ -60,8 +61,19 @@ class DeepaMehtaStorage implements Storage {
     // --- Types ---
 
     @Override
+    public MetaType createMetaType(MetaType metaType) {
+        // create node
+        HyperNode node = hg.createHyperNode();
+        node.setAttribute("uri", metaType.getUri(), IndexMode.KEY);
+        node.setAttribute("value", metaType.getValue());
+        //
+        return buildMetaType(node);
+    }
+
+    @Override
     public TopicType createTopicType(TopicType topicType) {
-        return null;
+        Topic topic = createTopic(topicType);
+        return new TopicType(topic, topicType.getDataTypeUri());
     }
 
     // --- DB ---
@@ -118,5 +130,12 @@ class DeepaMehtaStorage implements Storage {
         }
         return new Topic(node.getId(), node.getString("uri"), new TopicValue(node.get("value")),
             getTopicType(node).getString("uri"), null);     // composite=null
+    }
+
+    private MetaType buildMetaType(HyperNode node) {
+        if (node == null) {
+            throw new NullPointerException("Tried to build a MetaType from a null HyperNode");
+        }
+        return new MetaType(node.getId(), node.getString("uri"), new TopicValue(node.get("value")));
     }
 }

@@ -4,6 +4,7 @@ import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
@@ -521,6 +522,21 @@ public class EmbeddedService implements CoreService {
         }
     } */
 
+    @Override
+    public MetaType createMetaType(MetaType metaType) {
+        Transaction tx = storage.beginTx();
+        try {
+            metaType = storage.createMetaType(metaType);
+            tx.success();
+            return metaType;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Creation of " + metaType + " failed", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
     @POST
     @Path("/topictype")
     @Consumes("application/x-www-form-urlencoded")
@@ -773,8 +789,8 @@ public class EmbeddedService implements CoreService {
         int migrationNr = storage.getMigrationNr();
         int requiredMigrationNr = REQUIRED_CORE_MIGRATION;
         int migrationsToRun = requiredMigrationNr - migrationNr;
-        logger.info("migrationNr=" + migrationNr + ", requiredMigrationNr=" + requiredMigrationNr +
-            " -- running " + migrationsToRun + " core migrations");
+        logger.info("Running " + migrationsToRun + " core migrations (migrationNr=" + migrationNr +
+            ", requiredMigrationNr=" + requiredMigrationNr + ")");
         for (int i = migrationNr + 1; i <= requiredMigrationNr; i++) {
             runCoreMigration(i, isCleanInstall);
         }
@@ -831,7 +847,7 @@ public class EmbeddedService implements CoreService {
             }
             logger.info("Updating migration number (" + migrationNr + ")");
         } catch (Exception e) {
-            throw new RuntimeException("Error while running " + mi.migrationInfo, e);
+            throw new RuntimeException("Running " + mi.migrationInfo + " failed", e);
         }
     }
 
@@ -903,8 +919,8 @@ public class EmbeddedService implements CoreService {
                     logger.info("Reading migration config file \"" + configFile + "\"");
                     migrationConfig.load(in);
                 } else {
-                    logger.info("No migration config file found (tried \"" + configFile + "\")" +
-                        " -- using default configuration");
+                    logger.info("Using default migration configuration (no migration config file found, " +
+                        "tried \"" + configFile + "\")");
                 }
                 //
                 runMode = migrationConfig.getProperty("migrationRunMode", MigrationRunMode.ALWAYS.name());

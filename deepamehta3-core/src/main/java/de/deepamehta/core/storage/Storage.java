@@ -1,5 +1,6 @@
 package de.deepamehta.core.storage;
 
+import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
@@ -109,6 +110,8 @@ public interface Storage {
     // Set<String> getTopicTypeUris();
 
     // TopicType getTopicType(String typeUri);
+
+    MetaType createMetaType(MetaType metaType);
 
     TopicType createTopicType(TopicType topicType);
 

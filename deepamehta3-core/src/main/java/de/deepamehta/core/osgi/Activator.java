@@ -9,7 +9,6 @@ import de.deepamehta.hypergraph.neo4j.Neo4jHyperGraph;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.index.Index;
-import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 import org.osgi.framework.BundleActivator;
@@ -116,20 +115,12 @@ public class Activator implements BundleActivator, FrameworkListener {
         GraphDatabaseService neo4j = null;
         try {
             neo4j = new EmbeddedGraphDatabase(DATABASE_PATH);
-            // access/create indexes
-            Index<Node> exactIndex = neo4j.index().forNodes("exact");
-            Index<Node> fulltextIndex;
-            if (neo4j.index().existsForNodes("fulltext")) {
-                fulltextIndex = neo4j.index().forNodes("fulltext");
-            } else {
-                Map<String, String> configuration = MapUtil.stringMap("provider", "lucene", "type", "fulltext");
-                fulltextIndex = neo4j.index().forNodes("fulltext", configuration);
-            }
-            //
-            return new Neo4jHyperGraph(neo4j, exactIndex, fulltextIndex);
+            return new Neo4jHyperGraph(neo4j);
         } catch (Exception e) {
             logger.info("Shutdown DB");
-            neo4j.shutdown();
+            if (neo4j != null) {
+                neo4j.shutdown();
+            }
             throw new RuntimeException("Opening database failed (path=" + DATABASE_PATH + ")", e);
         }
     }

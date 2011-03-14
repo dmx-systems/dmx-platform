@@ -20,28 +20,23 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class TopicType extends Topic {
+public class MetaType extends Topic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    protected String dataTypeUri;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TopicType(Topic topic, String dataTypeUri) {
-        super(topic);
-        this.dataTypeUri = dataTypeUri;
+    public MetaType(long id, String uri, TopicValue value) {
+        super(id, uri, value, null, null);  // typeUri=null, composite=null
     }
 
-    public TopicType(JSONObject type) {
+    public MetaType(JSONObject type) {
         try {
             this.id = -1;
             this.uri = type.getString("uri");
             this.value = new TopicValue(type.get("value"));
-            this.typeUri = "dm3.core.topic_type";
-            this.dataTypeUri = type.getString("data_type");
         } catch (Exception e) {
             throw new RuntimeException("Parsing " + this + " failed", e);
         }
@@ -49,25 +44,21 @@ public class TopicType extends Topic {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public String getDataTypeUri() {
-        return dataTypeUri;
-    }
-
-    // ---
-
     @Override
     public JSONObject toJSON() {
         try {
-            JSONObject o = super.toJSON();
-            o.put("data_type", dataTypeUri);
+            JSONObject o = new JSONObject();
+            o.put("id", id);
+            o.put("uri", uri);
+            o.put("value", value.value());
             return o;
-        } catch (Exception e) {
+        } catch (JSONException e) {
             throw new RuntimeException("Serializing " + this + " failed", e);
         }
     }
 
     @Override
     public String toString() {
-        return "topic type " + id + " \"" + value + "\" (uri=\"" + uri + "\", typeUri=\"" + typeUri + "\")";
+        return "meta type " + id + " \"" + value + "\" (uri=\"" + uri + "\")";
     }
 }

@@ -4,6 +4,7 @@ import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.DataField;
+import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
@@ -151,6 +152,8 @@ public interface CoreService {
     // public Set<String> getTopicTypeUris();
 
     // public TopicType getTopicType(String typeUri, ClientContext clientContext);
+
+    public MetaType createMetaType(MetaType metaType);
 
     public TopicType createTopicType(TopicType topicType, ClientContext clientContext);
 

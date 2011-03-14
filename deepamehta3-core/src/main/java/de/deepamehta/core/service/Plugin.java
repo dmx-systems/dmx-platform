@@ -557,8 +557,8 @@ public class Plugin implements BundleActivator {
         int migrationNr = pluginTopic.getProperty("de/deepamehta/core/property/PluginMigrationNr").intValue();
         int requiredMigrationNr = Integer.parseInt(getConfigProperty("requiredPluginMigrationNr", "0"));
         int migrationsToRun = requiredMigrationNr - migrationNr;
-        logger.info("migrationNr=" + migrationNr + ", requiredMigrationNr=" + requiredMigrationNr +
-            " -- running " + migrationsToRun + " plugin migrations");
+        logger.info("Running " + migrationsToRun + " plugin migrations (migrationNr=" + migrationNr +
+            ", requiredMigrationNr=" + requiredMigrationNr + ")");
         for (int i = migrationNr + 1; i <= requiredMigrationNr; i++) {
             dms.runPluginMigration(this, i, isCleanInstall);
         }
