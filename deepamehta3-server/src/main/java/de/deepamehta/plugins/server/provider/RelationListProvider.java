@@ -67,7 +67,7 @@ public class RelationListProvider implements MessageBodyWriter<List<Relation>> {
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            Relation.relationsToJson(relations).write(writer);
+            // FIXME: Relation.relationsToJson(relations).write(writer);
             writer.flush();
         } catch (Exception e) {
             throw new IOException("Writing " + relations + " to response stream failed", e);

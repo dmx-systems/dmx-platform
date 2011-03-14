@@ -1,5 +1,7 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.model.Association;
+import de.deepamehta.core.model.AssociationType;
 import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
@@ -35,7 +37,7 @@ class DeepaMehtaStorage implements Storage {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    // --- Topics ---
+    // === Topics ===
 
     @Override
     public Topic getTopic(String key, TopicValue value) {
@@ -51,14 +53,20 @@ class DeepaMehtaStorage implements Storage {
         node.setAttribute("value", topic.getValue());
         // associate with type
         HyperNode topicType = lookupTopicType(topic.getTypeUri());
-        HyperEdge edge = hg.createHyperEdge("dm3.core.instantiation");
+        HyperEdge edge = hg.createHyperEdge();  // FIXME: use association type ("dm3.core.instantiation")
         edge.addHyperNode(topicType, "dm3.core.type");
         edge.addHyperNode(node, "dm3.core.instance");
         //
         return buildTopic(node);
     }
 
-    // --- Types ---
+    // === Associations ===
+
+    @Override
+    public Association createAssociation(Association assoc) {
+    }
+
+    // === Types ===
 
     @Override
     public MetaType createMetaType(MetaType metaType) {
@@ -76,7 +84,13 @@ class DeepaMehtaStorage implements Storage {
         return new TopicType(topic, topicType.getDataTypeUri());
     }
 
-    // --- DB ---
+    @Override
+    public AssociationType createAssociationType(AssociationType assocType) {
+        Topic topic = createTopic(assocType);
+        return new AssociationType(topic);
+    }
+
+    // === DB ===
 
     @Override
     public Transaction beginTx() {
@@ -113,7 +127,8 @@ class DeepaMehtaStorage implements Storage {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private HyperNode getTopicType(HyperNode node) {
-        return node.traverse("dm3.core.instance", "dm3.core.instantiation", "dm3.core.type");
+        // FIXME: should we additionally check weather the edge type is "dm3.core.instantiation"?
+        return node.traverse("dm3.core.instance", "dm3.core.type");
     }
 
     private HyperNode lookupTopicType(String typeUri) {

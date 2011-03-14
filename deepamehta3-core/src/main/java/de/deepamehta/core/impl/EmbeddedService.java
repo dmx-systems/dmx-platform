@@ -1,5 +1,7 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.model.Association;
+import de.deepamehta.core.model.AssociationType;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
@@ -64,7 +66,7 @@ public class EmbeddedService implements CoreService {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String CORE_MIGRATIONS_PACKAGE = "de.deepamehta.core.migrations";
-    private static final int REQUIRED_CORE_MIGRATION = 1;
+    private static final int REQUIRED_CORE_MIGRATION = 2;
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -376,7 +378,7 @@ public class EmbeddedService implements CoreService {
         }
     } */
 
-    // === Relations ===
+    // === Associations ===
 
     /* @Override
     public Relation getRelation(long id) {
@@ -429,28 +431,26 @@ public class EmbeddedService implements CoreService {
         } finally {
             tx.finish();
         }
-    }
+    } */
 
     @POST
     @Path("/relation/{src}/{dst}/{typeId}")
     @Override
-    public Relation createRelation(@PathParam("typeId") String typeId, @PathParam("src") long srcTopicId,
-                                   @PathParam("dst") long dstTopicId, Properties properties) {
+    public Association createAssociation(Association assoc, @HeaderParam("Cookie") ClientContext clientContext) {
         Transaction tx = storage.beginTx();
         try {
-            Relation rel = new Relation(-1, typeId, srcTopicId, dstTopicId, properties);
-            Relation relation = storage.createRelation(rel.typeId, rel.srcTopicId, rel.dstTopicId, rel.getProperties());
+            assoc = storage.createAssociation(assoc);
             tx.success();
-            return relation;
+            return assoc;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Relation of type \"" + typeId + "\" can't be created", e);
+            throw new RuntimeException("Creating " + assoc + " failed", e);
         } finally {
             tx.finish();
         }
     }
 
-    @PUT
+    /* @PUT
     @Path("/relation/{id}")
     @Override
     public void setRelationProperties(@PathParam("id") long id, Properties properties) {
@@ -555,6 +555,21 @@ public class EmbeddedService implements CoreService {
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Creation of " + topicType + " failed", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Override
+    public AssociationType createAssociationType(AssociationType assocType, ClientContext clientContext) {
+        Transaction tx = storage.beginTx();
+        try {
+            assocType = storage.createAssociationType(assocType);
+            tx.success();
+            return assocType;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Creation of " + assocType + " failed", e);
         } finally {
             tx.finish();
         }

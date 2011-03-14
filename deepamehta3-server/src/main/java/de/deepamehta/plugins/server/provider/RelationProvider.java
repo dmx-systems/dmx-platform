@@ -53,7 +53,7 @@ public class RelationProvider implements MessageBodyWriter<Relation> {
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            relation.toJSON().write(writer);
+            // FIXME: relation.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
             throw new IOException("Writing " + relation + " to response stream failed", e);

@@ -1,5 +1,7 @@
 package de.deepamehta.core.service;
 
+import de.deepamehta.core.model.Association;
+import de.deepamehta.core.model.AssociationType;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
@@ -100,8 +102,8 @@ public interface CoreService {
      *          (a Relation object).
      */
     // public List<RelatedTopic> getRelatedTopics(long topicId, List<String> includeTopicTypes,
-    //                                                         List<String> includeRelTypes,
-    //                                                         List<String> excludeRelTypes);
+    //                                                          List<String> includeRelTypes,
+    //                                                          List<String> excludeRelTypes);
 
     /**
      * Performs a fulltext search.
@@ -110,7 +112,8 @@ public interface CoreService {
      * @param   wholeWord   If true the searchTerm is regarded as whole word.
      *                      If false the searchTerm is regarded as begin-of-word substring.
      */
-    // public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, ClientContext clientContext);
+    // public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord,
+    //                                                                     ClientContext clientContext);
 
     public Topic createTopic(Topic topic, ClientContext clientContext);
 
@@ -118,7 +121,7 @@ public interface CoreService {
 
     // public void deleteTopic(long id);
 
-    // === Relations ===
+    // === Associations ===
 
     // public Relation getRelation(long id);
 
@@ -141,7 +144,7 @@ public interface CoreService {
      */
     // public List<Relation> getRelations(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
 
-    // public Relation createRelation(String typeId, long srcTopicId, long dstTopicId, Properties properties);
+    public Association createAssociation(Association assoc, ClientContext clientContext);
 
     // public void setRelationProperties(long id, Properties properties);
 
@@ -156,6 +159,8 @@ public interface CoreService {
     public MetaType createMetaType(MetaType metaType);
 
     public TopicType createTopicType(TopicType topicType, ClientContext clientContext);
+
+    public AssociationType createAssociationType(AssociationType assocType, ClientContext clientContext);
 
     // public void addDataField(String typeUri, DataField dataField);
 

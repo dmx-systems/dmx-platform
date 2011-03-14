@@ -1,5 +1,7 @@
 package de.deepamehta.core.storage;
 
+import de.deepamehta.core.model.Association;
+import de.deepamehta.core.model.AssociationType;
 import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
@@ -18,7 +20,7 @@ import java.util.Set;
  */
 public interface Storage {
 
-    // --- Topics ---
+    // === Topics ===
 
     // Topic getTopic(long id);
 
@@ -74,7 +76,7 @@ public interface Storage {
      */
     // void deleteTopic(long id);
 
-    // --- Relations ---
+    // === Associations ===
 
     // Relation getRelation(long id);
 
@@ -99,13 +101,13 @@ public interface Storage {
      */
     // List<Relation> getRelations(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
 
-    // Relation createRelation(String typeId, long srcTopicId, long dstTopicId, Properties properties);
+    Association createAssociation(Association assoc);
 
     // void setRelationProperties(long id, Properties properties);
 
     // void deleteRelation(long id);
 
-    // --- Types ---
+    // === Types ===
 
     // Set<String> getTopicTypeUris();
 
@@ -115,6 +117,8 @@ public interface Storage {
 
     TopicType createTopicType(TopicType topicType);
 
+    AssociationType createAssociationType(AssociationType assocType);
+
     // void addDataField(String typeUri, DataField dataField);
 
     // void updateDataField(String typeUri, DataField dataField);
@@ -123,7 +127,7 @@ public interface Storage {
 
     // void setDataFieldOrder(String typeUri, List fieldUris);
 
-    // --- DB ---
+    // === DB ===
 
     Transaction beginTx();
 
