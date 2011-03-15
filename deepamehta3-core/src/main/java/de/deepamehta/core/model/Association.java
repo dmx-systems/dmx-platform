@@ -6,7 +6,9 @@ import org.codehaus.jettison.json.JSONException;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 
@@ -27,31 +29,41 @@ public class Association {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    /* public long id;
-    public String typeId;
-    public long srcTopicId;
-    public long dstTopicId;
+    private long id;
+    private String typeUri;
 
-    protected Properties properties;
+    private Set<Role> roles;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public Association(long id, String typeId, long srcTopicId, long dstTopicId, Properties properties) {
+    public Association(long id, String typeUri, Set<Role> roles) {
         this.id = id;
-        this.typeId = typeId;
-        this.srcTopicId = srcTopicId;
-        this.dstTopicId = dstTopicId;
-        this.properties = properties != null ? properties : new Properties();
+        this.typeUri = typeUri;
+        this.roles = roles;
     }
 
-    public Association(Relation relation) {
-        this(relation.id, relation.typeId, relation.srcTopicId, relation.dstTopicId, relation.properties);
-    } */
-
     public Association(JSONObject assoc) {
+        try {
+            this.id = -1;
+            this.typeUri = assoc.getString("assoc_type");
+            JSONArray topics = assoc.getJSONArray("topics");
+            for (int i = 0; i < topics.length(); i++) {
+                roles.add(new Role(topics.getJSONObject(i)));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing " + this + " failed", e);
+        }
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    public String getTypeUri() {
+        return typeUri;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
 
     /* public PropValue getProperty(String key) {
         PropValue value = properties.get(key);
@@ -61,42 +73,6 @@ public class Association {
                 "Use the providePropertiesHook() to initialize the properties you need.");
         }
         return value;
-    }
-
-    public Properties getProperties() {
-        return properties;
-    }
-
-    // ---
-
-    public void setProperty(String key, String value) {
-        properties.put(key, value);
-    }
-
-    public void setProperty(String key, int value) {
-        properties.put(key, value);
-    }
-
-    public void setProperty(String key, long value) {
-        properties.put(key, value);
-    }
-
-    public void setProperty(String key, boolean value) {
-        properties.put(key, value);
-    }
-
-    public void setProperty(String key, PropValue value) {
-        properties.put(key, value);
-    } */
-
-    // ---
-
-    /**
-     * Sets various properties at once.
-     * Same as consecutive {@link setProperty} calls.
-     */
-    /* public void setProperties(Properties properties) {
-        this.properties.putAll(properties);
     }
 
     // ---
@@ -121,13 +97,12 @@ public class Association {
             array.put(relation.toJSON());
         }
         return array;
-    }
+    } */
 
     // ---
 
     @Override
     public String toString() {
-        return "relation " + id + ", connecting topics " + srcTopicId + " and " + dstTopicId +
-            " (typeId=" + typeId + ")";
-    } */
+        return "association " + id + " (typeUri=\"" + typeUri + "\", roles=" + roles + ")";
+    }
 }

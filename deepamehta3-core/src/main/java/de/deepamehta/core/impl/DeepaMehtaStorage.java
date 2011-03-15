@@ -3,6 +3,7 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationType;
 import de.deepamehta.core.model.MetaType;
+import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicValue;
@@ -19,7 +20,7 @@ import java.util.logging.Logger;
 
 
 /**
- * Implementation of the DeepaMehta storage interface.
+ * A bridge between the DeepaMehta storage abstraction and the HyperGraph abstraction.
  */
 class DeepaMehtaStorage implements Storage {
 
@@ -64,6 +65,11 @@ class DeepaMehtaStorage implements Storage {
 
     @Override
     public Association createAssociation(Association assoc) {
+        HyperEdge edge = hg.createHyperEdge();  // FIXME: use association type
+        for (Role role : assoc.getRoles()) {
+            edge.addHyperNode(lookupTopic(role.getTopicUri()), role.getRoleTypeUri());
+        }
+        return new Association(edge.getId(), assoc.getTypeUri(), assoc.getRoles());
     }
 
     // === Types ===
@@ -75,7 +81,7 @@ class DeepaMehtaStorage implements Storage {
         node.setAttribute("uri", metaType.getUri(), IndexMode.KEY);
         node.setAttribute("value", metaType.getValue());
         //
-        return buildMetaType(node);
+        return new MetaType(node.getId(), metaType.getUri(), new TopicValue(metaType.getValue()));
     }
 
     @Override
@@ -124,22 +130,27 @@ class DeepaMehtaStorage implements Storage {
         hg.getHyperNode(0).setAttribute("core_migration_nr", migrationNr);
     }
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
+    // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    private HyperNode getTopicType(HyperNode node) {
-        // FIXME: should we additionally check weather the edge type is "dm3.core.instantiation"?
-        return node.traverse("dm3.core.instance", "dm3.core.type");
+    HyperNode lookupTopic(String uri) {
+        HyperNode topic = hg.getHyperNode("uri", uri);
+        if (topic == null) {
+            throw new RuntimeException("Topic \"" + uri + "\" not found");
+        }
+        return topic;
     }
 
-    private HyperNode lookupTopicType(String typeUri) {
+    HyperNode lookupTopicType(String typeUri) {
         HyperNode topicType = hg.getHyperNode("uri", typeUri);
         if (topicType == null) {
-            throw new RuntimeException("Topic type \"" + typeUri + "\" is unknown");
+            throw new RuntimeException("Topic type \"" + typeUri + "\" not found");
         }
         return topicType;
     }
 
-    private Topic buildTopic(HyperNode node) {
+    // ---
+
+    Topic buildTopic(HyperNode node) {
         if (node == null) {
             throw new NullPointerException("Tried to build a Topic from a null HyperNode");
         }
@@ -147,10 +158,10 @@ class DeepaMehtaStorage implements Storage {
             getTopicType(node).getString("uri"), null);     // composite=null
     }
 
-    private MetaType buildMetaType(HyperNode node) {
-        if (node == null) {
-            throw new NullPointerException("Tried to build a MetaType from a null HyperNode");
-        }
-        return new MetaType(node.getId(), node.getString("uri"), new TopicValue(node.get("value")));
+    // ---
+
+    HyperNode getTopicType(HyperNode node) {
+        // FIXME: should we additionally check weather the edge type is "dm3.core.instantiation"?
+        return node.traverseSingle("dm3.core.instance", "dm3.core.type");
     }
 }

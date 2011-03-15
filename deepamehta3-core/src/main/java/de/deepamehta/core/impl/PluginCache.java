@@ -27,7 +27,7 @@ class PluginCache {
     Plugin get(String pluginId) {
         Plugin plugin = plugins.get(pluginId);
         if (plugin == null) {
-            throw new RuntimeException("Plugin \"" + pluginId + "\" is unknown.");
+            throw new RuntimeException("Plugin \"" + pluginId + "\" not found");
         }
         return plugin;
     }
