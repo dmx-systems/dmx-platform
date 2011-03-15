@@ -75,6 +75,11 @@ class DeepaMehtaStorage implements Storage {
     // === Types ===
 
     @Override
+    public TopicType getTopicType(String typeUri) {
+        return buildTopicType(lookupTopicType(typeUri));
+    }
+
+    @Override
     public MetaType createMetaType(MetaType metaType) {
         // create node
         HyperNode node = hg.createHyperNode();
@@ -156,6 +161,10 @@ class DeepaMehtaStorage implements Storage {
         }
         return new Topic(node.getId(), node.getString("uri"), new TopicValue(node.get("value")),
             getTopicType(node).getString("uri"), null);     // composite=null
+    }
+
+    TopicType buildTopicType(HyperNode node) {
+        return new TopicType(buildTopic(node), null);       // FIXME: dataTypeUri=null
     }
 
     // ---

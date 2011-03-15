@@ -35,6 +35,11 @@ public class TopicType extends Topic {
         this.dataTypeUri = dataTypeUri;
     }
 
+    public TopicType(TopicType type) {
+        super(type);
+        this.dataTypeUri = type.getDataTypeUri();
+    }
+
     public TopicType(JSONObject type) {
         try {
             this.id = -1;

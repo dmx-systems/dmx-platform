@@ -70,16 +70,6 @@
             topic_type: "dm3.core.role_type"
         },
         {
-            uri: "dm3.core.whole_cardinality",
-            value: "Whole Cardinality",
-            topic_type: "dm3.core.role_type"
-        },
-        {
-            uri: "dm3.core.part_cardinality",
-            value: "Part Cardinality",
-            topic_type: "dm3.core.role_type"
-        },
-        {
             uri: "dm3.core.whole_role_type",
             value: "Whole Role Type",
             topic_type: "dm3.core.role_type"
@@ -87,6 +77,16 @@
         {
             uri: "dm3.core.part_role_type",
             value: "Part Role Type",
+            topic_type: "dm3.core.role_type"
+        },
+        {
+            uri: "dm3.core.whole_cardinality",
+            value: "Whole Cardinality",
+            topic_type: "dm3.core.role_type"
+        },
+        {
+            uri: "dm3.core.part_cardinality",
+            value: "Part Cardinality",
             topic_type: "dm3.core.role_type"
         },
 

@@ -111,7 +111,7 @@ public interface Storage {
 
     // Set<String> getTopicTypeUris();
 
-    // TopicType getTopicType(String typeUri);
+    TopicType getTopicType(String typeUri);
 
     MetaType createMetaType(MetaType metaType);
 
