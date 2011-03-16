@@ -6,6 +6,7 @@ import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.model.TopicTypeDefinition;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
 import de.deepamehta.core.storage.DeepaMehtaTransaction;
@@ -27,6 +28,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private HyperGraph hg;
+    private HGTypeCache typeCache;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -34,6 +36,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     public HGStorageBridge(HyperGraph hg) {
         this.hg = hg;
+        this.typeCache = new HGTypeCache(this);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -77,6 +80,11 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     @Override
     public TopicType getTopicType(String typeUri) {
         return buildTopicType(lookupTopicType(typeUri));
+    }
+
+    @Override
+    public TopicTypeDefinition getTopicTypeDefinition(String typeUri) {
+        return typeCache.get(typeUri);
     }
 
     @Override

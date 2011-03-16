@@ -66,6 +66,8 @@ public class AssociationDefinition {
 
     @Override
     public String toString() {
-        return "association type definition";
+        return "\n    association type definition (assocTypeUri=\"" + assocTypeUri + "\")\n" +
+            "        whole: (type=\"" + wholeTopicTypeUri + "\", role=\"" + wholeRoleTypeUri + "\", cardinality=\"" + wholeCardinalityUri + "\")\n" +
+            "        part: (type=\"" + partTopicTypeUri + "\", role=\"" + partRoleTypeUri + "\", cardinality=\"" + partCardinalityUri + "\")";
     }
 }

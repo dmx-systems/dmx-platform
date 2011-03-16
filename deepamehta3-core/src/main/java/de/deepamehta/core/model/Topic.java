@@ -32,10 +32,9 @@ public class Topic {
     protected long id;
     protected String uri;
     protected TopicValue value;
-
     protected String typeUri;
-    protected Composite composite;
 
+    protected Composite composite;
     private   Map<String, Object> enrichment;
 
     // ---------------------------------------------------------------------------------------------------- Constructors

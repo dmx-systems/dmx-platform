@@ -7,6 +7,7 @@ import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.model.TopicTypeDefinition;
 import de.deepamehta.core.model.TopicValue;
 
 import java.util.Map;
@@ -112,6 +113,8 @@ public interface DeepaMehtaStorage {
     // Set<String> getTopicTypeUris();
 
     TopicType getTopicType(String typeUri);
+
+    TopicTypeDefinition getTopicTypeDefinition(String typeUri);
 
     MetaType createMetaType(MetaType metaType);
 

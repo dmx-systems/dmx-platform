@@ -113,6 +113,7 @@ public class Activator implements BundleActivator, FrameworkListener {
     private HyperGraph openDB() {
         GraphDatabaseService neo4j = null;
         try {
+            logger.info("Creating DB and indexing services");
             neo4j = new EmbeddedGraphDatabase(DATABASE_PATH);
             return new Neo4jHyperGraph(neo4j);
         } catch (Exception e) {

@@ -26,10 +26,10 @@ public class CoreServiceTestEnvironment {
 
     @Before
     public void setup() {
-        GraphDatabaseService neo4j = null;
         try {
+            logger.info("Creating DB and indexing services");
             dbPath = JavaUtils.createTempDirectory("dm3");
-            neo4j = new EmbeddedGraphDatabase(dbPath.getAbsolutePath());
+            GraphDatabaseService neo4j = new EmbeddedGraphDatabase(dbPath.getAbsolutePath());
             dms = new EmbeddedService(new HGStorageBridge(new Neo4jHyperGraph(neo4j)));
             dms.setupDB();
         } catch (Exception e) {

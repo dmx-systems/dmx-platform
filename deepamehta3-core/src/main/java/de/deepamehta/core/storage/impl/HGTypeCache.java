@@ -71,8 +71,10 @@ class HGTypeCache {
             AssociationDefinition assocDef = new AssociationDefinition(null, wholeTopicTypeUri, partTopicTypeUri);
             initRoleTypes(assocDef, edge);
             initCardinality(assocDef, edge);
+            //
+            topicTypeDef.addAssociationDefinition(assocDef);
         }
-        return null;
+        return topicTypeDef;
     }
 
     private void initRoleTypes(AssociationDefinition assocDef, HyperEdge edge) {

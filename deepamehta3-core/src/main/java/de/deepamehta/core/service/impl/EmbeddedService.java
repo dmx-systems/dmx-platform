@@ -11,6 +11,7 @@ import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.model.TopicTypeDefinition;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.service.CoreService;
@@ -519,6 +520,21 @@ public class EmbeddedService implements CoreService {
             tx.finish();
         }
     } */
+
+    @Override
+    public TopicTypeDefinition getTopicTypeDefinition(String typeUri) {
+        DeepaMehtaTransaction tx = storage.beginTx();
+        try {
+            TopicTypeDefinition typeDef = storage.getTopicTypeDefinition(typeUri);
+            tx.success();
+            return typeDef;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Retrieving topic type definition failed (typeUri=\"" + typeUri + "\")", e);
+        } finally {
+            tx.finish();
+        }
+    }
 
     @Override
     public MetaType createMetaType(MetaType metaType) {

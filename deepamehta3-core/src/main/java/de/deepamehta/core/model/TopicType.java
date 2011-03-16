@@ -73,6 +73,7 @@ public class TopicType extends Topic {
 
     @Override
     public String toString() {
-        return "topic type " + id + " \"" + value + "\" (uri=\"" + uri + "\", typeUri=\"" + typeUri + "\")";
+        return "topic type " + id + " \"" + value + "\" (uri=\"" + uri + "\", typeUri=\"" + typeUri +
+            "\", dataTypeUri=\"" + dataTypeUri + "\")";
     }
 }

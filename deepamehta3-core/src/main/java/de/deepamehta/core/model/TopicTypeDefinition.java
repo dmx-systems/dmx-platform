@@ -27,6 +27,7 @@ public class TopicTypeDefinition extends TopicType {
 
     public TopicTypeDefinition(TopicType topicType) {
         super(topicType);
+        this.assocDefs = new ArrayList();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -40,6 +41,7 @@ public class TopicTypeDefinition extends TopicType {
 
     @Override
     public String toString() {
-        return "topic type definition \"" + uri + "\"";
+        return "topic type definition " + id + " \"" + value + "\" (uri=\"" + uri + "\", typeUri=\"" + typeUri +
+            "\", dataTypeUri=\"" + dataTypeUri + "\", assocDefs=" + assocDefs + ")";
     }
 }
