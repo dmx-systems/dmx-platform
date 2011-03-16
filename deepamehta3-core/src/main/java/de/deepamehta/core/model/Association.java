@@ -46,6 +46,7 @@ public class Association {
         try {
             this.id = -1;
             this.typeUri = assoc.getString("assoc_type");
+            this.roles = new HashSet();
             JSONArray topics = assoc.getJSONArray("topics");
             for (int i = 0; i < topics.length(); i++) {
                 roles.add(new Role(topics.getJSONObject(i)));

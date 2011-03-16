@@ -110,7 +110,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public boolean init() {
-        // init migration number
+        // init core migration number
         boolean isCleanInstall = false;
         if (!hg.getHyperNode(0).hasAttribute("core_migration_nr")) {
             logger.info("Starting with a fresh DB -- Setting migration number to 0");
