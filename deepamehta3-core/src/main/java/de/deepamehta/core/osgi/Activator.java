@@ -1,14 +1,13 @@
 package de.deepamehta.core.osgi;
 
-import de.deepamehta.core.impl.EmbeddedService;
 import de.deepamehta.core.service.CoreService;
+import de.deepamehta.core.service.impl.EmbeddedService;
+import de.deepamehta.core.storage.impl.HGStorageBridge;
 
 import de.deepamehta.hypergraph.HyperGraph;
-import de.deepamehta.hypergraph.neo4j.Neo4jHyperGraph;
+import de.deepamehta.hypergraph.impl.Neo4jHyperGraph;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.index.Index;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 import org.osgi.framework.BundleActivator;
@@ -52,7 +51,7 @@ public class Activator implements BundleActivator, FrameworkListener {
     public void start(BundleContext context) {
         try {
             logger.info("========== Starting bundle \"DeepaMehta 3 Core\" ==========");
-            dms = new EmbeddedService(openDB());
+            dms = new EmbeddedService(new HGStorageBridge(openDB()));
             dms.setupDB();
             //
             logger.info("Registering DeepaMehta core service at OSGi framework");

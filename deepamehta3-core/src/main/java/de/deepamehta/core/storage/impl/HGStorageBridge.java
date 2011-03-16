@@ -1,4 +1,4 @@
-package de.deepamehta.core.impl;
+package de.deepamehta.core.storage.impl;
 
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationType;
@@ -7,8 +7,8 @@ import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicValue;
-import de.deepamehta.core.storage.Storage;
-import de.deepamehta.core.storage.Transaction;
+import de.deepamehta.core.storage.DeepaMehtaStorage;
+import de.deepamehta.core.storage.DeepaMehtaTransaction;
 
 import de.deepamehta.hypergraph.HyperEdge;
 import de.deepamehta.hypergraph.HyperGraph;
@@ -20,9 +20,9 @@ import java.util.logging.Logger;
 
 
 /**
- * A bridge between the DeepaMehta storage abstraction and the HyperGraph abstraction.
+ * A bridge between the DeepaMehta storage abstraction and a HyperGraph implementation.
  */
-class DeepaMehtaStorage implements Storage {
+public class HGStorageBridge implements DeepaMehtaStorage {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -32,7 +32,7 @@ class DeepaMehtaStorage implements Storage {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DeepaMehtaStorage(HyperGraph hg) {
+    public HGStorageBridge(HyperGraph hg) {
         this.hg = hg;
     }
 
@@ -104,8 +104,8 @@ class DeepaMehtaStorage implements Storage {
     // === DB ===
 
     @Override
-    public Transaction beginTx() {
-        return new DeepaMehtaTransaction(hg);
+    public DeepaMehtaTransaction beginTx() {
+        return new HGTransactionAdapter(hg);
     }
 
     @Override

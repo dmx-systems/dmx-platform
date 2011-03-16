@@ -1,4 +1,4 @@
-package de.deepamehta.core.impl;
+package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.service.Plugin;
 

@@ -18,7 +18,7 @@ import java.util.Set;
 /**
  * Abstraction of the DeepaMehta storage layer.
  */
-public interface Storage {
+public interface DeepaMehtaStorage {
 
     // === Topics ===
 
@@ -129,7 +129,7 @@ public interface Storage {
 
     // === DB ===
 
-    Transaction beginTx();
+    DeepaMehtaTransaction beginTx();
 
     /**
      * Performs storage layer initialization. Runs in a transaction.

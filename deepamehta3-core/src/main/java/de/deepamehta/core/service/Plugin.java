@@ -9,7 +9,7 @@ import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.util.JavaUtils;
-import de.deepamehta.core.storage.Transaction;
+import de.deepamehta.core.storage.DeepaMehtaTransaction;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
@@ -381,7 +381,7 @@ public class Plugin implements BundleActivator {
      * - trigger MODIFY_TOPIC_TYPE hook (multiple times)
      */
     private void installPlugin(BundleContext context) {
-        Transaction tx = dms.beginTx();
+        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             boolean isCleanInstall = initPluginTopic();
             // ### runPluginMigrations(isCleanInstall);

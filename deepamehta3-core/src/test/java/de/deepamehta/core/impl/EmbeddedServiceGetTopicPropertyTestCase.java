@@ -1,8 +1,8 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.PropValue;
-import de.deepamehta.core.storage.Storage;
-import de.deepamehta.core.storage.Transaction;
+import de.deepamehta.core.storage.DeepaMehtaStorage;
+import de.deepamehta.core.storage.DeepaMehtaTransaction;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -19,8 +19,8 @@ import org.junit.Test;
 public class EmbeddedServiceGetTopicPropertyTestCase {
 
     private EmbeddedService cut;
-    private Storage storageMock;
-    private Transaction transactionMock;
+    private DeepaMehtaStorage storageMock;
+    private DeepaMehtaTransaction transactionMock;
 
     private long topicId = 1L;
     private String key = "key";
@@ -29,8 +29,8 @@ public class EmbeddedServiceGetTopicPropertyTestCase {
 
     @Before
     public void setup() {
-        storageMock = createMock(Storage.class);
-        transactionMock = createMock(Transaction.class);
+        storageMock = createMock(DeepaMehtaStorage.class);
+        transactionMock = createMock(DeepaMehtaTransaction.class);
         cut = new EmbeddedService(storageMock);
     }
 

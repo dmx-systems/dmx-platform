@@ -1,8 +1,8 @@
-package de.deepamehta.core.impl;
+package de.deepamehta.core.storage.impl;
 
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.TopicTypeDefinition;
-import de.deepamehta.core.storage.Storage;
+import de.deepamehta.core.storage.DeepaMehtaStorage;
 
 import de.deepamehta.hypergraph.HyperEdge;
 import de.deepamehta.hypergraph.HyperNode;
@@ -14,18 +14,18 @@ import java.util.logging.Logger;
 
 
 
-class TypeCache {
+class HGTypeCache {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Map<String, TopicTypeDefinition> cache = new HashMap();
-    private DeepaMehtaStorage storage;
+    private HGStorageBridge storage;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeCache(DeepaMehtaStorage storage) {
+    HGTypeCache(HGStorageBridge storage) {
         this.storage = storage;
     }
 

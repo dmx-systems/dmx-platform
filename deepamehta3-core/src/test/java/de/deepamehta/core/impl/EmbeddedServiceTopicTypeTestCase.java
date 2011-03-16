@@ -3,7 +3,7 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.TopicType;
-import de.deepamehta.core.storage.Transaction;
+import de.deepamehta.core.storage.DeepaMehtaTransaction;
 
 import static org.junit.Assert.assertEquals;
 
@@ -79,7 +79,7 @@ public class EmbeddedServiceTopicTypeTestCase extends EmbeddedServiceTestEnviron
         TopicType topicType = dms.getTopicType("de/deepamehta/core/topictype/Workspace", null);
         //
         // FIXME: let topicType.addDataField() open an transaction
-        Transaction tx = dms.beginTx();
+        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             topicType.addDataField(dateCreatedField);
             topicType.addDataField(dateModifiedField);

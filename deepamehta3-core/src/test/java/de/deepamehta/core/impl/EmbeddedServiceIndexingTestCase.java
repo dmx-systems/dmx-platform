@@ -22,7 +22,7 @@ public class EmbeddedServiceIndexingTestCase extends EmbeddedServiceTestEnvironm
 
     @Test
     public void indexing() {
-        // Transaction tx = dms.beginTx();  // enable to test nested transactions
+        // DeepaMehtaTransaction tx = dms.beginTx();  // enable to test nested transactions
         // try {
             createTopicType();              // ### Operation 1
             createTopic();                  // ### Operation 2

@@ -2,7 +2,7 @@ package de.deepamehta.core.storage;
 
 
 
-public interface Transaction {
+public interface DeepaMehtaTransaction {
 
     void success();
 

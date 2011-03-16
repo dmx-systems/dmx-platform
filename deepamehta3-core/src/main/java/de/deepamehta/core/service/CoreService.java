@@ -13,7 +13,7 @@ import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
-import de.deepamehta.core.storage.Transaction;
+import de.deepamehta.core.storage.DeepaMehtaTransaction;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -188,7 +188,7 @@ public interface CoreService {
 
     // === Misc ===
 
-    public Transaction beginTx();
+    public DeepaMehtaTransaction beginTx();
 
     /**
      * Triggers the ALL_PLUGINS_READY hook.

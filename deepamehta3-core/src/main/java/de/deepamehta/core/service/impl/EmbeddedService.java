@@ -1,4 +1,4 @@
-package de.deepamehta.core.impl;
+package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationType;
@@ -17,11 +17,9 @@ import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.storage.Storage;
-import de.deepamehta.core.storage.Transaction;
+import de.deepamehta.core.storage.DeepaMehtaStorage;
+import de.deepamehta.core.storage.DeepaMehtaTransaction;
 import de.deepamehta.core.util.JSONHelper;
-
-import de.deepamehta.hypergraph.HyperGraph;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -72,7 +70,7 @@ public class EmbeddedService implements CoreService {
 
     private PluginCache pluginCache = new PluginCache();
 
-    private Storage storage;
+    private DeepaMehtaStorage storage;
 
     private enum Hook {
 
@@ -129,8 +127,8 @@ public class EmbeddedService implements CoreService {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public EmbeddedService(HyperGraph hg) {
-        this.storage = new DeepaMehtaStorage(hg);
+    public EmbeddedService(DeepaMehtaStorage storage) {
+        this.storage = storage;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -149,7 +147,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topic/{id}")
     @Override
     public Topic getTopic(@PathParam("id") long id, @HeaderParam("Cookie") ClientContext clientContext) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             Topic topic = storage.getTopic(id);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
@@ -167,7 +165,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topic/by_property/{key}/{value}")
     @Override
     public Topic getTopic(@PathParam("key") String key, @PathParam("value") TopicValue value) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             Topic topic = storage.getTopic(key, value);
             tx.success();
@@ -186,7 +184,7 @@ public class EmbeddedService implements CoreService {
     public Topic getTopic(@PathParam("typeUri") String typeUri,
                           @PathParam("key")     String key,
                           @PathParam("value")   TopicValue value) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             Topic topic = storage.getTopic(typeUri, key, value);
             tx.success();
@@ -202,7 +200,7 @@ public class EmbeddedService implements CoreService {
 
     @Override
     public TopicValue getTopicProperty(long topicId, String key) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             TopicValue value = storage.getTopicProperty(topicId, key);
             tx.success();
@@ -219,7 +217,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topic/by_type/{typeUri}")
     @Override
     public List<Topic> getTopics(@PathParam("typeUri") String typeUri) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             List<Topic> topics = storage.getTopics(typeUri);
             //
@@ -239,7 +237,7 @@ public class EmbeddedService implements CoreService {
 
     @Override
     public List<Topic> getTopics(String key, Object value) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             List<Topic> topics = storage.getTopics(key, value);
             tx.success();
@@ -268,7 +266,7 @@ public class EmbeddedService implements CoreService {
             throw new IllegalArgumentException("includeRelTypes and excludeRelTypes can not be used at the same time");
         }
         //
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             List<RelatedTopic> relTopics = storage.getRelatedTopics(topicId, includeTopicTypes, includeRelTypes,
                                                                                                 excludeRelTypes);
@@ -295,7 +293,7 @@ public class EmbeddedService implements CoreService {
                                     @QueryParam("field")     String fieldUri,
                                     @QueryParam("wholeword") boolean wholeWord,
                                     @HeaderParam("Cookie")   ClientContext clientContext) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             List<Topic> searchResult = storage.searchTopics(searchTerm, fieldUri, wholeWord);
             tx.success();
@@ -313,7 +311,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topic")
     @Override
     public Topic createTopic(Topic topic, @HeaderParam("Cookie") ClientContext clientContext) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             triggerHook(Hook.PRE_CREATE_TOPIC, topic, clientContext);
             //
@@ -336,7 +334,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topic/{id}")
     @Override
     public void setTopicProperties(@PathParam("id") long id, Properties properties) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             Topic topic = getTopic(id, null);   // clientContext=null
             Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
@@ -361,7 +359,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topic/{id}")
     @Override
     public void deleteTopic(@PathParam("id") long id) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             // delete all the topic's relationships
             for (Relation rel : storage.getRelations(id)) {
@@ -382,7 +380,7 @@ public class EmbeddedService implements CoreService {
 
     /* @Override
     public Relation getRelation(long id) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             Relation relation = storage.getRelation(id);
             tx.success();
@@ -400,7 +398,7 @@ public class EmbeddedService implements CoreService {
     @Override
     public Relation getRelation(@QueryParam("src") long srcTopicId, @QueryParam("dst") long dstTopicId,
                                 @QueryParam("type") String typeId, @QueryParam("directed") boolean isDirected) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             Relation relation = storage.getRelation(srcTopicId, dstTopicId, typeId, isDirected);
             tx.success();
@@ -419,7 +417,7 @@ public class EmbeddedService implements CoreService {
     @Override
     public List<Relation> getRelations(@QueryParam("src") long srcTopicId, @QueryParam("dst") long dstTopicId,
                                        @QueryParam("type") String typeId, @QueryParam("directed") boolean isDirected) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             List<Relation> relations = storage.getRelations(srcTopicId, dstTopicId, typeId, isDirected);
             tx.success();
@@ -437,7 +435,7 @@ public class EmbeddedService implements CoreService {
     @Path("/relation/{src}/{dst}/{typeId}")
     @Override
     public Association createAssociation(Association assoc, @HeaderParam("Cookie") ClientContext clientContext) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             assoc = storage.createAssociation(assoc);
             tx.success();
@@ -454,7 +452,7 @@ public class EmbeddedService implements CoreService {
     @Path("/relation/{id}")
     @Override
     public void setRelationProperties(@PathParam("id") long id, Properties properties) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             storage.setRelationProperties(id, properties);
             tx.success();
@@ -470,7 +468,7 @@ public class EmbeddedService implements CoreService {
     @Path("/relation/{id}")
     @Override
     public void deleteRelation(@PathParam("id") long id) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             triggerHook(Hook.PRE_DELETE_RELATION, id);
             storage.deleteRelation(id);
@@ -490,7 +488,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topictype")
     @Override
     public Set<String> getTopicTypeUris() {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             Set typeUris = storage.getTopicTypeUris();
             tx.success();
@@ -508,7 +506,7 @@ public class EmbeddedService implements CoreService {
     @Override
     public TopicType getTopicType(@PathParam("typeUri") String typeUri,
                                   @HeaderParam("Cookie") ClientContext clientContext) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             TopicType topicType = storage.getTopicType(typeUri);
             triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
@@ -524,7 +522,7 @@ public class EmbeddedService implements CoreService {
 
     @Override
     public MetaType createMetaType(MetaType metaType) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             metaType = storage.createMetaType(metaType);
             tx.success();
@@ -542,7 +540,7 @@ public class EmbeddedService implements CoreService {
     @Consumes("application/x-www-form-urlencoded")
     @Override
     public TopicType createTopicType(TopicType topicType, @HeaderParam("Cookie") ClientContext clientContext) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             topicType = storage.createTopicType(topicType);
             // Note: the modification must be applied *before* the enrichment.
@@ -562,7 +560,7 @@ public class EmbeddedService implements CoreService {
 
     @Override
     public AssociationType createAssociationType(AssociationType assocType, ClientContext clientContext) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             assocType = storage.createAssociationType(assocType);
             tx.success();
@@ -579,7 +577,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topictype/{typeUri}")
     @Override
     public void addDataField(@PathParam("typeUri") String typeUri, DataField dataField) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             storage.addDataField(typeUri, dataField);
             tx.success();
@@ -596,7 +594,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topictype/{typeUri}")
     @Override
     public void updateDataField(@PathParam("typeUri") String typeUri, DataField dataField) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             storage.updateDataField(typeUri, dataField);
             tx.success();
@@ -613,7 +611,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topictype/{typeUri}/field_order")
     @Override
     public void setDataFieldOrder(@PathParam("typeUri") String typeUri, List<String> fieldUris) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             storage.setDataFieldOrder(typeUri, fieldUris);
             tx.success();
@@ -629,7 +627,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topictype/{typeUri}/field/{fieldUri}")
     @Override
     public void removeDataField(@PathParam("typeUri") String typeUri, @PathParam("fieldUri") String fieldUri) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             storage.removeDataField(typeUri, fieldUri);
             tx.success();
@@ -650,7 +648,7 @@ public class EmbeddedService implements CoreService {
     @Override
     public CommandResult executeCommand(@PathParam("command") String command, CommandParams params,
                                         @HeaderParam("Cookie") ClientContext clientContext) {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             Iterator<CommandResult> i = triggerHook(Hook.EXECUTE_COMMAND, command, params, clientContext).iterator();
             if (!i.hasNext()) {
@@ -711,7 +709,7 @@ public class EmbeddedService implements CoreService {
     // === Misc ===
 
     @Override
-    public Transaction beginTx() {
+    public DeepaMehtaTransaction beginTx() {
         return storage.beginTx();
     }
 
@@ -722,7 +720,7 @@ public class EmbeddedService implements CoreService {
 
     @Override
     public void setupDB() {
-        Transaction tx = storage.beginTx();
+        DeepaMehtaTransaction tx = storage.beginTx();
         try {
             boolean isCleanInstall = initDB();
             runCoreMigrations(isCleanInstall);
