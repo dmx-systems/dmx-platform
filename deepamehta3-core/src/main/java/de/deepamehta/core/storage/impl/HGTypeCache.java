@@ -41,21 +41,21 @@ class HGTypeCache {
         return topicTypeDef;
     }
 
-    // FIXME: needed? (putting should be the cache's responsibility)
-    void put(TopicTypeDefinition topicTypeDef) {
-        String typeUri = topicTypeDef.getUri();
-        cache.put(typeUri, topicTypeDef);
-    }
-
-    void remove(String typeUri) {
+    void invalidate(String typeUri) {
         if (cache.remove(typeUri) != null) {
-            logger.info("Removing topic type \"" + typeUri + "\" from type cache");
+            logger.info("Invalidating topic type \"" + typeUri + "\" in type cache");
         } else {
             throw new RuntimeException("Topic type \"" + typeUri + "\" not found in type cache");
         }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void put(TopicTypeDefinition topicTypeDef) {
+        cache.put(topicTypeDef.getUri(), topicTypeDef);
+    }
+
+    // ---
 
     private TopicTypeDefinition loadTopicTypeDefinition(String typeUri) {
         TopicTypeDefinition topicTypeDef = new TopicTypeDefinition(storage.getTopicType(typeUri));
@@ -67,38 +67,78 @@ class HGTypeCache {
             if (!wholeTopicTypeUri.equals(typeUri)) {
                 throw new RuntimeException("jri doesn't understand Neo4j traversal");
             }
-            // FIXME: association type = null
-            AssociationDefinition assocDef = new AssociationDefinition(null, wholeTopicTypeUri, partTopicTypeUri);
-            initRoleTypes(assocDef, edge);
-            initCardinality(assocDef, edge);
+            //
+            RoleTypes roleTypes = getRoleTypes(edge);
+            Cardinality cardinality = getCardinality(edge);
+            AssociationDefinition assocDef = new AssociationDefinition(wholeTopicTypeUri, partTopicTypeUri,
+                roleTypes.wholeRoleTypeUri, roleTypes.partRoleTypeUri);
+            assocDef.setWholeCardinalityUri(cardinality.wholeCardinalityUri);
+            assocDef.setPartCardinalityUri(cardinality.partCardinalityUri);
+            // FIXME: call assocDef's setUri() and setAssocTypeUri()
             //
             topicTypeDef.addAssociationDefinition(assocDef);
         }
         return topicTypeDef;
     }
 
-    private void initRoleTypes(AssociationDefinition assocDef, HyperEdge edge) {
+    // ---
+
+    private RoleTypes getRoleTypes(HyperEdge edge) {
         HyperNode wholeRoleType = edge.getHyperNode("dm3.core.whole_role_type");
         HyperNode  partRoleType = edge.getHyperNode("dm3.core.part_role_type");
+        RoleTypes roleTypes = new RoleTypes();
         // role types are optional
         if (wholeRoleType != null) {
-            assocDef.setWholeRoleTypeUri(wholeRoleType.getString("uri"));
+            roleTypes.setWholeRoleTypeUri(wholeRoleType.getString("uri"));
         }
         if (partRoleType != null) {
-            assocDef.setPartRoleTypeUri(partRoleType.getString("uri"));
+            roleTypes.setPartRoleTypeUri(partRoleType.getString("uri"));
+        }
+        return roleTypes;
+    }
+
+    private Cardinality getCardinality(HyperEdge edge) {
+        HyperNode wholeCardinality = edge.getHyperNode("dm3.core.whole_cardinality");
+        HyperNode  partCardinality = edge.getHyperNode("dm3.core.part_cardinality");
+        Cardinality cardinality = new Cardinality();
+        if (wholeCardinality != null) {
+            cardinality.setWholeCardinalityUri(wholeCardinality.getString("uri"));
+        }
+        if (partCardinality != null) {
+            cardinality.setPartCardinalityUri(partCardinality.getString("uri"));
+        } else {
+            throw new RuntimeException("Missing part cardinality in association definition");
+        }
+        return cardinality;
+    }
+
+    // --------------------------------------------------------------------------------------------------- Inner Classes
+
+    private class RoleTypes {
+
+        private String wholeRoleTypeUri;
+        private String  partRoleTypeUri;
+
+        private void setWholeRoleTypeUri(String wholeRoleTypeUri) {
+            this.wholeRoleTypeUri = wholeRoleTypeUri;
+        }
+
+        private void setPartRoleTypeUri(String partRoleTypeUri) {
+            this.partRoleTypeUri = partRoleTypeUri;
         }
     }
 
-    private void initCardinality(AssociationDefinition assocDef, HyperEdge edge) {
-        HyperNode wholeCardinality = edge.getHyperNode("dm3.core.whole_cardinality");
-        HyperNode  partCardinality = edge.getHyperNode("dm3.core.part_cardinality");
-        if (wholeCardinality != null) {
-            assocDef.setWholeCardinalityUri(wholeCardinality.getString("uri"));
+    private class Cardinality {
+
+        private String wholeCardinalityUri;
+        private String  partCardinalityUri;
+
+        private void setWholeCardinalityUri(String wholeCardinalityUri) {
+            this.wholeCardinalityUri = wholeCardinalityUri;
         }
-        if (partCardinality != null) {
-            assocDef.setPartCardinalityUri(partCardinality.getString("uri"));
-        } else {
-            throw new RuntimeException("Missing part cardinality in association definition");
+
+        private void setPartCardinalityUri(String partCardinalityUri) {
+            this.partCardinalityUri = partCardinalityUri;
         }
     }
 }
