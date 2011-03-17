@@ -1,5 +1,7 @@
 package de.deepamehta.core.model;
 
+import de.deepamehta.core.model.impl.BaseTopic;
+
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -13,14 +15,9 @@ import java.util.logging.Logger;
 
 
 /**
- * A topic type. Part of the meta-model (like a class).
- * <p>
- * A topic type is an ordered collection of {@link DataField}s.
- * A topic type itself is a {@link Topic}.
- *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class AssociationType extends Topic {
+public class AssociationType extends BaseTopic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

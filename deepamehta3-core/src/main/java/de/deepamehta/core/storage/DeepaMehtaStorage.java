@@ -6,6 +6,7 @@ import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeDefinition;
 import de.deepamehta.core.model.TopicValue;
@@ -66,7 +67,7 @@ public interface DeepaMehtaStorage {
 
     // List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord);
 
-    Topic createTopic(Topic topic);
+    Topic createTopic(TopicData topicData);
 
     // void setTopicProperties(long id, Properties properties);
 

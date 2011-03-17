@@ -1,5 +1,7 @@
 package de.deepamehta.core.model;
 
+import de.deepamehta.core.model.impl.BaseTopic;
+
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -20,7 +22,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class TopicType extends Topic {
+public class TopicType extends BaseTopic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

@@ -7,6 +7,7 @@ import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.service.CoreService;
 
@@ -136,8 +137,8 @@ public class JSONHelper {
 
     public static void createTopics(JSONArray topics, CoreService dms) throws Exception {
         for (int i = 0; i < topics.length(); i++) {
-            Topic topic = new Topic(topics.getJSONObject(i));
-            dms.createTopic(topic, null);                   // clientContext=null
+            TopicData topicData = new TopicData(topics.getJSONObject(i));
+            dms.createTopic(topicData, null);               // clientContext=null
         }
     }
 

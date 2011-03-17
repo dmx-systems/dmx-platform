@@ -5,6 +5,7 @@ import de.deepamehta.core.model.AssociationType;
 import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeDefinition;
 import de.deepamehta.core.model.TopicValue;
@@ -50,13 +51,13 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     }
 
     @Override
-    public Topic createTopic(Topic topic) {
+    public Topic createTopic(TopicData topicData) {
         // create node
         HyperNode node = hg.createHyperNode();
-        node.setAttribute("uri", topic.getUri(), IndexMode.KEY);
-        node.setAttribute("value", topic.getValue());
+        node.setAttribute("uri", topicData.getUri(), IndexMode.KEY);
+        node.setAttribute("value", topicData.getValue());
         // associate with type
-        HyperNode topicType = lookupTopicType(topic.getTypeUri());
+        HyperNode topicType = lookupTopicType(topicData.getTypeUri());
         HyperEdge edge = hg.createHyperEdge();  // FIXME: use association type ("dm3.core.instantiation")
         edge.addHyperNode(topicType, "dm3.core.type");
         edge.addHyperNode(node, "dm3.core.instance");
@@ -94,7 +95,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         node.setAttribute("uri", metaType.getUri(), IndexMode.KEY);
         node.setAttribute("value", metaType.getValue());
         //
-        return new MetaType(node.getId(), metaType.getUri(), new TopicValue(metaType.getValue()));
+        return new MetaType(node.getId(), metaType.getUri(), metaType.getValue());
     }
 
     @Override
@@ -167,7 +168,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         if (node == null) {
             throw new NullPointerException("Tried to build a Topic from a null HyperNode");
         }
-        return new Topic(node.getId(), node.getString("uri"), new TopicValue(node.get("value")),
+        return new HGTopic(node.getId(), node.getString("uri"), node.get("value"),
             getTopicType(node).getString("uri"), null);     // composite=null
     }
 

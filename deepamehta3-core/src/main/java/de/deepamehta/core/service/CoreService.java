@@ -10,13 +10,12 @@ import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeDefinition;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.storage.DeepaMehtaTransaction;
-
-import org.codehaus.jettison.json.JSONObject;
 
 import java.util.Collection;
 import java.util.List;
@@ -116,7 +115,7 @@ public interface CoreService {
     // public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord,
     //                                                                     ClientContext clientContext);
 
-    public Topic createTopic(Topic topic, ClientContext clientContext);
+    public Topic createTopic(TopicData data, ClientContext clientContext);
 
     // public void setTopicProperties(long id, Properties properties);
 

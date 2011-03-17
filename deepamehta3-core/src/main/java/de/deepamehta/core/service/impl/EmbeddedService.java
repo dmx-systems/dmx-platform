@@ -10,6 +10,7 @@ import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeDefinition;
 import de.deepamehta.core.model.RelatedTopic;
@@ -311,12 +312,12 @@ public class EmbeddedService implements CoreService {
     @POST
     @Path("/topic")
     @Override
-    public Topic createTopic(Topic topic, @HeaderParam("Cookie") ClientContext clientContext) {
+    public Topic createTopic(TopicData topicData, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = storage.beginTx();
         try {
-            triggerHook(Hook.PRE_CREATE_TOPIC, topic, clientContext);
+            triggerHook(Hook.PRE_CREATE_TOPIC, topicData, clientContext);
             //
-            topic = storage.createTopic(topic);
+            Topic topic = storage.createTopic(topicData);
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
@@ -325,7 +326,7 @@ public class EmbeddedService implements CoreService {
             return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating " + topic + " failed", e);
+            throw new RuntimeException("Creating topic failed (" + topicData + ")", e);
         } finally {
             tx.finish();
         }

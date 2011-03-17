@@ -7,6 +7,7 @@ import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.storage.DeepaMehtaTransaction;
@@ -540,7 +541,7 @@ public class Plugin implements BundleActivator {
             return false;
         } else {
             logger.info("Creating topic for " + this + " -- this is a plugin clean install");
-            pluginTopic = dms.createTopic(new Topic(pluginId, new TopicValue(pluginName), "dm3.core.plugin",
+            pluginTopic = dms.createTopic(new TopicData(pluginId, pluginName, "dm3.core.plugin",
                 new Composite("{dm3.core.plugin_migration_nr: 0}")), null);     // FIXME: clientContext=null
             return true;
         }

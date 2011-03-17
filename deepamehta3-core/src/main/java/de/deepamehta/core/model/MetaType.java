@@ -1,5 +1,7 @@
 package de.deepamehta.core.model;
 
+import de.deepamehta.core.model.impl.BaseTopic;
+
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -20,7 +22,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class MetaType extends Topic {
+public class MetaType extends BaseTopic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -28,7 +30,7 @@ public class MetaType extends Topic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public MetaType(long id, String uri, TopicValue value) {
+    public MetaType(long id, String uri, Object value) {
         super(id, uri, value, null, null);  // typeUri=null, composite=null
     }
 
