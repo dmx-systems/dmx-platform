@@ -19,7 +19,7 @@ public class TopicTypeDefinition extends TopicType {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private List<AssociationDefinition> assocDefs;
+    private Map<String, AssociationDefinition> assocDefs;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -27,14 +27,25 @@ public class TopicTypeDefinition extends TopicType {
 
     public TopicTypeDefinition(TopicType topicType) {
         super(topicType);
-        this.assocDefs = new ArrayList();
+        this.assocDefs = new HashMap();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    public AssociationDefinition getAssociationDefinition(String uri) {
+        return assocDefs.get(uri);
+    }
+
     // FIXME: abstraction. Adding should be the factory's resposibility
     public void addAssociationDefinition(AssociationDefinition assocDef) {
-        assocDefs.add(assocDef);
+        String assocDefUri = assocDef.getUri();
+        AssociationDefinition existing = getAssociationDefinition(assocDefUri);
+        if (existing != null) {
+            throw new RuntimeException("Ambiguity: topic type definition \"" + uri + "\" has more than one " +
+                "associations definitions with uri \"" + assocDefUri + "\" -- Use distinct part role types or " +
+                "specifiy an unique uri");
+        }
+        assocDefs.put(assocDefUri, assocDef);
     }
 
     // ---

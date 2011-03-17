@@ -48,6 +48,40 @@ public class AssociationDefinition {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    public String getUri() {
+        return uri;
+    }
+
+    public String getAssocTypeUri() {
+        return assocTypeUri;
+    }
+
+    public String getWholeTopicTypeUri() {
+        return wholeTopicTypeUri;
+    }
+
+    public String getPartTopicTypeUri() {
+        return partTopicTypeUri;
+    }
+
+    public String getWholeRoleTypeUri() {
+        return wholeRoleTypeUri;
+    }
+
+    public String getPartRoleTypeUri() {
+        return partRoleTypeUri;
+    }
+
+    public String getWholeCardinalityUri() {
+        return wholeCardinalityUri;
+    }
+
+    public String getPartCardinalityUri() {
+        return partCardinalityUri;
+    }
+
+    // ---
+
     public void setUri(String uri) {
         this.uri = uri;
     }

@@ -24,7 +24,7 @@ public interface DeepaMehtaStorage {
 
     // === Topics ===
 
-    // Topic getTopic(long id);
+    Topic getTopic(long topicId);
 
     /**
      * Looks up a single topic by exact property value.
@@ -62,8 +62,10 @@ public interface DeepaMehtaStorage {
     // List<Topic> getTopics(String key, Object value);
 
     // List<RelatedTopic> getRelatedTopics(long topicId, List<String> includeTopicTypes,
-    //                                                          List<String> includeRelTypes,
-    //                                                          List<String> excludeRelTypes);
+    //                                                   List<String> includeRelTypes,
+    //                                                   List<String> excludeRelTypes);
+
+    Topic getRelatedTopic(long topcicId, String assocTypeUri, String myRoleType, String othersRoleType);
 
     // List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord);
 

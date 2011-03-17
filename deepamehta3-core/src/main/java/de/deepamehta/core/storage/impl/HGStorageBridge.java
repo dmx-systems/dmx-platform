@@ -12,6 +12,7 @@ import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
 import de.deepamehta.core.storage.DeepaMehtaTransaction;
 
+import de.deepamehta.hypergraph.ConnectedHyperNode;
 import de.deepamehta.hypergraph.HyperEdge;
 import de.deepamehta.hypergraph.HyperGraph;
 import de.deepamehta.hypergraph.HyperNode;
@@ -45,16 +46,30 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // === Topics ===
 
     @Override
+    public Topic getTopic(long topicId) {
+        return buildTopic(hg.getHyperNode(topicId));
+    }
+
+    @Override
     public Topic getTopic(String key, TopicValue value) {
         HyperNode node = hg.getHyperNode(key, value.value());
         return node != null ? buildTopic(node) : null;
     }
 
     @Override
+    public Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri) {
+        ConnectedHyperNode node = hg.getHyperNode(topicId).getConnectedHyperNode(myRoleTypeUri, othersRoleTypeUri);
+        // FIXME: assocTypeUri not checked
+        return node != null ? buildTopic(node.getHyperNode()) : null;
+    }
+
+    @Override
     public Topic createTopic(TopicData topicData) {
         // create node
         HyperNode node = hg.createHyperNode();
-        node.setAttribute("uri", topicData.getUri(), IndexMode.KEY);
+        if (topicData.getUri() != null) {
+            node.setAttribute("uri", topicData.getUri(), IndexMode.KEY);
+        }
         node.setAttribute("value", topicData.getValue());
         // associate with type
         HyperNode topicType = lookupTopicType(topicData.getTypeUri());
@@ -71,7 +86,13 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     public Association createAssociation(Association assoc) {
         HyperEdge edge = hg.createHyperEdge();  // FIXME: use association type
         for (Role role : assoc.getRoles()) {
-            edge.addHyperNode(lookupTopic(role.getTopicUri()), role.getRoleTypeUri());
+            HyperNode node;
+            if (role.topicIdentifiedById()) {
+                node = hg.getHyperNode(role.getTopicId());
+            } else {
+                node = lookupTopic(role.getTopicUri());
+            }
+            edge.addHyperNode(node, role.getRoleTypeUri());
         }
         return new Association(edge.getId(), assoc.getTypeUri(), assoc.getRoles());
     }
@@ -168,7 +189,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         if (node == null) {
             throw new NullPointerException("Tried to build a Topic from a null HyperNode");
         }
-        return new HGTopic(node.getId(), node.getString("uri"), node.get("value"),
+        return new HGTopic(node.getId(), node.getString("uri", null), node.get("value"),
             getTopicType(node).getString("uri"), null);     // composite=null
     }
 
@@ -180,6 +201,6 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     HyperNode getTopicType(HyperNode node) {
         // FIXME: should we additionally check weather the edge type is "dm3.core.instantiation"?
-        return node.traverseSingle("dm3.core.instance", "dm3.core.type");
+        return node.getConnectedHyperNode("dm3.core.instance", "dm3.core.type").getHyperNode();
     }
 }

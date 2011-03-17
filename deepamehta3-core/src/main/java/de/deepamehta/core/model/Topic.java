@@ -33,5 +33,11 @@ public interface Topic {
 
     // ---
 
+    void setValue(String assocDefUri, Object value);
+
+    Topic getRelatedTopic(String assocTypeUri, String myRoleType, String othersRoleType);
+
+    // ---
+
     public JSONObject toJSON();
 }

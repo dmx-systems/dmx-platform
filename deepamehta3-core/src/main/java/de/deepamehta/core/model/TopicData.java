@@ -24,6 +24,9 @@ public class TopicData {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    /**
+     * @param   uri     If <code>null</code> the topic will have no URI. This is OK.
+     */
     public TopicData(String uri, Object value, String typeUri, Composite composite) {
         this.uri = uri;
         this.value = new TopicValue(value);
@@ -66,5 +69,13 @@ public class TopicData {
 
     public Composite getComposite() {
         return composite;
+    }
+
+    // ---
+
+    @Override
+    public String toString() {
+        return "topic data (uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
+            "\", composite=" + composite + ")";
     }
 }

@@ -13,16 +13,6 @@ import java.util.Set;
 
 
 /**
- * A relation between 2 {@link Topic}s.
- * A relation has an ID, a type, and a set of properties.
- * <p>
- * Instances of this class are used to pass data around (<i>data transfer object</i>).
- * <p>
- * Note: instances of this class are not backed by a database.
- * That is, direct changes to a Relation object (e.g. by {@link #setProperty}) are not persistent.
- * To make persistent changes use the methods of the DeepaMehta core service
- * ({@link de.deepamehta.core.service.CoreService}).
- *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
 public class Association {
