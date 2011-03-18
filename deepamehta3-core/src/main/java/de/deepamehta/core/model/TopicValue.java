@@ -22,12 +22,6 @@ public class TopicValue {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     /**
-     * Constructs a "no-value" respresenting value.
-     */
-    public TopicValue() {
-    }
-
-    /**
      * Called by JAX-RS container to create a TopicValue from a @PathParam or @QueryParam
      */
     public TopicValue(String value) {
@@ -54,7 +48,7 @@ public class TopicValue {
 
     @Override
     public String toString() {
-        return value != null ? value.toString() : null;
+        return value.toString();
     }
 
     public int intValue() {
@@ -80,12 +74,11 @@ public class TopicValue {
         if (!(o instanceof TopicValue)) {
             return false;
         }
-        TopicValue v = (TopicValue) o;
-        return v.value == null ? value == null : value == null ? false : v.value.equals(value);
+        return ((TopicValue) o).value.equals(value);
     }
 
     @Override
     public int hashCode() {
-        return value != null ? value.hashCode() : 0;
+        return value.hashCode();
     }
 }

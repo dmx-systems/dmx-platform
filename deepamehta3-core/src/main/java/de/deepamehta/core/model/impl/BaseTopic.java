@@ -90,6 +90,11 @@ public class BaseTopic extends TopicData implements Topic {
     // ---
 
     @Override
+    public Object getValue(String assocDefUri) {
+        throw new RuntimeException("Method not implemented (" + getClass() + ")");
+    }
+
+    @Override
     public void setValue(String assocDefUri, Object value) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }

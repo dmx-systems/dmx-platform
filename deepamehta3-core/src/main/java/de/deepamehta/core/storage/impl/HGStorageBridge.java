@@ -64,6 +64,11 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     }
 
     @Override
+    public void setTopicValue(long topicId, TopicValue value) {
+        hg.getHyperNode(topicId).setAttribute("value", value.value());
+    }
+
+    @Override
     public Topic createTopic(TopicData topicData) {
         // create node
         HyperNode node = hg.createHyperNode();

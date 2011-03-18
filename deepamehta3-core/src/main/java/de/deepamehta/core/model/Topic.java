@@ -33,6 +33,8 @@ public interface Topic {
 
     // ---
 
+    Object getValue(String assocDefUri);
+
     void setValue(String assocDefUri, Object value);
 
     Topic getRelatedTopic(String assocTypeUri, String myRoleType, String othersRoleType);

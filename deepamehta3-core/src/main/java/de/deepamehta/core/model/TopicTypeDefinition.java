@@ -32,17 +32,21 @@ public class TopicTypeDefinition extends TopicType {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public AssociationDefinition getAssociationDefinition(String uri) {
-        return assocDefs.get(uri);
+    public AssociationDefinition getAssociationDefinition(String assocDefUri) {
+        AssociationDefinition assocDef = assocDefs.get(assocDefUri);
+        if (assocDef == null) {
+            throw new RuntimeException("Association definition \"" + assocDefUri + "\" not found (in " + this + ")");
+        }
+        return assocDef;
     }
 
     // FIXME: abstraction. Adding should be the factory's resposibility
     public void addAssociationDefinition(AssociationDefinition assocDef) {
         String assocDefUri = assocDef.getUri();
-        AssociationDefinition existing = getAssociationDefinition(assocDefUri);
+        AssociationDefinition existing = assocDefs.get(assocDefUri);
         if (existing != null) {
             throw new RuntimeException("Ambiguity: topic type definition \"" + uri + "\" has more than one " +
-                "associations definitions with uri \"" + assocDefUri + "\" -- Use distinct part role types or " +
+                "association definitions with uri \"" + assocDefUri + "\" -- Use distinct part role types or " +
                 "specifiy an unique uri");
         }
         assocDefs.put(assocDefUri, assocDef);

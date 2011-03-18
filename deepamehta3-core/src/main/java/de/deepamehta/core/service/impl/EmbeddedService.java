@@ -1,6 +1,7 @@
 package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Association;
+import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.AssociationType;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
@@ -8,6 +9,7 @@ import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.PluginInfo;
+import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
@@ -759,15 +761,68 @@ public class EmbeddedService implements CoreService {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    DeepaMehtaStorage getStorage() {
-        return storage;
+    void setTopicValue(long topicId, TopicValue value) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            storage.setTopicValue(topicId, value);
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Setting value for topic " + topicId + " failed (value=" + value + ")", e);
+        } finally {
+            tx.finish();
+        }
     }
 
-    Topic buildTopic(Topic topic) {
-        return new AttachedTopic(topic, this);
+    Object getTopicValue(Topic topic, String assocDefUri) {
+        TopicTypeDefinition typeDef = getTopicTypeDefinition(topic.getTypeUri());
+        AssociationDefinition assocDef = typeDef.getAssociationDefinition(assocDefUri);
+        String assocTypeUri = assocDef.getAssocTypeUri();
+        String wholeRoleTypeUri = assocDef.getWholeRoleTypeUri();
+        String  partRoleTypeUri = assocDef.getPartRoleTypeUri();
+        //
+        Topic childTopic = getRelatedTopic(topic.getId(), assocTypeUri, wholeRoleTypeUri, partRoleTypeUri);
+        if (childTopic != null) {
+            return childTopic.getValue();
+        }
+        return null;
+    }
+
+    void setTopicValue(Topic topic, String assocDefUri, Object value) {
+        TopicTypeDefinition typeDef = getTopicTypeDefinition(topic.getTypeUri());
+        AssociationDefinition assocDef = typeDef.getAssociationDefinition(assocDefUri);
+        String assocTypeUri = assocDef.getAssocTypeUri();
+        String wholeRoleTypeUri = assocDef.getWholeRoleTypeUri();
+        String  partRoleTypeUri = assocDef.getPartRoleTypeUri();
+        //
+        Topic childTopic = getRelatedTopic(topic.getId(), assocTypeUri, wholeRoleTypeUri, partRoleTypeUri);
+        if (childTopic != null) {
+            childTopic.setValue(new TopicValue(value));
+        } else {
+            // create child topic
+            String topicTypeUri = assocDef.getPartTopicTypeUri();
+            childTopic = createTopic(new TopicData(null, value, topicTypeUri, null), null);
+            // create association
+            Set<Role> roles = new HashSet();
+            roles.add(new Role(topic.getId(), wholeRoleTypeUri));
+            roles.add(new Role(childTopic.getId(), partRoleTypeUri));
+            createAssociation(new Association(-1, assocTypeUri, roles), null);
+        }
+    }
+
+    Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleType, String othersRoleType) {
+        Topic topic = storage.getRelatedTopic(topicId, assocTypeUri, myRoleType, othersRoleType);
+        return topic != null ? buildTopic(topic) : null;
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private Topic buildTopic(Topic topic) {
+        if (topic == null) {
+            throw new NullPointerException("Tried to build an AttachedTopic from a null Topic");
+        }
+        return new AttachedTopic(topic, this);
+    }
 
     // === Plugins ===
 
