@@ -43,7 +43,7 @@ public class BaseTopic extends TopicData implements Topic {
     /**
      * @param   uri     If <code>null</code> the topic will have no URI. This is OK.
      */
-    protected BaseTopic(long id, String uri, Object value, String typeUri, Composite composite) {
+    protected BaseTopic(long id, String uri, TopicValue value, String typeUri, Composite composite) {
         super(uri, value, typeUri, composite);
         this.id = id;
     }
@@ -90,12 +90,12 @@ public class BaseTopic extends TopicData implements Topic {
     // ---
 
     @Override
-    public Object getValue(String assocDefUri) {
+    public TopicValue getValue(String assocDefUri) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 
     @Override
-    public void setValue(String assocDefUri, Object value) {
+    public void setValue(String assocDefUri, TopicValue value) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 

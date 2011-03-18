@@ -541,7 +541,7 @@ public class Plugin implements BundleActivator {
             return false;
         } else {
             logger.info("Creating topic for " + this + " -- this is a plugin clean install");
-            pluginTopic = dms.createTopic(new TopicData(pluginId, pluginName, "dm3.core.plugin",
+            pluginTopic = dms.createTopic(new TopicData(pluginId, new TopicValue(pluginName), "dm3.core.plugin",
                 new Composite("{dm3.core.plugin_migration_nr: 0}")), null);     // FIXME: clientContext=null
             return true;
         }

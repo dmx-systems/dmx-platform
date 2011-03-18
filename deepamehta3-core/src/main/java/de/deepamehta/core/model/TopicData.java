@@ -27,22 +27,22 @@ public class TopicData {
     /**
      * @param   uri     If <code>null</code> the topic will have no URI. This is OK.
      */
-    public TopicData(String uri, Object value, String typeUri, Composite composite) {
+    public TopicData(String uri, TopicValue value, String typeUri, Composite composite) {
         this.uri = uri;
-        this.value = new TopicValue(value);
+        this.value = value;
         this.typeUri = typeUri;
         this.composite = composite;
     }
 
-    public TopicData(TopicData topic) {
-        this(topic.uri, topic.value, topic.typeUri, topic.composite);
+    public TopicData(TopicData topicData) {
+        this(topicData.uri, topicData.value, topicData.typeUri, topicData.composite);
     }
 
-    public TopicData(JSONObject topic) {
+    public TopicData(JSONObject topicData) {
         try {
-            this.uri = topic.getString("uri");
-            this.value = new TopicValue(topic.get("value"));
-            this.typeUri = topic.getString("topic_type");
+            this.uri = topicData.getString("uri");
+            this.value = new TopicValue(topicData.get("value"));
+            this.typeUri = topicData.getString("topic_type");
         } catch (Exception e) {
             throw new RuntimeException("Parsing " + this + " failed", e);
         }
@@ -59,8 +59,8 @@ public class TopicData {
         return uri;
     }
 
-    public Object getValue() {
-        return value.value();
+    public TopicValue getValue() {
+        return value;
     }
 
     public String getTypeUri() {

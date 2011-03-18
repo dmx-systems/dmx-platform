@@ -3,6 +3,7 @@ package de.deepamehta.core.service.impl;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.TopicTypeDefinition;
 
 import static org.junit.Assert.assertEquals;
@@ -30,16 +31,20 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void setValue() {
-        Topic topic = dms.createTopic(new TopicData("de.deepamehta.3-notes", "DeepaMehta 3 Notes", "dm3.core.plugin",
-            new Composite("{dm3.core.plugin_migration_nr: 0}")), null);     // FIXME: clientContext=null
-        topic.setValue("dm3.core.plugin_migration_nr", 23);
+        Topic topic = dms.createTopic(new TopicData("de.deepamehta.3-notes", new TopicValue("DeepaMehta 3 Notes"),
+            "dm3.core.plugin", new Composite("{dm3.core.plugin_migration_nr: 12}")), null);
         //
-        int nr = (Integer) topic.getValue("dm3.core.plugin_migration_nr");
+        int nr = topic.getValue("dm3.core.plugin_migration_nr").intValue();
+        assertEquals(12, nr);
+        //
+        topic.setValue("dm3.core.plugin_migration_nr", new TopicValue(23));
+        //
+        nr = topic.getValue("dm3.core.plugin_migration_nr").intValue();
         assertEquals(23, nr);
         //
-        topic.setValue("dm3.core.plugin_migration_nr", 42);
+        topic.setValue("dm3.core.plugin_migration_nr", new TopicValue(42));
         //
-        nr = (Integer) topic.getValue("dm3.core.plugin_migration_nr");
+        nr = topic.getValue("dm3.core.plugin_migration_nr").intValue();
         assertEquals(42, nr);
     }
 }

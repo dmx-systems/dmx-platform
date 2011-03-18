@@ -1,6 +1,7 @@
 package de.deepamehta.core.storage.impl;
 
 import de.deepamehta.core.model.Association;
+import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.AssociationType;
 import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.Role;
@@ -18,6 +19,8 @@ import de.deepamehta.hypergraph.HyperGraph;
 import de.deepamehta.hypergraph.HyperNode;
 import de.deepamehta.hypergraph.IndexMode;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -75,7 +78,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         if (topicData.getUri() != null) {
             node.setAttribute("uri", topicData.getUri(), IndexMode.KEY);
         }
-        node.setAttribute("value", topicData.getValue());
+        node.setAttribute("value", topicData.getValue().value());
         // associate with type
         HyperNode topicType = lookupTopicType(topicData.getTypeUri());
         HyperEdge edge = hg.createHyperEdge();  // FIXME: use association type ("dm3.core.instantiation")
@@ -119,7 +122,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         // create node
         HyperNode node = hg.createHyperNode();
         node.setAttribute("uri", metaType.getUri(), IndexMode.KEY);
-        node.setAttribute("value", metaType.getValue());
+        node.setAttribute("value", metaType.getValue().value());
         //
         return new MetaType(node.getId(), metaType.getUri(), metaType.getValue());
     }
@@ -194,12 +197,18 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         if (node == null) {
             throw new NullPointerException("Tried to build a Topic from a null HyperNode");
         }
-        return new HGTopic(node.getId(), node.getString("uri", null), node.get("value"),
-            getTopicType(node).getString("uri"), null);     // composite=null
+        return new HGTopic(node.getId(), node.getString("uri", null), new TopicValue(node.get("value")),
+            getTopicTypeUri(node), null);     // composite=null
     }
 
     TopicType buildTopicType(HyperNode node) {
         return new TopicType(buildTopic(node), null);       // FIXME: dataTypeUri=null
+    }
+
+    // ---
+
+    String getTopicTypeUri(HyperNode node) {
+        return getTopicType(node).getString("uri");
     }
 
     // ---

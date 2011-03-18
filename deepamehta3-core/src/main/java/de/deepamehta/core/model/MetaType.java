@@ -30,7 +30,7 @@ public class MetaType extends BaseTopic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public MetaType(long id, String uri, Object value) {
+    public MetaType(long id, String uri, TopicValue value) {
         super(id, uri, value, null, null);  // typeUri=null, composite=null
     }
 

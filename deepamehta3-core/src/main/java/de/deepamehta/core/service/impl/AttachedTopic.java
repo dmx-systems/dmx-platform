@@ -38,12 +38,12 @@ class AttachedTopic extends BaseTopic {
     // ---
 
     @Override
-    public Object getValue(String assocDefUri) {
+    public TopicValue getValue(String assocDefUri) {
         return dms.getTopicValue(this, assocDefUri);
     }
 
     @Override
-    public void setValue(String assocDefUri, Object value) {
+    public void setValue(String assocDefUri, TopicValue value) {
         dms.setTopicValue(this, assocDefUri, value);
     }
 

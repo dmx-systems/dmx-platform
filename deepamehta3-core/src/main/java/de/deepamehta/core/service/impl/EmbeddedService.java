@@ -6,6 +6,7 @@ import de.deepamehta.core.model.AssociationType;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
+import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.PluginInfo;
@@ -320,6 +321,10 @@ public class EmbeddedService implements CoreService {
             triggerHook(Hook.PRE_CREATE_TOPIC, topicData, clientContext);
             //
             Topic topic = storage.createTopic(topicData);
+            Composite comp = topicData.getComposite();
+            if (comp != null) {
+                createTopicTree(topic, comp);
+            }
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
@@ -774,7 +779,7 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    Object getTopicValue(Topic topic, String assocDefUri) {
+    TopicValue getTopicValue(Topic topic, String assocDefUri) {
         TopicTypeDefinition typeDef = getTopicTypeDefinition(topic.getTypeUri());
         AssociationDefinition assocDef = typeDef.getAssociationDefinition(assocDefUri);
         String assocTypeUri = assocDef.getAssocTypeUri();
@@ -788,7 +793,7 @@ public class EmbeddedService implements CoreService {
         return null;
     }
 
-    void setTopicValue(Topic topic, String assocDefUri, Object value) {
+    void setTopicValue(Topic topic, String assocDefUri, TopicValue value) {
         TopicTypeDefinition typeDef = getTopicTypeDefinition(topic.getTypeUri());
         AssociationDefinition assocDef = typeDef.getAssociationDefinition(assocDefUri);
         String assocTypeUri = assocDef.getAssocTypeUri();
@@ -797,7 +802,7 @@ public class EmbeddedService implements CoreService {
         //
         Topic childTopic = getRelatedTopic(topic.getId(), assocTypeUri, wholeRoleTypeUri, partRoleTypeUri);
         if (childTopic != null) {
-            childTopic.setValue(new TopicValue(value));
+            childTopic.setValue(value);
         } else {
             // create child topic
             String topicTypeUri = assocDef.getPartTopicTypeUri();
@@ -822,6 +827,17 @@ public class EmbeddedService implements CoreService {
             throw new NullPointerException("Tried to build an AttachedTopic from a null Topic");
         }
         return new AttachedTopic(topic, this);
+    }
+
+    private void createTopicTree(Topic topic, Composite comp) {
+        Iterator<String> i = comp.keys();
+        while (i.hasNext()) {
+            String key = i.next();
+            Object value = comp.get(key);
+            if (!(value instanceof Composite)) {
+                setTopicValue(topic, key, new TopicValue(value));
+            }
+        }
     }
 
     // === Plugins ===

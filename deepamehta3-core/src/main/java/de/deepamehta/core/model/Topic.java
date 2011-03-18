@@ -13,7 +13,7 @@ public interface Topic {
 
     public String getUri();
 
-    public Object getValue();
+    public TopicValue getValue();
 
     public String getTypeUri();
 
@@ -33,9 +33,9 @@ public interface Topic {
 
     // ---
 
-    Object getValue(String assocDefUri);
+    TopicValue getValue(String assocDefUri);
 
-    void setValue(String assocDefUri, Object value);
+    void setValue(String assocDefUri, TopicValue value);
 
     Topic getRelatedTopic(String assocTypeUri, String myRoleType, String othersRoleType);
 
