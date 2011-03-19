@@ -174,7 +174,7 @@ public class EmbeddedService implements CoreService {
         try {
             Topic topic = storage.getTopic(key, value);
             tx.success();
-            return buildTopic(topic);
+            return topic != null ? buildTopic(topic) : null;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Retrieving topic by value failed (\"" + key + "\"=" + value + ")", e);
@@ -727,7 +727,7 @@ public class EmbeddedService implements CoreService {
     @Override
     public void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall) {
         runMigration(migrationNr, plugin, isCleanInstall);
-        // ### setPluginMigrationNr(plugin, migrationNr);
+        plugin.setMigrationNr(migrationNr);
     }
 
     // === Misc ===
@@ -888,14 +888,6 @@ public class EmbeddedService implements CoreService {
         Method hookMethod = plugin.getClass().getMethod(hook.methodName, hook.paramClasses);
         return hookMethod.invoke(plugin, params);
     }
-
-    // ---
-
-    /* ### private void setPluginMigrationNr(Plugin plugin, int migrationNr) {
-        Properties properties = new Properties();
-        properties.put("de/deepamehta/core/property/PluginMigrationNr", migrationNr);
-        setTopicProperties(plugin.getPluginTopic().id, properties);
-    } */
 
     // === DB ===
 

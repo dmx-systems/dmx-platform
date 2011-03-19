@@ -7,7 +7,7 @@
     <name>DeepaMehta 3 Core</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-core</artifactId>
-    <version>0.4.5-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
@@ -104,13 +104,11 @@
                     <instructions>
                         <Export-Package>
                             de.deepamehta.core.model,
+                            de.deepamehta.core.model.helper,
                             de.deepamehta.core.osgi,
                             de.deepamehta.core.service,
                             de.deepamehta.core.util
                         </Export-Package>
-                        <Private-Package>
-                            de.deepamehta.core.*
-                        </Private-Package>
                         <Bundle-Activator>
                             de.deepamehta.core.osgi.Activator
                         </Bundle-Activator>

@@ -112,6 +112,11 @@ public class Plugin implements BundleActivator {
         return pluginPackage + ".migrations.Migration" + migrationNr;
     }
 
+    // FIXME: should be private
+    public void setMigrationNr(int migrationNr) {
+        pluginTopic.setValue("dm3.core.plugin_migration_nr", new TopicValue(migrationNr));
+    }
+
     /**
      * Uses the plugin bundle's class loader to find a resource.
      *
@@ -167,10 +172,11 @@ public class Plugin implements BundleActivator {
             createServiceTracker(CoreService.class.getName(), context);
             createServiceTracker(HttpService.class.getName(), context);
             createServiceTrackers(context);
-        } catch (RuntimeException e) {
-            logger.severe("Starting " + this + " failed. Reason:");
+        } catch (Exception e) {
+            logger.severe("Activation of " + this + " failed:");
             e.printStackTrace();
-            throw e;
+            // Note: an exception thrown from here is swallowed by the container without reporting
+            // and let File Install retry to start the bundle endlessly.
         }
     }
 
@@ -385,7 +391,7 @@ public class Plugin implements BundleActivator {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             boolean isCleanInstall = initPluginTopic();
-            // ### runPluginMigrations(isCleanInstall);
+            runPluginMigrations(isCleanInstall);
             if (isCleanInstall) {
                 postInstallPluginHook();  // trigger hook
                 // ### introduceTypesToPlugin();
@@ -554,8 +560,8 @@ public class Plugin implements BundleActivator {
     /**
      * Determines the migrations to be run for this plugin and run them.
      */
-    /* ### private void runPluginMigrations(boolean isCleanInstall) {
-        int migrationNr = pluginTopic.getProperty("de/deepamehta/core/property/PluginMigrationNr").intValue();
+    private void runPluginMigrations(boolean isCleanInstall) {
+        int migrationNr = pluginTopic.getValue("dm3.core.plugin_migration_nr").intValue();
         int requiredMigrationNr = Integer.parseInt(getConfigProperty("requiredPluginMigrationNr", "0"));
         int migrationsToRun = requiredMigrationNr - migrationNr;
         logger.info("Running " + migrationsToRun + " plugin migrations (migrationNr=" + migrationNr +
@@ -563,7 +569,7 @@ public class Plugin implements BundleActivator {
         for (int i = migrationNr + 1; i <= requiredMigrationNr; i++) {
             dms.runPluginMigration(this, i, isCleanInstall);
         }
-    } */
+    }
 
     /* ### private void introduceTypesToPlugin() {
         for (String typeUri : dms.getTopicTypeUris()) {

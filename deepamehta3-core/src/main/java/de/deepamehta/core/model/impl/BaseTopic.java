@@ -121,14 +121,6 @@ public class BaseTopic extends TopicData implements Topic {
         }
     }
 
-    public static JSONArray topicsToJson(List<BaseTopic> topics) {
-        JSONArray array = new JSONArray();
-        for (BaseTopic topic : topics) {
-            array.put(topic.toJSON());
-        }
-        return array;
-    }
-
     // ---
 
     @Override

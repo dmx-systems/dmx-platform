@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.server.provider;
 
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.helper.ModelHelper;
 import de.deepamehta.core.util.JSONHelper;
 
 import java.io.BufferedWriter;
@@ -67,7 +68,7 @@ public class TopicListProvider implements MessageBodyWriter<List<Topic>> {
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            Topic.topicsToJson(topics).write(writer);
+            ModelHelper.topicsToJSON(topics).write(writer);
             writer.flush();
         } catch (Exception e) {
             throw new IOException("Writing " + topics + " to response stream failed", e);
