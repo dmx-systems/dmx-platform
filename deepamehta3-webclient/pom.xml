@@ -4,10 +4,10 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 3 Client</name>
+    <name>DeepaMehta 3 Webclient</name>
     <groupId>de.deepamehta</groupId>
-    <artifactId>deepamehta3-client</artifactId>
-    <version>0.4.5-SNAPSHOT</version>
+    <artifactId>deepamehta3-webclient</artifactId>
+    <version>0.5-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
@@ -21,12 +21,12 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-core</artifactId>
-            <version>0.4.5-SNAPSHOT</version>
+            <version>0.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-server</artifactId>
-            <version>0.4.4-SNAPSHOT</version>
+            <version>0.5-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -38,7 +38,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.plugins.client.ClientPlugin
+                            de.deepamehta.plugins.webclient.WebclientPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

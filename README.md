@@ -56,7 +56,7 @@ Starting
    Then a browser window opens and DeepaMehta is ready to use.
 
    Note: to open the DeepaMehta browser window manually use this address:  
-   <http://localhost:8080/de.deepamehta.3-client/index.html>
+   <http://localhost:8080/de.deepamehta.3-webclient/index.html>
 
 
 Stopping

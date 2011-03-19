@@ -10,7 +10,7 @@ import java.io.InputStream;
  * Files are uploaded via the REST API by POSTing <code>multipart/form-data</code> to the <code>/command</code>
  * resource.
  * <p>
- * Client-side support: the <a href="http://github.com/jri/deepamehta3-client">deepamehta3-client</a> plugin
+ * Client-side support: the <code>deepamehta3-webclient</code> plugin
  * provides an utility method <code>show_upload_dialog</code> that allows the user to choose and upload a file.</p>
  * <p>
  * At server-side a plugin accesses the upload file via the

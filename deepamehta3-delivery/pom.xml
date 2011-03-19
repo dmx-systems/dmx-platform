@@ -7,7 +7,7 @@
     <name>DeepaMehta 3 Delivery</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-delivery</artifactId>
-    <version>0.4.5-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -99,7 +99,7 @@
                   ${project.basedir}/../deepamehta3-core/target,
                   ${project.basedir}/../deepamehta3-coretypes/target,
                   ${project.basedir}/../deepamehta3-server/target,
-                  ${project.basedir}/../deepamehta3-client/target,
+                  ${project.basedir}/../deepamehta3-webclient/target,
                   ${project.basedir}/../deepamehta3-time/target,
                   ${project.basedir}/../deepamehta3-notes/target,
                   ${project.basedir}/../deepamehta3-workspaces/target,

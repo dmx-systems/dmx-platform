@@ -213,7 +213,7 @@ public class Plugin implements BundleActivator {
 
     // ---
 
-    public void preCreateHook(Topic topic, ClientContext clientContext) {
+    public void preCreateHook(TopicData topicData, ClientContext clientContext) {
     }
 
     public void postCreateHook(Topic topic, ClientContext clientContext) {
@@ -437,8 +437,8 @@ public class Plugin implements BundleActivator {
             logger.info("Registering web resources of " + this + " at namespace " + namespace);
             httpService.registerResources(namespace, "/web", null);
         } catch (NamespaceException e) {
-            throw new RuntimeException("Web resources of " + this + " can't be registered " +
-                "at namespace " + namespace, e);
+            throw new RuntimeException("Registering web resources of " + this + " failed " +
+                "(namespace=" + namespace + ")", e);
         }
     }
 
@@ -473,8 +473,8 @@ public class Plugin implements BundleActivator {
             }
         } catch (Exception e) {
             unregisterWebResources();
-            throw new RuntimeException("REST resources of " + this + " can't be registered " +
-                "at namespace " + namespace, e);
+            throw new RuntimeException("Registering REST resources of " + this + " failed " +
+                "(namespace=" + namespace + ")", e);
         }
     }
 

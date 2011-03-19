@@ -6,7 +6,7 @@
     <name>DeepaMehta 3 Distribution Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-bundles</artifactId>
-    <version>0.4.5-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
 
     <!-- All modules that belong to the DeepaMehta 3 standard installation. -->
     <dependencies>
@@ -14,7 +14,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-core</artifactId>
-            <version>0.4.5-SNAPSHOT</version>
+            <version>0.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
@@ -26,13 +26,13 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-server</artifactId>
-            <version>0.4.4-SNAPSHOT</version>
+            <version>0.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta3-client</artifactId>
-            <version>0.4.5-SNAPSHOT</version>
+            <artifactId>deepamehta3-webclient</artifactId>
+            <version>0.5-SNAPSHOT</version>
         </dependency>
 
         <!-- distribution -->

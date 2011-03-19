@@ -220,7 +220,7 @@ var js = {
         expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000) */
         //
         // DeepaMehta note: the cookie's path must be explicitly set to "/". If not set the browser would set it to
-        // "/de.deepamehta.3-client" (the "directory" of the page that loaded this script) and the cookie will not be
+        // "/de.deepamehta.3-webclient" (the "directory" of the page that loaded this script) and the cookie will not be
         // send back to the server for XHR requests as these are bound to "/core".
         // Vice versa we can't set the cookie's path to "/core" because it would not be accessible here at client-side.
         document.cookie = key + "=" + value + ";path=/" // + ";expires=" + expires.toGMTString()

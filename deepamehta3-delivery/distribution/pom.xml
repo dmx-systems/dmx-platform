@@ -7,13 +7,13 @@
     <name>DeepaMehta 3 Distribution</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3</artifactId>
-    <version>0.4.5-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta3-delivery</artifactId>
-        <version>0.4.5-SNAPSHOT</version>
+        <version>0.5-SNAPSHOT</version>
     </parent>
 
     <properties>

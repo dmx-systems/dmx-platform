@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.client;
+package de.deepamehta.plugins.webclient;
 
 import de.deepamehta.plugins.server.provider.TopicProvider;
 
@@ -21,7 +21,7 @@ public class Application extends javax.ws.rs.core.Application {
     @Override
     public Set getSingletons() {
         Set singletons = new HashSet();
-        singletons.add(Activator.getService().getPlugin("de.deepamehta.3-client"));
+        singletons.add(Activator.getService().getPlugin("de.deepamehta.3-webclient"));
         return singletons;
     }
 }

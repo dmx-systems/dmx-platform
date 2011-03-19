@@ -94,7 +94,7 @@ public class EmbeddedService implements CoreService {
         // It is declared here for documentation purpose only.
         SERVICE_GONE("serviceGone", PluginService.class),
 
-         PRE_CREATE_TOPIC("preCreateHook",  Topic.class, ClientContext.class),
+         PRE_CREATE_TOPIC("preCreateHook",  TopicData.class, ClientContext.class),
         POST_CREATE_TOPIC("postCreateHook", Topic.class, ClientContext.class),
         // ### PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, Properties.class),
         // ### POST_UPDATE_TOPIC("postUpdateHook", Topic.class, Properties.class),

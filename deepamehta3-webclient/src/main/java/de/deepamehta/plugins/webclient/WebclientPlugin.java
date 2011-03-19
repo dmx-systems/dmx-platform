@@ -1,7 +1,6 @@
-package de.deepamehta.plugins.client;
+package de.deepamehta.plugins.webclient;
 
 import de.deepamehta.core.model.ClientContext;
-import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.service.Plugin;
 
@@ -26,7 +25,7 @@ import java.util.logging.Logger;
 @Path("/")
 @Consumes("application/json")
 @Produces("application/json")
-public class ClientPlugin extends Plugin {
+public class WebclientPlugin extends Plugin {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -47,7 +46,7 @@ public class ClientPlugin extends Plugin {
         String webclientUrl = null;
         try {
             String port = System.getProperty("org.osgi.service.http.port");
-            webclientUrl = "http://localhost:" + port + "/de.deepamehta.3-client/index.html";
+            webclientUrl = "http://localhost:" + port + "/de.deepamehta.3-webclient/index.html";
             logger.info("### Launching webclient (" + webclientUrl + ")");
             //
             Desktop.getDesktop().browse(new URI(webclientUrl));
@@ -79,8 +78,8 @@ public class ClientPlugin extends Plugin {
                               @HeaderParam("Cookie") ClientContext clientContext) {
         logger.info("searchTerm=" + searchTerm + ", fieldUri=" + fieldUri + ", wholeWord=" + wholeWord +
             ", cookie=" + clientContext);
-        List<Topic> searchResult = dms.searchTopics(searchTerm, fieldUri, wholeWord, clientContext);
-        return createResultTopic(searchTerm, searchResult, clientContext);
+        // ### List<Topic> searchResult = dms.searchTopics(searchTerm, fieldUri, wholeWord, clientContext);
+        return null;    // ### createResultTopic(searchTerm, searchResult, clientContext);
     }
 
     /**
@@ -94,7 +93,7 @@ public class ClientPlugin extends Plugin {
     @Path("/search/by_type/{typeUri}")
     public Topic getTopics(@PathParam("typeUri") String typeUri) {
         logger.info("typeUri=" + typeUri);
-        return createResultTopic(typeUri, dms.getTopics(typeUri), null);
+        return null;    // ### createResultTopic(typeUri, dms.getTopics(typeUri), null);
     }
 
 
@@ -104,7 +103,7 @@ public class ClientPlugin extends Plugin {
     /**
      * Creates a search result topic (a bucket).
      */
-    private Topic createResultTopic(String searchTerm, List<Topic> topics, ClientContext clientContext) {
+    /* ### private Topic createResultTopic(String searchTerm, List<Topic> topics, ClientContext clientContext) {
         Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/SearchTerm", searchTerm);
         Topic resultTopic = dms.createTopic("de/deepamehta/core/topictype/SearchResult", properties, clientContext);
@@ -115,5 +114,5 @@ public class ClientPlugin extends Plugin {
             dms.createRelation("SEARCH_RESULT", resultTopic.id, topic.id, null);
         }
         return resultTopic;
-    }
+    } */
 }

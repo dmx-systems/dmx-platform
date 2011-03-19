@@ -7,7 +7,7 @@
     <name>DeepaMehta 3 Global</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-global</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <!-- All modules that belong to the DeepaMehta 3 standard installation. -->
@@ -35,7 +35,7 @@
         <module>deepamehta3-projects</module>
         <module>deepamehta3-notes</module>
 
-        <module>deepamehta3-client</module>
+        <module>deepamehta3-webclient</module>
         <module>deepamehta3-delivery</module>
 
         <module>deepamehta3-plugin-parent</module>

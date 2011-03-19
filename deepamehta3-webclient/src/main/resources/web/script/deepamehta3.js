@@ -508,8 +508,8 @@ var dm3c = new function() {
         $("#upload-dialog form").attr("action", "/core/command/" + command)
         $("#upload-dialog").dialog("open")
         // bind callback function, using artifact ID as event namespace
-        $("#upload-target").unbind("load.deepamehta3-client")
-        $("#upload-target").bind("load.deepamehta3-client", upload_complete(callback))
+        $("#upload-target").unbind("load.deepamehta3-webclient")
+        $("#upload-target").bind("load.deepamehta3-webclient", upload_complete(callback))
 
         function upload_complete(callback) {
             return function() {
