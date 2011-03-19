@@ -8,8 +8,6 @@ import java.util.logging.Logger;
 
 /**
  * A wrapper for a property value. Supported property types are String, int, long, boolean.
- * <p>
- * A TopicValue object may also represent "no-value".
  */
 public class TopicValue {
 

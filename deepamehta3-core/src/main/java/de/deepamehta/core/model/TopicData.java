@@ -26,6 +26,7 @@ public class TopicData {
 
     /**
      * @param   uri     If <code>null</code> the topic will have no URI. This is OK.
+     * @param   value   If <code>null</code> the topic will have no value. This is OK.
      */
     public TopicData(String uri, TopicValue value, String typeUri, Composite composite) {
         this.uri = uri;

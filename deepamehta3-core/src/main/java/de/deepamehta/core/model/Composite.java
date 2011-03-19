@@ -16,6 +16,10 @@ public class Composite {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    public Composite(JSONObject values) {
+        this.values = values;
+    }
+
     public Composite(String json) {
         try {
             this.values = new JSONObject(json);
@@ -32,7 +36,12 @@ public class Composite {
 
     public Object get(String key) {
         try {
-            return values.get(key);
+            Object value = values.get(key);
+            if (value instanceof JSONObject) {
+                return new Composite((JSONObject) value);
+            } else {
+                return value;
+            }
         } catch (Exception e) {
             throw new RuntimeException("Getting key \"" + key + "\" failed");
         }

@@ -793,26 +793,39 @@ public class EmbeddedService implements CoreService {
         return null;
     }
 
-    void setTopicValue(Topic topic, String assocDefUri, TopicValue value) {
-        TopicTypeDefinition typeDef = getTopicTypeDefinition(topic.getTypeUri());
+    /**
+     * Set a child's topic value. If the child topic does not exist it is created.
+     *
+     * @param   parentTopic     The parent topic.
+     * @param   assocDefUri     The "axis" that leads to the child. The URI of an {@link AssociationDefinition}.
+     * @param   value           The value to set. If <code>null</code> nothing is set. The child topic is potentially
+     *                          created and returned anyway.
+     *
+     * @return  The child topic.
+     */
+    Topic setChildTopicValue(Topic parentTopic, String assocDefUri, TopicValue value) {
+        TopicTypeDefinition typeDef = getTopicTypeDefinition(parentTopic.getTypeUri());
         AssociationDefinition assocDef = typeDef.getAssociationDefinition(assocDefUri);
         String assocTypeUri = assocDef.getAssocTypeUri();
         String wholeRoleTypeUri = assocDef.getWholeRoleTypeUri();
         String  partRoleTypeUri = assocDef.getPartRoleTypeUri();
         //
-        Topic childTopic = getRelatedTopic(topic.getId(), assocTypeUri, wholeRoleTypeUri, partRoleTypeUri);
+        Topic childTopic = getRelatedTopic(parentTopic.getId(), assocTypeUri, wholeRoleTypeUri, partRoleTypeUri);
         if (childTopic != null) {
-            childTopic.setValue(value);
+            if (value != null) {
+                childTopic.setValue(value);
+            }
         } else {
             // create child topic
             String topicTypeUri = assocDef.getPartTopicTypeUri();
             childTopic = createTopic(new TopicData(null, value, topicTypeUri, null), null);
             // create association
             Set<Role> roles = new HashSet();
-            roles.add(new Role(topic.getId(), wholeRoleTypeUri));
+            roles.add(new Role(parentTopic.getId(), wholeRoleTypeUri));
             roles.add(new Role(childTopic.getId(), partRoleTypeUri));
             createAssociation(new Association(-1, assocTypeUri, roles), null);
         }
+        return childTopic;
     }
 
     Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleType, String othersRoleType) {
@@ -834,8 +847,11 @@ public class EmbeddedService implements CoreService {
         while (i.hasNext()) {
             String key = i.next();
             Object value = comp.get(key);
-            if (!(value instanceof Composite)) {
-                setTopicValue(topic, key, new TopicValue(value));
+            if (value instanceof Composite) {
+                Topic childTopic = setChildTopicValue(topic, key, null);
+                createTopicTree(childTopic, (Composite) value);
+            } else {
+                setChildTopicValue(topic, key, new TopicValue(value));
             }
         }
     }
