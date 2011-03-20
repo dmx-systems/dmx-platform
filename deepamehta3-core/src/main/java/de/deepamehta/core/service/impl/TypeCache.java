@@ -19,7 +19,7 @@ class TypeCache {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Map<String, TopicType> cache = new HashMap();
+    private Map<String, AttachedTopicType> cache = new HashMap();   // key: topic type URI
     private EmbeddedService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -32,8 +32,8 @@ class TypeCache {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    TopicType get(String typeUri) {
-        TopicType topicType = cache.get(typeUri);
+    AttachedTopicType get(String typeUri) {
+        AttachedTopicType topicType = cache.get(typeUri);
         if (topicType == null) {
             logger.info("Loading topic type \"" + typeUri + "\" into type cache");
             topicType = loadTopicType(typeUri);
@@ -52,13 +52,13 @@ class TypeCache {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void put(TopicType topicType) {
+    private void put(AttachedTopicType topicType) {
         cache.put(topicType.getUri(), topicType);
     }
 
     // ---
 
-    private TopicType loadTopicType(String typeUri) {
+    private AttachedTopicType loadTopicType(String typeUri) {
         Topic typeTopic = dms.storage.getTopic("uri", new TopicValue(typeUri));
         TopicTypeData topicTypeData = new TopicTypeData(typeTopic);
         for (Association assoc : dms.storage.getAssociations(typeTopic.getId(), "dm3.core.whole_topic_type")) {

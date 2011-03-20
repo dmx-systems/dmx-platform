@@ -8,7 +8,7 @@ import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
-import de.deepamehta.core.model.TopicTypeData;
+import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.storage.DeepaMehtaTransaction;
 
@@ -246,7 +246,8 @@ public class Plugin implements BundleActivator {
     public void enrichTopicHook(Topic topic, ClientContext clientContext) {
     }
 
-    public void enrichTopicTypeHook(TopicTypeData topicTypeData, ClientContext clientContext) {
+    public Map<String, Object> enrichTopicTypeHook(TopicType topicType, ClientContext clientContext) {
+        return null;
     }
 
     // ---
@@ -280,7 +281,7 @@ public class Plugin implements BundleActivator {
      *                      particular the underlying type topic has an ID already. That is, the type is ready for
      *                      e.g. being related to other topics.
      */
-    public void modifyTopicTypeHook(TopicTypeData topicTypeData, ClientContext clientContext) {
+    public void modifyTopicTypeHook(TopicType topicType, ClientContext clientContext) {
     }
 
     // ---

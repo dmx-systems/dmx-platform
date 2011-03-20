@@ -106,12 +106,12 @@ public class EmbeddedService implements CoreService {
         PROVIDE_RELATION_PROPERTIES("providePropertiesHook", Association.class),
 
         ENRICH_TOPIC("enrichTopicHook", Topic.class, ClientContext.class),
-        ENRICH_TOPIC_TYPE("enrichTopicTypeHook", TopicTypeData.class, ClientContext.class),
+        ENRICH_TOPIC_TYPE("enrichTopicTypeHook", TopicType.class, ClientContext.class),
 
         // Note: besides regular triggering (see {@link #createTopicType})
         // this hook is triggered by the plugin itself
         // (see {@link de.deepamehta.core.service.Plugin#introduceTypesToPlugin}).
-        MODIFY_TOPIC_TYPE("modifyTopicTypeHook", TopicTypeData.class, ClientContext.class),
+        MODIFY_TOPIC_TYPE("modifyTopicTypeHook", TopicType.class, ClientContext.class),
 
         EXECUTE_COMMAND("executeCommandHook", String.class, CommandParams.class, ClientContext.class);
 
@@ -514,10 +514,16 @@ public class EmbeddedService implements CoreService {
     public TopicType getTopicType(@PathParam("uri") String uri, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            TopicType topicType = typeCache.get(uri);
-            triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
+            AttachedTopicType topicType = typeCache.get(uri);
+            // enrichment
+            Map<String, Object> result = triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
+            EnrichedTopicType enrichedTopicType = new EnrichedTopicType(topicType);
+            for (String pluginId : result.keySet()) {
+                enrichedTopicType.setEnrichment(pluginId, result.get(pluginId));
+            }
+            //
             tx.success();
-            return topicType;
+            return enrichedTopicType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Retrieving topic type \"" + uri + "\" failed", e);
@@ -549,6 +555,8 @@ public class EmbeddedService implements CoreService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             Topic topic = storage.createTopic(topicTypeData);
+            // TODO: process dataTypeUri
+            //
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
             triggerHook(Hook.MODIFY_TOPIC_TYPE, topicTypeData, clientContext);
@@ -656,11 +664,11 @@ public class EmbeddedService implements CoreService {
                                         @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Iterator<CommandResult> i = triggerHook(Hook.EXECUTE_COMMAND, command, params, clientContext).iterator();
+            Iterator i = triggerHook(Hook.EXECUTE_COMMAND, command, params, clientContext).values().iterator();
             if (!i.hasNext()) {
                 throw new RuntimeException("Command is not handled by any plugin");
             }
-            CommandResult result = i.next();
+            CommandResult result = (CommandResult) i.next();
             if (i.hasNext()) {
                 throw new RuntimeException("Ambiguity: more than one plugin returned a result");
             }
@@ -849,22 +857,22 @@ public class EmbeddedService implements CoreService {
     /**
      * Triggers a hook for all installed plugins.
      */
-    private Set triggerHook(final Hook hook, final Object... params) {
-        final Set resultSet = new HashSet();
+    private Map<String, Object> triggerHook(final Hook hook, final Object... params) {
+        final Map resultMap = new HashMap();
         new PluginCache.Iterator() {
             @Override
             void body(Plugin plugin) {
                 try {
                     Object result = triggerHook(plugin, hook, params);
                     if (result != null) {
-                        resultSet.add(result);
+                        resultMap.put(plugin.getId(), result);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException("Triggering hook " + hook + " of " + plugin + " failed", e);
                 }
             }
         };
-        return resultSet;
+        return resultMap;
     }
 
     /**

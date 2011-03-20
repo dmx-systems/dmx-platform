@@ -2,6 +2,7 @@ package de.deepamehta.plugins.webclient;
 
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.service.Plugin;
 
 import javax.ws.rs.GET;
@@ -55,6 +56,14 @@ public class WebclientPlugin extends Plugin {
             logger.warning("### Webclient can't be launched automatically (" + e + ")");
             logger.info("### Please launch webclient manually: " + webclientUrl);
         }
+    }
+
+    @Override
+    public Map<String, Object> enrichTopicTypeHook(TopicType topicType, ClientContext clientContext) {
+        Map m = new HashMap();
+        m.put("text", "hallo");
+        m.put("nr", 123);
+        return m;
     }
 
 

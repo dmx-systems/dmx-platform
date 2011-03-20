@@ -23,9 +23,9 @@ public class TopicTypeData extends TopicData implements TopicType {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected long id;
+    private long id;
 
-    protected String dataTypeUri;
+    private String dataTypeUri;
 
     private Map<String, AssociationDefinition> assocDefs;
 

@@ -1,7 +1,7 @@
 function TypeCache() {
 
-    var topic_types = {}        // key: Type URI, value: type definition (object with "uri", "fields", "label",
-                                //                       "icon_src", and "js_renderer_class" attributes)
+    var topic_types = {}        // key: Type URI, value: type definition (object with "uri", "value",
+                                //                                  "icon_src", and "assoc_defs" properties)
     var topic_type_icons = {}   // key: Type URI, value: icon (JavaScript Image object)
 
     // ------------------------------------------------------------------------------------------------------ Public API
@@ -30,10 +30,10 @@ function TypeCache() {
     /**
      * Looks up a type definition from the cache.
      *
-     * @param   type_topic  the topic representing the type (object with "id", "type_uri", and "properties" attributes).
+     * @param   type_topic  the topic representing the type (object with "id", "type_uri", and "properties" properties).
      *
-     * @return  the type definition (object with "uri", "fields", "label", "icon_src", and "js_renderer_class"
-     *          attributes).
+     * @return  the type definition (object with "uri", "fields", "value", "icon_src", and "js_renderer_class"
+     *          properties).
      */
     this.get_topic_type = function(type_topic) {
         var type_uri = type_topic.properties["de/deepamehta/core/property/TypeURI"]
@@ -47,7 +47,7 @@ function TypeCache() {
     }
 
     this.get_label = function(type_uri) {
-        return topic_types[type_uri].label
+        return topic_types[type_uri].value
     }
 
     this.get_icon = function(type_uri) {
@@ -71,7 +71,7 @@ function TypeCache() {
     }
 
     this.set_topic_type_label = function(type_uri, label) {
-        topic_types[type_uri].label = label
+        topic_types[type_uri].value = label
     }
 
     // --- Data Fields ---

@@ -25,6 +25,12 @@ class AttachedTopicType extends TopicTypeData {
         this.dms = dms;
     }
 
-    // -------------------------------------------------------------------------------------------------- Public Methods
+    AttachedTopicType(AttachedTopicType topicType) {
+        super(topicType);
+        this.dms = topicType.dms;
+    }
 
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    
 }

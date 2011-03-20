@@ -42,21 +42,21 @@ public class TopicTypeProvider implements MessageBodyWriter<TopicType> {
     }
 
     @Override
-    public long getSize(TopicType topicTypeDef, Class<?> type, Type genericType, Annotation[] annotations,
+    public long getSize(TopicType topicType, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(TopicType topicTypeDef, Class<?> type, Type genericType, Annotation[] annotations,
+    public void writeTo(TopicType topicType, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            topicTypeDef.toJSON().write(writer);
+            topicType.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + topicTypeDef + " to response stream failed", e);
+            throw new IOException("Writing " + topicType + " to response stream failed", e);
         }
     }
 }
