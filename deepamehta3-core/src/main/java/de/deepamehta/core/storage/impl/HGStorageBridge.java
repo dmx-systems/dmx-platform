@@ -7,7 +7,6 @@ import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
-import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeDefinition;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
@@ -121,11 +120,6 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // === Types ===
 
     @Override
-    public TopicType getTopicType(String typeUri) {
-        return buildTopicType(lookupTopicType(typeUri));
-    }
-
-    @Override
     public TopicTypeDefinition getTopicTypeDefinition(String typeUri) {
         return typeCache.get(typeUri);
     }
@@ -134,12 +128,6 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     public MetaType createMetaType(MetaType metaType) {
         Topic topic = createTopic(metaType);
         return new MetaType(topic);
-    }
-
-    @Override
-    public TopicType createTopicType(TopicType topicType) {
-        Topic topic = createTopic(topicType);
-        return new TopicType(topic, topicType.getDataTypeUri());
     }
 
     @Override
@@ -209,10 +197,6 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         }
         return new HGTopic(node.getId(), node.getString("uri", null), new TopicValue(node.get("value")),
             getTopicTypeUri(node), null);     // composite=null
-    }
-
-    TopicType buildTopicType(HyperNode node) {
-        return new TopicType(buildTopic(node), null);       // FIXME: dataTypeUri=null
     }
 
     // ---

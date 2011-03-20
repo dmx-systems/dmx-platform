@@ -74,6 +74,21 @@ public class TopicData {
 
     // ---
 
+    public JSONObject toJSON() {
+        try {
+            JSONObject o = new JSONObject();
+            o.put("uri", uri);
+            o.put("value", value.value());
+            o.put("topic_type", typeUri);
+            o.put("composite", composite);
+            return o;
+        } catch (JSONException e) {
+            throw new RuntimeException("Serializing " + this + " failed", e);
+        }
+    }
+
+    // ---
+
     @Override
     public String toString() {
         return "topic data (uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +

@@ -7,17 +7,15 @@ import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.Composite;
-import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
-import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.model.TopicTypeData;
 import de.deepamehta.core.model.TopicTypeDefinition;
 import de.deepamehta.core.model.RelatedTopic;
-import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
@@ -103,15 +101,15 @@ public class EmbeddedService implements CoreService {
         POST_DELETE_RELATION("postDeleteRelationHook", Long.TYPE),
 
         PROVIDE_TOPIC_PROPERTIES("providePropertiesHook", Topic.class),
-        PROVIDE_RELATION_PROPERTIES("providePropertiesHook", Relation.class),
+        PROVIDE_RELATION_PROPERTIES("providePropertiesHook", Association.class),
 
         ENRICH_TOPIC("enrichTopicHook", Topic.class, ClientContext.class),
-        ENRICH_TOPIC_TYPE("enrichTopicTypeHook", TopicType.class, ClientContext.class),
+        ENRICH_TOPIC_TYPE("enrichTopicTypeHook", TopicTypeData.class, ClientContext.class),
 
         // Note: besides regular triggering (see {@link #createTopicType})
         // this hook is triggered by the plugin itself
         // (see {@link de.deepamehta.core.service.Plugin#introduceTypesToPlugin}).
-        MODIFY_TOPIC_TYPE("modifyTopicTypeHook", TopicType.class, ClientContext.class),
+        MODIFY_TOPIC_TYPE("modifyTopicTypeHook", TopicTypeData.class, ClientContext.class),
 
         EXECUTE_COMMAND("executeCommandHook", String.class, CommandParams.class, ClientContext.class);
 
@@ -560,20 +558,20 @@ public class EmbeddedService implements CoreService {
     @Path("/topictype")
     @Consumes("application/x-www-form-urlencoded")
     @Override
-    public TopicType createTopicType(TopicType topicType, @HeaderParam("Cookie") ClientContext clientContext) {
+    public Topic createTopicType(TopicTypeData topicTypeData, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            topicType = storage.createTopicType(topicType);
+            Topic topic = storage.createTopic(topicTypeData);
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
-            triggerHook(Hook.MODIFY_TOPIC_TYPE, topicType, clientContext);
-            triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
+            triggerHook(Hook.MODIFY_TOPIC_TYPE, topicTypeData, clientContext);
+            triggerHook(Hook.ENRICH_TOPIC_TYPE, topicTypeData, clientContext);
             //
             tx.success();
-            return topicType;
+            return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creation of " + topicType + " failed", e);
+            throw new RuntimeException("Creating topic type failed (" + topicTypeData + ")", e);
         } finally {
             tx.finish();
         }

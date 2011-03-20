@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.server.provider;
 
-import de.deepamehta.core.model.Relation;
+import de.deepamehta.core.model.TopicTypeData;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class RelationProvider implements MessageBodyWriter<Relation> {
+public class TopicTypeDataProvider implements MessageBodyWriter<TopicTypeData> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -38,25 +38,25 @@ public class RelationProvider implements MessageBodyWriter<Relation> {
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
-        return type == Relation.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
+        return genericType == TopicTypeData.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Override
-    public long getSize(Relation relation, Class<?> type, Type genericType, Annotation[] annotations,
+    public long getSize(TopicTypeData topicType, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(Relation relation, Class<?> type, Type genericType, Annotation[] annotations,
+    public void writeTo(TopicTypeData topicType, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            // FIXME: relation.toJSON().write(writer);
+            topicType.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + relation + " to response stream failed", e);
+            throw new IOException("Writing " + topicType + " to response stream failed", e);
         }
     }
 }

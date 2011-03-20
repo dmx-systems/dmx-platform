@@ -15,22 +15,27 @@ import java.util.logging.Logger;
 /**
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class TopicTypeDefinition extends TopicType {
+public class TopicTypeDefinition {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private String topicTypeUri;
     private Map<String, AssociationDefinition> assocDefs;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TopicTypeDefinition(TopicType topicType) {
-        super(topicType);
+    public TopicTypeDefinition(String topicTypeUri) {
+        this.topicTypeUri = topicTypeUri;
         this.assocDefs = new HashMap();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    public String getUri() {
+        return topicTypeUri;
+    }
 
     public AssociationDefinition getAssociationDefinition(String assocDefUri) {
         AssociationDefinition assocDef = assocDefs.get(assocDefUri);
@@ -45,8 +50,8 @@ public class TopicTypeDefinition extends TopicType {
         String assocDefUri = assocDef.getUri();
         AssociationDefinition existing = assocDefs.get(assocDefUri);
         if (existing != null) {
-            throw new RuntimeException("Ambiguity: topic type definition \"" + uri + "\" has more than one " +
-                "association definitions with uri \"" + assocDefUri + "\" -- Use distinct part role types or " +
+            throw new RuntimeException("Ambiguity: topic type definition \"" + topicTypeUri + "\" has more than " +
+                "one association definitions with uri \"" + assocDefUri + "\" -- Use distinct part role types or " +
                 "specifiy an unique uri");
         }
         assocDefs.put(assocDefUri, assocDef);
@@ -56,7 +61,6 @@ public class TopicTypeDefinition extends TopicType {
 
     @Override
     public String toString() {
-        return "topic type definition " + id + " \"" + value + "\" (uri=\"" + uri + "\", typeUri=\"" + typeUri +
-            "\", dataTypeUri=\"" + dataTypeUri + "\", assocDefs=" + assocDefs + ")";
+        return "topic type definition (uri=\"" + topicTypeUri + "\", assocDefs=" + assocDefs + ")";
     }
 }

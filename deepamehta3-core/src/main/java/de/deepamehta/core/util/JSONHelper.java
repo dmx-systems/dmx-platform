@@ -5,10 +5,9 @@ import de.deepamehta.core.model.AssociationType;
 import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.RelatedTopic;
-import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
-import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.model.TopicTypeData;
 import de.deepamehta.core.service.CoreService;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -123,8 +122,8 @@ public class JSONHelper {
 
     public static void createTopicTypes(JSONArray topicTypes, CoreService dms) throws Exception {
         for (int i = 0; i < topicTypes.length(); i++) {
-            TopicType topicType = new TopicType(topicTypes.getJSONObject(i));
-            dms.createTopicType(topicType, null);           // clientContext=null
+            TopicTypeData topicTypeData = new TopicTypeData(topicTypes.getJSONObject(i));
+            dms.createTopicType(topicTypeData, null);           // clientContext=null
         }
     }
 

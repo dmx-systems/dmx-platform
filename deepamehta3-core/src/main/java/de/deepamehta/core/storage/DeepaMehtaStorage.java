@@ -4,10 +4,9 @@ import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationType;
 import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.RelatedTopic;
-import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
-import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.model.TopicTypeData;
 import de.deepamehta.core.model.TopicTypeDefinition;
 import de.deepamehta.core.model.TopicValue;
 
@@ -117,25 +116,11 @@ public interface DeepaMehtaStorage {
 
     // === Types ===
 
-    // Set<String> getTopicTypeUris();
-
-    TopicType getTopicType(String typeUri);
-
     TopicTypeDefinition getTopicTypeDefinition(String typeUri);
 
     MetaType createMetaType(MetaType metaType);
 
-    TopicType createTopicType(TopicType topicType);
-
     AssociationType createAssociationType(AssociationType assocType);
-
-    // void addDataField(String typeUri, DataField dataField);
-
-    // void updateDataField(String typeUri, DataField dataField);
-
-    // void removeDataField(String typeUri, String fieldUri);
-
-    // void setDataFieldOrder(String typeUri, List fieldUris);
 
     // === DB ===
 

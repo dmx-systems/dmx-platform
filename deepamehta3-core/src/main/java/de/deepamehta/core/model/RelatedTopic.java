@@ -6,7 +6,7 @@ import java.util.List;
 
 
 /**
- * A Topic-Relation pair.
+ * A Topic-Association pair.
  * <p>
  * Acts as a data transfer object.
  */
@@ -15,16 +15,16 @@ public class RelatedTopic {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Topic topic;
-    private Relation relation;
+    private Association association;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public RelatedTopic() {
     }
 
-    public RelatedTopic(Topic topic, Relation relation) {
+    public RelatedTopic(Topic topic, Association association) {
         this.topic = topic;
-        this.relation = relation;
+        this.association = association;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -33,8 +33,8 @@ public class RelatedTopic {
         return topic;
     }
 
-    public Relation getRelation() {
-        return relation;
+    public Association getRelation() {
+        return association;
     }
 
     // ---
@@ -43,8 +43,8 @@ public class RelatedTopic {
         this.topic = topic;
     }
 
-    public void setRelation(Relation relation) {
-        this.relation = relation;
+    public void setRelation(Association association) {
+        this.association = association;
     }
 
     // ---

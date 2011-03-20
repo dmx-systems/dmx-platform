@@ -115,12 +115,8 @@ public class BaseTopic extends TopicData implements Topic {
     @Override
     public JSONObject toJSON() {
         try {
-            JSONObject o = new JSONObject();
+            JSONObject o = super.toJSON();
             o.put("id", id);
-            o.put("uri", uri);
-            o.put("value", value.value());
-            o.put("topic_type", typeUri);
-            o.put("composite", composite);
             return o;
         } catch (JSONException e) {
             throw new RuntimeException("Serializing " + this + " failed", e);

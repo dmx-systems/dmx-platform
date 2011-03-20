@@ -58,7 +58,7 @@ class HGTypeCache {
     // ---
 
     private TopicTypeDefinition loadTopicTypeDefinition(String typeUri) {
-        TopicTypeDefinition topicTypeDef = new TopicTypeDefinition(storage.getTopicType(typeUri));
+        TopicTypeDefinition topicTypeDef = new TopicTypeDefinition(typeUri);
         HyperNode topicType = storage.lookupTopicType(typeUri);
         for (HyperEdge edge : topicType.getHyperEdges("dm3.core.whole_topic_type")) {
             String wholeTopicTypeUri = edge.getHyperNode("dm3.core.whole_topic_type").getString("uri");
