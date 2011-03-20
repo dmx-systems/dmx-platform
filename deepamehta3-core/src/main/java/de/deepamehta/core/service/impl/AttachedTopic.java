@@ -51,4 +51,9 @@ class AttachedTopic extends BaseTopic {
     public Topic getRelatedTopic(String assocTypeUri, String myRoleType, String othersRoleType) {
         return dms.getRelatedTopic(getId(), assocTypeUri, myRoleType, othersRoleType);
     }
+
+    @Override
+    public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType) {
+        return dms.getRelatedTopics(getId(), assocTypeUri, myRoleType, othersRoleType);
+    }
 }

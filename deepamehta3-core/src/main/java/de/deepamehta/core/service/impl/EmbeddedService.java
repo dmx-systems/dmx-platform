@@ -493,24 +493,21 @@ public class EmbeddedService implements CoreService {
 
     // === Types ===
 
-    /* @GET
+    @GET
     @Path("/topictype")
     @Override
     public Set<String> getTopicTypeUris() {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            Set typeUris = storage.getTopicTypeUris();
-            tx.success();
-            return typeUris;
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Topic type URIs can't be retrieved", e);
-        } finally {
-            tx.finish();
+        Topic metaType = buildTopic(storage.getTopic("uri", new TopicValue("dm3.core.topic_type")));
+        Set<Topic> topicTypes = metaType.getRelatedTopics("dm3.core.instantiation", "dm3.core.type",
+                                                                                    "dm3.core.instance");
+        Set<String> topicTypeUris = new HashSet();
+        for (Topic topicType : topicTypes) {
+            topicTypeUris.add(topicType.getUri());
         }
+        return topicTypeUris;
     }
 
-    @GET
+    /* @GET
     @Path("/topictype/{typeUri}")
     @Override
     public TopicType getTopicType(@PathParam("typeUri") String typeUri,
@@ -831,6 +828,12 @@ public class EmbeddedService implements CoreService {
     Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleType, String othersRoleType) {
         Topic topic = storage.getRelatedTopic(topicId, assocTypeUri, myRoleType, othersRoleType);
         return topic != null ? buildTopic(topic) : null;
+    }
+
+    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleType, String othersRoleType) {
+        Set<Topic> topics = storage.getRelatedTopics(topicId, assocTypeUri, myRoleType, othersRoleType);
+        return topics;
+        // return topic != null ? buildTopic(topic) : null;     FIXME: attach topics
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

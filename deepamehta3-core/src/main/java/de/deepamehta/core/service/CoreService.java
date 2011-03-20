@@ -152,7 +152,7 @@ public interface CoreService {
 
     // === Types ===
 
-    // public Set<String> getTopicTypeUris();
+    public Set<String> getTopicTypeUris();
 
     // public TopicType getTopicType(String typeUri, ClientContext clientContext);
 

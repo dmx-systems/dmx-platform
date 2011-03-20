@@ -30,8 +30,8 @@ public class MetaType extends BaseTopic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public MetaType(long id, String uri, TopicValue value) {
-        super(id, uri, value, null, null);  // typeUri=null, composite=null
+    public MetaType(Topic topic) {
+        super(topic);
     }
 
     public MetaType(JSONObject type) {
@@ -39,6 +39,7 @@ public class MetaType extends BaseTopic {
             this.id = -1;
             this.uri = type.getString("uri");
             this.value = new TopicValue(type.get("value"));
+            this.typeUri = "dm3.core.meta_type";
         } catch (Exception e) {
             throw new RuntimeException("Parsing " + this + " failed", e);
         }
@@ -47,20 +48,7 @@ public class MetaType extends BaseTopic {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public JSONObject toJSON() {
-        try {
-            JSONObject o = new JSONObject();
-            o.put("id", id);
-            o.put("uri", uri);
-            o.put("value", value.value());
-            return o;
-        } catch (JSONException e) {
-            throw new RuntimeException("Serializing " + this + " failed", e);
-        }
-    }
-
-    @Override
     public String toString() {
-        return "meta type " + id + " \"" + value + "\" (uri=\"" + uri + "\")";
+        return "meta type " + id + " \"" + value + "\" (uri=\"" + uri + "\", typeUri=\"" + typeUri + "\")";
     }
 }

@@ -67,6 +67,8 @@ public interface DeepaMehtaStorage {
 
     Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleType, String othersRoleType);
 
+    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleType, String othersRoleType);
+
     void setTopicValue(long topicId, TopicValue value);
 
     // List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord);

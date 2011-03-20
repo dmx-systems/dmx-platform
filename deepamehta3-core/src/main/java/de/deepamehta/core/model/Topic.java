@@ -1,6 +1,7 @@
 package de.deepamehta.core.model;
 
 import org.codehaus.jettison.json.JSONObject;
+import java.util.Set;
 
 
 
@@ -38,6 +39,8 @@ public interface Topic {
     void setValue(String assocDefUri, TopicValue value);
 
     Topic getRelatedTopic(String assocTypeUri, String myRoleType, String othersRoleType);
+
+    Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType);
 
     // ---
 

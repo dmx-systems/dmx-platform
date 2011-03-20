@@ -13,6 +13,7 @@ import org.codehaus.jettison.json.JSONException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 
@@ -101,6 +102,11 @@ public class BaseTopic extends TopicData implements Topic {
 
     @Override
     public Topic getRelatedTopic(String assocTypeUri, String myRoleType, String othersRoleType) {
+        throw new RuntimeException("Method not implemented (" + getClass() + ")");
+    }
+
+    @Override
+    public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 

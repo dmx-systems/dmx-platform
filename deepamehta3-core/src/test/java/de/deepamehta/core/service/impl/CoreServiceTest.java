@@ -19,14 +19,14 @@ import org.junit.Test;
 public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
-    public void topicTypeDef() {
+    public void getTopicTypeDef() {
         TopicTypeDefinition typeDef = dms.getTopicTypeDefinition("dm3.core.plugin");
         logger.info(typeDef.toString());
-        assertEquals("topic type definition 43 \"Plugin\" (uri=\"dm3.core.plugin\", typeUri=\"dm3.core.topic_type\", " +
-            "dataTypeUri=\"null\", assocDefs={dm3.core.plugin_migration_nr=\n    association definition " +
-            "(assocTypeUri=\"null\")\n        whole: (type=\"dm3.core.plugin\", role=\"dm3.core.plugin\", " +
-            "cardinality=\"null\")\n        part: (type=\"dm3.core.plugin_migration_nr\", " +
-            "role=\"dm3.core.plugin_migration_nr\", cardinality=\"dm3.core.one\")})", typeDef.toString());
+        assertTrue(typeDef.toString().matches("topic type definition \\d+ \"Plugin\" \\(uri=\"dm3.core.plugin\", " +
+            "typeUri=\"dm3.core.topic_type\", dataTypeUri=\"null\", assocDefs=\\{dm3.core.plugin_migration_nr=\n    " +
+            "association definition \\(assocTypeUri=\"null\"\\)\n        whole: \\(type=\"dm3.core.plugin\", role=\"" +
+            "dm3.core.plugin\", cardinality=\"null\"\\)\n        part: \\(type=\"dm3.core.plugin_migration_nr\", " +
+            "role=\"dm3.core.plugin_migration_nr\", cardinality=\"dm3.core.one\"\\)\\}\\)"));
     }
 
     @Test

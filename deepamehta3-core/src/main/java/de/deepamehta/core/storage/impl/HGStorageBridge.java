@@ -61,9 +61,22 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri) {
+        // FIXME: assocTypeUri not respected
         ConnectedHyperNode node = hg.getHyperNode(topicId).getConnectedHyperNode(myRoleTypeUri, othersRoleTypeUri);
-        // FIXME: assocTypeUri not checked
         return node != null ? buildTopic(node.getHyperNode()) : null;
+    }
+
+    @Override
+    public Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                          String othersRoleTypeUri) {
+        // FIXME: assocTypeUri not respected
+        Set<ConnectedHyperNode> nodes = hg.getHyperNode(topicId).getConnectedHyperNodes(myRoleTypeUri,
+                                                                                        othersRoleTypeUri);
+        Set<Topic> topics = new HashSet();
+        for (ConnectedHyperNode node : nodes) {
+            topics.add(buildTopic(node.getHyperNode()));
+        }
+        return topics;
     }
 
     @Override
@@ -119,12 +132,8 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public MetaType createMetaType(MetaType metaType) {
-        // create node
-        HyperNode node = hg.createHyperNode();
-        node.setAttribute("uri", metaType.getUri(), IndexMode.KEY);
-        node.setAttribute("value", metaType.getValue().value());
-        //
-        return new MetaType(node.getId(), metaType.getUri(), metaType.getValue());
+        Topic topic = createTopic(metaType);
+        return new MetaType(topic);
     }
 
     @Override
@@ -153,6 +162,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         if (!hg.getHyperNode(0).hasAttribute("core_migration_nr")) {
             logger.info("Starting with a fresh DB -- Setting migration number to 0");
             setMigrationNr(0);
+            setupMetaNode();
             isCleanInstall = true;
         }
         return isCleanInstall;
@@ -216,5 +226,13 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     HyperNode getTopicType(HyperNode node) {
         // FIXME: should we additionally check weather the edge type is "dm3.core.instantiation"?
         return node.getConnectedHyperNode("dm3.core.instance", "dm3.core.type").getHyperNode();
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void setupMetaNode() {
+        HyperNode refNode = hg.getHyperNode(0);
+        refNode.setAttribute("uri", "dm3.core.meta_type", IndexMode.KEY);
+        refNode.setAttribute("value", "Meta Type");
     }
 }
