@@ -7,7 +7,6 @@ import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicTypeData;
-import de.deepamehta.core.model.TopicTypeDefinition;
 import de.deepamehta.core.model.TopicValue;
 
 import java.util.Map;
@@ -108,6 +107,8 @@ public interface DeepaMehtaStorage {
      */
     // List<Relation> getRelations(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
 
+    Set<Association> getAssociations(long topicId, String myRoleType);
+
     Association createAssociation(Association assoc);
 
     // void setRelationProperties(long id, Properties properties);
@@ -115,8 +116,6 @@ public interface DeepaMehtaStorage {
     // void deleteRelation(long id);
 
     // === Types ===
-
-    TopicTypeDefinition getTopicTypeDefinition(String typeUri);
 
     MetaType createMetaType(MetaType metaType);
 

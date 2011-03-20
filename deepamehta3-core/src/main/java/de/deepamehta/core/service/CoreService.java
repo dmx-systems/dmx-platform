@@ -10,8 +10,8 @@ import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeData;
-import de.deepamehta.core.model.TopicTypeDefinition;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.storage.DeepaMehtaTransaction;
 
@@ -152,9 +152,7 @@ public interface CoreService {
 
     public Set<String> getTopicTypeUris();
 
-    // public TopicType getTopicType(String typeUri, ClientContext clientContext);
-
-    public TopicTypeDefinition getTopicTypeDefinition(String typeUri);
+    public TopicType getTopicType(String topicTypeUri, ClientContext clientContext);
 
     public MetaType createMetaType(MetaType metaType);
 

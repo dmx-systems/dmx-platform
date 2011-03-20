@@ -4,7 +4,7 @@ import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicValue;
-import de.deepamehta.core.model.TopicTypeDefinition;
+import de.deepamehta.core.model.TopicType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -20,12 +20,13 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void getTopicTypeDef() {
-        TopicTypeDefinition typeDef = dms.getTopicTypeDefinition("dm3.core.plugin");
+        TopicType typeDef = dms.getTopicType("dm3.core.plugin", null);  // clientContext=null
         logger.info(typeDef.toString());
-        assertEquals("topic type definition (uri=\"dm3.core.plugin\", assocDefs={dm3.core.plugin_migration_nr=\n    " +
-            "association definition (assocTypeUri=\"null\")\n        whole: (type=\"dm3.core.plugin\", " +
-            "role=\"dm3.core.plugin\", cardinality=\"null\")\n        part: (type=\"dm3.core.plugin_migration_nr\", " +
-            "role=\"dm3.core.plugin_migration_nr\", cardinality=\"dm3.core.one\")})", typeDef.toString());
+        assertEquals("topic type data (uri=\"dm3.core.plugin\", value=Plugin, typeUri=\"dm3.core.topic_type\", " +
+            "dataTypeUri=\"null\", assocDefs={dm3.core.plugin_migration_nr=\n    association definition " +
+            "(uri=\"dm3.core.plugin_migration_nr\", assocTypeUri=\"null\")\n        whole: (type=\"dm3.core.plugin\"," +
+            " role=\"dm3.core.plugin\", cardinality=\"null\")\n        part: (type=\"dm3.core.plugin_migration_nr\"," +
+            " role=\"dm3.core.plugin_migration_nr\", cardinality=\"dm3.core.one\")})", typeDef.toString());
     }
 
     @Test

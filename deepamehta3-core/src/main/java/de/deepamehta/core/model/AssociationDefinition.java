@@ -100,11 +100,30 @@ public class AssociationDefinition {
 
     // ---
 
+    public JSONObject toJSON() {
+        try {
+            JSONObject o = new JSONObject();
+            o.put("uri", uri);
+            o.put("assocTypeUri", assocTypeUri);
+            o.put("wholeTopicTypeUri", wholeTopicTypeUri);
+            o.put("partTopicTypeUri", partTopicTypeUri);
+            o.put("wholeRoleTypeUri", wholeRoleTypeUri);
+            o.put("partRoleTypeUri", partRoleTypeUri);
+            o.put("wholeCardinalityUri", wholeCardinalityUri);
+            o.put("partCardinalityUri", partCardinalityUri);
+            return o;
+        } catch (Exception e) {
+            throw new RuntimeException("Serializing " + this + " failed", e);
+        }
+    }
+
+    // ---
+
     @Override
     public String toString() {
-        return "\n    association definition (assocTypeUri=\"" + assocTypeUri + "\")\n        whole: (type=\"" +
-            wholeTopicTypeUri + "\", role=\"" + wholeRoleTypeUri + "\", cardinality=\"" + wholeCardinalityUri +
-            "\")\n        part: (type=\"" + partTopicTypeUri + "\", role=\"" + partRoleTypeUri + "\", cardinality=\"" +
-            partCardinalityUri + "\")";
+        return "\n    association definition (uri=\"" + uri + "\", assocTypeUri=\"" + assocTypeUri + "\")\n        " +
+            "whole: (type=\"" + wholeTopicTypeUri + "\", role=\"" + wholeRoleTypeUri + "\", cardinality=\"" +
+            wholeCardinalityUri + "\")\n        part: (type=\"" + partTopicTypeUri + "\", role=\"" + partRoleTypeUri +
+            "\", cardinality=\"" + partCardinalityUri + "\")";
     }
 }

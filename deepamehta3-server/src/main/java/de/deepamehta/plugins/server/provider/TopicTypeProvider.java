@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.server.provider;
 
-import de.deepamehta.core.model.TopicTypeData;
+import de.deepamehta.core.model.TopicType;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class TopicTypeDataProvider implements MessageBodyWriter<TopicTypeData> {
+public class TopicTypeProvider implements MessageBodyWriter<TopicType> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -38,25 +38,25 @@ public class TopicTypeDataProvider implements MessageBodyWriter<TopicTypeData> {
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
-        return genericType == TopicTypeData.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
+        return genericType == TopicType.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Override
-    public long getSize(TopicTypeData topicType, Class<?> type, Type genericType, Annotation[] annotations,
+    public long getSize(TopicType topicTypeDef, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(TopicTypeData topicType, Class<?> type, Type genericType, Annotation[] annotations,
+    public void writeTo(TopicType topicTypeDef, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            topicType.toJSON().write(writer);
+            topicTypeDef.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + topicType + " to response stream failed", e);
+            throw new IOException("Writing " + topicTypeDef + " to response stream failed", e);
         }
     }
 }

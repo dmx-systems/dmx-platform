@@ -10,7 +10,7 @@ import de.deepamehta.plugins.server.provider.StringListProvider;
 import de.deepamehta.plugins.server.provider.StringSetProvider;
 import de.deepamehta.plugins.server.provider.TopicProvider;
 import de.deepamehta.plugins.server.provider.TopicListProvider;
-import de.deepamehta.plugins.server.provider.TopicTypeDataProvider;
+import de.deepamehta.plugins.server.provider.TopicTypeProvider;
 
 import de.deepamehta.core.osgi.Activator;
 
@@ -30,7 +30,7 @@ public class Application extends javax.ws.rs.core.Application {
         classes.add(RelatedTopicListProvider.class);
         classes.add(AssociationProvider.class);
         classes.add(AssociationListProvider.class);
-        classes.add(TopicTypeDataProvider.class);
+        classes.add(TopicTypeProvider.class);
         classes.add(StringListProvider.class);
         classes.add(StringSetProvider.class);
         classes.add(CommandParamsProvider.class);

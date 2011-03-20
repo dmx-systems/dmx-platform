@@ -4,7 +4,6 @@ import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicValue;
-import de.deepamehta.core.model.TopicTypeDefinition;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

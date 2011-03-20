@@ -1,11 +1,12 @@
-package de.deepamehta.core.storage.impl;
+package de.deepamehta.core.service.impl;
 
+import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationDefinition;
-import de.deepamehta.core.model.TopicTypeDefinition;
-import de.deepamehta.core.storage.DeepaMehtaStorage;
-
-import de.deepamehta.hypergraph.HyperEdge;
-import de.deepamehta.hypergraph.HyperNode;
+import de.deepamehta.core.model.Role;
+import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicTypeData;
+import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.model.TopicValue;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,31 +15,31 @@ import java.util.logging.Logger;
 
 
 
-class HGTypeCache {
+class TypeCache {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Map<String, TopicTypeDefinition> cache = new HashMap();
-    private HGStorageBridge storage;
+    private Map<String, TopicType> cache = new HashMap();
+    private EmbeddedService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    HGTypeCache(HGStorageBridge storage) {
-        this.storage = storage;
+    TypeCache(EmbeddedService dms) {
+        this.dms = dms;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    TopicTypeDefinition get(String typeUri) {
-        TopicTypeDefinition topicTypeDef = cache.get(typeUri);
-        if (topicTypeDef == null) {
+    TopicType get(String typeUri) {
+        TopicType topicType = cache.get(typeUri);
+        if (topicType == null) {
             logger.info("Loading topic type \"" + typeUri + "\" into type cache");
-            topicTypeDef = loadTopicTypeDefinition(typeUri);
-            put(topicTypeDef);
+            topicType = loadTopicType(typeUri);
+            put(topicType);
         }
-        return topicTypeDef;
+        return topicType;
     }
 
     void invalidate(String typeUri) {
@@ -51,65 +52,77 @@ class HGTypeCache {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void put(TopicTypeDefinition topicTypeDef) {
-        cache.put(topicTypeDef.getUri(), topicTypeDef);
+    private void put(TopicType topicType) {
+        cache.put(topicType.getUri(), topicType);
     }
 
     // ---
 
-    private TopicTypeDefinition loadTopicTypeDefinition(String typeUri) {
-        TopicTypeDefinition topicTypeDef = new TopicTypeDefinition(typeUri);
-        HyperNode topicType = storage.lookupTopicType(typeUri);
-        for (HyperEdge edge : topicType.getHyperEdges("dm3.core.whole_topic_type")) {
-            String wholeTopicTypeUri = edge.getHyperNode("dm3.core.whole_topic_type").getString("uri");
-            String  partTopicTypeUri = edge.getHyperNode("dm3.core.part_topic_type").getString("uri");
+    private TopicType loadTopicType(String typeUri) {
+        Topic typeTopic = dms.storage.getTopic("uri", new TopicValue(typeUri));
+        TopicTypeData topicTypeData = new TopicTypeData(typeTopic);
+        for (Association assoc : dms.storage.getAssociations(typeTopic.getId(), "dm3.core.whole_topic_type")) {
+            String wholeTopicTypeUri = getTopic(assoc, "dm3.core.whole_topic_type").getUri();
+            String  partTopicTypeUri = getTopic(assoc, "dm3.core.part_topic_type").getUri();
             // sanity check
             if (!wholeTopicTypeUri.equals(typeUri)) {
                 throw new RuntimeException("jri doesn't understand Neo4j traversal");
             }
             //
-            RoleTypes roleTypes = getRoleTypes(edge);
-            Cardinality cardinality = getCardinality(edge);
+            RoleTypes roleTypes = getRoleTypes(assoc);
+            Cardinality cardinality = getCardinality(assoc);
             AssociationDefinition assocDef = new AssociationDefinition(wholeTopicTypeUri, partTopicTypeUri,
                 roleTypes.wholeRoleTypeUri, roleTypes.partRoleTypeUri);
             assocDef.setWholeCardinalityUri(cardinality.wholeCardinalityUri);
             assocDef.setPartCardinalityUri(cardinality.partCardinalityUri);
             // FIXME: call assocDef's setUri() and setAssocTypeUri()
             //
-            topicTypeDef.addAssociationDefinition(assocDef);
+            topicTypeData.addAssociationDefinition(assocDef);
         }
-        return topicTypeDef;
+        return new AttachedTopicType(topicTypeData, dms);
     }
 
     // ---
 
-    private RoleTypes getRoleTypes(HyperEdge edge) {
-        HyperNode wholeRoleType = edge.getHyperNode("dm3.core.whole_role_type");
-        HyperNode  partRoleType = edge.getHyperNode("dm3.core.part_role_type");
+    private RoleTypes getRoleTypes(Association assoc) {
+        Topic wholeRoleType = getTopic(assoc, "dm3.core.whole_role_type");
+        Topic  partRoleType = getTopic(assoc, "dm3.core.part_role_type");
         RoleTypes roleTypes = new RoleTypes();
         // role types are optional
         if (wholeRoleType != null) {
-            roleTypes.setWholeRoleTypeUri(wholeRoleType.getString("uri"));
+            roleTypes.setWholeRoleTypeUri(wholeRoleType.getUri());
         }
         if (partRoleType != null) {
-            roleTypes.setPartRoleTypeUri(partRoleType.getString("uri"));
+            roleTypes.setPartRoleTypeUri(partRoleType.getUri());
         }
         return roleTypes;
     }
 
-    private Cardinality getCardinality(HyperEdge edge) {
-        HyperNode wholeCardinality = edge.getHyperNode("dm3.core.whole_cardinality");
-        HyperNode  partCardinality = edge.getHyperNode("dm3.core.part_cardinality");
+    private Cardinality getCardinality(Association assoc) {
+        Topic wholeCardinality = getTopic(assoc, "dm3.core.whole_cardinality");
+        Topic  partCardinality = getTopic(assoc, "dm3.core.part_cardinality");
         Cardinality cardinality = new Cardinality();
         if (wholeCardinality != null) {
-            cardinality.setWholeCardinalityUri(wholeCardinality.getString("uri"));
+            cardinality.setWholeCardinalityUri(wholeCardinality.getUri());
         }
         if (partCardinality != null) {
-            cardinality.setPartCardinalityUri(partCardinality.getString("uri"));
+            cardinality.setPartCardinalityUri(partCardinality.getUri());
         } else {
             throw new RuntimeException("Missing part cardinality in association definition");
         }
         return cardinality;
+    }
+
+    // ---
+
+    // FIXME: introduce attached associations and drop this method
+    Topic getTopic(Association assoc, String roleTypeUri) {
+        for (Role role : assoc.getRoles()) {
+            if (role.getRoleTypeUri().equals(roleTypeUri)) {
+                return dms.storage.getTopic(role.getTopicId());
+            }
+        }
+        return null;
     }
 
     // --------------------------------------------------------------------------------------------------- Inner Classes

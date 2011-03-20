@@ -19,11 +19,15 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class TopicTypeData extends TopicData {
+public class TopicTypeData extends TopicData implements TopicType {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    protected long id;
+
     protected String dataTypeUri;
+
+    private Map<String, AssociationDefinition> assocDefs;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -32,11 +36,19 @@ public class TopicTypeData extends TopicData {
     public TopicTypeData(TopicData topicData, String dataTypeUri) {
         super(topicData);
         this.dataTypeUri = dataTypeUri;
+        this.assocDefs = new HashMap();
     }
 
     public TopicTypeData(TopicTypeData topicTypeData) {
         super(topicTypeData);
         this.dataTypeUri = topicTypeData.getDataTypeUri();
+        this.assocDefs = topicTypeData.getAssocDefs();
+    }
+
+    public TopicTypeData(Topic topic) {
+        super(topic.getUri(), topic.getValue(), topic.getTypeUri(), null);  // composite=null
+        this.dataTypeUri = dataTypeUri;
+        this.assocDefs = new HashMap();
     }
 
     public TopicTypeData(JSONObject type) {
@@ -45,6 +57,7 @@ public class TopicTypeData extends TopicData {
             this.value = new TopicValue(type.get("value"));
             this.typeUri = "dm3.core.topic_type";
             this.dataTypeUri = type.getString("data_type");
+            this.assocDefs = new HashMap();
         } catch (Exception e) {
             throw new RuntimeException("Parsing " + this + " failed", e);
         }
@@ -52,8 +65,43 @@ public class TopicTypeData extends TopicData {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    @Override
     public String getDataTypeUri() {
         return dataTypeUri;
+    }
+
+    @Override
+    public Map<String, AssociationDefinition> getAssocDefs() {
+        return assocDefs;
+    }
+
+    // ---
+
+    @Override
+    public AssociationDefinition getAssociationDefinition(String assocDefUri) {
+        AssociationDefinition assocDef = assocDefs.get(assocDefUri);
+        if (assocDef == null) {
+            throw new RuntimeException("Association definition \"" + assocDefUri + "\" not found (in " + this + ")");
+        }
+        return assocDef;
+    }
+
+    // FIXME: abstraction. Adding should be the factory's resposibility
+    @Override
+    public void addAssociationDefinition(AssociationDefinition assocDef) {
+        String assocDefUri = assocDef.getUri();
+        AssociationDefinition existing = assocDefs.get(assocDefUri);
+        if (existing != null) {
+            throw new RuntimeException("Ambiguity: topic type definition \"" + uri + "\" has more than " +
+                "one association definitions with uri \"" + assocDefUri + "\" -- Use distinct part role types or " +
+                "specifiy an unique uri");
+        }
+        assocDefs.put(assocDefUri, assocDef);
     }
 
     // ---
@@ -63,6 +111,13 @@ public class TopicTypeData extends TopicData {
         try {
             JSONObject o = super.toJSON();
             o.put("data_type", dataTypeUri);
+            //
+            List assocDefs = new ArrayList();
+            for (AssociationDefinition assocDef : this.assocDefs.values()) {
+                assocDefs.add(assocDef.toJSON());
+            }
+            o.put("assoc_defs", assocDefs);
+            //
             return o;
         } catch (Exception e) {
             throw new RuntimeException("Serializing " + this + " failed", e);
@@ -72,6 +127,6 @@ public class TopicTypeData extends TopicData {
     @Override
     public String toString() {
         return "topic type data (uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
-            "\", dataTypeUri=\"" + dataTypeUri + "\", composite=" + composite + ")";
+            "\", dataTypeUri=\"" + dataTypeUri + "\", assocDefs=" + assocDefs + ")";
     }
 }

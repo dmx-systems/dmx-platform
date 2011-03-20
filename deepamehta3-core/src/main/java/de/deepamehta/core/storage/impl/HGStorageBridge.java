@@ -7,7 +7,6 @@ import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
-import de.deepamehta.core.model.TopicTypeDefinition;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
 import de.deepamehta.core.storage.DeepaMehtaTransaction;
@@ -16,6 +15,7 @@ import de.deepamehta.hypergraph.ConnectedHyperNode;
 import de.deepamehta.hypergraph.HyperEdge;
 import de.deepamehta.hypergraph.HyperGraph;
 import de.deepamehta.hypergraph.HyperNode;
+import de.deepamehta.hypergraph.HyperNodeRole;
 import de.deepamehta.hypergraph.IndexMode;
 
 import java.util.HashSet;
@@ -32,7 +32,6 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private HyperGraph hg;
-    private HGTypeCache typeCache;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -40,7 +39,6 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     public HGStorageBridge(HyperGraph hg) {
         this.hg = hg;
-        this.typeCache = new HGTypeCache(this);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -103,6 +101,20 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // === Associations ===
 
     @Override
+    public Set<Association> getAssociations(long topicId, String myRoleType) {
+        Set<Association> assocs = new HashSet();
+        HyperNode node = hg.getHyperNode(topicId);
+        for (HyperEdge edge : node.getHyperEdges(myRoleType)) {
+            Set<Role> roles = new HashSet();
+            for (HyperNodeRole role : edge.getHyperNodes()) {
+                roles.add(new Role(role.getHyperNode().getId(), role.getRoleType()));
+            }
+            assocs.add(new Association(edge.getId(), null, roles));   // FIXME: assocTypeUri=null
+        }
+        return assocs;
+    }
+
+    @Override
     public Association createAssociation(Association assoc) {
         HyperEdge edge = hg.createHyperEdge();  // FIXME: use association type
         for (Role role : assoc.getRoles()) {
@@ -118,11 +130,6 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     }
 
     // === Types ===
-
-    @Override
-    public TopicTypeDefinition getTopicTypeDefinition(String typeUri) {
-        return typeCache.get(typeUri);
-    }
 
     @Override
     public MetaType createMetaType(MetaType metaType) {

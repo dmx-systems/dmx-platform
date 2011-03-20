@@ -13,8 +13,8 @@ import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeData;
-import de.deepamehta.core.model.TopicTypeDefinition;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.Migration;
@@ -71,9 +71,11 @@ public class EmbeddedService implements CoreService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+            DeepaMehtaStorage storage;
+
     private PluginCache pluginCache = new PluginCache();
 
-    private DeepaMehtaStorage storage;
+    private TypeCache typeCache;
 
     private enum Hook {
 
@@ -132,6 +134,7 @@ public class EmbeddedService implements CoreService {
 
     public EmbeddedService(DeepaMehtaStorage storage) {
         this.storage = storage;
+        this.typeCache = new TypeCache(this);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -505,35 +508,19 @@ public class EmbeddedService implements CoreService {
         return topicTypeUris;
     }
 
-    /* @GET
-    @Path("/topictype/{typeUri}")
+    @GET
+    @Path("/topictype/{uri}")
     @Override
-    public TopicType getTopicType(@PathParam("typeUri") String typeUri,
-                                  @HeaderParam("Cookie") ClientContext clientContext) {
+    public TopicType getTopicType(@PathParam("uri") String uri, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            TopicType topicType = storage.getTopicType(typeUri);
+            TopicType topicType = typeCache.get(uri);
             triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
             tx.success();
             return topicType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Topic type \"" + typeUri + "\" can't be retrieved", e);
-        } finally {
-            tx.finish();
-        }
-    } */
-
-    @Override
-    public TopicTypeDefinition getTopicTypeDefinition(String typeUri) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            TopicTypeDefinition typeDef = storage.getTopicTypeDefinition(typeUri);
-            tx.success();
-            return typeDef;
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving topic type definition failed (typeUri=\"" + typeUri + "\")", e);
+            throw new RuntimeException("Retrieving topic type \"" + uri + "\" failed", e);
         } finally {
             tx.finish();
         }
@@ -775,8 +762,8 @@ public class EmbeddedService implements CoreService {
     }
 
     TopicValue getTopicValue(Topic topic, String assocDefUri) {
-        TopicTypeDefinition typeDef = getTopicTypeDefinition(topic.getTypeUri());
-        AssociationDefinition assocDef = typeDef.getAssociationDefinition(assocDefUri);
+        TopicType topicType = getTopicType(topic.getTypeUri(), null);   // FIXME: clientContext=null
+        AssociationDefinition assocDef = topicType.getAssociationDefinition(assocDefUri);
         String assocTypeUri = assocDef.getAssocTypeUri();
         String wholeRoleTypeUri = assocDef.getWholeRoleTypeUri();
         String  partRoleTypeUri = assocDef.getPartRoleTypeUri();
@@ -799,8 +786,8 @@ public class EmbeddedService implements CoreService {
      * @return  The child topic.
      */
     Topic setChildTopicValue(Topic parentTopic, String assocDefUri, TopicValue value) {
-        TopicTypeDefinition typeDef = getTopicTypeDefinition(parentTopic.getTypeUri());
-        AssociationDefinition assocDef = typeDef.getAssociationDefinition(assocDefUri);
+        TopicType topicType = getTopicType(parentTopic.getTypeUri(), null);     // FIXME: clientContext=null
+        AssociationDefinition assocDef = topicType.getAssociationDefinition(assocDefUri);
         String assocTypeUri = assocDef.getAssocTypeUri();
         String wholeRoleTypeUri = assocDef.getWholeRoleTypeUri();
         String  partRoleTypeUri = assocDef.getPartRoleTypeUri();
