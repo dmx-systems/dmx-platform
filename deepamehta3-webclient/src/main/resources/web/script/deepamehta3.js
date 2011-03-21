@@ -590,13 +590,14 @@ var dm3c = new function() {
      * @return  The icon source (string).
      */
     this.get_icon_src = function(type_uri) {
-        // Note: topic_type is undefined if plugin is deactivated and content still exist.
         var topic_type = dm3c.type_cache.get(type_uri)
-        if (topic_type && topic_type.icon_src) {
-            return topic_type.icon_src
-        } else {
-            return GENERIC_TOPIC_ICON_SRC
+        if (topic_type) {   // Note: topic_type is undefined if plugin is deactivated and content still exist.
+            var icon_src = topic_type.enrichment["de.deepamehta.3-webclient"].icon_src
+            if (icon_src) {
+                return icon_src
+            }
         }
+        return GENERIC_TOPIC_ICON_SRC
     }
 
     /**
