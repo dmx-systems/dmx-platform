@@ -70,7 +70,7 @@ public class AssociationListProvider implements MessageBodyWriter<List<Associati
             // FIXME: Association.relationsToJson(associations).write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + associations + " to response stream failed", e);
+            throw new IOException("Writing message body failed (" + associations + ")", e);
         }
     }
 }

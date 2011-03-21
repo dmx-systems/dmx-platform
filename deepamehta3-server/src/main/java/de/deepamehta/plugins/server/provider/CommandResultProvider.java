@@ -56,7 +56,7 @@ public class CommandResultProvider implements MessageBodyWriter<CommandResult> {
             result.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + result + " to response stream failed", e);
+            throw new IOException("Writing message body failed (" + result + ")", e);
         }
     }
 }

@@ -854,16 +854,14 @@ public class EmbeddedService implements CoreService {
         new PluginCache.Iterator() {
             @Override
             void body(Plugin plugin) {
-                Map<String, Object> enrichment = new HashMap();
                 Map<String, Object> staticTypeConfig = plugin.getTypeConfig(topicType.getUri());
                 Map<String, Object> dynamicEnrichment = (Map) result.get(plugin.getId());
                 if (staticTypeConfig != null) {
-                    enrichment.putAll(staticTypeConfig);
+                    enrichedTopicType.addEnrichment(staticTypeConfig);
                 }
                 if (dynamicEnrichment != null) {
-                    enrichment.putAll(dynamicEnrichment);
+                    enrichedTopicType.addEnrichment(dynamicEnrichment);
                 }
-                enrichedTopicType.setEnrichment(plugin.getId(), enrichment);
             }
         };
         return enrichedTopicType;

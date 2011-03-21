@@ -83,7 +83,7 @@ public class TopicData {
             o.put("composite", composite);
             return o;
         } catch (JSONException e) {
-            throw new RuntimeException("Serializing " + this + " failed", e);
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
 

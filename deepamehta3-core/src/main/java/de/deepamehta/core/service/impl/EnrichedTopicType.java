@@ -18,7 +18,7 @@ class EnrichedTopicType extends AttachedTopicType {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Map<String, Map<String, Object>> enrichment;    // key: plugin ID
+    private Map<String, Object> enrichment;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -31,9 +31,14 @@ class EnrichedTopicType extends AttachedTopicType {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    void setEnrichment(String pluginId, Map<String, Object> values) {
-        if (values.size() > 0) {
-            enrichment.put(pluginId, values);
+    void addEnrichment(Map<String, Object> values) {
+        for (String key : values.keySet()) {
+            Object value = values.get(key);
+            Object previousValue = enrichment.put(key, value);
+            if (previousValue != null) {
+                throw new RuntimeException("Key clash in enrichment for topic type \"" + getUri() + "\" (key=\"" +
+                    key + "\", value=\"" + value + "\", previousValue=\"" + previousValue + "\")");
+            }
         }
     }
 
@@ -44,18 +49,19 @@ class EnrichedTopicType extends AttachedTopicType {
         try {
             JSONObject o = super.toJSON();
             // enrichment
-            if (enrichment.size() > 0) {
-                JSONObject e = new JSONObject();
-                for (String pluginId : enrichment.keySet()) {
-                    Map<String, Object> values = enrichment.get(pluginId);
-                    e.put(pluginId, new JSONObject(values));
+            for (String key : enrichment.keySet()) {
+                Object value = enrichment.get(key);
+                Object previousValue = o.opt(key);
+                if (previousValue != null) {
+                    throw new RuntimeException("Key clash in enrichment for topic type \"" + getUri() + "\" (key=\"" +
+                        key + "\", value=\"" + value + "\", previousValue=\"" + previousValue + "\")");
                 }
-                o.put("enrichment", e);
+                o.put(key, value);
             }
             //
             return o;
         } catch (Exception e) {
-            throw new RuntimeException("Serializing " + this + " failed", e);
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
 }

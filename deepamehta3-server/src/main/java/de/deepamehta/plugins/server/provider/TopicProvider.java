@@ -55,7 +55,7 @@ public class TopicProvider implements MessageBodyWriter<Topic> {
             topic.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + topic + " to response stream failed", e);
+            throw new IOException("Writing message body failed (" + topic + ")", e);
         }
     }
 }

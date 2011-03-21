@@ -52,12 +52,11 @@ public class TopicmapProvider implements MessageBodyWriter<Topicmap> {
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {
-            // logger.info("Writing " + entity + " to response stream");
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
             topicmap.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + topicmap + " to response stream failed", e);
+            throw new IOException("Writing message body failed (" + topicmap + ")", e);
         }
     }
 }

@@ -56,7 +56,7 @@ public class ResourceInfoProvider implements MessageBodyWriter<ResourceInfo> {
             info.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + info + " to response stream failed", e);
+            throw new IOException("Writing message body failed (" + info + ")", e);
         }
     }
 }

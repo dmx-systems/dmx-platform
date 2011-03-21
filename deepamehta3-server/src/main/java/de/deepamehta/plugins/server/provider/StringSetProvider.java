@@ -68,7 +68,7 @@ public class StringSetProvider implements MessageBodyWriter<Set<String>> {
             JSONHelper.stringsToJson(strings).write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + strings + " to response stream failed", e);
+            throw new IOException("Writing message body failed (" + strings + ")", e);
         }
     }
 }

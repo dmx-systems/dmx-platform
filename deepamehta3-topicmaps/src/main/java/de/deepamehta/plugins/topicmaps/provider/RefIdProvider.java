@@ -58,7 +58,7 @@ public class RefIdProvider implements MessageBodyWriter<Long> {
             entity.write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing refId" + refId + " to response stream failed", e);
+            throw new IOException("Writing message body failed (" + refId + ")", e);
         }
     }
 }

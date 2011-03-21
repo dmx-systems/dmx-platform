@@ -78,7 +78,7 @@ public class Association {
             o.put("properties", properties.toJSON());
             return o;
         } catch (JSONException e) {
-            throw new RuntimeException("Serializing " + this + " failed", e);
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
 

@@ -46,7 +46,7 @@ public class DirectoryListing {
             dir.put("items", items);
             return dir;
         } catch (JSONException e) {
-            throw new RuntimeException("Serializing " + this + " failed", e);
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
 
@@ -94,7 +94,7 @@ public class DirectoryListing {
                 }
                 return item;
             } catch (JSONException e) {
-                throw new RuntimeException("Serializing " + this + " failed", e);
+                throw new RuntimeException("Serialization failed (" + this + ")", e);
             }
         }        
     }

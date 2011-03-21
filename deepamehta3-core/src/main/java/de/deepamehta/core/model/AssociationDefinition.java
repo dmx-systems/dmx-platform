@@ -113,7 +113,7 @@ public class AssociationDefinition {
             o.put("partCardinalityUri", partCardinalityUri);
             return o;
         } catch (Exception e) {
-            throw new RuntimeException("Serializing " + this + " failed", e);
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
 

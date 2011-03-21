@@ -119,7 +119,7 @@ public class BaseTopic extends TopicData implements Topic {
             o.put("id", id);
             return o;
         } catch (JSONException e) {
-            throw new RuntimeException("Serializing " + this + " failed", e);
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
 

@@ -69,7 +69,7 @@ public class PluginInfoProvider implements MessageBodyWriter<Set<PluginInfo>> {
             PluginInfo.pluginInfoToJson(pluginInfo).write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + pluginInfo + " to response stream failed", e);
+            throw new IOException("Writing message body failed (" + pluginInfo + ")", e);
         }
     }
 }

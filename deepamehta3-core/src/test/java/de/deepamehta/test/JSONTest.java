@@ -16,6 +16,14 @@ public class JSONTest {
     // --- Testing Serialization ---
 
     @Test
+    public void put() throws JSONException {
+        JSONObject o = new JSONObject();
+        JSONObject ret = o.put("value", "hello");
+        //
+        assertSame(o, ret);
+    }
+
+    @Test
     public void string() throws JSONException {
         String str = "hi";
         //

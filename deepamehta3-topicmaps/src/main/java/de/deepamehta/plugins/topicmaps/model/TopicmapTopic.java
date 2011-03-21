@@ -41,7 +41,7 @@ public class TopicmapTopic extends BaseTopic {
             o.put("ref_id", refId);
             return o;
         } catch (JSONException e) {
-            throw new RuntimeException("Error while serializing " + this, e);
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
 

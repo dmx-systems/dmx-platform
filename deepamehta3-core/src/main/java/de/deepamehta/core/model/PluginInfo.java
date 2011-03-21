@@ -37,7 +37,7 @@ public class PluginInfo {
             pluginInfo.put("plugin_file", pluginFile);
             return pluginInfo;
         } catch (JSONException e) {
-            throw new RuntimeException("Serializing " + this + " failed", e);
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
 

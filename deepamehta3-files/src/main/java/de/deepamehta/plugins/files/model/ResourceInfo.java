@@ -44,7 +44,7 @@ public class ResourceInfo {
             }
             return info;
         } catch (JSONException e) {
-            throw new RuntimeException("Serializing " + this + " failed", e);
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
 

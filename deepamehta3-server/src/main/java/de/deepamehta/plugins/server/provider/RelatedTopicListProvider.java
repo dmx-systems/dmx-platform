@@ -70,7 +70,7 @@ public class RelatedTopicListProvider implements MessageBodyWriter<List<RelatedT
             RelatedTopic.relatedTopicsToJson(relTopics).write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + relTopics + " to response stream failed", e);
+            throw new IOException("Writing message body failed (" + relTopics + ")", e);
         }
     }
 }

@@ -71,7 +71,7 @@ public class TopicListProvider implements MessageBodyWriter<List<Topic>> {
             ModelHelper.topicsToJSON(topics).write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + topics + " to response stream failed", e);
+            throw new IOException("Writing message body failed (" + topics + ")", e);
         }
     }
 }

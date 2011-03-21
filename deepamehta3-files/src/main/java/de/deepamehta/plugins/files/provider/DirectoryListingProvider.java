@@ -56,7 +56,7 @@ public class DirectoryListingProvider implements MessageBodyWriter<DirectoryList
             dir.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing " + dir + " to response stream failed", e);
+            throw new IOException("Writing message body failed (" + dir + ")", e);
         }
     }
 }
