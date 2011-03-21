@@ -18,7 +18,7 @@ class EnrichedTopicType extends AttachedTopicType {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Map<String, Object> enrichment;
+    private Map<String, Map<String, Object>> enrichment;    // key: plugin ID
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -31,8 +31,10 @@ class EnrichedTopicType extends AttachedTopicType {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    void setEnrichment(String key, Object value) {
-        enrichment.put(key, value);
+    void setEnrichment(String pluginId, Map<String, Object> values) {
+        if (values.size() > 0) {
+            enrichment.put(pluginId, values);
+        }
     }
 
     // ---
@@ -44,9 +46,9 @@ class EnrichedTopicType extends AttachedTopicType {
             // enrichment
             if (enrichment.size() > 0) {
                 JSONObject e = new JSONObject();
-                for (String key : enrichment.keySet()) {
-                    Object value = enrichment.get(key);
-                    e.put(key, new JSONObject((Map) value));
+                for (String pluginId : enrichment.keySet()) {
+                    Map<String, Object> values = enrichment.get(pluginId);
+                    e.put(pluginId, new JSONObject(values));
                 }
                 o.put("enrichment", e);
             }

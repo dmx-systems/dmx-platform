@@ -1,0 +1,5 @@
+{
+    dm3.webclient.search: {
+        icon_src: "/de.deepamehta.3-webclient/images/bucket.png"
+    }
+}

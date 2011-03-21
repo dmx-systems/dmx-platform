@@ -516,11 +516,7 @@ public class EmbeddedService implements CoreService {
         try {
             AttachedTopicType topicType = typeCache.get(uri);
             // enrichment
-            Map<String, Object> result = triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
-            EnrichedTopicType enrichedTopicType = new EnrichedTopicType(topicType);
-            for (String pluginId : result.keySet()) {
-                enrichedTopicType.setEnrichment(pluginId, result.get(pluginId));
-            }
+            EnrichedTopicType enrichedTopicType = enrichTopicType(topicType, clientContext);
             //
             tx.success();
             return enrichedTopicType;
@@ -850,6 +846,27 @@ public class EmbeddedService implements CoreService {
                 setChildTopicValue(topic, key, new TopicValue(value));
             }
         }
+    }
+
+    private EnrichedTopicType enrichTopicType(final AttachedTopicType topicType, ClientContext clientContext) {
+        final Map result = triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
+        final EnrichedTopicType enrichedTopicType = new EnrichedTopicType(topicType);
+        new PluginCache.Iterator() {
+            @Override
+            void body(Plugin plugin) {
+                Map<String, Object> enrichment = new HashMap();
+                Map<String, Object> staticTypeConfig = plugin.getTypeConfig(topicType.getUri());
+                Map<String, Object> dynamicEnrichment = (Map) result.get(plugin.getId());
+                if (staticTypeConfig != null) {
+                    enrichment.putAll(staticTypeConfig);
+                }
+                if (dynamicEnrichment != null) {
+                    enrichment.putAll(dynamicEnrichment);
+                }
+                enrichedTopicType.setEnrichment(plugin.getId(), enrichment);
+            }
+        };
+        return enrichedTopicType;
     }
 
     // === Plugins ===

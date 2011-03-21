@@ -58,17 +58,6 @@ public class WebclientPlugin extends Plugin {
         }
     }
 
-    @Override
-    public Map<String, Object> enrichTopicTypeHook(TopicType topicType, ClientContext clientContext) {
-        Map m = new HashMap();
-        //
-        if (topicType.getUri().equals("dm3.webclient.search")) {
-            m.put("icon_src", "/de.deepamehta.3-webclient/images/bucket.png");
-        }
-        //
-        return m;
-    }
-
 
 
     // **********************

@@ -10,6 +10,7 @@ import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.util.JavaUtils;
+import de.deepamehta.core.util.JSONHelper;
 import de.deepamehta.core.storage.DeepaMehtaTransaction;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
@@ -22,18 +23,19 @@ import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
 
+import org.codehaus.jettison.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
-
 import java.io.InputStream;
 import java.io.IOException;
-
 import java.net.URL;
 
 
@@ -46,18 +48,20 @@ public class Plugin implements BundleActivator {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
+    private static final String   TYPE_CONFIG_FILE = "/typeconfig.json";
     private static final String STANDARD_PROVIDER_PACKAGE = "de.deepamehta.plugins.server.provider";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String pluginId;                // This bundle's symbolic name.
-    private String pluginName;              // This bundle's name = POM project name.
+    private String pluginId;        // This bundle's symbolic name, e.g. "de.deepamehta.3-webclient".
+    private String pluginName;      // This bundle's name = POM project name.
     private String pluginClass;
     private String pluginPackage;
     private Bundle pluginBundle;
-    private Topic  pluginTopic;             // Represents this plugin in DB. Holds plugin migration number.
+    private Topic  pluginTopic;     // Represents this plugin in DB. Holds plugin migration number.
 
-    private Properties configProperties;    // Read from file "plugin.properties"
+    private Properties configProperties;                    // Read from file "plugin.properties"
+    private Map<String, Map<String, Object>> typeConfig;    // Read from file "typeconfig.json"
 
     protected CoreService dms;
     private HttpService httpService;
@@ -82,6 +86,14 @@ public class Plugin implements BundleActivator {
 
     public String getConfigProperty(String key) {
         return getConfigProperty(key, null);
+    }
+
+    /**
+     * Returns the type configuration for the given type (as read from typeconfig.json) or
+     * <code>null</code> if there is no configuration.
+     */
+    public Map<String, Object> getTypeConfig(String typeUri) {
+        return typeConfig.get(typeUri);
     }
 
     /**
@@ -134,15 +146,6 @@ public class Plugin implements BundleActivator {
         }
     }
 
-    // FIXME: drop method and make dms protected instead?
-    public CoreService getService() {
-        // CoreService dms = (CoreService) deepamehtaServiceTracker.getService();
-        if (dms == null) {
-            throw new RuntimeException("DeepaMehta core service is not yet available for " + this);
-        }
-        return dms;
-    }
-
     @Override
     public String toString() {
         return "plugin \"" + pluginName + "\"";
@@ -168,6 +171,8 @@ public class Plugin implements BundleActivator {
             //
             configProperties = readConfigFile();
             pluginPackage = getConfigProperty("pluginPackage", getClass().getPackage().getName());
+            //
+            typeConfig = readTypeConfigFile();
             //
             createServiceTracker(CoreService.class.getName(), context);
             createServiceTracker(HttpService.class.getName(), context);
@@ -370,6 +375,9 @@ public class Plugin implements BundleActivator {
      * - register the plugin's OSGi service at the OSGi framework
      * - register the plugin's static web resources at the OSGi HTTP service
      * - register the plugin's REST resources at the OSGi HTTP service
+     *
+     * These are the tasks which rely on both, the CoreService and the HttpService.
+     * This method is called once both services become available.
      */
     private void initPlugin(BundleContext context) {
         logger.info("----- Initializing " + this + " -----");
@@ -515,20 +523,55 @@ public class Plugin implements BundleActivator {
             Properties properties = new Properties();
             InputStream in = getResourceAsStream(PLUGIN_CONFIG_FILE);
             if (in != null) {
-                logger.info("Reading plugin config file \"" + PLUGIN_CONFIG_FILE + "\"");
+                logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this);
                 properties.load(in);
             } else {
-                logger.info("No plugin config file found (tried \"" + PLUGIN_CONFIG_FILE + "\")" +
-                    " -- using default configuration");
+                logger.info("Using default configuration for " + this + " (no config file found, " +
+                    "tried \"" + PLUGIN_CONFIG_FILE + "\")");
             }
             return properties;
-        } catch (IOException e) {
-            throw new RuntimeException("Plugin config file can't be read", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Reading config file for " + this + " failed", e);
         }
     }
 
     private String getConfigProperty(String key, String defaultValue) {
         return configProperties.getProperty(key, defaultValue);
+    }
+
+    // --- Type Configuration ---
+
+    private Map<String, Map<String, Object>> readTypeConfigFile() {
+        try {
+            InputStream in = getResourceAsStream(TYPE_CONFIG_FILE);
+            if (in != null) {
+                logger.info("Reading type config file \"" + TYPE_CONFIG_FILE + "\" for " + this);
+                return createTypeConfig(JavaUtils.readText(in));
+            } else {
+                logger.info("Using default type configuration for " + this + " (no type config file found, " +
+                    "tried \"" + TYPE_CONFIG_FILE + "\")");
+                return new HashMap();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Reading type config file for " + this + " failed", e);
+        }
+    }
+
+    private Map<String, Map<String, Object>> createTypeConfig(String fileContent) {
+        try {
+            Map typeConfig = new HashMap();
+            JSONObject o = new JSONObject(fileContent);
+            Iterator<String> i = o.keys();
+            while (i.hasNext()) {
+                String typeUri = i.next();
+                Map config = JSONHelper.toMap(o.getJSONObject(typeUri));
+                typeConfig.put(typeUri, config);
+            }
+            return typeConfig;
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing type config file for " + this +
+                " failed (file=\"" + TYPE_CONFIG_FILE + "\")", e);
+        }
     }
 
     // ---
