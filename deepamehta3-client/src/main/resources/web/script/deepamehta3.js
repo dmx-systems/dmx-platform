@@ -213,9 +213,16 @@ var dm3c = new function() {
         css_stylesheets.push(css_path)
     }
 
-    this.javascript_source = function(source_path, callback) {
+    /**
+     * Loads a Javascript file dynamically. Synchronous and asynchronous loading is supported.
+     *
+     * @param   script_url      The URL (absolute or relative) of the Javascript file to load.
+     * @param   callback        The function to invoke when asynchronous loading is complete.
+     *                          If not given loading is performed synchronously.
+     */
+    this.javascript_source = function(script_url, callback) {
         $.ajax({
-            url: source_path,
+            url: script_url,
             dataType: "script",
             success: callback,
             async: callback != undefined
@@ -810,33 +817,6 @@ var dm3c = new function() {
         //
         register_plugins()
         load_plugins()
-        load_document_renderers()
-        load_field_renderers()
-        load_stylesheets()
-        //
-        // --- 3) Setup GUI ---
-        // Note: in order to let a plugin provide a custom canvas renderer (the dm3-freifunk-geomap plugin does!)
-        // the canvas is created *after* loading the plugins.
-        dm3c.canvas = dm3c.trigger_hook("get_canvas_renderer")[0] || new Canvas()
-        // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta3-topicmaps plugin does!)
-        // the "init" hook is triggered *after* creating the canvas.
-        dm3c.trigger_hook("init")
-        //
-        // setup create widget
-        var menu = dm3c.create_type_menu("create-type-menu")
-        $("#create-type-menu-placeholder").replaceWith(menu.dom)
-        dm3c.ui.button("create-button", do_create_topic, "Create", "plus")
-        if (!menu.get_item_count()) {
-            $("#create-widget").hide()
-        }
-        //
-        dm3c.ui.menu("searchmode-select", searchmode_selected)
-        dm3c.ui.menu("special-menu", special_selected, undefined, "Special")
-        // the detail panel
-        if (dm3c.LOG_GUI) dm3c.log("Setting detail panel height: " + $("#canvas").height())
-        $("#detail-panel").height($("#canvas").height())
-        //
-        $(window).resize(window_resized)
 
         /**
          * Loads and instantiates all registered plugins.
@@ -844,19 +824,55 @@ var dm3c = new function() {
         function load_plugins() {
 
             if (LOG_PLUGIN_LOADING) dm3c.log("Loading " + plugin_sources.length + " plugins:")
+            var plugins_complete = 0
             for (var i = 0, plugin_source; plugin_source = plugin_sources[i]; i++) {
                 load_plugin(plugin_source)
             }
 
             function load_plugin(plugin_source) {
                 if (LOG_PLUGIN_LOADING) dm3c.log("..... " + plugin_source)
-                // 1) load
-                dm3c.javascript_source(plugin_source)
-                // 2) instantiate
-                var plugin_class = js.basename(plugin_source)
-                if (LOG_PLUGIN_LOADING) dm3c.log(".......... instantiating \"" + plugin_class + "\"")
-                plugins[plugin_class] = js.new_object(plugin_class)
+                // load plugin asynchronously
+                dm3c.javascript_source(plugin_source, function() {
+                    // instantiate
+                    var plugin_class = js.basename(plugin_source)
+                    if (LOG_PLUGIN_LOADING) dm3c.log(".......... instantiating \"" + plugin_class + "\"")
+                    plugins[plugin_class] = js.new_object(plugin_class)
+                    // all plugins complete?
+                    plugins_complete++
+                    if (plugins_complete == plugin_sources.length) {
+                        if (LOG_PLUGIN_LOADING) dm3c.log("PLUGINS COMPLETE!")
+                        setup_gui()
+                    }
+                })
             }
+        }
+
+        function setup_gui() {
+            load_document_renderers()
+            load_field_renderers()
+            load_stylesheets()
+            // Note: in order to let a plugin provide a custom canvas renderer (the dm3-freifunk-geomap plugin does!)
+            // the canvas is created *after* loading the plugins.
+            dm3c.canvas = dm3c.trigger_hook("get_canvas_renderer")[0] || new Canvas()
+            // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta3-topicmaps plugin
+            // does!) the "init" hook is triggered *after* creating the canvas.
+            dm3c.trigger_hook("init")
+            //
+            // setup create widget
+            var menu = dm3c.create_type_menu("create-type-menu")
+            $("#create-type-menu-placeholder").replaceWith(menu.dom)
+            dm3c.ui.button("create-button", do_create_topic, "Create", "plus")
+            if (!menu.get_item_count()) {
+                $("#create-widget").hide()
+            }
+            //
+            dm3c.ui.menu("searchmode-select", searchmode_selected)
+            dm3c.ui.menu("special-menu", special_selected, undefined, "Special")
+            // the detail panel
+            if (dm3c.LOG_GUI) dm3c.log("Setting detail panel height: " + $("#canvas").height())
+            $("#detail-panel").height($("#canvas").height())
+            //
+            $(window).resize(window_resized)
         }
 
         function load_document_renderers() {
@@ -868,21 +884,13 @@ var dm3c = new function() {
 
             function load_doctype_impl(doctype_impl_src) {
                 if (LOG_PLUGIN_LOADING) dm3c.log("..... " + doctype_impl_src)
-                //
-                // Note: the PlainDocument renderer can't be loaded dynamically because of a strange Firefox problem.
-                // If script is loaded synchronously: instantiation fails ("PlainDocument is not defined").
-                // If script is loaded asynchronously (with a callback): instantiation fails silently.
-                // The workaround is to load plain_document.js statically (see index.html).
-                // With Safari their is no problem at all.
-                //
-                // 1) load
-                // dm3c.javascript_source(doctype_impl_src)
-                //
-                // 2) instantiate
-                var doctype_class = js.to_camel_case(js.basename(doctype_impl_src))
-                if (LOG_PLUGIN_LOADING) dm3c.log(".......... instantiating \"" + doctype_class + "\"")
-                if (LOG_PLUGIN_LOADING) dm3c.log("...........typeof=" + typeof(eval(doctype_class)))
-                doctype_impls[doctype_class] = js.new_object(doctype_class)
+                // load doctype implementation asynchronously
+                dm3c.javascript_source(doctype_impl_src, function() {
+                    // instantiate
+                    var doctype_class = js.to_camel_case(js.basename(doctype_impl_src))
+                    if (LOG_PLUGIN_LOADING) dm3c.log(".......... instantiating \"" + doctype_class + "\"")
+                    doctype_impls[doctype_class] = js.new_object(doctype_class)
+                })
             }
         }
 
