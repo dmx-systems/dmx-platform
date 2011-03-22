@@ -35,16 +35,10 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
-                <excludes>
-                    <exclude>web/index.html</exclude>
-                </excludes>
             </resource>
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>src/main/resources-filtered</directory>
                 <filtering>true</filtering>
-                <includes>
-                    <include>web/index.html</include>
-                </includes>
             </resource>
         </resources>
 
