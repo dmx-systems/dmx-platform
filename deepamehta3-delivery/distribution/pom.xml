@@ -49,6 +49,8 @@
     </dependencies>
 
     <build>
+        <finalName>deepamehta3-v${project.version}</finalName>
+
         <plugins>
 
             <!-- create distribution archives -->
