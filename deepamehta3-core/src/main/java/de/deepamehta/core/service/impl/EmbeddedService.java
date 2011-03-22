@@ -2,12 +2,10 @@ package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationDefinition;
-import de.deepamehta.core.model.AssociationType;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.Composite;
-import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.TopicValue;
@@ -38,12 +36,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
-
 import java.io.InputStream;
 import java.io.IOException;
-
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,7 +63,7 @@ public class EmbeddedService implements CoreService {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String CORE_MIGRATIONS_PACKAGE = "de.deepamehta.core.migrations";
-    private static final int REQUIRED_CORE_MIGRATION = 2;
+    private static final int REQUIRED_CORE_MIGRATION = 3;
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -319,9 +315,12 @@ public class EmbeddedService implements CoreService {
     public Topic createTopic(TopicData topicData, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
+            checkUniqueness(topicData.getUri());
+            //
             triggerHook(Hook.PRE_CREATE_TOPIC, topicData, clientContext);
             //
             Topic topic = storage.createTopic(topicData);
+            //
             Composite comp = topicData.getComposite();
             if (comp != null) {
                 createTopicTree(topic, comp);
@@ -528,21 +527,6 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    @Override
-    public MetaType createMetaType(MetaType metaType) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            metaType = storage.createMetaType(metaType);
-            tx.success();
-            return metaType;
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creation of " + metaType + " failed", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
     @POST
     @Path("/topictype")
     @Consumes("application/x-www-form-urlencoded")
@@ -550,6 +534,8 @@ public class EmbeddedService implements CoreService {
     public Topic createTopicType(TopicTypeData topicTypeData, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
+            checkUniqueness(topicTypeData.getUri());
+            //
             Topic topic = storage.createTopic(topicTypeData);
             // TODO: process dataTypeUri
             //
@@ -562,22 +548,8 @@ public class EmbeddedService implements CoreService {
             return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating topic type failed (" + topicTypeData + ")", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
-    @Override
-    public AssociationType createAssociationType(AssociationType assocType, ClientContext clientContext) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            assocType = storage.createAssociationType(assocType);
-            tx.success();
-            return assocType;
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creation of " + assocType + " failed", e);
+            throw new RuntimeException("Creating topic type \"" + topicTypeData.getUri() +
+                "\" failed (" + topicTypeData + ")", e);
         } finally {
             tx.finish();
         }
@@ -732,10 +704,12 @@ public class EmbeddedService implements CoreService {
     public void setupDB() {
         DeepaMehtaTransaction tx = beginTx();
         try {
+            logger.info("----- Initializing DeepaMehta 3 Core -----");
             boolean isCleanInstall = initDB();
             runCoreMigrations(isCleanInstall);
             tx.success();
             tx.finish();
+            logger.info("----- Initialization of DeepaMehta 3 Core complete -----");
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             tx.finish();
@@ -865,6 +839,17 @@ public class EmbeddedService implements CoreService {
             }
         };
         return enrichedTopicType;
+    }
+
+    /**
+     * Throws an exception if there is a topic with the given URI in the database.
+     *
+     * @param   uri     The URI to check. If null no check is performed.
+     */
+    private void checkUniqueness(String uri) {
+        if (uri != null && storage.topicExists("uri", new TopicValue(uri))) {
+            throw new RuntimeException("Topic with URI \"" + uri + "\" exists already");
+        }
     }
 
     // === Plugins ===

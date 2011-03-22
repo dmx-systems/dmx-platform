@@ -1,0 +1,24 @@
+{
+    topic_types: [
+        {
+            uri: "dm3.base.name",
+            value: "Name",
+            data_type: "dm3.core.text"
+        },
+        {
+            uri: "dm3.base.description",
+            value: "Description",
+            data_type: "dm3.core.text"
+        },
+        {
+            uri: "dm3.base.title",
+            value: "Title",
+            data_type: "dm3.core.text"
+        },
+        {
+            uri: "dm3.base.text",
+            value: "Text",
+            data_type: "dm3.core.text"
+        }
+    ]
+}

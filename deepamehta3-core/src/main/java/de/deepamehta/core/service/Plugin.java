@@ -316,7 +316,7 @@ public class Plugin implements BundleActivator {
             public Object addingService(ServiceReference serviceRef) {
                 Object service = super.addingService(serviceRef);
                 if (service instanceof CoreService) {
-                    logger.info("Adding DeepaMehta core service to plugin \"" + pluginName + "\"");
+                    logger.info("Adding DeepaMehta 3 core service to plugin \"" + pluginName + "\"");
                     dms = (CoreService) service;
                     checkServiceAvailability();
                 } else if (service instanceof HttpService) {
@@ -335,7 +335,7 @@ public class Plugin implements BundleActivator {
             @Override
             public void removedService(ServiceReference ref, Object service) {
                 if (service == dms) {
-                    logger.info("Removing DeepaMehta core service from plugin \"" + pluginName + "\"");
+                    logger.info("Removing DeepaMehta 3 core service from plugin \"" + pluginName + "\"");
                     unregisterPlugin();
                     dms = null;
                 } else if (service == httpService) {
@@ -429,12 +429,12 @@ public class Plugin implements BundleActivator {
      * core service control flow, that is the plugin's hooks are triggered.
      */
     private void registerPlugin() {
-        logger.info("Registering " + this + " at DeepaMehta core service");
+        logger.info("Registering " + this + " at DeepaMehta 3 core service");
         dms.registerPlugin(this);
     }
 
     private void unregisterPlugin() {
-        logger.info("Unregistering " + this + " at DeepaMehta core service");
+        logger.info("Unregistering " + this + " at DeepaMehta 3 core service");
         dms.unregisterPlugin(pluginId);
     }
 

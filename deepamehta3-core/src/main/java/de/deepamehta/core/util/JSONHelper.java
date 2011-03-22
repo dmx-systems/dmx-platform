@@ -1,8 +1,8 @@
 package de.deepamehta.core.util;
 
 import de.deepamehta.core.model.Association;
-import de.deepamehta.core.model.AssociationType;
-import de.deepamehta.core.model.MetaType;
+import de.deepamehta.core.model.AssociationTypeData;
+import de.deepamehta.core.model.MetaTypeData;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
@@ -115,36 +115,36 @@ public class JSONHelper {
 
     public static void createMetaTypes(JSONArray metaTypes, CoreService dms) throws Exception {
         for (int i = 0; i < metaTypes.length(); i++) {
-            MetaType metaType = new MetaType(metaTypes.getJSONObject(i));
-            dms.createMetaType(metaType);
+            MetaTypeData metaTypeData = new MetaTypeData(metaTypes.getJSONObject(i));
+            dms.createTopic(metaTypeData, null);        // clientContext=null
         }
     }
 
     public static void createTopicTypes(JSONArray topicTypes, CoreService dms) throws Exception {
         for (int i = 0; i < topicTypes.length(); i++) {
             TopicTypeData topicTypeData = new TopicTypeData(topicTypes.getJSONObject(i));
-            dms.createTopicType(topicTypeData, null);           // clientContext=null
+            dms.createTopicType(topicTypeData, null);   // clientContext=null
         }
     }
 
     public static void createAssociationTypes(JSONArray assocTypes, CoreService dms) throws Exception {
         for (int i = 0; i < assocTypes.length(); i++) {
-            AssociationType assocType = new AssociationType(assocTypes.getJSONObject(i));
-            dms.createAssociationType(assocType, null);     // clientContext=null
+            AssociationTypeData assocTypeData = new AssociationTypeData(assocTypes.getJSONObject(i));
+            dms.createTopic(assocTypeData, null);       // clientContext=null
         }
     }
 
     public static void createTopics(JSONArray topics, CoreService dms) throws Exception {
         for (int i = 0; i < topics.length(); i++) {
             TopicData topicData = new TopicData(topics.getJSONObject(i));
-            dms.createTopic(topicData, null);               // clientContext=null
+            dms.createTopic(topicData, null);           // clientContext=null
         }
     }
 
     public static void createAssociations(JSONArray assocs, CoreService dms) throws Exception {
         for (int i = 0; i < assocs.length(); i++) {
             Association assoc = new Association(assocs.getJSONObject(i));
-            dms.createAssociation(assoc, null);             // clientContext=null
+            dms.createAssociation(assoc, null);         // clientContext=null
         }
     }
 }

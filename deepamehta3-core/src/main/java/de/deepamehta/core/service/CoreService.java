@@ -1,11 +1,9 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.model.Association;
-import de.deepamehta.core.model.AssociationType;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
-import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
@@ -154,11 +152,7 @@ public interface CoreService {
 
     public TopicType getTopicType(String topicTypeUri, ClientContext clientContext);
 
-    public MetaType createMetaType(MetaType metaType);
-
     public Topic createTopicType(TopicTypeData topicTypeData, ClientContext clientContext);
-
-    public AssociationType createAssociationType(AssociationType assocType, ClientContext clientContext);
 
     // public void addDataField(String typeUri, DataField dataField);
 

@@ -2,8 +2,6 @@ package de.deepamehta.core.storage.impl;
 
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationDefinition;
-import de.deepamehta.core.model.AssociationType;
-import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
@@ -54,6 +52,11 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     public Topic getTopic(String key, TopicValue value) {
         HyperNode node = hg.getHyperNode(key, value.value());
         return node != null ? buildTopic(node) : null;
+    }
+
+    @Override
+    public boolean topicExists(String key, TopicValue value) {
+        return hg.getHyperNode(key, value.value()) != null;
     }
 
     @Override
@@ -127,20 +130,6 @@ public class HGStorageBridge implements DeepaMehtaStorage {
             edge.addHyperNode(node, role.getRoleTypeUri());
         }
         return new Association(edge.getId(), assoc.getTypeUri(), assoc.getRoles());
-    }
-
-    // === Types ===
-
-    @Override
-    public MetaType createMetaType(MetaType metaType) {
-        Topic topic = createTopic(metaType);
-        return new MetaType(topic);
-    }
-
-    @Override
-    public AssociationType createAssociationType(AssociationType assocType) {
-        Topic topic = createTopic(assocType);
-        return new AssociationType(topic);
     }
 
     // === DB ===

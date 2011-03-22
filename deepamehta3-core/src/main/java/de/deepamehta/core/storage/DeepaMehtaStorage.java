@@ -1,8 +1,6 @@
 package de.deepamehta.core.storage;
 
 import de.deepamehta.core.model.Association;
-import de.deepamehta.core.model.AssociationType;
-import de.deepamehta.core.model.MetaType;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
@@ -36,6 +34,8 @@ public interface DeepaMehtaStorage {
      * (for dynamically created data fields, typically in migration classes).
      */
     Topic getTopic(String key, TopicValue value);
+
+    boolean topicExists(String key, TopicValue value);
 
     // Topic getTopic(String typeUri, String key, PropValue value);
 
@@ -114,12 +114,6 @@ public interface DeepaMehtaStorage {
     // void setRelationProperties(long id, Properties properties);
 
     // void deleteRelation(long id);
-
-    // === Types ===
-
-    MetaType createMetaType(MetaType metaType);
-
-    AssociationType createAssociationType(AssociationType assocType);
 
     // === DB ===
 

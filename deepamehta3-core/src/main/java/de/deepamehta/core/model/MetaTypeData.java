@@ -1,7 +1,5 @@
 package de.deepamehta.core.model;
 
-import de.deepamehta.core.model.impl.BaseTopic;
-
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -17,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class AssociationType extends BaseTopic {
+public class MetaTypeData extends TopicData {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -25,16 +23,15 @@ public class AssociationType extends BaseTopic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public AssociationType(Topic topic) {
+    /* public MetaTypeData(Topic topic) {
         super(topic);
-    }
+    } */
 
-    public AssociationType(JSONObject type) {
+    public MetaTypeData(JSONObject metaTypeData) {
         try {
-            this.id = -1;
-            this.uri = type.getString("uri");
-            this.value = new TopicValue(type.get("value"));
-            this.typeUri = "dm3.core.assoc_type";
+            this.uri = metaTypeData.getString("uri");
+            this.value = new TopicValue(metaTypeData.get("value"));
+            this.typeUri = "dm3.core.meta_type";
         } catch (Exception e) {
             throw new RuntimeException("Parsing " + this + " failed", e);
         }
@@ -44,6 +41,7 @@ public class AssociationType extends BaseTopic {
 
     @Override
     public String toString() {
-        return "assocication type " + id + " \"" + value + "\" (uri=\"" + uri + "\", typeUri=\"" + typeUri + "\")";
+        return "meta type data (uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
+            "\", composite=" + composite + ")";
     }
 }

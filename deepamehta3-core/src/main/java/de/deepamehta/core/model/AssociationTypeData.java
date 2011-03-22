@@ -1,7 +1,5 @@
 package de.deepamehta.core.model;
 
-import de.deepamehta.core.model.impl.BaseTopic;
-
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -15,14 +13,9 @@ import java.util.logging.Logger;
 
 
 /**
- * A topic type. Part of the meta-model (like a class).
- * <p>
- * A topic type is an ordered collection of {@link DataField}s.
- * A topic type itself is a {@link Topic}.
- *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class MetaType extends BaseTopic {
+public class AssociationTypeData extends TopicData {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -30,16 +23,15 @@ public class MetaType extends BaseTopic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public MetaType(Topic topic) {
+    /* public AssociationTypeData(Topic topic) {
         super(topic);
-    }
+    } */
 
-    public MetaType(JSONObject type) {
+    public AssociationTypeData(JSONObject assocTypeData) {
         try {
-            this.id = -1;
-            this.uri = type.getString("uri");
-            this.value = new TopicValue(type.get("value"));
-            this.typeUri = "dm3.core.meta_type";
+            this.uri = assocTypeData.getString("uri");
+            this.value = new TopicValue(assocTypeData.get("value"));
+            this.typeUri = "dm3.core.assoc_type";
         } catch (Exception e) {
             throw new RuntimeException("Parsing " + this + " failed", e);
         }
@@ -49,6 +41,7 @@ public class MetaType extends BaseTopic {
 
     @Override
     public String toString() {
-        return "meta type " + id + " \"" + value + "\" (uri=\"" + uri + "\", typeUri=\"" + typeUri + "\")";
+        return "association type data (uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
+            "\", composite=" + composite + ")";
     }
 }
