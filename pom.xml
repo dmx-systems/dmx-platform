@@ -42,4 +42,8 @@
         <module>deepamehta3-plugin-example</module>
     </modules>
 
+    <scm>
+        <connection>scm:git:git@github.com:jri/deepamehta3.git</connection>
+    </scm>
+
 </project>
