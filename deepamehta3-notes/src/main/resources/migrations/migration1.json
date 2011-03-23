@@ -1,0 +1,28 @@
+{
+    topic_types: [
+        {
+            uri: "dm3.notes.note",
+            value: "Note",
+            data_type: "dm3.core.composite"
+        },
+    ],
+
+    associations: [
+        {
+            assoc_type: "dm3.core.composition",
+            topics: [
+                {topic: "dm3.notes.note",   role_type: "dm3.core.whole_topic_type"},
+                {topic: "dm3.base.title",   role_type: "dm3.core.part_topic_type"},
+                {topic: "dm3.core.one",     role_type: "dm3.core.part_cardinality"}
+            ]
+        },
+        {
+            assoc_type: "dm3.core.composition",
+            topics: [
+                {topic: "dm3.notes.note",   role_type: "dm3.core.whole_topic_type"},
+                {topic: "dm3.base.text",    role_type: "dm3.core.part_topic_type"},
+                {topic: "dm3.core.one",     role_type: "dm3.core.part_cardinality"}
+            ]
+        }
+    ]
+}

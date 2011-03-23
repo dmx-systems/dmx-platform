@@ -40,7 +40,7 @@ public class Role {
             this.roleTypeUri = role.getString("role_type");
             this.topicIdentifiedById = false;
         } catch (Exception e) {
-            throw new RuntimeException("Parsing " + this + " failed", e);
+            throw new RuntimeException("Parsing Role failed (JSONObject=" + role + ")", e);
         }
     }
 

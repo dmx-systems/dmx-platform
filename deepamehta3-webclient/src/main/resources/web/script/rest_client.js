@@ -59,8 +59,8 @@ function RESTClient(core_service_uri) {
         return request("GET", "/topic?" + params.to_query_string())
     }
 
-    this.create_topic = function(topic) {
-        return request("POST", "/topic/" + encodeURIComponent(topic.type_uri), topic.properties)
+    this.create_topic = function(topic_data) {
+        return request("POST", "/topic", topic_data)
     }
 
     this.set_topic_properties = function(topic_id, properties) {

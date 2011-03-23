@@ -23,6 +23,9 @@ public class TopicValue {
      * Called by JAX-RS container to create a TopicValue from a @PathParam or @QueryParam
      */
     public TopicValue(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Tried to build a TopicValue from a null String");
+        }
         this.value = value;
     }
 
@@ -39,6 +42,9 @@ public class TopicValue {
     }
 
     public TopicValue(Object value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Tried to build a TopicValue from a null Object");
+        }
         this.value = value;
     }
 

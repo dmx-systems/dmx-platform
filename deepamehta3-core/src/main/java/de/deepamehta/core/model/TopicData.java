@@ -41,11 +41,15 @@ public class TopicData {
 
     public TopicData(JSONObject topicData) {
         try {
-            this.uri = topicData.getString("uri");
-            this.value = new TopicValue(topicData.get("value"));
+            if (topicData.has("uri")) {
+                this.uri = topicData.getString("uri");
+            }
+            if (topicData.has("value")) {
+                this.value = new TopicValue(topicData.get("value"));
+            }
             this.typeUri = topicData.getString("topic_type");
         } catch (Exception e) {
-            throw new RuntimeException("Parsing " + this + " failed", e);
+            throw new RuntimeException("Parsing TopicData failed (JSONObject=" + topicData + ")", e);
         }
     }
 
@@ -77,8 +81,11 @@ public class TopicData {
     public JSONObject toJSON() {
         try {
             JSONObject o = new JSONObject();
+            // Note: "uri" and "value" are optional
             o.put("uri", uri);
-            o.put("value", value.value());
+            if (value != null) {
+                o.put("value", value.value());
+            }
             o.put("topic_type", typeUri);
             o.put("composite", composite);
             return o;

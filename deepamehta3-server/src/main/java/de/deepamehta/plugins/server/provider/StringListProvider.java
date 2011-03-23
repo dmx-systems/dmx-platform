@@ -62,7 +62,7 @@ public class StringListProvider implements MessageBodyReader<List<String>> {
             String json = JavaUtils.readText(entityStream);
             return JSONHelper.toList(new JSONArray(json));
         } catch (Exception e) {
-            throw new IOException("Reading a list of strings from request stream failed", e);
+            throw new IOException("Creating a list of strings from message body failed", e);
         }
     }
 }

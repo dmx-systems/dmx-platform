@@ -61,12 +61,12 @@ var dm3c = new function() {
      *
      * @return  The topic as stored in the DB.
      */
-    this.create_topic = function(type_uri, properties) {
-        var topic = {
-            type_uri: type_uri,
-            properties: properties || {}
+    this.create_topic = function(type_uri) {
+        var topic_data = {
+            // Note: "uri", "value", and "composite" are optional
+            topic_type: type_uri
         }
-        topic = dm3c.restc.create_topic(topic)
+        var topic = dm3c.restc.create_topic(topic_data)
         // trigger hook
         dm3c.trigger_hook("post_create_topic", topic)
         //

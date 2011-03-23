@@ -33,12 +33,6 @@ public class TopicTypeData extends TopicData implements TopicType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TopicTypeData(TopicData topicData, String dataTypeUri) {
-        super(topicData);
-        this.dataTypeUri = dataTypeUri;
-        this.assocDefs = new HashMap();
-    }
-
     public TopicTypeData(TopicTypeData topicTypeData) {
         super(topicTypeData);
         this.dataTypeUri = topicTypeData.getDataTypeUri();
@@ -59,7 +53,7 @@ public class TopicTypeData extends TopicData implements TopicType {
             this.dataTypeUri = type.getString("data_type");
             this.assocDefs = new HashMap();
         } catch (Exception e) {
-            throw new RuntimeException("Parsing " + this + " failed", e);
+            throw new RuntimeException("Parsing TopicTypeData failed (JSONObject=" + type + ")", e);
         }
     }
 

@@ -23,17 +23,13 @@ public class AssociationTypeData extends TopicData {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    /* public AssociationTypeData(Topic topic) {
-        super(topic);
-    } */
-
     public AssociationTypeData(JSONObject assocTypeData) {
         try {
             this.uri = assocTypeData.getString("uri");
             this.value = new TopicValue(assocTypeData.get("value"));
             this.typeUri = "dm3.core.assoc_type";
         } catch (Exception e) {
-            throw new RuntimeException("Parsing " + this + " failed", e);
+            throw new RuntimeException("Parsing AssociationTypeData failed (JSONObject=" + assocTypeData + ")", e);
         }
     }
 

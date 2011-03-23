@@ -72,7 +72,7 @@ public class CommandParamsProvider implements MessageBodyReader<CommandParams> {
                 throw new RuntimeException("Unexpected media type: " + mediaType);
             }
         } catch (Exception e) {
-            throw new IOException("Reading a CommandParams object from request stream failed", e);
+            throw new IOException("Creating CommandParams from message body failed", e);
         }
     }
 

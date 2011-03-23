@@ -42,7 +42,7 @@ public class Association {
                 roles.add(new Role(topics.getJSONObject(i)));
             }
         } catch (Exception e) {
-            throw new RuntimeException("Parsing " + this + " failed", e);
+            throw new RuntimeException("Parsing Association failed (JSONObject=" + assoc + ")", e);
         }
     }
 

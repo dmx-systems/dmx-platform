@@ -803,7 +803,7 @@ public class EmbeddedService implements CoreService {
 
     private Topic buildTopic(Topic topic) {
         if (topic == null) {
-            throw new NullPointerException("Tried to build an AttachedTopic from a null Topic");
+            throw new IllegalArgumentException("Tried to build an AttachedTopic from a null Topic");
         }
         return new AttachedTopic(topic, this);
     }
