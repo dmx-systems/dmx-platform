@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
     <name>DeepaMehta 3 Distribution</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3</artifactId>
-    <version>0.4.5-SNAPSHOT</version>
+    <version>0.4.5</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta3-delivery</artifactId>
-        <version>0.4.5-SNAPSHOT</version>
+        <version>0.4.5</version>
     </parent>
 
     <properties>
@@ -31,19 +30,19 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-third-party</artifactId>
-            <version>0.4.5-SNAPSHOT</version>
+            <version>0.4.5</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-felix</artifactId>
-            <version>0.4.5-SNAPSHOT</version>
+            <version>0.4.5</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-bundles</artifactId>
-            <version>0.4.5-SNAPSHOT</version>
+            <version>0.4.5</version>
             <type>pom</type>
         </dependency>
     </dependencies>
