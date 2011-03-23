@@ -55,8 +55,11 @@ Start
    While the server starts a terminal window opens and you see some information logged.  
    Then a browser window opens and DeepaMehta is ready to use.
 
-   Note: to open the DeepaMehta browser window manually use this address:  
+   Hint: if no browser window appears open it manually:  
    <http://localhost:8080/de.deepamehta.3-client/index.html>
+
+2. Login via the *Special* menu as *admin*. Leave the password field empty.  
+   You're enabled to create content now.
 
 
 Stop
@@ -77,7 +80,7 @@ To update a previous DeepaMehta installation and keep your database content:
 
 1. Stop DeepaMehta (if running) and install the new DeepaMehta version (as described above).
 
-2. Copy your *deepamehta-db* folder into the *deepamehta3-v0.4.5* folder (next to the *bin*, *bundles*, and *conf* folders).
+2. Copy your *deepamehta-db* folder into the *deepamehta3-v0.4.5* folder (next to the *bin*, *bundle*, and *conf* folders).
 
 3. Start the new DeepaMehta (as described above).  
    Your database automatically migrates to the new format.  
@@ -112,11 +115,11 @@ See the wiki page [DeepaMehta 3 Development](https://github.com/jri/deepamehta3/
 Version History
 ---------------
 
-**v0.4.5** -- *upcoming*
+**v0.4.5** -- Mar 24, 2011
 
 * Under the hood changes to support (new) developers:
     * Complete new build system based on pure Maven and Pax Runner (no shellscripts anymore).
-    * Easy from-scratch setup of development environment. No manual Felix installation required anymore.
+    * Easy from-scratch setup of development environment. No manual Felix installation required.
     * Example plugin project included.
     * Testing support. Prepared test enironments for your own tests. Core tests included.
     * Hot deployment. Changes are deployed immediately. No Felix shell interaction required (in most cases).
@@ -183,4 +186,4 @@ Version History
 
 ------------
 Jörg Richter  
-Mar 23, 2011
+Mar 24, 2011
