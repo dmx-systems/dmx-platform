@@ -14,7 +14,7 @@ public class CoreServiceFelixTestCase extends CoreServiceTest {
 
     @Configuration
     public static Option[] felixConfiguration() {
-        return options(felix(), scanPom("mvn:de.deepamehta/deepamehta3-felix/0.4.5-SNAPSHOT/pom"));
+        return options(felix(), scanPom("mvn:de.deepamehta/deepamehta3-felix/0.4.5/pom"));
     }
 
 }

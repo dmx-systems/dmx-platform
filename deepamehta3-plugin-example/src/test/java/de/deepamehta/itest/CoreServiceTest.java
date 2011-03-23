@@ -49,8 +49,8 @@ public abstract class CoreServiceTest {
         return options(cleanCaches(), autoWrap(), //
                 systemProperty("org.osgi.service.http.port").value("8086"), //
                 systemProperty("deepamehta3.database.path").value("dm3-db"), //
-                scanPom("mvn:de.deepamehta/deepamehta3-third-party/0.4.5-SNAPSHOT/pom"), //
-                scanPom("mvn:de.deepamehta/deepamehta3-bundles/0.4.5-SNAPSHOT/pom"));
+                scanPom("mvn:de.deepamehta/deepamehta3-third-party/0.4.5/pom"), //
+                scanPom("mvn:de.deepamehta/deepamehta3-bundles/0.4.5/pom"));
     }
 
     private CoreService retrieveCoreService() throws InterruptedException {

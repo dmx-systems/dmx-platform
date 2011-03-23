@@ -21,7 +21,7 @@
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>deepamehta3-parent</artifactId>
-                <version>0.1-SNAPSHOT</version>
+                <version>1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -131,21 +131,21 @@
                                 <artifactItem>
                                     <groupId>de.deepamehta</groupId>
                                     <artifactId>deepamehta3-third-party</artifactId>
-                                    <version>0.4.5-SNAPSHOT</version>
+                                    <version>0.4.5</version>
                                     <type>pom</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>de.deepamehta</groupId>
                                     <artifactId>deepamehta3-felix</artifactId>
-                                    <version>0.4.5-SNAPSHOT</version>
+                                    <version>0.4.5</version>
                                     <type>pom</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>de.deepamehta</groupId>
                                     <artifactId>deepamehta3-bundles</artifactId>
-                                    <version>0.4.5-SNAPSHOT</version>
+                                    <version>0.4.5</version>
                                     <type>pom</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
@@ -162,9 +162,9 @@
                 <configuration>
                     <widenScope>true</widenScope>
                     <deployPoms><![CDATA[
-                        target/poms/deepamehta3-third-party-0.4.5-SNAPSHOT.pom,
-                        target/poms/deepamehta3-felix-0.4.5-SNAPSHOT.pom,
-                        target/poms/deepamehta3-bundles-0.4.5-SNAPSHOT.pom
+                        target/poms/deepamehta3-third-party-0.4.5.pom,
+                        target/poms/deepamehta3-felix-0.4.5.pom,
+                        target/poms/deepamehta3-bundles-0.4.5.pom
                     ]]></deployPoms>
                 </configuration>
             </plugin>
