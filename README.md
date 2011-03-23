@@ -121,8 +121,11 @@ Version History
     * Complete new build system based on pure Maven and Pax Runner (no shellscripts anymore).
     * Easy from-scratch setup of development environment. No manual Felix installation required.
     * Example plugin project included.
-    * Testing support. Prepared test enironments for your own tests. Core tests included.
-    * Hot deployment. Changes are deployed immediately. No Felix shell interaction required (in most cases).
+    * Testing support: Prepared test environments for your own tests. Core tests included.
+    * Hot deployment: Changes are deployed immediately. No Felix shell interaction required (in most cases).
+* Under the hood core implementation changes:
+    * Plugins publish their public API as OSGi service, consumable by other plugins.
+    * Plugin and Core services are published at 2 endpoints (HTTP/REST and OSGi) solely by annotation.
 
 **v0.4.4** -- Jan 3, 2011
 
