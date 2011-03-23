@@ -33,20 +33,20 @@ Requirements
   Doesn't work with IE8. Potentially works with IE9.
 
 
-Installing
-----------
+Install
+-------
 
 1. Download latest release from here:  
    <http://github.com/jri/deepamehta3/downloads/>
 
 2. Unpack zip archive.  
-   A folder *deepamehta3-v0.4.4* is created.
+   A folder *deepamehta3-v0.4.5* is created.
 
 
-Starting
---------
+Start
+-----
 
-1. Open the *deepamehta3-v0.4.4* folder and use the respective starter script for your platform:
+1. Open the *deepamehta3-v0.4.5* folder and use the respective starter script for your platform:
 
         deepamehta-linux.sh         # choose "Run in terminal"
         deepamehta-macosx.command   # double-click it
@@ -59,8 +59,8 @@ Starting
    <http://localhost:8080/de.deepamehta.3-client/index.html>
 
 
-Stopping
---------
+Stop
+----
 
 1. Go to the terminal window that opened while startup and type:
 
@@ -70,44 +70,56 @@ Stopping
    You can close the terminal window now.
 
 
-Updating
---------
+Update
+------
 
-To update a previous DeepaMehta installation and keep your database:
+To update a previous DeepaMehta installation and keep your database content:
 
-1. Stop DeepaMehta (if running).
+1. Stop DeepaMehta (if running) and install the new DeepaMehta version (as described above).
 
-2. Download and unpack the new DeepaMehta version.
+2. Copy your *deepamehta-db* folder into the *deepamehta3-v0.4.5* folder (next to the *bin*, *bundles*, and *conf* folders).
 
-3. Replace its *deepamehta-db* folder with a copy of your current one.
-
-4. Start the new DeepaMehta (as described above).  
+3. Start the new DeepaMehta (as described above).  
    Your database automatically migrates to the new format.  
    Wait until the logging has finished.
 
-5. **IMPORTANT:** stop DeepaMehta and start it again (as described above).  
+4. Stop DeepaMehta and start it again (as described above).  
    (Now the memory cache is up-to-date.) Sorry for this extra step!
 
-6. You're done. The DeepaMehta browser window opens automatically.
+   You're done. The DeepaMehta browser window opens automatically.
 
-Please Note:
+Hints:
 
-* **You can only update a stable DeepaMehta release.** Updating a snapshot release is not supported.  
-  The first updatable version is DeepaMehta 3 v0.4. Updating DeepaMehta v0.3 is not suppported.
+* The first updatable version is DeepaMehta 3 v0.4. Updating DeepaMehta v0.3 is not suppported.
 
 * Keep your old *deepamehta-db* folder at a safe place.  
   You'll need it as a backup when something went wrong while migration.
 
 
-Uninstalling
-------------
+Uninstall
+---------
 
-Stop DeepaMehta and delete the *deepamehta3-v0.4.4* folder.  
-This removes DeepaMehta completely from your computer, including your database.
+Stop DeepaMehta and delete the *deepamehta3-v0.4.5* folder.  
+This removes DeepaMehta completely from your computer, including the database.
+
+
+Build from Source
+-----------------
+
+See the wiki page [DeepaMehta 3 Development](https://github.com/jri/deepamehta3/wiki/DeepaMehta-3-Development)
 
 
 Version History
 ---------------
+
+**v0.4.5** -- *upcoming*
+
+* Under the hood changes to support (new) developers:
+    * Complete new build system based on pure Maven and Pax Runner (no shellscripts anymore).
+    * Easy from-scratch setup of development environment. No manual Felix installation required anymore.
+    * Example plugin project included.
+    * Testing support. Prepared test enironments for your own tests. Core tests included.
+    * Hot deployment. Changes are deployed immediately. No Felix shell interaction required (in most cases).
 
 **v0.4.4** -- Jan 3, 2011
 
@@ -171,4 +183,4 @@ Version History
 
 ------------
 Jörg Richter  
-Jan 5, 2011
+Mar 23, 2011
