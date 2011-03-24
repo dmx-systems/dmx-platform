@@ -847,7 +847,7 @@ public class EmbeddedService implements CoreService {
      * @param   uri     The URI to check. If null no check is performed.
      */
     private void checkUniqueness(String uri) {
-        if (uri != null && storage.topicExists("uri", new TopicValue(uri))) {
+        if (!uri.equals("") && storage.topicExists("uri", new TopicValue(uri))) {
             throw new RuntimeException("Topic with URI \"" + uri + "\" exists already");
         }
     }

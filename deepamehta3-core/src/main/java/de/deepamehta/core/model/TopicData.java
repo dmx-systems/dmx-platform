@@ -25,12 +25,12 @@ public class TopicData {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     /**
-     * @param   uri     If <code>null</code> the topic will have no URI. This is OK.
-     * @param   value   If <code>null</code> the topic will have no value. This is OK.
+     * @param   uri     If <code>null</code> an empty string is used. This is OK.
+     * @param   value   If <code>null</code> an empty string value is used. This is OK.
      */
     public TopicData(String uri, TopicValue value, String typeUri, Composite composite) {
-        this.uri = uri;
-        this.value = value;
+        this.uri = uri != null ? uri : "";
+        this.value = value != null ? value : new TopicValue("");
         this.typeUri = typeUri;
         this.composite = composite;
     }
@@ -41,13 +41,10 @@ public class TopicData {
 
     public TopicData(JSONObject topicData) {
         try {
-            if (topicData.has("uri")) {
-                this.uri = topicData.getString("uri");
-            }
-            if (topicData.has("value")) {
-                this.value = new TopicValue(topicData.get("value"));
-            }
+            this.uri = topicData.optString("uri");
+            this.value = new TopicValue(topicData.optString("value"));
             this.typeUri = topicData.getString("type_uri");
+            // FIXME: composite is not set
         } catch (Exception e) {
             throw new RuntimeException("Parsing TopicData failed (JSONObject=" + topicData + ")", e);
         }
@@ -81,11 +78,8 @@ public class TopicData {
     public JSONObject toJSON() {
         try {
             JSONObject o = new JSONObject();
-            // Note: "uri" and "value" are optional
             o.put("uri", uri);
-            if (value != null) {
-                o.put("value", value.value());
-            }
+            o.put("value", value.value());
             o.put("type_uri", typeUri);
             o.put("composite", composite);
             return o;

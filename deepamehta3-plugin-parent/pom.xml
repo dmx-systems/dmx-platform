@@ -7,7 +7,7 @@
     <name>DeepaMehta 3 Plugin Parent</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-plugin-parent</artifactId>
-    <version>0.4.5-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -33,7 +33,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-core</artifactId>
-            <version>0.4.5-SNAPSHOT</version>
+            <version>0.5-SNAPSHOT</version>
         </dependency>
 
         <!-- Testing -->
@@ -146,7 +146,7 @@
                                 <artifactItem>
                                     <groupId>de.deepamehta</groupId>
                                     <artifactId>deepamehta3-bundles</artifactId>
-                                    <version>0.4.5-SNAPSHOT</version>
+                                    <version>0.5-SNAPSHOT</version>
                                     <type>pom</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
@@ -165,7 +165,7 @@
                     <deployPoms><![CDATA[
                         target/poms/deepamehta3-third-party-0.4.5-SNAPSHOT.pom,
                         target/poms/deepamehta3-felix-0.4.5-SNAPSHOT.pom,
-                        target/poms/deepamehta3-bundles-0.4.5-SNAPSHOT.pom
+                        target/poms/deepamehta3-bundles-0.5-SNAPSHOT.pom
                     ]]></deployPoms>
                 </configuration>
             </plugin>

@@ -88,13 +88,8 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     public Topic createTopic(TopicData topicData) {
         // 1) create node
         HyperNode node = hg.createHyperNode();
-        // Note: "uri" and "value" are optional
-        if (topicData.getUri() != null) {
-            node.setAttribute("uri", topicData.getUri(), IndexMode.KEY);
-        }
-        if (topicData.getValue() != null) {
-            node.setAttribute("value", topicData.getValue().value());
-        }
+        node.setAttribute("uri", topicData.getUri(), IndexMode.KEY);
+        node.setAttribute("value", topicData.getValue().value());
         // 2) associate with type
         HyperNode topicType = lookupTopicType(topicData.getTypeUri());
         HyperEdge edge = hg.createHyperEdge();  // FIXME: use association type ("dm3.core.instantiation")
@@ -194,15 +189,9 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         if (node == null) {
             throw new IllegalArgumentException("Tried to build a Topic from a null HyperNode");
         }
-        // build value
-        TopicValue value = null;
-        Object v = node.get("value", null);
-        if (v != null) {
-            value = new TopicValue(v);
-        }
-        // Note: "uri" and "value" are optional
-        return new HGTopic(node.getId(), node.getString("uri", null), value, getTopicTypeUri(node), null);
-                                                                                                    // composite=null
+        //
+        return new HGTopic(node.getId(), node.getString("uri"), new TopicValue(node.get("value")),
+            getTopicTypeUri(node), null);   // composite=null
     }
 
     // ---

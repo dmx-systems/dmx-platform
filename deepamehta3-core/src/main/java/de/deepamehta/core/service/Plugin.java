@@ -408,7 +408,7 @@ public class Plugin implements BundleActivator {
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK! (" + this + ")");
-            throw new RuntimeException("Installation of " + this + " in the database failed", e);
+            throw new RuntimeException("Installation of " + this + " failed", e);
         } finally {
             tx.finish();
         }
