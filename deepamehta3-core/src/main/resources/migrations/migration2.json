@@ -3,12 +3,12 @@
         {
             uri: "dm3.core.plugin",
             value: "Plugin",
-            data_type: "dm3.core.composite"
+            data_type_uri: "dm3.core.composite"
         },
         {
             uri: "dm3.core.plugin_migration_nr",
             value: "Plugin Migration Nr.",
-            data_type: "dm3.core.number"
+            data_type_uri: "dm3.core.number"
         }
     ],
 

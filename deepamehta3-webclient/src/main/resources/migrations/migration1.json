@@ -3,17 +3,17 @@
         {
             uri: "dm3.webclient.search",
             value: "Search",
-            data_type: "dm3.core.composite"
+            data_type_uri: "dm3.core.composite"
         },
         {
             uri: "dm3.webclient.search_term",
             value: "Search Term",
-            data_type: "dm3.core.text"
+            data_type_uri: "dm3.core.text"
         },
         {
             uri: "dm3.webclient.search_result",
             value: "Search Result",
-            data_type: "dm3.core.text"
+            data_type_uri: "dm3.core.text"
         }
     ],
 

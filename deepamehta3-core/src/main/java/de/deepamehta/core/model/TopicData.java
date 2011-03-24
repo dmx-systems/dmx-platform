@@ -47,7 +47,7 @@ public class TopicData {
             if (topicData.has("value")) {
                 this.value = new TopicValue(topicData.get("value"));
             }
-            this.typeUri = topicData.getString("topic_type");
+            this.typeUri = topicData.getString("type_uri");
         } catch (Exception e) {
             throw new RuntimeException("Parsing TopicData failed (JSONObject=" + topicData + ")", e);
         }
@@ -86,7 +86,7 @@ public class TopicData {
             if (value != null) {
                 o.put("value", value.value());
             }
-            o.put("topic_type", typeUri);
+            o.put("type_uri", typeUri);
             o.put("composite", composite);
             return o;
         } catch (JSONException e) {

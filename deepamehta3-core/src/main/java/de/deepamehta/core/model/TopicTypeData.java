@@ -50,7 +50,7 @@ public class TopicTypeData extends TopicData implements TopicType {
             this.uri = type.getString("uri");
             this.value = new TopicValue(type.get("value"));
             this.typeUri = "dm3.core.topic_type";
-            this.dataTypeUri = type.getString("data_type");
+            this.dataTypeUri = type.getString("data_type_uri");
             this.assocDefs = new HashMap();
         } catch (Exception e) {
             throw new RuntimeException("Parsing TopicTypeData failed (JSONObject=" + type + ")", e);
@@ -104,7 +104,7 @@ public class TopicTypeData extends TopicData implements TopicType {
     public JSONObject toJSON() {
         try {
             JSONObject o = super.toJSON();
-            o.put("data_type", dataTypeUri);
+            o.put("data_type_uri", dataTypeUri);
             //
             List assocDefs = new ArrayList();
             for (AssociationDefinition assocDef : this.assocDefs.values()) {

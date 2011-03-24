@@ -3,7 +3,7 @@
         {
             uri: "dm3.notes.note",
             value: "Note",
-            data_type: "dm3.core.composite"
+            data_type_uri: "dm3.core.composite"
         },
     ],
 

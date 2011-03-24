@@ -64,7 +64,7 @@ var dm3c = new function() {
     this.create_topic = function(type_uri) {
         var topic_data = {
             // Note: "uri", "value", and "composite" are optional
-            topic_type: type_uri
+            type_uri: type_uri
         }
         var topic = dm3c.restc.create_topic(topic_data)
         // trigger hook
@@ -304,18 +304,9 @@ var dm3c = new function() {
 
     /**
      * Returns the label for the topic.
-     *
-     * FIXME: method to be dropped? We have this logic at server-side
      */
     this.topic_label = function(topic) {
-        var type = dm3c.type_cache.get(topic.type_uri)
-        // if there is a topic_label_field_uri declaration use the content of that field
-        var field_uri = type.topic_label_field_uri
-        if (field_uri) {
-            return topic.properties[field_uri] || ""
-        }
-        // fallback: use the content of the first field
-        return topic.properties[type.fields[0].uri] || ""
+        return topic.value
     }
 
     // === Types ===

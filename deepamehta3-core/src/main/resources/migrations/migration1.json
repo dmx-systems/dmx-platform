@@ -14,17 +14,17 @@
         {
             uri: "dm3.core.role_type",
             value: "Role Type",
-            data_type: "dm3.core.text"
+            data_type_uri: "dm3.core.text"
         },
         {
             uri: "dm3.core.data_type",
             value: "Data Type",
-            data_type: "dm3.core.text"
+            data_type_uri: "dm3.core.text"
         },
         {
             uri: "dm3.core.cardinality",
             value: "Cardinality",
-            data_type: "dm3.core.text"
+            data_type_uri: "dm3.core.text"
         }
     ],
 
@@ -52,69 +52,69 @@
         {
             uri: "dm3.core.type",
             value: "Type",
-            topic_type: "dm3.core.role_type"
+            type_uri: "dm3.core.role_type"
         },
         {
             uri: "dm3.core.instance",
             value: "Instance",
-            topic_type: "dm3.core.role_type"
+            type_uri: "dm3.core.role_type"
         },
         {
             uri: "dm3.core.whole_topic_type",
             value: "Whole Topic Type",
-            topic_type: "dm3.core.role_type"
+            type_uri: "dm3.core.role_type"
         },
         {
             uri: "dm3.core.part_topic_type",
             value: "Part Topic Type",
-            topic_type: "dm3.core.role_type"
+            type_uri: "dm3.core.role_type"
         },
         {
             uri: "dm3.core.whole_role_type",
             value: "Whole Role Type",
-            topic_type: "dm3.core.role_type"
+            type_uri: "dm3.core.role_type"
         },
         {
             uri: "dm3.core.part_role_type",
             value: "Part Role Type",
-            topic_type: "dm3.core.role_type"
+            type_uri: "dm3.core.role_type"
         },
         {
             uri: "dm3.core.whole_cardinality",
             value: "Whole Cardinality",
-            topic_type: "dm3.core.role_type"
+            type_uri: "dm3.core.role_type"
         },
         {
             uri: "dm3.core.part_cardinality",
             value: "Part Cardinality",
-            topic_type: "dm3.core.role_type"
+            type_uri: "dm3.core.role_type"
         },
 
         {
             uri: "dm3.core.text",
             value: "Text",
-            topic_type: "dm3.core.data_type"
+            type_uri: "dm3.core.data_type"
         },
         {
             uri: "dm3.core.number",
             value: "Number",
-            topic_type: "dm3.core.data_type"
+            type_uri: "dm3.core.data_type"
         },
         {
             uri: "dm3.core.composite",
             value: "Composite",
-            topic_type: "dm3.core.data_type"
+            type_uri: "dm3.core.data_type"
         },
 
         {
             uri: "dm3.core.one",
             value: "One",
-            topic_type: "dm3.core.cardinality"
+            type_uri: "dm3.core.cardinality"
         },
         {
             uri: "dm3.core.many",
             value: "Many",
-            topic_type: "dm3.core.cardinality"
+            type_uri: "dm3.core.cardinality"
         }
     ]
 }
