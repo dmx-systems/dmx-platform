@@ -42,7 +42,7 @@ public class AssociationData implements Association {
     public AssociationData(JSONObject assoc) {
         try {
             this.id = -1;
-            this.typeUri = assoc.getString("assoc_type");
+            this.typeUri = assoc.getString("type_uri");
             this.roles = new HashSet();
             JSONArray topics = assoc.getJSONArray("topics");
             for (int i = 0; i < topics.length(); i++) {

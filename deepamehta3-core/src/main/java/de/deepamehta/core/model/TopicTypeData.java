@@ -39,8 +39,14 @@ public class TopicTypeData extends TopicData implements TopicType {
         this.assocDefs = topicTypeData.getAssocDefs();
     }
 
-    public TopicTypeData(Topic topic) {
-        super(topic.getUri(), topic.getValue(), topic.getTypeUri(), null);  // composite=null
+    public TopicTypeData(Topic typeTopic, String dataTypeUri) {
+        super(typeTopic.getUri(), typeTopic.getValue(), typeTopic.getTypeUri(), null);  // composite=null
+        this.dataTypeUri = dataTypeUri;
+        this.assocDefs = new HashMap();
+    }
+
+    public TopicTypeData(String uri, String value, String dataTypeUri) {
+        super(uri, new TopicValue(value), "dm3.core.topic_type", null);                 // composite=null
         this.dataTypeUri = dataTypeUri;
         this.assocDefs = new HashMap();
     }

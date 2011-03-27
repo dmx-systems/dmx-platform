@@ -7,6 +7,7 @@ import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.Composite;
+import de.deepamehta.core.model.MetaTypeData;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.TopicValue;
@@ -536,10 +537,12 @@ public class EmbeddedService implements CoreService {
     public Topic createTopicType(TopicTypeData topicTypeData, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            checkUniqueness(topicTypeData.getUri());
+            String typeUri = topicTypeData.getUri();
+            checkUniqueness(typeUri);
             //
             Topic topic = storage.createTopic(topicTypeData);
-            // TODO: process dataTypeUri
+            //
+            associateDataType(typeUri, topicTypeData.getDataTypeUri());
             //
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
@@ -708,6 +711,9 @@ public class EmbeddedService implements CoreService {
         try {
             logger.info("----- Initializing DeepaMehta 3 Core -----");
             boolean isCleanInstall = initDB();
+            if (isCleanInstall) {
+                setupMetaContent();
+            }
             runCoreMigrations(isCleanInstall);
             tx.success();
             tx.finish();
@@ -824,6 +830,13 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    private void associateDataType(String topicTypeUri, String dataTypeUri) {
+        AssociationData assocData = new AssociationData("dm3.core.association");
+        assocData.addRole(new Role(topicTypeUri, "dm3.core.topic_type"));
+        assocData.addRole(new Role(dataTypeUri,  "dm3.core.data_type"));
+        createAssociation(assocData, null);     // FIXME: clientContext=null
+    }
+
     private EnrichedTopicType enrichTopicType(final AttachedTopicType topicType, ClientContext clientContext) {
         final Map result = triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
         final EnrichedTopicType enrichedTopicType = new EnrichedTopicType(topicType);
@@ -898,6 +911,23 @@ public class EmbeddedService implements CoreService {
 
     private void closeDB() {
         storage.shutdown();
+    }
+
+    // ---
+
+    private void setupMetaContent() {
+        createTopic(new MetaTypeData("dm3.core.topic_type", "Topic Type"), null);           // clientContext=null
+        createTopic(new MetaTypeData("dm3.core.assoc_type", "Association Type"), null);     // clientContext=null
+        // Note: the topic type "Data Type" depends on the "Text" topic and the "Text" topic depends on the 
+        // topic type "Data Type" in turn. To resolve this circle we use a low-level storage call here and
+        // postpone the data type association.
+        storage.createTopic(new TopicTypeData("dm3.core.data_type", "Data Type", "dm3.core.text"));
+        //
+        createTopic(new TopicData("dm3.core.text",      new TopicValue("Text"),      "dm3.core.data_type", null), null);
+        createTopic(new TopicData("dm3.core.number",    new TopicValue("Number"),    "dm3.core.data_type", null), null);
+        createTopic(new TopicData("dm3.core.composite", new TopicValue("Composite"), "dm3.core.data_type", null), null);
+        // postponed data type association
+        associateDataType("dm3.core.data_type", "dm3.core.text");
     }
 
     // === Migrations ===

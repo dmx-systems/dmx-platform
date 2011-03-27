@@ -59,8 +59,9 @@ class TypeCache {
     // ---
 
     private AttachedTopicType loadTopicType(String typeUri) {
-        Topic typeTopic = dms.storage.getTopic("uri", new TopicValue(typeUri));
-        TopicTypeData topicTypeData = new TopicTypeData(typeTopic);
+        Topic typeTopic = dms.getTopic("uri", new TopicValue(typeUri));
+        Topic dataType = typeTopic.getRelatedTopic("dm3.core.association", "dm3.core.topic_type", "dm3.core.data_type");
+        TopicTypeData topicTypeData = new TopicTypeData(typeTopic, dataType.getUri());
         for (Association assoc : dms.storage.getAssociations(typeTopic.getId(), "dm3.core.whole_topic_type")) {
             String wholeTopicTypeUri = getTopic(assoc, "dm3.core.whole_topic_type").getUri();
             String  partTopicTypeUri = getTopic(assoc, "dm3.core.part_topic_type").getUri();

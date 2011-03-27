@@ -23,14 +23,10 @@ public class MetaTypeData extends TopicData {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public MetaTypeData(JSONObject metaTypeData) {
-        try {
-            this.uri = metaTypeData.getString("uri");
-            this.value = new TopicValue(metaTypeData.get("value"));
-            this.typeUri = "dm3.core.meta_type";
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing MetaTypeData failed (JSONObject=" + metaTypeData + ")", e);
-        }
+    public MetaTypeData(String uri, String value) {
+        this.uri = uri;
+        this.value = new TopicValue(value);
+        this.typeUri = "dm3.core.meta_type";
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

@@ -9,7 +9,7 @@
 
     associations: [
         {
-            assoc_type: "dm3.core.composition",
+            type_uri: "dm3.core.composition",
             topics: [
                 {topic: "dm3.notes.note",   role_type: "dm3.core.whole_topic_type"},
                 {topic: "dm3.base.title",   role_type: "dm3.core.part_topic_type"},
@@ -17,7 +17,7 @@
             ]
         },
         {
-            assoc_type: "dm3.core.composition",
+            type_uri: "dm3.core.composition",
             topics: [
                 {topic: "dm3.notes.note",   role_type: "dm3.core.whole_topic_type"},
                 {topic: "dm3.base.text",    role_type: "dm3.core.part_topic_type"},

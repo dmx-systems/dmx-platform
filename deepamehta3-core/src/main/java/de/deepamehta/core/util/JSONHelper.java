@@ -89,10 +89,6 @@ public class JSONHelper {
             String fileContent = JavaUtils.readText(is);
             //
             JSONObject o = new JSONObject(fileContent);
-            JSONArray metaTypes = o.optJSONArray("meta_types");
-            if (metaTypes != null) {
-                createMetaTypes(metaTypes, dms);
-            }
             JSONArray topicTypes = o.optJSONArray("topic_types");
             if (topicTypes != null) {
                 createTopicTypes(topicTypes, dms);
@@ -111,13 +107,6 @@ public class JSONHelper {
             }
         } catch (Exception e) {
             throw new RuntimeException("Reading migration file \"" + migrationFileName + "\" failed", e);
-        }
-    }
-
-    public static void createMetaTypes(JSONArray metaTypes, CoreService dms) throws Exception {
-        for (int i = 0; i < metaTypes.length(); i++) {
-            MetaTypeData metaTypeData = new MetaTypeData(metaTypes.getJSONObject(i));
-            dms.createTopic(metaTypeData, null);        // clientContext=null
         }
     }
 

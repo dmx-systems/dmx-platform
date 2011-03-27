@@ -1,24 +1,8 @@
 {
-    meta_types: [
-        {
-            uri: "dm3.core.topic_type",
-            value: "Topic Type"
-        },
-        {
-            uri: "dm3.core.assoc_type",
-            value: "Association Type"
-        }
-    ],
-
     topic_types: [
         {
             uri: "dm3.core.role_type",
             value: "Role Type",
-            data_type_uri: "dm3.core.text"
-        },
-        {
-            uri: "dm3.core.data_type",
-            value: "Data Type",
             data_type_uri: "dm3.core.text"
         },
         {
@@ -88,22 +72,6 @@
             uri: "dm3.core.part_cardinality",
             value: "Part Cardinality",
             type_uri: "dm3.core.role_type"
-        },
-
-        {
-            uri: "dm3.core.text",
-            value: "Text",
-            type_uri: "dm3.core.data_type"
-        },
-        {
-            uri: "dm3.core.number",
-            value: "Number",
-            type_uri: "dm3.core.data_type"
-        },
-        {
-            uri: "dm3.core.composite",
-            value: "Composite",
-            type_uri: "dm3.core.data_type"
         },
 
         {
