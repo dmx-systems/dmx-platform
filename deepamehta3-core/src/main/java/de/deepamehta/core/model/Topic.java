@@ -10,27 +10,27 @@ import java.util.Set;
  */
 public interface Topic {
 
-    public long getId();
+    long getId();
 
-    public String getUri();
+    String getUri();
 
-    public TopicValue getValue();
+    TopicValue getValue();
 
-    public String getTypeUri();
+    String getTypeUri();
 
-    public Composite getComposite();
+    Composite getComposite();
 
     // ---
 
-    public void setValue(String value);
+    void setValue(String value);
 
-    public void setValue(int value);
+    void setValue(int value);
 
-    public void setValue(long value);
+    void setValue(long value);
 
-    public void setValue(boolean value);
+    void setValue(boolean value);
 
-    public void setValue(TopicValue value);
+    void setValue(TopicValue value);
 
     // ---
 
@@ -44,5 +44,5 @@ public interface Topic {
 
     // ---
 
-    public JSONObject toJSON();
+    JSONObject toJSON();
 }

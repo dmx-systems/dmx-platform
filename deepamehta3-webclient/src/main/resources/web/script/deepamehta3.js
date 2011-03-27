@@ -279,7 +279,8 @@ var dm3c = new function() {
     }
 
     this.get_doctype_impl = function(topic) {
-        return doctype_impls[dm3c.type_cache.get(topic.type_uri).js_renderer_class]
+        // return doctype_impls[dm3c.type_cache.get(topic.type_uri).js_renderer_class]
+        return doctype_impls["PlainDocument"]   // FIXME: hardcoded
     }
 
 

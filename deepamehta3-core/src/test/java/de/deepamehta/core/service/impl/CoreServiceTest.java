@@ -19,14 +19,15 @@ import org.junit.Test;
 public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
-    public void getTopicTypeDef() {
-        TopicType typeDef = dms.getTopicType("dm3.core.plugin", null);  // clientContext=null
-        logger.info(typeDef.toString());
+    public void getTopicType() {
+        TopicType topicType = dms.getTopicType("dm3.core.plugin", null);  // clientContext=null
+        logger.info(topicType.toString());
         assertEquals("topic type data (uri=\"dm3.core.plugin\", value=Plugin, typeUri=\"dm3.core.topic_type\", " +
             "dataTypeUri=\"null\", assocDefs={dm3.core.plugin_migration_nr=\n    association definition " +
             "(uri=\"dm3.core.plugin_migration_nr\", assocTypeUri=\"null\")\n        whole: (type=\"dm3.core.plugin\"," +
             " role=\"dm3.core.plugin\", cardinality=\"null\")\n        part: (type=\"dm3.core.plugin_migration_nr\"," +
-            " role=\"dm3.core.plugin_migration_nr\", cardinality=\"dm3.core.one\")})", typeDef.toString());
+            " role=\"dm3.core.plugin_migration_nr\", cardinality=\"dm3.core.one\")})", topicType.toString());
+        // assertEquals("dm3.core.composite", topicType.getDataTypeUri());
     }
 
     @Test

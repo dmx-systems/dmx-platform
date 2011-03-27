@@ -1,6 +1,7 @@
 package de.deepamehta.core.storage;
 
 import de.deepamehta.core.model.Association;
+import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
@@ -109,7 +110,7 @@ public interface DeepaMehtaStorage {
 
     Set<Association> getAssociations(long topicId, String myRoleType);
 
-    Association createAssociation(Association assoc);
+    Association createAssociation(AssociationData assoc);
 
     // void setRelationProperties(long id, Properties properties);
 

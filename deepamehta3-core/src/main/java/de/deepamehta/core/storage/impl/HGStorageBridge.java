@@ -1,6 +1,7 @@
 package de.deepamehta.core.storage.impl;
 
 import de.deepamehta.core.model.Association;
+import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
@@ -106,19 +107,19 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         Set<Association> assocs = new HashSet();
         HyperNode node = hg.getHyperNode(topicId);
         for (HyperEdge edge : node.getHyperEdges(myRoleType)) {
-            Set<Role> roles = new HashSet();
+            AssociationData assocData = new AssociationData(edge.getId(), null);    // FIXME: typeUri=null
             for (HyperNodeRole role : edge.getHyperNodes()) {
-                roles.add(new Role(role.getHyperNode().getId(), role.getRoleType()));
+                assocData.addRole(new Role(role.getHyperNode().getId(), role.getRoleType()));
             }
-            assocs.add(new Association(edge.getId(), null, roles));   // FIXME: assocTypeUri=null
+            assocs.add(assocData);
         }
         return assocs;
     }
 
     @Override
-    public Association createAssociation(Association assoc) {
+    public Association createAssociation(AssociationData assocData) {
         HyperEdge edge = hg.createHyperEdge();  // FIXME: use association type
-        for (Role role : assoc.getRoles()) {
+        for (Role role : assocData.getRoles()) {
             HyperNode node;
             if (role.topicIdentifiedById()) {
                 node = hg.getHyperNode(role.getTopicId());
@@ -127,7 +128,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
             }
             edge.addHyperNode(node, role.getRoleTypeUri());
         }
-        return new Association(edge.getId(), assoc.getTypeUri(), assoc.getRoles());
+        return buildAssociation(edge, assocData.getTypeUri(), assocData.getRoles());
     }
 
     // === DB ===
@@ -192,6 +193,14 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         //
         return new HGTopic(node.getId(), node.getString("uri"), new TopicValue(node.get("value")),
             getTopicTypeUri(node), null);   // composite=null
+    }
+
+    Association buildAssociation(HyperEdge edge, String typeUri, Set<Role> roles) {
+        if (edge == null) {
+            throw new IllegalArgumentException("Tried to build an Association from a null HyperEdge");
+        }
+        //
+        return new HGAssociation(edge.getId(), typeUri, roles);
     }
 
     // ---

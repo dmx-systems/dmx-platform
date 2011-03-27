@@ -1,6 +1,7 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.model.Association;
+import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
@@ -140,7 +141,7 @@ public interface CoreService {
      */
     // public List<Relation> getRelations(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
 
-    public Association createAssociation(Association assoc, ClientContext clientContext);
+    public Association createAssociation(AssociationData assoc, ClientContext clientContext);
 
     // public void setRelationProperties(long id, Properties properties);
 

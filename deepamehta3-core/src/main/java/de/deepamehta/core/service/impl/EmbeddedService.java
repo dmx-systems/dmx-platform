@@ -1,6 +1,7 @@
 package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Association;
+import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
@@ -443,15 +444,16 @@ public class EmbeddedService implements CoreService {
     @POST
     @Path("/relation/{src}/{dst}/{typeId}")
     @Override
-    public Association createAssociation(Association assoc, @HeaderParam("Cookie") ClientContext clientContext) {
+    public Association createAssociation(AssociationData assocData,
+                                         @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            assoc = storage.createAssociation(assoc);
+            Association assoc = storage.createAssociation(assocData);
             tx.success();
             return assoc;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating " + assoc + " failed", e);
+            throw new RuntimeException("Creating association failed (" + assocData + ")", e);
         } finally {
             tx.finish();
         }
@@ -780,10 +782,10 @@ public class EmbeddedService implements CoreService {
             String topicTypeUri = assocDef.getPartTopicTypeUri();
             childTopic = createTopic(new TopicData(null, value, topicTypeUri, null), null);
             // create association
-            Set<Role> roles = new HashSet();
-            roles.add(new Role(parentTopic.getId(), wholeRoleTypeUri));
-            roles.add(new Role(childTopic.getId(), partRoleTypeUri));
-            createAssociation(new Association(-1, assocTypeUri, roles), null);
+            AssociationData assocData = new AssociationData(assocTypeUri);
+            assocData.addRole(new Role(parentTopic.getId(), wholeRoleTypeUri));
+            assocData.addRole(new Role(childTopic.getId(), partRoleTypeUri));
+            createAssociation(assocData, null);     // FIXME: clientContext=null
         }
         return childTopic;
     }
