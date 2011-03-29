@@ -3,9 +3,12 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.storage.neo4j.Neo4jStorage;
 import de.deepamehta.core.util.JavaUtils;
 
+import org.junit.After;
 import org.junit.Before;
 
 import java.io.File;
+
+
 
 public class EmbeddedServiceTestEnvironment {
 
@@ -16,13 +19,13 @@ public class EmbeddedServiceTestEnvironment {
     public void setup() throws Exception {
         dbPath = JavaUtils.createTempDirectory("dm3");
         Neo4jStorage storage = new Neo4jStorage(dbPath.getAbsolutePath());
-        dms = new EmbeddedService(storage);
+        dms = new EmbeddedService(storage, null);
         dms.setupDB();
     }
 
+    @After
     public void tearDown() {
         dms.shutdown();
         dbPath.delete();
     }
-
 }

@@ -10,6 +10,8 @@ import org.junit.Before;
 
 import java.io.File;
 
+
+
 public class Neo4jTestEnvironment {
 
     protected Storage cut;
@@ -19,8 +21,7 @@ public class Neo4jTestEnvironment {
     public void setup() {
         dbPath = JavaUtils.createTempDirectory("neo4j");
         cut = new Neo4jStorage(dbPath.getAbsolutePath());
-        // TODO decouple storage initialization
-        new EmbeddedService(cut).setupDB();
+        new EmbeddedService(cut, null).setupDB();
     }
 
     @After
@@ -28,5 +29,4 @@ public class Neo4jTestEnvironment {
         cut.shutdown();
         dbPath.delete();
     }
-
 }

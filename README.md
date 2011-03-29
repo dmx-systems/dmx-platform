@@ -115,7 +115,7 @@ See the wiki page [DeepaMehta 3 Development](https://github.com/jri/deepamehta3/
 Version History
 ---------------
 
-**v0.4.5** -- Mar 24, 2011
+**v0.4.5** -- Mar 29, 2011
 
 * Under the hood changes to support (new) developers:
     * Complete new build system based on pure Maven and Pax Runner (no shellscripts anymore).
@@ -189,4 +189,4 @@ Version History
 
 ------------
 Jörg Richter  
-Mar 24, 2011
+Mar 29, 2011

@@ -19,6 +19,9 @@ import de.deepamehta.core.storage.Storage;
 import de.deepamehta.core.storage.Transaction;
 import de.deepamehta.core.util.JSONHelper;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -35,10 +38,8 @@ import javax.ws.rs.QueryParam;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
-
 import java.io.InputStream;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,6 +69,7 @@ public class EmbeddedService implements CoreService {
     private PluginCache pluginCache = new PluginCache();
 
     private Storage storage;
+    private BundleContext bundleContext;
 
     private enum Hook {
 
@@ -124,8 +126,9 @@ public class EmbeddedService implements CoreService {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public EmbeddedService(Storage storage) {
+    public EmbeddedService(Storage storage, BundleContext bundleContext) {
         this.storage = storage;
+        this.bundleContext = bundleContext;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -689,8 +692,24 @@ public class EmbeddedService implements CoreService {
     }
 
     @Override
-    public void pluginsReady() {
-        triggerHook(Hook.ALL_PLUGINS_READY);
+    public void checkPluginsReady() {
+        Bundle[] bundles = bundleContext.getBundles();
+        int plugins = 0;
+        int registered = 0;
+        for (Bundle bundle : bundles) {
+            if (isDeepaMehtaPlugin(bundle)) {
+                plugins++;
+                if (isPluginRegistered(bundle)) {
+                    registered++;
+                }
+            }
+        }
+        logger.info("### bundles total: " + bundles.length +
+            ", DM plugins: " + plugins + ", registered: " + registered);
+        if (plugins == registered) {
+            logger.info("########## All plugins ready ##########");
+            triggerHook(Hook.ALL_PLUGINS_READY);
+        }
     }
 
     @Override
@@ -775,6 +794,19 @@ public class EmbeddedService implements CoreService {
         Properties properties = new Properties();
         properties.put("de/deepamehta/core/property/PluginMigrationNr", migrationNr);
         setTopicProperties(plugin.getPluginTopic().id, properties);
+    }
+
+    // ---
+
+    private boolean isDeepaMehtaPlugin(Bundle bundle) {
+        String packages = (String) bundle.getHeaders().get("Import-Package");
+        // Note: packages might be null. Not all bundles import packges.
+        return packages != null && packages.contains("de.deepamehta.core.service") &&
+            !bundle.getSymbolicName().equals("de.deepamehta.3-core");
+    }
+
+    private boolean isPluginRegistered(Bundle bundle) {
+        return pluginCache.contains(bundle.getSymbolicName());
     }
 
     // === DB ===
