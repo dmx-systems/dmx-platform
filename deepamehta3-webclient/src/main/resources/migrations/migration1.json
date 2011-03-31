@@ -1,11 +1,6 @@
 {
     topic_types: [
         {
-            uri: "dm3.webclient.search",
-            value: "Search",
-            data_type_uri: "dm3.core.composite"
-        },
-        {
             uri: "dm3.webclient.search_term",
             value: "Search Term",
             data_type_uri: "dm3.core.text"
@@ -14,24 +9,22 @@
             uri: "dm3.webclient.search_result",
             value: "Search Result",
             data_type_uri: "dm3.core.text"
-        }
-    ],
-
-    associations: [
-        {
-            type_uri: "dm3.core.composition",
-            topics: [
-                {topic: "dm3.webclient.search",         role_type: "dm3.core.whole_topic_type"},
-                {topic: "dm3.webclient.search_term",    role_type: "dm3.core.part_topic_type"},
-                {topic: "dm3.core.one",                 role_type: "dm3.core.part_cardinality"}
-            ]
         },
         {
-            type_uri: "dm3.core.composition",
-            topics: [
-                {topic: "dm3.webclient.search",         role_type: "dm3.core.whole_topic_type"},
-                {topic: "dm3.webclient.search_result",  role_type: "dm3.core.part_topic_type"},
-                {topic: "dm3.core.one",                 role_type: "dm3.core.part_cardinality"}
+            uri: "dm3.webclient.search",
+            value: "Search",
+            data_type_uri: "dm3.core.composite",
+            assoc_defs: [
+                {
+                    assoc_type_uri:       "dm3.core.composition",
+                    part_topic_type_uri:  "dm3.webclient.search_term",
+                    part_cardinality_uri: "dm3.core.one"
+                },
+                {
+                    assoc_type_uri:       "dm3.core.composition",
+                    part_topic_type_uri:  "dm3.webclient.search_result",
+                    part_cardinality_uri: "dm3.core.one"
+                }
             ]
         }
     ]
