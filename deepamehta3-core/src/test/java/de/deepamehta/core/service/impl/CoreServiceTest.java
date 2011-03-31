@@ -25,7 +25,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertEquals("topic type data (uri=\"dm3.core.plugin\", value=Plugin, typeUri=\"dm3.core.topic_type\", " +
             "dataTypeUri=\"dm3.core.composite\", assocDefs={dm3.core.plugin_migration_nr=\n    association " +
             "definition (uri=\"dm3.core.plugin_migration_nr\", assocTypeUri=\"null\")\n        whole: (type=" +
-            "\"dm3.core.plugin\", role=\"dm3.core.plugin\", cardinality=\"null\")\n        part: (type=" +
+            "\"dm3.core.plugin\", role=\"dm3.core.plugin\", cardinality=\"dm3.core.one\")\n        part: (type=" +
             "\"dm3.core.plugin_migration_nr\", role=\"dm3.core.plugin_migration_nr\", cardinality=\"dm3.core.one\")})",
             topicType.toString());
         assertEquals("dm3.core.composite", topicType.getDataTypeUri());

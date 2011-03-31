@@ -43,6 +43,7 @@
             value: "Instance",
             type_uri: "dm3.core.role_type"
         },
+
         {
             uri: "dm3.core.whole_topic_type",
             value: "Whole Topic Type",

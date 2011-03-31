@@ -13,10 +13,6 @@ import java.util.logging.Logger;
 
 
 /**
- * A topic type. Part of the meta-model (like a class).
- * <p>
- * A topic type itself is a {@link Topic}.
- *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
 public class TopicTypeData extends TopicData implements TopicType {
@@ -51,15 +47,16 @@ public class TopicTypeData extends TopicData implements TopicType {
         this.assocDefs = new HashMap();
     }
 
-    public TopicTypeData(JSONObject type) {
+    public TopicTypeData(JSONObject topicType) {
         try {
-            this.uri = type.getString("uri");
-            this.value = new TopicValue(type.get("value"));
+            this.uri = topicType.getString("uri");
+            this.value = new TopicValue(topicType.get("value"));
             this.typeUri = "dm3.core.topic_type";
-            this.dataTypeUri = type.getString("data_type_uri");
+            this.dataTypeUri = topicType.getString("data_type_uri");
             this.assocDefs = new HashMap();
+            parseAssocDefs(topicType);
         } catch (Exception e) {
-            throw new RuntimeException("Parsing TopicTypeData failed (JSONObject=" + type + ")", e);
+            throw new RuntimeException("Parsing TopicTypeData failed (JSONObject=" + topicType + ")", e);
         }
     }
 
@@ -83,7 +80,7 @@ public class TopicTypeData extends TopicData implements TopicType {
     // ---
 
     @Override
-    public AssociationDefinition getAssociationDefinition(String assocDefUri) {
+    public AssociationDefinition getAssocDef(String assocDefUri) {
         AssociationDefinition assocDef = assocDefs.get(assocDefUri);
         if (assocDef == null) {
             throw new RuntimeException("Association definition \"" + assocDefUri + "\" not found (in " + this + ")");
@@ -93,7 +90,7 @@ public class TopicTypeData extends TopicData implements TopicType {
 
     // FIXME: abstraction. Adding should be the factory's resposibility
     @Override
-    public void addAssociationDefinition(AssociationDefinition assocDef) {
+    public void addAssocDef(AssociationDefinition assocDef) {
         String assocDefUri = assocDef.getUri();
         AssociationDefinition existing = assocDefs.get(assocDefUri);
         if (existing != null) {
@@ -128,5 +125,16 @@ public class TopicTypeData extends TopicData implements TopicType {
     public String toString() {
         return "topic type data (uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + dataTypeUri + "\", assocDefs=" + assocDefs + ")";
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void parseAssocDefs(JSONObject topicType) throws Exception {
+        JSONArray assocDefs = topicType.optJSONArray("assoc_defs");
+        if (assocDefs != null) {
+            for (int i = 0; i < assocDefs.length(); i++) {
+                addAssocDef(new AssociationDefinition(assocDefs.getJSONObject(i), this.uri));
+            }
+        }
     }
 }

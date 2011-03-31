@@ -78,7 +78,7 @@ class TypeCache {
             assocDef.setPartCardinalityUri(cardinality.partCardinalityUri);
             // FIXME: call assocDef's setUri() and setAssocTypeUri()
             //
-            topicTypeData.addAssociationDefinition(assocDef);
+            topicTypeData.addAssocDef(assocDef);
         }
         return new AttachedTopicType(topicTypeData, dms);
     }

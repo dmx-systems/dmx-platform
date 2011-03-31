@@ -66,6 +66,7 @@ public class Role {
 
     @Override
     public String toString() {
-        return "role \"" + roleTypeUri + "\" (topicId=" + topicId + ", topicUri=\"" + topicUri + "\")";
+        return "\n        role (roleTypeUri=\"" + roleTypeUri + "\", topicId=" + topicId +
+            ", topicUri=\"" + topicUri + "\", topicIdentifiedById=" + topicIdentifiedById + ")";
     }
 }

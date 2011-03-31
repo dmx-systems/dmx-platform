@@ -25,9 +25,9 @@ public interface TopicType {
 
     // ---
 
-    AssociationDefinition getAssociationDefinition(String assocDefUri);
+    AssociationDefinition getAssocDef(String assocDefUri);
 
-    void addAssociationDefinition(AssociationDefinition assocDef);
+    void addAssocDef(AssociationDefinition assocDef);
 
     // ---
 

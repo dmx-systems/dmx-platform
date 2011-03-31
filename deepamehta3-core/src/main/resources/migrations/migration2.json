@@ -1,24 +1,20 @@
 {
     topic_types: [
         {
-            uri: "dm3.core.plugin",
-            value: "Plugin",
-            data_type_uri: "dm3.core.composite"
-        },
-        {
             uri: "dm3.core.plugin_migration_nr",
             value: "Plugin Migration Nr.",
             data_type_uri: "dm3.core.number"
-        }
-    ],
-
-    associations: [
+        },
         {
-            type_uri: "dm3.core.composition",
-            topics: [
-                {topic: "dm3.core.plugin",              role_type: "dm3.core.whole_topic_type"},
-                {topic: "dm3.core.plugin_migration_nr", role_type: "dm3.core.part_topic_type"},
-                {topic: "dm3.core.one",                 role_type: "dm3.core.part_cardinality"}
+            uri: "dm3.core.plugin",
+            value: "Plugin",
+            data_type_uri: "dm3.core.composite",
+            assoc_defs: [
+                {
+                    assoc_type_uri:       "dm3.core.composition",
+                    part_topic_type_uri:  "dm3.core.plugin_migration_nr",
+                    part_cardinality_uri: "dm3.core.one"
+                }
             ]
         }
     ]

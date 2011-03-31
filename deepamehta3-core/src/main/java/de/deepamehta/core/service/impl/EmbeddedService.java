@@ -543,6 +543,7 @@ public class EmbeddedService implements CoreService {
             Topic topic = storage.createTopic(topicTypeData);
             //
             associateDataType(typeUri, topicTypeData.getDataTypeUri());
+            associateTopicTypes(topicTypeData.getAssocDefs());
             //
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
@@ -749,7 +750,7 @@ public class EmbeddedService implements CoreService {
 
     TopicValue getTopicValue(Topic topic, String assocDefUri) {
         TopicType topicType = getTopicType(topic.getTypeUri(), null);   // FIXME: clientContext=null
-        AssociationDefinition assocDef = topicType.getAssociationDefinition(assocDefUri);
+        AssociationDefinition assocDef = topicType.getAssocDef(assocDefUri);
         String assocTypeUri = assocDef.getAssocTypeUri();
         String wholeRoleTypeUri = assocDef.getWholeRoleTypeUri();
         String  partRoleTypeUri = assocDef.getPartRoleTypeUri();
@@ -773,7 +774,7 @@ public class EmbeddedService implements CoreService {
      */
     Topic setChildTopicValue(Topic parentTopic, String assocDefUri, TopicValue value) {
         TopicType topicType = getTopicType(parentTopic.getTypeUri(), null);     // FIXME: clientContext=null
-        AssociationDefinition assocDef = topicType.getAssociationDefinition(assocDefUri);
+        AssociationDefinition assocDef = topicType.getAssocDef(assocDefUri);
         String assocTypeUri = assocDef.getAssocTypeUri();
         String wholeRoleTypeUri = assocDef.getWholeRoleTypeUri();
         String  partRoleTypeUri = assocDef.getPartRoleTypeUri();
@@ -835,6 +836,12 @@ public class EmbeddedService implements CoreService {
         assocData.addRole(new Role(topicTypeUri, "dm3.core.topic_type"));
         assocData.addRole(new Role(dataTypeUri,  "dm3.core.data_type"));
         createAssociation(assocData, null);     // FIXME: clientContext=null
+    }
+
+    private void associateTopicTypes(Map<String, AssociationDefinition> assocDefs) {
+        for (AssociationDefinition assocDef : assocDefs.values()) {
+            createAssociation(assocDef.toAssociationData(), null);     // FIXME: clientContext=null
+        }
     }
 
     private EnrichedTopicType enrichTopicType(final AttachedTopicType topicType, ClientContext clientContext) {
