@@ -1,5 +1,6 @@
 package de.deepamehta.core.model.impl;
 
+import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
@@ -107,6 +108,11 @@ public class BaseTopic extends TopicData implements Topic {
 
     @Override
     public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType) {
+        throw new RuntimeException("Method not implemented (" + getClass() + ")");
+    }
+
+    @Override
+    public Set<Association> getAssociations(String myRoleType) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 

@@ -6,8 +6,10 @@ import org.codehaus.jettison.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -20,10 +22,9 @@ public class TopicTypeData extends TopicData implements TopicType {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private long id;
-
     private String dataTypeUri;
-
     private Map<String, AssociationDefinition> assocDefs;
+    private Set<TopicData> viewConfig;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -33,18 +34,21 @@ public class TopicTypeData extends TopicData implements TopicType {
         super(topicTypeData);
         this.dataTypeUri = topicTypeData.getDataTypeUri();
         this.assocDefs = topicTypeData.getAssocDefs();
+        this.viewConfig = topicTypeData.getViewConfig();
     }
 
-    public TopicTypeData(Topic typeTopic, String dataTypeUri) {
+    public TopicTypeData(Topic typeTopic, String dataTypeUri, Set<TopicData> viewConfig) {
         super(typeTopic.getUri(), typeTopic.getValue(), typeTopic.getTypeUri(), null);  // composite=null
         this.dataTypeUri = dataTypeUri;
         this.assocDefs = new HashMap();
+        this.viewConfig = viewConfig;
     }
 
     public TopicTypeData(String uri, String value, String dataTypeUri) {
         super(uri, new TopicValue(value), "dm3.core.topic_type", null);                 // composite=null
         this.dataTypeUri = dataTypeUri;
         this.assocDefs = new HashMap();
+        this.viewConfig = new HashSet();
     }
 
     public TopicTypeData(JSONObject topicType) {
@@ -52,8 +56,10 @@ public class TopicTypeData extends TopicData implements TopicType {
             this.uri = topicType.getString("uri");
             this.value = new TopicValue(topicType.get("value"));
             this.typeUri = "dm3.core.topic_type";
+            //
             this.dataTypeUri = topicType.getString("data_type_uri");
             this.assocDefs = new HashMap();
+            this.viewConfig = parseViewConfig(topicType);
             parseAssocDefs(topicType);
         } catch (Exception e) {
             throw new RuntimeException("Parsing TopicTypeData failed (JSONObject=" + topicType + ")", e);
@@ -75,6 +81,11 @@ public class TopicTypeData extends TopicData implements TopicType {
     @Override
     public Map<String, AssociationDefinition> getAssocDefs() {
         return assocDefs;
+    }
+
+    @Override
+    public Set<TopicData> getViewConfig() {
+        return viewConfig;
     }
 
     // ---
@@ -115,6 +126,12 @@ public class TopicTypeData extends TopicData implements TopicType {
             }
             o.put("assoc_defs", assocDefs);
             //
+            List viewConfigTopics = new ArrayList();
+            for (TopicData topicData : viewConfig) {
+                viewConfigTopics.add(topicData.toJSON());
+            }
+            o.put("view_config_topics", viewConfigTopics);
+            //
             return o;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
@@ -124,7 +141,7 @@ public class TopicTypeData extends TopicData implements TopicType {
     @Override
     public String toString() {
         return "topic type data (uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
-            "\", dataTypeUri=\"" + dataTypeUri + "\", assocDefs=" + assocDefs + ")";
+            "\", dataTypeUri=\"" + dataTypeUri + "\",\nassocDefs=" + assocDefs + ",\nviewConfig=" + viewConfig + ")";
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -136,5 +153,16 @@ public class TopicTypeData extends TopicData implements TopicType {
                 addAssocDef(new AssociationDefinition(assocDefs.getJSONObject(i), this.uri));
             }
         }
+    }
+
+    private Set<TopicData> parseViewConfig(JSONObject topicType) throws Exception {
+        Set<TopicData> viewConfig = new HashSet();
+        JSONArray topics = topicType.optJSONArray("view_config_topics");
+        if (topics != null) {
+            for (int i = 0; i < topics.length(); i++) {
+                viewConfig.add(new TopicData(topics.getJSONObject(i)));
+            }
+        }
+        return viewConfig;
     }
 }

@@ -42,6 +42,8 @@ public interface Topic {
 
     Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType);
 
+    Set<Association> getAssociations(String myRoleType);
+
     // ---
 
     JSONObject toJSON();

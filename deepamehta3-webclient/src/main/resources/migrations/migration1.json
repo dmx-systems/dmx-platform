@@ -1,6 +1,24 @@
 {
     topic_types: [
         {
+            uri: "dm3.webclient.icon_src",
+            value: "Icon Source",
+            data_type_uri: "dm3.core.text"
+        },
+        {
+            uri: "dm3.webclient.topic_type_view_config",
+            value: "Topic Type View Configuration",
+            data_type_uri: "dm3.core.composite",
+            assoc_defs: [
+                {
+                    assoc_type_uri:       "dm3.core.composition",
+                    part_topic_type_uri:  "dm3.webclient.icon_src",
+                    part_cardinality_uri: "dm3.core.one"
+                }
+            ]
+        },
+
+        {
             uri: "dm3.webclient.search_term",
             value: "Search Term",
             data_type_uri: "dm3.core.text"
@@ -24,6 +42,14 @@
                     assoc_type_uri:       "dm3.core.composition",
                     part_topic_type_uri:  "dm3.webclient.search_result",
                     part_cardinality_uri: "dm3.core.one"
+                }
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm3.webclient.topic_type_view_config",
+                    composite: {
+                        dm3.webclient.icon_src: "/de.deepamehta.3-webclient/images/bucket.png"
+                    }
                 }
             ]
         }

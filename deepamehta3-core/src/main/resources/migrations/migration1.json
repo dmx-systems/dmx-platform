@@ -14,11 +14,6 @@
 
     assoc_types: [
         {
-            uri: "dm3.core.instantiation",
-            value: "Instantiation"
-        },
-
-        {
             uri: "dm3.core.association",
             value: "Association"
         },
@@ -29,6 +24,15 @@
         {
             uri: "dm3.core.composition",
             value: "Composition"
+        },
+
+        {
+            uri: "dm3.core.instantiation",
+            value: "Instantiation"
+        },
+        {
+            uri: "dm3.core.view_configuration",
+            value: "View Configuration"
         }
     ],
 

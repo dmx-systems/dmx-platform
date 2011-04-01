@@ -17,16 +17,18 @@ public class TopicData {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected String uri;
-    protected TopicValue value;
-    protected String typeUri;
-    protected Composite composite;
+    protected String uri;           // is never null, may be empty
+    protected TopicValue value;     // is never null, may be constructed on empty string
+    protected String typeUri;       // 
+    protected Composite composite;  // may be null
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     /**
-     * @param   uri     If <code>null</code> an empty string is used. This is OK.
-     * @param   value   If <code>null</code> an empty string value is used. This is OK.
+     * @param   uri         If <code>null</code> an empty string is used. This is OK.
+     * @param   value       If <code>null</code> an empty string value is used. This is OK.
+     * @param   typeUri     Mandatory.
+     * @param   composite   If <code>null</code> composite is not initialized (remains null). This is OK.
      */
     public TopicData(String uri, TopicValue value, String typeUri, Composite composite) {
         this.uri = uri != null ? uri : "";
@@ -39,12 +41,18 @@ public class TopicData {
         this(topicData.uri, topicData.value, topicData.typeUri, topicData.composite);
     }
 
+    public TopicData(Topic topic) {
+        this(topic.getUri(), topic.getValue(), topic.getTypeUri(), topic.getComposite());
+    }
+
     public TopicData(JSONObject topicData) {
         try {
             this.uri = topicData.optString("uri");
             this.value = new TopicValue(topicData.optString("value"));
             this.typeUri = topicData.getString("type_uri");
-            // FIXME: composite is not set
+            if (topicData.has("composite")) {
+                this.composite = new Composite(topicData.getJSONObject("composite"));
+            }
         } catch (Exception e) {
             throw new RuntimeException("Parsing TopicData failed (JSONObject=" + topicData + ")", e);
         }

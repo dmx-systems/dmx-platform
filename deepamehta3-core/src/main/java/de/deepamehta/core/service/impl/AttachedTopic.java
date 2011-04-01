@@ -1,5 +1,6 @@
 package de.deepamehta.core.service.impl;
 
+import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.impl.BaseTopic;
@@ -55,5 +56,10 @@ class AttachedTopic extends BaseTopic {
     @Override
     public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType) {
         return dms.getRelatedTopics(getId(), assocTypeUri, myRoleType, othersRoleType);
+    }
+
+    @Override
+    public Set<Association> getAssociations(String myRoleType) {
+        return dms.getAssociations(getId(), myRoleType);
     }
 }

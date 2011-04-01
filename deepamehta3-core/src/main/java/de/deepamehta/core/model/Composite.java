@@ -46,4 +46,11 @@ public class Composite {
             throw new RuntimeException("Getting key \"" + key + "\" failed");
         }
     }
+
+    // ---
+
+    @Override
+    public String toString() {
+        return values.toString();
+    }
 }

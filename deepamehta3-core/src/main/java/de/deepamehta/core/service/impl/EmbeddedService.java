@@ -544,6 +544,7 @@ public class EmbeddedService implements CoreService {
             //
             associateDataType(typeUri, topicTypeData.getDataTypeUri());
             associateTopicTypes(topicTypeData.getAssocDefs());
+            associateViewConfig(typeUri, topicTypeData.getViewConfig());
             //
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
@@ -808,6 +809,10 @@ public class EmbeddedService implements CoreService {
         // return topic != null ? buildTopic(topic) : null;     FIXME: attach topics
     }
 
+    Set<Association> getAssociations(long topicId, String myRoleType) {
+        return storage.getAssociations(topicId, myRoleType);
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Topic buildTopic(Topic topic) {
@@ -831,18 +836,32 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+    // ---
+
     private void associateDataType(String topicTypeUri, String dataTypeUri) {
         AssociationData assocData = new AssociationData("dm3.core.association");
         assocData.addRole(new Role(topicTypeUri, "dm3.core.topic_type"));
         assocData.addRole(new Role(dataTypeUri,  "dm3.core.data_type"));
-        createAssociation(assocData, null);     // FIXME: clientContext=null
+        createAssociation(assocData, null);                         // FIXME: clientContext=null
     }
 
     private void associateTopicTypes(Map<String, AssociationDefinition> assocDefs) {
         for (AssociationDefinition assocDef : assocDefs.values()) {
-            createAssociation(assocDef.toAssociationData(), null);     // FIXME: clientContext=null
+            createAssociation(assocDef.toAssociationData(), null);  // FIXME: clientContext=null
         }
     }
+
+    private void associateViewConfig(String topicTypeUri, Set<TopicData> viewConfig) {
+        for (TopicData topicData : viewConfig) {
+            Topic topic = createTopic(topicData, null);             // FIXME: clientContext=null
+            AssociationData assocData = new AssociationData("dm3.core.view_configuration");
+            assocData.addRole(new Role(topicTypeUri,  "dm3.core.topic_type"));
+            assocData.addRole(new Role(topic.getId(), "dm3.core.view_config"));
+            createAssociation(assocData, null);                     // FIXME: clientContext=null
+        }
+    }
+
+    // ---
 
     private EnrichedTopicType enrichTopicType(final AttachedTopicType topicType, ClientContext clientContext) {
         final Map result = triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);

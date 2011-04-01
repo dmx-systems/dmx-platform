@@ -4,13 +4,16 @@ import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicTypeData;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicValue;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -60,9 +63,10 @@ class TypeCache {
 
     private AttachedTopicType loadTopicType(String typeUri) {
         Topic typeTopic = dms.getTopic("uri", new TopicValue(typeUri));
-        Topic dataType = typeTopic.getRelatedTopic("dm3.core.association", "dm3.core.topic_type", "dm3.core.data_type");
-        TopicTypeData topicTypeData = new TopicTypeData(typeTopic, dataType.getUri());
-        for (Association assoc : dms.storage.getAssociations(typeTopic.getId(), "dm3.core.whole_topic_type")) {
+        Topic dataType = fetchDataType(typeTopic);
+        Set<TopicData> viewConfig = toTopicData(fetchViewConfig(typeTopic));
+        TopicTypeData topicTypeData = new TopicTypeData(typeTopic, dataType.getUri(), viewConfig);
+        for (Association assoc : typeTopic.getAssociations("dm3.core.whole_topic_type")) {
             String wholeTopicTypeUri = getTopic(assoc, "dm3.core.whole_topic_type").getUri();
             String  partTopicTypeUri = getTopic(assoc, "dm3.core.part_topic_type").getUri();
             // sanity check
@@ -81,6 +85,24 @@ class TypeCache {
             topicTypeData.addAssocDef(assocDef);
         }
         return new AttachedTopicType(topicTypeData, dms);
+    }
+
+    // ---
+
+    private Topic fetchDataType(Topic topic) {
+        return topic.getRelatedTopic("dm3.core.association", "dm3.core.topic_type", "dm3.core.data_type");
+    }
+
+    private Set<Topic> fetchViewConfig(Topic topic) {
+        return topic.getRelatedTopics("dm3.core.view_configuration", "dm3.core.topic_type", "dm3.core.view_config");
+    }
+
+    private Set<TopicData> toTopicData(Set<Topic> topics) {
+        Set topicData = new HashSet();
+        for (Topic topic : topics) {
+            topicData.add(new TopicData(topic));
+        }
+        return topicData;
     }
 
     // ---
