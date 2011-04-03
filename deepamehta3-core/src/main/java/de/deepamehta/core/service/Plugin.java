@@ -126,7 +126,7 @@ public class Plugin implements BundleActivator {
 
     // FIXME: should be private
     public void setMigrationNr(int migrationNr) {
-        pluginTopic.setValue("dm3.core.plugin_migration_nr", new TopicValue(migrationNr));
+        pluginTopic.setChildTopicValue("dm3.core.plugin_migration_nr", new TopicValue(migrationNr));
     }
 
     /**
@@ -605,7 +605,7 @@ public class Plugin implements BundleActivator {
      * Determines the migrations to be run for this plugin and run them.
      */
     private void runPluginMigrations(boolean isCleanInstall) {
-        int migrationNr = pluginTopic.getValue("dm3.core.plugin_migration_nr").intValue();
+        int migrationNr = pluginTopic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
         int requiredMigrationNr = Integer.parseInt(getConfigProperty("requiredPluginMigrationNr", "0"));
         int migrationsToRun = requiredMigrationNr - migrationNr;
         logger.info("Running " + migrationsToRun + " plugin migrations (migrationNr=" + migrationNr +

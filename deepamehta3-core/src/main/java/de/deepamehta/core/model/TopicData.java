@@ -129,11 +129,11 @@ public class TopicData {
 
     // ---
 
-    public TopicValue getValue(String assocDefUri) {
+    public TopicValue getChildTopicValue(String assocDefUri) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 
-    public void setValue(String assocDefUri, TopicValue value) {
+    public void setChildTopicValue(String assocDefUri, TopicValue value) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 

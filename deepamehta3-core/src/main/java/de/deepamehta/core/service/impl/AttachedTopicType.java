@@ -1,6 +1,7 @@
 package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeData;
 import de.deepamehta.core.model.TopicValue;
 
@@ -10,13 +11,11 @@ import java.util.logging.Logger;
 
 
 
-class AttachedTopicType extends TopicTypeData {
+class AttachedTopicType extends TopicTypeData implements TopicType {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private EmbeddedService dms;
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -29,8 +28,4 @@ class AttachedTopicType extends TopicTypeData {
         super(topicType);
         this.dms = topicType.dms;
     }
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    
 }

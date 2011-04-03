@@ -36,14 +36,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic topic = dms.createTopic(new TopicData("de.deepamehta.3-notes", new TopicValue("DeepaMehta 3 Notes"),
             "dm3.core.plugin", null), null);    // composite=null, clientContext=null
         //
-        topic.setValue("dm3.core.plugin_migration_nr", new TopicValue(23));
+        topic.setChildTopicValue("dm3.core.plugin_migration_nr", new TopicValue(23));
         //
-        int nr = topic.getValue("dm3.core.plugin_migration_nr").intValue();
+        int nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
         assertEquals(23, nr);
         //
-        topic.setValue("dm3.core.plugin_migration_nr", new TopicValue(42));
+        topic.setChildTopicValue("dm3.core.plugin_migration_nr", new TopicValue(42));
         //
-        nr = topic.getValue("dm3.core.plugin_migration_nr").intValue();
+        nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
         assertEquals(42, nr);
     }
 
@@ -52,12 +52,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic topic = dms.createTopic(new TopicData("de.deepamehta.3-notes", new TopicValue("DeepaMehta 3 Notes"),
             "dm3.core.plugin", new Composite("{dm3.core.plugin_migration_nr: 23}")), null);
         //
-        int nr = topic.getValue("dm3.core.plugin_migration_nr").intValue();
+        int nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
         assertEquals(23, nr);
         //
-        topic.setValue("dm3.core.plugin_migration_nr", new TopicValue(42));
+        topic.setChildTopicValue("dm3.core.plugin_migration_nr", new TopicValue(42));
         //
-        nr = topic.getValue("dm3.core.plugin_migration_nr").intValue();
+        nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
         assertEquals(42, nr);
     }
 }

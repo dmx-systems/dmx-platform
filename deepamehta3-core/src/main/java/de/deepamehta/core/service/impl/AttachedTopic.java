@@ -44,12 +44,12 @@ class AttachedTopic extends TopicData implements Topic {
     // ---
 
     @Override
-    public TopicValue getValue(String assocDefUri) {
+    public TopicValue getChildTopicValue(String assocDefUri) {
         return dms.getChildTopicValue(this, assocDefUri);
     }
 
     @Override
-    public void setValue(String assocDefUri, TopicValue value) {
+    public void setChildTopicValue(String assocDefUri, TopicValue value) {
         dms.setChildTopicValue(this, assocDefUri, value);
     }
 

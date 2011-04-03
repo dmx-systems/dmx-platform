@@ -15,13 +15,14 @@ import java.util.logging.Logger;
 
 
 /**
+ * Collection of the data that makes up a {@link TopicType}.
+ *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class TopicTypeData extends TopicData implements TopicType {
+public class TopicTypeData extends TopicData {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private long id;
     private String dataTypeUri;
     private Map<String, AssociationDefinition> assocDefs;
     private Set<TopicData> viewConfig;
@@ -38,14 +39,14 @@ public class TopicTypeData extends TopicData implements TopicType {
     }
 
     public TopicTypeData(Topic typeTopic, String dataTypeUri, Set<TopicData> viewConfig) {
-        super(typeTopic.getUri(), typeTopic.getValue(), typeTopic.getTypeUri(), null);  // composite=null
+        super(typeTopic);
         this.dataTypeUri = dataTypeUri;
         this.assocDefs = new HashMap();
         this.viewConfig = viewConfig;
     }
 
     public TopicTypeData(String uri, String value, String dataTypeUri) {
-        super(uri, new TopicValue(value), "dm3.core.topic_type", null);                 // composite=null
+        super(uri, new TopicValue(value), "dm3.core.topic_type");
         this.dataTypeUri = dataTypeUri;
         this.assocDefs = new HashMap();
         this.viewConfig = new HashSet();
@@ -53,9 +54,11 @@ public class TopicTypeData extends TopicData implements TopicType {
 
     public TopicTypeData(JSONObject topicType) {
         try {
+            this.id = -1;
             this.uri = topicType.getString("uri");
             this.value = new TopicValue(topicType.get("value"));
             this.typeUri = "dm3.core.topic_type";
+            this.composite = null;
             //
             this.dataTypeUri = topicType.getString("data_type_uri");
             this.assocDefs = new HashMap();
@@ -68,29 +71,20 @@ public class TopicTypeData extends TopicData implements TopicType {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
     public String getDataTypeUri() {
         return dataTypeUri;
     }
 
-    @Override
     public Map<String, AssociationDefinition> getAssocDefs() {
         return assocDefs;
     }
 
-    @Override
     public Set<TopicData> getViewConfig() {
         return viewConfig;
     }
 
     // ---
 
-    @Override
     public AssociationDefinition getAssocDef(String assocDefUri) {
         AssociationDefinition assocDef = assocDefs.get(assocDefUri);
         if (assocDef == null) {
@@ -100,7 +94,6 @@ public class TopicTypeData extends TopicData implements TopicType {
     }
 
     // FIXME: abstraction. Adding should be the factory's resposibility
-    @Override
     public void addAssocDef(AssociationDefinition assocDef) {
         String assocDefUri = assocDef.getUri();
         AssociationDefinition existing = assocDefs.get(assocDefUri);
@@ -140,7 +133,7 @@ public class TopicTypeData extends TopicData implements TopicType {
 
     @Override
     public String toString() {
-        return "topic type data (uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
+        return "topic type data (id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + dataTypeUri + "\",\nassocDefs=" + assocDefs + ",\nviewConfig=" + viewConfig + ")";
     }
 

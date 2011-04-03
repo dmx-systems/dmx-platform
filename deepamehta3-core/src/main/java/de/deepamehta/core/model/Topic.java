@@ -40,9 +40,9 @@ public interface Topic {
 
     // ---
 
-    TopicValue getValue(String assocDefUri);
+    TopicValue getChildTopicValue(String assocDefUri);
 
-    void setValue(String assocDefUri, TopicValue value);
+    void setChildTopicValue(String assocDefUri, TopicValue value);
 
     Topic getRelatedTopic(String assocTypeUri, String myRoleType, String othersRoleType);
 
