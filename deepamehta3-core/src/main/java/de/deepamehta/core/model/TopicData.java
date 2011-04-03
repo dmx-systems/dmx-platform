@@ -24,10 +24,14 @@ public class TopicData {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    public TopicData(String uri, TopicValue value, String typeUri) {
+        this(uri, value, typeUri, null);
+    }
+
     /**
      * @param   uri         If <code>null</code> an empty string is used. This is OK.
      * @param   value       If <code>null</code> an empty string value is used. This is OK.
-     * @param   typeUri     Mandatory.
+     * @param   typeUri     Mandatory. Note: only the internal meta type topic (ID 0) has no type URI (null).
      * @param   composite   If <code>null</code> composite is not initialized (remains null). This is OK.
      */
     public TopicData(String uri, TopicValue value, String typeUri, Composite composite) {

@@ -62,7 +62,8 @@ class TypeCache {
     // ---
 
     private AttachedTopicType loadTopicType(String typeUri) {
-        Topic typeTopic = dms.getTopic("uri", new TopicValue(typeUri));
+        // Note: storage low-level call used here ### explain
+        Topic typeTopic = dms.storage.getTopic("uri", new TopicValue(typeUri));
         Topic dataType = fetchDataType(typeTopic);
         Set<TopicData> viewConfig = toTopicData(fetchViewConfig(typeTopic));
         TopicTypeData topicTypeData = new TopicTypeData(typeTopic, dataType.getUri(), viewConfig);
@@ -89,8 +90,14 @@ class TypeCache {
 
     // ---
 
-    private Topic fetchDataType(Topic topic) {
-        return topic.getRelatedTopic("dm3.core.association", "dm3.core.topic_type", "dm3.core.data_type");
+    private Topic fetchDataType(Topic typeTopic) {
+        // Note: storage low-level call used here ### explain
+        Topic dataType = dms.storage.getRelatedTopic(typeTopic.getId(), "dm3.core.association", "dm3.core.topic_type",
+                                                                                                "dm3.core.data_type");
+        if (dataType == null) {
+            throw new RuntimeException("Determining data type failed (topic type=" + typeTopic + ")");
+        }
+        return dataType;
     }
 
     private Set<Topic> fetchViewConfig(Topic topic) {
@@ -142,7 +149,7 @@ class TypeCache {
     Topic getTopic(Association assoc, String roleTypeUri) {
         for (Role role : assoc.getRoles()) {
             if (role.getRoleTypeUri().equals(roleTypeUri)) {
-                return dms.storage.getTopic(role.getTopicId());
+                return dms.getTopic(role.getTopicId(), null);   // FIXME: clientContext=null
             }
         }
         return null;

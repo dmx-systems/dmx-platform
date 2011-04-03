@@ -145,7 +145,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         if (!hg.getHyperNode(0).hasAttribute("core_migration_nr")) {
             logger.info("Starting with a fresh DB -- Setting migration number to 0");
             setMigrationNr(0);
-            setupMetaNode();
+            setupMetaTypeNode();
             isCleanInstall = true;
         }
         return isCleanInstall;
@@ -205,20 +205,34 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
+    /**
+     * Determines the topic type of a hyper node.
+     *
+     * @return  The topic type's URI.
+     *          ### Note: if the node is the meta type node (ID 0) <code>null</code> is returned.
+     */
     String getTopicTypeUri(HyperNode node) {
-        return getTopicType(node).getString("uri");
+        // ### if (!node.getString("uri").equals("dm3.core.meta_type")) {
+            return getTopicType(node).getString("uri");
+        // } else {
+        //     return null;
+        // }
     }
 
     // ---
 
     HyperNode getTopicType(HyperNode node) {
         // FIXME: should we additionally check weather the edge type is "dm3.core.instantiation"?
-        return node.getConnectedHyperNode("dm3.core.instance", "dm3.core.type").getHyperNode();
+        ConnectedHyperNode typeNode = node.getConnectedHyperNode("dm3.core.instance", "dm3.core.type");
+        if (typeNode == null) {
+            throw new RuntimeException("Determining topic type failed (" + node + ")");
+        }
+        return typeNode.getHyperNode();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void setupMetaNode() {
+    private void setupMetaTypeNode() {
         HyperNode refNode = hg.getHyperNode(0);
         refNode.setAttribute("uri", "dm3.core.meta_type", IndexMode.KEY);
         refNode.setAttribute("value", "Meta Type");

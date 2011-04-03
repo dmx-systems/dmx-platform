@@ -34,6 +34,10 @@ public interface Topic {
 
     // ---
 
+    void setComposite(Composite comp);
+
+    // ---
+
     TopicValue getValue(String assocDefUri);
 
     void setValue(String assocDefUri, TopicValue value);

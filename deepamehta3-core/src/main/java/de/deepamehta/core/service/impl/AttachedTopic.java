@@ -40,7 +40,7 @@ class AttachedTopic extends BaseTopic {
 
     @Override
     public TopicValue getValue(String assocDefUri) {
-        return dms.getTopicValue(this, assocDefUri);
+        return dms.getChildTopicValue(this, assocDefUri);
     }
 
     @Override

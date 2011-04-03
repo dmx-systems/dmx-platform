@@ -147,7 +147,7 @@ public class EmbeddedService implements CoreService {
 
     // === Topics ===
 
-    /* @GET
+    @GET
     @Path("/topic/{id}")
     @Override
     public Topic getTopic(@PathParam("id") long id, @HeaderParam("Cookie") ClientContext clientContext) {
@@ -156,14 +156,14 @@ public class EmbeddedService implements CoreService {
             Topic topic = storage.getTopic(id);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
             tx.success();
-            return topic;
+            return buildTopic(topic, true);
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Topic " + id + " can't be retrieved", e);
+            throw new RuntimeException("Retrieving topic failed (id=" + id + ")", e);
         } finally {
             tx.finish();
         }
-    } */
+    }
 
     @GET
     @Path("/topic/by_property/{key}/{value}")
@@ -173,10 +173,10 @@ public class EmbeddedService implements CoreService {
         try {
             Topic topic = storage.getTopic(key, value);
             tx.success();
-            return topic != null ? buildTopic(topic) : null;
+            return topic != null ? buildTopic(topic, true) : null;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving topic by value failed (\"" + key + "\"=" + value + ")", e);
+            throw new RuntimeException("Retrieving topic failed (key=\"" + key + "\", value=" + value + ")", e);
         } finally {
             tx.finish();
         }
@@ -332,7 +332,7 @@ public class EmbeddedService implements CoreService {
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
             //
             tx.success();
-            return buildTopic(topic);
+            return buildTopic(topic, true);
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Creating topic failed (" + topicData + ")", e);
@@ -500,7 +500,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topictype")
     @Override
     public Set<String> getTopicTypeUris() {
-        Topic metaType = buildTopic(storage.getTopic("uri", new TopicValue("dm3.core.topic_type")));
+        Topic metaType = buildTopic(storage.getTopic("uri", new TopicValue("dm3.core.topic_type")), false);
         Set<Topic> topicTypes = metaType.getRelatedTopics("dm3.core.instantiation", "dm3.core.type",
                                                                                     "dm3.core.instance");
         Set<String> topicTypeUris = new HashSet();
@@ -514,6 +514,9 @@ public class EmbeddedService implements CoreService {
     @Path("/topictype/{uri}")
     @Override
     public TopicType getTopicType(@PathParam("uri") String uri, @HeaderParam("Cookie") ClientContext clientContext) {
+        if (uri == null) {
+            throw new IllegalArgumentException("Tried to get a topic type with null URI");
+        }
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedTopicType topicType = typeCache.get(uri);
@@ -736,6 +739,8 @@ public class EmbeddedService implements CoreService {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    // === Topic API Delegates ===
+
     void setTopicValue(long topicId, TopicValue value) {
         DeepaMehtaTransaction tx = beginTx();
         try {
@@ -749,14 +754,8 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    TopicValue getTopicValue(Topic topic, String assocDefUri) {
-        TopicType topicType = getTopicType(topic.getTypeUri(), null);   // FIXME: clientContext=null
-        AssociationDefinition assocDef = topicType.getAssocDef(assocDefUri);
-        String assocTypeUri = assocDef.getAssocTypeUri();
-        String wholeRoleTypeUri = assocDef.getWholeRoleTypeUri();
-        String  partRoleTypeUri = assocDef.getPartRoleTypeUri();
-        //
-        Topic childTopic = getRelatedTopic(topic.getId(), assocTypeUri, wholeRoleTypeUri, partRoleTypeUri);
+    TopicValue getChildTopicValue(Topic parentTopic, String assocDefUri) {
+        Topic childTopic = new ChildTopicEvaluator(parentTopic, assocDefUri).getChildTopic();
         if (childTopic != null) {
             return childTopic.getValue();
         }
@@ -773,34 +772,31 @@ public class EmbeddedService implements CoreService {
      *
      * @return  The child topic.
      */
-    Topic setChildTopicValue(Topic parentTopic, String assocDefUri, TopicValue value) {
-        TopicType topicType = getTopicType(parentTopic.getTypeUri(), null);     // FIXME: clientContext=null
-        AssociationDefinition assocDef = topicType.getAssocDef(assocDefUri);
-        String assocTypeUri = assocDef.getAssocTypeUri();
-        String wholeRoleTypeUri = assocDef.getWholeRoleTypeUri();
-        String  partRoleTypeUri = assocDef.getPartRoleTypeUri();
-        //
-        Topic childTopic = getRelatedTopic(parentTopic.getId(), assocTypeUri, wholeRoleTypeUri, partRoleTypeUri);
-        if (childTopic != null) {
-            if (value != null) {
-                childTopic.setValue(value);
+    Topic setChildTopicValue(final Topic parentTopic, String assocDefUri, final TopicValue value) {
+        return new ChildTopicEvaluator(parentTopic, assocDefUri) {
+            @Override
+            void evaluate(Topic childTopic, AssociationDefinition assocDef) {
+                if (childTopic != null) {
+                    if (value != null) {
+                        childTopic.setValue(value);
+                    }
+                } else {
+                    // create child topic
+                    String topicTypeUri = assocDef.getPartTopicTypeUri();
+                    childTopic = createTopic(new TopicData(null, value, topicTypeUri, null), null);
+                    // associate child topic
+                    AssociationData assocData = new AssociationData(assocDef.getAssocTypeUri());
+                    assocData.addRole(new Role(parentTopic.getId(), assocDef.getWholeRoleTypeUri()));
+                    assocData.addRole(new Role(childTopic.getId(), assocDef.getPartRoleTypeUri()));
+                    createAssociation(assocData, null);     // FIXME: clientContext=null
+                }
             }
-        } else {
-            // create child topic
-            String topicTypeUri = assocDef.getPartTopicTypeUri();
-            childTopic = createTopic(new TopicData(null, value, topicTypeUri, null), null);
-            // create association
-            AssociationData assocData = new AssociationData(assocTypeUri);
-            assocData.addRole(new Role(parentTopic.getId(), wholeRoleTypeUri));
-            assocData.addRole(new Role(childTopic.getId(), partRoleTypeUri));
-            createAssociation(assocData, null);     // FIXME: clientContext=null
-        }
-        return childTopic;
+        }.getChildTopic();
     }
 
     Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleType, String othersRoleType) {
         Topic topic = storage.getRelatedTopic(topicId, assocTypeUri, myRoleType, othersRoleType);
-        return topic != null ? buildTopic(topic) : null;
+        return topic != null ? buildTopic(topic, true) : null;
     }
 
     Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleType, String othersRoleType) {
@@ -815,24 +811,89 @@ public class EmbeddedService implements CoreService {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private Topic buildTopic(Topic topic) {
+    /**
+     * Attaches this service to a topic retrieved from the storage layer.
+     *
+     * @return  Instance of {@link AttachedTopic}.
+     */
+    private Topic buildTopic(Topic topic, boolean includeComposite) {
         if (topic == null) {
             throw new IllegalArgumentException("Tried to build an AttachedTopic from a null Topic");
         }
+        // set composite
+        if (includeComposite) {
+            // ### Note: if the topic is the meta type topic (ID 0) its type can't be determined.
+            // ### if (!topic.getTypeUri().equals("dm3.core.meta_type")) {
+                TopicType topicType = getTopicType(topic.getTypeUri(), null);               // FIXME: clientContext=null
+                if (topicType.getDataTypeUri().equals("dm3.core.composite")) {
+                    topic.setComposite(retrieveComposite(topic));
+                }
+            // ### }
+        }
+        //
         return new AttachedTopic(topic, this);
     }
 
     private void createTopicTree(Topic topic, Composite comp) {
         Iterator<String> i = comp.keys();
         while (i.hasNext()) {
-            String key = i.next();
-            Object value = comp.get(key);
+            String assocDefUri = i.next();
+            Object value = comp.get(assocDefUri);
             if (value instanceof Composite) {
-                Topic childTopic = setChildTopicValue(topic, key, null);
+                Topic childTopic = setChildTopicValue(topic, assocDefUri, null);
                 createTopicTree(childTopic, (Composite) value);
             } else {
-                setChildTopicValue(topic, key, new TopicValue(value));
+                setChildTopicValue(topic, assocDefUri, new TopicValue(value));
             }
+        }
+    }
+
+    private Composite retrieveComposite(Topic topic) {
+        Composite comp = new Composite();
+        TopicType topicType = getTopicType(topic.getTypeUri(), null);                       // FIXME: clientContext=null
+        for (AssociationDefinition assocDef : topicType.getAssocDefs().values()) {
+            String assocDefUri = assocDef.getUri();
+            TopicType partTopicType = getTopicType(assocDef.getPartTopicTypeUri(), null);   // FIXME: clientContext=null
+            if (partTopicType.getDataTypeUri().equals("dm3.core.composite")) {
+                Topic childTopic = new ChildTopicEvaluator(topic, assocDefUri).getChildTopic();
+                if (childTopic != null) {
+                    comp.put(assocDefUri, retrieveComposite(childTopic));
+                }
+            } else {
+                TopicValue value = getChildTopicValue(topic, assocDefUri);
+                if (value != null) {
+                    comp.put(assocDefUri, value.value());
+                }
+            }
+        }
+        return comp;
+    }
+
+    private class ChildTopicEvaluator {
+
+        private Topic childTopic;
+        private AssociationDefinition assocDef;
+
+        private ChildTopicEvaluator(Topic parentTopic, String assocDefUri) {
+            getChildTopic(parentTopic, assocDefUri);
+            evaluate(childTopic, assocDef);
+        }
+
+        void evaluate(Topic childTopic, AssociationDefinition assocDef) {
+        }
+
+        Topic getChildTopic() {
+            return childTopic;
+        }
+
+        private void getChildTopic(Topic parentTopic, String assocDefUri) {
+            TopicType topicType = getTopicType(parentTopic.getTypeUri(), null);     // FIXME: clientContext=null
+            this.assocDef = topicType.getAssocDef(assocDefUri);
+            String assocTypeUri = assocDef.getAssocTypeUri();
+            String wholeRoleTypeUri = assocDef.getWholeRoleTypeUri();
+            String  partRoleTypeUri = assocDef.getPartRoleTypeUri();
+            //
+            this.childTopic = getRelatedTopic(parentTopic.getId(), assocTypeUri, wholeRoleTypeUri, partRoleTypeUri);
         }
     }
 
@@ -942,16 +1003,17 @@ public class EmbeddedService implements CoreService {
     // ---
 
     private void setupMetaContent() {
-        createTopic(new MetaTypeData("dm3.core.topic_type", "Topic Type"), null);           // clientContext=null
-        createTopic(new MetaTypeData("dm3.core.assoc_type", "Association Type"), null);     // clientContext=null
+        // Note: storage low-level call used here ### explain
+        storage.createTopic(new MetaTypeData("dm3.core.topic_type", "Topic Type"));
+        storage.createTopic(new MetaTypeData("dm3.core.assoc_type", "Association Type"));
         // Note: the topic type "Data Type" depends on the "Text" topic and the "Text" topic depends on the 
         // topic type "Data Type" in turn. To resolve this circle we use a low-level storage call here and
         // postpone the data type association.
         storage.createTopic(new TopicTypeData("dm3.core.data_type", "Data Type", "dm3.core.text"));
-        //
-        createTopic(new TopicData("dm3.core.text",      new TopicValue("Text"),      "dm3.core.data_type", null), null);
-        createTopic(new TopicData("dm3.core.number",    new TopicValue("Number"),    "dm3.core.data_type", null), null);
-        createTopic(new TopicData("dm3.core.composite", new TopicValue("Composite"), "dm3.core.data_type", null), null);
+        // Note: storage low-level call used here ### explain
+        storage.createTopic(new TopicData("dm3.core.text",      new TopicValue("Text"),      "dm3.core.data_type"));
+        storage.createTopic(new TopicData("dm3.core.number",    new TopicValue("Number"),    "dm3.core.data_type"));
+        storage.createTopic(new TopicData("dm3.core.composite", new TopicValue("Composite"), "dm3.core.data_type"));
         // postponed data type association
         associateDataType("dm3.core.data_type", "dm3.core.text");
     }

@@ -8,6 +8,10 @@ import java.util.Iterator;
 
 
 
+/**
+ * A composite of key/value pairs. Keys are strings, values are non-null atomic (string, int, long, boolean)
+ * or again a <code>Composite</code>.
+ */
 public class Composite {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -15,6 +19,10 @@ public class Composite {
     private JSONObject values;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
+
+    public Composite() {
+        this.values = new JSONObject();
+    }
 
     public Composite(JSONObject values) {
         this.values = values;
@@ -43,7 +51,19 @@ public class Composite {
                 return value;
             }
         } catch (Exception e) {
-            throw new RuntimeException("Getting key \"" + key + "\" failed");
+            throw new RuntimeException("Getting value failed (key=\"" + key + "\", composite=" + this + ")");
+        }
+    }
+
+    public void put(String key, Object value) {
+        try {
+            if (value == null) {
+                throw new IllegalArgumentException("Tried to put a null value in a Composite");
+            }
+            values.put(key, value);
+        } catch (Exception e) {
+            throw new RuntimeException("Putting value failed (key=\"" + key + "\", value=" + value +
+                ", composite=" + this + ")");
         }
     }
 

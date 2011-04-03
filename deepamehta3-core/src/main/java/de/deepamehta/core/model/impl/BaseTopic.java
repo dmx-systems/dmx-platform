@@ -92,6 +92,13 @@ public class BaseTopic extends TopicData implements Topic {
     // ---
 
     @Override
+    public void setComposite(Composite comp) {
+        this.composite = comp;
+    }
+
+    // ---
+
+    @Override
     public TopicValue getValue(String assocDefUri) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }

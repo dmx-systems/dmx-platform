@@ -39,7 +39,7 @@ public interface CoreService {
 
     // === Topics ===
 
-    // public Topic getTopic(long id, ClientContext clientContext);
+    public Topic getTopic(long id, ClientContext clientContext);
 
     /**
      * Looks up a single topic by exact property value.

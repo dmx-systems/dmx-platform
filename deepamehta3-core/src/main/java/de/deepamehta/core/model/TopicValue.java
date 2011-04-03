@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A wrapper for a property value. Supported property types are String, int, long, boolean.
+ * A wrapper for the topic value (atomic, non-null). Supported value types are string, int, long, boolean.
  */
 public class TopicValue {
 
