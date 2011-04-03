@@ -2,8 +2,8 @@ package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicValue;
-import de.deepamehta.core.model.impl.BaseTopic;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,7 +11,10 @@ import java.util.logging.Logger;
 
 
 
-class AttachedTopic extends BaseTopic {
+/**
+ * A topic that is attached to a {@link CoreService} implementation.
+ */
+class AttachedTopic extends TopicData implements Topic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -35,6 +38,8 @@ class AttachedTopic extends BaseTopic {
         // update DB
         dms.setTopicValue(getId(), value);
     }
+
+    // TODO: override setComposite()
 
     // ---
 

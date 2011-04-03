@@ -6,6 +6,8 @@ import java.util.Set;
 
 
 /**
+ * Specification of a topic -- DeepaMehta's central data object.
+ *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
 public interface Topic {

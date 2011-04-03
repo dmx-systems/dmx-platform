@@ -1,12 +1,13 @@
 package de.deepamehta.core.storage.impl;
 
 import de.deepamehta.core.model.Composite;
+import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicValue;
-import de.deepamehta.core.model.impl.BaseTopic;
 
 
 
-class HGTopic extends BaseTopic {
+class HGTopic extends TopicData implements Topic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 

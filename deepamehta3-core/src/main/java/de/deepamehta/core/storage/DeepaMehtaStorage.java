@@ -2,10 +2,8 @@ package de.deepamehta.core.storage;
 
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationData;
-import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
-import de.deepamehta.core.model.TopicTypeData;
 import de.deepamehta.core.model.TopicValue;
 
 import java.util.Map;
