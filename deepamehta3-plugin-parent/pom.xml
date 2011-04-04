@@ -160,6 +160,7 @@
                 <artifactId>maven-pax-plugin</artifactId>
                 <version>1.4</version>
                 <configuration>
+                    <runner>1.6.1</runner>
                     <widenScope>true</widenScope>
                     <deployPoms><![CDATA[
                         target/poms/deepamehta3-third-party-0.4.5.pom,
