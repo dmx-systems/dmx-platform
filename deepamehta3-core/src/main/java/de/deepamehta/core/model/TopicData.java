@@ -141,7 +141,8 @@ public class TopicData {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 
-    public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType) {
+    public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType,
+                                                                               boolean includeComposite) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 
@@ -158,7 +159,9 @@ public class TopicData {
             o.put("uri", uri);
             o.put("value", value.value());
             o.put("type_uri", typeUri);
-            o.put("composite", composite);
+            if (composite != null) {
+                o.put("composite", composite.toJSON());
+            }
             return o;
         } catch (JSONException e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);

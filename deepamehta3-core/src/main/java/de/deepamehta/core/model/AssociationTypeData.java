@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 
 
 /**
+ * Collection of the data that makes up an {@link AssociationType}.
+ *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
 public class AssociationTypeData extends TopicData {
@@ -25,9 +27,11 @@ public class AssociationTypeData extends TopicData {
 
     public AssociationTypeData(JSONObject assocTypeData) {
         try {
+            this.id = -1;
             this.uri = assocTypeData.getString("uri");
             this.value = new TopicValue(assocTypeData.get("value"));
             this.typeUri = "dm3.core.assoc_type";
+            this.composite = null;
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationTypeData failed (JSONObject=" + assocTypeData + ")", e);
         }
@@ -37,7 +41,7 @@ public class AssociationTypeData extends TopicData {
 
     @Override
     public String toString() {
-        return "association type data (uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
-            "\", composite=" + composite + ")";
+        return "association type data (id=" + id + ", uri=\"" + uri + "\", value=" + value +
+            ", typeUri=\"" + typeUri + "\")";
     }
 }

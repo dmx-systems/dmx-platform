@@ -59,8 +59,9 @@ class AttachedTopic extends TopicData implements Topic {
     }
 
     @Override
-    public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType) {
-        return dms.getRelatedTopics(getId(), assocTypeUri, myRoleType, othersRoleType);
+    public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType,
+                                                                               boolean includeComposite) {
+        return dms.getRelatedTopics(getId(), assocTypeUri, myRoleType, othersRoleType, includeComposite);
     }
 
     @Override

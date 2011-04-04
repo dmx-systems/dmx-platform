@@ -46,7 +46,8 @@ public interface Topic {
 
     Topic getRelatedTopic(String assocTypeUri, String myRoleType, String othersRoleType);
 
-    Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType);
+    Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType,
+                                                                        boolean includeComposite);
 
     Set<Association> getAssociations(String myRoleType);
 

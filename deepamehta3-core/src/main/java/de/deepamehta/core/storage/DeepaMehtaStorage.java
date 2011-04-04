@@ -66,6 +66,8 @@ public interface DeepaMehtaStorage {
 
     Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleType, String othersRoleType);
 
+    Set<Association> getAssociations(long topicId, String myRoleType);
+
     void setTopicValue(long topicId, TopicValue value);
 
     // List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord);
@@ -105,8 +107,6 @@ public interface DeepaMehtaStorage {
      *                      is expected to be directed <i>from</i> source topic <i>to</i> destination topic.
      */
     // List<Relation> getRelations(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
-
-    Set<Association> getAssociations(long topicId, String myRoleType);
 
     Association createAssociation(AssociationData assoc);
 

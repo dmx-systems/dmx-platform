@@ -13,6 +13,8 @@ import java.util.Set;
 
 
 /**
+ * Specification of an association -- A n-ary connection between topics and other associations.
+ *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
 public interface Association {

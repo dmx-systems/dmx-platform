@@ -13,9 +13,11 @@ import java.util.Set;
 
 
 /**
+ * Collection of the data that makes up an {@link Association}.
+ *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class AssociationData implements Association {
+public class AssociationData {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -55,24 +57,20 @@ public class AssociationData implements Association {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    @Override
     public long getId() {
         return id;
     }
 
-    @Override
     public String getTypeUri() {
         return typeUri;
     }
 
-    @Override
     public Set<Role> getRoles() {
         return roles;
     }
 
     // ---
 
-    @Override
     public void addRole(Role role) {
         roles.add(role);
     }

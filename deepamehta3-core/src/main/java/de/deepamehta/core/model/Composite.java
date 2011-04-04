@@ -69,6 +69,12 @@ public class Composite {
 
     // ---
 
+    public JSONObject toJSON() {
+        return values;
+    }
+
+    // ---
+
     @Override
     public String toString() {
         return values.toString();

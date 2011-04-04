@@ -52,20 +52,20 @@ public class TopicTypeData extends TopicData {
         this.viewConfig = new HashSet();
     }
 
-    public TopicTypeData(JSONObject topicType) {
+    public TopicTypeData(JSONObject topicTypeData) {
         try {
             this.id = -1;
-            this.uri = topicType.getString("uri");
-            this.value = new TopicValue(topicType.get("value"));
+            this.uri = topicTypeData.getString("uri");
+            this.value = new TopicValue(topicTypeData.get("value"));
             this.typeUri = "dm3.core.topic_type";
             this.composite = null;
             //
-            this.dataTypeUri = topicType.getString("data_type_uri");
+            this.dataTypeUri = topicTypeData.getString("data_type_uri");
             this.assocDefs = new HashMap();
-            this.viewConfig = parseViewConfig(topicType);
-            parseAssocDefs(topicType);
+            this.viewConfig = parseViewConfig(topicTypeData);
+            parseAssocDefs(topicTypeData);
         } catch (Exception e) {
-            throw new RuntimeException("Parsing TopicTypeData failed (JSONObject=" + topicType + ")", e);
+            throw new RuntimeException("Parsing TopicTypeData failed (JSONObject=" + topicTypeData + ")", e);
         }
     }
 
@@ -139,8 +139,8 @@ public class TopicTypeData extends TopicData {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void parseAssocDefs(JSONObject topicType) throws Exception {
-        JSONArray assocDefs = topicType.optJSONArray("assoc_defs");
+    private void parseAssocDefs(JSONObject topicTypeData) throws Exception {
+        JSONArray assocDefs = topicTypeData.optJSONArray("assoc_defs");
         if (assocDefs != null) {
             for (int i = 0; i < assocDefs.length(); i++) {
                 addAssocDef(new AssociationDefinition(assocDefs.getJSONObject(i), this.uri));
@@ -148,9 +148,9 @@ public class TopicTypeData extends TopicData {
         }
     }
 
-    private Set<TopicData> parseViewConfig(JSONObject topicType) throws Exception {
+    private Set<TopicData> parseViewConfig(JSONObject topicTypeData) throws Exception {
         Set<TopicData> viewConfig = new HashSet();
-        JSONArray topics = topicType.optJSONArray("view_config_topics");
+        JSONArray topics = topicTypeData.optJSONArray("view_config_topics");
         if (topics != null) {
             for (int i = 0; i < topics.length(); i++) {
                 viewConfig.add(new TopicData(topics.getJSONObject(i)));

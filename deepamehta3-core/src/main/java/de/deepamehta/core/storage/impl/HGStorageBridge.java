@@ -81,6 +81,20 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     }
 
     @Override
+    public Set<Association> getAssociations(long topicId, String myRoleType) {
+        Set<Association> assocs = new HashSet();
+        HyperNode node = hg.getHyperNode(topicId);
+        for (HyperEdge edge : node.getHyperEdges(myRoleType)) {
+            Set<Role> roles = new HashSet();
+            for (HyperNodeRole role : edge.getHyperNodes()) {
+                roles.add(new Role(role.getHyperNode().getId(), role.getRoleType()));
+            }
+            assocs.add(buildAssociation(edge, null, roles));    // FIXME: typeUri=null
+        }
+        return assocs;
+    }
+
+    @Override
     public void setTopicValue(long topicId, TopicValue value) {
         hg.getHyperNode(topicId).setAttribute("value", value.value());
     }
@@ -93,7 +107,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         node.setAttribute("value", topicData.getValue().value());
         // 2) associate with type
         HyperNode topicType = lookupTopicType(topicData.getTypeUri());
-        HyperEdge edge = hg.createHyperEdge();  // FIXME: use association type ("dm3.core.instantiation")
+        HyperEdge edge = hg.createHyperEdge();
         edge.addHyperNode(topicType, "dm3.core.type");
         edge.addHyperNode(node, "dm3.core.instance");
         //
@@ -103,22 +117,8 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // === Associations ===
 
     @Override
-    public Set<Association> getAssociations(long topicId, String myRoleType) {
-        Set<Association> assocs = new HashSet();
-        HyperNode node = hg.getHyperNode(topicId);
-        for (HyperEdge edge : node.getHyperEdges(myRoleType)) {
-            AssociationData assocData = new AssociationData(edge.getId(), null);    // FIXME: typeUri=null
-            for (HyperNodeRole role : edge.getHyperNodes()) {
-                assocData.addRole(new Role(role.getHyperNode().getId(), role.getRoleType()));
-            }
-            assocs.add(assocData);
-        }
-        return assocs;
-    }
-
-    @Override
     public Association createAssociation(AssociationData assocData) {
-        HyperEdge edge = hg.createHyperEdge();  // FIXME: use association type
+        HyperEdge edge = hg.createHyperEdge();          // FIXME: use association type
         for (Role role : assocData.getRoles()) {
             HyperNode node;
             if (role.topicIdentifiedById()) {
@@ -209,20 +209,14 @@ public class HGStorageBridge implements DeepaMehtaStorage {
      * Determines the topic type of a hyper node.
      *
      * @return  The topic type's URI.
-     *          ### Note: if the node is the meta type node (ID 0) <code>null</code> is returned.
      */
     String getTopicTypeUri(HyperNode node) {
-        // ### if (!node.getString("uri").equals("dm3.core.meta_type")) {
-            return getTopicType(node).getString("uri");
-        // } else {
-        //     return null;
-        // }
+        return getTopicType(node).getString("uri");
     }
 
     // ---
 
     HyperNode getTopicType(HyperNode node) {
-        // FIXME: should we additionally check weather the edge type is "dm3.core.instantiation"?
         ConnectedHyperNode typeNode = node.getConnectedHyperNode("dm3.core.instance", "dm3.core.type");
         if (typeNode == null) {
             throw new RuntimeException("Determining topic type failed (" + node + ")");

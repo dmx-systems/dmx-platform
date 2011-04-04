@@ -113,28 +113,28 @@ public class JSONHelper {
     public static void createTopicTypes(JSONArray topicTypes, CoreService dms) throws Exception {
         for (int i = 0; i < topicTypes.length(); i++) {
             TopicTypeData topicTypeData = new TopicTypeData(topicTypes.getJSONObject(i));
-            dms.createTopicType(topicTypeData, null);   // clientContext=null
+            dms.createTopicType(topicTypeData, null);           // clientContext=null
         }
     }
 
     public static void createAssociationTypes(JSONArray assocTypes, CoreService dms) throws Exception {
         for (int i = 0; i < assocTypes.length(); i++) {
             AssociationTypeData assocTypeData = new AssociationTypeData(assocTypes.getJSONObject(i));
-            dms.createTopic(assocTypeData, null);       // clientContext=null
+            dms.createAssociationType(assocTypeData, null);     // clientContext=null
         }
     }
 
     public static void createTopics(JSONArray topics, CoreService dms) throws Exception {
         for (int i = 0; i < topics.length(); i++) {
             TopicData topicData = new TopicData(topics.getJSONObject(i));
-            dms.createTopic(topicData, null);           // clientContext=null
+            dms.createTopic(topicData, null);                   // clientContext=null
         }
     }
 
     public static void createAssociations(JSONArray assocs, CoreService dms) throws Exception {
         for (int i = 0; i < assocs.length(); i++) {
             AssociationData assocData = new AssociationData(assocs.getJSONObject(i));
-            dms.createAssociation(assocData, null);     // clientContext=null
+            dms.createAssociation(assocData, null);             // clientContext=null
         }
     }
 }

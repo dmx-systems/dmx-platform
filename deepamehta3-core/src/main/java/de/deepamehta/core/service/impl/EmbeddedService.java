@@ -3,6 +3,7 @@ package de.deepamehta.core.service.impl;
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.AssociationDefinition;
+import de.deepamehta.core.model.AssociationTypeData;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
@@ -325,7 +326,7 @@ public class EmbeddedService implements CoreService {
             //
             Composite comp = topicData.getComposite();
             if (comp != null) {
-                createTopicTree(topic, comp);
+                storeComposite(topic, comp);
             }
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext);
@@ -502,7 +503,7 @@ public class EmbeddedService implements CoreService {
     public Set<String> getTopicTypeUris() {
         Topic metaType = buildTopic(storage.getTopic("uri", new TopicValue("dm3.core.topic_type")), false);
         Set<Topic> topicTypes = metaType.getRelatedTopics("dm3.core.instantiation", "dm3.core.type",
-                                                                                    "dm3.core.instance");
+                                                                                    "dm3.core.instance", false);
         Set<String> topicTypeUris = new HashSet();
         for (Topic topicType : topicTypes) {
             topicTypeUris.add(topicType.getUri());
@@ -537,7 +538,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topictype")
     @Consumes("application/x-www-form-urlencoded")
     @Override
-    public Topic createTopicType(TopicTypeData topicTypeData, @HeaderParam("Cookie") ClientContext clientContext) {
+    public TopicType createTopicType(TopicTypeData topicTypeData, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             String typeUri = topicTypeData.getUri();
@@ -549,19 +550,42 @@ public class EmbeddedService implements CoreService {
             associateTopicTypes(topicTypeData.getAssocDefs());
             associateViewConfig(typeUri, topicTypeData.getViewConfig());
             //
+            TopicType topicType = typeCache.get(typeUri);
+            //
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
-            triggerHook(Hook.MODIFY_TOPIC_TYPE, topicTypeData, clientContext);
-            triggerHook(Hook.ENRICH_TOPIC_TYPE, topicTypeData, clientContext);
+            triggerHook(Hook.MODIFY_TOPIC_TYPE, topicType, clientContext);
+            triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
             //
             tx.success();
-            return topic;
+            return topicType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Creating topic type \"" + topicTypeData.getUri() +
                 "\" failed (" + topicTypeData + ")", e);
         } finally {
             tx.finish();
+        }
+    }
+
+    @Override
+    public Topic createAssociationType(AssociationTypeData assocTypeData,
+                                       @HeaderParam("Cookie") ClientContext clientContext) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+           String typeUri = assocTypeData.getUri();
+           checkUniqueness(typeUri);
+           //
+           Topic topic = storage.createTopic(assocTypeData);
+           //
+           tx.success();
+           return topic;
+        } catch (Exception e) {
+           logger.warning("ROLLBACK!");
+           throw new RuntimeException("Creating association type \"" + assocTypeData.getUri() +
+               "\" failed (" + assocTypeData + ")", e);
+        } finally {
+           tx.finish();
         }
     }
 
@@ -799,10 +823,13 @@ public class EmbeddedService implements CoreService {
         return topic != null ? buildTopic(topic, true) : null;
     }
 
-    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleType, String othersRoleType) {
-        Set<Topic> topics = storage.getRelatedTopics(topicId, assocTypeUri, myRoleType, othersRoleType);
+    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleType, String othersRoleType,
+                                                                                      boolean includeComposite) {
+        Set<Topic> topics = new HashSet();
+        for (Topic topic : storage.getRelatedTopics(topicId, assocTypeUri, myRoleType, othersRoleType)) {
+            topics.add(buildTopic(topic, includeComposite));
+        }
         return topics;
-        // return topic != null ? buildTopic(topic) : null;     FIXME: attach topics
     }
 
     Set<Association> getAssociations(long topicId, String myRoleType) {
@@ -822,33 +849,30 @@ public class EmbeddedService implements CoreService {
         }
         // set composite
         if (includeComposite) {
-            // ### Note: if the topic is the meta type topic (ID 0) its type can't be determined.
-            // ### if (!topic.getTypeUri().equals("dm3.core.meta_type")) {
-                TopicType topicType = getTopicType(topic.getTypeUri(), null);               // FIXME: clientContext=null
-                if (topicType.getDataTypeUri().equals("dm3.core.composite")) {
-                    topic.setComposite(retrieveComposite(topic));
-                }
-            // ### }
+            TopicType topicType = getTopicType(topic.getTypeUri(), null);       // FIXME: clientContext=null
+            if (topicType.getDataTypeUri().equals("dm3.core.composite")) {
+                topic.setComposite(fetchComposite(topic));
+            }
         }
         //
         return new AttachedTopic(topic, this);
     }
 
-    private void createTopicTree(Topic topic, Composite comp) {
+    private void storeComposite(Topic topic, Composite comp) {
         Iterator<String> i = comp.keys();
         while (i.hasNext()) {
             String assocDefUri = i.next();
             Object value = comp.get(assocDefUri);
             if (value instanceof Composite) {
                 Topic childTopic = setChildTopicValue(topic, assocDefUri, null);
-                createTopicTree(childTopic, (Composite) value);
+                storeComposite(childTopic, (Composite) value);
             } else {
                 setChildTopicValue(topic, assocDefUri, new TopicValue(value));
             }
         }
     }
 
-    private Composite retrieveComposite(Topic topic) {
+    private Composite fetchComposite(Topic topic) {
         Composite comp = new Composite();
         TopicType topicType = getTopicType(topic.getTypeUri(), null);                       // FIXME: clientContext=null
         for (AssociationDefinition assocDef : topicType.getAssocDefs().values()) {
@@ -857,7 +881,7 @@ public class EmbeddedService implements CoreService {
             if (partTopicType.getDataTypeUri().equals("dm3.core.composite")) {
                 Topic childTopic = new ChildTopicEvaluator(topic, assocDefUri).getChildTopic();
                 if (childTopic != null) {
-                    comp.put(assocDefUri, retrieveComposite(childTopic));
+                    comp.put(assocDefUri, fetchComposite(childTopic));
                 }
             } else {
                 TopicValue value = getChildTopicValue(topic, assocDefUri);

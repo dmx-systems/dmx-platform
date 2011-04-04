@@ -67,7 +67,7 @@ class TypeCache {
         Topic dataType = fetchDataType(typeTopic);
         Set<TopicData> viewConfig = toTopicData(fetchViewConfig(typeTopic));
         TopicTypeData topicTypeData = new TopicTypeData(typeTopic, dataType.getUri(), viewConfig);
-        for (Association assoc : typeTopic.getAssociations("dm3.core.whole_topic_type")) {
+        for (Association assoc : dms.storage.getAssociations(typeTopic.getId(), "dm3.core.whole_topic_type")) {
             String wholeTopicTypeUri = getTopic(assoc, "dm3.core.whole_topic_type").getUri();
             String  partTopicTypeUri = getTopic(assoc, "dm3.core.part_topic_type").getUri();
             // sanity check
@@ -101,7 +101,9 @@ class TypeCache {
     }
 
     private Set<Topic> fetchViewConfig(Topic topic) {
-        return topic.getRelatedTopics("dm3.core.view_configuration", "dm3.core.topic_type", "dm3.core.view_config");
+        // ### Note: storage low-level call used here ### explain
+        return dms.getRelatedTopics(topic.getId(), "dm3.core.view_configuration", "dm3.core.topic_type",
+                                                                                  "dm3.core.view_config", true);
     }
 
     private Set<TopicData> toTopicData(Set<Topic> topics) {
@@ -149,7 +151,8 @@ class TypeCache {
     Topic getTopic(Association assoc, String roleTypeUri) {
         for (Role role : assoc.getRoles()) {
             if (role.getRoleTypeUri().equals(roleTypeUri)) {
-                return dms.getTopic(role.getTopicId(), null);   // FIXME: clientContext=null
+                // Note: storage low-level call used here ### explain
+                return dms.storage.getTopic(role.getTopicId());
             }
         }
         return null;
