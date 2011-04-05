@@ -24,8 +24,8 @@ public class TopicTypeData extends TopicData {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private String dataTypeUri;
-    private Map<String, AssociationDefinition> assocDefs;
-    private Set<TopicData> viewConfig;
+    private Map<String, AssociationDefinition> assocDefs;   // is never null, may be empty
+    private Set<TopicData> viewConfig;                      // is never null, may be empty
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -119,9 +119,9 @@ public class TopicTypeData extends TopicData {
             }
             o.put("assoc_defs", assocDefs);
             //
-            List viewConfigTopics = new ArrayList();
+            Map viewConfigTopics = new HashMap();
             for (TopicData topicData : viewConfig) {
-                viewConfigTopics.add(topicData.toJSON());
+                viewConfigTopics.put(topicData.getTypeUri(), topicData.toJSON());
             }
             o.put("view_config_topics", viewConfigTopics);
             //

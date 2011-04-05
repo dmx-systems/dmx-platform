@@ -584,8 +584,9 @@ var dm3c = new function() {
     this.get_icon_src = function(type_uri) {
         var topic_type = dm3c.type_cache.get(type_uri)
         // Note: topic_type is undefined if plugin is deactivated and content still exist.
-        if (topic_type && topic_type.icon_src) {
-            return topic_type.icon_src
+        if (topic_type && topic_type.view_config_topics["dm3.webclient.topic_type_view_config"]) {
+            return topic_type.view_config_topics["dm3.webclient.topic_type_view_config"].
+                composite["dm3.webclient.icon_src"]
         }
         return GENERIC_TOPIC_ICON_SRC
     }

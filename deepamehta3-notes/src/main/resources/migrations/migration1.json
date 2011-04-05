@@ -15,6 +15,14 @@
                     part_topic_type_uri:  "dm3.base.text",
                     part_cardinality_uri: "dm3.core.one"
                 }
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm3.webclient.topic_type_view_config",
+                    composite: {
+                        dm3.webclient.icon_src: "/de.deepamehta.3-notes/images/pencil.png"
+                    }
+                }
             ]
         }
     ]

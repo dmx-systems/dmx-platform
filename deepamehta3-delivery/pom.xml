@@ -21,7 +21,9 @@
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
         <deepamehta3.database.path>${project.basedir}/../deepamehta-db</deepamehta3.database.path>
         <file.encoding>UTF-8</file.encoding>
-        <java.util.logging.config.file>${project.basedir}/distribution/logging.properties</java.util.logging.config.file>
+        <java.util.logging.config.file>
+            ${project.basedir}/distribution/logging.properties
+        </java.util.logging.config.file>
     </properties>
 
     <profiles>
@@ -117,8 +119,14 @@
                         ${project.basedir}/../deepamehta3-accesscontrol/target
                     -->
                 </felix.fileinstall.dir>
+                <!-- Watching only for jar files suppresses deployment of exploded bundles (which often fails).     -->
                 <felix.fileinstall.filter>.*\\.jar</felix.fileinstall.filter>
-                <felix.fileinstall.log.level>1</felix.fileinstall.log.level>
+                <!-- Setting "noInitialDelay" to true causes *synchronous* bundle starts in the order the           -->
+                <!-- directories are defined! Furthermore the STARTED framework event is eventually fired.          -->
+                <!-- Default is noInitialDelay=false, which causes *asynchronous* bundle starts in arbitrary order. -->
+                <felix.fileinstall.noInitialDelay>true</felix.fileinstall.noInitialDelay>
+                <!-- To see any File Install logging set the level to at least 4.                                   -->
+                <felix.fileinstall.log.level>0</felix.fileinstall.log.level>
                 <felix.log.level>2</felix.log.level>
                 <obr.repository.url>file:${user.home}/.m2/repository/repository.xml</obr.repository.url>
             </properties>
