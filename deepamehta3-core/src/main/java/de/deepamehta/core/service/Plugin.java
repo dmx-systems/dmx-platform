@@ -48,20 +48,18 @@ public class Plugin implements BundleActivator {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
-    private static final String   TYPE_CONFIG_FILE = "/typeconfig.json";
     private static final String STANDARD_PROVIDER_PACKAGE = "de.deepamehta.plugins.server.provider";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String pluginId;        // This bundle's symbolic name, e.g. "de.deepamehta.3-webclient".
-    private String pluginName;      // This bundle's name = POM project name.
+    private String pluginId;                // This bundle's symbolic name, e.g. "de.deepamehta.3-webclient".
+    private String pluginName;              // This bundle's name = POM project name.
     private String pluginClass;
     private String pluginPackage;
     private Bundle pluginBundle;
-    private Topic  pluginTopic;     // Represents this plugin in DB. Holds plugin migration number.
+    private Topic  pluginTopic;             // Represents this plugin in DB. Holds plugin migration number.
 
-    private Properties configProperties;                    // Read from file "plugin.properties"
-    private Map<String, Map<String, Object>> typeConfig;    // Read from file "typeconfig.json"
+    private Properties configProperties;    // Read from file "plugin.properties"
 
     protected CoreService dms;
     private HttpService httpService;
@@ -86,14 +84,6 @@ public class Plugin implements BundleActivator {
 
     public String getConfigProperty(String key) {
         return getConfigProperty(key, null);
-    }
-
-    /**
-     * Returns the type configuration for the given type (as read from typeconfig.json) or
-     * <code>null</code> if there is no configuration.
-     */
-    public Map<String, Object> getTypeConfig(String typeUri) {
-        return typeConfig.get(typeUri);
     }
 
     /**
@@ -172,8 +162,6 @@ public class Plugin implements BundleActivator {
             configProperties = readConfigFile();
             pluginPackage = getConfigProperty("pluginPackage", getClass().getPackage().getName());
             //
-            typeConfig = readTypeConfigFile();
-            //
             createServiceTracker(CoreService.class.getName(), context);
             createServiceTracker(HttpService.class.getName(), context);
             createServiceTrackers(context);
@@ -251,8 +239,7 @@ public class Plugin implements BundleActivator {
     public void enrichTopicHook(Topic topic, ClientContext clientContext) {
     }
 
-    public Map<String, Object> enrichTopicTypeHook(TopicType topicType, ClientContext clientContext) {
-        return null;
+    public void enrichTopicTypeHook(TopicType topicType, ClientContext clientContext) {
     }
 
     // ---
@@ -537,41 +524,6 @@ public class Plugin implements BundleActivator {
 
     private String getConfigProperty(String key, String defaultValue) {
         return configProperties.getProperty(key, defaultValue);
-    }
-
-    // --- Type Configuration ---
-
-    private Map<String, Map<String, Object>> readTypeConfigFile() {
-        try {
-            InputStream in = getResourceAsStream(TYPE_CONFIG_FILE);
-            if (in != null) {
-                logger.info("Reading type config file \"" + TYPE_CONFIG_FILE + "\" for " + this);
-                return createTypeConfig(JavaUtils.readText(in));
-            } else {
-                logger.info("Using default type configuration for " + this + " (no type config file found, " +
-                    "tried \"" + TYPE_CONFIG_FILE + "\")");
-                return new HashMap();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Reading type config file for " + this + " failed", e);
-        }
-    }
-
-    private Map<String, Map<String, Object>> createTypeConfig(String fileContent) {
-        try {
-            Map typeConfig = new HashMap();
-            JSONObject o = new JSONObject(fileContent);
-            Iterator<String> i = o.keys();
-            while (i.hasNext()) {
-                String typeUri = i.next();
-                Map config = JSONHelper.toMap(o.getJSONObject(typeUri));
-                typeConfig.put(typeUri, config);
-            }
-            return typeConfig;
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing type config file for " + this +
-                " failed (file=\"" + TYPE_CONFIG_FILE + "\")", e);
-        }
     }
 
     // ---

@@ -521,11 +521,9 @@ public class EmbeddedService implements CoreService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedTopicType topicType = typeCache.get(uri);
-            // enrichment
-            EnrichedTopicType enrichedTopicType = enrichTopicType(topicType, clientContext);
-            //
+            triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
             tx.success();
-            return enrichedTopicType;
+            return topicType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Retrieving topic type \"" + uri + "\" failed", e);
@@ -947,25 +945,6 @@ public class EmbeddedService implements CoreService {
     }
 
     // ---
-
-    private EnrichedTopicType enrichTopicType(final AttachedTopicType topicType, ClientContext clientContext) {
-        final Map result = triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
-        final EnrichedTopicType enrichedTopicType = new EnrichedTopicType(topicType);
-        new PluginCache.Iterator() {
-            @Override
-            void body(Plugin plugin) {
-                Map<String, Object> staticTypeConfig = plugin.getTypeConfig(topicType.getUri());
-                Map<String, Object> dynamicEnrichment = (Map) result.get(plugin.getId());
-                if (staticTypeConfig != null) {
-                    enrichedTopicType.addEnrichment(staticTypeConfig);
-                }
-                if (dynamicEnrichment != null) {
-                    enrichedTopicType.addEnrichment(dynamicEnrichment);
-                }
-            }
-        };
-        return enrichedTopicType;
-    }
 
     /**
      * Throws an exception if there is a topic with the given URI in the database.

@@ -23,9 +23,4 @@ class AttachedTopicType extends TopicTypeData implements TopicType {
         super(topicTypeData);
         this.dms = dms;
     }
-
-    AttachedTopicType(AttachedTopicType topicType) {
-        super(topicType);
-        this.dms = topicType.dms;
-    }
 }
