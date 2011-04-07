@@ -25,7 +25,7 @@ public class TopicTypeData extends TopicData {
 
     private String dataTypeUri;
     private Map<String, AssociationDefinition> assocDefs;   // is never null, may be empty
-    private Set<TopicData> viewConfig;                      // is never null, may be empty
+    private ViewConfiguration viewConfig;                   // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -38,7 +38,7 @@ public class TopicTypeData extends TopicData {
         this.viewConfig = topicTypeData.getViewConfig();
     }
 
-    public TopicTypeData(Topic typeTopic, String dataTypeUri, Set<TopicData> viewConfig) {
+    public TopicTypeData(Topic typeTopic, String dataTypeUri, ViewConfiguration viewConfig) {
         super(typeTopic);
         this.dataTypeUri = dataTypeUri;
         this.assocDefs = new HashMap();
@@ -49,7 +49,7 @@ public class TopicTypeData extends TopicData {
         super(uri, new TopicValue(value), "dm3.core.topic_type");
         this.dataTypeUri = dataTypeUri;
         this.assocDefs = new HashMap();
-        this.viewConfig = new HashSet();
+        this.viewConfig = new ViewConfiguration();
     }
 
     public TopicTypeData(JSONObject topicTypeData) {
@@ -62,7 +62,7 @@ public class TopicTypeData extends TopicData {
             //
             this.dataTypeUri = topicTypeData.getString("data_type_uri");
             this.assocDefs = new HashMap();
-            this.viewConfig = parseViewConfig(topicTypeData);
+            this.viewConfig = new ViewConfiguration(topicTypeData);
             parseAssocDefs(topicTypeData);
         } catch (Exception e) {
             throw new RuntimeException("Parsing TopicTypeData failed (JSONObject=" + topicTypeData + ")", e);
@@ -79,7 +79,7 @@ public class TopicTypeData extends TopicData {
         return assocDefs;
     }
 
-    public Set<TopicData> getViewConfig() {
+    public ViewConfiguration getViewConfig() {
         return viewConfig;
     }
 
@@ -119,11 +119,7 @@ public class TopicTypeData extends TopicData {
             }
             o.put("assoc_defs", assocDefs);
             //
-            Map viewConfigTopics = new HashMap();
-            for (TopicData topicData : viewConfig) {
-                viewConfigTopics.put(topicData.getTypeUri(), topicData.toJSON());
-            }
-            o.put("view_config_topics", viewConfigTopics);
+            viewConfig.toJSON(o);
             //
             return o;
         } catch (Exception e) {
@@ -134,7 +130,7 @@ public class TopicTypeData extends TopicData {
     @Override
     public String toString() {
         return "topic type data (id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
-            "\", dataTypeUri=\"" + dataTypeUri + "\",\nassocDefs=" + assocDefs + ",\nviewConfig=" + viewConfig + ")";
+            "\", dataTypeUri=\"" + dataTypeUri + "\",\nassocDefs=" + assocDefs + ",\ntopic type " + viewConfig + ")";
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -146,16 +142,5 @@ public class TopicTypeData extends TopicData {
                 addAssocDef(new AssociationDefinition(assocDefs.getJSONObject(i), this.uri));
             }
         }
-    }
-
-    private Set<TopicData> parseViewConfig(JSONObject topicTypeData) throws Exception {
-        Set<TopicData> viewConfig = new HashSet();
-        JSONArray topics = topicTypeData.optJSONArray("view_config_topics");
-        if (topics != null) {
-            for (int i = 0; i < topics.length(); i++) {
-                viewConfig.add(new TopicData(topics.getJSONObject(i)));
-            }
-        }
-        return viewConfig;
     }
 }

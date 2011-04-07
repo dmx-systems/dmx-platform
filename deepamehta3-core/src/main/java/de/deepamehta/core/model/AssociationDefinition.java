@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -19,17 +20,19 @@ public class AssociationDefinition {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String uri;                 // value might be derived (there's not necessarily a topic with that uri)
+    private String uri;                     // value might be derived (there's not necessarily a topic with that uri)
     private String assocTypeUri;
 
     private String wholeTopicTypeUri;
     private String  partTopicTypeUri;
 
-    private String wholeRoleTypeUri;    // value might be derived (there's not necessarily a topic with that uri)
-    private String  partRoleTypeUri;    // value might be derived (there's not necessarily a topic with that uri)
+    private String wholeRoleTypeUri;        // value might be derived (there's not necessarily a topic with that uri)
+    private String  partRoleTypeUri;        // value might be derived (there's not necessarily a topic with that uri)
 
     private String wholeCardinalityUri;
     private String  partCardinalityUri;
+
+    private ViewConfiguration viewConfig;   // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -62,6 +65,8 @@ public class AssociationDefinition {
             }
             this.wholeCardinalityUri = assocDef.optString("whole_cardinality_uri", "dm3.core.one");
              this.partCardinalityUri = assocDef.getString("part_cardinality_uri");
+            //
+            this.viewConfig = new ViewConfiguration(assocDef);
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationDefinition failed (JSONObject=" + assocDef + ")", e);
         }
@@ -101,6 +106,10 @@ public class AssociationDefinition {
         return partCardinalityUri;
     }
 
+    public ViewConfiguration getViewConfig() {
+        return viewConfig;
+    }
+
     // ---
 
     public void setUri(String uri) {
@@ -117,6 +126,10 @@ public class AssociationDefinition {
 
     public void setPartCardinalityUri(String partCardinalityUri) {
         this.partCardinalityUri = partCardinalityUri;
+    }
+
+    public void setViewConfig(ViewConfiguration viewConfig) {
+        this.viewConfig = viewConfig;
     }
 
     // ---
@@ -143,6 +156,7 @@ public class AssociationDefinition {
             o.put( "part_role_type_uri",  partRoleTypeUri);
             o.put("whole_cardinality_uri", wholeCardinalityUri);
             o.put( "part_cardinality_uri",  partCardinalityUri);
+            viewConfig.toJSON(o);
             return o;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
@@ -156,6 +170,6 @@ public class AssociationDefinition {
         return "\n    association definition (uri=\"" + uri + "\", assocTypeUri=\"" + assocTypeUri + "\")\n        " +
             "whole: (type=\"" + wholeTopicTypeUri + "\", role=\"" + wholeRoleTypeUri + "\", cardinality=\"" +
             wholeCardinalityUri + "\")\n        part: (type=\"" + partTopicTypeUri + "\", role=\"" + partRoleTypeUri +
-            "\", cardinality=\"" + partCardinalityUri + "\")";
+            "\", cardinality=\"" + partCardinalityUri + "\")\n        association definition " + viewConfig;
     }
 }

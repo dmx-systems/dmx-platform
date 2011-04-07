@@ -17,6 +17,7 @@ import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeData;
 import de.deepamehta.core.model.RelatedTopic;
+import de.deepamehta.core.model.ViewConfiguration;
 import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
@@ -930,17 +931,25 @@ public class EmbeddedService implements CoreService {
 
     private void associateTopicTypes(Map<String, AssociationDefinition> assocDefs) {
         for (AssociationDefinition assocDef : assocDefs.values()) {
-            createAssociation(assocDef.toAssociationData(), null);  // FIXME: clientContext=null
+            Association assoc = createAssociation(assocDef.toAssociationData(), null);  // FIXME: clientContext=null
+            associateViewConfig(assoc, assocDef.getViewConfig());
         }
     }
 
-    private void associateViewConfig(String topicTypeUri, Set<TopicData> viewConfig) {
-        for (TopicData topicData : viewConfig) {
+    private void associateViewConfig(String topicTypeUri, ViewConfiguration viewConfig) {
+        for (TopicData topicData : viewConfig.getTopicData()) {
             Topic topic = createTopic(topicData, null);             // FIXME: clientContext=null
             AssociationData assocData = new AssociationData("dm3.core.view_configuration");
             assocData.addRole(new Role(topicTypeUri,  "dm3.core.topic_type"));
             assocData.addRole(new Role(topic.getId(), "dm3.core.view_config"));
             createAssociation(assocData, null);                     // FIXME: clientContext=null
+        }
+    }
+
+    private void associateViewConfig(Association assocDefAssoc, ViewConfiguration viewConfig) {
+        for (TopicData topicData : viewConfig.getTopicData()) {
+            Topic topic = createTopic(topicData, null);             // FIXME: clientContext=null
+            assocDefAssoc.addRole(new Role(topic.getId(), "dm3.core.view_config"));
         }
     }
 

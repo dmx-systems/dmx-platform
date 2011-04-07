@@ -28,11 +28,21 @@ function PlainDocument() {
         var defined_relation_topics = []
 
         dm3c.empty_detail_panel()
-        render_fields()
+        render_fields(dm3c.type_cache.get(topic.type_uri))
         render_relations()
         render_buttons(topic, "detail-panel-show")
 
-        function render_fields() {
+        function render_fields(topic_type) {
+            if (topic_type.data_type_uri == "dm3.core.composite") {
+                for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
+                    render_fields(dm3c.type_cache.get(assoc_def.part_topic_type_uri))
+                }
+            } else {
+                js_renderer_class = "TextFieldRenderer"
+            }
+        }
+
+        function $render_fields() {
             for (var i = 0, field; field = dm3c.type_cache.get(topic.type_uri).fields[i]; i++) {
                 if (!field.viewable) {
                     continue
@@ -87,10 +97,20 @@ function PlainDocument() {
 
         dm3c.empty_detail_panel()
         dm3c.trigger_hook("pre_render_form", topic)
-        render_fields()
+        render_fields(dm3c.type_cache.get(topic.type_uri))
         render_buttons(topic, "detail-panel-edit")
 
-        function render_fields() {
+        function render_fields(topic_type) {
+            if (topic_type.data_type_uri == "dm3.core.composite") {
+                for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
+                    render_fields(dm3c.type_cache.get(assoc_def.part_topic_type_uri))
+                }
+            } else {
+                js_renderer_class = "TextFieldRenderer"
+            }
+        }
+
+        function $render_fields() {
             for (var i = 0, field; field = dm3c.type_cache.get(topic.type_uri).fields[i]; i++) {
                 if (!field.editable) {
                     continue

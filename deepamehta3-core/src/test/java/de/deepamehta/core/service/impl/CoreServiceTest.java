@@ -27,7 +27,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             "migration_nr=\n    association definition \\(uri=\"dm3.core.plugin_migration_nr\", assocTypeUri=\"null\"" +
             "\\)\n        whole: \\(type=\"dm3.core.plugin\", role=\"dm3.core.plugin\", cardinality=\"dm3.core.one\"" +
             "\\)\n        part: \\(type=\"dm3.core.plugin_migration_nr\", role=\"dm3.core.plugin_migration_nr\", " +
-            "cardinality=\"dm3.core.one\"\\)\\},\nviewConfig=\\[\\]\\)"));
+            "cardinality=\"dm3.core.one\"\\)\n        association definition view configuration \\[\\]\\},\n" +
+            "topic type view configuration \\[\\]\\)"));
         assertEquals("dm3.core.composite", topicType.getDataTypeUri());
     }
 

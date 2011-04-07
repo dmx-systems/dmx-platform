@@ -25,7 +25,7 @@ public interface TopicType {
 
     Map<String, AssociationDefinition> getAssocDefs();
 
-    Set<TopicData> getViewConfig();
+    ViewConfiguration getViewConfig();
 
     // ---
 

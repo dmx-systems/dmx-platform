@@ -8,12 +8,28 @@
                 {
                     assoc_type_uri:       "dm3.core.composition",
                     part_topic_type_uri:  "dm3.base.title",
-                    part_cardinality_uri: "dm3.core.one"
+                    part_cardinality_uri: "dm3.core.one",
+                    view_config_topics: [
+                        {
+                            type_uri: "dm3.webclient.assoc_def_view_config",
+                            composite: {
+                                dm3.webclient.js_renderer_class: "TitleRenderer"
+                            }
+                        }
+                    ]
                 },
                 {
                     assoc_type_uri:       "dm3.core.composition",
                     part_topic_type_uri:  "dm3.base.text",
-                    part_cardinality_uri: "dm3.core.one"
+                    part_cardinality_uri: "dm3.core.one",
+                    view_config_topics: [
+                        {
+                            type_uri: "dm3.webclient.assoc_def_view_config",
+                            composite: {
+                                dm3.webclient.js_renderer_class: "BodyTextRenderer"
+                            }
+                        }
+                    ]
                 }
             ],
             view_config_topics: [

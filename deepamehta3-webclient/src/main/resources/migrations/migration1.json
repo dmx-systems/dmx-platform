@@ -19,6 +19,24 @@
         },
 
         {
+            uri: "dm3.webclient.js_renderer_class",
+            value: "JavaScript Renderer Class",
+            data_type_uri: "dm3.core.text"
+        },
+        {
+            uri: "dm3.webclient.assoc_def_view_config",
+            value: "Association Definition View Configuration",
+            data_type_uri: "dm3.core.composite",
+            assoc_defs: [
+                {
+                    assoc_type_uri:       "dm3.core.composition",
+                    part_topic_type_uri:  "dm3.webclient.js_renderer_class",
+                    part_cardinality_uri: "dm3.core.one"
+                }
+            ]
+        },
+
+        {
             uri: "dm3.webclient.search_term",
             value: "Search Term",
             data_type_uri: "dm3.core.text"
