@@ -451,7 +451,7 @@ public class EmbeddedService implements CoreService {
                                          @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Association assoc = storage.createAssociation(assocData);
+            Association assoc = buildAssociation(storage.createAssociation(assocData));
             tx.success();
             return assoc;
         } catch (Exception e) {
@@ -832,13 +832,32 @@ public class EmbeddedService implements CoreService {
     }
 
     Set<Association> getAssociations(long topicId, String myRoleType) {
-        return storage.getAssociations(topicId, myRoleType);
+        Set<Association> assocs = new HashSet();
+        for (Association assoc : storage.getAssociations(topicId, myRoleType)) {
+            assocs.add(buildAssociation(assoc));
+        }
+        return assocs;
+    }
+
+    // === Association API Delegates ===
+
+    void addAssociationRole(long assocId, Role role) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            storage.addAssociationRole(assocId, role);
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Adding role to associatin " + assocId + " failed (" + role + ")", e);
+        } finally {
+            tx.finish();
+        }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     /**
-     * Attaches this service to a topic retrieved from the storage layer.
+     * Attaches this service to a topic retrieved from storage layer.
      *
      * @return  Instance of {@link AttachedTopic}.
      */
@@ -856,6 +875,21 @@ public class EmbeddedService implements CoreService {
         //
         return new AttachedTopic(topic, this);
     }
+
+    /**
+     * Attaches this service to an association retrieved from storage layer.
+     *
+     * @return  Instance of {@link AttachedAssociation}.
+     */
+    private Association buildAssociation(Association assoc) {
+        if (assoc == null) {
+            throw new IllegalArgumentException("Tried to build an AttachedAssociation from a null Association");
+        }
+        //
+        return new AttachedAssociation(assoc, this);
+    }
+
+    // ---
 
     private void storeComposite(Topic topic, Composite comp) {
         Iterator<String> i = comp.keys();
@@ -1027,7 +1061,9 @@ public class EmbeddedService implements CoreService {
         storage.createTopic(new TopicData("dm3.core.number",    new TopicValue("Number"),    "dm3.core.data_type"));
         storage.createTopic(new TopicData("dm3.core.composite", new TopicValue("Composite"), "dm3.core.data_type"));
         // postponed data type association
-        associateDataType("dm3.core.data_type", "dm3.core.text");
+        associateDataType("dm3.core.topic_type", "dm3.core.text");
+        associateDataType("dm3.core.assoc_type", "dm3.core.text");
+        associateDataType("dm3.core.data_type",  "dm3.core.text");
     }
 
     // === Migrations ===

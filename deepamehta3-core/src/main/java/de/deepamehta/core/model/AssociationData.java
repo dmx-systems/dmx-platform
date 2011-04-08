@@ -41,6 +41,10 @@ public class AssociationData {
         this.roles = roles;
     }
 
+    public AssociationData(Association assoc) {
+        this(assoc.getId(), assoc.getTypeUri(), assoc.getRoles());
+    }
+
     public AssociationData(JSONObject assoc) {
         try {
             this.id = -1;
@@ -67,6 +71,16 @@ public class AssociationData {
 
     public Set<Role> getRoles() {
         return roles;
+    }
+
+    // ---
+
+    public Topic getTopic(String roleTypeUri) {
+        throw new RuntimeException("Method not implemented (" + getClass() + ")");
+    }
+
+    public Set<Topic> getTopics(String roleTypeUri) {
+        throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 
     // ---

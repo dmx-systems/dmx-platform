@@ -67,9 +67,9 @@ class TypeCache {
         Topic typeTopic = dms.storage.getTopic("uri", new TopicValue(typeUri));
         Topic dataType = fetchDataType(typeTopic);
         TopicTypeData topicTypeData = new TopicTypeData(typeTopic, dataType.getUri(), fetchViewConfig(typeTopic));
-        for (Association assoc : dms.storage.getAssociations(typeTopic.getId(), "dm3.core.whole_topic_type")) {
-            String wholeTopicTypeUri = getTopic(assoc, "dm3.core.whole_topic_type").getUri();
-            String  partTopicTypeUri = getTopic(assoc, "dm3.core.part_topic_type").getUri();
+        for (Association assoc : dms.getAssociations(typeTopic.getId(), "dm3.core.whole_topic_type")) {
+            String wholeTopicTypeUri = assoc.getTopic("dm3.core.whole_topic_type").getUri();
+            String  partTopicTypeUri = assoc.getTopic("dm3.core.part_topic_type").getUri();
             // sanity check
             if (!wholeTopicTypeUri.equals(typeUri)) {
                 throw new RuntimeException("jri doesn't understand Neo4j traversal");
@@ -111,15 +111,15 @@ class TypeCache {
     }
 
     private ViewConfiguration fetchViewConfig(Association assoc) {
-        Set<Topic> topics = getTopics(assoc, "dm3.core.view_config");
+        Set<Topic> topics = assoc.getTopics("dm3.core.view_config");
         return new ViewConfiguration(topics);
     }
 
     // ---
 
     private RoleTypes fetchRoleTypes(Association assoc) {
-        Topic wholeRoleType = getTopic(assoc, "dm3.core.whole_role_type");
-        Topic  partRoleType = getTopic(assoc, "dm3.core.part_role_type");
+        Topic wholeRoleType = assoc.getTopic("dm3.core.whole_role_type");
+        Topic  partRoleType = assoc.getTopic("dm3.core.part_role_type");
         RoleTypes roleTypes = new RoleTypes();
         // role types are optional
         if (wholeRoleType != null) {
@@ -132,8 +132,8 @@ class TypeCache {
     }
 
     private Cardinality fetchCardinality(Association assoc) {
-        Topic wholeCardinality = getTopic(assoc, "dm3.core.whole_cardinality");
-        Topic  partCardinality = getTopic(assoc, "dm3.core.part_cardinality");
+        Topic wholeCardinality = assoc.getTopic("dm3.core.whole_cardinality");
+        Topic  partCardinality = assoc.getTopic("dm3.core.part_cardinality");
         Cardinality cardinality = new Cardinality();
         if (wholeCardinality != null) {
             cardinality.setWholeCardinalityUri(wholeCardinality.getUri());
@@ -144,34 +144,6 @@ class TypeCache {
             throw new RuntimeException("Missing part cardinality in association definition");
         }
         return cardinality;
-    }
-
-    // ---
-
-    // FIXME: introduce attached associations and drop this method
-    Topic getTopic(Association assoc, String roleTypeUri) {
-        Set<Topic> topics = getTopics(assoc, roleTypeUri);
-        switch (topics.size()) {
-        case 0:
-            return null;
-        case 1:
-            return topics.iterator().next();
-        default:
-            throw new RuntimeException("Ambiguity in association: " + topics.size() + " topics have role type \"" +
-                roleTypeUri + "\" (" + assoc + ")");
-        }
-    }
-
-    // FIXME: introduce attached associations and drop this method
-    Set<Topic> getTopics(Association assoc, String roleTypeUri) {
-        Set<Topic> topics = new HashSet();
-        for (Role role : assoc.getRoles()) {
-            if (role.getRoleTypeUri().equals(roleTypeUri)) {
-                // Note: storage low-level call used here ### explain
-                topics.add(dms.storage.getTopic(role.getTopicId()));
-            }
-        }
-        return topics;
     }
 
     // --------------------------------------------------------------------------------------------------- Inner Classes

@@ -27,5 +27,11 @@ public interface Association {
 
     // ---
 
+    Topic getTopic(String roleTypeUri);
+
+    Set<Topic> getTopics(String roleTypeUri);
+
+    // ---
+
     void addRole(Role role);
 }

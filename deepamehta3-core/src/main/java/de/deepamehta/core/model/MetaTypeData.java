@@ -24,16 +24,14 @@ public class MetaTypeData extends TopicData {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public MetaTypeData(String uri, String value) {
-        this.uri = uri;
-        this.value = new TopicValue(value);
-        this.typeUri = "dm3.core.meta_type";
+        super(uri, new TopicValue(value), "dm3.core.meta_type");
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
     public String toString() {
-        return "meta type data (uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
-            "\", composite=" + composite + ")";
+        return "meta type data (id=" + id + ", uri=\"" + uri + "\", value=" + value +
+            ", typeUri=\"" + typeUri + "\", composite=" + composite + ")";
     }
 }

@@ -120,15 +120,14 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     public Association createAssociation(AssociationData assocData) {
         HyperEdge edge = hg.createHyperEdge();          // FIXME: use association type
         for (Role role : assocData.getRoles()) {
-            HyperNode node;
-            if (role.topicIdentifiedById()) {
-                node = hg.getHyperNode(role.getTopicId());
-            } else {
-                node = lookupTopic(role.getTopicUri());
-            }
-            edge.addHyperNode(node, role.getRoleTypeUri());
+            addAssociationRole(edge, role);
         }
         return buildAssociation(edge, assocData.getTypeUri(), assocData.getRoles());
+    }
+
+    @Override
+    public void addAssociationRole(long assocId, Role role) {
+        addAssociationRole(hg.getHyperEdge(assocId), role);
     }
 
     // === DB ===
@@ -225,6 +224,20 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void addAssociationRole(HyperEdge edge, Role role) {
+        edge.addHyperNode(getRoleNode(role), role.getRoleTypeUri());
+    }
+
+    private HyperNode getRoleNode(Role role) {
+        if (role.topicIdentifiedById()) {
+            return hg.getHyperNode(role.getTopicId());
+        } else {
+            return lookupTopic(role.getTopicUri());
+        }
+    }
+
+    // ---
 
     private void setupMetaTypeNode() {
         HyperNode refNode = hg.getHyperNode(0);
