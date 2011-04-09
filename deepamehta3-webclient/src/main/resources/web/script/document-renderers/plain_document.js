@@ -3,10 +3,10 @@
  */
 function PlainDocument() {
 
-    var field_renderers         // key: field URI, value: renderer object
+    var fields      // key: field URI, value: Field object
 
     // Settings
-    DEFAULT_AREA_HEIGHT = 15    // in lines
+    DEFAULT_AREA_HEIGHT = 15    // in rows
 
     // The autocomplete list
     $("#document-form").append($("<div>").addClass("autocomplete-list"))
@@ -24,7 +24,7 @@ function PlainDocument() {
 
     this.render_document = function(topic) {
 
-        field_renderers = {}            // key: field URI, value: renderer object
+        fields = {}            // key: field URI, value: renderer object
         var defined_relation_topics = []
 
         dm3c.empty_detail_panel()
@@ -42,7 +42,7 @@ function PlainDocument() {
             }
         }
 
-        function $render_fields() {
+        function _render_fields() {
             for (var i = 0, field; field = dm3c.type_cache.get(topic.type_uri).fields[i]; i++) {
                 if (!field.viewable) {
                     continue
@@ -54,7 +54,7 @@ function PlainDocument() {
                     continue
                 }
                 var rel_topics = related_topics(field)
-                field_renderers[field.uri] = js.new_object(field.js_renderer_class, topic, field, rel_topics)
+                fields[field.uri] = js.new_object(field.js_renderer_class, topic, field, rel_topics)
                 // render field
                 var field_value_div = $("<div>").addClass("field-value")
                 var html = trigger_renderer_hook(field, "render_field", field_value_div)
@@ -91,59 +91,23 @@ function PlainDocument() {
 
     this.render_form = function(topic) {
 
-        field_renderers = {}            // key: field URI, value: renderer object
+        fields = {}            // key: field URI, value: renderer object
         this.topic_buffer = {}
         plain_doc = this
 
         dm3c.empty_detail_panel()
         dm3c.trigger_hook("pre_render_form", topic)
-        render_fields(dm3c.type_cache.get(topic.type_uri))
+        render_fields("", dm3c.type_cache.get(topic.type_uri))
         render_buttons(topic, "detail-panel-edit")
 
-        function render_fields(topic_type) {
+        function render_fields(field_uri, topic_type, assoc_def) {
             if (topic_type.data_type_uri == "dm3.core.composite") {
                 for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                    render_fields(dm3c.type_cache.get(assoc_def.part_topic_type_uri))
+                    var part_topic_type = dm3c.type_cache.get(assoc_def.part_topic_type_uri)
+                    render_fields(field_uri + dm3c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri, part_topic_type, assoc_def)
                 }
             } else {
-                js_renderer_class = "TextFieldRenderer"
-            }
-        }
-
-        function $render_fields() {
-            for (var i = 0, field; field = dm3c.type_cache.get(topic.type_uri).fields[i]; i++) {
-                if (!field.editable) {
-                    continue
-                }
-                // create renderer
-                if (!field.js_renderer_class) {
-                    alert("WARNING (PlainDocument.render_form):\n\nField \"" + field.label +
-                        "\" has no field renderer.\n\nfield=" + JSON.stringify(field))
-                    continue
-                }
-                var rel_topics = related_topics(field)
-                field_renderers[field.uri] = js.new_object(field.js_renderer_class, topic, field, rel_topics)
-                // render field label
-                dm3c.render.field_label(field)
-                // render form element
-                var html = trigger_renderer_hook(field, "render_form_element")
-                if (html !== undefined) {
-                    $("#detail-panel").append($("<div>").addClass("field-value").append(html))
-                    trigger_renderer_hook(field, "post_render_form_element")
-                } else {
-                    alert("WARNING (PlainDocument.render_form):\n\nRenderer for field \"" + field.label + "\" " +
-                        "returned no form element.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(field))
-                }
-            }
-
-            function related_topics(field) {
-                if (field.data_type == "reference") {
-                    var topics = get_reference_field_content(topic.id, field)
-                    // buffer current topic selection to compare it at submit time
-                    plain_doc.topic_buffer[field.uri] = topics
-                    //
-                    return topics
-                }
+                new Field(field_uri, topic, topic_type, assoc_def).render()
             }
         }
     }
@@ -228,34 +192,81 @@ function PlainDocument() {
                                                        include_relation_types, exclude_relation_types)
     }
 
-    // --- Field Renderer ---
 
-    /**
-     * Triggers a renderer hook for the given field.
-     *
-     * @param   hook_name   Name of the renderer hook to trigger.
-     * @param   <varargs>   Variable number of arguments. Passed to the hook.
-     */
-    function trigger_renderer_hook(field, hook_name) {
-        // Lookup renderer
-        var field_renderer = field_renderers[field.uri]
-        // Trigger the hook only if it is defined (a renderer must not define all hooks).
-        if (field_renderer[hook_name]) {
-            if (arguments.length == 2) {
-                return field_renderer[hook_name]()
-            } else if (arguments.length == 3) {
-                return field_renderer[hook_name](arguments[2])
+
+    // === Field Renderer ===
+
+    function Field(uri, topic, topic_type, assoc_def) {
+
+        var editable          = get_view_config("editable")
+        var viewable          = get_view_config("viewable")
+        var js_renderer_class = get_view_config("js_renderer_class")
+        this.rows = get_view_config("rows")
+        this.uri = uri
+        var renderer
+
+        fields[uri] = this
+
+        function get_view_config(setting) {
+            return dm3c.get_view_config(assoc_def, setting) || dm3c.get_view_config(topic_type, setting)
+        }
+
+        this.render = function() {
+            if (!editable) {
+                return
+            }
+            // create renderer
+            if (!js_renderer_class) {
+                alert("WARNING (PlainDocument.render_form):\n\nField \"" + uri +
+                    "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
+                return
+            }
+            // var rel_topics = related_topics(field)
+            renderer = js.new_object(js_renderer_class, topic, this /*, rel_topics */)
+            // render field label
+            dm3c.render.field_label(topic_type.value)
+            // render form element
+            var html = trigger_renderer_hook("render_form_element")
+            if (html !== undefined) {
+                $("#detail-panel").append($("<div>").addClass("field-value").append(html))
+                trigger_renderer_hook("post_render_form_element")
+            } else {
+                alert("WARNING (PlainDocument.render_form):\n\nRenderer for field \"" + uri + "\" " +
+                    "returned no form element.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
+            }
+
+            function related_topics(field) {
+                if (field.data_type == "reference") {
+                    var topics = get_reference_field_content(topic.id, field)
+                    // buffer current topic selection to compare it at submit time
+                    plain_doc.topic_buffer[field.uri] = topics
+                    //
+                    return topics
+                }
+            }
+        }
+
+        /**
+         * Triggers a renderer hook for this field.
+         *
+         * @param   hook_name   Name of the renderer hook to trigger.
+         * @param   <varargs>   Variable number of arguments. Passed to the hook.
+         */
+        function trigger_renderer_hook(hook_name) {
+            // Trigger the hook only if it is defined (a renderer must not define all hooks).
+            if (renderer[hook_name]) {
+                if (arguments.length == 1) {
+                    return renderer[hook_name]()
+                } else if (arguments.length == 2) {
+                    return renderer[hook_name](arguments[1])
+                }
             }
         }
     }
 
 
 
-    /***********************/
-    /*** Auto-Completion ***/
-    /***********************/
-
-
+    // === Auto-Completion ===
 
     /**
      * Auto-Completion main function. Triggered for every keystroke.

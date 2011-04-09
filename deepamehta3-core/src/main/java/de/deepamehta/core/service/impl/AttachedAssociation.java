@@ -51,7 +51,6 @@ class AttachedAssociation extends AssociationData implements Association {
         Set<Topic> topics = new HashSet();
         for (Role role : getRoles()) {
             if (role.getRoleTypeUri().equals(roleTypeUri)) {
-                // Note: storage low-level call used here ### explain
                 topics.add(dms.getTopic(role.getTopicId(), null));
             }
         }

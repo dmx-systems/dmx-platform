@@ -3,6 +3,7 @@ var dm3c = new function() {
     // Settings
     var CORE_SERVICE_URI = "/core"
     this.SEARCH_FIELD_WIDTH = 16    // in chars
+    this.COMPOSITE_PATH_SEPARATOR = "/"
     var UPLOAD_DIALOG_WIDTH = "50em"
     var GENERIC_TOPIC_ICON_SRC = "images/gray-dot.png"
 
@@ -294,13 +295,39 @@ var dm3c = new function() {
     // === Topics ===
 
     this.get_value = function(topic, field_uri) {
-        var value = topic.properties[field_uri]
+        var assoc_def_uris = field_uri.split(dm3c.COMPOSITE_PATH_SEPARATOR)
+        if (assoc_def_uris.length == 1) {
+            // alert("topic=" + JSON.stringify(topic) + "\n\nfield_uri=\"" + field_uri + "\"\n\n=> " + topic.value)
+            return topic.value
+        } else {
+            var comp = topic.composite
+            for (var i = 1, assoc_def_uri; assoc_def_uri = assoc_def_uris[i]; i++) {
+                comp = comp[assoc_def_uri]
+            }
+            // alert("topic=" + JSON.stringify(topic) + "\n\nfield_uri=\"" + field_uri + "\"\n\n=> " + comp)
+            return comp
+        }
+        /* var value = topic.properties[field_uri]
         if (value == undefined) {
             // alert("WARNING (get_value): Data field \"" + field_uri + "\" has no value.\n\n" +
             //    "Topic: " + JSON.stringify(topic))
             value = ""
         }
-        return value
+        return value */
+    }
+
+    /**
+     * Read out a view configuration setting.
+     *
+     * @param   configurable    a topic type or an association definition
+     * @param   setting         last URI component, e.g. "icon_src"
+     */
+    this.get_view_config = function(configurable, setting) {
+        // every configurable has an view_config_topics object, however it might by empty
+        var client_config = configurable.view_config_topics["dm3.webclient.view_config"]
+        if (client_config) {
+            return client_config.composite["dm3.webclient." + setting]
+        }
     }
 
     /**
@@ -584,11 +611,10 @@ var dm3c = new function() {
     this.get_icon_src = function(type_uri) {
         var topic_type = dm3c.type_cache.get(type_uri)
         // Note: topic_type is undefined if plugin is deactivated and content still exist.
-        if (topic_type && topic_type.view_config_topics["dm3.webclient.topic_type_view_config"]) {
-            return topic_type.view_config_topics["dm3.webclient.topic_type_view_config"].
-                composite["dm3.webclient.icon_src"]
+        if (topic_type) {
+            var icon_src = dm3c.get_view_config(topic_type, "icon_src")
         }
-        return GENERIC_TOPIC_ICON_SRC
+        return icon_src || GENERIC_TOPIC_ICON_SRC
     }
 
     /**

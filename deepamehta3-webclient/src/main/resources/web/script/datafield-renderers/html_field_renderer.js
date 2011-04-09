@@ -1,4 +1,4 @@
-function HTMLFieldRenderer(doc, field, rel_topics) {
+function HTMLFieldRenderer(topic, field, rel_topics) {
 
     tinymce_options = {
         theme: "advanced",
@@ -21,14 +21,14 @@ function HTMLFieldRenderer(doc, field, rel_topics) {
         // render field label
         dm3c.render.field_label(field)
         // render field value
-        return dm3c.get_value(doc, field.uri)
+        return dm3c.get_value(topic, field.uri)
     }
 
     this.render_form_element = function() {
-        var lines = field.lines || DEFAULT_AREA_HEIGHT
+        var rows = field.rows || DEFAULT_AREA_HEIGHT
         var textarea = $("<textarea>")
-        textarea.attr({id: "field_" + field.uri, rows: lines})
-        textarea.text(dm3c.get_value(doc, field.uri))
+        textarea.attr({id: "field_" + field.uri, rows: rows})
+        textarea.text(dm3c.get_value(topic, field.uri))
         return textarea
     }
 

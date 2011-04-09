@@ -1,4 +1,4 @@
-function ReferenceFieldRenderer(doc, field, rel_topics) {
+function ReferenceFieldRenderer(topic, field, rel_topics) {
 
     this.render_field = function() {
         // field label
@@ -32,18 +32,18 @@ function ReferenceFieldRenderer(doc, field, rel_topics) {
             $("input:checkbox[name=relation_" + field.uri + "]").each(
                 function() {
                     var checkbox = this
-                    var was_checked_before = js.includes(dm3c.get_doctype_impl(doc).topic_buffer[field.uri],
+                    var was_checked_before = js.includes(dm3c.get_doctype_impl(topic).topic_buffer[field.uri],
                         function(topic) {
                             return topic.id == checkbox.id
                         }
                     )
                     if (checkbox.checked) {
                         if (!was_checked_before) {
-                            dm3c.create_relation("RELATION", doc.id, checkbox.id)
+                            dm3c.create_relation("RELATION", topic.id, checkbox.id)
                         }
                     } else {
                         if (was_checked_before) {
-                            dm3c.delete_relation(dm3c.restc.get_relation(doc.id, checkbox.id).id)
+                            dm3c.delete_relation(dm3c.restc.get_relation(topic.id, checkbox.id).id)
                         }
                     }
                 }

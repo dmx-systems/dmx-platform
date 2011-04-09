@@ -1,14 +1,14 @@
-function NumberFieldRenderer(doc, field, rel_topics) {
+function NumberFieldRenderer(topic, field, rel_topics) {
 
     this.render_field = function() {
         // field label
         dm3c.render.field_label(field)
         // field value
-        return dm3c.get_value(doc, field.uri)
+        return dm3c.get_value(topic, field.uri)
     }
 
     this.render_form_element = function() {
-        return dm3c.render.input(doc, field)
+        return dm3c.render.input(topic, field)
     }
 
     this.read_form_value = function() {

@@ -1059,6 +1059,7 @@ public class EmbeddedService implements CoreService {
         // Note: storage low-level call used here ### explain
         storage.createTopic(new TopicData("dm3.core.text",      new TopicValue("Text"),      "dm3.core.data_type"));
         storage.createTopic(new TopicData("dm3.core.number",    new TopicValue("Number"),    "dm3.core.data_type"));
+        storage.createTopic(new TopicData("dm3.core.boolean",   new TopicValue("Boolean"),   "dm3.core.data_type"));
         storage.createTopic(new TopicData("dm3.core.composite", new TopicValue("Composite"), "dm3.core.data_type"));
         // postponed data type association
         associateDataType("dm3.core.topic_type", "dm3.core.text");

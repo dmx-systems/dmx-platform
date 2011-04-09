@@ -14,6 +14,9 @@ import java.util.logging.Logger;
 
 
 /**
+ * Definition of an association between 2 topic types -- part of DeepaMehta's type system,
+ * like an association in a class diagram. Used to represent both, an aggregation and a composition.
+ *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
 public class AssociationDefinition {

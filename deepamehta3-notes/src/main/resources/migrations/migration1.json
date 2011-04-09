@@ -7,26 +7,32 @@
             assoc_defs: [
                 {
                     assoc_type_uri:       "dm3.core.composition",
-                    part_topic_type_uri:  "dm3.base.title",
                     part_cardinality_uri: "dm3.core.one",
+                    part_topic_type_uri:  "dm3.base.title",
                     view_config_topics: [
                         {
-                            type_uri: "dm3.webclient.assoc_def_view_config",
+                            type_uri: "dm3.webclient.view_config",
                             composite: {
-                                dm3.webclient.js_renderer_class: "TitleRenderer"
+                                dm3.webclient.editable: true,
+                                dm3.webclient.viewable: true,
+                                dm3.webclient.js_renderer_class: "TitleRenderer",
+                                dm3.webclient.rows: 1
                             }
                         }
                     ]
                 },
                 {
                     assoc_type_uri:       "dm3.core.composition",
-                    part_topic_type_uri:  "dm3.base.text",
                     part_cardinality_uri: "dm3.core.one",
+                    part_topic_type_uri:  "dm3.base.text",
                     view_config_topics: [
                         {
-                            type_uri: "dm3.webclient.assoc_def_view_config",
+                            type_uri: "dm3.webclient.view_config",
                             composite: {
-                                dm3.webclient.js_renderer_class: "BodyTextRenderer"
+                                dm3.webclient.editable: true,
+                                dm3.webclient.viewable: true,
+                                dm3.webclient.js_renderer_class: "BodyTextRenderer",
+                                dm3.webclient.rows: 15
                             }
                         }
                     ]
@@ -34,7 +40,7 @@
             ],
             view_config_topics: [
                 {
-                    type_uri: "dm3.webclient.topic_type_view_config",
+                    type_uri: "dm3.webclient.view_config",
                     composite: {
                         dm3.webclient.icon_src: "/de.deepamehta.3-notes/images/pencil.png"
                     }
