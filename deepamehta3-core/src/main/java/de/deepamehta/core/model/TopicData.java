@@ -60,7 +60,7 @@ public class TopicData {
 
     public TopicData(JSONObject topicData) {
         try {
-            this.id = -1;
+            this.id = topicData.optLong("id", -1);
             this.uri = topicData.optString("uri");
             this.value = new TopicValue(topicData.optString("value"));
             this.typeUri = topicData.getString("type_uri");

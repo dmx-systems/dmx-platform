@@ -10,7 +10,7 @@ function HTMLFieldRenderer(topic, field, rel_topics) {
         // Theme options
         theme_advanced_buttons1: "formatselect,|,bullist,numlist,|,bold,italic,underline,|,link,unlink,anchor,|," +
             "image,code,|,undo,redo",
-        theme_advanced_buttons2: "fontselect,fontsizeselect,forecolor,backcolor",
+        theme_advanced_buttons2: "",    // "fontselect,fontsizeselect,forecolor,backcolor",
         theme_advanced_buttons3: "",
         theme_advanced_blockformats: "h1,h2,h3,p",
         theme_advanced_toolbar_location: "top",

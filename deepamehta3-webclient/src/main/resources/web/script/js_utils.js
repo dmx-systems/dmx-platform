@@ -145,6 +145,10 @@ var js = {
         }
     },
 
+    instance_of: function(obj, clazz) {
+        return obj.__proto__.constructor == clazz
+    },
+
 
 
     // ************

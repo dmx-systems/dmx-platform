@@ -88,7 +88,8 @@ public class TopicTypeData extends TopicData {
     public AssociationDefinition getAssocDef(String assocDefUri) {
         AssociationDefinition assocDef = assocDefs.get(assocDefUri);
         if (assocDef == null) {
-            throw new RuntimeException("Association definition \"" + assocDefUri + "\" not found (in " + this + ")");
+            throw new RuntimeException("Schema violation: association definition \"" +
+                assocDefUri + "\" not found in " + this);
         }
         return assocDef;
     }
@@ -98,9 +99,8 @@ public class TopicTypeData extends TopicData {
         String assocDefUri = assocDef.getUri();
         AssociationDefinition existing = assocDefs.get(assocDefUri);
         if (existing != null) {
-            throw new RuntimeException("Ambiguity: topic type definition \"" + uri + "\" has more than " +
-                "one association definitions with uri \"" + assocDefUri + "\" -- Use distinct part role types or " +
-                "specifiy an unique uri");
+            throw new RuntimeException("Schema ambiguity: topic type \"" + uri + "\" has more than one " +
+                "association definitions with uri \"" + assocDefUri + "\" -- Use distinct part role types");
         }
         assocDefs.put(assocDefUri, assocDef);
     }

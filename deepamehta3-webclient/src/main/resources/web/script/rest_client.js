@@ -63,8 +63,8 @@ function RESTClient(core_service_uri) {
         return request("POST", "/topic", topic_data)
     }
 
-    this.set_topic_properties = function(topic_id, properties) {
-        request("PUT", "/topic/" + topic_id, properties)
+    this.update_topic = function(topic_data) {
+        request("PUT", "/topic", topic_data)
     }
 
     this.delete_topic = function(id) {

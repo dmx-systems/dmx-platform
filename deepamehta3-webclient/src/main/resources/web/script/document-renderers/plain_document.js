@@ -3,7 +3,9 @@
  */
 function PlainDocument() {
 
-    var fields      // key: field URI, value: Field object
+    var fields      // either a Field object (non-composite) or an object (composite):
+                    //     key: assoc def URI
+                    //     value: either a Field object (non-composite) or again a fields object (composite)
 
     // Settings
     DEFAULT_AREA_HEIGHT = 15    // in rows
@@ -91,30 +93,41 @@ function PlainDocument() {
 
     this.render_form = function(topic) {
 
-        fields = {}            // key: field URI, value: renderer object
         this.topic_buffer = {}
         plain_doc = this
 
         dm3c.empty_detail_panel()
         dm3c.trigger_hook("pre_render_form", topic)
-        render_fields("", dm3c.type_cache.get(topic.type_uri))
+        fields = render_fields("", dm3c.type_cache.get(topic.type_uri))
         render_buttons(topic, "detail-panel-edit")
+        // alert("render_form(): fields=" + JSON.stringify(fields));
 
         function render_fields(field_uri, topic_type, assoc_def) {
             if (topic_type.data_type_uri == "dm3.core.composite") {
+                var fields = {}
                 for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
                     var part_topic_type = dm3c.type_cache.get(assoc_def.part_topic_type_uri)
-                    render_fields(field_uri + dm3c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri, part_topic_type, assoc_def)
+                    var child_field_uri = field_uri + dm3c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
+                    var child_fields = render_fields(child_field_uri, part_topic_type, assoc_def)
+                    if (child_fields) {
+                        fields[assoc_def.uri] = child_fields
+                    }
                 }
+                return fields;
             } else {
-                new Field(field_uri, topic, topic_type, assoc_def).render()
+                var field = new Field(field_uri, topic, topic_type, assoc_def)
+                if (field.editable) {
+                    field.render_form_element()
+                    return field
+                }
             }
         }
     }
 
     this.process_form = function(topic) {
+
         // 1) update DB and memory
-        dm3c.update_topic(topic, read_form_values())
+        dm3c.update_topic(topic, build_topic_data())
         dm3c.trigger_hook("post_submit_form", topic)
         // 2) update GUI
         var topic_id = topic.id
@@ -125,28 +138,44 @@ function PlainDocument() {
         dm3c.trigger_hook("post_set_topic_label", topic_id, label)
 
         /**
-         * Reads out values from GUI elements.
+         * Reads out values from GUI elements and builds a topic data object from it.
+         *
+         * @return  a topic data object
          */
-        function read_form_values() {
-            var form_values = {}
-            for (var i = 0, field; field = dm3c.type_cache.get(topic.type_uri).fields[i]; i++) {
-                if (!field.editable) {
-                    continue
+        function build_topic_data() {
+            var topic_data = {
+                id: topic.id,
+                uri: topic.uri,
+                type_uri: topic.type_uri
+            }
+            if (js.instance_of(fields, Field)) {
+                var form_value = fields.read_form_value()
+                // Note: undefined form value is an error (means: field renderer returned no value).
+                // null is a valid form value (means: field renderer prevents the field from being updated).
+                if (form_value != null) {
+                    topic_data.value = form_value
                 }
-                //
-                var value = trigger_renderer_hook(field, "read_form_value")
-                // Note: undefined value is an error (means: field renderer returned no value).
-                // null is a valid result (means: field renderer prevents the field from being updated).
-                if (value !== undefined) {
-                    if (value != null) {
-                        form_values[field.uri] = value
+            } else {
+                topic_data.composite = build_composite(fields)
+            }
+            return topic_data
+        }
+
+        function build_composite(fields) {
+            var composite = {}
+            for (var assoc_def_uri in fields) {
+                if (js.instance_of(fields[assoc_def_uri], Field)) {
+                    var form_value = fields[assoc_def_uri].read_form_value()
+                    // Note: undefined form value is an error (means: field renderer returned no value).
+                    // null is a valid form value (means: field renderer prevents the field from being updated).
+                    if (form_value != null) {
+                        composite[assoc_def_uri] = form_value
                     }
                 } else {
-                    alert("WARNING (PlainDocument.process_form):\n\nRenderer for field \"" + field.label + "\" " +
-                        "returned no form value.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(field))
+                    composite[assoc_def_uri] = build_composite(fields[assoc_def_uri])
                 }
             }
-            return form_values
+            return composite
         }
     }
 
@@ -198,23 +227,18 @@ function PlainDocument() {
 
     function Field(uri, topic, topic_type, assoc_def) {
 
-        var editable          = get_view_config("editable")
+        this.editable         = get_view_config("editable")
         var viewable          = get_view_config("viewable")
         var js_renderer_class = get_view_config("js_renderer_class")
         this.rows = get_view_config("rows")
         this.uri = uri
         var renderer
 
-        fields[uri] = this
-
         function get_view_config(setting) {
             return dm3c.get_view_config(assoc_def, setting) || dm3c.get_view_config(topic_type, setting)
         }
 
-        this.render = function() {
-            if (!editable) {
-                return
-            }
+        this.render_form_element = function() {
             // create renderer
             if (!js_renderer_class) {
                 alert("WARNING (PlainDocument.render_form):\n\nField \"" + uri +
@@ -243,6 +267,18 @@ function PlainDocument() {
                     //
                     return topics
                 }
+            }
+        }
+
+        this.read_form_value = function() {
+            var form_value = trigger_renderer_hook("read_form_value")
+            // Note: undefined value is an error (means: field renderer returned no value).
+            // null is a valid result (means: field renderer prevents the field from being updated).
+            if (form_value !== undefined) {
+                return form_value
+            } else {
+                alert("WARNING (PlainDocument.process_form):\n\nRenderer for field \"" + uri + "\" " +
+                    "returned no form value.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
             }
         }
 

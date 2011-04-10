@@ -75,20 +75,21 @@ var dm3c = new function() {
     }
 
     /**
-     * Updates topic properties in the DB and and memory.
+     * Updates a topic in the DB and in memory.
      * Triggers the "post_update_topic" hook.
      *
      * High-level utility method for plugin developers.
      */
-    this.update_topic = function(topic, properties) {
-        // update DB
-        dm3c.restc.set_topic_properties(topic.id, properties)
-        // update memory
-        var old_properties = {}
-        js.copy(topic.properties, old_properties)
-        js.copy(properties, topic.properties)
-        // trigger hook
-        dm3c.trigger_hook("post_update_topic", topic, old_properties)
+    this.update_topic = function(topic, topic_data) {
+        // 1) update DB
+        // alert("dm3c.update_topic(): topic_data=" + JSON.stringify(topic_data));
+        dm3c.restc.update_topic(topic_data)
+        // 2) update memory
+        // ### var old_properties = {}
+        // ### js.copy(topic.properties, old_properties)
+        // ### js.copy(properties, topic.properties)
+        // 3) trigger hook
+        // ### dm3c.trigger_hook("post_update_topic", topic, old_properties)
     }
 
     /**
@@ -295,6 +296,7 @@ var dm3c = new function() {
     // === Topics ===
 
     this.get_value = function(topic, field_uri) {
+        // alert("topic=" + JSON.stringify(topic) + "\n\nfield_uri=\"" + field_uri + "\"")
         var assoc_def_uris = field_uri.split(dm3c.COMPOSITE_PATH_SEPARATOR)
         if (assoc_def_uris.length == 1) {
             // alert("topic=" + JSON.stringify(topic) + "\n\nfield_uri=\"" + field_uri + "\"\n\n=> " + topic.value)

@@ -113,9 +113,9 @@ public interface CoreService {
     // public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord,
     //                                                                     ClientContext clientContext);
 
-    public Topic createTopic(TopicData data, ClientContext clientContext);
+    public Topic createTopic(TopicData topicData, ClientContext clientContext);
 
-    // public void setTopicProperties(long id, Properties properties);
+    public void updateTopic(TopicData topicData, ClientContext clientContext);
 
     // public void deleteTopic(long id);
 

@@ -27,13 +27,6 @@ function TextFieldRenderer(topic, field, rel_topics) {
     }
 
     this.read_form_value = function() {
-        switch (field.editor) {
-        case "single line":
-        case "multi line":
-            return $.trim($("[field-uri=" + field.uri + "]").val())
-        default:
-            alert("WARNING (TextFieldRenderer.read_form_value):\n\nField \"" + field.label +
-                "\" has unexpected editor: \"" + field.editor + "\".\n\nfield=" + JSON.stringify(field))
-        }
+        return $.trim($("[field-uri=" + field.uri + "]").val())
     }
 }

@@ -343,32 +343,36 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    /* @PUT
-    @Path("/topic/{id}")
+    @PUT
+    @Path("/topic")
     @Override
-    public void setTopicProperties(@PathParam("id") long id, Properties properties) {
+    public void updateTopic(TopicData topicData, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Topic topic = getTopic(id, null);   // clientContext=null
-            Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
+            Topic topic = getTopic(topicData.getId(), clientContext);
+            // ### Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             //
-            triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
+            // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
-            storage.setTopicProperties(id, properties);
+            // ### storage.setTopicProperties(id, properties);
+            Composite comp = topicData.getComposite();
+            if (comp != null) {
+                storeComposite(topic, comp);
+            }
             //
-            topic.setProperties(properties);
-            triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
+            // ### topic.setProperties(properties);
+            // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
             //
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Setting properties of topic " + id + " failed\n" + properties, e);
+            throw new RuntimeException("Updating topic failed (" + topicData + ")", e);
         } finally {
             tx.finish();
         }
     }
 
-    @DELETE
+    /* @DELETE
     @Path("/topic/{id}")
     @Override
     public void deleteTopic(@PathParam("id") long id) {
@@ -807,6 +811,7 @@ public class EmbeddedService implements CoreService {
                     // create child topic
                     String topicTypeUri = assocDef.getPartTopicTypeUri();
                     childTopic = createTopic(new TopicData(null, value, topicTypeUri, null), null);
+                    setChildTopic(childTopic);
                     // associate child topic
                     AssociationData assocData = new AssociationData(assocDef.getAssocTypeUri());
                     assocData.addRole(new Role(parentTopic.getId(), assocDef.getWholeRoleTypeUri()));
@@ -931,17 +936,33 @@ public class EmbeddedService implements CoreService {
         private Topic childTopic;
         private AssociationDefinition assocDef;
 
+        // ---
+
         private ChildTopicEvaluator(Topic parentTopic, String assocDefUri) {
             getChildTopic(parentTopic, assocDefUri);
             evaluate(childTopic, assocDef);
         }
 
+        // ---
+
+        /**
+         * Note: if the caller uses evaluate() to create a missing child topic
+         * he must not forget to call setChildTopic().
+         */
         void evaluate(Topic childTopic, AssociationDefinition assocDef) {
         }
+
+        // ---
 
         Topic getChildTopic() {
             return childTopic;
         }
+
+        void setChildTopic(Topic childTopic) {
+            this.childTopic = childTopic;
+        }
+
+        // ---
 
         private void getChildTopic(Topic parentTopic, String assocDefUri) {
             TopicType topicType = getTopicType(parentTopic.getTypeUri(), null);     // FIXME: clientContext=null
