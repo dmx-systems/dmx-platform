@@ -5,15 +5,24 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Logger;
 
 
 
 public class JSONTest {
 
-    // --- Testing Serialization ---
+    private Logger logger = Logger.getLogger(getClass().getName());
+
+    // --- Serialization ---
 
     @Test
     public void put() throws JSONException {
@@ -73,7 +82,7 @@ public class JSONTest {
             "{\"id\":123,\"value\":\"de.deepamehta.test.JSONTest$ClassWithoutToStringMethod@"));
     }
 
-    // --- Testing Get ---
+    // --- Get ---
 
     @Test
     public void getClassWithToStringMethod() throws JSONException {
@@ -101,6 +110,29 @@ public class JSONTest {
         //
         String s = o.getString("value");
         assertNull(s);  // getting the object as string returns its toString() result -- null in this case
+    }
+
+    // --- Iteration ---
+
+    @Test
+    public void iteration() throws JSONException {
+        List keys = new ArrayList();
+        JSONObject o = new JSONObject("{d: 78, c: 90, a: 56, e: 12, b: 34}");
+        Iterator<String> i = o.keys();
+        while (i.hasNext()) {
+            String key = i.next();
+            keys.add(key);
+        }
+        assertEquals(Arrays.asList("d", "c", "a", "e", "b"), keys);
+        // the jettison JSONObject implementation preserves the natural key order (uses LinkedHashMap)
+    }
+
+    @Test
+    public void names() throws JSONException {
+        JSONObject o = new JSONObject("{d: 78, c: 90, a: 56, e: 12, b: 34}");
+        JSONArray keys = o.names();
+        assertEquals("[\"d\",\"c\",\"a\",\"e\",\"b\"]", keys.toString());
+        // the jettison JSONObject implementation preserves the natural key order (uses LinkedHashMap)
     }
 
     // --- Helper Classes ---

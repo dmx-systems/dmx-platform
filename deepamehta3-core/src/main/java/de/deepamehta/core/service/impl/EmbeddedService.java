@@ -319,8 +319,6 @@ public class EmbeddedService implements CoreService {
     public Topic createTopic(TopicData topicData, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            checkUniqueness(topicData.getUri());
-            //
             triggerHook(Hook.PRE_CREATE_TOPIC, topicData, clientContext);
             //
             Topic topic = storage.createTopic(topicData);
@@ -350,7 +348,7 @@ public class EmbeddedService implements CoreService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             Topic topic = getTopic(topicData.getId(), clientContext);
-            // ### Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
+            // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             //
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
@@ -544,11 +542,9 @@ public class EmbeddedService implements CoreService {
     public TopicType createTopicType(TopicTypeData topicTypeData, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            String typeUri = topicTypeData.getUri();
-            checkUniqueness(typeUri);
-            //
             Topic topic = storage.createTopic(topicTypeData);
             //
+            String typeUri = topicTypeData.getUri();
             associateDataType(typeUri, topicTypeData.getDataTypeUri());
             associateTopicTypes(topicTypeData.getAssocDefs());
             associateViewConfig(typeUri, topicTypeData.getViewConfig());
@@ -576,11 +572,7 @@ public class EmbeddedService implements CoreService {
                                        @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-           String typeUri = assocTypeData.getUri();
-           checkUniqueness(typeUri);
-           //
            Topic topic = storage.createTopic(assocTypeData);
-           //
            tx.success();
            return topic;
         } catch (Exception e) {
@@ -994,7 +986,7 @@ public class EmbeddedService implements CoreService {
     private void associateViewConfig(String topicTypeUri, ViewConfiguration viewConfig) {
         for (TopicData topicData : viewConfig.getTopicData()) {
             Topic topic = createTopic(topicData, null);             // FIXME: clientContext=null
-            AssociationData assocData = new AssociationData("dm3.core.view_configuration");
+            AssociationData assocData = new AssociationData("dm3.core.association");
             assocData.addRole(new Role(topicTypeUri,  "dm3.core.topic_type"));
             assocData.addRole(new Role(topic.getId(), "dm3.core.view_config"));
             createAssociation(assocData, null);                     // FIXME: clientContext=null
@@ -1005,19 +997,6 @@ public class EmbeddedService implements CoreService {
         for (TopicData topicData : viewConfig.getTopicData()) {
             Topic topic = createTopic(topicData, null);             // FIXME: clientContext=null
             assocDefAssoc.addRole(new Role(topic.getId(), "dm3.core.view_config"));
-        }
-    }
-
-    // ---
-
-    /**
-     * Throws an exception if there is a topic with the given URI in the database.
-     *
-     * @param   uri     The URI to check. If null no check is performed.
-     */
-    private void checkUniqueness(String uri) {
-        if (!uri.equals("") && storage.topicExists("uri", new TopicValue(uri))) {
-            throw new RuntimeException("Topic with URI \"" + uri + "\" exists already");
         }
     }
 

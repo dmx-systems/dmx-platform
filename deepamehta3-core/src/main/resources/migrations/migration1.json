@@ -1,92 +1,94 @@
 {
     topic_types: [
         {
-            uri: "dm3.core.role_type",
-            value: "Role Type",
+            value:         "Role Type",
+            uri:           "dm3.core.role_type",
             data_type_uri: "dm3.core.text"
         },
         {
-            uri: "dm3.core.cardinality",
-            value: "Cardinality",
+            value:         "Cardinality",
+            uri:           "dm3.core.cardinality",
             data_type_uri: "dm3.core.text"
         }
     ],
 
     assoc_types: [
         {
-            uri: "dm3.core.association",
-            value: "Association"
+            value: "Association",
+            uri:   "dm3.core.association"
         },
         {
-            uri: "dm3.core.aggregation",
-            value: "Aggregation"
+            value: "Aggregation",
+            uri:   "dm3.core.aggregation"
         },
         {
-            uri: "dm3.core.composition",
-            value: "Composition"
+            value: "Composition",
+            uri:   "dm3.core.composition"
         },
 
         {
-            uri: "dm3.core.instantiation",
-            value: "Instantiation"
-        },
-        {
-            uri: "dm3.core.view_configuration",
-            value: "View Configuration"
+            value: "Instantiation",
+            uri:   "dm3.core.instantiation"
         }
     ],
 
     topics: [
         {
-            uri: "dm3.core.type",
-            value: "Type",
+            value:    "Type",
+            uri:      "dm3.core.type",
             type_uri: "dm3.core.role_type"
         },
         {
-            uri: "dm3.core.instance",
-            value: "Instance",
-            type_uri: "dm3.core.role_type"
-        },
-
-        {
-            uri: "dm3.core.whole_topic_type",
-            value: "Whole Topic Type",
-            type_uri: "dm3.core.role_type"
-        },
-        {
-            uri: "dm3.core.part_topic_type",
-            value: "Part Topic Type",
-            type_uri: "dm3.core.role_type"
-        },
-        {
-            uri: "dm3.core.whole_role_type",
-            value: "Whole Role Type",
-            type_uri: "dm3.core.role_type"
-        },
-        {
-            uri: "dm3.core.part_role_type",
-            value: "Part Role Type",
-            type_uri: "dm3.core.role_type"
-        },
-        {
-            uri: "dm3.core.whole_cardinality",
-            value: "Whole Cardinality",
-            type_uri: "dm3.core.role_type"
-        },
-        {
-            uri: "dm3.core.part_cardinality",
-            value: "Part Cardinality",
+            value:    "Instance",
+            uri:      "dm3.core.instance",
             type_uri: "dm3.core.role_type"
         },
 
         {
-            uri: "dm3.core.one",
-            value: "One",
+            value:    "Whole Topic Type",
+            uri:      "dm3.core.whole_topic_type",
+            type_uri: "dm3.core.role_type"
+        },
+        {
+            value:    "Part Topic Type",
+            uri:      "dm3.core.part_topic_type",
+            type_uri: "dm3.core.role_type"
+        },
+        {
+            value:    "Whole Role Type",
+            uri:      "dm3.core.whole_role_type",
+            type_uri: "dm3.core.role_type"
+        },
+        {
+            value:    "Part Role Type",
+            uri:      "dm3.core.part_role_type",
+            type_uri: "dm3.core.role_type"
+        },
+        {
+            value:    "Whole Cardinality",
+            uri:      "dm3.core.whole_cardinality",
+            type_uri: "dm3.core.role_type"
+        },
+        {
+            value:    "Part Cardinality",
+            uri:      "dm3.core.part_cardinality",
+            type_uri: "dm3.core.role_type"
+        },
+
+        {
+            value:    "View Configuration",
+            uri:      "dm3.core.view_config",
+            type_uri: "dm3.core.role_type"
+        },
+
+        {
+            value:    "One",
+            uri:      "dm3.core.one",
             type_uri: "dm3.core.cardinality"
         },
         {
-            uri: "dm3.core.many",
-            value: "Many",
+            value:    "Many",
+            uri:      "dm3.core.many",
             type_uri: "dm3.core.cardinality"
         }
     ]

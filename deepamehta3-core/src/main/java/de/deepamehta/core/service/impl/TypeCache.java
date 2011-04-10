@@ -105,8 +105,8 @@ class TypeCache {
 
     private ViewConfiguration fetchViewConfig(Topic topic) {
         // ### Note: storage low-level call used here ### explain
-        Set<Topic> topics = dms.getRelatedTopics(topic.getId(), "dm3.core.view_configuration",
-                                                                "dm3.core.topic_type", "dm3.core.view_config", true);
+        Set<Topic> topics = dms.getRelatedTopics(topic.getId(), "dm3.core.association", "dm3.core.topic_type",
+                                                                                        "dm3.core.view_config", true);
         return new ViewConfiguration(topics);
     }
 

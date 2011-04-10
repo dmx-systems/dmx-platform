@@ -7,6 +7,7 @@ import org.codehaus.jettison.json.JSONException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,14 +42,14 @@ public class TopicTypeData extends TopicData {
     public TopicTypeData(Topic typeTopic, String dataTypeUri, ViewConfiguration viewConfig) {
         super(typeTopic);
         this.dataTypeUri = dataTypeUri;
-        this.assocDefs = new HashMap();
+        this.assocDefs = new LinkedHashMap();
         this.viewConfig = viewConfig;
     }
 
     public TopicTypeData(String uri, String value, String dataTypeUri) {
         super(uri, new TopicValue(value), "dm3.core.topic_type");
         this.dataTypeUri = dataTypeUri;
-        this.assocDefs = new HashMap();
+        this.assocDefs = new LinkedHashMap();
         this.viewConfig = new ViewConfiguration();
     }
 
@@ -61,7 +62,7 @@ public class TopicTypeData extends TopicData {
             this.composite = null;
             //
             this.dataTypeUri = topicTypeData.getString("data_type_uri");
-            this.assocDefs = new HashMap();
+            this.assocDefs = new LinkedHashMap();
             this.viewConfig = new ViewConfiguration(topicTypeData);
             parseAssocDefs(topicTypeData);
         } catch (Exception e) {

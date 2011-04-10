@@ -35,8 +35,6 @@ public interface DeepaMehtaStorage {
      */
     Topic getTopic(String key, TopicValue value);
 
-    boolean topicExists(String key, TopicValue value);
-
     // Topic getTopic(String typeUri, String key, PropValue value);
 
     /**

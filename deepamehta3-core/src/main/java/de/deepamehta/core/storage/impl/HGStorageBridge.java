@@ -56,11 +56,6 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     }
 
     @Override
-    public boolean topicExists(String key, TopicValue value) {
-        return hg.getHyperNode(key, value.value()) != null;
-    }
-
-    @Override
     public Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri) {
         // FIXME: assocTypeUri not respected
         ConnectedHyperNode node = hg.getHyperNode(topicId).getConnectedHyperNode(myRoleTypeUri, othersRoleTypeUri);
@@ -101,6 +96,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public Topic createTopic(TopicData topicData) {
+        checkUniqueness(topicData.getUri());
         // 1) create node
         HyperNode node = hg.createHyperNode();
         node.setAttribute("uri", topicData.getUri(), IndexMode.KEY);
@@ -165,27 +161,9 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         hg.getHyperNode(0).setAttribute("core_migration_nr", migrationNr);
     }
 
-    // ----------------------------------------------------------------------------------------- Package Private Methods
+    // ------------------------------------------------------------------------------------------------- Private Methods
 
-    HyperNode lookupTopic(String uri) {
-        HyperNode topic = hg.getHyperNode("uri", uri);
-        if (topic == null) {
-            throw new RuntimeException("Topic \"" + uri + "\" not found");
-        }
-        return topic;
-    }
-
-    HyperNode lookupTopicType(String typeUri) {
-        HyperNode topicType = hg.getHyperNode("uri", typeUri);
-        if (topicType == null) {
-            throw new RuntimeException("Topic type \"" + typeUri + "\" not found");
-        }
-        return topicType;
-    }
-
-    // ---
-
-    Topic buildTopic(HyperNode node) {
+    private Topic buildTopic(HyperNode node) {
         if (node == null) {
             throw new IllegalArgumentException("Tried to build a Topic from a null HyperNode");
         }
@@ -194,7 +172,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
             getTopicTypeUri(node), null);   // composite=null
     }
 
-    Association buildAssociation(HyperEdge edge, String typeUri, Set<Role> roles) {
+    private Association buildAssociation(HyperEdge edge, String typeUri, Set<Role> roles) {
         if (edge == null) {
             throw new IllegalArgumentException("Tried to build an Association from a null HyperEdge");
         }
@@ -204,18 +182,65 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
+    private HyperNode lookupTopic(String uri) {
+        HyperNode topic = lookupHyperNode(uri);
+        if (topic == null) {
+            throw new RuntimeException("Topic \"" + uri + "\" not found");
+        }
+        return topic;
+    }
+
+    private HyperNode lookupTopicType(String topicTypeUri) {
+        HyperNode topicType = lookupHyperNode(topicTypeUri);
+        if (topicType == null) {
+            throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
+        }
+        return topicType;
+    }
+
+    private HyperNode lookupRoleType(String roleTypeUri) {
+        HyperNode roleType = lookupHyperNode(roleTypeUri);
+        if (roleType == null) {
+            throw new RuntimeException("Role type \"" + roleTypeUri + "\" not found");
+        }
+        return roleType;
+    }
+
+    // ---
+
+    /**
+     * Throws an exception if there is a topic with the given URI in the database.
+     * If an empty string is given no check is performed.
+     *
+     * @param   uri     The URI to check. Must not be null.
+     */
+    private void checkUniqueness(String uri) {
+        if (!uri.equals("") && lookupHyperNode(uri) != null) {
+            throw new RuntimeException("Topic with URI \"" + uri + "\" exists already");
+        }
+    }
+
+    private HyperNode lookupHyperNode(String uri) {
+        return hg.getHyperNode("uri", uri);
+    }
+
+    // ---
+
     /**
      * Determines the topic type of a hyper node.
      *
      * @return  The topic type's URI.
      */
-    String getTopicTypeUri(HyperNode node) {
+    private String getTopicTypeUri(HyperNode node) {
         return getTopicType(node).getString("uri");
     }
 
-    // ---
-
-    HyperNode getTopicType(HyperNode node) {
+    /**
+     * Determines the topic type of a hyper node.
+     *
+     * @return  The hyper node that represents the topic type.
+     */
+    private HyperNode getTopicType(HyperNode node) {
         ConnectedHyperNode typeNode = node.getConnectedHyperNode("dm3.core.instance", "dm3.core.type");
         if (typeNode == null) {
             throw new RuntimeException("Determining topic type failed (" + node + ")");
@@ -223,10 +248,12 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         return typeNode.getHyperNode();
     }
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
+    // ---
 
     private void addAssociationRole(HyperEdge edge, Role role) {
-        edge.addHyperNode(getRoleNode(role), role.getRoleTypeUri());
+        String roleTypeUri = role.getRoleTypeUri();
+        lookupRoleType(roleTypeUri);    // consistency check
+        edge.addHyperNode(getRoleNode(role), roleTypeUri);
     }
 
     private HyperNode getRoleNode(Role role) {
