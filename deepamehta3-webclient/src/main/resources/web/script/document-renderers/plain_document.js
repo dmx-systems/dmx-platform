@@ -26,53 +26,32 @@ function PlainDocument() {
 
     this.render_document = function(topic) {
 
+        // alert("render_document(): topic=" + JSON.stringify(topic));
         fields = {}            // key: field URI, value: renderer object
         var defined_relation_topics = []
 
         dm3c.empty_detail_panel()
-        render_fields(dm3c.type_cache.get(topic.type_uri))
-        render_relations()
+        render_fields("", dm3c.type_cache.get(topic.type_uri))
+        // ### render_relations()
         render_buttons(topic, "detail-panel-show")
 
-        function render_fields(topic_type) {
+        function render_fields(field_uri, topic_type, assoc_def) {
             if (topic_type.data_type_uri == "dm3.core.composite") {
+                var fields = {}
                 for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                    render_fields(dm3c.type_cache.get(assoc_def.part_topic_type_uri))
+                    var part_topic_type = dm3c.type_cache.get(assoc_def.part_topic_type_uri)
+                    var child_field_uri = field_uri + dm3c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
+                    var child_fields = render_fields(child_field_uri, part_topic_type, assoc_def)
+                    if (child_fields) {
+                        fields[assoc_def.uri] = child_fields
+                    }
                 }
+                return fields;
             } else {
-                js_renderer_class = "TextFieldRenderer"
-            }
-        }
-
-        function _render_fields() {
-            for (var i = 0, field; field = dm3c.type_cache.get(topic.type_uri).fields[i]; i++) {
-                if (!field.viewable) {
-                    continue
-                }
-                // create renderer
-                if (!field.js_renderer_class) {
-                    alert("WARNING (PlainDocument.render_document):\n\nField \"" + field.label +
-                        "\" has no field renderer.\n\nfield=" + JSON.stringify(field))
-                    continue
-                }
-                var rel_topics = related_topics(field)
-                fields[field.uri] = js.new_object(field.js_renderer_class, topic, field, rel_topics)
-                // render field
-                var field_value_div = $("<div>").addClass("field-value")
-                var html = trigger_renderer_hook(field, "render_field", field_value_div)
-                if (html !== undefined) {
-                    $("#detail-panel").append(field_value_div.append(html))
-                } else {
-                    alert("WARNING (PlainDocument.render_document):\n\nRenderer for field \"" + field.label + "\" " +
-                        "returned no field.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(field))
-                }
-            }
-
-            function related_topics(field) {
-                if (field.data_type == "reference") {
-                    var topics = get_reference_field_content(topic.id, field)
-                    defined_relation_topics = defined_relation_topics.concat(topics)
-                    return topics
+                var field = new Field(field_uri, topic, topic_type, assoc_def)
+                if (field.viewable) {
+                    field.render_field()
+                    return field
                 }
             }
         }
@@ -228,7 +207,7 @@ function PlainDocument() {
     function Field(uri, topic, topic_type, assoc_def) {
 
         this.editable         = get_view_config("editable")
-        var viewable          = get_view_config("viewable")
+        this.viewable         = get_view_config("viewable")
         var js_renderer_class = get_view_config("js_renderer_class")
         this.rows = get_view_config("rows")
         this.uri = uri
@@ -238,6 +217,34 @@ function PlainDocument() {
             return dm3c.get_view_config(assoc_def, setting) || dm3c.get_view_config(topic_type, setting)
         }
 
+        this.render_field = function() {
+            // create renderer
+            if (!js_renderer_class) {
+                alert("WARNING (PlainDocument.render_document):\n\nField \"" + uri +
+                    "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
+                return
+            }
+            // ### var rel_topics = related_topics(field)
+            renderer = js.new_object(js_renderer_class, topic, this /*, rel_topics */)
+            // render field
+            var field_value_div = $("<div>").addClass("field-value")
+            var html = trigger_renderer_hook("render_field", field_value_div)
+            if (html !== undefined) {
+                $("#detail-panel").append(field_value_div.append(html))
+            } else {
+                alert("WARNING (PlainDocument.render_document):\n\nRenderer for field \"" + uri + "\" " +
+                    "returned no field.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
+            }
+
+            function related_topics(field) {
+                if (field.data_type == "reference") {
+                    var topics = get_reference_field_content(topic.id, field)
+                    defined_relation_topics = defined_relation_topics.concat(topics)
+                    return topics
+                }
+            }
+        }
+
         this.render_form_element = function() {
             // create renderer
             if (!js_renderer_class) {
@@ -245,7 +252,7 @@ function PlainDocument() {
                     "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
                 return
             }
-            // var rel_topics = related_topics(field)
+            // ### var rel_topics = related_topics(field)
             renderer = js.new_object(js_renderer_class, topic, this /*, rel_topics */)
             // render field label
             dm3c.render.field_label(topic_type.value)
