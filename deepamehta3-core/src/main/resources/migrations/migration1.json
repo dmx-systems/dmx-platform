@@ -14,6 +14,11 @@
 
     assoc_types: [
         {
+            value: "Instantiation",
+            uri:   "dm3.core.instantiation"
+        },
+
+        {
             value: "Association",
             uri:   "dm3.core.association"
         },
@@ -24,11 +29,6 @@
         {
             value: "Composition",
             uri:   "dm3.core.composition"
-        },
-
-        {
-            value: "Instantiation",
-            uri:   "dm3.core.instantiation"
         }
     ],
 
@@ -75,6 +75,22 @@
             type_uri: "dm3.core.role_type"
         },
 
+        {
+            value:    "Predecessor",
+            uri:      "dm3.core.predecessor",
+            type_uri: "dm3.core.role_type"
+        },
+        {
+            value:    "Successor",
+            uri:      "dm3.core.successor",
+            type_uri: "dm3.core.role_type"
+        },
+
+        {
+            value:    "First Association Definition",
+            uri:      "dm3.core.first_assoc_def",
+            type_uri: "dm3.core.role_type"
+        },
         {
             value:    "View Configuration",
             uri:      "dm3.core.view_config",

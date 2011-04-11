@@ -546,7 +546,7 @@ public class EmbeddedService implements CoreService {
             //
             String typeUri = topicTypeData.getUri();
             associateDataType(typeUri, topicTypeData.getDataTypeUri());
-            associateTopicTypes(topicTypeData.getAssocDefs());
+            associateTopicTypes(typeUri, topicTypeData.getAssocDefs());
             associateViewConfig(typeUri, topicTypeData.getViewConfig());
             //
             TopicType topicType = typeCache.get(typeUri);
@@ -976,12 +976,42 @@ public class EmbeddedService implements CoreService {
         createAssociation(assocData, null);                         // FIXME: clientContext=null
     }
 
-    private void associateTopicTypes(Map<String, AssociationDefinition> assocDefs) {
+    private void associateTopicTypes(String topicTypeUri, Map<String, AssociationDefinition> assocDefs) {
+        Association lastAssocDef = null;
         for (AssociationDefinition assocDef : assocDefs.values()) {
-            Association assoc = createAssociation(assocDef.toAssociationData(), null);  // FIXME: clientContext=null
-            associateViewConfig(assoc, assocDef.getViewConfig());
+            lastAssocDef = associateTopicType(topicTypeUri, assocDef, lastAssocDef);
         }
     }
+
+    private Association associateTopicType(String topicTypeUri, AssociationDefinition assocDef,
+                                                                Association lastAssocDef) {
+        try {
+            Association assoc = createAssociation(assocDef.toAssociationData(), null);  // FIXME: clientContext=null
+            putInSequence(topicTypeUri, assoc, lastAssocDef);
+            associateViewConfig(assoc, assocDef.getViewConfig());
+            return assoc;
+        } catch (Exception e) {
+            throw new RuntimeException("Associating topic type \"" + assocDef.getPartTopicTypeUri() + "\" failed", e);
+        }
+    }
+
+    private void putInSequence(String topicTypeUri, Association assocDef, Association lastAssocDef) {
+        if (lastAssocDef == null) {
+            // begin sequence
+            AssociationData assocData = new AssociationData("dm3.core.association");
+            assocData.addRole(new Role(topicTypeUri,     "dm3.core.topic_type"));
+            assocData.addRole(new Role(assocDef.getId(), "dm3.core.first_assoc_def"));
+            createAssociation(assocData, null);                     // FIXME: clientContext=null
+        } else {
+            // continue sequence
+            AssociationData assocData = new AssociationData("dm3.core.sequence");
+            assocData.addRole(new Role(lastAssocDef.getId(), "dm3.core.predecessor"));
+            assocData.addRole(new Role(assocDef.getId(),     "dm3.core.successor"));
+            createAssociation(assocData, null);                     // FIXME: clientContext=null
+        }
+    }
+
+    // ---
 
     private void associateViewConfig(String topicTypeUri, ViewConfiguration viewConfig) {
         for (TopicData topicData : viewConfig.getTopicData()) {
@@ -993,10 +1023,10 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    private void associateViewConfig(Association assocDefAssoc, ViewConfiguration viewConfig) {
+    private void associateViewConfig(Association assocDef, ViewConfiguration viewConfig) {
         for (TopicData topicData : viewConfig.getTopicData()) {
             Topic topic = createTopic(topicData, null);             // FIXME: clientContext=null
-            assocDefAssoc.addRole(new Role(topic.getId(), "dm3.core.view_config"));
+            assocDef.addRole(new Role(topic.getId(), "dm3.core.view_config"));
         }
     }
 

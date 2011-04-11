@@ -131,7 +131,7 @@ public class TopicTypeData extends TopicData {
     @Override
     public String toString() {
         return "topic type data (id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
-            "\", dataTypeUri=\"" + dataTypeUri + "\",\nassocDefs=" + assocDefs + ",\ntopic type " + viewConfig + ")";
+            "\", dataTypeUri=\"" + dataTypeUri + "\", assocDefs=" + assocDefs + ",\ntopic type " + viewConfig + ")";
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

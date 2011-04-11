@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 /**
  * Definition of an association between 2 topic types -- part of DeepaMehta's type system,
- * like an association in a class diagram. Used to represent both, an aggregation and a composition.
+ * like an association in a class diagram. Used to represent both, aggregations and compositions.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
@@ -23,14 +23,15 @@ public class AssociationDefinition {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String uri;                     // value might be derived (there's not necessarily a topic with that uri)
+    private long id;                        // ID of the underlying association
+    private String uri;                     // not persistent, value is derived from other values, there is no setter
     private String assocTypeUri;
 
     private String wholeTopicTypeUri;
     private String  partTopicTypeUri;
 
-    private String wholeRoleTypeUri;        // value might be derived (there's not necessarily a topic with that uri)
-    private String  partRoleTypeUri;        // value might be derived (there's not necessarily a topic with that uri)
+    private String wholeRoleTypeUri;        // value might be derived, there is not necessarily such a role type topic
+    private String  partRoleTypeUri;        // value might be derived, there is not necessarily such a role type topic
 
     private String wholeCardinalityUri;
     private String  partCardinalityUri;
@@ -41,26 +42,30 @@ public class AssociationDefinition {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public AssociationDefinition(String wholeTopicTypeUri, String partTopicTypeUri,
-                                 String wholeRoleTypeUri,  String partRoleTypeUri) {
+    public AssociationDefinition(long id, String wholeTopicTypeUri, String partTopicTypeUri,
+                                          String wholeRoleTypeUri,  String partRoleTypeUri) {
+        this.id = id;
+        //
         this.wholeTopicTypeUri = wholeTopicTypeUri;
          this.partTopicTypeUri =  partTopicTypeUri;
         // set default role types
         this.wholeRoleTypeUri = wholeRoleTypeUri != null ? wholeRoleTypeUri : wholeTopicTypeUri;
          this.partRoleTypeUri =  partRoleTypeUri != null ? partRoleTypeUri  : partTopicTypeUri;
-        // set default uri
+        // derive uri
         this.uri = this.partRoleTypeUri;
     }
 
     public AssociationDefinition(JSONObject assocDef, String wholeTopicTypeUri) {
         try {
+            this.id = -1;
+            //
             this.wholeTopicTypeUri = wholeTopicTypeUri;
              this.partTopicTypeUri = assocDef.getString("part_topic_type_uri");
             //
             this.wholeRoleTypeUri = assocDef.optString("whole_role_type_uri", wholeTopicTypeUri);
              this.partRoleTypeUri = assocDef.optString( "part_role_type_uri",  partTopicTypeUri);
             //
-            this.uri = assocDef.optString("uri", partRoleTypeUri);  // FIXME: make uri purely derived (not manual set)?
+            this.uri = this.partRoleTypeUri;
             this.assocTypeUri = assocDef.getString("assoc_type_uri");
             //
             if (!assocDef.has("whole_cardinality_uri") && !assocTypeUri.equals("dm3.core.composition")) {
@@ -76,6 +81,10 @@ public class AssociationDefinition {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    public long getId() {
+        return id;
+    }
 
     public String getUri() {
         return uri;
@@ -115,10 +124,6 @@ public class AssociationDefinition {
 
     // ---
 
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
     public void setAssocTypeUri(String assocTypeUri) {
         this.assocTypeUri = assocTypeUri;
     }
@@ -151,6 +156,7 @@ public class AssociationDefinition {
     public JSONObject toJSON() {
         try {
             JSONObject o = new JSONObject();
+            o.put("id", id);
             o.put("uri", uri);
             o.put("assoc_type_uri", assocTypeUri);
             o.put("whole_topic_type_uri", wholeTopicTypeUri);
@@ -170,9 +176,11 @@ public class AssociationDefinition {
 
     @Override
     public String toString() {
-        return "\n    association definition (uri=\"" + uri + "\", assocTypeUri=\"" + assocTypeUri + "\")\n        " +
-            "whole: (type=\"" + wholeTopicTypeUri + "\", role=\"" + wholeRoleTypeUri + "\", cardinality=\"" +
-            wholeCardinalityUri + "\")\n        part: (type=\"" + partTopicTypeUri + "\", role=\"" + partRoleTypeUri +
-            "\", cardinality=\"" + partCardinalityUri + "\")\n        association definition " + viewConfig;
+        return "\n    association definition (id=" + id + ", uri=\"" + uri + "\", assocTypeUri=\"" + assocTypeUri +
+            "\")\n        whole: (type=\"" + wholeTopicTypeUri + "\", role=\"" + wholeRoleTypeUri +
+            "\", cardinality=\"" + wholeCardinalityUri +
+            "\")\n        part: (type=\"" + partTopicTypeUri + "\", role=\"" + partRoleTypeUri +
+            "\", cardinality=\"" + partCardinalityUri +
+            "\")\n        association definition " + viewConfig;
     }
 }
