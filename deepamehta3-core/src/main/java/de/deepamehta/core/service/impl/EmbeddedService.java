@@ -3,6 +3,7 @@ package de.deepamehta.core.service.impl;
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.AssociationDefinition;
+import de.deepamehta.core.model.AssociationRole;
 import de.deepamehta.core.model.AssociationTypeData;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
@@ -10,12 +11,12 @@ import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.MetaTypeData;
 import de.deepamehta.core.model.PluginInfo;
-import de.deepamehta.core.model.Role;
-import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeData;
+import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.ViewConfiguration;
 import de.deepamehta.core.service.CoreService;
@@ -806,8 +807,8 @@ public class EmbeddedService implements CoreService {
                     setChildTopic(childTopic);
                     // associate child topic
                     AssociationData assocData = new AssociationData(assocDef.getAssocTypeUri());
-                    assocData.addRole(new Role(parentTopic.getId(), assocDef.getWholeRoleTypeUri()));
-                    assocData.addRole(new Role(childTopic.getId(), assocDef.getPartRoleTypeUri()));
+                    assocData.addTopicRole(new TopicRole(parentTopic.getId(), assocDef.getWholeRoleTypeUri()));
+                    assocData.addTopicRole(new TopicRole(childTopic.getId(), assocDef.getPartRoleTypeUri()));
                     createAssociation(assocData, null);     // FIXME: clientContext=null
                 }
             }
@@ -838,14 +839,28 @@ public class EmbeddedService implements CoreService {
 
     // === Association API Delegates ===
 
-    void addAssociationRole(long assocId, Role role) {
+    void addTopicToAssociation(long assocId, TopicRole topicRole) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.addAssociationRole(assocId, role);
+            storage.addTopicToAssociation(assocId, topicRole);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Adding role to associatin " + assocId + " failed (" + role + ")", e);
+            throw new RuntimeException("Adding topic to association " + assocId + " failed (" + topicRole + ")", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    void addAssociationToAssociation(long assocId, AssociationRole assocRole) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            storage.addAssociationToAssociation(assocId, assocRole);
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Adding association to association " + assocId + " failed (" + assocRole +
+                ")", e);
         } finally {
             tx.finish();
         }
@@ -971,8 +986,8 @@ public class EmbeddedService implements CoreService {
 
     private void associateDataType(String topicTypeUri, String dataTypeUri) {
         AssociationData assocData = new AssociationData("dm3.core.association");
-        assocData.addRole(new Role(topicTypeUri, "dm3.core.topic_type"));
-        assocData.addRole(new Role(dataTypeUri,  "dm3.core.data_type"));
+        assocData.addTopicRole(new TopicRole(topicTypeUri, "dm3.core.topic_type"));
+        assocData.addTopicRole(new TopicRole(dataTypeUri,  "dm3.core.data_type"));
         createAssociation(assocData, null);                         // FIXME: clientContext=null
     }
 
@@ -991,7 +1006,8 @@ public class EmbeddedService implements CoreService {
             associateViewConfig(assoc, assocDef.getViewConfig());
             return assoc;
         } catch (Exception e) {
-            throw new RuntimeException("Associating topic type \"" + assocDef.getPartTopicTypeUri() + "\" failed", e);
+            throw new RuntimeException("Associating topic type \"" + topicTypeUri +
+                "\" with topic type \"" + assocDef.getPartTopicTypeUri() + "\" failed", e);
         }
     }
 
@@ -999,14 +1015,14 @@ public class EmbeddedService implements CoreService {
         if (lastAssocDef == null) {
             // begin sequence
             AssociationData assocData = new AssociationData("dm3.core.association");
-            assocData.addRole(new Role(topicTypeUri,     "dm3.core.topic_type"));
-            assocData.addRole(new Role(assocDef.getId(), "dm3.core.first_assoc_def"));
+            assocData.addTopicRole(new TopicRole(topicTypeUri, "dm3.core.topic_type"));
+            assocData.addAssociationRole(new AssociationRole(assocDef.getId(), "dm3.core.first_assoc_def"));
             createAssociation(assocData, null);                     // FIXME: clientContext=null
         } else {
             // continue sequence
             AssociationData assocData = new AssociationData("dm3.core.sequence");
-            assocData.addRole(new Role(lastAssocDef.getId(), "dm3.core.predecessor"));
-            assocData.addRole(new Role(assocDef.getId(),     "dm3.core.successor"));
+            assocData.addAssociationRole(new AssociationRole(lastAssocDef.getId(), "dm3.core.predecessor"));
+            assocData.addAssociationRole(new AssociationRole(assocDef.getId(),     "dm3.core.successor"));
             createAssociation(assocData, null);                     // FIXME: clientContext=null
         }
     }
@@ -1017,8 +1033,8 @@ public class EmbeddedService implements CoreService {
         for (TopicData topicData : viewConfig.getTopicData()) {
             Topic topic = createTopic(topicData, null);             // FIXME: clientContext=null
             AssociationData assocData = new AssociationData("dm3.core.association");
-            assocData.addRole(new Role(topicTypeUri,  "dm3.core.topic_type"));
-            assocData.addRole(new Role(topic.getId(), "dm3.core.view_config"));
+            assocData.addTopicRole(new TopicRole(topicTypeUri,  "dm3.core.topic_type"));
+            assocData.addTopicRole(new TopicRole(topic.getId(), "dm3.core.view_config"));
             createAssociation(assocData, null);                     // FIXME: clientContext=null
         }
     }
@@ -1026,7 +1042,7 @@ public class EmbeddedService implements CoreService {
     private void associateViewConfig(Association assocDef, ViewConfiguration viewConfig) {
         for (TopicData topicData : viewConfig.getTopicData()) {
             Topic topic = createTopic(topicData, null);             // FIXME: clientContext=null
-            assocDef.addRole(new Role(topic.getId(), "dm3.core.view_config"));
+            assocDef.addTopicRole(new TopicRole(topic.getId(), "dm3.core.view_config"));
         }
     }
 

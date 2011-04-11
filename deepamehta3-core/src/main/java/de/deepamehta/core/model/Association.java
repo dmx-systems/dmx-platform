@@ -23,7 +23,11 @@ public interface Association {
 
     String getTypeUri();
 
-    Set<Role> getRoles();
+    // ---
+
+    Set<TopicRole> getTopicRoles();
+
+    Set<AssociationRole> getAssociationRoles();
 
     // ---
 
@@ -33,5 +37,7 @@ public interface Association {
 
     // ---
 
-    void addRole(Role role);
+    void addTopicRole(TopicRole topicRole);
+
+    void addAssociationRole(AssociationRole assocRole);
 }

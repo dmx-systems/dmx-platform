@@ -2,7 +2,6 @@ package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationDefinition;
-import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicTypeData;
@@ -116,19 +115,25 @@ class TypeCache {
     // ---
 
     private List<Long> fetchSequenceIds(Topic typeTopic) {
-        // Note: storage low-level call used here ### should dms.getRelatedTopic() get a "includeComposite" parameter?
-        // Note: the type topic is not attached to the service
-        List<Long> sequenceIds = new ArrayList();
-        Topic assocDef = dms.storage.getRelatedTopic(typeTopic.getId(), "dm3.core.association",
-                                                           "dm3.core.topic_type", "dm3.core.first_assoc_def");
-        if (assocDef != null) {
-            sequenceIds.add(assocDef.getId());
-            while ((assocDef = dms.storage.getRelatedTopic(assocDef.getId(), "dm3.core.sequence",
-                                                           "dm3.core.predecessor", "dm3.core.successor")) != null) {
+        try {
+            // Note: storage low-level call used here
+            // Note: the type topic is not attached to the service
+            // ### should dms.getRelatedTopic() get a "includeComposite" parameter?
+            List<Long> sequenceIds = new ArrayList();
+            Topic assocDef = dms.storage.getRelatedTopic(typeTopic.getId(), "dm3.core.association",
+                                                               "dm3.core.topic_type", "dm3.core.first_assoc_def");
+            if (assocDef != null) {
                 sequenceIds.add(assocDef.getId());
+                while ((assocDef = dms.storage.getRelatedTopic(assocDef.getId(), "dm3.core.sequence",
+                                                               "dm3.core.predecessor", "dm3.core.successor")) != null) {
+                    sequenceIds.add(assocDef.getId());
+                }
             }
+            return sequenceIds;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching sequence IDs for topic type \"" + typeTopic.getUri() +
+                "\" failed", e);
         }
-        return sequenceIds;
     }
 
     private AttachedTopicType buildAttachedTopicType(Topic typeTopic, Map<Long, AssociationDefinition> assocDefs,

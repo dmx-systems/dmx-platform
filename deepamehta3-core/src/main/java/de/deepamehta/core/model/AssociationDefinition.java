@@ -144,12 +144,12 @@ public class AssociationDefinition {
 
     public AssociationData toAssociationData() {
         AssociationData assocData = new AssociationData(getAssocTypeUri());
-        assocData.addRole(new Role(getWholeTopicTypeUri(),   "dm3.core.whole_topic_type"));
-        assocData.addRole(new Role( getPartTopicTypeUri(),   "dm3.core.part_topic_type"));
-        assocData.addRole(new Role(getWholeRoleTypeUri(),    "dm3.core.whole_role_type"));
-        assocData.addRole(new Role( getPartRoleTypeUri(),    "dm3.core.part_role_type"));
-        assocData.addRole(new Role(getWholeCardinalityUri(), "dm3.core.whole_cardinality"));
-        assocData.addRole(new Role( getPartCardinalityUri(), "dm3.core.part_cardinality"));
+        assocData.addTopicRole(new TopicRole(getWholeTopicTypeUri(),   "dm3.core.whole_topic_type"));
+        assocData.addTopicRole(new TopicRole( getPartTopicTypeUri(),   "dm3.core.part_topic_type"));
+        assocData.addTopicRole(new TopicRole(getWholeRoleTypeUri(),    "dm3.core.whole_role_type"));
+        assocData.addTopicRole(new TopicRole( getPartRoleTypeUri(),    "dm3.core.part_role_type"));
+        assocData.addTopicRole(new TopicRole(getWholeCardinalityUri(), "dm3.core.whole_cardinality"));
+        assocData.addTopicRole(new TopicRole( getPartCardinalityUri(), "dm3.core.part_cardinality"));
         return assocData;
     }
 

@@ -2,9 +2,10 @@ package de.deepamehta.core.storage;
 
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationData;
-import de.deepamehta.core.model.Role;
+import de.deepamehta.core.model.AssociationRole;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicValue;
 
 import java.util.Map;
@@ -61,11 +62,18 @@ public interface DeepaMehtaStorage {
     //                                                   List<String> includeRelTypes,
     //                                                   List<String> excludeRelTypes);
 
-    Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleType, String othersRoleType);
+    Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri);
 
-    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleType, String othersRoleType);
+    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri);
 
-    Set<Association> getAssociations(long topicId, String myRoleType);
+    // ---
+
+    Set<Association> getAssociations(long topicId, String myRoleTypeUri);
+
+    Association getRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                         String othersRoleTypeUri);
+
+    // ---
 
     void setTopicValue(long topicId, TopicValue value);
 
@@ -109,7 +117,9 @@ public interface DeepaMehtaStorage {
 
     Association createAssociation(AssociationData assoc);
 
-    void addAssociationRole(long assocId, Role role);
+    void addTopicToAssociation(long assocId, TopicRole topicRole);
+
+    void addAssociationToAssociation(long assocId, AssociationRole assocRole);
 
     // void setRelationProperties(long id, Properties properties);
 

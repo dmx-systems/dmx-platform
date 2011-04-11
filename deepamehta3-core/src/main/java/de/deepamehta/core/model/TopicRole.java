@@ -10,7 +10,7 @@ import java.util.Map;
 
 
 
-public class Role {
+public class TopicRole {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -22,25 +22,25 @@ public class Role {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public Role(long topicId, String roleTypeUri) {
+    public TopicRole(long topicId, String roleTypeUri) {
         this.topicId = topicId;
         this.roleTypeUri = roleTypeUri;
         this.topicIdentifiedById = true;
     }
 
-    public Role(String topicUri, String roleTypeUri) {
+    public TopicRole(String topicUri, String roleTypeUri) {
         this.topicUri = topicUri;
         this.roleTypeUri = roleTypeUri;
         this.topicIdentifiedById = false;
     }
 
-    public Role(JSONObject role) {
+    public TopicRole(JSONObject topicRole) {
         try {
-            this.topicUri = role.getString("topic");
-            this.roleTypeUri = role.getString("role_type");
+            this.topicUri = topicRole.getString("topic_uri");
+            this.roleTypeUri = topicRole.getString("role_type_uri");
             this.topicIdentifiedById = false;
         } catch (Exception e) {
-            throw new RuntimeException("Parsing Role failed (JSONObject=" + role + ")", e);
+            throw new RuntimeException("Parsing TopicRole failed (JSONObject=" + topicRole + ")", e);
         }
     }
 
@@ -66,7 +66,7 @@ public class Role {
 
     @Override
     public String toString() {
-        return "\n        role (roleTypeUri=\"" + roleTypeUri + "\", topicId=" + topicId +
+        return "\n        topic role (roleTypeUri=\"" + roleTypeUri + "\", topicId=" + topicId +
             ", topicUri=\"" + topicUri + "\", topicIdentifiedById=" + topicIdentifiedById + ")";
     }
 }

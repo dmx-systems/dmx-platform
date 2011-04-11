@@ -2,8 +2,9 @@ package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationData;
-import de.deepamehta.core.model.Role;
+import de.deepamehta.core.model.AssociationRole;
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicRole;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -49,9 +50,9 @@ class AttachedAssociation extends AssociationData implements Association {
     @Override
     public Set<Topic> getTopics(String roleTypeUri) {
         Set<Topic> topics = new HashSet();
-        for (Role role : getRoles()) {
-            if (role.getRoleTypeUri().equals(roleTypeUri)) {
-                topics.add(dms.getTopic(role.getTopicId(), null));
+        for (TopicRole topicRole : getTopicRoles()) {
+            if (topicRole.getRoleTypeUri().equals(roleTypeUri)) {
+                topics.add(dms.getTopic(topicRole.getTopicId(), null));
             }
         }
         return topics;
@@ -60,10 +61,18 @@ class AttachedAssociation extends AssociationData implements Association {
     // ---
 
     @Override
-    public void addRole(Role role) {
+    public void addTopicRole(TopicRole topicRole) {
         // update memory
-        super.addRole(role);
+        super.addTopicRole(topicRole);
         // update DB
-        dms.addAssociationRole(getId(), role);
+        dms.addTopicToAssociation(getId(), topicRole);
+    }
+
+    @Override
+    public void addAssociationRole(AssociationRole assocRole) {
+        // update memory
+        super.addAssociationRole(assocRole);
+        // update DB
+        dms.addAssociationToAssociation(getId(), assocRole);
     }
 }

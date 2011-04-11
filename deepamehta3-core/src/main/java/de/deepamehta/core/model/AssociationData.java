@@ -23,7 +23,9 @@ public class AssociationData {
 
     private long id;
     private String typeUri;
-    private Set<Role> roles;
+
+    private Set<TopicRole>       topicRoles;
+    private Set<AssociationRole> assocRoles;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -32,30 +34,32 @@ public class AssociationData {
     }
 
     public AssociationData(long id, String typeUri) {
-        this(id, typeUri, new HashSet());
+        this(id, typeUri, new HashSet(), new HashSet());
     }
 
-    public AssociationData(long id, String typeUri, Set<Role> roles) {
+    public AssociationData(long id, String typeUri, Set<TopicRole> topicRoles, Set<AssociationRole> assocRoles) {
         this.id = id;
         this.typeUri = typeUri;
-        this.roles = roles;
+        this.topicRoles = topicRoles;
+        this.assocRoles = assocRoles;
     }
 
     public AssociationData(Association assoc) {
-        this(assoc.getId(), assoc.getTypeUri(), assoc.getRoles());
+        this(assoc.getId(), assoc.getTypeUri(), assoc.getTopicRoles(), assoc.getAssociationRoles());
     }
 
-    public AssociationData(JSONObject assoc) {
+    public AssociationData(JSONObject assocData) {
         try {
             this.id = -1;
-            this.typeUri = assoc.getString("type_uri");
-            this.roles = new HashSet();
-            JSONArray topics = assoc.getJSONArray("topics");
-            for (int i = 0; i < topics.length(); i++) {
-                roles.add(new Role(topics.getJSONObject(i)));
+            this.typeUri = assocData.getString("type_uri");
+            this.topicRoles = new HashSet();
+            JSONArray topicRoles = assocData.getJSONArray("topic_roles");
+            for (int i = 0; i < topicRoles.length(); i++) {
+                this.topicRoles.add(new TopicRole(topicRoles.getJSONObject(i)));
             }
+            // FIXME: init assoc roles
         } catch (Exception e) {
-            throw new RuntimeException("Parsing AssociationData failed (JSONObject=" + assoc + ")", e);
+            throw new RuntimeException("Parsing AssociationData failed (JSONObject=" + assocData + ")", e);
         }
     }
 
@@ -69,8 +73,14 @@ public class AssociationData {
         return typeUri;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    // ---
+
+    public Set<TopicRole> getTopicRoles() {
+        return topicRoles;
+    }
+
+    public Set<AssociationRole> getAssociationRoles() {
+        return assocRoles;
     }
 
     // ---
@@ -85,8 +95,12 @@ public class AssociationData {
 
     // ---
 
-    public void addRole(Role role) {
-        roles.add(role);
+    public void addTopicRole(TopicRole topicRole) {
+        topicRoles.add(topicRole);
+    }
+
+    public void addAssociationRole(AssociationRole assocRole) {
+        assocRoles.add(assocRole);
     }
 
     /* public PropValue getProperty(String key) {
@@ -127,6 +141,7 @@ public class AssociationData {
 
     @Override
     public String toString() {
-        return "association data (id=" + id + ", typeUri=\"" + typeUri + "\", roles=" + roles + ")";
+        return "association data (id=" + id + ", typeUri=\"" + typeUri +
+            "\", topicRoles=" + topicRoles + ", assocRoles=" + assocRoles + ")";
     }
 }
