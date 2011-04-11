@@ -5,21 +5,20 @@ import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.service.Plugin;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-
 import java.awt.Desktop;
+import java.net.InetAddress;
 import java.net.URI;
-import java.util.HashMap;
+import java.net.UnknownHostException;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 
 
 
@@ -28,13 +27,35 @@ import java.util.logging.Logger;
 @Produces("application/json")
 public class ClientPlugin extends Plugin {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    public static final String CLIENT_INDEX_HTML = "/de.deepamehta.3-client/index.html";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
+    private boolean webclientUrlOpened = false;
+
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    public String getWebclientUrl() {
 
+        String port = System.getProperty("org.osgi.service.http.port");
+        if(port == null ) {
+            port = "8080"; // default
+        }
+
+        String host = "localhost";
+        try {
+            host = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+
+        return  "http://" + host + ":" + port + CLIENT_INDEX_HTML;
+    }
 
     // **************************************************
     // *** Core Hooks (called from DeepaMehta 3 Core) ***
@@ -44,17 +65,17 @@ public class ClientPlugin extends Plugin {
 
     @Override
     public void allPluginsReadyHook() {
-        String webclientUrl = null;
-        try {
-            String port = System.getProperty("org.osgi.service.http.port");
-            webclientUrl = "http://localhost:" + port + "/de.deepamehta.3-client/index.html";
-            logger.info("### Launching webclient (" + webclientUrl + ")");
-            //
-            Desktop.getDesktop().browse(new URI(webclientUrl));
-            //
-        } catch (Exception e) {
-            logger.warning("### Webclient can't be launched automatically (" + e + ")");
-            logger.info("### Please launch webclient manually: " + webclientUrl);
+        if(webclientUrlOpened == false) {
+            String webclientUrl = getWebclientUrl();
+
+            try {
+                logger.info("### Launching webclient (" + webclientUrl + ")");
+                Desktop.getDesktop().browse(new URI(webclientUrl));
+                webclientUrlOpened = true;
+            } catch (Exception e) {
+                logger.warning("### Webclient can't be launched automatically (" + e + ")");
+                logger.info("### Please launch webclient manually: " + webclientUrl);
+            }
         }
     }
 
