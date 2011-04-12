@@ -70,8 +70,8 @@ public interface DeepaMehtaStorage {
 
     Set<Association> getAssociations(long topicId, String myRoleTypeUri);
 
-    Association getRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                         String othersRoleTypeUri);
+    Association getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                              String othersRoleTypeUri);
 
     // ---
 
@@ -114,6 +114,11 @@ public interface DeepaMehtaStorage {
      *                      is expected to be directed <i>from</i> source topic <i>to</i> destination topic.
      */
     // List<Relation> getRelations(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
+
+    Association getAssociationRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                                                    String othersRoleTypeUri);
+
+    // ---
 
     Association createAssociation(AssociationData assoc);
 

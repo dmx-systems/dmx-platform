@@ -19,6 +19,14 @@ import java.util.logging.Logger;
 
 
 
+/**
+ * A memory-cache for topic type definitions.
+ * <p>
+ * Types are accessed by the {@link get} method. They are lazy-loaded from the DB.
+ * <p>
+ * This class is internally used by the {@link EmbeddedService}. The plugin developer accesses topic types via the
+ * {@link de.deepamehta.core.service.CoreService#getTopicType} core service call.
+ */
 class TypeCache {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -74,8 +82,12 @@ class TypeCache {
             throw new RuntimeException("Graph inconsistency: there are " + assocDefs.size() + " association " +
                 "definitions but sequence length is " + sequenceIds.size());
         }
+        // build topic type
+        TopicTypeData topicTypeData = new TopicTypeData(typeTopic, fetchDataTypeUri(typeTopic),
+                                                                   fetchViewConfig(typeTopic));
+        sortAssociationDefinitions(topicTypeData, assocDefs, sequenceIds);
         //
-        return buildAttachedTopicType(typeTopic, assocDefs, sequenceIds);
+        return new AttachedTopicType(topicTypeData, dms);
     }
 
     // ---
@@ -120,11 +132,11 @@ class TypeCache {
             // Note: the type topic is not attached to the service
             // ### should dms.getRelatedTopic() get a "includeComposite" parameter?
             List<Long> sequenceIds = new ArrayList();
-            Topic assocDef = dms.storage.getRelatedTopic(typeTopic.getId(), "dm3.core.association",
+            Association assocDef = dms.storage.getTopicRelatedAssociation(typeTopic.getId(), "dm3.core.association",
                                                                "dm3.core.topic_type", "dm3.core.first_assoc_def");
             if (assocDef != null) {
                 sequenceIds.add(assocDef.getId());
-                while ((assocDef = dms.storage.getRelatedTopic(assocDef.getId(), "dm3.core.sequence",
+                while ((assocDef = dms.storage.getAssociationRelatedAssociation(assocDef.getId(), "dm3.core.sequence",
                                                                "dm3.core.predecessor", "dm3.core.successor")) != null) {
                     sequenceIds.add(assocDef.getId());
                 }
@@ -136,10 +148,8 @@ class TypeCache {
         }
     }
 
-    private AttachedTopicType buildAttachedTopicType(Topic typeTopic, Map<Long, AssociationDefinition> assocDefs,
-                                                                                            List<Long> sequenceIds) {
-        TopicTypeData topicTypeData = new TopicTypeData(typeTopic, fetchDataTypeUri(typeTopic),
-                                                                   fetchViewConfig(typeTopic));
+    private void sortAssociationDefinitions(TopicTypeData topicTypeData, Map<Long, AssociationDefinition> assocDefs,
+                                                                         List<Long> sequenceIds) {
         for (long assocDefId : sequenceIds) {
             AssociationDefinition assocDef = assocDefs.get(assocDefId);
             // sanity check
@@ -150,8 +160,6 @@ class TypeCache {
             //
             topicTypeData.addAssocDef(assocDef);
         }
-        //
-        return new AttachedTopicType(topicTypeData, dms);
     }
 
     // ---
