@@ -71,7 +71,7 @@ function RESTClient(core_service_uri) {
         request("DELETE", "/topic/" + id)
     }
 
-    // === Relations ===
+    // === Associations ===
 
     /**
      * Returns the relation between two topics.
@@ -104,9 +104,8 @@ function RESTClient(core_service_uri) {
         return request("GET", "/relation/multiple?" + params.to_query_string())
     }
 
-    this.create_relation = function(relation) {
-        return request("POST", "/relation/" + relation.src_topic_id + "/" + relation.dst_topic_id + "/" +
-            relation.type_id, relation.properties)
+    this.create_association = function(assoc_data) {
+        return request("POST", "/association", assoc_data)
     }
 
     this.set_relation_properties = function(relation_id, properties) {

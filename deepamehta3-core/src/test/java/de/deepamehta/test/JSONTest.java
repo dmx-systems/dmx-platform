@@ -112,6 +112,26 @@ public class JSONTest {
         assertNull(s);  // getting the object as string returns its toString() result -- null in this case
     }
 
+    // --- Default Values ---
+
+    @Test
+    public void defaultNumber() throws JSONException {
+        JSONObject o = new JSONObject();
+        o.put("id", 123);
+        assertEquals(456, o.optLong("value", 456));
+        assertEquals(-1, o.optLong("value", -1));
+        assertEquals(0, o.optLong("value"));
+    }
+
+    @Test
+    public void defaultString() throws JSONException {
+        JSONObject o = new JSONObject();
+        o.put("id", 123);
+        assertEquals("test", o.optString("value", "test"));
+        assertEquals("", o.optString("value"));
+        assertNull(o.optString("value", null));
+    }
+
     // --- Iteration ---
 
     @Test

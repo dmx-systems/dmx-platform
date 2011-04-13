@@ -48,8 +48,8 @@ public class TopicProvider implements MessageBodyWriter<Topic> {
 
     @Override
     public void writeTo(Topic topic, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
-            MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException,
-            WebApplicationException {
+                        MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
+                        throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
             topic.toJSON().write(writer);

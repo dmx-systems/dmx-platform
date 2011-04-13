@@ -4,6 +4,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.HashSet;
@@ -52,12 +53,18 @@ public class AssociationData {
         try {
             this.id = -1;
             this.typeUri = assocData.getString("type_uri");
+            //
             this.topicRoles = new HashSet();
             JSONArray topicRoles = assocData.getJSONArray("topic_roles");
             for (int i = 0; i < topicRoles.length(); i++) {
                 this.topicRoles.add(new TopicRole(topicRoles.getJSONObject(i)));
             }
-            // FIXME: init assoc roles
+            //
+            this.assocRoles = new HashSet();
+            JSONArray assocRoles = assocData.getJSONArray("assoc_roles");
+            for (int i = 0; i < assocRoles.length(); i++) {
+                this.assocRoles.add(new AssociationRole(assocRoles.getJSONObject(i)));
+            }
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationData failed (JSONObject=" + assocData + ")", e);
         }
@@ -111,7 +118,7 @@ public class AssociationData {
                 "Use the providePropertiesHook() to initialize the properties you need.");
         }
         return value;
-    }
+    } */
 
     // ---
 
@@ -119,17 +126,26 @@ public class AssociationData {
         try {
             JSONObject o = new JSONObject();
             o.put("id", id);
-            o.put("type_id", typeId);
-            o.put("src_topic_id", srcTopicId);
-            o.put("dst_topic_id", dstTopicId);
-            o.put("properties", properties.toJSON());
+            o.put("type_uri", typeUri);
+            //
+            List topicRoles = new ArrayList();
+            for (TopicRole topicRole : this.topicRoles) {
+                topicRoles.add(topicRole.toJSON());
+            }
+            o.put("topic_roles", topicRoles);
+            //
+            List assocRoles = new ArrayList();
+            for (AssociationRole assocRole : this.assocRoles) {
+                assocRoles.add(assocRole.toJSON());
+            }
+            o.put("assoc_roles", assocRoles);
             return o;
         } catch (JSONException e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
 
-    public static JSONArray relationsToJson(List<Relation> relations) {
+    /* public static JSONArray relationsToJson(List<Relation> relations) {
         JSONArray array = new JSONArray();
         for (Relation relation : relations) {
             array.put(relation.toJSON());

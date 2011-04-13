@@ -40,4 +40,8 @@ public interface Association {
     void addTopicRole(TopicRole topicRole);
 
     void addAssociationRole(AssociationRole assocRole);
+
+    // ---
+
+    JSONObject toJSON();
 }

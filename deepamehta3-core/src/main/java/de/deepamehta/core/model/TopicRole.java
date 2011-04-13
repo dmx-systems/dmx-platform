@@ -18,27 +18,37 @@ public class TopicRole {
     private String topicUri;
     private String roleTypeUri;
 
-    private boolean topicIdentifiedById;
+    private boolean topicIdentifiedByUri;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public TopicRole(long topicId, String roleTypeUri) {
         this.topicId = topicId;
+        this.topicUri = null;
         this.roleTypeUri = roleTypeUri;
-        this.topicIdentifiedById = true;
+        this.topicIdentifiedByUri = false;
     }
 
     public TopicRole(String topicUri, String roleTypeUri) {
+        this.topicId = -1;
         this.topicUri = topicUri;
         this.roleTypeUri = roleTypeUri;
-        this.topicIdentifiedById = false;
+        this.topicIdentifiedByUri = true;
     }
 
     public TopicRole(JSONObject topicRole) {
         try {
-            this.topicUri = topicRole.getString("topic_uri");
+            this.topicId = topicRole.optLong("topic_id", -1);
+            this.topicUri = topicRole.optString("topic_uri", null);
             this.roleTypeUri = topicRole.getString("role_type_uri");
-            this.topicIdentifiedById = false;
+            this.topicIdentifiedByUri = topicUri != null;
+            //
+            if (topicId == -1 && topicUri == null) {
+                throw new IllegalArgumentException("Neiter \"topic_id\" nor \"topic_uri\" is set");
+            }
+            if (topicId != -1 && topicUri != null) {
+                throw new IllegalArgumentException("\"topic_id\" and \"topic_uri\" must not be set at the same time");
+            }
         } catch (Exception e) {
             throw new RuntimeException("Parsing TopicRole failed (JSONObject=" + topicRole + ")", e);
         }
@@ -47,10 +57,16 @@ public class TopicRole {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     public long getTopicId() {
+        if (topicIdentifiedByUri) {
+            throw new IllegalStateException("The topic is not identified by ID but by URI (" + this + ")");
+        }
         return topicId;
     }
 
     public String getTopicUri() {
+        if (!topicIdentifiedByUri) {
+            throw new IllegalStateException("The topic is not identified by URI but by ID (" + this + ")");
+        }
         return topicUri;
     }
 
@@ -58,8 +74,25 @@ public class TopicRole {
         return roleTypeUri;
     }
 
-    public boolean topicIdentifiedById() {
-        return topicIdentifiedById;
+    public boolean topicIdentifiedByUri() {
+        return topicIdentifiedByUri;
+    }
+
+    // ---
+
+    public JSONObject toJSON() {
+        try {
+            JSONObject o = new JSONObject();
+            if (topicIdentifiedByUri) {
+                o.put("topic_uri", topicUri);
+            } else {
+                o.put("topic_id", topicId);
+            }
+            o.put("role_type_uri", roleTypeUri);
+            return o;
+        } catch (JSONException e) {
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
+        }
     }
 
     // ---
@@ -67,6 +100,6 @@ public class TopicRole {
     @Override
     public String toString() {
         return "\n        topic role (roleTypeUri=\"" + roleTypeUri + "\", topicId=" + topicId +
-            ", topicUri=\"" + topicUri + "\", topicIdentifiedById=" + topicIdentifiedById + ")";
+            ", topicUri=\"" + topicUri + "\", topicIdentifiedByUri=" + topicIdentifiedByUri + ")";
     }
 }

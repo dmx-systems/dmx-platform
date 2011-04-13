@@ -448,7 +448,7 @@ public class EmbeddedService implements CoreService {
     } */
 
     @POST
-    @Path("/relation/{src}/{dst}/{typeId}")
+    @Path("/association")
     @Override
     public Association createAssociation(AssociationData assocData,
                                          @HeaderParam("Cookie") ClientContext clientContext) {

@@ -81,10 +81,10 @@ function Canvas() {
         }
     }
 
-    this.add_relation = function(id, doc1_id, doc2_id, refresh_canvas) {
-        if (!assoc_exists(id)) {
+    this.add_association = function(assoc, refresh_canvas) {
+        if (!assoc_exists(assoc.id)) {
             // update model
-            var ca = new CanvasAssoc(id, doc1_id, doc2_id)
+            var ca = new CanvasAssoc(assoc)
             canvas_assocs.push(ca)
             // trigger hook
             dm3c.trigger_hook("post_add_relation_to_canvas", ca)
@@ -214,7 +214,7 @@ function Canvas() {
     function draw() {
         ctx.clearRect(-trans_x, -trans_y, self.canvas_width, self.canvas_height)
         //
-        draw_relations()
+        draw_associations()
         //
         if (relation_in_progress) {
             draw_line(action_topic.x, action_topic.y, tmp_x - trans_x, tmp_y - trans_y, ASSOC_WIDTH, ACTIVE_COLOR)
@@ -245,15 +245,15 @@ function Canvas() {
         }
     }
 
-    function draw_relations() {
+    function draw_associations() {
         for (var i in canvas_assocs) {
             var ca = canvas_assocs[i]
-            var ct1 = topic_by_id(ca.doc1_id)
-            var ct2 = topic_by_id(ca.doc2_id)
+            var ct1 = topic_by_id(ca.topic_roles[0].topic_id)
+            var ct2 = topic_by_id(ca.topic_roles[1].topic_id)
             // assertion
             if (!ct1 || !ct2) {
                 // TODO: deleted relations must be removed from all topicmaps.
-                dm3c.log("### ERROR in draw_relations: relation " + ca.id + " is missing a topic")
+                dm3c.log("### ERROR in draw_associations: relation " + ca.id + " is missing a topic")
                 delete canvas_assocs[i]
                 continue
             }
@@ -348,8 +348,11 @@ function Canvas() {
             //
             var ct = topic_by_position(event)
             if (ct) {
-                var rel = dm3c.create_relation("RELATION", dm3c.selected_topic.id, ct.id)
-                dm3c.canvas.add_relation(rel.id, rel.src_topic_id, rel.dst_topic_id)
+                var assoc = dm3c.create_association("dm3.core.association", [
+                    {topic_id: dm3c.selected_topic.id, role_type_uri: dm3c.selected_topic.type_uri},
+                    {topic_id: ct.id,                  role_type_uri: ct.type}
+                ])
+                dm3c.canvas.add_association(assoc)
                 select_topic(dm3c.selected_topic.id)
             } else {
                 draw()
@@ -807,10 +810,11 @@ function Canvas() {
         }
     }
 
-    function CanvasAssoc(id, doc1_id, doc2_id) {
-        this.id = id
-        this.doc1_id = doc1_id
-        this.doc2_id = doc2_id
+    function CanvasAssoc(assoc) {
+        this.id = assoc.id
+        this.type_uri = assoc.type_uri
+        this.topic_roles = assoc.topic_roles
+        this.assoc_roles = assoc.assoc_roles
     }
 
     // ---

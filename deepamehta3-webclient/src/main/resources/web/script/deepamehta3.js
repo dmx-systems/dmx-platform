@@ -127,31 +127,35 @@ var dm3c = new function() {
 
 
 
-    /*****************/
-    /*** Relations ***/
-    /*****************/
+    /********************/
+    /*** Associations ***/
+    /********************/
 
 
 
     /**
-     * Creates a relation in the DB.
+     * Creates an association in the DB.
      *
      * High-level utility method for plugin developers.
      *
-     * @param   type_id             The relation type ID, e.g. "RELATION", "SEARCH_RESULT".
-     * @param   properties          Optional: relation properties (object, key: field URI, value: content).
+     * @param   type_uri            The association type URI, e.g. "dm3.core.instantiation".
+     * @param   topic_roles         The topic roles, an array of objects, e.g.
+     *                                  [
+     *                                      {topic_uri: "dm3.core.cardinality", role_type_uri: "dm3.core.type"},
+     *                                      {topic_id: 123,                     role_type_uri: "dm3.core.instance"},
+     *                                  ]
+     *                              The topics can be identified either by URI or by ID.
      *
      * @return  The relation as stored in the DB.
      */
-    this.create_relation = function(type_id, src_topic_id, dst_topic_id, properties) {
-        var relation = {
-            type_id: type_id,
-            src_topic_id: src_topic_id,
-            dst_topic_id: dst_topic_id,
-            properties: properties || {}
+    this.create_association = function(type_uri, topic_roles, assoc_roles) {
+        var assoc_data = {
+            type_uri: type_uri,
+            topic_roles: topic_roles || [],
+            assoc_roles: assoc_roles || []
         }
         // FIXME: "create" hooks are not triggered
-        return dm3c.restc.create_relation(relation)
+        return dm3c.restc.create_association(assoc_data)
     }
 
     /**
@@ -385,7 +389,7 @@ var dm3c = new function() {
         // reveal relations
         var relations = dm3c.restc.get_relations(dm3c.selected_topic.id, topic_id)
         for (var i = 0, rel; rel = relations[i]; i++) {
-            dm3c.canvas.add_relation(rel.id, rel.src_topic_id, rel.dst_topic_id)
+            dm3c.canvas.add_association(rel)
         }
         // reveal topic
         dm3c.add_topic_to_canvas(dm3c.restc.get_topic_by_id(topic_id), "show")

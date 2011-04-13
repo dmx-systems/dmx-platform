@@ -38,25 +38,25 @@ public class AssociationProvider implements MessageBodyWriter<Association> {
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
-        return type == Association.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
+        return genericType == Association.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Override
-    public long getSize(Association association, Class<?> type, Type genericType, Annotation[] annotations,
+    public long getSize(Association assoc, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(Association association, Class<?> type, Type genericType, Annotation[] annotations,
+    public void writeTo(Association assoc, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            // FIXME: association.toJSON().write(writer);
+            assoc.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing message body failed (" + association + ")", e);
+            throw new IOException("Writing message body failed (" + assoc + ")", e);
         }
     }
 }

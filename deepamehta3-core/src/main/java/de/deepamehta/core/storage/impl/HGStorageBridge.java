@@ -337,10 +337,10 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     private HyperNode getRoleNode(TopicRole topicRole) {
-        if (topicRole.topicIdentifiedById()) {
-            return hg.getHyperNode(topicRole.getTopicId());
-        } else {
+        if (topicRole.topicIdentifiedByUri()) {
             return lookupTopic(topicRole.getTopicUri());
+        } else {
+            return hg.getHyperNode(topicRole.getTopicId());
         }
     }
 

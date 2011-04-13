@@ -20,7 +20,7 @@ function TopicmapRenderer() {
      */
     this.add_topic = function(id, type, label, highlight_topic, refresh_canvas, x, y) {}
 
-    this.add_relation = function(id, doc1_id, doc2_id, refresh_canvas) {}
+    this.add_association = function(assoc, refresh_canvas) {}
 
     this.remove_topic = function(id, refresh_canvas, is_part_of_delete_operation) {}
 
