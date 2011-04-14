@@ -5,6 +5,11 @@
         # and "Data Type" are created programmatically.
         # See EmbeddedService.setupMetaContent()
 
+        /*{
+            value:         "Data Type",
+            uri:           "dm3.core.data_type",
+            data_type_uri: "dm3.core.text"
+        },*/
         {
             value:         "Role Type",
             uri:           "dm3.core.role_type",
@@ -31,10 +36,10 @@
             uri:   "dm3.core.composition"
         },
 
-        {
+        /*{
             value: "Instantiation",
             uri:   "dm3.core.instantiation"
-        },
+        },*/
         {
             value: "Sequence",
             uri:   "dm3.core.sequence"
@@ -66,16 +71,16 @@
 
         ### Role Types ###
 
-        {
+        /*{
             value:    "Type",
             uri:      "dm3.core.type",
             type_uri: "dm3.core.role_type"
-        },
-        {
+        },*/
+        /*{
             value:    "Instance",
             uri:      "dm3.core.instance",
             type_uri: "dm3.core.role_type"
-        },
+        },*/
 
         {
             value:    "Whole Topic Type",

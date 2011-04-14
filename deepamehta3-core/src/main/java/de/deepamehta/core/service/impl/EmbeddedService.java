@@ -323,6 +323,7 @@ public class EmbeddedService implements CoreService {
             triggerHook(Hook.PRE_CREATE_TOPIC, topicData, clientContext);
             //
             Topic topic = storage.createTopic(topicData);
+            associateWithTopicType(topic);
             //
             Composite comp = topicData.getComposite();
             if (comp != null) {
@@ -455,6 +456,8 @@ public class EmbeddedService implements CoreService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             Association assoc = buildAssociation(storage.createAssociation(assocData));
+            associateWithAssociationType(assoc);
+            //
             tx.success();
             return assoc;
         } catch (Exception e) {
@@ -544,6 +547,7 @@ public class EmbeddedService implements CoreService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             Topic topic = storage.createTopic(topicTypeData);
+            associateWithTopicType(topic);
             //
             String typeUri = topicTypeData.getUri();
             associateDataType(typeUri, topicTypeData.getDataTypeUri());
@@ -574,6 +578,8 @@ public class EmbeddedService implements CoreService {
         DeepaMehtaTransaction tx = beginTx();
         try {
            Topic topic = storage.createTopic(assocTypeData);
+           associateWithTopicType(topic);
+           //
            tx.success();
            return topic;
         } catch (Exception e) {
@@ -737,7 +743,7 @@ public class EmbeddedService implements CoreService {
             logger.info("----- Initializing DeepaMehta 3 Core -----");
             boolean isCleanInstall = initDB();
             if (isCleanInstall) {
-                setupMetaContent();
+                setupBootstrapContent();
             }
             runCoreMigrations(isCleanInstall);
             tx.success();
@@ -991,7 +997,33 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    // ---
+    // === Topic/Association Storage ===
+
+    private void associateWithTopicType(Topic topic) {
+        try {
+            AssociationData assocData = new AssociationData("dm3.core.instantiation");
+            assocData.addTopicRole(new TopicRole(topic.getTypeUri(), "dm3.core.type"));
+            assocData.addTopicRole(new TopicRole(topic.getId(), "dm3.core.instance"));
+            associateWithAssociationType(storage.createAssociation(assocData));
+        } catch (Exception e) {
+            throw new RuntimeException("Associating topic with topic type \"" +
+                topic.getTypeUri() + "\" failed (" + topic + ")", e);
+        }
+    }
+
+    private void associateWithAssociationType(Association assoc) {
+        try {
+            AssociationData assocData = new AssociationData("dm3.core.instantiation");
+            assocData.addTopicRole(new TopicRole(assoc.getTypeUri(), "dm3.core.type"));
+            assocData.addAssociationRole(new AssociationRole(assoc.getId(), "dm3.core.instance"));
+            storage.createAssociation(assocData);
+        } catch (Exception e) {
+            throw new RuntimeException("Associating association with association type \"" +
+                assoc.getTypeUri() + "\" failed (" + assoc + ")", e);
+        }
+    }
+
+    // === Topic Type Storage ===
 
     private void associateDataType(String topicTypeUri, String dataTypeUri) {
         AssociationData assocData = new AssociationData("dm3.core.association");
@@ -1103,25 +1135,34 @@ public class EmbeddedService implements CoreService {
 
     // ---
 
-    private void setupMetaContent() {
+    private void setupBootstrapContent() {
         // Before topic types and asscociation types can be created the meta types must created
         // Note: storage low-level call used here ### explain
-        storage.createTopic(new MetaTypeData("dm3.core.topic_type", "Topic Type"));
+        Topic topicType = storage.createTopic(new MetaTypeData("dm3.core.topic_type", "Topic Type"));
         storage.createTopic(new MetaTypeData("dm3.core.assoc_type", "Association Type"));
         // Create topic type "Data Type"
-        // Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
+        // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
         // depends on the topic type "Data Type". To resolve this circle we use a low-level storage call here
         // and postpone the data type association.
-        storage.createTopic(new TopicTypeData("dm3.core.data_type", "Data Type", "dm3.core.text"));
+        Topic dataType = storage.createTopic(new TopicTypeData("dm3.core.data_type", "Data Type", "dm3.core.text"));
         // Create data type "Text"
         // Note: storage low-level call used here ### explain
-        storage.createTopic(new TopicData("dm3.core.text", new TopicValue("Text"), "dm3.core.data_type"));
+        Topic text = storage.createTopic(new TopicData("dm3.core.text", new TopicValue("Text"), "dm3.core.data_type"));
+        //
+        storage.createTopic(new TopicData("dm3.core.type", new TopicValue("Type"), "dm3.core.role_type"));
+        storage.createTopic(new TopicData("dm3.core.instance", new TopicValue("Instance"), "dm3.core.role_type"));
         // Before data type topics can be associated we must create the association type "Association"
         storage.createTopic(new AssociationTypeData("dm3.core.association", "Association"));
+        //
+        storage.createTopic(new AssociationTypeData("dm3.core.instantiation", "Instantiation"));
         // Postponed data type association
         associateDataType("dm3.core.topic_type", "dm3.core.text");
         associateDataType("dm3.core.assoc_type", "dm3.core.text");
         associateDataType("dm3.core.data_type",  "dm3.core.text");
+        //
+        associateWithTopicType(topicType);
+        associateWithTopicType(dataType);
+        associateWithTopicType(text);
     }
 
     // === Migrations ===

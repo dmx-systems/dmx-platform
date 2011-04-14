@@ -133,8 +133,6 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         HyperNode node = hg.createHyperNode();
         node.setAttribute("uri", uri, IndexMode.KEY);
         node.setAttribute("value", value.value());
-        // 3) connect to type node
-        connectNodeToTypeNode(node, typeUri);
         //
         return buildTopic(node.getId(), uri, value, typeUri);
     }
@@ -161,7 +159,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
             throw new IllegalArgumentException("Tried to create an association with null association type " +
                 "(typeUri=null)");
         }
-        // 1) create edge
+        //
         HyperEdge edge = hg.createHyperEdge();
         for (TopicRole topicRole : topicRoles) {
             addTopicToEdge(edge, topicRole);
@@ -169,8 +167,6 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         for (AssociationRole assocRole : assocRoles) {
             addAssociationToEdge(edge, assocRole);
         }
-        // 2) connect to type node
-        connectEdgeToTypeNode(edge, typeUri);
         //
         return buildAssociation(edge.getId(), typeUri, topicRoles, assocRoles);
     }
@@ -369,22 +365,6 @@ public class HGStorageBridge implements DeepaMehtaStorage {
             throw new RuntimeException("No type node is connected to " + edge);
         }
         return typeNode.getHyperNode();
-    }
-
-    // ---
-
-    private void connectNodeToTypeNode(HyperNode node, String typeUri) {
-        HyperNode topicType = lookupTopicType(typeUri);
-        HyperEdge connectingEdge = hg.createHyperEdge();
-        connectingEdge.addHyperNode(topicType, "dm3.core.type");
-        connectingEdge.addHyperNode(node, "dm3.core.instance");
-    }
-
-    private void connectEdgeToTypeNode(HyperEdge edge, String typeUri) {
-        HyperNode topicType = lookupAssociationType(typeUri);
-        HyperEdge connectingEdge = hg.createHyperEdge();
-        connectingEdge.addHyperNode(topicType, "dm3.core.type");
-        connectingEdge.addHyperEdge(edge, "dm3.core.instance");
     }
 
     // ---
