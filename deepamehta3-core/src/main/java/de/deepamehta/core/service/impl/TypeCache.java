@@ -83,7 +83,7 @@ class TypeCache {
                 "definitions but sequence length is " + sequenceIds.size());
         }
         // build topic type
-        TopicTypeData topicTypeData = new TopicTypeData(typeTopic, fetchDataTypeUri(typeTopic),
+        TopicTypeData topicTypeData = new TopicTypeData(typeTopic, fetchDataTypeTopic(typeTopic).getUri(),
                                                                    fetchViewConfig(typeTopic));
         sortAssociationDefinitions(topicTypeData, assocDefs, sequenceIds);
         //
@@ -119,8 +119,8 @@ class TypeCache {
         );
         assocDef.setWholeCardinalityUri(cardinality.wholeCardinalityUri);
         assocDef.setPartCardinalityUri(cardinality.partCardinalityUri);
+        assocDef.setAssocTypeUri(assoc.getTypeUri());
         assocDef.setViewConfig(fetchViewConfig(assoc));
-        // FIXME: call assocDef's setAssocTypeUri()
         return assocDef;
     }
 
@@ -164,15 +164,22 @@ class TypeCache {
 
     // ---
 
-    private String fetchDataTypeUri(Topic typeTopic) {
-        // Note: storage low-level call used here ### should dms.getRelatedTopic() get a "includeComposite" parameter?
-        // Note: the type topic is not attached to the service
-        Topic dataType = dms.storage.getRelatedTopic(typeTopic.getId(), "dm3.core.association", "dm3.core.topic_type",
-                                                                                                "dm3.core.data_type");
-        if (dataType == null) {
-            throw new RuntimeException("Determining data type failed (topic type=" + typeTopic + ")");
+    private Topic fetchDataTypeTopic(Topic typeTopic) {
+        try {
+            // Note: storage low-level call used here
+            // Note: the type topic is not attached to the service
+            // ### should dms.getRelatedTopic() get a "includeComposite" parameter?
+            Topic dataType = dms.storage.getRelatedTopic(typeTopic.getId(), "dm3.core.association",
+                                                                        "dm3.core.topic_type", "dm3.core.data_type");
+            if (dataType == null) {
+                throw new RuntimeException("No data type topic is associated to topic type \"" + typeTopic.getUri() +
+                    "\"");
+            }
+            return dataType;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching the data type topic for topic type \"" + typeTopic.getUri() +
+                "\" failed", e);
         }
-        return dataType.getUri();
     }
 
     // ---

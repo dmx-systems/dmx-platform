@@ -155,6 +155,35 @@ public class JSONTest {
         // the jettison JSONObject implementation preserves the natural key order (uses LinkedHashMap)
     }
 
+    // --- Comments ---
+
+    @Test
+    public void comment() throws JSONException {
+        JSONObject o = new JSONObject("{abc: 123, /* comment */ def: 456}");
+        assertEquals(123, o.getInt("abc"));
+        assertEquals(456, o.getInt("def"));
+        // the jettison JSON parser allows comments!
+        // That's surprising as comments are not covered by the JSON specification.
+    }
+
+    @Test
+    public void commentToLineEnd() throws JSONException {
+        JSONObject o = new JSONObject("{abc: 123, // comment\ndef: 456}");
+        assertEquals(123, o.getInt("abc"));
+        assertEquals(456, o.getInt("def"));
+        // the jettison JSON parser allows comments!
+        // That's surprising as comments are not covered by the JSON specification.
+    }
+
+    @Test
+    public void commentHash() throws JSONException {
+        JSONObject o = new JSONObject("{abc: 123, # comment\ndef: 456}");
+        assertEquals(123, o.getInt("abc"));
+        assertEquals(456, o.getInt("def"));
+        // the jettison JSON parser allows comments!
+        // That's surprising as comments are not covered by the JSON specification.
+    }
+
     // --- Helper Classes ---
 
     class ClassWithToStringMethod {

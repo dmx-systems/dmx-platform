@@ -127,13 +127,17 @@ public class TopicData {
         this.composite = comp;
     }
 
-    // ---
+    // === Traversal ===
 
     public TopicValue getChildTopicValue(String assocDefUri) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 
     public void setChildTopicValue(String assocDefUri, TopicValue value) {
+        throw new RuntimeException("Method not implemented (" + getClass() + ")");
+    }
+
+    public Set<Topic> getRelatedTopics(String assocTypeUri) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 
@@ -150,7 +154,7 @@ public class TopicData {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 
-    // ---
+    // === Serialization ===
 
     public JSONObject toJSON() {
         try {

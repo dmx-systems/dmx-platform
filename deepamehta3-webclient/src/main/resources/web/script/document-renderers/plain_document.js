@@ -27,7 +27,7 @@ function PlainDocument() {
     this.render_document = function(topic) {
 
         // alert("render_document(): topic=" + JSON.stringify(topic));
-        fields = {}            // key: field URI, value: renderer object
+        // fields = {}  // the global fields object is not needed for document rendering (only for form rendering)
         var defined_relation_topics = []
 
         dm3c.empty_detail_panel()
@@ -202,7 +202,7 @@ function PlainDocument() {
 
 
 
-    // === Field Renderer ===
+    // === Field Renderering ===
 
     function Field(uri, topic, topic_type, assoc_def) {
 

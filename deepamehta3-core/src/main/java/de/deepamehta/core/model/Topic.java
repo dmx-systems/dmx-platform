@@ -38,11 +38,13 @@ public interface Topic {
 
     void setComposite(Composite comp);
 
-    // ---
+    // === Traversal ===
 
     TopicValue getChildTopicValue(String assocDefUri);
 
     void setChildTopicValue(String assocDefUri, TopicValue value);
+
+    Set<Topic> getRelatedTopics(String assocTypeUri);
 
     Topic getRelatedTopic(String assocTypeUri, String myRoleType, String othersRoleType);
 
@@ -51,7 +53,7 @@ public interface Topic {
 
     Set<Association> getAssociations(String myRoleType);
 
-    // ---
+    // === Serialization ===
 
     JSONObject toJSON();
 }

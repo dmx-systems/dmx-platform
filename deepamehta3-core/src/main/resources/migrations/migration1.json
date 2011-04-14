@@ -1,5 +1,10 @@
 {
     topic_types: [
+
+        # Note: The topic types "Topic Type", "Association Type",
+        # and "Data Type" are created programmatically.
+        # See EmbeddedService.setupMetaContent()
+
         {
             value:         "Role Type",
             uri:           "dm3.core.role_type",
@@ -13,15 +18,10 @@
     ],
 
     assoc_types: [
-        {
-            value: "Instantiation",
-            uri:   "dm3.core.instantiation"
-        },
 
-        {
-            value: "Association",
-            uri:   "dm3.core.association"
-        },
+        # Note: The association type "Association" is created programmatically.
+        # See EmbeddedService.setupMetaContent()
+
         {
             value: "Aggregation",
             uri:   "dm3.core.aggregation"
@@ -29,10 +29,43 @@
         {
             value: "Composition",
             uri:   "dm3.core.composition"
+        },
+
+        {
+            value: "Instantiation",
+            uri:   "dm3.core.instantiation"
+        },
+        {
+            value: "Sequence",
+            uri:   "dm3.core.sequence"
         }
     ],
 
     topics: [
+
+        ### Data Types ###
+
+        # Note: The data type "Text" is created programmatically.
+        # See EmbeddedService.setupMetaContent()
+
+        {
+            value:    "Number",
+            uri:      "dm3.core.number",
+            type_uri: "dm3.core.data_type"
+        },
+        {
+            value:    "Boolean",
+            uri:      "dm3.core.boolean",
+            type_uri: "dm3.core.data_type"
+        },
+        {
+            value:    "Composite",
+            uri:      "dm3.core.composite",
+            type_uri: "dm3.core.data_type"
+        },
+
+        ### Role Types ###
+
         {
             value:    "Type",
             uri:      "dm3.core.type",
@@ -96,6 +129,8 @@
             uri:      "dm3.core.view_config",
             type_uri: "dm3.core.role_type"
         },
+
+        ### Cardinalities ###
 
         {
             value:    "One",

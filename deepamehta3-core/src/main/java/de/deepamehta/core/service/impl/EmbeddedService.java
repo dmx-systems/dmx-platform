@@ -793,26 +793,35 @@ public class EmbeddedService implements CoreService {
      * @return  The child topic.
      */
     Topic setChildTopicValue(final Topic parentTopic, String assocDefUri, final TopicValue value) {
-        return new ChildTopicEvaluator(parentTopic, assocDefUri) {
-            @Override
-            void evaluate(Topic childTopic, AssociationDefinition assocDef) {
-                if (childTopic != null) {
-                    if (value != null) {
-                        childTopic.setValue(value);
+        try {
+            return new ChildTopicEvaluator(parentTopic, assocDefUri) {
+                @Override
+                void evaluate(Topic childTopic, AssociationDefinition assocDef) {
+                    if (childTopic != null) {
+                        if (value != null) {
+                            childTopic.setValue(value);
+                        }
+                    } else {
+                        // create child topic
+                        String topicTypeUri = assocDef.getPartTopicTypeUri();
+                        childTopic = createTopic(new TopicData(null, value, topicTypeUri, null), null);
+                        setChildTopic(childTopic);
+                        // associate child topic
+                        AssociationData assocData = new AssociationData(assocDef.getAssocTypeUri());
+                        assocData.addTopicRole(new TopicRole(parentTopic.getId(), assocDef.getWholeRoleTypeUri()));
+                        assocData.addTopicRole(new TopicRole(childTopic.getId(), assocDef.getPartRoleTypeUri()));
+                        createAssociation(assocData, null);     // FIXME: clientContext=null
                     }
-                } else {
-                    // create child topic
-                    String topicTypeUri = assocDef.getPartTopicTypeUri();
-                    childTopic = createTopic(new TopicData(null, value, topicTypeUri, null), null);
-                    setChildTopic(childTopic);
-                    // associate child topic
-                    AssociationData assocData = new AssociationData(assocDef.getAssocTypeUri());
-                    assocData.addTopicRole(new TopicRole(parentTopic.getId(), assocDef.getWholeRoleTypeUri()));
-                    assocData.addTopicRole(new TopicRole(childTopic.getId(), assocDef.getPartRoleTypeUri()));
-                    createAssociation(assocData, null);     // FIXME: clientContext=null
                 }
-            }
-        }.getChildTopic();
+            }.getChildTopic();
+        } catch (Exception e) {
+            throw new RuntimeException("Setting child topic value failed (parentTopic=" + parentTopic +
+                ", assocDefUri=\"" + assocDefUri + "\", value=" + value + ")", e);
+        }
+    }
+
+    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri) {
+        throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 
     Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleType, String othersRoleType) {
@@ -1095,19 +1104,21 @@ public class EmbeddedService implements CoreService {
     // ---
 
     private void setupMetaContent() {
+        // Before topic types and asscociation types can be created the meta types must created
         // Note: storage low-level call used here ### explain
         storage.createTopic(new MetaTypeData("dm3.core.topic_type", "Topic Type"));
         storage.createTopic(new MetaTypeData("dm3.core.assoc_type", "Association Type"));
-        // Note: the topic type "Data Type" depends on the "Text" topic and the "Text" topic depends on the 
-        // topic type "Data Type" in turn. To resolve this circle we use a low-level storage call here and
-        // postpone the data type association.
+        // Create topic type "Data Type"
+        // Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
+        // depends on the topic type "Data Type". To resolve this circle we use a low-level storage call here
+        // and postpone the data type association.
         storage.createTopic(new TopicTypeData("dm3.core.data_type", "Data Type", "dm3.core.text"));
+        // Create data type "Text"
         // Note: storage low-level call used here ### explain
-        storage.createTopic(new TopicData("dm3.core.text",      new TopicValue("Text"),      "dm3.core.data_type"));
-        storage.createTopic(new TopicData("dm3.core.number",    new TopicValue("Number"),    "dm3.core.data_type"));
-        storage.createTopic(new TopicData("dm3.core.boolean",   new TopicValue("Boolean"),   "dm3.core.data_type"));
-        storage.createTopic(new TopicData("dm3.core.composite", new TopicValue("Composite"), "dm3.core.data_type"));
-        // postponed data type association
+        storage.createTopic(new TopicData("dm3.core.text", new TopicValue("Text"), "dm3.core.data_type"));
+        // Before data type topics can be associated we must create the association type "Association"
+        storage.createTopic(new AssociationTypeData("dm3.core.association", "Association"));
+        // Postponed data type association
         associateDataType("dm3.core.topic_type", "dm3.core.text");
         associateDataType("dm3.core.assoc_type", "dm3.core.text");
         associateDataType("dm3.core.data_type",  "dm3.core.text");

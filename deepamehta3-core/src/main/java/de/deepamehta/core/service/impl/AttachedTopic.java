@@ -53,6 +53,10 @@ class AttachedTopic extends TopicData implements Topic {
         dms.setChildTopicValue(this, assocDefUri, value);
     }
 
+    public Set<Topic> getRelatedTopics(String assocTypeUri) {
+        return dms.getRelatedTopics(getId(), assocTypeUri);
+    }
+
     @Override
     public Topic getRelatedTopic(String assocTypeUri, String myRoleType, String othersRoleType) {
         return dms.getRelatedTopic(getId(), assocTypeUri, myRoleType, othersRoleType);

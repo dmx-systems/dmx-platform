@@ -62,6 +62,12 @@ public interface DeepaMehtaStorage {
     //                                                   List<String> includeRelTypes,
     //                                                   List<String> excludeRelTypes);
 
+    // ---
+
+    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri);
+
+    // ---
+
     Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri);
 
     Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri);

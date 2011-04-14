@@ -25,6 +25,10 @@ public class AssociationTypeData extends TopicData {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    public AssociationTypeData(String uri, String value) {
+        super(uri, new TopicValue(value), "dm3.core.assoc_type");
+    }
+
     public AssociationTypeData(JSONObject assocTypeData) {
         try {
             this.id = -1;
