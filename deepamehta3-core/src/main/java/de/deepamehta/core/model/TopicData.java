@@ -4,6 +4,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONException;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -170,6 +171,14 @@ public class TopicData {
         } catch (JSONException e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
+    }
+
+    public static JSONArray topicsToJSON(Collection<Topic> topics) {
+        JSONArray array = new JSONArray();
+        for (Topic topic : topics) {
+            array.put(topic.toJSON());
+        }
+        return array;
     }
 
     // ---

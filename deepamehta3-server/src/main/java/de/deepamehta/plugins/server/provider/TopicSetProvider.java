@@ -11,7 +11,7 @@ import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
+import java.util.Set;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -24,7 +24,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class TopicListProvider implements MessageBodyWriter<List<Topic>> {
+public class TopicSetProvider implements MessageBodyWriter<Set<Topic>> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -45,7 +45,7 @@ public class TopicListProvider implements MessageBodyWriter<List<Topic>> {
         if (genericType instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) genericType;
             Type[] typeArgs = pt.getActualTypeArguments();
-            if (pt.getRawType() == List.class && typeArgs.length == 1 && typeArgs[0] == Topic.class) {
+            if (pt.getRawType() == Set.class && typeArgs.length == 1 && typeArgs[0] == Topic.class) {
                 // Note: unlike equals() isCompatible() ignores parameters
                 // like "charset" in "application/json;charset=UTF-8"
                 if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
@@ -57,13 +57,13 @@ public class TopicListProvider implements MessageBodyWriter<List<Topic>> {
     }
 
     @Override
-    public long getSize(List<Topic> topics, Class<?> type, Type genericType, Annotation[] annotations,
+    public long getSize(Set<Topic> topics, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(List<Topic> topics, Class<?> type, Type genericType, Annotation[] annotations,
+    public void writeTo(Set<Topic> topics, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {

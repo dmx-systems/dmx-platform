@@ -26,13 +26,9 @@ function PlainDocument() {
 
     this.render_document = function(topic) {
 
-        // alert("render_document(): topic=" + JSON.stringify(topic));
-        // fields = {}  // the global fields object is not needed for document rendering (only for form rendering)
-        var defined_relation_topics = []
-
         dm3c.empty_detail_panel()
         render_fields("", dm3c.type_cache.get(topic.type_uri))
-        // ### render_relations()
+        render_relations()
         render_buttons(topic, "detail-panel-show")
 
         function render_fields(field_uri, topic_type, assoc_def) {
@@ -57,16 +53,13 @@ function PlainDocument() {
         }
 
         function render_relations() {
-            var topics = dm3c.restc.get_related_topics(topic.id, [], [], ["SEARCH_RESULT;OUTGOING"])
-            // don't render topics already rendered via "defined relations"
-            js.substract(topics, defined_relation_topics, function(topic, drt) {
-                return topic.id == drt.id
-            })
-            //
-            dm3c.render.field_label("Relations (" + topics.length + ")")
-            var field_value = $("<div>").addClass("field-value")
-            field_value.append(dm3c.render_topic_list(topics))
-            $("#detail-panel").append(field_value)
+            var topics = dm3c.restc.get_related_topics(topic.id, "dm3.core.association")
+            // render label
+            dm3c.render.field_label("Associations (" + topics.length + ")")
+            // render field
+            var field_value_div = $("<div>").addClass("field-value")
+            field_value_div.append(dm3c.render_topic_list(topics))
+            $("#detail-panel").append(field_value_div)
         }
     }
 

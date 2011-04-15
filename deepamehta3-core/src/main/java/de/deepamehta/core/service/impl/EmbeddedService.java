@@ -826,8 +826,23 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
+    @GET
+    @Path("/topic/{id}/related_topics")
+    public Set<Topic> getRelatedTopics(@PathParam("id") long topicId,
+                                       @QueryParam("assoc_type_uri") String assocTypeUri) {
+        try {
+            Set<Topic> topics = storage.getRelatedTopics(topicId, assocTypeUri);
+            //
+            /* ### for (RelatedTopic topic : topics) {
+                triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, relTopic.getTopic());
+                triggerHook(Hook.PROVIDE_RELATION_PROPERTIES, relTopic.getRelation());
+            } */
+            //
+            return topics;
+        } catch (Exception e) {
+            throw new RuntimeException("Retrieving related topics of topic " + topicId +
+                " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
+        }
     }
 
     Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleType, String othersRoleType) {

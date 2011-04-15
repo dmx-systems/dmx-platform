@@ -31,25 +31,22 @@ function RESTClient(core_service_uri) {
     }
 
     /**
-     * @param   include_topic_types     Optional: the topic type filter (array of topic type URIs, e.g.
+     * @param   include_topic_types     ### Optional: the topic type filter (array of topic type URIs, e.g.
      *                                  ["de/deepamehta/core/topictype/Note"]).
      *                                  If not specified (undefined or empty) the filter is switched off.
      *
-     * @param   include_rel_types       Optional: the include relation type filter (array of strings of the form
+     * @param   include_rel_types       ### Optional: the include relation type filter (array of strings of the form
      *                                  "<relTypeName>[;<direction>]", e.g. ["TOPICMAP_TOPIC;INCOMING"]).
      *                                  If not specified (undefined or empty) the filter is switched off.
      *
-     * @param   exclude_rel_types       Optional: the exclude relation type filter (array of strings of the form
+     * @param   exclude_rel_types       ### Optional: the exclude relation type filter (array of strings of the form
      *                                  "<relTypeName>[;<direction>]", e.g. ["SEARCH_RESULT;OUTGOING"]).
      *                                  If not specified (undefined or empty) the filter is switched off.
      *
      * @return  array of topics, possibly empty.
      */
-    this.get_related_topics = function(topic_id, include_topic_types, include_rel_types, exclude_rel_types) {
-        var params = new RequestParameter()
-        params.add_list("include_topic_types", include_topic_types)
-        params.add_list("include_rel_types", include_rel_types)
-        params.add_list("exclude_rel_types", exclude_rel_types)
+    this.get_related_topics = function(topic_id, assoc_type_uri) {
+        var params = new RequestParameter({assoc_type_uri: assoc_type_uri})
         return request("GET", "/topic/" + topic_id + "/related_topics?" + params.to_query_string())
     }
 

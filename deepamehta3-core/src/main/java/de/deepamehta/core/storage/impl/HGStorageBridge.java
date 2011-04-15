@@ -21,6 +21,7 @@ import de.deepamehta.hypergraph.HyperNodeRole;
 import de.deepamehta.hypergraph.IndexMode;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -85,6 +86,11 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     @Override
     public Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                                           String othersRoleTypeUri) {
+        if (assocTypeUri == null) {
+            throw new IllegalArgumentException("Tried to call getRelatedTopics() with a null " +
+                "association type filter (assocTypeUri=null)");
+        }
+        //
         Set<ConnectedHyperNode> nodes = hg.getHyperNode(topicId).getConnectedHyperNodes(myRoleTypeUri,
                                                                                         othersRoleTypeUri);
         applyAssocTypeFilter(nodes, assocTypeUri);
@@ -250,20 +256,20 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     private void applyAssocTypeFilter(Set<ConnectedHyperNode> nodes, String assocTypeUri) {
-        ConnectedHyperNode n = null;
+        ConnectedHyperNode node = null;
         HyperEdge edge = null;
         try {
-            for (ConnectedHyperNode node : nodes) {
-                n = node;
+            Iterator<ConnectedHyperNode> i = nodes.iterator();
+            while (i.hasNext()) {
+                node = i.next();
                 edge = node.getConnectingHyperEdge();
-                String uri = getAssociationTypeUri(edge);
-                if (!uri.equals(assocTypeUri)) {
-                    nodes.remove(node);
+                if (!getAssociationTypeUri(edge).equals(assocTypeUri)) {
+                    i.remove();
                 }
             }
         } catch (Exception e) {
             throw new RuntimeException("Applying association type filter \"" + assocTypeUri +
-                "\" failed (" + edge + ",\n" + n.getHyperNode() + ")", e);
+                "\" failed (" + edge + ",\n" + node.getHyperNode() + ")", e);
         }
     }
 
