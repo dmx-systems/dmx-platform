@@ -12,18 +12,18 @@ function default_plugin () {
 
     this.init = function() {
 
-        dm3c.ui.dialog("delete-topic-dialog",    "Delete Topic?",    "Delete", do_delete_topic)
-        dm3c.ui.dialog("delete-relation-dialog", "Delete Relation?", "Delete", do_delete_relation)
+        dm3c.ui.dialog("delete-topic-dialog",       "Delete Topic?",       "Delete", do_delete_topic)
+        dm3c.ui.dialog("delete-association-dialog", "Delete Association?", "Delete", do_delete_association)
 
         function do_delete_topic() {
             $("#delete-topic-dialog").dialog("close")
             dm3c.delete_topic(dm3c.selected_topic)
         }
 
-        function do_delete_relation() {
-            $("#delete-relation-dialog").dialog("close")
+        function do_delete_association() {
+            $("#delete-association-dialog").dialog("close")
             // update model
-            dm3c.delete_relation(dm3c.current_rel_id)
+            dm3c.delete_association(dm3c.current_rel_id)
             // update view
             dm3c.canvas.refresh()
             dm3c.render_topic()
@@ -34,8 +34,8 @@ function default_plugin () {
 
         var commands = []
         //
-        commands.push({label: "Hide",   handler: do_hide,   context: "context-menu"})
-        commands.push({label: "Relate", handler: do_relate, context: "context-menu"})
+        commands.push({label: "Hide",      handler: do_hide,      context: "context-menu"})
+        commands.push({label: "Associate", handler: do_associate, context: "context-menu"})
         //
         if (dm3c.has_write_permission(topic)) {
             commands.push({label: "Edit",   handler: do_edit,    context: "detail-panel-show", ui_icon: "pencil"})
@@ -52,7 +52,7 @@ function default_plugin () {
             dm3c.hide_topic(topic.id)
         }
 
-        function do_relate(event) {
+        function do_associate(event) {
             dm3c.canvas.begin_relation(topic.id, event)
         }
 
@@ -95,7 +95,7 @@ function default_plugin () {
         }
 
         function do_confirm() {
-            $("#delete-relation-dialog").dialog("open")
+            $("#delete-association-dialog").dialog("open")
         }
     }
 

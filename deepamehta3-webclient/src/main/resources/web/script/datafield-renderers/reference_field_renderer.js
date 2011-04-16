@@ -43,7 +43,7 @@ function ReferenceFieldRenderer(topic, field, rel_topics) {
                         }
                     } else {
                         if (was_checked_before) {
-                            dm3c.delete_relation(dm3c.restc.get_relation(topic.id, checkbox.id).id)
+                            dm3c.delete_association(dm3c.restc.get_relation(topic.id, checkbox.id).id)
                         }
                     }
                 }

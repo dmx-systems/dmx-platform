@@ -105,6 +105,11 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
+    public Set<Association> getAssociations(long topicId) {
+        return getAssociations(topicId, null);
+    }
+
+    @Override
     public Set<Association> getAssociations(long topicId, String myRoleTypeUri) {
         Set<Association> assocs = new HashSet();
         for (HyperEdge edge : hg.getHyperNode(topicId).getHyperEdges(myRoleTypeUri)) {
@@ -141,6 +146,11 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         node.setAttribute("value", value.value());
         //
         return buildTopic(node.getId(), uri, value, typeUri);
+    }
+
+    @Override
+    public void deleteTopic(long topicId) {
+        hg.getHyperNode(topicId).delete();
     }
 
     // === Associations ===
@@ -185,6 +195,11 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     @Override
     public void addAssociationToAssociation(long assocId, AssociationRole assocRole) {
         addAssociationToEdge(hg.getHyperEdge(assocId), assocRole);
+    }
+
+    @Override
+    public void deleteAssociation(long assocId) {
+        hg.getHyperEdge(assocId).delete();
     }
 
     // === DB ===

@@ -164,9 +164,9 @@ var dm3c = new function() {
      *
      * High-level utility method for plugin developers.
      */
-    this.delete_relation = function(rel_id) {
+    this.delete_association = function(rel_id) {
         // update DB
-        dm3c.restc.delete_relation(rel_id)
+        dm3c.restc.delete_association(rel_id)
         // trigger hook
         dm3c.trigger_hook("post_delete_relation", rel_id)
         // update GUI
@@ -585,7 +585,7 @@ var dm3c = new function() {
             icon_td.append(render_topic_anchor(topic, type_icon_tag(topic.type_uri, "type-icon")))
             // label
             var topic_td = $("<td>").addClass("topic-label").addClass(i == topics.length - 1 ? "last-topic" : undefined)
-            var list_item = $("<div>").append(render_topic_anchor(topic, topic.label))
+            var list_item = $("<div>").append(render_topic_anchor(topic, topic.value))
             dm3c.trigger_hook("render_topic_list_item", topic, list_item)
             topic_td.append(list_item)
             //

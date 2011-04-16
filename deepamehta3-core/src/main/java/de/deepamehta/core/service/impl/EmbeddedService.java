@@ -375,26 +375,22 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    /* @DELETE
+    @DELETE
     @Path("/topic/{id}")
     @Override
-    public void deleteTopic(@PathParam("id") long id) {
+    public void deleteTopic(@PathParam("id") long topicId, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            // delete all the topic's relationships
-            for (Relation rel : storage.getRelations(id)) {
-                deleteRelation(rel.id);
-            }
-            //
-            storage.deleteTopic(id);
+            Topic topic = getTopic(topicId, clientContext);
+            deleteTopic(topic);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Topic " + id + " can't be deleted", e);
+            throw new RuntimeException("Deleting topic " + topicId + " failed", e);
         } finally {
             tx.finish();
         }
-    } */
+    }
 
     // === Associations ===
 
@@ -485,25 +481,25 @@ public class EmbeddedService implements CoreService {
         } finally {
             tx.finish();
         }
-    }
+    } */
 
     @DELETE
-    @Path("/relation/{id}")
+    @Path("/association/{id}")
     @Override
-    public void deleteRelation(@PathParam("id") long id) {
+    public void deleteAssociation(@PathParam("id") long assocId, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            triggerHook(Hook.PRE_DELETE_RELATION, id);
-            storage.deleteRelation(id);
-            triggerHook(Hook.POST_DELETE_RELATION, id);
+            triggerHook(Hook.PRE_DELETE_RELATION, assocId);
+            storage.deleteAssociation(assocId);
+            triggerHook(Hook.POST_DELETE_RELATION, assocId);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Relation " + id + " can't be deleted", e);
+            throw new RuntimeException("Deleting association " + assocId + " failed", e);
         } finally {
             tx.finish();
         }
-    } */
+    }
 
     // === Types ===
 
@@ -1039,6 +1035,34 @@ public class EmbeddedService implements CoreService {
             throw new RuntimeException("Associating association with association type \"" +
                 assoc.getTypeUri() + "\" failed (" + assoc + ")", e);
         }
+    }
+
+    // ---
+
+    /**
+     * Deletes a topic in its entirety, that is the topic itself (the <i>whole</i>) and all sub-topics
+     * (the <i>parts</i>) which are associated via "dm3.core.composition" (recursively).
+     */
+    private void deleteTopic(Topic topic) {
+        // 1) step down recusively
+        TopicType topicType = getTopicType(topic.getTypeUri(), null);       // FIXME: clientContext=null
+        if (topicType.getDataTypeUri().equals("dm3.core.composite")) {
+            for (AssociationDefinition assocDef : topicType.getAssocDefs().values()) {
+                String assocDefUri = assocDef.getUri();
+                if (assocDef.getAssocTypeUri().equals("dm3.core.composition")) {
+                    Topic childTopic = new ChildTopicEvaluator(topic, assocDefUri).getChildTopic();
+                    deleteTopic(childTopic);
+                }
+            }
+        }
+        // 2) delete topic
+        // delete all the topic's relationships
+        for (Association assoc : storage.getAssociations(topic.getId())) {
+            deleteAssociation(assoc.getId(), null);                         // FIXME: clientContext=null
+        }
+        //
+        logger.info("Deleting " + topic);
+        storage.deleteTopic(topic.getId());
     }
 
     // === Topic Type Storage ===

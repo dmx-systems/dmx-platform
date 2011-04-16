@@ -117,7 +117,7 @@ public interface CoreService {
 
     public Topic updateTopic(TopicData topicData, ClientContext clientContext);
 
-    // public void deleteTopic(long id);
+    public void deleteTopic(long topicId, ClientContext clientContext);
 
     // === Associations ===
 
@@ -146,7 +146,7 @@ public interface CoreService {
 
     // public void setRelationProperties(long id, Properties properties);
 
-    // public void deleteRelation(long id);
+    public void deleteAssociation(long assocId, ClientContext clientContext);
 
     // === Types ===
 

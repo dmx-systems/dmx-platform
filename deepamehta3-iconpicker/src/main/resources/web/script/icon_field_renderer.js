@@ -31,7 +31,7 @@ function IconFieldRenderer(doc, field, rel_topics) {
         if (old_icon_id) {
             if (old_icon_id != new_icon_id) {
                 // re-assign icon
-                dm3c.delete_relation(dm3c.restc.get_relation(doc.id, old_icon_id).id)
+                dm3c.delete_association(dm3c.restc.get_relation(doc.id, old_icon_id).id)
                 dm3c.create_relation("RELATION", doc.id, new_icon_id)
             }
         } else if (new_icon_id) {

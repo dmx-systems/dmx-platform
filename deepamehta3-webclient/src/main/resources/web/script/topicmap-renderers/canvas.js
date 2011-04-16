@@ -710,7 +710,6 @@ function Canvas() {
     function CanvasTopic(topic, x, y) {
 
         var ct = this   // Note: variable "self" is already in use (canvas reference)
-        var icon
 
         this.x = x
         this.y = y

@@ -74,6 +74,8 @@ public interface DeepaMehtaStorage {
 
     // ---
 
+    Set<Association> getAssociations(long topicId);
+
     Set<Association> getAssociations(long topicId, String myRoleTypeUri);
 
     Association getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
@@ -94,7 +96,7 @@ public interface DeepaMehtaStorage {
      * <p>
      * Prerequisite: the topic has no relations.
      */
-    // void deleteTopic(long id);
+    void deleteTopic(long topicId);
 
     // === Associations ===
 
@@ -134,7 +136,7 @@ public interface DeepaMehtaStorage {
 
     // void setRelationProperties(long id, Properties properties);
 
-    // void deleteRelation(long id);
+    void deleteAssociation(long assocId);
 
     // === DB ===
 

@@ -3,7 +3,7 @@
 
         # Note: The topic types "Topic Type", "Association Type",
         # and "Data Type" are created programmatically.
-        # See EmbeddedService.setupMetaContent()
+        # See EmbeddedService.setupBootstrapContent()
 
         /*{
             value:         "Data Type",
@@ -25,7 +25,7 @@
     assoc_types: [
 
         # Note: The association type "Association" is created programmatically.
-        # See EmbeddedService.setupMetaContent()
+        # See EmbeddedService.setupBootstrapContent()
 
         {
             value: "Aggregation",
@@ -51,7 +51,7 @@
         ### Data Types ###
 
         # Note: The data type "Text" is created programmatically.
-        # See EmbeddedService.setupMetaContent()
+        # See EmbeddedService.setupBootstrapContent()
 
         {
             value:    "Number",

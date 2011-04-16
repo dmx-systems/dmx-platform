@@ -109,8 +109,8 @@ function RESTClient(core_service_uri) {
         request("PUT", "/relation/" + relation_id, properties)
     }
 
-    this.delete_relation = function(id) {
-        request("DELETE", "/relation/" + id)
+    this.delete_association = function(id) {
+        request("DELETE", "/association/" + id)
     }
 
     // === Types ===
