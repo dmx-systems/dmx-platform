@@ -83,7 +83,7 @@ var dm3c = new function() {
     this.update_topic = function(topic, topic_data) {
         // 1) update DB
         // alert("dm3c.update_topic(): topic_data=" + JSON.stringify(topic_data));
-        dm3c.restc.update_topic(topic_data)
+        return dm3c.restc.update_topic(topic_data)
         // 2) update memory
         // ### var old_properties = {}
         // ### js.copy(topic.properties, old_properties)
@@ -336,13 +336,6 @@ var dm3c = new function() {
         }
     }
 
-    /**
-     * Returns the label for the topic.
-     */
-    this.topic_label = function(topic) {
-        return topic.value
-    }
-
     // === Types ===
 
     this.type_label = function(type_uri) {
@@ -428,7 +421,7 @@ var dm3c = new function() {
         action = action || "none"   // set default
         // update canvas
         var highlight = action != "none"
-        dm3c.canvas.add_topic(topic.id, topic.type_uri, dm3c.topic_label(topic), highlight, true, x, y)
+        dm3c.canvas.add_topic(topic, highlight, true, x, y)
         // update detail panel
         switch (action) {
         case "none":

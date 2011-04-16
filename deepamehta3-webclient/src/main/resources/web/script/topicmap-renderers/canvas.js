@@ -52,8 +52,8 @@ function Canvas() {
      * @param   x                   Optional
      * @param   y                   Optional
      */
-    this.add_topic = function(id, type, label, highlight_topic, refresh_canvas, x, y) {
-        if (!topic_exists(id)) {
+    this.add_topic = function(topic, highlight_topic, refresh_canvas, x, y) {
+        if (!topic_exists(topic.id)) {
             // init geometry
             if (x == undefined && y == undefined) {
                 if (grid_positioning) {
@@ -66,14 +66,14 @@ function Canvas() {
                 }
             }
             // update model
-            var ct = new CanvasTopic(id, type, label, x, y)
+            var ct = new CanvasTopic(topic, x, y)
             canvas_topics.push(ct)
             // trigger hook
             dm3c.trigger_hook("post_add_topic_to_canvas", ct)
         }
         // highlight topic
         if (highlight_topic) {
-            set_highlight_topic(id)
+            set_highlight_topic(topic.id)
         }
         // update GUI
         if (refresh_canvas) {
@@ -93,6 +93,10 @@ function Canvas() {
         if (refresh_canvas) {
             this.refresh()
         }
+    }
+
+    this.update_topic = function(topic) {
+        topic_by_id(topic.id).update(topic)
     }
 
     this.remove_topic = function(id, refresh_canvas, is_part_of_delete_operation) {
@@ -151,10 +155,6 @@ function Canvas() {
         for (var i = 0; i < assoc_ids.length; i++) {
             this.remove_relation(assoc_ids[i], false, is_part_of_delete_operation)
         }
-    }
-
-    this.set_topic_label = function(id, label) {
-        topic_by_id(id).set_label(label)
     }
 
     this.scroll_topic_to_center = function(topic_id) {
@@ -350,7 +350,7 @@ function Canvas() {
             if (ct) {
                 var assoc = dm3c.create_association("dm3.core.association", [
                     {topic_id: dm3c.selected_topic.id, role_type_uri: dm3c.selected_topic.type_uri},
-                    {topic_id: ct.id,                  role_type_uri: ct.type}
+                    {topic_id: ct.id,                  role_type_uri: ct.type_uri}
                 ])
                 dm3c.canvas.add_association(assoc)
                 select_topic(dm3c.selected_topic.id)
@@ -702,32 +702,27 @@ function Canvas() {
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
-    function CanvasTopic(id, type, label, x, y) {
+    /**
+     * Properties:
+     *  x, y            Topic position. Represents the center of the topic's icon.
+     *  width, height   Icon size.
+     */
+    function CanvasTopic(topic, x, y) {
 
-        var icon = dm3c.get_type_icon(type)
-        var w = icon.width
-        var h = icon.height
+        var ct = this   // Note: variable "self" is already in use (canvas reference)
+        var icon
 
-        this.id = id
-        this.type = type                    // FIXME: rename to type_uri
-        this.label = label
         this.x = x
         this.y = y
-        this.icon = icon
-        this.width = w
-        this.height = h
 
-        // label div
-        this.lox = -w / 2                   // label offset
-        this.loy = h / 2 + LABEL_DIST_Y     // label offset
-        init_label_pos(this)
-        build_label(this)
+        init(topic);
+        build_label()
 
         this.move_to = function(x, y) {
             this.x = x
             this.y = y
-            init_label_pos(this)
-            this.label_div.css(label_position_css(this))
+            init_label_pos()
+            this.label_div.css(label_position_css())
         }
 
         this.move_by = function(tx, ty) {
@@ -739,19 +734,35 @@ function Canvas() {
         this.move_label_by = function(tx, ty) {
             this.label_x += tx
             this.label_y += ty
-            this.label_div.css(label_position_css(this))
-        }
-        
-        this.set_label = function(label) {
-            this.label = label
-            this.label_div.text(this.label)
+            this.label_div.css(label_position_css())
         }
 
         this.build_label = function() {
-            build_label(this)
+            build_label()
         }
 
-        function init_label_pos(ct) {
+        this.update = function(topic) {
+            init(topic)
+            this.label_div.text(this.label)
+        }
+
+        function init(topic) {
+            ct.id       = topic.id
+            ct.type_uri = topic.type_uri
+            ct.label    = topic.value
+            //
+            ct.icon = dm3c.get_type_icon(topic.type_uri)
+            var w = ct.icon.width
+            var h = ct.icon.height
+            ct.width = w
+            ct.height = h
+            // label div
+            ct.lox = -w / 2                   // label offset
+            ct.loy = h / 2 + LABEL_DIST_Y     // label offset
+            init_label_pos()
+        }
+
+        function init_label_pos() {
             ct.label_x = ct.x + ct.lox + trans_x
             ct.label_y = ct.y + ct.loy + trans_y
         }
@@ -761,7 +772,7 @@ function Canvas() {
          * - the topic is build initially.
          * - all label div's are rebuild (in reaction of resizing the canvas).
          */
-        function build_label(ct) {
+        function build_label() {
             // Note: we must add the label div to the document (along with text content and max-width
             // setting) _before_ the clipping is applied. Otherwise the clipping can't be calculated
             // because the size of the label div is unknown.
@@ -769,7 +780,7 @@ function Canvas() {
             ct.label_div.css({"max-width": LABEL_MAX_WIDTH})
             ct.label_div.mouseup(mouseup)       // to not block mouse gestures when mouse-up over the label div
             $("#canvas-panel").append(ct.label_div)
-            ct.label_div.css(label_position_css(ct))
+            ct.label_div.css(label_position_css())
             // Note: we must add the label div as a canvas sibling. As a canvas child element it doesn't appear.
         }
 
@@ -781,7 +792,7 @@ function Canvas() {
          * - the topic has moved.
          * - the label div has moved.
          */
-        function label_position_css(ct) {
+        function label_position_css() {
             // 1) Positioning
             var css = {position: "absolute", top: ct.label_y + "px", left: ct.label_x + "px"}
             // 2) Clipping

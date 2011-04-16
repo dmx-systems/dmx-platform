@@ -18,9 +18,11 @@ function TopicmapRenderer() {
      * @param   x                   Optional
      * @param   y                   Optional
      */
-    this.add_topic = function(id, type, label, highlight_topic, refresh_canvas, x, y) {}
+    this.add_topic = function(topic, highlight_topic, refresh_canvas, x, y) {}
 
     this.add_association = function(assoc, refresh_canvas) {}
+
+    this.update_topic = function(topic) {}
 
     this.remove_topic = function(id, refresh_canvas, is_part_of_delete_operation) {}
 
@@ -33,8 +35,6 @@ function TopicmapRenderer() {
     this.remove_relation = function(id, refresh_canvas, is_part_of_delete_operation) {}
 
     this.remove_all_relations_of_topic = function(topic_id, is_part_of_delete_operation) {}
-
-    this.set_topic_label = function(id, label) {}
 
     this.scroll_topic_to_center = function(topic_id) {}
 

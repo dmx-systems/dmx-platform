@@ -69,6 +69,26 @@ public class Composite {
 
     // ---
 
+    public String getLabel() {
+        return getLabel(this);
+    }
+
+    private String getLabel(Object value) {
+        if (value instanceof Composite) {
+            Composite comp = (Composite) value;
+            Iterator<String> i = comp.keys();
+            if (i.hasNext()) {
+                return getLabel(comp.get(i.next()));
+            } else {
+                return null;
+            }
+        } else {
+            return value.toString();
+        }
+    }
+
+    // ---
+
     public JSONObject toJSON() {
         return values;
     }

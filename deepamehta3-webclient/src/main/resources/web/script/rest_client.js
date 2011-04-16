@@ -61,7 +61,7 @@ function RESTClient(core_service_uri) {
     }
 
     this.update_topic = function(topic_data) {
-        request("PUT", "/topic", topic_data)
+        return request("PUT", "/topic", topic_data)
     }
 
     this.delete_topic = function(id) {

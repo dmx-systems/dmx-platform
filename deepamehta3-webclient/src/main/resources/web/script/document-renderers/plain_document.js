@@ -99,15 +99,13 @@ function PlainDocument() {
     this.process_form = function(topic) {
 
         // 1) update DB and memory
-        dm3c.update_topic(topic, build_topic_data())
+        topic = dm3c.update_topic(topic, build_topic_data())
         dm3c.trigger_hook("post_submit_form", topic)
         // 2) update GUI
-        var topic_id = topic.id
-        var label = dm3c.topic_label(topic)
-        dm3c.canvas.set_topic_label(topic_id, label)
+        dm3c.canvas.update_topic(topic)
         dm3c.canvas.refresh()
         dm3c.render_topic()
-        dm3c.trigger_hook("post_set_topic_label", topic_id, label)
+        // ### dm3c.trigger_hook("post_set_topic_label", topic_id, label)
 
         /**
          * Reads out values from GUI elements and builds a topic data object from it.

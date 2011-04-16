@@ -346,7 +346,7 @@ public class EmbeddedService implements CoreService {
     @PUT
     @Path("/topic")
     @Override
-    public void updateTopic(TopicData topicData, @HeaderParam("Cookie") ClientContext clientContext) {
+    public Topic updateTopic(TopicData topicData, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             Topic topic = getTopic(topicData.getId(), clientContext);
@@ -358,12 +358,15 @@ public class EmbeddedService implements CoreService {
             Composite comp = topicData.getComposite();
             if (comp != null) {
                 storeComposite(topic, comp);
+                storage.setTopicValue(topic.getId(), new TopicValue(comp.getLabel()));
             }
             //
+            topic = getTopic(topicData.getId(), clientContext);
             // ### topic.setProperties(properties);
             // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
             //
             tx.success();
+            return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Updating topic failed (" + topicData + ")", e);

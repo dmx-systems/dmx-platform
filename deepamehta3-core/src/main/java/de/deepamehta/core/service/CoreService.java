@@ -115,7 +115,7 @@ public interface CoreService {
 
     public Topic createTopic(TopicData topicData, ClientContext clientContext);
 
-    public void updateTopic(TopicData topicData, ClientContext clientContext);
+    public Topic updateTopic(TopicData topicData, ClientContext clientContext);
 
     // public void deleteTopic(long id);
 
