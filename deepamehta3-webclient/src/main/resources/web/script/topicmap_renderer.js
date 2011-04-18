@@ -32,9 +32,9 @@ function TopicmapRenderer() {
      *
      * @param   refresh_canvas  Optional - if true, the canvas is refreshed.
      */
-    this.remove_relation = function(id, refresh_canvas, is_part_of_delete_operation) {}
+    this.remove_association = function(id, refresh_canvas, is_part_of_delete_operation) {}
 
-    this.remove_all_relations_of_topic = function(topic_id, is_part_of_delete_operation) {}
+    this.remove_all_associations_of_topic = function(topic_id, is_part_of_delete_operation) {}
 
     this.scroll_topic_to_center = function(topic_id) {}
 

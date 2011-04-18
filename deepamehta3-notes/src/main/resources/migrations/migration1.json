@@ -42,7 +42,7 @@
                 {
                     type_uri: "dm3.webclient.view_config",
                     composite: {
-                        dm3.webclient.icon_src: "/de.deepamehta.3-notes/images/pencil.png"
+                        dm3.webclient.icon_src: "/de.deepamehta.3-notes/images/yellow-ball.png"
                     }
                 }
             ]

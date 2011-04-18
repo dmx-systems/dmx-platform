@@ -5,7 +5,7 @@ var dm3c = new function() {
     this.SEARCH_FIELD_WIDTH = 16    // in chars
     this.COMPOSITE_PATH_SEPARATOR = "/"
     var UPLOAD_DIALOG_WIDTH = "50em"
-    var GENERIC_TOPIC_ICON_SRC = "images/gray-dot.png"
+    var GENERIC_TOPIC_ICON_SRC = "images/grey-ball.png"
 
     var EXCLUDE_TYPES_FROM_MENUS = [
         "de/deepamehta/core/topictype/Workspace",
@@ -113,8 +113,8 @@ var dm3c = new function() {
      */
     this.hide_topic = function(topic_id, is_part_of_delete_operation) {
         // canvas
-        dm3c.canvas.remove_all_relations_of_topic(topic_id, is_part_of_delete_operation)
-        dm3c.canvas.remove_topic(topic_id, true, is_part_of_delete_operation)    // refresh=true
+        dm3c.canvas.remove_all_associations_of_topic(topic_id, is_part_of_delete_operation)
+        dm3c.canvas.remove_topic(topic_id, true, is_part_of_delete_operation)       // refresh_canvas=true
         // detail panel
         if (topic_id == dm3c.selected_topic.id) {
             dm3c.selected_topic = null
@@ -159,28 +159,28 @@ var dm3c = new function() {
     }
 
     /**
-     * Deletes a relation from the DB, and from the view (canvas).
+     * Deletes an association from the DB, and from the view (canvas).
      * Note: the canvas and the detail panel are not refreshed.
      *
      * High-level utility method for plugin developers.
      */
-    this.delete_association = function(rel_id) {
+    this.delete_association = function(assoc_id) {
         // update DB
-        dm3c.restc.delete_association(rel_id)
+        dm3c.restc.delete_association(assoc_id)
         // trigger hook
-        dm3c.trigger_hook("post_delete_relation", rel_id)
+        dm3c.trigger_hook("post_delete_relation", assoc_id)
         // update GUI
-        dm3c.hide_relation(rel_id, true)     // is_part_of_delete_operation=true
+        dm3c.hide_association(assoc_id, true)     // is_part_of_delete_operation=true
     }
 
     /**
-     * Hides a relation from the GUI (canvas).
+     * Hides an association from the GUI (canvas).
      * Note: the canvas is not refreshed.
      *
-     * High-level utility method for plugin developers.
+     * High-level utility method for plugin developers (### the is_part_of_delete_operation parameter is not!).
      */
-    this.hide_relation = function(rel_id, is_part_of_delete_operation) {
-        dm3c.canvas.remove_relation(rel_id, false, is_part_of_delete_operation)
+    this.hide_association = function(assoc_id, is_part_of_delete_operation) {
+        dm3c.canvas.remove_association(assoc_id, false, is_part_of_delete_operation)  // refresh_canvas=false
     }
 
 
@@ -353,8 +353,8 @@ var dm3c = new function() {
         return get_commands(dm3c.trigger_hook("add_topic_commands", topic), context)
     }
 
-    this.get_relation_commands = function(relation, context) {
-        return get_commands(dm3c.trigger_hook("add_relation_commands", relation), context)
+    this.get_association_commands = function(assoc, context) {
+        return get_commands(dm3c.trigger_hook("add_association_commands", assoc), context)
     }
 
     this.get_canvas_commands = function(cx, cy, context) {

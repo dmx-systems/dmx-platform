@@ -79,7 +79,7 @@ function default_plugin () {
         }
     }
 
-    this.add_relation_commands = function(relation) {
+    this.add_association_commands = function(relation) {
 
         return [
             {label: "Hide",   handler: do_hide,    context: "context-menu"},
@@ -89,7 +89,7 @@ function default_plugin () {
 
         function do_hide() {
             // update model
-            dm3c.hide_relation(relation.id)
+            dm3c.hide_association(relation.id)
             // update view
             dm3c.canvas.refresh()
         }

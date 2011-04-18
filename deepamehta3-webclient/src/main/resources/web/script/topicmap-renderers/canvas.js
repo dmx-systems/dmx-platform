@@ -103,7 +103,7 @@ function Canvas() {
         // 1) update model
         var ct = remove_topic(id)
         // assertion
-        if (ct) {
+        if (!ct) {
             throw "remove_topic: topic not on canvas (" + id + ")"
         }
         // 2) update GUI
@@ -123,14 +123,14 @@ function Canvas() {
      *
      * @param   refresh_canvas  Optional - if true, the canvas is refreshed.
      */
-    this.remove_relation = function(id, refresh_canvas, is_part_of_delete_operation) {
+    this.remove_association = function(id, refresh_canvas, is_part_of_delete_operation) {
         // 1) update model
         var ca = remove_association(id)
         // Note: it is not an error if the relation is not present on the canvas. This can happen
         // for prgrammatically deleted relations, e.g. when updating a data field of type "reference".
         if (!ca) {
             return
-            // throw "remove_relation: relation not on canvas (" + id + ")"
+            // throw "remove_association: relation not on canvas (" + id + ")"
         }
         //
         if (dm3c.current_rel_id == id) {
@@ -146,10 +146,10 @@ function Canvas() {
         }
     }
 
-    this.remove_all_relations_of_topic = function(topic_id, is_part_of_delete_operation) {
+    this.remove_all_associations_of_topic = function(topic_id, is_part_of_delete_operation) {
         var assoc_ids = assoc_ids_of_topic(topic_id)
         for (var i = 0; i < assoc_ids.length; i++) {
-            this.remove_relation(assoc_ids[i], false, is_part_of_delete_operation)
+            this.remove_association(assoc_ids[i], false, is_part_of_delete_operation)   // refresh_canvas=false
         }
     }
 
@@ -242,8 +242,8 @@ function Canvas() {
 
     function draw_associations() {
         iterate_associations(function(ca) {
-            var ct1 = get_topic(ca.topic_roles[0].topic_id)
-            var ct2 = get_topic(ca.topic_roles[1].topic_id)
+            var ct1 = get_topic(ca.get_topic1_id())
+            var ct2 = get_topic(ca.get_topic2_id())
             // assertion
             if (!ct1 || !ct2) {
                 // TODO: deleted relations must be removed from all topicmaps.
@@ -277,7 +277,7 @@ function Canvas() {
 
 
 
-    /*** Mouse Events ***/
+    // === Mouse Events ===
 
     function mousedown(event) {
         if (dm3c.LOG_GUI) dm3c.log("Mouse down!")
@@ -389,8 +389,8 @@ function Canvas() {
         var x = cx(event, true)
         var y = cy(event, true)
         return iterate_associations(function(ca) {
-            var ct1 = get_topic(ca.doc1_id)
-            var ct2 = get_topic(ca.doc2_id)
+            var ct1 = get_topic(ca.get_topic1_id())
+            var ct2 = get_topic(ca.get_topic2_id())
             // bounding rectangle
             var aw2 = ASSOC_WIDTH / 2   // buffer to make orthogonal associations selectable
             var bx1 = Math.min(ct1.x, ct2.x) - aw2
@@ -438,7 +438,9 @@ function Canvas() {
         }
     }
 
-    /*** Context Menu Events ***/
+
+
+    // === Context Menu Events ===
 
     function contextmenu(event) {
         if (dm3c.LOG_GUI) dm3c.log("Contextmenu!")
@@ -453,7 +455,7 @@ function Canvas() {
         } else if (ca = assoc_by_position(event)) {
             dm3c.current_rel_id = ca.id
             draw()
-            var commands = dm3c.get_relation_commands(ca, "context-menu")
+            var commands = dm3c.get_association_commands(ca, "context-menu")
         } else {
             var x = cx(event, true)
             var y = cy(event, true)
@@ -502,7 +504,9 @@ function Canvas() {
         $("#canvas-panel .contextmenu").remove()
     }
 
-    /*** Drag and Drop Events ***/
+
+
+    // === Drag and Drop Events ===
 
     // Required. Otherwise we don't receive a drop.
     function dragover () {
@@ -595,7 +599,7 @@ function Canvas() {
     function assoc_ids_of_topic(topic_id) {
         var assoc_ids = []
         iterate_associations(function(ca) {
-            if (ca.doc1_id == topic_id || ca.doc2_id == topic_id) {
+            if (ca.get_topic1_id() == topic_id || ca.get_topic2_id() == topic_id) {
                 assoc_ids.push(ca.id)
             }
         })
@@ -849,6 +853,14 @@ function Canvas() {
         this.type_uri = assoc.type_uri
         this.topic_roles = assoc.topic_roles
         this.assoc_roles = assoc.assoc_roles
+
+        this.get_topic1_id = function() {
+            return this.topic_roles[0].topic_id
+        }
+
+        this.get_topic2_id = function() {
+            return this.topic_roles[1].topic_id
+        }
     }
 
     // ---
