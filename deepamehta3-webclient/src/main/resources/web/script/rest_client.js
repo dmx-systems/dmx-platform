@@ -194,7 +194,7 @@ function RESTClient(core_service_uri) {
         var exception               // in case of unsuccessful request: possibly an exception
         //
         if (LOG_AJAX_REQUESTS) dm3c.log(method + " " + uri + "\n..... " + JSON.stringify(data))
-        // 
+        //
         content_type = content_type || "application/json"       // set default
         if (content_type == "application/json") {
             data = JSON.stringify(data)
@@ -232,7 +232,7 @@ function RESTClient(core_service_uri) {
     }
 
     function RequestParameter(params) {
-        
+
         var param_array = []
 
         if (params && !params.length) {

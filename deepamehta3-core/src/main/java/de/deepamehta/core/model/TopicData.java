@@ -24,7 +24,7 @@ public class TopicData {
     protected long id;
     protected String uri;           // is never null, may be empty
     protected TopicValue value;     // is never null, may be constructed on empty string
-    protected String typeUri;       // 
+    protected String typeUri;       //
     protected Composite composite;  // may be null ### Should it initialized always? Would easify some code
 
     // ---------------------------------------------------------------------------------------------------- Constructors

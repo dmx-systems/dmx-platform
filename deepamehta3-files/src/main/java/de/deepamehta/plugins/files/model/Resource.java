@@ -9,7 +9,7 @@ import java.net.URL;
  * Everything an URL can point to.
  */
 public class Resource {
-    
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     // used for local directories

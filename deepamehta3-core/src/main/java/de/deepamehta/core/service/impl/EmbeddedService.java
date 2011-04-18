@@ -1040,11 +1040,11 @@ public class EmbeddedService implements CoreService {
     // ---
 
     /**
-     * Deletes a topic in its entirety, that is the topic itself (the <i>whole</i>) and all sub-topics
-     * (the <i>parts</i>) which are associated via "dm3.core.composition" (recursively).
+     * Recursively deletes a topic in its entirety, that is the topic itself (the <i>whole</i>) and all sub-topics
+     * associated via "dm3.core.composition" (the <i>parts</i>).
      */
     private void deleteTopic(Topic topic) {
-        // 1) step down recusively
+        // 1) step down recursively
         TopicType topicType = getTopicType(topic.getTypeUri(), null);       // FIXME: clientContext=null
         if (topicType.getDataTypeUri().equals("dm3.core.composite")) {
             for (AssociationDefinition assocDef : topicType.getAssocDefs().values()) {
@@ -1056,7 +1056,7 @@ public class EmbeddedService implements CoreService {
             }
         }
         // 2) delete topic
-        // delete all the topic's relationships
+        // delete all the topic's relationships first
         for (Association assoc : storage.getAssociations(topic.getId())) {
             deleteAssociation(assoc.getId(), null);                         // FIXME: clientContext=null
         }

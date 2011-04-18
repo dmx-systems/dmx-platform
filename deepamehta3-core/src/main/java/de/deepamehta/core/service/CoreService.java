@@ -177,7 +177,7 @@ public interface CoreService {
     public void unregisterPlugin(String pluginId);
 
     public Plugin getPlugin(String pluginId);
-    
+
     public Set<PluginInfo> getPluginInfo();
 
     public void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall);

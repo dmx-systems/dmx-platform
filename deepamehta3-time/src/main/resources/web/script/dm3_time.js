@@ -44,4 +44,4 @@ function dm3_time() {
         var time_div = $("<div>").addClass("result-item-time").append(js.format_timestamp(timestamp))
         return list_item.append(time_div)
     }
-} 
+}

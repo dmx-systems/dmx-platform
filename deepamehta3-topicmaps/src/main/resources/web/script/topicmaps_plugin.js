@@ -136,7 +136,7 @@ function topicmaps_plugin() {
      * @param   topic   a Topic object
      */
     this.post_delete_topic = function(topic) {
-        // 1) Remove topic from all topicmap models 
+        // 1) Remove topic from all topicmap models
         if (LOG_TOPICMAPS) dm3c.log("Deleting topic " + topic.id + " from all topicmaps")
         for (var id in topicmaps) {
             topicmaps[id].delete_topic(topic.id)
@@ -164,7 +164,7 @@ function topicmaps_plugin() {
     }
 
     this.post_delete_relation = function(relation_id) {
-        // Remove relation from all topicmap models 
+        // Remove relation from all topicmap models
         if (LOG_TOPICMAPS) dm3c.log("Deleting relation " + relation_id + " from all topicmaps")
         for (var id in topicmaps) {
             topicmaps[id].delete_relation(relation_id)
@@ -218,7 +218,7 @@ function topicmaps_plugin() {
     /**
      * Reloads a topicmap from DB and displays it on the canvas.
      *
-     * Prerequisite: the topicmap is already selected in the topicmap menu. 
+     * Prerequisite: the topicmap is already selected in the topicmap menu.
      */
     this.refresh_topicmap = function(topicmap_id) {
         delete topicmaps[topicmap_id]
@@ -309,7 +309,7 @@ function topicmaps_plugin() {
      *
      * Updates global state: "topicmap", the selected topicmap.
      *
-     * Prerequisite: the topicmap is already selected in the topicmap menu. 
+     * Prerequisite: the topicmap is already selected in the topicmap menu.
      */
     function display_topicmap(topicmap_id) {
         if (LOG_TOPICMAPS) dm3c.log("Selecting topicmap " + topicmap_id)

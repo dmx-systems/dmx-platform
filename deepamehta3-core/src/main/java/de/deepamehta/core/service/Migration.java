@@ -9,7 +9,7 @@ import java.io.InputStream;
 public abstract class Migration {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
-    
+
     protected CoreService dms;
 
     // -------------------------------------------------------------------------------------------------- Public Methods

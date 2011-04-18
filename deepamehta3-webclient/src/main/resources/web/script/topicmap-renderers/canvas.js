@@ -19,12 +19,12 @@ function Canvas() {
     var LABEL_MAX_WIDTH = "10em"
 
     // Model
-    var canvas_topics               // topics displayed on canvas (array of CanvasTopic)
-    var canvas_assocs               // relations displayed on canvas (array of CanvasAssoc)
+    var canvas_topics               // topics displayed on canvas (Object, key: topic ID, value: CanvasTopic)
+    var canvas_assocs               // relations displayed on canvas (Object, key: assoc ID, value: CanvasAssoc)
     var trans_x, trans_y            // canvas translation (in pixel)
     var highlight_topic_id          // ID of the highlighted topic (drawn with red frame), if any
     var grid_positioning            // while grid positioning is in progress: a GridPositioning object, null otherwise
-    
+
     // View (Canvas)
     var ctx                         // the canvas drawing context
 
@@ -67,7 +67,7 @@ function Canvas() {
             }
             // update model
             var ct = new CanvasTopic(topic, x, y)
-            canvas_topics.push(ct)
+            add_topic(ct)
             // trigger hook
             dm3c.trigger_hook("post_add_topic_to_canvas", ct)
         }
@@ -82,10 +82,10 @@ function Canvas() {
     }
 
     this.add_association = function(assoc, refresh_canvas) {
-        if (!assoc_exists(assoc.id)) {
+        if (!association_exists(assoc.id)) {
             // update model
             var ca = new CanvasAssoc(assoc)
-            canvas_assocs.push(ca)
+            add_association(ca)
             // trigger hook
             dm3c.trigger_hook("post_add_relation_to_canvas", ca)
         }
@@ -96,24 +96,22 @@ function Canvas() {
     }
 
     this.update_topic = function(topic) {
-        topic_by_id(topic.id).update(topic)
+        get_topic(topic.id).update(topic)
     }
 
     this.remove_topic = function(id, refresh_canvas, is_part_of_delete_operation) {
-        var i = topic_index(id)
+        // 1) update model
+        var ct = remove_topic(id)
         // assertion
-        if (i == -1) {
+        if (ct) {
             throw "remove_topic: topic not on canvas (" + id + ")"
         }
-        // update model
-        var ct = canvas_topics[i]
-        canvas_topics.splice(i, 1)
-        // update GUI
+        // 2) update GUI
         ct.label_div.remove()
         if (refresh_canvas) {
             this.refresh()
         }
-        // trigger hook
+        // 3) trigger hook
         if (!is_part_of_delete_operation) {
             dm3c.trigger_hook("post_hide_topic_from_canvas", ct)
         }
@@ -126,25 +124,23 @@ function Canvas() {
      * @param   refresh_canvas  Optional - if true, the canvas is refreshed.
      */
     this.remove_relation = function(id, refresh_canvas, is_part_of_delete_operation) {
-        var i = assoc_index(id)
+        // 1) update model
+        var ca = remove_association(id)
         // Note: it is not an error if the relation is not present on the canvas. This can happen
         // for prgrammatically deleted relations, e.g. when updating a data field of type "reference".
-        if (i == -1) {
+        if (!ca) {
             return
             // throw "remove_relation: relation not on canvas (" + id + ")"
         }
-        // update model
-        var ca = canvas_assocs[i]
-        canvas_assocs.splice(i, 1)
         //
         if (dm3c.current_rel_id == id) {
             dm3c.current_rel_id = null
         }
-        // update GUI
+        // 2) update GUI
         if (refresh_canvas) {
             this.refresh()
         }
-        // trigger hook
+        // 3) trigger hook
         if (!is_part_of_delete_operation) {
             dm3c.trigger_hook("post_hide_relation_from_canvas", ca)
         }
@@ -158,7 +154,7 @@ function Canvas() {
     }
 
     this.scroll_topic_to_center = function(topic_id) {
-        var ct = topic_by_id(topic_id)
+        var ct = get_topic(topic_id)
         scroll_to_center(ct.x + trans_x, ct.y + trans_y)
     }
 
@@ -172,7 +168,7 @@ function Canvas() {
 
     this.begin_relation = function(topic_id, event) {
         relation_in_progress = true
-        action_topic = topic_by_id(topic_id)
+        action_topic = get_topic(topic_id)
         //
         tmp_x = cx(event)
         tmp_y = cy(event)
@@ -226,8 +222,7 @@ function Canvas() {
     function draw_topics() {
         ctx.lineWidth = ACTIVE_TOPIC_WIDTH
         ctx.strokeStyle = ACTIVE_COLOR
-        for (var i in canvas_topics) {
-            var ct = canvas_topics[i]
+        iterate_topics(function(ct) {
             var w = ct.icon.width
             var h = ct.icon.height
             try {
@@ -242,20 +237,19 @@ function Canvas() {
                     "\nicon.height=" + ct.icon.height  + "\nicon.complete=" + ct.icon.complete
                     /* + "\n" + JSON.stringify(e) */)
             }
-        }
+        })
     }
 
     function draw_associations() {
-        for (var i in canvas_assocs) {
-            var ca = canvas_assocs[i]
-            var ct1 = topic_by_id(ca.topic_roles[0].topic_id)
-            var ct2 = topic_by_id(ca.topic_roles[1].topic_id)
+        iterate_associations(function(ca) {
+            var ct1 = get_topic(ca.topic_roles[0].topic_id)
+            var ct2 = get_topic(ca.topic_roles[1].topic_id)
             // assertion
             if (!ct1 || !ct2) {
                 // TODO: deleted relations must be removed from all topicmaps.
-                dm3c.log("### ERROR in draw_associations: relation " + ca.id + " is missing a topic")
-                delete canvas_assocs[i]
-                continue
+                alert("ERROR in draw_associations: relation " + ca.id + " is missing a topic")
+                // ### delete canvas_assocs[i]
+                return
             }
             // hightlight
             if (dm3c.current_rel_id == ca.id) {
@@ -263,7 +257,7 @@ function Canvas() {
             }
             //
             draw_line(ct1.x, ct1.y, ct2.x, ct2.y, ASSOC_WIDTH, ASSOC_COLOR)
-        }
+        })
     }
 
     function draw_line(x1, y1, x2, y2, width, color) {
@@ -382,22 +376,21 @@ function Canvas() {
     function topic_by_position(event) {
         var x = cx(event, true)
         var y = cy(event, true)
-        for (var i = 0, ct; ct = canvas_topics[i]; i++) {
+        return iterate_topics(function(ct) {
             if (x >= ct.x - ct.width / 2 && x < ct.x + ct.width / 2 &&
                 y >= ct.y - ct.height / 2 && y < ct.y + ct.height / 2) {
                 //
                 return ct
             }
-        }
+        })
     }
 
     function assoc_by_position(event) {
         var x = cx(event, true)
         var y = cy(event, true)
-        for (var i in canvas_assocs) {
-            var ca = canvas_assocs[i]
-            var ct1 = topic_by_id(ca.doc1_id)
-            var ct2 = topic_by_id(ca.doc2_id)
+        return iterate_associations(function(ca) {
+            var ct1 = get_topic(ca.doc1_id)
+            var ct2 = get_topic(ca.doc2_id)
             // bounding rectangle
             var aw2 = ASSOC_WIDTH / 2   // buffer to make orthogonal associations selectable
             var bx1 = Math.min(ct1.x, ct2.x) - aw2
@@ -406,7 +399,7 @@ function Canvas() {
             var by2 = Math.max(ct1.y, ct2.y) + aw2
             var in_bounding = x > bx1 && x < bx2 && y > by1 && y < by2
             if (!in_bounding) {
-                continue
+                return
             }
             // gradient
             var g1 = (y - ct1.y) / (x - ct1.x)
@@ -416,8 +409,7 @@ function Canvas() {
             if (Math.abs(g1 - g2) < ASSOC_CLICK_TOLERANCE) {
                 return ca
             }
-        }
-        return null
+        })
     }
 
     // ---
@@ -532,15 +524,93 @@ function Canvas() {
 
 
 
-    /*** Model Helper ***/
-
-    // Mutator methods
+    // === Model Helper ===
 
     function init_model() {
-        canvas_topics = []
-        canvas_assocs = []
+        canvas_topics = {}
+        canvas_assocs = {}
         trans_x = 0, trans_y = 0
     }
+
+    // ---
+
+    function get_topic(id) {
+        return canvas_topics[id]
+    }
+
+    function add_topic(ct) {
+        canvas_topics[ct.id] = ct
+    }
+
+    function remove_topic(id) {
+        var ct = get_topic(id)
+        delete canvas_topics[id]
+        return ct
+    }
+
+    function topic_exists(id) {
+        return get_topic(id) != undefined
+    }
+
+    function iterate_topics(func) {
+        for (var id in canvas_topics) {
+            var ret = func(get_topic(id))
+            if (ret) {
+                return ret
+            }
+        }
+    }
+
+    // ---
+
+    function get_association(id) {
+        return canvas_assocs[id]
+    }
+
+    function add_association(ca) {
+        canvas_assocs[ca.id] = ca
+    }
+
+    function remove_association(id) {
+        var ca = get_association(id)
+        delete canvas_assocs[id]
+        return ca
+    }
+
+    function association_exists(id) {
+        return get_association(id) != undefined
+    }
+
+    function iterate_associations(func) {
+        for (var id in canvas_assocs) {
+            var ret = func(get_association(id))
+            if (ret) {
+                return ret
+            }
+        }
+    }
+
+    // ---
+
+    function assoc_ids_of_topic(topic_id) {
+        var assoc_ids = []
+        iterate_associations(function(ca) {
+            if (ca.doc1_id == topic_id || ca.doc2_id == topic_id) {
+                assoc_ids.push(ca.id)
+            }
+        })
+        return assoc_ids
+    }
+
+    // ---
+
+    function set_highlight_topic(topic_id) {
+        highlight_topic_id = topic_id
+    }
+
+
+
+    // === GUI Helper ===
 
     function select_topic(topic_id, synchronous) {
         set_highlight_topic(topic_id)
@@ -552,53 +622,7 @@ function Canvas() {
         }
     }
 
-    function set_highlight_topic(topic_id) {
-        highlight_topic_id = topic_id
-    }
-
-    // Accessor methods
-
-    function topic_index(topic_id) {
-        for (var i = 0, ct; ct = canvas_topics[i]; i++) {
-            if (ct.id == topic_id) {
-                return i
-            }
-        }
-        return -1
-    }
-
-    function topic_exists(topic_id) {
-        return topic_index(topic_id) >= 0
-    }
-
-    function assoc_index(assoc_id) {
-        for (var i = 0, ca; ca = canvas_assocs[i]; i++) {
-            if (ca.id == assoc_id) {
-                return i
-            }
-        }
-        return -1
-    }
-
-    function assoc_exists(assoc_id) {
-        return assoc_index(assoc_id) >= 0
-    }
-
-    function topic_by_id(topic_id) {
-        return canvas_topics[topic_index(topic_id)]
-    }
-
-    function assoc_ids_of_topic(topic_id) {
-        var assoc_ids = []
-        for (var i = 0, ca; ca = canvas_assocs[i]; i++) {
-            if (ca.doc1_id == topic_id || ca.doc2_id == topic_id) {
-                assoc_ids.push(ca.id)
-            }
-        }
-        return assoc_ids
-    }
-
-    /*** GUI Helper ***/
+    // ---
 
     /**
      * Creates the HTML5 canvas element, binds the event handlers, and adds it to the document.
@@ -650,15 +674,15 @@ function Canvas() {
     }
 
     function move_topic_labels_by(tx, ty) {
-         for (var i = 0, ct; ct = canvas_topics[i]; i++) {
+         iterate_topics(function(ct) {
              ct.move_label_by(tx, ty)
-         }
+         })
     }
 
     function rebuild_topic_labels() {
-         for (var i = 0, ct; ct = canvas_topics[i]; i++) {
+        iterate_topics(function(ct) {
              ct.build_label()
-         }
+        })
     }
 
     function scroll_to_center(x, y) {
@@ -857,11 +881,11 @@ function Canvas() {
 
         function find_start_postition() {
             var max_y = MIN_Y
-            for (var i = 0, ct; ct = canvas_topics[i]; i++) {
+            iterate_topics(function(ct) {
                 if (ct.y > max_y) {
                     max_y = ct.y
                 }
-            }
+            })
             var x = START_X
             var y = max_y != MIN_Y ? max_y + GRID_DIST_Y : START_Y
             return {x: x, y: y}

@@ -9,7 +9,7 @@ import java.net.URL;
 
 
 public class ResourceInfo {
-    
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private String kind;    // "file", "directory", "remote"

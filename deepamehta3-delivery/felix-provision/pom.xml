@@ -10,7 +10,7 @@
 
     <!--
         All modules that belong to the Apache Felix 3 installation.
-        
+
         These dependencies are deployed as bundles in Felix when
             - running pax:run from the deepamehta3-delivery directory
             - running pax:run from an external plugin directory

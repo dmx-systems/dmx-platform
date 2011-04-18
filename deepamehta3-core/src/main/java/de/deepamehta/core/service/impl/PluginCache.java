@@ -45,7 +45,7 @@ class PluginCache {
     }
 
     static class Iterator {
-        
+
         Iterator() {
             synchronized(plugins) {
                 for (Plugin plugin : plugins.values()) {

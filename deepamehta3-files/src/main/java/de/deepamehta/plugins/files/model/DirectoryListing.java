@@ -13,7 +13,7 @@ import java.util.List;
 
 
 public class DirectoryListing {
-    
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private FileItem dirInfo;
@@ -96,6 +96,6 @@ public class DirectoryListing {
             } catch (JSONException e) {
                 throw new RuntimeException("Serialization failed (" + this + ")", e);
             }
-        }        
+        }
     }
 }
