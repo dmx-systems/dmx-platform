@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.server.provider;
 
-import de.deepamehta.core.model.Association;
-import de.deepamehta.core.util.JSONHelper;
+import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicData;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -10,8 +10,7 @@ import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
@@ -23,7 +22,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class AssociationListProvider implements MessageBodyWriter<List<Association>> {
+public class TopicCollectionProvider implements MessageBodyWriter<Collection<Topic>> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -42,9 +41,8 @@ public class AssociationListProvider implements MessageBodyWriter<List<Associati
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         if (genericType instanceof ParameterizedType) {
-            ParameterizedType pt = (ParameterizedType) genericType;
-            Type[] typeArgs = pt.getActualTypeArguments();
-            if (pt.getRawType() == List.class && typeArgs.length == 1 && typeArgs[0] == Association.class) {
+            Type[] typeArgs = ((ParameterizedType) genericType).getActualTypeArguments();
+            if (Collection.class.isAssignableFrom(type) && typeArgs.length == 1 && typeArgs[0] == Topic.class) {
                 // Note: unlike equals() isCompatible() ignores parameters
                 // like "charset" in "application/json;charset=UTF-8"
                 if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
@@ -56,21 +54,21 @@ public class AssociationListProvider implements MessageBodyWriter<List<Associati
     }
 
     @Override
-    public long getSize(List<Association> associations, Class<?> type, Type genericType, Annotation[] annotations,
+    public long getSize(Collection<Topic> topics, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(List<Association> associations, Class<?> type, Type genericType, Annotation[] annotations,
+    public void writeTo(Collection<Topic> topics, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            // FIXME: Association.relationsToJson(associations).write(writer);
+            TopicData.topicsToJSON(topics).write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing message body failed (" + associations + ")", e);
+            throw new IOException("Writing message body failed (" + topics + ")", e);
         }
     }
 }

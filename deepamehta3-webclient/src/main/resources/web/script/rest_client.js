@@ -2,6 +2,8 @@ function RESTClient(core_service_uri) {
 
     var LOG_AJAX_REQUESTS = false
 
+
+
     // === Topics ===
 
     this.get_topic_by_id = function(topic_id) {
@@ -68,6 +70,8 @@ function RESTClient(core_service_uri) {
         request("DELETE", "/topic/" + id)
     }
 
+
+
     // === Associations ===
 
     /**
@@ -96,9 +100,8 @@ function RESTClient(core_service_uri) {
      *
      * @return  An array of relations.
      */
-    this.get_relations = function(src_topic_id, dst_topic_id, type_id, is_directed) {
-        var params = new RequestParameter({src: src_topic_id, dst: dst_topic_id, type: type_id, directed: is_directed})
-        return request("GET", "/relation/multiple?" + params.to_query_string())
+    this.get_associations = function(topic1_id, topic2_id, assoc_type_uri) {
+        return request("GET", "/association/multiple/" + topic1_id + "/" + topic2_id + "/" + assoc_type_uri)
     }
 
     this.create_association = function(assoc_data) {
@@ -112,6 +115,8 @@ function RESTClient(core_service_uri) {
     this.delete_association = function(id) {
         request("DELETE", "/association/" + id)
     }
+
+
 
     // === Types ===
 
@@ -146,17 +151,23 @@ function RESTClient(core_service_uri) {
             "/field/" + encodeURIComponent(field_uri))
     }
 
+
+
     // === Commands ===
 
     this.execute_command = function(command, params) {
         return request("POST", "/command/" + encodeURIComponent(command), params)
     }
 
+
+
     // === Plugins ===
 
     this.get_plugins = function() {
         return request("GET", "/plugin")
     }
+
+
 
     // === Utilities for plugin developers ===
 
@@ -177,6 +188,8 @@ function RESTClient(core_service_uri) {
     this.createRequestParameter = function(params) {
         return new RequestParameter(params)
     }
+
+
 
     // === Private Helpers ===
 

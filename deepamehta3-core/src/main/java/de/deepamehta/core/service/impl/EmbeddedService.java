@@ -426,26 +426,27 @@ public class EmbeddedService implements CoreService {
         } finally {
             tx.finish();
         }
-    }
+    } */
 
     @GET
-    @Path("/relation/multiple")
+    @Path("/association/multiple/{topic1_id}/{topic2_id}/{assoc_type_uri}")
     @Override
-    public List<Relation> getRelations(@QueryParam("src") long srcTopicId, @QueryParam("dst") long dstTopicId,
-                                       @QueryParam("type") String typeId, @QueryParam("directed") boolean isDirected) {
+    public Set<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
+                                            @PathParam("topic2_id") long topic2Id,
+                                            @PathParam("assoc_type_uri") String assocTypeUri) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            List<Relation> relations = storage.getRelations(srcTopicId, dstTopicId, typeId, isDirected);
+            Set<Association> assocs = storage.getAssociations(topic1Id, topic2Id, assocTypeUri);
             tx.success();
-            return relations;
+            return assocs;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Error while retrieving relations between topics " + srcTopicId +
-                " and " + dstTopicId + " (typeId=" + typeId + ", isDirected=" + isDirected + ")", e);
+            throw new RuntimeException("Retrieving associations between topics " + topic1Id +
+                " and " + topic2Id + " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
         } finally {
             tx.finish();
         }
-    } */
+    }
 
     @POST
     @Path("/association")

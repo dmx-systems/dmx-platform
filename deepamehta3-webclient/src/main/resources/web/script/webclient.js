@@ -380,7 +380,7 @@ var dm3c = new function() {
      */
     this.reveal_related_topic = function(topic_id) {
         // reveal relations
-        var relations = dm3c.restc.get_relations(dm3c.selected_topic.id, topic_id)
+        var relations = dm3c.restc.get_associations(dm3c.selected_topic.id, topic_id, "dm3.core.association")
         for (var i = 0, rel; rel = relations[i]; i++) {
             dm3c.canvas.add_association(rel)
         }

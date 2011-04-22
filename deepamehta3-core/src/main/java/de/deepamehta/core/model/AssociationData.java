@@ -120,7 +120,7 @@ public class AssociationData {
         return value;
     } */
 
-    // ---
+    // === Serialization ===
 
     public JSONObject toJSON() {
         try {
@@ -145,13 +145,13 @@ public class AssociationData {
         }
     }
 
-    /* public static JSONArray relationsToJson(List<Relation> relations) {
+    public static JSONArray associationsToJSON(Iterable<Association> assocs) {
         JSONArray array = new JSONArray();
-        for (Relation relation : relations) {
-            array.put(relation.toJSON());
+        for (Association assoc : assocs) {
+            array.put(assoc.toJSON());
         }
         return array;
-    } */
+    }
 
     // ---
 

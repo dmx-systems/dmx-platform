@@ -46,6 +46,8 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+
+
     // === Topics ===
 
     @Override
@@ -93,13 +95,8 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         //
         Set<ConnectedHyperNode> nodes = hg.getHyperNode(topicId).getConnectedHyperNodes(myRoleTypeUri,
                                                                                         othersRoleTypeUri);
-        applyAssocTypeFilter(nodes, assocTypeUri);
-        //
-        Set<Topic> topics = new HashSet();
-        for (ConnectedHyperNode node : nodes) {
-            topics.add(buildTopic(node.getHyperNode()));
-        }
-        return topics;
+        filterNodesByAssociationType(nodes, assocTypeUri);
+        return buildTopics(nodes);
     }
 
     // ---
@@ -111,11 +108,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public Set<Association> getAssociations(long topicId, String myRoleTypeUri) {
-        Set<Association> assocs = new HashSet();
-        for (HyperEdge edge : hg.getHyperNode(topicId).getHyperEdges(myRoleTypeUri)) {
-            assocs.add(buildAssociation(edge));
-        }
-        return assocs;
+        return buildAssociations(hg.getHyperNode(topicId).getHyperEdges(myRoleTypeUri));
     }
 
     @Override
@@ -153,7 +146,16 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         hg.getHyperNode(topicId).delete();
     }
 
+
+
     // === Associations ===
+
+    @Override
+    public Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
+        Set<HyperEdge> edges = hg.getHyperEdges(topic1Id, topic2Id);
+        filterEdgesByAssociationType(edges, assocTypeUri);
+        return buildAssociations(edges);
+    }
 
     @Override
     public Association getAssociationRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
@@ -202,6 +204,8 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         hg.getHyperEdge(assocId).delete();
     }
 
+
+
     // === DB ===
 
     @Override
@@ -237,6 +241,8 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         hg.getHyperNode(0).setAttribute("core_migration_nr", migrationNr);
     }
 
+
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Topic buildTopic(HyperNode node) {
@@ -250,6 +256,16 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     private Topic buildTopic(long id, String uri, TopicValue value, String typeUri) {
         return new HGTopic(id, uri, value, typeUri, null);   // composite=null
+    }
+
+    // ---
+
+    private Set<Topic> buildTopics(Iterable<ConnectedHyperNode> nodes) {
+        Set<Topic> topics = new HashSet();
+        for (ConnectedHyperNode node : nodes) {
+            topics.add(buildTopic(node.getHyperNode()));
+        }
+        return topics;
     }
 
     // ---
@@ -270,7 +286,17 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
-    private void applyAssocTypeFilter(Set<ConnectedHyperNode> nodes, String assocTypeUri) {
+    private Set<Association> buildAssociations(Iterable<HyperEdge> edges) {
+        Set<Association> assocs = new HashSet();
+        for (HyperEdge edge : edges) {
+            assocs.add(buildAssociation(edge));
+        }
+        return assocs;
+    }
+
+    // ---
+
+    private void filterNodesByAssociationType(Set<ConnectedHyperNode> nodes, String assocTypeUri) {
         ConnectedHyperNode node = null;
         HyperEdge edge = null;
         try {
@@ -285,6 +311,22 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         } catch (Exception e) {
             throw new RuntimeException("Applying association type filter \"" + assocTypeUri +
                 "\" failed (" + edge + ",\n" + node.getHyperNode() + ")", e);
+        }
+    }
+
+    private void filterEdgesByAssociationType(Set<HyperEdge> edges, String assocTypeUri) {
+        HyperEdge edge = null;
+        try {
+            Iterator<HyperEdge> i = edges.iterator();
+            while (i.hasNext()) {
+                edge = i.next();
+                if (!getAssociationTypeUri(edge).equals(assocTypeUri)) {
+                    i.remove();
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Applying association type filter \"" + assocTypeUri +
+                "\" failed (" + edge + ")", e);
         }
     }
 

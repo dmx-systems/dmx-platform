@@ -140,7 +140,7 @@ public interface CoreService {
      * @param   isDirected  Direction filter. Pass <code>true</code> if direction matters. In this case the relation
      *                      is expected to be directed <i>from</i> source topic <i>to</i> destination topic.
      */
-    // public List<Relation> getRelations(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
+    public Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
 
     public Association createAssociation(AssociationData assoc, ClientContext clientContext);
 

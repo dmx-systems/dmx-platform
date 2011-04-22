@@ -121,7 +121,7 @@ public interface DeepaMehtaStorage {
      * @param   isDirected  Direction filter. Pass <code>true</code> if direction matters. In this case the relation
      *                      is expected to be directed <i>from</i> source topic <i>to</i> destination topic.
      */
-    // List<Relation> getRelations(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
+    Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
 
     Association getAssociationRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                                                     String othersRoleTypeUri);
