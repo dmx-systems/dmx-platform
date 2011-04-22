@@ -291,7 +291,7 @@ public class EmbeddedService implements CoreService {
         } finally {
             tx.finish();
         }
-    }
+    } */
 
     @GET
     @Path("/topic")
@@ -302,17 +302,17 @@ public class EmbeddedService implements CoreService {
                                     @HeaderParam("Cookie")   ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            List<Topic> searchResult = storage.searchTopics(searchTerm, fieldUri, wholeWord);
+            List<Topic> topics = storage.searchTopics(searchTerm, fieldUri, wholeWord);
             tx.success();
-            return searchResult;
+            return topics;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Error while searching topics (searchTerm=" + searchTerm + ", fieldUri=" +
-                fieldUri + ", wholeWord=" + wholeWord + ", clientContext=" + clientContext + ")", e);
+            throw new RuntimeException("Searching topics failed (searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
+                fieldUri + "\", wholeWord=" + wholeWord + ", clientContext=" + clientContext + ")", e);
         } finally {
             tx.finish();
         }
-    } */
+    }
 
     @POST
     @Path("/topic")

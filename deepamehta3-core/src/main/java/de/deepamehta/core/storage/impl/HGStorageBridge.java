@@ -20,8 +20,10 @@ import de.deepamehta.hypergraph.HyperNode;
 import de.deepamehta.hypergraph.HyperNodeRole;
 import de.deepamehta.hypergraph.IndexMode;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -117,6 +119,16 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         // FIXME: assocTypeUri not respected
         ConnectedHyperEdge edge = hg.getHyperNode(topicId).getConnectedHyperEdge(myRoleTypeUri, othersRoleTypeUri);
         return edge != null ? buildAssociation(edge.getHyperEdge()) : null;
+    }
+
+    // ---
+
+    @Override
+    public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord) {
+        if (!wholeWord) {
+            searchTerm += "*";
+        }
+        return buildTopics(hg.queryHyperNodes(fieldUri, searchTerm));
     }
 
     // ---
@@ -264,6 +276,14 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         Set<Topic> topics = new HashSet();
         for (ConnectedHyperNode node : nodes) {
             topics.add(buildTopic(node.getHyperNode()));
+        }
+        return topics;
+    }
+
+    private List<Topic> buildTopics(Iterable<HyperNode> nodes) {
+        List<Topic> topics = new ArrayList();
+        for (HyperNode node : nodes) {
+            topics.add(buildTopic(node));
         }
         return topics;
     }

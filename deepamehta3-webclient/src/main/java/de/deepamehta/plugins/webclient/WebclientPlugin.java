@@ -1,8 +1,11 @@
 package de.deepamehta.plugins.webclient;
 
+import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Topic;
-import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicRole;
+import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.service.Plugin;
 
 import javax.ws.rs.GET;
@@ -77,10 +80,10 @@ public class WebclientPlugin extends Plugin {
                               @QueryParam("field")  String fieldUri,
                               @QueryParam("wholeword") boolean wholeWord,
                               @HeaderParam("Cookie") ClientContext clientContext) {
-        logger.info("searchTerm=" + searchTerm + ", fieldUri=" + fieldUri + ", wholeWord=" + wholeWord +
-            ", cookie=" + clientContext);
-        // ### List<Topic> searchResult = dms.searchTopics(searchTerm, fieldUri, wholeWord, clientContext);
-        return null;    // ### createResultTopic(searchTerm, searchResult, clientContext);
+        logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\", wholeWord=" + wholeWord +
+            ", clientContext=" + clientContext);
+        List<Topic> topics = dms.searchTopics(searchTerm, fieldUri, wholeWord, clientContext);
+        return createResultTopic(searchTerm, topics, clientContext);
     }
 
     /**
@@ -104,16 +107,18 @@ public class WebclientPlugin extends Plugin {
     /**
      * Creates a search result topic (a bucket).
      */
-    /* ### private Topic createResultTopic(String searchTerm, List<Topic> topics, ClientContext clientContext) {
-        Properties properties = new Properties();
-        properties.put("de/deepamehta/core/property/SearchTerm", searchTerm);
-        Topic resultTopic = dms.createTopic("de/deepamehta/core/topictype/SearchResult", properties, clientContext);
+    private Topic createResultTopic(String searchTerm, List<Topic> topics, ClientContext clientContext) {
+        Topic searchTopic = dms.createTopic(new TopicData("dm3.webclient.search"), clientContext);
+        searchTopic.setChildTopicValue("dm3.webclient.search_term", new TopicValue(searchTerm));
         // associate result topics
-        logger.fine("Relating " + topics.size() + " result topics");
+        logger.info("Associating " + topics.size() + " result topics");
         for (Topic topic : topics) {
-            logger.fine("Relating " + topic);
-            dms.createRelation("SEARCH_RESULT", resultTopic.id, topic.id, null);
+            logger.info("Associating " + topic);
+            AssociationData assocData = new AssociationData("dm3.webclient.result_item");
+            assocData.addTopicRole(new TopicRole(searchTopic.getId(), "dm3.webclient.search"));
+            assocData.addTopicRole(new TopicRole(topic.getId(), "dm3.webclient.result_item"));
+            dms.createAssociation(assocData, clientContext);
         }
-        return resultTopic;
-    } */
+        return searchTopic;
+    }
 }

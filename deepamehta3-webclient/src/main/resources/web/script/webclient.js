@@ -941,14 +941,14 @@ var dm3c = new function() {
 
             dm3c.restc.search_topics_and_create_bucket = function(text, field_uri, whole_word) {
                 var params = this.createRequestParameter({search: text, field: field_uri, wholeword: whole_word})
-                return this.request("GET", "/client/search?" + params.to_query_string())
+                return this.request("GET", "/webclient/search?" + params.to_query_string())
             }
 
             // Note: this method is actually part of the Type Search plugin.
             // TODO: proper modulariuation. Either let the Type Search plugin provide its own REST resource (with
             // another namespace again) or make the Type Search plugin an integral part of the Client plugin.
             dm3c.restc.get_topics_and_create_bucket = function(type_uri) {
-                return this.request("GET", "/client/search/by_type/" + encodeURIComponent(type_uri))
+                return this.request("GET", "/webclient/search/by_type/" + encodeURIComponent(type_uri))
             }
         }
     })

@@ -83,9 +83,11 @@ public interface DeepaMehtaStorage {
 
     // ---
 
-    void setTopicValue(long topicId, TopicValue value);
+    List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord);
 
-    // List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord);
+    // ---
+
+    void setTopicValue(long topicId, TopicValue value);
 
     Topic createTopic(TopicData topicData);
 

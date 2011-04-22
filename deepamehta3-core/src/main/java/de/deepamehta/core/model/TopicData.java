@@ -28,6 +28,10 @@ public class TopicData {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    public TopicData(String typeUri) {
+        this(null, null, typeUri);
+    }
+
     public TopicData(String uri, TopicValue value, String typeUri) {
         this(uri, value, typeUri, null);
     }
