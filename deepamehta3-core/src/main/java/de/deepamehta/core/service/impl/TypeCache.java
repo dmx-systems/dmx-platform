@@ -2,6 +2,7 @@ package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationDefinition;
+import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicTypeData;
@@ -84,6 +85,7 @@ class TypeCache {
         }
         // build topic type
         TopicTypeData topicTypeData = new TopicTypeData(typeTopic, fetchDataTypeTopic(typeTopic).getUri(),
+                                                                   fetchIndexModes(typeTopic),
                                                                    fetchViewConfig(typeTopic));
         sortAssociationDefinitions(topicTypeData, assocDefs, sequenceIds);
         //
@@ -180,6 +182,12 @@ class TypeCache {
             throw new RuntimeException("Fetching the data type topic for topic type \"" + typeTopic.getUri() +
                 "\" failed", e);
         }
+    }
+
+    private Set<IndexMode> fetchIndexModes(Topic typeTopic) {
+        Set<Topic> topics = dms.getRelatedTopics(typeTopic.getId(), "dm3.core.association", "dm3.core.topic_type",
+                                                                                          "dm3.core.index_mode", false);
+        return IndexMode.fromTopics(topics);
     }
 
     // ---

@@ -19,6 +19,11 @@
             value:         "Cardinality",
             uri:           "dm3.core.cardinality",
             data_type_uri: "dm3.core.text"
+        },
+        {
+            value:         "Index Mode",
+            uri:           "dm3.core.index_mode",
+            data_type_uri: "dm3.core.text"
         }
     ],
 
@@ -146,6 +151,29 @@
             value:    "Many",
             uri:      "dm3.core.many",
             type_uri: "dm3.core.cardinality"
+        },
+
+        ### Index Modes ###
+
+        {
+            value:    "Off",
+            uri:      "dm3.core.off",
+            type_uri: "dm3.core.index_mode"
+        },
+        {
+            value:    "Key",
+            uri:      "dm3.core.key",
+            type_uri: "dm3.core.index_mode"
+        },
+        {
+            value:    "Fulltext",
+            uri:      "dm3.core.fulltext",
+            type_uri: "dm3.core.index_mode"
+        },
+        {
+            value:    "Fulltext Key",
+            uri:      "dm3.core.fulltext_key",
+            type_uri: "dm3.core.index_mode"
         }
     ]
 }

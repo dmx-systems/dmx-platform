@@ -1,24 +1,28 @@
 {
     topic_types: [
         {
-            uri: "dm3.base.name",
             value: "Name",
-            data_type_uri: "dm3.core.text"
+            uri: "dm3.base.name",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
         },
         {
-            uri: "dm3.base.description",
             value: "Description",
-            data_type_uri: "dm3.core.text"
+            uri: "dm3.base.description",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
         },
         {
-            uri: "dm3.base.title",
             value: "Title",
-            data_type_uri: "dm3.core.text"
+            uri: "dm3.base.title",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
         },
         {
-            uri: "dm3.base.text",
             value: "Text",
-            data_type_uri: "dm3.core.text"
+            uri: "dm3.base.text",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
         }
     ]
 }

@@ -5,6 +5,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -182,5 +183,15 @@ public class AssociationDefinition {
             "\")\n        part: (type=\"" + partTopicTypeUri + "\", role=\"" + partRoleTypeUri +
             "\", cardinality=\"" + partCardinalityUri +
             "\")\n        association definition " + viewConfig;
+    }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    static void toJSON(Collection<AssociationDefinition> assocDefs, JSONObject o) throws Exception {
+        List assocDefList = new ArrayList();
+        for (AssociationDefinition assocDef : assocDefs) {
+            assocDefList.add(assocDef.toJSON());
+        }
+        o.put("assoc_defs", assocDefList);
     }
 }

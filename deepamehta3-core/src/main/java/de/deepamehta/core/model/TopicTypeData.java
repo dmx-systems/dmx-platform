@@ -25,6 +25,7 @@ public class TopicTypeData extends TopicData {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private String dataTypeUri;
+    private Set<IndexMode> indexModes;
     private Map<String, AssociationDefinition> assocDefs;   // is never null, may be empty
     private ViewConfiguration viewConfig;                   // is never null
 
@@ -35,13 +36,15 @@ public class TopicTypeData extends TopicData {
     public TopicTypeData(TopicTypeData topicTypeData) {
         super(topicTypeData);
         this.dataTypeUri = topicTypeData.getDataTypeUri();
+        this.indexModes = topicTypeData.getIndexModes();
         this.assocDefs = topicTypeData.getAssocDefs();
         this.viewConfig = topicTypeData.getViewConfig();
     }
 
-    public TopicTypeData(Topic typeTopic, String dataTypeUri, ViewConfiguration viewConfig) {
+    public TopicTypeData(Topic typeTopic, String dataTypeUri, Set<IndexMode> indexModes, ViewConfiguration viewConfig) {
         super(typeTopic);
         this.dataTypeUri = dataTypeUri;
+        this.indexModes = indexModes;
         this.assocDefs = new LinkedHashMap();
         this.viewConfig = viewConfig;
     }
@@ -49,6 +52,7 @@ public class TopicTypeData extends TopicData {
     public TopicTypeData(String uri, String value, String dataTypeUri) {
         super(uri, new TopicValue(value), "dm3.core.topic_type");
         this.dataTypeUri = dataTypeUri;
+        this.indexModes = new HashSet();
         this.assocDefs = new LinkedHashMap();
         this.viewConfig = new ViewConfiguration();
     }
@@ -62,6 +66,7 @@ public class TopicTypeData extends TopicData {
             this.composite = null;
             //
             this.dataTypeUri = topicTypeData.getString("data_type_uri");
+            this.indexModes = IndexMode.parse(topicTypeData);
             this.assocDefs = new LinkedHashMap();
             this.viewConfig = new ViewConfiguration(topicTypeData);
             parseAssocDefs(topicTypeData);
@@ -74,6 +79,10 @@ public class TopicTypeData extends TopicData {
 
     public String getDataTypeUri() {
         return dataTypeUri;
+    }
+
+    public Set<IndexMode> getIndexModes() {
+        return indexModes;
     }
 
     public Map<String, AssociationDefinition> getAssocDefs() {
@@ -112,14 +121,10 @@ public class TopicTypeData extends TopicData {
     public JSONObject toJSON() {
         try {
             JSONObject o = super.toJSON();
+            //
             o.put("data_type_uri", dataTypeUri);
-            //
-            List assocDefs = new ArrayList();
-            for (AssociationDefinition assocDef : this.assocDefs.values()) {
-                assocDefs.add(assocDef.toJSON());
-            }
-            o.put("assoc_defs", assocDefs);
-            //
+            IndexMode.toJSON(indexModes, o);
+            AssociationDefinition.toJSON(assocDefs.values(), o);
             viewConfig.toJSON(o);
             //
             return o;
@@ -131,7 +136,8 @@ public class TopicTypeData extends TopicData {
     @Override
     public String toString() {
         return "topic type data (id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
-            "\", dataTypeUri=\"" + dataTypeUri + "\", assocDefs=" + assocDefs + ",\ntopic type " + viewConfig + ")";
+            "\", dataTypeUri=\"" + dataTypeUri + "\", indexModes=" + indexModes + ", assocDefs=" + assocDefs +
+            ",\ntopic type " + viewConfig + ")";
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

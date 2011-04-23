@@ -9,6 +9,7 @@ import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.Composite;
+import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.MetaTypeData;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.Topic;
@@ -17,7 +18,6 @@ import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeData;
 import de.deepamehta.core.model.TopicValue;
-import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.ViewConfiguration;
 import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.Migration;
@@ -551,6 +551,7 @@ public class EmbeddedService implements CoreService {
             //
             String typeUri = topicTypeData.getUri();
             associateDataType(typeUri, topicTypeData.getDataTypeUri());
+            associateIndexModes(typeUri, topicTypeData.getIndexModes());
             associateTopicTypes(typeUri, topicTypeData.getAssocDefs());
             associateViewConfig(typeUri, topicTypeData.getViewConfig());
             //
@@ -1073,6 +1074,15 @@ public class EmbeddedService implements CoreService {
         assocData.addTopicRole(new TopicRole(topicTypeUri, "dm3.core.topic_type"));
         assocData.addTopicRole(new TopicRole(dataTypeUri,  "dm3.core.data_type"));
         createAssociation(assocData, null);                         // FIXME: clientContext=null
+    }
+
+    private void associateIndexModes(String topicTypeUri, Set<IndexMode> indexModes) {
+        for (IndexMode indexMode : indexModes) {
+            AssociationData assocData = new AssociationData("dm3.core.association");
+            assocData.addTopicRole(new TopicRole(topicTypeUri, "dm3.core.topic_type"));
+            assocData.addTopicRole(new TopicRole(indexMode.toUri(), "dm3.core.index_mode"));
+            createAssociation(assocData, null);                     // FIXME: clientContext=null
+        }
     }
 
     private void associateTopicTypes(String topicTypeUri, Map<String, AssociationDefinition> assocDefs) {
