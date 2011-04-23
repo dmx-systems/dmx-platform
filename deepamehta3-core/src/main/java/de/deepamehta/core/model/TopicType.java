@@ -23,6 +23,8 @@ public interface TopicType {
 
     String getDataTypeUri();
 
+    Set<IndexMode> getIndexModes();
+
     Map<String, AssociationDefinition> getAssocDefs();
 
     ViewConfiguration getViewConfig();

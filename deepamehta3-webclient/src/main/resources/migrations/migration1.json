@@ -1,33 +1,33 @@
 {
     topic_types: [
         {
-            uri: "dm3.webclient.icon_src",
             value: "Icon Source",
+            uri: "dm3.webclient.icon_src",
             data_type_uri: "dm3.core.text"
         },
         {
-            uri: "dm3.webclient.editable",
             value: "Editable",
+            uri: "dm3.webclient.editable",
             data_type_uri: "dm3.core.boolean"
         },
         {
-            uri: "dm3.webclient.viewable",
             value: "Viewable",
+            uri: "dm3.webclient.viewable",
             data_type_uri: "dm3.core.boolean"
         },
         {
-            uri: "dm3.webclient.js_renderer_class",
             value: "JavaScript Renderer Class",
+            uri: "dm3.webclient.js_renderer_class",
             data_type_uri: "dm3.core.text"
         },
         {
-            uri: "dm3.webclient.rows",
             value: "Rows",
+            uri: "dm3.webclient.rows",
             data_type_uri: "dm3.core.number"
         },
         {
-            uri: "dm3.webclient.view_config",
             value: "View Configuration",
+            uri: "dm3.webclient.view_config",
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
@@ -59,18 +59,36 @@
         },
 
         {
-            uri: "dm3.webclient.search_term",
             value: "Search Term",
-            data_type_uri: "dm3.core.text"
+            uri: "dm3.webclient.search_term",
+            data_type_uri: "dm3.core.text",
+            view_config_topics: [
+                {
+                    type_uri: "dm3.webclient.view_config",
+                    composite: {
+                        dm3.webclient.viewable: true,
+                        dm3.webclient.js_renderer_class: "TextFieldRenderer"
+                    }
+                }
+            ]
         },
         {
-            uri: "dm3.webclient.search_result",
             value: "Search Result",
-            data_type_uri: "dm3.core.text"
+            uri: "dm3.webclient.search_result",
+            data_type_uri: "dm3.core.text",
+            view_config_topics: [
+                {
+                    type_uri: "dm3.webclient.view_config",
+                    composite: {
+                        dm3.webclient.viewable: true,
+                        dm3.webclient.js_renderer_class: "TextFieldRenderer"
+                    }
+                }
+            ]
         },
         {
-            uri: "dm3.webclient.search",
             value: "Search",
+            uri: "dm3.webclient.search",
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
@@ -93,5 +111,12 @@
                 }
             ]
         }
+    ],
+
+    assoc_types: [
+        {
+            value: "Search Result Item",
+            uri:   "dm3.webclient.search_result_item"
+        },
     ]
 }

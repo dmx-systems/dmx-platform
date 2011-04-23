@@ -311,7 +311,7 @@ var dm3c = new function() {
                 comp = comp[assoc_def_uri]
             }
             // alert("topic=" + JSON.stringify(topic) + "\n\nfield_uri=\"" + field_uri + "\"\n\n=> " + comp)
-            return comp
+            return comp || ""
         }
         /* var value = topic.properties[field_uri]
         if (value == undefined) {
@@ -681,6 +681,7 @@ var dm3c = new function() {
         try {
             var searchmode = dm3c.ui.menu_item("searchmode-select").label
             var search_topic = dm3c.trigger_hook("search", searchmode)[0]
+            // alert("search_topic=" + JSON.stringify(search_topic))
             dm3c.add_topic_to_canvas(search_topic, "show")
         } catch (e) {
             alert("ERROR while searching:\n\n" + JSON.stringify(e))

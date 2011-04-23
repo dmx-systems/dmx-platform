@@ -197,10 +197,11 @@ function PlainDocument() {
 
     function Field(uri, topic, topic_type, assoc_def) {
 
+        this.label = topic_type.value
         this.editable         = get_view_config("editable")
         this.viewable         = get_view_config("viewable")
         var js_renderer_class = get_view_config("js_renderer_class")
-        this.rows = get_view_config("rows")
+        this.rows             = get_view_config("rows")
         this.uri = uri
         var renderer
 
@@ -246,7 +247,7 @@ function PlainDocument() {
             // ### var rel_topics = related_topics(field)
             renderer = js.new_object(js_renderer_class, topic, this /*, rel_topics */)
             // render field label
-            dm3c.render.field_label(topic_type.value)
+            dm3c.render.field_label(this)
             // render form element
             var html = trigger_renderer_hook("render_form_element")
             if (html !== undefined) {

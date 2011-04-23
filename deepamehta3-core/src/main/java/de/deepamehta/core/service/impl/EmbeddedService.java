@@ -323,6 +323,7 @@ public class EmbeddedService implements CoreService {
             triggerHook(Hook.PRE_CREATE_TOPIC, topicData, clientContext);
             //
             Topic topic = storage.createTopic(topicData);
+            indexTopic(topic);
             associateWithTopicType(topic);
             //
             Composite comp = topicData.getComposite();
@@ -1014,6 +1015,15 @@ public class EmbeddedService implements CoreService {
     }
 
     // === Topic/Association Storage ===
+
+    private void indexTopic(Topic topic) {
+        TopicType topicType = getTopicType(topic.getTypeUri(), null);                       // FIXME: clientContext=null
+        for (IndexMode indexMode : topicType.getIndexModes()) {
+            storage.indexTopicValue(topic.getId(), indexMode, topicType.getUri(), topic.getValue(), null);
+        }
+    }
+
+    // ---
 
     private void associateWithTopicType(Topic topic) {
         try {

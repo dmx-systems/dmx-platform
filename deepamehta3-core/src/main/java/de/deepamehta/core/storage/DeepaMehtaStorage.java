@@ -3,6 +3,7 @@ package de.deepamehta.core.storage;
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.AssociationRole;
+import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicRole;
@@ -88,6 +89,8 @@ public interface DeepaMehtaStorage {
     // ---
 
     void setTopicValue(long topicId, TopicValue value);
+
+    void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, TopicValue value, TopicValue oldValue);
 
     Topic createTopic(TopicData topicData);
 

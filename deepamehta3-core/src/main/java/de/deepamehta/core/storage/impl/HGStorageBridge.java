@@ -4,6 +4,7 @@ import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.AssociationRole;
+import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicRole;
@@ -16,9 +17,9 @@ import de.deepamehta.hypergraph.ConnectedHyperNode;
 import de.deepamehta.hypergraph.HyperEdge;
 import de.deepamehta.hypergraph.HyperEdgeRole;
 import de.deepamehta.hypergraph.HyperGraph;
+import de.deepamehta.hypergraph.HyperGraphIndexMode;
 import de.deepamehta.hypergraph.HyperNode;
 import de.deepamehta.hypergraph.HyperNodeRole;
-import de.deepamehta.hypergraph.IndexMode;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -135,7 +136,14 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public void setTopicValue(long topicId, TopicValue value) {
-        hg.getHyperNode(topicId).setAttribute("value", value.value());
+        hg.getHyperNode(topicId).setObject("value", value.value());
+    }
+
+    @Override
+    public void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, TopicValue value,
+                                                                                    TopicValue oldValue) {
+        hg.getHyperNode(topicId).indexAttribute(fromIndexMode(indexMode), indexKey, value.value(),
+            oldValue != null ? oldValue.value() : null);
     }
 
     @Override
@@ -147,8 +155,10 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         checkUniqueness(uri);
         // 2) create node
         HyperNode node = hg.createHyperNode();
-        node.setAttribute("uri", uri, IndexMode.KEY);
-        node.setAttribute("value", value.value());
+        node.setString("uri", uri);
+        node.setObject("value", value.value());
+        // 3) index URI
+        node.indexAttribute(HyperGraphIndexMode.KEY, "uri", uri, null);   // oldValue=null
         //
         return buildTopic(node.getId(), uri, value, typeUri);
     }
@@ -250,7 +260,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public void setMigrationNr(int migrationNr) {
-        hg.getHyperNode(0).setAttribute("core_migration_nr", migrationNr);
+        hg.getHyperNode(0).setInteger("core_migration_nr", migrationNr);
     }
 
 
@@ -262,7 +272,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
             throw new IllegalArgumentException("Tried to build a Topic from a null HyperNode");
         }
         //
-        return buildTopic(node.getId(), node.getString("uri"), new TopicValue(node.get("value")),
+        return buildTopic(node.getId(), node.getString("uri"), new TopicValue(node.getObject("value")),
             getTopicTypeUri(node));
     }
 
@@ -498,9 +508,18 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
+    private HyperGraphIndexMode fromIndexMode(IndexMode indexMode) {
+        return HyperGraphIndexMode.valueOf(indexMode.name());
+    }
+
+    // ---
+
     private void setupMetaTypeNode() {
         HyperNode refNode = hg.getHyperNode(0);
-        refNode.setAttribute("uri", "dm3.core.meta_type", IndexMode.KEY);
-        refNode.setAttribute("value", "Meta Type");
+        String uri = "dm3.core.meta_type";
+        refNode.setString("uri", uri);
+        refNode.setString("value", "Meta Type");
+        //
+        refNode.indexAttribute(HyperGraphIndexMode.KEY, "uri", uri, null);     // oldValue=null
     }
 }

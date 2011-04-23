@@ -110,13 +110,13 @@ public class WebclientPlugin extends Plugin {
     private Topic createResultTopic(String searchTerm, List<Topic> topics, ClientContext clientContext) {
         Topic searchTopic = dms.createTopic(new TopicData("dm3.webclient.search"), clientContext);
         searchTopic.setChildTopicValue("dm3.webclient.search_term", new TopicValue(searchTerm));
-        // associate result topics
-        logger.info("Associating " + topics.size() + " result topics");
+        // associate search result topics
+        logger.info("Associating " + topics.size() + " search result topics");
         for (Topic topic : topics) {
             logger.info("Associating " + topic);
-            AssociationData assocData = new AssociationData("dm3.webclient.result_item");
+            AssociationData assocData = new AssociationData("dm3.webclient.search_result_item");
             assocData.addTopicRole(new TopicRole(searchTopic.getId(), "dm3.webclient.search"));
-            assocData.addTopicRole(new TopicRole(topic.getId(), "dm3.webclient.result_item"));
+            assocData.addTopicRole(new TopicRole(topic.getId(), "dm3.webclient.search_result_item"));
             dms.createAssociation(assocData, clientContext);
         }
         return searchTopic;
