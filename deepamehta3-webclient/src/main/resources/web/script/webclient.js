@@ -325,14 +325,14 @@ var dm3c = new function() {
     /**
      * Read out a view configuration setting.
      *
-     * @param   configurable    a topic type or an association definition
-     * @param   setting         last URI component, e.g. "icon_src"
+     * @param   configurable    A topic type or an association definition. Must not be null/undefined.
+     * @param   setting         Last URI component, e.g. "icon_src"
      */
     this.get_view_config = function(configurable, setting) {
-        // every configurable has an view_config_topics object, however it might by empty
-        var client_config = configurable.view_config_topics["dm3.webclient.view_config"]
-        if (client_config) {
-            return client_config.composite["dm3.webclient." + setting]
+        // every configurable has an view_config_topics object, however it might be empty
+        var view_config = configurable.view_config_topics["dm3.webclient.view_config"]
+        if (view_config) {
+            return view_config.composite["dm3.webclient." + setting]
         }
     }
 
@@ -801,6 +801,7 @@ var dm3c = new function() {
     //
     this.register_field_renderer("script/datafield-renderers/title_renderer.js")
     this.register_field_renderer("script/datafield-renderers/body_text_renderer.js")
+    this.register_field_renderer("script/datafield-renderers/search_result_renderer.js")
     //
     register_plugin("script/internal-plugins/default_plugin.js")
     register_plugin("script/internal-plugins/fulltext_plugin.js")

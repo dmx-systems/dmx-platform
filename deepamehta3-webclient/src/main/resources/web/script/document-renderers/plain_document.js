@@ -195,6 +195,17 @@ function PlainDocument() {
 
     // === Field Renderering ===
 
+    /**
+     * @param   uri         The field URI. Unique within the page/form. The field URI is a path composed of association
+     *                      definition URIs that leads to this field, e.g. "/dm3.contacts.address/dm3.contacts.street".
+     *                      For a non-composite topic the field URI is an empty string.
+     * @param   topic       The topic the page/form is rendered for.
+     *                      Note: that is the same topic for the Field objects of one page/form.
+     * @param   topic_type  The topic type underlying this field.
+     *                      Note: in general the topic type is different for the Field objects of one page/form.
+     * @param   assoc_def   The direct association definition that leads to this field.
+     *                      For a non-composite topic it is undefined.
+     */
     function Field(uri, topic, topic_type, assoc_def) {
 
         this.label = topic_type.value
@@ -204,10 +215,6 @@ function PlainDocument() {
         this.rows             = get_view_config("rows")
         this.uri = uri
         var renderer
-
-        function get_view_config(setting) {
-            return dm3c.get_view_config(assoc_def, setting) || dm3c.get_view_config(topic_type, setting)
-        }
 
         this.render_field = function() {
             // create renderer
@@ -296,6 +303,10 @@ function PlainDocument() {
                     return renderer[hook_name](arguments[1])
                 }
             }
+        }
+
+        function get_view_config(setting) {
+            return assoc_def && dm3c.get_view_config(assoc_def, setting) || dm3c.get_view_config(topic_type, setting)
         }
     }
 
