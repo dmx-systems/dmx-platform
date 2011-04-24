@@ -135,8 +135,9 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public void setTopicValue(long topicId, TopicValue value) {
-        hg.getHyperNode(topicId).setObject("value", value.value());
+    public TopicValue setTopicValue(long topicId, TopicValue value) {
+        Object oldValue = hg.getHyperNode(topicId).setObject("value", value.value());
+        return oldValue != null ? new TopicValue(oldValue) : null;
     }
 
     @Override
@@ -159,6 +160,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         node.setObject("value", value.value());
         // 3) index URI
         node.indexAttribute(HyperGraphIndexMode.KEY, "uri", uri, null);   // oldValue=null
+        // Note: indexing the topic value is up to the caller (the core service)
         //
         return buildTopic(node.getId(), uri, value, typeUri);
     }

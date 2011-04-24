@@ -88,7 +88,10 @@ public interface DeepaMehtaStorage {
 
     // ---
 
-    void setTopicValue(long topicId, TopicValue value);
+    /**
+     * @return  The previous topic value, or <code>null</code> if no value was set.
+     */
+    TopicValue setTopicValue(long topicId, TopicValue value);
 
     void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, TopicValue value, TopicValue oldValue);
 

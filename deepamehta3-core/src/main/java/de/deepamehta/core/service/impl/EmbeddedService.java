@@ -323,7 +323,7 @@ public class EmbeddedService implements CoreService {
             triggerHook(Hook.PRE_CREATE_TOPIC, topicData, clientContext);
             //
             Topic topic = storage.createTopic(topicData);
-            indexTopic(topic);
+            indexTopicValue(topic, topic.getValue(), null);     // oldValue=null (just created topics have no old value)
             associateWithTopicType(topic);
             //
             Composite comp = topicData.getComposite();
@@ -769,14 +769,15 @@ public class EmbeddedService implements CoreService {
 
     // === Topic API Delegates ===
 
-    void setTopicValue(long topicId, TopicValue value) {
+    void setTopicValue(Topic topic, TopicValue value) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.setTopicValue(topicId, value);
+            TopicValue oldValue = storage.setTopicValue(topic.getId(), value);
+            indexTopicValue(topic, value, oldValue);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Setting value for topic " + topicId + " failed (value=" + value + ")", e);
+            throw new RuntimeException("Setting topic value failed (" + topic + ", value=" + value + ")", e);
         } finally {
             tx.finish();
         }
@@ -1016,10 +1017,11 @@ public class EmbeddedService implements CoreService {
 
     // === Topic/Association Storage ===
 
-    private void indexTopic(Topic topic) {
+    private void indexTopicValue(Topic topic, TopicValue value, TopicValue oldValue) {
         TopicType topicType = getTopicType(topic.getTypeUri(), null);                       // FIXME: clientContext=null
+        String indexKey = topicType.getUri();
         for (IndexMode indexMode : topicType.getIndexModes()) {
-            storage.indexTopicValue(topic.getId(), indexMode, topicType.getUri(), topic.getValue(), null);
+            storage.indexTopicValue(topic.getId(), indexMode, indexKey, value, oldValue);
         }
     }
 

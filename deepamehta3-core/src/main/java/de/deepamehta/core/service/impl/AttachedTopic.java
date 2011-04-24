@@ -36,7 +36,7 @@ class AttachedTopic extends TopicData implements Topic {
         // update memory
         super.setValue(value);
         // update DB
-        dms.setTopicValue(getId(), value);
+        dms.setTopicValue(this, value);
     }
 
     // TODO: override setComposite()
