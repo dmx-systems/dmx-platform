@@ -327,6 +327,8 @@ var dm3c = new function() {
      *
      * @param   configurable    A topic type or an association definition. Must not be null/undefined.
      * @param   setting         Last URI component, e.g. "icon_src"
+     *
+     * @return  The setting value, or <code>undefined</code> if there is no such setting
      */
     this.get_view_config = function(configurable, setting) {
         // every configurable has an view_config_topics object, however it might be empty

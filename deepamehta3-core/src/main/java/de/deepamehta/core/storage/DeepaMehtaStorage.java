@@ -89,7 +89,7 @@ public interface DeepaMehtaStorage {
     // ---
 
     /**
-     * @return  The previous topic value, or <code>null</code> if no value was set.
+     * @return  The previous topic value, or <code>null</code> if no value was set before.
      */
     TopicValue setTopicValue(long topicId, TopicValue value);
 

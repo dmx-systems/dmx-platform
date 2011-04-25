@@ -8,7 +8,7 @@ function PlainDocument() {
                     //     value: either a Field object (non-composite) or again a fields object (composite)
 
     // Settings
-    DEFAULT_AREA_HEIGHT = 15    // in rows
+    var DEFAULT_FIELD_ROWS = 1
 
     // The autocomplete list
     $("#document-form").append($("<div>").addClass("autocomplete-list"))
@@ -204,7 +204,7 @@ function PlainDocument() {
      * @param   topic_type  The topic type underlying this field.
      *                      Note: in general the topic type is different for the Field objects of one page/form.
      * @param   assoc_def   The direct association definition that leads to this field.
-     *                      For a non-composite topic it is undefined.
+     *                      For a non-composite topic it is <code>undefined</code>.
      */
     function Field(uri, topic, topic_type, assoc_def) {
 
@@ -306,7 +306,38 @@ function PlainDocument() {
         }
 
         function get_view_config(setting) {
-            return assoc_def && dm3c.get_view_config(assoc_def, setting) || dm3c.get_view_config(topic_type, setting)
+
+            var val = assoc_def && dm3c.get_view_config(assoc_def, setting) || dm3c.get_view_config(topic_type, setting)
+            return val != undefined ? val : get_default_value()
+
+            function get_default_value() {
+                switch (setting) {
+                case "editable":
+                    return true
+                case "viewable":
+                    return true
+                case "js_renderer_class":
+                    return get_default_renderer_class()
+                case "rows":
+                    return DEFAULT_FIELD_ROWS
+                default:
+                    alert("Field.get_view_config: setting \"" + setting + "\" not implemented")
+                }
+            }
+
+            function get_default_renderer_class() {
+                switch (topic_type.data_type_uri) {
+                case "dm3.core.text":
+                    return "TextFieldRenderer"
+                case "dm3.core.number":
+                    return "NumberFieldRenderer"
+                case "dm3.core.boolean":
+                    return "TextFieldRenderer"  // TODO: boolean renderer (a checkbox)
+                default:
+                    alert("Field.get_view_config: data type \"" + topic_type.data_type_uri +
+                        "\" has no default renderer class")
+                }
+            }
         }
     }
 

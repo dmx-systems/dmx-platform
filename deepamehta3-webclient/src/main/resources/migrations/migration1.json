@@ -61,16 +61,7 @@
         {
             value: "Search Term",
             uri: "dm3.webclient.search_term",
-            data_type_uri: "dm3.core.text",
-            view_config_topics: [
-                {
-                    type_uri: "dm3.webclient.view_config",
-                    composite: {
-                        dm3.webclient.viewable: true,
-                        dm3.webclient.js_renderer_class: "TextFieldRenderer"
-                    }
-                }
-            ]
+            data_type_uri: "dm3.core.text"
         },
         {
             value: "Search Result",
@@ -80,7 +71,6 @@
                 {
                     type_uri: "dm3.webclient.view_config",
                     composite: {
-                        dm3.webclient.viewable: true,
                         dm3.webclient.js_renderer_class: "SearchResultRenderer"
                     }
                 }

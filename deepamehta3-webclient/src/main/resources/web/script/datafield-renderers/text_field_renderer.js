@@ -21,8 +21,9 @@ function TextFieldRenderer(topic, field, rel_topics) {
             }
             return input
         } else {
-            var rows = field.rows || DEFAULT_AREA_HEIGHT
-            return $("<textarea>").attr({"field-uri": field.uri, rows: rows}).text(dm3c.get_value(topic, field.uri))
+            return $("<textarea>")
+                .attr({"field-uri": field.uri, rows: field.rows})
+                .text(dm3c.get_value(topic, field.uri))
         }
     }
 

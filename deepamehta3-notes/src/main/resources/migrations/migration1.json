@@ -1,22 +1,40 @@
 {
     topic_types: [
         {
-            uri: "dm3.notes.note",
+            value: "Title",
+            uri: "dm3.notes.title",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"],
+        },
+        {
+            value: "Text",
+            uri: "dm3.notes.text",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"],
+            view_config_topics: [
+                {
+                    type_uri: "dm3.webclient.view_config",
+                    composite: {
+                        dm3.webclient.js_renderer_class: "HTMLFieldRenderer",
+                        dm3.webclient.rows: 15
+                    }
+                }
+            ]
+        },
+        {
             value: "Note",
+            uri: "dm3.notes.note",
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
                     assoc_type_uri:       "dm3.core.composition",
                     part_cardinality_uri: "dm3.core.one",
-                    part_topic_type_uri:  "dm3.base.title",
+                    part_topic_type_uri:  "dm3.notes.title",
                     view_config_topics: [
                         {
                             type_uri: "dm3.webclient.view_config",
                             composite: {
-                                dm3.webclient.editable: true,
-                                dm3.webclient.viewable: true,
-                                dm3.webclient.js_renderer_class: "TitleRenderer",
-                                dm3.webclient.rows: 1
+                                dm3.webclient.js_renderer_class: "TitleRenderer"
                             }
                         }
                     ]
@@ -24,15 +42,12 @@
                 {
                     assoc_type_uri:       "dm3.core.composition",
                     part_cardinality_uri: "dm3.core.one",
-                    part_topic_type_uri:  "dm3.base.text",
+                    part_topic_type_uri:  "dm3.notes.text",
                     view_config_topics: [
                         {
                             type_uri: "dm3.webclient.view_config",
                             composite: {
-                                dm3.webclient.editable: true,
-                                dm3.webclient.viewable: true,
-                                dm3.webclient.js_renderer_class: "BodyTextRenderer",
-                                dm3.webclient.rows: 15
+                                dm3.webclient.js_renderer_class: "BodyTextRenderer"
                             }
                         }
                     ]

@@ -74,6 +74,10 @@ class TypeCache {
     private AttachedTopicType fetchTopicType(String topicTypeUri) {
         // Note: storage low-level call used here ### explain
         Topic typeTopic = dms.storage.getTopic("uri", new TopicValue(topicTypeUri));
+        // error check
+        if (typeTopic == null) {
+            throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
+        }
         //
         Map<Long, AssociationDefinition> assocDefs = fetchAssociationDefinitions(typeTopic);
         //

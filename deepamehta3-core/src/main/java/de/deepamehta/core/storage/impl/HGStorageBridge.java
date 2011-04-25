@@ -372,6 +372,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         return topic;
     }
 
+    // FIXME: not used
     private HyperNode lookupTopicType(String topicTypeUri) {
         HyperNode topicType = lookupHyperNode(topicTypeUri);
         if (topicType == null) {
@@ -380,6 +381,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         return topicType;
     }
 
+    // FIXME: not used
     private HyperNode lookupAssociationType(String assocTypeUri) {
         HyperNode assocType = lookupHyperNode(assocTypeUri);
         if (assocType == null) {

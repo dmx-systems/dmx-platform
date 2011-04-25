@@ -25,9 +25,8 @@ function HTMLFieldRenderer(topic, field, rel_topics) {
     }
 
     this.render_form_element = function() {
-        var rows = field.rows || DEFAULT_AREA_HEIGHT
         var textarea = $("<textarea>")
-        textarea.attr({id: "field_" + field.uri, rows: rows})
+        textarea.attr({id: "field_" + field.uri, rows: field.rows})
         textarea.text(dm3c.get_value(topic, field.uri))
         return textarea
     }
