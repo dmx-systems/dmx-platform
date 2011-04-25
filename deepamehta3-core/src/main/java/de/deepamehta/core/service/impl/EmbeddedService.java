@@ -326,9 +326,8 @@ public class EmbeddedService implements CoreService {
             indexTopicValue(topic, topic.getValue(), null);     // oldValue=null (just created topics have no old value)
             associateWithTopicType(topic);
             //
-            Composite comp = topicData.getComposite();
-            if (comp != null) {
-                storeComposite(topic, comp);
+            if (getTopicType(topic).getDataTypeUri().equals("dm3.core.composite")) {
+                storeComposite(topic, topicData.getComposite());
             }
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext);
@@ -356,12 +355,14 @@ public class EmbeddedService implements CoreService {
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
             // ### storage.setTopicProperties(id, properties);
-            Composite comp = topicData.getComposite();
-            if (comp != null) {
+            if (getTopicType(topic).getDataTypeUri().equals("dm3.core.composite")) {
+                Composite comp = topicData.getComposite();
                 storeComposite(topic, comp);
                 storage.setTopicValue(topic.getId(), new TopicValue(comp.getLabel()));
+            } else {
+                setTopicValue(topic, topicData.getValue());
             }
-            //
+            // FIXME: update topic in-memory and avoid re-fetch
             topic = getTopic(topicData.getId(), clientContext);
             // ### topic.setProperties(properties);
             // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
@@ -912,8 +913,7 @@ public class EmbeddedService implements CoreService {
         }
         // set composite
         if (includeComposite) {
-            TopicType topicType = getTopicType(topic.getTypeUri(), null);       // FIXME: clientContext=null
-            if (topicType.getDataTypeUri().equals("dm3.core.composite")) {
+            if (getTopicType(topic).getDataTypeUri().equals("dm3.core.composite")) {
                 topic.setComposite(fetchComposite(topic));
             }
         }
@@ -936,6 +936,12 @@ public class EmbeddedService implements CoreService {
 
     // ---
 
+    private TopicType getTopicType(Topic topic) {
+        return getTopicType(topic.getTypeUri(), null);                       // FIXME: clientContext=null
+    }
+
+    // ---
+
     private void storeComposite(Topic topic, Composite comp) {
         Iterator<String> i = comp.keys();
         while (i.hasNext()) {
@@ -952,8 +958,7 @@ public class EmbeddedService implements CoreService {
 
     private Composite fetchComposite(Topic topic) {
         Composite comp = new Composite();
-        TopicType topicType = getTopicType(topic.getTypeUri(), null);                       // FIXME: clientContext=null
-        for (AssociationDefinition assocDef : topicType.getAssocDefs().values()) {
+        for (AssociationDefinition assocDef : getTopicType(topic).getAssocDefs().values()) {
             String assocDefUri = assocDef.getUri();
             TopicType partTopicType = getTopicType(assocDef.getPartTopicTypeUri(), null);   // FIXME: clientContext=null
             if (partTopicType.getDataTypeUri().equals("dm3.core.composite")) {
@@ -1005,8 +1010,7 @@ public class EmbeddedService implements CoreService {
         // ---
 
         private void getChildTopic(Topic parentTopic, String assocDefUri) {
-            TopicType topicType = getTopicType(parentTopic.getTypeUri(), null);     // FIXME: clientContext=null
-            this.assocDef = topicType.getAssocDef(assocDefUri);
+            this.assocDef = getTopicType(parentTopic).getAssocDef(assocDefUri);
             String assocTypeUri = assocDef.getAssocTypeUri();
             String wholeRoleTypeUri = assocDef.getWholeRoleTypeUri();
             String  partRoleTypeUri = assocDef.getPartRoleTypeUri();
@@ -1017,8 +1021,11 @@ public class EmbeddedService implements CoreService {
 
     // === Topic/Association Storage ===
 
+    /**
+     * @param   topic   Hint: only the topic ID and type URI are evaluated
+     */
     private void indexTopicValue(Topic topic, TopicValue value, TopicValue oldValue) {
-        TopicType topicType = getTopicType(topic.getTypeUri(), null);                       // FIXME: clientContext=null
+        TopicType topicType = getTopicType(topic);
         String indexKey = topicType.getUri();
         for (IndexMode indexMode : topicType.getIndexModes()) {
             storage.indexTopicValue(topic.getId(), indexMode, indexKey, value, oldValue);
@@ -1059,7 +1066,7 @@ public class EmbeddedService implements CoreService {
      */
     private void deleteTopic(Topic topic) {
         // 1) step down recursively
-        TopicType topicType = getTopicType(topic.getTypeUri(), null);       // FIXME: clientContext=null
+        TopicType topicType = getTopicType(topic);
         if (topicType.getDataTypeUri().equals("dm3.core.composite")) {
             for (AssociationDefinition assocDef : topicType.getAssocDefs().values()) {
                 String assocDefUri = assocDef.getUri();

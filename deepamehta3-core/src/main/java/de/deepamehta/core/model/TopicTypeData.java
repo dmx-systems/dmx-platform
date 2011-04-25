@@ -63,7 +63,7 @@ public class TopicTypeData extends TopicData {
             this.uri = topicTypeData.getString("uri");
             this.value = new TopicValue(topicTypeData.get("value"));
             this.typeUri = "dm3.core.topic_type";
-            this.composite = null;
+            this.composite = new Composite();
             //
             this.dataTypeUri = topicTypeData.getString("data_type_uri");
             this.indexModes = IndexMode.parse(topicTypeData);

@@ -24,7 +24,7 @@ public class TopicData {
     protected String uri;           // is never null, may be empty
     protected TopicValue value;     // is never null, may be constructed on empty string
     protected String typeUri;       //
-    protected Composite composite;  // may be null ### Should it initialized always? Would easify some code
+    protected Composite composite;  // is never null, may be empty
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -41,17 +41,17 @@ public class TopicData {
     }
 
     /**
-     * @param   uri         If <code>null</code> an empty string is used. This is OK.
-     * @param   value       If <code>null</code> an empty string value is used. This is OK.
+     * @param   uri         If <code>null</code> an empty string is set. This is OK.
+     * @param   value       If <code>null</code> an empty string value is set. This is OK.
      * @param   typeUri     Mandatory. Note: only the internal meta type topic (ID 0) has no type URI (null).
-     * @param   composite   If <code>null</code> composite is not initialized (remains null). This is OK.
+     * @param   composite   If <code>null</code> an empty composite is set. This is OK.
      */
     public TopicData(long id, String uri, TopicValue value, String typeUri, Composite composite) {
         this.id = id;
         this.uri = uri != null ? uri : "";
         this.value = value != null ? value : new TopicValue("");
         this.typeUri = typeUri;
-        this.composite = composite;
+        this.composite = composite != null ? composite : new Composite();
     }
 
     public TopicData(TopicData topicData) {
@@ -70,6 +70,8 @@ public class TopicData {
             this.typeUri = topicData.getString("type_uri");
             if (topicData.has("composite")) {
                 this.composite = new Composite(topicData.getJSONObject("composite"));
+            } else {
+                this.composite = new Composite();
             }
         } catch (Exception e) {
             throw new RuntimeException("Parsing TopicData failed (JSONObject=" + topicData + ")", e);
@@ -167,9 +169,7 @@ public class TopicData {
             o.put("uri", uri);
             o.put("value", value.value());
             o.put("type_uri", typeUri);
-            if (composite != null) {
-                o.put("composite", composite.toJSON());
-            }
+            o.put("composite", composite.toJSON());
             return o;
         } catch (JSONException e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);

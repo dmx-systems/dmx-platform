@@ -35,7 +35,7 @@ public class AssociationTypeData extends TopicData {
             this.uri = assocTypeData.getString("uri");
             this.value = new TopicValue(assocTypeData.get("value"));
             this.typeUri = "dm3.core.assoc_type";
-            this.composite = null;
+            this.composite = new Composite();
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationTypeData failed (JSONObject=" + assocTypeData + ")", e);
         }
