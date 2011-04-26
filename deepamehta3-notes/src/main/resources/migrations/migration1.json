@@ -27,9 +27,9 @@
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
-                    assoc_type_uri:       "dm3.core.composition",
-                    part_cardinality_uri: "dm3.core.one",
-                    part_topic_type_uri:  "dm3.notes.title",
+                    assoc_type_uri:    "dm3.core.composition",
+                    cardinality_uri_2: "dm3.core.one",
+                    topic_type_uri_2:  "dm3.notes.title",
                     view_config_topics: [
                         {
                             type_uri: "dm3.webclient.view_config",
@@ -40,9 +40,9 @@
                     ]
                 },
                 {
-                    assoc_type_uri:       "dm3.core.composition",
-                    part_cardinality_uri: "dm3.core.one",
-                    part_topic_type_uri:  "dm3.notes.text",
+                    assoc_type_uri:    "dm3.core.composition",
+                    cardinality_uri_2: "dm3.core.one",
+                    topic_type_uri_2:  "dm3.notes.text",
                     view_config_topics: [
                         {
                             type_uri: "dm3.webclient.view_config",

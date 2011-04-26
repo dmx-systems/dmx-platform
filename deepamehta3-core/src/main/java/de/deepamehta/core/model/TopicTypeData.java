@@ -110,7 +110,7 @@ public class TopicTypeData extends TopicData {
         AssociationDefinition existing = assocDefs.get(assocDefUri);
         if (existing != null) {
             throw new RuntimeException("Schema ambiguity: topic type \"" + uri + "\" has more than one " +
-                "association definitions with uri \"" + assocDefUri + "\" -- Use distinct part role types");
+                "association definitions with uri \"" + assocDefUri + "\" -- Use distinct role types at position 2");
         }
         assocDefs.put(assocDefUri, assocDef);
     }

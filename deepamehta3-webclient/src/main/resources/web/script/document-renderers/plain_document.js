@@ -35,9 +35,9 @@ function PlainDocument() {
             if (topic_type.data_type_uri == "dm3.core.composite") {
                 var fields = {}
                 for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                    var part_topic_type = dm3c.type_cache.get(assoc_def.part_topic_type_uri)
+                    var topic_type_2 = dm3c.type_cache.get(assoc_def.topic_type_uri_2)
                     var child_field_uri = field_uri + dm3c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
-                    var child_fields = render_fields(child_field_uri, part_topic_type, assoc_def)
+                    var child_fields = render_fields(child_field_uri, topic_type_2, assoc_def)
                     if (child_fields) {
                         fields[assoc_def.uri] = child_fields
                     }
@@ -78,9 +78,9 @@ function PlainDocument() {
             if (topic_type.data_type_uri == "dm3.core.composite") {
                 var fields = {}
                 for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                    var part_topic_type = dm3c.type_cache.get(assoc_def.part_topic_type_uri)
+                    var topic_type_2 = dm3c.type_cache.get(assoc_def.topic_type_uri_2)
                     var child_field_uri = field_uri + dm3c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
-                    var child_fields = render_fields(child_field_uri, part_topic_type, assoc_def)
+                    var child_fields = render_fields(child_field_uri, topic_type_2, assoc_def)
                     if (child_fields) {
                         fields[assoc_def.uri] = child_fields
                     }

@@ -813,13 +813,13 @@ public class EmbeddedService implements CoreService {
                         }
                     } else {
                         // create child topic
-                        String topicTypeUri = assocDef.getPartTopicTypeUri();
+                        String topicTypeUri = assocDef.getTopicTypeUri2();
                         childTopic = createTopic(new TopicData(null, value, topicTypeUri, null), null);
                         setChildTopic(childTopic);
                         // associate child topic
                         AssociationData assocData = new AssociationData(assocDef.getAssocTypeUri());
-                        assocData.addTopicRole(new TopicRole(parentTopic.getId(), assocDef.getWholeRoleTypeUri()));
-                        assocData.addTopicRole(new TopicRole(childTopic.getId(), assocDef.getPartRoleTypeUri()));
+                        assocData.addTopicRole(new TopicRole(parentTopic.getId(), assocDef.getRoleTypeUri1()));
+                        assocData.addTopicRole(new TopicRole(childTopic.getId(), assocDef.getRoleTypeUri2()));
                         createAssociation(assocData, null);     // FIXME: clientContext=null
                     }
                 }
@@ -960,8 +960,8 @@ public class EmbeddedService implements CoreService {
         Composite comp = new Composite();
         for (AssociationDefinition assocDef : getTopicType(topic).getAssocDefs().values()) {
             String assocDefUri = assocDef.getUri();
-            TopicType partTopicType = getTopicType(assocDef.getPartTopicTypeUri(), null);   // FIXME: clientContext=null
-            if (partTopicType.getDataTypeUri().equals("dm3.core.composite")) {
+            TopicType topicType2 = getTopicType(assocDef.getTopicTypeUri2(), null);   // FIXME: clientContext=null
+            if (topicType2.getDataTypeUri().equals("dm3.core.composite")) {
                 Topic childTopic = new ChildTopicEvaluator(topic, assocDefUri).getChildTopic();
                 if (childTopic != null) {
                     comp.put(assocDefUri, fetchComposite(childTopic));
@@ -1012,10 +1012,10 @@ public class EmbeddedService implements CoreService {
         private void getChildTopic(Topic parentTopic, String assocDefUri) {
             this.assocDef = getTopicType(parentTopic).getAssocDef(assocDefUri);
             String assocTypeUri = assocDef.getAssocTypeUri();
-            String wholeRoleTypeUri = assocDef.getWholeRoleTypeUri();
-            String  partRoleTypeUri = assocDef.getPartRoleTypeUri();
+            String roleTypeUri1 = assocDef.getRoleTypeUri1();
+            String roleTypeUri2 = assocDef.getRoleTypeUri2();
             //
-            this.childTopic = getRelatedTopic(parentTopic.getId(), assocTypeUri, wholeRoleTypeUri, partRoleTypeUri);
+            this.childTopic = getRelatedTopic(parentTopic.getId(), assocTypeUri, roleTypeUri1, roleTypeUri2);
         }
     }
 
@@ -1120,7 +1120,7 @@ public class EmbeddedService implements CoreService {
             return assoc;
         } catch (Exception e) {
             throw new RuntimeException("Associating topic type \"" + topicTypeUri +
-                "\" with topic type \"" + assocDef.getPartTopicTypeUri() + "\" failed", e);
+                "\" with topic type \"" + assocDef.getTopicTypeUri2() + "\" failed", e);
         }
     }
 

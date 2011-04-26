@@ -100,7 +100,7 @@ class TypeCache {
 
     private Map<Long, AssociationDefinition> fetchAssociationDefinitions(Topic typeTopic) {
         Map<Long, AssociationDefinition> assocDefs = new HashMap();
-        for (Association assoc : dms.getAssociations(typeTopic.getId(), "dm3.core.whole_topic_type")) {
+        for (Association assoc : dms.getAssociations(typeTopic.getId(), "dm3.core.topic_type_1")) {
             AssociationDefinition assocDef = fetchAssociationDefinition(assoc, typeTopic.getUri());
             assocDefs.put(assocDef.getId(), assocDef);
         }
@@ -115,16 +115,14 @@ class TypeCache {
         RoleTypes   roleTypes   = fetchRoleTypes(assoc);
         Cardinality cardinality = fetchCardinality(assoc);
         // sanity check
-        if (!topicTypes.wholeTopicTypeUri.equals(topicTypeUri)) {
+        if (!topicTypes.topicTypeUri1.equals(topicTypeUri)) {
             throw new RuntimeException("jri doesn't understand Neo4j traversal");
         }
         //
         AssociationDefinition assocDef = new AssociationDefinition(assoc.getId(),
-            topicTypes.wholeTopicTypeUri, topicTypes.partTopicTypeUri,
-            roleTypes.wholeRoleTypeUri,   roleTypes.partRoleTypeUri
-        );
-        assocDef.setWholeCardinalityUri(cardinality.wholeCardinalityUri);
-        assocDef.setPartCardinalityUri(cardinality.partCardinalityUri);
+            topicTypes.topicTypeUri1, topicTypes.topicTypeUri2, roleTypes.roleTypeUri1, roleTypes.roleTypeUri2);
+        assocDef.setCardinalityUri1(cardinality.cardinalityUri1);
+        assocDef.setCardinalityUri2(cardinality.cardinalityUri2);
         assocDef.setAssocTypeUri(assoc.getTypeUri());
         assocDef.setViewConfig(fetchViewConfig(assoc));
         return assocDef;
@@ -211,36 +209,36 @@ class TypeCache {
     // ---
 
     private TopicTypes fetchTopicTypes(Association assoc) {
-        String wholeTopicTypeUri = assoc.getTopic("dm3.core.whole_topic_type").getUri();
-        String  partTopicTypeUri = assoc.getTopic("dm3.core.part_topic_type").getUri();
-        return new TopicTypes(wholeTopicTypeUri, partTopicTypeUri);
+        String topicTypeUri1 = assoc.getTopic("dm3.core.topic_type_1").getUri();
+        String topicTypeUri2 = assoc.getTopic("dm3.core.topic_type_2").getUri();
+        return new TopicTypes(topicTypeUri1, topicTypeUri2);
     }
 
     private RoleTypes fetchRoleTypes(Association assoc) {
-        Topic wholeRoleType = assoc.getTopic("dm3.core.whole_role_type");
-        Topic  partRoleType = assoc.getTopic("dm3.core.part_role_type");
+        Topic roleType1 = assoc.getTopic("dm3.core.role_type_1");
+        Topic roleType2 = assoc.getTopic("dm3.core.role_type_2");
         RoleTypes roleTypes = new RoleTypes();
         // role types are optional
-        if (wholeRoleType != null) {
-            roleTypes.setWholeRoleTypeUri(wholeRoleType.getUri());
+        if (roleType1 != null) {
+            roleTypes.setRoleTypeUri1(roleType1.getUri());
         }
-        if (partRoleType != null) {
-            roleTypes.setPartRoleTypeUri(partRoleType.getUri());
+        if (roleType2 != null) {
+            roleTypes.setRoleTypeUri2(roleType2.getUri());
         }
         return roleTypes;
     }
 
     private Cardinality fetchCardinality(Association assoc) {
-        Topic wholeCardinality = assoc.getTopic("dm3.core.whole_cardinality");
-        Topic  partCardinality = assoc.getTopic("dm3.core.part_cardinality");
+        Topic cardinality1 = assoc.getTopic("dm3.core.cardinality_1");
+        Topic cardinality2 = assoc.getTopic("dm3.core.cardinality_2");
         Cardinality cardinality = new Cardinality();
-        if (wholeCardinality != null) {
-            cardinality.setWholeCardinalityUri(wholeCardinality.getUri());
+        if (cardinality1 != null) {
+            cardinality.setCardinalityUri1(cardinality1.getUri());
         }
-        if (partCardinality != null) {
-            cardinality.setPartCardinalityUri(partCardinality.getUri());
+        if (cardinality2 != null) {
+            cardinality.setCardinalityUri2(cardinality2.getUri());
         } else {
-            throw new RuntimeException("Missing part cardinality in association definition");
+            throw new RuntimeException("Missing cardinality of position 2 in association definition");
         }
         return cardinality;
     }
@@ -249,40 +247,40 @@ class TypeCache {
 
     private class TopicTypes {
 
-        private String wholeTopicTypeUri;
-        private String  partTopicTypeUri;
+        private String topicTypeUri1;
+        private String topicTypeUri2;
 
-        private TopicTypes(String wholeTopicTypeUri, String partTopicTypeUri) {
-            this.wholeTopicTypeUri = wholeTopicTypeUri;
-            this.partTopicTypeUri = partTopicTypeUri;
+        private TopicTypes(String topicTypeUri1, String topicTypeUri2) {
+            this.topicTypeUri1 = topicTypeUri1;
+            this.topicTypeUri2 = topicTypeUri2;
         }
     }
 
     private class RoleTypes {
 
-        private String wholeRoleTypeUri;
-        private String  partRoleTypeUri;
+        private String roleTypeUri1;
+        private String roleTypeUri2;
 
-        private void setWholeRoleTypeUri(String wholeRoleTypeUri) {
-            this.wholeRoleTypeUri = wholeRoleTypeUri;
+        private void setRoleTypeUri1(String roleTypeUri1) {
+            this.roleTypeUri1 = roleTypeUri1;
         }
 
-        private void setPartRoleTypeUri(String partRoleTypeUri) {
-            this.partRoleTypeUri = partRoleTypeUri;
+        private void setRoleTypeUri2(String roleTypeUri2) {
+            this.roleTypeUri2 = roleTypeUri2;
         }
     }
 
     private class Cardinality {
 
-        private String wholeCardinalityUri;
-        private String  partCardinalityUri;
+        private String cardinalityUri1;
+        private String cardinalityUri2;
 
-        private void setWholeCardinalityUri(String wholeCardinalityUri) {
-            this.wholeCardinalityUri = wholeCardinalityUri;
+        private void setCardinalityUri1(String cardinalityUri1) {
+            this.cardinalityUri1 = cardinalityUri1;
         }
 
-        private void setPartCardinalityUri(String partCardinalityUri) {
-            this.partCardinalityUri = partCardinalityUri;
+        private void setCardinalityUri2(String cardinalityUri2) {
+            this.cardinalityUri2 = cardinalityUri2;
         }
     }
 }
