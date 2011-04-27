@@ -186,7 +186,17 @@ public class TopicData {
         return array;
     }
 
-    // ---
+    // === Java API ===
+
+    @Override
+    public boolean equals(Object o) {
+        return ((TopicData) o).id == id;
+    }
+
+    @Override
+    public int hashCode() {
+        return ((Long) id).hashCode();
+    }
 
     @Override
     public String toString() {

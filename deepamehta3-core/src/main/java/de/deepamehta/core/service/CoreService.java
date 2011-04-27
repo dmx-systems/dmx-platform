@@ -110,8 +110,8 @@ public interface CoreService {
      * @param   wholeWord   If true the searchTerm is regarded as whole word.
      *                      If false the searchTerm is regarded as begin-of-word substring.
      */
-    public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord,
-                                                                        ClientContext clientContext);
+    public Set<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord,
+                                                                       ClientContext clientContext);
 
     public Topic createTopic(TopicData topicData, ClientContext clientContext);
 

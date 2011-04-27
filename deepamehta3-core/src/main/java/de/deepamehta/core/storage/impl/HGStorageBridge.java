@@ -24,6 +24,7 @@ import de.deepamehta.hypergraph.HyperNodeRole;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -94,17 +95,14 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     public Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                                           String othersRoleTypeUri,
                                                                           String othersTopicTypeUri) {
-        if (assocTypeUri == null) {
-            throw new IllegalArgumentException("Tried to call getRelatedTopics() with a null " +
-                "association type filter (assocTypeUri=null)");
-        }
-        //
         Set<ConnectedHyperNode> nodes = hg.getHyperNode(topicId).getConnectedHyperNodes(myRoleTypeUri,
                                                                                         othersRoleTypeUri);
         if (othersTopicTypeUri != null) {
             filterNodesByTopicType(nodes, othersTopicTypeUri);
         }
-        filterNodesByAssociationType(nodes, assocTypeUri);
+        if (assocTypeUri != null) {
+            filterNodesByAssociationType(nodes, assocTypeUri);
+        }
         return buildTopics(nodes);
     }
 
@@ -131,7 +129,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord) {
+    public Set<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord) {
         if (!wholeWord) {
             searchTerm += "*";
         }
@@ -290,16 +288,16 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
-    private Set<Topic> buildTopics(Iterable<ConnectedHyperNode> nodes) {
-        Set<Topic> topics = new HashSet();
+    private Set<Topic> buildTopics(Set<ConnectedHyperNode> nodes) {
+        Set<Topic> topics = new LinkedHashSet();
         for (ConnectedHyperNode node : nodes) {
             topics.add(buildTopic(node.getHyperNode()));
         }
         return topics;
     }
 
-    private List<Topic> buildTopics(Iterable<HyperNode> nodes) {
-        List<Topic> topics = new ArrayList();
+    private Set<Topic> buildTopics(Iterable<HyperNode> nodes) {
+        Set<Topic> topics = new LinkedHashSet();
         for (HyperNode node : nodes) {
             topics.add(buildTopic(node));
         }

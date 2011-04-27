@@ -19,9 +19,13 @@ import javax.ws.rs.QueryParam;
 
 import java.awt.Desktop;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -82,8 +86,10 @@ public class WebclientPlugin extends Plugin {
                               @HeaderParam("Cookie") ClientContext clientContext) {
         logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\", wholeWord=" + wholeWord +
             ", clientContext=" + clientContext);
-        List<Topic> topics = dms.searchTopics(searchTerm, fieldUri, wholeWord, clientContext);
-        return createResultTopic(searchTerm, topics, clientContext);
+        Set<Topic> topics = dms.searchTopics(searchTerm, fieldUri, wholeWord, clientContext);
+        Set<Topic> wholeTopics = filterWholeTopics(topics);
+        logger.info(topics.size() + " topics found, " + wholeTopics.size() + " after whole topic filtering");
+        return createResultTopic(searchTerm, wholeTopics, clientContext);
     }
 
     /**
@@ -104,10 +110,25 @@ public class WebclientPlugin extends Plugin {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private Set<Topic> filterWholeTopics(Set<Topic> topics) {
+        Set<Topic> wholeTopics = new LinkedHashSet();
+        for (Topic topic : topics) {
+            Set<Topic> parentTopics = topic.getRelatedTopics(null, "dm3.core.part", "dm3.core.whole", null, false);
+            if (parentTopics.isEmpty()) {
+                wholeTopics.add(topic);
+            } else {
+                wholeTopics.addAll(filterWholeTopics(parentTopics));
+            }
+        }
+        return wholeTopics;
+    }
+
+    // ---
+
     /**
      * Creates a search result topic (a bucket).
      */
-    private Topic createResultTopic(String searchTerm, List<Topic> topics, ClientContext clientContext) {
+    private Topic createResultTopic(String searchTerm, Set<Topic> topics, ClientContext clientContext) {
         Topic searchTopic = dms.createTopic(new TopicData("dm3.webclient.search"), clientContext);
         searchTopic.setChildTopicValue("dm3.webclient.search_term", new TopicValue(searchTerm));
         // associate search result topics

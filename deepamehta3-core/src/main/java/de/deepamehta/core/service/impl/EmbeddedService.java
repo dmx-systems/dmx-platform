@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -296,13 +297,13 @@ public class EmbeddedService implements CoreService {
     @GET
     @Path("/topic")
     @Override
-    public List<Topic> searchTopics(@QueryParam("search")    String searchTerm,
-                                    @QueryParam("field")     String fieldUri,
-                                    @QueryParam("wholeword") boolean wholeWord,
-                                    @HeaderParam("Cookie")   ClientContext clientContext) {
+    public Set<Topic> searchTopics(@QueryParam("search")    String searchTerm,
+                                   @QueryParam("field")     String fieldUri,
+                                   @QueryParam("wholeword") boolean wholeWord,
+                                   @HeaderParam("Cookie")   ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            List<Topic> topics = storage.searchTopics(searchTerm, fieldUri, wholeWord);
+            Set<Topic> topics = buildTopics(storage.searchTopics(searchTerm, fieldUri, wholeWord), false);
             tx.success();
             return topics;
         } catch (Exception e) {
@@ -863,12 +864,8 @@ public class EmbeddedService implements CoreService {
     Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                          String othersTopicTypeUri,
                                                                                          boolean includeComposite) {
-        Set<Topic> topics = new HashSet();
-        for (Topic topic : storage.getRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-                                                                                          othersTopicTypeUri)) {
-            topics.add(buildTopic(topic, includeComposite));
-        }
-        return topics;
+        return buildTopics(storage.getRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri), includeComposite);
     }
 
     Set<Association> getAssociations(long topicId, String myRoleTypeUri) {
@@ -932,6 +929,16 @@ public class EmbeddedService implements CoreService {
         //
         return new AttachedTopic(topic, this);
     }
+
+    private Set<Topic> buildTopics(Set<Topic> topics, boolean includeComposite) {
+        Set<Topic> attachedTopics = new LinkedHashSet();
+        for (Topic topic : topics) {
+            attachedTopics.add(buildTopic(topic, includeComposite));
+        }
+        return attachedTopics;
+    }
+
+    // ---
 
     /**
      * Attaches this service to an association retrieved from storage layer.

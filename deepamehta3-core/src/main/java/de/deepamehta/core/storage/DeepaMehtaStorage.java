@@ -73,7 +73,7 @@ public interface DeepaMehtaStorage {
                                                                                    String othersTopicTypeUri);
 
     /**
-     * @param   assocTypeUri        must not be null ### FIXME: remove that constraint, ensure by caller instead
+     * @param   assocTypeUri        may be null
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
@@ -92,7 +92,7 @@ public interface DeepaMehtaStorage {
 
     // ---
 
-    List<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord);
+    Set<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord);
 
     // ---
 
