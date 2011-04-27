@@ -68,14 +68,16 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public Set<Topic> getRelatedTopics(long topicId, String assocTypeUri) {
-        return getRelatedTopics(topicId, assocTypeUri, null, null);
+        return getRelatedTopics(topicId, assocTypeUri, null, null, null);
     }
 
     // ---
 
     @Override
-    public Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri) {
-        Set<Topic> topics = getRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri);
+    public Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                          String othersTopicTypeUri) {
+        Set<Topic> topics = getRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+                                                                                   othersTopicTypeUri);
         switch (topics.size()) {
         case 0:
             return null;
@@ -90,7 +92,8 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                          String othersRoleTypeUri) {
+                                                                          String othersRoleTypeUri,
+                                                                          String othersTopicTypeUri) {
         if (assocTypeUri == null) {
             throw new IllegalArgumentException("Tried to call getRelatedTopics() with a null " +
                 "association type filter (assocTypeUri=null)");
@@ -98,6 +101,9 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         //
         Set<ConnectedHyperNode> nodes = hg.getHyperNode(topicId).getConnectedHyperNodes(myRoleTypeUri,
                                                                                         othersRoleTypeUri);
+        if (othersTopicTypeUri != null) {
+            filterNodesByTopicType(nodes, othersTopicTypeUri);
+        }
         filterNodesByAssociationType(nodes, assocTypeUri);
         return buildTopics(nodes);
     }
@@ -343,6 +349,21 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         } catch (Exception e) {
             throw new RuntimeException("Applying association type filter \"" + assocTypeUri +
                 "\" failed (" + edge + ",\n" + node.getHyperNode() + ")", e);
+        }
+    }
+
+    private void filterNodesByTopicType(Set<ConnectedHyperNode> nodes, String topicTypeUri) {
+        HyperNode node = null;
+        try {
+            Iterator<ConnectedHyperNode> i = nodes.iterator();
+            while (i.hasNext()) {
+                node = i.next().getHyperNode();
+                if (!getTopicTypeUri(node).equals(topicTypeUri)) {
+                    i.remove();
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Applying topic type filter \"" + topicTypeUri + "\" failed (" + node + ")", e);
         }
     }
 

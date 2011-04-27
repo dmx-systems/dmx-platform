@@ -111,8 +111,8 @@ class TypeCache {
      * @param   topicTypeUri    only used for sanity check
      */
     private AssociationDefinition fetchAssociationDefinition(Association assoc, String topicTypeUri) {
-        TopicTypes  topicTypes  = fetchTopicTypes(assoc);
-        RoleTypes   roleTypes   = fetchRoleTypes(assoc);
+        TopicTypes topicTypes = fetchTopicTypes(assoc);
+        // ### RoleTypes roleTypes = fetchRoleTypes(assoc);
         Cardinality cardinality = fetchCardinality(assoc);
         // sanity check
         if (!topicTypes.topicTypeUri1.equals(topicTypeUri)) {
@@ -120,7 +120,8 @@ class TypeCache {
         }
         //
         AssociationDefinition assocDef = new AssociationDefinition(assoc.getId(),
-            topicTypes.topicTypeUri1, topicTypes.topicTypeUri2, roleTypes.roleTypeUri1, roleTypes.roleTypeUri2);
+            topicTypes.topicTypeUri1, topicTypes.topicTypeUri2
+            /* ###, roleTypes.roleTypeUri1, roleTypes.roleTypeUri2 */);
         assocDef.setCardinalityUri1(cardinality.cardinalityUri1);
         assocDef.setCardinalityUri2(cardinality.cardinalityUri2);
         assocDef.setAssocTypeUri(assoc.getTypeUri());
@@ -174,7 +175,7 @@ class TypeCache {
             // Note: the type topic is not attached to the service
             // ### should dms.getRelatedTopic() get a "includeComposite" parameter?
             Topic dataType = dms.storage.getRelatedTopic(typeTopic.getId(), "dm3.core.association",
-                                                                        "dm3.core.topic_type", "dm3.core.data_type");
+                "dm3.core.topic_type", "dm3.core.data_type", "dm3.core.data_type");
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to topic type \"" + typeTopic.getUri() +
                     "\"");
@@ -187,8 +188,8 @@ class TypeCache {
     }
 
     private Set<IndexMode> fetchIndexModes(Topic typeTopic) {
-        Set<Topic> topics = dms.getRelatedTopics(typeTopic.getId(), "dm3.core.association", "dm3.core.topic_type",
-                                                                                          "dm3.core.index_mode", false);
+        Set<Topic> topics = dms.getRelatedTopics(typeTopic.getId(), "dm3.core.association",
+            "dm3.core.topic_type", "dm3.core.index_mode", "dm3.core.index_mode", false);
         return IndexMode.fromTopics(topics);
     }
 
@@ -196,8 +197,9 @@ class TypeCache {
 
     private ViewConfiguration fetchViewConfig(Topic typeTopic) {
         // Note: the type topic is not attached to the service
-        Set<Topic> topics = dms.getRelatedTopics(typeTopic.getId(), "dm3.core.association", "dm3.core.topic_type",
-                                                                                          "dm3.core.view_config", true);
+        Set<Topic> topics = dms.getRelatedTopics(typeTopic.getId(), "dm3.core.association",
+            "dm3.core.topic_type", "dm3.core.view_config", null, true);
+        // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
         return new ViewConfiguration(topics);
     }
 
@@ -214,7 +216,7 @@ class TypeCache {
         return new TopicTypes(topicTypeUri1, topicTypeUri2);
     }
 
-    private RoleTypes fetchRoleTypes(Association assoc) {
+    /* ### private RoleTypes fetchRoleTypes(Association assoc) {
         Topic roleType1 = assoc.getTopic("dm3.core.role_type_1");
         Topic roleType2 = assoc.getTopic("dm3.core.role_type_2");
         RoleTypes roleTypes = new RoleTypes();
@@ -226,7 +228,7 @@ class TypeCache {
             roleTypes.setRoleTypeUri2(roleType2.getUri());
         }
         return roleTypes;
-    }
+    } */
 
     private Cardinality fetchCardinality(Association assoc) {
         Topic cardinality1 = assoc.getTopic("dm3.core.cardinality_1");
@@ -256,7 +258,7 @@ class TypeCache {
         }
     }
 
-    private class RoleTypes {
+    /* ### private class RoleTypes {
 
         private String roleTypeUri1;
         private String roleTypeUri2;
@@ -268,7 +270,7 @@ class TypeCache {
         private void setRoleTypeUri2(String roleTypeUri2) {
             this.roleTypeUri2 = roleTypeUri2;
         }
-    }
+    } */
 
     private class Cardinality {
 

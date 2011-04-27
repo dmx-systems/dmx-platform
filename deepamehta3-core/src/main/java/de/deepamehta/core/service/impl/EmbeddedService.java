@@ -512,7 +512,7 @@ public class EmbeddedService implements CoreService {
     public Set<String> getTopicTypeUris() {
         Topic metaType = buildTopic(storage.getTopic("uri", new TopicValue("dm3.core.topic_type")), false);
         Set<Topic> topicTypes = metaType.getRelatedTopics("dm3.core.instantiation", "dm3.core.type",
-                                                                                    "dm3.core.instance", false);
+                                                          "dm3.core.instance", "dm3.core.topic_type", false);
         Set<String> topicTypeUris = new HashSet();
         for (Topic topicType : topicTypes) {
             topicTypeUris.add(topicType.getUri());
@@ -766,7 +766,11 @@ public class EmbeddedService implements CoreService {
         closeDB();
     }
 
+
+
     // ----------------------------------------------------------------------------------------- Package Private Methods
+
+
 
     // === Topic API Delegates ===
 
@@ -849,27 +853,33 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleType, String othersRoleType) {
-        Topic topic = storage.getRelatedTopic(topicId, assocTypeUri, myRoleType, othersRoleType);
+    Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                   String othersTopicTypeUri) {
+        Topic topic = storage.getRelatedTopic(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri);
         return topic != null ? buildTopic(topic, true) : null;
     }
 
-    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleType, String othersRoleType,
-                                                                                      boolean includeComposite) {
+    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                         String othersTopicTypeUri,
+                                                                                         boolean includeComposite) {
         Set<Topic> topics = new HashSet();
-        for (Topic topic : storage.getRelatedTopics(topicId, assocTypeUri, myRoleType, othersRoleType)) {
+        for (Topic topic : storage.getRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+                                                                                          othersTopicTypeUri)) {
             topics.add(buildTopic(topic, includeComposite));
         }
         return topics;
     }
 
-    Set<Association> getAssociations(long topicId, String myRoleType) {
+    Set<Association> getAssociations(long topicId, String myRoleTypeUri) {
         Set<Association> assocs = new HashSet();
-        for (Association assoc : storage.getAssociations(topicId, myRoleType)) {
+        for (Association assoc : storage.getAssociations(topicId, myRoleTypeUri)) {
             assocs.add(buildAssociation(assoc));
         }
         return assocs;
     }
+
+
 
     // === Association API Delegates ===
 
@@ -899,6 +909,8 @@ public class EmbeddedService implements CoreService {
             tx.finish();
         }
     }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
@@ -1015,7 +1027,8 @@ public class EmbeddedService implements CoreService {
             String roleTypeUri1 = assocDef.getRoleTypeUri1();
             String roleTypeUri2 = assocDef.getRoleTypeUri2();
             //
-            this.childTopic = getRelatedTopic(parentTopic.getId(), assocTypeUri, roleTypeUri1, roleTypeUri2);
+            this.childTopic = getRelatedTopic(parentTopic.getId(), assocTypeUri, roleTypeUri1, roleTypeUri2,
+                assocDefUri);
         }
     }
 

@@ -58,18 +58,21 @@ class AttachedTopic extends TopicData implements Topic {
     }
 
     @Override
-    public Topic getRelatedTopic(String assocTypeUri, String myRoleType, String othersRoleType) {
-        return dms.getRelatedTopic(getId(), assocTypeUri, myRoleType, othersRoleType);
+    public Topic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                            String othersTopicTypeUri) {
+        return dms.getRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     @Override
-    public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType,
-                                                                               boolean includeComposite) {
-        return dms.getRelatedTopics(getId(), assocTypeUri, myRoleType, othersRoleType, includeComposite);
+    public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                  String othersTopicTypeUri,
+                                                                                  boolean includeComposite) {
+        return dms.getRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+            includeComposite);
     }
 
     @Override
-    public Set<Association> getAssociations(String myRoleType) {
-        return dms.getAssociations(getId(), myRoleType);
+    public Set<Association> getAssociations(String myRoleTypeUri) {
+        return dms.getAssociations(getId(), myRoleTypeUri);
     }
 }

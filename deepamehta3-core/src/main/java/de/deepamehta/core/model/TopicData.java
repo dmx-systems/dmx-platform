@@ -147,16 +147,18 @@ public class TopicData {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 
-    public Topic getRelatedTopic(String assocTypeUri, String myRoleType, String othersRoleType) {
+    public Topic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                            String othersTopicTypeUri) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 
-    public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType,
-                                                                               boolean includeComposite) {
+    public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                  String othersTopicTypeUri,
+                                                                                  boolean includeComposite) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 
-    public Set<Association> getAssociations(String myRoleType) {
+    public Set<Association> getAssociations(String myRoleTypeUri) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 

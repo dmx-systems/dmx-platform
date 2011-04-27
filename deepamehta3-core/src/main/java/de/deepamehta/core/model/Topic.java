@@ -46,12 +46,14 @@ public interface Topic {
 
     Set<Topic> getRelatedTopics(String assocTypeUri);
 
-    Topic getRelatedTopic(String assocTypeUri, String myRoleType, String othersRoleType);
+    Topic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                     String othersTopicTypeUri);
 
-    Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleType, String othersRoleType,
-                                                                        boolean includeComposite);
+    Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                           String othersTopicTypeUri,
+                                                                           boolean includeComposite);
 
-    Set<Association> getAssociations(String myRoleType);
+    Set<Association> getAssociations(String myRoleTypeUri);
 
     // === Serialization ===
 

@@ -88,6 +88,16 @@
         },*/
 
         {
+            value:    "Whole",
+            uri:      "dm3.core.whole",
+            type_uri: "dm3.core.role_type"
+        },
+        {
+            value:    "Part",
+            uri:      "dm3.core.part",
+            type_uri: "dm3.core.role_type"
+        },
+        {
             value:    "Topic Type 1",
             uri:      "dm3.core.topic_type_1",
             type_uri: "dm3.core.role_type"

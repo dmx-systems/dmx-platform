@@ -69,9 +69,17 @@ public interface DeepaMehtaStorage {
 
     // ---
 
-    Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri);
+    Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                   String othersTopicTypeUri);
 
-    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri);
+    /**
+     * @param   assocTypeUri        must not be null ### FIXME: remove that constraint, ensure by caller instead
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
+    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                         String othersTopicTypeUri);
 
     // ---
 

@@ -43,17 +43,17 @@ public class AssociationDefinition {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public AssociationDefinition(long id, String topicTypeUri1, String topicTypeUri2,
-                                          String roleTypeUri1, String roleTypeUri2) {
+    public AssociationDefinition(long id, String topicTypeUri1, String topicTypeUri2
+                                          /* ### String roleTypeUri1, String roleTypeUri2 */) {
         this.id = id;
         //
         this.topicTypeUri1 = topicTypeUri1;
         this.topicTypeUri2 = topicTypeUri2;
         // set default role types
-        this.roleTypeUri1 = roleTypeUri1 != null ? roleTypeUri1 : topicTypeUri1;
-        this.roleTypeUri2 = roleTypeUri2 != null ? roleTypeUri2 : topicTypeUri2;
+        this.roleTypeUri1 = "dm3.core.whole";       // ### roleTypeUri1 != null ? roleTypeUri1 : topicTypeUri1;
+        this.roleTypeUri2 = "dm3.core.part";        // ### roleTypeUri2 != null ? roleTypeUri2 : topicTypeUri2;
         // derive uri
-        this.uri = this.roleTypeUri2;
+        this.uri = topicTypeUri2;                   // ### roleTypeUri2;
     }
 
     public AssociationDefinition(JSONObject assocDef, String topicTypeUri1) {
@@ -63,10 +63,10 @@ public class AssociationDefinition {
             this.topicTypeUri1 = topicTypeUri1;
             this.topicTypeUri2 = assocDef.getString("topic_type_uri_2");
             //
-            this.roleTypeUri1 = assocDef.optString("role_type_uri_1", topicTypeUri1);
-            this.roleTypeUri2 = assocDef.optString("role_type_uri_2", topicTypeUri2);
+            this.roleTypeUri1 = "dm3.core.whole";   // ### assocDef.optString("role_type_uri_1", topicTypeUri1);
+            this.roleTypeUri2 = "dm3.core.part";    // ### assocDef.optString("role_type_uri_2", topicTypeUri2);
             //
-            this.uri = this.roleTypeUri2;
+            this.uri = topicTypeUri2;               // ### roleTypeUri2;
             this.assocTypeUri = assocDef.getString("assoc_type_uri");
             //
             if (!assocDef.has("cardinality_uri_1") && !assocTypeUri.equals("dm3.core.composition")) {
