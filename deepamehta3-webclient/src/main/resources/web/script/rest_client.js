@@ -91,17 +91,15 @@ function RESTClient(core_service_uri) {
     }
 
     /**
-     * Returns the relations between two topics.
-     * If no such relation exists an empty array is returned.
+     * Returns the associations between two topics. If no such association exists an empty array is returned.
      *
-     * @param   type_id     Relation type filter (optional). Pass <code>null</code> to switch filter off.
-     * @param   isDirected  Direction filter (optional). Pass <code>true</code> if direction matters. In this case the
-     *                      relation is expected to be directed <i>from</i> source topic <i>to</i> destination topic.
+     * @param   assoc_type_uri  Association type filter (optional).
+     *                          Pass <code>null</code>/<code>undefined</code> to switch filter off.
      *
-     * @return  An array of relations.
+     * @return  An array of associations.
      */
     this.get_associations = function(topic1_id, topic2_id, assoc_type_uri) {
-        return request("GET", "/association/multiple/" + topic1_id + "/" + topic2_id + "/" + assoc_type_uri)
+        return request("GET", "/association/multiple/" + topic1_id + "/" + topic2_id + "/" + (assoc_type_uri || ""))
     }
 
     this.create_association = function(assoc_data) {

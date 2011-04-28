@@ -131,11 +131,9 @@ public interface DeepaMehtaStorage {
     // Relation getRelation(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
 
     /**
-     * Returns the relations between two topics. If no such relation exists an empty list is returned.
+     * Returns the associations between two topics. If no such association exists an empty set is returned.
      *
-     * @param   typeId      Relation type filter. Pass <code>null</code> to switch filter off.
-     * @param   isDirected  Direction filter. Pass <code>true</code> if direction matters. In this case the relation
-     *                      is expected to be directed <i>from</i> source topic <i>to</i> destination topic.
+     * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      */
     Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
 

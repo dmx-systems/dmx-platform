@@ -432,11 +432,20 @@ public class EmbeddedService implements CoreService {
     } */
 
     @GET
+    @Path("/association/multiple/{topic1_id}/{topic2_id}")
+    @Override
+    public Set<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
+                                            @PathParam("topic2_id") long topic2Id) {
+        return getAssociations(topic1Id, topic2Id, null);
+    }
+
+    @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}/{assoc_type_uri}")
     @Override
     public Set<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
                                             @PathParam("topic2_id") long topic2Id,
                                             @PathParam("assoc_type_uri") String assocTypeUri) {
+        logger.info("topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", assocTypeUri=\"" + assocTypeUri + "\"");
         DeepaMehtaTransaction tx = beginTx();
         try {
             Set<Association> assocs = storage.getAssociations(topic1Id, topic2Id, assocTypeUri);
@@ -450,6 +459,8 @@ public class EmbeddedService implements CoreService {
             tx.finish();
         }
     }
+
+    // ---
 
     @POST
     @Path("/association")

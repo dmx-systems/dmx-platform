@@ -181,7 +181,9 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     @Override
     public Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
         Set<HyperEdge> edges = hg.getHyperEdges(topic1Id, topic2Id);
-        filterEdgesByAssociationType(edges, assocTypeUri);
+        if (assocTypeUri != null) {
+            filterEdgesByAssociationType(edges, assocTypeUri);
+        }
         return buildAssociations(edges);
     }
 
