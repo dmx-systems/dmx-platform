@@ -26,11 +26,13 @@ public class JavaUtils {
 
 
 
-    // *************
-    // *** Files ***
-    // *************
+    // === Text ===
 
+    public static String stripHTML(String html) {
+        return html.replaceAll("<.*?>", "");    // *? is the reluctant version of the * quantifier (which is greedy)
+    }
 
+    // === Files ===
 
     private static FileNameMap fileTypeMap = URLConnection.getFileNameMap();
 
@@ -89,11 +91,7 @@ public class JavaUtils {
 
 
 
-    // ************
-    // *** URLs ***
-    // ************
-
-
+    // === URLs ===
 
     public static String encodeURIComponent(String uriComp) {
         try {
@@ -105,11 +103,7 @@ public class JavaUtils {
 
 
 
-    // ******************
-    // *** Encryption ***
-    // ******************
-
-
+    // === Encryption ===
 
     /* static {
         for (Provider p : Security.getProviders()) {

@@ -33,17 +33,8 @@ function RESTClient(core_service_uri) {
     }
 
     /**
-     * @param   include_topic_types     ### Optional: the topic type filter (array of topic type URIs, e.g.
-     *                                  ["de/deepamehta/core/topictype/Note"]).
-     *                                  If not specified (undefined or empty) the filter is switched off.
-     *
-     * @param   include_rel_types       ### Optional: the include relation type filter (array of strings of the form
-     *                                  "<relTypeName>[;<direction>]", e.g. ["TOPICMAP_TOPIC;INCOMING"]).
-     *                                  If not specified (undefined or empty) the filter is switched off.
-     *
-     * @param   exclude_rel_types       ### Optional: the exclude relation type filter (array of strings of the form
-     *                                  "<relTypeName>[;<direction>]", e.g. ["SEARCH_RESULT;OUTGOING"]).
-     *                                  If not specified (undefined or empty) the filter is switched off.
+     * @param   assoc_type_uri  Association type filter (optional).
+     *                          Pass <code>null</code>/<code>undefined</code> to switch filter off.
      *
      * @return  array of topics, possibly empty.
      */
@@ -248,6 +239,7 @@ function RESTClient(core_service_uri) {
 
         if (params && !params.length) {
             for (var param_name in params) {
+                // do not add null or undefined values
                 if (params[param_name]) {
                     add(param_name, params[param_name])
                 }

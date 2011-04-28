@@ -65,10 +65,19 @@ public interface DeepaMehtaStorage {
 
     // ---
 
+    /**
+     * @param   assocTypeUri        may be null
+     */
     Set<Topic> getRelatedTopics(long topicId, String assocTypeUri);
 
     // ---
 
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
     Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                    String othersTopicTypeUri);
 
@@ -101,6 +110,9 @@ public interface DeepaMehtaStorage {
      */
     TopicValue setTopicValue(long topicId, TopicValue value);
 
+    /**
+     * @param   oldValue    may be null
+     */
     void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, TopicValue value, TopicValue oldValue);
 
     Topic createTopic(TopicData topicData);

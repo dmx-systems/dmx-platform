@@ -329,6 +329,8 @@ function PlainDocument() {
                 switch (topic_type.data_type_uri) {
                 case "dm3.core.text":
                     return "TextFieldRenderer"
+                case "dm3.core.html":
+                    return "HTMLFieldRenderer"
                 case "dm3.core.number":
                     return "NumberFieldRenderer"
                 case "dm3.core.boolean":

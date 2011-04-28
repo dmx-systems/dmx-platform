@@ -25,6 +25,7 @@ import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
 import de.deepamehta.core.storage.DeepaMehtaTransaction;
+import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.JSONHelper;
 
 import javax.ws.rs.GET;
@@ -850,6 +851,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topic/{id}/related_topics")
     public Set<Topic> getRelatedTopics(@PathParam("id") long topicId,
                                        @QueryParam("assoc_type_uri") String assocTypeUri) {
+        logger.info("topicId=" + topicId + ", assocTypeUri=\"" + assocTypeUri + "\"");
         try {
             Set<Topic> topics = storage.getRelatedTopics(topicId, assocTypeUri);
             //
@@ -1058,6 +1060,14 @@ public class EmbeddedService implements CoreService {
     private void indexTopicValue(Topic topic, TopicValue value, TopicValue oldValue) {
         TopicType topicType = getTopicType(topic);
         String indexKey = topicType.getUri();
+        // strip HTML tags before indexing
+        if (topicType.getDataTypeUri().equals("dm3.core.html")) {
+            value = new TopicValue(JavaUtils.stripHTML(value.toString()));
+            if (oldValue != null) {
+                oldValue = new TopicValue(JavaUtils.stripHTML(oldValue.toString()));
+            }
+        }
+        //
         for (IndexMode indexMode : topicType.getIndexModes()) {
             storage.indexTopicValue(topic.getId(), indexMode, indexKey, value, oldValue);
         }

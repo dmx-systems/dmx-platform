@@ -59,6 +59,11 @@
         # See EmbeddedService.setupBootstrapContent()
 
         {
+            value:    "HTML",
+            uri:      "dm3.core.html",
+            type_uri: "dm3.core.data_type"
+        },
+        {
             value:    "Number",
             uri:      "dm3.core.number",
             type_uri: "dm3.core.data_type"

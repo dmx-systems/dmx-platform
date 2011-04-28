@@ -4,22 +4,13 @@
             value: "Title",
             uri: "dm3.notes.title",
             data_type_uri: "dm3.core.text",
-            index_mode_uris: ["dm3.core.fulltext"],
+            index_mode_uris: ["dm3.core.fulltext"]
         },
         {
             value: "Text",
             uri: "dm3.notes.text",
-            data_type_uri: "dm3.core.text",
-            index_mode_uris: ["dm3.core.fulltext"],
-            view_config_topics: [
-                {
-                    type_uri: "dm3.webclient.view_config",
-                    composite: {
-                        dm3.webclient.js_renderer_class: "HTMLFieldRenderer",
-                        dm3.webclient.rows: 15
-                    }
-                }
-            ]
+            data_type_uri: "dm3.core.html",
+            index_mode_uris: ["dm3.core.fulltext"]
         },
         {
             value: "Note",
@@ -47,7 +38,8 @@
                         {
                             type_uri: "dm3.webclient.view_config",
                             composite: {
-                                dm3.webclient.js_renderer_class: "BodyTextRenderer"
+                                dm3.webclient.js_renderer_class: "BodyTextRenderer",
+                                dm3.webclient.rows: 15
                             }
                         }
                     ]
