@@ -118,7 +118,7 @@ function PlainDocument() {
                 uri: topic.uri,
                 type_uri: topic.type_uri
             }
-            if (js.instance_of(fields, Field)) {
+            if (fields instanceof Field) {
                 var form_value = fields.read_form_value()
                 // Note: undefined form value is an error (means: field renderer returned no value).
                 // null is a valid form value (means: field renderer prevents the field from being updated).
@@ -134,7 +134,7 @@ function PlainDocument() {
         function build_composite(fields) {
             var composite = {}
             for (var assoc_def_uri in fields) {
-                if (js.instance_of(fields[assoc_def_uri], Field)) {
+                if (fields[assoc_def_uri] instanceof Field) {
                     var form_value = fields[assoc_def_uri].read_form_value()
                     // Note: undefined form value is an error (means: field renderer returned no value).
                     // null is a valid form value (means: field renderer prevents the field from being updated).

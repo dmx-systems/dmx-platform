@@ -6,6 +6,11 @@
             data_type_uri: "dm3.core.text"
         },
         {
+            value: "Add To Create Menu",
+            uri: "dm3.webclient.add_to_create_menu",
+            data_type_uri: "dm3.core.boolean"
+        },
+        {
             value: "Editable",
             uri: "dm3.webclient.editable",
             data_type_uri: "dm3.core.boolean"
@@ -34,6 +39,11 @@
                     assoc_type_uri:    "dm3.core.composition",
                     cardinality_uri_2: "dm3.core.one",
                     topic_type_uri_2:  "dm3.webclient.icon_src"
+                },
+                {
+                    assoc_type_uri:    "dm3.core.composition",
+                    cardinality_uri_2: "dm3.core.one",
+                    topic_type_uri_2:  "dm3.webclient.add_to_create_menu"
                 },
                 {
                     assoc_type_uri:    "dm3.core.composition",

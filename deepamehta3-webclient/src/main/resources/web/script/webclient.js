@@ -1,20 +1,10 @@
 var dm3c = new function() {
 
-    // Settings
     var CORE_SERVICE_URI = "/core"
     this.SEARCH_FIELD_WIDTH = 16    // in chars
     this.COMPOSITE_PATH_SEPARATOR = "/"
     var UPLOAD_DIALOG_WIDTH = "50em"
     var GENERIC_TOPIC_ICON_SRC = "images/grey-ball.png"
-
-    var EXCLUDE_TYPES_FROM_MENUS = [
-        "de/deepamehta/core/topictype/Workspace",
-        "de/deepamehta/core/topictype/Topicmap",
-        "de/deepamehta/core/topictype/Icon",
-        "de/deepamehta/core/topictype/SearchResult",
-        "de/deepamehta/core/topictype/TopicmapRelationRef",
-        "de/deepamehta/core/topictype/Plugin"
-    ]
 
     var ENABLE_LOGGING = false
     var LOG_PLUGIN_LOADING = false
@@ -322,6 +312,32 @@ var dm3c = new function() {
         return value */
     }
 
+    // === Types ===
+
+    this.type_label = function(type_uri) {
+        return dm3c.type_cache.get_label(type_uri)
+    }
+
+    this.reload_types = function() {
+        dm3c.type_cache.clear()
+        load_types()
+    }
+
+    /**
+     * Returns the icon source for a topic type.
+     * If no icon is configured for that type the source of the generic topic icon is returned.
+     *
+     * @return  The icon source (string).
+     */
+    this.get_icon_src = function(type_uri) {
+        var topic_type = dm3c.type_cache.get(type_uri)
+        // Note: topic_type is undefined if plugin is deactivated and content still exist.
+        if (topic_type) {
+            var icon_src = dm3c.get_view_config(topic_type, "icon_src")
+        }
+        return icon_src || GENERIC_TOPIC_ICON_SRC
+    }
+
     /**
      * Read out a view configuration setting.
      *
@@ -336,17 +352,6 @@ var dm3c = new function() {
         if (view_config) {
             return view_config.composite["dm3.webclient." + setting]
         }
-    }
-
-    // === Types ===
-
-    this.type_label = function(type_uri) {
-        return dm3c.type_cache.get_label(type_uri)
-    }
-
-    this.reload_types = function() {
-        dm3c.type_cache.clear()
-        load_types()
     }
 
     // === Commands ===
@@ -474,7 +479,8 @@ var dm3c = new function() {
         var type_uris = dm3c.type_cache.get_type_uris()
         for (var i = 0; i < type_uris.length; i++) {
             var type_uri = type_uris[i]
-            if (dm3c.has_create_permission(type_uri) && !js.contains(EXCLUDE_TYPES_FROM_MENUS, type_uri)) {
+            var topic_type = dm3c.type_cache.get(type_uri)
+            if (dm3c.has_create_permission(type_uri) && topic_type.get_menu_config(menu_id)) {
                 // add type to menu
                 type_menu.add_item({
                     label: dm3c.type_label(type_uri),
@@ -601,21 +607,6 @@ var dm3c = new function() {
      */
     this.image_tag = function(src, css_class) {
         return $("<img>").attr("src", src).addClass(css_class)
-    }
-
-    /**
-     * Returns the icon source for a topic type.
-     * If no icon is configured for that type the source of the generic topic icon is returned.
-     *
-     * @return  The icon source (string).
-     */
-    this.get_icon_src = function(type_uri) {
-        var topic_type = dm3c.type_cache.get(type_uri)
-        // Note: topic_type is undefined if plugin is deactivated and content still exist.
-        if (topic_type) {
-            var icon_src = dm3c.get_view_config(topic_type, "icon_src")
-        }
-        return icon_src || GENERIC_TOPIC_ICON_SRC
     }
 
     /**

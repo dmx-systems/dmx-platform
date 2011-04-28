@@ -7,6 +7,7 @@ function TypeCache() {
     // ------------------------------------------------------------------------------------------------------ Public API
 
     this.put = function(type_uri, topic_type) {
+        js.set_class(topic_type, TopicType)
         topic_types[type_uri] = topic_type
         topic_type_icons[type_uri] = dm3c.create_image(dm3c.get_icon_src(type_uri))
     }

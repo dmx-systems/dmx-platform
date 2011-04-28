@@ -123,6 +123,14 @@ var js = {
         }
     },
 
+
+
+    // ***************
+    // *** Classes ***
+    // ***************
+
+
+
     /**
      * Constructs a new object dynamically.
      *
@@ -130,23 +138,20 @@ var js = {
      * @param   <varargs>   Variable number of arguments. Passed to the constructor.
      */
     new_object: function(class_name) {
-        if (arguments.length == 1) {
-            return new Function("return new " + class_name)()
-        } else if (arguments.length == 2) {
-            return new Function("arg1", "return new " + class_name + "(arg1)")(arguments[1])
-        } else if (arguments.length == 3) {
-            return new Function("arg1", "arg2", "return new " + class_name + "(arg1, arg2)")(arguments[1], arguments[2])
-        } else if (arguments.length == 4) {
-            return new Function("arg1", "arg2", "arg3", "return new " + class_name + "(arg1, arg2, arg3)")
-                                                                            (arguments[1], arguments[2], arguments[3])
-        } else {
-            alert("ERROR (new_object): too much arguments (" +
-                (arguments.length - 1) + "), maximum is 3.\nclass_name=" + class_name)
+        var args = []
+        var argvals = []
+        for (var i = 1; i < arguments.length; i++) {
+            args.push("arg" + i)
+            argvals.push(arguments[i])
         }
+        var argstr = args.join()
+        //
+        return new Function(argstr, "return new " + class_name + "(" + argstr + ")").apply(undefined, argvals)
     },
 
-    instance_of: function(obj, clazz) {
-        return obj.__proto__.constructor == clazz
+    set_class: function(obj, clazz) {
+        obj.clazz = clazz
+        obj.clazz()
     },
 
 
