@@ -32,6 +32,10 @@ public class TopicData {
         this(null, null, typeUri);
     }
 
+    public TopicData(String typeUri, Composite composite) {
+        this(null, null, typeUri, composite);
+    }
+
     public TopicData(String uri, TopicValue value, String typeUri) {
         this(uri, value, typeUri, null);
     }

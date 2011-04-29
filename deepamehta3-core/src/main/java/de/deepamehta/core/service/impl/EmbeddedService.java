@@ -324,19 +324,20 @@ public class EmbeddedService implements CoreService {
         try {
             triggerHook(Hook.PRE_CREATE_TOPIC, topicData, clientContext);
             //
-            Topic topic = storage.createTopic(topicData);
-            indexTopicValue(topic, topic.getValue(), null);     // oldValue=null (just created topics have no old value)
+            Topic topic = buildTopic(storage.createTopic(topicData), false);
             associateWithTopicType(topic);
             //
             if (getTopicType(topic).getDataTypeUri().equals("dm3.core.composite")) {
                 storeComposite(topic, topicData.getComposite());
+            } else {
+                indexTopicValue(topic, topic.getValue(), null); // oldValue=null (just created topics have no old value)
             }
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
             //
             tx.success();
-            return buildTopic(topic, true);
+            return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Creating topic failed (" + topicData + ")", e);
@@ -358,9 +359,7 @@ public class EmbeddedService implements CoreService {
             //
             // ### storage.setTopicProperties(id, properties);
             if (getTopicType(topic).getDataTypeUri().equals("dm3.core.composite")) {
-                Composite comp = topicData.getComposite();
-                storeComposite(topic, comp);
-                storage.setTopicValue(topic.getId(), new TopicValue(comp.getLabel()));
+                storeComposite(topic, topicData.getComposite());
             } else {
                 setTopicValue(topic, topicData.getValue());
             }
@@ -986,6 +985,11 @@ public class EmbeddedService implements CoreService {
                 setChildTopicValue(topic, assocDefUri, new TopicValue(value));
             }
         }
+        //
+        String label = comp.getLabel();
+        if (label != null) {
+            topic.setValue(label);
+        }
     }
 
     private Composite fetchComposite(Topic topic) {
@@ -1010,11 +1014,14 @@ public class EmbeddedService implements CoreService {
 
     private class ChildTopicEvaluator {
 
-        private Topic childTopic;
+        private Topic childTopic;   // is attached
         private AssociationDefinition assocDef;
 
         // ---
 
+        /**
+         * @param   parentTopic     Hint: only the topic ID and type URI are evaluated
+         */
         private ChildTopicEvaluator(Topic parentTopic, String assocDefUri) {
             getChildTopic(parentTopic, assocDefUri);
             evaluate(childTopic, assocDef);
