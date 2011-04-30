@@ -1114,20 +1114,15 @@ public class EmbeddedService implements CoreService {
      */
     private void deleteTopic(Topic topic) {
         // 1) step down recursively
-        TopicType topicType = getTopicType(topic);
-        if (topicType.getDataTypeUri().equals("dm3.core.composite")) {
-            for (AssociationDefinition assocDef : topicType.getAssocDefs().values()) {
-                String assocDefUri = assocDef.getUri();
-                if (assocDef.getAssocTypeUri().equals("dm3.core.composition")) {
-                    Topic childTopic = new ChildTopicEvaluator(topic, assocDefUri).getChildTopic();
-                    deleteTopic(childTopic);
-                }
-            }
+        Set<Topic> partTopics = topic.getRelatedTopics("dm3.core.composition", "dm3.core.whole", "dm3.core.part",
+            null, false);
+        for (Topic partTopic : partTopics) {
+            deleteTopic(partTopic);
         }
-        // 2) delete topic
+        // 2) delete topic itself
         // delete all the topic's relationships first
         for (Association assoc : storage.getAssociations(topic.getId())) {
-            deleteAssociation(assoc.getId(), null);                         // FIXME: clientContext=null
+            deleteAssociation(assoc.getId(), null);     // FIXME: clientContext=null
         }
         //
         logger.info("Deleting " + topic);
@@ -1140,7 +1135,7 @@ public class EmbeddedService implements CoreService {
         AssociationData assocData = new AssociationData("dm3.core.association");
         assocData.addTopicRole(new TopicRole(topicTypeUri, "dm3.core.topic_type"));
         assocData.addTopicRole(new TopicRole(dataTypeUri,  "dm3.core.data_type"));
-        createAssociation(assocData, null);                         // FIXME: clientContext=null
+        createAssociation(assocData, null);             // FIXME: clientContext=null
     }
 
     private void associateIndexModes(String topicTypeUri, Set<IndexMode> indexModes) {
@@ -1148,7 +1143,7 @@ public class EmbeddedService implements CoreService {
             AssociationData assocData = new AssociationData("dm3.core.association");
             assocData.addTopicRole(new TopicRole(topicTypeUri, "dm3.core.topic_type"));
             assocData.addTopicRole(new TopicRole(indexMode.toUri(), "dm3.core.index_mode"));
-            createAssociation(assocData, null);                     // FIXME: clientContext=null
+            createAssociation(assocData, null);         // FIXME: clientContext=null
         }
     }
 
