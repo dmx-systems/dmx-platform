@@ -44,6 +44,12 @@ class PluginCache {
         }
     }
 
+    boolean contains(String pluginId) {
+        synchronized(plugins) {
+            return plugins.get(pluginId) != null;
+        }
+    }
+
     static class Iterator {
 
         Iterator() {

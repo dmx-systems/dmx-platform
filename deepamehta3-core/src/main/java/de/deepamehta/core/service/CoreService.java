@@ -192,13 +192,13 @@ public interface CoreService {
     public DeepaMehtaTransaction beginTx();
 
     /**
-     * Triggers the ALL_PLUGINS_READY hook.
-     * Called once all bundles are activated.
+     * Checks if all DeepaMehta plugin bundles are registered at core.
+     * Triggers the ALL_PLUGINS_READY hook if so.
      * <p>
-     * Called from the OSGi framework.
+     * Called from the Plugin class.
      * Not meant to be called by a plugin developer.
      */
-    public void pluginsReady();
+    public void checkPluginsReady();
 
     /**
      * Setups the database to be compatible with this core service.

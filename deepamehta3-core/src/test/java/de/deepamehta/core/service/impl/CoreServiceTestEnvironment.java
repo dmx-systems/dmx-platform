@@ -30,7 +30,7 @@ public class CoreServiceTestEnvironment {
             logger.info("Creating DB and indexing services");
             dbPath = JavaUtils.createTempDirectory("dm3-");
             GraphDatabaseService neo4j = new EmbeddedGraphDatabase(dbPath.getAbsolutePath());
-            dms = new EmbeddedService(new HGStorageBridge(new Neo4jHyperGraph(neo4j)));
+            dms = new EmbeddedService(new HGStorageBridge(new Neo4jHyperGraph(neo4j)), null);
             dms.setupDB();
         } catch (Exception e) {
             throw new RuntimeException("Opening database failed (path=" + dbPath + ")", e);

@@ -28,6 +28,9 @@ import de.deepamehta.core.storage.DeepaMehtaTransaction;
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.JSONHelper;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -76,8 +79,9 @@ public class EmbeddedService implements CoreService {
 
             DeepaMehtaStorage storage;
 
-    private PluginCache pluginCache = new PluginCache();
+    private BundleContext bundleContext;
 
+    private PluginCache pluginCache;
     private TypeCache typeCache;
 
     private enum Hook {
@@ -135,8 +139,10 @@ public class EmbeddedService implements CoreService {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public EmbeddedService(DeepaMehtaStorage storage) {
+    public EmbeddedService(DeepaMehtaStorage storage, BundleContext bundleContext) {
         this.storage = storage;
+        this.bundleContext = bundleContext;
+        this.pluginCache = new PluginCache();
         this.typeCache = new TypeCache(this);
     }
 
@@ -747,8 +753,24 @@ public class EmbeddedService implements CoreService {
     }
 
     @Override
-    public void pluginsReady() {
-        triggerHook(Hook.ALL_PLUGINS_READY);
+    public void checkPluginsReady() {
+        Bundle[] bundles = bundleContext.getBundles();
+        int plugins = 0;
+        int registered = 0;
+        for (Bundle bundle : bundles) {
+            if (isDeepaMehtaPlugin(bundle)) {
+                plugins++;
+                if (isPluginRegistered(bundle)) {
+                    registered++;
+                }
+            }
+        }
+        logger.info("### bundles total: " + bundles.length +
+            ", DM plugins: " + plugins + ", registered: " + registered);
+        if (plugins == registered) {
+            logger.info("########## All plugins ready ##########");
+            triggerHook(Hook.ALL_PLUGINS_READY);
+        }
     }
 
     @Override
@@ -1233,6 +1255,19 @@ public class EmbeddedService implements CoreService {
     private Object triggerHook(Plugin plugin, Hook hook, Object... params) throws Exception {
         Method hookMethod = plugin.getClass().getMethod(hook.methodName, hook.paramClasses);
         return hookMethod.invoke(plugin, params);
+    }
+
+    // ---
+
+    private boolean isDeepaMehtaPlugin(Bundle bundle) {
+        String packages = (String) bundle.getHeaders().get("Import-Package");
+        // Note: packages might be null. Not all bundles import packges.
+        return packages != null && packages.contains("de.deepamehta.core.service") &&
+            !bundle.getSymbolicName().equals("de.deepamehta.3-core");
+    }
+
+    private boolean isPluginRegistered(Bundle bundle) {
+        return pluginCache.contains(bundle.getSymbolicName());
     }
 
     // === DB ===

@@ -13,7 +13,6 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
-import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
@@ -23,7 +22,7 @@ import java.util.logging.Logger;
 
 
 
-public class Activator implements BundleActivator, FrameworkListener {
+public class Activator implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -50,14 +49,12 @@ public class Activator implements BundleActivator, FrameworkListener {
     @Override
     public void start(BundleContext context) {
         try {
-            logger.info("========== Starting DeepaMehta 3 Core ==========");
-            dms = new EmbeddedService(new HGStorageBridge(openDB()));
+            logger.info("========== Starting bundle \"DeepaMehta 3 Core\" ==========");
+            dms = new EmbeddedService(new HGStorageBridge(openDB()), context);
             dms.setupDB();
             //
             logger.info("Registering DeepaMehta 3 core service at OSGi framework");
             context.registerService(CoreService.class.getName(), dms, null);
-            //
-            context.addFrameworkListener(this);
         } catch (Exception e) {
             logger.severe("Activation of DeepaMehta 3 Core failed:");
             e.printStackTrace();
@@ -71,22 +68,6 @@ public class Activator implements BundleActivator, FrameworkListener {
         logger.info("========== Stopping DeepaMehta 3 Core ==========");
         if (dms != null) {
             dms.shutdown();
-        }
-    }
-
-
-
-    // ****************************************
-    // *** FrameworkListener Implementation ***
-    // ****************************************
-
-
-
-    @Override
-    public void frameworkEvent(FrameworkEvent event) {
-        if (event.getType() == FrameworkEvent.STARTED) {
-            logger.info("########## OSGi framework STARTED ##########");
-            dms.pluginsReady();
         }
     }
 

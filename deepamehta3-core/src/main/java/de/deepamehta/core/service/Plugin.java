@@ -166,7 +166,7 @@ public class Plugin implements BundleActivator {
             createServiceTracker(HttpService.class.getName(), context);
             createServiceTrackers(context);
         } catch (Exception e) {
-            logger.severe("Activation of " + this + " failed:");
+            logger.severe("Starting " + this + " failed:");
             e.printStackTrace();
             // Note: an exception thrown from here is swallowed by the container without reporting
             // and let File Install retry to start the bundle endlessly.
@@ -346,6 +346,7 @@ public class Plugin implements BundleActivator {
             private void checkServiceAvailability() {
                 if (dms != null && httpService != null) {
                     initPlugin(context);
+                    dms.checkPluginsReady();
                 }
             }
         };
@@ -368,11 +369,11 @@ public class Plugin implements BundleActivator {
      */
     private void initPlugin(BundleContext context) {
         logger.info("----- Initializing " + this + " -----");
-        installPlugin(context);             // relies on CoreService
-        registerPlugin();                   // relies on CoreService
+        installPlugin();                    // relies on CoreService
+        registerPlugin();                   // relies on CoreService (and committed migrations)
         registerPluginService(context);
         registerWebResources();             // relies on HttpService
-        registerRestResources();            // relies on HttpService and CoreService
+        registerRestResources();            // relies on HttpService and CoreService (and registered plugin)
         logger.info("----- Initialization of " + this + " complete -----");
     }
 
@@ -383,7 +384,7 @@ public class Plugin implements BundleActivator {
      * - trigger POST_INSTALL_PLUGIN hook
      * - trigger MODIFY_TOPIC_TYPE hook (multiple times)
      */
-    private void installPlugin(BundleContext context) {
+    private void installPlugin() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             boolean isCleanInstall = initPluginTopic();

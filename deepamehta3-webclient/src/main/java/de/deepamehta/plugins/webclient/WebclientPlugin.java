@@ -9,19 +9,17 @@ import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.service.Plugin;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.CookieParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import java.awt.Desktop;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -36,7 +34,13 @@ import java.util.logging.Logger;
 @Produces("application/json")
 public class WebclientPlugin extends Plugin {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    public static final String WEBCLIENT_URL = "/de.deepamehta.3-webclient/index.html";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    private boolean webclientLaunched = false;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -52,17 +56,16 @@ public class WebclientPlugin extends Plugin {
 
     @Override
     public void allPluginsReadyHook() {
-        String webclientUrl = null;
-        try {
-            String port = System.getProperty("org.osgi.service.http.port");
-            webclientUrl = "http://localhost:" + port + "/de.deepamehta.3-webclient/index.html";
-            logger.info("### Launching webclient (" + webclientUrl + ")");
-            //
-            Desktop.getDesktop().browse(new URI(webclientUrl));
-            //
-        } catch (Exception e) {
-            logger.warning("### Webclient can't be launched automatically (" + e + ")");
-            logger.info("### Please launch webclient manually: " + webclientUrl);
+        if (webclientLaunched == false) {
+            String webclientUrl = getWebclientUrl();
+            try {
+                logger.info("### Launching webclient (url=\"" + webclientUrl + "\")");
+                Desktop.getDesktop().browse(new URI(webclientUrl));
+                webclientLaunched = true;
+            } catch (Exception e) {
+                logger.warning("### Launching webclient failed (" + e + ")");
+                logger.info("### Please launch webclient manually: " + webclientUrl);
+            }
         }
     }
 
@@ -124,8 +127,6 @@ public class WebclientPlugin extends Plugin {
         return wholeTopics;
     }
 
-    // ---
-
     /**
      * Creates a search result topic (a bucket).
      */
@@ -144,5 +145,13 @@ public class WebclientPlugin extends Plugin {
             dms.createAssociation(assocData, clientContext);
         }
         return searchTopic;
+    }
+
+    // ---
+
+    private String getWebclientUrl() {
+        String host = "localhost";
+        String port = System.getProperty("org.osgi.service.http.port");
+        return  "http://" + host + ":" + port + WEBCLIENT_URL;
     }
 }
