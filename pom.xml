@@ -17,6 +17,7 @@
         <module>deepamehta3-server</module>
         <module>deepamehta3-webclient</module>
         <module>deepamehta3-notes</module>
+        <module>deepamehta3-contacts</module>
 
         <!-- <module>deepamehta3-coretypes</module>
         <module>deepamehta3-typeeditor</module>
@@ -31,7 +32,6 @@
         <module>deepamehta3-filemanager</module>
         <module>deepamehta3-iconpicker</module>
 
-        <module>deepamehta3-contacts</module>
         <module>deepamehta3-projects</module>
 
         <module>deepamehta3-delivery</module>

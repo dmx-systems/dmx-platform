@@ -36,34 +36,34 @@
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
-                    assoc_type_uri:    "dm3.core.composition",
+                    topic_type_uri_2:  "dm3.webclient.icon_src",
                     cardinality_uri_2: "dm3.core.one",
-                    topic_type_uri_2:  "dm3.webclient.icon_src"
+                    assoc_type_uri:    "dm3.core.composition"
                 },
                 {
-                    assoc_type_uri:    "dm3.core.composition",
+                    topic_type_uri_2:  "dm3.webclient.add_to_create_menu",
                     cardinality_uri_2: "dm3.core.one",
-                    topic_type_uri_2:  "dm3.webclient.add_to_create_menu"
+                    assoc_type_uri:    "dm3.core.composition"
                 },
                 {
-                    assoc_type_uri:    "dm3.core.composition",
+                    topic_type_uri_2:  "dm3.webclient.editable",
                     cardinality_uri_2: "dm3.core.one",
-                    topic_type_uri_2:  "dm3.webclient.editable"
+                    assoc_type_uri:    "dm3.core.composition"
                 },
                 {
-                    assoc_type_uri:    "dm3.core.composition",
+                    topic_type_uri_2:  "dm3.webclient.viewable",
                     cardinality_uri_2: "dm3.core.one",
-                    topic_type_uri_2:  "dm3.webclient.viewable"
+                    assoc_type_uri:    "dm3.core.composition"
                 },
                 {
-                    assoc_type_uri:    "dm3.core.composition",
+                    topic_type_uri_2:  "dm3.webclient.js_renderer_class",
                     cardinality_uri_2: "dm3.core.one",
-                    topic_type_uri_2:  "dm3.webclient.js_renderer_class"
+                    assoc_type_uri:    "dm3.core.composition"
                 },
                 {
-                    assoc_type_uri:    "dm3.core.composition",
+                    topic_type_uri_2:  "dm3.webclient.rows",
                     cardinality_uri_2: "dm3.core.one",
-                    topic_type_uri_2:  "dm3.webclient.rows"
+                    assoc_type_uri:    "dm3.core.composition"
                 }
             ]
         },
@@ -92,14 +92,14 @@
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
-                    assoc_type_uri:    "dm3.core.composition",
+                    topic_type_uri_2:  "dm3.webclient.search_term",
                     cardinality_uri_2: "dm3.core.one",
-                    topic_type_uri_2:  "dm3.webclient.search_term"
+                    assoc_type_uri:    "dm3.core.composition"
                 },
                 {
-                    assoc_type_uri:    "dm3.core.composition",
+                    topic_type_uri_2:  "dm3.webclient.search_result",
                     cardinality_uri_2: "dm3.core.one",
-                    topic_type_uri_2:  "dm3.webclient.search_result"
+                    assoc_type_uri:    "dm3.core.composition"
                 }
             ],
             view_config_topics: [
@@ -117,6 +117,6 @@
         {
             value: "Search Result Item",
             uri:   "dm3.webclient.search_result_item"
-        },
+        }
     ]
 }

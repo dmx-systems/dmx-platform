@@ -289,7 +289,7 @@ var dm3c = new function() {
 
     // === Topics ===
 
-    this.get_value = function(topic, field_uri) {
+    /* this.get_value = function(topic, field_uri) {
         // alert("topic=" + JSON.stringify(topic) + "\n\nfield_uri=\"" + field_uri + "\"")
         var assoc_def_uris = field_uri.split(dm3c.COMPOSITE_PATH_SEPARATOR)
         if (assoc_def_uris.length == 1) {
@@ -302,7 +302,7 @@ var dm3c = new function() {
             }
             // alert("topic=" + JSON.stringify(topic) + "\n\nfield_uri=\"" + field_uri + "\"\n\n=> " + comp)
             return comp || ""
-        }
+        } */
         /* var value = topic.properties[field_uri]
         if (value == undefined) {
             // alert("WARNING (get_value): Data field \"" + field_uri + "\" has no value.\n\n" +
@@ -310,7 +310,7 @@ var dm3c = new function() {
             value = ""
         }
         return value */
-    }
+    // }
 
     // === Types ===
 

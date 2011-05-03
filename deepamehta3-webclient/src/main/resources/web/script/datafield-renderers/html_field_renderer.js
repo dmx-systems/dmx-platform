@@ -21,13 +21,13 @@ function HTMLFieldRenderer(topic, field, rel_topics) {
         // render field label
         dm3c.render.field_label(field)
         // render field value
-        return dm3c.get_value(topic, field.uri)
+        return field.value
     }
 
     this.render_form_element = function() {
         var textarea = $("<textarea>")
         textarea.attr({id: "field_" + field.uri, rows: field.rows})
-        textarea.text(dm3c.get_value(topic, field.uri))
+        textarea.text(field.value)
         return textarea
     }
 

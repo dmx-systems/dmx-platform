@@ -27,24 +27,26 @@ function PlainDocument() {
     this.render_document = function(topic) {
 
         dm3c.empty_detail_panel()
-        render_fields("", dm3c.type_cache.get(topic.type_uri))
+        render_fields("", topic.composite, dm3c.type_cache.get(topic.type_uri))
         render_relations()
         render_buttons(topic, "detail-panel-show")
 
-        function render_fields(field_uri, topic_type, assoc_def) {
+        function render_fields(field_uri, composite, topic_type, assoc_def) {
             if (topic_type.data_type_uri == "dm3.core.composite") {
                 var fields = {}
                 for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
                     var topic_type_2 = dm3c.type_cache.get(assoc_def.topic_type_uri_2)
                     var child_field_uri = field_uri + dm3c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
-                    var child_fields = render_fields(child_field_uri, topic_type_2, assoc_def)
+                    var comp = composite && composite[assoc_def.uri]
+                    var child_fields = render_fields(child_field_uri, comp, topic_type_2, assoc_def)
                     if (child_fields) {
                         fields[assoc_def.uri] = child_fields
                     }
                 }
                 return fields;
             } else {
-                var field = new Field(field_uri, topic, topic_type, assoc_def)
+                var value = field_uri == "" ? topic.value : composite
+                var field = new Field(field_uri, value, topic, topic_type, assoc_def)
                 if (field.viewable) {
                     field.render_field()
                     return field
@@ -70,24 +72,26 @@ function PlainDocument() {
 
         dm3c.empty_detail_panel()
         dm3c.trigger_hook("pre_render_form", topic)
-        fields = render_fields("", dm3c.type_cache.get(topic.type_uri))
+        fields = render_fields("", topic.composite, dm3c.type_cache.get(topic.type_uri))
         render_buttons(topic, "detail-panel-edit")
         // alert("render_form(): fields=" + JSON.stringify(fields));
 
-        function render_fields(field_uri, topic_type, assoc_def) {
+        function render_fields(field_uri, composite, topic_type, assoc_def) {
             if (topic_type.data_type_uri == "dm3.core.composite") {
                 var fields = {}
                 for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
                     var topic_type_2 = dm3c.type_cache.get(assoc_def.topic_type_uri_2)
                     var child_field_uri = field_uri + dm3c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
-                    var child_fields = render_fields(child_field_uri, topic_type_2, assoc_def)
+                    var comp = composite && composite[assoc_def.uri]
+                    var child_fields = render_fields(child_field_uri, comp, topic_type_2, assoc_def)
                     if (child_fields) {
                         fields[assoc_def.uri] = child_fields
                     }
                 }
                 return fields;
             } else {
-                var field = new Field(field_uri, topic, topic_type, assoc_def)
+                var value = field_uri == "" ? topic.value : composite
+                var field = new Field(field_uri, value, topic, topic_type, assoc_def)
                 if (field.editable) {
                     field.render_form_element()
                     return field
@@ -199,21 +203,24 @@ function PlainDocument() {
      * @param   uri         The field URI. Unique within the page/form. The field URI is a path composed of association
      *                      definition URIs that leads to this field, e.g. "/dm3.contacts.address/dm3.contacts.street".
      *                      For a non-composite topic the field URI is an empty string.
+     * @param   value       The value to be rendered.
+     *                      May be null/undefined, in this case an empty string is rendered.
      * @param   topic       The topic the page/form is rendered for.
-     *                      Note: that is the same topic for the Field objects of one page/form.
+     *                      Note: that is the same topic for all the Field objects of one page/form.
      * @param   topic_type  The topic type underlying this field.
      *                      Note: in general the topic type is different for the Field objects of one page/form.
      * @param   assoc_def   The direct association definition that leads to this field.
      *                      For a non-composite topic it is <code>undefined</code>.
      */
-    function Field(uri, topic, topic_type, assoc_def) {
+    function Field(uri, value, topic, topic_type, assoc_def) {
 
+        this.uri = uri
+        this.value = value || ""
         this.label = topic_type.value
         this.editable         = get_view_config("editable")
         this.viewable         = get_view_config("viewable")
         var js_renderer_class = get_view_config("js_renderer_class")
         this.rows             = get_view_config("rows")
-        this.uri = uri
         var renderer
 
         this.render_field = function() {

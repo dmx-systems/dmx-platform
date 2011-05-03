@@ -4,7 +4,7 @@ function NumberFieldRenderer(topic, field, rel_topics) {
         // field label
         dm3c.render.field_label(field)
         // field value
-        return dm3c.get_value(topic, field.uri)
+        return field.value
     }
 
     this.render_form_element = function() {

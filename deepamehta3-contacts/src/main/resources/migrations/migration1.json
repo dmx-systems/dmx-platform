@@ -1,112 +1,242 @@
 {
     topic_types: [
+
+        ### Person Name & Institution Name ###
+
         {
-            label: "Person",
-            uri: "de/deepamehta/core/topictype/Person",
-            icon_src: "/de.deepamehta.3-contacts/images/bird.png",
-            js_renderer_class: "PlainDocument",
-            fields: [
+            value: "First",
+            uri: "dm3.contacts.first_name",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
+        },
+        {
+            value: "Last",
+            uri: "dm3.contacts.last_name",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
+        },
+        {
+            value: "Name",
+            uri: "dm3.contacts.name",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
+        },
+
+        ### Phone ###
+
+        {
+            value: "Label",
+            uri: "dm3.contacts.phone_label",
+            data_type_uri: "dm3.core.text"
+        },
+        {
+            value: "Phone",
+            uri: "dm3.contacts.phone_number",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
+        },
+        {
+            value: "Phone Entry",
+            uri: "dm3.contacts.phone_entry",
+            data_type_uri: "dm3.core.composite",
+            assoc_defs: [
                 {
-                    label: "Name",
-                    uri: "de/deepamehta/core/property/Name",
-                    data_type: "text",
-                    editor: "single line",
-                    js_renderer_class: "TitleRenderer",
-                    indexing_mode: "FULLTEXT"
+                    topic_type_uri_2:  "dm3.contacts.phone_label",
+                    cardinality_uri_2: "dm3.core.one",
+                    cardinality_uri_1: "dm3.core.many",
+                    assoc_type_uri:    "dm3.core.aggregation"
                 },
                 {
-                    label: "Phone",
-                    uri: "de/deepamehta/core/property/Phone",
-                    data_type: "text",
-                    editor: "multi line",
-                    lines: 2,
-                    indexing_mode: "FULLTEXT"
-                },
-                {
-                    label: "Email",
-                    uri: "de/deepamehta/core/property/Email",
-                    data_type: "text",
-                    editor: "multi line",
-                    lines: 2,
-                    indexing_mode: "FULLTEXT"
-                },
-                {
-                    label: "Website",
-                    uri: "de/deepamehta/core/property/Website",
-                    data_type: "text",
-                    editor: "multi line",
-                    lines: 2,
-                    indexing_mode: "FULLTEXT"
-                },
-                {
-                    label: "Address",
-                    uri: "de/deepamehta/core/property/Address",
-                    data_type: "text",
-                    editor: "multi line",
-                    lines: 4,
-                    indexing_mode: "FULLTEXT"
-                },
-                {
-                    label: "Notes",
-                    uri: "de/deepamehta/core/property/Notes",
-                    data_type: "html",
-                    lines: 10,
-                    indexing_mode: "FULLTEXT"
+                    topic_type_uri_2:  "dm3.contacts.phone_number",
+                    cardinality_uri_2: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition"
                 }
             ]
         },
+
+        ### Email & Website ###
+
         {
-            label: "Institution",
-            uri: "de/deepamehta/core/topictype/Institution",
-            icon_src: "/de.deepamehta.3-contacts/images/birdhouse.png",
-            js_renderer_class: "PlainDocument",
-            fields: [
+            value: "Email",
+            uri: "dm3.contacts.email_address",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
+        },
+        {
+            value: "Website",
+            uri: "dm3.contacts.website_url",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
+        },
+
+        ### Address ###
+
+        {
+            value: "Street",
+            uri: "dm3.contacts.street",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
+        },
+        {
+            value: "Postal Code",
+            uri: "dm3.contacts.postal_code",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
+        },
+        {
+            value: "City",
+            uri: "dm3.contacts.city",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
+        },
+        {
+            value: "Country",
+            uri: "dm3.contacts.country",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
+        },
+        {
+            value: "Address",
+            uri: "dm3.contacts.address",
+            data_type_uri: "dm3.core.composite",
+            assoc_defs: [
                 {
-                    label: "Name",
-                    uri: "de/deepamehta/core/property/Name",
-                    data_type: "text",
-                    editor: "single line",
-                    js_renderer_class: "TitleRenderer",
-                    indexing_mode: "FULLTEXT"
+                    topic_type_uri_2:  "dm3.contacts.street",
+                    cardinality_uri_2: "dm3.core.one",
+                    cardinality_uri_1: "dm3.core.many",
+                    assoc_type_uri:    "dm3.core.aggregation"
                 },
                 {
-                    label: "Phone",
-                    uri: "de/deepamehta/core/property/Phone",
-                    data_type: "text",
-                    editor: "multi line",
-                    lines: 2,
-                    indexing_mode: "FULLTEXT"
+                    topic_type_uri_2:  "dm3.contacts.postal_code",
+                    cardinality_uri_2: "dm3.core.one",
+                    cardinality_uri_1: "dm3.core.many",
+                    assoc_type_uri:    "dm3.core.aggregation"
                 },
                 {
-                    label: "Email",
-                    uri: "de/deepamehta/core/property/Email",
-                    data_type: "text",
-                    editor: "multi line",
-                    lines: 2,
-                    indexing_mode: "FULLTEXT"
+                    topic_type_uri_2:  "dm3.contacts.city",
+                    cardinality_uri_2: "dm3.core.one",
+                    cardinality_uri_1: "dm3.core.many",
+                    assoc_type_uri:    "dm3.core.aggregation"
                 },
                 {
-                    label: "Website",
-                    uri: "de/deepamehta/core/property/Website",
-                    data_type: "text",
-                    editor: "multi line",
-                    lines: 2,
-                    indexing_mode: "FULLTEXT"
+                    topic_type_uri_2:  "dm3.contacts.country",
+                    cardinality_uri_2: "dm3.core.one",
+                    cardinality_uri_1: "dm3.core.many",
+                    assoc_type_uri:    "dm3.core.aggregation"
+                }
+            ]
+        },
+
+        ### Notes ###
+
+        {
+            value: "Notes",
+            uri: "dm3.contacts.notes",
+            data_type_uri: "dm3.core.html",
+            index_mode_uris: ["dm3.core.fulltext"]
+        },
+
+        ### Person ###
+
+        {
+            value: "Person",
+            uri: "dm3.contacts.person",
+            data_type_uri: "dm3.core.composite",
+            assoc_defs: [
+                {
+                    topic_type_uri_2:  "dm3.contacts.first_name",
+                    cardinality_uri_2: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition"
                 },
                 {
-                    label: "Address",
-                    uri: "de/deepamehta/core/property/Address",
-                    data_type: "text",
-                    editor: "multi line",
-                    lines: 4,
-                    indexing_mode: "FULLTEXT"
+                    topic_type_uri_2:  "dm3.contacts.last_name",
+                    cardinality_uri_2: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition"
                 },
                 {
-                    label: "Notes",
-                    uri: "de/deepamehta/core/property/Notes",
-                    data_type: "html",
-                    lines: 10,
-                    indexing_mode: "FULLTEXT"
+                    topic_type_uri_2:  "dm3.contacts.phone_entry",
+                    cardinality_uri_2: "dm3.core.many",
+                    assoc_type_uri:    "dm3.core.composition"
+                },
+                {
+                    topic_type_uri_2:  "dm3.contacts.email_address",
+                    cardinality_uri_2: "dm3.core.many",
+                    assoc_type_uri:    "dm3.core.composition"
+                },
+                {
+                    topic_type_uri_2:  "dm3.contacts.website_url",
+                    cardinality_uri_2: "dm3.core.one",
+                    cardinality_uri_1: "dm3.core.many",
+                    assoc_type_uri:    "dm3.core.aggregation"
+                },
+                {
+                    topic_type_uri_2:  "dm3.contacts.address",
+                    cardinality_uri_2: "dm3.core.many",
+                    assoc_type_uri:    "dm3.core.composition"
+                },
+                {
+                    topic_type_uri_2:  "dm3.contacts.notes",
+                    cardinality_uri_2: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition"
+                }
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm3.webclient.view_config",
+                    composite: {
+                        dm3.webclient.icon_src: "/de.deepamehta.3-contacts/images/person.png",
+                        dm3.webclient.add_to_create_menu: true
+                    }
+                }
+            ]
+        },
+
+        ### Institution ###
+
+        {
+            value: "Institution",
+            uri: "dm3.contacts.institution",
+            data_type_uri: "dm3.core.composite",
+            assoc_defs: [
+                {
+                    topic_type_uri_2:  "dm3.contacts.name",
+                    cardinality_uri_2: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition"
+                },
+                {
+                    topic_type_uri_2:  "dm3.contacts.phone_entry",
+                    cardinality_uri_2: "dm3.core.many",
+                    assoc_type_uri:    "dm3.core.composition"
+                },
+                {
+                    topic_type_uri_2:  "dm3.contacts.email_address",
+                    cardinality_uri_2: "dm3.core.many",
+                    assoc_type_uri:    "dm3.core.composition"
+                },
+                {
+                    topic_type_uri_2:  "dm3.contacts.website_url",
+                    cardinality_uri_2: "dm3.core.one",
+                    cardinality_uri_1: "dm3.core.many",
+                    assoc_type_uri:    "dm3.core.aggregation"
+                },
+                {
+                    topic_type_uri_2:  "dm3.contacts.address",
+                    cardinality_uri_2: "dm3.core.many",
+                    assoc_type_uri:    "dm3.core.composition"
+                },
+                {
+                    topic_type_uri_2:  "dm3.contacts.notes",
+                    cardinality_uri_2: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition"
+                }
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm3.webclient.view_config",
+                    composite: {
+                        dm3.webclient.icon_src: "/de.deepamehta.3-contacts/images/house.png",
+                        dm3.webclient.add_to_create_menu: true
+                    }
                 }
             ]
         }

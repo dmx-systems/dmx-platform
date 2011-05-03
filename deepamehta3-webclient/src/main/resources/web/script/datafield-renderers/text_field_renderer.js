@@ -4,7 +4,7 @@ function TextFieldRenderer(topic, field, rel_topics) {
         // field label
         dm3c.render.field_label(field)
         // field value
-        return js.render_text(dm3c.get_value(topic, field.uri))
+        return js.render_text(field.value)
     }
 
     this.render_form_element = function() {
@@ -21,9 +21,7 @@ function TextFieldRenderer(topic, field, rel_topics) {
             }
             return input
         } else {
-            return $("<textarea>")
-                .attr({"field-uri": field.uri, rows: field.rows})
-                .text(dm3c.get_value(topic, field.uri))
+            return $("<textarea>").attr({"field-uri": field.uri, rows: field.rows}).text(field.value)
         }
     }
 
