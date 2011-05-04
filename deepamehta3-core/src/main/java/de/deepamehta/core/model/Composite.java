@@ -9,13 +9,17 @@ import java.util.Iterator;
 
 
 /**
- * A composite of key/value pairs. Keys are strings, values are non-null atomic (string, int, long, boolean)
- * or again a <code>Composite</code>.
+ * A recursive composite of key/value pairs.
+ * Keys are strings, values are non-null atomic (string, int, long, boolean) or again a <code>Composite</code>.
  */
 public class Composite {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    /**
+     * Internal representation.
+     * Key: String, value: non-null atomic (String, Integer, Long, Boolean) or composite (JSONObject).
+     */
     private JSONObject values;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -32,7 +36,7 @@ public class Composite {
         try {
             this.values = new JSONObject(json);
         } catch (Exception e) {
-            throw new RuntimeException("Constructing a Composite from a JSON string failed (\"" + json + "\")", e);
+            throw new RuntimeException("Constructing a Composite from a string failed (\"" + json + "\")", e);
         }
     }
 
@@ -51,31 +55,61 @@ public class Composite {
                 return value;
             }
         } catch (Exception e) {
-            throw new RuntimeException("Getting value failed (key=\"" + key + "\", composite=" + this + ")");
+            throw new RuntimeException("Getting a value from a Composite failed (key=\"" +
+                key + "\", composite=" + this + ")", e);
         }
     }
 
+    /**
+     * @param   value   a String, Integer, Long, Boolean, or a Composite.
+     */
     public void put(String key, Object value) {
         try {
+            // error checks
             if (value == null) {
                 throw new IllegalArgumentException("Tried to put a null value in a Composite");
             }
+            Class clazz = value.getClass();
+            if (clazz != String.class && clazz != Integer.class && clazz != Long.class && clazz != Boolean.class &&
+                clazz != Composite.class) {
+                throw new IllegalArgumentException("Tried to put a " + clazz.getName() + " value in a Composite " +
+                    "(expected are String, Integer, Long, Boolean, or Composite)");
+            }
+            // put value
+            if (clazz == Composite.class) {
+                value = ((Composite) value).values;
+            }
             values.put(key, value);
         } catch (Exception e) {
-            throw new RuntimeException("Putting value failed (key=\"" + key + "\", value=" + value +
-                ", composite=" + this + ")");
+            throw new RuntimeException("Putting a value in a Composite failed (key=\"" + key + "\", value=" + value +
+                ", composite=" + this + ")", e);
         }
     }
 
     // ---
 
     public String getLabel() {
-        return getLabel(this);
+        try {
+            return getLabel(values);
+        } catch (Exception e) {
+            throw new RuntimeException("Getting the label of a Composite failed (composite=" + this + ")", e);
+        }
     }
 
-    private String getLabel(Object value) {
-        if (value instanceof Composite) {
-            Composite comp = (Composite) value;
+    public JSONObject toJSON() {
+        return values;
+    }
+
+    @Override
+    public String toString() {
+        return values.toString();
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private String getLabel(Object value) throws Exception {
+        if (value instanceof JSONObject) {
+            JSONObject comp = (JSONObject) value;
             Iterator<String> i = comp.keys();
             if (i.hasNext()) {
                 return getLabel(comp.get(i.next()));
@@ -85,18 +119,5 @@ public class Composite {
         } else {
             return value.toString();
         }
-    }
-
-    // ---
-
-    public JSONObject toJSON() {
-        return values;
-    }
-
-    // ---
-
-    @Override
-    public String toString() {
-        return values.toString();
     }
 }
