@@ -10,6 +10,15 @@ import java.util.Map;
 
 
 
+/**
+ * The role a topic plays in an association.
+ * <p>
+ * A TopicRole object is a pair of a topic reference and a role type reference.
+ * The topic is refered to either by its ID or URI.
+ * The role type is refered to by its URI.
+ * <p>
+ * In the database a role type is represented by a topic of type "dm3.core.role_type".
+ */
 public class TopicRole {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables

@@ -2,11 +2,12 @@ package de.deepamehta.plugins.workspaces;
 
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
+import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.ClientContext;
-import de.deepamehta.core.model.DataField;
-import de.deepamehta.core.model.Properties;
-import de.deepamehta.core.model.RelatedTopic;
+import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.service.Plugin;
 
@@ -14,16 +15,18 @@ import static java.util.Arrays.asList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
 
 public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
-    private static enum RelationType {
-        RELATION,       // A topic assigned to a workspace. Direction is from topic to workspace.
-        WORKSPACE_TYPE  // A type assigned to a workspace. Direction is from workspace to type.
-    }
+    private static final String DEFAULT_WORKSPACE_NAME = "Default";
+
+    // association type semantics
+    private static final String WORKSPACE_TOPIC = "dm3.core.aggregation";   // A topic assigned to a workspace.
+    private static final String WORKSPACE_TYPE  = "dm3.core.aggregation";   // A type assigned to a workspace.
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -40,24 +43,30 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
 
     /**
+     * Creates the "Default" workspace.
+     */
+    @Override
+    public void postInstallPluginHook() {
+        createWorkspace(DEFAULT_WORKSPACE_NAME);
+    }
+
+    /**
      * Assigns a newly created topic to the current workspace.
-     * <p>
-     * Note: we must use the postCreateHook to create the relation because at pre_create the topic has no ID yet.
      */
     @Override
     public void postCreateHook(Topic topic, ClientContext clientContext) {
         long workspaceId = -1;
         try {
-            // check precondition 1
-            if (topic.typeUri.equals("de/deepamehta/core/topictype/SearchResult") ||
-                topic.typeUri.equals("de/deepamehta/core/topictype/Workspace")) {
-                // Note 1: we do not relate search results to a workspace. Otherwise the search result would appear
+            /* ### check precondition 1
+            if (topic.getTypeUri.equals("dm3.webclient.search") ||
+                topic.getTypeUri.equals("dm3.workspaces.workspace")) {
+                // Note 1: we do not relate search topics to a workspace. Otherwise the search result would appear
                 // as relation when displaying the workspace. That's because a "SEARCH_RESULT" relation is not be
                 // created if there is another relation already.
                 // Note 2: we do not relate workspaces to a workspace. This would be contra-intuitive.
                 logger.info(topic + " is deliberately not assigned to any workspace");
                 return;
-            }
+            } */
             // check precondition 2
             if (clientContext == null) {
                 logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +
@@ -73,7 +82,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
             }
             // assign topic to workspace
             workspaceId = Long.parseLong(wsId);
-            assignTopic(workspaceId, topic.id);
+            assignTopic(workspaceId, topic.getId());
         } catch (Exception e) {
             logger.warning("Assigning " + topic + " to workspace " + workspaceId + " failed (" + e + "). " +
                 "This can happen if there is a stale \"dm3_workspace_id\" cookie.");
@@ -85,13 +94,13 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
      */
     @Override
     public void modifyTopicTypeHook(TopicType topicType, ClientContext clientContext) {
-        //
+        /* ###
         DataField workspacesField = new DataField("Workspaces", "reference");
         workspacesField.setUri("de/deepamehta/core/property/Workspaces");
         workspacesField.setRefTopicTypeUri("de/deepamehta/core/topictype/Workspace");
         workspacesField.setEditor("checkboxes");
         //
-        topicType.addDataField(workspacesField);
+        topicType.addDataField(workspacesField); */
     }
 
 
@@ -104,36 +113,36 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
     @Override
     public Topic createWorkspace(String name) {
-        Properties properties = new Properties();
-        properties.put("de/deepamehta/core/property/Name", name);
-        return dms.createTopic("de/deepamehta/core/topictype/Workspace", properties, null);     // clientContext=null
+        logger.info("Creating workspace \"" + name + "\"");
+        Composite comp = new Composite("{dm3.workspaces.name: \"" + name + "\"}");
+        return dms.createTopic(new TopicData("dm3.workspaces.workspace", comp), null);  // clientContext=null
     }
 
     @Override
     public void assignTopic(long workspaceId, long topicId) {
         checkWorkspaceId(workspaceId);
-        dms.createRelation(RelationType.RELATION.name(), topicId, workspaceId, null);           // properties=null
+        //
+        AssociationData assocData = new AssociationData(WORKSPACE_TOPIC);
+        assocData.addTopicRole(new TopicRole(workspaceId, "dm3.core.whole"));
+        assocData.addTopicRole(new TopicRole(topicId, "dm3.core.part"));
+        dms.createAssociation(assocData, null);         // clientContext=null
     }
 
     @Override
     public void assignType(long workspaceId, long typeId) {
         checkWorkspaceId(workspaceId);
-        dms.createRelation(RelationType.WORKSPACE_TYPE.name(), workspaceId, typeId, null);      // properties=null
+        //
+        AssociationData assocData = new AssociationData(WORKSPACE_TYPE);
+        assocData.addTopicRole(new TopicRole(workspaceId, "dm3.core.whole"));
+        assocData.addTopicRole(new TopicRole(typeId, "dm3.core.part"));
+        dms.createAssociation(assocData, null);         // clientContext=null
     }
 
-    /**
-     * Returns the workspaces a type is assigned to.
-     */
     @Override
-    public List<RelatedTopic> getWorkspaces(long typeId) {
-        // Note: takes a type ID instead of a type URI to avoid endless recursion through dms.getTopicType().
-        // Consider the Access Control plugin: determining the permissions for a type with MEMBER role would involve
-        // retrieving the type itself. This in turn would involve determining its permissions ...
-        // See AccessControlPlugin.userIsMember()
-        //
-        // long typeId = dms.getTopicType(typeUri, null).id;
-        return dms.getRelatedTopics(typeId, asList("de/deepamehta/core/topictype/Workspace"),
-            asList(RelationType.WORKSPACE_TYPE.name() + ";OUTGOING"), null);
+    public Set<Topic> getWorkspaces(long typeId) {
+        Topic typeTopic = dms.getTopic(typeId, null);   // clientContext=null
+        return typeTopic.getRelatedTopics(WORKSPACE_TYPE, "dm3.core.part", "dm3.core.whole", "dm3.workspaces.workspace",
+            false);     // includeComposite=false
     }
 
 
@@ -141,8 +150,8 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void checkWorkspaceId(long workspaceId) {
-        String typeUri = dms.getTopic(workspaceId, null).typeUri;
-        if (!typeUri.equals("de/deepamehta/core/topictype/Workspace")) {
+        String typeUri = dms.getTopic(workspaceId, null).getTypeUri();
+        if (!typeUri.equals("dm3.workspaces.workspace")) {
             throw new IllegalArgumentException("Topic " + workspaceId + " is not a workspace (but of type \"" +
                 typeUri + "\")");
         }

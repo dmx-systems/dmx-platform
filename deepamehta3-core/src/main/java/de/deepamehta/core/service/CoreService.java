@@ -63,7 +63,7 @@ public interface CoreService {
      */
     // public TopicValue getTopicProperty(long topicId);
 
-    // public List<Topic> getTopics(String typeUri);
+    public Set<Topic> getTopics(String typeUri);
 
     /**
      * Looks up topics by exact property value.

@@ -6,25 +6,17 @@ function workspaces_plugin() {
 
 
 
-    // *******************************
-    // *** Overriding Plugin Hooks ***
-    // *******************************
+    // ************************************************************
+    // *** Webclient Hooks (triggered by deepamehta3-webclient) ***
+    // ************************************************************
 
 
 
     this.init = function() {
 
         var workspaces = get_all_workspaces()
-        create_default_workspace()
         create_workspace_menu()
         create_workspace_dialog()
-
-        function create_default_workspace() {
-            if (!workspaces.length) {
-                create_workspace_topic("Default")
-                workspaces = get_all_workspaces()
-            }
-        }
 
         function create_workspace_menu() {
             var workspace_label = $("<span>").attr("id", "workspace-label").text("Workspace")
@@ -51,16 +43,16 @@ function workspaces_plugin() {
      * @param   topic   a Topic object
      */
     this.post_delete_topic = function(topic) {
-        if (topic.type_uri == "de/deepamehta/core/topictype/Workspace") {
+        if (topic.type_uri == "dm3.workspaces.workspace") {
             rebuild_workspace_menu()
         }
     }
 
 
 
-    // ***************************************
-    // *** Overriding Access Control Hooks ***
-    // ***************************************
+    // *********************************************************************
+    // *** Access Control Hooks (triggered by deepamehta3-accesscontrol) ***
+    // *********************************************************************
 
 
 
@@ -77,7 +69,7 @@ function workspaces_plugin() {
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function get_all_workspaces() {
-        return dm3c.restc.get_topics("de/deepamehta/core/topictype/Workspace")
+        return dm3c.restc.get_topics("dm3.workspaces.workspace")
     }
 
     /**
@@ -131,8 +123,7 @@ function workspaces_plugin() {
      * Creates a new workspace in the DB.
      */
     function create_workspace_topic(name) {
-        var properties = {"de/deepamehta/core/property/Name": name}
-        return dm3c.create_topic("de/deepamehta/core/topictype/Workspace", properties)
+        return dm3c.create_topic("dm3.workspaces.workspace", {"dm3.workspaces.name": name})
     }
 
     // ---
@@ -150,13 +141,13 @@ function workspaces_plugin() {
         }
         //
         dm3c.ui.empty_menu("workspace-menu")
-        var icon_src = dm3c.get_icon_src("de/deepamehta/core/topictype/Workspace")
+        var icon_src = dm3c.get_icon_src("dm3.workspaces.workspace")
         // add workspaces to menu
         for (var i = 0, workspace; workspace = workspaces[i]; i++) {
-            dm3c.ui.add_menu_item("workspace-menu", {label: workspace.label, value: workspace.id, icon: icon_src})
+            dm3c.ui.add_menu_item("workspace-menu", {label: workspace.value, value: workspace.id, icon: icon_src})
         }
         // add "New..." to menu
-        if (dm3c.has_create_permission("de/deepamehta/core/topictype/Workspace")) {
+        if (dm3c.has_create_permission("dm3.workspaces.workspace")) {
             dm3c.ui.add_menu_separator("workspace-menu")
             dm3c.ui.add_menu_item("workspace-menu", {label: "New Workspace...", value: "_new", is_trigger: true})
         }

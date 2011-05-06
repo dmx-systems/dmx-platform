@@ -1,0 +1,41 @@
+{
+    topic_types: [
+        {
+            value: "Name",
+            uri: "dm3.workspaces.name",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
+        },
+        {
+            value: "Description",
+            uri: "dm3.workspaces.description",
+            data_type_uri: "dm3.core.html",
+            index_mode_uris: ["dm3.core.fulltext"]
+        },
+        {
+            value: "Workspace",
+            uri: "dm3.workspaces.workspace",
+            data_type_uri: "dm3.core.composite",
+            assoc_defs: [
+                {
+                    topic_type_uri_2:  "dm3.workspaces.name",
+                    cardinality_uri_2: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition"
+                },
+                {
+                    topic_type_uri_2:  "dm3.workspaces.description",
+                    cardinality_uri_2: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition"
+                }
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm3.webclient.view_config",
+                    composite: {
+                        dm3.webclient.icon_src: "/de.deepamehta.3-workspaces/images/star.png"
+                    }
+                }
+            ]
+        }
+    ]
+}

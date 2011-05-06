@@ -47,15 +47,16 @@ var dm3c = new function() {
      *
      * High-level utility method for plugin developers.
      *
-     * @param   type_uri        The topic type URI, e.g. "de/deepamehta/core/topictype/Note".
-     * @param   properties      Optional: topic properties (object, key: field URI, value: content).
+     * @param   type_uri        The topic type URI, e.g. "dm3.notes.note".
+     * @param   composite       Optional.
      *
      * @return  The topic as stored in the DB.
      */
-    this.create_topic = function(type_uri) {
+    this.create_topic = function(type_uri, composite) {
         var topic_data = {
             // Note: "uri", "value", and "composite" are optional
-            type_uri: type_uri
+            type_uri: type_uri,
+            composite: composite    // not serialized to request body if undefined
         }
         var topic = dm3c.restc.create_topic(topic_data)
         // trigger hook

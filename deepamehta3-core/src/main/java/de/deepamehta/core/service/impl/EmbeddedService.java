@@ -226,31 +226,33 @@ public class EmbeddedService implements CoreService {
         } finally {
             tx.finish();
         }
-    }
+    } */
 
     @GET
-    @Path("/topic/by_type/{typeUri}")
+    @Path("/topic/by_type/{type_uri}")
     @Override
-    public List<Topic> getTopics(@PathParam("typeUri") String typeUri) {
+    public Set<Topic> getTopics(@PathParam("type_uri") String typeUri) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            List<Topic> topics = storage.getTopics(typeUri);
-            //
+            long typeId = getTopicType(typeUri, null).getId();
+            Set<Topic> topics = getRelatedTopics(typeId, "dm3.core.instantiation", "dm3.core.type", "dm3.core.instance",
+                null, false);   // othersTopicTypeUri=null, includeComposite=false
+            /*
             for (Topic topic : topics) {
                 triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, topic);
             }
-            //
+            */
             tx.success();
             return topics;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Topics of type \"" + typeUri + "\" can't be retrieved", e);
+            throw new RuntimeException("Retrieving topics by type failed (typeUri=\"" + typeUri + "\")", e);
         } finally {
             tx.finish();
         }
     }
 
-    @Override
+    /* @Override
     public List<Topic> getTopics(String key, Object value) {
         DeepaMehtaTransaction tx = beginTx();
         try {
@@ -401,6 +403,8 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+
+
     // === Associations ===
 
     /* @Override
@@ -521,6 +525,8 @@ public class EmbeddedService implements CoreService {
             tx.finish();
         }
     }
+
+
 
     // === Types ===
 
@@ -679,6 +685,8 @@ public class EmbeddedService implements CoreService {
         }
     } */
 
+
+
     // === Commands ===
 
     @POST
@@ -706,6 +714,8 @@ public class EmbeddedService implements CoreService {
             tx.finish();
         }
     }
+
+
 
     // === Plugins ===
 
@@ -744,6 +754,8 @@ public class EmbeddedService implements CoreService {
         runMigration(migrationNr, plugin, isCleanInstall);
         plugin.setMigrationNr(migrationNr);
     }
+
+
 
     // === Misc ===
 
@@ -1081,6 +1093,8 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+
+
     // === Topic/Association Storage ===
 
     /**
@@ -1150,6 +1164,8 @@ public class EmbeddedService implements CoreService {
         logger.info("Deleting " + topic);
         storage.deleteTopic(topic.getId());
     }
+
+
 
     // === Topic Type Storage ===
 
@@ -1224,6 +1240,8 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+
+
     // === Plugins ===
 
     /**
@@ -1270,6 +1288,8 @@ public class EmbeddedService implements CoreService {
         return pluginCache.contains(bundle.getSymbolicName());
     }
 
+
+
     // === DB ===
 
     /**
@@ -1314,6 +1334,8 @@ public class EmbeddedService implements CoreService {
         associateWithTopicType(dataType);
         associateWithTopicType(text);
     }
+
+
 
     // === Migrations ===
 

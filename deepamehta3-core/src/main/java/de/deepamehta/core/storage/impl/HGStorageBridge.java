@@ -393,23 +393,23 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         return topic;
     }
 
-    // FIXME: not used
+    /* FIXME: not used
     private HyperNode lookupTopicType(String topicTypeUri) {
         HyperNode topicType = lookupHyperNode(topicTypeUri);
         if (topicType == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
         }
         return topicType;
-    }
+    } */
 
-    // FIXME: not used
+    /* FIXME: not used
     private HyperNode lookupAssociationType(String assocTypeUri) {
         HyperNode assocType = lookupHyperNode(assocTypeUri);
         if (assocType == null) {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found");
         }
         return assocType;
-    }
+    } */
 
     private HyperNode lookupRoleType(String roleTypeUri) {
         HyperNode roleType = lookupHyperNode(roleTypeUri);

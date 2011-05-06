@@ -20,16 +20,15 @@ function RESTClient(core_service_uri) {
      * @return  the topic, or <code>null</code>.
      */
     this.get_topic_by_property = function(key, value) {
-        return request("GET", "/topic/by_property/" + encodeURIComponent(key) + "/" + encodeURIComponent(value))
+        return request("GET", "/topic/by_property/" + key + "/" + encodeURIComponent(value))
     }
 
     this.get_topic = function(type_uri, key, value) {
-        return request("GET", "/topic/" + encodeURIComponent(type_uri) + "/" +
-            encodeURIComponent(key) + "/" + encodeURIComponent(value))
+        return request("GET", "/topic/" + type_uri + "/" + key + "/" + encodeURIComponent(value))
     }
 
     this.get_topics = function(type_uri) {
-        return request("GET", "/topic/by_type/" + encodeURIComponent(type_uri))
+        return request("GET", "/topic/by_type/" + type_uri)
     }
 
     /**
@@ -114,7 +113,7 @@ function RESTClient(core_service_uri) {
     }
 
     this.get_topic_type = function(type_uri) {
-        return request("GET", "/topictype/" + encodeURIComponent(type_uri))
+        return request("GET", "/topictype/" + type_uri)
     }
 
     this.create_topic_type = function(properties, data_fields) {
@@ -124,20 +123,19 @@ function RESTClient(core_service_uri) {
     }
 
     this.add_data_field = function(type_uri, field) {
-        return request("POST", "/topictype/" + encodeURIComponent(type_uri), field)
+        return request("POST", "/topictype/" + type_uri, field)
     }
 
     this.update_data_field = function(type_uri, field) {
-        return request("PUT", "/topictype/" + encodeURIComponent(type_uri), field)
+        return request("PUT", "/topictype/" + type_uri, field)
     }
 
     this.set_data_field_order = function(type_uri, field_uris) {
-        return request("PUT", "/topictype/" + encodeURIComponent(type_uri) + "/field_order", field_uris)
+        return request("PUT", "/topictype/" + type_uri + "/field_order", field_uris)
     }
 
     this.remove_data_field = function(type_uri, field_uri) {
-        return request("DELETE", "/topictype/" + encodeURIComponent(type_uri) +
-            "/field/" + encodeURIComponent(field_uri))
+        return request("DELETE", "/topictype/" + type_uri + "/field/" + field_uri)
     }
 
 
@@ -145,7 +143,7 @@ function RESTClient(core_service_uri) {
     // === Commands ===
 
     this.execute_command = function(command, params) {
-        return request("POST", "/command/" + encodeURIComponent(command), params)
+        return request("POST", "/command/" + command, params)
     }
 
 
@@ -185,6 +183,10 @@ function RESTClient(core_service_uri) {
     /**
      * Sends an AJAX request.
      *
+     * @param   data                The data to be send as the request body. This argument depends on the
+     *                              content_type argument. By default the data object (key/value pairs) is
+     *                              serialized to JSON. Note: pairs with undefined values are not serialzed.
+     * @param   content_type        Optional: the content type of the data. Default is "application/json".
      * @param   is_absolute_uri     If true, the URI is interpreted as relative to the DeepaMehta core service URI.
      *                              If false, the URI is interpreted as an absolute URI.
      */

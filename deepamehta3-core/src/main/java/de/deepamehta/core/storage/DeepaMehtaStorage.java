@@ -45,8 +45,6 @@ public interface DeepaMehtaStorage {
      */
     // PropValue getTopicProperty(long topicId, String key);
 
-    // List<Topic> getTopics(String typeUri);
-
     /**
      * Looks up topics by exact property value.
      * If no such topics exists an empty list is returned.
