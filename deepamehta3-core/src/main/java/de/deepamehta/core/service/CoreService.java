@@ -6,6 +6,7 @@ import de.deepamehta.core.model.AssociationTypeData;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
+import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
@@ -13,7 +14,6 @@ import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeData;
 import de.deepamehta.core.model.RelatedTopic;
-import de.deepamehta.core.storage.DeepaMehtaTransaction;
 
 import java.util.Collection;
 import java.util.List;

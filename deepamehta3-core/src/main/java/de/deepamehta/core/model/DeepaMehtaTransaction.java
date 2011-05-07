@@ -1,4 +1,4 @@
-package de.deepamehta.core.storage;
+package de.deepamehta.core.model;
 
 
 

@@ -3,14 +3,13 @@ package de.deepamehta.plugins.webclient;
 import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Composite;
+import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.service.Plugin;
-import de.deepamehta.core.storage.DeepaMehtaTransaction;
-// FIXME: move DeepaMehtaTransaction to service package
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;

@@ -101,12 +101,10 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <!-- FIXME: make storage package private -->
                         <Export-Package>
                             de.deepamehta.core.model,
                             de.deepamehta.core.osgi,
                             de.deepamehta.core.service,
-                            de.deepamehta.core.storage,
                             de.deepamehta.core.util
                         </Export-Package>
                         <Bundle-Activator>
