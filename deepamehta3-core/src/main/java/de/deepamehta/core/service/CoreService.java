@@ -12,7 +12,7 @@ import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicType;
-import de.deepamehta.core.model.TopicTypeData;
+import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.RelatedTopic;
 
 import java.util.Collection;
@@ -159,7 +159,7 @@ public interface CoreService {
 
     public TopicType getTopicType(String topicTypeUri, ClientContext clientContext);
 
-    public TopicType createTopicType(TopicTypeData topicTypeData, ClientContext clientContext);
+    public TopicType createTopicType(TopicTypeModel topicTypeModel, ClientContext clientContext);
 
     public Topic createAssociationType(AssociationTypeData assocTypeData, ClientContext clientContext);
 

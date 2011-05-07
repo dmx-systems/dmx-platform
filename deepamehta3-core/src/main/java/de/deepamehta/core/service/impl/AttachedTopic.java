@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A topic that is attached to a {@link CoreService} implementation.
+ * A topic that is attached to the {@link CoreService}.
  */
 class AttachedTopic extends TopicData implements Topic {
 

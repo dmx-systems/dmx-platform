@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 
 /**
- * An association that is attached to a {@link CoreService} implementation.
+ * An association that is attached to the {@link CoreService}.
  */
 class AttachedAssociation extends AssociationData implements Association {
 

@@ -23,7 +23,11 @@ public interface TopicType {
 
     String getDataTypeUri();
 
+    // ---
+
     Set<IndexMode> getIndexModes();
+
+    void setIndexModes(Set<IndexMode> indexModes);
 
     // ---
 
@@ -38,6 +42,12 @@ public interface TopicType {
     ViewConfiguration getViewConfig();
 
     Object getViewConfig(String typeUri, String settingUri);
+
+    // ---
+
+    void fetch(String topicTypeUri);
+
+    void store();
 
     // ---
 

@@ -33,10 +33,10 @@ public enum IndexMode {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    static Set<IndexMode> parse(JSONObject topicTypeData) {
+    static Set<IndexMode> parse(JSONObject topicTypeModel) {
         try {
             Set<IndexMode> indexModes = new HashSet();
-            JSONArray indexModeUris = topicTypeData.optJSONArray("index_mode_uris");
+            JSONArray indexModeUris = topicTypeModel.optJSONArray("index_mode_uris");
             if (indexModeUris != null) {
                 for (int i = 0; i < indexModeUris.length(); i++) {
                     indexModes.add(fromUri(indexModeUris.getString(i)));
@@ -44,7 +44,7 @@ public enum IndexMode {
             }
             return indexModes;
         } catch (Exception e) {
-            throw new RuntimeException("Parsing index modes failed (topicTypeData=" + topicTypeData + ")", e);
+            throw new RuntimeException("Parsing index modes failed (topicTypeModel=" + topicTypeModel + ")", e);
         }
     }
 

@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class TopicTypeData extends TopicData {
+public class TopicTypeModel extends TopicData {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -33,15 +33,16 @@ public class TopicTypeData extends TopicData {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TopicTypeData(TopicTypeData topicTypeData) {
-        super(topicTypeData);
-        this.dataTypeUri = topicTypeData.getDataTypeUri();
-        this.indexModes = topicTypeData.getIndexModes();
-        this.assocDefs = topicTypeData.getAssocDefs();
-        this.viewConfig = topicTypeData.getViewConfig();
+    public TopicTypeModel(TopicTypeModel topicTypeModel) {
+        super(topicTypeModel);
+        this.dataTypeUri = topicTypeModel.getDataTypeUri();
+        this.indexModes = topicTypeModel.getIndexModes();
+        this.assocDefs = topicTypeModel.getAssocDefs();
+        this.viewConfig = topicTypeModel.getViewConfig();
     }
 
-    public TopicTypeData(Topic typeTopic, String dataTypeUri, Set<IndexMode> indexModes, ViewConfiguration viewConfig) {
+    public TopicTypeModel(Topic typeTopic, String dataTypeUri, Set<IndexMode> indexModes,
+                                                               ViewConfiguration viewConfig) {
         super(typeTopic);
         this.dataTypeUri = dataTypeUri;
         this.indexModes = indexModes;
@@ -49,7 +50,7 @@ public class TopicTypeData extends TopicData {
         this.viewConfig = viewConfig;
     }
 
-    public TopicTypeData(String uri, String value, String dataTypeUri) {
+    public TopicTypeModel(String uri, String value, String dataTypeUri) {
         super(uri, new TopicValue(value), "dm3.core.topic_type");
         this.dataTypeUri = dataTypeUri;
         this.indexModes = new HashSet();
@@ -57,21 +58,21 @@ public class TopicTypeData extends TopicData {
         this.viewConfig = new ViewConfiguration();
     }
 
-    public TopicTypeData(JSONObject topicTypeData) {
+    public TopicTypeModel(JSONObject topicTypeModel) {
         try {
             this.id = -1;
-            this.uri = topicTypeData.getString("uri");
-            this.value = new TopicValue(topicTypeData.get("value"));
+            this.uri = topicTypeModel.getString("uri");
+            this.value = new TopicValue(topicTypeModel.get("value"));
             this.typeUri = "dm3.core.topic_type";
             this.composite = new Composite();
             //
-            this.dataTypeUri = topicTypeData.getString("data_type_uri");
-            this.indexModes = IndexMode.parse(topicTypeData);
+            this.dataTypeUri = topicTypeModel.getString("data_type_uri");
+            this.indexModes = IndexMode.parse(topicTypeModel);
             this.assocDefs = new LinkedHashMap();
-            this.viewConfig = new ViewConfiguration(topicTypeData);
-            parseAssocDefs(topicTypeData);
+            this.viewConfig = new ViewConfiguration(topicTypeModel);
+            parseAssocDefs(topicTypeModel);
         } catch (Exception e) {
-            throw new RuntimeException("Parsing TopicTypeData failed (JSONObject=" + topicTypeData + ")", e);
+            throw new RuntimeException("Parsing TopicTypeModel failed (JSONObject=" + topicTypeModel + ")", e);
         }
     }
 
@@ -81,8 +82,14 @@ public class TopicTypeData extends TopicData {
         return dataTypeUri;
     }
 
+    // ---
+
     public Set<IndexMode> getIndexModes() {
         return indexModes;
+    }
+
+    public void setIndexModes(Set<IndexMode> indexModes) {
+        this.indexModes = indexModes;
     }
 
     // ---
@@ -148,8 +155,8 @@ public class TopicTypeData extends TopicData {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void parseAssocDefs(JSONObject topicTypeData) throws Exception {
-        JSONArray assocDefs = topicTypeData.optJSONArray("assoc_defs");
+    private void parseAssocDefs(JSONObject topicTypeModel) throws Exception {
+        JSONArray assocDefs = topicTypeModel.optJSONArray("assoc_defs");
         if (assocDefs != null) {
             for (int i = 0; i < assocDefs.length(); i++) {
                 addAssocDef(new AssociationDefinition(assocDefs.getJSONObject(i), this.uri));

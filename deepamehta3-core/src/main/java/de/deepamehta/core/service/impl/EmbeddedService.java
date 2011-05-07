@@ -17,7 +17,7 @@ import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicType;
-import de.deepamehta.core.model.TopicTypeData;
+import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.ViewConfiguration;
 import de.deepamehta.core.service.CoreService;
@@ -553,7 +553,7 @@ public class EmbeddedService implements CoreService {
         }
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopicType topicType = typeCache.get(uri);
+            TopicType topicType = typeCache.get(uri);
             triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
             tx.success();
             return topicType;
@@ -569,19 +569,12 @@ public class EmbeddedService implements CoreService {
     @Path("/topictype")
     @Consumes("application/x-www-form-urlencoded")
     @Override
-    public TopicType createTopicType(TopicTypeData topicTypeData, @HeaderParam("Cookie") ClientContext clientContext) {
+    public TopicType createTopicType(TopicTypeModel topicTypeModel,
+                                     @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Topic topic = storage.createTopic(topicTypeData);
-            associateWithTopicType(topic);
-            //
-            String typeUri = topicTypeData.getUri();
-            associateDataType(typeUri, topicTypeData.getDataTypeUri());
-            associateIndexModes(typeUri, topicTypeData.getIndexModes());
-            associateTopicTypes(typeUri, topicTypeData.getAssocDefs());
-            associateViewConfig(typeUri, topicTypeData.getViewConfig());
-            //
-            TopicType topicType = typeCache.get(typeUri);
+            TopicType topicType = new AttachedTopicType(topicTypeModel, this);
+            topicType.store();
             //
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
@@ -592,8 +585,8 @@ public class EmbeddedService implements CoreService {
             return topicType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating topic type \"" + topicTypeData.getUri() +
-                "\" failed (" + topicTypeData + ")", e);
+            throw new RuntimeException("Creating topic type \"" + topicTypeModel.getUri() +
+                "\" failed (" + topicTypeModel + ")", e);
         } finally {
             tx.finish();
         }
@@ -1118,7 +1111,7 @@ public class EmbeddedService implements CoreService {
 
     // ---
 
-    private void associateWithTopicType(Topic topic) {
+    void associateWithTopicType(Topic topic) {
         try {
             AssociationData assocData = new AssociationData("dm3.core.instantiation");
             assocData.addTopicRole(new TopicRole(topic.getTypeUri(), "dm3.core.type"));
@@ -1169,75 +1162,12 @@ public class EmbeddedService implements CoreService {
 
     // === Topic Type Storage ===
 
-    private void associateDataType(String topicTypeUri, String dataTypeUri) {
+    // FIXME: move to AttachedTopicType
+    void associateDataType(String topicTypeUri, String dataTypeUri) {
         AssociationData assocData = new AssociationData("dm3.core.association");
         assocData.addTopicRole(new TopicRole(topicTypeUri, "dm3.core.topic_type"));
         assocData.addTopicRole(new TopicRole(dataTypeUri,  "dm3.core.data_type"));
         createAssociation(assocData, null);             // FIXME: clientContext=null
-    }
-
-    private void associateIndexModes(String topicTypeUri, Set<IndexMode> indexModes) {
-        for (IndexMode indexMode : indexModes) {
-            AssociationData assocData = new AssociationData("dm3.core.association");
-            assocData.addTopicRole(new TopicRole(topicTypeUri, "dm3.core.topic_type"));
-            assocData.addTopicRole(new TopicRole(indexMode.toUri(), "dm3.core.index_mode"));
-            createAssociation(assocData, null);         // FIXME: clientContext=null
-        }
-    }
-
-    private void associateTopicTypes(String topicTypeUri, Map<String, AssociationDefinition> assocDefs) {
-        Association lastAssocDef = null;
-        for (AssociationDefinition assocDef : assocDefs.values()) {
-            lastAssocDef = associateTopicType(topicTypeUri, assocDef, lastAssocDef);
-        }
-    }
-
-    private Association associateTopicType(String topicTypeUri, AssociationDefinition assocDef,
-                                                                Association lastAssocDef) {
-        try {
-            Association assoc = createAssociation(assocDef.toAssociationData(), null);  // FIXME: clientContext=null
-            putInSequence(topicTypeUri, assoc, lastAssocDef);
-            associateViewConfig(assoc, assocDef.getViewConfig());
-            return assoc;
-        } catch (Exception e) {
-            throw new RuntimeException("Associating topic type \"" + topicTypeUri +
-                "\" with topic type \"" + assocDef.getTopicTypeUri2() + "\" failed", e);
-        }
-    }
-
-    private void putInSequence(String topicTypeUri, Association assocDef, Association lastAssocDef) {
-        if (lastAssocDef == null) {
-            // begin sequence
-            AssociationData assocData = new AssociationData("dm3.core.association");
-            assocData.addTopicRole(new TopicRole(topicTypeUri, "dm3.core.topic_type"));
-            assocData.addAssociationRole(new AssociationRole(assocDef.getId(), "dm3.core.first_assoc_def"));
-            createAssociation(assocData, null);                     // FIXME: clientContext=null
-        } else {
-            // continue sequence
-            AssociationData assocData = new AssociationData("dm3.core.sequence");
-            assocData.addAssociationRole(new AssociationRole(lastAssocDef.getId(), "dm3.core.predecessor"));
-            assocData.addAssociationRole(new AssociationRole(assocDef.getId(),     "dm3.core.successor"));
-            createAssociation(assocData, null);                     // FIXME: clientContext=null
-        }
-    }
-
-    // ---
-
-    private void associateViewConfig(String topicTypeUri, ViewConfiguration viewConfig) {
-        for (TopicData configTopic : viewConfig.getConfigTopics()) {
-            Topic topic = createTopic(configTopic, null);           // FIXME: clientContext=null
-            AssociationData assocData = new AssociationData("dm3.core.association");
-            assocData.addTopicRole(new TopicRole(topicTypeUri,  "dm3.core.topic_type"));
-            assocData.addTopicRole(new TopicRole(topic.getId(), "dm3.core.view_config"));
-            createAssociation(assocData, null);                     // FIXME: clientContext=null
-        }
-    }
-
-    private void associateViewConfig(Association assocDef, ViewConfiguration viewConfig) {
-        for (TopicData configTopic : viewConfig.getConfigTopics()) {
-            Topic topic = createTopic(configTopic, null);           // FIXME: clientContext=null
-            assocDef.addTopicRole(new TopicRole(topic.getId(), "dm3.core.view_config"));
-        }
     }
 
 
@@ -1314,7 +1244,7 @@ public class EmbeddedService implements CoreService {
         // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
         // depends on the topic type "Data Type". To resolve this circle we use a low-level storage call here
         // and postpone the data type association.
-        Topic dataType = storage.createTopic(new TopicTypeData("dm3.core.data_type", "Data Type", "dm3.core.text"));
+        Topic dataType = storage.createTopic(new TopicTypeModel("dm3.core.data_type", "Data Type", "dm3.core.text"));
         // Create data type "Text"
         // Note: storage low-level call used here ### explain
         Topic text = storage.createTopic(new TopicData("dm3.core.text", new TopicValue("Text"), "dm3.core.data_type"));
