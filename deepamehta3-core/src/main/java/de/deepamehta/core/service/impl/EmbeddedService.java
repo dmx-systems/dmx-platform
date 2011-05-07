@@ -1224,8 +1224,8 @@ public class EmbeddedService implements CoreService {
     // ---
 
     private void associateViewConfig(String topicTypeUri, ViewConfiguration viewConfig) {
-        for (TopicData topicData : viewConfig.getTopicData()) {
-            Topic topic = createTopic(topicData, null);             // FIXME: clientContext=null
+        for (TopicData configTopic : viewConfig.getConfigTopics()) {
+            Topic topic = createTopic(configTopic, null);           // FIXME: clientContext=null
             AssociationData assocData = new AssociationData("dm3.core.association");
             assocData.addTopicRole(new TopicRole(topicTypeUri,  "dm3.core.topic_type"));
             assocData.addTopicRole(new TopicRole(topic.getId(), "dm3.core.view_config"));
@@ -1234,8 +1234,8 @@ public class EmbeddedService implements CoreService {
     }
 
     private void associateViewConfig(Association assocDef, ViewConfiguration viewConfig) {
-        for (TopicData topicData : viewConfig.getTopicData()) {
-            Topic topic = createTopic(topicData, null);             // FIXME: clientContext=null
+        for (TopicData configTopic : viewConfig.getConfigTopics()) {
+            Topic topic = createTopic(configTopic, null);           // FIXME: clientContext=null
             assocDef.addTopicRole(new TopicRole(topic.getId(), "dm3.core.view_config"));
         }
     }

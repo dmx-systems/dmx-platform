@@ -21,7 +21,7 @@ public class ViewConfiguration {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Set<TopicData> viewConfig = new HashSet();
+    private Map<String, TopicData> viewConfig = new HashMap();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -30,7 +30,7 @@ public class ViewConfiguration {
 
     public ViewConfiguration(Set<Topic> topics) {
         for (Topic topic : topics) {
-            viewConfig.add(new TopicData(topic));
+            put(new TopicData(topic));
         }
     }
 
@@ -39,7 +39,7 @@ public class ViewConfiguration {
             JSONArray topics = configurable.optJSONArray("view_config_topics");
             if (topics != null) {
                 for (int i = 0; i < topics.length(); i++) {
-                    viewConfig.add(new TopicData(topics.getJSONObject(i)));
+                    put(new TopicData(topics.getJSONObject(i)));
                 }
             }
         } catch (Exception e) {
@@ -49,8 +49,27 @@ public class ViewConfiguration {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public Iterable<TopicData> getTopicData() {
-        return viewConfig;
+    public Iterable<TopicData> getConfigTopics() {
+        return viewConfig.values();
+    }
+
+    /**
+     * Read out a view configuration setting.
+     * <p>
+     * Compare to client-side counterpart: function get_view_config() in webclient.js
+     *
+     * @param   typeUri     The type URI of the configuration topic, e.g. "dm3.webclient.view_config"
+     * @param   settingUri  The setting URI, e.g. "dm3.webclient.icon_src"
+     *
+     * @return  The setting value, or <code>null</code> if there is no such setting
+     */
+    public Object getSetting(String typeUri, String settingUri) {
+        TopicData configTopic = get(typeUri);
+        if (configTopic == null) {
+            return null;
+        }
+        Composite comp = configTopic.getComposite();
+        return comp.has(settingUri) ? comp.get(settingUri) : null;
     }
 
     // ---
@@ -58,8 +77,8 @@ public class ViewConfiguration {
     public void toJSON(JSONObject configurable) {
         try {
             Map viewConfigTopics = new HashMap();
-            for (TopicData topicData : viewConfig) {
-                viewConfigTopics.put(topicData.getTypeUri(), topicData.toJSON());
+            for (TopicData configTopic : getConfigTopics()) {
+                viewConfigTopics.put(configTopic.getTypeUri(), configTopic.toJSON());
             }
             configurable.put("view_config_topics", viewConfigTopics);
         } catch (Exception e) {
@@ -69,6 +88,16 @@ public class ViewConfiguration {
 
     @Override
     public String toString() {
-        return "view configuration " + viewConfig.toString();
+        return "view configuration " + viewConfig;
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private TopicData get(String typeUri) {
+        return viewConfig.get(typeUri);
+    }
+
+    private void put(TopicData configTopic) {
+        viewConfig.put(configTopic.getTypeUri(), configTopic);
     }
 }

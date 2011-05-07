@@ -85,15 +85,11 @@ public class TopicTypeData extends TopicData {
         return indexModes;
     }
 
+    // ---
+
     public Map<String, AssociationDefinition> getAssocDefs() {
         return assocDefs;
     }
-
-    public ViewConfiguration getViewConfig() {
-        return viewConfig;
-    }
-
-    // ---
 
     public AssociationDefinition getAssocDef(String assocDefUri) {
         AssociationDefinition assocDef = assocDefs.get(assocDefUri);
@@ -113,6 +109,16 @@ public class TopicTypeData extends TopicData {
                 "association definitions with uri \"" + assocDefUri + "\" -- Use distinct role types at position 2");
         }
         assocDefs.put(assocDefUri, assocDef);
+    }
+
+    // ---
+
+    public ViewConfiguration getViewConfig() {
+        return viewConfig;
+    }
+
+    public Object getViewConfig(String typeUri, String settingUri) {
+        return viewConfig.getSetting(typeUri, settingUri);
     }
 
     // ---

@@ -341,9 +341,11 @@ var dm3c = new function() {
 
     /**
      * Read out a view configuration setting.
+     * <p>
+     * Compare to server-side counterparts: WebclientPlugin.getViewConfig() and ViewConfiguration.getSetting()
      *
      * @param   configurable    A topic type or an association definition. Must not be null/undefined.
-     * @param   setting         Last URI component, e.g. "icon_src"
+     * @param   setting         Last component of the setting URI, e.g. "icon_src".
      *
      * @return  The setting value, or <code>undefined</code> if there is no such setting
      */

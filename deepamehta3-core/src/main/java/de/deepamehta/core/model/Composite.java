@@ -65,25 +65,28 @@ public class Composite {
      */
     public void put(String key, Object value) {
         try {
-            // error checks
+            // check argument
             if (value == null) {
                 throw new IllegalArgumentException("Tried to put a null value in a Composite");
             }
-            Class clazz = value.getClass();
-            if (clazz != String.class && clazz != Integer.class && clazz != Long.class && clazz != Boolean.class &&
-                clazz != Composite.class) {
-                throw new IllegalArgumentException("Tried to put a " + clazz.getName() + " value in a Composite " +
-                    "(expected are String, Integer, Long, Boolean, or Composite)");
+            if (!(value instanceof String || value instanceof Integer || value instanceof Long ||
+                  value instanceof Boolean || value instanceof Composite)) {
+                throw new IllegalArgumentException("Tried to put a " + value.getClass().getName() +
+                    " value in a Composite (expected are String, Integer, Long, Boolean, or Composite)");
             }
             // put value
-            if (clazz == Composite.class) {
+            if (value instanceof Composite) {
                 value = ((Composite) value).values;
             }
             values.put(key, value);
         } catch (Exception e) {
-            throw new RuntimeException("Putting a value in a Composite failed (key=\"" + key + "\", value=" + value +
-                ", composite=" + this + ")", e);
+            throw new RuntimeException("Putting a value in a Composite failed (key=\"" + key +
+                "\", value=" + value + ", composite=" + this + ")", e);
         }
+    }
+
+    public boolean has(String key) {
+        return values.has(key);
     }
 
     // ---

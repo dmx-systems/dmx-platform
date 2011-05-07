@@ -1,5 +1,8 @@
 {
     topic_types: [
+
+        ### View Configuration ###
+
         {
             value: "Icon Source",
             uri: "dm3.webclient.icon_src",
@@ -8,6 +11,11 @@
         {
             value: "Add To Create Menu",
             uri: "dm3.webclient.add_to_create_menu",
+            data_type_uri: "dm3.core.boolean"
+        },
+        {
+            value: "Is Searchable Unit",
+            uri: "dm3.webclient.is_searchable_unit",
             data_type_uri: "dm3.core.boolean"
         },
         {
@@ -46,6 +54,11 @@
                     assoc_type_uri:    "dm3.core.composition"
                 },
                 {
+                    topic_type_uri_2:  "dm3.webclient.is_searchable_unit",
+                    cardinality_uri_2: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition"
+                },
+                {
                     topic_type_uri_2:  "dm3.webclient.editable",
                     cardinality_uri_2: "dm3.core.one",
                     assoc_type_uri:    "dm3.core.composition"
@@ -67,6 +80,8 @@
                 }
             ]
         },
+
+        ### Search ###
 
         {
             value: "Search Term",

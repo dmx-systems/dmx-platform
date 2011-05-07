@@ -185,7 +185,8 @@
                     type_uri: "dm3.webclient.view_config",
                     composite: {
                         dm3.webclient.icon_src: "/de.deepamehta.3-contacts/images/person.png",
-                        dm3.webclient.add_to_create_menu: true
+                        dm3.webclient.add_to_create_menu: true,
+                        dm3.webclient.is_searchable_unit: true
                     }
                 }
             ]
@@ -235,7 +236,8 @@
                     type_uri: "dm3.webclient.view_config",
                     composite: {
                         dm3.webclient.icon_src: "/de.deepamehta.3-contacts/images/house.png",
-                        dm3.webclient.add_to_create_menu: true
+                        dm3.webclient.add_to_create_menu: true,
+                        dm3.webclient.is_searchable_unit: true
                     }
                 }
             ]

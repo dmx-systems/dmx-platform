@@ -57,16 +57,15 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     public void postCreateHook(Topic topic, ClientContext clientContext) {
         long workspaceId = -1;
         try {
-            /* ### check precondition 1
-            if (topic.getTypeUri.equals("dm3.webclient.search") ||
-                topic.getTypeUri.equals("dm3.workspaces.workspace")) {
-                // Note 1: we do not relate search topics to a workspace. Otherwise the search result would appear
-                // as relation when displaying the workspace. That's because a "SEARCH_RESULT" relation is not be
-                // created if there is another relation already.
-                // Note 2: we do not relate workspaces to a workspace. This would be contra-intuitive.
-                logger.info(topic + " is deliberately not assigned to any workspace");
+            // check precondition 1
+            if (topic.getTypeUri().equals("dm3.webclient.search") ||
+                topic.getTypeUri().equals("dm3.workspaces.workspace")) {
+                // Note 1: we do not relate search topics to a workspace.
+                // Note 2: we do not relate workspaces to a workspace.
+                logger.info("Assigning topic to a workspace ABORTED: searches and workspaces are not assigned (" +
+                    topic + ")");
                 return;
-            } */
+            }
             // check precondition 2
             if (clientContext == null) {
                 logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +

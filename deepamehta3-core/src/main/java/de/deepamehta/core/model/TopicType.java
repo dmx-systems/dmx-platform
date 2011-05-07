@@ -25,15 +25,19 @@ public interface TopicType {
 
     Set<IndexMode> getIndexModes();
 
-    Map<String, AssociationDefinition> getAssocDefs();
-
-    ViewConfiguration getViewConfig();
-
     // ---
+
+    Map<String, AssociationDefinition> getAssocDefs();
 
     AssociationDefinition getAssocDef(String assocDefUri);
 
     void addAssocDef(AssociationDefinition assocDef);
+
+    // ---
+
+    ViewConfiguration getViewConfig();
+
+    Object getViewConfig(String typeUri, String settingUri);
 
     // ---
 
