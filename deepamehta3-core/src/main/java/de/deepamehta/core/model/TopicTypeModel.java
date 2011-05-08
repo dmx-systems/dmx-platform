@@ -107,7 +107,6 @@ public class TopicTypeModel extends TopicData {
         return assocDef;
     }
 
-    // FIXME: abstraction. Adding should be the factory's resposibility
     public void addAssocDef(AssociationDefinition assocDef) {
         String assocDefUri = assocDef.getUri();
         AssociationDefinition existing = assocDefs.get(assocDefUri);

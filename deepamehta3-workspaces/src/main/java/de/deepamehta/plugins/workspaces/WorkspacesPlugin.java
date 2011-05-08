@@ -3,12 +3,14 @@ package de.deepamehta.plugins.workspaces;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
 import de.deepamehta.core.model.AssociationData;
+import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicData;
 import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.model.ViewConfiguration;
 import de.deepamehta.core.service.Plugin;
 
 import static java.util.Arrays.asList;
@@ -27,6 +29,9 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     // association type semantics
     private static final String WORKSPACE_TOPIC = "dm3.core.aggregation";   // A topic assigned to a workspace.
     private static final String WORKSPACE_TYPE  = "dm3.core.aggregation";   // A type assigned to a workspace.
+    private static final String ROLE_TYPE_TOPIC = "dm3.core.whole";
+    private static final String ROLE_TYPE_TYPE = "dm3.core.whole";
+    private static final String ROLE_TYPE_WORKSPACE = "dm3.core.part";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -93,13 +98,21 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
      */
     @Override
     public void modifyTopicTypeHook(TopicType topicType, ClientContext clientContext) {
-        /* ###
-        DataField workspacesField = new DataField("Workspaces", "reference");
-        workspacesField.setUri("de/deepamehta/core/property/Workspaces");
-        workspacesField.setRefTopicTypeUri("de/deepamehta/core/topictype/Workspace");
-        workspacesField.setEditor("checkboxes");
+        String topicTypeUri = topicType.getUri();
+        // skip our own types
+        if (topicTypeUri.startsWith("dm3.workspaces.")) {
+            return;
+        }
         //
-        topicType.addDataField(workspacesField); */
+        logger.info("########## Associate type \"" + topicTypeUri + "\" with type \"dm3.workspaces.workspace\"");
+        AssociationDefinition assocDef = new AssociationDefinition(topicTypeUri, "dm3.workspaces.workspace");
+        assocDef.setAssocTypeUri("dm3.core.aggregation");
+        assocDef.setCardinalityUri1("dm3.core.many");
+        assocDef.setCardinalityUri2("dm3.core.many");
+        assocDef.setViewConfig(new ViewConfiguration()); // FIXME: serialization fails if plugin developer forget to set
+        //
+        // TopicType workspaceType = dms.getTopicType("dm3.workspaces.workspace", null);
+        topicType.addAssocDef(assocDef);
     }
 
 
@@ -122,8 +135,8 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
         checkWorkspaceId(workspaceId);
         //
         AssociationData assocData = new AssociationData(WORKSPACE_TOPIC);
-        assocData.addTopicRole(new TopicRole(workspaceId, "dm3.core.whole"));
-        assocData.addTopicRole(new TopicRole(topicId, "dm3.core.part"));
+        assocData.addTopicRole(new TopicRole(workspaceId, ROLE_TYPE_WORKSPACE));
+        assocData.addTopicRole(new TopicRole(topicId, ROLE_TYPE_TOPIC));
         dms.createAssociation(assocData, null);         // clientContext=null
     }
 
@@ -132,16 +145,16 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
         checkWorkspaceId(workspaceId);
         //
         AssociationData assocData = new AssociationData(WORKSPACE_TYPE);
-        assocData.addTopicRole(new TopicRole(workspaceId, "dm3.core.whole"));
-        assocData.addTopicRole(new TopicRole(typeId, "dm3.core.part"));
+        assocData.addTopicRole(new TopicRole(workspaceId, ROLE_TYPE_WORKSPACE));
+        assocData.addTopicRole(new TopicRole(typeId, ROLE_TYPE_TYPE));
         dms.createAssociation(assocData, null);         // clientContext=null
     }
 
     @Override
     public Set<Topic> getWorkspaces(long typeId) {
         Topic typeTopic = dms.getTopic(typeId, null);   // clientContext=null
-        return typeTopic.getRelatedTopics(WORKSPACE_TYPE, "dm3.core.part", "dm3.core.whole", "dm3.workspaces.workspace",
-            false);     // includeComposite=false
+        return typeTopic.getRelatedTopics(WORKSPACE_TYPE, ROLE_TYPE_TYPE, ROLE_TYPE_WORKSPACE,
+            "dm3.workspaces.workspace", false);         // includeComposite=false
     }
 
 
