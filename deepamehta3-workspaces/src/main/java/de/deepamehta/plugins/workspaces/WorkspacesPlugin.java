@@ -104,6 +104,14 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
             return;
         }
         //
+        if (!topicType.getDataTypeUri().equals("dm3.core.composite")) {
+            return;
+        }
+        //
+        if (!isSearchableUnit(topicType)) {
+            return;
+        }
+        //
         logger.info("########## Associate type \"" + topicTypeUri + "\" with type \"dm3.workspaces.workspace\"");
         AssociationDefinition assocDef = new AssociationDefinition(topicTypeUri, "dm3.workspaces.workspace");
         assocDef.setAssocTypeUri("dm3.core.aggregation");
@@ -167,5 +175,15 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
             throw new IllegalArgumentException("Topic " + workspaceId + " is not a workspace (but of type \"" +
                 typeUri + "\")");
         }
+    }
+
+    // FIXME: the "is_searchable_unit" setting is possibly not a view configuration but part of the topic type model.
+    // Evidence:
+    // - Code is doubled, see isSearchableUnit() and getViewConfig() in WebclientPlugin.
+    // - Dependency on Webclient plugin.
+    private boolean isSearchableUnit(TopicType topicType) {
+        Boolean isSearchableUnit = (Boolean) topicType.getViewConfig("dm3.webclient.view_config",
+            "dm3.webclient.is_searchable_unit");
+        return isSearchableUnit != null ? isSearchableUnit.booleanValue() : false;  // default is false
     }
 }

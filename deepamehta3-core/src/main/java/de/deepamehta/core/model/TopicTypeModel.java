@@ -109,11 +109,18 @@ public class TopicTypeModel extends TopicData {
 
     public void addAssocDef(AssociationDefinition assocDef) {
         String assocDefUri = assocDef.getUri();
+        // error check 1
+        if (!getDataTypeUri().equals("dm3.core.composite")) {
+            throw new RuntimeException("Association definitions can only be added to composite topic types. " +
+                "Topic type \"" + getUri() + " is of data type \"" + getDataTypeUri() + "\". (" + assocDef + ")");
+        }
+        // error check 2
         AssociationDefinition existing = assocDefs.get(assocDefUri);
         if (existing != null) {
             throw new RuntimeException("Schema ambiguity: topic type \"" + uri + "\" has more than one " +
                 "association definitions with uri \"" + assocDefUri + "\" -- Use distinct role types at position 2");
         }
+        //
         assocDefs.put(assocDefUri, assocDef);
     }
 
@@ -123,6 +130,8 @@ public class TopicTypeModel extends TopicData {
         return viewConfig;
     }
 
+    // FIXME: server-side operations on the view config settings possibly suggest they are not acually
+    // view config settings but part of the topic type model. Possibly this method should be dropped.
     public Object getViewConfig(String typeUri, String settingUri) {
         return viewConfig.getSetting(typeUri, settingUri);
     }
