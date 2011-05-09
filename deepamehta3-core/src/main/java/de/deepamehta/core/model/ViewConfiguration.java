@@ -21,7 +21,7 @@ public class ViewConfiguration {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Map<String, TopicData> viewConfig = new HashMap();
+    private Map<String, TopicModel> viewConfig = new HashMap();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -30,7 +30,7 @@ public class ViewConfiguration {
 
     public ViewConfiguration(Set<Topic> topics) {
         for (Topic topic : topics) {
-            put(new TopicData(topic));
+            put(new TopicModel(topic));
         }
     }
 
@@ -39,7 +39,7 @@ public class ViewConfiguration {
             JSONArray topics = configurable.optJSONArray("view_config_topics");
             if (topics != null) {
                 for (int i = 0; i < topics.length(); i++) {
-                    put(new TopicData(topics.getJSONObject(i)));
+                    put(new TopicModel(topics.getJSONObject(i)));
                 }
             }
         } catch (Exception e) {
@@ -49,7 +49,7 @@ public class ViewConfiguration {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public Iterable<TopicData> getConfigTopics() {
+    public Iterable<TopicModel> getConfigTopics() {
         return viewConfig.values();
     }
 
@@ -64,7 +64,7 @@ public class ViewConfiguration {
      * @return  The setting value, or <code>null</code> if there is no such setting
      */
     public Object getSetting(String typeUri, String settingUri) {
-        TopicData configTopic = get(typeUri);
+        TopicModel configTopic = get(typeUri);
         if (configTopic == null) {
             return null;
         }
@@ -77,7 +77,7 @@ public class ViewConfiguration {
     public void toJSON(JSONObject configurable) {
         try {
             Map viewConfigTopics = new HashMap();
-            for (TopicData configTopic : getConfigTopics()) {
+            for (TopicModel configTopic : getConfigTopics()) {
                 viewConfigTopics.put(configTopic.getTypeUri(), configTopic.toJSON());
             }
             configurable.put("view_config_topics", viewConfigTopics);
@@ -93,11 +93,11 @@ public class ViewConfiguration {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private TopicData get(String typeUri) {
+    private TopicModel get(String typeUri) {
         return viewConfig.get(typeUri);
     }
 
-    private void put(TopicData configTopic) {
+    private void put(TopicModel configTopic) {
         viewConfig.put(configTopic.getTypeUri(), configTopic);
     }
 }

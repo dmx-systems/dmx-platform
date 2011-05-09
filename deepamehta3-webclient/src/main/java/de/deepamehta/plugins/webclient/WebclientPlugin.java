@@ -5,7 +5,7 @@ import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.Topic;
-import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicValue;
@@ -147,9 +147,9 @@ public class WebclientPlugin extends Plugin {
      * Creates a search result topic (a bucket).
      */
     private Topic createSearchTopic(String searchTerm, Set<Topic> topics, ClientContext clientContext) {
-        Composite comp = new Composite("{dm3.webclient.search_term: \"" + searchTerm + "\"}");
-        Topic searchTopic = dms.createTopic(new TopicData("dm3.webclient.search", comp), clientContext);
-        // searchTopic.setChildTopicValue("dm3.webclient.search_term", new TopicValue(searchTerm));
+        // Composite comp = new Composite("{dm3.webclient.search_term: \"" + searchTerm + "\"}");
+        Topic searchTopic = dms.createTopic(new TopicModel("dm3.webclient.search" /*, comp */), clientContext);
+        searchTopic.setChildTopicValue("dm3.webclient.search_term", new TopicValue(searchTerm));
         //
         // associate result topics
         logger.info("Associating " + topics.size() + " result topics to search topic (ID " + searchTopic.getId() + ")");

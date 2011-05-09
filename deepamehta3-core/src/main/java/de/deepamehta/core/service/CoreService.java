@@ -10,7 +10,7 @@ import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
-import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.RelatedTopic;
@@ -113,9 +113,9 @@ public interface CoreService {
     public Set<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord,
                                                                        ClientContext clientContext);
 
-    public Topic createTopic(TopicData topicData, ClientContext clientContext);
+    public Topic createTopic(TopicModel topicModel, ClientContext clientContext);
 
-    public Topic updateTopic(TopicData topicData, ClientContext clientContext);
+    public Topic updateTopic(TopicModel topicModel, ClientContext clientContext);
 
     public void deleteTopic(long topicId, ClientContext clientContext);
 

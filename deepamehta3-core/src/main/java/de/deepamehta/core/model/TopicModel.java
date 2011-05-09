@@ -16,7 +16,7 @@ import java.util.Set;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class TopicData {
+public class TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -28,19 +28,19 @@ public class TopicData {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TopicData(String typeUri) {
+    public TopicModel(String typeUri) {
         this(null, null, typeUri);
     }
 
-    public TopicData(String typeUri, Composite composite) {
+    public TopicModel(String typeUri, Composite composite) {
         this(null, null, typeUri, composite);
     }
 
-    public TopicData(String uri, TopicValue value, String typeUri) {
+    public TopicModel(String uri, TopicValue value, String typeUri) {
         this(uri, value, typeUri, null);
     }
 
-    public TopicData(String uri, TopicValue value, String typeUri, Composite composite) {
+    public TopicModel(String uri, TopicValue value, String typeUri, Composite composite) {
         this(-1, uri, value, typeUri, composite);
     }
 
@@ -50,7 +50,7 @@ public class TopicData {
      * @param   typeUri     Mandatory. Note: only the internal meta type topic (ID 0) has no type URI (null).
      * @param   composite   If <code>null</code> an empty composite is set. This is OK.
      */
-    public TopicData(long id, String uri, TopicValue value, String typeUri, Composite composite) {
+    public TopicModel(long id, String uri, TopicValue value, String typeUri, Composite composite) {
         this.id = id;
         this.uri = uri != null ? uri : "";
         this.value = value != null ? value : new TopicValue("");
@@ -58,33 +58,33 @@ public class TopicData {
         this.composite = composite != null ? composite : new Composite();
     }
 
-    public TopicData(TopicData topicData) {
-        this(topicData.id, topicData.uri, topicData.value, topicData.typeUri, topicData.composite);
+    public TopicModel(TopicModel topicModel) {
+        this(topicModel.id, topicModel.uri, topicModel.value, topicModel.typeUri, topicModel.composite);
     }
 
-    public TopicData(Topic topic) {
+    public TopicModel(Topic topic) {
         this(topic.getId(), topic.getUri(), topic.getValue(), topic.getTypeUri(), topic.getComposite());
     }
 
-    public TopicData(JSONObject topicData) {
+    public TopicModel(JSONObject topicModel) {
         try {
-            this.id = topicData.optLong("id", -1);
-            this.uri = topicData.optString("uri");
-            this.value = new TopicValue(topicData.optString("value"));
-            this.typeUri = topicData.getString("type_uri");
-            if (topicData.has("composite")) {
-                this.composite = new Composite(topicData.getJSONObject("composite"));
+            this.id = topicModel.optLong("id", -1);
+            this.uri = topicModel.optString("uri");
+            this.value = new TopicValue(topicModel.optString("value"));
+            this.typeUri = topicModel.getString("type_uri");
+            if (topicModel.has("composite")) {
+                this.composite = new Composite(topicModel.getJSONObject("composite"));
             } else {
                 this.composite = new Composite();
             }
         } catch (Exception e) {
-            throw new RuntimeException("Parsing TopicData failed (JSONObject=" + topicData + ")", e);
+            throw new RuntimeException("Parsing TopicModel failed (JSONObject=" + topicModel + ")", e);
         }
     }
 
     // ---
 
-    protected TopicData() {
+    protected TopicModel() {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -137,35 +137,6 @@ public class TopicData {
         this.composite = comp;
     }
 
-    // === Traversal ===
-
-    public TopicValue getChildTopicValue(String assocDefUri) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
-    }
-
-    public void setChildTopicValue(String assocDefUri, TopicValue value) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
-    }
-
-    public Set<Topic> getRelatedTopics(String assocTypeUri) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
-    }
-
-    public Topic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                            String othersTopicTypeUri) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
-    }
-
-    public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                  String othersTopicTypeUri,
-                                                                                  boolean includeComposite) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
-    }
-
-    public Set<Association> getAssociations(String myRoleTypeUri) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
-    }
-
     // === Serialization ===
 
     public JSONObject toJSON() {
@@ -194,7 +165,7 @@ public class TopicData {
 
     @Override
     public boolean equals(Object o) {
-        return ((TopicData) o).id == id;
+        return ((TopicModel) o).id == id;
     }
 
     @Override
@@ -204,7 +175,7 @@ public class TopicData {
 
     @Override
     public String toString() {
-        return "topic data (id=" + id + ", uri=\"" + uri + "\", value=" + value +
+        return "topic model (id=" + id + ", uri=\"" + uri + "\", value=" + value +
             ", typeUri=\"" + typeUri + "\", composite=" + composite + ")";
     }
 }

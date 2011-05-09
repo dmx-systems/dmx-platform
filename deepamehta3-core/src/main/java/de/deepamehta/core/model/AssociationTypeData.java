@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class AssociationTypeData extends TopicData {
+public class AssociationTypeData extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

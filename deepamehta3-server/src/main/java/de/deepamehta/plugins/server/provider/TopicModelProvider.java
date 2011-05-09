@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.server.provider;
 
-import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.JSONHelper;
 import de.deepamehta.core.util.UploadedFile;
@@ -33,7 +33,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class TopicDataProvider implements MessageBodyReader<TopicData> {
+public class TopicModelProvider implements MessageBodyReader<TopicModel> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -54,18 +54,18 @@ public class TopicDataProvider implements MessageBodyReader<TopicData> {
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
-        return type == TopicData.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
+        return type == TopicModel.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Override
-    public TopicData readFrom(Class<TopicData> type, Type genericType, Annotation[] annotations,
+    public TopicModel readFrom(Class<TopicModel> type, Type genericType, Annotation[] annotations,
             MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
                                                                 throws IOException, WebApplicationException {
         try {
             String json = JavaUtils.readText(entityStream);
-            return new TopicData(new JSONObject(json));
+            return new TopicModel(new JSONObject(json));
         } catch (Exception e) {
-            throw new IOException("Creating TopicData from message body failed", e);
+            throw new IOException("Creating TopicModel from message body failed", e);
         }
     }
 }

@@ -7,7 +7,7 @@ import de.deepamehta.core.model.AssociationRole;
 import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.Topic;
-import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
@@ -152,10 +152,10 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     }
 
     @Override
-    public Topic createTopic(TopicData topicData) {
-        String uri = topicData.getUri();
-        TopicValue value = topicData.getValue();
-        String typeUri = topicData.getTypeUri();
+    public Topic createTopic(TopicModel topicModel) {
+        String uri = topicModel.getUri();
+        TopicValue value = topicModel.getValue();
+        String typeUri = topicModel.getTypeUri();
         // 1) check uniqueness
         checkUniqueness(uri);
         // 2) create node

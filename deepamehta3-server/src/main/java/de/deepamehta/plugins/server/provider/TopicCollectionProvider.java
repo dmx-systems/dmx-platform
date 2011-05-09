@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.server.provider;
 
 import de.deepamehta.core.model.Topic;
-import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicModel;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class TopicCollectionProvider implements MessageBodyWriter<Collection<Top
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            TopicData.topicsToJSON(topics).write(writer);
+            TopicModel.topicsToJSON(topics).write(writer);
             writer.flush();
         } catch (Exception e) {
             throw new IOException("Writing message body failed (" + topics + ")", e);

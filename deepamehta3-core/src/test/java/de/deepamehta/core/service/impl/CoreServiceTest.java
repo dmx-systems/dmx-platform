@@ -2,7 +2,7 @@ package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.Topic;
-import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.TopicType;
 
@@ -22,7 +22,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void getTopicType() {
         TopicType topicType = dms.getTopicType("dm3.core.plugin", null);  // clientContext=null
         logger.info(topicType.toString());
-        assertTrue(topicType.toString().matches("topic type data \\(id=\\d+, uri=\"dm3.core.plugin\", value=Plugin, " +
+        assertTrue(topicType.toString().matches("topic type model \\(id=\\d+, uri=\"dm3.core.plugin\", value=Plugin, " +
             "typeUri=\"dm3.core.topic_type\", dataTypeUri=\"dm3.core.composite\", indexModes=\\[\\], assocDefs=" +
             "\\{dm3.core.plugin_migration_nr=\n    association definition \\(id=\\d+, uri=\"dm3.core.plugin_" +
             "migration_nr\", assocTypeUri=\"dm3.core.composition\"\\)\n        pos 1: \\(type=\"dm3.core.plugin\", " +
@@ -34,7 +34,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void createWithoutComposite() {
-        Topic topic = dms.createTopic(new TopicData("de.deepamehta.3-notes", new TopicValue("DeepaMehta 3 Notes"),
+        Topic topic = dms.createTopic(new TopicModel("de.deepamehta.3-notes", new TopicValue("DeepaMehta 3 Notes"),
             "dm3.core.plugin", null), null);    // composite=null, clientContext=null
         //
         topic.setChildTopicValue("dm3.core.plugin_migration_nr", new TopicValue(23));
@@ -50,7 +50,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void createWithComposite() {
-        Topic topic = dms.createTopic(new TopicData("de.deepamehta.3-notes", new TopicValue("DeepaMehta 3 Notes"),
+        Topic topic = dms.createTopic(new TopicModel("de.deepamehta.3-notes", new TopicValue("DeepaMehta 3 Notes"),
             "dm3.core.plugin", new Composite("{dm3.core.plugin_migration_nr: 23}")), null);
         //
         int nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();

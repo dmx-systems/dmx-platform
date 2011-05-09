@@ -8,7 +8,7 @@ import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
-import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.JSONHelper;
@@ -206,7 +206,7 @@ public class Plugin implements BundleActivator {
 
     // ---
 
-    public void preCreateHook(TopicData topicData, ClientContext clientContext) {
+    public void preCreateHook(TopicModel topicModel, ClientContext clientContext) {
     }
 
     public void postCreateHook(Topic topic, ClientContext clientContext) {
@@ -544,7 +544,7 @@ public class Plugin implements BundleActivator {
             return false;
         } else {
             logger.info("Creating topic for " + this + " -- this is a plugin clean install");
-            pluginTopic = dms.createTopic(new TopicData(pluginId, new TopicValue(pluginName), "dm3.core.plugin",
+            pluginTopic = dms.createTopic(new TopicModel(pluginId, new TopicValue(pluginName), "dm3.core.plugin",
                 new Composite("{dm3.core.plugin_migration_nr: 0}")), null);     // FIXME: clientContext=null
             return true;
         }

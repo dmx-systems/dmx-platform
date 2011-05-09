@@ -2,8 +2,9 @@ package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.Topic;
-import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicValue;
+import de.deepamehta.core.model.impl.TopicBase;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * A topic that is attached to the {@link CoreService}.
  */
-class AttachedTopic extends TopicData implements Topic {
+class AttachedTopic extends TopicBase {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -25,7 +26,7 @@ class AttachedTopic extends TopicData implements Topic {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedTopic(Topic topic, EmbeddedService dms) {
-        super(topic);
+        super(new TopicModel(topic));
         this.dms = dms;
     }
 

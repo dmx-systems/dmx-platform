@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class MetaTypeData extends TopicData {
+public class MetaTypeData extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

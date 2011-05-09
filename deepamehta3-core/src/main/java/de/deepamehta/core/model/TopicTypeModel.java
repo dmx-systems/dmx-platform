@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class TopicTypeModel extends TopicData {
+public class TopicTypeModel extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -148,7 +148,7 @@ public class TopicTypeModel extends TopicData {
 
     @Override
     public String toString() {
-        return "topic type data (id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
+        return "topic type model (id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + dataTypeUri + "\", indexModes=" + indexModes + ", assocDefs=" + assocDefs +
             ",\ntopic type " + viewConfig + ")";
     }

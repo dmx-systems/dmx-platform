@@ -6,7 +6,7 @@ import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.AssociationRole;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.Topic;
-import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeModel;
@@ -416,7 +416,7 @@ class AttachedTopicType implements TopicType {
 
     // FIXME: to be called from setViewConfig()
     private void storeViewConfig() {
-        for (TopicData configTopic : getViewConfig().getConfigTopics()) {
+        for (TopicModel configTopic : getViewConfig().getConfigTopics()) {
             Topic topic = dms.createTopic(configTopic, null);           // FIXME: clientContext=null
             AssociationData assocData = new AssociationData("dm3.core.association");
             assocData.addTopicRole(new TopicRole(getUri(),  "dm3.core.topic_type"));
@@ -426,7 +426,7 @@ class AttachedTopicType implements TopicType {
     }
 
     private void storeViewConfig(Association assocDef, ViewConfiguration viewConfig) {
-        for (TopicData configTopic : viewConfig.getConfigTopics()) {
+        for (TopicModel configTopic : viewConfig.getConfigTopics()) {
             Topic topic = dms.createTopic(configTopic, null);           // FIXME: clientContext=null
             assocDef.addTopicRole(new TopicRole(topic.getId(), "dm3.core.view_config"));
         }

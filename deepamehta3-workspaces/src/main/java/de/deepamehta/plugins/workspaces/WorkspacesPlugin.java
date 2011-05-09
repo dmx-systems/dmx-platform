@@ -6,7 +6,7 @@ import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.Topic;
-import de.deepamehta.core.model.TopicData;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.service.Plugin;
@@ -114,7 +114,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     public Topic createWorkspace(String name) {
         logger.info("Creating workspace \"" + name + "\"");
         Composite comp = new Composite("{dm3.workspaces.name: \"" + name + "\"}");
-        return dms.createTopic(new TopicData("dm3.workspaces.workspace", comp), null);  // clientContext=null
+        return dms.createTopic(new TopicModel("dm3.workspaces.workspace", comp), null);  // clientContext=null
     }
 
     @Override
