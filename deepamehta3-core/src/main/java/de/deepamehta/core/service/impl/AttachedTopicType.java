@@ -120,7 +120,18 @@ class AttachedTopicType implements TopicType {
     // ---
 
     @Override
-    public void fetch(String topicTypeUri) {
+    public JSONObject toJSON() {
+        return model.toJSON();
+    }
+
+    @Override
+    public String toString() {
+        return model.toString();
+    }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    void fetch(String topicTypeUri) {
         // Note: storage low-level call used here ### explain
         Topic typeTopic = dms.storage.getTopic("uri", new TopicValue(topicTypeUri));
         // error check
@@ -145,8 +156,7 @@ class AttachedTopicType implements TopicType {
         this.model = topicTypeModel;
     }
 
-    @Override
-    public void store() {
+    void store() {
         Topic topic = dms.storage.createTopic(model);
         dms.associateWithTopicType(topic);
         //
@@ -155,18 +165,6 @@ class AttachedTopicType implements TopicType {
         storeIndexModes();
         storeAssocDefs();
         storeViewConfig();
-    }
-
-    // ---
-
-    @Override
-    public JSONObject toJSON() {
-        return model.toJSON();
-    }
-
-    @Override
-    public String toString() {
-        return model.toString();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

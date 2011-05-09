@@ -21,7 +21,7 @@ class TypeCache {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Map<String, TopicType> cache = new HashMap();   // key: topic type URI
+    private Map<String, AttachedTopicType> cache = new HashMap();   // key: topic type URI
     private EmbeddedService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -35,7 +35,7 @@ class TypeCache {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     TopicType get(String topicTypeUri) {
-        TopicType topicType = cache.get(topicTypeUri);
+        AttachedTopicType topicType = cache.get(topicTypeUri);
         if (topicType == null) {
             // fetch topic type
             logger.info("Loading topic type \"" + topicTypeUri + "\"");
@@ -57,7 +57,7 @@ class TypeCache {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void put(TopicType topicType) {
+    private void put(AttachedTopicType topicType) {
         cache.put(topicType.getUri(), topicType);
     }
 }

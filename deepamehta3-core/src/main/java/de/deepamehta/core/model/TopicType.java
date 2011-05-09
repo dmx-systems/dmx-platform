@@ -45,11 +45,5 @@ public interface TopicType {
 
     // ---
 
-    void fetch(String topicTypeUri);
-
-    void store();
-
-    // ---
-
     JSONObject toJSON();
 }

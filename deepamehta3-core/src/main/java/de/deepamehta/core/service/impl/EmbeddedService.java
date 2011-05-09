@@ -573,7 +573,7 @@ public class EmbeddedService implements CoreService {
                                      @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            TopicType topicType = new AttachedTopicType(topicTypeModel, this);
+            AttachedTopicType topicType = new AttachedTopicType(topicTypeModel, this);
             topicType.store();
             //
             // Note: the modification must be applied *before* the enrichment.
