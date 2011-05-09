@@ -141,7 +141,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     public Set<Topic> getWorkspaces(long typeId) {
         Topic typeTopic = dms.getTopic(typeId, null);   // clientContext=null
         return typeTopic.getRelatedTopics(WORKSPACE_TYPE, "dm3.core.part", "dm3.core.whole", "dm3.workspaces.workspace",
-            false);     // includeComposite=false
+            false);     // fetchComposite=false
     }
 
 

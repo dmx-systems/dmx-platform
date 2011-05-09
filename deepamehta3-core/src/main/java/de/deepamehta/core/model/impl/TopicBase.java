@@ -115,7 +115,7 @@ public class TopicBase implements Topic {
     @Override
     public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                   String othersTopicTypeUri,
-                                                                                  boolean includeComposite) {
+                                                                                  boolean fetchComposite) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 

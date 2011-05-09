@@ -236,7 +236,7 @@ public class EmbeddedService implements CoreService {
         try {
             long typeId = getTopicType(typeUri, null).getId();
             Set<Topic> topics = getRelatedTopics(typeId, "dm3.core.instantiation", "dm3.core.type", "dm3.core.instance",
-                null, false);   // othersTopicTypeUri=null, includeComposite=false
+                null, false);   // othersTopicTypeUri=null, fetchComposite=false
             /*
             for (Topic topic : topics) {
                 triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, topic);
@@ -336,7 +336,7 @@ public class EmbeddedService implements CoreService {
             associateWithTopicType(topic);
             //
             if (getTopicType(topic).getDataTypeUri().equals("dm3.core.composite")) {
-                storeComposite(topic, topicModel.getComposite());
+                topic.setComposite(topicModel.getComposite());
             } else {
                 indexTopicValue(topic, topic.getValue(), null); // oldValue=null (just created topics have no old value)
             }
@@ -367,7 +367,7 @@ public class EmbeddedService implements CoreService {
             //
             // ### storage.setTopicProperties(id, properties);
             if (getTopicType(topic).getDataTypeUri().equals("dm3.core.composite")) {
-                storeComposite(topic, topicModel.getComposite());
+                topic.setComposite(topicModel.getComposite());
             } else {
                 setTopicValue(topic, topicModel.getValue());
             }
@@ -827,52 +827,6 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    TopicValue getChildTopicValue(Topic parentTopic, String assocDefUri) {
-        Topic childTopic = new ChildTopicEvaluator(parentTopic, assocDefUri).getChildTopic();
-        if (childTopic != null) {
-            return childTopic.getValue();
-        }
-        return null;
-    }
-
-    /**
-     * Set a child's topic value. If the child topic does not exist it is created.
-     *
-     * @param   parentTopic     The parent topic.
-     * @param   assocDefUri     The "axis" that leads to the child. The URI of an {@link AssociationDefinition}.
-     * @param   value           The value to set. If <code>null</code> nothing is set. The child topic is potentially
-     *                          created and returned anyway.
-     *
-     * @return  The child topic.
-     */
-    Topic setChildTopicValue(final Topic parentTopic, String assocDefUri, final TopicValue value) {
-        try {
-            return new ChildTopicEvaluator(parentTopic, assocDefUri) {
-                @Override
-                void evaluate(Topic childTopic, AssociationDefinition assocDef) {
-                    if (childTopic != null) {
-                        if (value != null) {
-                            childTopic.setValue(value);
-                        }
-                    } else {
-                        // create child topic
-                        String topicTypeUri = assocDef.getTopicTypeUri2();
-                        childTopic = createTopic(new TopicModel(null, value, topicTypeUri, null), null);
-                        setChildTopic(childTopic);
-                        // associate child topic
-                        AssociationData assocData = new AssociationData(assocDef.getAssocTypeUri());
-                        assocData.addTopicRole(new TopicRole(parentTopic.getId(), assocDef.getRoleTypeUri1()));
-                        assocData.addTopicRole(new TopicRole(childTopic.getId(), assocDef.getRoleTypeUri2()));
-                        createAssociation(assocData, null);     // FIXME: clientContext=null
-                    }
-                }
-            }.getChildTopic();
-        } catch (Exception e) {
-            throw new RuntimeException("Setting child topic value failed (parentTopic=" + parentTopic +
-                ", assocDefUri=\"" + assocDefUri + "\", value=" + value + ")", e);
-        }
-    }
-
     @GET
     @Path("/topic/{id}/related_topics")
     public Set<Topic> getRelatedTopics(@PathParam("id") long topicId,
@@ -902,9 +856,9 @@ public class EmbeddedService implements CoreService {
 
     Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                          String othersTopicTypeUri,
-                                                                                         boolean includeComposite) {
+                                                                                         boolean fetchComposite) {
         return buildTopics(storage.getRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri), includeComposite);
+            othersTopicTypeUri), fetchComposite);
     }
 
     Set<Association> getAssociations(long topicId, String myRoleTypeUri) {
@@ -951,28 +905,30 @@ public class EmbeddedService implements CoreService {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     /**
-     * Attaches this service to a topic retrieved from storage layer.
+     * Attaches this core service to a topic retrieved from storage layer.
      *
      * @return  Instance of {@link AttachedTopic}.
      */
-    private Topic buildTopic(Topic topic, boolean includeComposite) {
+    private Topic buildTopic(Topic topic, boolean fetchComposite) {
         if (topic == null) {
             throw new IllegalArgumentException("Tried to build an AttachedTopic from a null Topic");
         }
-        // set composite
-        if (includeComposite) {
-            if (getTopicType(topic).getDataTypeUri().equals("dm3.core.composite")) {
-                topic.setComposite(fetchComposite(topic));
+        // attach core service
+        AttachedTopic attachedTopic = new AttachedTopic(topic, this);
+        // fetch composite
+        if (fetchComposite) {
+            if (getTopicType(attachedTopic).getDataTypeUri().equals("dm3.core.composite")) {
+                attachedTopic.fetchComposite();
             }
         }
         //
-        return new AttachedTopic(topic, this);
+        return attachedTopic;
     }
 
-    private Set<Topic> buildTopics(Set<Topic> topics, boolean includeComposite) {
+    private Set<Topic> buildTopics(Set<Topic> topics, boolean fetchComposite) {
         Set<Topic> attachedTopics = new LinkedHashSet();
         for (Topic topic : topics) {
-            attachedTopics.add(buildTopic(topic, includeComposite));
+            attachedTopics.add(buildTopic(topic, fetchComposite));
         }
         return attachedTopics;
     }
@@ -996,94 +952,6 @@ public class EmbeddedService implements CoreService {
 
     private TopicType getTopicType(Topic topic) {
         return getTopicType(topic.getTypeUri(), null);                       // FIXME: clientContext=null
-    }
-
-    // ---
-
-    private void storeComposite(Topic topic, Composite comp) {
-        Iterator<String> i = comp.keys();
-        while (i.hasNext()) {
-            String assocDefUri = i.next();
-            Object value = comp.get(assocDefUri);
-            if (value instanceof Composite) {
-                Topic childTopic = setChildTopicValue(topic, assocDefUri, null);
-                storeComposite(childTopic, (Composite) value);
-            } else {
-                setChildTopicValue(topic, assocDefUri, new TopicValue(value));
-            }
-        }
-        //
-        String label = comp.getLabel();
-        if (label != null) {
-            topic.setValue(label);
-        }
-    }
-
-    private Composite fetchComposite(Topic topic) {
-        Composite comp = new Composite();
-        for (AssociationDefinition assocDef : getTopicType(topic).getAssocDefs().values()) {
-            String assocDefUri = assocDef.getUri();
-            TopicType topicType2 = getTopicType(assocDef.getTopicTypeUri2(), null);   // FIXME: clientContext=null
-            if (topicType2.getDataTypeUri().equals("dm3.core.composite")) {
-                Topic childTopic = new ChildTopicEvaluator(topic, assocDefUri).getChildTopic();
-                if (childTopic != null) {
-                    comp.put(assocDefUri, fetchComposite(childTopic));
-                }
-            } else {
-                TopicValue value = getChildTopicValue(topic, assocDefUri);
-                if (value != null) {
-                    comp.put(assocDefUri, value.value());
-                }
-            }
-        }
-        return comp;
-    }
-
-    private class ChildTopicEvaluator {
-
-        private Topic childTopic;   // is attached
-        private AssociationDefinition assocDef;
-
-        // ---
-
-        /**
-         * @param   parentTopic     Hint: only the topic ID and type URI are evaluated
-         */
-        private ChildTopicEvaluator(Topic parentTopic, String assocDefUri) {
-            getChildTopic(parentTopic, assocDefUri);
-            evaluate(childTopic, assocDef);
-        }
-
-        // ---
-
-        /**
-         * Note: if the caller uses evaluate() to create a missing child topic
-         * he must not forget to call setChildTopic().
-         */
-        void evaluate(Topic childTopic, AssociationDefinition assocDef) {
-        }
-
-        // ---
-
-        Topic getChildTopic() {
-            return childTopic;
-        }
-
-        void setChildTopic(Topic childTopic) {
-            this.childTopic = childTopic;
-        }
-
-        // ---
-
-        private void getChildTopic(Topic parentTopic, String assocDefUri) {
-            this.assocDef = getTopicType(parentTopic).getAssocDef(assocDefUri);
-            String assocTypeUri = assocDef.getAssocTypeUri();
-            String roleTypeUri1 = assocDef.getRoleTypeUri1();
-            String roleTypeUri2 = assocDef.getRoleTypeUri2();
-            //
-            this.childTopic = getRelatedTopic(parentTopic.getId(), assocTypeUri, roleTypeUri1, roleTypeUri2,
-                assocDefUri);
-        }
     }
 
 

@@ -53,6 +53,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic topic = dms.createTopic(new TopicModel("de.deepamehta.3-notes", new TopicValue("DeepaMehta 3 Notes"),
             "dm3.core.plugin", new Composite("{dm3.core.plugin_migration_nr: 23}")), null);
         //
+        assertTrue(topic.getComposite().has("dm3.core.plugin_migration_nr"));
+        //
         int nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
         assertEquals(23, nr);
         //

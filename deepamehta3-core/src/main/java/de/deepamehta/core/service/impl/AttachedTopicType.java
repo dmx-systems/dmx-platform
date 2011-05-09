@@ -210,7 +210,7 @@ class AttachedTopicType implements TopicType {
         try {
             // Note: storage low-level call used here
             // Note: the type topic is not attached to the service
-            // ### should dms.getRelatedTopic() get a "includeComposite" parameter?
+            // ### should dms.getRelatedTopic() get a "fetchComposite" parameter?
             List<Long> sequenceIds = new ArrayList();
             Association assocDef = dms.storage.getTopicRelatedAssociation(typeTopic.getId(), "dm3.core.association",
                                                                "dm3.core.topic_type", "dm3.core.first_assoc_def");
@@ -248,7 +248,7 @@ class AttachedTopicType implements TopicType {
         try {
             // Note: storage low-level call used here
             // Note: the type topic is not attached to the service
-            // ### should dms.getRelatedTopic() get a "includeComposite" parameter?
+            // ### should dms.getRelatedTopic() get a "fetchComposite" parameter?
             Topic dataType = dms.storage.getRelatedTopic(typeTopic.getId(), "dm3.core.association",
                 "dm3.core.topic_type", "dm3.core.data_type", "dm3.core.data_type");
             if (dataType == null) {
