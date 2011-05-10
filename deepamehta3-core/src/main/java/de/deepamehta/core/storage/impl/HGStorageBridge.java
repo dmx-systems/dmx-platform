@@ -429,7 +429,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
      */
     private void checkUniqueness(String uri) {
         if (!uri.equals("") && lookupHyperNode(uri) != null) {
-            throw new RuntimeException("Topic with URI \"" + uri + "\" exists already");
+            throw new RuntimeException("Topic URI \"" + uri + "\" is not unique");
         }
     }
 

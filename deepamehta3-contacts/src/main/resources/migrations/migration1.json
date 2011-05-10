@@ -1,23 +1,43 @@
 {
     topic_types: [
 
-        ### Person Name & Institution Name ###
+        ### Person Name ###
 
         {
-            value: "First",
+            value: "First Name",
             uri: "dm3.contacts.first_name",
             data_type_uri: "dm3.core.text",
             index_mode_uris: ["dm3.core.fulltext"]
         },
         {
-            value: "Last",
+            value: "Last Name",
             uri: "dm3.contacts.last_name",
             data_type_uri: "dm3.core.text",
             index_mode_uris: ["dm3.core.fulltext"]
         },
         {
-            value: "Name",
-            uri: "dm3.contacts.name",
+            value: "Person Name",
+            uri: "dm3.contacts.person_name",
+            data_type_uri: "dm3.core.composite",
+            assoc_defs: [
+                {
+                    topic_type_uri_2:  "dm3.contacts.first_name",
+                    cardinality_uri_2: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition"
+                },
+                {
+                    topic_type_uri_2:  "dm3.contacts.last_name",
+                    cardinality_uri_2: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition"
+                }
+            ]
+        },
+
+        ### Institution Name ###
+
+        {
+            value: "Institution Name",
+            uri: "dm3.contacts.institution_name",
             data_type_uri: "dm3.core.text",
             index_mode_uris: ["dm3.core.fulltext"]
         },
@@ -127,6 +147,30 @@
             ]
         },
 
+        {
+            value: "Label",
+            uri: "dm3.contacts.address_label",
+            data_type_uri: "dm3.core.text"
+        },
+        {
+            value: "Address Entry",
+            uri: "dm3.contacts.address_entry",
+            data_type_uri: "dm3.core.composite",
+            assoc_defs: [
+                {
+                    topic_type_uri_2:  "dm3.contacts.address_label",
+                    cardinality_uri_2: "dm3.core.one",
+                    cardinality_uri_1: "dm3.core.many",
+                    assoc_type_uri:    "dm3.core.aggregation"
+                },
+                {
+                    topic_type_uri_2:  "dm3.contacts.address",
+                    cardinality_uri_2: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition"
+                }
+            ]
+        },
+
         ### Notes ###
 
         {
@@ -144,12 +188,7 @@
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
-                    topic_type_uri_2:  "dm3.contacts.first_name",
-                    cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition"
-                },
-                {
-                    topic_type_uri_2:  "dm3.contacts.last_name",
+                    topic_type_uri_2:  "dm3.contacts.person_name",
                     cardinality_uri_2: "dm3.core.one",
                     assoc_type_uri:    "dm3.core.composition"
                 },
@@ -170,7 +209,7 @@
                     assoc_type_uri:    "dm3.core.aggregation"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.address",
+                    topic_type_uri_2:  "dm3.contacts.address_entry",
                     cardinality_uri_2: "dm3.core.many",
                     assoc_type_uri:    "dm3.core.composition"
                 },
@@ -200,7 +239,7 @@
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
-                    topic_type_uri_2:  "dm3.contacts.name",
+                    topic_type_uri_2:  "dm3.contacts.institution_name",
                     cardinality_uri_2: "dm3.core.one",
                     assoc_type_uri:    "dm3.core.composition"
                 },
@@ -221,7 +260,7 @@
                     assoc_type_uri:    "dm3.core.aggregation"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.address",
+                    topic_type_uri_2:  "dm3.contacts.address_entry",
                     cardinality_uri_2: "dm3.core.many",
                     assoc_type_uri:    "dm3.core.composition"
                 },
@@ -241,6 +280,50 @@
                     }
                 }
             ]
+        }
+    ],
+
+    topics: [
+
+        ### Phone Labels ###
+
+        {
+            value: "work",
+            uri: "dm3.contacts.work_phone",
+            type_uri: "dm3.contacts.phone_label"
+        },
+        {
+            value: "home",
+            uri: "dm3.contacts.home_phone",
+            type_uri: "dm3.contacts.phone_label"
+        },
+        {
+            value: "mobile",
+            uri: "dm3.contacts.mobile",
+            type_uri: "dm3.contacts.phone_label"
+        },
+        {
+            value: "work fax",
+            uri: "dm3.contacts.work_fax",
+            type_uri: "dm3.contacts.phone_label"
+        },
+        {
+            value: "home fax",
+            uri: "dm3.contacts.home_fax",
+            type_uri: "dm3.contacts.phone_label"
+        },
+
+        ### Address Labels ###
+
+        {
+            value: "work",
+            uri: "dm3.contacts.work_address",
+            type_uri: "dm3.contacts.address_label"
+        },
+        {
+            value: "home",
+            uri: "dm3.contacts.home_address",
+            type_uri: "dm3.contacts.address_label"
         }
     ]
 }
