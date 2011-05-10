@@ -1,6 +1,7 @@
 package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Composite;
+import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicValue;
@@ -34,33 +35,53 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void createWithoutComposite() {
-        Topic topic = dms.createTopic(new TopicModel("de.deepamehta.3-notes", new TopicValue("DeepaMehta 3 Notes"),
-            "dm3.core.plugin", null), null);    // composite=null, clientContext=null
-        //
-        topic.setChildTopicValue("dm3.core.plugin_migration_nr", new TopicValue(23));
-        //
-        int nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
-        assertEquals(23, nr);
-        //
-        topic.setChildTopicValue("dm3.core.plugin_migration_nr", new TopicValue(42));
-        //
-        nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
-        assertEquals(42, nr);
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic topic = dms.createTopic(new TopicModel("de.deepamehta.3-notes", new TopicValue("DeepaMehta 3 Notes"),
+                "dm3.core.plugin", null), null);    // composite=null, clientContext=null
+            //
+            topic.setChildTopicValue("dm3.core.plugin_migration_nr", new TopicValue(23));
+            //
+            int nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
+            assertEquals(23, nr);
+            //
+            topic.setChildTopicValue("dm3.core.plugin_migration_nr", new TopicValue(42));
+            //
+            nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
+            assertEquals(42, nr);
+            //
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Test createWithoutComposite() failed", e);
+        } finally {
+            tx.finish();
+        }
     }
 
     @Test
     public void createWithComposite() {
-        Topic topic = dms.createTopic(new TopicModel("de.deepamehta.3-notes", new TopicValue("DeepaMehta 3 Notes"),
-            "dm3.core.plugin", new Composite("{dm3.core.plugin_migration_nr: 23}")), null);
-        //
-        assertTrue(topic.getComposite().has("dm3.core.plugin_migration_nr"));
-        //
-        int nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
-        assertEquals(23, nr);
-        //
-        topic.setChildTopicValue("dm3.core.plugin_migration_nr", new TopicValue(42));
-        //
-        nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
-        assertEquals(42, nr);
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic topic = dms.createTopic(new TopicModel("de.deepamehta.3-notes", new TopicValue("DeepaMehta 3 Notes"),
+                "dm3.core.plugin", new Composite("{dm3.core.plugin_migration_nr: 23}")), null);
+            //
+            assertTrue(topic.getComposite().has("dm3.core.plugin_migration_nr"));
+            //
+            int nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
+            assertEquals(23, nr);
+            //
+            topic.setChildTopicValue("dm3.core.plugin_migration_nr", new TopicValue(42));
+            //
+            nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
+            assertEquals(42, nr);
+            //
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Test createWithComposite() failed", e);
+        } finally {
+            tx.finish();
+        }
     }
 }

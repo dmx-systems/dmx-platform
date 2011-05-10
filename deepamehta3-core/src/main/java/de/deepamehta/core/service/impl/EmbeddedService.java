@@ -10,7 +10,6 @@ import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.DeepaMehtaTransaction;
-import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.MetaTypeData;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.Topic;
@@ -25,7 +24,6 @@ import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
-import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.JSONHelper;
 
 import org.osgi.framework.Bundle;
@@ -338,7 +336,7 @@ public class EmbeddedService implements CoreService {
             if (getTopicType(topic).getDataTypeUri().equals("dm3.core.composite")) {
                 topic.setComposite(topicModel.getComposite());
             } else {
-                indexTopicValue(topic, topic.getValue(), null); // oldValue=null (just created topics have no old value)
+                topic.setValue(topicModel.getValue());
             }
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext);
@@ -361,19 +359,15 @@ public class EmbeddedService implements CoreService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             Topic topic = getTopic(topicModel.getId(), clientContext);
-            // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             //
+            // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
-            // ### storage.setTopicProperties(id, properties);
             if (getTopicType(topic).getDataTypeUri().equals("dm3.core.composite")) {
                 topic.setComposite(topicModel.getComposite());
             } else {
-                setTopicValue(topic, topicModel.getValue());
+                topic.setValue(topicModel.getValue());
             }
-            // FIXME: update topic in-memory and avoid re-fetch
-            topic = getTopic(topicModel.getId(), clientContext);
-            // ### topic.setProperties(properties);
             // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
             //
             tx.success();
@@ -813,20 +807,6 @@ public class EmbeddedService implements CoreService {
 
     // === Topic API Delegates ===
 
-    void setTopicValue(Topic topic, TopicValue value) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            TopicValue oldValue = storage.setTopicValue(topic.getId(), value);
-            indexTopicValue(topic, value, oldValue);
-            tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Setting topic value failed (" + topic + ", value=" + value + ")", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
     @GET
     @Path("/topic/{id}/related_topics")
     public Set<Topic> getRelatedTopics(@PathParam("id") long topicId,
@@ -909,7 +889,7 @@ public class EmbeddedService implements CoreService {
      *
      * @return  Instance of {@link AttachedTopic}.
      */
-    private Topic buildTopic(Topic topic, boolean fetchComposite) {
+    Topic buildTopic(Topic topic, boolean fetchComposite) {
         if (topic == null) {
             throw new IllegalArgumentException("Tried to build an AttachedTopic from a null Topic");
         }
@@ -957,27 +937,6 @@ public class EmbeddedService implements CoreService {
 
 
     // === Topic/Association Storage ===
-
-    /**
-     * @param   topic   Hint: only the topic ID and type URI are evaluated
-     */
-    private void indexTopicValue(Topic topic, TopicValue value, TopicValue oldValue) {
-        TopicType topicType = getTopicType(topic);
-        String indexKey = topicType.getUri();
-        // strip HTML tags before indexing
-        if (topicType.getDataTypeUri().equals("dm3.core.html")) {
-            value = new TopicValue(JavaUtils.stripHTML(value.toString()));
-            if (oldValue != null) {
-                oldValue = new TopicValue(JavaUtils.stripHTML(oldValue.toString()));
-            }
-        }
-        //
-        for (IndexMode indexMode : topicType.getIndexModes()) {
-            storage.indexTopicValue(topic.getId(), indexMode, indexKey, value, oldValue);
-        }
-    }
-
-    // ---
 
     void associateWithTopicType(Topic topic) {
         try {
@@ -1106,23 +1065,23 @@ public class EmbeddedService implements CoreService {
     private void setupBootstrapContent() {
         // Before topic types and asscociation types can be created the meta types must created
         // Note: storage low-level call used here ### explain
-        Topic topicType = storage.createTopic(new MetaTypeData("dm3.core.topic_type", "Topic Type"));
-        storage.createTopic(new MetaTypeData("dm3.core.assoc_type", "Association Type"));
+        Topic topicType = _createTopic(new MetaTypeData("dm3.core.topic_type", "Topic Type"));
+        _createTopic(new MetaTypeData("dm3.core.assoc_type", "Association Type"));
         // Create topic type "Data Type"
         // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
         // depends on the topic type "Data Type". To resolve this circle we use a low-level storage call here
         // and postpone the data type association.
-        Topic dataType = storage.createTopic(new TopicTypeModel("dm3.core.data_type", "Data Type", "dm3.core.text"));
+        Topic dataType = _createTopic(new TopicTypeModel("dm3.core.data_type", "Data Type", "dm3.core.text"));
         // Create data type "Text"
         // Note: storage low-level call used here ### explain
-        Topic text = storage.createTopic(new TopicModel("dm3.core.text", new TopicValue("Text"), "dm3.core.data_type"));
+        Topic text = _createTopic(new TopicModel("dm3.core.text", new TopicValue("Text"), "dm3.core.data_type"));
         //
-        storage.createTopic(new TopicModel("dm3.core.type", new TopicValue("Type"), "dm3.core.role_type"));
-        storage.createTopic(new TopicModel("dm3.core.instance", new TopicValue("Instance"), "dm3.core.role_type"));
+        _createTopic(new TopicModel("dm3.core.type", new TopicValue("Type"), "dm3.core.role_type"));
+        _createTopic(new TopicModel("dm3.core.instance", new TopicValue("Instance"), "dm3.core.role_type"));
         // Before data type topics can be associated we must create the association type "Association"
-        storage.createTopic(new AssociationTypeData("dm3.core.association", "Association"));
+        _createTopic(new AssociationTypeData("dm3.core.association", "Association"));
         //
-        storage.createTopic(new AssociationTypeData("dm3.core.instantiation", "Instantiation"));
+        _createTopic(new AssociationTypeData("dm3.core.instantiation", "Instantiation"));
         // Postponed data type association
         associateDataType("dm3.core.topic_type", "dm3.core.text");
         associateDataType("dm3.core.assoc_type", "dm3.core.text");
@@ -1131,6 +1090,12 @@ public class EmbeddedService implements CoreService {
         associateWithTopicType(topicType);
         associateWithTopicType(dataType);
         associateWithTopicType(text);
+    }
+
+    private Topic _createTopic(TopicModel topicModel) {
+        Topic topic = storage.createTopic(topicModel);
+        storage.setTopicValue(topic.getId(), topic.getValue());
+        return topic;
     }
 
 

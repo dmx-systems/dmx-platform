@@ -16,7 +16,7 @@ function RenderHelper() {
         $("#detail-panel").append($("<div>").addClass("field-name").text(name))
     }
 
-    this.input = function(topic, field) {
-        return $("<input>").attr({type: "text", "field-uri": field.uri, value: field.value})
+    this.input = function(field) {
+        return $("<input>").attr({type: "text", value: field.value})
     }
 }

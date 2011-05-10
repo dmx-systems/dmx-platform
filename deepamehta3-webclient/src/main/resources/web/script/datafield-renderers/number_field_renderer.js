@@ -8,7 +8,7 @@ function NumberFieldRenderer(topic, field, rel_topics) {
     }
 
     this.render_form_element = function() {
-        return dm3c.render.input(topic, field)
+        return dm3c.render.input(field)
     }
 
     this.read_form_value = function() {

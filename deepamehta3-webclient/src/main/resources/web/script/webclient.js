@@ -53,12 +53,12 @@ var dm3c = new function() {
      * @return  The topic as stored in the DB.
      */
     this.create_topic = function(type_uri, composite) {
-        var topic_data = {
+        var topic_model = {
             // Note: "uri", "value", and "composite" are optional
             type_uri: type_uri,
             composite: composite    // not serialized to request body if undefined
         }
-        var topic = dm3c.restc.create_topic(topic_data)
+        var topic = dm3c.restc.create_topic(topic_model)
         // trigger hook
         dm3c.trigger_hook("post_create_topic", topic)
         //
@@ -71,10 +71,10 @@ var dm3c = new function() {
      *
      * High-level utility method for plugin developers.
      */
-    this.update_topic = function(topic, topic_data) {
+    this.update_topic = function(topic, topic_model) {
         // 1) update DB
-        // alert("dm3c.update_topic(): topic_data=" + JSON.stringify(topic_data));
-        return dm3c.restc.update_topic(topic_data)
+        // alert("dm3c.update_topic(): topic_model=" + JSON.stringify(topic_model));
+        return dm3c.restc.update_topic(topic_model)
         // 2) update memory
         // ### var old_properties = {}
         // ### js.copy(topic.properties, old_properties)
@@ -408,6 +408,7 @@ var dm3c = new function() {
         var topic = dm3c.trigger_hook("custom_create_topic", type_uri)[0]
         if (!topic) {
             topic = dm3c.create_topic(type_uri)
+            // ### alert("topic created: " + JSON.stringify(topic))
         }
         // 2) update GUI
         dm3c.add_topic_to_canvas(topic, "edit", x, y)

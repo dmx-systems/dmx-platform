@@ -103,7 +103,9 @@ function PlainDocument() {
     this.process_form = function(topic) {
 
         // 1) update DB and memory
-        topic = dm3c.update_topic(topic, build_topic_data())
+        var topic_model = build_topic_model()
+        alert("topic model to update: " + JSON.stringify(topic_model))
+        topic = dm3c.update_topic(topic, topic_model)
         dm3c.trigger_hook("post_submit_form", topic)
         // 2) update GUI
         dm3c.canvas.update_topic(topic)
@@ -116,8 +118,8 @@ function PlainDocument() {
          *
          * @return  a topic data object
          */
-        function build_topic_data() {
-            var topic_data = {
+        function build_topic_model() {
+            var topic_model = {
                 id: topic.id,
                 uri: topic.uri,
                 type_uri: topic.type_uri
@@ -127,12 +129,12 @@ function PlainDocument() {
                 // Note: undefined form value is an error (means: field renderer returned no value).
                 // null is a valid form value (means: field renderer prevents the field from being updated).
                 if (form_value != null) {
-                    topic_data.value = form_value
+                    topic_model.value = form_value
                 }
             } else {
-                topic_data.composite = build_composite(fields)
+                topic_model.composite = build_composite(fields)
             }
-            return topic_data
+            return topic_model
         }
 
         function build_composite(fields) {
@@ -216,6 +218,8 @@ function PlainDocument() {
 
         this.uri = uri
         this.value = value || ""
+        this.topic_type = topic_type
+        this.assoc_def = assoc_def
         this.label = topic_type.value
         this.editable         = get_view_config("editable")
         this.viewable         = get_view_config("viewable")

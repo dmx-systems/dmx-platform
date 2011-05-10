@@ -168,8 +168,9 @@ class AttachedTopicType implements TopicType {
     }
 
     void store() {
-        Topic topic = dms.storage.createTopic(model);
+        Topic topic = dms.buildTopic(dms.storage.createTopic(model), false);
         dms.associateWithTopicType(topic);
+        topic.setValue(model.getValue());
         //
         String typeUri = getUri();
         dms.associateDataType(typeUri, getDataTypeUri());

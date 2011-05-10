@@ -4,12 +4,14 @@ import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.Composite;
+import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.impl.TopicBase;
+import de.deepamehta.core.util.JavaUtils;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,7 +45,7 @@ class AttachedTopic extends TopicBase {
         // update memory
         super.setValue(value);
         // update DB
-        dms.setTopicValue(this, value);
+        storeTopicValue(value);
     }
 
     // ---
@@ -139,6 +141,11 @@ class AttachedTopic extends TopicBase {
 
     // === Store ===
 
+    private void storeTopicValue(TopicValue value) {
+        TopicValue oldValue = dms.storage.setTopicValue(getId(), value);
+        indexTopicValue(value, oldValue);
+    }
+
     private void storeComposite(Topic topic, Composite comp) {
         Iterator<String> i = comp.keys();
         while (i.hasNext()) {
@@ -190,6 +197,25 @@ class AttachedTopic extends TopicBase {
         } catch (Exception e) {
             throw new RuntimeException("Setting child topic value failed (parentTopic=" + parentTopic +
                 ", assocDefUri=\"" + assocDefUri + "\", value=" + value + ")", e);
+        }
+    }
+
+    /**
+     * @param   topic   Hint: only the topic ID and type URI are evaluated
+     */
+    private void indexTopicValue(TopicValue value, TopicValue oldValue) {
+        TopicType topicType = getTopicType(this);
+        String indexKey = topicType.getUri();
+        // strip HTML tags before indexing
+        if (topicType.getDataTypeUri().equals("dm3.core.html")) {
+            value = new TopicValue(JavaUtils.stripHTML(value.toString()));
+            if (oldValue != null) {
+                oldValue = new TopicValue(JavaUtils.stripHTML(oldValue.toString()));
+            }
+        }
+        //
+        for (IndexMode indexMode : topicType.getIndexModes()) {
+            dms.storage.indexTopicValue(getId(), indexMode, indexKey, value, oldValue);
         }
     }
 
@@ -247,10 +273,7 @@ class AttachedTopic extends TopicBase {
     // ---
 
     private void updateTopicValue(Topic topic, Composite comp) {
-        String label = comp.getLabel();
-        if (label != null) {
-            topic.setValue(label);
-        }
+        topic.setValue(comp.getLabel());
     }
 
     // FIXME: copy in EmbeddedService

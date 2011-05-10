@@ -48,12 +48,12 @@ function RESTClient(core_service_uri) {
         return request("GET", "/topic?" + params.to_query_string())
     }
 
-    this.create_topic = function(topic_data) {
-        return request("POST", "/topic", topic_data)
+    this.create_topic = function(topic_model) {
+        return request("POST", "/topic", topic_model)
     }
 
-    this.update_topic = function(topic_data) {
-        return request("PUT", "/topic", topic_data)
+    this.update_topic = function(topic_model) {
+        return request("PUT", "/topic", topic_model)
     }
 
     this.delete_topic = function(id) {

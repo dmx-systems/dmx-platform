@@ -137,7 +137,7 @@ public class TopicBase implements Topic {
 
     @Override
     public boolean equals(Object o) {
-        return model.equals(o);
+        return ((TopicBase) o).model.equals(model);
     }
 
     @Override

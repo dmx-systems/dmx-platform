@@ -114,6 +114,12 @@ public interface DeepaMehtaStorage {
      */
     void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, TopicValue value, TopicValue oldValue);
 
+    /**
+     * @return  the created topic. Note:
+     *          - the topic URI   is initialzed and     persisted.
+     *          - the topic value is initialzed but not persisted.
+     *          - the type URI    is initialzed but not persisted.
+     */
     Topic createTopic(TopicModel topicModel);
 
     // void setTopicProperties(long id, Properties properties);

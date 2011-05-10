@@ -117,7 +117,7 @@ public class Composite {
             if (i.hasNext()) {
                 return getLabel(comp.get(i.next()));
             } else {
-                return null;
+                return "";
             }
         } else {
             return value.toString();

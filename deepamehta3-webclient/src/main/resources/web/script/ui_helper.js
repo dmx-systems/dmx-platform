@@ -205,7 +205,7 @@ function UIHelper() {
             }
 
             /**
-             * Returns the selected menu item.
+             * Returns the selected menu item (object with "value" and "label" properties).
              * If the menu has no items, undefined/null is returned.
              */
             this.get_selection = function() {

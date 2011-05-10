@@ -154,19 +154,15 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     @Override
     public Topic createTopic(TopicModel topicModel) {
         String uri = topicModel.getUri();
-        TopicValue value = topicModel.getValue();
-        String typeUri = topicModel.getTypeUri();
         // 1) check uniqueness
         checkUniqueness(uri);
         // 2) create node
         HyperNode node = hg.createHyperNode();
         node.setString("uri", uri);
-        node.setObject("value", value.value());
         // 3) index URI
         node.indexAttribute(HyperGraphIndexMode.KEY, "uri", uri, null);   // oldValue=null
-        // Note: indexing the topic value is up to the caller (the core service)
         //
-        return buildTopic(node.getId(), uri, value, typeUri);
+        return buildTopic(node.getId(), uri, topicModel.getValue(), topicModel.getTypeUri());
     }
 
     @Override
