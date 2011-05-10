@@ -391,7 +391,7 @@ public class Plugin implements BundleActivator {
             runPluginMigrations(isCleanInstall);
             if (isCleanInstall) {
                 postInstallPluginHook();  // trigger hook
-                // ### introduceTypesToPlugin();
+                introduceTypesToPlugin();
             }
             tx.success();
         } catch (Exception e) {
@@ -568,10 +568,14 @@ public class Plugin implements BundleActivator {
         }
     }
 
-    /* ### private void introduceTypesToPlugin() {
-        for (String typeUri : dms.getTopicTypeUris()) {
-            // trigger hook
-            modifyTopicTypeHook(dms.getTopicType(typeUri, null), null);   // clientContext=null
+    private void introduceTypesToPlugin() {
+        try {
+            for (String topicTypeUri : dms.getTopicTypeUris()) {
+                // trigger hook
+                modifyTopicTypeHook(dms.getTopicType(topicTypeUri, null), null);   // clientContext=null (2x)
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Introducing topic types to " + this + " failed", e);
         }
-    } */
+    }
 }

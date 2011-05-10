@@ -43,6 +43,10 @@ public class AssociationDefinition {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    public AssociationDefinition(String topicTypeUri1, String topicTypeUri2) {
+        this(-1, topicTypeUri1, topicTypeUri2);
+    }
+
     public AssociationDefinition(long id, String topicTypeUri1, String topicTypeUri2
                                           /* ### String roleTypeUri1, String roleTypeUri2 */) {
         this.id = id;
@@ -124,6 +128,10 @@ public class AssociationDefinition {
     }
 
     // ---
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public void setAssocTypeUri(String assocTypeUri) {
         this.assocTypeUri = assocTypeUri;
