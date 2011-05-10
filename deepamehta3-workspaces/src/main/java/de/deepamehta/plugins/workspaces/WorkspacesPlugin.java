@@ -26,7 +26,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
     private static final String DEFAULT_WORKSPACE_NAME = "Default";
 
-    // association type semantics
+    // association type semantics ### FIXME: to be dropped. Model-driven manipulators required.
     private static final String WORKSPACE_TOPIC = "dm3.core.aggregation";   // A topic assigned to a workspace.
     private static final String WORKSPACE_TYPE  = "dm3.core.aggregation";   // A type assigned to a workspace.
     private static final String ROLE_TYPE_TOPIC = "dm3.core.whole";
@@ -94,8 +94,8 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     }
 
     /**
-     * Adds "Workspaces" data field to all topic types.
-     */
+     * Adds a "Workspace" association to all topic types.
+     * FIXME: not ready for the prime time
     @Override
     public void modifyTopicTypeHook(TopicType topicType, ClientContext clientContext) {
         String topicTypeUri = topicType.getUri();
@@ -119,9 +119,8 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
         assocDef.setCardinalityUri2("dm3.core.many");
         assocDef.setViewConfig(new ViewConfiguration()); // FIXME: serialization fails if plugin developer forget to set
         //
-        // TopicType workspaceType = dms.getTopicType("dm3.workspaces.workspace", null);
         topicType.addAssocDef(assocDef);
-    }
+    } */
 
 
 
