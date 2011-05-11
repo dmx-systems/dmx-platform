@@ -159,13 +159,13 @@ public class EmbeddedService implements CoreService {
     @GET
     @Path("/topic/{id}")
     @Override
-    public Topic getTopic(@PathParam("id") long id, @HeaderParam("Cookie") ClientContext clientContext) {
+    public AttachedTopic getTopic(@PathParam("id") long id, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Topic topic = storage.getTopic(id);
+            AttachedTopic topic = buildTopic(storage.getTopic(id), true);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
             tx.success();
-            return buildTopic(topic, true);
+            return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Retrieving topic failed (id=" + id + ")", e);
@@ -325,19 +325,15 @@ public class EmbeddedService implements CoreService {
     @POST
     @Path("/topic")
     @Override
-    public Topic createTopic(TopicModel topicModel, @HeaderParam("Cookie") ClientContext clientContext) {
+    public AttachedTopic createTopic(TopicModel topicModel, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             triggerHook(Hook.PRE_CREATE_TOPIC, topicModel, clientContext);
             //
-            Topic topic = buildTopic(storage.createTopic(topicModel), false);
+            AttachedTopic topic = buildTopic(storage.createTopic(topicModel), false);
             associateWithTopicType(topic);
             //
-            if (getTopicType(topic).getDataTypeUri().equals("dm3.core.composite")) {
-                topic.setComposite(topicModel.getComposite());
-            } else {
-                topic.setValue(topicModel.getValue());
-            }
+            topic.update(topicModel);
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
@@ -358,16 +354,13 @@ public class EmbeddedService implements CoreService {
     public Topic updateTopic(TopicModel topicModel, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Topic topic = getTopic(topicModel.getId(), clientContext);
+            AttachedTopic topic = getTopic(topicModel.getId(), clientContext);
             //
             // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
-            if (getTopicType(topic).getDataTypeUri().equals("dm3.core.composite")) {
-                topic.setComposite(topicModel.getComposite());
-            } else {
-                topic.setValue(topicModel.getValue());
-            }
+            topic.update(topicModel);
+            //
             // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
             //
             tx.success();
@@ -827,13 +820,6 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                   String othersTopicTypeUri) {
-        Topic topic = storage.getRelatedTopic(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri);
-        return topic != null ? buildTopic(topic, true) : null;
-    }
-
     Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                          String othersTopicTypeUri,
                                                                                          boolean fetchComposite) {
@@ -889,7 +875,7 @@ public class EmbeddedService implements CoreService {
      *
      * @return  Instance of {@link AttachedTopic}.
      */
-    Topic buildTopic(Topic topic, boolean fetchComposite) {
+    AttachedTopic buildTopic(Topic topic, boolean fetchComposite) {
         if (topic == null) {
             throw new IllegalArgumentException("Tried to build an AttachedTopic from a null Topic");
         }
@@ -897,8 +883,8 @@ public class EmbeddedService implements CoreService {
         AttachedTopic attachedTopic = new AttachedTopic(topic, this);
         // fetch composite
         if (fetchComposite) {
-            if (getTopicType(attachedTopic).getDataTypeUri().equals("dm3.core.composite")) {
-                attachedTopic.fetchComposite();
+            if (attachedTopic.getTopicType().getDataTypeUri().equals("dm3.core.composite")) {
+                attachedTopic.loadComposite();
             }
         }
         //
@@ -926,12 +912,6 @@ public class EmbeddedService implements CoreService {
         }
         //
         return new AttachedAssociation(assoc, this);
-    }
-
-    // ---
-
-    private TopicType getTopicType(Topic topic) {
-        return getTopicType(topic.getTypeUri(), null);                       // FIXME: clientContext=null
     }
 
 

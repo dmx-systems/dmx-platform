@@ -40,6 +40,10 @@ class AttachedTopic extends TopicBase {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+
+
+    // === Topic Overrides ===
+
     @Override
     public void setValue(TopicValue value) {
         // update memory
@@ -55,18 +59,14 @@ class AttachedTopic extends TopicBase {
         // update memory
         super.setComposite(comp);
         // update DB
-        storeComposite(this, comp);
-    }
-
-    void fetchComposite() {
-        super.setComposite(fetchComposite(this));
+        storeComposite(comp);
     }
 
     // ---
 
     @Override
     public TopicValue getChildTopicValue(String assocDefUri) {
-        return fetchChildTopicValue(this, assocDefUri);
+        return fetchChildTopicValue(assocDefUri);
     }
 
     @Override
@@ -75,9 +75,9 @@ class AttachedTopic extends TopicBase {
         // update memory
         comp.put(assocDefUri, value.value());
         // update DB
-        storeChildTopicValue(this, assocDefUri, value);
+        storeChildTopicValue(assocDefUri, value);
         //
-        updateTopicValue(this, comp);
+        updateTopicValue(comp);
     }
 
     public Set<Topic> getRelatedTopics(String assocTypeUri) {
@@ -85,9 +85,11 @@ class AttachedTopic extends TopicBase {
     }
 
     @Override
-    public Topic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+    public AttachedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                             String othersTopicTypeUri) {
-        return dms.getRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+        Topic topic = dms.storage.getRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri);
+        return topic != null ? dms.buildTopic(topic, true) : null;
     }
 
     @Override
@@ -103,24 +105,48 @@ class AttachedTopic extends TopicBase {
         return dms.getAssociations(getId(), myRoleTypeUri);
     }
 
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    /**
+     * Called from {@link EmbeddedService#buildTopic}
+     */
+    void loadComposite() {
+        // fetch from DB
+        Composite comp = fetchComposite();
+        // update memory
+        super.setComposite(comp);
+    }
+
+    void update(TopicModel topicModel) {
+        if (getTopicType().getDataTypeUri().equals("dm3.core.composite")) {
+            setComposite(topicModel.getComposite());
+        } else {
+            setValue(topicModel.getValue());
+        }
+    }
+
+    TopicType getTopicType() {
+        return dms.getTopicType(getTypeUri(), null);      // FIXME: clientContext=null
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
 
 
     // === Fetch ===
 
-    private Composite fetchComposite(Topic topic) {
+    private Composite fetchComposite() {
         Composite comp = new Composite();
-        for (AssociationDefinition assocDef : getTopicType(topic).getAssocDefs().values()) {
+        for (AssociationDefinition assocDef : getTopicType().getAssocDefs().values()) {
             String assocDefUri = assocDef.getUri();
             TopicType topicType2 = dms.getTopicType(assocDef.getTopicTypeUri2(), null);   // FIXME: clientContext=null
             if (topicType2.getDataTypeUri().equals("dm3.core.composite")) {
-                Topic childTopic = new ChildTopicEvaluator(topic, assocDefUri).getChildTopic();
+                AttachedTopic childTopic = new ChildTopicEvaluator(assocDefUri).getChildTopic();
                 if (childTopic != null) {
-                    comp.put(assocDefUri, fetchComposite(childTopic));
+                    comp.put(assocDefUri, childTopic.fetchComposite());
                 }
             } else {
-                TopicValue value = fetchChildTopicValue(topic, assocDefUri);
+                TopicValue value = fetchChildTopicValue(assocDefUri);
                 if (value != null) {
                     comp.put(assocDefUri, value.value());
                 }
@@ -129,8 +155,8 @@ class AttachedTopic extends TopicBase {
         return comp;
     }
 
-    private TopicValue fetchChildTopicValue(Topic parentTopic, String assocDefUri) {
-        Topic childTopic = new ChildTopicEvaluator(parentTopic, assocDefUri).getChildTopic();
+    private TopicValue fetchChildTopicValue(String assocDefUri) {
+        Topic childTopic = new ChildTopicEvaluator(assocDefUri).getChildTopic();
         if (childTopic != null) {
             return childTopic.getValue();
         }
@@ -146,20 +172,20 @@ class AttachedTopic extends TopicBase {
         indexTopicValue(value, oldValue);
     }
 
-    private void storeComposite(Topic topic, Composite comp) {
+    private void storeComposite(Composite comp) {
         Iterator<String> i = comp.keys();
         while (i.hasNext()) {
             String assocDefUri = i.next();
             Object value = comp.get(assocDefUri);
             if (value instanceof Composite) {
-                Topic childTopic = storeChildTopicValue(topic, assocDefUri, null);
-                storeComposite(childTopic, (Composite) value);
+                AttachedTopic childTopic = storeChildTopicValue(assocDefUri, null);
+                childTopic.storeComposite((Composite) value);
             } else {
-                storeChildTopicValue(topic, assocDefUri, new TopicValue(value));
+                storeChildTopicValue(assocDefUri, new TopicValue(value));
             }
         }
         //
-        updateTopicValue(topic, comp);
+        updateTopicValue(comp);
     }
 
     /**
@@ -172,11 +198,11 @@ class AttachedTopic extends TopicBase {
      *
      * @return  The child topic.
      */
-    private Topic storeChildTopicValue(final Topic parentTopic, String assocDefUri, final TopicValue value) {
+    private AttachedTopic storeChildTopicValue(String assocDefUri, final TopicValue value) {
         try {
-            return new ChildTopicEvaluator(parentTopic, assocDefUri) {
+            return new ChildTopicEvaluator(assocDefUri) {
                 @Override
-                void evaluate(Topic childTopic, AssociationDefinition assocDef) {
+                void evaluate(AttachedTopic childTopic, AssociationDefinition assocDef) {
                     if (childTopic != null) {
                         if (value != null) {
                             childTopic.setValue(value);
@@ -188,14 +214,14 @@ class AttachedTopic extends TopicBase {
                         setChildTopic(childTopic);
                         // associate child topic
                         AssociationData assocData = new AssociationData(assocDef.getAssocTypeUri());
-                        assocData.addTopicRole(new TopicRole(parentTopic.getId(), assocDef.getRoleTypeUri1()));
+                        assocData.addTopicRole(new TopicRole(getId(), assocDef.getRoleTypeUri1()));
                         assocData.addTopicRole(new TopicRole(childTopic.getId(), assocDef.getRoleTypeUri2()));
                         dms.createAssociation(assocData, null);     // FIXME: clientContext=null
                     }
                 }
             }.getChildTopic();
         } catch (Exception e) {
-            throw new RuntimeException("Setting child topic value failed (parentTopic=" + parentTopic +
+            throw new RuntimeException("Setting child topic value failed (parentTopic=" + this +
                 ", assocDefUri=\"" + assocDefUri + "\", value=" + value + ")", e);
         }
     }
@@ -204,7 +230,7 @@ class AttachedTopic extends TopicBase {
      * @param   topic   Hint: only the topic ID and type URI are evaluated
      */
     private void indexTopicValue(TopicValue value, TopicValue oldValue) {
-        TopicType topicType = getTopicType(this);
+        TopicType topicType = getTopicType();
         String indexKey = topicType.getUri();
         // strip HTML tags before indexing
         if (topicType.getDataTypeUri().equals("dm3.core.html")) {
@@ -225,16 +251,13 @@ class AttachedTopic extends TopicBase {
 
     private class ChildTopicEvaluator {
 
-        private Topic childTopic;   // is attached
+        private AttachedTopic childTopic;
         private AssociationDefinition assocDef;
 
         // ---
 
-        /**
-         * @param   parentTopic     Hint: only the topic ID and type URI are evaluated
-         */
-        private ChildTopicEvaluator(Topic parentTopic, String assocDefUri) {
-            getChildTopic(parentTopic, assocDefUri);
+        private ChildTopicEvaluator(String assocDefUri) {
+            fetchChildTopic(assocDefUri);
             evaluate(childTopic, assocDef);
         }
 
@@ -244,40 +267,34 @@ class AttachedTopic extends TopicBase {
          * Note: if the caller uses evaluate() to create a missing child topic
          * he must not forget to call setChildTopic().
          */
-        void evaluate(Topic childTopic, AssociationDefinition assocDef) {
+        void evaluate(AttachedTopic childTopic, AssociationDefinition assocDef) {
         }
 
         // ---
 
-        Topic getChildTopic() {
+        AttachedTopic getChildTopic() {
             return childTopic;
         }
 
-        void setChildTopic(Topic childTopic) {
+        void setChildTopic(AttachedTopic childTopic) {
             this.childTopic = childTopic;
         }
 
         // ---
 
-        private void getChildTopic(Topic parentTopic, String assocDefUri) {
-            this.assocDef = getTopicType(parentTopic).getAssocDef(assocDefUri);
+        private void fetchChildTopic(String assocDefUri) {
+            this.assocDef = getTopicType().getAssocDef(assocDefUri);
             String assocTypeUri = assocDef.getAssocTypeUri();
             String roleTypeUri1 = assocDef.getRoleTypeUri1();
             String roleTypeUri2 = assocDef.getRoleTypeUri2();
             //
-            this.childTopic = dms.getRelatedTopic(parentTopic.getId(), assocTypeUri,
-                roleTypeUri1, roleTypeUri2, assocDefUri);
+            this.childTopic = getRelatedTopic(assocTypeUri, roleTypeUri1, roleTypeUri2, assocDefUri);
         }
     }
 
     // ---
 
-    private void updateTopicValue(Topic topic, Composite comp) {
-        topic.setValue(comp.getLabel());
-    }
-
-    // FIXME: copy in EmbeddedService
-    private TopicType getTopicType(Topic topic) {
-        return dms.getTopicType(topic.getTypeUri(), null);      // FIXME: clientContext=null
+    private void updateTopicValue(Composite comp) {
+        setValue(comp.getLabel());
     }
 }
