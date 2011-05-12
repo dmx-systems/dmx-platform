@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.workspaces.service;
 
+import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.service.PluginService;
 
@@ -23,5 +24,5 @@ public interface WorkspacesService extends PluginService {
      * retrieving the type itself. This in turn would involve determining its permissions ...
      * See AccessControlPlugin.userIsMember() ### still true?
      */
-    public Set<Topic> getWorkspaces(long typeId);
+    public Set<RelatedTopic> getWorkspaces(long typeId);
 }

@@ -5,6 +5,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +30,12 @@ public class ViewConfiguration {
     }
 
     public ViewConfiguration(Set<Topic> topics) {
+        for (Topic topic : topics) {
+            put(new TopicModel(topic));
+        }
+    }
+
+    public ViewConfiguration(Collection<RelatedTopic> topics) {
         for (Topic topic : topics) {
             put(new TopicModel(topic));
         }

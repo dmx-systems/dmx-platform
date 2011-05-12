@@ -4,6 +4,7 @@ import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.DeepaMehtaTransaction;
+import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
@@ -132,7 +133,8 @@ public class WebclientPlugin extends Plugin {
             if (isSearchableUnit(topic)) {
                 searchableUnits.add(topic);
             } else {
-                Set<Topic> parentTopics = topic.getRelatedTopics(null, "dm3.core.part", "dm3.core.whole", null, false);
+                Set<Topic> parentTopics = toTopicSet(topic.getRelatedTopics(null,
+                    "dm3.core.part", "dm3.core.whole", null, false));
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
                 } else {
@@ -183,6 +185,16 @@ public class WebclientPlugin extends Plugin {
      */
     private Object getViewConfig(TopicType topicType, String setting) {
         return topicType.getViewConfig("dm3.webclient.view_config", "dm3.webclient." + setting);
+    }
+
+    // ---
+
+    private Set<Topic> toTopicSet(Set<RelatedTopic> relTopics) {
+        Set<Topic> topics = new LinkedHashSet();
+        for (Topic topic : relTopics) {
+            topics.add(topic);
+        }
+        return topics;
     }
 
     // ---

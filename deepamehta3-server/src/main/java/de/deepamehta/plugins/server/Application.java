@@ -6,7 +6,7 @@ import de.deepamehta.plugins.server.provider.AssociationProvider;
 import de.deepamehta.plugins.server.provider.CommandParamsProvider;
 import de.deepamehta.plugins.server.provider.CommandResultProvider;
 import de.deepamehta.plugins.server.provider.PluginInfoProvider;
-import de.deepamehta.plugins.server.provider.RelatedTopicListProvider;
+import de.deepamehta.plugins.server.provider.RelatedTopicCollectionProvider;
 import de.deepamehta.plugins.server.provider.StringListProvider;
 import de.deepamehta.plugins.server.provider.StringSetProvider;
 import de.deepamehta.plugins.server.provider.TopicCollectionProvider;
@@ -33,7 +33,7 @@ public class Application extends javax.ws.rs.core.Application {
         classes.add(CommandParamsProvider.class);
         classes.add(CommandResultProvider.class);
         classes.add(PluginInfoProvider.class);
-        classes.add(RelatedTopicListProvider.class);
+        classes.add(RelatedTopicCollectionProvider.class);
         classes.add(StringListProvider.class);
         classes.add(StringSetProvider.class);
         classes.add(TopicCollectionProvider.class);

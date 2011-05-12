@@ -5,6 +5,7 @@ import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.AssociationRole;
 import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
@@ -66,10 +67,12 @@ public interface DeepaMehtaStorage {
 
     /**
      * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
      */
-    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri);
-
-    // ---
+    RelatedTopic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                          String othersTopicTypeUri);
 
     /**
      * @param   assocTypeUri        may be null
@@ -77,17 +80,9 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                   String othersTopicTypeUri);
-
-    /**
-     * @param   assocTypeUri        may be null
-     * @param   myRoleTypeUri       may be null
-     * @param   othersRoleTypeUri   may be null
-     * @param   othersTopicTypeUri  may be null
-     */
-    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                         String othersTopicTypeUri);
+    Set<RelatedTopic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                          String othersRoleTypeUri,
+                                                                          String othersTopicTypeUri);
 
     // ---
 

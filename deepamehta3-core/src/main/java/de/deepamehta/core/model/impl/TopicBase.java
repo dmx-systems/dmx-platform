@@ -2,6 +2,7 @@ package de.deepamehta.core.model.impl;
 
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.Composite;
+import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicValue;
@@ -102,7 +103,7 @@ public class TopicBase implements Topic {
     }
 
     @Override
-    public Set<Topic> getRelatedTopics(String assocTypeUri) {
+    public Set<RelatedTopic> getRelatedTopics(String assocTypeUri) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 
@@ -113,9 +114,9 @@ public class TopicBase implements Topic {
     }
 
     @Override
-    public Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                  String othersTopicTypeUri,
-                                                                                  boolean fetchComposite) {
+    public Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                         String othersTopicTypeUri,
+                                                                                         boolean fetchComposite) {
         throw new RuntimeException("Method not implemented (" + getClass() + ")");
     }
 
@@ -148,5 +149,16 @@ public class TopicBase implements Topic {
     @Override
     public String toString() {
         return model.toString();
+    }
+
+
+
+    // ----------------------------------------------------------------------------------------------- Protected Methods
+
+    // ### This is supposed to be protected, but doesn't compile!
+    // ### It is called from the subclasses constructors, on a differnt BaseTopic instance.
+    // ### See de.deepamehta.core.storage.impl.HGTopic and de.deepamehta.core.service.impl.AttachedTopic.
+    public TopicModel getModel() {
+        return model;
     }
 }

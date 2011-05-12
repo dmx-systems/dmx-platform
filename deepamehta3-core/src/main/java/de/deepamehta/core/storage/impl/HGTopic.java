@@ -12,6 +12,10 @@ class HGTopic extends TopicBase {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    HGTopic(Topic topic) {
+        super(((TopicBase) topic).getModel());
+    }
+
     HGTopic(long id, String uri, TopicValue value, String typeUri, Composite composite) {
         super(new TopicModel(id, uri, value, typeUri, composite));
     }

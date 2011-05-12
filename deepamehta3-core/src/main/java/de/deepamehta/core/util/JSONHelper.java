@@ -79,6 +79,18 @@ public class JSONHelper {
 
     // === DeepaMehta specific ===
 
+    public static JSONArray relatedTopicsToJson(Iterable<RelatedTopic> relTopics) {
+        JSONArray array = new JSONArray();
+        for (RelatedTopic relTopic : relTopics) {
+            // FIXME: for the moment it is sufficient to serialize the topics only.
+            // The respective associations are omitted.
+            array.put(relTopic.toJSON());
+        }
+        return array;
+    }
+
+    // ---
+
     /**
      * Creates types and topics from a JSON formatted input stream.
      *

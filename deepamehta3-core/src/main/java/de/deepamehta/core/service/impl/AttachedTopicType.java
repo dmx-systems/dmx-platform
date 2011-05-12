@@ -5,6 +5,7 @@ import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.AssociationRole;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
@@ -155,8 +156,8 @@ class AttachedTopicType implements TopicType {
         List<Long> sequenceIds = fetchSequenceIds(typeTopic);
         // sanity check
         if (assocDefs.size() != sequenceIds.size()) {
-            throw new RuntimeException("Graph inconsistency: there are " + assocDefs.size() + " association " +
-                "definitions but sequence length is " + sequenceIds.size());
+            throw new RuntimeException("Graph inconsistency: " + assocDefs.size() + " association " +
+                "definitions found but sequence length is " + sequenceIds.size());
         }
         // build topic type
         TopicTypeModel topicTypeModel = new TopicTypeModel(typeTopic, fetchDataTypeTopic(typeTopic).getUri(),
@@ -280,7 +281,7 @@ class AttachedTopicType implements TopicType {
     }
 
     private Set<IndexMode> fetchIndexModes(Topic typeTopic) {
-        Set<Topic> topics = dms.getRelatedTopics(typeTopic.getId(), "dm3.core.association",
+        Set<RelatedTopic> topics = dms.getRelatedTopics(typeTopic.getId(), "dm3.core.association",
             "dm3.core.topic_type", "dm3.core.index_mode", "dm3.core.index_mode", false);
         return IndexMode.fromTopics(topics);
     }
@@ -289,7 +290,7 @@ class AttachedTopicType implements TopicType {
 
     private ViewConfiguration fetchViewConfig(Topic typeTopic) {
         // Note: the type topic is not attached to the service
-        Set<Topic> topics = dms.getRelatedTopics(typeTopic.getId(), "dm3.core.association",
+        Set<RelatedTopic> topics = dms.getRelatedTopics(typeTopic.getId(), "dm3.core.association",
             "dm3.core.topic_type", "dm3.core.view_config", null, true);
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
         return new ViewConfiguration(topics);

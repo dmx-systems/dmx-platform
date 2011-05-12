@@ -6,6 +6,7 @@ import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.AssociationRole;
 import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
@@ -68,33 +69,27 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public Set<Topic> getRelatedTopics(long topicId, String assocTypeUri) {
-        return getRelatedTopics(topicId, assocTypeUri, null, null, null);
-    }
-
-    // ---
-
-    @Override
-    public Topic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                          String othersTopicTypeUri) {
-        Set<Topic> topics = getRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-                                                                                   othersTopicTypeUri);
-        switch (topics.size()) {
+    public RelatedTopic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                           String othersRoleTypeUri,
+                                                                           String othersTopicTypeUri) {
+        Set<RelatedTopic> relTopics = getRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+                                                                                             othersTopicTypeUri);
+        switch (relTopics.size()) {
         case 0:
             return null;
         case 1:
-            return topics.iterator().next();
+            return relTopics.iterator().next();
         default:
-            throw new RuntimeException("Ambiguity: there are " + topics.size() + " related topics " +
-                "(topicId=" + topicId + ", assocTypeUri=\"" + assocTypeUri +
-                "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\")");
+            throw new RuntimeException("Ambiguity: there are " + relTopics.size() + " related topics " + "(topicId=" +
+                topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
+                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
         }
     }
 
     @Override
-    public Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                          String othersRoleTypeUri,
-                                                                          String othersTopicTypeUri) {
+    public Set<RelatedTopic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                                 String othersRoleTypeUri,
+                                                                                 String othersTopicTypeUri) {
         Set<ConnectedHyperNode> nodes = hg.getHyperNode(topicId).getConnectedHyperNodes(myRoleTypeUri,
                                                                                         othersRoleTypeUri);
         if (othersTopicTypeUri != null) {
@@ -103,7 +98,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         if (assocTypeUri != null) {
             filterNodesByAssociationType(nodes, assocTypeUri);
         }
-        return buildTopics(nodes);
+        return buildRelatedTopics(nodes);
     }
 
     // ---
@@ -271,6 +266,10 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+
+
+    // === Build Topics from HyperNodes ===
+
     private Topic buildTopic(HyperNode node) {
         if (node == null) {
             throw new IllegalArgumentException("Tried to build a Topic from a null HyperNode");
@@ -286,15 +285,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
-    private Set<Topic> buildTopics(Set<ConnectedHyperNode> nodes) {
-        Set<Topic> topics = new LinkedHashSet();
-        for (ConnectedHyperNode node : nodes) {
-            topics.add(buildTopic(node.getHyperNode()));
-        }
-        return topics;
-    }
-
-    private Set<Topic> buildTopics(Iterable<HyperNode> nodes) {
+    private Set<Topic> buildTopics(List<HyperNode> nodes) {
         Set<Topic> topics = new LinkedHashSet();
         for (HyperNode node : nodes) {
             topics.add(buildTopic(node));
@@ -303,6 +294,24 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     }
 
     // ---
+
+    private RelatedTopic buildRelatedTopic(ConnectedHyperNode node) {
+        RelatedTopic relTopic = new HGRelatedTopic(buildTopic(node.getHyperNode()));
+        relTopic.setAssociation(buildAssociation(node.getConnectingHyperEdge()));
+        return relTopic;
+    }
+
+    private Set<RelatedTopic> buildRelatedTopics(Set<ConnectedHyperNode> nodes) {
+        Set<RelatedTopic> topics = new LinkedHashSet();
+        for (ConnectedHyperNode node : nodes) {
+            topics.add(buildRelatedTopic(node));
+        }
+        return topics;
+    }
+
+
+
+    // === Build Associations from HyperEdges ===
 
     private Association buildAssociation(HyperEdge edge) {
         if (edge == null) {
@@ -328,7 +337,9 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         return assocs;
     }
 
-    // ---
+
+
+    // === Type Filter ===
 
     private void filterNodesByAssociationType(Set<ConnectedHyperNode> nodes, String assocTypeUri) {
         ConnectedHyperNode node = null;
@@ -379,7 +390,9 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         }
     }
 
-    // ---
+
+
+    // === Helper ===
 
     private HyperNode lookupTopic(String uri) {
         HyperNode topic = lookupHyperNode(uri);

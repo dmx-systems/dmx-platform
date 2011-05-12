@@ -19,7 +19,7 @@ public enum IndexMode {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public static Set<IndexMode> fromTopics(Set<Topic> topics) {
+    public static Set<IndexMode> fromTopics(Set<RelatedTopic> topics) {
         Set<IndexMode> indexModes = new HashSet();
         for (Topic topic : topics) {
             indexModes.add(fromUri(topic.getUri()));

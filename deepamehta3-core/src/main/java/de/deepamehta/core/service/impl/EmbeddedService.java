@@ -12,6 +12,7 @@ import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.MetaTypeData;
 import de.deepamehta.core.model.PluginInfo;
+import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
@@ -229,12 +230,12 @@ public class EmbeddedService implements CoreService {
     @GET
     @Path("/topic/by_type/{type_uri}")
     @Override
-    public Set<Topic> getTopics(@PathParam("type_uri") String typeUri) {
+    public Set<RelatedTopic> getTopics(@PathParam("type_uri") String typeUri) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             long typeId = getTopicType(typeUri, null).getId();
-            Set<Topic> topics = getRelatedTopics(typeId, "dm3.core.instantiation", "dm3.core.type", "dm3.core.instance",
-                null, false);   // othersTopicTypeUri=null, fetchComposite=false
+            Set<RelatedTopic> topics = getRelatedTopics(typeId, "dm3.core.instantiation", "dm3.core.type",
+                "dm3.core.instance", null, false);   // othersTopicTypeUri=null, fetchComposite=false
             /*
             for (Topic topic : topics) {
                 triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, topic);
@@ -522,8 +523,8 @@ public class EmbeddedService implements CoreService {
     @Override
     public Set<String> getTopicTypeUris() {
         Topic metaType = buildTopic(storage.getTopic("uri", new TopicValue("dm3.core.topic_type")), false);
-        Set<Topic> topicTypes = metaType.getRelatedTopics("dm3.core.instantiation", "dm3.core.type",
-                                                          "dm3.core.instance", "dm3.core.topic_type", false);
+        Set<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm3.core.instantiation", "dm3.core.type",
+                                                                 "dm3.core.instance", "dm3.core.topic_type", false);
         Set<String> topicTypeUris = new HashSet();
         for (Topic topicType : topicTypes) {
             topicTypeUris.add(topicType.getUri());
@@ -802,11 +803,11 @@ public class EmbeddedService implements CoreService {
 
     @GET
     @Path("/topic/{id}/related_topics")
-    public Set<Topic> getRelatedTopics(@PathParam("id") long topicId,
-                                       @QueryParam("assoc_type_uri") String assocTypeUri) {
+    public Set<RelatedTopic> getRelatedTopics(@PathParam("id") long topicId,
+                                              @QueryParam("assoc_type_uri") String assocTypeUri) {
         logger.info("topicId=" + topicId + ", assocTypeUri=\"" + assocTypeUri + "\"");
         try {
-            Set<Topic> topics = storage.getRelatedTopics(topicId, assocTypeUri);
+            Set<RelatedTopic> topics = storage.getRelatedTopics(topicId, assocTypeUri, null, null, null);
             //
             /* ### for (RelatedTopic topic : topics) {
                 triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, relTopic.getTopic());
@@ -820,10 +821,11 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    Set<Topic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                         String othersTopicTypeUri,
-                                                                                         boolean fetchComposite) {
-        return buildTopics(storage.getRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+    Set<RelatedTopic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                          String othersRoleTypeUri,
+                                                                          String othersTopicTypeUri,
+                                                                          boolean fetchComposite) {
+        return buildRelatedTopics(storage.getRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri), fetchComposite);
     }
 
@@ -901,6 +903,29 @@ public class EmbeddedService implements CoreService {
 
     // ---
 
+    AttachedRelatedTopic buildRelatedTopic(RelatedTopic relTopic, boolean fetchComposite) {
+        // attach core service
+        AttachedRelatedTopic attachedRelTopic = new AttachedRelatedTopic(relTopic, this);
+        attachedRelTopic.setAssociation(buildAssociation(relTopic.getAssociation()));
+        // fetch composite
+        if (fetchComposite) {
+            if (attachedRelTopic.getTopicType().getDataTypeUri().equals("dm3.core.composite")) {
+                attachedRelTopic.loadComposite();
+            }
+        }
+        return attachedRelTopic;
+    }
+
+    private Set<RelatedTopic> buildRelatedTopics(Set<RelatedTopic> relTopics, boolean fetchComposite) {
+        Set<RelatedTopic> attachedTopics = new LinkedHashSet();
+        for (RelatedTopic relTopic : relTopics) {
+            attachedTopics.add(buildRelatedTopic(relTopic, fetchComposite));
+        }
+        return attachedTopics;
+    }
+
+    // ---
+
     /**
      * Attaches this service to an association retrieved from storage layer.
      *
@@ -950,8 +975,8 @@ public class EmbeddedService implements CoreService {
      */
     private void deleteTopic(Topic topic) {
         // 1) step down recursively
-        Set<Topic> partTopics = topic.getRelatedTopics("dm3.core.composition", "dm3.core.whole", "dm3.core.part",
-            null, false);
+        Set<RelatedTopic> partTopics = topic.getRelatedTopics("dm3.core.composition",
+            "dm3.core.whole", "dm3.core.part", null, false);
         for (Topic partTopic : partTopics) {
             deleteTopic(partTopic);
         }

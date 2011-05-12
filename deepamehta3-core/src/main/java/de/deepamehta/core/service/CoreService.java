@@ -8,6 +8,7 @@ import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.PluginInfo;
+import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
@@ -63,7 +64,7 @@ public interface CoreService {
      */
     // public TopicValue getTopicProperty(long topicId);
 
-    public Set<Topic> getTopics(String typeUri);
+    public Set<RelatedTopic> getTopics(String typeUri);
 
     /**
      * Looks up topics by exact property value.

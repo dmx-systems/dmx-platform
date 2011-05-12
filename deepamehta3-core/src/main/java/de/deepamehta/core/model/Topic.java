@@ -44,14 +44,14 @@ public interface Topic {
 
     void setChildTopicValue(String assocDefUri, TopicValue value);
 
-    Set<Topic> getRelatedTopics(String assocTypeUri);
+    Set<RelatedTopic> getRelatedTopics(String assocTypeUri);
 
     Topic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                      String othersTopicTypeUri);
 
-    Set<Topic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                           String othersTopicTypeUri,
-                                                                           boolean fetchComposite);
+    Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                  String othersTopicTypeUri,
+                                                                                  boolean fetchComposite);
 
     Set<Association> getAssociations(String myRoleTypeUri);
 

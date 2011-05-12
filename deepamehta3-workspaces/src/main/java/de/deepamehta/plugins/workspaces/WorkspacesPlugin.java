@@ -6,6 +6,7 @@ import de.deepamehta.core.model.AssociationData;
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Composite;
+import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
@@ -158,7 +159,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     }
 
     @Override
-    public Set<Topic> getWorkspaces(long typeId) {
+    public Set<RelatedTopic> getWorkspaces(long typeId) {
         Topic typeTopic = dms.getTopic(typeId, null);   // clientContext=null
         return typeTopic.getRelatedTopics(WORKSPACE_TYPE, ROLE_TYPE_TYPE, ROLE_TYPE_WORKSPACE,
             "dm3.workspaces.workspace", false);         // fetchComposite=false
