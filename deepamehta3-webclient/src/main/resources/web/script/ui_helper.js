@@ -187,6 +187,8 @@ function UIHelper() {
                 remove_selection()
             }
 
+            // ---
+
             /**
              * @param   item_value      Value of the menu item to select.
              *                          If there is not such menu item nothing is performed.
@@ -194,6 +196,16 @@ function UIHelper() {
             this.select = function(item_value) {
                 select_item(find_item(item_value))
             }
+
+            /**
+             * @param   item_label      Label of the menu item to select.
+             *                          If there is not such menu item nothing is performed.
+             */
+            this.select_by_label = function(item_label) {
+                select_item(find_item_by_label(item_label))
+            }
+
+            // ---
 
             this.set_item_label = function(item_value, new_label) {
                 find_item(item_value, function(item, item_id) {
@@ -259,6 +271,7 @@ function UIHelper() {
                 items.push(item)
                 // 2) update GUI
                 var item_id = items.length - 1
+                // FIXME: using a closure as event handler would free us from fiddling with id attributes
                 var anchor = $("<a>").attr({href: "#", id: anchor_id(item_id)}).click(item_selected)
                 if (item.icon) {
                     anchor.append(dm3c.image_tag(item.icon, "menu-icon"))
@@ -395,6 +408,20 @@ function UIHelper() {
                     }
                 }
             }
+
+            /**
+             * Finds a menu item by label.
+             * If there is no such menu item undefined is returned.
+             */
+            function find_item_by_label(label, func) {
+                for (var i = 0, item; item = items[i]; i++) {
+                    if (item.label == label) {
+                        return item
+                    }
+                }
+            }
+
+            // ---
 
             function anchor_id(item_id) {
                 return menu_id + "_item_" + item_id

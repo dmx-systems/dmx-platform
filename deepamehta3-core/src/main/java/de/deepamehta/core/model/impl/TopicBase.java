@@ -156,7 +156,7 @@ public class TopicBase implements Topic {
     // ----------------------------------------------------------------------------------------------- Protected Methods
 
     // ### This is supposed to be protected, but doesn't compile!
-    // ### It is called from the subclasses constructors, on a differnt BaseTopic instance.
+    // ### It is called from the subclasses constructors, but on a differnt TopicBase instance.
     // ### See de.deepamehta.core.storage.impl.HGTopic and de.deepamehta.core.service.impl.AttachedTopic.
     public TopicModel getModel() {
         return model;

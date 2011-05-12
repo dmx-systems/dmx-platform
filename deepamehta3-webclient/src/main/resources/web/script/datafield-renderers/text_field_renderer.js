@@ -79,7 +79,7 @@ function TextFieldRenderer(topic, field, rel_topics) {
                 menu.add_item({label: topics[i].value, value: topics[i].id})
             }
             // select item
-            // ### menu.select(field.data_type)
+            menu.select_by_label(field.value)
             //
             return menu
         }
