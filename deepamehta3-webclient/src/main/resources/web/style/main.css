@@ -59,6 +59,10 @@ body {
     line-height: 1.6em;
 }
 
+#detail-panel input.combobox {
+    width: 85%;
+}
+
 /*** Detail Panel ***/
 
 .title {

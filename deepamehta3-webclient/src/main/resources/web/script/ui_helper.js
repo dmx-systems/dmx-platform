@@ -1,12 +1,9 @@
 function UIHelper() {
 
+    var self = this
 
 
-    /**************/
-    /*** Button ***/
-    /**************/
-
-
+    // === Button ===
 
     /**
      * Creates and returns a button.
@@ -55,11 +52,7 @@ function UIHelper() {
 
 
 
-    /******************/
-    /*** Dialog Box ***/
-    /******************/
-
-
+    // === Dialog Box ===
 
     // Settings
     var DIALOG_WIDTH = 350   // in pixel
@@ -76,11 +69,7 @@ function UIHelper() {
 
 
 
-    /************/
-    /*** Menu ***/
-    /************/
-
-
+    // === Menu ===
 
     var menus = {}          // key: menu ID, value: a Menu object
 
@@ -141,8 +130,8 @@ function UIHelper() {
             // Model
             // Note: the surrounding "menu_id", "handler", "items", and "menu_title" are also part of the menu's model.
             var stateful = !menu_title
-            var selection   // selected item (object with "value" and "label" properties). Used only for stateful
-                            // select-like menus.
+            var selection   // selected item (object with "value" and "label" properties).
+                            // Used only for stateful select-like menus.
 
             // GUI
             var menu        // the actual menu (jQuery <div> object)
@@ -190,6 +179,11 @@ function UIHelper() {
             // ---
 
             /**
+             * Selects a menu item by its value.
+             * <p>
+             * Only applicable for stateful select-like menus.
+             * (For stateless action-trigger menus nothing is performed.)
+             *
              * @param   item_value      Value of the menu item to select.
              *                          If there is not such menu item nothing is performed.
              */
@@ -198,6 +192,11 @@ function UIHelper() {
             }
 
             /**
+             * Selects a menu item by its label.
+             * <p>
+             * Only applicable for stateful select-like menus.
+             * (For stateless action-trigger menus nothing is performed.)
+             *
              * @param   item_label      Label of the menu item to select.
              *                          If there is not such menu item nothing is performed.
              */
@@ -219,6 +218,9 @@ function UIHelper() {
             /**
              * Returns the selected menu item (object with "value" and "label" properties).
              * If the menu has no items, undefined/null is returned.
+             * <p>
+             * Only applicable for stateful select-like menus.
+             * (Stateless action-trigger menus always return undefined.)
              */
             this.get_selection = function() {
                 return selection
@@ -226,6 +228,18 @@ function UIHelper() {
 
             this.get_item_count = function() {
                 return items.length
+            }
+
+            /**
+             * Finds a menu item by label.
+             * If there is no such menu item undefined is returned.
+             */
+            this.find_item_by_label = function(label, func) {
+                for (var i = 0, item; item = items[i]; i++) {
+                    if (item.label == label) {
+                        return item
+                    }
+                }
             }
 
             this.hide = function() {
@@ -286,10 +300,13 @@ function UIHelper() {
             }
 
             /**
+             * Only applicable for stateful select-like menus.
+             * (For stateless action-trigger menus nothing is performed.)
+             *
              * @param   item    object with "value" and "label" properties. If undefined nothing is performed.
              */
             function select_item(item) {
-                // Note: only select-like menus have selection state.
+                // Note: only stateful select-like menus have selection state.
                 if (stateful && item && !item.is_trigger) {
                     // update model
                     selection = item
@@ -409,18 +426,6 @@ function UIHelper() {
                 }
             }
 
-            /**
-             * Finds a menu item by label.
-             * If there is no such menu item undefined is returned.
-             */
-            function find_item_by_label(label, func) {
-                for (var i = 0, item; item = items[i]; i++) {
-                    if (item.label == label) {
-                        return item
-                    }
-                }
-            }
-
             // ---
 
             function anchor_id(item_id) {
@@ -463,6 +468,57 @@ function UIHelper() {
     this.menu_item = function(menu_id) {
         return menus[menu_id].get_selection()
     }
+
+
+
+    // === Combobox ===
+
+    this.combobox = function(menu_id) {
+
+        return new Combobox()
+
+        function Combobox() {
+            var menu = self.menu(menu_id, item_selected, undefined, "x")
+            var input = $("<input>").attr("type", "text").addClass("combobox")
+            menu.dom.prepend(input)
+            this.dom = menu.dom
+
+            this.add_item = function(item) {
+                menu.add_item(item)
+            }
+
+            this.select_by_label = function(item_label) {
+                setInputText(item_label)
+            }
+
+            /**
+             * Returns either the selected menu item (object with "value" and "label" properties)
+             * or the text entered in the input field (string).
+             * <p>
+             * There are 2 cases:
+             * 1) the user has choosen an item from the combobox's menu.
+             * 2) the user entered a text which do *not* appear in the menu.
+             * (If the user entered a text which *do* appear in the menu case 1 applies.)
+             * <p>
+             * To examine which case occured the caller uses "typeof" on the returned value.
+             */
+            this.get_selection = function() {
+                var text = input.val()
+                var item = menu.find_item_by_label(text)
+                return item || text
+            }
+
+            function item_selected(item, menu_id) {
+                setInputText(item.label)
+            }
+
+            function setInputText(text) {
+                input.val(text)
+            }
+        }
+    }
+
+
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 

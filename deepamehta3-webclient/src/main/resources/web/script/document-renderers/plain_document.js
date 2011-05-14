@@ -114,9 +114,9 @@ function PlainDocument() {
         // ### dm3c.trigger_hook("post_set_topic_label", topic_id, label)
 
         /**
-         * Reads out values from GUI elements and builds a topic data object from it.
+         * Reads out values from GUI elements and builds a topic model object from it.
          *
-         * @return  a topic data object
+         * @return  a topic model object
          */
         function build_topic_model() {
             var topic_model = {
@@ -145,7 +145,13 @@ function PlainDocument() {
                     // Note: undefined form value is an error (means: field renderer returned no value).
                     // null is a valid form value (means: field renderer prevents the field from being updated).
                     if (form_value != null) {
-                        composite[assoc_def_uri] = form_value
+                        if (typeof(form_value) == "object") {
+                            // store reference to existing topic
+                            composite[assoc_def_uri + "$id"] = form_value.topic_id
+                        } else {
+                            // store value for new topic
+                            composite[assoc_def_uri] = form_value
+                        }
                     }
                 } else {
                     composite[assoc_def_uri] = build_composite(fields[assoc_def_uri])

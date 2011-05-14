@@ -177,16 +177,24 @@ class AttachedTopic extends TopicBase {
         indexTopicValue(value, oldValue);
     }
 
+    // TODO: factorize this method
     private void storeComposite(Composite comp) {
         try {
             Iterator<String> i = comp.keys();
             while (i.hasNext()) {
-                String assocDefUri = i.next();
+                String key = i.next();
+                String[] t = key.split("\\$");
+                //
+                if (t.length < 1 || t.length > 2 || t.length == 2 && !t[1].equals("id")) {
+                    throw new RuntimeException("Invalid composite key (\"" + key + "\")");
+                }
+                //
+                String assocDefUri = t[0];
                 AssociationDefinition assocDef = getAssocDef(assocDefUri);
+                TopicType childTopicType = dms.getTopicType(assocDef.getTopicTypeUri2(), null);
                 String assocTypeUri = assocDef.getAssocTypeUri();
-                Object value = comp.get(assocDefUri);
+                Object value = comp.get(key);
                 if (assocTypeUri.equals("dm3.core.composition")) {
-                    TopicType childTopicType = dms.getTopicType(assocDef.getTopicTypeUri2(), null);
                     if (childTopicType.getDataTypeUri().equals("dm3.core.composite")) {
                         AttachedTopic childTopic = storeChildTopicValue(assocDef, null);
                         childTopic.storeComposite((Composite) value);
@@ -194,14 +202,25 @@ class AttachedTopic extends TopicBase {
                         storeChildTopicValue(assocDef, new TopicValue(value));
                     }
                 } else if (assocTypeUri.equals("dm3.core.aggregation")) {
-                    RelatedTopic childTopic = fetchChildTopic(assocDef);
-                    if (childTopic != null) {
-                        long assocId = childTopic.getAssociation().getId();
-                        dms.deleteAssociation(assocId, null);  // clientContext=null
+                    if (childTopicType.getDataTypeUri().equals("dm3.core.composite")) {
+                        throw new RuntimeException("Aggregation of composite topic types not yet supported");
+                    } else {
+                        // remove current assignment
+                        RelatedTopic childTopic = fetchChildTopic(assocDef);
+                        if (childTopic != null) {
+                            long assocId = childTopic.getAssociation().getId();
+                            dms.deleteAssociation(assocId, null);  // clientContext=null
+                        }
+                        //
+                        boolean assignExistingTopic = t.length == 2;
+                        if (assignExistingTopic) {
+                            long childTopicId = (Integer) value;   // Note: the JSON parser creates Integers (not Longs)
+                            associateChildTopic(assocDef, childTopicId);
+                        } else {
+                            // create new child topic
+                            storeChildTopicValue(assocDef, new TopicValue(value));
+                        }
                     }
-                    // associate child topic
-                    long childTopicId = (Integer) value;    // Note: the JSON parser creates Integers (not Longs)
-                    associateChildTopic(assocDef, childTopicId);
                 } else {
                     throw new RuntimeException("Association type \"" + assocTypeUri + "\" not supported");
                 }

@@ -45,7 +45,7 @@
         ### Phone ###
 
         {
-            value: "Label",
+            value: "Phone Label",
             uri: "dm3.contacts.phone_label",
             data_type_uri: "dm3.core.text"
         },
@@ -148,7 +148,7 @@
         },
 
         {
-            value: "Label",
+            value: "Address Label",
             uri: "dm3.contacts.address_label",
             data_type_uri: "dm3.core.text"
         },

@@ -3,7 +3,7 @@ function TextFieldRenderer(topic, field, rel_topics) {
     /**
      * Input field: a jQuery object
      * Text area:   a jQuery object
-     * Choice:      a UIHelper Menu object
+     * Combo box:   a UIHelper Combobox object
      */
     var gui_element
 
@@ -23,7 +23,7 @@ function TextFieldRenderer(topic, field, rel_topics) {
             case "dm3.core.composition":
                 return gui_element = render_input()
             case "dm3.core.aggregation":
-                gui_element = render_choice()
+                gui_element = render_combobox()
                 return gui_element.dom
             default:
                 alert("TextFieldRenderer.render_form_element(): unexpected assoc type URI (\"" +
@@ -38,12 +38,9 @@ function TextFieldRenderer(topic, field, rel_topics) {
         if (gui_element instanceof jQuery) {
             return $.trim(gui_element.val())
         } else {
-            var item = gui_element.get_selection()
-            if (item) {
-                return item.value
-            } else {
-                // alert("TextFieldRenderer: read_form_value() failed (" + field.topic_type.uri+ ")")
-            }
+            // gui_element is a Combobox
+            var selection = gui_element.get_selection() // either a menu item (object) or the text entered (string)
+            return typeof(selection) == "object" ? {topic_id: selection.value} : selection
         }
     }
 
@@ -64,24 +61,24 @@ function TextFieldRenderer(topic, field, rel_topics) {
         return $("<textarea>").attr("rows", field.rows).text(field.value)
     }
 
-    function render_choice() {
+    function render_combobox() {
 
         // retrieve all instances
         var topics = dm3c.restc.get_topics(field.topic_type.uri)
-        return create_choice();
+        return create_combobox();
 
-        function create_choice() {
+        function create_combobox() {
             //
-            var menu = dm3c.ui.menu(field.uri)
-            // ### menu.dom.addClass("field-editor-menu")
+            // var menu = dm3c.ui.menu(field.uri)
+            var combobox = dm3c.ui.combobox(field.uri)
             // add items
             for (var i in topics) {
-                menu.add_item({label: topics[i].value, value: topics[i].id})
+                combobox.add_item({label: topics[i].value, value: topics[i].id})
             }
             // select item
-            menu.select_by_label(field.value)
+            combobox.select_by_label(field.value)
             //
-            return menu
+            return combobox
         }
     }
 }
