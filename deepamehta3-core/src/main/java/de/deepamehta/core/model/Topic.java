@@ -47,7 +47,8 @@ public interface Topic {
     Set<RelatedTopic> getRelatedTopics(String assocTypeUri);
 
     Topic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                     String othersTopicTypeUri);
+                                                                     String othersTopicTypeUri,
+                                                                     boolean fetchComposite);
 
     Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                   String othersTopicTypeUri,

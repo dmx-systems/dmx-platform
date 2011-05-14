@@ -78,10 +78,6 @@ public class Plugin implements BundleActivator {
         return pluginName;
     }
 
-    public Topic getPluginTopic() {
-        return pluginTopic;
-    }
-
     public String getConfigProperty(String key) {
         return getConfigProperty(key, null);
     }
@@ -540,10 +536,10 @@ public class Plugin implements BundleActivator {
     private boolean initPluginTopic() {
         pluginTopic = findPluginTopic();
         if (pluginTopic != null) {
-            logger.info("Do NOT create topic for " + this + " -- already exists");
+            logger.info("Installing " + this + " ABORTED -- already installed");
             return false;
         } else {
-            logger.info("Creating topic for " + this + " -- this is a plugin clean install");
+            logger.info("Installing " + this);
             pluginTopic = dms.createTopic(new TopicModel(pluginId, new TopicValue(pluginName), "dm3.core.plugin",
                 new Composite("{dm3.core.plugin_migration_nr: 0}")), null);     // FIXME: clientContext=null
             return true;
@@ -551,7 +547,7 @@ public class Plugin implements BundleActivator {
     }
 
     private Topic findPluginTopic() {
-        return dms.getTopic("uri", new TopicValue(pluginId));
+        return dms.getTopic("uri", new TopicValue(pluginId), false);    // fetchComposite=false
     }
 
     /**

@@ -93,11 +93,13 @@ public class AssociationData {
     // ---
 
     public Topic getTopic(String roleTypeUri) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
+        throw new RuntimeException("Association is not attached to the core service ("
+            + getClass() + ", " + this + ")");
     }
 
     public Set<Topic> getTopics(String roleTypeUri) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
+        throw new RuntimeException("Association is not attached to the core service ("
+            + getClass() + ", " + this + ")");
     }
 
     // ---

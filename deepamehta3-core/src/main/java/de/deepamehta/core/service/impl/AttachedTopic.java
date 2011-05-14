@@ -28,14 +28,18 @@ class AttachedTopic extends TopicBase {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private EmbeddedService dms;
+    protected final EmbeddedService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedTopic(Topic topic, EmbeddedService dms) {
-        super(((TopicBase) topic).getModel());
+        this(((TopicBase) topic).getModel(), dms);
+    }
+
+    AttachedTopic(TopicModel topicModel, EmbeddedService dms) {
+        super(topicModel);
         this.dms = dms;
     }
 
@@ -81,24 +85,33 @@ class AttachedTopic extends TopicBase {
         updateTopicValue(comp);
     }
 
+    @Override
     public Set<RelatedTopic> getRelatedTopics(String assocTypeUri) {
-        return dms.getRelatedTopics(getId(), assocTypeUri);
+        Set<RelatedTopic> topics = dms.storage.getRelatedTopics(getId(), assocTypeUri, null, null, null);
+        //
+        /* ### for (RelatedTopic topic : topics) {
+            triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, relTopic.getTopic());
+            triggerHook(Hook.PROVIDE_RELATION_PROPERTIES, relTopic.getRelation());
+        } */
+        //
+        return topics;
     }
 
     @Override
     public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                           String othersTopicTypeUri) {
+                                                                                           String othersTopicTypeUri,
+                                                                                           boolean fetchComposite) {
         RelatedTopic topic = dms.storage.getRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
-        return topic != null ? dms.buildRelatedTopic(topic, true) : null;
+        return topic != null ? dms.attach(topic, fetchComposite) : null;
     }
 
     @Override
     public Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                          String othersTopicTypeUri,
                                                                                          boolean fetchComposite) {
-        return dms.getRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-            fetchComposite);
+        return dms.attach(dms.storage.getRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri), fetchComposite);
     }
 
     @Override
@@ -109,7 +122,7 @@ class AttachedTopic extends TopicBase {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
-     * Called from {@link EmbeddedService#buildTopic}
+     * Called from {@link EmbeddedService#attach}
      */
     void loadComposite() {
         // fetch from DB
@@ -289,7 +302,8 @@ class AttachedTopic extends TopicBase {
         String othersRoleTypeUri  = assocDef.getRoleTypeUri2();
         String othersTopicTypeUri = assocDef.getTopicTypeUri2();
         //
-        return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+        return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, true);
+        // fetchComposite=true ### false sufficient?
     }
 
     private void associateChildTopic(AssociationDefinition assocDef, long childTopicId) {

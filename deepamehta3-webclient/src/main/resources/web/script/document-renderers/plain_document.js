@@ -104,7 +104,7 @@ function PlainDocument() {
 
         // 1) update DB and memory
         var topic_model = build_topic_model()
-        alert("topic model to update: " + JSON.stringify(topic_model))
+        // alert("topic model to update: " + JSON.stringify(topic_model))
         topic = dm3c.update_topic(topic, topic_model)
         dm3c.trigger_hook("post_submit_form", topic)
         // 2) update GUI

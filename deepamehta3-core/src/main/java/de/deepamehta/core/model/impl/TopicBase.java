@@ -94,35 +94,36 @@ public class TopicBase implements Topic {
 
     @Override
     public TopicValue getChildTopicValue(String assocDefUri) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
+        throw new RuntimeException("Topic is not attached to the core service (" + getClass() + ", " + this + ")");
     }
 
     @Override
     public void setChildTopicValue(String assocDefUri, TopicValue value) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
+        throw new RuntimeException("Topic is not attached to the core service (" + getClass() + ", " + this + ")");
     }
 
     @Override
     public Set<RelatedTopic> getRelatedTopics(String assocTypeUri) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
+        throw new RuntimeException("Topic is not attached to the core service (" + getClass() + ", " + this + ")");
     }
 
     @Override
     public Topic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                            String othersTopicTypeUri) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
+                                                                            String othersTopicTypeUri,
+                                                                            boolean fetchComposite) {
+        throw new RuntimeException("Topic is not attached to the core service (" + getClass() + ", " + this + ")");
     }
 
     @Override
     public Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                          String othersTopicTypeUri,
                                                                                          boolean fetchComposite) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
+        throw new RuntimeException("Topic is not attached to the core service (" + getClass() + ", " + this + ")");
     }
 
     @Override
     public Set<Association> getAssociations(String myRoleTypeUri) {
-        throw new RuntimeException("Method not implemented (" + getClass() + ")");
+        throw new RuntimeException("Topic is not attached to the core service (" + getClass() + ", " + this + ")");
     }
 
     // --- Serialization ---
@@ -160,5 +161,9 @@ public class TopicBase implements Topic {
     // ### See de.deepamehta.core.storage.impl.HGTopic and de.deepamehta.core.service.impl.AttachedTopic.
     public TopicModel getModel() {
         return model;
+    }
+
+    protected final void setModel(TopicModel model) {
+        this.model = model;
     }
 }

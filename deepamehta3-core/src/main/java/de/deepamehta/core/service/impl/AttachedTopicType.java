@@ -29,22 +29,18 @@ import java.util.logging.Logger;
 /**
  * A topic type that is attached to the {@link CoreService}.
  */
-class AttachedTopicType implements TopicType {
+class AttachedTopicType extends AttachedTopic implements TopicType {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private TopicTypeModel model;
-    private EmbeddedService dms;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedTopicType(EmbeddedService dms) {
-        this(null, dms);
+        this(null, dms);    // the model remains uninitialized. It is initialued later on through fetch().
     }
 
     AttachedTopicType(TopicTypeModel model, EmbeddedService dms) {
-        this.model = model;
-        this.dms = dms;
+        super(model, dms);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -54,38 +50,21 @@ class AttachedTopicType implements TopicType {
     // === TopicType Implementation ===
 
     @Override
-    public long getId() {
-        return model.getId();
-    }
-
-    @Override
-    public String getUri() {
-        return model.getUri();
-    }
-
-    @Override
-    public TopicValue getValue() {
-        return model.getValue();
-    }
-
-    // ---
-
-    @Override
     public String getDataTypeUri() {
-        return model.getDataTypeUri();
+        return getModel().getDataTypeUri();
     }
 
     // ---
 
     @Override
     public Set<IndexMode> getIndexModes() {
-        return model.getIndexModes();
+        return getModel().getIndexModes();
     }
 
     @Override
     public void setIndexModes(Set<IndexMode> indexModes) {
         // update memory
-        model.setIndexModes(indexModes);
+        getModel().setIndexModes(indexModes);
         // update DB
         storeIndexModes();
     }
@@ -94,19 +73,19 @@ class AttachedTopicType implements TopicType {
 
     @Override
     public Map<String, AssociationDefinition> getAssocDefs() {
-        return model.getAssocDefs();
+        return getModel().getAssocDefs();
     }
 
     @Override
     public AssociationDefinition getAssocDef(String assocDefUri) {
-        return model.getAssocDef(assocDefUri);
+        return getModel().getAssocDef(assocDefUri);
     }
 
     @Override
     public void addAssocDef(AssociationDefinition assocDef) {
         AssociationDefinition predAssocDef = findLastAssocDef();
         // update memory
-        model.addAssocDef(assocDef);
+        getModel().addAssocDef(assocDef);
         // update DB
         storeAssocDef(assocDef, predAssocDef);
     }
@@ -115,28 +94,21 @@ class AttachedTopicType implements TopicType {
 
     @Override
     public ViewConfiguration getViewConfig() {
-        return model.getViewConfig();
+        return getModel().getViewConfig();
     }
 
     @Override
     public Object getViewConfig(String typeUri, String settingUri) {
-        return model.getViewConfig(typeUri, settingUri);
-    }
-
-    // ---
-
-    @Override
-    public JSONObject toJSON() {
-        return model.toJSON();
+        return getModel().getViewConfig(typeUri, settingUri);
     }
 
 
 
-    // === Java API ===
+    // === TopicBase Overrides ===
 
     @Override
-    public String toString() {
-        return model.toString();
+    public TopicTypeModel getModel() {
+        return (TopicTypeModel) super.getModel();
     }
 
 
@@ -144,8 +116,7 @@ class AttachedTopicType implements TopicType {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void fetch(String topicTypeUri) {
-        // Note: storage low-level call used here ### explain
-        Topic typeTopic = dms.storage.getTopic("uri", new TopicValue(topicTypeUri));
+        Topic typeTopic = dms.getTopic("uri", new TopicValue(topicTypeUri), false);     // fetchComposite=false
         // error check
         if (typeTopic == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
@@ -165,13 +136,13 @@ class AttachedTopicType implements TopicType {
                                                                       fetchViewConfig(typeTopic));
         addAssocDefs(topicTypeModel, assocDefs, sequenceIds);
         //
-        this.model = topicTypeModel;
+        setModel(topicTypeModel);
     }
 
     void store() {
-        Topic topic = dms.buildTopic(dms.storage.createTopic(model), false);
+        Topic topic = dms.attach(dms.storage.createTopic(getModel()), false);
         dms.associateWithTopicType(topic);
-        topic.setValue(model.getValue());
+        topic.setValue(getModel().getValue());
         //
         String typeUri = getUri();
         dms.associateDataType(typeUri, getDataTypeUri());
@@ -226,9 +197,9 @@ class AttachedTopicType implements TopicType {
 
     private List<Long> fetchSequenceIds(Topic typeTopic) {
         try {
-            // Note: storage low-level call used here
-            // Note: the type topic is not attached to the service
-            // ### should dms.getRelatedTopic() get a "fetchComposite" parameter?
+            // FIXME: don't make storage low-level calls here
+            // TODO: extend Topic       interface by getRelatedAssociation
+            // TODO: extend Association interface by getRelatedAssociation
             List<Long> sequenceIds = new ArrayList();
             Association assocDef = dms.storage.getTopicRelatedAssociation(typeTopic.getId(), "dm3.core.association",
                                                                "dm3.core.topic_type", "dm3.core.first_assoc_def");
@@ -264,11 +235,8 @@ class AttachedTopicType implements TopicType {
 
     private Topic fetchDataTypeTopic(Topic typeTopic) {
         try {
-            // Note: storage low-level call used here
-            // Note: the type topic is not attached to the service
-            // ### should dms.getRelatedTopic() get a "fetchComposite" parameter?
-            Topic dataType = dms.storage.getRelatedTopic(typeTopic.getId(), "dm3.core.association",
-                "dm3.core.topic_type", "dm3.core.data_type", "dm3.core.data_type");
+            Topic dataType = typeTopic.getRelatedTopic("dm3.core.association", "dm3.core.topic_type",
+                "dm3.core.data_type", "dm3.core.data_type", false);     // fetchComposite=false
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to topic type \"" + typeTopic.getUri() +
                     "\"");
@@ -281,17 +249,16 @@ class AttachedTopicType implements TopicType {
     }
 
     private Set<IndexMode> fetchIndexModes(Topic typeTopic) {
-        Set<RelatedTopic> topics = dms.getRelatedTopics(typeTopic.getId(), "dm3.core.association",
-            "dm3.core.topic_type", "dm3.core.index_mode", "dm3.core.index_mode", false);
+        Set<RelatedTopic> topics = typeTopic.getRelatedTopics("dm3.core.association", "dm3.core.topic_type",
+            "dm3.core.index_mode", "dm3.core.index_mode", false);       // fetchComposite=false
         return IndexMode.fromTopics(topics);
     }
 
     // ---
 
     private ViewConfiguration fetchViewConfig(Topic typeTopic) {
-        // Note: the type topic is not attached to the service
-        Set<RelatedTopic> topics = dms.getRelatedTopics(typeTopic.getId(), "dm3.core.association",
-            "dm3.core.topic_type", "dm3.core.view_config", null, true);
+        Set<RelatedTopic> topics = typeTopic.getRelatedTopics("dm3.core.association", "dm3.core.topic_type",
+            "dm3.core.view_config", null, true);    // fetchComposite=true
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
         return new ViewConfiguration(topics);
     }

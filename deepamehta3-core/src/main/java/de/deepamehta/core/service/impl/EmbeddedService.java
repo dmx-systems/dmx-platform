@@ -163,7 +163,7 @@ public class EmbeddedService implements CoreService {
     public AttachedTopic getTopic(@PathParam("id") long id, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopic topic = buildTopic(storage.getTopic(id), true);
+            AttachedTopic topic = attach(storage.getTopic(id), true);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
             tx.success();
             return topic;
@@ -178,12 +178,14 @@ public class EmbeddedService implements CoreService {
     @GET
     @Path("/topic/by_property/{key}/{value}")
     @Override
-    public Topic getTopic(@PathParam("key") String key, @PathParam("value") TopicValue value) {
+    public Topic getTopic(@PathParam("key") String key, @PathParam("value") TopicValue value,
+                          @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             Topic topic = storage.getTopic(key, value);
+            topic = topic != null ? attach(topic, fetchComposite) : null;
             tx.success();
-            return topic != null ? buildTopic(topic, true) : null;
+            return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Retrieving topic failed (key=\"" + key + "\", value=" + value + ")", e);
@@ -233,9 +235,8 @@ public class EmbeddedService implements CoreService {
     public Set<RelatedTopic> getTopics(@PathParam("type_uri") String typeUri) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            long typeId = getTopicType(typeUri, null).getId();
-            Set<RelatedTopic> topics = getRelatedTopics(typeId, "dm3.core.instantiation", "dm3.core.type",
-                "dm3.core.instance", null, false);   // othersTopicTypeUri=null, fetchComposite=false
+            Set<RelatedTopic> topics = getTopicType(typeUri, null).getRelatedTopics("dm3.core.instantiation",
+                "dm3.core.type", "dm3.core.instance", null, false);   // othersTopicTypeUri=null, fetchComposite=false
             /*
             for (Topic topic : topics) {
                 triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, topic);
@@ -311,7 +312,7 @@ public class EmbeddedService implements CoreService {
                                    @HeaderParam("Cookie")   ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Set<Topic> topics = buildTopics(storage.searchTopics(searchTerm, fieldUri, wholeWord), false);
+            Set<Topic> topics = attach(storage.searchTopics(searchTerm, fieldUri, wholeWord), false);
             tx.success();
             return topics;
         } catch (Exception e) {
@@ -331,7 +332,7 @@ public class EmbeddedService implements CoreService {
         try {
             triggerHook(Hook.PRE_CREATE_TOPIC, topicModel, clientContext);
             //
-            AttachedTopic topic = buildTopic(storage.createTopic(topicModel), false);
+            AttachedTopic topic = attach(storage.createTopic(topicModel), false);
             associateWithTopicType(topic);
             //
             topic.update(topicModel);
@@ -467,7 +468,7 @@ public class EmbeddedService implements CoreService {
                                          @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Association assoc = buildAssociation(storage.createAssociation(assocData));
+            Association assoc = attach(storage.createAssociation(assocData));
             associateWithAssociationType(assoc);
             //
             tx.success();
@@ -522,7 +523,7 @@ public class EmbeddedService implements CoreService {
     @Path("/topictype")
     @Override
     public Set<String> getTopicTypeUris() {
-        Topic metaType = buildTopic(storage.getTopic("uri", new TopicValue("dm3.core.topic_type")), false);
+        Topic metaType = attach(storage.getTopic("uri", new TopicValue("dm3.core.topic_type")), false);
         Set<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm3.core.instantiation", "dm3.core.type",
                                                                  "dm3.core.instance", "dm3.core.topic_type", false);
         Set<String> topicTypeUris = new HashSet();
@@ -807,32 +808,26 @@ public class EmbeddedService implements CoreService {
                                               @QueryParam("assoc_type_uri") String assocTypeUri) {
         logger.info("topicId=" + topicId + ", assocTypeUri=\"" + assocTypeUri + "\"");
         try {
-            Set<RelatedTopic> topics = storage.getRelatedTopics(topicId, assocTypeUri, null, null, null);
-            //
-            /* ### for (RelatedTopic topic : topics) {
-                triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, relTopic.getTopic());
-                triggerHook(Hook.PROVIDE_RELATION_PROPERTIES, relTopic.getRelation());
-            } */
-            //
-            return topics;
+            return getTopic(topicId, null).getRelatedTopics(assocTypeUri);
         } catch (Exception e) {
             throw new RuntimeException("Retrieving related topics of topic " + topicId +
                 " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
         }
     }
 
+    /* TODO: activate for REST API
     Set<RelatedTopic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                                           String othersRoleTypeUri,
                                                                           String othersTopicTypeUri,
                                                                           boolean fetchComposite) {
-        return buildRelatedTopics(storage.getRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri), fetchComposite);
-    }
+        return getTopic(topicId, null).getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri, fetchComposite);
+    } */
 
     Set<Association> getAssociations(long topicId, String myRoleTypeUri) {
         Set<Association> assocs = new HashSet();
         for (Association assoc : storage.getAssociations(topicId, myRoleTypeUri)) {
-            assocs.add(buildAssociation(assoc));
+            assocs.add(attach(assoc));
         }
         return assocs;
     }
@@ -877,65 +872,61 @@ public class EmbeddedService implements CoreService {
      *
      * @return  Instance of {@link AttachedTopic}.
      */
-    AttachedTopic buildTopic(Topic topic, boolean fetchComposite) {
-        if (topic == null) {
-            throw new IllegalArgumentException("Tried to build an AttachedTopic from a null Topic");
-        }
+    AttachedTopic attach(Topic topic, boolean fetchComposite) {
         // attach core service
         AttachedTopic attachedTopic = new AttachedTopic(topic, this);
         // fetch composite
+        fetchComposite(fetchComposite, attachedTopic);
+        //
+        return attachedTopic;
+    }
+
+    private Set<Topic> attach(Set<Topic> topics, boolean fetchComposite) {
+        Set<Topic> attachedTopics = new LinkedHashSet();
+        for (Topic topic : topics) {
+            attachedTopics.add(attach(topic, fetchComposite));
+        }
+        return attachedTopics;
+    }
+
+    // ---
+
+    AttachedRelatedTopic attach(RelatedTopic relTopic, boolean fetchComposite) {
+        // attach core service
+        AttachedRelatedTopic attachedRelTopic = new AttachedRelatedTopic(relTopic, this);
+        attachedRelTopic.setAssociation(attach(relTopic.getAssociation()));
+        // fetch composite
+        fetchComposite(fetchComposite, attachedRelTopic);
+        //
+        return attachedRelTopic;
+    }
+
+    Set<RelatedTopic> attach(Iterable<RelatedTopic> relTopics, boolean fetchComposite) {
+        Set<RelatedTopic> attachedTopics = new LinkedHashSet();
+        for (RelatedTopic relTopic : relTopics) {
+            attachedTopics.add(attach(relTopic, fetchComposite));
+        }
+        return attachedTopics;
+    }
+
+    // ---
+
+    private void fetchComposite(boolean fetchComposite, AttachedTopic attachedTopic) {
         if (fetchComposite) {
             if (attachedTopic.getTopicType().getDataTypeUri().equals("dm3.core.composite")) {
                 attachedTopic.loadComposite();
             }
         }
-        //
-        return attachedTopic;
-    }
-
-    private Set<Topic> buildTopics(Set<Topic> topics, boolean fetchComposite) {
-        Set<Topic> attachedTopics = new LinkedHashSet();
-        for (Topic topic : topics) {
-            attachedTopics.add(buildTopic(topic, fetchComposite));
-        }
-        return attachedTopics;
-    }
-
-    // ---
-
-    AttachedRelatedTopic buildRelatedTopic(RelatedTopic relTopic, boolean fetchComposite) {
-        // attach core service
-        AttachedRelatedTopic attachedRelTopic = new AttachedRelatedTopic(relTopic, this);
-        attachedRelTopic.setAssociation(buildAssociation(relTopic.getAssociation()));
-        // fetch composite
-        if (fetchComposite) {
-            if (attachedRelTopic.getTopicType().getDataTypeUri().equals("dm3.core.composite")) {
-                attachedRelTopic.loadComposite();
-            }
-        }
-        return attachedRelTopic;
-    }
-
-    private Set<RelatedTopic> buildRelatedTopics(Set<RelatedTopic> relTopics, boolean fetchComposite) {
-        Set<RelatedTopic> attachedTopics = new LinkedHashSet();
-        for (RelatedTopic relTopic : relTopics) {
-            attachedTopics.add(buildRelatedTopic(relTopic, fetchComposite));
-        }
-        return attachedTopics;
     }
 
     // ---
 
     /**
-     * Attaches this service to an association retrieved from storage layer.
+     * Attaches this core service to an association retrieved from storage layer.
      *
      * @return  Instance of {@link AttachedAssociation}.
      */
-    private Association buildAssociation(Association assoc) {
-        if (assoc == null) {
-            throw new IllegalArgumentException("Tried to build an AttachedAssociation from a null Association");
-        }
-        //
+    private Association attach(Association assoc) {
         return new AttachedAssociation(assoc, this);
     }
 
@@ -1163,7 +1154,7 @@ public class EmbeddedService implements CoreService {
                     migration.setService(this);
                     migration.run();
                 }
-                logger.info(mi.migrationType + " migration complete");
+                logger.info("Completing " + mi.migrationInfo);
             } else {
                 logger.info("Do NOT run " + mi.migrationInfo + runInfo);
             }
