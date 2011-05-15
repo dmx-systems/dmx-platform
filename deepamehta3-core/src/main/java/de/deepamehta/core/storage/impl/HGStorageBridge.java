@@ -454,7 +454,11 @@ public class HGStorageBridge implements DeepaMehtaStorage {
      * @return  The topic type's URI.
      */
     private String getTopicTypeUri(HyperNode node) {
-        return fetchTypeNode(node).getString("uri");
+        if (node.getString("uri").equals("dm3.core.meta_type")) {
+            return "dm3.core.meta_meta_type";
+        } else {
+            return fetchTypeNode(node).getString("uri");
+        }
     }
 
     /**

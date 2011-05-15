@@ -131,7 +131,7 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
                 "definitions found but sequence length is " + sequenceIds.size());
         }
         // build topic type
-        TopicTypeModel topicTypeModel = new TopicTypeModel(typeTopic, fetchDataTypeTopic(typeTopic).getUri(),
+        TopicTypeModel topicTypeModel = new TopicTypeModel(typeTopic, fetchDataTypeUri(typeTopic),
                                                                       fetchIndexModes(typeTopic),
                                                                       fetchViewConfig(typeTopic));
         addAssocDefs(topicTypeModel, assocDefs, sequenceIds);
@@ -233,15 +233,19 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
 
     // ---
 
-    private Topic fetchDataTypeTopic(Topic typeTopic) {
+    private String fetchDataTypeUri(Topic typeTopic) {
         try {
+            if (typeTopic.getUri().equals("dm3.core.meta_type")) {
+                return "dm3.core.text";
+            }
+            //
             Topic dataType = typeTopic.getRelatedTopic("dm3.core.association", "dm3.core.topic_type",
                 "dm3.core.data_type", "dm3.core.data_type", false);     // fetchComposite=false
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to topic type \"" + typeTopic.getUri() +
                     "\"");
             }
-            return dataType;
+            return dataType.getUri();
         } catch (Exception e) {
             throw new RuntimeException("Fetching the data type topic for topic type \"" + typeTopic.getUri() +
                 "\" failed", e);

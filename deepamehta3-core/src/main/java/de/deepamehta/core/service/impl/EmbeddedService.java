@@ -527,6 +527,11 @@ public class EmbeddedService implements CoreService {
         Set<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm3.core.instantiation", "dm3.core.type",
                                                                  "dm3.core.instance", "dm3.core.topic_type", false);
         Set<String> topicTypeUris = new HashSet();
+        // add meta types
+        topicTypeUris.add("dm3.core.meta_type");
+        topicTypeUris.add("dm3.core.topic_type");
+        topicTypeUris.add("dm3.core.assoc_type");
+        // add regular types
         for (Topic topicType : topicTypes) {
             topicTypeUris.add(topicType.getUri());
         }
@@ -1062,7 +1067,7 @@ public class EmbeddedService implements CoreService {
         // Before topic types and asscociation types can be created the meta types must created
         // Note: storage low-level call used here ### explain
         Topic topicType = _createTopic(new MetaTypeData("dm3.core.topic_type", "Topic Type"));
-        _createTopic(new MetaTypeData("dm3.core.assoc_type", "Association Type"));
+        Topic assocType = _createTopic(new MetaTypeData("dm3.core.assoc_type", "Association Type"));
         // Create topic type "Data Type"
         // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
         // depends on the topic type "Data Type". To resolve this circle we use a low-level storage call here
@@ -1084,6 +1089,7 @@ public class EmbeddedService implements CoreService {
         associateDataType("dm3.core.data_type",  "dm3.core.text");
         //
         associateWithTopicType(topicType);
+        associateWithTopicType(assocType);
         associateWithTopicType(dataType);
         associateWithTopicType(text);
     }

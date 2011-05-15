@@ -288,7 +288,7 @@ function UIHelper() {
                 // FIXME: using a closure as event handler would free us from fiddling with id attributes
                 var anchor = $("<a>").attr({href: "#", id: anchor_id(item_id)}).click(item_selected)
                 if (item.icon) {
-                    anchor.append(dm3c.image_tag(item.icon, "menu-icon"))
+                    anchor.append(dm3c.render.image(item.icon, "menu-icon"))
                 }
                 anchor.append(item.label)
                 menu.append(anchor)

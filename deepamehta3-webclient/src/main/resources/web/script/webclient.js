@@ -587,33 +587,6 @@ var dm3c = new function() {
     // ---
 
     /**
-     * @param   topics      Topics to render (array of Topic objects).
-     */
-    this.render_topic_list = function(topics) {
-        var table = $("<table>")
-        for (var i = 0, topic; topic = topics[i]; i++) {
-            // icon
-            var icon_td = $("<td>").addClass("topic-icon").addClass(i == topics.length - 1 ? "last-topic" : undefined)
-            icon_td.append(render_topic_anchor(topic, type_icon_tag(topic.type_uri, "type-icon")))
-            // label
-            var topic_td = $("<td>").addClass("topic-label").addClass(i == topics.length - 1 ? "last-topic" : undefined)
-            var list_item = $("<div>").append(render_topic_anchor(topic, topic.value))
-            dm3c.trigger_hook("render_topic_list_item", topic, list_item)
-            topic_td.append(list_item)
-            //
-            table.append($("<tr>").append(icon_td).append(topic_td))
-        }
-        return table
-    }
-
-    /**
-     * @return  The <img> element (jQuery object).
-     */
-    this.image_tag = function(src, css_class) {
-        return $("<img>").attr("src", src).addClass(css_class)
-    }
-
-    /**
      * Returns the icon for a topic type.
      * If no icon is configured for that type the generic topic icon is returned.
      *
@@ -686,6 +659,15 @@ var dm3c = new function() {
         return false
     }
 
+    // ---
+
+    function submit_document() {
+        var submit_button = $("#document-form button[submit=true]")
+        // alert("submit_document: submit button id=" + submit_button.attr("id"))
+        submit_button.click()
+        return false
+    }
+
     // --- Special Menu ---
 
     function create_special_select() {
@@ -695,34 +677,6 @@ var dm3c = new function() {
     function special_selected(menu_item) {
         var command = menu_item.label
         dm3c.trigger_hook("handle_special_command", command)
-    }
-
-    // --- Rendering ---
-
-    /**
-     * @param   topic       Topic to render (a Topic object).
-     */
-    function render_topic_anchor(topic, anchor_content) {
-        return $("<a>").attr({href: "#"}).append(anchor_content).click(function() {
-            dm3c.reveal_related_topic(topic.id)
-            return false
-        })
-    }
-
-    /**
-     * @return  The <img> element (jQuery object).
-     */
-    function type_icon_tag(type_uri, css_class) {
-        return dm3c.image_tag(dm3c.get_icon_src(type_uri), css_class)
-    }
-
-    // ---
-
-    function submit_document() {
-        var submit_button = $("#document-form button[submit=true]")
-        // alert("submit_document: submit button id=" + submit_button.attr("id"))
-        submit_button.click()
-        return false
     }
 
     // === Plugin Support ===

@@ -6,6 +6,6 @@ function SearchResultRenderer(topic, field) {
         // field label
         dm3c.render.field_label(field, " (" + topics.length + ")")
         // field value
-        return dm3c.render_topic_list(topics)
+        return dm3c.render.topic_list(topics)
     }
 }

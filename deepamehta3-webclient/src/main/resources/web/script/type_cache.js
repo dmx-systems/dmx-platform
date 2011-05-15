@@ -25,7 +25,11 @@ function TypeCache() {
     // ---
 
     this.get = function(type_uri) {
-        return topic_types[type_uri]
+        var topic_type = topic_types[type_uri]
+        if (!topic_type) {
+            throw "ERROR (TypeCache.get): topic type not found (type_uri=\"" + type_uri + "\")"
+        }
+        return topic_type
     }
 
     /**
@@ -48,7 +52,7 @@ function TypeCache() {
     }
 
     this.get_label = function(type_uri) {
-        return topic_types[type_uri].value
+        return this.get(type_uri).value
     }
 
     this.get_icon = function(type_uri) {

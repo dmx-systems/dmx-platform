@@ -28,7 +28,7 @@ function PlainDocument() {
 
         dm3c.empty_detail_panel()
         render_fields("", topic.composite, dm3c.type_cache.get(topic.type_uri))
-        render_relations()
+        render_associations()
         render_buttons(topic, "detail-panel-show")
 
         function render_fields(field_uri, composite, topic_type, assoc_def) {
@@ -54,13 +54,13 @@ function PlainDocument() {
             }
         }
 
-        function render_relations() {
-            var topics = dm3c.restc.get_related_topics(topic.id, "dm3.core.association")
+        function render_associations() {
+            var topics = dm3c.restc.get_related_topics(topic.id) //, "dm3.core.association")
             // render label
             dm3c.render.field_label("Associations (" + topics.length + ")")
             // render field
             var field_value_div = $("<div>").addClass("field-value")
-            field_value_div.append(dm3c.render_topic_list(topics))
+            field_value_div.append(dm3c.render.topic_list(topics))
             $("#detail-panel").append(field_value_div)
         }
     }
