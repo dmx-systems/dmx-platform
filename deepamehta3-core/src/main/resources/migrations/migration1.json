@@ -93,6 +93,12 @@
         },*/
 
         {
+            value:    "Association Definition",
+            uri:      "dm3.core.assoc_def",
+            type_uri: "dm3.core.role_type"
+        },
+
+        {
             value:    "Whole",
             uri:      "dm3.core.whole",
             type_uri: "dm3.core.role_type"

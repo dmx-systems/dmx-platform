@@ -2,7 +2,7 @@ package de.deepamehta.plugins.workspaces;
 
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
-import de.deepamehta.core.model.AssociationData;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Composite;
@@ -142,20 +142,20 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     public void assignTopic(long workspaceId, long topicId) {
         checkWorkspaceId(workspaceId);
         //
-        AssociationData assocData = new AssociationData(WORKSPACE_TOPIC);
-        assocData.addTopicRole(new TopicRole(workspaceId, ROLE_TYPE_WORKSPACE));
-        assocData.addTopicRole(new TopicRole(topicId, ROLE_TYPE_TOPIC));
-        dms.createAssociation(assocData, null);         // clientContext=null
+        AssociationModel assocModel = new AssociationModel(WORKSPACE_TOPIC);
+        assocModel.setRole1(new TopicRole(workspaceId, ROLE_TYPE_WORKSPACE));
+        assocModel.setRole2(new TopicRole(topicId, ROLE_TYPE_TOPIC));
+        dms.createAssociation(assocModel, null);         // clientContext=null
     }
 
     @Override
     public void assignType(long workspaceId, long typeId) {
         checkWorkspaceId(workspaceId);
         //
-        AssociationData assocData = new AssociationData(WORKSPACE_TYPE);
-        assocData.addTopicRole(new TopicRole(workspaceId, ROLE_TYPE_WORKSPACE));
-        assocData.addTopicRole(new TopicRole(typeId, ROLE_TYPE_TYPE));
-        dms.createAssociation(assocData, null);         // clientContext=null
+        AssociationModel assocModel = new AssociationModel(WORKSPACE_TYPE);
+        assocModel.setRole1(new TopicRole(workspaceId, ROLE_TYPE_WORKSPACE));
+        assocModel.setRole2(new TopicRole(typeId, ROLE_TYPE_TYPE));
+        dms.createAssociation(assocModel, null);         // clientContext=null
     }
 
     @Override

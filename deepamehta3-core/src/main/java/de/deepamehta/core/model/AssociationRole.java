@@ -10,18 +10,17 @@ import java.util.Map;
 
 
 
-public class AssociationRole {
+public class AssociationRole extends Role {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private long   assocId;
-    private String roleTypeUri;
+    private long assocId;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public AssociationRole(long assocId, String roleTypeUri) {
+        super(roleTypeUri);
         this.assocId = assocId;
-        this.roleTypeUri = roleTypeUri;
     }
 
     public AssociationRole(JSONObject assocRole) {
@@ -37,10 +36,6 @@ public class AssociationRole {
 
     public long getAssociationId() {
         return assocId;
-    }
-
-    public String getRoleTypeUri() {
-        return roleTypeUri;
     }
 
     // ---

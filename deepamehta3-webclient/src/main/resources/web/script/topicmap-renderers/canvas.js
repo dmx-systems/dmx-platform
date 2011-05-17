@@ -851,15 +851,15 @@ function Canvas() {
     function CanvasAssoc(assoc) {
         this.id = assoc.id
         this.type_uri = assoc.type_uri
-        this.topic_roles = assoc.topic_roles
-        this.assoc_roles = assoc.assoc_roles
+        this.role_1 = assoc.role_1
+        this.role_2 = assoc.role_2
 
         this.get_topic1_id = function() {
-            return this.topic_roles[0].topic_id
+            return this.role_1.topic_id
         }
 
         this.get_topic2_id = function() {
-            return this.topic_roles[1].topic_id
+            return this.role_2.topic_id
         }
     }
 

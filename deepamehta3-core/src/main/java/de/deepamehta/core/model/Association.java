@@ -25,9 +25,9 @@ public interface Association {
 
     // ---
 
-    Set<TopicRole> getTopicRoles();
+    Role getRole1();
 
-    Set<AssociationRole> getAssociationRoles();
+    Role getRole2();
 
     // ---
 
@@ -35,11 +35,15 @@ public interface Association {
 
     Set<Topic> getTopics(String roleTypeUri);
 
-    // ---
+    // === Traversal ===
 
-    void addTopicRole(TopicRole topicRole);
+    Topic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                     String othersTopicTypeUri,
+                                                                     boolean fetchComposite);
 
-    void addAssociationRole(AssociationRole assocRole);
+    Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                  String othersTopicTypeUri,
+                                                                                  boolean fetchComposite);
 
     // ---
 

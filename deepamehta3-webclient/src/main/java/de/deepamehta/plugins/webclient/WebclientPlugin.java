@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.webclient;
 
-import de.deepamehta.core.model.AssociationData;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.DeepaMehtaTransaction;
@@ -157,10 +157,10 @@ public class WebclientPlugin extends Plugin {
         logger.info("Associating " + topics.size() + " result topics to search topic (ID " + searchTopic.getId() + ")");
         for (Topic topic : topics) {
             logger.info("Associating " + topic);
-            AssociationData assocData = new AssociationData("dm3.webclient.search_result_item");
-            assocData.addTopicRole(new TopicRole(searchTopic.getId(), "dm3.webclient.search"));
-            assocData.addTopicRole(new TopicRole(topic.getId(), "dm3.webclient.search_result_item"));
-            dms.createAssociation(assocData, clientContext);
+            AssociationModel assocModel = new AssociationModel("dm3.webclient.search_result_item");
+            assocModel.setRole1(new TopicRole(searchTopic.getId(), "dm3.webclient.search"));
+            assocModel.setRole2(new TopicRole(topic.getId(), "dm3.webclient.search_result_item"));
+            dms.createAssociation(assocModel, clientContext);
         }
         return searchTopic;
     }

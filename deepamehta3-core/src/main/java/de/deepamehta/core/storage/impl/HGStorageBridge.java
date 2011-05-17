@@ -1,12 +1,13 @@
 package de.deepamehta.core.storage.impl;
 
 import de.deepamehta.core.model.Association;
-import de.deepamehta.core.model.AssociationData;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.AssociationRole;
 import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopic;
+import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
@@ -16,11 +17,11 @@ import de.deepamehta.core.storage.DeepaMehtaStorage;
 import de.deepamehta.hypergraph.ConnectedHyperEdge;
 import de.deepamehta.hypergraph.ConnectedHyperNode;
 import de.deepamehta.hypergraph.HyperEdge;
-import de.deepamehta.hypergraph.HyperEdgeRole;
 import de.deepamehta.hypergraph.HyperGraph;
 import de.deepamehta.hypergraph.HyperGraphIndexMode;
 import de.deepamehta.hypergraph.HyperNode;
-import de.deepamehta.hypergraph.HyperNodeRole;
+import de.deepamehta.hypergraph.HyperObject;
+import de.deepamehta.hypergraph.HyperObjectRole;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -69,11 +70,11 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public RelatedTopic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                           String othersRoleTypeUri,
-                                                                           String othersTopicTypeUri) {
-        Set<RelatedTopic> relTopics = getRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-                                                                                             othersTopicTypeUri);
+    public RelatedTopic getTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                                String othersRoleTypeUri,
+                                                                                String othersTopicTypeUri) {
+        Set<RelatedTopic> relTopics = getTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+                                                                                                  othersTopicTypeUri);
         switch (relTopics.size()) {
         case 0:
             return null;
@@ -87,9 +88,9 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     }
 
     @Override
-    public Set<RelatedTopic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                                 String othersRoleTypeUri,
-                                                                                 String othersTopicTypeUri) {
+    public Set<RelatedTopic> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                                      String othersRoleTypeUri,
+                                                                                      String othersTopicTypeUri) {
         Set<ConnectedHyperNode> nodes = hg.getHyperNode(topicId).getConnectedHyperNodes(myRoleTypeUri,
                                                                                         othersRoleTypeUri);
         if (othersTopicTypeUri != null) {
@@ -178,6 +179,44 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         return buildAssociations(edges);
     }
 
+    // ---
+
+    @Override
+    public RelatedTopic getAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                                                      String othersRoleTypeUri,
+                                                                                      String othersTopicTypeUri) {
+        Set<RelatedTopic> relTopics = getAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
+                                                                                         othersRoleTypeUri,
+                                                                                         othersTopicTypeUri);
+        switch (relTopics.size()) {
+        case 0:
+            return null;
+        case 1:
+            return relTopics.iterator().next();
+        default:
+            throw new RuntimeException("Ambiguity: there are " + relTopics.size() + " related topics " + "(assocId=" +
+                assocId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
+                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
+        }
+    }
+
+    @Override
+    public Set<RelatedTopic> getAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                                                            String othersRoleTypeUri,
+                                                                                            String othersTopicTypeUri) {
+        Set<ConnectedHyperNode> nodes = hg.getHyperEdge(assocId).getConnectedHyperNodes(myRoleTypeUri,
+                                                                                        othersRoleTypeUri);
+        if (othersTopicTypeUri != null) {
+            filterNodesByTopicType(nodes, othersTopicTypeUri);
+        }
+        if (assocTypeUri != null) {
+            filterNodesByAssociationType(nodes, assocTypeUri);
+        }
+        return buildRelatedTopics(nodes);
+    }
+
+    // ---
+
     @Override
     public Association getAssociationRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                                                            String othersRoleTypeUri) {
@@ -189,28 +228,22 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public Association createAssociation(AssociationData assocData) {
-        String typeUri = assocData.getTypeUri();
-        Set<TopicRole> topicRoles = assocData.getTopicRoles();
-        Set<AssociationRole> assocRoles = assocData.getAssociationRoles();
+    public Association createAssociation(AssociationModel assocModel) {
+        String typeUri = assocModel.getTypeUri();
         //
         if (typeUri == null) {
             throw new IllegalArgumentException("Tried to create an association with null association type " +
                 "(typeUri=null)");
         }
         //
-        HyperEdge edge = hg.createHyperEdge();
-        for (TopicRole topicRole : topicRoles) {
-            addTopicToEdge(edge, topicRole);
-        }
-        for (AssociationRole assocRole : assocRoles) {
-            addAssociationToEdge(edge, assocRole);
-        }
+        Role role1 = assocModel.getRole1();
+        Role role2 = assocModel.getRole2();
+        HyperEdge edge = hg.createHyperEdge(getHyperObjectRole(role1), getHyperObjectRole(role2));
         //
-        return buildAssociation(edge.getId(), typeUri, topicRoles, assocRoles);
+        return buildAssociation(edge.getId(), typeUri, role1, role2);
     }
 
-    @Override
+    /* @Override
     public void addTopicToAssociation(long assocId, TopicRole topicRole) {
         addTopicToEdge(hg.getHyperEdge(assocId), topicRole);
     }
@@ -218,7 +251,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     @Override
     public void addAssociationToAssociation(long assocId, AssociationRole assocRole) {
         addAssociationToEdge(hg.getHyperEdge(assocId), assocRole);
-    }
+    } */
 
     @Override
     public void deleteAssociation(long assocId) {
@@ -318,13 +351,12 @@ public class HGStorageBridge implements DeepaMehtaStorage {
             throw new IllegalArgumentException("Tried to build an Association from a null HyperEdge");
         }
         //
-        return buildAssociation(edge.getId(), getAssociationTypeUri(edge), getTopicRoles(edge),
-                                                                           getAssociationRoles(edge));
+        List<Role> roles = getRoles(edge);
+        return buildAssociation(edge.getId(), getAssociationTypeUri(edge), roles.get(0), roles.get(1));
     }
 
-    private Association buildAssociation(long id, String typeUri, Set<TopicRole> topicRoles,
-                                                                  Set<AssociationRole> assocRoles) {
-        return new HGAssociation(id, typeUri, topicRoles, assocRoles);
+    private Association buildAssociation(long id, String typeUri, Role role1, Role role2) {
+        return new HGAssociation(id, typeUri, role1, role2);
     }
 
     // ---
@@ -500,37 +532,43 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
-    private void addTopicToEdge(HyperEdge edge, TopicRole topicRole) {
-        String roleTypeUri = topicRole.getRoleTypeUri();
+    private HyperObjectRole getHyperObjectRole(Role role) {
+        String roleTypeUri = role.getRoleTypeUri();
         lookupRoleType(roleTypeUri);    // consistency check
-        edge.addHyperNode(getRoleNode(topicRole), roleTypeUri);
+        return new HyperObjectRole(getRoleObject(role), roleTypeUri);
     }
 
-    private void addAssociationToEdge(HyperEdge edge, AssociationRole assocRole) {
-        String roleTypeUri = assocRole.getRoleTypeUri();
-        lookupRoleType(roleTypeUri);    // consistency check
-        edge.addHyperEdge(getRoleEdge(assocRole), roleTypeUri);
+    private List<Role> getRoles(HyperEdge edge) {
+        List<Role> roles = new ArrayList();
+        for (HyperObjectRole objectRole : edge.getHyperObjects()) {
+            HyperObject hyperObject = objectRole.getHyperObject();
+            String roleTypeUri = objectRole.getRoleType();
+            long id = hyperObject.getId();
+            //
+            Role role;
+            if (hyperObject instanceof HyperNode) {
+                role = new TopicRole(id, roleTypeUri);
+            } else if (hyperObject instanceof HyperEdge) {
+                role = new AssociationRole(id, roleTypeUri);
+            } else {
+                throw new RuntimeException("Unexpected HyperObject (" + hyperObject.getClass() + ")");
+            }
+            roles.add(role);
+        }
+        return roles;
     }
 
     // ---
 
-    private Set<TopicRole> getTopicRoles(HyperEdge edge) {
-        Set<TopicRole> topicRoles = new HashSet();
-        for (HyperNodeRole role : edge.getHyperNodes()) {
-            topicRoles.add(new TopicRole(role.getHyperNode().getId(), role.getRoleType()));
+    private HyperObject getRoleObject(Role role) {
+        if (role instanceof TopicRole) {
+            return getRoleNode((TopicRole) role);
+        } else if (role instanceof AssociationRole) {
+            return getRoleEdge((AssociationRole) role);
+        } else {
+            throw new RuntimeException("Unexpected Role object (" + role.getClass() + ")");
         }
-        return topicRoles;
     }
-
-    private Set<AssociationRole> getAssociationRoles(HyperEdge edge) {
-        Set<AssociationRole> assocRoles = new HashSet();
-        for (HyperEdgeRole role : edge.getHyperEdges()) {
-            assocRoles.add(new AssociationRole(role.getHyperEdge().getId(), role.getRoleType()));
-        }
-        return assocRoles;
-    }
-
-    // ---
 
     private HyperNode getRoleNode(TopicRole topicRole) {
         if (topicRole.topicIdentifiedByUri()) {

@@ -1,7 +1,7 @@
 package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Association;
-import de.deepamehta.core.model.AssociationData;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.IndexMode;
@@ -87,7 +87,7 @@ class AttachedTopic extends TopicBase {
 
     @Override
     public Set<RelatedTopic> getRelatedTopics(String assocTypeUri) {
-        Set<RelatedTopic> topics = dms.storage.getRelatedTopics(getId(), assocTypeUri, null, null, null);
+        Set<RelatedTopic> topics = dms.storage.getTopicRelatedTopics(getId(), assocTypeUri, null, null, null);
         //
         /* ### for (RelatedTopic topic : topics) {
             triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, relTopic.getTopic());
@@ -101,7 +101,7 @@ class AttachedTopic extends TopicBase {
     public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri,
                                                                                            boolean fetchComposite) {
-        RelatedTopic topic = dms.storage.getRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        RelatedTopic topic = dms.storage.getTopicRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
         return topic != null ? dms.attach(topic, fetchComposite) : null;
     }
@@ -110,7 +110,7 @@ class AttachedTopic extends TopicBase {
     public Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                          String othersTopicTypeUri,
                                                                                          boolean fetchComposite) {
-        return dms.attach(dms.storage.getRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return dms.attach(dms.storage.getTopicRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri), fetchComposite);
     }
 
@@ -307,10 +307,10 @@ class AttachedTopic extends TopicBase {
     }
 
     private void associateChildTopic(AssociationDefinition assocDef, long childTopicId) {
-        AssociationData assocData = new AssociationData(assocDef.getAssocTypeUri());
-        assocData.addTopicRole(new TopicRole(getId(), assocDef.getRoleTypeUri1()));
-        assocData.addTopicRole(new TopicRole(childTopicId, assocDef.getRoleTypeUri2()));
-        dms.createAssociation(assocData, null);     // FIXME: clientContext=null
+        AssociationModel assocModel = new AssociationModel(assocDef.getAssocTypeUri());
+        assocModel.setRole1(new TopicRole(getId(), assocDef.getRoleTypeUri1()));
+        assocModel.setRole2(new TopicRole(childTopicId, assocDef.getRoleTypeUri2()));
+        dms.createAssociation(assocModel, null);     // FIXME: clientContext=null
     }
 
     // ---

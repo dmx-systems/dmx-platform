@@ -1,7 +1,7 @@
 package de.deepamehta.core.storage;
 
 import de.deepamehta.core.model.Association;
-import de.deepamehta.core.model.AssociationData;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRole;
 import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.IndexMode;
@@ -71,8 +71,9 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    RelatedTopic getRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                          String othersTopicTypeUri);
+    RelatedTopic getTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                         String othersRoleTypeUri,
+                                                                         String othersTopicTypeUri);
 
     /**
      * @param   assocTypeUri        may be null
@@ -80,9 +81,9 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Set<RelatedTopic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                          String othersRoleTypeUri,
-                                                                          String othersTopicTypeUri);
+    Set<RelatedTopic> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                               String othersRoleTypeUri,
+                                                                               String othersTopicTypeUri);
 
     // ---
 
@@ -149,16 +150,40 @@ public interface DeepaMehtaStorage {
      */
     Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
 
+    // ---
+
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
+    RelatedTopic getAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                                               String othersRoleTypeUri,
+                                                                               String othersTopicTypeUri);
+
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
+    Set<RelatedTopic> getAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                                                     String othersRoleTypeUri,
+                                                                                     String othersTopicTypeUri);
+
+    // ---
+
     Association getAssociationRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                                                     String othersRoleTypeUri);
 
     // ---
 
-    Association createAssociation(AssociationData assoc);
+    Association createAssociation(AssociationModel assocModel);
 
-    void addTopicToAssociation(long assocId, TopicRole topicRole);
+    // void addTopicToAssociation(long assocId, TopicRole topicRole);
 
-    void addAssociationToAssociation(long assocId, AssociationRole assocRole);
+    // void addAssociationToAssociation(long assocId, AssociationRole assocRole);
 
     // void setRelationProperties(long id, Properties properties);
 

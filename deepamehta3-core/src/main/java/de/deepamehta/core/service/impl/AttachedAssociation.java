@@ -1,10 +1,11 @@
 package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Association;
-import de.deepamehta.core.model.AssociationData;
-import de.deepamehta.core.model.AssociationRole;
+import de.deepamehta.core.model.RelatedTopic;
+import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicRole;
+import de.deepamehta.core.model.impl.AssociationBase;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +17,7 @@ import java.util.logging.Logger;
 /**
  * An association that is attached to the {@link CoreService}.
  */
-class AttachedAssociation extends AssociationData implements Association {
+class AttachedAssociation extends AssociationBase {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -27,11 +28,13 @@ class AttachedAssociation extends AssociationData implements Association {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedAssociation(Association assoc, EmbeddedService dms) {
-        super(assoc);
+        super(((AssociationBase) assoc).getModel());
         this.dms = dms;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    // === Association Overrides ===
 
     @Override
     public Topic getTopic(String roleTypeUri) {
@@ -50,29 +53,39 @@ class AttachedAssociation extends AssociationData implements Association {
     @Override
     public Set<Topic> getTopics(String roleTypeUri) {
         Set<Topic> topics = new HashSet();
-        for (TopicRole topicRole : getTopicRoles()) {
-            if (topicRole.getRoleTypeUri().equals(roleTypeUri)) {
-                topics.add(dms.getTopic(topicRole.getTopicId(), null));
-            }
-        }
+        filterTopic(getRole1(), roleTypeUri, topics);
+        filterTopic(getRole2(), roleTypeUri, topics);
         return topics;
     }
 
     // ---
 
     @Override
-    public void addTopicRole(TopicRole topicRole) {
-        // update memory
-        super.addTopicRole(topicRole);
-        // update DB
-        dms.addTopicToAssociation(getId(), topicRole);
+    public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                           String othersTopicTypeUri,
+                                                                                           boolean fetchComposite) {
+        RelatedTopic topic = dms.storage.getAssociationRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
+        return topic != null ? dms.attach(topic, fetchComposite) : null;
     }
 
     @Override
-    public void addAssociationRole(AssociationRole assocRole) {
-        // update memory
-        super.addAssociationRole(assocRole);
-        // update DB
-        dms.addAssociationToAssociation(getId(), assocRole);
+    public Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                         String othersTopicTypeUri,
+                                                                                         boolean fetchComposite) {
+        return dms.attach(dms.storage.getAssociationRelatedTopics(getId(), assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri), fetchComposite);
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void filterTopic(Role role, String roleTypeUri, Set<Topic> topics) {
+        if (role instanceof TopicRole && role.getRoleTypeUri().equals(roleTypeUri)) {
+            topics.add(getRoleTopic((TopicRole) role));
+        }
+    }
+
+    private Topic getRoleTopic(TopicRole role) {
+        return dms.getTopic(role.getTopicId(), null);
     }
 }

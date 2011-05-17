@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.server;
 
 import de.deepamehta.plugins.server.provider.AssociationCollectionProvider;
-import de.deepamehta.plugins.server.provider.AssociationDataProvider;
+import de.deepamehta.plugins.server.provider.AssociationModelProvider;
 import de.deepamehta.plugins.server.provider.AssociationProvider;
 import de.deepamehta.plugins.server.provider.CommandParamsProvider;
 import de.deepamehta.plugins.server.provider.CommandResultProvider;
@@ -28,7 +28,7 @@ public class Application extends javax.ws.rs.core.Application {
         Set classes = new HashSet();
         // provider classes
         classes.add(AssociationCollectionProvider.class);
-        classes.add(AssociationDataProvider.class);
+        classes.add(AssociationModelProvider.class);
         classes.add(AssociationProvider.class);
         classes.add(CommandParamsProvider.class);
         classes.add(CommandResultProvider.class);

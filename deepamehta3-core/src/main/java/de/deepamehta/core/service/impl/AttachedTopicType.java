@@ -1,7 +1,7 @@
 package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Association;
-import de.deepamehta.core.model.AssociationData;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.AssociationRole;
 import de.deepamehta.core.model.IndexMode;
@@ -268,7 +268,9 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
     }
 
     private ViewConfiguration fetchViewConfig(Association assoc) {
-        Set<Topic> topics = assoc.getTopics("dm3.core.view_config");
+        Set<RelatedTopic> topics = assoc.getRelatedTopics("dm3.core.aggregation", "dm3.core.assoc_def",
+            "dm3.core.view_config", null, true);    // fetchComposite=true
+        // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
         return new ViewConfiguration(topics);
     }
 
@@ -295,8 +297,10 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
     } */
 
     private Cardinality fetchCardinality(Association assoc) {
-        Topic cardinality1 = assoc.getTopic("dm3.core.cardinality_1");
-        Topic cardinality2 = assoc.getTopic("dm3.core.cardinality_2");
+        Topic cardinality1 = assoc.getRelatedTopic("dm3.core.aggregation", "dm3.core.assoc_def",
+            "dm3.core.cardinality_1", "dm3.core.cardinality", false);    // fetchComposite=false
+        Topic cardinality2 = assoc.getRelatedTopic("dm3.core.aggregation", "dm3.core.assoc_def",
+            "dm3.core.cardinality_2", "dm3.core.cardinality", false);    // fetchComposite=false
         Cardinality cardinality = new Cardinality();
         if (cardinality1 != null) {
             cardinality.setCardinalityUri1(cardinality1.getUri());
@@ -356,10 +360,10 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
 
     private void storeIndexModes() {
         for (IndexMode indexMode : getIndexModes()) {
-            AssociationData assocData = new AssociationData("dm3.core.association");
-            assocData.addTopicRole(new TopicRole(getUri(), "dm3.core.topic_type"));
-            assocData.addTopicRole(new TopicRole(indexMode.toUri(), "dm3.core.index_mode"));
-            dms.createAssociation(assocData, null);         // FIXME: clientContext=null
+            AssociationModel assocModel = new AssociationModel("dm3.core.association");
+            assocModel.setRole1(new TopicRole(getUri(), "dm3.core.topic_type"));
+            assocModel.setRole2(new TopicRole(indexMode.toUri(), "dm3.core.index_mode"));
+            dms.createAssociation(assocModel, null);         // FIXME: clientContext=null
         }
     }
 
@@ -377,8 +381,25 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
      */
     private void storeAssocDef(AssociationDefinition assocDef, AssociationDefinition predAssocDef) {
         try {
-            Association assoc = dms.createAssociation(assocDef.toAssociationData(), null);  // FIXME: clientContext=null
+            // topic types
+            Association assoc = dms.createAssociation(assocDef.getAssocTypeUri(),
+                new TopicRole(assocDef.getTopicTypeUri1(), "dm3.core.topic_type_1"),
+                new TopicRole(assocDef.getTopicTypeUri2(), "dm3.core.topic_type_2"));
             assocDef.setId(assoc.getId());
+            // role types
+            dms.createAssociation("dm3.core.aggregation",
+                new TopicRole(assocDef.getRoleTypeUri1(), "dm3.core.role_type_1"),
+                new AssociationRole(assoc.getId(), "dm3.core.assoc_def"));
+            dms.createAssociation("dm3.core.aggregation",
+                new TopicRole(assocDef.getRoleTypeUri2(), "dm3.core.role_type_2"),
+                new AssociationRole(assoc.getId(), "dm3.core.assoc_def"));
+            // cardinality
+            dms.createAssociation("dm3.core.aggregation",
+                new TopicRole(assocDef.getCardinalityUri1(), "dm3.core.cardinality_1"),
+                new AssociationRole(assoc.getId(), "dm3.core.assoc_def"));
+            dms.createAssociation("dm3.core.aggregation",
+                new TopicRole(assocDef.getCardinalityUri2(), "dm3.core.cardinality_2"),
+                new AssociationRole(assoc.getId(), "dm3.core.assoc_def"));
             //
             putInSequence(assocDef, predAssocDef);
             //
@@ -392,16 +413,16 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
     private void putInSequence(AssociationDefinition assocDef, AssociationDefinition predAssocDef) {
         if (predAssocDef == null) {
             // start sequence
-            AssociationData assocData = new AssociationData("dm3.core.association");
-            assocData.addTopicRole(new TopicRole(getUri(), "dm3.core.topic_type"));
-            assocData.addAssociationRole(new AssociationRole(assocDef.getId(), "dm3.core.first_assoc_def"));
-            dms.createAssociation(assocData, null);                     // FIXME: clientContext=null
+            AssociationModel assocModel = new AssociationModel("dm3.core.association");
+            assocModel.setRole1(new TopicRole(getUri(), "dm3.core.topic_type"));
+            assocModel.setRole2(new AssociationRole(assocDef.getId(), "dm3.core.first_assoc_def"));
+            dms.createAssociation(assocModel, null);                     // FIXME: clientContext=null
         } else {
             // continue sequence
-            AssociationData assocData = new AssociationData("dm3.core.sequence");
-            assocData.addAssociationRole(new AssociationRole(predAssocDef.getId(), "dm3.core.predecessor"));
-            assocData.addAssociationRole(new AssociationRole(assocDef.getId(),     "dm3.core.successor"));
-            dms.createAssociation(assocData, null);                     // FIXME: clientContext=null
+            AssociationModel assocModel = new AssociationModel("dm3.core.sequence");
+            assocModel.setRole1(new AssociationRole(predAssocDef.getId(), "dm3.core.predecessor"));
+            assocModel.setRole2(new AssociationRole(assocDef.getId(),     "dm3.core.successor"));
+            dms.createAssociation(assocModel, null);                     // FIXME: clientContext=null
         }
     }
 
@@ -411,17 +432,19 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
     private void storeViewConfig() {
         for (TopicModel configTopic : getViewConfig().getConfigTopics()) {
             Topic topic = dms.createTopic(configTopic, null);           // FIXME: clientContext=null
-            AssociationData assocData = new AssociationData("dm3.core.association");
-            assocData.addTopicRole(new TopicRole(getUri(),  "dm3.core.topic_type"));
-            assocData.addTopicRole(new TopicRole(topic.getId(), "dm3.core.view_config"));
-            dms.createAssociation(assocData, null);                     // FIXME: clientContext=null
+            AssociationModel assocModel = new AssociationModel("dm3.core.association");
+            assocModel.setRole1(new TopicRole(getUri(), "dm3.core.topic_type"));
+            assocModel.setRole2(new TopicRole(topic.getId(), "dm3.core.view_config"));
+            dms.createAssociation(assocModel, null);                     // FIXME: clientContext=null
         }
     }
 
     private void storeViewConfig(Association assocDef, ViewConfiguration viewConfig) {
         for (TopicModel configTopic : viewConfig.getConfigTopics()) {
             Topic topic = dms.createTopic(configTopic, null);           // FIXME: clientContext=null
-            assocDef.addTopicRole(new TopicRole(topic.getId(), "dm3.core.view_config"));
+            dms.createAssociation("dm3.core.aggregation",
+                new TopicRole(topic.getId(), "dm3.core.view_config"),
+                new AssociationRole(assocDef.getId(), "dm3.core.assoc_def"));
         }
     }
 

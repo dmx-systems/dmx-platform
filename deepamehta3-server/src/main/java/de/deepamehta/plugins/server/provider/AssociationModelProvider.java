@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.server.provider;
 
-import de.deepamehta.core.model.AssociationData;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.JSONHelper;
 import de.deepamehta.core.util.UploadedFile;
@@ -33,7 +33,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class AssociationDataProvider implements MessageBodyReader<AssociationData> {
+public class AssociationModelProvider implements MessageBodyReader<AssociationModel> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -54,18 +54,18 @@ public class AssociationDataProvider implements MessageBodyReader<AssociationDat
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
-        return type == AssociationData.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
+        return type == AssociationModel.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Override
-    public AssociationData readFrom(Class<AssociationData> type, Type genericType, Annotation[] annotations,
+    public AssociationModel readFrom(Class<AssociationModel> type, Type genericType, Annotation[] annotations,
             MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
                                                                 throws IOException, WebApplicationException {
         try {
             String json = JavaUtils.readText(entityStream);
-            return new AssociationData(new JSONObject(json));
+            return new AssociationModel(new JSONObject(json));
         } catch (Exception e) {
-            throw new IOException("Creating AssociationData from message body failed", e);
+            throw new IOException("Creating AssociationModel from message body failed", e);
         }
     }
 }

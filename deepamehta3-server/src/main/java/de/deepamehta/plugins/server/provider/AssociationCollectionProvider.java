@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.server.provider;
 
 import de.deepamehta.core.model.Association;
-import de.deepamehta.core.model.AssociationData;
+import de.deepamehta.core.model.AssociationModel;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class AssociationCollectionProvider implements MessageBodyWriter<Collecti
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            AssociationData.associationsToJSON(assocs).write(writer);
+            AssociationModel.associationsToJSON(assocs).write(writer);
             writer.flush();
         } catch (Exception e) {
             throw new IOException("Writing message body failed (" + assocs + ")", e);

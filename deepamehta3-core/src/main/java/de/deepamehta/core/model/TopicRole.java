@@ -19,29 +19,28 @@ import java.util.Map;
  * <p>
  * In the database a role type is represented by a topic of type "dm3.core.role_type".
  */
-public class TopicRole {
+public class TopicRole extends Role {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private long   topicId;
     private String topicUri;
-    private String roleTypeUri;
 
     private boolean topicIdentifiedByUri;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public TopicRole(long topicId, String roleTypeUri) {
+        super(roleTypeUri);
         this.topicId = topicId;
         this.topicUri = null;
-        this.roleTypeUri = roleTypeUri;
         this.topicIdentifiedByUri = false;
     }
 
     public TopicRole(String topicUri, String roleTypeUri) {
+        super(roleTypeUri);
         this.topicId = -1;
         this.topicUri = topicUri;
-        this.roleTypeUri = roleTypeUri;
         this.topicIdentifiedByUri = true;
     }
 
@@ -77,10 +76,6 @@ public class TopicRole {
             throw new IllegalStateException("The topic is not identified by URI but by ID (" + this + ")");
         }
         return topicUri;
-    }
-
-    public String getRoleTypeUri() {
-        return roleTypeUri;
     }
 
     public boolean topicIdentifiedByUri() {

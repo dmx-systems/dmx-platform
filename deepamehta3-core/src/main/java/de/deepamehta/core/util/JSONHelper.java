@@ -1,7 +1,7 @@
 package de.deepamehta.core.util;
 
 import de.deepamehta.core.model.Association;
-import de.deepamehta.core.model.AssociationData;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeData;
 import de.deepamehta.core.model.MetaTypeData;
 import de.deepamehta.core.model.PluginInfo;
@@ -126,7 +126,7 @@ public class JSONHelper {
     public static void createTopicTypes(JSONArray topicTypes, CoreService dms) throws Exception {
         for (int i = 0; i < topicTypes.length(); i++) {
             TopicTypeModel topicTypeModel = new TopicTypeModel(topicTypes.getJSONObject(i));
-            dms.createTopicType(topicTypeModel, null);           // clientContext=null
+            dms.createTopicType(topicTypeModel, null);          // clientContext=null
         }
     }
 
@@ -140,14 +140,14 @@ public class JSONHelper {
     public static void createTopics(JSONArray topics, CoreService dms) throws Exception {
         for (int i = 0; i < topics.length(); i++) {
             TopicModel topicModel = new TopicModel(topics.getJSONObject(i));
-            dms.createTopic(topicModel, null);                   // clientContext=null
+            dms.createTopic(topicModel, null);                  // clientContext=null
         }
     }
 
     public static void createAssociations(JSONArray assocs, CoreService dms) throws Exception {
         for (int i = 0; i < assocs.length(); i++) {
-            AssociationData assocData = new AssociationData(assocs.getJSONObject(i));
-            dms.createAssociation(assocData, null);             // clientContext=null
+            AssociationModel assocModel = new AssociationModel(assocs.getJSONObject(i));
+            dms.createAssociation(assocModel, null);            // clientContext=null
         }
     }
 }

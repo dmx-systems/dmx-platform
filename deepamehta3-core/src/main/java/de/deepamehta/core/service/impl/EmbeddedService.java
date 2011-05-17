@@ -1,7 +1,7 @@
 package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Association;
-import de.deepamehta.core.model.AssociationData;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.AssociationRole;
 import de.deepamehta.core.model.AssociationTypeData;
@@ -13,6 +13,7 @@ import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.MetaTypeData;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.RelatedTopic;
+import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
@@ -464,18 +465,18 @@ public class EmbeddedService implements CoreService {
     @POST
     @Path("/association")
     @Override
-    public Association createAssociation(AssociationData assocData,
+    public Association createAssociation(AssociationModel assocModel,
                                          @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Association assoc = attach(storage.createAssociation(assocData));
+            Association assoc = attach(storage.createAssociation(assocModel));
             associateWithAssociationType(assoc);
             //
             tx.success();
             return assoc;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating association failed (" + assocData + ")", e);
+            throw new RuntimeException("Creating association failed (" + assocModel + ")", e);
         } finally {
             tx.finish();
         }
@@ -841,7 +842,7 @@ public class EmbeddedService implements CoreService {
 
     // === Association API Delegates ===
 
-    void addTopicToAssociation(long assocId, TopicRole topicRole) {
+    /* void addTopicToAssociation(long assocId, TopicRole topicRole) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             storage.addTopicToAssociation(assocId, topicRole);
@@ -866,8 +867,16 @@ public class EmbeddedService implements CoreService {
         } finally {
             tx.finish();
         }
-    }
+    } */
 
+    // === Helper ===
+
+    /**
+     * Convenience method.
+     */
+    Association createAssociation(String typeUri, Role role1, Role role2) {
+        return createAssociation(new AssociationModel(typeUri, role1, role2), null);    // FIXME: clientContext=null
+    }
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -941,10 +950,10 @@ public class EmbeddedService implements CoreService {
 
     void associateWithTopicType(Topic topic) {
         try {
-            AssociationData assocData = new AssociationData("dm3.core.instantiation");
-            assocData.addTopicRole(new TopicRole(topic.getTypeUri(), "dm3.core.type"));
-            assocData.addTopicRole(new TopicRole(topic.getId(), "dm3.core.instance"));
-            associateWithAssociationType(storage.createAssociation(assocData));
+            AssociationModel assocModel = new AssociationModel("dm3.core.instantiation");
+            assocModel.setRole1(new TopicRole(topic.getTypeUri(), "dm3.core.type"));
+            assocModel.setRole2(new TopicRole(topic.getId(), "dm3.core.instance"));
+            associateWithAssociationType(storage.createAssociation(assocModel));
         } catch (Exception e) {
             throw new RuntimeException("Associating topic with topic type \"" +
                 topic.getTypeUri() + "\" failed (" + topic + ")", e);
@@ -953,10 +962,10 @@ public class EmbeddedService implements CoreService {
 
     private void associateWithAssociationType(Association assoc) {
         try {
-            AssociationData assocData = new AssociationData("dm3.core.instantiation");
-            assocData.addTopicRole(new TopicRole(assoc.getTypeUri(), "dm3.core.type"));
-            assocData.addAssociationRole(new AssociationRole(assoc.getId(), "dm3.core.instance"));
-            storage.createAssociation(assocData);
+            AssociationModel assocModel = new AssociationModel("dm3.core.instantiation");
+            assocModel.setRole1(new TopicRole(assoc.getTypeUri(), "dm3.core.type"));
+            assocModel.setRole2(new AssociationRole(assoc.getId(), "dm3.core.instance"));
+            storage.createAssociation(assocModel);
         } catch (Exception e) {
             throw new RuntimeException("Associating association with association type \"" +
                 assoc.getTypeUri() + "\" failed (" + assoc + ")", e);
@@ -992,10 +1001,10 @@ public class EmbeddedService implements CoreService {
 
     // FIXME: move to AttachedTopicType
     void associateDataType(String topicTypeUri, String dataTypeUri) {
-        AssociationData assocData = new AssociationData("dm3.core.association");
-        assocData.addTopicRole(new TopicRole(topicTypeUri, "dm3.core.topic_type"));
-        assocData.addTopicRole(new TopicRole(dataTypeUri,  "dm3.core.data_type"));
-        createAssociation(assocData, null);             // FIXME: clientContext=null
+        AssociationModel assocModel = new AssociationModel("dm3.core.association");
+        assocModel.setRole1(new TopicRole(topicTypeUri, "dm3.core.topic_type"));
+        assocModel.setRole2(new TopicRole(dataTypeUri,  "dm3.core.data_type"));
+        createAssociation(assocModel, null);             // FIXME: clientContext=null
     }
 
 

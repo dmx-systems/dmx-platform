@@ -29,13 +29,13 @@ public class ViewConfiguration {
     public ViewConfiguration() {
     }
 
-    public ViewConfiguration(Set<Topic> topics) {
+    /* ### public ViewConfiguration(Set<Topic> topics) {
         for (Topic topic : topics) {
             put(new TopicModel(topic));
         }
-    }
+    } */
 
-    public ViewConfiguration(Collection<RelatedTopic> topics) {
+    public ViewConfiguration(Set<RelatedTopic> topics) {
         for (Topic topic : topics) {
             put(new TopicModel(topic));
         }
