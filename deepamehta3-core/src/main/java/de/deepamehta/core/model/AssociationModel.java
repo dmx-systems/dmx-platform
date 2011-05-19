@@ -139,8 +139,10 @@ public class AssociationModel {
     private Role parseRole(JSONObject role) {
         if (role.has("topic_id") || role.has("topic_uri")) {
             return new TopicRole(role);
-        } else {
+        } else if (role.has("assoc_id")) {
             return new AssociationRole(role);
+        } else {
+            throw new RuntimeException("Parsing TopicRole/AssociationRole failed (JSONObject=" + role + ")");
         }
     }
 }

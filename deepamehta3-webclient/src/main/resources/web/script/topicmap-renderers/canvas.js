@@ -10,7 +10,7 @@ function Canvas() {
     var ACTIVE_COLOR = "red"
     var ACTIVE_TOPIC_WIDTH = 3
     var ACTIVE_ASSOC_WIDTH = 10
-    var ASSOC_COLOR = "gray"
+    var ASSOC_COLOR = "#b0b0b0"
     var ASSOC_WIDTH = 4
     var ASSOC_CLICK_TOLERANCE = 0.3
     var CANVAS_ANIMATION_STEPS = 30

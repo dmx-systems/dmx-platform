@@ -115,8 +115,8 @@ public class AssociationBase implements Association {
     // ----------------------------------------------------------------------------------------------- Protected Methods
 
     // ### This is supposed to be protected, but doesn't compile!
-    // ### It is called from the subclasses constructors, but on a differnt TopicBase instance.
-    // ### See de.deepamehta.core.storage.impl.HGTopic and de.deepamehta.core.service.impl.AttachedTopic.
+    // ### It is called from the subclass constructor, but on a differnt AssociationBase instance.
+    // ### See de.deepamehta.core.service.impl.AttachedAssociation.
     public AssociationModel getModel() {
         return model;
     }

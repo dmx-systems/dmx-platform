@@ -151,17 +151,6 @@ public class AssociationDefinition {
 
     // ---
 
-    /* ### public AssociationModel toAssociationModel() {
-        AssociationModel assocModel = new AssociationModel(getAssocTypeUri());
-        assocModel.addTopicRole(new TopicRole(getTopicTypeUri1(), "dm3.core.topic_type_1"));
-        assocModel.addTopicRole(new TopicRole(getTopicTypeUri2(), "dm3.core.topic_type_2"));
-        assocModel.addTopicRole(new TopicRole(getRoleTypeUri1(), "dm3.core.role_type_1"));
-        assocModel.addTopicRole(new TopicRole(getRoleTypeUri2(), "dm3.core.role_type_2"));
-        assocModel.addTopicRole(new TopicRole(getCardinalityUri1(), "dm3.core.cardinality_1"));
-        assocModel.addTopicRole(new TopicRole(getCardinalityUri2(), "dm3.core.cardinality_2"));
-        return assocModel;
-    } */
-
     public JSONObject toJSON() {
         try {
             JSONObject o = new JSONObject();

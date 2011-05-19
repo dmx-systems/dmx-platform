@@ -12,6 +12,7 @@ class HGTopic extends TopicBase {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    // Called from subclass constructor HGRelatedTopic
     HGTopic(Topic topic) {
         super(((TopicBase) topic).getModel());
     }
