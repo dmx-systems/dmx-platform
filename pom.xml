@@ -19,9 +19,9 @@
         <module>deepamehta3-notes</module>
         <module>deepamehta3-contacts</module>
         <module>deepamehta3-workspaces</module>
+        <module>deepamehta3-typeeditor</module>
 
         <!-- <module>deepamehta3-coretypes</module>
-        <module>deepamehta3-typeeditor</module>
         <module>deepamehta3-typesearch</module>
 
         <module>deepamehta3-time</module>

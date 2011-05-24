@@ -24,6 +24,8 @@ class TypeCache {
     private Map<String, AttachedTopicType> cache = new HashMap();   // key: topic type URI
     private EmbeddedService dms;
 
+    private int callCount = 0;
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -37,6 +39,13 @@ class TypeCache {
     TopicType get(String topicTypeUri) {
         AttachedTopicType topicType = cache.get(topicTypeUri);
         if (topicType == null) {
+            // error check
+            if (topicTypeUri.equals("dm3.core.topic_type")) {
+                callCount++;
+                if (callCount == 3) {
+                    throw new RuntimeException("Endless Recursion!");
+                }
+            }
             // fetch topic type
             logger.info("Loading topic type \"" + topicTypeUri + "\"");
             topicType = new AttachedTopicType(dms);

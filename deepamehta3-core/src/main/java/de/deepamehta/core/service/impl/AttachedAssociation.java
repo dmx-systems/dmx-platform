@@ -86,6 +86,6 @@ class AttachedAssociation extends AssociationBase {
     }
 
     private Topic getRoleTopic(TopicRole role) {
-        return dms.getTopic(role.getTopicId(), null);
+        return dms.getTopic(role.getTopicId(), false, null);    // fetchComposite=false
     }
 }

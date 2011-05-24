@@ -6,6 +6,7 @@ import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.AssociationRole;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopic;
+import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
@@ -34,14 +35,18 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private AttachedViewConfiguration viewConfig;
+
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedTopicType(EmbeddedService dms) {
-        this(null, dms);    // the model remains uninitialized. It is initialued later on through fetch().
+        super((TopicModel) null, dms);  // the model and viewConfig remain uninitialized.
+                                        // They are initialued later on through fetch().
     }
 
     AttachedTopicType(TopicTypeModel model, EmbeddedService dms) {
         super(model, dms);
+        initViewConfig();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -95,7 +100,7 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
 
     @Override
     public ViewConfiguration getViewConfig() {
-        return new AttachedViewConfiguration(getModel().getViewConfigModel(), dms);
+        return viewConfig;
     }
 
     // FIXME: to be dropped
@@ -139,6 +144,7 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
         addAssocDefs(topicTypeModel, assocDefs, sequenceIds);
         //
         setModel(topicTypeModel);
+        initViewConfig();
     }
 
     void store() {
@@ -150,7 +156,7 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
         dms.associateDataType(typeUri, getDataTypeUri());
         storeIndexModes();
         storeAssocDefs();
-        storeViewConfig();
+        viewConfig.store();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -430,16 +436,6 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
 
     // ---
 
-    // FIXME: to be called from setViewConfig()
-    private void storeViewConfig() {
-        for (TopicModel configTopic : getViewConfig().getConfigTopics()) {
-            Topic topic = dms.createTopic(configTopic, null);           // FIXME: clientContext=null
-            dms.createAssociation("dm3.core.association",
-                new TopicRole(getUri(), "dm3.core.topic_type"),
-                new TopicRole(topic.getId(), "dm3.core.view_config"));
-        }
-    }
-
     // FIXME: move to an AttachedAssociationDefinition class
     private void storeViewConfig(AssociationDefinition assocDef) {
         for (TopicModel configTopic : assocDef.getViewConfigModel().getConfigTopics()) {
@@ -453,6 +449,12 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
 
 
     // === Helper ===
+
+    private void initViewConfig() {
+        // Note: this type must be identified by its URI. Types being created have no ID yet.
+        Role configurable = new TopicRole(getUri(), "dm3.core.topic_type");
+        this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
+    }
 
     private AssociationDefinition findLastAssocDef() {
         AssociationDefinition lastAssocDef = null;

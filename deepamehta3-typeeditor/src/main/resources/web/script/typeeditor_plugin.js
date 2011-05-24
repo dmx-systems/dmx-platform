@@ -1,4 +1,4 @@
-function dm3_typeeditor() {
+function typeeditor_plugin() {
 
     dm3c.register_field_renderer("/de.deepamehta.3-typeeditor/script/field_definition_renderer.js")
     dm3c.css_stylesheet("/de.deepamehta.3-typeeditor/style/dm3-typeeditor.css")

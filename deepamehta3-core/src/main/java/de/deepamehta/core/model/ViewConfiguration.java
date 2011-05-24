@@ -8,4 +8,6 @@ package de.deepamehta.core.model;
 public interface ViewConfiguration {
 
     Iterable<TopicModel> getConfigTopics();
+
+    void addConfigTopic(TopicModel configTopic);
 }

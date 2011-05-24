@@ -161,9 +161,9 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
     @Override
     public Set<RelatedTopic> getWorkspaces(long typeId) {
-        Topic typeTopic = dms.getTopic(typeId, null);   // clientContext=null
+        Topic typeTopic = dms.getTopic(typeId, false, null);    // fetchComposite=false, clientContext=null
         return typeTopic.getRelatedTopics(WORKSPACE_TYPE, ROLE_TYPE_TYPE, ROLE_TYPE_WORKSPACE,
-            "dm3.workspaces.workspace", false);         // fetchComposite=false
+            "dm3.workspaces.workspace", false);                 // fetchComposite=false
     }
 
 
@@ -171,7 +171,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void checkWorkspaceId(long workspaceId) {
-        String typeUri = dms.getTopic(workspaceId, null).getTypeUri();
+        String typeUri = dms.getTopic(workspaceId, false, null).getTypeUri();   // fetchComposite=false
         if (!typeUri.equals("dm3.workspaces.workspace")) {
             throw new IllegalArgumentException("Topic " + workspaceId + " is not a workspace (but of type \"" +
                 typeUri + "\")");

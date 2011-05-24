@@ -160,10 +160,12 @@ public class EmbeddedService implements CoreService {
     @GET
     @Path("/topic/{id}")
     @Override
-    public AttachedTopic getTopic(@PathParam("id") long id, @HeaderParam("Cookie") ClientContext clientContext) {
+    public AttachedTopic getTopic(@PathParam("id") long id,
+                                  @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite,
+                                  @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopic topic = attach(storage.getTopic(id), true);
+            AttachedTopic topic = attach(storage.getTopic(id), fetchComposite);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
             tx.success();
             return topic;
@@ -356,7 +358,7 @@ public class EmbeddedService implements CoreService {
     public Topic updateTopic(TopicModel topicModel, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopic topic = getTopic(topicModel.getId(), clientContext);
+            AttachedTopic topic = getTopic(topicModel.getId(), true, clientContext);   // fetchComposite=true ### false?
             //
             // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
@@ -381,7 +383,7 @@ public class EmbeddedService implements CoreService {
     public void deleteTopic(@PathParam("id") long topicId, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Topic topic = getTopic(topicId, clientContext);
+            Topic topic = getTopic(topicId, true, clientContext);   // fetchComposite=true ### false?
             deleteTopic(topic);
             tx.success();
         } catch (Exception e) {
@@ -813,7 +815,7 @@ public class EmbeddedService implements CoreService {
                                               @QueryParam("assoc_type_uri") String assocTypeUri) {
         logger.info("topicId=" + topicId + ", assocTypeUri=\"" + assocTypeUri + "\"");
         try {
-            return getTopic(topicId, null).getRelatedTopics(assocTypeUri);
+            return getTopic(topicId, false, null).getRelatedTopics(assocTypeUri);   // fetchComposite=false
         } catch (Exception e) {
             throw new RuntimeException("Retrieving related topics of topic " + topicId +
                 " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);

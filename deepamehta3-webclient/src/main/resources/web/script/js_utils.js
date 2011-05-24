@@ -150,8 +150,7 @@ var js = {
     },
 
     set_class: function(obj, clazz) {
-        obj.clazz = clazz
-        obj.clazz()
+        clazz.apply(obj)
     },
 
 

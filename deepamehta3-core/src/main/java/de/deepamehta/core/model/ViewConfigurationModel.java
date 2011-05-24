@@ -22,6 +22,9 @@ public class ViewConfigurationModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    /**
+     * Key: config topic type URI
+     */
     private Map<String, TopicModel> viewConfig = new HashMap();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -31,16 +34,19 @@ public class ViewConfigurationModel {
 
     public ViewConfigurationModel(Set<RelatedTopic> configTopics) {
         for (Topic topic : configTopics) {
-            put(new TopicModel(topic));
+            addConfigTopic(new TopicModel(topic));
         }
     }
 
+    /**
+     * @param   configurable    A topic type or an association definition.
+     */
     public ViewConfigurationModel(JSONObject configurable) {
         try {
             JSONArray topics = configurable.optJSONArray("view_config_topics");
             if (topics != null) {
                 for (int i = 0; i < topics.length(); i++) {
-                    put(new TopicModel(topics.getJSONObject(i)));
+                    addConfigTopic(new TopicModel(topics.getJSONObject(i)));
                 }
             }
         } catch (Exception e) {
@@ -49,6 +55,23 @@ public class ViewConfigurationModel {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    public TopicModel getConfigTopic(String topicTypeUri) {
+        return viewConfig.get(topicTypeUri);
+    }
+
+    public void addConfigTopic(TopicModel configTopic) {
+        String topicTypeUri = configTopic.getTypeUri();
+        // error check
+        TopicModel existing = getConfigTopic(topicTypeUri);
+        if (existing != null) {
+            throw new RuntimeException("There is already a configuration topic of type \"" + topicTypeUri + "\"");
+        }
+        //
+        viewConfig.put(topicTypeUri, configTopic);
+    }
+
+    // ---
 
     public Iterable<TopicModel> getConfigTopics() {
         return viewConfig.values();
@@ -61,13 +84,13 @@ public class ViewConfigurationModel {
      * <p>
      * Compare to client-side counterpart: function get_view_config() in webclient.js
      *
-     * @param   typeUri     The type URI of the configuration topic, e.g. "dm3.webclient.view_config"
-     * @param   settingUri  The setting URI, e.g. "dm3.webclient.icon_src"
+     * @param   topicTypeUri    The type URI of the configuration topic, e.g. "dm3.webclient.view_config"
+     * @param   settingUri      The setting URI, e.g. "dm3.webclient.icon_src"
      *
      * @return  The setting value, or <code>null</code> if there is no such setting
      */
-    public Object getSetting(String typeUri, String settingUri) {
-        TopicModel configTopic = get(typeUri);
+    public Object getSetting(String topicTypeUri, String settingUri) {
+        TopicModel configTopic = getConfigTopic(topicTypeUri);
         if (configTopic == null) {
             return null;
         }
@@ -95,12 +118,4 @@ public class ViewConfigurationModel {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private TopicModel get(String typeUri) {
-        return viewConfig.get(typeUri);
-    }
-
-    private void put(TopicModel configTopic) {
-        viewConfig.put(configTopic.getTypeUri(), configTopic);
-    }
 }
