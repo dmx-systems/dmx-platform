@@ -11,7 +11,7 @@ import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicType;
-import de.deepamehta.core.model.ViewConfiguration;
+import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.Plugin;
 
 import static java.util.Arrays.asList;
@@ -118,7 +118,8 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
         assocDef.setAssocTypeUri("dm3.core.aggregation");
         assocDef.setCardinalityUri1("dm3.core.many");
         assocDef.setCardinalityUri2("dm3.core.many");
-        assocDef.setViewConfig(new ViewConfiguration()); // FIXME: serialization fails if plugin developer forget to set
+        assocDef.setViewConfigModel(new ViewConfigurationModel());  // FIXME: serialization fails if plugin developer
+                                                                    // forget to set
         //
         topicType.addAssocDef(assocDef);
     } */

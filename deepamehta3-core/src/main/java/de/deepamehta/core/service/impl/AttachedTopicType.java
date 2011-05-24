@@ -13,6 +13,7 @@ import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.ViewConfiguration;
+import de.deepamehta.core.model.ViewConfigurationModel;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -94,9 +95,10 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
 
     @Override
     public ViewConfiguration getViewConfig() {
-        return getModel().getViewConfig();
+        return new AttachedViewConfiguration(getModel().getViewConfigModel(), dms);
     }
 
+    // FIXME: to be dropped
     @Override
     public Object getViewConfig(String typeUri, String settingUri) {
         return getModel().getViewConfig(typeUri, settingUri);
@@ -185,7 +187,7 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
             assocDef.setCardinalityUri1(cardinality.cardinalityUri1);
             assocDef.setCardinalityUri2(cardinality.cardinalityUri2);
             assocDef.setAssocTypeUri(assoc.getTypeUri());
-            assocDef.setViewConfig(fetchViewConfig(assoc));
+            assocDef.setViewConfigModel(fetchViewConfig(assoc));
             return assocDef;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association definition for topic type \"" + topicTypeUri +
@@ -260,18 +262,18 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
 
     // ---
 
-    private ViewConfiguration fetchViewConfig(Topic typeTopic) {
+    private ViewConfigurationModel fetchViewConfig(Topic typeTopic) {
         Set<RelatedTopic> topics = typeTopic.getRelatedTopics("dm3.core.association", "dm3.core.topic_type",
             "dm3.core.view_config", null, true);    // fetchComposite=true
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
-        return new ViewConfiguration(topics);
+        return new ViewConfigurationModel(topics);
     }
 
-    private ViewConfiguration fetchViewConfig(Association assoc) {
+    private ViewConfigurationModel fetchViewConfig(Association assoc) {
         Set<RelatedTopic> topics = assoc.getRelatedTopics("dm3.core.aggregation", "dm3.core.assoc_def",
             "dm3.core.view_config", null, true);    // fetchComposite=true
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
-        return new ViewConfiguration(topics);
+        return new ViewConfigurationModel(topics);
     }
 
     // ---
@@ -403,7 +405,7 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
             //
             putInSequence(assocDef, predAssocDef);
             //
-            storeViewConfig(assoc, assocDef.getViewConfig());
+            storeViewConfig(assocDef);
         } catch (Exception e) {
             throw new RuntimeException("Storing association definition \"" + assocDef.getUri() +
                 "\" of topic type \"" + getUri() + "\" failed", e);
@@ -432,19 +434,19 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
     private void storeViewConfig() {
         for (TopicModel configTopic : getViewConfig().getConfigTopics()) {
             Topic topic = dms.createTopic(configTopic, null);           // FIXME: clientContext=null
-            AssociationModel assocModel = new AssociationModel("dm3.core.association");
-            assocModel.setRole1(new TopicRole(getUri(), "dm3.core.topic_type"));
-            assocModel.setRole2(new TopicRole(topic.getId(), "dm3.core.view_config"));
-            dms.createAssociation(assocModel, null);                     // FIXME: clientContext=null
+            dms.createAssociation("dm3.core.association",
+                new TopicRole(getUri(), "dm3.core.topic_type"),
+                new TopicRole(topic.getId(), "dm3.core.view_config"));
         }
     }
 
-    private void storeViewConfig(Association assocDef, ViewConfiguration viewConfig) {
-        for (TopicModel configTopic : viewConfig.getConfigTopics()) {
+    // FIXME: move to an AttachedAssociationDefinition class
+    private void storeViewConfig(AssociationDefinition assocDef) {
+        for (TopicModel configTopic : assocDef.getViewConfigModel().getConfigTopics()) {
             Topic topic = dms.createTopic(configTopic, null);           // FIXME: clientContext=null
             dms.createAssociation("dm3.core.aggregation",
-                new TopicRole(topic.getId(), "dm3.core.view_config"),
-                new AssociationRole(assocDef.getId(), "dm3.core.assoc_def"));
+                new AssociationRole(assocDef.getId(), "dm3.core.assoc_def"),
+                new TopicRole(topic.getId(), "dm3.core.view_config"));
         }
     }
 

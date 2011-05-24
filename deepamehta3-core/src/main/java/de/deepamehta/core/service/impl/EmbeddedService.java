@@ -20,7 +20,6 @@ import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TopicValue;
-import de.deepamehta.core.model.ViewConfiguration;
 import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;

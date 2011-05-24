@@ -37,7 +37,7 @@ public class AssociationDefinition {
     private String cardinalityUri1;
     private String cardinalityUri2;
 
-    private ViewConfiguration viewConfig;   // is never null
+    private ViewConfigurationModel viewConfigModel;   // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -79,7 +79,7 @@ public class AssociationDefinition {
             this.cardinalityUri1 = assocDef.optString("cardinality_uri_1", "dm3.core.one");
             this.cardinalityUri2 = assocDef.getString("cardinality_uri_2");
             //
-            this.viewConfig = new ViewConfiguration(assocDef);
+            this.viewConfigModel = new ViewConfigurationModel(assocDef);
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationDefinition failed (JSONObject=" + assocDef + ")", e);
         }
@@ -123,8 +123,8 @@ public class AssociationDefinition {
         return cardinalityUri2;
     }
 
-    public ViewConfiguration getViewConfig() {
-        return viewConfig;
+    public ViewConfigurationModel getViewConfigModel() {
+        return viewConfigModel;
     }
 
     // ---
@@ -145,8 +145,8 @@ public class AssociationDefinition {
         this.cardinalityUri2 = cardinalityUri2;
     }
 
-    public void setViewConfig(ViewConfiguration viewConfig) {
-        this.viewConfig = viewConfig;
+    public void setViewConfigModel(ViewConfigurationModel viewConfigModel) {
+        this.viewConfigModel = viewConfigModel;
     }
 
     // ---
@@ -163,7 +163,7 @@ public class AssociationDefinition {
             o.put("role_type_uri_2", roleTypeUri2);
             o.put("cardinality_uri_1", cardinalityUri1);
             o.put("cardinality_uri_2", cardinalityUri2);
-            viewConfig.toJSON(o);
+            viewConfigModel.toJSON(o);
             return o;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
@@ -179,7 +179,7 @@ public class AssociationDefinition {
             "\", cardinality=\"" + cardinalityUri1 +
             "\")\n        pos 2: (type=\"" + topicTypeUri2 + "\", role=\"" + roleTypeUri2 +
             "\", cardinality=\"" + cardinalityUri2 +
-            "\")\n        association definition " + viewConfig;
+            "\")\n        association definition " + viewConfigModel;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

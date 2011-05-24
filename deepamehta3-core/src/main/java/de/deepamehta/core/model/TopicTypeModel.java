@@ -27,7 +27,7 @@ public class TopicTypeModel extends TopicModel {
     private String dataTypeUri;
     private Set<IndexMode> indexModes;
     private Map<String, AssociationDefinition> assocDefs;   // is never null, may be empty
-    private ViewConfiguration viewConfig;                   // is never null
+    private ViewConfigurationModel viewConfigModel;         // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -38,16 +38,16 @@ public class TopicTypeModel extends TopicModel {
         this.dataTypeUri = topicTypeModel.getDataTypeUri();
         this.indexModes = topicTypeModel.getIndexModes();
         this.assocDefs = topicTypeModel.getAssocDefs();
-        this.viewConfig = topicTypeModel.getViewConfig();
+        this.viewConfigModel = topicTypeModel.getViewConfigModel();
     }
 
     public TopicTypeModel(Topic typeTopic, String dataTypeUri, Set<IndexMode> indexModes,
-                                                               ViewConfiguration viewConfig) {
+                                                               ViewConfigurationModel viewConfigModel) {
         super(typeTopic);
         this.dataTypeUri = dataTypeUri;
         this.indexModes = indexModes;
         this.assocDefs = new LinkedHashMap();
-        this.viewConfig = viewConfig;
+        this.viewConfigModel = viewConfigModel;
     }
 
     public TopicTypeModel(String uri, String value, String dataTypeUri) {
@@ -55,7 +55,7 @@ public class TopicTypeModel extends TopicModel {
         this.dataTypeUri = dataTypeUri;
         this.indexModes = new HashSet();
         this.assocDefs = new LinkedHashMap();
-        this.viewConfig = new ViewConfiguration();
+        this.viewConfigModel = new ViewConfigurationModel();
     }
 
     public TopicTypeModel(JSONObject topicTypeModel) {
@@ -69,7 +69,7 @@ public class TopicTypeModel extends TopicModel {
             this.dataTypeUri = topicTypeModel.getString("data_type_uri");
             this.indexModes = IndexMode.parse(topicTypeModel);
             this.assocDefs = new LinkedHashMap();
-            this.viewConfig = new ViewConfiguration(topicTypeModel);
+            this.viewConfigModel = new ViewConfigurationModel(topicTypeModel);
             parseAssocDefs(topicTypeModel);
         } catch (Exception e) {
             throw new RuntimeException("Parsing TopicTypeModel failed (JSONObject=" + topicTypeModel + ")", e);
@@ -126,14 +126,14 @@ public class TopicTypeModel extends TopicModel {
 
     // ---
 
-    public ViewConfiguration getViewConfig() {
-        return viewConfig;
+    public ViewConfigurationModel getViewConfigModel() {
+        return viewConfigModel;
     }
 
     // FIXME: server-side operations on the view config settings possibly suggest they are not acually
     // view config settings but part of the topic type model. Possibly this method should be dropped.
     public Object getViewConfig(String typeUri, String settingUri) {
-        return viewConfig.getSetting(typeUri, settingUri);
+        return viewConfigModel.getSetting(typeUri, settingUri);
     }
 
     // ---
@@ -146,7 +146,7 @@ public class TopicTypeModel extends TopicModel {
             o.put("data_type_uri", dataTypeUri);
             IndexMode.toJSON(indexModes, o);
             AssociationDefinition.toJSON(assocDefs.values(), o);
-            viewConfig.toJSON(o);
+            viewConfigModel.toJSON(o);
             //
             return o;
         } catch (Exception e) {
@@ -158,7 +158,7 @@ public class TopicTypeModel extends TopicModel {
     public String toString() {
         return "topic type model (id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + dataTypeUri + "\", indexModes=" + indexModes + ", assocDefs=" + assocDefs +
-            ",\ntopic type " + viewConfig + ")";
+            ",\ntopic type " + viewConfigModel + ")";
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
