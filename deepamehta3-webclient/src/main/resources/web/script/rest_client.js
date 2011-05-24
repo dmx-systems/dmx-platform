@@ -92,8 +92,8 @@ function RESTClient(core_service_uri) {
         return request("GET", "/association/multiple/" + topic1_id + "/" + topic2_id + "/" + (assoc_type_uri || ""))
     }
 
-    this.create_association = function(assoc_data) {
-        return request("POST", "/association", assoc_data)
+    this.create_association = function(assoc_model) {
+        return request("POST", "/association", assoc_model)
     }
 
     this.set_relation_properties = function(relation_id, properties) {
