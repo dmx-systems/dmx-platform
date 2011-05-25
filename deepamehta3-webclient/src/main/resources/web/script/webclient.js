@@ -130,23 +130,26 @@ var dm3c = new function() {
      * High-level utility method for plugin developers.
      *
      * @param   type_uri            The association type URI, e.g. "dm3.core.instantiation".
-     * @param   topic_roles         The topic roles, an array of objects, e.g.
-     *                                  [
-     *                                      {topic_uri: "dm3.core.cardinality", role_type_uri: "dm3.core.type"},
-     *                                      {topic_id: 123,                     role_type_uri: "dm3.core.instance"},
-     *                                  ]
-     *                              The topics can be identified either by URI or by ID.
+     * @param   role_1              The topic role or association role at one end (an object).
+     *                              Examples for a topic role:
+     *                                  {topic_uri: "dm3.core.cardinality", role_type_uri: "dm3.core.type"},
+     *                                  {topic_id: 123,                     role_type_uri: "dm3.core.instance"},
+     *                              The topic can be identified either by URI or by ID.
+     *                              Example for an association role:
+     *                                  {assoc_id: 456, role_type_uri: "dm3.core.assoc_def"},
+     *                              The association is identified by ID.
+     * @param   role_2              The topic role or association role at the other end (an object, like role_1).
      *
      * @return  The relation as stored in the DB.
      */
-    this.create_association = function(type_uri, topic_roles, assoc_roles) {
-        var assoc_data = {
+    this.create_association = function(type_uri, role_1, role_2) {
+        var assoc_model = {
             type_uri: type_uri,
-            topic_roles: topic_roles || [],
-            assoc_roles: assoc_roles || []
+            role_1: role_1,
+            role_2: role_2
         }
         // FIXME: "create" hooks are not triggered
-        return dm3c.restc.create_association(assoc_data)
+        return dm3c.restc.create_association(assoc_model)
     }
 
     /**

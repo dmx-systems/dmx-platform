@@ -342,10 +342,10 @@ function Canvas() {
             //
             var ct = topic_by_position(event)
             if (ct) {
-                var assoc = dm3c.create_association("dm3.core.association", [
+                var assoc = dm3c.create_association("dm3.core.association",
                     {topic_id: dm3c.selected_topic.id, role_type_uri: dm3c.selected_topic.type_uri},
                     {topic_id: ct.id,                  role_type_uri: ct.type_uri}
-                ])
+                )
                 dm3c.canvas.add_association(assoc)
                 select_topic(dm3c.selected_topic.id)
             } else {

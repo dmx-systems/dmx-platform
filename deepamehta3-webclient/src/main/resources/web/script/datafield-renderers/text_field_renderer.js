@@ -19,7 +19,10 @@ function TextFieldRenderer(topic, field, rel_topics) {
             alert("WARNING (TextFieldRenderer.render_form_element):\n\nField \"" + field.uri +
                 "\" has no \"rows\" setting.\n\nfield=" + JSON.stringify(field))
         } else if (field.rows == 1) {
-            switch (field.assoc_def.assoc_type_uri) {
+            switch (field.assoc_def && field.assoc_def.assoc_type_uri) {
+            case undefined:
+                // Note: for non-composite topics the field's assoc_def is undefined.
+                // We treat this like a composition here.
             case "dm3.core.composition":
                 return gui_element = render_input()
             case "dm3.core.aggregation":
