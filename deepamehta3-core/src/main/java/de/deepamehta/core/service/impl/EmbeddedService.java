@@ -563,7 +563,6 @@ public class EmbeddedService implements CoreService {
 
     @POST
     @Path("/topictype")
-    @Consumes("application/x-www-form-urlencoded")
     @Override
     public TopicType createTopicType(TopicTypeModel topicTypeModel,
                                      @HeaderParam("Cookie") ClientContext clientContext) {

@@ -3,12 +3,6 @@ package de.deepamehta.plugins.server.provider;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.JSONHelper;
-import de.deepamehta.core.util.UploadedFile;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -20,8 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
-import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -36,8 +28,6 @@ import javax.ws.rs.ext.Provider;
 public class TopicModelProvider implements MessageBodyReader<TopicModel> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    @Context HttpServletRequest request;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 

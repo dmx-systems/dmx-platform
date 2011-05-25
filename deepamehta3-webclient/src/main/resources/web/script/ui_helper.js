@@ -149,7 +149,7 @@ function UIHelper() {
             // ---------------------------------------------------------------------------------------------- Public API
 
             /**
-             * @param   item    The menu item to add. An object with this properties:
+             * @param   item    The menu item to add. An object with these properties:
              *                      "label" - The label to be displayed in the menu.
              *                      "value" - Optional: the value to be examined by the caller.
              *                          Note: if this item is about to be selected programatically or re-labeled
@@ -158,6 +158,7 @@ function UIHelper() {
              *                      "is_trigger" (boolean) - Optional: if true this item acts as stateless
              *                          action-trigger within an stateful select-like menu. Default is false.
              *                          Reasonable only for stateful select-like menus.
+             *                      "handler" - Optional: the individual handler.
              */
             this.add_item = function(item) {
                 add_item(item)
@@ -286,7 +287,7 @@ function UIHelper() {
                 // 2) update GUI
                 var item_id = items.length - 1
                 // FIXME: using a closure as event handler would free us from fiddling with id attributes
-                var anchor = $("<a>").attr({href: "#", id: anchor_id(item_id)}).click(item_selected)
+                var anchor = $("<a>").attr({href: "#", id: anchor_id(item_id)}).click(create_handler(item))
                 if (item.icon) {
                     anchor.append(dm3c.render.image(item.icon, "menu-icon"))
                 }
@@ -319,26 +320,19 @@ function UIHelper() {
                 selection = null
             }
 
-            /**
-             * @param   anchor      the <a> jQuery object
-             * @return              the menu item (object with "value" and "label" properties)
-             */
-            function get_item(anchor) {
-                return items[item_id(anchor.attr("id"))]
-            }
-
-            function item_selected() {
-                // 1) remember selection
-                // Note: "this" references the <a> DOM element.
-                var item = get_item($(this))
-                select_item(item)
-                // 2) hide menu
-                hide_menu()
-                // 3) call handler
-                if (handler) {
-                     handler(item, menu_id)
+            function create_handler(item) {
+                return function item_selected() {
+                    // 1) remember selection
+                    select_item(item)
+                    // 2) hide menu
+                    hide_menu()
+                    // 3) call handler
+                    var h = item.handler || handler     // individual item handler has precedence
+                    if (h) {
+                         h(item, menu_id)
+                    }
+                    return false
                 }
-                return false
             }
 
             /**
@@ -431,10 +425,6 @@ function UIHelper() {
             function anchor_id(item_id) {
                 return menu_id + "_item_" + item_id
             }
-
-            function item_id(anchor_id) {
-                return anchor_id.substring((menu_id + "_item_").length)
-            }
         }
     }
 
@@ -480,7 +470,7 @@ function UIHelper() {
         function Combobox() {
             var menu = self.menu(menu_id, item_selected, undefined, "x")
             var input = $("<input>").attr("type", "text").addClass("combobox")
-            menu.dom.prepend(input)
+            menu.dom.append(input)
             this.dom = menu.dom
 
             this.add_item = function(item) {

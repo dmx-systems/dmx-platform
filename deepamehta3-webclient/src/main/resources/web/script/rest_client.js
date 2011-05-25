@@ -116,10 +116,8 @@ function RESTClient(core_service_uri) {
         return request("GET", "/topictype/" + type_uri)
     }
 
-    this.create_topic_type = function(properties, data_fields) {
-        var params = new RequestParameter({properties: properties})
-        params.add_list("data_fields", data_fields)
-        return request("POST", "/topictype", params.to_query_string(), "application/x-www-form-urlencoded")
+    this.create_topic_type = function(topic_type_model) {
+        return request("POST", "/topictype", topic_type_model)
     }
 
     this.add_data_field = function(type_uri, field) {

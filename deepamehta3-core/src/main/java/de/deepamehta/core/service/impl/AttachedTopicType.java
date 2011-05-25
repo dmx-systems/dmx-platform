@@ -149,11 +149,11 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
 
     void store() {
         Topic topic = dms.attach(dms.storage.createTopic(getModel()), false);
+        getModel().setId(topic.getId());
         dms.associateWithTopicType(topic);
         topic.setValue(getModel().getValue());
         //
-        String typeUri = getUri();
-        dms.associateDataType(typeUri, getDataTypeUri());
+        dms.associateDataType(getUri(), getDataTypeUri());
         storeIndexModes();
         storeAssocDefs();
         viewConfig.store();

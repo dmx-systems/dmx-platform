@@ -59,6 +59,7 @@ var dm3c = new function() {
             composite: composite    // not serialized to request body if undefined
         }
         var topic = dm3c.restc.create_topic(topic_model)
+        // alert("Topic created: " + JSON.stringify(topic));
         // trigger hook
         dm3c.trigger_hook("post_create_topic", topic)
         //
@@ -188,9 +189,10 @@ var dm3c = new function() {
     /**
      * Creates a topic type in the DB.
      */
-    this.create_topic_type = function(properties, data_fields) {
+    this.create_topic_type = function(topic_type_model) {
         // update DB
-        var topic_type = dm3c.restc.create_topic_type(properties, data_fields);
+        var topic_type = dm3c.restc.create_topic_type(topic_type_model);
+        // alert("Topic type created: " + JSON.stringify(topic_type));
         // trigger hook
         dm3c.trigger_hook("post_create_topic", topic_type)
         //
@@ -353,6 +355,10 @@ var dm3c = new function() {
      * @return  The setting value, or <code>undefined</code> if there is no such setting
      */
     this.get_view_config = function(configurable, setting) {
+        // error check
+        if (!configurable.view_config_topics) {
+            throw "Invalid configurable: " + JSON.stringify(configurable)
+        }
         // every configurable has an view_config_topics object, however it might be empty
         var view_config = configurable.view_config_topics["dm3.webclient.view_config"]
         if (view_config) {
@@ -408,11 +414,8 @@ var dm3c = new function() {
      */
     this.create_topic_from_menu = function(type_uri, x, y) {
         // 1) update DB
-        var topic = dm3c.trigger_hook("custom_create_topic", type_uri)[0]
-        if (!topic) {
-            topic = dm3c.create_topic(type_uri)
-            // ### alert("topic created: " + JSON.stringify(topic))
-        }
+        topic = dm3c.create_topic(type_uri)
+        // ### alert("topic created: " + JSON.stringify(topic))
         // 2) update GUI
         dm3c.add_topic_to_canvas(topic, "edit", x, y)
     }
@@ -481,6 +484,13 @@ var dm3c = new function() {
 
     // ---
 
+    /**
+     * @param   menu_id     Used IDs are e.g.
+     *                      "create-type-menu"
+     *                      "search-type-menu" - introduced by typesearch plugin
+     *
+     * @return  The menu (a UIHelper Menu object).
+     */
     this.create_type_menu = function(menu_id, handler) {
         var type_menu = dm3c.ui.menu(menu_id, handler)
         var type_uris = dm3c.type_cache.get_type_uris()
@@ -496,6 +506,9 @@ var dm3c = new function() {
                 })
             }
         }
+        //
+        dm3c.trigger_hook("post_create_type_menu", type_menu)
+        //
         return type_menu
     }
 
