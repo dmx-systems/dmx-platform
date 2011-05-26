@@ -28,6 +28,11 @@ function typeeditor_plugin() {
 
 
 
+    this.pre_submit_form = function(topic) {
+        if (topic.type_uri == "dm3.core.topic_type") {
+        }
+    }
+
     this.post_create_type_menu = function(type_menu) {
         type_menu.add_separator()
         type_menu.add_item({

@@ -28,9 +28,9 @@ function accesscontrol_plugin() {
         function create_login_dialog() {
             var login_dialog = $("<div>").attr("id", "login-dialog")
             var login_message = $("<div>").attr("id", "login-message").html("&nbsp;")
-            login_dialog.append($("<div>").addClass("field-name").text("Username"))
+            login_dialog.append($("<div>").addClass("field-label").text("Username"))
             login_dialog.append($("<input>").attr({id: "login-username"}))
-            login_dialog.append($("<div>").addClass("field-name").text("Password"))
+            login_dialog.append($("<div>").addClass("field-label").text("Password"))
             login_dialog.append($("<input>").attr({id: "login-password", type: "password"}))
             // Note: purpose of the login message container is maintaining the space
             // when the login message is faded out (display=none)

@@ -46,22 +46,37 @@ function RenderHelper() {
     }
 
     /**
-     * @param   field   a field object or a string.
+     * @param   field   a Field object or a string.
      */
-    this.field_label = function(field, suffix) {
-        var name
+    this.input = function(field) {
+        var value
         if (typeof(field) == "string") {
-            name = field
+            value = field
         } else {
-            name = field.label
-            if (suffix) {
-                name += suffix
-            }
+            value = field.value
         }
-        $("#detail-panel").append($("<div>").addClass("field-name").text(name))
+        return $("<input>").attr({type: "text", value: value})
     }
 
-    this.input = function(field) {
-        return $("<input>").attr({type: "text", value: field.value})
+    // ---
+
+    /**
+     * @param   field   a Field object or a string.
+     */
+    this.field_label = function(field, suffix) {
+        var label
+        if (typeof(field) == "string") {
+            label = field
+        } else {
+            label = field.label
+            if (suffix) {
+                label += suffix
+            }
+        }
+        $("#detail-panel").append($("<div>").addClass("field-label").text(label))
+    }
+
+    this.field_value = function(value) {
+        $("#detail-panel").append($("<div>").addClass("field-value").append(value))
     }
 }

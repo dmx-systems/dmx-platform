@@ -3,9 +3,9 @@
  */
 function PlainDocument() {
 
-    var fields      // either a Field object (non-composite) or an object (composite):
+    var page_model  // either a Field object (non-composite) or an object (composite):
                     //     key: assoc def URI
-                    //     value: either a Field object (non-composite) or again a fields object (composite)
+                    //     value: either a Field object or again a page model object
 
     // Settings
     var DEFAULT_FIELD_ROWS = 1
@@ -27,30 +27,13 @@ function PlainDocument() {
     this.render_document = function(topic) {
 
         dm3c.empty_detail_panel()
-        render_fields("", topic.composite, dm3c.type_cache.get(topic.type_uri))
+        render_page_model(create_page_model(topic), render_field)
         render_associations()
         render_buttons(topic, "detail-panel-show")
 
-        function render_fields(field_uri, composite, topic_type, assoc_def) {
-            if (topic_type.data_type_uri == "dm3.core.composite") {
-                var fields = {}
-                for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                    var topic_type_2 = dm3c.type_cache.get(assoc_def.topic_type_uri_2)
-                    var child_field_uri = field_uri + dm3c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
-                    var comp = composite && composite[assoc_def.uri]
-                    var child_fields = render_fields(child_field_uri, comp, topic_type_2, assoc_def)
-                    if (child_fields) {
-                        fields[assoc_def.uri] = child_fields
-                    }
-                }
-                return fields;
-            } else {
-                var value = field_uri == "" ? topic.value : composite
-                var field = new Field(field_uri, value, topic, topic_type, assoc_def)
-                if (field.viewable) {
-                    field.render_field()
-                    return field
-                }
+        function render_field(field) {
+            if (field.viewable) {
+                field.render_field()
             }
         }
 
@@ -59,43 +42,21 @@ function PlainDocument() {
             // render label
             dm3c.render.field_label("Associations (" + topics.length + ")")
             // render field
-            var field_value_div = $("<div>").addClass("field-value")
-            field_value_div.append(dm3c.render.topic_list(topics))
-            $("#detail-panel").append(field_value_div)
+            dm3c.render.field_value(dm3c.render.topic_list(topics))
         }
     }
 
     this.render_form = function(topic) {
 
-        this.topic_buffer = {}
-        plain_doc = this
-
         dm3c.empty_detail_panel()
         dm3c.trigger_hook("pre_render_form", topic)
-        fields = render_fields("", topic.composite, dm3c.type_cache.get(topic.type_uri))
+        page_model = create_page_model(topic)
+        render_page_model(page_model, render_field)
         render_buttons(topic, "detail-panel-edit")
-        // alert("render_form(): fields=" + JSON.stringify(fields));
 
-        function render_fields(field_uri, composite, topic_type, assoc_def) {
-            if (topic_type.data_type_uri == "dm3.core.composite") {
-                var fields = {}
-                for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                    var topic_type_2 = dm3c.type_cache.get(assoc_def.topic_type_uri_2)
-                    var child_field_uri = field_uri + dm3c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
-                    var comp = composite && composite[assoc_def.uri]
-                    var child_fields = render_fields(child_field_uri, comp, topic_type_2, assoc_def)
-                    if (child_fields) {
-                        fields[assoc_def.uri] = child_fields
-                    }
-                }
-                return fields;
-            } else {
-                var value = field_uri == "" ? topic.value : composite
-                var field = new Field(field_uri, value, topic, topic_type, assoc_def)
-                if (field.editable) {
-                    field.render_form_element()
-                    return field
-                }
+        function render_field(field) {
+            if (field.editable) {
+                field.render_form_element()
             }
         }
     }
@@ -124,15 +85,15 @@ function PlainDocument() {
                 uri: topic.uri,
                 type_uri: topic.type_uri
             }
-            if (fields instanceof Field) {
-                var form_value = fields.read_form_value()
+            if (page_model instanceof Field) {
+                var form_value = page_model.read_form_value()
                 // Note: undefined form value is an error (means: field renderer returned no value).
                 // null is a valid form value (means: field renderer prevents the field from being updated).
                 if (form_value != null) {
                     topic_model.value = form_value
                 }
             } else {
-                topic_model.composite = build_composite(fields)
+                topic_model.composite = build_composite(page_model)
             }
             return topic_model
         }
@@ -179,33 +140,41 @@ function PlainDocument() {
         }
     }
 
-    /**
-     * Returns the content of a "reference" data field.
-     *
-     * @return  Array of Topic objects.
-     */
-    function get_reference_field_content(topic_id, field) {
-        // set topic type filter
-        var include_topic_types = []
-        if (field.ref_topic_type_uri) {
-            include_topic_types.push(field.ref_topic_type_uri)
+
+
+    // === Page Model ===
+
+    function create_page_model(topic) {
+
+        return create_fields("", topic.composite, dm3c.type_cache.get(topic.type_uri))
+
+        function create_fields(field_uri, composite, topic_type, assoc_def) {
+            if (topic_type.data_type_uri == "dm3.core.composite") {
+                var fields = {}
+                for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
+                    var topic_type_2 = dm3c.type_cache.get(assoc_def.topic_type_uri_2)
+                    var child_field_uri = field_uri + dm3c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
+                    var comp = composite && composite[assoc_def.uri]
+                    var child_fields = create_fields(child_field_uri, comp, topic_type_2, assoc_def)
+                    fields[assoc_def.uri] = child_fields
+                }
+                return fields;
+            } else {
+                var value = field_uri == "" ? topic.value : composite
+                return new Field(field_uri, value, topic, topic_type, assoc_def)
+            }
         }
-        // set relation type filter
-        if (field.ref_relation_type_id) {
-            var include_relation_types = [field.ref_relation_type_id]
-            var exclude_relation_types = []
-        } else {
-            var include_relation_types = []
-            var exclude_relation_types = ["SEARCH_RESULT"]
-        }
-        //
-        return dm3c.restc.get_related_topics(topic_id, include_topic_types,
-                                                       include_relation_types, exclude_relation_types)
     }
 
-
-
-    // === Field Renderering ===
+    function render_page_model(page_model, render_func) {
+        if (page_model instanceof Field) {
+            render_func(page_model)
+        } else {
+            for (var assoc_def_uri in page_model) {
+                render_page_model(page_model[assoc_def_uri], render_func)
+            }
+        }
+    }
 
     /**
      * @param   uri         The field URI. Unique within the page/form. The field URI is a path composed of association
@@ -234,62 +203,46 @@ function PlainDocument() {
         var renderer
 
         this.render_field = function() {
-            // create renderer
+            // error check
             if (!js_renderer_class) {
                 alert("WARNING (PlainDocument.render_document):\n\nField \"" + uri +
                     "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
                 return
             }
-            // ### var rel_topics = related_topics(field)
-            renderer = js.new_object(js_renderer_class, topic, this /*, rel_topics */)
+            // create renderer
+            renderer = js.new_object(js_renderer_class, topic, this)
             // render field
             var field_value_div = $("<div>").addClass("field-value")
             var html = trigger_renderer_hook("render_field", field_value_div)
             if (html !== undefined) {
                 $("#detail-panel").append(field_value_div.append(html))
+                trigger_renderer_hook("post_render_field")
             } else {
                 alert("WARNING (PlainDocument.render_document):\n\nRenderer for field \"" + uri + "\" " +
                     "returned no field.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
             }
-
-            function related_topics(field) {
-                if (field.data_type == "reference") {
-                    var topics = get_reference_field_content(topic.id, field)
-                    defined_relation_topics = defined_relation_topics.concat(topics)
-                    return topics
-                }
-            }
         }
 
         this.render_form_element = function() {
-            // create renderer
+            // error check
             if (!js_renderer_class) {
                 alert("WARNING (PlainDocument.render_form):\n\nField \"" + uri +
                     "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
                 return
             }
-            // ### var rel_topics = related_topics(field)
-            renderer = js.new_object(js_renderer_class, topic, this /*, rel_topics */)
+            // create renderer
+            renderer = js.new_object(js_renderer_class, topic, this)
             // render field label
             dm3c.render.field_label(this)
             // render form element
+            var field_value_div = $("<div>").addClass("field-value")
             var html = trigger_renderer_hook("render_form_element")
             if (html !== undefined) {
-                $("#detail-panel").append($("<div>").addClass("field-value").append(html))
+                $("#detail-panel").append(field_value_div.append(html))
                 trigger_renderer_hook("post_render_form_element")
             } else {
                 alert("WARNING (PlainDocument.render_form):\n\nRenderer for field \"" + uri + "\" " +
                     "returned no form element.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
-            }
-
-            function related_topics(field) {
-                if (field.data_type == "reference") {
-                    var topics = get_reference_field_content(topic.id, field)
-                    // buffer current topic selection to compare it at submit time
-                    plain_doc.topic_buffer[field.uri] = topics
-                    //
-                    return topics
-                }
             }
         }
 

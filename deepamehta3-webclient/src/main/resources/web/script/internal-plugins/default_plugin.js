@@ -65,7 +65,7 @@ function default_plugin () {
         }
 
         function do_save() {
-            var result = dm3c.trigger_hook("pre_submit_form", dm3c.selected_topic)
+            var result = dm3c.trigger_hook("pre_submit_form", dm3c.selected_topic)  // FIXME: use "topic" as parameter?
             if (!js.contains(result, false)) {
                 dm3c.trigger_doctype_hook(topic, "process_form", topic)
             } else {
