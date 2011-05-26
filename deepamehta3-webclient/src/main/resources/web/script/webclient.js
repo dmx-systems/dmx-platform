@@ -21,9 +21,9 @@ var dm3c = new function() {
     this.canvas = null          // the canvas that displays the topicmap (a Canvas object)
     //
     var plugin_sources = []
-    var plugins = {}            // key: plugin class, value: plugin instance
-    var doctype_impl_sources = []
-    var doctype_impls = {}
+    var plugins = {}                // key: plugin class name, base name of source file (string), value: plugin instance
+    var page_renderer_sources = []
+    var page_renderers = {}         // key: page renderer class name, camel case (string), value: renderer instance
     var field_renderer_sources = []
     var css_stylesheets = []
 
@@ -61,7 +61,7 @@ var dm3c = new function() {
         var topic = dm3c.restc.create_topic(topic_model)
         // alert("Topic created: " + JSON.stringify(topic));
         // trigger hook
-        dm3c.trigger_hook("post_create_topic", topic)
+        dm3c.trigger_plugin_hook("post_create_topic", topic)
         //
         return topic
     }
@@ -81,7 +81,7 @@ var dm3c = new function() {
         // ### js.copy(topic.properties, old_properties)
         // ### js.copy(properties, topic.properties)
         // 3) trigger hook
-        // ### dm3c.trigger_hook("post_update_topic", topic, old_properties)
+        // ### dm3c.trigger_plugin_hook("post_update_topic", topic, old_properties)
     }
 
     /**
@@ -93,7 +93,7 @@ var dm3c = new function() {
         // update DB
         dm3c.restc.delete_topic(topic.id)
         // trigger hook
-        dm3c.trigger_hook("post_delete_topic", topic)
+        dm3c.trigger_plugin_hook("post_delete_topic", topic)
         // update GUI
         dm3c.hide_topic(topic.id, true)      // is_part_of_delete_operation=true
     }
@@ -163,7 +163,7 @@ var dm3c = new function() {
         // update DB
         dm3c.restc.delete_association(assoc_id)
         // trigger hook
-        dm3c.trigger_hook("post_delete_relation", assoc_id)
+        dm3c.trigger_plugin_hook("post_delete_relation", assoc_id)
         // update GUI
         dm3c.hide_association(assoc_id, true)     // is_part_of_delete_operation=true
     }
@@ -194,7 +194,7 @@ var dm3c = new function() {
         var topic_type = dm3c.restc.create_topic_type(topic_type_model);
         // alert("Topic type created: " + JSON.stringify(topic_type));
         // trigger hook
-        dm3c.trigger_hook("post_create_topic", topic_type)
+        dm3c.trigger_plugin_hook("post_create_topic", topic_type)
         //
         return topic_type
     }
@@ -207,11 +207,15 @@ var dm3c = new function() {
 
 
 
+    this.register_page_renderer = function(source_path) {
+        page_renderer_sources.push(source_path)
+    }
+
     this.register_field_renderer = function(source_path) {
         field_renderer_sources.push(source_path)
     }
 
-    this.css_stylesheet = function(css_path) {
+    this.register_css_stylesheet = function(css_path) {
         css_stylesheets.push(css_path)
     }
 
@@ -239,7 +243,7 @@ var dm3c = new function() {
      * @param   hook_name   Name of the plugin hook to trigger.
      * @param   <varargs>   Variable number of arguments. Passed to the hook.
      */
-    this.trigger_hook = function(hook_name) {
+    this.trigger_plugin_hook = function(hook_name) {
         var result = []
         for (var plugin_class in plugins) {
             var plugin = dm3c.get_plugin(plugin_class)
@@ -254,7 +258,7 @@ var dm3c = new function() {
                 } else if (arguments.length == 4) {
                     var res = plugin[hook_name](arguments[1], arguments[2], arguments[3])
                 } else {
-                    alert("ERROR (trigger_hook): too much arguments (" +
+                    alert("ERROR (trigger_plugin_hook): too much arguments (" +
                         (arguments.length - 1) + "), maximum is 3.\nhook=" + hook_name)
                 }
                 // 2) Store result
@@ -267,12 +271,12 @@ var dm3c = new function() {
         return result
     }
 
-    this.trigger_doctype_hook = function(doc, hook_name, args) {
-        // Lookup doctype renderer
-        var doctype_impl = dm3c.get_doctype_impl(doc)
-        // Trigger the hook only if it is defined (a doctype renderer must not define all hooks).
-        if (doctype_impl[hook_name]) {
-            return doctype_impl[hook_name](args)
+    this.trigger_page_renderer_hook = function(topic, hook_name, args) {
+        // Lookup page renderer
+        var page_renderer = dm3c.get_page_renderer(topic)
+        // Trigger the hook only if it is defined (a page renderer must not define all hooks).
+        if (page_renderer[hook_name]) {
+            return page_renderer[hook_name](args)
         }
     }
 
@@ -280,9 +284,16 @@ var dm3c = new function() {
         return plugins[plugin_class]
     }
 
-    this.get_doctype_impl = function(topic) {
-        // return doctype_impls[dm3c.type_cache.get(topic.type_uri).js_renderer_class]
-        return doctype_impls["PlainDocument"]   // FIXME: hardcoded
+    this.get_page_renderer = function(topic) {
+        var topic_type = dm3c.type_cache.get(topic.type_uri)
+        var page_renderer_class = topic_type.get_page_renderer_class()
+        var page_renderer = page_renderers[page_renderer_class]
+        // error check
+        if (!page_renderer) {
+            throw "UnknownPageRenderer: page renderer \"" + page_renderer_class + "\" is not registered"
+        }
+        //
+        return page_renderer
     }
 
 
@@ -369,26 +380,26 @@ var dm3c = new function() {
     // === Commands ===
 
     this.get_topic_commands = function(topic, context) {
-        return get_commands(dm3c.trigger_hook("add_topic_commands", topic), context)
+        return get_commands(dm3c.trigger_plugin_hook("add_topic_commands", topic), context)
     }
 
     this.get_association_commands = function(assoc, context) {
-        return get_commands(dm3c.trigger_hook("add_association_commands", assoc), context)
+        return get_commands(dm3c.trigger_plugin_hook("add_association_commands", assoc), context)
     }
 
     this.get_canvas_commands = function(cx, cy, context) {
-        return get_commands(dm3c.trigger_hook("add_canvas_commands", cx, cy), context)
+        return get_commands(dm3c.trigger_plugin_hook("add_canvas_commands", cx, cy), context)
     }
 
     // === Persmissions ===
 
     this.has_write_permission = function(topic) {
-        var result = dm3c.trigger_hook("has_write_permission", topic)
+        var result = dm3c.trigger_plugin_hook("has_write_permission", topic)
         return !js.contains(result, false)
     }
 
     this.has_create_permission = function(type_uri) {
-        var result = dm3c.trigger_hook("has_create_permission", dm3c.type_cache.get(type_uri))
+        var result = dm3c.trigger_plugin_hook("has_create_permission", dm3c.type_cache.get(type_uri))
         return !js.contains(result, false)
     }
 
@@ -474,12 +485,14 @@ var dm3c = new function() {
         var topic = dm3c.restc.get_topic_by_id(topic_id)
         // update global state
         dm3c.selected_topic = topic
-        //
-        dm3c.trigger_doctype_hook(dm3c.selected_topic, "render_document", dm3c.selected_topic)
+        // render page
+        dm3c.empty_detail_panel()
+        dm3c.trigger_page_renderer_hook(dm3c.selected_topic, "render_page", dm3c.selected_topic)
     }
 
     this.edit_topic = function(topic) {
-        dm3c.trigger_doctype_hook(topic, "render_form", topic)
+        dm3c.empty_detail_panel()
+        dm3c.trigger_page_renderer_hook(topic, "render_form", topic)
     }
 
     // ---
@@ -507,7 +520,7 @@ var dm3c = new function() {
             }
         }
         //
-        dm3c.trigger_hook("post_create_type_menu", type_menu)
+        dm3c.trigger_plugin_hook("post_create_type_menu", type_menu)
         //
         return type_menu
     }
@@ -659,14 +672,14 @@ var dm3c = new function() {
         // -- including its event handlers -- and the append() would eventually add the crippled type menu.
         $("#search-widget").empty()
         var searchmode = menu_item.label
-        var search_widget = dm3c.trigger_hook("search_widget", searchmode)[0]
+        var search_widget = dm3c.trigger_plugin_hook("search_widget", searchmode)[0]
         $("#search-widget").append(search_widget)
     }
 
     function search() {
         try {
             var searchmode = dm3c.ui.menu_item("searchmode-select").label
-            var search_topic = dm3c.trigger_hook("search", searchmode)[0]
+            var search_topic = dm3c.trigger_plugin_hook("search", searchmode)[0]
             // alert("search_topic=" + JSON.stringify(search_topic))
             dm3c.add_topic_to_canvas(search_topic, "show")
         } catch (e) {
@@ -692,17 +705,13 @@ var dm3c = new function() {
 
     function special_selected(menu_item) {
         var command = menu_item.label
-        dm3c.trigger_hook("handle_special_command", command)
+        dm3c.trigger_plugin_hook("handle_special_command", command)
     }
 
     // === Plugin Support ===
 
     function register_plugin(source_path) {
         plugin_sources.push(source_path)
-    }
-
-    function register_doctype_renderer(source_path) {
-        doctype_impl_sources.push(source_path)
     }
 
     // ---
@@ -758,17 +767,17 @@ var dm3c = new function() {
 
     // --- register default modules ---
     //
-    register_doctype_renderer("script/document-renderers/plain_document.js")
+    this.register_page_renderer("script/page-renderers/default_page_renderer.js")
     //
-    this.register_field_renderer("script/datafield-renderers/text_field_renderer.js")
-    this.register_field_renderer("script/datafield-renderers/number_field_renderer.js")
-    this.register_field_renderer("script/datafield-renderers/date_field_renderer.js")
-    this.register_field_renderer("script/datafield-renderers/html_field_renderer.js")
-    this.register_field_renderer("script/datafield-renderers/reference_field_renderer.js")
+    this.register_field_renderer("script/field-renderers/text_field_renderer.js")
+    this.register_field_renderer("script/field-renderers/number_field_renderer.js")
+    this.register_field_renderer("script/field-renderers/date_field_renderer.js")
+    this.register_field_renderer("script/field-renderers/html_field_renderer.js")
+    this.register_field_renderer("script/field-renderers/reference_field_renderer.js")
     //
-    this.register_field_renderer("script/datafield-renderers/title_renderer.js")
-    this.register_field_renderer("script/datafield-renderers/body_text_renderer.js")
-    this.register_field_renderer("script/datafield-renderers/search_result_renderer.js")
+    this.register_field_renderer("script/field-renderers/title_renderer.js")
+    this.register_field_renderer("script/field-renderers/body_text_renderer.js")
+    this.register_field_renderer("script/field-renderers/search_result_renderer.js")
     //
     register_plugin("script/internal-plugins/default_plugin.js")
     register_plugin("script/internal-plugins/fulltext_plugin.js")
@@ -839,10 +848,10 @@ var dm3c = new function() {
             load_stylesheets()
             // Note: in order to let a plugin provide a custom canvas renderer (the dm3-freifunk-geomap plugin does!)
             // the canvas is created *after* loading the plugins.
-            dm3c.canvas = dm3c.trigger_hook("get_canvas_renderer")[0] || new Canvas()
+            dm3c.canvas = dm3c.trigger_plugin_hook("get_canvas_renderer")[0] || new Canvas()
             // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta3-topicmaps plugin
             // does!) the "init" hook is triggered *after* creating the canvas.
-            dm3c.trigger_hook("init")
+            dm3c.trigger_plugin_hook("init")
             //
             // setup create widget
             var menu = dm3c.create_type_menu("create-type-menu")
@@ -863,19 +872,19 @@ var dm3c = new function() {
 
         function load_document_renderers() {
 
-            if (LOG_PLUGIN_LOADING) dm3c.log("Loading " + doctype_impl_sources.length + " doctype renderers:")
-            for (var i = 0, doctype_impl_src; doctype_impl_src = doctype_impl_sources[i]; i++) {
-                load_doctype_impl(doctype_impl_src)
+            if (LOG_PLUGIN_LOADING) dm3c.log("Loading " + page_renderer_sources.length + " page renderers:")
+            for (var i = 0, page_renderer_src; page_renderer_src = page_renderer_sources[i]; i++) {
+                load_page_renderer(page_renderer_src)
             }
 
-            function load_doctype_impl(doctype_impl_src) {
-                if (LOG_PLUGIN_LOADING) dm3c.log("..... " + doctype_impl_src)
-                // load doctype implementation asynchronously
-                dm3c.javascript_source(doctype_impl_src, function() {
+            function load_page_renderer(page_renderer_src) {
+                if (LOG_PLUGIN_LOADING) dm3c.log("..... " + page_renderer_src)
+                // load page renderer asynchronously
+                dm3c.javascript_source(page_renderer_src, function() {
                     // instantiate
-                    var doctype_class = js.to_camel_case(js.basename(doctype_impl_src))
-                    if (LOG_PLUGIN_LOADING) dm3c.log(".......... instantiating \"" + doctype_class + "\"")
-                    doctype_impls[doctype_class] = js.new_object(doctype_class)
+                    var page_renderer_class = js.to_camel_case(js.basename(page_renderer_src))
+                    if (LOG_PLUGIN_LOADING) dm3c.log(".......... instantiating \"" + page_renderer_class + "\"")
+                    page_renderers[page_renderer_class] = js.new_object(page_renderer_class)
                 })
             }
         }

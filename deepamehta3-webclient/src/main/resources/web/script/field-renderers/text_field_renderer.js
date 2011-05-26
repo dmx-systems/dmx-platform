@@ -52,9 +52,9 @@ function TextFieldRenderer(topic, field, rel_topics) {
     function render_input() {
         var input = dm3c.render.input(field)
         if (field.autocomplete_indexes) {
-            var doctype_impl = dm3c.get_doctype_impl(topic)
-            input.keyup(doctype_impl.autocomplete)
-            input.blur(doctype_impl.lost_focus)
+            var page_renderer = dm3c.get_page_renderer(topic)
+            input.keyup(page_renderer.autocomplete)
+            input.blur(page_renderer.lost_focus)
             input.attr({autocomplete: "off"})
         }
         return input

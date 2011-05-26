@@ -1,6 +1,6 @@
 function fulltext_plugin() {
 
-    dm3c.css_stylesheet("style/search_result.css")
+    dm3c.register_css_stylesheet("style/search_result.css")
 
     // ------------------------------------------------------------------------------------------------ Overriding Hooks
 

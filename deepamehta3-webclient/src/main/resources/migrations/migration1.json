@@ -29,8 +29,13 @@
             data_type_uri: "dm3.core.boolean"
         },
         {
-            value: "JavaScript Renderer Class",
-            uri: "dm3.webclient.js_renderer_class",
+            value: "JavaScript Page Renderer Class",
+            uri: "dm3.webclient.js_page_renderer_class",
+            data_type_uri: "dm3.core.text"
+        },
+        {
+            value: "JavaScript Field Renderer Class",
+            uri: "dm3.webclient.js_field_renderer_class",
             data_type_uri: "dm3.core.text"
         },
         {
@@ -69,7 +74,12 @@
                     assoc_type_uri:    "dm3.core.composition"
                 },
                 {
-                    topic_type_uri_2:  "dm3.webclient.js_renderer_class",
+                    topic_type_uri_2:  "dm3.webclient.js_page_renderer_class",
+                    cardinality_uri_2: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition"
+                },
+                {
+                    topic_type_uri_2:  "dm3.webclient.js_field_renderer_class",
                     cardinality_uri_2: "dm3.core.one",
                     assoc_type_uri:    "dm3.core.composition"
                 },
@@ -96,7 +106,7 @@
                 {
                     type_uri: "dm3.webclient.view_config",
                     composite: {
-                        dm3.webclient.js_renderer_class: "SearchResultRenderer"
+                        dm3.webclient.js_field_renderer_class: "SearchResultRenderer"
                     }
                 }
             ]

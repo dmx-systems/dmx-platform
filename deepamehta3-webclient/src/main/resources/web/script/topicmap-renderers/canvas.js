@@ -69,7 +69,7 @@ function Canvas() {
             var ct = new CanvasTopic(topic, x, y)
             add_topic(ct)
             // trigger hook
-            dm3c.trigger_hook("post_add_topic_to_canvas", ct)
+            dm3c.trigger_plugin_hook("post_add_topic_to_canvas", ct)
         }
         // highlight topic
         if (highlight_topic) {
@@ -87,7 +87,7 @@ function Canvas() {
             var ca = new CanvasAssoc(assoc)
             add_association(ca)
             // trigger hook
-            dm3c.trigger_hook("post_add_relation_to_canvas", ca)
+            dm3c.trigger_plugin_hook("post_add_relation_to_canvas", ca)
         }
         // update GUI
         if (refresh_canvas) {
@@ -113,7 +113,7 @@ function Canvas() {
         }
         // 3) trigger hook
         if (!is_part_of_delete_operation) {
-            dm3c.trigger_hook("post_hide_topic_from_canvas", ct)
+            dm3c.trigger_plugin_hook("post_hide_topic_from_canvas", ct)
         }
     }
 
@@ -142,7 +142,7 @@ function Canvas() {
         }
         // 3) trigger hook
         if (!is_part_of_delete_operation) {
-            dm3c.trigger_hook("post_hide_relation_from_canvas", ca)
+            dm3c.trigger_plugin_hook("post_hide_relation_from_canvas", ca)
         }
     }
 
@@ -367,7 +367,7 @@ function Canvas() {
     function dblclick(event) {
         var ct = topic_by_position(event)
         if (ct) {
-            dm3c.trigger_hook("topic_doubleclicked", ct)
+            dm3c.trigger_plugin_hook("topic_doubleclicked", ct)
         }
     }
 
@@ -417,7 +417,7 @@ function Canvas() {
     function end_topic_move() {
         topic_move_in_progress = false
         // trigger hook
-        dm3c.trigger_hook("post_move_topic_on_canvas", action_topic)
+        dm3c.trigger_plugin_hook("post_move_topic_on_canvas", action_topic)
     }
 
     function end_canvas_move() {
@@ -516,7 +516,7 @@ function Canvas() {
 
     function drop(e) {
         // e.preventDefault();  // Useful for debugging when exception is thrown before false is returned.
-        dm3c.trigger_hook("process_drop", e.dataTransfer)
+        dm3c.trigger_plugin_hook("process_drop", e.dataTransfer)
         return false
     }
 

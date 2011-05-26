@@ -12,7 +12,7 @@ function RenderHelper() {
             // label
             var topic_td = $("<td>").addClass("topic-label").addClass(i == topics.length - 1 ? "last-topic" : undefined)
             var list_item = $("<div>").append(this.topic_link(topic, topic.value))
-            dm3c.trigger_hook("render_topic_list_item", topic, list_item)
+            dm3c.trigger_plugin_hook("render_topic_list_item", topic, list_item)
             topic_td.append(list_item)
             //
             table.append($("<tr>").append(icon_td).append(topic_td))

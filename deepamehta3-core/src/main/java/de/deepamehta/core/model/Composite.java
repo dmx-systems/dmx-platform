@@ -62,8 +62,10 @@ public class Composite {
 
     /**
      * @param   value   a String, Integer, Long, Boolean, or a Composite.
+     *
+     * @return  this Composite.
      */
-    public void put(String key, Object value) {
+    public Composite put(String key, Object value) {
         try {
             // check argument
             if (value == null) {
@@ -79,6 +81,8 @@ public class Composite {
                 value = ((Composite) value).values;
             }
             values.put(key, value);
+            //
+            return this;
         } catch (Exception e) {
             throw new RuntimeException("Putting a value in a Composite failed (key=\"" + key +
                 "\", value=" + value + ", composite=" + this + ")", e);

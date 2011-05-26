@@ -1,7 +1,7 @@
 /**
- * A document renderer that models a document as a set of fields.
+ * A page renderer that models a page as a set of fields.
  */
-function PlainDocument() {
+function DefaultPageRenderer() {
 
     var page_model  // either a Field object (non-composite) or an object (composite):
                     //     key: assoc def URI
@@ -18,15 +18,14 @@ function PlainDocument() {
 
 
 
-    // *********************************************************
-    // *** Implementation of the document renderer interface ***
-    // *********************************************************
+    // ************************************
+    // *** Page Renderer Implementation ***
+    // ************************************
 
 
 
-    this.render_document = function(topic) {
+    this.render_page = function(topic) {
 
-        dm3c.empty_detail_panel()
         render_page_model(create_page_model(topic), render_field)
         render_associations()
         render_buttons(topic, "detail-panel-show")
@@ -48,8 +47,7 @@ function PlainDocument() {
 
     this.render_form = function(topic) {
 
-        dm3c.empty_detail_panel()
-        dm3c.trigger_hook("pre_render_form", topic)
+        dm3c.trigger_plugin_hook("pre_render_form", topic)
         page_model = create_page_model(topic)
         render_page_model(page_model, render_field)
         render_buttons(topic, "detail-panel-edit")
@@ -67,12 +65,12 @@ function PlainDocument() {
         var topic_model = build_topic_model()
         // alert("topic model to update: " + JSON.stringify(topic_model))
         topic = dm3c.update_topic(topic, topic_model)
-        dm3c.trigger_hook("post_submit_form", topic)
+        dm3c.trigger_plugin_hook("post_submit_form", topic)
         // 2) update GUI
         dm3c.canvas.update_topic(topic)
         dm3c.canvas.refresh()
         dm3c.render_topic()
-        // ### dm3c.trigger_hook("post_set_topic_label", topic_id, label)
+        // ### dm3c.trigger_plugin_hook("post_set_topic_label", topic_id, label)
 
         /**
          * Reads out values from GUI elements and builds a topic model object from it.
@@ -196,21 +194,21 @@ function PlainDocument() {
         this.topic_type = topic_type
         this.assoc_def = assoc_def
         this.label = topic_type.value
-        this.editable         = get_view_config("editable")
-        this.viewable         = get_view_config("viewable")
-        var js_renderer_class = get_view_config("js_renderer_class")
-        this.rows             = get_view_config("rows")
+        this.editable               = get_view_config("editable")
+        this.viewable               = get_view_config("viewable")
+        var js_field_renderer_class = get_view_config("js_field_renderer_class")
+        this.rows                   = get_view_config("rows")
         var renderer
 
         this.render_field = function() {
             // error check
-            if (!js_renderer_class) {
-                alert("WARNING (PlainDocument.render_document):\n\nField \"" + uri +
+            if (!js_field_renderer_class) {
+                alert("WARNING (DefaultPageRenderer.render_page):\n\nField \"" + uri +
                     "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
                 return
             }
             // create renderer
-            renderer = js.new_object(js_renderer_class, topic, this)
+            renderer = js.new_object(js_field_renderer_class, topic, this)
             // render field
             var field_value_div = $("<div>").addClass("field-value")
             var html = trigger_renderer_hook("render_field", field_value_div)
@@ -218,20 +216,20 @@ function PlainDocument() {
                 $("#detail-panel").append(field_value_div.append(html))
                 trigger_renderer_hook("post_render_field")
             } else {
-                alert("WARNING (PlainDocument.render_document):\n\nRenderer for field \"" + uri + "\" " +
+                alert("WARNING (DefaultPageRenderer.render_page):\n\nRenderer for field \"" + uri + "\" " +
                     "returned no field.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
             }
         }
 
         this.render_form_element = function() {
             // error check
-            if (!js_renderer_class) {
-                alert("WARNING (PlainDocument.render_form):\n\nField \"" + uri +
+            if (!js_field_renderer_class) {
+                alert("WARNING (DefaultPageRenderer.render_form):\n\nField \"" + uri +
                     "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
                 return
             }
             // create renderer
-            renderer = js.new_object(js_renderer_class, topic, this)
+            renderer = js.new_object(js_field_renderer_class, topic, this)
             // render field label
             dm3c.render.field_label(this)
             // render form element
@@ -241,7 +239,7 @@ function PlainDocument() {
                 $("#detail-panel").append(field_value_div.append(html))
                 trigger_renderer_hook("post_render_form_element")
             } else {
-                alert("WARNING (PlainDocument.render_form):\n\nRenderer for field \"" + uri + "\" " +
+                alert("WARNING (DefaultPageRenderer.render_form):\n\nRenderer for field \"" + uri + "\" " +
                     "returned no form element.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
             }
         }
@@ -253,7 +251,7 @@ function PlainDocument() {
             if (form_value !== undefined) {
                 return form_value
             } else {
-                alert("WARNING (PlainDocument.process_form):\n\nRenderer for field \"" + uri + "\" " +
+                alert("WARNING (DefaultPageRenderer.process_form):\n\nRenderer for field \"" + uri + "\" " +
                     "returned no form value.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
             }
         }
@@ -286,7 +284,7 @@ function PlainDocument() {
                     return true
                 case "viewable":
                     return true
-                case "js_renderer_class":
+                case "js_field_renderer_class":
                     return get_default_renderer_class()
                 case "rows":
                     return DEFAULT_FIELD_ROWS
@@ -327,7 +325,7 @@ function PlainDocument() {
         }
         // assertion
         if (this.id.substr(0, 6) != "field_") {
-            alert("WARNING (PlainDocument.autocomplete):\n\nTopic " + dm3c.selected_topic.id +
+            alert("WARNING (DefaultPageRenderer.autocomplete):\n\nTopic " + dm3c.selected_topic.id +
                 " has unexpected element id: \"" + this.id + "\".\n\nIt is expected to begin with \"field_\".")
             return
         }
@@ -359,7 +357,8 @@ function PlainDocument() {
                         // --- Add item to model ---
                         autocomplete_items.push(item)
                         // --- Add item to view ---
-                        var ac_item = dm3c.trigger_doctype_hook(dm3c.selected_topic, "render_autocomplete_item", item)
+                        var ac_item = dm3c.trigger_page_renderer_hook(dm3c.selected_topic,
+                            "render_autocomplete_item", item)
                         var a = $("<a>").attr({href: "", id: item_id++}).append(ac_item)
                         a.mousemove(item_hovered)
                         a.mousedown(process_selection)
@@ -423,7 +422,7 @@ function PlainDocument() {
         if (autocomplete_item != -1) {
             var input_element = get_input_element()
             // trigger hook to get the item (string) to insert into the input element
-            var item = dm3c.trigger_doctype_hook(dm3c.selected_topic, "process_autocomplete_selection",
+            var item = dm3c.trigger_page_renderer_hook(dm3c.selected_topic, "process_autocomplete_selection",
                 autocomplete_items[autocomplete_item])
             //
             var field = get_field(input_element)

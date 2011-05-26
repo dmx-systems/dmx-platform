@@ -32,7 +32,7 @@ function ReferenceFieldRenderer(topic, field, rel_topics) {
             $("input:checkbox[name=relation_" + field.uri + "]").each(
                 function() {
                     var checkbox = this
-                    var was_checked_before = js.includes(dm3c.get_doctype_impl(topic).topic_buffer[field.uri],
+                    var was_checked_before = js.includes(dm3c.get_page_renderer(topic).topic_buffer[field.uri],
                         function(topic) {
                             return topic.id == checkbox.id
                         }

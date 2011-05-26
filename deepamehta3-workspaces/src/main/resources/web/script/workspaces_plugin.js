@@ -1,6 +1,6 @@
 function workspaces_plugin() {
 
-    dm3c.css_stylesheet("/de.deepamehta.3-workspaces/style/dm3-workspaces.css")
+    dm3c.register_css_stylesheet("/de.deepamehta.3-workspaces/style/dm3-workspaces.css")
 
     // ------------------------------------------------------------------------------------------------------ Public API
 

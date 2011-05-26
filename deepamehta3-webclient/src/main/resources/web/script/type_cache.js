@@ -38,7 +38,7 @@ function TypeCache() {
      * @param   type_topic  the topic representing the type (object with "id", "type_uri", and "properties" properties).
      *
      * @return  the type definition (object with "uri", "fields", "value", "icon_src", and "js_renderer_class"
-     *          properties).
+     *          properties). ### FIXME: update doc
      */
     this.get_topic_type = function(type_topic) {
         var type_uri = type_topic.properties["de/deepamehta/core/property/TypeURI"]

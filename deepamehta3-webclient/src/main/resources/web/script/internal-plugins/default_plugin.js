@@ -65,16 +65,16 @@ function default_plugin () {
         }
 
         function do_save() {
-            var result = dm3c.trigger_hook("pre_submit_form", dm3c.selected_topic)  // FIXME: use "topic" as parameter?
+            var result = dm3c.trigger_plugin_hook("pre_submit_form", dm3c.selected_topic)  // FIXME: use "topic" as parameter?
             if (!js.contains(result, false)) {
-                dm3c.trigger_doctype_hook(topic, "process_form", topic)
+                dm3c.trigger_page_renderer_hook(topic, "process_form", topic)
             } else {
                 alert("submit is prohibited by plugin") // FIXME: drop this
             }
         }
 
         function do_cancel() {
-            dm3c.trigger_hook("post_submit_form", topic)
+            dm3c.trigger_plugin_hook("post_submit_form", topic)
             dm3c.render_topic()
         }
     }

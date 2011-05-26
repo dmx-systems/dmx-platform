@@ -25,7 +25,7 @@
                         {
                             type_uri: "dm3.webclient.view_config",
                             composite: {
-                                dm3.webclient.js_renderer_class: "TitleRenderer"
+                                dm3.webclient.js_field_renderer_class: "TitleRenderer"
                             }
                         }
                     ]
@@ -38,7 +38,7 @@
                         {
                             type_uri: "dm3.webclient.view_config",
                             composite: {
-                                dm3.webclient.js_renderer_class: "BodyTextRenderer",
+                                dm3.webclient.js_field_renderer_class: "BodyTextRenderer",
                                 dm3.webclient.rows: 15
                             }
                         }
