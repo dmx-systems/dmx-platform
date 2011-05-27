@@ -7,9 +7,6 @@ function DefaultPageRenderer() {
                     //     key: assoc def URI
                     //     value: either a Field object or again a page model object
 
-    // Settings
-    var DEFAULT_FIELD_ROWS = 1
-
     // The autocomplete list
     $("#document-form").append($("<div>").addClass("autocomplete-list"))
     autocomplete_item = -1
@@ -38,9 +35,8 @@ function DefaultPageRenderer() {
 
         function render_associations() {
             var topics = dm3c.restc.get_related_topics(topic.id) //, "dm3.core.association")
-            // render label
+            //
             dm3c.render.field_label("Associations (" + topics.length + ")")
-            // render field
             dm3c.render.field_value(dm3c.render.topic_list(topics))
         }
     }
@@ -60,7 +56,6 @@ function DefaultPageRenderer() {
     }
 
     this.process_form = function(topic) {
-
         // 1) update DB and memory
         var topic_model = build_topic_model()
         // alert("topic model to update: " + JSON.stringify(topic_model))
@@ -70,7 +65,6 @@ function DefaultPageRenderer() {
         dm3c.canvas.update_topic(topic)
         dm3c.canvas.refresh()
         dm3c.render_topic()
-        // ### dm3c.trigger_plugin_hook("post_set_topic_label", topic_id, label)
 
         /**
          * Reads out values from GUI elements and builds a topic model object from it.
@@ -83,7 +77,7 @@ function DefaultPageRenderer() {
                 uri: topic.uri,
                 type_uri: topic.type_uri
             }
-            if (page_model instanceof Field) {
+            if (page_model instanceof DefaultPageRenderer.Field) {
                 var form_value = page_model.read_form_value()
                 // Note: undefined form value is an error (means: field renderer returned no value).
                 // null is a valid form value (means: field renderer prevents the field from being updated).
@@ -99,7 +93,7 @@ function DefaultPageRenderer() {
         function build_composite(fields) {
             var composite = {}
             for (var assoc_def_uri in fields) {
-                if (fields[assoc_def_uri] instanceof Field) {
+                if (fields[assoc_def_uri] instanceof DefaultPageRenderer.Field) {
                     var form_value = fields[assoc_def_uri].read_form_value()
                     // Note: undefined form value is an error (means: field renderer returned no value).
                     // null is a valid form value (means: field renderer prevents the field from being updated).
@@ -118,6 +112,18 @@ function DefaultPageRenderer() {
             }
             return composite
         }
+    }
+
+
+
+    /******************/
+    /*** Public API ***/
+    /******************/
+
+
+
+    this.get_page_model = function() {
+        return page_model
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
@@ -159,154 +165,17 @@ function DefaultPageRenderer() {
                 return fields;
             } else {
                 var value = field_uri == "" ? topic.value : composite
-                return new Field(field_uri, value, topic, topic_type, assoc_def)
+                return new DefaultPageRenderer.Field(field_uri, value, topic, topic_type, assoc_def)
             }
         }
     }
 
     function render_page_model(page_model, render_func) {
-        if (page_model instanceof Field) {
+        if (page_model instanceof DefaultPageRenderer.Field) {
             render_func(page_model)
         } else {
             for (var assoc_def_uri in page_model) {
                 render_page_model(page_model[assoc_def_uri], render_func)
-            }
-        }
-    }
-
-    /**
-     * @param   uri         The field URI. Unique within the page/form. The field URI is a path composed of association
-     *                      definition URIs that leads to this field, e.g. "/dm3.contacts.address/dm3.contacts.street".
-     *                      For a non-composite topic the field URI is an empty string.
-     * @param   value       The value to be rendered.
-     *                      May be null/undefined, in this case an empty string is rendered.
-     * @param   topic       The topic the page/form is rendered for.
-     *                      Note: that is the same topic for all the Field objects of one page/form.
-     * @param   topic_type  The topic type underlying this field.
-     *                      Note: in general the topic type is different for the Field objects of one page/form.
-     * @param   assoc_def   The direct association definition that leads to this field.
-     *                      For a non-composite topic it is <code>undefined</code>.
-     */
-    function Field(uri, value, topic, topic_type, assoc_def) {
-
-        this.uri = uri
-        this.value = value || ""
-        this.topic_type = topic_type
-        this.assoc_def = assoc_def
-        this.label = topic_type.value
-        this.editable               = get_view_config("editable")
-        this.viewable               = get_view_config("viewable")
-        var js_field_renderer_class = get_view_config("js_field_renderer_class")
-        this.rows                   = get_view_config("rows")
-        var renderer
-
-        this.render_field = function() {
-            // error check
-            if (!js_field_renderer_class) {
-                alert("WARNING (DefaultPageRenderer.render_page):\n\nField \"" + uri +
-                    "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
-                return
-            }
-            // create renderer
-            renderer = js.new_object(js_field_renderer_class, topic, this)
-            // render field
-            var field_value_div = $("<div>").addClass("field-value")
-            var html = trigger_renderer_hook("render_field", field_value_div)
-            if (html !== undefined) {
-                $("#detail-panel").append(field_value_div.append(html))
-                trigger_renderer_hook("post_render_field")
-            } else {
-                alert("WARNING (DefaultPageRenderer.render_page):\n\nRenderer for field \"" + uri + "\" " +
-                    "returned no field.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
-            }
-        }
-
-        this.render_form_element = function() {
-            // error check
-            if (!js_field_renderer_class) {
-                alert("WARNING (DefaultPageRenderer.render_form):\n\nField \"" + uri +
-                    "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
-                return
-            }
-            // create renderer
-            renderer = js.new_object(js_field_renderer_class, topic, this)
-            // render field label
-            dm3c.render.field_label(this)
-            // render form element
-            var field_value_div = $("<div>").addClass("field-value")
-            var html = trigger_renderer_hook("render_form_element")
-            if (html !== undefined) {
-                $("#detail-panel").append(field_value_div.append(html))
-                trigger_renderer_hook("post_render_form_element")
-            } else {
-                alert("WARNING (DefaultPageRenderer.render_form):\n\nRenderer for field \"" + uri + "\" " +
-                    "returned no form element.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
-            }
-        }
-
-        this.read_form_value = function() {
-            var form_value = trigger_renderer_hook("read_form_value")
-            // Note: undefined value is an error (means: field renderer returned no value).
-            // null is a valid result (means: field renderer prevents the field from being updated).
-            if (form_value !== undefined) {
-                return form_value
-            } else {
-                alert("WARNING (DefaultPageRenderer.process_form):\n\nRenderer for field \"" + uri + "\" " +
-                    "returned no form value.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
-            }
-        }
-
-        /**
-         * Triggers a renderer hook for this field.
-         *
-         * @param   hook_name   Name of the renderer hook to trigger.
-         * @param   <varargs>   Variable number of arguments. Passed to the hook.
-         */
-        function trigger_renderer_hook(hook_name) {
-            // Trigger the hook only if it is defined (a renderer must not define all hooks).
-            if (renderer[hook_name]) {
-                if (arguments.length == 1) {
-                    return renderer[hook_name]()
-                } else if (arguments.length == 2) {
-                    return renderer[hook_name](arguments[1])
-                }
-            }
-        }
-
-        function get_view_config(setting) {
-
-            var val = assoc_def && dm3c.get_view_config(assoc_def, setting) || dm3c.get_view_config(topic_type, setting)
-            return val != undefined ? val : get_default_value()
-
-            function get_default_value() {
-                switch (setting) {
-                case "editable":
-                    return true
-                case "viewable":
-                    return true
-                case "js_field_renderer_class":
-                    return get_default_renderer_class()
-                case "rows":
-                    return DEFAULT_FIELD_ROWS
-                default:
-                    alert("Field.get_view_config: setting \"" + setting + "\" not implemented")
-                }
-            }
-
-            function get_default_renderer_class() {
-                switch (topic_type.data_type_uri) {
-                case "dm3.core.text":
-                    return "TextFieldRenderer"
-                case "dm3.core.html":
-                    return "HTMLFieldRenderer"
-                case "dm3.core.number":
-                    return "NumberFieldRenderer"
-                case "dm3.core.boolean":
-                    return "TextFieldRenderer"  // TODO: boolean renderer (a checkbox)
-                default:
-                    alert("Field.get_view_config: data type \"" + topic_type.data_type_uri +
-                        "\" has no default renderer class")
-                }
             }
         }
     }
@@ -512,5 +381,147 @@ function DefaultPageRenderer() {
     function item_hovered() {
         autocomplete_item = this.id
         activate_list_item()
+    }
+}
+
+
+
+/**
+ * @param   uri         The field URI. Unique within the page/form. The field URI is a path composed of association
+ *                      definition URIs that leads to this field, e.g. "/dm3.contacts.address/dm3.contacts.street".
+ *                      For a non-composite topic the field URI is an empty string.
+ * @param   value       The value to be rendered.
+ *                      May be null/undefined, in this case an empty string is rendered.
+ * @param   topic       The topic the page/form is rendered for.
+ *                      Note: that is the same topic for all the Field objects of one page/form.
+ * @param   topic_type  The topic type underlying this field.
+ *                      Note: in general the topic type is different for the Field objects of one page/form.
+ * @param   assoc_def   The direct association definition that leads to this field.
+ *                      For a non-composite topic it is <code>undefined</code>.
+ */
+DefaultPageRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
+
+    // preference
+    var DEFAULT_FIELD_ROWS = 1
+
+    this.uri = uri
+    this.value = value || ""
+    this.topic_type = topic_type
+    this.assoc_def = assoc_def
+    this.label = topic_type.value
+    this.editable               = get_view_config("editable")
+    this.viewable               = get_view_config("viewable")
+    var js_field_renderer_class = get_view_config("js_field_renderer_class")
+    this.rows                   = get_view_config("rows")
+    var renderer
+
+    this.render_field = function() {
+        // error check
+        if (!js_field_renderer_class) {
+            alert("WARNING (DefaultPageRenderer.render_page):\n\nField \"" + uri +
+                "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
+            return
+        }
+        // create renderer
+        renderer = js.new_object(js_field_renderer_class, topic, this)
+        // render field
+        var field_value_div = $("<div>").addClass("field-value")
+        var html = trigger_renderer_hook("render_field", field_value_div)
+        if (html !== undefined) {
+            $("#detail-panel").append(field_value_div.append(html))
+            trigger_renderer_hook("post_render_field")
+        } else {
+            alert("WARNING (DefaultPageRenderer.render_page):\n\nRenderer for field \"" + uri + "\" " +
+                "returned no field.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
+        }
+    }
+
+    this.render_form_element = function() {
+        // error check
+        if (!js_field_renderer_class) {
+            alert("WARNING (DefaultPageRenderer.render_form):\n\nField \"" + uri +
+                "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
+            return
+        }
+        // create renderer
+        renderer = js.new_object(js_field_renderer_class, topic, this)
+        // render field label
+        dm3c.render.field_label(this)
+        // render form element
+        var field_value_div = $("<div>").addClass("field-value")
+        var html = trigger_renderer_hook("render_form_element")
+        if (html !== undefined) {
+            $("#detail-panel").append(field_value_div.append(html))
+            trigger_renderer_hook("post_render_form_element")
+        } else {
+            alert("WARNING (DefaultPageRenderer.render_form):\n\nRenderer for field \"" + uri + "\" " +
+                "returned no form element.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
+        }
+    }
+
+    this.read_form_value = function() {
+        var form_value = trigger_renderer_hook("read_form_value")
+        // Note: undefined value is an error (means: field renderer returned no value).
+        // null is a valid result (means: field renderer prevents the field from being updated).
+        if (form_value !== undefined) {
+            return form_value
+        } else {
+            alert("WARNING (DefaultPageRenderer.process_form):\n\nRenderer for field \"" + uri + "\" " +
+                "returned no form value.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
+        }
+    }
+
+    /**
+     * Triggers a renderer hook for this field.
+     *
+     * @param   hook_name   Name of the renderer hook to trigger.
+     * @param   <varargs>   Variable number of arguments. Passed to the hook.
+     */
+    function trigger_renderer_hook(hook_name) {
+        // Trigger the hook only if it is defined (a renderer must not define all hooks).
+        if (renderer[hook_name]) {
+            if (arguments.length == 1) {
+                return renderer[hook_name]()
+            } else if (arguments.length == 2) {
+                return renderer[hook_name](arguments[1])
+            }
+        }
+    }
+
+    function get_view_config(setting) {
+
+        var val = assoc_def && dm3c.get_view_config(assoc_def, setting) || dm3c.get_view_config(topic_type, setting)
+        return val != undefined ? val : get_default_value()
+
+        function get_default_value() {
+            switch (setting) {
+            case "editable":
+                return true
+            case "viewable":
+                return true
+            case "js_field_renderer_class":
+                return get_default_renderer_class()
+            case "rows":
+                return DEFAULT_FIELD_ROWS
+            default:
+                alert("Field.get_view_config: setting \"" + setting + "\" not implemented")
+            }
+        }
+
+        function get_default_renderer_class() {
+            switch (topic_type.data_type_uri) {
+            case "dm3.core.text":
+                return "TextFieldRenderer"
+            case "dm3.core.html":
+                return "HTMLFieldRenderer"
+            case "dm3.core.number":
+                return "NumberFieldRenderer"
+            case "dm3.core.boolean":
+                return "TextFieldRenderer"  // TODO: boolean renderer (a checkbox)
+            default:
+                alert("Field.get_view_config: data type \"" + topic_type.data_type_uri +
+                    "\" has no default renderer class")
+            }
+        }
     }
 }

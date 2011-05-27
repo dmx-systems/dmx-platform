@@ -199,6 +199,19 @@ var dm3c = new function() {
         return topic_type
     }
 
+    /**
+     * Updates a topic type in the DB.
+     */
+    this.update_topic_type = function(topic_type_model) {
+        // update DB
+        var topic_type = dm3c.restc.update_topic_type(topic_type_model);
+        // alert("Topic type updated: " + JSON.stringify(topic_type));
+        // trigger hook
+        // ### dm3c.trigger_plugin_hook("post_create_topic", topic_type)
+        //
+        return topic_type
+    }
+
 
 
     /**********************/
@@ -284,9 +297,13 @@ var dm3c = new function() {
         return plugins[plugin_class]
     }
 
-    this.get_page_renderer = function(topic) {
-        var topic_type = dm3c.type_cache.get(topic.type_uri)
-        var page_renderer_class = topic_type.get_page_renderer_class()
+    this.get_page_renderer = function(topic_or_classname) {
+        if (typeof(topic_or_classname) == "string") {
+            var page_renderer_class = topic_or_classname
+        } else {
+            var topic_type = dm3c.type_cache.get(topic_or_classname.type_uri)
+            var page_renderer_class = topic_type.get_page_renderer_class()
+        }
         var page_renderer = page_renderers[page_renderer_class]
         // error check
         if (!page_renderer) {
@@ -843,7 +860,7 @@ var dm3c = new function() {
         }
 
         function setup_gui() {
-            load_document_renderers()
+            load_page_renderers()
             load_field_renderers()
             load_stylesheets()
             // Note: in order to let a plugin provide a custom canvas renderer (the dm3-freifunk-geomap plugin does!)
@@ -870,7 +887,7 @@ var dm3c = new function() {
             $(window).resize(window_resized)
         }
 
-        function load_document_renderers() {
+        function load_page_renderers() {
 
             if (LOG_PLUGIN_LOADING) dm3c.log("Loading " + page_renderer_sources.length + " page renderers:")
             for (var i = 0, page_renderer_src; page_renderer_src = page_renderer_sources[i]; i++) {
@@ -893,6 +910,7 @@ var dm3c = new function() {
             if (LOG_PLUGIN_LOADING) dm3c.log("Loading " + field_renderer_sources.length + " data field renderers:")
             for (var i = 0, field_renderer_source; field_renderer_source = field_renderer_sources[i]; i++) {
                 if (LOG_PLUGIN_LOADING) dm3c.log("..... " + field_renderer_source)
+                // load field renderer asynchronously
                 dm3c.javascript_source(field_renderer_source, function() {})
             }
         }

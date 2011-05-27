@@ -36,7 +36,7 @@ class TypeCache {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    TopicType get(String topicTypeUri) {
+    AttachedTopicType get(String topicTypeUri) {
         AttachedTopicType topicType = cache.get(topicTypeUri);
         if (topicType == null) {
             // error check
@@ -57,9 +57,8 @@ class TypeCache {
     }
 
     void invalidate(String topicTypeUri) {
-        if (cache.remove(topicTypeUri) != null) {
-            logger.info("Invalidating topic type \"" + topicTypeUri + "\"");
-        } else {
+        logger.info("Invalidating topic type \"" + topicTypeUri + "\"");
+        if (cache.remove(topicTypeUri) == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found in type cache");
         }
     }

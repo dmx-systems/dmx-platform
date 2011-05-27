@@ -135,6 +135,11 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
+    public void setTopicUri(long topicId, String uri) {
+        setNodeUri(hg.getHyperNode(topicId), uri);
+    }
+
+    @Override
     public TopicValue setTopicValue(long topicId, TopicValue value) {
         Object oldValue = hg.getHyperNode(topicId).setObject("value", value.value());
         return oldValue != null ? new TopicValue(oldValue) : null;
@@ -143,8 +148,9 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     @Override
     public void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, TopicValue value,
                                                                                     TopicValue oldValue) {
-        hg.getHyperNode(topicId).indexAttribute(fromIndexMode(indexMode), indexKey, value.value(),
-            oldValue != null ? oldValue.value() : null);
+        HyperGraphIndexMode hgIndexMode = fromIndexMode(indexMode);
+        Object oldVal = oldValue != null ? oldValue.value() : null;
+        hg.getHyperNode(topicId).indexAttribute(hgIndexMode, indexKey, value.value(), oldVal);
     }
 
     @Override
@@ -154,9 +160,8 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         checkUniqueness(uri);
         // 2) create node
         HyperNode node = hg.createHyperNode();
-        node.setString("uri", uri);
-        // 3) index URI
-        node.indexAttribute(HyperGraphIndexMode.KEY, "uri", uri, null);   // oldValue=null
+        // 3) set URI
+        setNodeUri(node, uri);
         //
         return buildTopic(node.getId(), uri, topicModel.getValue(), topicModel.getTypeUri());
     }
@@ -476,6 +481,14 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     private HyperNode lookupHyperNode(String uri) {
         return hg.getHyperNode("uri", uri);
+    }
+
+    // ---
+
+    private void setNodeUri(HyperNode node, String uri) {
+        String oldUri = node.getString("uri", null);
+        node.setString("uri", uri);
+        node.indexAttribute(HyperGraphIndexMode.KEY, "uri", uri, oldUri);
     }
 
     // ---

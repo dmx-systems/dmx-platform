@@ -24,6 +24,12 @@ public interface Topic {
 
     // ---
 
+    void setId(long id);
+
+    void setUri(String uri);
+
+    // ---
+
     void setValue(String value);
 
     void setValue(int value);

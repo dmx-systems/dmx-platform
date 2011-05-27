@@ -120,7 +120,11 @@ function RESTClient(core_service_uri) {
         return request("POST", "/topictype", topic_type_model)
     }
 
-    this.add_data_field = function(type_uri, field) {
+    this.update_topic_type = function(topic_type_model) {
+        return request("PUT", "/topictype", topic_type_model)
+    }
+
+    /* ### this.add_data_field = function(type_uri, field) {
         return request("POST", "/topictype/" + type_uri, field)
     }
 
@@ -134,7 +138,7 @@ function RESTClient(core_service_uri) {
 
     this.remove_data_field = function(type_uri, field_uri) {
         return request("DELETE", "/topictype/" + type_uri + "/field/" + field_uri)
-    }
+    } */
 
 
 

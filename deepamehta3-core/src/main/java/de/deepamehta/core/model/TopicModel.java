@@ -115,6 +115,10 @@ public class TopicModel {
         this.id = id;
     }
 
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
     // ---
 
     public void setValue(String value) {

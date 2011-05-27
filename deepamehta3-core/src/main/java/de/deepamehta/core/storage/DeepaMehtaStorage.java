@@ -101,6 +101,15 @@ public interface DeepaMehtaStorage {
     // ---
 
     /**
+     * Stores and indexes the topic URI.
+     */
+    void setTopicUri(long topicId, String uri);
+
+    /**
+     * Sets the topic value.
+     * <p>
+     * Note: the value is not indexed automatically. Use the {@link indexTopicValue} method.
+     *
      * @return  The previous topic value, or <code>null</code> if no value was set before.
      */
     TopicValue setTopicValue(long topicId, TopicValue value);
@@ -111,6 +120,10 @@ public interface DeepaMehtaStorage {
     void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, TopicValue value, TopicValue oldValue);
 
     /**
+     * Creates a topic.
+     * <p>
+     * The topic's URI is stored and indexed.
+     *
      * @return  the created topic. Note:
      *          - the topic URI   is initialzed and     persisted.
      *          - the topic value is initialzed but not persisted.

@@ -148,15 +148,33 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
     }
 
     void store() {
-        Topic topic = dms.attach(dms.storage.createTopic(getModel()), false);
-        getModel().setId(topic.getId());
-        dms.associateWithTopicType(topic);
-        topic.setValue(getModel().getValue());
+        setId(dms.storage.createTopic(getModel()).getId());
+        dms.associateWithTopicType(this);
+        setValue(getValue());
         //
         dms.associateDataType(getUri(), getDataTypeUri());
         storeIndexModes();
         storeAssocDefs();
         viewConfig.store();
+    }
+
+    void update(TopicTypeModel topicTypeModel) {
+        // error check
+        if (getId() != topicTypeModel.getId()) {
+            throw new RuntimeException("The topic type ID can't be changed (tried " +
+                getId() + " -> " + topicTypeModel.getId() + ")");
+        }
+        //
+        boolean uriChanged = !getUri().equals(topicTypeModel.getUri());
+        boolean valueChanged = !getValue().equals(topicTypeModel.getValue());
+        //
+        if (uriChanged) {
+            dms.invalidateTypeCache(getUri());
+        }
+        //
+        if (uriChanged || valueChanged) {
+            super.update(topicTypeModel);
+        }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

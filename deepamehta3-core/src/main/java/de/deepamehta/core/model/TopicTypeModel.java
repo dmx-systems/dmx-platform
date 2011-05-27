@@ -60,7 +60,7 @@ public class TopicTypeModel extends TopicModel {
 
     public TopicTypeModel(JSONObject topicTypeModel) {
         try {
-            this.id = -1;
+            this.id = topicTypeModel.optLong("id", -1);
             this.uri = topicTypeModel.getString("uri");
             this.value = new TopicValue(topicTypeModel.get("value"));
             this.typeUri = "dm3.core.topic_type";

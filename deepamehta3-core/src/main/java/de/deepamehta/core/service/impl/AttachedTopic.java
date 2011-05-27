@@ -50,14 +50,20 @@ class AttachedTopic extends TopicBase {
     // === Topic Overrides ===
 
     @Override
+    public void setUri(String uri) {
+        // update memory
+        super.setUri(uri);
+        // update DB
+        storeTopicUri(uri);
+    }
+
+    @Override
     public void setValue(TopicValue value) {
         // update memory
         super.setValue(value);
         // update DB
         storeTopicValue(value);
     }
-
-    // ---
 
     @Override
     public void setComposite(Composite comp) {
@@ -133,14 +139,15 @@ class AttachedTopic extends TopicBase {
 
     void update(TopicModel topicModel) {
         if (getTopicType().getDataTypeUri().equals("dm3.core.composite")) {
-            setComposite(topicModel.getComposite());
+            setComposite(topicModel.getComposite());    // setComposite() includes setValue()
         } else {
             setValue(topicModel.getValue());
         }
+        setUri(topicModel.getUri());
     }
 
     TopicType getTopicType() {
-        return dms.getTopicType(getTypeUri(), null);      // FIXME: clientContext=null
+        return dms.getTopicType(getTypeUri(), null);    // FIXME: clientContext=null
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -184,6 +191,10 @@ class AttachedTopic extends TopicBase {
 
 
     // === Store ===
+
+    private void storeTopicUri(String uri) {
+        dms.storage.setTopicUri(getId(), uri);
+    }
 
     private void storeTopicValue(TopicValue value) {
         TopicValue oldValue = dms.storage.setTopicValue(getId(), value);

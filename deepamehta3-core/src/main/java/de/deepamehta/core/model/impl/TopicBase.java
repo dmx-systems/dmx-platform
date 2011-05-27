@@ -59,6 +59,18 @@ public class TopicBase implements Topic {
     // ---
 
     @Override
+    public void setId(long id) {
+        model.setId(id);
+    }
+
+    @Override
+    public void setUri(String uri) {
+        model.setUri(uri);
+    }
+
+    // ---
+
+    @Override
     public void setValue(String value) {
         setValue(new TopicValue(value));
     }

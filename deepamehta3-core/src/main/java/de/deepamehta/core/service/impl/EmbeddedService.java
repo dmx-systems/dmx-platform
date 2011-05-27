@@ -543,13 +543,14 @@ public class EmbeddedService implements CoreService {
     @GET
     @Path("/topictype/{uri}")
     @Override
-    public TopicType getTopicType(@PathParam("uri") String uri, @HeaderParam("Cookie") ClientContext clientContext) {
+    public AttachedTopicType getTopicType(@PathParam("uri") String uri,
+                                          @HeaderParam("Cookie") ClientContext clientContext) {
         if (uri == null) {
             throw new IllegalArgumentException("Tried to get a topic type with null URI");
         }
         DeepaMehtaTransaction tx = beginTx();
         try {
-            TopicType topicType = typeCache.get(uri);
+            AttachedTopicType topicType = typeCache.get(uri);
             triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
             tx.success();
             return topicType;
@@ -582,6 +583,33 @@ public class EmbeddedService implements CoreService {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Creating topic type \"" + topicTypeModel.getUri() +
                 "\" failed (" + topicTypeModel + ")", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @PUT
+    @Path("/topictype")
+    @Override
+    public TopicType updateTopicType(TopicTypeModel topicTypeModel,
+                                     @HeaderParam("Cookie") ClientContext clientContext) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            String topicTypeUri = getTopic(topicTypeModel.getId(), false, clientContext).getUri();  // fetchComp..=false
+            AttachedTopicType topicType = getTopicType(topicTypeUri, clientContext);
+            //
+            // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
+            // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
+            //
+            topicType.update(topicTypeModel);
+            //
+            // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
+            //
+            tx.success();
+            return topicType;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Updating topic type failed (" + topicTypeModel + ")", e);
         } finally {
             tx.finish();
         }
@@ -876,6 +904,10 @@ public class EmbeddedService implements CoreService {
      */
     Association createAssociation(String typeUri, Role role1, Role role2) {
         return createAssociation(new AssociationModel(typeUri, role1, role2), null);    // FIXME: clientContext=null
+    }
+
+    void invalidateTypeCache(String topicTypeUri) {
+        typeCache.invalidate(topicTypeUri);
     }
 
 

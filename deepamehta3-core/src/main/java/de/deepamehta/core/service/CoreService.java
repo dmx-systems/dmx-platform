@@ -162,6 +162,8 @@ public interface CoreService {
 
     public TopicType createTopicType(TopicTypeModel topicTypeModel, ClientContext clientContext);
 
+    public TopicType updateTopicType(TopicTypeModel topicTypeModel, ClientContext clientContext);
+
     public Topic createAssociationType(AssociationTypeData assocTypeData, ClientContext clientContext);
 
     // public void addDataField(String typeUri, DataField dataField);
