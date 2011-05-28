@@ -38,28 +38,28 @@ body {
     background: #f8f8f8;
 }
 
-#document-form {
+#page-panel {
     line-height: 1.6em;
 }
 
-#detail-panel {
+#page-content {
     width: 33em;
     overflow: auto;
 }
 
-#detail-panel input[type=text],
-#detail-panel textarea {
+#page-content input[type=text],
+#page-content textarea {
     width: 97%;
     font-size: 1em;
 }
 
-#detail-panel textarea {
+#page-content textarea {
     /* Firefox: default font in textarea is courier */
     font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
     line-height: 1.6em;
 }
 
-#detail-panel input.combobox {
+#page-content input.combobox {
     width: 85%;
 }
 

@@ -1,22 +1,22 @@
 .dm-toolbar   .ui-widget,
-#detail-panel .ui-widget {
+#page-content .ui-widget {
     font-size: 75%;
 }
 
 .dm-toolbar   .ui-button-text-icon .ui-button-text,
-#detail-panel .ui-button-text-icon .ui-button-text {
+#page-content .ui-button-text-icon .ui-button-text {
     padding-top: 0.2em;
     padding-bottom: 0.2em;
 }
 
 .dm-toolbar   .ui-button-text-only .ui-button-text,
-#detail-panel .ui-button-text-only .ui-button-text {
+#page-content .ui-button-text-only .ui-button-text {
     padding-top: 0.2em;
     padding-bottom: 0.2em;
 }
 
 .dm-toolbar   .ui-button-icon-only .ui-button-text,
-#detail-panel .ui-button-icon-only .ui-button-text {
+#page-content .ui-button-icon-only .ui-button-text {
     padding-top: 0.6em;
     padding-bottom: 0.6em;
 }

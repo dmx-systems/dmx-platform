@@ -19,6 +19,7 @@ var dm3c = new function() {
     this.selected_topic = null  // topic being displayed, or null if no one is currently displayed (a Topic object)
     this.current_rel_id = null  // ID of relation being activated, or null if no one is currently activated
     this.canvas = null          // the canvas that displays the topicmap (a Canvas object)
+    this.page_panel = null      // the page panel on the right hand side (a PagePanel object)
     //
     var plugin_sources = []
     var plugins = {}                // key: plugin class name, base name of source file (string), value: plugin instance
@@ -502,7 +503,7 @@ var dm3c = new function() {
             if (dm3c.selected_topic) {
                 topic_id = dm3c.selected_topic.id
             } else {
-                dm3c.empty_detail_panel()
+                dm3c.page_panel.empty()
                 return
             }
         }
@@ -511,12 +512,12 @@ var dm3c = new function() {
         // update global state
         dm3c.selected_topic = topic
         // render page
-        dm3c.empty_detail_panel()
+        dm3c.page_panel.empty()
         dm3c.trigger_page_renderer_hook(dm3c.selected_topic, "render_page", dm3c.selected_topic)
     }
 
     this.edit_topic = function(topic) {
-        dm3c.empty_detail_panel()
+        dm3c.page_panel.empty()
         dm3c.trigger_page_renderer_hook(topic, "render_form", topic)
     }
 
@@ -670,13 +671,6 @@ var dm3c = new function() {
 
     // ---
 
-    this.empty_detail_panel = function() {
-        $("#detail-panel").empty()
-        $("#lower-toolbar").empty()
-    }
-
-    // ---
-
     this.log = function(text) {
         if (ENABLE_LOGGING) {
             // Note: the log window might be closed meanwhile,
@@ -722,8 +716,9 @@ var dm3c = new function() {
 
     // ---
 
+    // ### TODO: rework
     function submit_document() {
-        var submit_button = $("#document-form button[submit=true]")
+        var submit_button = $("#page-panel button[submit=true]")
         // alert("submit_document: submit button id=" + submit_button.attr("id"))
         submit_button.click()
         return false
@@ -827,9 +822,11 @@ var dm3c = new function() {
         dm3c.ui.button("search-button", search, "Search", "gear")
         // the special form
         $("#special-menu-placeholder").replaceWith(create_special_select())
-        // the document form
-        $("#document-form").submit(submit_document)
-        detail_panel_width = $("#detail-panel").width()
+        // the page panel
+        dm3c.page_panel = new PagePanel()
+        $("#split-panel > tbody > tr > td").eq(1).append(dm3c.page_panel.dom)
+        // ### $("#document-form").submit(submit_document)
+        detail_panel_width = $("#page-content").width()
         if (dm3c.LOG_GUI) dm3c.log("Mesuring detail panel width: " + detail_panel_width)
         // the upload dialog
         $("#upload-dialog").dialog({
@@ -896,7 +893,7 @@ var dm3c = new function() {
             dm3c.ui.menu("special-menu", special_selected, undefined, "Special")
             // the detail panel
             if (dm3c.LOG_GUI) dm3c.log("Setting detail panel height: " + $("#canvas").height())
-            $("#detail-panel").height($("#canvas").height())
+            $("#page-content").height($("#canvas").height())
             //
             $(window).resize(window_resized)
         }
@@ -944,7 +941,7 @@ var dm3c = new function() {
 
         function window_resized() {
             dm3c.canvas.adjust_size()
-            $("#detail-panel").height($("#canvas").height())
+            $("#page-content").height($("#canvas").height())
         }
 
         function extend_rest_client() {

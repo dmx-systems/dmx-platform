@@ -104,7 +104,7 @@ function TopicmapRenderer() {
         self.resize()
         // resize detail panel
         calculate_detail_panel_size()
-        $("#detail-panel").width(detail_panel_width)
+        $("#page-content").width(detail_panel_width)
     }
 
     function stop_resize() {

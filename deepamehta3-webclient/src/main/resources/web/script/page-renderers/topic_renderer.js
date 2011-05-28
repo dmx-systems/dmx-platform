@@ -8,7 +8,7 @@ function TopicRenderer() {
                     //     value: either a Field object or again a page model object
 
     // The autocomplete list
-    $("#document-form").append($("<div>").addClass("autocomplete-list"))
+    $("#page-panel").append($("<div>").addClass("autocomplete-list"))
     autocomplete_item = -1
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -140,7 +140,7 @@ function TopicRenderer() {
         var commands = dm3c.get_topic_commands(topic, context)
         for (var i = 0, cmd; cmd = commands[i]; i++) {
             var button = dm3c.ui.button(undefined, cmd.handler, cmd.label, cmd.ui_icon, cmd.is_submit)
-            $("#lower-toolbar").append(button)
+            $("#page-toolbar").append(button)
         }
     }
 
@@ -428,7 +428,7 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
         var field_value_div = $("<div>").addClass("field-value")
         var html = trigger_renderer_hook("render_field", field_value_div)
         if (html !== undefined) {
-            $("#detail-panel").append(field_value_div.append(html))
+            $("#page-content").append(field_value_div.append(html))
             trigger_renderer_hook("post_render_field")
         } else {
             alert("WARNING (TopicRenderer.render_page):\n\nRenderer for field \"" + uri + "\" " +
@@ -451,7 +451,7 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
         var field_value_div = $("<div>").addClass("field-value")
         var html = trigger_renderer_hook("render_form_element")
         if (html !== undefined) {
-            $("#detail-panel").append(field_value_div.append(html))
+            $("#page-content").append(field_value_div.append(html))
             trigger_renderer_hook("post_render_form_element")
         } else {
             alert("WARNING (TopicRenderer.render_form):\n\nRenderer for field \"" + uri + "\" " +

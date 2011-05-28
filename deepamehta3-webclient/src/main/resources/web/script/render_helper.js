@@ -73,10 +73,10 @@ function RenderHelper() {
                 label += suffix
             }
         }
-        $("#detail-panel").append($("<div>").addClass("field-label").text(label))
+        $("#page-content").append($("<div>").addClass("field-label").text(label))
     }
 
     this.field_value = function(value) {
-        $("#detail-panel").append($("<div>").addClass("field-value").append(value))
+        $("#page-content").append($("<div>").addClass("field-value").append(value))
     }
 }
