@@ -58,30 +58,38 @@ var dm3c = new function() {
             type_uri: type_uri,
             composite: composite    // not serialized to request body if undefined
         }
+        // 1) update DB
         var topic = dm3c.restc.create_topic(topic_model)
         // alert("Topic created: " + JSON.stringify(topic));
-        // trigger hook
+        // 2) trigger hook
         dm3c.trigger_plugin_hook("post_create_topic", topic)
         //
         return topic
     }
 
     /**
-     * Updates a topic in the DB and in memory.
+     * Updates a topic in the DB.
      * Triggers the "post_update_topic" hook.
      *
      * High-level utility method for plugin developers.
+     *
+     * @param   old_topic   the topic that is about to be updated. This "old" version is passed to the
+     *                      post_update_topic hook to let plugins compare the old and new ones.
+     * @param   new_topic   the new topic that is about to override the old topic.
+     *
+     * @return  The updated topic as stored in the DB.
+     *          Note: the new topic and the updated topic are not necessarily 100% identical. The new topic contains
+     *          only the parts that are required for the update, e.g. a composite topic doesn't contain the "value"
+     *          field. The updated topic on the other hand is the complete topic as returned by the server.
      */
-    this.update_topic = function(topic, topic_model) {
+    this.update_topic = function(old_topic, new_topic) {
         // 1) update DB
-        // alert("dm3c.update_topic(): topic_model=" + JSON.stringify(topic_model));
-        return dm3c.restc.update_topic(topic_model)
-        // 2) update memory
-        // ### var old_properties = {}
-        // ### js.copy(topic.properties, old_properties)
-        // ### js.copy(properties, topic.properties)
-        // 3) trigger hook
-        // ### dm3c.trigger_plugin_hook("post_update_topic", topic, old_properties)
+        // alert("dm3c.update_topic(): new_topic=" + JSON.stringify(new_topic));
+        var updated_topic = dm3c.restc.update_topic(new_topic)
+        // 2) trigger hook
+        dm3c.trigger_plugin_hook("post_update_topic", updated_topic, old_topic)
+        //
+        return updated_topic
     }
 
     /**
@@ -189,27 +197,27 @@ var dm3c = new function() {
     /**
      * Creates a topic type in the DB.
      */
-    this.create_topic_type = function(topic_type_model) {
-        // update DB
-        var topic_type = dm3c.restc.create_topic_type(topic_type_model);
+    this.create_topic_type = function(topic_type) {
+        // 1) update DB
+        var created_topic_type = dm3c.restc.create_topic_type(topic_type);
         // alert("Topic type created: " + JSON.stringify(topic_type));
-        // trigger hook
-        dm3c.trigger_plugin_hook("post_create_topic", topic_type)
+        // 2) trigger hook
+        dm3c.trigger_plugin_hook("post_create_topic", created_topic_type)
         //
-        return topic_type
+        return created_topic_type
     }
 
     /**
      * Updates a topic type in the DB.
      */
-    this.update_topic_type = function(topic_type_model) {
-        // update DB
-        var topic_type = dm3c.restc.update_topic_type(topic_type_model);
+    this.update_topic_type = function(old_topic_type, new_topic_type) {
+        // 1) update DB
+        var updated_topic_type = dm3c.restc.update_topic_type(new_topic_type);
         // alert("Topic type updated: " + JSON.stringify(topic_type));
-        // trigger hook
-        // ### dm3c.trigger_plugin_hook("post_create_topic", topic_type)
+        // 2) trigger hook
+        dm3c.trigger_plugin_hook("post_update_topic", updated_topic_type, old_topic_type)
         //
-        return topic_type
+        return updated_topic_type
     }
 
 
@@ -349,7 +357,7 @@ var dm3c = new function() {
     // === Types ===
 
     this.type_label = function(type_uri) {
-        return dm3c.type_cache.get_label(type_uri)
+        return dm3c.type_cache.get(type_uri).value
     }
 
     this.reload_types = function() {
@@ -542,15 +550,22 @@ var dm3c = new function() {
         return type_menu
     }
 
+    /**
+     * @param   menu_id     Used IDs are e.g.
+     *                      "create-type-menu"
+     *                      "search-type-menu" - introduced by typesearch plugin
+     *
+     * @return  The menu (a UIHelper Menu object).
+     */
     this.recreate_type_menu = function(menu_id) {
         var selection = dm3c.ui.menu_item(menu_id)
-        var menu = dm3c.create_type_menu(menu_id)
+        var type_menu = dm3c.create_type_menu(menu_id)
         // restore selection
         // Note: selection is undefined if the menu has no items.
         if (selection) {
             dm3c.ui.select_menu_item(menu_id, selection.value)
         }
-        return menu
+        return type_menu
     }
 
     // ---
@@ -770,9 +785,8 @@ var dm3c = new function() {
     function load_types() {
         var type_uris = dm3c.restc.get_topic_type_uris()
         for (var i = 0; i < type_uris.length; i++) {
-            var type_uri = type_uris[i]
-            var type = dm3c.restc.get_topic_type(type_uri)
-            dm3c.type_cache.put(type_uri, type)
+            var topic_type = dm3c.restc.get_topic_type(type_uris[i])
+            dm3c.type_cache.put(topic_type)
         }
     }
 
@@ -784,7 +798,7 @@ var dm3c = new function() {
 
     // --- register default modules ---
     //
-    this.register_page_renderer("script/page-renderers/default_page_renderer.js")
+    this.register_page_renderer("script/page-renderers/topic_renderer.js")
     //
     this.register_field_renderer("script/field-renderers/text_field_renderer.js")
     this.register_field_renderer("script/field-renderers/number_field_renderer.js")

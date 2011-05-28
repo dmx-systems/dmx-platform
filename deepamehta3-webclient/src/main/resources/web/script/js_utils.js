@@ -115,13 +115,13 @@ var js = {
     },
 
     /**
-     * Copies all attributes from source object to destination object.
-     */
+     * Copies all properties from source object to destination object.
+     * ### not in use
     copy: function(src_obj, dst_obj) {
         for (var key in src_obj) {
             dst_obj[key] = src_obj[key]
         }
-    },
+    },*/
 
 
 

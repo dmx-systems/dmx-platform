@@ -1,6 +1,6 @@
 function typeeditor_plugin() {
 
-    dm3c.register_page_renderer("/de.deepamehta.3-typeeditor/script/typeeditor_renderer.js")
+    dm3c.register_page_renderer("/de.deepamehta.3-typeeditor/script/topictype_renderer.js")
     dm3c.register_css_stylesheet("/de.deepamehta.3-typeeditor/style/dm3-typeeditor.css")
 
     var DEFAULT_TOPIC_TYPE = {
@@ -28,8 +28,48 @@ function typeeditor_plugin() {
 
 
 
-    this.pre_submit_form = function(topic) {
+    /**
+     * Once a topic type is created we must
+     * 1) Update the type cache.
+     * 2) Rebuild the "Create" button's type menu.
+     *
+     * @param   topic   The topic just created.
+     *                  Note: in case the just created topic is a type, the entire type definition is passed.
+     */
+    this.post_create_topic = function(topic) {
         if (topic.type_uri == "dm3.core.topic_type") {
+            // 1) Update type cache
+            dm3c.type_cache.put(topic)
+            // 2) Rebuild type menu
+            dm3c.recreate_type_menu("create-type-menu")
+        }
+    }
+
+    /**
+     * Once a topic type is updated we must
+     * 1) Update the type cache.
+     * 2) Rebuild the "Create" button's type menu.
+     */
+    this.post_update_topic = function(topic, old_topic) {
+        if (topic.type_uri == "dm3.core.topic_type") {
+            // alert("post_update_topic:\n\nnew topic type=\n" + JSON.stringify(topic) +
+            //     "\n\nold topic type=\n" + JSON.stringify(old_topic))
+            // 1) Update type cache
+            var uri_changed = topic.uri != old_topic.uri
+            var value_changed = topic.value != old_topic.value
+            if (uri_changed) {
+                // alert("Type URI changed: " + old_topic.uri + " -> " + topic.uri)
+                dm3c.type_cache.remove(old_topic.uri)
+                dm3c.type_cache.put(topic)
+            }
+            if (value_changed) {
+                // alert("Type name changed: " + old_topic.value + " -> " + topic.value)
+                dm3c.type_cache.get(topic.uri).value = topic.value
+            }
+            // 2) Rebuild type menu
+            if (uri_changed || value_changed) {
+                dm3c.recreate_type_menu("create-type-menu")
+            }
         }
     }
 
@@ -39,8 +79,8 @@ function typeeditor_plugin() {
             label: "New Topic Type...",
             value: "create_topic_type",
             is_trigger: true,
-            handler: create_topic_type}
-        )
+            handler: create_topic_type
+        })
     }
 
 

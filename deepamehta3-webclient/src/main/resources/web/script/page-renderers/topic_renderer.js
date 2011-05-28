@@ -1,7 +1,7 @@
 /**
  * A page renderer that models a page as a set of fields.
  */
-function DefaultPageRenderer() {
+function TopicRenderer() {
 
     var page_model  // either a Field object (non-composite) or an object (composite):
                     //     key: assoc def URI
@@ -77,7 +77,7 @@ function DefaultPageRenderer() {
                 uri: topic.uri,
                 type_uri: topic.type_uri
             }
-            if (page_model instanceof DefaultPageRenderer.Field) {
+            if (page_model instanceof TopicRenderer.Field) {
                 var form_value = page_model.read_form_value()
                 // Note: undefined form value is an error (means: field renderer returned no value).
                 // null is a valid form value (means: field renderer prevents the field from being updated).
@@ -93,7 +93,7 @@ function DefaultPageRenderer() {
         function build_composite(fields) {
             var composite = {}
             for (var assoc_def_uri in fields) {
-                if (fields[assoc_def_uri] instanceof DefaultPageRenderer.Field) {
+                if (fields[assoc_def_uri] instanceof TopicRenderer.Field) {
                     var form_value = fields[assoc_def_uri].read_form_value()
                     // Note: undefined form value is an error (means: field renderer returned no value).
                     // null is a valid form value (means: field renderer prevents the field from being updated).
@@ -165,13 +165,13 @@ function DefaultPageRenderer() {
                 return fields;
             } else {
                 var value = field_uri == "" ? topic.value : composite
-                return new DefaultPageRenderer.Field(field_uri, value, topic, topic_type, assoc_def)
+                return new TopicRenderer.Field(field_uri, value, topic, topic_type, assoc_def)
             }
         }
     }
 
     function render_page_model(page_model, render_func) {
-        if (page_model instanceof DefaultPageRenderer.Field) {
+        if (page_model instanceof TopicRenderer.Field) {
             render_func(page_model)
         } else {
             for (var assoc_def_uri in page_model) {
@@ -194,7 +194,7 @@ function DefaultPageRenderer() {
         }
         // assertion
         if (this.id.substr(0, 6) != "field_") {
-            alert("WARNING (DefaultPageRenderer.autocomplete):\n\nTopic " + dm3c.selected_topic.id +
+            alert("WARNING (TopicRenderer.autocomplete):\n\nTopic " + dm3c.selected_topic.id +
                 " has unexpected element id: \"" + this.id + "\".\n\nIt is expected to begin with \"field_\".")
             return
         }
@@ -399,7 +399,7 @@ function DefaultPageRenderer() {
  * @param   assoc_def   The direct association definition that leads to this field.
  *                      For a non-composite topic it is <code>undefined</code>.
  */
-DefaultPageRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
+TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
 
     // preference
     var DEFAULT_FIELD_ROWS = 1
@@ -418,7 +418,7 @@ DefaultPageRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
     this.render_field = function() {
         // error check
         if (!js_field_renderer_class) {
-            alert("WARNING (DefaultPageRenderer.render_page):\n\nField \"" + uri +
+            alert("WARNING (TopicRenderer.render_page):\n\nField \"" + uri +
                 "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
             return
         }
@@ -431,7 +431,7 @@ DefaultPageRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
             $("#detail-panel").append(field_value_div.append(html))
             trigger_renderer_hook("post_render_field")
         } else {
-            alert("WARNING (DefaultPageRenderer.render_page):\n\nRenderer for field \"" + uri + "\" " +
+            alert("WARNING (TopicRenderer.render_page):\n\nRenderer for field \"" + uri + "\" " +
                 "returned no field.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
         }
     }
@@ -439,7 +439,7 @@ DefaultPageRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
     this.render_form_element = function() {
         // error check
         if (!js_field_renderer_class) {
-            alert("WARNING (DefaultPageRenderer.render_form):\n\nField \"" + uri +
+            alert("WARNING (TopicRenderer.render_form):\n\nField \"" + uri +
                 "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
             return
         }
@@ -454,7 +454,7 @@ DefaultPageRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
             $("#detail-panel").append(field_value_div.append(html))
             trigger_renderer_hook("post_render_form_element")
         } else {
-            alert("WARNING (DefaultPageRenderer.render_form):\n\nRenderer for field \"" + uri + "\" " +
+            alert("WARNING (TopicRenderer.render_form):\n\nRenderer for field \"" + uri + "\" " +
                 "returned no form element.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
         }
     }
@@ -466,7 +466,7 @@ DefaultPageRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
         if (form_value !== undefined) {
             return form_value
         } else {
-            alert("WARNING (DefaultPageRenderer.process_form):\n\nRenderer for field \"" + uri + "\" " +
+            alert("WARNING (TopicRenderer.process_form):\n\nRenderer for field \"" + uri + "\" " +
                 "returned no form value.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
         }
     }

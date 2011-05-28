@@ -159,16 +159,12 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
     }
 
     void update(TopicTypeModel topicTypeModel) {
-        // error check
-        if (getId() != topicTypeModel.getId()) {
-            throw new RuntimeException("The topic type ID can't be changed (tried " +
-                getId() + " -> " + topicTypeModel.getId() + ")");
-        }
-        //
         boolean uriChanged = !getUri().equals(topicTypeModel.getUri());
         boolean valueChanged = !getValue().equals(topicTypeModel.getValue());
         //
         if (uriChanged) {
+            // Note: on valueChanged the cache is not required to be invalidated.
+            // Value changes are performed on the cached object.
             dms.invalidateTypeCache(getUri());
         }
         //

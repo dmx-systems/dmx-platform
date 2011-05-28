@@ -1,7 +1,7 @@
 function TopicType() {
 
     this.get_page_renderer_class = function() {
-        return dm3c.get_view_config(this, "js_page_renderer_class") || "DefaultPageRenderer"
+        return dm3c.get_view_config(this, "js_page_renderer_class") || "TopicRenderer"
     }
 
     this.get_menu_config = function(menu_id) {
