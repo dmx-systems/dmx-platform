@@ -34,9 +34,9 @@ function TopictypeRenderer() {
         var topic_type = dm3c.update_topic_type(topic, topic_type_model)
         dm3c.trigger_plugin_hook("post_submit_form", topic)
         // 2) update GUI
-        dm3c.canvas.update_topic(topic_type)    // Note: a type is passed as topic. It works. Types *are* topics.
+        dm3c.canvas.update_topic(topic_type)    // Note: a topic type is passed as topic. Topic types *are* topics.
         dm3c.canvas.refresh()
-        dm3c.render_topic()
+        dm3c.page_panel.display(topic_type)
 
         /**
          * Reads out values from GUI elements and builds a topic type model object from it.

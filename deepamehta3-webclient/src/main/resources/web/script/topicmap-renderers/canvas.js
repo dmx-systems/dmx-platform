@@ -620,9 +620,9 @@ function Canvas() {
         set_highlight_topic(topic_id)
         draw()
         if (synchronous) {
-            dm3c.render_topic(topic_id)
+            dm3c.select_topic(topic_id)
         } else {
-            setTimeout(dm3c.render_topic, 0, topic_id)
+            setTimeout(dm3c.select_topic, 0, topic_id)
         }
     }
 

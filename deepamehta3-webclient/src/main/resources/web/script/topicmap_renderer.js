@@ -69,7 +69,7 @@ function TopicmapRenderer() {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     /**
-     * Calculates the canvas size based on window size and (fixed) detail panel size.
+     * Calculates the canvas size based on window size and (fixed) page panel size.
      *
      * Stores the result in the "canvas_width" and "canvas_height" properties.
      */
@@ -102,7 +102,7 @@ function TopicmapRenderer() {
         // resize canvas
         self.canvas_width = ui_event.size.width
         self.resize()
-        // resize detail panel
+        // resize page panel
         calculate_detail_panel_size()
         $("#page-content").width(detail_panel_width)
     }

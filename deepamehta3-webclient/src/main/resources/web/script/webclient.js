@@ -108,18 +108,21 @@ var dm3c = new function() {
     }
 
     /**
-     * Hides a topic (including its relations) from the GUI (canvas & detail panel).
+     * Hides a topic (including its relations) from the GUI (canvas & page panel).
      *
      * High-level utility method for plugin developers.
+     * FIXME: remove is_part_of_delete_operation parameter
      */
     this.hide_topic = function(topic_id, is_part_of_delete_operation) {
-        // canvas
+        // 1) update canvas
         dm3c.canvas.remove_all_associations_of_topic(topic_id, is_part_of_delete_operation)
         dm3c.canvas.remove_topic(topic_id, true, is_part_of_delete_operation)       // refresh_canvas=true
-        // detail panel
+        // 2) update page panel
         if (topic_id == dm3c.selected_topic.id) {
+            // update model
             dm3c.selected_topic = null
-            dm3c.render_topic()
+            // update GUI
+            dm3c.page_panel.clear()
         } else {
             alert("WARNING: removed topic which was not selected\n" +
                 "(removed=" + topic_id + " selected=" + dm3c.selected_topic.id + ")")
@@ -164,7 +167,7 @@ var dm3c = new function() {
 
     /**
      * Deletes an association from the DB, and from the view (canvas).
-     * Note: the canvas and the detail panel are not refreshed.
+     * Note: the canvas and the page panel are not refreshed.
      *
      * High-level utility method for plugin developers.
      */
@@ -458,16 +461,16 @@ var dm3c = new function() {
     }
 
     /**
-     * Adds a topic to the canvas, and refreshes the detail panel according to the specified action.
+     * Adds a topic to the canvas, and refreshes the page panel according to the specified action.
      *
      * High-level utility method for plugin developers.
      * Note: the topic must exist in the DB already. Possibly call create_topic() before.
      *
      * @param   topic       Topic to add (a Topic object).
      * @param   action      Optional: action to perform, 3 possible values:
-     *                      "none" - do not select the topic (detail panel doesn't change) -- the default.
-     *                      "show" - select the topic and show its info in the detail panel.
-     *                      "edit" - select the topic and show its form in the detail panel.
+     *                      "none" - do not select the topic (page panel doesn't change) -- the default.
+     *                      "show" - select the topic and show its info in the page panel.
+     *                      "edit" - select the topic and show its form in the page panel.
      * @param   x, y        Optional: the coordinates for placing the topic on the canvas.
      *                      If not specified, placement is up to the canvas.
      */
@@ -476,15 +479,14 @@ var dm3c = new function() {
         // update canvas
         var highlight = action != "none"
         dm3c.canvas.add_topic(topic, highlight, true, x, y)
-        // update detail panel
+        // update page panel
         switch (action) {
         case "none":
             break
         case "show":
-            dm3c.render_topic(topic.id)
+            display_topic(topic)
             break
         case "edit":
-            dm3c.selected_topic = topic     // update global state
             dm3c.edit_topic(topic)
             break
         default:
@@ -493,32 +495,27 @@ var dm3c = new function() {
     }
 
     /**
-     * Fetches the topic and displays it on the detail panel.
-     * Updates global state (selected_topic).
-     * If no topic is specified, the selected topic is re-fetched.
-     * If there is no selected topic the detail panel is emptied.
+     * Fetches the topic and displays it on the page panel.
      */
-    this.render_topic = function(topic_id) {
-        if (topic_id == undefined) {
-            if (dm3c.selected_topic) {
-                topic_id = dm3c.selected_topic.id
-            } else {
-                dm3c.page_panel.empty()
-                return
-            }
-        }
-        // fetch topic
-        var topic = dm3c.restc.get_topic_by_id(topic_id)
-        // update global state
+    this.select_topic = function(topic_id) {
+        display_topic(dm3c.restc.get_topic_by_id(topic_id))
+    }
+
+    /**
+     * Displays the topic on the page panel.
+     */
+    function display_topic(topic) {
+        // update model
         dm3c.selected_topic = topic
-        // render page
-        dm3c.page_panel.empty()
-        dm3c.trigger_page_renderer_hook(dm3c.selected_topic, "render_page", dm3c.selected_topic)
+        // update GUI
+        dm3c.page_panel.display(topic)
     }
 
     this.edit_topic = function(topic) {
-        dm3c.page_panel.empty()
-        dm3c.trigger_page_renderer_hook(topic, "render_form", topic)
+        // update model
+        dm3c.selected_topic = topic
+        // update GUI
+        dm3c.page_panel.edit(topic)
     }
 
     // ---
@@ -827,7 +824,7 @@ var dm3c = new function() {
         $("#split-panel > tbody > tr > td").eq(1).append(dm3c.page_panel.dom)
         // ### $("#document-form").submit(submit_document)
         detail_panel_width = $("#page-content").width()
-        if (dm3c.LOG_GUI) dm3c.log("Mesuring detail panel width: " + detail_panel_width)
+        if (dm3c.LOG_GUI) dm3c.log("Mesuring page panel width: " + detail_panel_width)
         // the upload dialog
         $("#upload-dialog").dialog({
             modal: true, autoOpen: false, draggable: false, resizable: false, width: UPLOAD_DIALOG_WIDTH
@@ -891,8 +888,8 @@ var dm3c = new function() {
             //
             dm3c.ui.menu("searchmode-select", searchmode_selected)
             dm3c.ui.menu("special-menu", special_selected, undefined, "Special")
-            // the detail panel
-            if (dm3c.LOG_GUI) dm3c.log("Setting detail panel height: " + $("#canvas").height())
+            // the page panel
+            if (dm3c.LOG_GUI) dm3c.log("Setting page panel height: " + $("#canvas").height())
             $("#page-content").height($("#canvas").height())
             //
             $(window).resize(window_resized)

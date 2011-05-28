@@ -64,7 +64,7 @@ function TopicRenderer() {
         // 2) update GUI
         dm3c.canvas.update_topic(topic)
         dm3c.canvas.refresh()
-        dm3c.render_topic()
+        dm3c.page_panel.display(topic)
 
         /**
          * Reads out values from GUI elements and builds a topic model object from it.

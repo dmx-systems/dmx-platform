@@ -26,7 +26,7 @@ function default_plugin () {
             dm3c.delete_association(dm3c.current_rel_id)
             // update view
             dm3c.canvas.refresh()
-            dm3c.render_topic()
+            dm3c.page_panel.refresh()
         }
     }
 
@@ -70,7 +70,7 @@ function default_plugin () {
 
         function do_cancel() {
             dm3c.trigger_plugin_hook("post_submit_form", topic)
-            dm3c.render_topic()
+            dm3c.page_panel.refresh()
         }
     }
 
