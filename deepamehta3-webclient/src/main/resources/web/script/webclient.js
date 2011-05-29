@@ -4,7 +4,7 @@ var dm3c = new function() {
     this.SEARCH_FIELD_WIDTH = 16    // in chars
     this.COMPOSITE_PATH_SEPARATOR = "/"
     var UPLOAD_DIALOG_WIDTH = "50em"
-    var GENERIC_TOPIC_ICON_SRC = "images/grey-ball.png"
+    this.GENERIC_TOPIC_ICON_SRC = "images/grey-ball.png"
 
     var ENABLE_LOGGING = false
     var LOG_PLUGIN_LOADING = false
@@ -60,7 +60,7 @@ var dm3c = new function() {
             composite: composite    // not serialized to request body if undefined
         }
         // 1) update DB
-        var topic = dm3c.restc.create_topic(topic_model)
+        var topic = build_topic(dm3c.restc.create_topic(topic_model))
         // alert("Topic created: " + JSON.stringify(topic));
         // 2) trigger hook
         dm3c.trigger_plugin_hook("post_create_topic", topic)
@@ -86,7 +86,7 @@ var dm3c = new function() {
     this.update_topic = function(old_topic, new_topic) {
         // 1) update DB
         // alert("dm3c.update_topic(): new_topic=" + JSON.stringify(new_topic));
-        var updated_topic = dm3c.restc.update_topic(new_topic)
+        var updated_topic = build_topic(dm3c.restc.update_topic(new_topic))
         // 2) trigger hook
         dm3c.trigger_plugin_hook("post_update_topic", updated_topic, old_topic)
         //
@@ -296,9 +296,9 @@ var dm3c = new function() {
         return result
     }
 
-    this.trigger_page_renderer_hook = function(topic, hook_name, args) {
+    this.trigger_page_renderer_hook = function(topic_or_association, hook_name, args) {
         // Lookup page renderer
-        var page_renderer = dm3c.get_page_renderer(topic)
+        var page_renderer = dm3c.get_page_renderer(topic_or_association)
         // Trigger the hook only if it is defined (a page renderer must not define all hooks).
         if (page_renderer[hook_name]) {
             return page_renderer[hook_name](args)
@@ -309,12 +309,12 @@ var dm3c = new function() {
         return plugins[plugin_class]
     }
 
-    this.get_page_renderer = function(topic_or_classname) {
-        if (typeof(topic_or_classname) == "string") {
-            var page_renderer_class = topic_or_classname
+    this.get_page_renderer = function(topic_or_association_or_classname) {
+        if (typeof(topic_or_association_or_classname) == "string") {
+            var page_renderer_class = topic_or_association_or_classname
         } else {
-            var topic_type = dm3c.type_cache.get(topic_or_classname.type_uri)
-            var page_renderer_class = topic_type.get_page_renderer_class()
+            var type = topic_or_association_or_classname.get_type()
+            var page_renderer_class = type.get_page_renderer_class()
         }
         var page_renderer = page_renderers[page_renderer_class]
         // error check
@@ -360,8 +360,11 @@ var dm3c = new function() {
 
     // === Types ===
 
+    /**
+     * Convenience method that returns the topic type's label.
+     */
     this.type_label = function(type_uri) {
-        return dm3c.type_cache.get(type_uri).value
+        return dm3c.type_cache.get_topic_type(type_uri).value
     }
 
     this.reload_types = function() {
@@ -370,18 +373,18 @@ var dm3c = new function() {
     }
 
     /**
-     * Returns the icon source for a topic type.
-     * If no icon is configured for that type the source of the generic topic icon is returned.
+     * Convenience method that returns the topic type's icon source.
+     * If no icon is configured the generic topic icon is returned.
      *
      * @return  The icon source (string).
      */
     this.get_icon_src = function(type_uri) {
-        var topic_type = dm3c.type_cache.get(type_uri)
+        var topic_type = dm3c.type_cache.get_topic_type(type_uri)
         // Note: topic_type is undefined if plugin is deactivated and content still exist.
         if (topic_type) {
-            var icon_src = dm3c.get_view_config(topic_type, "icon_src")
+            return topic_type.get_icon_src()
         }
-        return icon_src || GENERIC_TOPIC_ICON_SRC
+        return this.GENERIC_TOPIC_ICON_SRC
     }
 
     /**
@@ -397,7 +400,7 @@ var dm3c = new function() {
     this.get_view_config = function(configurable, setting) {
         // error check
         if (!configurable.view_config_topics) {
-            throw "Invalid configurable: " + JSON.stringify(configurable)
+            throw "InvalidConfigurable: no \"view_config_topics\" property found in " + JSON.stringify(configurable)
         }
         // every configurable has an view_config_topics object, however it might be empty
         var view_config = configurable.view_config_topics["dm3.webclient.view_config"]
@@ -428,7 +431,7 @@ var dm3c = new function() {
     }
 
     this.has_create_permission = function(type_uri) {
-        var result = dm3c.trigger_plugin_hook("has_create_permission", dm3c.type_cache.get(type_uri))
+        var result = dm3c.trigger_plugin_hook("has_create_permission", dm3c.type_cache.get_topic_type(type_uri))
         return !js.contains(result, false)
     }
 
@@ -444,7 +447,7 @@ var dm3c = new function() {
             dm3c.canvas.add_association(rel)
         }
         // reveal topic
-        dm3c.add_topic_to_canvas(dm3c.restc.get_topic_by_id(topic_id), "show")
+        dm3c.add_topic_to_canvas(fetch_topic(topic_id), "show")
         dm3c.canvas.scroll_topic_to_center(topic_id)
     }
 
@@ -500,14 +503,14 @@ var dm3c = new function() {
      * Fetches the topic and displays it on the page panel.
      */
     this.select_topic = function(topic_id) {
-        display_topic(dm3c.restc.get_topic_by_id(topic_id))
+        display_topic(fetch_topic(topic_id))
     }
 
     /**
      * Fetches the association and displays it on the page panel.
      */
     this.select_association = function(assoc_id) {
-        display_association(dm3c.restc.get_association(assoc_id))
+        display_association(fetch_association(assoc_id))
     }
 
     // ---
@@ -529,7 +532,7 @@ var dm3c = new function() {
         // update model
         set_selected_association(assoc)
         // update GUI
-        dm3c.page_panel.clear()     // TODO: display(assoc)
+        dm3c.page_panel.display(assoc)
     }
 
     // ---
@@ -555,13 +558,13 @@ var dm3c = new function() {
         var type_uris = dm3c.type_cache.get_type_uris()
         for (var i = 0; i < type_uris.length; i++) {
             var type_uri = type_uris[i]
-            var topic_type = dm3c.type_cache.get(type_uri)
+            var topic_type = dm3c.type_cache.get_topic_type(type_uri)
             if (dm3c.has_create_permission(type_uri) && topic_type.get_menu_config(menu_id)) {
                 // add type to menu
                 type_menu.add_item({
-                    label: dm3c.type_label(type_uri),
+                    label: topic_type.value,
                     value: type_uri,
-                    icon: dm3c.get_icon_src(type_uri)
+                    icon: topic_type.get_icon_src()
                 })
             }
         }
@@ -703,6 +706,24 @@ var dm3c = new function() {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
+    function fetch_topic(topic_id) {
+        return build_topic(dm3c.restc.get_topic_by_id(topic_id))
+    }
+
+    function fetch_association(assoc_id) {
+        return build_association(dm3c.restc.get_association(assoc_id))
+    }
+
+    // ---
+
+    function build_topic(topic) {
+        return new Topic(topic)
+    }
+
+    function build_association(assoc) {
+        return new Association(assoc)
+    }
+
     // === Model ===
 
     function set_selected_topic(topic) {
@@ -737,7 +758,7 @@ var dm3c = new function() {
     function search() {
         try {
             var searchmode = dm3c.ui.menu_item("searchmode-select").label
-            var search_topic = dm3c.trigger_plugin_hook("search", searchmode)[0]
+            var search_topic = build_topic(dm3c.trigger_plugin_hook("search", searchmode)[0])
             // alert("search_topic=" + JSON.stringify(search_topic))
             dm3c.add_topic_to_canvas(search_topic, "show")
         } catch (e) {
@@ -810,10 +831,17 @@ var dm3c = new function() {
     // --- Types ---
 
     function load_types() {
+        // topic types
         var type_uris = dm3c.restc.get_topic_type_uris()
         for (var i = 0; i < type_uris.length; i++) {
             var topic_type = dm3c.restc.get_topic_type(type_uris[i])
-            dm3c.type_cache.put(topic_type)
+            dm3c.type_cache.put_topic_type(topic_type)
+        }
+        // association types
+        var type_uris = dm3c.restc.get_association_type_uris()
+        for (var i = 0; i < type_uris.length; i++) {
+            var assoc_type = dm3c.restc.get_association_type(type_uris[i])
+            dm3c.type_cache.put_association_type(assoc_type)
         }
     }
 
@@ -826,6 +854,7 @@ var dm3c = new function() {
     // --- register default modules ---
     //
     this.register_page_renderer("script/page-renderers/topic_renderer.js")
+    this.register_page_renderer("script/page-renderers/association_renderer.js")
     //
     this.register_field_renderer("script/field-renderers/text_field_renderer.js")
     this.register_field_renderer("script/field-renderers/number_field_renderer.js")
@@ -841,7 +870,7 @@ var dm3c = new function() {
     register_plugin("script/internal-plugins/fulltext_plugin.js")
     register_plugin("script/internal-plugins/tinymce_plugin.js")
 
-    var generic_topic_icon = this.create_image(GENERIC_TOPIC_ICON_SRC)
+    var generic_topic_icon = this.create_image(this.GENERIC_TOPIC_ICON_SRC)
 
     $(function() {
         //

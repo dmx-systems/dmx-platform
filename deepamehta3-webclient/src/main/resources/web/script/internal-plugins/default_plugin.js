@@ -87,6 +87,7 @@ function default_plugin () {
             dm3c.hide_association(relation.id)
             // update view
             dm3c.canvas.refresh()
+            dm3c.page_panel.clear()
         }
 
         function do_confirm() {

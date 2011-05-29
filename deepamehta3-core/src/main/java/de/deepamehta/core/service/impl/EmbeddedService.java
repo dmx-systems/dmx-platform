@@ -1105,7 +1105,7 @@ public class EmbeddedService implements CoreService {
         associateDataType("dm3.core.assoc_type", "dm3.core.text");
         associateDataType("dm3.core.data_type",  "dm3.core.text");
         //
-        associateWithTopicType(topicType);  // FIXME: move associateWithTopicType() calls to _createTopic()?
+        associateWithTopicType(topicType);  // FIXME: move associateWithTopicType() call to _createTopic()?
         associateWithTopicType(assocType);
         associateWithTopicType(dataType);
         associateWithTopicType(text);

@@ -111,7 +111,7 @@ function RESTClient(core_service_uri) {
 
 
 
-    // === Types ===
+    // === Topic Types ===
 
     this.get_topic_type_uris = function() {
         return request("GET", "/topictype")
@@ -129,21 +129,17 @@ function RESTClient(core_service_uri) {
         return request("PUT", "/topictype", topic_type_model)
     }
 
-    /* ### this.add_data_field = function(type_uri, field) {
-        return request("POST", "/topictype/" + type_uri, field)
+
+
+    // === Association Types ===
+
+    this.get_association_type_uris = function() {
+        return request("GET", "/assoctype")
     }
 
-    this.update_data_field = function(type_uri, field) {
-        return request("PUT", "/topictype/" + type_uri, field)
+    this.get_association_type = function(type_uri) {
+        return request("GET", "/assoctype/" + type_uri)
     }
-
-    this.set_data_field_order = function(type_uri, field_uris) {
-        return request("PUT", "/topictype/" + type_uri + "/field_order", field_uris)
-    }
-
-    this.remove_data_field = function(type_uri, field_uri) {
-        return request("DELETE", "/topictype/" + type_uri + "/field/" + field_uri)
-    } */
 
 
 

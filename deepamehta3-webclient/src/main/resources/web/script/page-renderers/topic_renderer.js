@@ -150,13 +150,13 @@ function TopicRenderer() {
 
     function create_page_model(topic) {
 
-        return create_fields("", topic.composite, dm3c.type_cache.get(topic.type_uri))
+        return create_fields("", topic.composite, topic.get_type())
 
         function create_fields(field_uri, composite, topic_type, assoc_def) {
             if (topic_type.data_type_uri == "dm3.core.composite") {
                 var fields = {}
                 for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                    var topic_type_2 = dm3c.type_cache.get(assoc_def.topic_type_uri_2)
+                    var topic_type_2 = dm3c.type_cache.get_topic_type(assoc_def.topic_type_uri_2)
                     var child_field_uri = field_uri + dm3c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
                     var comp = composite && composite[assoc_def.uri]
                     var child_fields = create_fields(child_field_uri, comp, topic_type_2, assoc_def)

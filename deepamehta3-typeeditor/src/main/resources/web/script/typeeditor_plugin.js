@@ -39,7 +39,7 @@ function typeeditor_plugin() {
     this.post_create_topic = function(topic) {
         if (topic.type_uri == "dm3.core.topic_type") {
             // 1) Update type cache
-            dm3c.type_cache.put(topic)
+            dm3c.type_cache.put_topic_type(topic)
             // 2) Rebuild type menu
             dm3c.recreate_type_menu("create-type-menu")
         }
@@ -60,11 +60,11 @@ function typeeditor_plugin() {
             if (uri_changed) {
                 // alert("Type URI changed: " + old_topic.uri + " -> " + topic.uri)
                 dm3c.type_cache.remove(old_topic.uri)
-                dm3c.type_cache.put(topic)
+                dm3c.type_cache.put_topic_type(topic)
             }
             if (value_changed) {
                 // alert("Type name changed: " + old_topic.value + " -> " + topic.value)
-                dm3c.type_cache.get(topic.uri).value = topic.value
+                dm3c.type_cache.get_topic_type(topic.uri).value = topic.value
             }
             // 2) Rebuild type menu
             if (uri_changed || value_changed) {

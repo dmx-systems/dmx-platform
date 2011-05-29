@@ -1,7 +1,13 @@
 function TopicType() {
 
-    this.get_page_renderer_class = function() {
-        return dm3c.get_view_config(this, "js_page_renderer_class") || "TopicRenderer"
+    /**
+     * Returns the icon source.
+     * If no icon is configured the source of the generic topic icon is returned.
+     *
+     * @return  The icon source (string).
+     */
+    this.get_icon_src = function() {
+        return dm3c.get_view_config(this, "icon_src") || dm3c.GENERIC_TOPIC_ICON_SRC
     }
 
     this.get_menu_config = function(menu_id) {
@@ -13,5 +19,9 @@ function TopicType() {
         default:
             alert("TopicType.get_menu_config: menu \"" + menu_id + "\" not implemented")
         }
+    }
+
+    this.get_page_renderer_class = function() {
+        return dm3c.get_view_config(this, "js_page_renderer_class") || "TopicRenderer"
     }
 }
