@@ -160,18 +160,18 @@ public class EmbeddedService implements CoreService {
     @GET
     @Path("/topic/{id}")
     @Override
-    public AttachedTopic getTopic(@PathParam("id") long id,
+    public AttachedTopic getTopic(@PathParam("id") long topicId,
                                   @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite,
                                   @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopic topic = attach(storage.getTopic(id), fetchComposite);
+            AttachedTopic topic = attach(storage.getTopic(topicId), fetchComposite);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
             tx.success();
             return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving topic failed (id=" + id + ")", e);
+            throw new RuntimeException("Retrieving topic " + topicId + " failed", e);
         } finally {
             tx.finish();
         }
@@ -398,22 +398,24 @@ public class EmbeddedService implements CoreService {
 
     // === Associations ===
 
-    /* @Override
-    public Relation getRelation(long id) {
+    @GET
+    @Path("/association/{id}")
+    @Override
+    public Association getAssociation(@PathParam("id") long assocId) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Relation relation = storage.getRelation(id);
+            Association assoc = storage.getAssociation(assocId);
             tx.success();
-            return relation;
+            return assoc;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Relation " + id + " can't be retrieved", e);
+            throw new RuntimeException("Retrieving association " + assocId + " failed", e);
         } finally {
             tx.finish();
         }
     }
 
-    @GET
+    /* @GET
     @Path("/relation")
     @Override
     public Relation getRelation(@QueryParam("src") long srcTopicId, @QueryParam("dst") long dstTopicId,

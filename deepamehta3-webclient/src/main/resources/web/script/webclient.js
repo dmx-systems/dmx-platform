@@ -17,7 +17,7 @@ var dm3c = new function() {
     this.render = new RenderHelper()
 
     this.selected_topic = null  // topic being displayed, or null if no one is currently displayed (a Topic object)
-    this.current_rel_id = null  // ID of relation being activated, or null if no one is currently activated
+    this.selected_assoc = null  // ID of relation being activated, or null if no one is currently activated
     this.canvas = null          // the canvas that displays the topicmap (a Canvas object)
     this.page_panel = null      // the page panel on the right hand side (a PagePanel object)
     //
@@ -494,6 +494,8 @@ var dm3c = new function() {
         }
     }
 
+    // ---
+
     /**
      * Fetches the topic and displays it on the page panel.
      */
@@ -502,18 +504,39 @@ var dm3c = new function() {
     }
 
     /**
+     * Fetches the association and displays it on the page panel.
+     */
+    this.select_association = function(assoc_id) {
+        display_association(dm3c.restc.get_association(assoc_id))
+    }
+
+    // ---
+
+    /**
      * Displays the topic on the page panel.
      */
     function display_topic(topic) {
         // update model
-        dm3c.selected_topic = topic
+        set_selected_topic(topic)
         // update GUI
         dm3c.page_panel.display(topic)
     }
 
+    /**
+     * Displays the association on the page panel.
+     */
+    function display_association(assoc) {
+        // update model
+        set_selected_association(assoc)
+        // update GUI
+        dm3c.page_panel.clear()     // TODO: display(assoc)
+    }
+
+    // ---
+
     this.edit_topic = function(topic) {
         // update model
-        dm3c.selected_topic = topic
+        set_selected_topic(topic)
         // update GUI
         dm3c.page_panel.edit(topic)
     }
@@ -679,6 +702,18 @@ var dm3c = new function() {
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
+
+    // === Model ===
+
+    function set_selected_topic(topic) {
+        dm3c.selected_topic = topic
+        dm3c.selected_assoc = null
+    }
+
+    function set_selected_association(assoc) {
+        dm3c.selected_topic = null
+        dm3c.selected_assoc = assoc
+    }
 
     // === GUI ===
 

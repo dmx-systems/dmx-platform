@@ -39,6 +39,8 @@ import java.util.Set;
  */
 public interface CoreService {
 
+
+
     // === Topics ===
 
     public Topic getTopic(long id, boolean fetchComposite, ClientContext clientContext);
@@ -120,9 +122,11 @@ public interface CoreService {
 
     public void deleteTopic(long topicId, ClientContext clientContext);
 
+
+
     // === Associations ===
 
-    // public Relation getRelation(long id);
+    public Association getAssociation(long assocId);
 
     /**
      * Returns the relation between two topics. If no such relation exists null is returned.
@@ -154,6 +158,8 @@ public interface CoreService {
 
     public void deleteAssociation(long assocId, ClientContext clientContext);
 
+
+
     // === Types ===
 
     public Set<String> getTopicTypeUris();
@@ -174,9 +180,13 @@ public interface CoreService {
 
     // public void removeDataField(String typeUri, String fieldUri);
 
+
+
     // === Commands ===
 
     public CommandResult executeCommand(String command, CommandParams params, ClientContext clientContext);
+
+
 
     // === Plugins ===
 
@@ -189,6 +199,8 @@ public interface CoreService {
     public Set<PluginInfo> getPluginInfo();
 
     public void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall);
+
+
 
     // === Misc ===
 

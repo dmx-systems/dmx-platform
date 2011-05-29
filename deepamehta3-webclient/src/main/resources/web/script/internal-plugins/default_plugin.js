@@ -23,10 +23,10 @@ function default_plugin () {
         function do_delete_association() {
             $("#delete-association-dialog").dialog("close")
             // update model
-            dm3c.delete_association(dm3c.current_rel_id)
+            dm3c.delete_association(dm3c.selected_assoc.id)
             // update view
             dm3c.canvas.refresh()
-            dm3c.page_panel.refresh()
+            dm3c.page_panel.clear()
         }
     }
 
@@ -53,7 +53,7 @@ function default_plugin () {
         }
 
         function do_associate(event) {
-            dm3c.canvas.begin_relation(topic.id, event)
+            dm3c.canvas.begin_association(topic.id, event)
         }
 
         function do_edit() {

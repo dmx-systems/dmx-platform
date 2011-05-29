@@ -22,6 +22,8 @@ import java.util.Set;
  */
 public interface DeepaMehtaStorage {
 
+
+
     // === Topics ===
 
     Topic getTopic(long topicId);
@@ -140,9 +142,11 @@ public interface DeepaMehtaStorage {
      */
     void deleteTopic(long topicId);
 
+
+
     // === Associations ===
 
-    // Relation getRelation(long id);
+    Association getAssociation(long assocId);
 
     // Set<Relation> getRelations(long topicId);
 
@@ -201,6 +205,8 @@ public interface DeepaMehtaStorage {
     // void setRelationProperties(long id, Properties properties);
 
     void deleteAssociation(long assocId);
+
+
 
     // === DB ===
 

@@ -35,7 +35,9 @@ function PagePanel() {
 
     this.refresh = function() {
         // update GUI
-        render_page()
+        if (displayed_topic) {  // if page has been cleared before we must not do anything (rendering would fail)
+            render_page()
+        }
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions

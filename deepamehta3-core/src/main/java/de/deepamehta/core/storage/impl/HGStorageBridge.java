@@ -176,6 +176,11 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // === Associations ===
 
     @Override
+    public Association getAssociation(long assocId) {
+        return buildAssociation(hg.getHyperEdge(assocId));
+    }
+
+    @Override
     public Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
         Set<HyperEdge> edges = hg.getHyperEdges(topic1Id, topic2Id);
         if (assocTypeUri != null) {
@@ -299,8 +304,6 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     public void setMigrationNr(int migrationNr) {
         hg.getHyperNode(0).setInteger("core_migration_nr", migrationNr);
     }
-
-
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

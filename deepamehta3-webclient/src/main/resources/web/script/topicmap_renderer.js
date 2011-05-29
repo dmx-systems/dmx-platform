@@ -42,7 +42,7 @@ function TopicmapRenderer() {
 
     this.close_context_menu = function() {}
 
-    this.begin_relation = function(doc_id, event) {}
+    this.begin_association = function(doc_id, event) {}
 
     this.clear = function() {}
 

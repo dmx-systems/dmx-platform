@@ -20,9 +20,10 @@ function Canvas() {
 
     // Model
     var canvas_topics               // topics displayed on canvas (Object, key: topic ID, value: CanvasTopic)
-    var canvas_assocs               // relations displayed on canvas (Object, key: assoc ID, value: CanvasAssoc)
+    var canvas_assocs               // associations displayed on canvas (Object, key: assoc ID, value: CanvasAssoc)
     var trans_x, trans_y            // canvas translation (in pixel)
     var highlight_topic_id          // ID of the highlighted topic (drawn with red frame), if any
+    var highlight_assoc_id          // ID of the highlighted association (drawn with red frame), if any
     var grid_positioning            // while grid positioning is in progress: a GridPositioning object, null otherwise
 
     // View (Canvas)
@@ -31,8 +32,9 @@ function Canvas() {
     // Short-term Interaction State (model)
     var topic_move_in_progress      // true while topic move is in progress (boolean)
     var canvas_move_in_progress     // true while canvas translation is in progress (boolean)
-    var relation_in_progress        // true while new association is pulled (boolean)
-    var action_topic                // the topic being moved / related (a CanvasTopic)
+    var association_in_progress     // true while new association is pulled (boolean)
+    var action_topic                // the topic being moved/associated (CanvasTopic)
+    var action_assoc                // the association being clicked (CanvasAssoc)
     var tmp_x, tmp_y                // coordinates while action is in progress
 
     // build the canvas
@@ -87,7 +89,7 @@ function Canvas() {
             var ca = new CanvasAssoc(assoc)
             add_association(ca)
             // trigger hook
-            dm3c.trigger_plugin_hook("post_add_relation_to_canvas", ca)
+            dm3c.trigger_plugin_hook("post_add_association_to_canvas", ca)
         }
         // update GUI
         if (refresh_canvas) {
@@ -118,23 +120,23 @@ function Canvas() {
     }
 
     /**
-     * Removes a relation from the canvas (model) and optionally refreshes the canvas (view).
-     * If the relation is not present on the canvas nothing is performed.
+     * Removes an association from the canvas (model) and optionally refreshes the canvas (view).
+     * If the association is not present on the canvas nothing is performed.
      *
      * @param   refresh_canvas  Optional - if true, the canvas is refreshed.
      */
     this.remove_association = function(id, refresh_canvas, is_part_of_delete_operation) {
         // 1) update model
         var ca = remove_association(id)
-        // Note: it is not an error if the relation is not present on the canvas. This can happen
-        // for prgrammatically deleted relations, e.g. when updating a data field of type "reference".
+        // Note: it is not an error if the association is not present on the canvas. This can happen
+        // for prgrammatically deleted associations, e.g. when updating a data field of type "reference".
         if (!ca) {
             return
-            // throw "remove_association: relation not on canvas (" + id + ")"
+            // throw "remove_association: association not on canvas (" + id + ")"
         }
         //
-        if (dm3c.current_rel_id == id) {
-            dm3c.current_rel_id = null
+        if (highlight_assoc_id == id) {
+            highlight_assoc_id = -1
         }
         // 2) update GUI
         if (refresh_canvas) {
@@ -142,7 +144,7 @@ function Canvas() {
         }
         // 3) trigger hook
         if (!is_part_of_delete_operation) {
-            dm3c.trigger_plugin_hook("post_hide_relation_from_canvas", ca)
+            dm3c.trigger_plugin_hook("post_hide_association_from_canvas", ca)
         }
     }
 
@@ -166,8 +168,8 @@ function Canvas() {
         close_context_menu()
     }
 
-    this.begin_relation = function(topic_id, event) {
-        relation_in_progress = true
+    this.begin_association = function(topic_id, event) {
+        association_in_progress = true
         action_topic = get_topic(topic_id)
         //
         tmp_x = cx(event)
@@ -212,7 +214,7 @@ function Canvas() {
         //
         draw_associations()
         //
-        if (relation_in_progress) {
+        if (association_in_progress) {
             draw_line(action_topic.x, action_topic.y, tmp_x - trans_x, tmp_y - trans_y, ASSOC_WIDTH, ACTIVE_COLOR)
         }
         //
@@ -246,13 +248,13 @@ function Canvas() {
             var ct2 = get_topic(ca.get_topic2_id())
             // assertion
             if (!ct1 || !ct2) {
-                // TODO: deleted relations must be removed from all topicmaps.
-                alert("ERROR in draw_associations: relation " + ca.id + " is missing a topic")
+                // TODO: deleted associations must be removed from all topicmaps.
+                alert("ERROR in draw_associations: association " + ca.id + " is missing a topic")
                 // ### delete canvas_assocs[i]
                 return
             }
             // hightlight
-            if (dm3c.current_rel_id == ca.id) {
+            if (highlight_assoc_id == ca.id) {
                 draw_line(ct1.x, ct1.y, ct2.x, ct2.y, ACTIVE_ASSOC_WIDTH, ACTIVE_COLOR)
             }
             //
@@ -289,15 +291,20 @@ function Canvas() {
             var ct = topic_by_position(event)
             if (ct) {
                 action_topic = ct
-            } else if (!relation_in_progress) {
-                canvas_move_in_progress = true
+            } else {
+                var ca = assoc_by_position(event)
+                if (ca) {
+                    action_assoc = ca
+                } else if (!association_in_progress) {
+                    canvas_move_in_progress = true
+                }
             }
         }
     }
 
     function mousemove(event) {
         if (action_topic || canvas_move_in_progress) {
-            if (relation_in_progress) {
+            if (association_in_progress) {
                 tmp_x = cx(event)
                 tmp_y = cy(event)
             } else if (canvas_move_in_progress) {
@@ -321,8 +328,8 @@ function Canvas() {
     function mouseleave(event) {
         if (dm3c.LOG_GUI) dm3c.log("Mouse leave!")
         //
-        if (relation_in_progress) {
-            end_relation_in_progress()
+        if (association_in_progress) {
+            end_association_in_progress()
             draw()
         } else if (topic_move_in_progress) {
             end_topic_move()
@@ -337,8 +344,8 @@ function Canvas() {
         //
         close_context_menu()
         //
-        if (relation_in_progress) {
-            end_relation_in_progress()
+        if (association_in_progress) {
+            end_association_in_progress()
             //
             var ct = topic_by_position(event)
             if (ct) {
@@ -356,9 +363,11 @@ function Canvas() {
         } else if (canvas_move_in_progress) {
             end_canvas_move()
         } else {
-            var ct = topic_by_position(event)
+            var ct = topic_by_position(event)   // ### FIXME: use actionTopic instead of searching again?
             if (ct) {
                 select_topic(ct.id)
+            } else if (action_assoc) {
+                select_association(action_assoc.id)
             }
         }
         end_interaction()
@@ -424,16 +433,17 @@ function Canvas() {
         canvas_move_in_progress = false
     }
 
-    function end_relation_in_progress() {
-        relation_in_progress = false
+    function end_association_in_progress() {
+        association_in_progress = false
     }
 
     function end_interaction() {
         // remove topic activation
         action_topic = null
+        action_assoc = null
         // remove assoc activation
-        if (dm3c.current_rel_id) {
-            dm3c.current_rel_id = null
+        if (dm3c.selected_assoc) {
+            dm3c.selected_assoc = null
             draw()
         }
     }
@@ -453,8 +463,8 @@ function Canvas() {
             // Note: only dm3c.selected_topic has the auxiliary attributes (the canvas topic has not)
             var commands = dm3c.get_topic_commands(dm3c.selected_topic, "context-menu")
         } else if (ca = assoc_by_position(event)) {
-            dm3c.current_rel_id = ca.id
-            draw()
+            select_association(ca.id)
+            // ### FIXME: use dm3c.selected assoc?
             var commands = dm3c.get_association_commands(ca, "context-menu")
         } else {
             var x = cx(event, true)
@@ -610,6 +620,12 @@ function Canvas() {
 
     function set_highlight_topic(topic_id) {
         highlight_topic_id = topic_id
+        highlight_assoc_id = -1
+    }
+
+    function set_highlight_association(assoc_id) {
+        highlight_topic_id = -1
+        highlight_assoc_id = assoc_id
     }
 
 
@@ -624,6 +640,12 @@ function Canvas() {
         } else {
             setTimeout(dm3c.select_topic, 0, topic_id)
         }
+    }
+
+    function select_association(assoc_id) {
+        set_highlight_association(assoc_id)
+        draw()
+        dm3c.select_association(assoc_id)
     }
 
     // ---

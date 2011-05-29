@@ -64,6 +64,10 @@ function RESTClient(core_service_uri) {
 
     // === Associations ===
 
+    this.get_association = function(assoc_id) {
+        return request("GET", "/association/" + assoc_id)
+    }
+
     /**
      * Returns the relation between two topics.
      * If no such relation exists null is returned. FIXME: check this.
@@ -74,11 +78,11 @@ function RESTClient(core_service_uri) {
      *                      relation is expected to be directed <i>from</i> source topic <i>to</i> destination topic.
      *
      * @return  The relation (a Relation object). FIXME: check this.
-     */
+     * FIXME: not in use
     this.get_relation = function(src_topic_id, dst_topic_id, type_id, is_directed) {
         var params = new RequestParameter({src: src_topic_id, dst: dst_topic_id, type: type_id, directed: is_directed})
         return request("GET", "/relation?" + params.to_query_string())
-    }
+    } */
 
     /**
      * Returns the associations between two topics. If no such association exists an empty array is returned.
@@ -96,9 +100,10 @@ function RESTClient(core_service_uri) {
         return request("POST", "/association", assoc_model)
     }
 
+    /* FIXME: not in use
     this.set_relation_properties = function(relation_id, properties) {
         request("PUT", "/relation/" + relation_id, properties)
-    }
+    } */
 
     this.delete_association = function(id) {
         request("DELETE", "/association/" + id)
