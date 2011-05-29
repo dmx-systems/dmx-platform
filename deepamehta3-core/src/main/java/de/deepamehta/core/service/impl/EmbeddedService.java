@@ -4,7 +4,8 @@ import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.AssociationRole;
-import de.deepamehta.core.model.AssociationTypeData;
+import de.deepamehta.core.model.AssociationType;
+import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
@@ -180,14 +181,14 @@ public class EmbeddedService implements CoreService {
     @GET
     @Path("/topic/by_property/{key}/{value}")
     @Override
-    public Topic getTopic(@PathParam("key") String key, @PathParam("value") TopicValue value,
-                          @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
+    public AttachedTopic getTopic(@PathParam("key") String key, @PathParam("value") TopicValue value,
+                                  @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             Topic topic = storage.getTopic(key, value);
-            topic = topic != null ? attach(topic, fetchComposite) : null;
+            AttachedTopic attachedTopic = topic != null ? attach(topic, fetchComposite) : null;
             tx.success();
-            return topic;
+            return attachedTopic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Retrieving topic failed (key=\"" + key + "\", value=" + value + ")", e);
@@ -521,7 +522,7 @@ public class EmbeddedService implements CoreService {
 
 
 
-    // === Types ===
+    // === Topic Types ===
 
     @GET
     @Path("/topictype")
@@ -552,7 +553,7 @@ public class EmbeddedService implements CoreService {
         }
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopicType topicType = typeCache.get(uri);
+            AttachedTopicType topicType = typeCache.getTopicType(uri);
             triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
             tx.success();
             return topicType;
@@ -617,91 +618,64 @@ public class EmbeddedService implements CoreService {
         }
     }
 
+
+
+    // === Association Types ===
+
+    @GET
+    @Path("/assoctype")
     @Override
-    public Topic createAssociationType(AssociationTypeData assocTypeData,
-                                       @HeaderParam("Cookie") ClientContext clientContext) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-           Topic topic = storage.createTopic(assocTypeData);
-           associateWithTopicType(topic);
-           //
-           tx.success();
-           return topic;
-        } catch (Exception e) {
-           logger.warning("ROLLBACK!");
-           throw new RuntimeException("Creating association type \"" + assocTypeData.getUri() +
-               "\" failed (" + assocTypeData + ")", e);
-        } finally {
-           tx.finish();
+    public Set<String> getAssociationTypeUris() {
+        Topic metaType = attach(storage.getTopic("uri", new TopicValue("dm3.core.assoc_type")), false);
+        Set<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm3.core.instantiation", "dm3.core.type",
+                                                                 "dm3.core.instance", "dm3.core.assoc_type", false);
+        Set<String> assocTypeUris = new HashSet();
+        for (Topic assocType : assocTypes) {
+            assocTypeUris.add(assocType.getUri());
         }
+        return assocTypeUris;
     }
 
-    /* @POST
-    @Path("/topictype/{typeUri}")
+    @GET
+    @Path("/assoctype/{uri}")
     @Override
-    public void addDataField(@PathParam("typeUri") String typeUri, DataField dataField) {
+    public AttachedAssociationType getAssociationType(@PathParam("uri") String uri,
+                                                @HeaderParam("Cookie") ClientContext clientContext) {
+        if (uri == null) {
+            throw new IllegalArgumentException("Tried to get an association type with null URI");
+        }
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.addDataField(typeUri, dataField);
+            AttachedAssociationType assocType = typeCache.getAssociationType(uri);
+            // ### triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
             tx.success();
+            return assocType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Data field \"" + dataField.getUri() + "\" can't be added to topic type \"" +
-                typeUri + "\"", e);
+            throw new RuntimeException("Retrieving association type \"" + uri + "\" failed", e);
         } finally {
             tx.finish();
         }
     }
 
-    @PUT
-    @Path("/topictype/{typeUri}")
     @Override
-    public void updateDataField(@PathParam("typeUri") String typeUri, DataField dataField) {
+    public AssociationType createAssociationType(AssociationTypeModel assocTypeModel,
+                                                 @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.updateDataField(typeUri, dataField);
+            AttachedAssociationType assocType = new AttachedAssociationType(assocTypeModel, this);
+            assocType.store();
+            //
             tx.success();
+            return assocType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Data field \"" + dataField.getUri() + "\" of topic type \"" +
-                typeUri + "\" can't be updated", e);
+            throw new RuntimeException("Creating association type \"" + assocTypeModel.getUri() +
+                "\" failed (" + assocTypeModel + ")", e);
         } finally {
             tx.finish();
         }
     }
-
-    @PUT
-    @Path("/topictype/{typeUri}/field_order")
-    @Override
-    public void setDataFieldOrder(@PathParam("typeUri") String typeUri, List<String> fieldUris) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            storage.setDataFieldOrder(typeUri, fieldUris);
-            tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Data field order of topic type \"" + typeUri + "\" can't be set", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
-    @DELETE
-    @Path("/topictype/{typeUri}/field/{fieldUri}")
-    @Override
-    public void removeDataField(@PathParam("typeUri") String typeUri, @PathParam("fieldUri") String fieldUri) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            storage.removeDataField(typeUri, fieldUri);
-            tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Data field \"" + fieldUri + "\" of topic type \"" +
-                typeUri + "\" can't be removed", e);
-        } finally {
-            tx.finish();
-        }
-    } */
 
 
 
@@ -1123,18 +1097,20 @@ public class EmbeddedService implements CoreService {
         _createTopic(new TopicModel("dm3.core.type", new TopicValue("Type"), "dm3.core.role_type"));
         _createTopic(new TopicModel("dm3.core.instance", new TopicValue("Instance"), "dm3.core.role_type"));
         // Before data type topics can be associated we must create the association type "Association"
-        _createTopic(new AssociationTypeData("dm3.core.association", "Association"));
+        Topic association = _createTopic(new AssociationTypeModel("dm3.core.association", "Association"));
         //
-        _createTopic(new AssociationTypeData("dm3.core.instantiation", "Instantiation"));
+        Topic instantiation = _createTopic(new AssociationTypeModel("dm3.core.instantiation", "Instantiation"));
         // Postponed data type association
         associateDataType("dm3.core.topic_type", "dm3.core.text");
         associateDataType("dm3.core.assoc_type", "dm3.core.text");
         associateDataType("dm3.core.data_type",  "dm3.core.text");
         //
-        associateWithTopicType(topicType);
+        associateWithTopicType(topicType);  // FIXME: move associateWithTopicType() calls to _createTopic()?
         associateWithTopicType(assocType);
         associateWithTopicType(dataType);
         associateWithTopicType(text);
+        associateWithTopicType(association);
+        associateWithTopicType(instantiation);
     }
 
     private Topic _createTopic(TopicModel topicModel) {

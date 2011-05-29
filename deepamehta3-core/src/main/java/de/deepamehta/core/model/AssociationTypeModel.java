@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class AssociationTypeData extends TopicModel {
+public class AssociationTypeModel extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -25,19 +25,19 @@ public class AssociationTypeData extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public AssociationTypeData(String uri, String value) {
+    public AssociationTypeModel(String uri, String value) {
         super(uri, new TopicValue(value), "dm3.core.assoc_type");
     }
 
-    public AssociationTypeData(JSONObject assocTypeData) {
+    public AssociationTypeModel(JSONObject assocTypeModel) {
         try {
             this.id = -1;
-            this.uri = assocTypeData.getString("uri");
-            this.value = new TopicValue(assocTypeData.get("value"));
+            this.uri = assocTypeModel.getString("uri");
+            this.value = new TopicValue(assocTypeModel.get("value"));
             this.typeUri = "dm3.core.assoc_type";
             this.composite = new Composite();
         } catch (Exception e) {
-            throw new RuntimeException("Parsing AssociationTypeData failed (JSONObject=" + assocTypeData + ")", e);
+            throw new RuntimeException("Parsing AssociationTypeModel failed (JSONObject=" + assocTypeModel + ")", e);
         }
     }
 

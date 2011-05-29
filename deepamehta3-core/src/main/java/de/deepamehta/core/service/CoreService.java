@@ -2,7 +2,8 @@ package de.deepamehta.core.service;
 
 import de.deepamehta.core.model.Association;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationTypeData;
+import de.deepamehta.core.model.AssociationType;
+import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
@@ -160,7 +161,7 @@ public interface CoreService {
 
 
 
-    // === Types ===
+    // === Topic Types ===
 
     public Set<String> getTopicTypeUris();
 
@@ -170,15 +171,15 @@ public interface CoreService {
 
     public TopicType updateTopicType(TopicTypeModel topicTypeModel, ClientContext clientContext);
 
-    public Topic createAssociationType(AssociationTypeData assocTypeData, ClientContext clientContext);
 
-    // public void addDataField(String typeUri, DataField dataField);
 
-    // public void updateDataField(String typeUri, DataField dataField);
+    // === Association Types ===
 
-    // public void setDataFieldOrder(String typeUri, List<String> fieldUris);
+    public Set<String> getAssociationTypeUris();
 
-    // public void removeDataField(String typeUri, String fieldUri);
+    public AssociationType getAssociationType(String assocTypeUri, ClientContext clientContext);
+
+    public AssociationType createAssociationType(AssociationTypeModel assocTypeModel, ClientContext clientContext);
 
 
 
