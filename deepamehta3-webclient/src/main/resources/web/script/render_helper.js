@@ -45,6 +45,8 @@ function RenderHelper() {
         return $("<img>").attr("src", src).addClass(css_class)
     }
 
+    // ---
+
     /**
      * @param   field   a Field object or a string.
      */
@@ -56,6 +58,22 @@ function RenderHelper() {
             value = field.value
         }
         return $("<input>").attr({type: "text", value: value})
+    }
+
+    /**
+     * @return  a UIHelper Menu object
+     */
+    this.topic_menu = function(topic_type_uri, selected_uri) {
+        // retrieve all instances
+        var topics = dm3c.restc.get_topics(topic_type_uri)
+        //
+        var menu = dm3c.ui.menu(topic_type_uri)
+        for (var i in topics) {
+            menu.add_item({label: topics[i].value, value: topics[i].uri})
+        }
+        menu.select(selected_uri)
+        //
+        return menu
     }
 
     // ---

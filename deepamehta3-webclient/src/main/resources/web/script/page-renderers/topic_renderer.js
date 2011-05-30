@@ -25,7 +25,6 @@ function TopicRenderer() {
 
         render_page_model(create_page_model(topic), render_field)
         render_associations()
-        render_buttons(topic, "detail-panel-show")
 
         function render_field(field) {
             if (field.viewable) {
@@ -46,7 +45,6 @@ function TopicRenderer() {
         dm3c.trigger_plugin_hook("pre_render_form", topic)
         page_model = create_page_model(topic)
         render_page_model(page_model, render_field)
-        render_buttons(topic, "detail-panel-edit")
 
         function render_field(field) {
             if (field.editable) {
@@ -136,16 +134,6 @@ function TopicRenderer() {
 
 
 
-    function render_buttons(topic, context) {
-        var commands = dm3c.get_topic_commands(topic, context)
-        for (var i = 0, cmd; cmd = commands[i]; i++) {
-            var button = dm3c.ui.button(undefined, cmd.handler, cmd.label, cmd.ui_icon, cmd.is_submit)
-            $("#page-toolbar").append(button)
-        }
-    }
-
-
-
     // === Page Model ===
 
     function create_page_model(topic) {
@@ -194,7 +182,7 @@ function TopicRenderer() {
         }
         // assertion
         if (this.id.substr(0, 6) != "field_") {
-            alert("WARNING (TopicRenderer.autocomplete):\n\nTopic " + dm3c.selected_topic.id +
+            alert("WARNING (TopicRenderer.autocomplete):\n\nTopic " + dm3c.selected_object.id +
                 " has unexpected element id: \"" + this.id + "\".\n\nIt is expected to begin with \"field_\".")
             return
         }
@@ -226,7 +214,7 @@ function TopicRenderer() {
                         // --- Add item to model ---
                         autocomplete_items.push(item)
                         // --- Add item to view ---
-                        var ac_item = dm3c.trigger_page_renderer_hook(dm3c.selected_topic,
+                        var ac_item = dm3c.trigger_page_renderer_hook(dm3c.selected_object,
                             "render_autocomplete_item", item)
                         var a = $("<a>").attr({href: "", id: item_id++}).append(ac_item)
                         a.mousemove(item_hovered)
@@ -291,7 +279,7 @@ function TopicRenderer() {
         if (autocomplete_item != -1) {
             var input_element = get_input_element()
             // trigger hook to get the item (string) to insert into the input element
-            var item = dm3c.trigger_page_renderer_hook(dm3c.selected_topic, "process_autocomplete_selection",
+            var item = dm3c.trigger_page_renderer_hook(dm3c.selected_object, "process_autocomplete_selection",
                 autocomplete_items[autocomplete_item])
             //
             var field = get_field(input_element)
@@ -329,7 +317,7 @@ function TopicRenderer() {
 
     function get_field(input_element) {
         var field_uri = input_element.id.substr(6)            // 6 = "field_".length
-        var field = dm3c.type_cache.get_data_field(dm3c.type_cache.get(dm3c.selected_topic.type_uri), field_uri)
+        var field = dm3c.type_cache.get_data_field(dm3c.type_cache.get(dm3c.selected_object.type_uri), field_uri)
         return field
     }
 

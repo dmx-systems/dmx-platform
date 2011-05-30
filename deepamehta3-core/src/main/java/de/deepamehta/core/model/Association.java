@@ -31,21 +31,37 @@ public interface Association {
 
     // ---
 
+    void setTypeUri(String assocTypeUri);
+
+    // === Traversal ===
+
     Topic getTopic(String roleTypeUri);
 
     Set<Topic> getTopics(String roleTypeUri);
 
-    // === Traversal ===
+    // ---
 
-    Topic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                     String othersTopicTypeUri,
-                                                                     boolean fetchComposite);
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
+    RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                            String othersTopicTypeUri,
+                                                                            boolean fetchComposite);
 
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
     Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                   String othersTopicTypeUri,
                                                                                   boolean fetchComposite);
 
-    // ---
+    // === Serialization ===
 
     JSONObject toJSON();
 }

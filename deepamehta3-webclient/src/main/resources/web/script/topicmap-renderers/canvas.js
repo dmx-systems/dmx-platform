@@ -101,6 +101,10 @@ function Canvas() {
         get_topic(topic.id).update(topic)
     }
 
+    this.update_association = function(assoc) {
+        get_association(assoc.id).update(assoc)
+    }
+
     this.remove_topic = function(id, refresh_canvas, is_part_of_delete_operation) {
         // 1) update model
         var ct = remove_topic(id)
@@ -350,11 +354,11 @@ function Canvas() {
             var ct = topic_by_position(event)
             if (ct) {
                 var assoc = dm3c.create_association("dm3.core.association",
-                    {topic_id: dm3c.selected_topic.id, role_type_uri: dm3c.selected_topic.type_uri},
-                    {topic_id: ct.id,                  role_type_uri: ct.type_uri}
+                    {topic_id: dm3c.selected_object.id, role_type_uri: dm3c.selected_object.type_uri},
+                    {topic_id: ct.id,                   role_type_uri: ct.type_uri}
                 )
                 dm3c.canvas.add_association(assoc)
-                select_topic(dm3c.selected_topic.id)
+                select_topic(dm3c.selected_object.id)
             } else {
                 draw()
             }
@@ -441,11 +445,11 @@ function Canvas() {
         // remove topic activation
         action_topic = null
         action_assoc = null
-        // remove assoc activation
-        if (dm3c.selected_assoc) {
-            dm3c.selected_assoc = null
+        /* ### remove assoc activation
+        if (dm3c.selected_object) {
+            dm3c.selected_object = null
             draw()
-        }
+        } */
     }
 
 
@@ -460,8 +464,8 @@ function Canvas() {
         var ct, ca
         if (ct = topic_by_position(event)) {
             select_topic(ct.id, true)
-            // Note: only dm3c.selected_topic has the auxiliary attributes (the canvas topic has not)
-            var commands = dm3c.get_topic_commands(dm3c.selected_topic, "context-menu")
+            // Note: only dm3c.selected_object has the auxiliary attributes (the canvas topic has not)
+            var commands = dm3c.get_topic_commands(dm3c.selected_object, "context-menu")
         } else if (ca = assoc_by_position(event)) {
             select_association(ca.id)
             // ### FIXME: use dm3c.selected assoc?
@@ -882,6 +886,12 @@ function Canvas() {
 
         this.get_topic2_id = function() {
             return this.role_2.topic_id
+        }
+
+        // ---
+
+        this.update = function(assoc) {
+            this.type_uri = assoc.type_uri
         }
     }
 

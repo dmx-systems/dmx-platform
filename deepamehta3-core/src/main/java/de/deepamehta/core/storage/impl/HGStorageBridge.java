@@ -515,7 +515,9 @@ public class HGStorageBridge implements DeepaMehtaStorage {
      * @return  The association type's URI.
      */
     private String getAssociationTypeUri(HyperEdge edge) {
-        return fetchTypeNode(edge).getString("uri");
+        HyperNode typeNode = fetchTypeNode(edge);
+        // typeNode is null for "dm3.core.instantiation" edges of edges
+        return typeNode != null ? typeNode.getString("uri") : "";
     }
 
     // ---
@@ -541,7 +543,9 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     private HyperNode fetchTypeNode(HyperEdge edge) {
         ConnectedHyperNode typeNode = edge.getConnectedHyperNode("dm3.core.instance", "dm3.core.type");
         if (typeNode == null) {
-            throw new RuntimeException("No type node is connected to " + edge);
+            return null;
+            // "dm3.core.instantiation" edges of edges are deliberately not connected to a type node
+            // ### throw new RuntimeException("No type node is connected to " + edge);
         }
         return typeNode.getHyperNode();
     }

@@ -1,7 +1,6 @@
 package de.deepamehta.plugins.server;
 
 import de.deepamehta.plugins.server.provider.AssociationCollectionProvider;
-import de.deepamehta.plugins.server.provider.AssociationModelProvider;
 import de.deepamehta.plugins.server.provider.AssociationProvider;
 import de.deepamehta.plugins.server.provider.CommandParamsProvider;
 import de.deepamehta.plugins.server.provider.CommandResultProvider;
@@ -10,7 +9,6 @@ import de.deepamehta.plugins.server.provider.RelatedTopicCollectionProvider;
 import de.deepamehta.plugins.server.provider.StringListProvider;
 import de.deepamehta.plugins.server.provider.StringSetProvider;
 import de.deepamehta.plugins.server.provider.TopicCollectionProvider;
-import de.deepamehta.plugins.server.provider.TopicModelProvider;
 import de.deepamehta.plugins.server.provider.TopicProvider;
 import de.deepamehta.plugins.server.provider.TopicTypeProvider;
 
@@ -28,7 +26,6 @@ public class Application extends javax.ws.rs.core.Application {
         Set classes = new HashSet();
         // provider classes
         classes.add(AssociationCollectionProvider.class);
-        classes.add(AssociationModelProvider.class);
         classes.add(AssociationProvider.class);
         classes.add(CommandParamsProvider.class);
         classes.add(CommandResultProvider.class);
@@ -37,7 +34,6 @@ public class Application extends javax.ws.rs.core.Application {
         classes.add(StringListProvider.class);
         classes.add(StringSetProvider.class);
         classes.add(TopicCollectionProvider.class);
-        classes.add(TopicModelProvider.class);
         classes.add(TopicProvider.class);
         classes.add(TopicTypeProvider.class);
         return classes;

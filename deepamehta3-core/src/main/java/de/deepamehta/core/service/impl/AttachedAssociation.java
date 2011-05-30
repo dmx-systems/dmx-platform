@@ -1,6 +1,7 @@
 package de.deepamehta.core.service.impl;
 
 import de.deepamehta.core.model.Association;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.Topic;
@@ -34,7 +35,23 @@ class AttachedAssociation extends AssociationBase {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+
+
     // === Association Overrides ===
+
+    @Override
+    public void setTypeUri(String assocTypeUri) {
+        // 1) update memory
+        super.setTypeUri(assocTypeUri);
+        // 2) update DB
+        // remove current assignment
+        long assocId = getTypeTopic().getAssociation().getId();
+        dms.deleteAssociation(assocId, null);  // clientContext=null
+        // create new assignment
+        dms.associateWithAssociationType(this);
+    }
+
+    // ---
 
     @Override
     public Topic getTopic(String roleTypeUri) {
@@ -77,7 +94,28 @@ class AttachedAssociation extends AssociationBase {
             othersRoleTypeUri, othersTopicTypeUri), fetchComposite);
     }
 
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    void update(AssociationModel assocModel) {
+        String typeUri = assocModel.getTypeUri();
+        boolean typeUriChanged = !getTypeUri().equals(typeUri);
+        //
+        if (typeUriChanged) {
+            logger.info("Changing type of association " + getId() + " from \"" + getTypeUri() +
+                "\" -> \"" + typeUri + "\" (new " + assocModel + ")");
+            setTypeUri(typeUri);
+        }
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private RelatedTopic getTypeTopic() {
+        // assocTypeUri=null (supposed to be "dm3.core.instantiation" but not possible ### explain)
+        return getRelatedTopic(null, "dm3.core.instance", "dm3.core.type", "dm3.core.assoc_type",
+            false);     // fetchComposite=false
+    }
+
+    // ---
 
     private void filterTopic(Role role, String roleTypeUri, Set<Topic> topics) {
         if (role instanceof TopicRole && role.getRoleTypeUri().equals(roleTypeUri)) {

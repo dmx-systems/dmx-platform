@@ -54,7 +54,7 @@ public class AssociationModel {
 
     public AssociationModel(JSONObject assocModel) {
         try {
-            this.id = -1;
+            this.id = assocModel.optLong("id", -1);
             this.typeUri = assocModel.getString("type_uri");
             this.role1 = parseRole(assocModel.getJSONObject("role_1"));
             this.role2 = parseRole(assocModel.getJSONObject("role_2"));
@@ -85,6 +85,12 @@ public class AssociationModel {
 
     // ---
 
+    public void setTypeUri(String typeUri) {
+        this.typeUri = typeUri;
+    }
+
+    // ---
+
     public void setRole1(Role role) {
         this.role1 = role;
     }
@@ -92,6 +98,8 @@ public class AssociationModel {
     public void setRole2(Role role) {
         this.role2 = role;
     }
+
+
 
     // === Serialization ===
 
@@ -116,6 +124,8 @@ public class AssociationModel {
         return array;
     }
 
+
+
     // === Java API ===
 
     @Override
@@ -133,6 +143,8 @@ public class AssociationModel {
         return "association model (id=" + id + ", typeUri=\"" + typeUri +
             "\", role1=" + role1 + ", role2=" + role2 + ")";
     }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

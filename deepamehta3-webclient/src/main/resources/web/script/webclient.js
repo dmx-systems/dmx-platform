@@ -16,8 +16,7 @@ var dm3c = new function() {
     this.ui = new UIHelper()
     this.render = new RenderHelper()
 
-    this.selected_topic = null  // topic being displayed, or null if no one is currently displayed (a Topic object)
-    this.selected_assoc = null  // ID of relation being activated, or null if no one is currently activated
+    this.selected_object = null // object being selected (Topic or Association object), or null if there is no selection
     this.canvas = null          // the canvas that displays the topicmap (a Canvas object)
     this.page_panel = null      // the page panel on the right hand side (a PagePanel object)
     //
@@ -94,7 +93,7 @@ var dm3c = new function() {
     }
 
     /**
-     * Deletes a topic (including its relations) from the DB and the GUI, and triggers the "post_delete_topic" hook.
+     * Deletes a topic (including its associations) from the DB and the GUI, and triggers the "post_delete_topic" hook.
      *
      * High-level utility method for plugin developers.
      */
@@ -108,7 +107,7 @@ var dm3c = new function() {
     }
 
     /**
-     * Hides a topic (including its relations) from the GUI (canvas & page panel).
+     * Hides a topic (including its associations) from the GUI (canvas & page panel).
      *
      * High-level utility method for plugin developers.
      * FIXME: remove is_part_of_delete_operation parameter
@@ -118,14 +117,14 @@ var dm3c = new function() {
         dm3c.canvas.remove_all_associations_of_topic(topic_id, is_part_of_delete_operation)
         dm3c.canvas.remove_topic(topic_id, true, is_part_of_delete_operation)       // refresh_canvas=true
         // 2) update page panel
-        if (topic_id == dm3c.selected_topic.id) {
+        if (topic_id == dm3c.selected_object.id) {
             // update model
-            dm3c.selected_topic = null
+            dm3c.selected_object = null
             // update GUI
             dm3c.page_panel.clear()
         } else {
             alert("WARNING: removed topic which was not selected\n" +
-                "(removed=" + topic_id + " selected=" + dm3c.selected_topic.id + ")")
+                "(removed=" + topic_id + " selected=" + dm3c.selected_object.id + ")")
         }
     }
 
@@ -153,7 +152,7 @@ var dm3c = new function() {
      *                              The association is identified by ID.
      * @param   role_2              The topic role or association role at the other end (an object, like role_1).
      *
-     * @return  The relation as stored in the DB.
+     * @return  The association as stored in the DB.
      */
     this.create_association = function(type_uri, role_1, role_2) {
         var assoc_model = {
@@ -163,6 +162,28 @@ var dm3c = new function() {
         }
         // FIXME: "create" hooks are not triggered
         return dm3c.restc.create_association(assoc_model)
+    }
+
+    /**
+     * Updates an association in the DB.
+     * ### FIXME: Triggers the "post_update_topic" hook.
+     *
+     * High-level utility method for plugin developers.
+     *
+     * @param   old_assoc   the association that is about to be updated. ### FIXME: This "old" version is passed to the
+     *                      post_update_topic hook to let plugins compare the old and new ones.
+     * @param   new_assoc   the new association that is about to override the old association.
+     *
+     * @return  The updated association as stored in the DB.
+     */
+    this.update_association = function(old_assoc, new_assoc) {
+        // 1) update DB
+        // alert("dm3c.update_association(): new_assoc=" + JSON.stringify(new_assoc));
+        var updated_assoc = build_association(dm3c.restc.update_association(new_assoc))
+        // 2) trigger hook
+        // ### dm3c.trigger_plugin_hook("post_update_topic", updated_assoc, old_assoc)
+        //
+        return updated_assoc
     }
 
     /**
@@ -425,11 +446,13 @@ var dm3c = new function() {
 
     // === Persmissions ===
 
+    // ### TODO: handle associations as well
     this.has_write_permission = function(topic) {
         var result = dm3c.trigger_plugin_hook("has_write_permission", topic)
         return !js.contains(result, false)
     }
 
+    // ### TODO: handle association types as well
     this.has_create_permission = function(type_uri) {
         var result = dm3c.trigger_plugin_hook("has_create_permission", dm3c.type_cache.get_topic_type(type_uri))
         return !js.contains(result, false)
@@ -441,10 +464,10 @@ var dm3c = new function() {
      * Reveals a topic that is related to the selected topic.
      */
     this.reveal_related_topic = function(topic_id) {
-        // reveal relations
-        var relations = dm3c.restc.get_associations(dm3c.selected_topic.id, topic_id)
-        for (var i = 0, rel; rel = relations[i]; i++) {
-            dm3c.canvas.add_association(rel)
+        // reveal associations
+        var assocs = dm3c.restc.get_associations(dm3c.selected_object.id, topic_id)
+        for (var i = 0, assoc; assoc = assocs[i]; i++) {
+            dm3c.canvas.add_association(assoc)
         }
         // reveal topic
         dm3c.add_topic_to_canvas(fetch_topic(topic_id), "show")
@@ -487,10 +510,10 @@ var dm3c = new function() {
         case "none":
             break
         case "show":
-            display_topic(topic)
+            display_object(topic)
             break
         case "edit":
-            dm3c.edit_topic(topic)
+            dm3c.begin_editing(topic)
             break
         default:
             alert("WARNING (add_topic_to_canvas):\n\nUnexpected action: \"" + action + "\"")
@@ -503,45 +526,33 @@ var dm3c = new function() {
      * Fetches the topic and displays it on the page panel.
      */
     this.select_topic = function(topic_id) {
-        display_topic(fetch_topic(topic_id))
+        display_object(fetch_topic(topic_id))
     }
 
     /**
      * Fetches the association and displays it on the page panel.
      */
     this.select_association = function(assoc_id) {
-        display_association(fetch_association(assoc_id))
+        display_object(fetch_association(assoc_id))
     }
 
     // ---
 
     /**
-     * Displays the topic on the page panel.
+     * Displays the topic or association on the page panel.
      */
-    function display_topic(topic) {
+    function display_object(object) {
         // update model
-        set_selected_topic(topic)
+        set_selected_object(object)
         // update GUI
-        dm3c.page_panel.display(topic)
+        dm3c.page_panel.display(object)
     }
 
-    /**
-     * Displays the association on the page panel.
-     */
-    function display_association(assoc) {
+    this.begin_editing = function(object) {
         // update model
-        set_selected_association(assoc)
+        set_selected_object(object)
         // update GUI
-        dm3c.page_panel.display(assoc)
-    }
-
-    // ---
-
-    this.edit_topic = function(topic) {
-        // update model
-        set_selected_topic(topic)
-        // update GUI
-        dm3c.page_panel.edit(topic)
+        dm3c.page_panel.edit(object)
     }
 
     // ---
@@ -726,14 +737,8 @@ var dm3c = new function() {
 
     // === Model ===
 
-    function set_selected_topic(topic) {
-        dm3c.selected_topic = topic
-        dm3c.selected_assoc = null
-    }
-
-    function set_selected_association(assoc) {
-        dm3c.selected_topic = null
-        dm3c.selected_assoc = assoc
+    function set_selected_object(object) {
+        dm3c.selected_object = object
     }
 
     // === GUI ===

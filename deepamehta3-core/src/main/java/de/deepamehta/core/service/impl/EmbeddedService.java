@@ -197,41 +197,6 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    /* @GET
-    @Path("/topic/{typeUri}/{key}/{value}")
-    @Override
-    public Topic getTopic(@PathParam("typeUri") String typeUri,
-                          @PathParam("key")     String key,
-                          @PathParam("value")   TopicValue value) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            Topic topic = storage.getTopic(typeUri, key, value);
-            tx.success();
-            return topic;
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Error while retrieving topic (typeUri=\"" + typeUri + "\", " +
-                "\"" + key + "\"=" + value + ")", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
-    @Override
-    public TopicValue getTopicProperty(long topicId, String key) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            TopicValue value = storage.getTopicProperty(topicId, key);
-            tx.success();
-            return value;
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Property \"" + key + "\" of topic " + topicId + " can't be retrieved", e);
-        } finally {
-            tx.finish();
-        }
-    } */
-
     @GET
     @Path("/topic/by_type/{type_uri}")
     @Override
@@ -254,57 +219,6 @@ public class EmbeddedService implements CoreService {
             tx.finish();
         }
     }
-
-    /* @Override
-    public List<Topic> getTopics(String key, Object value) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            List<Topic> topics = storage.getTopics(key, value);
-            tx.success();
-            return topics;
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Error while retrieving topics by property (\"" + key + "\"=" + value + ")", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
-    @GET
-    @Path("/topic/{id}/related_topics")
-    @Override
-    public List<RelatedTopic> getRelatedTopics(@PathParam("id") long topicId,
-                                               @QueryParam("include_topic_types") List<String> includeTopicTypes,
-                                               @QueryParam("include_rel_types")   List<String> includeRelTypes,
-                                               @QueryParam("exclude_rel_types")   List<String> excludeRelTypes) {
-        // set defaults
-        if (includeTopicTypes == null) includeTopicTypes = new ArrayList();
-        if (includeRelTypes   == null) includeRelTypes   = new ArrayList();
-        if (excludeRelTypes   == null) excludeRelTypes   = new ArrayList();
-        // error check
-        if (!includeRelTypes.isEmpty() && !excludeRelTypes.isEmpty()) {
-            throw new IllegalArgumentException("includeRelTypes and excludeRelTypes can not be used at the same time");
-        }
-        //
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            List<RelatedTopic> relTopics = storage.getRelatedTopics(topicId, includeTopicTypes, includeRelTypes,
-                                                                                                excludeRelTypes);
-            //
-            for (RelatedTopic relTopic : relTopics) {
-                triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, relTopic.getTopic());
-                triggerHook(Hook.PROVIDE_RELATION_PROPERTIES, relTopic.getRelation());
-            }
-            //
-            tx.success();
-            return relTopics;
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Related topics of topic " + topicId + " can't be retrieved", e);
-        } finally {
-            tx.finish();
-        }
-    } */
 
     @GET
     @Path("/topic")
@@ -402,10 +316,10 @@ public class EmbeddedService implements CoreService {
     @GET
     @Path("/association/{id}")
     @Override
-    public Association getAssociation(@PathParam("id") long assocId) {
+    public AttachedAssociation getAssociation(@PathParam("id") long assocId) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Association assoc = storage.getAssociation(assocId);
+            AttachedAssociation assoc = attach(storage.getAssociation(assocId));
             tx.success();
             return assoc;
         } catch (Exception e) {
@@ -415,25 +329,6 @@ public class EmbeddedService implements CoreService {
             tx.finish();
         }
     }
-
-    /* @GET
-    @Path("/relation")
-    @Override
-    public Relation getRelation(@QueryParam("src") long srcTopicId, @QueryParam("dst") long dstTopicId,
-                                @QueryParam("type") String typeId, @QueryParam("directed") boolean isDirected) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            Relation relation = storage.getRelation(srcTopicId, dstTopicId, typeId, isDirected);
-            tx.success();
-            return relation;
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Error while retrieving relation between topics " + srcTopicId +
-                " and " + dstTopicId + " (typeId=" + typeId + ", isDirected=" + isDirected + ")", e);
-        } finally {
-            tx.finish();
-        }
-    } */
 
     @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}")
@@ -486,21 +381,31 @@ public class EmbeddedService implements CoreService {
         }
     }
 
-    /* @PUT
-    @Path("/relation/{id}")
+    @PUT
+    @Path("/association")
     @Override
-    public void setRelationProperties(@PathParam("id") long id, Properties properties) {
+    public Association updateAssociation(AssociationModel assocModel,
+                                         @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.setRelationProperties(id, properties);
+            AttachedAssociation assoc = getAssociation(assocModel.getId());
+            //
+            // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
+            // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
+            //
+            assoc.update(assocModel);
+            //
+            // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
+            //
             tx.success();
+            return assoc;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Properties of relation " + id + " can't be set (" + properties + ")", e);
+            throw new RuntimeException("Updating association failed (" + assocModel + ")", e);
         } finally {
             tx.finish();
         }
-    } */
+    }
 
     @DELETE
     @Path("/association/{id}")
@@ -891,8 +796,6 @@ public class EmbeddedService implements CoreService {
 
     /**
      * Attaches this core service to a topic retrieved from storage layer.
-     *
-     * @return  Instance of {@link AttachedTopic}.
      */
     AttachedTopic attach(Topic topic, boolean fetchComposite) {
         // attach core service
@@ -933,23 +836,21 @@ public class EmbeddedService implements CoreService {
 
     // ---
 
+    /**
+     * Attaches this core service to an association retrieved from storage layer.
+     */
+    private AttachedAssociation attach(Association assoc) {
+        return new AttachedAssociation(assoc, this);
+    }
+
+    // ---
+
     private void fetchComposite(boolean fetchComposite, AttachedTopic attachedTopic) {
         if (fetchComposite) {
             if (attachedTopic.getTopicType().getDataTypeUri().equals("dm3.core.composite")) {
                 attachedTopic.loadComposite();
             }
         }
-    }
-
-    // ---
-
-    /**
-     * Attaches this core service to an association retrieved from storage layer.
-     *
-     * @return  Instance of {@link AttachedAssociation}.
-     */
-    private Association attach(Association assoc) {
-        return new AttachedAssociation(assoc, this);
     }
 
 
@@ -962,18 +863,19 @@ public class EmbeddedService implements CoreService {
             assocModel.setRole1(new TopicRole(topic.getTypeUri(), "dm3.core.type"));
             assocModel.setRole2(new TopicRole(topic.getId(), "dm3.core.instance"));
             associateWithAssociationType(storage.createAssociation(assocModel));
+            // storage low-level call used here ### explain
         } catch (Exception e) {
             throw new RuntimeException("Associating topic with topic type \"" +
                 topic.getTypeUri() + "\" failed (" + topic + ")", e);
         }
     }
 
-    private void associateWithAssociationType(Association assoc) {
+    void associateWithAssociationType(Association assoc) {
         try {
             AssociationModel assocModel = new AssociationModel("dm3.core.instantiation");
             assocModel.setRole1(new TopicRole(assoc.getTypeUri(), "dm3.core.type"));
             assocModel.setRole2(new AssociationRole(assoc.getId(), "dm3.core.instance"));
-            storage.createAssociation(assocModel);
+            storage.createAssociation(assocModel);  // storage low-level call used here ### explain
         } catch (Exception e) {
             throw new RuntimeException("Associating association with association type \"" +
                 assoc.getTypeUri() + "\" failed (" + assoc + ")", e);

@@ -154,9 +154,9 @@ public class WebclientPlugin extends Plugin {
         searchTopic.setChildTopicValue("dm3.webclient.search_term", new TopicValue(searchTerm));
         //
         // associate result topics
-        logger.info("Associating " + topics.size() + " result topics to search topic (ID " + searchTopic.getId() + ")");
+        logger.fine("Associating " + topics.size() + " result topics to search topic (ID " + searchTopic.getId() + ")");
         for (Topic topic : topics) {
-            logger.info("Associating " + topic);
+            logger.fine("Associating " + topic);
             AssociationModel assocModel = new AssociationModel("dm3.webclient.search_result_item");
             assocModel.setRole1(new TopicRole(searchTopic.getId(), "dm3.webclient.search"));
             assocModel.setRole2(new TopicRole(topic.getId(), "dm3.webclient.search_result_item"));

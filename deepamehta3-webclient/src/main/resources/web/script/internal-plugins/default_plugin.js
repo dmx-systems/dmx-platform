@@ -17,13 +17,13 @@ function default_plugin () {
 
         function do_delete_topic() {
             $("#delete-topic-dialog").dialog("close")
-            dm3c.delete_topic(dm3c.selected_topic)
+            dm3c.delete_topic(dm3c.selected_object)
         }
 
         function do_delete_association() {
             $("#delete-association-dialog").dialog("close")
             // update model
-            dm3c.delete_association(dm3c.selected_assoc.id)
+            dm3c.delete_association(dm3c.selected_object.id)
             // update view
             dm3c.canvas.refresh()
             dm3c.page_panel.clear()
@@ -31,15 +31,15 @@ function default_plugin () {
     }
 
     this.add_topic_commands = function(topic) {
-
         var commands = []
         //
-        commands.push({label: "Hide",      handler: do_hide,      context: "context-menu"})
-        commands.push({label: "Associate", handler: do_associate, context: "context-menu"})
+        commands.push({label: "Hide",       handler: do_hide,      context: "context-menu"})
+        commands.push({is_separator: true,                         context: "context-menu"})
+        commands.push({label: "Associate",  handler: do_associate, context: "context-menu"})
         //
         if (dm3c.has_write_permission(topic)) {
-            commands.push({label: "Edit",   handler: do_edit,    context: "detail-panel-show", ui_icon: "pencil"})
-            commands.push({label: "Delete", handler: do_confirm, context: "detail-panel-show", ui_icon: "trash"})
+            commands.push({label: "Edit",   handler: do_edit,      context: "detail-panel-show", ui_icon: "pencil"})
+            commands.push({label: "Delete", handler: do_confirm,   context: "detail-panel-show", ui_icon: "trash"})
         }
         //
         commands.push({label: "Save",   handler: do_save,   context: "detail-panel-edit", ui_icon: "circle-check",
@@ -57,7 +57,7 @@ function default_plugin () {
         }
 
         function do_edit() {
-            dm3c.edit_topic(topic)
+            dm3c.begin_editing(topic)
         }
 
         function do_confirm() {
@@ -74,24 +74,51 @@ function default_plugin () {
         }
     }
 
-    this.add_association_commands = function(relation) {
-
-        return [
-            {label: "Hide",   handler: do_hide,    context: "context-menu"},
-            {is_separator: true,                   context: "context-menu"},
-            {label: "Delete", handler: do_confirm, context: "context-menu"}
-        ]
+    this.add_association_commands = function(assoc) {
+        var commands = []
+        //
+        commands.push({label: "Hide",       handler: do_hide,      context: "context-menu"})
+        commands.push({is_separator: true,                         context: "context-menu"})
+        commands.push({label: "Associate",  handler: do_associate, context: "context-menu"})
+        //
+        if (dm3c.has_write_permission(assoc)) {
+            commands.push({label: "Edit",   handler: do_edit,      context: "detail-panel-show", ui_icon: "pencil"})
+            commands.push({label: "Delete", handler: do_confirm,   context: "detail-panel-show", ui_icon: "trash"})
+        }
+        //
+        commands.push({label: "Save",   handler: do_save,   context: "detail-panel-edit", ui_icon: "circle-check",
+                                                                                          is_submit: true})
+        commands.push({label: "Cancel", handler: do_cancel, context: "detail-panel-edit"})
+        //
+        return commands
 
         function do_hide() {
             // update model
-            dm3c.hide_association(relation.id)
+            dm3c.hide_association(assoc.id)
             // update view
             dm3c.canvas.refresh()
             dm3c.page_panel.clear()
         }
 
+        function do_associate(event) {
+            dm3c.canvas.begin_association(assoc.id, event)  // TODO
+        }
+
+        function do_edit() {
+            dm3c.begin_editing(assoc)
+        }
+
         function do_confirm() {
             $("#delete-association-dialog").dialog("open")
+        }
+
+        function do_save() {
+            dm3c.trigger_page_renderer_hook(assoc, "process_form", assoc)
+        }
+
+        function do_cancel() {
+            dm3c.trigger_plugin_hook("post_submit_form", assoc)
+            dm3c.page_panel.refresh()
         }
     }
 

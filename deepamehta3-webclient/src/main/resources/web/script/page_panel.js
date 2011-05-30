@@ -16,7 +16,7 @@ function PagePanel() {
         // update model
         displayed_object = topic_or_association
         // update GUI
-        render_page()
+        this.refresh()
     }
 
     this.edit = function(topic_or_association) {
@@ -24,6 +24,7 @@ function PagePanel() {
         displayed_object = topic_or_association
         // update GUI
         render_form()
+        render_buttons("detail-panel-edit")
     }
 
     this.clear = function() {
@@ -37,6 +38,7 @@ function PagePanel() {
         // update GUI
         if (displayed_object) {  // if page has been cleared before we must not do anything (rendering would fail)
             render_page()
+            render_buttons("detail-panel-show")
         }
     }
 
@@ -55,5 +57,15 @@ function PagePanel() {
     function empty() {
         $("#page-content").empty()
         $("#page-toolbar").empty()
+    }
+
+    // ---
+
+    function render_buttons(context) {
+        var commands = displayed_object.get_commands(context)
+        for (var i = 0, cmd; cmd = commands[i]; i++) {
+            var button = dm3c.ui.button(undefined, cmd.handler, cmd.label, cmd.ui_icon, cmd.is_submit)
+            $("#page-toolbar").append(button)
+        }
     }
 }

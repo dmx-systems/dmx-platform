@@ -100,10 +100,9 @@ function RESTClient(core_service_uri) {
         return request("POST", "/association", assoc_model)
     }
 
-    /* FIXME: not in use
-    this.set_relation_properties = function(relation_id, properties) {
-        request("PUT", "/relation/" + relation_id, properties)
-    } */
+    this.update_association = function(assoc_model) {
+        return request("PUT", "/association", assoc_model)
+    }
 
     this.delete_association = function(id) {
         request("DELETE", "/association/" + id)

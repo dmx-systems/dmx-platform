@@ -102,7 +102,9 @@ public class TopicBase implements Topic {
         model.setComposite(comp);
     }
 
-    // --- Traversal ---
+
+
+    // === Traversal ===
 
     @Override
     public TopicValue getChildTopicValue(String assocDefUri) {
@@ -120,9 +122,9 @@ public class TopicBase implements Topic {
     }
 
     @Override
-    public Topic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                            String othersTopicTypeUri,
-                                                                            boolean fetchComposite) {
+    public RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                   String othersTopicTypeUri,
+                                                                                   boolean fetchComposite) {
         throw new RuntimeException("Topic is not attached to the core service (" + getClass() + ", " + this + ")");
     }
 
@@ -138,7 +140,9 @@ public class TopicBase implements Topic {
         throw new RuntimeException("Topic is not attached to the core service (" + getClass() + ", " + this + ")");
     }
 
-    // --- Serialization ---
+
+
+    // === Serialization ===
 
     @Override
     public JSONObject toJSON() {

@@ -55,6 +55,15 @@ public class AssociationBase implements Association {
     // ---
 
     @Override
+    public void setTypeUri(String assocTypeUri) {
+        model.setTypeUri(assocTypeUri);
+    }
+
+
+
+    // === Traversal ===
+
+    @Override
     public Topic getTopic(String roleTypeUri) {
         throw new RuntimeException("Association is not attached to the core service ("
             + getClass() + ", " + this + ")");
@@ -66,12 +75,12 @@ public class AssociationBase implements Association {
             + getClass() + ", " + this + ")");
     }
 
-    // === Traversal ===
+    // ---
 
     @Override
-    public Topic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                            String othersTopicTypeUri,
-                                                                            boolean fetchComposite) {
+    public RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                   String othersTopicTypeUri,
+                                                                                   boolean fetchComposite) {
         throw new RuntimeException("Association is not attached to the core service ("
             + getClass() + ", " + this + ")");
     }
@@ -84,7 +93,9 @@ public class AssociationBase implements Association {
             + getClass() + ", " + this + ")");
     }
 
-    // ---
+
+
+    // === Serialization ===
 
     @Override
     public JSONObject toJSON() {

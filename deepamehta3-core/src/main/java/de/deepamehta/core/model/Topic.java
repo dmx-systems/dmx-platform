@@ -52,10 +52,22 @@ public interface Topic {
 
     Set<RelatedTopic> getRelatedTopics(String assocTypeUri);
 
-    Topic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                     String othersTopicTypeUri,
-                                                                     boolean fetchComposite);
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
+    RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                            String othersTopicTypeUri,
+                                                                            boolean fetchComposite);
 
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
     Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                   String othersTopicTypeUri,
                                                                                   boolean fetchComposite);

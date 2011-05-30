@@ -155,7 +155,7 @@ public interface CoreService {
 
     public Association createAssociation(AssociationModel assocModel, ClientContext clientContext);
 
-    // public void setRelationProperties(long id, Properties properties);
+    public Association updateAssociation(AssociationModel assocModel, ClientContext clientContext);
 
     public void deleteAssociation(long assocId, ClientContext clientContext);
 
