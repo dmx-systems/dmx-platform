@@ -224,7 +224,7 @@ var dm3c = new function() {
      */
     this.create_topic_type = function(topic_type) {
         // 1) update DB
-        var created_topic_type = dm3c.restc.create_topic_type(topic_type);
+        var created_topic_type = build_topic_type(dm3c.restc.create_topic_type(topic_type))
         // alert("Topic type created: " + JSON.stringify(topic_type));
         // 2) trigger hook
         dm3c.trigger_plugin_hook("post_create_topic", created_topic_type)
@@ -237,7 +237,7 @@ var dm3c = new function() {
      */
     this.update_topic_type = function(old_topic_type, new_topic_type) {
         // 1) update DB
-        var updated_topic_type = dm3c.restc.update_topic_type(new_topic_type);
+        var updated_topic_type = build_topic_type(dm3c.restc.update_topic_type(new_topic_type))
         // alert("Topic type updated: " + JSON.stringify(topic_type));
         // 2) trigger hook
         dm3c.trigger_plugin_hook("post_update_topic", updated_topic_type, old_topic_type)
@@ -715,6 +715,8 @@ var dm3c = new function() {
         }
     }
 
+
+
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function fetch_topic(topic_id) {
@@ -725,6 +727,14 @@ var dm3c = new function() {
         return build_association(dm3c.restc.get_association(assoc_id))
     }
 
+    function fetch_topic_type(topic_type_uri) {
+        return build_topic_type(dm3c.restc.get_topic_type(topic_type_uri))
+    }
+
+    function fetch_association_type(assoc_type_uri) {
+        return build_association_type(dm3c.restc.get_association_type(assoc_type_uri))
+    }
+
     // ---
 
     function build_topic(topic) {
@@ -733,6 +743,14 @@ var dm3c = new function() {
 
     function build_association(assoc) {
         return new Association(assoc)
+    }
+
+    function build_topic_type(topic_type) {
+        return new TopicType(topic_type)
+    }
+
+    function build_association_type(assoc_type) {
+        return new AssociationType(assoc_type)
     }
 
     // === Model ===
@@ -839,14 +857,12 @@ var dm3c = new function() {
         // topic types
         var type_uris = dm3c.restc.get_topic_type_uris()
         for (var i = 0; i < type_uris.length; i++) {
-            var topic_type = dm3c.restc.get_topic_type(type_uris[i])
-            dm3c.type_cache.put_topic_type(topic_type)
+            dm3c.type_cache.put_topic_type(fetch_topic_type(type_uris[i]))
         }
         // association types
         var type_uris = dm3c.restc.get_association_type_uris()
         for (var i = 0; i < type_uris.length; i++) {
-            var assoc_type = dm3c.restc.get_association_type(type_uris[i])
-            dm3c.type_cache.put_association_type(assoc_type)
+            dm3c.type_cache.put_association_type(fetch_association_type(type_uris[i]))
         }
     }
 

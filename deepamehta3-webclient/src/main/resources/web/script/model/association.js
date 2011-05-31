@@ -5,6 +5,8 @@ function Association(assoc) {
     this.role_1   = assoc.role_1
     this.role_2   = assoc.role_2
 
+    // === "Page Displayable" implementation ===
+
     this.get_type = function() {
         return dm3c.type_cache.get_association_type(this.type_uri)
     }

@@ -1,9 +1,9 @@
 function TypeCache() {
 
-    var topic_types = {}        // key: Type URI, value: type definition
+    var topic_types = {}        // key: Type URI, value: a TopicType object
     var topic_type_icons = {}   // key: Type URI, value: icon (JavaScript Image object)
                                 // FIXME: maintain icons in TopicType class
-    var assoc_types = {}        // key: Type URI, value: type definition
+    var assoc_types = {}        // key: Type URI, value: a AssociationType object
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -26,14 +26,12 @@ function TypeCache() {
     // ---
 
     this.put_topic_type = function(topic_type) {
-        js.set_class(topic_type, TopicType)
         var type_uri = topic_type.uri
         topic_types[type_uri] = topic_type
         topic_type_icons[type_uri] = dm3c.create_image(topic_type.get_icon_src())
     }
 
     this.put_association_type = function(assoc_type) {
-        js.set_class(assoc_type, AssociationType)
         var type_uri = assoc_type.uri
         assoc_types[type_uri] = assoc_type
         // ### topic_type_icons[type_uri] = dm3c.create_image(dm3c.get_icon_src(type_uri))

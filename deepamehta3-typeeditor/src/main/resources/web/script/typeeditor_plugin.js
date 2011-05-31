@@ -37,6 +37,7 @@ function typeeditor_plugin() {
      *                  Note: in case the just created topic is a type, the entire type definition is passed.
      */
     this.post_create_topic = function(topic) {
+        // ### FIXME: move code to dm3c.create_topic_type()?
         if (topic.type_uri == "dm3.core.topic_type") {
             // 1) Update type cache
             dm3c.type_cache.put_topic_type(topic)

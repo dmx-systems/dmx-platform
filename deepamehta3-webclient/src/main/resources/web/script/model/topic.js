@@ -6,6 +6,8 @@ function Topic(topic) {
     this.type_uri  = topic.type_uri
     this.composite = topic.composite
 
+    // === "Page Displayable" implementation ===
+
     this.get_type = function() {
         return dm3c.type_cache.get_topic_type(this.type_uri)
     }
