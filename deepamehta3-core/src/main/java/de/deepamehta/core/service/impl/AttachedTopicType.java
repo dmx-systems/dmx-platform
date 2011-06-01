@@ -37,6 +37,8 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
 
     private AttachedViewConfiguration viewConfig;
 
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedTopicType(EmbeddedService dms) {
@@ -58,6 +60,14 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
     @Override
     public String getDataTypeUri() {
         return getModel().getDataTypeUri();
+    }
+
+    @Override
+    public void setDataTypeUri(String dataTypeUri) {
+        // update memory
+        getModel().setDataTypeUri(dataTypeUri);
+        // update DB
+        storeDataTypeUri();
     }
 
     // ---
@@ -138,7 +148,7 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
                 "definitions found but sequence length is " + sequenceIds.size());
         }
         // build topic type
-        TopicTypeModel topicTypeModel = new TopicTypeModel(typeTopic, fetchDataTypeUri(typeTopic),
+        TopicTypeModel topicTypeModel = new TopicTypeModel(typeTopic, fetchDataTypeTopic(typeTopic).getUri(),
                                                                       fetchIndexModes(typeTopic),
                                                                       fetchViewConfig(typeTopic));
         addAssocDefs(topicTypeModel, assocDefs, sequenceIds);
@@ -159,17 +169,34 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
     }
 
     void update(TopicTypeModel topicTypeModel) {
-        boolean uriChanged = !getUri().equals(topicTypeModel.getUri());
-        boolean valueChanged = !getValue().equals(topicTypeModel.getValue());
+        logger.info("Updating topic type \"" + getUri() + "\" (new " + topicTypeModel + ")");
+        String uri = topicTypeModel.getUri();
+        TopicValue value = topicTypeModel.getValue();
+        String dataTypeUri = topicTypeModel.getDataTypeUri();
+        //
+        boolean uriChanged = !getUri().equals(uri);
+        boolean valueChanged = !getValue().equals(value);
+        boolean dataTypeChanged = !getDataTypeUri().equals(dataTypeUri);
         //
         if (uriChanged) {
+            logger.info("Changing URI from \"" + getUri() + "\" -> \"" + uri + "\"");
             // Note: on valueChanged the cache is not required to be invalidated.
             // Value changes are performed on the cached object.
             dms.invalidateTypeCache(getUri());
         }
-        //
+        if (valueChanged) {
+            logger.info("Changing name from \"" + getValue() + "\" -> \"" + value + "\"");
+        }
         if (uriChanged || valueChanged) {
             super.update(topicTypeModel);
+        }
+        if (dataTypeChanged) {
+            logger.info("Changing data type from \"" + getDataTypeUri() + "\" -> \"" + dataTypeUri + "\"");
+            setDataTypeUri(dataTypeUri);
+        }
+        //
+        if (!uriChanged && !valueChanged && !dataTypeChanged) {
+            logger.info("Updating topic type \"" + getUri() + "\" ABORTED -- no changes made by user");
         }
     }
 
@@ -255,19 +282,15 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
 
     // ---
 
-    private String fetchDataTypeUri(Topic typeTopic) {
+    private RelatedTopic fetchDataTypeTopic(Topic typeTopic) {
         try {
-            if (typeTopic.getUri().equals("dm3.core.meta_type")) {
-                return "dm3.core.text";
-            }
-            //
-            Topic dataType = typeTopic.getRelatedTopic("dm3.core.association", "dm3.core.topic_type",
+            RelatedTopic dataType = typeTopic.getRelatedTopic("dm3.core.association", "dm3.core.topic_type",
                 "dm3.core.data_type", "dm3.core.data_type", false);     // fetchComposite=false
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to topic type \"" + typeTopic.getUri() +
                     "\"");
             }
-            return dataType.getUri();
+            return dataType;
         } catch (Exception e) {
             throw new RuntimeException("Fetching the data type topic for topic type \"" + typeTopic.getUri() +
                 "\" failed", e);
@@ -379,6 +402,14 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
 
 
     // === Store ===
+
+    private void storeDataTypeUri() {
+        // remove current assignment
+        long assocId = fetchDataTypeTopic(this).getAssociation().getId();
+        dms.deleteAssociation(assocId, null);  // clientContext=null
+        // create new assignment
+        dms.associateDataType(getUri(), getDataTypeUri());
+    }
 
     private void storeIndexModes() {
         for (IndexMode indexMode : getIndexModes()) {

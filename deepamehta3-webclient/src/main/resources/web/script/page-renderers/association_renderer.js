@@ -17,13 +17,13 @@ function AssociationRenderer() {
         //
         dm3c.render.field_label("Association Type")
         dm3c.render.field_value(assoc_type.value)
+        //
         dm3c.render.field_label("Association Type URI")
         dm3c.render.field_value(assoc_type.uri)
     }
 
     this.render_form = function(assoc) {
         type_menu = dm3c.render.topic_menu("dm3.core.assoc_type", assoc.type_uri)
-        //
         dm3c.render.field_label("Association Type")
         dm3c.render.field_value(type_menu.dom)
     }

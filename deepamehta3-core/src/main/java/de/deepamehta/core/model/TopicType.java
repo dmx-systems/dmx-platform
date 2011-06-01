@@ -15,6 +15,8 @@ public interface TopicType extends Topic {
 
     String getDataTypeUri();
 
+    void setDataTypeUri(String dataTypeUri);
+
     // ---
 
     Set<IndexMode> getIndexModes();

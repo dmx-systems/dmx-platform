@@ -61,51 +61,7 @@ public interface CoreService {
 
     // public Topic getTopic(String typeUri, String key, TopicValue value);
 
-    /**
-     * Returns a property value of a topic.
-     * If the topic has no such property a "no-value" representing {@link TopicValue} object is returned.
-     */
-    // public TopicValue getTopicProperty(long topicId);
-
     public Set<RelatedTopic> getTopics(String typeUri);
-
-    /**
-     * Looks up topics by exact property value.
-     * If no such topics exists an empty list is returned.
-     * <p>
-     * IMPORTANT: Looking up a topic this way requires the property to be indexed with indexing mode <code>KEY</code>.
-     * This is achieved by declaring the respective data field with <code>indexing_mode: "KEY"</code>
-     * (for statically declared data field, typically in <code>types.json</code>) or
-     * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
-     * (for dynamically created data fields, typically in migration classes).
-     */
-    // public List<Topic> getTopics(String key, Object value);
-
-    /**
-     * Retrieves topics and relationships that are directly connected to the given topic, optionally filtered
-     * by topic types and relation types.
-     *
-     * IMPORTANT: the topics and relations returned by this method provide no properties.
-     * To initialize the properties needed by your plugin define its providePropertiesHook().
-     *
-     * @param   includeTopicTypes   The include topic type filter (optional).
-     *                              A list of topic type URIs (strings), e.g. "de/deepamehta/core/topictype/Note".
-     *                              Null or an empty list switches the filter off.
-     * @param   includeRelTypes     The include relation type filter (optional).
-     *                              A list of strings of the form "<relTypeName>[;<direction>]",
-     *                              e.g. "TOPICMAP_TOPIC;INCOMING".
-     *                              Null or an empty list switches the filter off.
-     * @param   excludeRelTypes     The exclude relation type filter (optional).
-     *                              A list of strings of the form "<relTypeName>[;<direction>]",
-     *                              e.g. "SEARCH_RESULT;OUTGOING".
-     *                              Null or an empty list switches the filter off.
-     *
-     * @return  The related topics, each one as a pair: the topic (a Topic object), and the connecting relation
-     *          (a Relation object).
-     */
-    // public List<RelatedTopic> getRelatedTopics(long topicId, List<String> includeTopicTypes,
-    //                                                          List<String> includeRelTypes,
-    //                                                          List<String> excludeRelTypes);
 
     /**
      * Performs a fulltext search.

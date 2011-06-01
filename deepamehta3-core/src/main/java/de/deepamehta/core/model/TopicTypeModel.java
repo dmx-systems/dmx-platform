@@ -82,6 +82,10 @@ public class TopicTypeModel extends TopicModel {
         return dataTypeUri;
     }
 
+    public void setDataTypeUri(String dataTypeUri) {
+        this.dataTypeUri = dataTypeUri;
+    }
+
     // ---
 
     public Set<IndexMode> getIndexModes() {

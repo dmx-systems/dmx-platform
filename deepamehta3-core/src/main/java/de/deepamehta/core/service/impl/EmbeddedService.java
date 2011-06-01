@@ -179,7 +179,7 @@ public class EmbeddedService implements CoreService {
     }
 
     @GET
-    @Path("/topic/by_property/{key}/{value}")
+    @Path("/topic/by_value/{key}/{value}")
     @Override
     public AttachedTopic getTopic(@PathParam("key") String key, @PathParam("value") TopicValue value,
                                   @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
@@ -1003,6 +1003,7 @@ public class EmbeddedService implements CoreService {
         //
         Topic instantiation = _createTopic(new AssociationTypeModel("dm3.core.instantiation", "Instantiation"));
         // Postponed data type association
+        associateDataType("dm3.core.meta_type",  "dm3.core.text");
         associateDataType("dm3.core.topic_type", "dm3.core.text");
         associateDataType("dm3.core.assoc_type", "dm3.core.text");
         associateDataType("dm3.core.data_type",  "dm3.core.text");

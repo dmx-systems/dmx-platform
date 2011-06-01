@@ -1,6 +1,7 @@
 function TopictypeRenderer() {
 
-    var uri_input   // a jQuery <input> element
+    var uri_input       // a jQuery <input> element
+    var data_type_menu  // a UIHelper Menu object
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -13,18 +14,30 @@ function TopictypeRenderer() {
 
 
     this.render_page = function(topic) {
+        var topic_type = dm3c.type_cache.get_topic_type(topic.uri)
+        //
         get_topic_renderer().render_page(topic)
         //
         dm3c.render.field_label("URI")
-        dm3c.render.field_value(topic.uri)
+        dm3c.render.field_value(topic_type.uri)
+        //
+        var data_type = dm3c.restc.get_topic_by_value("uri", topic_type.data_type_uri)
+        dm3c.render.field_label("Data Type")
+        dm3c.render.field_value(data_type.value)
     }
 
     this.render_form = function(topic) {
+        var topic_type = dm3c.type_cache.get_topic_type(topic.uri)
+        //
         get_topic_renderer().render_form(topic)
         //
-        uri_input = dm3c.render.input(topic.uri)
+        uri_input = dm3c.render.input(topic_type.uri)
         dm3c.render.field_label("URI")
         dm3c.render.field_value(uri_input)
+        //
+        data_type_menu = dm3c.render.topic_menu("dm3.core.data_type", topic_type.data_type_uri)
+        dm3c.render.field_label("Data Type")
+        dm3c.render.field_value(data_type_menu.dom)
     }
 
     this.process_form = function(topic) {
@@ -54,7 +67,7 @@ function TopictypeRenderer() {
                 id: topic.id,
                 uri: $.trim(uri_input.val()),
                 value: page_model.read_form_value(),
-                data_type_uri: "dm3.core.text"
+                data_type_uri: data_type_menu.get_selection().value
             }
             return topic_type_model
         }

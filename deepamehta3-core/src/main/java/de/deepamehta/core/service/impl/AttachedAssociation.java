@@ -44,11 +44,7 @@ class AttachedAssociation extends AssociationBase {
         // 1) update memory
         super.setTypeUri(assocTypeUri);
         // 2) update DB
-        // remove current assignment
-        long assocId = getTypeTopic().getAssociation().getId();
-        dms.deleteAssociation(assocId, null);  // clientContext=null
-        // create new assignment
-        dms.associateWithAssociationType(this);
+        storeTypeUri();
     }
 
     // ---
@@ -94,22 +90,31 @@ class AttachedAssociation extends AssociationBase {
             othersRoleTypeUri, othersTopicTypeUri), fetchComposite);
     }
 
+
+
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void update(AssociationModel assocModel) {
+        logger.info("Updating association " + getId() + " (new " + assocModel + ")");
         String typeUri = assocModel.getTypeUri();
+        //
         boolean typeUriChanged = !getTypeUri().equals(typeUri);
         //
         if (typeUriChanged) {
-            logger.info("Changing type of association " + getId() + " from \"" + getTypeUri() +
-                "\" -> \"" + typeUri + "\" (new " + assocModel + ")");
+            logger.info("Changing type from \"" + getTypeUri() + "\" -> \"" + typeUri + "\"");
             setTypeUri(typeUri);
+        }
+        //
+        if (!typeUriChanged) {
+            logger.info("Updating association " + getId() + " ABORTED -- no changes made by user");
         }
     }
 
+
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private RelatedTopic getTypeTopic() {
+    private RelatedTopic fetchTypeTopic() {
         // assocTypeUri=null (supposed to be "dm3.core.instantiation" but not possible ### explain)
         return getRelatedTopic(null, "dm3.core.instance", "dm3.core.type", "dm3.core.assoc_type",
             false);     // fetchComposite=false
@@ -119,11 +124,23 @@ class AttachedAssociation extends AssociationBase {
 
     private void filterTopic(Role role, String roleTypeUri, Set<Topic> topics) {
         if (role instanceof TopicRole && role.getRoleTypeUri().equals(roleTypeUri)) {
-            topics.add(getRoleTopic((TopicRole) role));
+            topics.add(fetchRoleTopic((TopicRole) role));
         }
     }
 
-    private Topic getRoleTopic(TopicRole role) {
-        return dms.getTopic(role.getTopicId(), false, null);    // fetchComposite=false
+    private Topic fetchRoleTopic(TopicRole role) {
+        return dms.getTopic(role.getTopicId(), false, null);    // fetchComposite=false, clientContext=null
     }
+
+
+
+    // === Store ===
+
+    private void storeTypeUri() {
+        // remove current assignment
+        long assocId = fetchTypeTopic().getAssociation().getId();
+        dms.deleteAssociation(assocId, null);  // clientContext=null
+        // create new assignment
+        dms.associateWithAssociationType(this);
+    }    
 }

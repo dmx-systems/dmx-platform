@@ -19,8 +19,8 @@ function RESTClient(core_service_uri) {
      *
      * @return  the topic, or <code>null</code>.
      */
-    this.get_topic_by_property = function(key, value) {
-        return request("GET", "/topic/by_property/" + key + "/" + encodeURIComponent(value))
+    this.get_topic_by_value = function(key, value) {
+        return request("GET", "/topic/by_value/" + key + "/" + encodeURIComponent(value))
     }
 
     this.get_topic = function(type_uri, key, value) {
