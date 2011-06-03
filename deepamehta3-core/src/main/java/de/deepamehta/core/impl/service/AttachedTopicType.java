@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A topic type that is attached to the {@link CoreService}.
+ * A topic type that is attached to the {@link DeepaMehtaService}.
  */
 class AttachedTopicType extends AttachedTopic implements TopicType {
 

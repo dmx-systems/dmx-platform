@@ -1,7 +1,7 @@
 package de.deepamehta.core.impl.service;
 
-import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.impl.storage.HGStorageBridge;
+import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.util.JavaUtils;
 
 import de.deepamehta.hypergraph.impl.Neo4jHyperGraph;
@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 public class CoreServiceTestEnvironment {
 
-    protected CoreService dms;
+    protected DeepaMehtaService dms;
     protected Logger logger = Logger.getLogger(getClass().getName());
 
     private File dbPath;

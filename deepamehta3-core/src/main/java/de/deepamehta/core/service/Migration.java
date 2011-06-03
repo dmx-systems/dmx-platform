@@ -10,11 +10,11 @@ public abstract class Migration {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected CoreService dms;
+    protected DeepaMehtaService dms;
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public void setService(CoreService dms) {
+    public void setService(DeepaMehtaService dms) {
         this.dms = dms;
     }
 

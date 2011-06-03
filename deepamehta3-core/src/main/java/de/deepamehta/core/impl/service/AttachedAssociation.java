@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 
 /**
- * An association that is attached to the {@link CoreService}.
+ * An association that is attached to the {@link DeepaMehtaService}.
  */
 class AttachedAssociation extends AssociationBase {
 

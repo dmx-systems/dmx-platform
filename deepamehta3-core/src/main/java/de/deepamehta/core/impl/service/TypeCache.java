@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * Types are accessed by the {@link get} methods. They are lazy-loaded from the DB.
  * <p>
  * This class is internally used by the {@link EmbeddedService}. The plugin developer accesses topic types via the
- * {@link de.deepamehta.core.service.CoreService#getTopicType} core service call.
+ * {@link de.deepamehta.core.service.DeepaMehtaService#getTopicType} core service call.
  */
 class TypeCache {
 

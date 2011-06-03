@@ -37,7 +37,7 @@ import java.util.Set;
  * Plugin developer notes: Inside the {@link Plugin} and {@link Migration} classes an instance of the DeepaMehta
  * core service is available through the <code>dms</code> object.
  */
-public interface CoreService {
+public interface DeepaMehtaService {
 
 
 

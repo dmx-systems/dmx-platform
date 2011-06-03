@@ -1,7 +1,7 @@
 package de.deepamehta.core.impl.service;
 
-import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.TopicValue;
 
 import static org.junit.Assert.assertEquals;

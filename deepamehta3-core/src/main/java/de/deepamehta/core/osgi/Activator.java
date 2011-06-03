@@ -2,7 +2,7 @@ package de.deepamehta.core.osgi;
 
 import de.deepamehta.core.impl.service.EmbeddedService;
 import de.deepamehta.core.impl.storage.HGStorageBridge;
-import de.deepamehta.core.service.CoreService;
+import de.deepamehta.core.service.DeepaMehtaService;
 
 import de.deepamehta.hypergraph.HyperGraph;
 import de.deepamehta.hypergraph.impl.Neo4jHyperGraph;
@@ -30,7 +30,7 @@ public class Activator implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 
-    private static CoreService dms;
+    private static DeepaMehtaService dms;
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -54,7 +54,7 @@ public class Activator implements BundleActivator {
             dms.setupDB();
             //
             logger.info("Registering DeepaMehta 3 core service at OSGi framework");
-            context.registerService(CoreService.class.getName(), dms, null);
+            context.registerService(DeepaMehtaService.class.getName(), dms, null);
         } catch (Exception e) {
             logger.severe("Activation of DeepaMehta 3 Core failed:");
             e.printStackTrace();
@@ -79,8 +79,8 @@ public class Activator implements BundleActivator {
 
 
 
-    public static CoreService getService() {
-        // CoreService dms = (CoreService) deepamehtaServiceTracker.getService();
+    public static DeepaMehtaService getService() {
+        // DeepaMehtaService dms = (DeepaMehtaService) deepamehtaServiceTracker.getService();
         if (dms == null) {
             throw new RuntimeException("DeepaMehta 3 core service is not yet available");
         }

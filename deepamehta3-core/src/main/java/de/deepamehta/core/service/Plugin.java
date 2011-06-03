@@ -61,7 +61,7 @@ public class Plugin implements BundleActivator {
 
     private Properties configProperties;    // Read from file "plugin.properties"
 
-    protected CoreService dms;
+    protected DeepaMehtaService dms;
     private HttpService httpService;
 
     private List<ServiceTracker> serviceTrackers = new ArrayList();
@@ -158,7 +158,7 @@ public class Plugin implements BundleActivator {
             configProperties = readConfigFile();
             pluginPackage = getConfigProperty("pluginPackage", getClass().getPackage().getName());
             //
-            createServiceTracker(CoreService.class.getName(), context);
+            createServiceTracker(DeepaMehtaService.class.getName(), context);
             createServiceTracker(HttpService.class.getName(), context);
             createServiceTrackers(context);
         } catch (Exception e) {
@@ -298,9 +298,9 @@ public class Plugin implements BundleActivator {
             @Override
             public Object addingService(ServiceReference serviceRef) {
                 Object service = super.addingService(serviceRef);
-                if (service instanceof CoreService) {
+                if (service instanceof DeepaMehtaService) {
                     logger.info("Adding DeepaMehta 3 core service to plugin \"" + pluginName + "\"");
-                    dms = (CoreService) service;
+                    dms = (DeepaMehtaService) service;
                     checkServiceAvailability();
                 } else if (service instanceof HttpService) {
                     logger.info("Adding HTTP service to plugin \"" + pluginName + "\"");
@@ -336,7 +336,7 @@ public class Plugin implements BundleActivator {
             }
 
             /**
-             * Checks if both required OSGi services (CoreService and HttpService) are available,
+             * Checks if both required OSGi services (DeepaMehtaService and HttpService) are available,
              * and if so, initializes the plugin.
              */
             private void checkServiceAvailability() {
@@ -360,16 +360,16 @@ public class Plugin implements BundleActivator {
      * - register the plugin's static web resources at the OSGi HTTP service
      * - register the plugin's REST resources at the OSGi HTTP service
      *
-     * These are the tasks which rely on both, the CoreService and the HttpService.
+     * These are the tasks which rely on both, the DeepaMehtaService and the HttpService.
      * This method is called once both services become available.
      */
     private void initPlugin(BundleContext context) {
         logger.info("----- Initializing " + this + " -----");
-        installPlugin();                    // relies on CoreService
-        registerPlugin();                   // relies on CoreService (and committed migrations)
+        installPlugin();                    // relies on DeepaMehtaService
+        registerPlugin();                   // relies on DeepaMehtaService (and committed migrations)
         registerPluginService(context);
         registerWebResources();             // relies on HttpService
-        registerRestResources();            // relies on HttpService and CoreService (and registered plugin)
+        registerRestResources();            // relies on HttpService and DeepaMehtaService (and registered plugin)
         logger.info("----- Initialization of " + this + " complete -----");
     }
 

@@ -7,7 +7,7 @@ import de.deepamehta.core.Topic;
 
 
 /**
- * A topic that is attached to the {@link CoreService}.
+ * A topic that is attached to the {@link DeepaMehtaService}.
  */
 class AttachedRelatedTopic extends AttachedTopic implements RelatedTopic {
 

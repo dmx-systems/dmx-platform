@@ -10,7 +10,7 @@ import de.deepamehta.core.model.ViewConfigurationModel;
 
 
 /**
- * A view configuration that is attached to the {@link CoreService}.
+ * A view configuration that is attached to the {@link DeepaMehtaService}.
  */
 class AttachedViewConfiguration implements ViewConfiguration {
 

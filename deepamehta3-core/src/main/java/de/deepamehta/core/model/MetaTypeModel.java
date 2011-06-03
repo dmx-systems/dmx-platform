@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class MetaTypeData extends TopicModel {
+public class MetaTypeModel extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -23,7 +23,7 @@ public class MetaTypeData extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public MetaTypeData(String uri, String value) {
+    public MetaTypeModel(String uri, String value) {
         super(uri, new TopicValue(value), "dm3.core.meta_type");
     }
 

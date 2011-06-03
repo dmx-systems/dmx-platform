@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A topic that is attached to the {@link CoreService}.
+ * A topic that is attached to the {@link DeepaMehtaService}.
  */
 class AttachedTopic extends TopicBase {
 

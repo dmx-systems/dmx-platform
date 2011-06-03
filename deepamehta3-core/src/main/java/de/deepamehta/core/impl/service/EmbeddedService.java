@@ -14,14 +14,14 @@ import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.Composite;
-import de.deepamehta.core.model.MetaTypeData;
+import de.deepamehta.core.model.MetaTypeModel;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.Role;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TopicValue;
-import de.deepamehta.core.service.CoreService;
+import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
@@ -68,7 +68,7 @@ import java.util.logging.Logger;
 @Path("/")
 @Consumes("application/json")
 @Produces("application/json")
-public class EmbeddedService implements CoreService {
+public class EmbeddedService implements DeepaMehtaService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -151,7 +151,7 @@ public class EmbeddedService implements CoreService {
 
 
     // **********************************
-    // *** CoreService Implementation ***
+    // *** DeepaMehtaService Implementation ***
     // **********************************
 
 
@@ -963,8 +963,8 @@ public class EmbeddedService implements CoreService {
     private void setupBootstrapContent() {
         // Before topic types and asscociation types can be created the meta types must created
         // Note: storage low-level call used here ### explain
-        Topic topicType = _createTopic(new MetaTypeData("dm3.core.topic_type", "Topic Type"));
-        Topic assocType = _createTopic(new MetaTypeData("dm3.core.assoc_type", "Association Type"));
+        Topic topicType = _createTopic(new MetaTypeModel("dm3.core.topic_type", "Topic Type"));
+        Topic assocType = _createTopic(new MetaTypeModel("dm3.core.assoc_type", "Association Type"));
         // Create topic type "Data Type"
         // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
         // depends on the topic type "Data Type". To resolve this circle we use a low-level storage call here

@@ -5,19 +5,14 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
-import de.deepamehta.core.model.MetaTypeData;
-import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.service.CoreService;
+import de.deepamehta.core.service.DeepaMehtaService;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,7 +91,7 @@ public class JSONHelper {
      *
      * @param   migrationFileName   The origin migration file. Used for logging only.
      */
-    public static void readMigrationFile(InputStream is, String migrationFileName, CoreService dms) {
+    public static void readMigrationFile(InputStream is, String migrationFileName, DeepaMehtaService dms) {
         try {
             logger.info("Reading migration file \"" + migrationFileName + "\"");
             String fileContent = JavaUtils.readText(is);
@@ -123,28 +118,28 @@ public class JSONHelper {
         }
     }
 
-    public static void createTopicTypes(JSONArray topicTypes, CoreService dms) throws Exception {
+    public static void createTopicTypes(JSONArray topicTypes, DeepaMehtaService dms) throws Exception {
         for (int i = 0; i < topicTypes.length(); i++) {
             TopicTypeModel topicTypeModel = new TopicTypeModel(topicTypes.getJSONObject(i));
             dms.createTopicType(topicTypeModel, null);          // clientContext=null
         }
     }
 
-    public static void createAssociationTypes(JSONArray assocTypes, CoreService dms) throws Exception {
+    public static void createAssociationTypes(JSONArray assocTypes, DeepaMehtaService dms) throws Exception {
         for (int i = 0; i < assocTypes.length(); i++) {
             AssociationTypeModel assocTypeModel = new AssociationTypeModel(assocTypes.getJSONObject(i));
             dms.createAssociationType(assocTypeModel, null);     // clientContext=null
         }
     }
 
-    public static void createTopics(JSONArray topics, CoreService dms) throws Exception {
+    public static void createTopics(JSONArray topics, DeepaMehtaService dms) throws Exception {
         for (int i = 0; i < topics.length(); i++) {
             TopicModel topicModel = new TopicModel(topics.getJSONObject(i));
             dms.createTopic(topicModel, null);                  // clientContext=null
         }
     }
 
-    public static void createAssociations(JSONArray assocs, CoreService dms) throws Exception {
+    public static void createAssociations(JSONArray assocs, DeepaMehtaService dms) throws Exception {
         for (int i = 0; i < assocs.length(); i++) {
             AssociationModel assocModel = new AssociationModel(assocs.getJSONObject(i));
             dms.createAssociation(assocModel, null);            // clientContext=null

@@ -1,11 +1,11 @@
 package de.deepamehta.itest;
 
+import de.deepamehta.core.Topic;
+import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Properties;
-import de.deepamehta.core.Topic;
-import de.deepamehta.core.TopicType;
-import de.deepamehta.core.service.CoreService;
+import de.deepamehta.core.service.DeepaMehtaService;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -36,7 +36,7 @@ public abstract class CoreServiceTest {
     @Inject
     private BundleContext bundleContext;
 
-    private CoreService sut;
+    private DeepaMehtaService sut;
     private Logger logger = Logger.getLogger(getClass().getName());
 
     @Before
@@ -53,10 +53,10 @@ public abstract class CoreServiceTest {
                 scanPom("mvn:de.deepamehta/deepamehta3-bundles/0.5-SNAPSHOT/pom"));
     }
 
-    private CoreService retrieveCoreService() throws InterruptedException {
-        ServiceTracker tracker = new ServiceTracker(bundleContext, CoreService.class.getName(), null);
+    private DeepaMehtaService retrieveCoreService() throws InterruptedException {
+        ServiceTracker tracker = new ServiceTracker(bundleContext, DeepaMehtaService.class.getName(), null);
         tracker.open();
-        CoreService core = (CoreService) tracker.waitForService(5000);
+        DeepaMehtaService core = (DeepaMehtaService) tracker.waitForService(5000);
         tracker.close();
         assertNotNull(core);
         return core;

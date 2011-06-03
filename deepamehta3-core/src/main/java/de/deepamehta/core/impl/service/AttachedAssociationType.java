@@ -8,7 +8,7 @@ import de.deepamehta.core.model.TopicValue;
 
 
 /**
- * An association type that is attached to the {@link CoreService}.
+ * An association type that is attached to the {@link DeepaMehtaService}.
  */
 class AttachedAssociationType extends AttachedTopic implements AssociationType {
 

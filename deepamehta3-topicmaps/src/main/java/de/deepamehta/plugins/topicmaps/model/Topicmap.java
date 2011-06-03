@@ -1,9 +1,9 @@
 package de.deepamehta.plugins.topicmaps.model;
 
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.service.CoreService;
+import de.deepamehta.core.model.Relation;
+import de.deepamehta.core.service.DeepaMehtaService;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -32,7 +32,7 @@ public class Topicmap {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     protected long topicmapId;
-    protected CoreService dms;
+    protected DeepaMehtaService dms;
 
     protected Map<Long, TopicmapTopic> topics = new HashMap();
     protected Map<Long, TopicmapRelation> relations = new HashMap();
@@ -44,7 +44,7 @@ public class Topicmap {
     /**
      * Loads a topicmap from the DB.
      */
-    public Topicmap(long topicmapId, CoreService dms) {
+    public Topicmap(long topicmapId, DeepaMehtaService dms) {
         this.topicmapId = topicmapId;
         this.dms = dms;
         logger.info("Loading topicmap " + topicmapId);
