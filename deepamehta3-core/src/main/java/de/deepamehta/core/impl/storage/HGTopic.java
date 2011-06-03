@@ -1,10 +1,10 @@
-package de.deepamehta.core.storage.impl;
+package de.deepamehta.core.impl.storage;
 
+import de.deepamehta.core.Topic;
+import de.deepamehta.core.impl.model.TopicBase;
 import de.deepamehta.core.model.Composite;
-import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicValue;
-import de.deepamehta.core.model.impl.TopicBase;
 
 
 

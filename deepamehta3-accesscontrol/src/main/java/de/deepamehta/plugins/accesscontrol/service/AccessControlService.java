@@ -3,7 +3,7 @@ package de.deepamehta.plugins.accesscontrol.service;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.plugins.accesscontrol.model.Role;
 import de.deepamehta.core.model.ClientContext;
-import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.PluginService;
 
 

@@ -1,45 +1,59 @@
-package de.deepamehta.core.model;
+package de.deepamehta.core;
 
-import org.codehaus.jettison.json.JSONArray;
+import de.deepamehta.core.model.Composite;
+import de.deepamehta.core.model.TopicValue;
+
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONException;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 
 
 /**
- * Specification of an association -- A n-ary connection between topics and other associations.
+ * Specification of a topic -- DeepaMehta's central data object.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface Association {
+public interface Topic {
 
     long getId();
 
+    String getUri();
+
+    TopicValue getValue();
+
     String getTypeUri();
 
-    // ---
-
-    Role getRole1();
-
-    Role getRole2();
+    Composite getComposite();
 
     // ---
 
-    void setTypeUri(String assocTypeUri);
+    void setId(long id);
+
+    void setUri(String uri);
+
+    // ---
+
+    void setValue(String value);
+
+    void setValue(int value);
+
+    void setValue(long value);
+
+    void setValue(boolean value);
+
+    void setValue(TopicValue value);
+
+    // ---
+
+    void setComposite(Composite comp);
 
     // === Traversal ===
 
-    Topic getTopic(String roleTypeUri);
+    TopicValue getChildTopicValue(String assocDefUri);
 
-    Set<Topic> getTopics(String roleTypeUri);
+    void setChildTopicValue(String assocDefUri, TopicValue value);
 
-    // ---
+    Set<RelatedTopic> getRelatedTopics(String assocTypeUri);
 
     /**
      * @param   assocTypeUri        may be null
@@ -60,6 +74,8 @@ public interface Association {
     Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                   String othersTopicTypeUri,
                                                                                   boolean fetchComposite);
+
+    Set<Association> getAssociations(String myRoleTypeUri);
 
     // === Serialization ===
 

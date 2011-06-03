@@ -6,7 +6,7 @@ import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Relation;
-import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.Plugin;
 
 import javax.ws.rs.GET;

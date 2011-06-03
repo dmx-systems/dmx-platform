@@ -1,17 +1,17 @@
-package de.deepamehta.core.service.impl;
+package de.deepamehta.core.impl.service;
 
-import de.deepamehta.core.model.Association;
+import de.deepamehta.core.Association;
+import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Topic;
+import de.deepamehta.core.TopicType;
+import de.deepamehta.core.impl.model.TopicBase;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.IndexMode;
-import de.deepamehta.core.model.RelatedTopic;
-import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
-import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicValue;
-import de.deepamehta.core.model.impl.TopicBase;
 import de.deepamehta.core.util.JavaUtils;
 
 import java.util.HashSet;

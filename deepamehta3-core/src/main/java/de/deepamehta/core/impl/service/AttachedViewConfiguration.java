@@ -1,10 +1,10 @@
-package de.deepamehta.core.service.impl;
+package de.deepamehta.core.impl.service;
 
+import de.deepamehta.core.Topic;
+import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.Role;
-import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
-import de.deepamehta.core.model.ViewConfiguration;
 import de.deepamehta.core.model.ViewConfigurationModel;
 
 

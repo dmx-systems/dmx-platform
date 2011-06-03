@@ -1,4 +1,6 @@
-package de.deepamehta.core.model;
+package de.deepamehta.core;
+
+import de.deepamehta.core.model.TopicModel;
 
 
 

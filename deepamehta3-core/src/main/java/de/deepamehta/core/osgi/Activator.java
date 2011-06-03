@@ -1,8 +1,8 @@
 package de.deepamehta.core.osgi;
 
+import de.deepamehta.core.impl.service.EmbeddedService;
+import de.deepamehta.core.impl.storage.HGStorageBridge;
 import de.deepamehta.core.service.CoreService;
-import de.deepamehta.core.service.impl.EmbeddedService;
-import de.deepamehta.core.storage.impl.HGStorageBridge;
 
 import de.deepamehta.hypergraph.HyperGraph;
 import de.deepamehta.hypergraph.impl.Neo4jHyperGraph;

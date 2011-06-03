@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.topicmaps.model;
 
-import de.deepamehta.core.model.impl.BaseTopic;
+import de.deepamehta.core.Topic;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -16,7 +16,7 @@ import java.util.Map;
  * <p>
  * Note: the topic's own properties are not initialized.
  */
-public class TopicmapTopic extends BaseTopic {
+public class TopicmapTopic extends Topic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -41,7 +41,7 @@ public class TopicmapTopic extends BaseTopic {
             o.put("ref_id", refId);
             return o;
         } catch (JSONException e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Error while serializing " + this, e);
         }
     }
 

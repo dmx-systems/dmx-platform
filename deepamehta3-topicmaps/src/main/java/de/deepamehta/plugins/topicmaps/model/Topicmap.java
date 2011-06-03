@@ -1,8 +1,8 @@
 package de.deepamehta.plugins.topicmaps.model;
 
-import de.deepamehta.core.model.RelatedTopic;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.model.Relation;
-import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.CoreService;
 
 import org.codehaus.jettison.json.JSONArray;

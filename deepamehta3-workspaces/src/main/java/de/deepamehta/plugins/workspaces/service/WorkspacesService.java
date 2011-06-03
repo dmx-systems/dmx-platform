@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.workspaces.service;
 
-import de.deepamehta.core.model.RelatedTopic;
-import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.PluginService;
 
 import java.util.Set;

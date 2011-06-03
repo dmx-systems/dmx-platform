@@ -3,12 +3,12 @@ package de.deepamehta.plugins.webclient;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Composite;
-import de.deepamehta.core.model.DeepaMehtaTransaction;
-import de.deepamehta.core.model.RelatedTopic;
-import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.DeepaMehtaTransaction;
+import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
-import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.service.Plugin;
 

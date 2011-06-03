@@ -1,56 +1,47 @@
-package de.deepamehta.core.model;
+package de.deepamehta.core;
 
+import de.deepamehta.core.model.Role;
+
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONException;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 
 
 /**
- * Specification of a topic -- DeepaMehta's central data object.
+ * Specification of an association -- A n-ary connection between topics and other associations.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface Topic {
+public interface Association {
 
     long getId();
 
-    String getUri();
-
-    TopicValue getValue();
-
     String getTypeUri();
 
-    Composite getComposite();
+    // ---
+
+    Role getRole1();
+
+    Role getRole2();
 
     // ---
 
-    void setId(long id);
-
-    void setUri(String uri);
-
-    // ---
-
-    void setValue(String value);
-
-    void setValue(int value);
-
-    void setValue(long value);
-
-    void setValue(boolean value);
-
-    void setValue(TopicValue value);
-
-    // ---
-
-    void setComposite(Composite comp);
+    void setTypeUri(String assocTypeUri);
 
     // === Traversal ===
 
-    TopicValue getChildTopicValue(String assocDefUri);
+    Topic getTopic(String roleTypeUri);
 
-    void setChildTopicValue(String assocDefUri, TopicValue value);
+    Set<Topic> getTopics(String roleTypeUri);
 
-    Set<RelatedTopic> getRelatedTopics(String assocTypeUri);
+    // ---
 
     /**
      * @param   assocTypeUri        may be null
@@ -71,8 +62,6 @@ public interface Topic {
     Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                   String othersTopicTypeUri,
                                                                                   boolean fetchComposite);
-
-    Set<Association> getAssociations(String myRoleTypeUri);
 
     // === Serialization ===
 

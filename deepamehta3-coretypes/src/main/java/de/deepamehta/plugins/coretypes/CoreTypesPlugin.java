@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.coretypes;
 
 import de.deepamehta.core.model.Properties;
-import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.Plugin;
 
 import java.util.logging.Logger;

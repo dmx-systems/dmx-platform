@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.server.provider;
 
-import de.deepamehta.core.model.RelatedTopic;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.util.JSONHelper;
 
 import java.io.BufferedWriter;

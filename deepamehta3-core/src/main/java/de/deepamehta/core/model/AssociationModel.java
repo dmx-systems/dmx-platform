@@ -1,5 +1,7 @@
 package de.deepamehta.core.model;
 
+import de.deepamehta.core.Association;
+
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONException;

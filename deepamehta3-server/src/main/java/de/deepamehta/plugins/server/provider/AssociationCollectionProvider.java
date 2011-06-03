@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.server.provider;
 
-import de.deepamehta.core.model.Association;
+import de.deepamehta.core.Association;
 import de.deepamehta.core.model.AssociationModel;
 
 import java.io.BufferedWriter;

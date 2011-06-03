@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.topicmaps.migrations;
 
 import de.deepamehta.core.model.DataField;
-import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.TopicType;
 import de.deepamehta.core.service.Migration;
 
 import java.util.logging.Logger;

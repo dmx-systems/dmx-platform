@@ -1,6 +1,6 @@
-package de.deepamehta.core.service.impl;
+package de.deepamehta.core.impl.service;
 
-import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.TopicType;
 
 import java.util.HashMap;
 import java.util.HashSet;

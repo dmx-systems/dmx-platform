@@ -1,12 +1,12 @@
 package de.deepamehta.core.util;
 
-import de.deepamehta.core.model.Association;
+import de.deepamehta.core.Association;
+import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.MetaTypeData;
 import de.deepamehta.core.model.PluginInfo;
-import de.deepamehta.core.model.RelatedTopic;
-import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.CoreService;

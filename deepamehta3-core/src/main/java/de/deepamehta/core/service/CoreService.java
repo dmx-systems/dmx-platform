@@ -1,21 +1,20 @@
 package de.deepamehta.core.service;
 
-import de.deepamehta.core.model.Association;
+import de.deepamehta.core.Association;
+import de.deepamehta.core.AssociationType;
+import de.deepamehta.core.DeepaMehtaTransaction;
+import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Topic;
+import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationType;
 import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
-import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.PluginInfo;
-import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.TopicValue;
-import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicType;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.model.RelatedTopic;
 
 import java.util.Collection;
 import java.util.List;

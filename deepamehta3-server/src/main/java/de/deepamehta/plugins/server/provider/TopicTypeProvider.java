@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.server.provider;
 
-import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.util.JavaUtils;
 

@@ -1,15 +1,12 @@
-package de.deepamehta.core.service.impl;
+package de.deepamehta.core.impl.storage;
 
-import de.deepamehta.core.model.Association;
-import de.deepamehta.core.model.RelatedTopic;
-import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.Association;
+import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Topic;
 
 
 
-/**
- * A topic that is attached to the {@link CoreService}.
- */
-class AttachedRelatedTopic extends AttachedTopic implements RelatedTopic {
+class HGRelatedTopic extends HGTopic implements RelatedTopic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -17,8 +14,8 @@ class AttachedRelatedTopic extends AttachedTopic implements RelatedTopic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedRelatedTopic(Topic topic, EmbeddedService dms) {
-        super(topic, dms);
+    HGRelatedTopic(Topic topic) {
+        super(topic);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

@@ -3,8 +3,8 @@ package de.deepamehta.itest;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.model.Properties;
-import de.deepamehta.core.model.Topic;
-import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.Topic;
+import de.deepamehta.core.TopicType;
 import de.deepamehta.core.service.CoreService;
 
 import static org.junit.Assert.assertEquals;

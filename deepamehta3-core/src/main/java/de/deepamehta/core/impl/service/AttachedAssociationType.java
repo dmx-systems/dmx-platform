@@ -1,12 +1,8 @@
-package de.deepamehta.core.service.impl;
+package de.deepamehta.core.impl.service;
 
-import de.deepamehta.core.model.AssociationType;
+import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.model.AssociationTypeModel;
-import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRole;
-import de.deepamehta.core.model.TopicType;
-import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TopicValue;
 
 

@@ -1,10 +1,10 @@
-package de.deepamehta.core.model.impl;
+package de.deepamehta.core.impl.model;
 
-import de.deepamehta.core.model.Association;
+import de.deepamehta.core.Association;
+import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.RelatedTopic;
 import de.deepamehta.core.model.Role;
-import de.deepamehta.core.model.Topic;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -127,7 +127,7 @@ public class AssociationBase implements Association {
 
     // ### This is supposed to be protected, but doesn't compile!
     // ### It is called from the subclass constructor, but on a differnt AssociationBase instance.
-    // ### See de.deepamehta.core.service.impl.AttachedAssociation.
+    // ### See de.deepamehta.core.impl.service.AttachedAssociation.
     public AssociationModel getModel() {
         return model;
     }

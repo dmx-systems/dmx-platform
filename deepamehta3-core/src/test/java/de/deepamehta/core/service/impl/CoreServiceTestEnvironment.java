@@ -1,7 +1,7 @@
-package de.deepamehta.core.service.impl;
+package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.service.CoreService;
-import de.deepamehta.core.storage.impl.HGStorageBridge;
+import de.deepamehta.core.impl.storage.HGStorageBridge;
 import de.deepamehta.core.util.JavaUtils;
 
 import de.deepamehta.hypergraph.impl.Neo4jHyperGraph;

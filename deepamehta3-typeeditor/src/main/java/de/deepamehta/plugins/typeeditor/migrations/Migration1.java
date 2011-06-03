@@ -2,8 +2,8 @@ package de.deepamehta.plugins.typeeditor.migrations;
 
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicType;
-import de.deepamehta.core.model.ViewConfiguration;
+import de.deepamehta.core.TopicType;
+import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.service.Migration;
 
 import java.util.logging.Logger;

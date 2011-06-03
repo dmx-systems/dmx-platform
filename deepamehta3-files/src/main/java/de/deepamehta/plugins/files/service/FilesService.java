@@ -4,7 +4,7 @@ import de.deepamehta.plugins.files.model.Resource;
 import de.deepamehta.plugins.files.model.ResourceInfo;
 
 import de.deepamehta.core.model.ClientContext;
-import de.deepamehta.core.model.Topic;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.PluginService;
 
 import java.net.URL;

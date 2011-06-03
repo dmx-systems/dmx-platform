@@ -1,9 +1,9 @@
-package de.deepamehta.core.model.impl;
+package de.deepamehta.core.impl.model;
 
-import de.deepamehta.core.model.Association;
+import de.deepamehta.core.Association;
+import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.Composite;
-import de.deepamehta.core.model.RelatedTopic;
-import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicValue;
 
@@ -174,7 +174,7 @@ public class TopicBase implements Topic {
 
     // ### This is supposed to be protected, but doesn't compile!
     // ### It is called from the subclasses constructors, but on a differnt TopicBase instance.
-    // ### See de.deepamehta.core.storage.impl.HGTopic and de.deepamehta.core.service.impl.AttachedTopic.
+    // ### See de.deepamehta.core.impl.storage.HGTopic and de.deepamehta.core.impl.service.AttachedTopic.
     public TopicModel getModel() {
         return model;
     }

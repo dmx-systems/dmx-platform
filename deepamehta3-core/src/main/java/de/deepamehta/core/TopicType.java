@@ -1,4 +1,7 @@
-package de.deepamehta.core.model;
+package de.deepamehta.core;
+
+import de.deepamehta.core.model.AssociationDefinition;
+import de.deepamehta.core.model.IndexMode;
 
 import org.codehaus.jettison.json.JSONObject;
 import java.util.Map;

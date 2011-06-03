@@ -1,8 +1,8 @@
 package de.deepamehta.plugins.iconpicker;
 
 import de.deepamehta.core.model.DataField;
-import de.deepamehta.core.model.Topic;
-import de.deepamehta.core.model.TopicType;
+import de.deepamehta.core.Topic;
+import de.deepamehta.core.TopicType;
 import de.deepamehta.core.service.Plugin;
 
 import java.util.Date;

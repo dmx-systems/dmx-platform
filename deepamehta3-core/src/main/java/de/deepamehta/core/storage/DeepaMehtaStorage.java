@@ -1,12 +1,12 @@
 package de.deepamehta.core.storage;
 
-import de.deepamehta.core.model.Association;
+import de.deepamehta.core.Association;
+import de.deepamehta.core.DeepaMehtaTransaction;
+import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRole;
-import de.deepamehta.core.model.DeepaMehtaTransaction;
 import de.deepamehta.core.model.IndexMode;
-import de.deepamehta.core.model.RelatedTopic;
-import de.deepamehta.core.model.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.model.TopicValue;

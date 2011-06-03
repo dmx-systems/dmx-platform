@@ -1,5 +1,8 @@
 package de.deepamehta.core.model;
 
+import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Topic;
+
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 

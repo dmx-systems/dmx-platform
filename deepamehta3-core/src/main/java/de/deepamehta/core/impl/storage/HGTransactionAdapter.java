@@ -1,6 +1,6 @@
-package de.deepamehta.core.storage.impl;
+package de.deepamehta.core.impl.storage;
 
-import de.deepamehta.core.model.DeepaMehtaTransaction;
+import de.deepamehta.core.DeepaMehtaTransaction;
 
 import de.deepamehta.hypergraph.HyperGraph;
 import de.deepamehta.hypergraph.HyperGraphTransaction;
