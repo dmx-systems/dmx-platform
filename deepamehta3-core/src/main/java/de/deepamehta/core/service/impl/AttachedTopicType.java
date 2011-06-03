@@ -178,16 +178,13 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
         boolean valueChanged = !getValue().equals(value);
         boolean dataTypeChanged = !getDataTypeUri().equals(dataTypeUri);
         //
-        if (uriChanged) {
-            logger.info("Changing URI from \"" + getUri() + "\" -> \"" + uri + "\"");
-            // Note: on valueChanged the cache is not required to be invalidated.
-            // Value changes are performed on the cached object.
-            dms.invalidateTypeCache(getUri());
-        }
-        if (valueChanged) {
-            logger.info("Changing name from \"" + getValue() + "\" -> \"" + value + "\"");
-        }
         if (uriChanged || valueChanged) {
+            if (uriChanged) {
+                logger.info("Changing URI from \"" + getUri() + "\" -> \"" + uri + "\"");
+            }
+            if (valueChanged) {
+                logger.info("Changing name from \"" + getValue() + "\" -> \"" + value + "\"");
+            }
             super.update(topicTypeModel);
         }
         if (dataTypeChanged) {

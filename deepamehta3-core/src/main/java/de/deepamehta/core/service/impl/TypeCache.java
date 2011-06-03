@@ -26,7 +26,7 @@ class TypeCache {
 
     private EmbeddedService dms;
 
-    private int callCount = 0;
+    private int callCount = 0;  // endless recursion protection
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -67,6 +67,16 @@ class TypeCache {
 
     // ---
 
+    void put(AttachedTopicType topicType) {
+        topicTypes.put(topicType.getUri(), topicType);
+    }
+
+    void put(AttachedAssociationType assocType) {
+        assocTypes.put(assocType.getUri(), assocType);
+    }
+
+    // ---
+
     void invalidate(String topicTypeUri) {
         logger.info("Invalidating topic type \"" + topicTypeUri + "\"");
         if (topicTypes.remove(topicTypeUri) == null) {
@@ -75,16 +85,6 @@ class TypeCache {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private void put(AttachedTopicType topicType) {
-        topicTypes.put(topicType.getUri(), topicType);
-    }
-
-    private void put(AttachedAssociationType assocType) {
-        assocTypes.put(assocType.getUri(), assocType);
-    }
-
-    // ---
 
     private void endlessRecursionProtection(String topicTypeUri) {
         if (topicTypeUri.equals("dm3.core.topic_type")) {

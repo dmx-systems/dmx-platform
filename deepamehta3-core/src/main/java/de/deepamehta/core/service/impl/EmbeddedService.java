@@ -479,6 +479,7 @@ public class EmbeddedService implements CoreService {
         try {
             AttachedTopicType topicType = new AttachedTopicType(topicTypeModel, this);
             topicType.store();
+            typeCache.put(topicType);
             //
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
@@ -503,6 +504,7 @@ public class EmbeddedService implements CoreService {
                                      @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
+            // Note: type lookup is by ID. The URI might change, the ID does not.
             String topicTypeUri = getTopic(topicTypeModel.getId(), false, clientContext).getUri();  // fetchComp..=false
             AttachedTopicType topicType = getTopicType(topicTypeUri, clientContext);
             //
@@ -510,6 +512,9 @@ public class EmbeddedService implements CoreService {
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
             topicType.update(topicTypeModel);
+            //
+            typeCache.invalidate(topicTypeUri);
+            topicType = getTopicType(topicType.getUri(), clientContext);
             //
             // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
             //
@@ -715,7 +720,7 @@ public class EmbeddedService implements CoreService {
 
 
 
-    // === Topic API Delegates ===
+    // === Topic REST API ===
 
     @GET
     @Path("/topic/{id}/related_topics")
@@ -739,6 +744,7 @@ public class EmbeddedService implements CoreService {
             othersTopicTypeUri, fetchComposite);
     } */
 
+    // TODO: move to AttachedTopic
     Set<Association> getAssociations(long topicId, String myRoleTypeUri) {
         Set<Association> assocs = new HashSet();
         for (Association assoc : storage.getAssociations(topicId, myRoleTypeUri)) {
@@ -749,34 +755,9 @@ public class EmbeddedService implements CoreService {
 
 
 
-    // === Association API Delegates ===
+    // === Association REST API ===
 
-    /* void addTopicToAssociation(long assocId, TopicRole topicRole) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            storage.addTopicToAssociation(assocId, topicRole);
-            tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Adding topic to association " + assocId + " failed (" + topicRole + ")", e);
-        } finally {
-            tx.finish();
-        }
-    }
 
-    void addAssociationToAssociation(long assocId, AssociationRole assocRole) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            storage.addAssociationToAssociation(assocId, assocRole);
-            tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Adding association to association " + assocId + " failed (" + assocRole +
-                ")", e);
-        } finally {
-            tx.finish();
-        }
-    } */
 
     // === Helper ===
 
@@ -787,9 +768,6 @@ public class EmbeddedService implements CoreService {
         return createAssociation(new AssociationModel(typeUri, role1, role2), null);    // FIXME: clientContext=null
     }
 
-    void invalidateTypeCache(String topicTypeUri) {
-        typeCache.invalidate(topicTypeUri);
-    }
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods

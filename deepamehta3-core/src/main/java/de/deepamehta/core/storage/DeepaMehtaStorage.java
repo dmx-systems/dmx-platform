@@ -176,12 +176,6 @@ public interface DeepaMehtaStorage {
 
     Association createAssociation(AssociationModel assocModel);
 
-    // void addTopicToAssociation(long assocId, TopicRole topicRole);
-
-    // void addAssociationToAssociation(long assocId, AssociationRole assocRole);
-
-    // void setRelationProperties(long id, Properties properties);
-
     void deleteAssociation(long assocId);
 
 
