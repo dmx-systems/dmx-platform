@@ -10,7 +10,7 @@ import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRole;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.util.JavaUtils;
 
@@ -319,8 +319,8 @@ class AttachedTopic extends TopicBase {
 
     private void associateChildTopic(AssociationDefinition assocDef, long childTopicId) {
         AssociationModel assocModel = new AssociationModel(assocDef.getAssocTypeUri());
-        assocModel.setRole1(new TopicRole(getId(), assocDef.getRoleTypeUri1()));
-        assocModel.setRole2(new TopicRole(childTopicId, assocDef.getRoleTypeUri2()));
+        assocModel.setRoleModel1(new TopicRoleModel(getId(), assocDef.getRoleTypeUri1()));
+        assocModel.setRoleModel2(new TopicRoleModel(childTopicId, assocDef.getRoleTypeUri2()));
         dms.createAssociation(assocModel, null);     // FIXME: clientContext=null
     }
 

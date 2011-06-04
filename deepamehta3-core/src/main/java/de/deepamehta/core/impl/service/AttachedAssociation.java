@@ -2,11 +2,11 @@ package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Role;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.TopicRole;
 import de.deepamehta.core.impl.model.AssociationBase;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.Role;
-import de.deepamehta.core.model.TopicRole;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -96,16 +96,31 @@ class AttachedAssociation extends AssociationBase {
 
     void update(AssociationModel assocModel) {
         logger.info("Updating association " + getId() + " (new " + assocModel + ")");
-        String typeUri = assocModel.getTypeUri();
+        String newTypeUri = assocModel.getTypeUri();
+        String newRoleTypeUri1 = assocModel.getRoleModel1().getRoleTypeUri();
+        String newRoleTypeUri2 = assocModel.getRoleModel2().getRoleTypeUri();
         //
-        boolean typeUriChanged = !getTypeUri().equals(typeUri);
+        String roleTypeUri1 = getRole1().getRoleTypeUri();
+        String roleTypeUri2 = getRole2().getRoleTypeUri();
+        //
+        boolean typeUriChanged = !getTypeUri().equals(newTypeUri);
+        boolean roleType1Changed = !roleTypeUri1.equals(newRoleTypeUri1);
+        boolean roleType2Changed = !roleTypeUri2.equals(newRoleTypeUri2);
         //
         if (typeUriChanged) {
-            logger.info("Changing type from \"" + getTypeUri() + "\" -> \"" + typeUri + "\"");
-            setTypeUri(typeUri);
+            logger.info("Changing type from \"" + getTypeUri() + "\" -> \"" + newTypeUri + "\"");
+            setTypeUri(newTypeUri);
+        }
+        if (roleType1Changed) {
+            logger.info("Changing role type 1 from \"" + roleTypeUri1 + "\" -> \"" + newRoleTypeUri1 + "\"");
+            getRole1().setRoleTypeUri(newRoleTypeUri1);
+        }
+        if (roleType2Changed) {
+            logger.info("Changing role type 2 from \"" + roleTypeUri2 + "\" -> \"" + newRoleTypeUri2 + "\"");
+            getRole2().setRoleTypeUri(newRoleTypeUri2);
         }
         //
-        if (!typeUriChanged) {
+        if (!typeUriChanged && !roleType1Changed && !roleType2Changed) {
             logger.info("Updating association " + getId() + " ABORTED -- no changes made by user");
         }
     }

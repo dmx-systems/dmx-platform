@@ -1,6 +1,10 @@
 function AssociationRenderer() {
 
-    var type_menu   // a UIHelper Menu object
+    var assoc_type_menu   // a UIHelper Menu object
+    var role_type_menu_1, role_type_menu_2
+
+    var topic_1, topic_2
+    var role_type_1, role_type_2
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -20,12 +24,38 @@ function AssociationRenderer() {
         //
         dm3c.render.field_label("Association Type URI")
         dm3c.render.field_value(assoc_type.uri)
+        //
+        topic_1 = assoc.get_topic_1()
+        role_type_1 = assoc.get_role_type_1()
+        dm3c.render.field_label("Topic 1")
+        dm3c.render.field_value("\"" + topic_1.value + "\" (" + topic_1.get_type().value + ")")
+        dm3c.render.field_label("Role Type 1")
+        dm3c.render.field_value(role_type_1.value)
+        //
+        topic_2 = assoc.get_topic_2()
+        role_type_2 = assoc.get_role_type_2()
+        dm3c.render.field_label("Topic 2")
+        dm3c.render.field_value("\"" + topic_2.value + "\" (" + topic_2.get_type().value + ")")
+        dm3c.render.field_label("Role Type 2")
+        dm3c.render.field_value(role_type_2.value)
     }
 
     this.render_form = function(assoc) {
-        type_menu = dm3c.render.topic_menu("dm3.core.assoc_type", assoc.type_uri)
+        assoc_type_menu = dm3c.render.topic_menu("dm3.core.assoc_type", assoc.type_uri)
         dm3c.render.field_label("Association Type")
-        dm3c.render.field_value(type_menu.dom)
+        dm3c.render.field_value(assoc_type_menu.dom)
+        //
+        role_type_menu_1 = dm3c.render.topic_menu("dm3.core.role_type", assoc.role_1.role_type_uri)
+        dm3c.render.field_label("Topic 1")
+        dm3c.render.field_value("\"" + topic_1.value + "\" (" + topic_1.get_type().value + ")")
+        dm3c.render.field_label("Role Type 1")
+        dm3c.render.field_value(role_type_menu_1.dom)
+        //
+        role_type_menu_2 = dm3c.render.topic_menu("dm3.core.role_type", assoc.role_2.role_type_uri)
+        dm3c.render.field_label("Topic 2")
+        dm3c.render.field_value("\"" + topic_2.value + "\" (" + topic_2.get_type().value + ")")
+        dm3c.render.field_label("Role Type 2")
+        dm3c.render.field_value(role_type_menu_2.dom)
     }
 
     this.process_form = function(assoc) {
@@ -47,9 +77,15 @@ function AssociationRenderer() {
         function build_association_model() {
             return {
                 id: assoc.id,
-                type_uri: type_menu.get_selection().value,
-                role_1: assoc.role_1,
-                role_2: assoc.role_2
+                type_uri: assoc_type_menu.get_selection().value,
+                role_1: {
+                    topic_id: assoc.role_1.topic_id,
+                    role_type_uri: role_type_menu_1.get_selection().value
+                },
+                role_2: {
+                    topic_id: assoc.role_2.topic_id,
+                    role_type_uri: role_type_menu_2.get_selection().value
+                }
             }
         }
     }

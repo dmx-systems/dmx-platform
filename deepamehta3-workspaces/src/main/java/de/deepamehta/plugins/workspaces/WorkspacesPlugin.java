@@ -9,7 +9,7 @@ import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRole;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.Plugin;
@@ -144,8 +144,8 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
         checkWorkspaceId(workspaceId);
         //
         AssociationModel assocModel = new AssociationModel(WORKSPACE_TOPIC);
-        assocModel.setRole1(new TopicRole(workspaceId, ROLE_TYPE_WORKSPACE));
-        assocModel.setRole2(new TopicRole(topicId, ROLE_TYPE_TOPIC));
+        assocModel.setRoleModel1(new TopicRoleModel(workspaceId, ROLE_TYPE_WORKSPACE));
+        assocModel.setRoleModel2(new TopicRoleModel(topicId, ROLE_TYPE_TOPIC));
         dms.createAssociation(assocModel, null);         // clientContext=null
     }
 
@@ -154,8 +154,8 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
         checkWorkspaceId(workspaceId);
         //
         AssociationModel assocModel = new AssociationModel(WORKSPACE_TYPE);
-        assocModel.setRole1(new TopicRole(workspaceId, ROLE_TYPE_WORKSPACE));
-        assocModel.setRole2(new TopicRole(typeId, ROLE_TYPE_TYPE));
+        assocModel.setRoleModel1(new TopicRoleModel(workspaceId, ROLE_TYPE_WORKSPACE));
+        assocModel.setRoleModel2(new TopicRoleModel(typeId, ROLE_TYPE_TYPE));
         dms.createAssociation(assocModel, null);         // clientContext=null
     }
 

@@ -1,6 +1,6 @@
 package de.deepamehta.core;
 
-import de.deepamehta.core.model.Role;
+import de.deepamehta.core.Role;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;

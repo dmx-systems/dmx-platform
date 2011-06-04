@@ -13,13 +13,13 @@ import java.util.Map;
 /**
  * The role a topic plays in an association.
  * <p>
- * A TopicRole object is a pair of a topic reference and a role type reference.
+ * A TopicRoleModel object is a pair of a topic reference and a role type reference.
  * The topic is refered to either by its ID or URI.
  * The role type is refered to by its URI.
  * <p>
  * In the database a role type is represented by a topic of type "dm3.core.role_type".
  */
-public class TopicRole extends Role {
+public class TopicRoleModel extends RoleModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -30,25 +30,25 @@ public class TopicRole extends Role {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TopicRole(long topicId, String roleTypeUri) {
+    public TopicRoleModel(long topicId, String roleTypeUri) {
         super(roleTypeUri);
         this.topicId = topicId;
         this.topicUri = null;
         this.topicIdentifiedByUri = false;
     }
 
-    public TopicRole(String topicUri, String roleTypeUri) {
+    public TopicRoleModel(String topicUri, String roleTypeUri) {
         super(roleTypeUri);
         this.topicId = -1;
         this.topicUri = topicUri;
         this.topicIdentifiedByUri = true;
     }
 
-    public TopicRole(JSONObject topicRole) {
+    public TopicRoleModel(JSONObject topicRoleModel) {
         try {
-            this.topicId = topicRole.optLong("topic_id", -1);
-            this.topicUri = topicRole.optString("topic_uri", null);
-            this.roleTypeUri = topicRole.getString("role_type_uri");
+            this.topicId = topicRoleModel.optLong("topic_id", -1);
+            this.topicUri = topicRoleModel.optString("topic_uri", null);
+            this.roleTypeUri = topicRoleModel.getString("role_type_uri");
             this.topicIdentifiedByUri = topicUri != null;
             //
             if (topicId == -1 && topicUri == null) {
@@ -58,7 +58,7 @@ public class TopicRole extends Role {
                 throw new IllegalArgumentException("\"topic_id\" and \"topic_uri\" must not be set at the same time");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Parsing TopicRole failed (JSONObject=" + topicRole + ")", e);
+            throw new RuntimeException("Parsing TopicRoleModel failed (JSONObject=" + topicRoleModel + ")", e);
         }
     }
 

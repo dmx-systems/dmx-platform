@@ -7,11 +7,11 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinition;
-import de.deepamehta.core.model.AssociationRole;
+import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.IndexMode;
-import de.deepamehta.core.model.Role;
+import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRole;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.ViewConfigurationModel;
@@ -411,8 +411,8 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
     private void storeIndexModes() {
         for (IndexMode indexMode : getIndexModes()) {
             AssociationModel assocModel = new AssociationModel("dm3.core.association");
-            assocModel.setRole1(new TopicRole(getUri(), "dm3.core.topic_type"));
-            assocModel.setRole2(new TopicRole(indexMode.toUri(), "dm3.core.index_mode"));
+            assocModel.setRoleModel1(new TopicRoleModel(getUri(), "dm3.core.topic_type"));
+            assocModel.setRoleModel2(new TopicRoleModel(indexMode.toUri(), "dm3.core.index_mode"));
             dms.createAssociation(assocModel, null);         // FIXME: clientContext=null
         }
     }
@@ -433,23 +433,23 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
         try {
             // topic types
             Association assoc = dms.createAssociation(assocDef.getAssocTypeUri(),
-                new TopicRole(assocDef.getTopicTypeUri1(), "dm3.core.topic_type_1"),
-                new TopicRole(assocDef.getTopicTypeUri2(), "dm3.core.topic_type_2"));
+                new TopicRoleModel(assocDef.getTopicTypeUri1(), "dm3.core.topic_type_1"),
+                new TopicRoleModel(assocDef.getTopicTypeUri2(), "dm3.core.topic_type_2"));
             assocDef.setId(assoc.getId());
             // role types
             dms.createAssociation("dm3.core.aggregation",
-                new TopicRole(assocDef.getRoleTypeUri1(), "dm3.core.role_type_1"),
-                new AssociationRole(assoc.getId(), "dm3.core.assoc_def"));
+                new TopicRoleModel(assocDef.getRoleTypeUri1(), "dm3.core.role_type_1"),
+                new AssociationRoleModel(assoc.getId(), "dm3.core.assoc_def"));
             dms.createAssociation("dm3.core.aggregation",
-                new TopicRole(assocDef.getRoleTypeUri2(), "dm3.core.role_type_2"),
-                new AssociationRole(assoc.getId(), "dm3.core.assoc_def"));
+                new TopicRoleModel(assocDef.getRoleTypeUri2(), "dm3.core.role_type_2"),
+                new AssociationRoleModel(assoc.getId(), "dm3.core.assoc_def"));
             // cardinality
             dms.createAssociation("dm3.core.aggregation",
-                new TopicRole(assocDef.getCardinalityUri1(), "dm3.core.cardinality_1"),
-                new AssociationRole(assoc.getId(), "dm3.core.assoc_def"));
+                new TopicRoleModel(assocDef.getCardinalityUri1(), "dm3.core.cardinality_1"),
+                new AssociationRoleModel(assoc.getId(), "dm3.core.assoc_def"));
             dms.createAssociation("dm3.core.aggregation",
-                new TopicRole(assocDef.getCardinalityUri2(), "dm3.core.cardinality_2"),
-                new AssociationRole(assoc.getId(), "dm3.core.assoc_def"));
+                new TopicRoleModel(assocDef.getCardinalityUri2(), "dm3.core.cardinality_2"),
+                new AssociationRoleModel(assoc.getId(), "dm3.core.assoc_def"));
             //
             putInSequence(assocDef, predAssocDef);
             //
@@ -464,14 +464,14 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
         if (predAssocDef == null) {
             // start sequence
             AssociationModel assocModel = new AssociationModel("dm3.core.association");
-            assocModel.setRole1(new TopicRole(getUri(), "dm3.core.topic_type"));
-            assocModel.setRole2(new AssociationRole(assocDef.getId(), "dm3.core.first_assoc_def"));
+            assocModel.setRoleModel1(new TopicRoleModel(getUri(), "dm3.core.topic_type"));
+            assocModel.setRoleModel2(new AssociationRoleModel(assocDef.getId(), "dm3.core.first_assoc_def"));
             dms.createAssociation(assocModel, null);                     // FIXME: clientContext=null
         } else {
             // continue sequence
             AssociationModel assocModel = new AssociationModel("dm3.core.sequence");
-            assocModel.setRole1(new AssociationRole(predAssocDef.getId(), "dm3.core.predecessor"));
-            assocModel.setRole2(new AssociationRole(assocDef.getId(),     "dm3.core.successor"));
+            assocModel.setRoleModel1(new AssociationRoleModel(predAssocDef.getId(), "dm3.core.predecessor"));
+            assocModel.setRoleModel2(new AssociationRoleModel(assocDef.getId(),     "dm3.core.successor"));
             dms.createAssociation(assocModel, null);                     // FIXME: clientContext=null
         }
     }
@@ -483,8 +483,8 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
         for (TopicModel configTopic : assocDef.getViewConfigModel().getConfigTopics()) {
             Topic topic = dms.createTopic(configTopic, null);           // FIXME: clientContext=null
             dms.createAssociation("dm3.core.aggregation",
-                new AssociationRole(assocDef.getId(), "dm3.core.assoc_def"),
-                new TopicRole(topic.getId(), "dm3.core.view_config"));
+                new AssociationRoleModel(assocDef.getId(), "dm3.core.assoc_def"),
+                new TopicRoleModel(topic.getId(), "dm3.core.view_config"));
         }
     }
 
@@ -494,7 +494,7 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
 
     private void initViewConfig() {
         // Note: this type must be identified by its URI. Types being created have no ID yet.
-        Role configurable = new TopicRole(getUri(), "dm3.core.topic_type");
+        RoleModel configurable = new TopicRoleModel(getUri(), "dm3.core.topic_type");
         this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
     }
 

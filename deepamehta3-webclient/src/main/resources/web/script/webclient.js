@@ -470,7 +470,7 @@ var dm3c = new function() {
             dm3c.canvas.add_association(assoc)
         }
         // reveal topic
-        dm3c.add_topic_to_canvas(fetch_topic(topic_id), "show")
+        dm3c.add_topic_to_canvas(dm3c.fetch_topic(topic_id), "show")
         dm3c.canvas.scroll_topic_to_center(topic_id)
     }
 
@@ -526,14 +526,14 @@ var dm3c = new function() {
      * Fetches the topic and displays it on the page panel.
      */
     this.select_topic = function(topic_id) {
-        display_object(fetch_topic(topic_id))
+        display_object(dm3c.fetch_topic(topic_id))
     }
 
     /**
      * Fetches the association and displays it on the page panel.
      */
     this.select_association = function(assoc_id) {
-        display_object(fetch_association(assoc_id))
+        display_object(dm3c.fetch_association(assoc_id))
     }
 
     // ---
@@ -719,11 +719,11 @@ var dm3c = new function() {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function fetch_topic(topic_id) {
+    this.fetch_topic = function(topic_id) {
         return build_topic(dm3c.restc.get_topic_by_id(topic_id))
     }
 
-    function fetch_association(assoc_id) {
+    this.fetch_association = function(assoc_id) {
         return build_association(dm3c.restc.get_association(assoc_id))
     }
 

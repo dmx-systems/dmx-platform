@@ -8,7 +8,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinition;
-import de.deepamehta.core.model.AssociationRole;
+import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
@@ -16,9 +16,9 @@ import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.MetaTypeModel;
 import de.deepamehta.core.model.PluginInfo;
-import de.deepamehta.core.model.Role;
+import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRole;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.service.DeepaMehtaService;
@@ -150,9 +150,9 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
-    // **********************************
+    // ****************************************
     // *** DeepaMehtaService Implementation ***
-    // **********************************
+    // ****************************************
 
 
 
@@ -764,8 +764,9 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * Convenience method.
      */
-    Association createAssociation(String typeUri, Role role1, Role role2) {
-        return createAssociation(new AssociationModel(typeUri, role1, role2), null);    // FIXME: clientContext=null
+    Association createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
+        // FIXME: clientContext=null
+        return createAssociation(new AssociationModel(typeUri, roleModel1, roleModel2), null);
     }
 
 
@@ -838,8 +839,8 @@ public class EmbeddedService implements DeepaMehtaService {
     void associateWithTopicType(Topic topic) {
         try {
             AssociationModel assocModel = new AssociationModel("dm3.core.instantiation");
-            assocModel.setRole1(new TopicRole(topic.getTypeUri(), "dm3.core.type"));
-            assocModel.setRole2(new TopicRole(topic.getId(), "dm3.core.instance"));
+            assocModel.setRoleModel1(new TopicRoleModel(topic.getTypeUri(), "dm3.core.type"));
+            assocModel.setRoleModel2(new TopicRoleModel(topic.getId(), "dm3.core.instance"));
             associateWithAssociationType(storage.createAssociation(assocModel));
             // storage low-level call used here ### explain
         } catch (Exception e) {
@@ -851,8 +852,8 @@ public class EmbeddedService implements DeepaMehtaService {
     void associateWithAssociationType(Association assoc) {
         try {
             AssociationModel assocModel = new AssociationModel("dm3.core.instantiation");
-            assocModel.setRole1(new TopicRole(assoc.getTypeUri(), "dm3.core.type"));
-            assocModel.setRole2(new AssociationRole(assoc.getId(), "dm3.core.instance"));
+            assocModel.setRoleModel1(new TopicRoleModel(assoc.getTypeUri(), "dm3.core.type"));
+            assocModel.setRoleModel2(new AssociationRoleModel(assoc.getId(), "dm3.core.instance"));
             storage.createAssociation(assocModel);  // storage low-level call used here ### explain
         } catch (Exception e) {
             throw new RuntimeException("Associating association with association type \"" +
@@ -890,8 +891,8 @@ public class EmbeddedService implements DeepaMehtaService {
     // FIXME: move to AttachedTopicType
     void associateDataType(String topicTypeUri, String dataTypeUri) {
         AssociationModel assocModel = new AssociationModel("dm3.core.association");
-        assocModel.setRole1(new TopicRole(topicTypeUri, "dm3.core.topic_type"));
-        assocModel.setRole2(new TopicRole(dataTypeUri,  "dm3.core.data_type"));
+        assocModel.setRoleModel1(new TopicRoleModel(topicTypeUri, "dm3.core.topic_type"));
+        assocModel.setRoleModel2(new TopicRoleModel(dataTypeUri,  "dm3.core.data_type"));
         createAssociation(assocModel, null);             // FIXME: clientContext=null
     }
 

@@ -4,7 +4,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 
-public abstract class Role {
+public abstract class RoleModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -12,10 +12,10 @@ public abstract class Role {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    protected Role() {
+    protected RoleModel() {
     }
 
-    protected Role(String roleTypeUri) {
+    protected RoleModel(String roleTypeUri) {
         this.roleTypeUri = roleTypeUri;
     }
 
@@ -24,6 +24,12 @@ public abstract class Role {
     public String getRoleTypeUri() {
         return roleTypeUri;
     }
+
+    public void setRoleTypeUri(String roleTypeUri) {
+        this.roleTypeUri = roleTypeUri;
+    }
+
+    // ---
 
     public abstract JSONObject toJSON();
 }

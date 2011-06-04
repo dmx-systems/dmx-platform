@@ -2,9 +2,9 @@ package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.ViewConfiguration;
-import de.deepamehta.core.model.Role;
+import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRole;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 
 
@@ -16,13 +16,13 @@ class AttachedViewConfiguration implements ViewConfiguration {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private final Role configurable;
+    private final RoleModel configurable;
     private final ViewConfigurationModel model;
     private final EmbeddedService dms;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedViewConfiguration(Role configurable, ViewConfigurationModel model, EmbeddedService dms) {
+    AttachedViewConfiguration(RoleModel configurable, ViewConfigurationModel model, EmbeddedService dms) {
         this.configurable = configurable;
         this.model = model;
         this.dms = dms;
@@ -56,6 +56,6 @@ class AttachedViewConfiguration implements ViewConfiguration {
     private void storeConfigTopic(TopicModel configTopic) {
         Topic topic = dms.createTopic(configTopic, null);   // FIXME: clientContext=null
         dms.createAssociation("dm3.core.association", configurable,
-            new TopicRole(topic.getId(), "dm3.core.view_config"));
+            new TopicRoleModel(topic.getId(), "dm3.core.view_config"));
     }
 }

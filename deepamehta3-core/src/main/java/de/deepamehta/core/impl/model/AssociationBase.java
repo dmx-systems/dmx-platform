@@ -2,9 +2,12 @@ package de.deepamehta.core.impl.model;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Role;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.Role;
+import de.deepamehta.core.model.AssociationRoleModel;
+import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.TopicRoleModel;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -17,11 +20,15 @@ public class AssociationBase implements Association {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private AssociationModel model;
+    private Role role1;
+    private Role role2;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     protected AssociationBase(AssociationModel model) {
         this.model = model;
+        this.role1 = createRole(model.getRoleModel1());
+        this.role2 = createRole(model.getRoleModel2());
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -44,12 +51,12 @@ public class AssociationBase implements Association {
 
     @Override
     public Role getRole1() {
-        return model.getRole1();
+        return role1;
     }
 
     @Override
     public Role getRole2() {
-        return model.getRole2();
+        return role2;
     }
 
     // ---
@@ -130,5 +137,19 @@ public class AssociationBase implements Association {
     // ### See de.deepamehta.core.impl.service.AttachedAssociation.
     public AssociationModel getModel() {
         return model;
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private Role createRole(RoleModel model) {
+        if (model instanceof TopicRoleModel) {
+            return new TopicRoleBase((TopicRoleModel) model);
+        } else if (model instanceof AssociationRoleModel) {
+            return new AssociationRoleBase((AssociationRoleModel) model);
+        } else {
+            throw new RuntimeException("Unexpected RoleModel object (" + model + ")");
+        }
     }
 }

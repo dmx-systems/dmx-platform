@@ -1,14 +1,14 @@
 package de.deepamehta.plugins.webclient;
 
-import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.ClientContext;
-import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRole;
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.ClientContext;
+import de.deepamehta.core.model.Composite;
+import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.service.Plugin;
 
@@ -158,8 +158,8 @@ public class WebclientPlugin extends Plugin {
         for (Topic topic : topics) {
             logger.fine("Associating " + topic);
             AssociationModel assocModel = new AssociationModel("dm3.webclient.search_result_item");
-            assocModel.setRole1(new TopicRole(searchTopic.getId(), "dm3.webclient.search"));
-            assocModel.setRole2(new TopicRole(topic.getId(), "dm3.webclient.search_result_item"));
+            assocModel.setRoleModel1(new TopicRoleModel(searchTopic.getId(), "dm3.webclient.search"));
+            assocModel.setRoleModel2(new TopicRoleModel(topic.getId(), "dm3.webclient.search_result_item"));
             dms.createAssociation(assocModel, clientContext);
         }
         return searchTopic;

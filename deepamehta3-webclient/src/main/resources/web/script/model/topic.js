@@ -15,4 +15,6 @@ function Topic(topic) {
     this.get_commands = function(context) {
         return dm3c.get_topic_commands(this, context)
     }
+
+    // === Public API ===
 }

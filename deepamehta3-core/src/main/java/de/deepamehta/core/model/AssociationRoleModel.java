@@ -10,7 +10,7 @@ import java.util.Map;
 
 
 
-public class AssociationRole extends Role {
+public class AssociationRoleModel extends RoleModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -18,17 +18,17 @@ public class AssociationRole extends Role {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public AssociationRole(long assocId, String roleTypeUri) {
+    public AssociationRoleModel(long assocId, String roleTypeUri) {
         super(roleTypeUri);
         this.assocId = assocId;
     }
 
-    public AssociationRole(JSONObject assocRole) {
+    public AssociationRoleModel(JSONObject assocRoleModel) {
         try {
-            this.assocId = assocRole.getLong("assoc_id");
-            this.roleTypeUri = assocRole.getString("role_type_uri");
+            this.assocId = assocRoleModel.getLong("assoc_id");
+            this.roleTypeUri = assocRoleModel.getString("role_type_uri");
         } catch (Exception e) {
-            throw new RuntimeException("Parsing AssociationRole failed (JSONObject=" + assocRole + ")", e);
+            throw new RuntimeException("Parsing AssociationRoleModel failed (JSONObject=" + assocRoleModel + ")", e);
         }
     }
 
