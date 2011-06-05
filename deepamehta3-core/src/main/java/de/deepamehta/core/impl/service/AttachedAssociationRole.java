@@ -1,20 +1,21 @@
-package de.deepamehta.core.impl.model;
+package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.AssociationRole;
 import de.deepamehta.core.model.AssociationRoleModel;
 
-import org.codehaus.jettison.json.JSONObject;
 
 
-
-public class AssociationRoleBase extends RoleBase implements AssociationRole {
+/**
+ * An association role that is attached to the {@link DeepaMehtaService}.
+ */
+class AttachedAssociationRole extends AttachedRole implements AssociationRole {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    protected AssociationRoleBase(AssociationRoleModel model) {
-        super(model);
+    AttachedAssociationRole(AssociationRoleModel model, EmbeddedService dms) {
+        super(model, dms);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -28,20 +29,11 @@ public class AssociationRoleBase extends RoleBase implements AssociationRole {
         return getModel().getAssociationId();
     }
 
-
-
-    // === Role Implementation ===
-
-    @Override
-    public JSONObject toJSON() {
-        return getModel().toJSON();
-    }
-
     // ----------------------------------------------------------------------------------------------- Protected Methods
 
 
 
-    // === RoleBase Overrides ===
+    // === AttachedRole Overrides ===
 
     @Override
     protected AssociationRoleModel getModel() {

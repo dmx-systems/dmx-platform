@@ -20,22 +20,22 @@ public class AssociationBase implements Association {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private AssociationModel model;
-    private Role role1;
-    private Role role2;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     protected AssociationBase(AssociationModel model) {
         this.model = model;
-        this.role1 = createRole(model.getRoleModel1());
-        this.role2 = createRole(model.getRoleModel2());
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
 
 
-    // === Association Implementation ===
+    // **********************************
+    // *** Association Implementation ***
+    // **********************************
+
+
 
     @Override
     public long getId() {
@@ -51,12 +51,14 @@ public class AssociationBase implements Association {
 
     @Override
     public Role getRole1() {
-        return role1;
+        throw new RuntimeException("Association is not attached to the core service ("
+            + getClass() + ", " + this + ")");
     }
 
     @Override
     public Role getRole2() {
-        return role2;
+        throw new RuntimeException("Association is not attached to the core service ("
+            + getClass() + ", " + this + ")");
     }
 
     // ---
@@ -111,7 +113,11 @@ public class AssociationBase implements Association {
 
 
 
-    // === Java API ===
+    // ****************
+    // *** Java API ***
+    // ****************
+
+
 
     @Override
     public boolean equals(Object o) {
@@ -137,19 +143,5 @@ public class AssociationBase implements Association {
     // ### See de.deepamehta.core.impl.service.AttachedAssociation.
     public AssociationModel getModel() {
         return model;
-    }
-
-
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private Role createRole(RoleModel model) {
-        if (model instanceof TopicRoleModel) {
-            return new TopicRoleBase((TopicRoleModel) model);
-        } else if (model instanceof AssociationRoleModel) {
-            return new AssociationRoleBase((AssociationRoleModel) model);
-        } else {
-            throw new RuntimeException("Unexpected RoleModel object (" + model + ")");
-        }
     }
 }

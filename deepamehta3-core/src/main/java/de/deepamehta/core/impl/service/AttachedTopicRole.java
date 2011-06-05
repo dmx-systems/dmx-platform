@@ -1,20 +1,25 @@
-package de.deepamehta.core.impl.model;
+package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.TopicRole;
 import de.deepamehta.core.model.TopicRoleModel;
 
-import org.codehaus.jettison.json.JSONObject;
+import java.util.logging.Logger;
 
 
 
-public class TopicRoleBase extends RoleBase implements TopicRole {
+/**
+ * A topic role that is attached to the {@link DeepaMehtaService}.
+ */
+class AttachedTopicRole extends AttachedRole implements TopicRole {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private Logger logger = Logger.getLogger(getClass().getName());
+    
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    protected TopicRoleBase(TopicRoleModel model) {
-        super(model);
+    AttachedTopicRole(TopicRoleModel model, EmbeddedService dms) {
+        super(model, dms);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -40,21 +45,34 @@ public class TopicRoleBase extends RoleBase implements TopicRole {
 
 
 
-    // === Role Implementation ===
+    // === Role Overrides ===
 
     @Override
-    public JSONObject toJSON() {
-        return getModel().toJSON();
+    public void setRoleTypeUri(String roleTypeUri) {
+        // 1) update memory
+        super.setRoleTypeUri(roleTypeUri);
+        // 2) update DB
+        storeRoleTypeUri();
     }
 
     // ----------------------------------------------------------------------------------------------- Protected Methods
 
 
 
-    // === RoleBase Overrides ===
+    // === AttachedRole Overrides ===
 
     @Override
     protected TopicRoleModel getModel() {
         return (TopicRoleModel) super.getModel();
     }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+
+
+    // === Store ===
+
+    private void storeRoleTypeUri() {
+        logger.info("### Storing role type URI \"" + getRoleTypeUri() + "\" (" + this + ")");
+    }    
 }

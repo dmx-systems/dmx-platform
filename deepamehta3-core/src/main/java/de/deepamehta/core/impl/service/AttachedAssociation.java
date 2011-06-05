@@ -7,6 +7,9 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicRole;
 import de.deepamehta.core.impl.model.AssociationBase;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.AssociationRoleModel;
+import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.TopicRoleModel;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +25,9 @@ class AttachedAssociation extends AssociationBase {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private Role role1;
+    private Role role2;
+
     private EmbeddedService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -29,7 +35,9 @@ class AttachedAssociation extends AssociationBase {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedAssociation(Association assoc, EmbeddedService dms) {
-        super(((AssociationBase) assoc).getModel());
+        super(getModel(assoc));
+        this.role1 = createRole(getModel(assoc).getRoleModel1());
+        this.role2 = createRole(getModel(assoc).getRoleModel2());
         this.dms = dms;
     }
 
@@ -37,7 +45,23 @@ class AttachedAssociation extends AssociationBase {
 
 
 
-    // === Association Overrides ===
+    // *****************************
+    // *** Association Overrides ***
+    // *****************************
+
+
+
+    @Override
+    public Role getRole1() {
+        return role1;
+    }
+
+    @Override
+    public Role getRole2() {
+        return role2;
+    }
+
+    // ---
 
     @Override
     public void setTypeUri(String assocTypeUri) {
@@ -47,7 +71,7 @@ class AttachedAssociation extends AssociationBase {
         storeTypeUri();
     }
 
-    // ---
+    // === Traversal ===
 
     @Override
     public Topic getTopic(String roleTypeUri) {
@@ -158,4 +182,22 @@ class AttachedAssociation extends AssociationBase {
         // create new assignment
         dms.associateWithAssociationType(this);
     }    
+
+
+
+    // === Helper ===
+
+    private Role createRole(RoleModel model) {
+        if (model instanceof TopicRoleModel) {
+            return new AttachedTopicRole((TopicRoleModel) model, dms);
+        } else if (model instanceof AssociationRoleModel) {
+            return new AttachedAssociationRole((AssociationRoleModel) model, dms);
+        } else {
+            throw new RuntimeException("Unexpected RoleModel object (" + model + ")");
+        }
+    }
+
+    private static AssociationModel getModel(Association assoc) {
+        return ((AssociationBase) assoc).getModel();
+    }
 }

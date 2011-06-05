@@ -17,6 +17,9 @@ import java.util.Set;
 
 /**
  * Abstraction of the DeepaMehta storage layer.
+ * <p>
+ * TODO: possibly the methods should return model classes instead of "attached" objects.
+ * We would get rid of the HG wrapper classes (which are actually *not* attached).
  */
 public interface DeepaMehtaStorage {
 

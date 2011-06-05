@@ -1,4 +1,4 @@
-package de.deepamehta.core.impl.model;
+package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Role;
 import de.deepamehta.core.model.RoleModel;
@@ -7,16 +7,19 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 
-public abstract class RoleBase implements Role {
+class AttachedRole implements Role {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private RoleModel model;
 
+    private EmbeddedService dms;
+
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    protected RoleBase(RoleModel model) {
+    protected AttachedRole(RoleModel model, EmbeddedService dms) {
         this.model = model;
+        this.dms = dms;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -37,7 +40,10 @@ public abstract class RoleBase implements Role {
 
     // ---
 
-    // Note: toJSON() remains abstract
+    @Override
+    public JSONObject toJSON() {
+        return getModel().toJSON();
+    }
 
 
 
