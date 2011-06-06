@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl.service;
 
+import de.deepamehta.core.Association;
 import de.deepamehta.core.Role;
 import de.deepamehta.core.model.RoleModel;
 
@@ -12,13 +13,15 @@ class AttachedRole implements Role {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private RoleModel model;
+    private Association assoc;
 
-    private EmbeddedService dms;
+    protected final EmbeddedService dms;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    protected AttachedRole(RoleModel model, EmbeddedService dms) {
+    protected AttachedRole(RoleModel model, Association assoc, EmbeddedService dms) {
         this.model = model;
+        this.assoc = assoc;
         this.dms = dms;
     }
 
@@ -36,6 +39,13 @@ class AttachedRole implements Role {
     @Override
     public void setRoleTypeUri(String roleTypeUri) {
         model.setRoleTypeUri(roleTypeUri);
+    }
+
+    // ---
+
+    @Override
+    public Association getAssociation() {
+        return assoc;
     }
 
     // ---

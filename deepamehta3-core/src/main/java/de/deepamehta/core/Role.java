@@ -12,5 +12,9 @@ public interface Role {
 
     // ---
 
+    Association getAssociation();
+
+    // ---
+
     JSONObject toJSON();
 }

@@ -23,7 +23,11 @@ public interface Association {
 
     long getId();
 
+    // ---
+
     String getTypeUri();
+
+    void setTypeUri(String assocTypeUri);
 
     // ---
 
@@ -33,7 +37,9 @@ public interface Association {
 
     // ---
 
-    void setTypeUri(String assocTypeUri);
+    Role getRole(long objectId);
+
+
 
     // === Traversal ===
 
@@ -62,6 +68,8 @@ public interface Association {
     Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                   String othersTopicTypeUri,
                                                                                   boolean fetchComposite);
+
+
 
     // === Serialization ===
 

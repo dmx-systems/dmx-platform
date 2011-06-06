@@ -175,6 +175,10 @@ public interface DeepaMehtaStorage {
 
     // ---
 
+    void setRoleTypeUri(long assocId, long objectId, String roleTypeUri);
+
+    // ---
+
     Association createAssociation(AssociationModel assocModel);
 
     void deleteAssociation(long assocId);

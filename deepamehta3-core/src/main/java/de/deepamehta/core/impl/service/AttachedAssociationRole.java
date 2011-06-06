@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl.service;
 
+import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationRole;
 import de.deepamehta.core.model.AssociationRoleModel;
 
@@ -14,8 +15,8 @@ class AttachedAssociationRole extends AttachedRole implements AssociationRole {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedAssociationRole(AssociationRoleModel model, EmbeddedService dms) {
-        super(model, dms);
+    AttachedAssociationRole(AssociationRoleModel model, Association assoc, EmbeddedService dms) {
+        super(model, assoc, dms);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

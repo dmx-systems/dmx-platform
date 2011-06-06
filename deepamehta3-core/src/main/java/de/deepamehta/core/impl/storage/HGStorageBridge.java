@@ -239,6 +239,13 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
+    public void setRoleTypeUri(long assocId, long objectId, String roleTypeUri) {
+        hg.getHyperEdge(assocId).getHyperObject(objectId).setRoleType(roleTypeUri);
+    }
+
+    // ---
+
+    @Override
     public Association createAssociation(AssociationModel assocModel) {
         String typeUri = assocModel.getTypeUri();
         //

@@ -42,9 +42,16 @@ public class AssociationBase implements Association {
         return model.getId();
     }
 
+    // ---
+
     @Override
     public String getTypeUri() {
         return model.getTypeUri();
+    }
+
+    @Override
+    public void setTypeUri(String assocTypeUri) {
+        model.setTypeUri(assocTypeUri);
     }
 
     // ---
@@ -64,8 +71,9 @@ public class AssociationBase implements Association {
     // ---
 
     @Override
-    public void setTypeUri(String assocTypeUri) {
-        model.setTypeUri(assocTypeUri);
+    public Role getRole(long objectId) {
+        throw new RuntimeException("Association is not attached to the core service ("
+            + getClass() + ", " + this + ")");
     }
 
 

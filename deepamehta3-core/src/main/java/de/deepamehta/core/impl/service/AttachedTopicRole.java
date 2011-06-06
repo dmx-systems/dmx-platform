@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl.service;
 
+import de.deepamehta.core.Association;
 import de.deepamehta.core.TopicRole;
 import de.deepamehta.core.model.TopicRoleModel;
 
@@ -18,8 +19,8 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
     
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedTopicRole(TopicRoleModel model, EmbeddedService dms) {
-        super(model, dms);
+    AttachedTopicRole(TopicRoleModel model, Association assoc, EmbeddedService dms) {
+        super(model, assoc, dms);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -52,7 +53,7 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
         // 1) update memory
         super.setRoleTypeUri(roleTypeUri);
         // 2) update DB
-        storeRoleTypeUri();
+        storeRoleTypeUri(roleTypeUri);
     }
 
     // ----------------------------------------------------------------------------------------------- Protected Methods
@@ -72,7 +73,7 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
 
     // === Store ===
 
-    private void storeRoleTypeUri() {
-        logger.info("### Storing role type URI \"" + getRoleTypeUri() + "\" (" + this + ")");
+    private void storeRoleTypeUri(String roleTypeUri) {
+        dms.storage.setRoleTypeUri(getAssociation().getId(), getTopicId(), roleTypeUri);
     }    
 }

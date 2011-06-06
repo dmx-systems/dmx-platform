@@ -36,9 +36,9 @@ class AttachedAssociation extends AssociationBase {
 
     AttachedAssociation(Association assoc, EmbeddedService dms) {
         super(getModel(assoc));
-        this.role1 = createRole(getModel(assoc).getRoleModel1());
-        this.role2 = createRole(getModel(assoc).getRoleModel2());
-        this.dms = dms;
+        this.dms = dms;     // Note: dms must be initialized *before* the attached roles are created
+        this.role1 = createAttachedRole(getModel(assoc).getRoleModel1());
+        this.role2 = createAttachedRole(getModel(assoc).getRoleModel2());
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -52,6 +52,16 @@ class AttachedAssociation extends AssociationBase {
 
 
     @Override
+    public void setTypeUri(String assocTypeUri) {
+        // 1) update memory
+        super.setTypeUri(assocTypeUri);
+        // 2) update DB
+        storeTypeUri();
+    }
+
+    // ---
+
+    @Override
     public Role getRole1() {
         return role1;
     }
@@ -63,13 +73,26 @@ class AttachedAssociation extends AssociationBase {
 
     // ---
 
+    // compare to Neo4jHyperEdge.getHyperObject()
     @Override
-    public void setTypeUri(String assocTypeUri) {
-        // 1) update memory
-        super.setTypeUri(assocTypeUri);
-        // 2) update DB
-        storeTypeUri();
+    public Role getRole(long objectId) {
+        long id1 = getObjectId(((AttachedRole) getRole1()).getModel());
+        long id2 = getObjectId(((AttachedRole) getRole2()).getModel());
+        //
+        if (id1 == objectId && id2 == objectId) {
+            throw new RuntimeException("Self-connected hyper objects are not supported (" + this + ")");
+        }
+        //
+        if (id1 == objectId) {
+            return getRole1();
+        } else if (id2 == objectId) {
+            return getRole2();
+        } else {
+            throw new RuntimeException("Topic/Association " + objectId + " plays no role in " + this);
+        }
     }
+
+
 
     // === Traversal ===
 
@@ -120,12 +143,18 @@ class AttachedAssociation extends AssociationBase {
 
     void update(AssociationModel assocModel) {
         logger.info("Updating association " + getId() + " (new " + assocModel + ")");
+        //
+        // Note: We must lookup the roles individually.
+        // The role order (getRole1(), getRole2()) is undeterministic and not fix.
+        Role role1 = getRole(getObjectId(assocModel.getRoleModel1()));
+        Role role2 = getRole(getObjectId(assocModel.getRoleModel2()));
+        //
         String newTypeUri = assocModel.getTypeUri();
         String newRoleTypeUri1 = assocModel.getRoleModel1().getRoleTypeUri();
         String newRoleTypeUri2 = assocModel.getRoleModel2().getRoleTypeUri();
         //
-        String roleTypeUri1 = getRole1().getRoleTypeUri();
-        String roleTypeUri2 = getRole2().getRoleTypeUri();
+        String roleTypeUri1 = role1.getRoleTypeUri();
+        String roleTypeUri2 = role2.getRoleTypeUri();
         //
         boolean typeUriChanged = !getTypeUri().equals(newTypeUri);
         boolean roleType1Changed = !roleTypeUri1.equals(newRoleTypeUri1);
@@ -137,11 +166,11 @@ class AttachedAssociation extends AssociationBase {
         }
         if (roleType1Changed) {
             logger.info("Changing role type 1 from \"" + roleTypeUri1 + "\" -> \"" + newRoleTypeUri1 + "\"");
-            getRole1().setRoleTypeUri(newRoleTypeUri1);
+            role1.setRoleTypeUri(newRoleTypeUri1);
         }
         if (roleType2Changed) {
             logger.info("Changing role type 2 from \"" + roleTypeUri2 + "\" -> \"" + newRoleTypeUri2 + "\"");
-            getRole2().setRoleTypeUri(newRoleTypeUri2);
+            role2.setRoleTypeUri(newRoleTypeUri2);
         }
         //
         if (!typeUriChanged && !roleType1Changed && !roleType2Changed) {
@@ -187,16 +216,28 @@ class AttachedAssociation extends AssociationBase {
 
     // === Helper ===
 
-    private Role createRole(RoleModel model) {
+    private Role createAttachedRole(RoleModel model) {
         if (model instanceof TopicRoleModel) {
-            return new AttachedTopicRole((TopicRoleModel) model, dms);
+            return new AttachedTopicRole((TopicRoleModel) model, this, dms);
         } else if (model instanceof AssociationRoleModel) {
-            return new AttachedAssociationRole((AssociationRoleModel) model, dms);
+            return new AttachedAssociationRole((AssociationRoleModel) model, this, dms);
         } else {
             throw new RuntimeException("Unexpected RoleModel object (" + model + ")");
         }
     }
 
+    // ### TODO: probably a generic getId() should be added to the Role interface.
+    private long getObjectId(RoleModel model) {
+        if (model instanceof TopicRoleModel) {
+            return ((TopicRoleModel) model).getTopicId();
+        } else if (model instanceof AssociationRoleModel) {
+            return ((AssociationRoleModel) model).getAssociationId();
+        } else {
+            throw new RuntimeException("Unexpected RoleModel object (" + model + ")");
+        }
+    }
+
+    // ### TODO: probably getModel() should be added to the Association (and all other) interface.
     private static AssociationModel getModel(Association assoc) {
         return ((AssociationBase) assoc).getModel();
     }

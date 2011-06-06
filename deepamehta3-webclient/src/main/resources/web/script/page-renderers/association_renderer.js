@@ -18,12 +18,8 @@ function AssociationRenderer() {
 
     this.render_page = function(assoc) {
         var assoc_type = dm3c.type_cache.get_association_type(assoc.type_uri)
-        //
         dm3c.render.field_label("Association Type")
         dm3c.render.field_value(assoc_type.value)
-        //
-        dm3c.render.field_label("Association Type URI")
-        dm3c.render.field_value(assoc_type.uri)
         //
         topic_1 = assoc.get_topic_1()
         role_type_1 = assoc.get_role_type_1()
