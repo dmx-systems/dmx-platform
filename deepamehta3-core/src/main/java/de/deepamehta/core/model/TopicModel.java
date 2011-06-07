@@ -64,6 +64,7 @@ public class TopicModel {
         this(topicModel.id, topicModel.uri, topicModel.value, topicModel.typeUri, topicModel.composite);
     }
 
+    // ### FIXME: drop this?
     public TopicModel(Topic topic) {
         this(topic.getId(), topic.getUri(), topic.getValue(), topic.getTypeUri(), topic.getComposite());
     }

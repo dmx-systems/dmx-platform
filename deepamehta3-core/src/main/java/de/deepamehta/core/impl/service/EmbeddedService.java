@@ -14,7 +14,6 @@ import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.Composite;
-import de.deepamehta.core.model.MetaTypeModel;
 import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
@@ -144,6 +143,7 @@ public class EmbeddedService implements DeepaMehtaService {
         this.bundleContext = bundleContext;
         this.pluginCache = new PluginCache();
         this.typeCache = new TypeCache(this);
+        bootstrapTypeCache();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -962,10 +962,12 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     private void setupBootstrapContent() {
-        // Before topic types and asscociation types can be created the meta types must created
+        // Before topic types and asscociation types can be created the meta types must be created
         // Note: storage low-level call used here ### explain
-        Topic topicType = _createTopic(new MetaTypeModel("dm3.core.topic_type", "Topic Type"));
-        Topic assocType = _createTopic(new MetaTypeModel("dm3.core.assoc_type", "Association Type"));
+        Topic topicType = _createTopic(new TopicModel("dm3.core.topic_type", new TopicValue("Topic Type"),
+            "dm3.core.meta_type"));
+        Topic assocType = _createTopic(new TopicModel("dm3.core.assoc_type", new TopicValue("Association Type"),
+            "dm3.core.meta_type"));
         // Create topic type "Data Type"
         // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
         // depends on the topic type "Data Type". To resolve this circle we use a low-level storage call here
@@ -973,7 +975,6 @@ public class EmbeddedService implements DeepaMehtaService {
         Topic dataType = _createTopic(new TopicTypeModel("dm3.core.data_type", "Data Type", "dm3.core.text"));
         Topic roleType = _createTopic(new TopicTypeModel("dm3.core.role_type", "Role Type", "dm3.core.text"));
         // Create data type "Text"
-        // Note: storage low-level call used here ### explain
         Topic text = _createTopic(new TopicModel("dm3.core.text", new TopicValue("Text"), "dm3.core.data_type"));
         //
         Topic type = _createTopic(new TopicModel("dm3.core.type", new TopicValue("Type"), "dm3.core.role_type"));
@@ -1005,6 +1006,13 @@ public class EmbeddedService implements DeepaMehtaService {
         Topic topic = storage.createTopic(topicModel);
         storage.setTopicValue(topic.getId(), topic.getValue());
         return topic;
+    }
+
+    // ---
+
+    private void bootstrapTypeCache() {
+        typeCache.put(new AttachedTopicType(new TopicTypeModel("dm3.core.meta_meta_type", "Meta Meta Type",
+            "dm3.core.meta_meta_meta_type", "dm3.core.text"), this));
     }
 
 

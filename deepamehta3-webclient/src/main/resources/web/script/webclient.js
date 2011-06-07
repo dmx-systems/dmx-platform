@@ -1042,3 +1042,16 @@ var dm3c = new function() {
         }
     })
 }
+
+dm3c.type_cache.put_topic_type(new TopicType({
+    id: -1,
+    uri: "dm3.core.meta_meta_type",
+    value: "Meta Meta Type",
+    type_uri: "dm3.core.meta_meta_meta_type",
+    composite: {},
+    
+    data_type_uri: "dm3.core.text",
+    index_mode_uris: [],
+    assoc_defs: [],
+    view_config_topics: {}
+}))

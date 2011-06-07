@@ -35,12 +35,16 @@ public class TopicTypeModel extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TopicTypeModel(TopicTypeModel topicTypeModel) {
-        super(topicTypeModel);
-        this.dataTypeUri = topicTypeModel.getDataTypeUri();
-        this.indexModes = topicTypeModel.getIndexModes();
-        this.assocDefs = topicTypeModel.getAssocDefs();
-        this.viewConfigModel = topicTypeModel.getViewConfigModel();
+    public TopicTypeModel(String uri, String value, String dataTypeUri) {
+        this(uri, value, "dm3.core.topic_type", dataTypeUri);
+    }
+
+    public TopicTypeModel(String uri, String value, String topicTypeUri, String dataTypeUri) {
+        super(uri, new TopicValue(value), topicTypeUri);
+        this.dataTypeUri = dataTypeUri;
+        this.indexModes = new HashSet();
+        this.assocDefs = new LinkedHashMap();
+        this.viewConfigModel = new ViewConfigurationModel();
     }
 
     public TopicTypeModel(Topic typeTopic, String dataTypeUri, Set<IndexMode> indexModes,
@@ -52,12 +56,12 @@ public class TopicTypeModel extends TopicModel {
         this.viewConfigModel = viewConfigModel;
     }
 
-    public TopicTypeModel(String uri, String value, String dataTypeUri) {
-        super(uri, new TopicValue(value), "dm3.core.topic_type");
-        this.dataTypeUri = dataTypeUri;
-        this.indexModes = new HashSet();
-        this.assocDefs = new LinkedHashMap();
-        this.viewConfigModel = new ViewConfigurationModel();
+    public TopicTypeModel(TopicTypeModel topicTypeModel) {
+        super(topicTypeModel);
+        this.dataTypeUri = topicTypeModel.getDataTypeUri();
+        this.indexModes = topicTypeModel.getIndexModes();
+        this.assocDefs = topicTypeModel.getAssocDefs();
+        this.viewConfigModel = topicTypeModel.getViewConfigModel();
     }
 
     public TopicTypeModel(JSONObject topicTypeModel) {
