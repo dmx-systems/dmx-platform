@@ -4,7 +4,7 @@ var dm3c = new function() {
     this.SEARCH_FIELD_WIDTH = 16    // in chars
     this.COMPOSITE_PATH_SEPARATOR = "/"
     var UPLOAD_DIALOG_WIDTH = "50em"
-    this.GENERIC_TOPIC_ICON_SRC = "images/grey-ball.png"
+    this.GENERIC_TOPIC_ICON_SRC = "images/ball-grey.png"
 
     var ENABLE_LOGGING = false
     var LOG_PLUGIN_LOADING = false

@@ -1,8 +1,8 @@
 {
     topic_types: [
 
-        # Note: The topic types "Topic Type", "Association Type",
-        # and "Data Type" are created programmatically.
+        # Note: The topic types "Topic Type", "Association Type", "Data Type",
+        # and "Role Type" are created programmatically.
         # See EmbeddedService.setupBootstrapContent()
 
         /*{
@@ -10,11 +10,11 @@
             uri:           "dm3.core.data_type",
             data_type_uri: "dm3.core.text"
         },*/
-        {
+        /*{
             value:         "Role Type",
             uri:           "dm3.core.role_type",
             data_type_uri: "dm3.core.text"
-        },
+        },*/
         {
             value:         "Cardinality",
             uri:           "dm3.core.cardinality",

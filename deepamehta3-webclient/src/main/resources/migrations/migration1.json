@@ -89,6 +89,7 @@
                     assoc_type_uri:    "dm3.core.composition"
                 }
             ]
+            ### Note: don't try to add view config topics to the view config type -> endless recursion!
         },
 
         ### Search ###

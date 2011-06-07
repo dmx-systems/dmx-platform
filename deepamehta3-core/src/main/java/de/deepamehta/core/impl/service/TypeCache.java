@@ -87,7 +87,7 @@ class TypeCache {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void endlessRecursionProtection(String topicTypeUri) {
-        if (topicTypeUri.equals("dm3.core.topic_type")) {
+        if (topicTypeUri.equals("dm3.webclient.view_config")) {
             callCount++;
             if (callCount >= 3) {
                 throw new RuntimeException("Endless Recursion!");

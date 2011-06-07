@@ -40,7 +40,7 @@ class AttachedAssociationType extends AttachedTopic implements AssociationType {
     }
 
     void store() {
-        setId(dms.storage.createTopic(getModel()).getId());
+        dms.storage.createTopic(getModel());
         dms.associateWithTopicType(this);
         setValue(getValue());
     }

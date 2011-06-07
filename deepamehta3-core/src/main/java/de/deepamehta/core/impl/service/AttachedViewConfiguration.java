@@ -5,6 +5,7 @@ import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.ViewConfigurationModel;
 
 
@@ -30,9 +31,16 @@ class AttachedViewConfiguration implements ViewConfiguration {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    // === ViewConfiguration Implementation ===
+
     @Override
     public Iterable<TopicModel> getConfigTopics() {
         return model.getConfigTopics();
+    }
+
+    @Override
+    public TopicModel getConfigTopic(String configTypeUri) {
+        return model.getConfigTopic(configTypeUri);
     }
 
     @Override
@@ -41,6 +49,14 @@ class AttachedViewConfiguration implements ViewConfiguration {
         model.addConfigTopic(configTopic);
         // update DB
         storeConfigTopic(configTopic);
+    }
+
+    @Override
+    public void addSetting(String configTypeUri, String settingUri, Object value) {
+        // update memory
+        boolean configTopicCreated = model.addSetting(configTypeUri, settingUri, value);
+        // update DB
+        storeSetting(configTopicCreated, configTypeUri, settingUri, value);
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -57,5 +73,15 @@ class AttachedViewConfiguration implements ViewConfiguration {
         Topic topic = dms.createTopic(configTopic, null);   // FIXME: clientContext=null
         dms.createAssociation("dm3.core.association", configurable,
             new TopicRoleModel(topic.getId(), "dm3.core.view_config"));
+    }
+
+    private void storeSetting(boolean configTopicCreated, String configTypeUri, String settingUri, Object value) {
+        TopicModel configTopic = getConfigTopic(configTypeUri);
+        if (configTopicCreated) {
+            storeConfigTopic(configTopic);
+        } else {
+            Topic topic = new AttachedTopic(configTopic, dms);
+            topic.setChildTopicValue(settingUri, new TopicValue(value));
+        }
     }
 }

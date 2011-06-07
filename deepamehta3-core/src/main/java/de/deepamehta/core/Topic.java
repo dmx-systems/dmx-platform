@@ -27,8 +27,6 @@ public interface Topic {
 
     // ---
 
-    void setId(long id);
-
     void setUri(String uri);
 
     // ---

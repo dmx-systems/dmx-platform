@@ -161,10 +161,11 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         checkUniqueness(uri);
         // 2) create node
         HyperNode node = hg.createHyperNode();
+        topicModel.setId(node.getId());
         // 3) set URI
         setNodeUri(node, uri);
         //
-        return buildTopic(node.getId(), uri, topicModel.getValue(), topicModel.getTypeUri());
+        return buildTopic(topicModel.getId(), uri, topicModel.getValue(), topicModel.getTypeUri());
     }
 
     @Override

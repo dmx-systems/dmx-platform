@@ -971,12 +971,14 @@ public class EmbeddedService implements DeepaMehtaService {
         // depends on the topic type "Data Type". To resolve this circle we use a low-level storage call here
         // and postpone the data type association.
         Topic dataType = _createTopic(new TopicTypeModel("dm3.core.data_type", "Data Type", "dm3.core.text"));
+        Topic roleType = _createTopic(new TopicTypeModel("dm3.core.role_type", "Role Type", "dm3.core.text"));
         // Create data type "Text"
         // Note: storage low-level call used here ### explain
         Topic text = _createTopic(new TopicModel("dm3.core.text", new TopicValue("Text"), "dm3.core.data_type"));
         //
-        _createTopic(new TopicModel("dm3.core.type", new TopicValue("Type"), "dm3.core.role_type"));
-        _createTopic(new TopicModel("dm3.core.instance", new TopicValue("Instance"), "dm3.core.role_type"));
+        Topic type = _createTopic(new TopicModel("dm3.core.type", new TopicValue("Type"), "dm3.core.role_type"));
+        Topic instance = _createTopic(new TopicModel("dm3.core.instance", new TopicValue("Instance"),
+            "dm3.core.role_type"));
         // Before data type topics can be associated we must create the association type "Association"
         Topic association = _createTopic(new AssociationTypeModel("dm3.core.association", "Association"));
         //
@@ -986,11 +988,15 @@ public class EmbeddedService implements DeepaMehtaService {
         associateDataType("dm3.core.topic_type", "dm3.core.text");
         associateDataType("dm3.core.assoc_type", "dm3.core.text");
         associateDataType("dm3.core.data_type",  "dm3.core.text");
-        //
-        associateWithTopicType(topicType);  // FIXME: move associateWithTopicType() call to _createTopic()?
+        associateDataType("dm3.core.role_type",  "dm3.core.text");
+        // Postponed topic type association
+        associateWithTopicType(topicType);
         associateWithTopicType(assocType);
         associateWithTopicType(dataType);
+        associateWithTopicType(roleType);
         associateWithTopicType(text);
+        associateWithTopicType(type);
+        associateWithTopicType(instance);
         associateWithTopicType(association);
         associateWithTopicType(instantiation);
     }
