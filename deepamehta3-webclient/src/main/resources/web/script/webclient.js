@@ -1034,24 +1034,11 @@ var dm3c = new function() {
             }
 
             // Note: this method is actually part of the Type Search plugin.
-            // TODO: proper modulariuation. Either let the Type Search plugin provide its own REST resource (with
+            // TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
             // another namespace again) or make the Type Search plugin an integral part of the Client plugin.
             dm3c.restc.get_topics_and_create_bucket = function(type_uri) {
-                return this.request("GET", "/webclient/search/by_type/" + encodeURIComponent(type_uri))
+                return this.request("GET", "/webclient/search/by_type/" + type_uri)
             }
         }
     })
 }
-
-dm3c.type_cache.put_topic_type(new TopicType({
-    id: -1,
-    uri: "dm3.core.meta_meta_type",
-    value: "Meta Meta Type",
-    type_uri: "dm3.core.meta_meta_meta_type",
-    composite: {},
-    
-    data_type_uri: "dm3.core.text",
-    index_mode_uris: [],
-    assoc_defs: [],
-    view_config_topics: {}
-}))

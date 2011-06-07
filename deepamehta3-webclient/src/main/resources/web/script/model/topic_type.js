@@ -9,7 +9,7 @@ function TopicType(topic_type) {
     this.data_type_uri      = topic_type.data_type_uri
     this.index_mode_uris    = topic_type.index_mode_uris
     this.assoc_defs         = topic_type.assoc_defs
-    this.view_config_topics = topic_type.view_config_topics
+    this.view_config_topics = hash_by_type(topic_type.view_config_topics)
 
     // === "Page Displayable" implementation ===
 
@@ -46,5 +46,15 @@ function TopicType(topic_type) {
         default:
             alert("TopicType.get_menu_config: menu \"" + menu_id + "\" not implemented")
         }
+    }
+
+    // ----------------------------------------------------------------------------------------------- Private Functions
+
+    function hash_by_type(topics) {
+        var hashed_topics = {}
+        for (var i = 0, topic; topic = topics[i]; i++) {
+            hashed_topics[topic.type_uri] = topic
+        }
+        return hashed_topics
     }
 }

@@ -438,9 +438,10 @@ public class EmbeddedService implements DeepaMehtaService {
                                                                  "dm3.core.instance", "dm3.core.topic_type", false);
         Set<String> topicTypeUris = new HashSet();
         // add meta types
-        topicTypeUris.add("dm3.core.meta_type");
         topicTypeUris.add("dm3.core.topic_type");
         topicTypeUris.add("dm3.core.assoc_type");
+        topicTypeUris.add("dm3.core.meta_type");
+        topicTypeUris.add("dm3.core.meta_meta_type");
         // add regular types
         for (Topic topicType : topicTypes) {
             topicTypeUris.add(topicType.getUri());

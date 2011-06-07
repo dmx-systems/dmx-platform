@@ -120,9 +120,9 @@ public class ViewConfigurationModel {
 
     public void toJSON(JSONObject configurable) {
         try {
-            Map viewConfigTopics = new HashMap();
+            List viewConfigTopics = new ArrayList();
             for (TopicModel configTopic : getConfigTopics()) {
-                viewConfigTopics.put(configTopic.getTypeUri(), configTopic.toJSON());
+                viewConfigTopics.add(configTopic.toJSON());
             }
             configurable.put("view_config_topics", viewConfigTopics);
         } catch (Exception e) {
