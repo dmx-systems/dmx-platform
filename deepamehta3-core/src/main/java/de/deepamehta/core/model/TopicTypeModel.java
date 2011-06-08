@@ -22,14 +22,13 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class TopicTypeModel extends TopicModel {
+public class TopicTypeModel extends TypeModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private String dataTypeUri;
     private Set<IndexMode> indexModes;
     private Map<String, AssociationDefinition> assocDefs;   // is never null, may be empty
-    private ViewConfigurationModel viewConfigModel;         // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -44,27 +43,25 @@ public class TopicTypeModel extends TopicModel {
         this.dataTypeUri = dataTypeUri;
         this.indexModes = new HashSet();
         this.assocDefs = new LinkedHashMap();
-        this.viewConfigModel = new ViewConfigurationModel();
     }
 
     public TopicTypeModel(Topic typeTopic, String dataTypeUri, Set<IndexMode> indexModes,
                                                                ViewConfigurationModel viewConfigModel) {
-        super(typeTopic);
+        super(typeTopic, viewConfigModel);
         this.dataTypeUri = dataTypeUri;
         this.indexModes = indexModes;
         this.assocDefs = new LinkedHashMap();
-        this.viewConfigModel = viewConfigModel;
     }
 
-    public TopicTypeModel(TopicTypeModel topicTypeModel) {
-        super(topicTypeModel);
-        this.dataTypeUri = topicTypeModel.getDataTypeUri();
-        this.indexModes = topicTypeModel.getIndexModes();
-        this.assocDefs = topicTypeModel.getAssocDefs();
-        this.viewConfigModel = topicTypeModel.getViewConfigModel();
+    public TopicTypeModel(TopicTypeModel model) {
+        super(model);
+        this.dataTypeUri = model.getDataTypeUri();
+        this.indexModes = model.getIndexModes();
+        this.assocDefs = model.getAssocDefs();
     }
 
     public TopicTypeModel(JSONObject topicTypeModel) {
+        super(topicTypeModel);
         try {
             this.id = topicTypeModel.optLong("id", -1);
             this.uri = topicTypeModel.getString("uri");
@@ -75,7 +72,6 @@ public class TopicTypeModel extends TopicModel {
             this.dataTypeUri = topicTypeModel.getString("data_type_uri");
             this.indexModes = IndexMode.parse(topicTypeModel);
             this.assocDefs = new LinkedHashMap();
-            this.viewConfigModel = new ViewConfigurationModel(topicTypeModel);
             parseAssocDefs(topicTypeModel);
         } catch (Exception e) {
             throw new RuntimeException("Parsing TopicTypeModel failed (JSONObject=" + topicTypeModel + ")", e);
@@ -136,18 +132,6 @@ public class TopicTypeModel extends TopicModel {
 
     // ---
 
-    public ViewConfigurationModel getViewConfigModel() {
-        return viewConfigModel;
-    }
-
-    // FIXME: server-side operations on the view config settings possibly suggest they are not acually
-    // view config settings but part of the topic type model. Possibly this method should be dropped.
-    public Object getViewConfig(String typeUri, String settingUri) {
-        return viewConfigModel.getSetting(typeUri, settingUri);
-    }
-
-    // ---
-
     @Override
     public JSONObject toJSON() {
         try {
@@ -156,7 +140,7 @@ public class TopicTypeModel extends TopicModel {
             o.put("data_type_uri", dataTypeUri);
             IndexMode.toJSON(indexModes, o);
             AssociationDefinition.toJSON(assocDefs.values(), o);
-            viewConfigModel.toJSON(o);
+            getViewConfigModel().toJSON(o);
             //
             return o;
         } catch (Exception e) {
@@ -168,7 +152,7 @@ public class TopicTypeModel extends TopicModel {
     public String toString() {
         return "topic type model (id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + dataTypeUri + "\", indexModes=" + indexModes + ", assocDefs=" + assocDefs +
-            ",\ntopic type " + viewConfigModel + ")";
+            ",\ntopic type " + getViewConfigModel() + ")";
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

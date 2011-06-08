@@ -2,5 +2,5 @@ package de.deepamehta.core;
 
 
 
-public interface AssociationType extends Topic {
+public interface AssociationType extends Type {
 }

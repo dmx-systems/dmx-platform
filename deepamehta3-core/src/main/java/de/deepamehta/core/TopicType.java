@@ -14,7 +14,7 @@ import java.util.Set;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface TopicType extends Topic {
+public interface TopicType extends Type {
 
     String getDataTypeUri();
 
@@ -33,11 +33,4 @@ public interface TopicType extends Topic {
     AssociationDefinition getAssocDef(String assocDefUri);
 
     void addAssocDef(AssociationDefinition assocDef);
-
-    // ---
-
-    ViewConfiguration getViewConfig();
-
-    // FIXME: to be dropped
-    Object getViewConfig(String typeUri, String settingUri);
 }

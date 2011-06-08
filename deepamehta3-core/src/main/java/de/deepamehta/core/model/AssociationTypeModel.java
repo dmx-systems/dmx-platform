@@ -1,5 +1,7 @@
 package de.deepamehta.core.model;
 
+import de.deepamehta.core.Topic;
+
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -17,7 +19,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class AssociationTypeModel extends TopicModel {
+public class AssociationTypeModel extends TypeModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -29,7 +31,12 @@ public class AssociationTypeModel extends TopicModel {
         super(uri, new TopicValue(value), "dm3.core.assoc_type");
     }
 
+    public AssociationTypeModel(Topic typeTopic, ViewConfigurationModel viewConfigModel) {
+        super(typeTopic, viewConfigModel);
+    }
+
     public AssociationTypeModel(JSONObject assocTypeModel) {
+        super(assocTypeModel);
         try {
             this.id = -1;
             this.uri = assocTypeModel.getString("uri");
@@ -44,8 +51,20 @@ public class AssociationTypeModel extends TopicModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
+    public JSONObject toJSON() {
+        try {
+            JSONObject o = super.toJSON();
+            getViewConfigModel().toJSON(o);
+            //
+            return o;
+        } catch (Exception e) {
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
+        }
+    }
+
+    @Override
     public String toString() {
-        return "association type data (id=" + id + ", uri=\"" + uri + "\", value=" + value +
-            ", typeUri=\"" + typeUri + "\")";
+        return "association type model (id=" + id + ", uri=\"" + uri + "\", value=" + value +
+            ", typeUri=\"" + typeUri + "\",\nassociation type " + getViewConfigModel() + ")";
     }
 }

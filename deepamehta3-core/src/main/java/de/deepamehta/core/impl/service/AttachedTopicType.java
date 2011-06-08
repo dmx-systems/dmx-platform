@@ -31,24 +31,21 @@ import java.util.logging.Logger;
 /**
  * A topic type that is attached to the {@link DeepaMehtaService}.
  */
-class AttachedTopicType extends AttachedTopic implements TopicType {
+class AttachedTopicType extends AttachedType implements TopicType {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private AttachedViewConfiguration viewConfig;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedTopicType(EmbeddedService dms) {
-        super((TopicModel) null, dms);  // the model and viewConfig remain uninitialized.
-                                        // They are initialued later on through fetch().
+        super(dms);     // the model and viewConfig remain uninitialized.
+                        // They are initialued later on through fetch().
     }
 
     AttachedTopicType(TopicTypeModel model, EmbeddedService dms) {
         super(model, dms);
-        initViewConfig();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -106,19 +103,6 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
         storeAssocDef(assocDef, predAssocDef);
     }
 
-    // ---
-
-    @Override
-    public ViewConfiguration getViewConfig() {
-        return viewConfig;
-    }
-
-    // FIXME: to be dropped
-    @Override
-    public Object getViewConfig(String typeUri, String settingUri) {
-        return getModel().getViewConfig(typeUri, settingUri);
-    }
-
 
 
     // === TopicBase Overrides ===
@@ -126,6 +110,18 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
     @Override
     public TopicTypeModel getModel() {
         return (TopicTypeModel) super.getModel();
+    }
+
+    // ----------------------------------------------------------------------------------------------- Protected Methods
+
+
+
+    // === AttachedType Abstracts ===
+
+    protected void initViewConfig() {
+        // Note: this type must be identified by its URI. Types being created have no ID yet.
+        RoleModel configurable = new TopicRoleModel(getUri(), "dm3.core.topic_type");
+        setViewConfig(new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms));
     }
 
 
@@ -147,13 +143,13 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
             throw new RuntimeException("Graph inconsistency: " + assocDefs.size() + " association " +
                 "definitions found but sequence length is " + sequenceIds.size());
         }
-        // build topic type
-        TopicTypeModel topicTypeModel = new TopicTypeModel(typeTopic, fetchDataTypeTopic(typeTopic).getUri(),
-                                                                      fetchIndexModes(typeTopic),
-                                                                      fetchViewConfig(typeTopic));
-        addAssocDefs(topicTypeModel, assocDefs, sequenceIds);
+        // build type model
+        TopicTypeModel model = new TopicTypeModel(typeTopic, fetchDataTypeTopic(typeTopic).getUri(),
+                                                             fetchIndexModes(typeTopic),
+                                                             fetchViewConfig(typeTopic));
+        addAssocDefs(model, assocDefs, sequenceIds);
         //
-        setModel(topicTypeModel);
+        setModel(model);
         initViewConfig();
     }
 
@@ -165,7 +161,7 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
         dms.associateDataType(getUri(), getDataTypeUri());
         storeIndexModes();
         storeAssocDefs();
-        viewConfig.store();
+        getViewConfig().store();
     }
 
     void update(TopicTypeModel topicTypeModel) {
@@ -301,13 +297,6 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
     }
 
     // ---
-
-    private ViewConfigurationModel fetchViewConfig(Topic typeTopic) {
-        Set<RelatedTopic> topics = typeTopic.getRelatedTopics("dm3.core.association", "dm3.core.topic_type",
-            "dm3.core.view_config", null, true);    // fetchComposite=true
-        // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
-        return new ViewConfigurationModel(topics);
-    }
 
     private ViewConfigurationModel fetchViewConfig(Association assoc) {
         // ### should we use "dm3.core.association" instead of "dm3.core.aggregation"?
@@ -492,12 +481,6 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
 
 
     // === Helper ===
-
-    private void initViewConfig() {
-        // Note: this type must be identified by its URI. Types being created have no ID yet.
-        RoleModel configurable = new TopicRoleModel(getUri(), "dm3.core.topic_type");
-        this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
-    }
 
     private AssociationDefinition findLastAssocDef() {
         AssociationDefinition lastAssocDef = null;
