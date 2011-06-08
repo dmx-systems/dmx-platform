@@ -27,6 +27,7 @@ public class AssociationDefinition {
     private long id;                    // ID of the underlying association
     private String uri;                 // not persistent, value is derived from other values, there is no setter
     private String assocTypeUri;
+    private String instanceLevelAssocTypeUri;
 
     private String topicTypeUri1;
     private String topicTypeUri2;
@@ -72,8 +73,9 @@ public class AssociationDefinition {
             //
             this.uri = topicTypeUri2;               // ### roleTypeUri2;
             this.assocTypeUri = assocDef.getString("assoc_type_uri");
+            initInstanceLevelAssocTypeUri();
             //
-            if (!assocDef.has("cardinality_uri_1") && !assocTypeUri.equals("dm3.core.composition")) {
+            if (!assocDef.has("cardinality_uri_1") && !assocTypeUri.equals("dm3.core.composition_def")) {
                 throw new RuntimeException("\"cardinality_uri_1\" is missing");
             }
             this.cardinalityUri1 = assocDef.optString("cardinality_uri_1", "dm3.core.one");
@@ -97,6 +99,10 @@ public class AssociationDefinition {
 
     public String getAssocTypeUri() {
         return assocTypeUri;
+    }
+
+    public String getInstanceLevelAssocTypeUri() {
+        return instanceLevelAssocTypeUri;
     }
 
     public String getTopicTypeUri1() {
@@ -135,6 +141,7 @@ public class AssociationDefinition {
 
     public void setAssocTypeUri(String assocTypeUri) {
         this.assocTypeUri = assocTypeUri;
+        initInstanceLevelAssocTypeUri();
     }
 
     public void setCardinalityUri1(String cardinalityUri1) {
@@ -190,5 +197,17 @@ public class AssociationDefinition {
             assocDefList.add(assocDef.toJSON());
         }
         o.put("assoc_defs", assocDefList);
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void initInstanceLevelAssocTypeUri() {
+        if (assocTypeUri.equals("dm3.core.aggregation_def")) {
+            this.instanceLevelAssocTypeUri = "dm3.core.aggregation";
+        } else if (assocTypeUri.equals("dm3.core.composition_def")) {
+            this.instanceLevelAssocTypeUri = "dm3.core.composition";
+        } else {
+            throw new RuntimeException("Unexpected association type URI: \"" + assocTypeUri + "\"");
+        }
     }
 }

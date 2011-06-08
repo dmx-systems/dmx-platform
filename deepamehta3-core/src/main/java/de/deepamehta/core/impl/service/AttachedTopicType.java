@@ -310,6 +310,7 @@ class AttachedTopicType extends AttachedTopic implements TopicType {
     }
 
     private ViewConfigurationModel fetchViewConfig(Association assoc) {
+        // ### should we use "dm3.core.association" instead of "dm3.core.aggregation"?
         Set<RelatedTopic> topics = assoc.getRelatedTopics("dm3.core.aggregation", "dm3.core.assoc_def",
             "dm3.core.view_config", null, true);    // fetchComposite=true
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null

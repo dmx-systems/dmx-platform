@@ -977,8 +977,9 @@ public class EmbeddedService implements DeepaMehtaService {
         Topic roleType = _createTopic(new TopicTypeModel("dm3.core.role_type", "Role Type", "dm3.core.text"));
         // Create data type "Text"
         Topic text = _createTopic(new TopicModel("dm3.core.text", new TopicValue("Text"), "dm3.core.data_type"));
-        //
-        Topic type = _createTopic(new TopicModel("dm3.core.type", new TopicValue("Type"), "dm3.core.role_type"));
+        // Create role types "Type" and "Instance"
+        Topic type     = _createTopic(new TopicModel("dm3.core.type",     new TopicValue("Type"),
+            "dm3.core.role_type"));
         Topic instance = _createTopic(new TopicModel("dm3.core.instance", new TopicValue("Instance"),
             "dm3.core.role_type"));
         // Before data type topics can be associated we must create the association type "Association"

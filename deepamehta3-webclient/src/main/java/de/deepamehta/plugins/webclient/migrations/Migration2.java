@@ -25,6 +25,7 @@ public class Migration2 extends Migration {
         addIconToType("dm3.core.data_type",   "box-green.png");
         addIconToType("dm3.core.cardinality", "box-yellow.png");
         addIconToType("dm3.core.index_mode",  "box-orange.png");
+        addIconToType("dm3.core.meta_type",   "box-grey.png");
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

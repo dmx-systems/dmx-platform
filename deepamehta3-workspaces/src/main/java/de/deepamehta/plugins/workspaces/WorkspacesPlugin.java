@@ -115,7 +115,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
         //
         logger.info("########## Associate type \"" + topicTypeUri + "\" with type \"dm3.workspaces.workspace\"");
         AssociationDefinition assocDef = new AssociationDefinition(topicTypeUri, "dm3.workspaces.workspace");
-        assocDef.setAssocTypeUri("dm3.core.aggregation");
+        assocDef.setAssocTypeUri("dm3.core.aggregation_def");
         assocDef.setCardinalityUri1("dm3.core.many");
         assocDef.setCardinalityUri2("dm3.core.many");
         assocDef.setViewConfigModel(new ViewConfigurationModel());  // FIXME: serialization fails if plugin developer

@@ -23,9 +23,9 @@ function TextFieldRenderer(topic, field, rel_topics) {
             case undefined:
                 // Note: for non-composite topics the field's assoc_def is undefined.
                 // We treat this like a composition here.
-            case "dm3.core.composition":
+            case "dm3.core.composition_def":
                 return gui_element = render_input()
-            case "dm3.core.aggregation":
+            case "dm3.core.aggregation_def":
                 gui_element = render_combobox()
                 return gui_element.dom
             default:

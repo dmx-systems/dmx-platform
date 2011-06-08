@@ -1,8 +1,8 @@
 {
     topic_types: [
 
-        # Note: The topic types "Topic Type", "Association Type", "Data Type",
-        # and "Role Type" are created programmatically.
+        # Note: The meta types "Topic Type" and "Association Type", and the
+        # topic types "Data Type" and "Role Type" are created programmatically.
         # See EmbeddedService.setupBootstrapContent()
 
         /*{
@@ -29,9 +29,13 @@
 
     assoc_types: [
 
-        # Note: The association type "Association" is created programmatically.
+        # Note: The association types "Association" and "Instantiation" are created programmatically.
         # See EmbeddedService.setupBootstrapContent()
 
+        /*{
+            value: "Association",
+            uri:   "dm3.core.association"
+        },*/
         {
             value: "Aggregation",
             uri:   "dm3.core.aggregation"
@@ -39,6 +43,15 @@
         {
             value: "Composition",
             uri:   "dm3.core.composition"
+        },
+
+        {
+            value: "Aggregation Definition",
+            uri:   "dm3.core.aggregation_def"
+        },
+        {
+            value: "Composition Definition",
+            uri:   "dm3.core.composition_def"
         },
 
         /*{
@@ -58,6 +71,11 @@
         # Note: The data type "Text" is created programmatically.
         # See EmbeddedService.setupBootstrapContent()
 
+        /*{
+            value:    "Text",
+            uri:      "dm3.core.text",
+            type_uri: "dm3.core.data_type"
+        },*/
         {
             value:    "HTML",
             uri:      "dm3.core.html",
@@ -80,6 +98,9 @@
         },
 
         ### Role Types ###
+
+        # Note: The role types "Type" and "Instance" are created programmatically.
+        # See EmbeddedService.setupBootstrapContent()
 
         /*{
             value:    "Type",

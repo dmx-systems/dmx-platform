@@ -51,42 +51,42 @@
                 {
                     topic_type_uri_2:  "dm3.webclient.icon_src",
                     cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition"
+                    assoc_type_uri:    "dm3.core.composition_def"
                 },
                 {
                     topic_type_uri_2:  "dm3.webclient.add_to_create_menu",
                     cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition"
+                    assoc_type_uri:    "dm3.core.composition_def"
                 },
                 {
                     topic_type_uri_2:  "dm3.webclient.is_searchable_unit",
                     cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition"
+                    assoc_type_uri:    "dm3.core.composition_def"
                 },
                 {
                     topic_type_uri_2:  "dm3.webclient.editable",
                     cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition"
+                    assoc_type_uri:    "dm3.core.composition_def"
                 },
                 {
                     topic_type_uri_2:  "dm3.webclient.viewable",
                     cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition"
+                    assoc_type_uri:    "dm3.core.composition_def"
                 },
                 {
                     topic_type_uri_2:  "dm3.webclient.js_page_renderer_class",
                     cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition"
+                    assoc_type_uri:    "dm3.core.composition_def"
                 },
                 {
                     topic_type_uri_2:  "dm3.webclient.js_field_renderer_class",
                     cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition"
+                    assoc_type_uri:    "dm3.core.composition_def"
                 },
                 {
                     topic_type_uri_2:  "dm3.webclient.rows",
                     cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition"
+                    assoc_type_uri:    "dm3.core.composition_def"
                 }
             ]
             ### Note: don't try to add view config topics to the view config type -> endless recursion!
@@ -120,12 +120,12 @@
                 {
                     topic_type_uri_2:  "dm3.webclient.search_term",
                     cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition"
+                    assoc_type_uri:    "dm3.core.composition_def"
                 },
                 {
                     topic_type_uri_2:  "dm3.webclient.search_result",
                     cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition"
+                    assoc_type_uri:    "dm3.core.composition_def"
                 }
             ],
             view_config_topics: [

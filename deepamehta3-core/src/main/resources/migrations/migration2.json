@@ -13,7 +13,7 @@
                 {
                     topic_type_uri_2:  "dm3.core.plugin_migration_nr",
                     cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition"
+                    assoc_type_uri:    "dm3.core.composition_def"
                 }
             ]
         }

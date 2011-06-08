@@ -218,14 +218,14 @@ class AttachedTopic extends TopicBase {
                 TopicType childTopicType = dms.getTopicType(assocDef.getTopicTypeUri2(), null);
                 String assocTypeUri = assocDef.getAssocTypeUri();
                 Object value = comp.get(key);
-                if (assocTypeUri.equals("dm3.core.composition")) {
+                if (assocTypeUri.equals("dm3.core.composition_def")) {
                     if (childTopicType.getDataTypeUri().equals("dm3.core.composite")) {
                         AttachedTopic childTopic = storeChildTopicValue(assocDef, null);
                         childTopic.storeComposite((Composite) value);
                     } else {
                         storeChildTopicValue(assocDef, new TopicValue(value));
                     }
-                } else if (assocTypeUri.equals("dm3.core.aggregation")) {
+                } else if (assocTypeUri.equals("dm3.core.aggregation_def")) {
                     if (childTopicType.getDataTypeUri().equals("dm3.core.composite")) {
                         throw new RuntimeException("Aggregation of composite topic types not yet supported");
                     } else {
@@ -308,7 +308,7 @@ class AttachedTopic extends TopicBase {
     // === Helper ===
 
     private AttachedRelatedTopic fetchChildTopic(AssociationDefinition assocDef) {
-        String assocTypeUri       = assocDef.getAssocTypeUri();
+        String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
         String myRoleTypeUri      = assocDef.getRoleTypeUri1();
         String othersRoleTypeUri  = assocDef.getRoleTypeUri2();
         String othersTopicTypeUri = assocDef.getTopicTypeUri2();
@@ -318,10 +318,9 @@ class AttachedTopic extends TopicBase {
     }
 
     private void associateChildTopic(AssociationDefinition assocDef, long childTopicId) {
-        AssociationModel assocModel = new AssociationModel(assocDef.getAssocTypeUri());
-        assocModel.setRoleModel1(new TopicRoleModel(getId(), assocDef.getRoleTypeUri1()));
-        assocModel.setRoleModel2(new TopicRoleModel(childTopicId, assocDef.getRoleTypeUri2()));
-        dms.createAssociation(assocModel, null);     // FIXME: clientContext=null
+        dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
+            new TopicRoleModel(getId(), assocDef.getRoleTypeUri1()),
+            new TopicRoleModel(childTopicId, assocDef.getRoleTypeUri2()));
     }
 
     // ---
