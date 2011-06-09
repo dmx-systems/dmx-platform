@@ -441,30 +441,17 @@ public class HGStorageBridge implements DeepaMehtaStorage {
         return topic;
     }
 
-    /* FIXME: not used
-    private HyperNode lookupTopicType(String topicTypeUri) {
-        HyperNode topicType = lookupHyperNode(topicTypeUri);
-        if (topicType == null) {
-            throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
+    private void checkRoleType(String roleTypeUri) {
+        // Note: the meta meta type is not stored in the DB (in memory only). It can't be looked up from DB.
+        // However, the meta meta type is used as role type to connect the meta meta type's instance (node 0)
+        // with its view configuration.
+        if (roleTypeUri.equals("dm3.core.meta_meta_type")) {
+            return;
         }
-        return topicType;
-    } */
-
-    /* FIXME: not used
-    private HyperNode lookupAssociationType(String assocTypeUri) {
-        HyperNode assocType = lookupHyperNode(assocTypeUri);
-        if (assocType == null) {
-            throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found");
-        }
-        return assocType;
-    } */
-
-    private HyperNode lookupRoleType(String roleTypeUri) {
         HyperNode roleType = lookupHyperNode(roleTypeUri);
         if (roleType == null) {
             throw new RuntimeException("Role type \"" + roleTypeUri + "\" not found");
         }
-        return roleType;
     }
 
     // ---
@@ -553,7 +540,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     private HyperObjectRole getHyperObjectRole(RoleModel roleModel) {
         String roleTypeUri = roleModel.getRoleTypeUri();
-        lookupRoleType(roleTypeUri);    // consistency check
+        checkRoleType(roleTypeUri);     // sanity check
         return new HyperObjectRole(getRoleObject(roleModel), roleTypeUri);
     }
 

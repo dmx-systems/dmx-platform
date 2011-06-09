@@ -26,18 +26,6 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
         super(model, dms);
     }
 
-    // -------------------------------------------------------------------------------------------------- Public Methods
-
-    // ----------------------------------------------------------------------------------------------- Protected Methods
-
-    // === AttachedType Abstracts ===
-
-    protected void initViewConfig() {
-        // Note: this type must be identified by its URI. Types being created have no ID yet.
-        RoleModel configurable = new TopicRoleModel(getUri(), "dm3.core.assoc_type");
-        setViewConfig(new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms));
-    }
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void fetch(String assocTypeUri) {

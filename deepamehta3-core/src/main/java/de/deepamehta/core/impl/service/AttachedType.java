@@ -6,6 +6,7 @@ import de.deepamehta.core.Type;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 
@@ -69,7 +70,9 @@ abstract class AttachedType extends AttachedTopic implements Type {
         return new ViewConfigurationModel(topics);
     }
 
-    // ---
-
-    protected abstract void initViewConfig();
+    protected final void initViewConfig() {
+        // Note: this type must be identified by its URI. Types being created have no ID yet.
+        RoleModel configurable = new TopicRoleModel(getUri(), getTypeUri());
+        setViewConfig(new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms));
+    }
 }

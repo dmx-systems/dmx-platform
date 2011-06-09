@@ -112,18 +112,6 @@ class AttachedTopicType extends AttachedType implements TopicType {
         return (TopicTypeModel) super.getModel();
     }
 
-    // ----------------------------------------------------------------------------------------------- Protected Methods
-
-
-
-    // === AttachedType Abstracts ===
-
-    protected void initViewConfig() {
-        // Note: this type must be identified by its URI. Types being created have no ID yet.
-        RoleModel configurable = new TopicRoleModel(getUri(), "dm3.core.topic_type");
-        setViewConfig(new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms));
-    }
-
 
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
