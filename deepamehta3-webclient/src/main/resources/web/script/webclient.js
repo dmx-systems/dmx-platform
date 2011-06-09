@@ -294,7 +294,7 @@ var dm3c = new function() {
         for (var plugin_class in plugins) {
             var plugin = dm3c.get_plugin(plugin_class)
             if (plugin[hook_name]) {
-                // 1) Trigger hook
+                // 1) Trigger hook ### FIXME: use apply()
                 if (arguments.length == 1) {
                     var res = plugin[hook_name]()
                 } else if (arguments.length == 2) {
@@ -356,28 +356,13 @@ var dm3c = new function() {
 
     // === Topics ===
 
-    /* this.get_value = function(topic, field_uri) {
-        // alert("topic=" + JSON.stringify(topic) + "\n\nfield_uri=\"" + field_uri + "\"")
-        var assoc_def_uris = field_uri.split(dm3c.COMPOSITE_PATH_SEPARATOR)
-        if (assoc_def_uris.length == 1) {
-            // alert("topic=" + JSON.stringify(topic) + "\n\nfield_uri=\"" + field_uri + "\"\n\n=> " + topic.value)
-            return topic.value
-        } else {
-            var comp = topic.composite
-            for (var i = 1, assoc_def_uri; assoc_def_uri = assoc_def_uris[i]; i++) {
-                comp = comp[assoc_def_uri]
-            }
-            // alert("topic=" + JSON.stringify(topic) + "\n\nfield_uri=\"" + field_uri + "\"\n\n=> " + comp)
-            return comp || ""
-        } */
-        /* var value = topic.properties[field_uri]
-        if (value == undefined) {
-            // alert("WARNING (get_value): Data field \"" + field_uri + "\" has no value.\n\n" +
-            //    "Topic: " + JSON.stringify(topic))
-            value = ""
+    this.hash_by_type = function(topics) {
+        var hashed_topics = {}
+        for (var i = 0, topic; topic = topics[i]; i++) {
+            hashed_topics[topic.type_uri] = topic
         }
-        return value */
-    // }
+        return hashed_topics
+    }
 
     // === Types ===
 
@@ -413,7 +398,8 @@ var dm3c = new function() {
      * <p>
      * Compare to server-side counterparts: WebclientPlugin.getViewConfig() and ViewConfiguration.getSetting()
      *
-     * @param   configurable    A topic type or an association definition. Must not be null/undefined.
+     * @param   configurable    A topic type, an association type or an association definition.
+     *                          Must not be null/undefined.
      * @param   setting         Last component of the setting URI, e.g. "icon_src".
      *
      * @return  The setting value, or <code>undefined</code> if there is no such setting

@@ -5,11 +5,11 @@ function TopicType(topic_type) {
     this.value     = topic_type.value
     this.type_uri  = topic_type.type_uri
     this.composite = topic_type.composite
-
+    //
     this.data_type_uri      = topic_type.data_type_uri
     this.index_mode_uris    = topic_type.index_mode_uris
     this.assoc_defs         = deserialize(topic_type.assoc_defs)
-    this.view_config_topics = hash_by_type(topic_type.view_config_topics)
+    this.view_config_topics = dm3c.hash_by_type(topic_type.view_config_topics)
 
     // === "Page Displayable" implementation ===
 
@@ -52,16 +52,8 @@ function TopicType(topic_type) {
 
     function deserialize(assoc_defs) {
         for (var i = 0, assoc_def; assoc_def = assoc_defs[i]; i++) {
-            assoc_def.view_config_topics = hash_by_type(assoc_def.view_config_topics)
+            assoc_def.view_config_topics = dm3c.hash_by_type(assoc_def.view_config_topics)
         }
         return assoc_defs
-    }
-
-    function hash_by_type(topics) {
-        var hashed_topics = {}
-        for (var i = 0, topic; topic = topics[i]; i++) {
-            hashed_topics[topic.type_uri] = topic
-        }
-        return hashed_topics
     }
 }

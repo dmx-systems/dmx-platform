@@ -551,7 +551,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Path("/assoctype/{uri}")
     @Override
     public AttachedAssociationType getAssociationType(@PathParam("uri") String uri,
-                                                @HeaderParam("Cookie") ClientContext clientContext) {
+                                                      @HeaderParam("Cookie") ClientContext clientContext) {
         if (uri == null) {
             throw new IllegalArgumentException("Tried to get an association type with null URI");
         }
