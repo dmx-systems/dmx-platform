@@ -398,7 +398,7 @@ var dm3c = new function() {
      * <p>
      * Compare to server-side counterparts: WebclientPlugin.getViewConfig() and ViewConfiguration.getSetting()
      *
-     * @param   configurable    A topic type, an association type or an association definition.
+     * @param   configurable    A topic type, an association type, or an association definition.
      *                          Must not be null/undefined.
      * @param   setting         Last component of the setting URI, e.g. "icon_src".
      *

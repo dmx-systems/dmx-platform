@@ -24,19 +24,12 @@ function TopicRenderer() {
     this.render_page = function(topic) {
 
         render_page_model(create_page_model(topic), render_field)
-        render_associations()
+        dm3c.render.associations(topic.id)
 
         function render_field(field) {
             if (field.viewable) {
                 field.render_field()
             }
-        }
-
-        function render_associations() {
-            var topics = dm3c.restc.get_related_topics(topic.id) //, "dm3.core.association")
-            //
-            dm3c.render.field_label("Associations (" + topics.length + ")")
-            dm3c.render.field_value(dm3c.render.topic_list(topics))
         }
     }
 

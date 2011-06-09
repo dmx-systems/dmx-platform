@@ -1,0 +1,15 @@
+#assoc-def-editors {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 0;
+}
+
+.assoc-def-editor {
+    padding: 0.4em 0.7em;
+    margin-top: 0.4em;
+    margin-right: 0.4em;
+}
+
+.assoc-def-editor .label {
+    margin-right: 0.7em;
+}

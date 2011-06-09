@@ -76,6 +76,17 @@ function RenderHelper() {
         return menu
     }
 
+
+
+    // === Direct-to-page Rendering ===
+
+    this.associations = function(topic_id) {
+        var topics = dm3c.restc.get_related_topics(topic_id) //, "dm3.core.association")
+        //
+        this.field_label("Associations (" + topics.length + ")")
+        this.field_value(this.topic_list(topics))
+    }
+
     // ---
 
     /**
@@ -91,10 +102,16 @@ function RenderHelper() {
                 label += suffix
             }
         }
-        $("#page-content").append($("<div>").addClass("field-label").text(label))
+        this.page($("<div>").addClass("field-label").text(label))
     }
 
     this.field_value = function(value) {
-        $("#page-content").append($("<div>").addClass("field-value").append(value))
+        this.page($("<div>").addClass("field-value").append(value))
+    }
+
+    // ---
+
+    this.page = function(html) {
+        $("#page-content").append(html)
     }
 }

@@ -1,7 +1,7 @@
 function typeeditor_plugin() {
 
     dm3c.register_page_renderer("/de.deepamehta.3-typeeditor/script/topictype_renderer.js")
-    dm3c.register_css_stylesheet("/de.deepamehta.3-typeeditor/style/dm3-typeeditor.css")
+    dm3c.register_css_stylesheet("/de.deepamehta.3-typeeditor/style/typeeditor.css")
 
     var DEFAULT_TOPIC_TYPE = {
         value: "Topic Type 1",
