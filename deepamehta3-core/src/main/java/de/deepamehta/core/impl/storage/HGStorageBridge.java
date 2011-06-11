@@ -6,7 +6,6 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.impl.model.AssociationBase;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;

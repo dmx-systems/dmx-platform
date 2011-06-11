@@ -7,7 +7,6 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.ClientContext;

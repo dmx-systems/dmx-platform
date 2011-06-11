@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class AssociationDefinition {
+public class AssociationDefinitionModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -44,11 +44,11 @@ public class AssociationDefinition {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public AssociationDefinition(String topicTypeUri1, String topicTypeUri2) {
+    public AssociationDefinitionModel(String topicTypeUri1, String topicTypeUri2) {
         this(-1, topicTypeUri1, topicTypeUri2);
     }
 
-    public AssociationDefinition(long id, String topicTypeUri1, String topicTypeUri2
+    public AssociationDefinitionModel(long id, String topicTypeUri1, String topicTypeUri2
                                           /* ### String roleTypeUri1, String roleTypeUri2 */) {
         this.id = id;
         //
@@ -61,7 +61,7 @@ public class AssociationDefinition {
         this.uri = topicTypeUri2;                   // ### roleTypeUri2;
     }
 
-    public AssociationDefinition(JSONObject assocDef, String topicTypeUri1) {
+    public AssociationDefinitionModel(JSONObject assocDef, String topicTypeUri1) {
         try {
             this.id = -1;
             //
@@ -83,7 +83,7 @@ public class AssociationDefinition {
             //
             this.viewConfigModel = new ViewConfigurationModel(assocDef);
         } catch (Exception e) {
-            throw new RuntimeException("Parsing AssociationDefinition failed (JSONObject=" + assocDef + ")", e);
+            throw new RuntimeException("Parsing AssociationDefinitionModel failed (JSONObject=" + assocDef + ")", e);
         }
     }
 
@@ -191,9 +191,9 @@ public class AssociationDefinition {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    static void toJSON(Collection<AssociationDefinition> assocDefs, JSONObject o) throws Exception {
+    static void toJSON(Collection<AssociationDefinitionModel> assocDefs, JSONObject o) throws Exception {
         List assocDefList = new ArrayList();
-        for (AssociationDefinition assocDef : assocDefs) {
+        for (AssociationDefinitionModel assocDef : assocDefs) {
             assocDefList.add(assocDef.toJSON());
         }
         o.put("assoc_defs", assocDefList);

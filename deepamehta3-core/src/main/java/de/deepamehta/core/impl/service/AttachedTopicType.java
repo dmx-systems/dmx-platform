@@ -1,26 +1,26 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationDefinition;
-import de.deepamehta.core.model.AssociationRoleModel;
+import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TopicValue;
-import de.deepamehta.core.model.ViewConfigurationModel;
 
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,17 +35,20 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private Map<String, AssociationDefinition> assocDefs;
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedTopicType(EmbeddedService dms) {
-        super(dms);     // the model and viewConfig remain uninitialized.
-                        // They are initialued later on through fetch().
+        super(dms);     // The model and assocDefs remain uninitialized.
+                        // They are initialized later on through fetch().
     }
 
     AttachedTopicType(TopicTypeModel model, EmbeddedService dms) {
         super(model, dms);
+        initAssocDefs();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -86,14 +89,20 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     @Override
     public Map<String, AssociationDefinition> getAssocDefs() {
-        return getModel().getAssocDefs();
+        return assocDefs;
     }
 
     @Override
     public AssociationDefinition getAssocDef(String assocDefUri) {
-        return getModel().getAssocDef(assocDefUri);
+        AssociationDefinition assocDef = assocDefs.get(assocDefUri);
+        if (assocDef == null) {
+            throw new RuntimeException("Schema violation: association definition \"" +
+                assocDefUri + "\" not found in " + this);
+        }
+        return assocDef;
     }
 
+    /* FIXME: not in use
     @Override
     public void addAssocDef(AssociationDefinition assocDef) {
         AssociationDefinition predAssocDef = findLastAssocDef();
@@ -101,7 +110,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         getModel().addAssocDef(assocDef);
         // update DB
         storeAssocDef(assocDef, predAssocDef);
-    }
+    } */
 
 
 
@@ -123,7 +132,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
         }
         //
-        Map<Long, AssociationDefinition> assocDefs = fetchAssociationDefinitions(typeTopic);
+        Map<Long, AttachedAssociationDefinition> assocDefs = fetchAssociationDefinitions(typeTopic);
         //
         List<Long> sequenceIds = fetchSequenceIds(typeTopic);
         // sanity check
@@ -131,14 +140,15 @@ class AttachedTopicType extends AttachedType implements TopicType {
             throw new RuntimeException("Graph inconsistency: " + assocDefs.size() + " association " +
                 "definitions found but sequence length is " + sequenceIds.size());
         }
-        // build type model
+        // build model
         TopicTypeModel model = new TopicTypeModel(typeTopic, fetchDataTypeTopic(typeTopic).getUri(),
                                                              fetchIndexModes(typeTopic),
                                                              fetchViewConfig(typeTopic));
-        addAssocDefs(model, assocDefs, sequenceIds);
-        //
+        addAssocDefsToModel(model, assocDefs, sequenceIds);
+        // set model of this topic type
         setModel(model);
-        initViewConfig();
+        // ### initAssocDefs(); // Note: the assoc defs are already initialized through previous addAssocDefsToModel()
+        initViewConfig();   // defined in superclass
     }
 
     void store() {
@@ -187,43 +197,17 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     // === Fetch ===
 
-    private Map<Long, AssociationDefinition> fetchAssociationDefinitions(Topic typeTopic) {
-        Map<Long, AssociationDefinition> assocDefs = new HashMap();
+    private Map<Long, AttachedAssociationDefinition> fetchAssociationDefinitions(Topic typeTopic) {
+        Map<Long, AttachedAssociationDefinition> assocDefs = new HashMap();
         for (Association assoc : typeTopic.getAssociations("dm3.core.topic_type_1")) {
-            AssociationDefinition assocDef = fetchAssociationDefinition(assoc, typeTopic.getUri());
+            AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(dms);
+            assocDef.fetch(assoc, typeTopic.getUri());
+            // Note: the returned map is an intermediate, hashed by ID. The actual type model is
+            // subsequently build from it by sorting the assoc def's according to the sequence IDs.
             assocDefs.put(assocDef.getId(), assocDef);
         }
         return assocDefs;
     }
-
-    /**
-     * @param   topicTypeUri    only used for sanity check
-     */
-    private AssociationDefinition fetchAssociationDefinition(Association assoc, String topicTypeUri) {
-        try {
-            TopicTypes topicTypes = fetchTopicTypes(assoc);
-            // ### RoleTypes roleTypes = fetchRoleTypes(assoc);
-            Cardinality cardinality = fetchCardinality(assoc);
-            // sanity check
-            if (!topicTypes.topicTypeUri1.equals(topicTypeUri)) {
-                throw new RuntimeException("jri doesn't understand Neo4j traversal");
-            }
-            //
-            AssociationDefinition assocDef = new AssociationDefinition(assoc.getId(),
-                topicTypes.topicTypeUri1, topicTypes.topicTypeUri2
-                /* ###, roleTypes.roleTypeUri1, roleTypes.roleTypeUri2 */);
-            assocDef.setCardinalityUri1(cardinality.cardinalityUri1);
-            assocDef.setCardinalityUri2(cardinality.cardinalityUri2);
-            assocDef.setAssocTypeUri(assoc.getTypeUri());
-            assocDef.setViewConfigModel(fetchViewConfig(assoc));
-            return assocDef;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching association definition for topic type \"" + topicTypeUri +
-                "\" failed (" + assoc + ")", e);
-        }
-    }
-
-    // ---
 
     private List<Long> fetchSequenceIds(Topic typeTopic) {
         try {
@@ -247,17 +231,19 @@ class AttachedTopicType extends AttachedType implements TopicType {
         }
     }
 
-    private void addAssocDefs(TopicTypeModel topicTypeModel, Map<Long, AssociationDefinition> assocDefs,
-                                                             List<Long> sequenceIds) {
+    private void addAssocDefsToModel(TopicTypeModel model, Map<Long, AttachedAssociationDefinition> assocDefs,
+                                                           List<Long> sequenceIds) {
+        this.assocDefs = new LinkedHashMap();
         for (long assocDefId : sequenceIds) {
-            AssociationDefinition assocDef = assocDefs.get(assocDefId);
+            AttachedAssociationDefinition assocDef = assocDefs.get(assocDefId);
             // sanity check
             if (assocDef == null) {
                 throw new RuntimeException("Graph inconsistency: ID " + assocDefId +
                     " is in sequence but association definition is not found");
             }
-            //
-            topicTypeModel.addAssocDef(assocDef);
+            // Note: the model and the attached object's are filled parallely.
+            model.addAssocDefModel(assocDef.getModel());
+            this.assocDefs.put(assocDef.getUri(), assocDef);
         }
     }
 
@@ -284,96 +270,6 @@ class AttachedTopicType extends AttachedType implements TopicType {
         return IndexMode.fromTopics(topics);
     }
 
-    // ---
-
-    private ViewConfigurationModel fetchViewConfig(Association assoc) {
-        // ### should we use "dm3.core.association" instead of "dm3.core.aggregation"?
-        Set<RelatedTopic> topics = assoc.getRelatedTopics("dm3.core.aggregation", "dm3.core.assoc_def",
-            "dm3.core.view_config", null, true);    // fetchComposite=true
-        // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
-        return new ViewConfigurationModel(topics);
-    }
-
-    // ---
-
-    private TopicTypes fetchTopicTypes(Association assoc) {
-        String topicTypeUri1 = assoc.getTopic("dm3.core.topic_type_1").getUri();
-        String topicTypeUri2 = assoc.getTopic("dm3.core.topic_type_2").getUri();
-        return new TopicTypes(topicTypeUri1, topicTypeUri2);
-    }
-
-    /* ### private RoleTypes fetchRoleTypes(Association assoc) {
-        Topic roleType1 = assoc.getTopic("dm3.core.role_type_1");
-        Topic roleType2 = assoc.getTopic("dm3.core.role_type_2");
-        RoleTypes roleTypes = new RoleTypes();
-        // role types are optional
-        if (roleType1 != null) {
-            roleTypes.setRoleTypeUri1(roleType1.getUri());
-        }
-        if (roleType2 != null) {
-            roleTypes.setRoleTypeUri2(roleType2.getUri());
-        }
-        return roleTypes;
-    } */
-
-    private Cardinality fetchCardinality(Association assoc) {
-        Topic cardinality1 = assoc.getRelatedTopic("dm3.core.aggregation", "dm3.core.assoc_def",
-            "dm3.core.cardinality_1", "dm3.core.cardinality", false);    // fetchComposite=false
-        Topic cardinality2 = assoc.getRelatedTopic("dm3.core.aggregation", "dm3.core.assoc_def",
-            "dm3.core.cardinality_2", "dm3.core.cardinality", false);    // fetchComposite=false
-        Cardinality cardinality = new Cardinality();
-        if (cardinality1 != null) {
-            cardinality.setCardinalityUri1(cardinality1.getUri());
-        }
-        if (cardinality2 != null) {
-            cardinality.setCardinalityUri2(cardinality2.getUri());
-        } else {
-            throw new RuntimeException("Missing cardinality of position 2");
-        }
-        return cardinality;
-    }
-
-    // --- Inner Classes ---
-
-    private class TopicTypes {
-
-        private String topicTypeUri1;
-        private String topicTypeUri2;
-
-        private TopicTypes(String topicTypeUri1, String topicTypeUri2) {
-            this.topicTypeUri1 = topicTypeUri1;
-            this.topicTypeUri2 = topicTypeUri2;
-        }
-    }
-
-    /* ### private class RoleTypes {
-
-        private String roleTypeUri1;
-        private String roleTypeUri2;
-
-        private void setRoleTypeUri1(String roleTypeUri1) {
-            this.roleTypeUri1 = roleTypeUri1;
-        }
-
-        private void setRoleTypeUri2(String roleTypeUri2) {
-            this.roleTypeUri2 = roleTypeUri2;
-        }
-    } */
-
-    private class Cardinality {
-
-        private String cardinalityUri1;
-        private String cardinalityUri2;
-
-        private void setCardinalityUri1(String cardinalityUri1) {
-            this.cardinalityUri1 = cardinalityUri1;
-        }
-
-        private void setCardinalityUri2(String cardinalityUri2) {
-            this.cardinalityUri2 = cardinalityUri2;
-        }
-    }
-
 
 
     // === Store ===
@@ -398,77 +294,22 @@ class AttachedTopicType extends AttachedType implements TopicType {
     private void storeAssocDefs() {
         AssociationDefinition predAssocDef = null;
         for (AssociationDefinition assocDef : getAssocDefs().values()) {
-            storeAssocDef(assocDef, predAssocDef);
+            ((AttachedAssociationDefinition) assocDef).store(predAssocDef);
             predAssocDef = assocDef;
-        }
-    }
-
-    /**
-     * @param   predAssocDef    The predecessor of the new assocdef. The new assocdef is added after this one.
-     *                          <code>null</code> indicates the sequence start. 
-     */
-    private void storeAssocDef(AssociationDefinition assocDef, AssociationDefinition predAssocDef) {
-        try {
-            // topic types
-            Association assoc = dms.createAssociation(assocDef.getAssocTypeUri(),
-                new TopicRoleModel(assocDef.getTopicTypeUri1(), "dm3.core.topic_type_1"),
-                new TopicRoleModel(assocDef.getTopicTypeUri2(), "dm3.core.topic_type_2"));
-            assocDef.setId(assoc.getId());
-            // role types
-            dms.createAssociation("dm3.core.aggregation",
-                new TopicRoleModel(assocDef.getRoleTypeUri1(), "dm3.core.role_type_1"),
-                new AssociationRoleModel(assoc.getId(), "dm3.core.assoc_def"));
-            dms.createAssociation("dm3.core.aggregation",
-                new TopicRoleModel(assocDef.getRoleTypeUri2(), "dm3.core.role_type_2"),
-                new AssociationRoleModel(assoc.getId(), "dm3.core.assoc_def"));
-            // cardinality
-            dms.createAssociation("dm3.core.aggregation",
-                new TopicRoleModel(assocDef.getCardinalityUri1(), "dm3.core.cardinality_1"),
-                new AssociationRoleModel(assoc.getId(), "dm3.core.assoc_def"));
-            dms.createAssociation("dm3.core.aggregation",
-                new TopicRoleModel(assocDef.getCardinalityUri2(), "dm3.core.cardinality_2"),
-                new AssociationRoleModel(assoc.getId(), "dm3.core.assoc_def"));
-            //
-            putInSequence(assocDef, predAssocDef);
-            //
-            storeViewConfig(assocDef);
-        } catch (Exception e) {
-            throw new RuntimeException("Storing association definition \"" + assocDef.getUri() +
-                "\" of topic type \"" + getUri() + "\" failed", e);
-        }
-    }
-
-    private void putInSequence(AssociationDefinition assocDef, AssociationDefinition predAssocDef) {
-        if (predAssocDef == null) {
-            // start sequence
-            AssociationModel assocModel = new AssociationModel("dm3.core.association");
-            assocModel.setRoleModel1(new TopicRoleModel(getUri(), "dm3.core.topic_type"));
-            assocModel.setRoleModel2(new AssociationRoleModel(assocDef.getId(), "dm3.core.first_assoc_def"));
-            dms.createAssociation(assocModel, null);                     // FIXME: clientContext=null
-        } else {
-            // continue sequence
-            AssociationModel assocModel = new AssociationModel("dm3.core.sequence");
-            assocModel.setRoleModel1(new AssociationRoleModel(predAssocDef.getId(), "dm3.core.predecessor"));
-            assocModel.setRoleModel2(new AssociationRoleModel(assocDef.getId(),     "dm3.core.successor"));
-            dms.createAssociation(assocModel, null);                     // FIXME: clientContext=null
-        }
-    }
-
-    // ---
-
-    // FIXME: move to an AttachedAssociationDefinition class
-    private void storeViewConfig(AssociationDefinition assocDef) {
-        for (TopicModel configTopic : assocDef.getViewConfigModel().getConfigTopics()) {
-            Topic topic = dms.createTopic(configTopic, null);           // FIXME: clientContext=null
-            dms.createAssociation("dm3.core.aggregation",
-                new AssociationRoleModel(assocDef.getId(), "dm3.core.assoc_def"),
-                new TopicRoleModel(topic.getId(), "dm3.core.view_config"));
         }
     }
 
 
 
     // === Helper ===
+
+    private void initAssocDefs() {
+        this.assocDefs = new LinkedHashMap();
+        for (AssociationDefinitionModel model : getModel().getAssocDefModels().values()) {
+            AssociationDefinition assocDef = new AttachedAssociationDefinition(model, dms);
+            assocDefs.put(assocDef.getUri(), assocDef);
+        }
+    }
 
     private AssociationDefinition findLastAssocDef() {
         AssociationDefinition lastAssocDef = null;

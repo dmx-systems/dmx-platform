@@ -23,8 +23,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedType(EmbeddedService dms) {
-        super((TopicModel) null, dms);  // the model and viewConfig remain uninitialized.
-                                        // They are initialued later on through fetch().
+        super((TopicModel) null, dms);  // The model and viewConfig remain uninitialized.
+                                        // They are initialized later on through subtype's fetch().
     }
 
     AttachedType(TypeModel model, EmbeddedService dms) {
@@ -39,11 +39,6 @@ abstract class AttachedType extends AttachedTopic implements Type {
     @Override
     public AttachedViewConfiguration getViewConfig() {
         return viewConfig;
-    }
-
-    @Override
-    public void setViewConfig(ViewConfiguration viewConfig) {
-        this.viewConfig = (AttachedViewConfiguration) viewConfig;
     }
 
     // ---
@@ -73,6 +68,6 @@ abstract class AttachedType extends AttachedTopic implements Type {
     protected final void initViewConfig() {
         // Note: this type must be identified by its URI. Types being created have no ID yet.
         RoleModel configurable = new TopicRoleModel(getUri(), getTypeUri());
-        setViewConfig(new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms));
+        this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
     }
 }

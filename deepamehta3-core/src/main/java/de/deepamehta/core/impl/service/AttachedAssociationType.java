@@ -18,8 +18,8 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedAssociationType(EmbeddedService dms) {
-        super(dms);     // the model remains uninitialized.
-                        // It is initialued later on through fetch().
+        super(dms);     // The model remains uninitialized.
+                        // It is initialized later on through fetch().
     }
 
     AttachedAssociationType(AssociationTypeModel model, EmbeddedService dms) {

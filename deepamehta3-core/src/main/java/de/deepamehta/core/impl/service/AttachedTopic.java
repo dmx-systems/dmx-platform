@@ -1,12 +1,11 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.impl.model.TopicBase;
-import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.TopicModel;

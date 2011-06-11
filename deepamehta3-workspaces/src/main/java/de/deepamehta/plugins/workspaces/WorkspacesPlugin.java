@@ -3,7 +3,6 @@ package de.deepamehta.plugins.workspaces;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationDefinition;
 import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.RelatedTopic;
