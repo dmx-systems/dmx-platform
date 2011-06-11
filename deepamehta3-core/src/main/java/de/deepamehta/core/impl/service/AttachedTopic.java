@@ -122,7 +122,7 @@ class AttachedTopic extends TopicBase {
 
     @Override
     public Set<Association> getAssociations(String myRoleTypeUri) {
-        return dms.getAssociations(getId(), myRoleTypeUri);
+        return dms.attach(dms.storage.getAssociations(getId(), myRoleTypeUri));
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

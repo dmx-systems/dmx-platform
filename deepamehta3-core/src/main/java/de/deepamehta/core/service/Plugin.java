@@ -216,10 +216,15 @@ public class Plugin implements BundleActivator {
 
     // ---
 
-    public void preDeleteRelationHook(long relationId) {
+    public void postRetypeAssociationHook(Association assoc, String oldTypeUri) {
     }
 
-    public void postDeleteRelationHook(long relationId) {
+    // ---
+
+    public void preDeleteAssociationHook(long assocId) {
+    }
+
+    public void postDeleteAssociationHook(long assocId) {
     }
 
     // ---
@@ -227,7 +232,7 @@ public class Plugin implements BundleActivator {
     public void providePropertiesHook(Topic topic) {
     }
 
-    public void providePropertiesHook(Association relation) {
+    public void providePropertiesHook(Association assoc) {
     }
 
     // ---

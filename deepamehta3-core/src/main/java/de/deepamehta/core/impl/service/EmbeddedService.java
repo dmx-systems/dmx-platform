@@ -105,8 +105,10 @@ public class EmbeddedService implements DeepaMehtaService {
         // ### PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, Properties.class),
         // ### POST_UPDATE_TOPIC("postUpdateHook", Topic.class, Properties.class),
 
-         PRE_DELETE_RELATION("preDeleteRelationHook",  Long.TYPE),
-        POST_DELETE_RELATION("postDeleteRelationHook", Long.TYPE),
+        POST_RETYPE_ASSOCIATION("postRetypeAssociationHook", Association.class, String.class),
+
+         PRE_DELETE_ASSOCIATION("preDeleteAssociationHook",  Long.TYPE),
+        POST_DELETE_ASSOCIATION("postDeleteAssociationHook", Long.TYPE),
 
         PROVIDE_TOPIC_PROPERTIES("providePropertiesHook", Topic.class),
         PROVIDE_RELATION_PROPERTIES("providePropertiesHook", Association.class),
@@ -393,9 +395,11 @@ public class EmbeddedService implements DeepaMehtaService {
             // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
-            assoc.update(assocModel);
+            AssociationChangeReport report = assoc.update(assocModel);
             //
-            // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
+            if (report.typeUriChanged) {
+                triggerHook(Hook.POST_RETYPE_ASSOCIATION, assoc, report.oldTypeUri);
+            }
             //
             tx.success();
             return assoc;
@@ -413,9 +417,9 @@ public class EmbeddedService implements DeepaMehtaService {
     public void deleteAssociation(@PathParam("id") long assocId, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            triggerHook(Hook.PRE_DELETE_RELATION, assocId);
+            triggerHook(Hook.PRE_DELETE_ASSOCIATION, assocId);
             storage.deleteAssociation(assocId);
-            triggerHook(Hook.POST_DELETE_RELATION, assocId);
+            triggerHook(Hook.POST_DELETE_ASSOCIATION, assocId);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -745,15 +749,6 @@ public class EmbeddedService implements DeepaMehtaService {
             othersTopicTypeUri, fetchComposite);
     } */
 
-    // TODO: move to AttachedTopic
-    Set<Association> getAssociations(long topicId, String myRoleTypeUri) {
-        Set<Association> assocs = new HashSet();
-        for (Association assoc : storage.getAssociations(topicId, myRoleTypeUri)) {
-            assocs.add(attach(assoc));
-        }
-        return assocs;
-    }
-
 
 
     // === Association REST API ===
@@ -821,6 +816,14 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     private AttachedAssociation attach(Association assoc) {
         return new AttachedAssociation(assoc, this);
+    }
+
+    Set<Association> attach(Set<Association> assocs) {
+        Set<Association> attachedAssocs = new LinkedHashSet();
+        for (Association assoc : assocs) {
+            attachedAssocs.add(attach(assoc));
+        }
+        return attachedAssocs;
     }
 
     // ---

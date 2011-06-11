@@ -189,7 +189,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     private Map<Long, AssociationDefinition> fetchAssociationDefinitions(Topic typeTopic) {
         Map<Long, AssociationDefinition> assocDefs = new HashMap();
-        for (Association assoc : dms.getAssociations(typeTopic.getId(), "dm3.core.topic_type_1")) {
+        for (Association assoc : typeTopic.getAssociations("dm3.core.topic_type_1")) {
             AssociationDefinition assocDef = fetchAssociationDefinition(assoc, typeTopic.getUri());
             assocDefs.put(assocDef.getId(), assocDef);
         }
@@ -328,7 +328,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         if (cardinality2 != null) {
             cardinality.setCardinalityUri2(cardinality2.getUri());
         } else {
-            throw new RuntimeException("Missing cardinality of position 2 in association definition");
+            throw new RuntimeException("Missing cardinality of position 2");
         }
         return cardinality;
     }

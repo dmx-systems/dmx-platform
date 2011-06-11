@@ -141,27 +141,31 @@ class AttachedAssociation extends AssociationBase {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void update(AssociationModel assocModel) {
+    AssociationChangeReport update(AssociationModel assocModel) {
         logger.info("Updating association " + getId() + " (new " + assocModel + ")");
         //
         // Note: We must lookup the roles individually.
         // The role order (getRole1(), getRole2()) is undeterministic and not fix.
         Role role1 = getRole(getObjectId(assocModel.getRoleModel1()));
         Role role2 = getRole(getObjectId(assocModel.getRoleModel2()));
-        //
+        // new values
         String newTypeUri = assocModel.getTypeUri();
         String newRoleTypeUri1 = assocModel.getRoleModel1().getRoleTypeUri();
         String newRoleTypeUri2 = assocModel.getRoleModel2().getRoleTypeUri();
-        //
+        // current values
+        String typeUri = getTypeUri();
         String roleTypeUri1 = role1.getRoleTypeUri();
         String roleTypeUri2 = role2.getRoleTypeUri();
-        //
-        boolean typeUriChanged = !getTypeUri().equals(newTypeUri);
+        // what has changed?
+        boolean typeUriChanged = !typeUri.equals(newTypeUri);
         boolean roleType1Changed = !roleTypeUri1.equals(newRoleTypeUri1);
         boolean roleType2Changed = !roleTypeUri2.equals(newRoleTypeUri2);
         //
+        AssociationChangeReport report = new AssociationChangeReport();
+        //
         if (typeUriChanged) {
-            logger.info("Changing type from \"" + getTypeUri() + "\" -> \"" + newTypeUri + "\"");
+            logger.info("Changing type from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
+            report.typeUriChanged(typeUri, newTypeUri);
             setTypeUri(newTypeUri);
         }
         if (roleType1Changed) {
@@ -176,6 +180,8 @@ class AttachedAssociation extends AssociationBase {
         if (!typeUriChanged && !roleType1Changed && !roleType2Changed) {
             logger.info("Updating association " + getId() + " ABORTED -- no changes made by user");
         }
+        //
+        return report;
     }
 
 
