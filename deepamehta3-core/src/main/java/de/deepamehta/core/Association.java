@@ -19,7 +19,7 @@ import java.util.Set;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface Association {
+public interface Association extends JSONEnabled {
 
     long getId();
 
@@ -68,10 +68,4 @@ public interface Association {
     Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                   String othersTopicTypeUri,
                                                                                   boolean fetchComposite);
-
-
-
-    // === Serialization ===
-
-    JSONObject toJSON();
 }

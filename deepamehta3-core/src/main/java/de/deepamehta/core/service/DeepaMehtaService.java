@@ -110,7 +110,7 @@ public interface DeepaMehtaService {
 
     public Association createAssociation(AssociationModel assocModel, ClientContext clientContext);
 
-    public Association updateAssociation(AssociationModel assocModel, ClientContext clientContext);
+    public Directives updateAssociation(AssociationModel assocModel, ClientContext clientContext);
 
     public void deleteAssociation(long assocId, ClientContext clientContext);
 

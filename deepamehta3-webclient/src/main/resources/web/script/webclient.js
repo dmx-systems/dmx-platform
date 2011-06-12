@@ -174,16 +174,18 @@ var dm3c = new function() {
      *                      post_update_topic hook to let plugins compare the old and new ones.
      * @param   new_assoc   the new association that is about to override the old association.
      *
-     * @return  The updated association as stored in the DB.
+     * ### FIXME: @return  The updated association as stored in the DB.
      */
     this.update_association = function(old_assoc, new_assoc) {
         // 1) update DB
         // alert("dm3c.update_association(): new_assoc=" + JSON.stringify(new_assoc));
-        var updated_assoc = build_association(dm3c.restc.update_association(new_assoc))
+        var directives = dm3c.restc.update_association(new_assoc)
+        // alert("update_association(): " + directives.length + " directives received\n\n" + JSON.stringify(directives))
+        process_directives(directives)
         // 2) trigger hook
         // ### dm3c.trigger_plugin_hook("post_update_topic", updated_assoc, old_assoc)
         //
-        return updated_assoc
+        // ### return updated_assoc
     }
 
     /**
@@ -737,6 +739,27 @@ var dm3c = new function() {
 
     function build_association_type(assoc_type) {
         return new AssociationType(assoc_type)
+    }
+
+    // === Directives ===
+
+    function process_directives(directives) {
+        for (var i = 0, directive; directive = directives[i]; i++) {
+            switch (directive.type) {
+            case "update_association":
+                var assoc = build_association(directive.arg)
+                dm3c.canvas.update_association(assoc)
+                dm3c.canvas.refresh()
+                dm3c.page_panel.display(assoc)
+                break
+            case "update_topic_type":
+                var topic_type = build_topic_type(directive.arg)
+                dm3c.type_cache.put_topic_type(topic_type)
+                break
+            default:
+                throw "UnknownDirectiveError: directive \"" + directive.type + "\" not implemented"
+            }
+        }
     }
 
     // === Model ===

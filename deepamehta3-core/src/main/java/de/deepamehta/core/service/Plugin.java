@@ -216,7 +216,7 @@ public class Plugin implements BundleActivator {
 
     // ---
 
-    public void postRetypeAssociationHook(Association assoc, String oldTypeUri) {
+    public void postRetypeAssociationHook(Association assoc, String oldTypeUri, Directives directives) {
     }
 
     // ---

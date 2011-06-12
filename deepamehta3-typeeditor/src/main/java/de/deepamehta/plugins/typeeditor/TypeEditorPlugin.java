@@ -4,6 +4,8 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.service.Directive;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
 
 import java.util.logging.Logger;
@@ -27,7 +29,7 @@ public class TypeEditorPlugin extends Plugin {
 
 
     @Override
-    public void postRetypeAssociationHook(Association assoc, String oldTypeUri) {
+    public void postRetypeAssociationHook(Association assoc, String oldTypeUri, Directives directives) {
         if (isAssocDef(assoc.getTypeUri())) {
             AssociationDefinitionModel assocDef = buildAssocDefModel(assoc);
             // update/create assoc def
@@ -42,6 +44,7 @@ public class TypeEditorPlugin extends Plugin {
                     "\" to topic type \"" + topicTypeUri + "\" (" + assocDef + ")");
                 topicType.addAssocDef(assocDef);
             }
+            directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
         }
     }
 

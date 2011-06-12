@@ -20,6 +20,8 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.Directive;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
@@ -104,7 +106,7 @@ public class EmbeddedService implements DeepaMehtaService {
         // ### PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, Properties.class),
         // ### POST_UPDATE_TOPIC("postUpdateHook", Topic.class, Properties.class),
 
-        POST_RETYPE_ASSOCIATION("postRetypeAssociationHook", Association.class, String.class),
+        POST_RETYPE_ASSOCIATION("postRetypeAssociationHook", Association.class, String.class, Directives.class),
 
          PRE_DELETE_ASSOCIATION("preDeleteAssociationHook",  Long.TYPE),
         POST_DELETE_ASSOCIATION("postDeleteAssociationHook", Long.TYPE),
@@ -385,7 +387,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @PUT
     @Path("/association")
     @Override
-    public Association updateAssociation(AssociationModel assocModel,
+    public Directives updateAssociation(AssociationModel assocModel,
                                          @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
@@ -396,12 +398,15 @@ public class EmbeddedService implements DeepaMehtaService {
             //
             AssociationChangeReport report = assoc.update(assocModel);
             //
+            Directives directives = new Directives();
+            directives.add(Directive.UPDATE_ASSOCIATION, assoc);
+            //
             if (report.typeUriChanged) {
-                triggerHook(Hook.POST_RETYPE_ASSOCIATION, assoc, report.oldTypeUri);
+                triggerHook(Hook.POST_RETYPE_ASSOCIATION, assoc, report.oldTypeUri, directives);
             }
             //
             tx.success();
-            return assoc;
+            return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Updating association failed (" + assocModel + ")", e);

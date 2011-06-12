@@ -61,9 +61,7 @@ function AssociationRenderer() {
         assoc = dm3c.update_association(assoc, assoc_model)
         dm3c.trigger_plugin_hook("post_submit_form", assoc)
         // 2) update GUI
-        dm3c.canvas.update_association(assoc)
-        dm3c.canvas.refresh()
-        dm3c.page_panel.display(assoc)
+        // ### moved to process_directives
 
         /**
          * Reads out values from GUI elements and builds an association model object from it.
