@@ -32,4 +32,6 @@ public interface TopicType extends Type {
     AssociationDefinition getAssocDef(String assocDefUri);
 
     void addAssocDef(AssociationDefinitionModel assocDef);
+
+    void updateAssocDef(AssociationDefinitionModel assocDef);
 }

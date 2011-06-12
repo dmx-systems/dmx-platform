@@ -128,7 +128,11 @@ public class TopicTypeModel extends TypeModel {
                 "association definitions with uri \"" + assocDefUri + "\" -- Use distinct role types at position 2");
         }
         //
-        assocDefModels.put(assocDefUri, assocDef);
+        updateAssocDefModel(assocDef);
+    }
+
+    public void updateAssocDefModel(AssociationDefinitionModel assocDef) {
+        assocDefModels.put(assocDef.getUri(), assocDef);
     }
 
     // ---

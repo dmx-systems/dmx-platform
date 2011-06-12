@@ -174,7 +174,7 @@ class AttachedAssociationDefinition implements AssociationDefinition {
     void store(AssociationDefinition predecessor) {
         try {
             // Note: creating the underlying association is conditional. It exists already for
-            //an interactively created association definition. Its ID is already set.
+            // an interactively created association definition. Its ID is already set.
             if (getId() == -1) {
                 Association assoc = dms.createAssociation(getAssocTypeUri(),
                     new TopicRoleModel(getTopicTypeUri1(), "dm3.core.topic_type_1"),

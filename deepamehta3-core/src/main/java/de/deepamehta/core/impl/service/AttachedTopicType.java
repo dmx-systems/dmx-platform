@@ -112,6 +112,15 @@ class AttachedTopicType extends AttachedType implements TopicType {
         assocDef.store(predecessor);
     }
 
+    @Override
+    public void updateAssocDef(AssociationDefinitionModel model) {
+        // update memory
+        getModel().updateAssocDefModel(model);
+        // update DB
+        // ### Note: nothing to do for the moment
+        // (in case of interactive assoc type change the association is already updated in DB)
+    }
+
 
 
     // === TopicBase Overrides ===
