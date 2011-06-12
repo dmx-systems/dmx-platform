@@ -102,15 +102,15 @@ class AttachedTopicType extends AttachedType implements TopicType {
         return assocDef;
     }
 
-    /* FIXME: not in use
     @Override
-    public void addAssocDef(AssociationDefinition assocDef) {
-        AssociationDefinition predAssocDef = findLastAssocDef();
+    public void addAssocDef(AssociationDefinitionModel model) {
+        AssociationDefinition predecessor = findLastAssocDef();
         // update memory
-        getModel().addAssocDef(assocDef);
+        getModel().addAssocDefModel(model);
         // update DB
-        storeAssocDef(assocDef, predAssocDef);
-    } */
+        AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(model, dms);
+        assocDef.store(predecessor);
+    }
 
 
 
@@ -292,10 +292,10 @@ class AttachedTopicType extends AttachedType implements TopicType {
     }
 
     private void storeAssocDefs() {
-        AssociationDefinition predAssocDef = null;
+        AssociationDefinition predecessor = null;
         for (AssociationDefinition assocDef : getAssocDefs().values()) {
-            ((AttachedAssociationDefinition) assocDef).store(predAssocDef);
-            predAssocDef = assocDef;
+            ((AttachedAssociationDefinition) assocDef).store(predecessor);
+            predecessor = assocDef;
         }
     }
 

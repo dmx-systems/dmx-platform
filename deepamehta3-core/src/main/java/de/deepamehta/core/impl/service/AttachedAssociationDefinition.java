@@ -16,6 +16,7 @@ import de.deepamehta.core.model.ViewConfigurationModel;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.Set;
+import java.util.logging.Logger;
 
 
 
@@ -29,6 +30,8 @@ class AttachedAssociationDefinition implements AssociationDefinition {
     private AssociationDefinitionModel model;
     private AttachedViewConfiguration viewConfig;
     private final EmbeddedService dms;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -170,25 +173,30 @@ class AttachedAssociationDefinition implements AssociationDefinition {
      */
     void store(AssociationDefinition predecessor) {
         try {
-            // topic types
-            Association assoc = dms.createAssociation(getAssocTypeUri(),
-                new TopicRoleModel(getTopicTypeUri1(), "dm3.core.topic_type_1"),
-                new TopicRoleModel(getTopicTypeUri2(), "dm3.core.topic_type_2"));
-            setId(assoc.getId());   // ### FIXME: move to storage layer
+            // Note: creating the underlying association is conditional. It exists already for
+            //an interactively created association definition. Its ID is already set.
+            if (getId() == -1) {
+                Association assoc = dms.createAssociation(getAssocTypeUri(),
+                    new TopicRoleModel(getTopicTypeUri1(), "dm3.core.topic_type_1"),
+                    new TopicRoleModel(getTopicTypeUri2(), "dm3.core.topic_type_2"));
+                setId(assoc.getId());
+            } else {
+                logger.info("########## Association for assoc def \"" + getUri() + "\" exists already");
+            }
             // role types
             dms.createAssociation("dm3.core.aggregation",
                 new TopicRoleModel(getRoleTypeUri1(), "dm3.core.role_type_1"),
-                new AssociationRoleModel(assoc.getId(), "dm3.core.assoc_def"));
+                new AssociationRoleModel(getId(), "dm3.core.assoc_def"));
             dms.createAssociation("dm3.core.aggregation",
                 new TopicRoleModel(getRoleTypeUri2(), "dm3.core.role_type_2"),
-                new AssociationRoleModel(assoc.getId(), "dm3.core.assoc_def"));
+                new AssociationRoleModel(getId(), "dm3.core.assoc_def"));
             // cardinality
             dms.createAssociation("dm3.core.aggregation",
                 new TopicRoleModel(getCardinalityUri1(), "dm3.core.cardinality_1"),
-                new AssociationRoleModel(assoc.getId(), "dm3.core.assoc_def"));
+                new AssociationRoleModel(getId(), "dm3.core.assoc_def"));
             dms.createAssociation("dm3.core.aggregation",
                 new TopicRoleModel(getCardinalityUri2(), "dm3.core.cardinality_2"),
-                new AssociationRoleModel(assoc.getId(), "dm3.core.assoc_def"));
+                new AssociationRoleModel(getId(), "dm3.core.assoc_def"));
             //
             putInSequence(predecessor);
             //

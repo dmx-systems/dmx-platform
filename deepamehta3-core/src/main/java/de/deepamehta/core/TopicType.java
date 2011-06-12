@@ -1,8 +1,8 @@
 package de.deepamehta.core;
 
+import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.IndexMode;
 
-import org.codehaus.jettison.json.JSONObject;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,5 +31,5 @@ public interface TopicType extends Type {
 
     AssociationDefinition getAssocDef(String assocDefUri);
 
-    // void addAssocDef(AssociationDefinition assocDef);    // FIXME: not in use
+    void addAssocDef(AssociationDefinitionModel assocDef);
 }
