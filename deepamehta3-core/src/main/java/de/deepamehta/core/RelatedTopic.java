@@ -8,6 +8,4 @@ package de.deepamehta.core;
 public interface RelatedTopic extends Topic {
 
     Association getAssociation();
-
-    void setAssociation(Association association);
 }

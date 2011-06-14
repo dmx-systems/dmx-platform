@@ -265,7 +265,7 @@ class AttachedAssociationDefinition implements AssociationDefinition {
         Set<RelatedTopic> topics = assoc.getRelatedTopics("dm3.core.aggregation", "dm3.core.assoc_def",
             "dm3.core.view_config", null, true);    // fetchComposite=true
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
-        return new ViewConfigurationModel(topics);
+        return new ViewConfigurationModel(dms.getTopicModels(topics));
     }
 
     // --- Inner Classes ---

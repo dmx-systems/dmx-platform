@@ -128,7 +128,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
 
 
-    // === TopicBase Overrides ===
+    // === AttachedTopic Overrides ===
 
     @Override
     public TopicTypeModel getModel() {
@@ -140,7 +140,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void fetch(String topicTypeUri) {
-        Topic typeTopic = dms.getTopic("uri", new TopicValue(topicTypeUri), false);     // fetchComposite=false
+        AttachedTopic typeTopic = dms.getTopic("uri", new TopicValue(topicTypeUri), false);     // fetchComposite=false
         // error check
         if (typeTopic == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
@@ -155,9 +155,9 @@ class AttachedTopicType extends AttachedType implements TopicType {
                 "definitions found but sequence length is " + sequenceIds.size());
         }
         // build model
-        TopicTypeModel model = new TopicTypeModel(typeTopic, fetchDataTypeTopic(typeTopic).getUri(),
-                                                             fetchIndexModes(typeTopic),
-                                                             fetchViewConfig(typeTopic));
+        TopicTypeModel model = new TopicTypeModel(typeTopic.getModel(), fetchDataTypeTopic(typeTopic).getUri(),
+                                                                        fetchIndexModes(typeTopic),
+                                                                        fetchViewConfig(typeTopic));
         addAssocDefsToModel(model, assocDefs, sequenceIds);
         // set model of this topic type
         setModel(model);
@@ -167,7 +167,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     void store() {
         dms.storage.createTopic(getModel());
-        dms.associateWithTopicType(this);
+        dms.associateWithTopicType(getModel());
         setValue(getValue());
         //
         dms.associateDataType(getUri(), getDataTypeUri());
@@ -229,8 +229,8 @@ class AttachedTopicType extends AttachedType implements TopicType {
             // TODO: extend Topic       interface by getRelatedAssociation
             // TODO: extend Association interface by getRelatedAssociation
             List<Long> sequenceIds = new ArrayList();
-            Association assocDef = dms.storage.getTopicRelatedAssociation(typeTopic.getId(), "dm3.core.association",
-                                                               "dm3.core.topic_type", "dm3.core.first_assoc_def");
+            AssociationModel assocDef = dms.storage.getTopicRelatedAssociation(typeTopic.getId(),
+                "dm3.core.association", "dm3.core.topic_type", "dm3.core.first_assoc_def");
             if (assocDef != null) {
                 sequenceIds.add(assocDef.getId());
                 while ((assocDef = dms.storage.getAssociationRelatedAssociation(assocDef.getId(), "dm3.core.sequence",

@@ -49,7 +49,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         return getModel().getViewConfig(typeUri, settingUri);
     }
 
-    // === TopicBase Overrides ===
+    // === AttachedTopic Overrides ===
 
     @Override
     public TypeModel getModel() {
@@ -62,7 +62,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         Set<RelatedTopic> topics = typeTopic.getRelatedTopics("dm3.core.association", typeTopic.getTypeUri(),
             "dm3.core.view_config", null, true);    // fetchComposite=true
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
-        return new ViewConfigurationModel(topics);
+        return new ViewConfigurationModel(dms.getTopicModels(topics));
     }
 
     protected final void initViewConfig() {

@@ -1,7 +1,6 @@
 package de.deepamehta.core.model;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.impl.model.AssociationBase;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -51,10 +50,6 @@ public class AssociationModel {
         this.roleModel2 = roleModel2;
     }
 
-    public AssociationModel(Association assoc) {
-        this(assoc.getId(), assoc.getTypeUri(), getModel(assoc).getRoleModel1(), getModel(assoc).getRoleModel2());
-    }
-
     public AssociationModel(JSONObject assocModel) {
         try {
             this.id = assocModel.optLong("id", -1);
@@ -87,6 +82,10 @@ public class AssociationModel {
     }
 
     // ---
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public void setTypeUri(String typeUri) {
         this.typeUri = typeUri;
@@ -160,9 +159,5 @@ public class AssociationModel {
             throw new RuntimeException("Parsing TopicRoleModel/AssociationRoleModel failed " +
                 "(JSONObject=" + roleModel + ")");
         }
-    }
-
-    private static AssociationModel getModel(Association assoc) {
-        return ((AssociationBase) assoc).getModel();
     }
 }

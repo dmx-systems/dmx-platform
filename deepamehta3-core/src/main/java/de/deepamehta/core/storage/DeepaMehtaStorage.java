@@ -1,11 +1,9 @@
 package de.deepamehta.core.storage;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaTransaction;
-import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicValue;
 
@@ -27,7 +25,7 @@ public interface DeepaMehtaStorage {
 
     // === Topics ===
 
-    Topic getTopic(long topicId);
+    TopicModel getTopic(long topicId);
 
     /**
      * Looks up a single topic by exact property value.
@@ -40,7 +38,7 @@ public interface DeepaMehtaStorage {
      * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
      * (for dynamically created data fields, typically in migration classes).
      */
-    Topic getTopic(String key, TopicValue value);
+    TopicModel getTopic(String key, TopicValue value);
 
     // Topic getTopic(String typeUri, String key, PropValue value);
 
@@ -52,9 +50,9 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    RelatedTopic getTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                         String othersRoleTypeUri,
-                                                                         String othersTopicTypeUri);
+    RelatedTopicModel getTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                              String othersRoleTypeUri,
+                                                                              String othersTopicTypeUri);
 
     /**
      * @param   assocTypeUri        may be null
@@ -62,22 +60,22 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Set<RelatedTopic> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                               String othersRoleTypeUri,
-                                                                               String othersTopicTypeUri);
+    Set<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                                    String othersRoleTypeUri,
+                                                                                    String othersTopicTypeUri);
 
     // ---
 
-    Set<Association> getAssociations(long topicId);
+    Set<AssociationModel> getAssociations(long topicId);
 
-    Set<Association> getAssociations(long topicId, String myRoleTypeUri);
+    Set<AssociationModel> getAssociations(long topicId, String myRoleTypeUri);
 
-    Association getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
+    AssociationModel getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                                               String othersRoleTypeUri);
 
     // ---
 
-    Set<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord);
+    Set<TopicModel> searchTopics(String searchTerm, String fieldUri, boolean wholeWord);
 
     // ---
 
@@ -105,12 +103,12 @@ public interface DeepaMehtaStorage {
      * <p>
      * The topic's URI is stored and indexed.
      *
-     * @return  the created topic. Note:
+     * @return  FIXME ### the created topic. Note:
      *          - the topic URI   is initialzed and     persisted.
      *          - the topic value is initialzed but not persisted.
      *          - the type URI    is initialzed but not persisted.
      */
-    Topic createTopic(TopicModel topicModel);
+    void createTopic(TopicModel topicModel);
 
     // void setTopicProperties(long id, Properties properties);
 
@@ -125,7 +123,7 @@ public interface DeepaMehtaStorage {
 
     // === Associations ===
 
-    Association getAssociation(long assocId);
+    AssociationModel getAssociation(long assocId);
 
     // Set<Relation> getRelations(long topicId);
 
@@ -144,7 +142,7 @@ public interface DeepaMehtaStorage {
      *
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      */
-    Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
+    Set<AssociationModel> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
 
     // ---
 
@@ -154,9 +152,9 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    RelatedTopic getAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                                               String othersRoleTypeUri,
-                                                                               String othersTopicTypeUri);
+    RelatedTopicModel getAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                                                    String othersRoleTypeUri,
+                                                                                    String othersTopicTypeUri);
 
     /**
      * @param   assocTypeUri        may be null
@@ -164,14 +162,14 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Set<RelatedTopic> getAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                                                     String othersRoleTypeUri,
-                                                                                     String othersTopicTypeUri);
+    Set<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                                                          String othersRoleTypeUri,
+                                                                                          String othersTopicTypeUri);
 
     // ---
 
-    Association getAssociationRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                                                    String othersRoleTypeUri);
+    AssociationModel getAssociationRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                                                         String othersRoleTypeUri);
 
     // ---
 
@@ -179,7 +177,7 @@ public interface DeepaMehtaStorage {
 
     // ---
 
-    Association createAssociation(AssociationModel assocModel);
+    void createAssociation(AssociationModel assocModel);
 
     void deleteAssociation(long assocId);
 

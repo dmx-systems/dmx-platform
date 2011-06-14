@@ -45,6 +45,8 @@ public interface Topic extends JSONEnabled {
 
     void setComposite(Composite comp);
 
+
+
     // === Traversal ===
 
     TopicValue getChildTopicValue(String assocDefUri);

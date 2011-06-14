@@ -5,13 +5,15 @@ import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.impl.model.TopicBase;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.util.JavaUtils;
+
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,22 +25,19 @@ import java.util.logging.Logger;
 /**
  * A topic that is attached to the {@link DeepaMehtaService}.
  */
-class AttachedTopic extends TopicBase {
+class AttachedTopic implements Topic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private TopicModel model;
     protected final EmbeddedService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedTopic(Topic topic, EmbeddedService dms) {
-        this(((TopicBase) topic).getModel(), dms);
-    }
-
-    AttachedTopic(TopicModel topicModel, EmbeddedService dms) {
-        super(topicModel);
+    AttachedTopic(TopicModel model, EmbeddedService dms) {
+        this.model = model;
         this.dms = dms;
     }
 
@@ -46,33 +45,90 @@ class AttachedTopic extends TopicBase {
 
 
 
-    // === Topic Overrides ===
+    // ****************************
+    // *** Topic Implementation ***
+    // ****************************
+
+
+
+    @Override
+    public long getId() {
+        return model.getId();
+    }
+
+    @Override
+    public String getUri() {
+        return model.getUri();
+    }
+
+    @Override
+    public TopicValue getValue() {
+        return model.getValue();
+    }
+
+    @Override
+    public String getTypeUri() {
+        return model.getTypeUri();
+    }
+
+    @Override
+    public Composite getComposite() {
+        return model.getComposite();
+    }
+
+    // ---
 
     @Override
     public void setUri(String uri) {
         // update memory
-        super.setUri(uri);
+        model.setUri(uri);
         // update DB
         storeTopicUri(uri);
+    }
+
+    // ---
+
+    @Override
+    public void setValue(String value) {
+        setValue(new TopicValue(value));
+    }
+
+    @Override
+    public void setValue(int value) {
+        setValue(new TopicValue(value));
+    }
+
+    @Override
+    public void setValue(long value) {
+        setValue(new TopicValue(value));
+    }
+
+    @Override
+    public void setValue(boolean value) {
+        setValue(new TopicValue(value));
     }
 
     @Override
     public void setValue(TopicValue value) {
         // update memory
-        super.setValue(value);
+        model.setValue(value);
         // update DB
         storeTopicValue(value);
     }
 
+    // ---
+
     @Override
     public void setComposite(Composite comp) {
         // update memory
-        super.setComposite(comp);
+        model.setComposite(comp);
         // update DB
         storeComposite(comp);
     }
 
-    // ---
+
+
+    // === Traversal ===
 
     @Override
     public TopicValue getChildTopicValue(String assocDefUri) {
@@ -92,7 +148,8 @@ class AttachedTopic extends TopicBase {
 
     @Override
     public Set<RelatedTopic> getRelatedTopics(String assocTypeUri) {
-        Set<RelatedTopic> topics = dms.storage.getTopicRelatedTopics(getId(), assocTypeUri, null, null, null);
+        Set<RelatedTopic> topics = dms.attach(dms.storage.getTopicRelatedTopics(
+            getId(), assocTypeUri, null, null, null), false);   // fetchComposite=false
         //
         /* ### for (RelatedTopic topic : topics) {
             triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, relTopic.getTopic());
@@ -106,8 +163,8 @@ class AttachedTopic extends TopicBase {
     public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri,
                                                                                            boolean fetchComposite) {
-        RelatedTopic topic = dms.storage.getTopicRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri);
+        RelatedTopicModel topic = dms.storage.getTopicRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
         return topic != null ? dms.attach(topic, fetchComposite) : null;
     }
 
@@ -124,6 +181,55 @@ class AttachedTopic extends TopicBase {
         return dms.attach(dms.storage.getAssociations(getId(), myRoleTypeUri));
     }
 
+
+
+    // === Serialization ===
+
+    @Override
+    public JSONObject toJSON() {
+        return model.toJSON();
+    }
+
+
+
+    // ****************
+    // *** Java API ***
+    // ****************
+
+
+
+    @Override
+    public boolean equals(Object o) {
+        return ((AttachedTopic) o).model.equals(model);
+    }
+
+    @Override
+    public int hashCode() {
+        return model.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return model.toString();
+    }
+
+
+
+    // ----------------------------------------------------------------------------------------------- Protected Methods
+
+    // ### This is supposed to be protected, but doesn't compile!
+    // ### It is called from the subclasses constructors, but on a differnt TopicBase instance.
+    // ### See de.deepamehta.core.impl.storage.HGTopic and de.deepamehta.core.impl.service.AttachedTopic.
+    public TopicModel getModel() {
+        return model;
+    }
+
+    protected final void setModel(TopicModel model) {
+        this.model = model;
+    }
+
+
+
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
@@ -133,7 +239,7 @@ class AttachedTopic extends TopicBase {
         // fetch from DB
         Composite comp = fetchComposite();
         // update memory
-        super.setComposite(comp);
+        model.setComposite(comp);
     }
 
     void update(TopicModel topicModel) {

@@ -45,9 +45,9 @@ public class TopicTypeModel extends TypeModel {
         this.assocDefModels = new LinkedHashMap();
     }
 
-    public TopicTypeModel(Topic typeTopic, String dataTypeUri, Set<IndexMode> indexModes,
-                                                               ViewConfigurationModel viewConfigModel) {
-        super(typeTopic, viewConfigModel);
+    public TopicTypeModel(TopicModel model, String dataTypeUri, Set<IndexMode> indexModes,
+                                                                ViewConfigurationModel viewConfigModel) {
+        super(model, viewConfigModel);
         this.dataTypeUri = dataTypeUri;
         this.indexModes = indexModes;
         this.assocDefModels = new LinkedHashMap();

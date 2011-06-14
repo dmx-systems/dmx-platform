@@ -1,7 +1,5 @@
 package de.deepamehta.core.model;
 
-import de.deepamehta.core.Topic;
-
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -32,8 +30,8 @@ public class TypeModel extends TopicModel {
         this.viewConfigModel = new ViewConfigurationModel();
     }
 
-    public TypeModel(Topic typeTopic, ViewConfigurationModel viewConfigModel) {
-        super(typeTopic);
+    public TypeModel(TopicModel model, ViewConfigurationModel viewConfigModel) {
+        super(model);
         this.viewConfigModel = viewConfigModel;
     }
 

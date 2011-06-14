@@ -31,8 +31,8 @@ public class AssociationTypeModel extends TypeModel {
         super(uri, new TopicValue(value), "dm3.core.assoc_type");
     }
 
-    public AssociationTypeModel(Topic typeTopic, ViewConfigurationModel viewConfigModel) {
-        super(typeTopic, viewConfigModel);
+    public AssociationTypeModel(TopicModel model, ViewConfigurationModel viewConfigModel) {
+        super(model, viewConfigModel);
     }
 
     public AssociationTypeModel(JSONObject assocTypeModel) {

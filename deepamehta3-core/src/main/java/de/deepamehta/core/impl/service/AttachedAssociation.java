@@ -5,11 +5,13 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Role;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicRole;
-import de.deepamehta.core.impl.model.AssociationBase;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicRoleModel;
+
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,40 +23,53 @@ import java.util.logging.Logger;
 /**
  * An association that is attached to the {@link DeepaMehtaService}.
  */
-class AttachedAssociation extends AssociationBase {
+class AttachedAssociation implements Association {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private AssociationModel model;
+    private EmbeddedService dms;
+    //
     private Role role1;
     private Role role2;
-
-    private EmbeddedService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedAssociation(Association assoc, EmbeddedService dms) {
-        super(getModel(assoc));
+    AttachedAssociation(AssociationModel model, EmbeddedService dms) {
+        this.model = model;
         this.dms = dms;     // Note: dms must be initialized *before* the attached roles are created
-        this.role1 = createAttachedRole(getModel(assoc).getRoleModel1());
-        this.role2 = createAttachedRole(getModel(assoc).getRoleModel2());
+        this.role1 = createAttachedRole(model.getRoleModel1());
+        this.role2 = createAttachedRole(model.getRoleModel2());
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
 
 
-    // *****************************
-    // *** Association Overrides ***
-    // *****************************
+    // **********************************
+    // *** Association Implementation ***
+    // **********************************
 
 
 
     @Override
+    public long getId() {
+        return model.getId();
+    }
+
+    // ---
+
+    @Override
+    public String getTypeUri() {
+        return model.getTypeUri();
+    }
+
+    @Override
     public void setTypeUri(String assocTypeUri) {
         // 1) update memory
-        super.setTypeUri(assocTypeUri);
+        model.setTypeUri(assocTypeUri);
         // 2) update DB
         storeTypeUri();
     }
@@ -124,7 +139,7 @@ class AttachedAssociation extends AssociationBase {
     public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri,
                                                                                            boolean fetchComposite) {
-        RelatedTopic topic = dms.storage.getAssociationRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
+        RelatedTopicModel topic = dms.storage.getAssociationRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
         return topic != null ? dms.attach(topic, fetchComposite) : null;
     }
@@ -135,6 +150,49 @@ class AttachedAssociation extends AssociationBase {
                                                                                          boolean fetchComposite) {
         return dms.attach(dms.storage.getAssociationRelatedTopics(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri), fetchComposite);
+    }
+
+
+
+    // === Serialization ===
+
+    @Override
+    public JSONObject toJSON() {
+        return model.toJSON();
+    }
+
+
+
+    // ****************
+    // *** Java API ***
+    // ****************
+
+
+
+    @Override
+    public boolean equals(Object o) {
+        return ((AttachedAssociation) o).model.equals(model);
+    }
+
+    @Override
+    public int hashCode() {
+        return model.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return model.toString();
+    }
+
+
+
+    // ----------------------------------------------------------------------------------------------- Protected Methods
+
+    // ### This is supposed to be protected, but doesn't compile!
+    // ### It is called from the subclass constructor, but on a differnt AssociationBase instance.
+    // ### See de.deepamehta.core.impl.service.AttachedAssociation.
+    public AssociationModel getModel() {
+        return model;
     }
 
 
@@ -215,7 +273,7 @@ class AttachedAssociation extends AssociationBase {
         long assocId = fetchTypeTopic().getAssociation().getId();
         dms.deleteAssociation(assocId, null);  // clientContext=null
         // create new assignment
-        dms.associateWithAssociationType(this);
+        dms.associateWithAssociationType(getModel());
     }    
 
 
@@ -241,10 +299,5 @@ class AttachedAssociation extends AssociationBase {
         } else {
             throw new RuntimeException("Unexpected RoleModel object (" + model + ")");
         }
-    }
-
-    // ### TODO: probably getModel() should be added to the Association (and all other) interface.
-    private static AssociationModel getModel(Association assoc) {
-        return ((AssociationBase) assoc).getModel();
     }
 }

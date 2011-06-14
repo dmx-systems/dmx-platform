@@ -1,8 +1,5 @@
 package de.deepamehta.core.model;
 
-import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.Topic;
-
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -35,14 +32,14 @@ public class ViewConfigurationModel {
     public ViewConfigurationModel() {
     }
 
-    public ViewConfigurationModel(Set<RelatedTopic> configTopics) {
-        for (Topic topic : configTopics) {
-            addConfigTopic(new TopicModel(topic));
+    public ViewConfigurationModel(Set<TopicModel> configTopics) {
+        for (TopicModel topic : configTopics) {
+            addConfigTopic(topic);
         }
     }
 
     /**
-     * @param   configurable    A topic type or an association definition.
+     * @param   configurable    A topic type, an association type, or an association definition.
      */
     public ViewConfigurationModel(JSONObject configurable) {
         try {
