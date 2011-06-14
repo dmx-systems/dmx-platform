@@ -35,6 +35,9 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    /**
+     * Attached object cache.
+     */
     private Map<String, AssociationDefinition> assocDefs;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -42,7 +45,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedTopicType(EmbeddedService dms) {
-        super(dms);     // The model and assocDefs remain uninitialized.
+        super(dms);     // The model and the attached object cache remain uninitialized.
                         // They are initialized later on through fetch().
     }
 
@@ -104,19 +107,21 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     @Override
     public void addAssocDef(AssociationDefinitionModel model) {
+        // Note: the predecessor must be determines *before* the memory is updated
         AssociationDefinition predecessor = findLastAssocDef();
-        // update memory
-        getModel().addAssocDefModel(model);
-        // update DB
-        AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(model, dms);
+        // 1) update memory
+        getModel().addAssocDefModel(model);                             // update model
+        AttachedAssociationDefinition assocDef = initAssocDef(model);   // update attached object cache
+        // 2) update DB
         assocDef.store(predecessor);
     }
 
     @Override
     public void updateAssocDef(AssociationDefinitionModel model) {
-        // update memory
-        getModel().updateAssocDefModel(model);
-        // update DB
+        // 1) update memory
+        getModel().updateAssocDefModel(model);                          // update model
+        initAssocDef(model);                                            // update attached object cache
+        // 2) update DB
         // ### Note: nothing to do for the moment
         // (in case of interactive assoc type change the association is already updated in DB)
     }
@@ -250,9 +255,9 @@ class AttachedTopicType extends AttachedType implements TopicType {
                 throw new RuntimeException("Graph inconsistency: ID " + assocDefId +
                     " is in sequence but association definition is not found");
             }
-            // Note: the model and the attached object's are filled parallely.
-            model.addAssocDefModel(assocDef.getModel());
-            this.assocDefs.put(assocDef.getUri(), assocDef);
+            // Note: the model and the attached object cache is updated together.
+            model.addAssocDefModel(assocDef.getModel());        // update model
+            this.assocDefs.put(assocDef.getUri(), assocDef);    // update attached object cache
         }
     }
 
@@ -312,19 +317,26 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     // === Helper ===
 
-    private void initAssocDefs() {
-        this.assocDefs = new LinkedHashMap();
-        for (AssociationDefinitionModel model : getModel().getAssocDefModels().values()) {
-            AssociationDefinition assocDef = new AttachedAssociationDefinition(model, dms);
-            assocDefs.put(assocDef.getUri(), assocDef);
-        }
-    }
-
     private AssociationDefinition findLastAssocDef() {
         AssociationDefinition lastAssocDef = null;
         for (AssociationDefinition assocDef : getAssocDefs().values()) {
             lastAssocDef = assocDef;
         }
         return lastAssocDef;
+    }
+
+    // --- Attached Object Cache ---
+
+    private void initAssocDefs() {
+        this.assocDefs = new LinkedHashMap();
+        for (AssociationDefinitionModel model : getModel().getAssocDefModels().values()) {
+            initAssocDef(model);
+        }
+    }
+
+    private AttachedAssociationDefinition initAssocDef(AssociationDefinitionModel model) {
+        AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(model, dms);
+        assocDefs.put(assocDef.getUri(), assocDef);
+        return assocDef;
     }
 }
