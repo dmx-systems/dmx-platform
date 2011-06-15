@@ -20,40 +20,32 @@ import java.util.Set;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class AssociationModel {
+public class AssociationModel extends DeepaMehtaObjectModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private long id;
-    private String typeUri;
     private RoleModel roleModel1;
     private RoleModel roleModel2;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public AssociationModel(String typeUri) {
-        this(-1, typeUri);
+        super(typeUri);
     }
 
     public AssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
         this(-1, typeUri, roleModel1, roleModel2);
     }
 
-    public AssociationModel(long id, String typeUri) {
-        this(id, typeUri, null, null);
-    }
-
     public AssociationModel(long id, String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
-        this.id = id;
-        this.typeUri = typeUri;
+        super(id, typeUri);
         this.roleModel1 = roleModel1;
         this.roleModel2 = roleModel2;
     }
 
     public AssociationModel(JSONObject assocModel) {
+        super(assocModel);
         try {
-            this.id = assocModel.optLong("id", -1);
-            this.typeUri = assocModel.getString("type_uri");
             this.roleModel1 = parseRole(assocModel.getJSONObject("role_1"));
             this.roleModel2 = parseRole(assocModel.getJSONObject("role_2"));
         } catch (Exception e) {
@@ -63,32 +55,12 @@ public class AssociationModel {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public long getId() {
-        return id;
-    }
-
-    public String getTypeUri() {
-        return typeUri;
-    }
-
-    // ---
-
     public RoleModel getRoleModel1() {
         return roleModel1;
     }
 
     public RoleModel getRoleModel2() {
         return roleModel2;
-    }
-
-    // ---
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setTypeUri(String typeUri) {
-        this.typeUri = typeUri;
     }
 
     // ---
@@ -107,9 +79,7 @@ public class AssociationModel {
 
     public JSONObject toJSON() {
         try {
-            JSONObject o = new JSONObject();
-            o.put("id", id);
-            o.put("type_uri", typeUri);
+            JSONObject o = super.toJSON();
             o.put("role_1", roleModel1.toJSON());
             o.put("role_2", roleModel2.toJSON());
             return o;
@@ -118,32 +88,14 @@ public class AssociationModel {
         }
     }
 
-    public static JSONArray associationsToJSON(Iterable<Association> assocs) {
-        JSONArray array = new JSONArray();
-        for (Association assoc : assocs) {
-            array.put(assoc.toJSON());
-        }
-        return array;
-    }
-
 
 
     // === Java API ===
 
     @Override
-    public boolean equals(Object o) {
-        return ((AssociationModel) o).id == id;
-    }
-
-    @Override
-    public int hashCode() {
-        return ((Long) id).hashCode();
-    }
-
-    @Override
     public String toString() {
-        return "association model (id=" + id + ", typeUri=\"" + typeUri +
-            "\", roleModel1=" + roleModel1 + ", roleModel2=" + roleModel2 + ")";
+        return "association model (id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
+            "\", composite=" + composite + ", roleModel1=" + roleModel1 + ", roleModel2=" + roleModel2 + ")";
     }
 
 

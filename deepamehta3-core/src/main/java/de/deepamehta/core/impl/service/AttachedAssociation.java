@@ -23,13 +23,10 @@ import java.util.logging.Logger;
 /**
  * An association that is attached to the {@link DeepaMehtaService}.
  */
-class AttachedAssociation implements Association {
+class AttachedAssociation extends AttachedDeepaMehtaObject implements Association {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private AssociationModel model;
-    private EmbeddedService dms;
-    //
     private Role role1;
     private Role role2;
 
@@ -38,8 +35,7 @@ class AttachedAssociation implements Association {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedAssociation(AssociationModel model, EmbeddedService dms) {
-        this.model = model;
-        this.dms = dms;     // Note: dms must be initialized *before* the attached roles are created
+        super(model, dms);
         this.role1 = createAttachedRole(model.getRoleModel1());
         this.role2 = createAttachedRole(model.getRoleModel2());
     }
@@ -48,33 +44,27 @@ class AttachedAssociation implements Association {
 
 
 
+    // ******************************************
+    // *** AttachedDeepaMehtaObject Overrides ***
+    // ******************************************
+
+
+
+    @Override
+    public void setTypeUri(String assocTypeUri) {
+        // update memory
+        super.setTypeUri(assocTypeUri);
+        // update DB
+        storeTypeUri();
+    }
+
+
+
     // **********************************
     // *** Association Implementation ***
     // **********************************
 
 
-
-    @Override
-    public long getId() {
-        return model.getId();
-    }
-
-    // ---
-
-    @Override
-    public String getTypeUri() {
-        return model.getTypeUri();
-    }
-
-    @Override
-    public void setTypeUri(String assocTypeUri) {
-        // 1) update memory
-        model.setTypeUri(assocTypeUri);
-        // 2) update DB
-        storeTypeUri();
-    }
-
-    // ---
 
     @Override
     public Role getRole1() {
@@ -154,45 +144,13 @@ class AttachedAssociation implements Association {
 
 
 
-    // === Serialization ===
-
-    @Override
-    public JSONObject toJSON() {
-        return model.toJSON();
-    }
-
-
-
-    // ****************
-    // *** Java API ***
-    // ****************
-
-
-
-    @Override
-    public boolean equals(Object o) {
-        return ((AttachedAssociation) o).model.equals(model);
-    }
-
-    @Override
-    public int hashCode() {
-        return model.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return model.toString();
-    }
-
-
-
     // ----------------------------------------------------------------------------------------------- Protected Methods
 
     // ### This is supposed to be protected, but doesn't compile!
     // ### It is called from the subclass constructor, but on a differnt AssociationBase instance.
     // ### See de.deepamehta.core.impl.service.AttachedAssociation.
     public AssociationModel getModel() {
-        return model;
+        return (AssociationModel) super.getModel();
     }
 
 

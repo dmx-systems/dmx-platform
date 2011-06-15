@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 
 
-public class TypeModel extends TopicModel {
+public abstract class TypeModel extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -41,6 +41,8 @@ public class TypeModel extends TopicModel {
     }
 
     public TypeModel(JSONObject typeModel) {
+        // Note: the super constructor is not called here.
+        // The entire object is initialized by the subclass constructors.
         this.viewConfigModel = new ViewConfigurationModel(typeModel);
     }
 

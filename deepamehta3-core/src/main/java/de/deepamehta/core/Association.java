@@ -1,11 +1,5 @@
 package de.deepamehta.core;
 
-import de.deepamehta.core.Role;
-
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONException;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.HashSet;
@@ -19,17 +13,7 @@ import java.util.Set;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface Association extends JSONEnabled {
-
-    long getId();
-
-    // ---
-
-    String getTypeUri();
-
-    void setTypeUri(String assocTypeUri);
-
-    // ---
+public interface Association extends DeepaMehtaObject {
 
     Role getRole1();
 

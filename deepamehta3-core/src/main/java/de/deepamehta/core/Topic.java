@@ -1,9 +1,7 @@
 package de.deepamehta.core;
 
-import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.TopicValue;
 
-import org.codehaus.jettison.json.JSONObject;
 import java.util.Set;
 
 
@@ -13,41 +11,14 @@ import java.util.Set;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface Topic extends JSONEnabled {
-
-    long getId();
-
-    String getUri();
-
-    TopicValue getValue();
-
-    String getTypeUri();
-
-    Composite getComposite();
-
-    // ---
-
-    void setUri(String uri);
-
-    // ---
-
-    void setValue(String value);
-
-    void setValue(int value);
-
-    void setValue(long value);
-
-    void setValue(boolean value);
-
-    void setValue(TopicValue value);
-
-    // ---
-
-    void setComposite(Composite comp);
+public interface Topic extends DeepaMehtaObject {
 
 
 
     // === Traversal ===
+
+    // ### TODO: move this methods to DeepaMehtaObject.
+    // ### Topic would be soley a marker interface then.
 
     TopicValue getChildTopicValue(String assocDefUri);
 

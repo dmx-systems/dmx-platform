@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.server.provider;
 
-import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.JSONEnabled;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class TopicCollectionProvider implements MessageBodyWriter<Collection<Topic>> {
+public class JSONEnabledCollectionProvider implements MessageBodyWriter<Collection<JSONEnabled>> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -42,7 +42,8 @@ public class TopicCollectionProvider implements MessageBodyWriter<Collection<Top
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         if (genericType instanceof ParameterizedType) {
             Type[] typeArgs = ((ParameterizedType) genericType).getActualTypeArguments();
-            if (Collection.class.isAssignableFrom(type) && typeArgs.length == 1 && typeArgs[0] == Topic.class) {
+            if (Collection.class.isAssignableFrom(type) && typeArgs.length == 1 &&
+                JSONEnabled.class.isAssignableFrom((Class) typeArgs[0])) {
                 // Note: unlike equals() isCompatible() ignores parameters
                 // like "charset" in "application/json;charset=UTF-8"
                 if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
@@ -54,21 +55,21 @@ public class TopicCollectionProvider implements MessageBodyWriter<Collection<Top
     }
 
     @Override
-    public long getSize(Collection<Topic> topics, Class<?> type, Type genericType, Annotation[] annotations,
+    public long getSize(Collection<JSONEnabled> objects, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(Collection<Topic> topics, Class<?> type, Type genericType, Annotation[] annotations,
+    public void writeTo(Collection<JSONEnabled> objects, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            TopicModel.topicsToJSON(topics).write(writer);
+            DeepaMehtaObjectModel.objectsToJSON(objects).write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing message body failed (" + topics + ")", e);
+            throw new IOException("Writing message body failed (" + objects + ")", e);
         }
     }
 }
