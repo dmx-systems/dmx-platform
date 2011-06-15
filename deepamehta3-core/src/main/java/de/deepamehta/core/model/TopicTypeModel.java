@@ -116,12 +116,12 @@ public class TopicTypeModel extends TypeModel {
 
     public void addAssocDefModel(AssociationDefinitionModel assocDef) {
         String assocDefUri = assocDef.getUri();
-        // error check 1
+        // sanity check ### FIXME: drop this check or provide proper feedback to the type editor user
         if (!getDataTypeUri().equals("dm3.core.composite")) {
             throw new RuntimeException("Association definitions can only be added to composite topic types. " +
-                "Topic type \"" + getUri() + " is of data type \"" + getDataTypeUri() + "\". (" + assocDef + ")");
+                "Topic type \"" + getUri() + "\" is of data type \"" + getDataTypeUri() + "\". (" + assocDef + ")");
         }
-        // error check 2
+        // error check
         AssociationDefinitionModel existing = assocDefModels.get(assocDefUri);
         if (existing != null) {
             throw new RuntimeException("Schema ambiguity: topic type \"" + uri + "\" has more than one " +

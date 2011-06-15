@@ -176,24 +176,25 @@ class AttachedTopicType extends AttachedType implements TopicType {
         getViewConfig().store();
     }
 
-    void update(TopicTypeModel topicTypeModel) {
-        logger.info("Updating topic type \"" + getUri() + "\" (new " + topicTypeModel + ")");
-        String uri = topicTypeModel.getUri();
-        TopicValue value = topicTypeModel.getValue();
-        String dataTypeUri = topicTypeModel.getDataTypeUri();
+    void update(TopicTypeModel model) {
+        logger.info("Updating topic type \"" + getUri() + "\" (new " + model + ")");
+        String uri = model.getUri();
+        TopicValue value = model.getValue();
+        String dataTypeUri = model.getDataTypeUri();
         //
         boolean uriChanged = !getUri().equals(uri);
         boolean valueChanged = !getValue().equals(value);
         boolean dataTypeChanged = !getDataTypeUri().equals(dataTypeUri);
         //
-        if (uriChanged || valueChanged) {
-            if (uriChanged) {
-                logger.info("Changing URI from \"" + getUri() + "\" -> \"" + uri + "\"");
-            }
-            if (valueChanged) {
-                logger.info("Changing name from \"" + getValue() + "\" -> \"" + value + "\"");
-            }
-            super.update(topicTypeModel);
+        if (uriChanged) {
+            logger.info("Changing URI from \"" + getUri() + "\" -> \"" + uri + "\"");
+            dms.typeCache.invalidate(getUri());
+            super.update(model);
+            dms.typeCache.put(this);
+        }
+        if (valueChanged) {
+            logger.info("Changing name from \"" + getValue() + "\" -> \"" + value + "\"");
+            super.update(model);
         }
         if (dataTypeChanged) {
             logger.info("Changing data type from \"" + getDataTypeUri() + "\" -> \"" + dataTypeUri + "\"");

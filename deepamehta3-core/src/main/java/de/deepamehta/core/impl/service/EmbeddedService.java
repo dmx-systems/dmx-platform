@@ -79,11 +79,10 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
             DeepaMehtaStorage storage;
-
-    private BundleContext bundleContext;
+            TypeCache typeCache;
 
     private PluginCache pluginCache;
-    private TypeCache typeCache;
+    private BundleContext bundleContext;
 
     private enum Hook {
 
@@ -524,9 +523,6 @@ public class EmbeddedService implements DeepaMehtaService {
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
             topicType.update(topicTypeModel);
-            //
-            typeCache.invalidate(topicTypeUri);
-            topicType = getTopicType(topicType.getUri(), clientContext);
             //
             // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
             //

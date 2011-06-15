@@ -357,8 +357,8 @@ class AttachedTopic implements Topic {
             //
             updateTopicValue(comp);
         } catch (Exception e) {
-            throw new RuntimeException("Storing the topic's composite failed (topic=" +
-                this + ",\ncomposite=" + comp + ")", e);
+            throw new RuntimeException("Storing the topic's composite failed (" + this +
+                ",\ncomposite=" + comp + ")", e);
         }
     }
 

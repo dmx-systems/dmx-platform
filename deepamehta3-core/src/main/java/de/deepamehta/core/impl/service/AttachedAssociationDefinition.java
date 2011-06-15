@@ -180,8 +180,6 @@ class AttachedAssociationDefinition implements AssociationDefinition {
                     new TopicRoleModel(getTopicTypeUri1(), "dm3.core.topic_type_1"),
                     new TopicRoleModel(getTopicTypeUri2(), "dm3.core.topic_type_2"));
                 setId(assoc.getId());
-            } else {
-                logger.info("########## Association for assoc def \"" + getUri() + "\" exists already");
             }
             // role types
             dms.createAssociation("dm3.core.aggregation",
