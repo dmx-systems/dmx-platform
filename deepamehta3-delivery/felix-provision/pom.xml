@@ -8,6 +8,12 @@
     <version>0.4.5</version>
     <packaging>pom</packaging>
 
+    <parent>
+        <groupId>de.deepamehta</groupId>
+        <artifactId>deepamehta3-delivery</artifactId>
+        <version>0.4.5</version>
+    </parent>
+
     <!--
         All modules that belong to the Apache Felix 3 installation.
         
