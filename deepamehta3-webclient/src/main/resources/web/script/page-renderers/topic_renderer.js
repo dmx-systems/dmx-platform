@@ -137,10 +137,10 @@ function TopicRenderer() {
             if (topic_type.data_type_uri == "dm3.core.composite") {
                 var fields = {}
                 for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                    var topic_type_2 = dm3c.type_cache.get_topic_type(assoc_def.topic_type_uri_2)
+                    var part_topic_type = dm3c.type_cache.get_topic_type(assoc_def.part_topic_type_uri)
                     var child_field_uri = field_uri + dm3c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
                     var comp = composite && composite[assoc_def.uri]
-                    var child_fields = create_fields(child_field_uri, comp, topic_type_2, assoc_def)
+                    var child_fields = create_fields(child_field_uri, comp, part_topic_type, assoc_def)
                     fields[assoc_def.uri] = child_fields
                 }
                 return fields;

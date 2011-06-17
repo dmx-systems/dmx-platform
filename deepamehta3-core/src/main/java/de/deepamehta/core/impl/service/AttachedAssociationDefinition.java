@@ -73,33 +73,33 @@ class AttachedAssociationDefinition implements AssociationDefinition {
     }
 
     @Override
-    public String getTopicTypeUri1() {
-        return model.getTopicTypeUri1();
+    public String getWholeTopicTypeUri() {
+        return model.getWholeTopicTypeUri();
     }
 
     @Override
-    public String getTopicTypeUri2() {
-        return model.getTopicTypeUri2();
+    public String getPartTopicTypeUri() {
+        return model.getPartTopicTypeUri();
     }
 
     @Override
-    public String getRoleTypeUri1() {
-        return model.getRoleTypeUri1();
+    public String getWholeRoleTypeUri() {
+        return model.getWholeRoleTypeUri();
     }
 
     @Override
-    public String getRoleTypeUri2() {
-        return model.getRoleTypeUri2();
+    public String getPartRoleTypeUri() {
+        return model.getPartRoleTypeUri();
     }
 
     @Override
-    public String getCardinalityUri1() {
-        return model.getCardinalityUri1();
+    public String getWholeCardinalityUri() {
+        return model.getWholeCardinalityUri();
     }
 
     @Override
-    public String getCardinalityUri2() {
-        return model.getCardinalityUri2();
+    public String getPartCardinalityUri() {
+        return model.getPartCardinalityUri();
     }
 
     @Override
@@ -120,13 +120,13 @@ class AttachedAssociationDefinition implements AssociationDefinition {
     }
 
     @Override
-    public void setCardinalityUri1(String cardinalityUri1) {
-        model.setCardinalityUri1(cardinalityUri1);
+    public void setWholeCardinalityUri(String wholeCardinalityUri) {
+        model.setWholeCardinalityUri(wholeCardinalityUri);
     }
 
     @Override
-    public void setCardinalityUri2(String cardinalityUri2) {
-        model.setCardinalityUri2(cardinalityUri2);
+    public void setPartCardinalityUri(String partCardinalityUri) {
+        model.setPartCardinalityUri(partCardinalityUri);
     }
 
     // ---
@@ -147,15 +147,15 @@ class AttachedAssociationDefinition implements AssociationDefinition {
             // ### RoleTypes roleTypes = fetchRoleTypes(assoc);
             Cardinality cardinality = fetchCardinality(assoc);
             // sanity check
-            if (!topicTypes.topicTypeUri1.equals(topicTypeUri)) {
+            if (!topicTypes.wholeTopicTypeUri.equals(topicTypeUri)) {
                 throw new RuntimeException("jri doesn't understand Neo4j traversal");
             }
             //
             AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(),
-                topicTypes.topicTypeUri1, topicTypes.topicTypeUri2
-                /* ###, roleTypes.roleTypeUri1, roleTypes.roleTypeUri2 */);
-            model.setCardinalityUri1(cardinality.cardinalityUri1);
-            model.setCardinalityUri2(cardinality.cardinalityUri2);
+                topicTypes.wholeTopicTypeUri, topicTypes.partTopicTypeUri
+                /* ###, roleTypes.wholeRoleTypeUri, roleTypes.partRoleTypeUri */);
+            model.setWholeCardinalityUri(cardinality.wholeCardinalityUri);
+            model.setPartCardinalityUri(cardinality.partCardinalityUri);
             model.setAssocTypeUri(assoc.getTypeUri());
             model.setViewConfigModel(fetchViewConfig(assoc));
             //
@@ -177,23 +177,23 @@ class AttachedAssociationDefinition implements AssociationDefinition {
             // an interactively created association definition. Its ID is already set.
             if (getId() == -1) {
                 Association assoc = dms.createAssociation(getAssocTypeUri(),
-                    new TopicRoleModel(getTopicTypeUri1(), "dm3.core.topic_type_1"),
-                    new TopicRoleModel(getTopicTypeUri2(), "dm3.core.topic_type_2"));
+                    new TopicRoleModel(getWholeTopicTypeUri(), "dm3.core.whole_topic_type"),
+                    new TopicRoleModel(getPartTopicTypeUri(), "dm3.core.part_topic_type"));
                 setId(assoc.getId());
             }
             // role types
             dms.createAssociation("dm3.core.aggregation",
-                new TopicRoleModel(getRoleTypeUri1(), "dm3.core.role_type_1"),
+                new TopicRoleModel(getWholeRoleTypeUri(), "dm3.core.whole_role_type"),
                 new AssociationRoleModel(getId(), "dm3.core.assoc_def"));
             dms.createAssociation("dm3.core.aggregation",
-                new TopicRoleModel(getRoleTypeUri2(), "dm3.core.role_type_2"),
+                new TopicRoleModel(getPartRoleTypeUri(), "dm3.core.part_role_type"),
                 new AssociationRoleModel(getId(), "dm3.core.assoc_def"));
             // cardinality
             dms.createAssociation("dm3.core.aggregation",
-                new TopicRoleModel(getCardinalityUri1(), "dm3.core.cardinality_1"),
+                new TopicRoleModel(getWholeCardinalityUri(), "dm3.core.whole_cardinality"),
                 new AssociationRoleModel(getId(), "dm3.core.assoc_def"));
             dms.createAssociation("dm3.core.aggregation",
-                new TopicRoleModel(getCardinalityUri2(), "dm3.core.cardinality_2"),
+                new TopicRoleModel(getPartCardinalityUri(), "dm3.core.part_cardinality"),
                 new AssociationRoleModel(getId(), "dm3.core.assoc_def"));
             //
             putInSequence(predecessor);
@@ -201,7 +201,7 @@ class AttachedAssociationDefinition implements AssociationDefinition {
             storeViewConfig();
         } catch (Exception e) {
             throw new RuntimeException("Storing association definition \"" + getUri() +
-                "\" of topic type \"" + getTopicTypeUri1() + "\" failed", e);
+                "\" of topic type \"" + getWholeTopicTypeUri() + "\" failed", e);
         }
     }
 
@@ -222,36 +222,36 @@ class AttachedAssociationDefinition implements AssociationDefinition {
     // === Fetch ===
 
     private TopicTypes fetchTopicTypes(Association assoc) {
-        String topicTypeUri1 = assoc.getTopic("dm3.core.topic_type_1").getUri();
-        String topicTypeUri2 = assoc.getTopic("dm3.core.topic_type_2").getUri();
-        return new TopicTypes(topicTypeUri1, topicTypeUri2);
+        String wholeTopicTypeUri = assoc.getTopic("dm3.core.whole_topic_type").getUri();
+        String partTopicTypeUri = assoc.getTopic("dm3.core.part_topic_type").getUri();
+        return new TopicTypes(wholeTopicTypeUri, partTopicTypeUri);
     }
 
     /* ### private RoleTypes fetchRoleTypes(Association assoc) {
-        Topic roleType1 = assoc.getTopic("dm3.core.role_type_1");
-        Topic roleType2 = assoc.getTopic("dm3.core.role_type_2");
+        Topic wholeRoleType = assoc.getTopic("dm3.core.whole_role_type");
+        Topic partRoleType = assoc.getTopic("dm3.core.part_role_type");
         RoleTypes roleTypes = new RoleTypes();
         // role types are optional
-        if (roleType1 != null) {
-            roleTypes.setRoleTypeUri1(roleType1.getUri());
+        if (wholeRoleType != null) {
+            roleTypes.setWholeRoleTypeUri(wholeRoleType.getUri());
         }
-        if (roleType2 != null) {
-            roleTypes.setRoleTypeUri2(roleType2.getUri());
+        if (partRoleType != null) {
+            roleTypes.setPartRoleTypeUri(partRoleType.getUri());
         }
         return roleTypes;
     } */
 
     private Cardinality fetchCardinality(Association assoc) {
-        Topic cardinality1 = assoc.getRelatedTopic("dm3.core.aggregation", "dm3.core.assoc_def",
-            "dm3.core.cardinality_1", "dm3.core.cardinality", false);    // fetchComposite=false
-        Topic cardinality2 = assoc.getRelatedTopic("dm3.core.aggregation", "dm3.core.assoc_def",
-            "dm3.core.cardinality_2", "dm3.core.cardinality", false);    // fetchComposite=false
+        Topic wholeCardinality = assoc.getRelatedTopic("dm3.core.aggregation", "dm3.core.assoc_def",
+            "dm3.core.whole_cardinality", "dm3.core.cardinality", false);    // fetchComposite=false
+        Topic partCardinality = assoc.getRelatedTopic("dm3.core.aggregation", "dm3.core.assoc_def",
+            "dm3.core.part_cardinality", "dm3.core.cardinality", false);    // fetchComposite=false
         Cardinality cardinality = new Cardinality();
-        if (cardinality1 != null) {
-            cardinality.setCardinalityUri1(cardinality1.getUri());
+        if (wholeCardinality != null) {
+            cardinality.setWholeCardinalityUri(wholeCardinality.getUri());
         }
-        if (cardinality2 != null) {
-            cardinality.setCardinalityUri2(cardinality2.getUri());
+        if (partCardinality != null) {
+            cardinality.setPartCardinalityUri(partCardinality.getUri());
         } else {
             throw new RuntimeException("Missing cardinality of position 2");
         }
@@ -270,40 +270,40 @@ class AttachedAssociationDefinition implements AssociationDefinition {
 
     private class TopicTypes {
 
-        private String topicTypeUri1;
-        private String topicTypeUri2;
+        private String wholeTopicTypeUri;
+        private String partTopicTypeUri;
 
-        private TopicTypes(String topicTypeUri1, String topicTypeUri2) {
-            this.topicTypeUri1 = topicTypeUri1;
-            this.topicTypeUri2 = topicTypeUri2;
+        private TopicTypes(String wholeTopicTypeUri, String partTopicTypeUri) {
+            this.wholeTopicTypeUri = wholeTopicTypeUri;
+            this.partTopicTypeUri = partTopicTypeUri;
         }
     }
 
     /* ### private class RoleTypes {
 
-        private String roleTypeUri1;
-        private String roleTypeUri2;
+        private String wholeRoleTypeUri;
+        private String partRoleTypeUri;
 
-        private void setRoleTypeUri1(String roleTypeUri1) {
-            this.roleTypeUri1 = roleTypeUri1;
+        private void setWholeRoleTypeUri(String wholeRoleTypeUri) {
+            this.wholeRoleTypeUri = wholeRoleTypeUri;
         }
 
-        private void setRoleTypeUri2(String roleTypeUri2) {
-            this.roleTypeUri2 = roleTypeUri2;
+        private void setPartRoleTypeUri(String partRoleTypeUri) {
+            this.partRoleTypeUri = partRoleTypeUri;
         }
     } */
 
     private class Cardinality {
 
-        private String cardinalityUri1;
-        private String cardinalityUri2;
+        private String wholeCardinalityUri;
+        private String partCardinalityUri;
 
-        private void setCardinalityUri1(String cardinalityUri1) {
-            this.cardinalityUri1 = cardinalityUri1;
+        private void setWholeCardinalityUri(String wholeCardinalityUri) {
+            this.wholeCardinalityUri = wholeCardinalityUri;
         }
 
-        private void setCardinalityUri2(String cardinalityUri2) {
-            this.cardinalityUri2 = cardinalityUri2;
+        private void setPartCardinalityUri(String partCardinalityUri) {
+            this.partCardinalityUri = partCardinalityUri;
         }
     }
 
@@ -315,7 +315,7 @@ class AttachedAssociationDefinition implements AssociationDefinition {
         if (predecessor == null) {
             // start sequence
             AssociationModel assocModel = new AssociationModel("dm3.core.association");
-            assocModel.setRoleModel1(new TopicRoleModel(getTopicTypeUri1(), "dm3.core.topic_type"));
+            assocModel.setRoleModel1(new TopicRoleModel(getWholeTopicTypeUri(), "dm3.core.topic_type"));
             assocModel.setRoleModel2(new AssociationRoleModel(getId(), "dm3.core.first_assoc_def"));
             dms.createAssociation(assocModel, null);            // FIXME: clientContext=null
         } else {

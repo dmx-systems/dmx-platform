@@ -60,25 +60,25 @@ function TopictypeRenderer() {
         }
 
         function AssociationDefEditor(assoc_def) {
-            var type_label_1 = $("<span>").addClass("label").text(topic_type.value)
-            var type_label_2 = $("<span>").addClass("label").text(dm3c.type_label(assoc_def.topic_type_uri_2))
-            var card_menu_1 = dm3c.render.topic_menu("dm3.core.cardinality", assoc_def.cardinality_uri_1)
-            var card_menu_2 = dm3c.render.topic_menu("dm3.core.cardinality", assoc_def.cardinality_uri_2)
+            var whole_type_label = $("<span>").addClass("label").text(topic_type.value)
+            var part_type_label = $("<span>").addClass("label").text(dm3c.type_label(assoc_def.part_topic_type_uri))
+            var whole_card_menu = dm3c.render.topic_menu("dm3.core.cardinality", assoc_def.whole_cardinality_uri)
+            var part_card_menu = dm3c.render.topic_menu("dm3.core.cardinality", assoc_def.part_cardinality_uri)
             var assoc_type_label = $("<span>").addClass("label").addClass("field-label").text("Association Type")
             var assoc_type_menu = create_assoc_type_menu(assoc_def.assoc_type_uri)
             //
-            var optional_card_div = $("<div>").append(type_label_1).append(card_menu_1.dom)
+            var optional_card_div = $("<div>").append(whole_type_label).append(whole_card_menu.dom)
             optional_card_div.toggle(is_aggregation_selected())
             //
             this.dom = $("<li>").addClass("assoc-def-editor").addClass("ui-state-default")
-                .append($("<div>").append(type_label_2).append(card_menu_2.dom))
+                .append($("<div>").append(part_type_label).append(part_card_menu.dom))
                 .append(optional_card_div)
                 .append($("<div>").append(assoc_type_label).append(assoc_type_menu.dom))
 
             function create_assoc_type_menu(selected_uri) {
-                var menu = dm3c.ui.menu(assoc_def.topic_type_uri_2, refresh_opional_card_div)
-                menu.add_item({label: "Composition", value: "dm3.core.composition_def"})
-                menu.add_item({label: "Aggregation", value: "dm3.core.aggregation_def"})
+                var menu = dm3c.ui.menu(assoc_def.part_topic_type_uri, refresh_opional_card_div)
+                menu.add_item({label: "Composition Definition", value: "dm3.core.composition_def"})
+                menu.add_item({label: "Aggregation Definition", value: "dm3.core.aggregation_def"})
                 menu.select(selected_uri)
                 return menu
             }

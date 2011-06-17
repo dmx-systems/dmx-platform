@@ -185,7 +185,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
             Composite comp = new Composite();
             for (AssociationDefinition assocDef : getTopicType().getAssocDefs().values()) {
                 String assocDefUri = assocDef.getUri();
-                TopicType topicType2 = dms.getTopicType(assocDef.getTopicTypeUri2(), null); // FIXME: clientContext=null
+                TopicType topicType2 = dms.getTopicType(assocDef.getPartTopicTypeUri(), null);  // clientContext=null
                 if (topicType2.getDataTypeUri().equals("dm3.core.composite")) {
                     AttachedTopic childTopic = fetchChildTopic(assocDef);
                     if (childTopic != null) {
@@ -239,7 +239,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
                 //
                 String assocDefUri = t[0];
                 AssociationDefinition assocDef = getAssocDef(assocDefUri);
-                TopicType childTopicType = dms.getTopicType(assocDef.getTopicTypeUri2(), null);
+                TopicType childTopicType = dms.getTopicType(assocDef.getPartTopicTypeUri(), null);
                 String assocTypeUri = assocDef.getAssocTypeUri();
                 Object value = comp.get(key);
                 if (assocTypeUri.equals("dm3.core.composition_def")) {
@@ -299,7 +299,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
                 }
             } else {
                 // create child topic
-                String topicTypeUri = assocDef.getTopicTypeUri2();
+                String topicTypeUri = assocDef.getPartTopicTypeUri();
                 childTopic = dms.createTopic(new TopicModel(null, value, topicTypeUri, null), null);
                 // associate child topic
                 associateChildTopic(assocDef, childTopic.getId());
@@ -333,9 +333,9 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     private AttachedRelatedTopic fetchChildTopic(AssociationDefinition assocDef) {
         String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri      = assocDef.getRoleTypeUri1();
-        String othersRoleTypeUri  = assocDef.getRoleTypeUri2();
-        String othersTopicTypeUri = assocDef.getTopicTypeUri2();
+        String myRoleTypeUri      = assocDef.getWholeRoleTypeUri();
+        String othersRoleTypeUri  = assocDef.getPartRoleTypeUri();
+        String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
         //
         return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, true);
         // fetchComposite=true ### false sufficient?
@@ -343,8 +343,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     private void associateChildTopic(AssociationDefinition assocDef, long childTopicId) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
-            new TopicRoleModel(getId(), assocDef.getRoleTypeUri1()),
-            new TopicRoleModel(childTopicId, assocDef.getRoleTypeUri2()));
+            new TopicRoleModel(getId(), assocDef.getWholeRoleTypeUri()),
+            new TopicRoleModel(childTopicId, assocDef.getPartRoleTypeUri()));
     }
 
     // ---

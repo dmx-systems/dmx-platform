@@ -29,14 +29,14 @@ public class AssociationDefinitionModel {
     private String assocTypeUri;
     private String instanceLevelAssocTypeUri;
 
-    private String topicTypeUri1;
-    private String topicTypeUri2;
+    private String wholeTopicTypeUri;
+    private String partTopicTypeUri;
 
-    private String roleTypeUri1;        // value might be derived, there is not necessarily such a role type topic
-    private String roleTypeUri2;        // value might be derived, there is not necessarily such a role type topic
+    private String wholeRoleTypeUri;    // value might be derived, there is not necessarily such a role type topic
+    private String partRoleTypeUri;     // value might be derived, there is not necessarily such a role type topic
 
-    private String cardinalityUri1;
-    private String cardinalityUri2;
+    private String wholeCardinalityUri;
+    private String partCardinalityUri;
 
     private ViewConfigurationModel viewConfigModel;   // is never null
 
@@ -44,42 +44,42 @@ public class AssociationDefinitionModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public AssociationDefinitionModel(String topicTypeUri1, String topicTypeUri2) {
-        this(-1, topicTypeUri1, topicTypeUri2);
+    public AssociationDefinitionModel(String wholeTopicTypeUri, String partTopicTypeUri) {
+        this(-1, wholeTopicTypeUri, partTopicTypeUri);
     }
 
-    public AssociationDefinitionModel(long id, String topicTypeUri1, String topicTypeUri2
-                                          /* ### String roleTypeUri1, String roleTypeUri2 */) {
+    public AssociationDefinitionModel(long id, String wholeTopicTypeUri, String partTopicTypeUri
+                                          /* ### String wholeRoleTypeUri, String partRoleTypeUri */) {
         this.id = id;
         //
-        this.topicTypeUri1 = topicTypeUri1;
-        this.topicTypeUri2 = topicTypeUri2;
+        this.wholeTopicTypeUri = wholeTopicTypeUri;
+        this.partTopicTypeUri = partTopicTypeUri;
         // set default role types
-        this.roleTypeUri1 = "dm3.core.whole";       // ### roleTypeUri1 != null ? roleTypeUri1 : topicTypeUri1;
-        this.roleTypeUri2 = "dm3.core.part";        // ### roleTypeUri2 != null ? roleTypeUri2 : topicTypeUri2;
+        this.wholeRoleTypeUri = "dm3.core.whole";// ### wholeRoleTypeUri != null ? wholeRoleTypeUri : wholeTopicTypeUri;
+        this.partRoleTypeUri = "dm3.core.part";  // ### partRoleTypeUri != null ? partRoleTypeUri : partTopicTypeUri;
         // derive uri
-        this.uri = topicTypeUri2;                   // ### roleTypeUri2;
+        this.uri = partTopicTypeUri;             // ### partRoleTypeUri;
     }
 
-    public AssociationDefinitionModel(JSONObject assocDef, String topicTypeUri1) {
+    public AssociationDefinitionModel(JSONObject assocDef, String wholeTopicTypeUri) {
         try {
             this.id = -1;
             //
-            this.topicTypeUri1 = topicTypeUri1;
-            this.topicTypeUri2 = assocDef.getString("topic_type_uri_2");
+            this.wholeTopicTypeUri = wholeTopicTypeUri;
+            this.partTopicTypeUri = assocDef.getString("part_topic_type_uri");
             //
-            this.roleTypeUri1 = "dm3.core.whole";   // ### assocDef.optString("role_type_uri_1", topicTypeUri1);
-            this.roleTypeUri2 = "dm3.core.part";    // ### assocDef.optString("role_type_uri_2", topicTypeUri2);
+            this.wholeRoleTypeUri = "dm3.core.whole";// ## assocDef.optString("whole_role_type_uri", wholeTopicTypeUri);
+            this.partRoleTypeUri = "dm3.core.part";  // ## assocDef.optString("part_role_type_uri", partTopicTypeUri);
             //
-            this.uri = topicTypeUri2;               // ### roleTypeUri2;
+            this.uri = partTopicTypeUri;             // ### partRoleTypeUri;
             this.assocTypeUri = assocDef.getString("assoc_type_uri");
             initInstanceLevelAssocTypeUri();
             //
-            if (!assocDef.has("cardinality_uri_1") && !assocTypeUri.equals("dm3.core.composition_def")) {
-                throw new RuntimeException("\"cardinality_uri_1\" is missing");
+            if (!assocDef.has("whole_cardinality_uri") && !assocTypeUri.equals("dm3.core.composition_def")) {
+                throw new RuntimeException("\"whole_cardinality_uri\" is missing");
             }
-            this.cardinalityUri1 = assocDef.optString("cardinality_uri_1", "dm3.core.one");
-            this.cardinalityUri2 = assocDef.getString("cardinality_uri_2");
+            this.wholeCardinalityUri = assocDef.optString("whole_cardinality_uri", "dm3.core.one");
+            this.partCardinalityUri = assocDef.getString("part_cardinality_uri");
             //
             this.viewConfigModel = new ViewConfigurationModel(assocDef);
         } catch (Exception e) {
@@ -105,28 +105,28 @@ public class AssociationDefinitionModel {
         return instanceLevelAssocTypeUri;
     }
 
-    public String getTopicTypeUri1() {
-        return topicTypeUri1;
+    public String getWholeTopicTypeUri() {
+        return wholeTopicTypeUri;
     }
 
-    public String getTopicTypeUri2() {
-        return topicTypeUri2;
+    public String getPartTopicTypeUri() {
+        return partTopicTypeUri;
     }
 
-    public String getRoleTypeUri1() {
-        return roleTypeUri1;
+    public String getWholeRoleTypeUri() {
+        return wholeRoleTypeUri;
     }
 
-    public String getRoleTypeUri2() {
-        return roleTypeUri2;
+    public String getPartRoleTypeUri() {
+        return partRoleTypeUri;
     }
 
-    public String getCardinalityUri1() {
-        return cardinalityUri1;
+    public String getWholeCardinalityUri() {
+        return wholeCardinalityUri;
     }
 
-    public String getCardinalityUri2() {
-        return cardinalityUri2;
+    public String getPartCardinalityUri() {
+        return partCardinalityUri;
     }
 
     public ViewConfigurationModel getViewConfigModel() {
@@ -144,12 +144,12 @@ public class AssociationDefinitionModel {
         initInstanceLevelAssocTypeUri();
     }
 
-    public void setCardinalityUri1(String cardinalityUri1) {
-        this.cardinalityUri1 = cardinalityUri1;
+    public void setWholeCardinalityUri(String wholeCardinalityUri) {
+        this.wholeCardinalityUri = wholeCardinalityUri;
     }
 
-    public void setCardinalityUri2(String cardinalityUri2) {
-        this.cardinalityUri2 = cardinalityUri2;
+    public void setPartCardinalityUri(String partCardinalityUri) {
+        this.partCardinalityUri = partCardinalityUri;
     }
 
     public void setViewConfigModel(ViewConfigurationModel viewConfigModel) {
@@ -164,12 +164,12 @@ public class AssociationDefinitionModel {
             o.put("id", id);
             o.put("uri", uri);
             o.put("assoc_type_uri", assocTypeUri);
-            o.put("topic_type_uri_1", topicTypeUri1);
-            o.put("topic_type_uri_2", topicTypeUri2);
-            o.put("role_type_uri_1", roleTypeUri1);
-            o.put("role_type_uri_2", roleTypeUri2);
-            o.put("cardinality_uri_1", cardinalityUri1);
-            o.put("cardinality_uri_2", cardinalityUri2);
+            o.put("whole_topic_type_uri", wholeTopicTypeUri);
+            o.put("part_topic_type_uri", partTopicTypeUri);
+            o.put("whole_role_type_uri", wholeRoleTypeUri);
+            o.put("part_role_type_uri", partRoleTypeUri);
+            o.put("whole_cardinality_uri", wholeCardinalityUri);
+            o.put("part_cardinality_uri", partCardinalityUri);
             viewConfigModel.toJSON(o);
             return o;
         } catch (Exception e) {
@@ -182,10 +182,10 @@ public class AssociationDefinitionModel {
     @Override
     public String toString() {
         return "\n    association definition (id=" + id + ", uri=\"" + uri + "\", assocTypeUri=\"" + assocTypeUri +
-            "\")\n        pos 1: (type=\"" + topicTypeUri1 + "\", role=\"" + roleTypeUri1 +
-            "\", cardinality=\"" + cardinalityUri1 +
-            "\")\n        pos 2: (type=\"" + topicTypeUri2 + "\", role=\"" + roleTypeUri2 +
-            "\", cardinality=\"" + cardinalityUri2 +
+            "\")\n        pos 1: (type=\"" + wholeTopicTypeUri + "\", role=\"" + wholeRoleTypeUri +
+            "\", cardinality=\"" + wholeCardinalityUri +
+            "\")\n        pos 2: (type=\"" + partTopicTypeUri + "\", role=\"" + partRoleTypeUri +
+            "\", cardinality=\"" + partCardinalityUri +
             "\")\n        association definition " + viewConfigModel;
     }
 

@@ -33,7 +33,7 @@ public class TypeEditorPlugin extends Plugin {
         if (isAssocDef(assoc.getTypeUri())) {
             AssociationDefinitionModel assocDef = buildAssocDefModel(assoc);
             // update/create assoc def
-            String topicTypeUri = assocDef.getTopicTypeUri1();
+            String topicTypeUri = assocDef.getWholeTopicTypeUri();
             TopicType topicType = dms.getTopicType(topicTypeUri, null);
             if (isAssocDef(oldTypeUri)) {
                 logger.info("### Updating association definition \"" + assocDef.getUri() +
@@ -51,15 +51,15 @@ public class TypeEditorPlugin extends Plugin {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private AssociationDefinitionModel buildAssocDefModel(Association assoc) {
-        String topicTypeUri1 = assoc.getTopic("dm3.core.topic_type_1").getUri();
-        String topicTypeUri2 = assoc.getTopic("dm3.core.topic_type_2").getUri();
+        String wholeTopicTypeUri = assoc.getTopic("dm3.core.whole_topic_type").getUri();
+        String partTopicTypeUri = assoc.getTopic("dm3.core.part_topic_type").getUri();
         // Note: the assoc def's ID is already known. Setting it explicitely
         // prevents the core from creating the underlying association.
         AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(),
-            topicTypeUri1, topicTypeUri2);
+            wholeTopicTypeUri, partTopicTypeUri);
         model.setAssocTypeUri(assoc.getTypeUri());
-        model.setCardinalityUri1("dm3.core.one");
-        model.setCardinalityUri2("dm3.core.one");
+        model.setWholeCardinalityUri("dm3.core.one");
+        model.setPartCardinalityUri("dm3.core.one");
         model.setViewConfigModel(new ViewConfigurationModel());     // FIXME: this should be the default
         //
         return model;

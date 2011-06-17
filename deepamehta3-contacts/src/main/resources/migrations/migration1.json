@@ -21,14 +21,14 @@
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
-                    topic_type_uri_2:  "dm3.contacts.first_name",
-                    cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm3.contacts.first_name",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.last_name",
-                    cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm3.contacts.last_name",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 }
             ]
         },
@@ -61,15 +61,15 @@
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
-                    topic_type_uri_2:  "dm3.contacts.phone_label",
-                    cardinality_uri_2: "dm3.core.one",
-                    cardinality_uri_1: "dm3.core.many",
-                    assoc_type_uri:    "dm3.core.aggregation_def"
+                    part_topic_type_uri:   "dm3.contacts.phone_label",
+                    part_cardinality_uri:  "dm3.core.one",
+                    whole_cardinality_uri: "dm3.core.many",
+                    assoc_type_uri:        "dm3.core.aggregation_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.phone_number",
-                    cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm3.contacts.phone_number",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 }
             ]
         },
@@ -121,28 +121,28 @@
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
-                    topic_type_uri_2:  "dm3.contacts.street",
-                    cardinality_uri_2: "dm3.core.one",
-                    cardinality_uri_1: "dm3.core.many",
-                    assoc_type_uri:    "dm3.core.aggregation_def"
+                    part_topic_type_uri:   "dm3.contacts.street",
+                    part_cardinality_uri:  "dm3.core.one",
+                    whole_cardinality_uri: "dm3.core.many",
+                    assoc_type_uri:        "dm3.core.aggregation_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.postal_code",
-                    cardinality_uri_2: "dm3.core.one",
-                    cardinality_uri_1: "dm3.core.many",
-                    assoc_type_uri:    "dm3.core.aggregation_def"
+                    part_topic_type_uri:   "dm3.contacts.postal_code",
+                    part_cardinality_uri:  "dm3.core.one",
+                    whole_cardinality_uri: "dm3.core.many",
+                    assoc_type_uri:        "dm3.core.aggregation_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.city",
-                    cardinality_uri_2: "dm3.core.one",
-                    cardinality_uri_1: "dm3.core.many",
-                    assoc_type_uri:    "dm3.core.aggregation_def"
+                    part_topic_type_uri:   "dm3.contacts.city",
+                    part_cardinality_uri:  "dm3.core.one",
+                    whole_cardinality_uri: "dm3.core.many",
+                    assoc_type_uri:        "dm3.core.aggregation_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.country",
-                    cardinality_uri_2: "dm3.core.one",
-                    cardinality_uri_1: "dm3.core.many",
-                    assoc_type_uri:    "dm3.core.aggregation_def"
+                    part_topic_type_uri:   "dm3.contacts.country",
+                    part_cardinality_uri:  "dm3.core.one",
+                    whole_cardinality_uri: "dm3.core.many",
+                    assoc_type_uri:        "dm3.core.aggregation_def"
                 }
             ]
         },
@@ -158,15 +158,15 @@
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
-                    topic_type_uri_2:  "dm3.contacts.address_label",
-                    cardinality_uri_2: "dm3.core.one",
-                    cardinality_uri_1: "dm3.core.many",
-                    assoc_type_uri:    "dm3.core.aggregation_def"
+                    part_topic_type_uri:   "dm3.contacts.address_label",
+                    part_cardinality_uri:  "dm3.core.one",
+                    whole_cardinality_uri: "dm3.core.many",
+                    assoc_type_uri:        "dm3.core.aggregation_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.address",
-                    cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm3.contacts.address",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 }
             ]
         },
@@ -188,35 +188,35 @@
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
-                    topic_type_uri_2:  "dm3.contacts.person_name",
-                    cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm3.contacts.person_name",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.phone_entry",
-                    cardinality_uri_2: "dm3.core.many",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm3.contacts.phone_entry",
+                    part_cardinality_uri: "dm3.core.many",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.email_address",
-                    cardinality_uri_2: "dm3.core.many",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm3.contacts.email_address",
+                    part_cardinality_uri: "dm3.core.many",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.website_url",
-                    cardinality_uri_2: "dm3.core.one",
-                    cardinality_uri_1: "dm3.core.many",
-                    assoc_type_uri:    "dm3.core.aggregation_def"
+                    part_topic_type_uri:   "dm3.contacts.website_url",
+                    part_cardinality_uri:  "dm3.core.one",
+                    whole_cardinality_uri: "dm3.core.many",
+                    assoc_type_uri:        "dm3.core.aggregation_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.address_entry",
-                    cardinality_uri_2: "dm3.core.many",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm3.contacts.address_entry",
+                    part_cardinality_uri: "dm3.core.many",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.notes",
-                    cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm3.contacts.notes",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 }
             ],
             view_config_topics: [
@@ -239,35 +239,35 @@
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
-                    topic_type_uri_2:  "dm3.contacts.institution_name",
-                    cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm3.contacts.institution_name",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.phone_entry",
-                    cardinality_uri_2: "dm3.core.many",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm3.contacts.phone_entry",
+                    part_cardinality_uri: "dm3.core.many",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.email_address",
-                    cardinality_uri_2: "dm3.core.many",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm3.contacts.email_address",
+                    part_cardinality_uri: "dm3.core.many",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.website_url",
-                    cardinality_uri_2: "dm3.core.one",
-                    cardinality_uri_1: "dm3.core.many",
-                    assoc_type_uri:    "dm3.core.aggregation_def"
+                    part_topic_type_uri:   "dm3.contacts.website_url",
+                    part_cardinality_uri:  "dm3.core.one",
+                    whole_cardinality_uri: "dm3.core.many",
+                    assoc_type_uri:        "dm3.core.aggregation_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.address_entry",
-                    cardinality_uri_2: "dm3.core.many",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm3.contacts.address_entry",
+                    part_cardinality_uri: "dm3.core.many",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.contacts.notes",
-                    cardinality_uri_2: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm3.contacts.notes",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 }
             ],
             view_config_topics: [

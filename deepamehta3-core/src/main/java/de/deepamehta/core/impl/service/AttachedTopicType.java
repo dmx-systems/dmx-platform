@@ -214,7 +214,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     private Map<Long, AttachedAssociationDefinition> fetchAssociationDefinitions(Topic typeTopic) {
         Map<Long, AttachedAssociationDefinition> assocDefs = new HashMap();
-        for (Association assoc : typeTopic.getAssociations("dm3.core.topic_type_1")) {
+        for (Association assoc : typeTopic.getAssociations("dm3.core.whole_topic_type")) {
             AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(dms);
             assocDef.fetch(assoc, typeTopic.getUri());
             // Note: the returned map is an intermediate, hashed by ID. The actual type model is

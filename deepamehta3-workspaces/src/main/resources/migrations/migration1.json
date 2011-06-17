@@ -18,13 +18,13 @@
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
-                    topic_type_uri_2:  "dm3.workspaces.name",
-                    cardinality_uri_2: "dm3.core.one",
+                    part_topic_type_uri:  "dm3.workspaces.name",
+                    part_cardinality_uri: "dm3.core.one",
                     assoc_type_uri:    "dm3.core.composition_def"
                 },
                 {
-                    topic_type_uri_2:  "dm3.workspaces.description",
-                    cardinality_uri_2: "dm3.core.one",
+                    part_topic_type_uri:  "dm3.workspaces.description",
+                    part_cardinality_uri: "dm3.core.one",
                     assoc_type_uri:    "dm3.core.composition_def"
                 }
             ],

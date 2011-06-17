@@ -30,17 +30,17 @@ public interface AssociationDefinition {
 
     String getInstanceLevelAssocTypeUri();
 
-    String getTopicTypeUri1();
+    String getWholeTopicTypeUri();
 
-    String getTopicTypeUri2();
+    String getPartTopicTypeUri();
 
-    String getRoleTypeUri1();
+    String getWholeRoleTypeUri();
 
-    String getRoleTypeUri2();
+    String getPartRoleTypeUri();
 
-    String getCardinalityUri1();
+    String getWholeCardinalityUri();
 
-    String getCardinalityUri2();
+    String getPartCardinalityUri();
 
     ViewConfiguration getViewConfig();
 
@@ -50,9 +50,9 @@ public interface AssociationDefinition {
 
     void setAssocTypeUri(String assocTypeUri);
 
-    void setCardinalityUri1(String cardinalityUri1);
+    void setWholeCardinalityUri(String wholeCardinalityUri);
 
-    void setCardinalityUri2(String cardinalityUri2);
+    void setPartCardinalityUri(String partCardinalityUri);
 
     // ---
 

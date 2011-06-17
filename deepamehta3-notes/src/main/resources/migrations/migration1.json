@@ -18,8 +18,8 @@
             data_type_uri: "dm3.core.composite",
             assoc_defs: [
                 {
-                    topic_type_uri_2:  "dm3.notes.title",
-                    cardinality_uri_2: "dm3.core.one",
+                    part_topic_type_uri:  "dm3.notes.title",
+                    part_cardinality_uri: "dm3.core.one",
                     assoc_type_uri:    "dm3.core.composition_def",
                     view_config_topics: [
                         {
@@ -31,8 +31,8 @@
                     ]
                 },
                 {
-                    topic_type_uri_2:  "dm3.notes.text",
-                    cardinality_uri_2: "dm3.core.one",
+                    part_topic_type_uri:  "dm3.notes.text",
+                    part_cardinality_uri: "dm3.core.one",
                     assoc_type_uri:    "dm3.core.composition_def",
                     view_config_topics: [
                         {
