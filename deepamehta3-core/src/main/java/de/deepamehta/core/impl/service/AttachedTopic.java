@@ -262,8 +262,15 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
                         //
                         boolean assignExistingTopic = t.length == 2;
                         if (assignExistingTopic) {
+                            // update DB
                             long childTopicId = (Integer) value;   // Note: the JSON parser creates Integers (not Longs)
                             associateChildTopic(assocDef, childTopicId);
+                            // adjust memory
+                            // ### FIXME: ConcurrentModificationException
+                            // ### current workaround: refetch after update, see EmbeddedService.updateTopic()
+                            // Topic assignedTopic = dms.getTopic(childTopicId, false, null);  // fetchComposite=false
+                            // comp.remove(key);
+                            // comp.put(assocDefUri, assignedTopic.getValue().value());
                         } else {
                             // create new child topic
                             storeChildTopicValue(assocDef, new TopicValue(value));

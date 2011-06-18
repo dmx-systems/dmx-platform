@@ -51,6 +51,7 @@ function TopicRenderer() {
         var topic_model = build_topic_model()
         // alert("topic model to update: " + JSON.stringify(topic_model))
         topic = dm3c.update_topic(topic, topic_model)
+        // alert("updated topic: " + JSON.stringify(topic))
         dm3c.trigger_plugin_hook("post_submit_form", topic)
         // 2) update GUI
         dm3c.canvas.update_topic(topic)

@@ -283,6 +283,9 @@ public class EmbeddedService implements DeepaMehtaService {
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
             topic.update(model);
+            // ### FIXME: avoid refetching. Required is updating the topic model for aggregations:
+            // replacing $id composite entries with actual values. See AttachedTopic.storeComposite()
+            topic = getTopic(model.getId(), true, clientContext);  // fetchComposite=true
             //
             // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
             //
