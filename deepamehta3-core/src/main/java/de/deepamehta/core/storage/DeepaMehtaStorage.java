@@ -15,9 +15,6 @@ import java.util.Set;
 
 /**
  * Abstraction of the DeepaMehta storage layer.
- * <p>
- * TODO: possibly the methods should return model classes instead of "attached" objects.
- * We would get rid of the HG wrapper classes (which are actually *not* attached).
  */
 public interface DeepaMehtaStorage {
 
@@ -40,29 +37,17 @@ public interface DeepaMehtaStorage {
      */
     TopicModel getTopic(String key, TopicValue value);
 
-    // Topic getTopic(String typeUri, String key, PropValue value);
-
     // ---
 
     /**
-     * @param   assocTypeUri        may be null
+     * @param   assocTypeUris       may be null
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    RelatedTopicModel getTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                              String othersRoleTypeUri,
-                                                                              String othersTopicTypeUri);
-
-    /**
-     * @param   assocTypeUri        may be null
-     * @param   myRoleTypeUri       may be null
-     * @param   othersRoleTypeUri   may be null
-     * @param   othersTopicTypeUri  may be null
-     */
-    Set<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                                    String othersRoleTypeUri,
-                                                                                    String othersTopicTypeUri);
+    Set<RelatedTopicModel> getTopicRelatedTopics(long topicId, List assocTypeUris, String myRoleTypeUri,
+                                                                                   String othersRoleTypeUri,
+                                                                                   String othersTopicTypeUri);
 
     // ---
 
@@ -71,7 +56,7 @@ public interface DeepaMehtaStorage {
     Set<AssociationModel> getAssociations(long topicId, String myRoleTypeUri);
 
     AssociationModel getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                              String othersRoleTypeUri);
+                                                                                   String othersRoleTypeUri);
 
     // ---
 
@@ -145,16 +130,6 @@ public interface DeepaMehtaStorage {
     Set<AssociationModel> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
 
     // ---
-
-    /**
-     * @param   assocTypeUri        may be null
-     * @param   myRoleTypeUri       may be null
-     * @param   othersRoleTypeUri   may be null
-     * @param   othersTopicTypeUri  may be null
-     */
-    RelatedTopicModel getAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                                                    String othersRoleTypeUri,
-                                                                                    String othersTopicTypeUri);
 
     /**
      * @param   assocTypeUri        may be null

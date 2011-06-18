@@ -17,6 +17,7 @@ import de.deepamehta.core.model.TopicValue;
 
 import org.codehaus.jettison.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,6 +61,8 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     // === TopicType Implementation ===
 
+    // --- Data Type ---
+
     @Override
     public String getDataTypeUri() {
         return getModel().getDataTypeUri();
@@ -73,7 +76,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         storeDataTypeUri();
     }
 
-    // ---
+    // --- Index Modes ---
 
     @Override
     public Set<IndexMode> getIndexModes() {
@@ -88,7 +91,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         storeIndexModes();
     }
 
-    // ---
+    // --- Association Definitions ---
 
     @Override
     public Map<String, AssociationDefinition> getAssocDefs() {
@@ -110,7 +113,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         // Note: the predecessor must be determines *before* the memory is updated
         AssociationDefinition predecessor = findLastAssocDef();
         // 1) update memory
-        getModel().addAssocDefModel(model);                             // update model
+        getModel().addAssocDef(model);                                  // update model
         AttachedAssociationDefinition assocDef = initAssocDef(model);   // update attached object cache
         // 2) update DB
         assocDef.store(predecessor);
@@ -119,11 +122,19 @@ class AttachedTopicType extends AttachedType implements TopicType {
     @Override
     public void updateAssocDef(AssociationDefinitionModel model) {
         // 1) update memory
-        getModel().updateAssocDefModel(model);                          // update model
+        getModel().updateAssocDef(model);                               // update model
         initAssocDef(model);                                            // update attached object cache
         // 2) update DB
         // ### Note: nothing to do for the moment
         // (in case of interactive assoc type change the association is already updated in DB)
+    }
+
+    @Override
+    public void removeAssocDef(String assocDefUri) {
+        // 1) update memory
+        getModel().removeAssocDef(assocDefUri);                         // update model
+        // 2) update DB
+        // ### TODO: maintain sequence
     }
 
 
@@ -162,7 +173,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         // set model of this topic type
         setModel(model);
         // ### initAssocDefs(); // Note: the assoc defs are already initialized through previous addAssocDefsToModel()
-        initViewConfig();   // defined in superclass
+        initViewConfig();       // defined in superclass
     }
 
     void store() {
@@ -186,15 +197,20 @@ class AttachedTopicType extends AttachedType implements TopicType {
         boolean valueChanged = !getValue().equals(value);
         boolean dataTypeChanged = !getDataTypeUri().equals(dataTypeUri);
         //
-        if (uriChanged) {
-            logger.info("Changing URI from \"" + getUri() + "\" -> \"" + uri + "\"");
-            dms.typeCache.invalidate(getUri());
-            super.update(model);
-            dms.typeCache.put(this);
-        }
-        if (valueChanged) {
-            logger.info("Changing name from \"" + getValue() + "\" -> \"" + value + "\"");
-            super.update(model);
+        if (uriChanged || valueChanged) {
+            if (uriChanged) {
+                logger.info("Changing URI from \"" + getUri() + "\" -> \"" + uri + "\"");
+            }
+            if (valueChanged) {
+                logger.info("Changing name from \"" + getValue() + "\" -> \"" + value + "\"");
+            }
+            if (uriChanged) {
+                dms.typeCache.invalidate(getUri());
+                super.update(model);
+                dms.typeCache.put(this);
+            } else {
+                super.update(model);
+            }
         }
         if (dataTypeChanged) {
             logger.info("Changing data type from \"" + getDataTypeUri() + "\" -> \"" + dataTypeUri + "\"");
@@ -214,9 +230,16 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     private Map<Long, AttachedAssociationDefinition> fetchAssociationDefinitions(Topic typeTopic) {
         Map<Long, AttachedAssociationDefinition> assocDefs = new HashMap();
-        for (Association assoc : typeTopic.getAssociations("dm3.core.whole_topic_type")) {
+        //
+        // fetch part topic types
+        List assocTypeFilter = Arrays.asList("dm3.core.aggregation_def", "dm3.core.composition_def");
+        Set<RelatedTopic> partTopicTypes = typeTopic.getRelatedTopics(assocTypeFilter,
+            "dm3.core.whole_topic_type", "dm3.core.part_topic_type", "dm3.core.topic_type", false);
+        //
+        for (RelatedTopic partTopicType : partTopicTypes) {
             AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(dms);
-            assocDef.fetch(assoc, typeTopic.getUri());
+            // FIXME: pass more info of the reltopic to the fetch() method to avoid double-fetching
+            assocDef.fetch(partTopicType.getAssociation(), typeTopic.getUri());
             // Note: the returned map is an intermediate, hashed by ID. The actual type model is
             // subsequently build from it by sorting the assoc def's according to the sequence IDs.
             assocDefs.put(assocDef.getId(), assocDef);
@@ -257,7 +280,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
                     " is in sequence but association definition is not found");
             }
             // Note: the model and the attached object cache is updated together.
-            model.addAssocDefModel(assocDef.getModel());        // update model
+            model.addAssocDef(assocDef.getModel());             // update model
             this.assocDefs.put(assocDef.getUri(), assocDef);    // update attached object cache
         }
     }
@@ -330,7 +353,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     private void initAssocDefs() {
         this.assocDefs = new LinkedHashMap();
-        for (AssociationDefinitionModel model : getModel().getAssocDefModels().values()) {
+        for (AssociationDefinitionModel model : getModel().getAssocDefs().values()) {
             initAssocDef(model);
         }
     }

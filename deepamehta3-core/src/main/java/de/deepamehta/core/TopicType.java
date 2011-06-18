@@ -15,17 +15,19 @@ import java.util.Set;
  */
 public interface TopicType extends Type {
 
+    // --- Data Type ---
+
     String getDataTypeUri();
 
     void setDataTypeUri(String dataTypeUri);
 
-    // ---
+    // --- Index Modes ---
 
     Set<IndexMode> getIndexModes();
 
     void setIndexModes(Set<IndexMode> indexModes);
 
-    // ---
+    // --- Association Definitions ---
 
     Map<String, AssociationDefinition> getAssocDefs();
 
@@ -34,4 +36,6 @@ public interface TopicType extends Type {
     void addAssocDef(AssociationDefinitionModel assocDef);
 
     void updateAssocDef(AssociationDefinitionModel assocDef);
+
+    void removeAssocDef(String assocDefUri);
 }

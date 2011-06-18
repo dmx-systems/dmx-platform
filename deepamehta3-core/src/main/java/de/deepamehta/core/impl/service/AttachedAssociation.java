@@ -129,9 +129,18 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri,
                                                                                            boolean fetchComposite) {
-        RelatedTopicModel topic = dms.storage.getAssociationRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri);
-        return topic != null ? dms.attach(topic, fetchComposite) : null;
+        Set<RelatedTopic> topics = getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+                                                                                                    fetchComposite);
+        switch (topics.size()) {
+        case 0:
+            return null;
+        case 1:
+            return (AttachedRelatedTopic) topics.iterator().next();
+        default:
+            throw new RuntimeException("Ambiguity: there are " + topics.size() + " related topics " + "(assocId=" +
+                getId() + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
+                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
+        }
     }
 
     @Override

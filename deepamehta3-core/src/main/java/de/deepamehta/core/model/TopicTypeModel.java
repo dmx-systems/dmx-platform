@@ -57,7 +57,7 @@ public class TopicTypeModel extends TypeModel {
         super(model);
         this.dataTypeUri = model.getDataTypeUri();
         this.indexModes = model.getIndexModes();
-        this.assocDefModels = model.getAssocDefModels();
+        this.assocDefModels = model.getAssocDefs();
     }
 
     public TopicTypeModel(JSONObject topicTypeModel) {
@@ -100,21 +100,20 @@ public class TopicTypeModel extends TypeModel {
 
     // ---
 
-    public Map<String, AssociationDefinitionModel> getAssocDefModels() {
+    public Map<String, AssociationDefinitionModel> getAssocDefs() {
         return assocDefModels;
     }
 
-    /* FIXME: not in use
-    public AssociationDefinitionModel getAssocDefModel(String assocDefUri) {
+    public AssociationDefinitionModel getAssocDef(String assocDefUri) {
         AssociationDefinitionModel model = assocDefModels.get(assocDefUri);
         if (model == null) {
             throw new RuntimeException("Schema violation: association definition \"" +
                 assocDefUri + "\" not found in " + this);
         }
         return model;
-    } */
+    }
 
-    public void addAssocDefModel(AssociationDefinitionModel assocDef) {
+    public void addAssocDef(AssociationDefinitionModel assocDef) {
         String assocDefUri = assocDef.getUri();
         // sanity check ### FIXME: drop this check or provide proper feedback to the type editor user
         if (!getDataTypeUri().equals("dm3.core.composite")) {
@@ -128,11 +127,18 @@ public class TopicTypeModel extends TypeModel {
                 "association definitions with uri \"" + assocDefUri + "\" -- Use distinct role types at position 2");
         }
         //
-        updateAssocDefModel(assocDef);
+        updateAssocDef(assocDef);
     }
 
-    public void updateAssocDefModel(AssociationDefinitionModel assocDef) {
+    public void updateAssocDef(AssociationDefinitionModel assocDef) {
         assocDefModels.put(assocDef.getUri(), assocDef);
+    }
+
+    public void removeAssocDef(String assocDefUri) {
+        // error check
+        getAssocDef(assocDefUri);
+        //
+        assocDefModels.remove(assocDefUri);
     }
 
     // ---
@@ -166,7 +172,7 @@ public class TopicTypeModel extends TypeModel {
         JSONArray models = topicTypeModel.optJSONArray("assoc_defs");
         if (models != null) {
             for (int i = 0; i < models.length(); i++) {
-                addAssocDefModel(new AssociationDefinitionModel(models.getJSONObject(i), this.uri));
+                addAssocDef(new AssociationDefinitionModel(models.getJSONObject(i), this.uri));
             }
         }
     }

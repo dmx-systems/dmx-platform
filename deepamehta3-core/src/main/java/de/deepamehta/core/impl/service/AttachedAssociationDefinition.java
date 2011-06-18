@@ -221,9 +221,12 @@ class AttachedAssociationDefinition implements AssociationDefinition {
 
     // === Fetch ===
 
+    // Note: in the fetch methods the assoc def's model isn't available. It doesn't exist yet.
+    // The model is only created by these very fetch methods.
+
     private TopicTypes fetchTopicTypes(Association assoc) {
-        String wholeTopicTypeUri = assoc.getTopic("dm3.core.whole_topic_type").getUri();
-        String partTopicTypeUri = assoc.getTopic("dm3.core.part_topic_type").getUri();
+        String wholeTopicTypeUri = getWholeTopicTypeUri(assoc);
+        String partTopicTypeUri = getPartTopicTypeUri(assoc);
         return new TopicTypes(wholeTopicTypeUri, partTopicTypeUri);
     }
 
@@ -343,5 +346,17 @@ class AttachedAssociationDefinition implements AssociationDefinition {
     private void initViewConfig() {
         RoleModel configurable = new AssociationRoleModel(getId(), "dm3.core.assoc_def");
         this.viewConfig = new AttachedViewConfiguration(configurable, model.getViewConfigModel(), dms);
+    }
+
+    // ---
+
+    // ### FIXME: copy in TypeEditorPlugin
+    private String getWholeTopicTypeUri(Association assoc) {
+        return assoc.getTopic("dm3.core.whole_topic_type").getUri();
+    }
+
+    // ### FIXME: copy in TypeEditorPlugin
+    private String getPartTopicTypeUri(Association assoc) {
+        return assoc.getTopic("dm3.core.part_topic_type").getUri();
     }
 }

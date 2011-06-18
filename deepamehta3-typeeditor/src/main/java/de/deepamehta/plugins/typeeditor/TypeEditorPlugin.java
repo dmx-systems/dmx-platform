@@ -45,22 +45,29 @@ public class TypeEditorPlugin extends Plugin {
                 topicType.addAssocDef(assocDef);
             }
             directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
+        } else if (isAssocDef(oldTypeUri)) {
+            String wholeTopicTypeUri = getWholeTopicTypeUri(assoc);
+            String partTopicTypeUri = getPartTopicTypeUri(assoc);
+            TopicType topicType = dms.getTopicType(wholeTopicTypeUri, null);
+            logger.info("### Removing association definition \"" + partTopicTypeUri +
+                "\" from topic type \"" + wholeTopicTypeUri + "\"");
+            topicType.removeAssocDef(partTopicTypeUri);
         }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private AssociationDefinitionModel buildAssocDefModel(Association assoc) {
-        String wholeTopicTypeUri = assoc.getTopic("dm3.core.whole_topic_type").getUri();
-        String partTopicTypeUri = assoc.getTopic("dm3.core.part_topic_type").getUri();
+        String wholeTopicTypeUri = getWholeTopicTypeUri(assoc);
+        String partTopicTypeUri = getPartTopicTypeUri(assoc);
         // Note: the assoc def's ID is already known. Setting it explicitely
         // prevents the core from creating the underlying association.
         AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(),
             wholeTopicTypeUri, partTopicTypeUri);
         model.setAssocTypeUri(assoc.getTypeUri());
-        model.setWholeCardinalityUri("dm3.core.one");
-        model.setPartCardinalityUri("dm3.core.one");
-        model.setViewConfigModel(new ViewConfigurationModel());     // FIXME: this should be the default
+        model.setWholeCardinalityUri("dm3.core.one");           // FIXME: handle cardinality
+        model.setPartCardinalityUri("dm3.core.one");            // FIXME: handle cardinality
+        model.setViewConfigModel(new ViewConfigurationModel()); // FIXME: this should be the default
         //
         return model;
     }
@@ -68,5 +75,17 @@ public class TypeEditorPlugin extends Plugin {
     private boolean isAssocDef(String assocTypeUri) {
         return assocTypeUri.equals("dm3.core.aggregation_def") ||
                assocTypeUri.equals("dm3.core.composition_def");
+    }
+
+    // ---
+
+    // ### FIXME: copy in AttachedAssociationDefinition
+    private String getWholeTopicTypeUri(Association assoc) {
+        return assoc.getTopic("dm3.core.whole_topic_type").getUri();
+    }
+
+    // ### FIXME: copy in AttachedAssociationDefinition
+    private String getPartTopicTypeUri(Association assoc) {
+        return assoc.getTopic("dm3.core.part_topic_type").getUri();
     }
 }

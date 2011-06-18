@@ -133,7 +133,7 @@ public class WebclientPlugin extends Plugin {
             if (isSearchableUnit(topic)) {
                 searchableUnits.add(topic);
             } else {
-                Set<Topic> parentTopics = toTopicSet(topic.getRelatedTopics(null,
+                Set<Topic> parentTopics = toTopicSet(topic.getRelatedTopics((List) null,
                     "dm3.core.part", "dm3.core.whole", null, false));
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);

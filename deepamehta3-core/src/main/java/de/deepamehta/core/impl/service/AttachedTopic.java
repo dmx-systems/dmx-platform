@@ -15,8 +15,10 @@ import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -99,31 +101,40 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     public Set<RelatedTopic> getRelatedTopics(String assocTypeUri) {
-        Set<RelatedTopic> topics = dms.attach(dms.storage.getTopicRelatedTopics(
-            getId(), assocTypeUri, null, null, null), false);   // fetchComposite=false
-        //
-        /* ### for (RelatedTopic topic : topics) {
-            triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, relTopic.getTopic());
-            triggerHook(Hook.PROVIDE_RELATION_PROPERTIES, relTopic.getRelation());
-        } */
-        //
-        return topics;
+        return getRelatedTopics(assocTypeUri, null, null, null, false);   // fetchComposite=false
     }
 
     @Override
     public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri,
                                                                                            boolean fetchComposite) {
-        RelatedTopicModel topic = dms.storage.getTopicRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri);
-        return topic != null ? dms.attach(topic, fetchComposite) : null;
+        Set<RelatedTopic> topics = getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+                                                                                                    fetchComposite);
+        switch (topics.size()) {
+        case 0:
+            return null;
+        case 1:
+            return (AttachedRelatedTopic) topics.iterator().next();
+        default:
+            throw new RuntimeException("Ambiguity: there are " + topics.size() + " related topics " + "(topicId=" +
+                getId() + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
+                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
+        }
     }
 
     @Override
     public Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                          String othersTopicTypeUri,
                                                                                          boolean fetchComposite) {
-        return dms.attach(dms.storage.getTopicRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        List assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
+        return getRelatedTopics(assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, fetchComposite);
+    }
+
+    @Override
+    public Set<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                        String othersTopicTypeUri,
+                                                                                        boolean fetchComposite) {
+        return dms.attach(dms.storage.getTopicRelatedTopics(getId(), assocTypeUris, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri), fetchComposite);
     }
 

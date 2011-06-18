@@ -2,6 +2,7 @@ package de.deepamehta.core;
 
 import de.deepamehta.core.model.TopicValue;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -45,6 +46,16 @@ public interface Topic extends DeepaMehtaObject {
     Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                   String othersTopicTypeUri,
                                                                                   boolean fetchComposite);
+
+    /**
+     * @param   assocTypeUris       may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
+    Set<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                 String othersTopicTypeUri,
+                                                                                 boolean fetchComposite);
 
     Set<Association> getAssociations(String myRoleTypeUri);
 }

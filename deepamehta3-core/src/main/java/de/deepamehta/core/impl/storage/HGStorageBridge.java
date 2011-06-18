@@ -21,6 +21,7 @@ import de.deepamehta.hypergraph.HyperObject;
 import de.deepamehta.hypergraph.HyperObjectRole;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -70,34 +71,16 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public RelatedTopicModel getTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                                     String othersRoleTypeUri,
-                                                                                     String othersTopicTypeUri) {
-        Set<RelatedTopicModel> relTopics = getTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
-                                                                          othersRoleTypeUri, othersTopicTypeUri);
-        switch (relTopics.size()) {
-        case 0:
-            return null;
-        case 1:
-            return relTopics.iterator().next();
-        default:
-            throw new RuntimeException("Ambiguity: there are " + relTopics.size() + " related topics " + "(topicId=" +
-                topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
-                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
-        }
-    }
-
-    @Override
-    public Set<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                                           String othersRoleTypeUri,
-                                                                                           String othersTopicTypeUri) {
+    public Set<RelatedTopicModel> getTopicRelatedTopics(long topicId, List assocTypeUris, String myRoleTypeUri,
+                                                                                          String othersRoleTypeUri,
+                                                                                          String othersTopicTypeUri) {
         Set<ConnectedHyperNode> nodes = hg.getHyperNode(topicId).getConnectedHyperNodes(myRoleTypeUri,
                                                                                         othersRoleTypeUri);
         if (othersTopicTypeUri != null) {
             filterNodesByTopicType(nodes, othersTopicTypeUri);
         }
-        if (assocTypeUri != null) {
-            filterNodesByAssociationType(nodes, assocTypeUri);
+        if (assocTypeUris != null) {
+            filterNodesByAssociationType(nodes, assocTypeUris);
         }
         return buildRelatedTopics(nodes);
     }
@@ -189,24 +172,6 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     }
 
     // ---
-
-    @Override
-    public RelatedTopicModel getAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                                                           String othersRoleTypeUri,
-                                                                                           String othersTopicTypeUri) {
-        Set<RelatedTopicModel> relTopics = getAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
-                                                                                othersRoleTypeUri, othersTopicTypeUri);
-        switch (relTopics.size()) {
-        case 0:
-            return null;
-        case 1:
-            return relTopics.iterator().next();
-        default:
-            throw new RuntimeException("Ambiguity: there are " + relTopics.size() + " related topics " + "(assocId=" +
-                assocId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
-                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
-        }
-    }
 
     @Override
     public Set<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
@@ -375,6 +340,10 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // === Type Filter ===
 
     private void filterNodesByAssociationType(Set<ConnectedHyperNode> nodes, String assocTypeUri) {
+        filterNodesByAssociationType(nodes, Arrays.asList(assocTypeUri));
+    }
+
+    private void filterNodesByAssociationType(Set<ConnectedHyperNode> nodes, List assocTypeUris) {
         ConnectedHyperNode node = null;
         HyperEdge edge = null;
         try {
@@ -382,15 +351,17 @@ public class HGStorageBridge implements DeepaMehtaStorage {
             while (i.hasNext()) {
                 node = i.next();
                 edge = node.getConnectingHyperEdge();
-                if (!getAssociationTypeUri(edge).equals(assocTypeUri)) {
+                if (!assocTypeUris.contains(getAssociationTypeUri(edge))) {
                     i.remove();
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Applying association type filter \"" + assocTypeUri +
-                "\" failed (" + edge + ",\n" + node.getHyperNode() + ")", e);
+            throw new RuntimeException("Applying association type filter " + assocTypeUris +
+                " failed (" + edge + ",\n" + node.getHyperNode() + ")", e);
         }
     }
+
+    // ---
 
     private void filterNodesByTopicType(Set<ConnectedHyperNode> nodes, String topicTypeUri) {
         HyperNode node = null;
