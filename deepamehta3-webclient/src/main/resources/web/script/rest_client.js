@@ -2,6 +2,8 @@ function RESTClient(core_service_uri) {
 
     var LOG_AJAX_REQUESTS = false
 
+    // -------------------------------------------------------------------------------------------------- Public Methods
+
 
 
     // === Topics ===
@@ -27,8 +29,8 @@ function RESTClient(core_service_uri) {
         return request("GET", "/topic/" + type_uri + "/" + key + "/" + encodeURIComponent(value))
     }
 
-    this.get_topics = function(type_uri) {
-        return request("GET", "/topic/by_type/" + type_uri)
+    this.get_topics = function(type_uri, sort) {
+        return sort_topics(request("GET", "/topic/by_type/" + type_uri), sort)
     }
 
     /**
@@ -37,9 +39,9 @@ function RESTClient(core_service_uri) {
      *
      * @return  array of topics, possibly empty.
      */
-    this.get_related_topics = function(topic_id, assoc_type_uri) {
+    this.get_related_topics = function(topic_id, assoc_type_uri, sort) {
         var params = new RequestParameter({assoc_type_uri: assoc_type_uri})
-        return request("GET", "/topic/" + topic_id + "/related_topics?" + params.to_query_string())
+        return sort_topics(request("GET", "/topic/" + topic_id + "/related_topics?" + params.to_query_string()), sort)
     }
 
     // FIXME: index parameter not used
@@ -180,7 +182,7 @@ function RESTClient(core_service_uri) {
 
 
 
-    // === Private Helpers ===
+    // ----------------------------------------------------------------------------------------------- Private Functions
 
     /**
      * Sends an AJAX request.
@@ -271,6 +273,32 @@ function RESTClient(core_service_uri) {
                 value = JSON.stringify(value)
             }
             param_array.push(param_name + "=" + value)
+        }
+    }
+
+    // ---
+
+    function sort_topics(topics, sort) {
+        if (sort) {
+            topics.sort(topics_sort_function)
+        }
+        return topics
+    }
+
+    function topics_sort_function(topic_1, topic_2) {
+        if (topic_1.type_uri == topic_2.type_uri) {
+            return compare(topic_1.value, topic_2.value)
+        }
+        return compare(topic_1.type_uri, topic_2.type_uri)
+
+        function compare(val_1, val_2) {
+            if (val_1 < val_2) {
+                return -1
+            } else if (val_1 > val_2) {
+                return 1
+            } else {
+                return 0
+            }
         }
     }
 }

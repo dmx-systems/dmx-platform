@@ -65,7 +65,7 @@ function RenderHelper() {
      */
     this.topic_menu = function(topic_type_uri, selected_uri) {
         // retrieve all instances
-        var topics = dm3c.restc.get_topics(topic_type_uri)
+        var topics = dm3c.restc.get_topics(topic_type_uri, true)    // sort=true
         //
         var menu = dm3c.ui.menu(topic_type_uri)
         for (var i in topics) {
@@ -81,7 +81,7 @@ function RenderHelper() {
     // === Direct-to-page Rendering ===
 
     this.associations = function(topic_id) {
-        var topics = dm3c.restc.get_related_topics(topic_id) //, "dm3.core.association")
+        var topics = dm3c.restc.get_related_topics(topic_id, undefined, true)   // assoc_type_uri=undefined, sort=true
         //
         this.field_label("Associations (" + topics.length + ")")
         this.field_value(this.topic_list(topics))

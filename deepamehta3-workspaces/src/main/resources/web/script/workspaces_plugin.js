@@ -69,7 +69,7 @@ function workspaces_plugin() {
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function get_all_workspaces() {
-        return dm3c.restc.get_topics("dm3.workspaces.workspace")
+        return dm3c.restc.get_topics("dm3.workspaces.workspace", true)  // sort=true
     }
 
     /**
