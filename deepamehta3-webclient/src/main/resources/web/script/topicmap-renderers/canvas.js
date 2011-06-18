@@ -292,11 +292,11 @@ function Canvas() {
             tmp_x = cx(event)
             tmp_y = cy(event)
             //
-            var ct = topic_by_position(event)
+            var ct = find_topic(event)
             if (ct) {
                 action_topic = ct
             } else {
-                var ca = assoc_by_position(event)
+                var ca = find_association(event)
                 if (ca) {
                     action_assoc = ca
                 } else if (!association_in_progress) {
@@ -351,7 +351,7 @@ function Canvas() {
         if (association_in_progress) {
             end_association_in_progress()
             //
-            var ct = topic_by_position(event)
+            var ct = find_topic(event)
             if (ct) {
                 var assoc = dm3c.create_association("dm3.core.association",
                     {topic_id: dm3c.selected_object.id, role_type_uri: dm3c.selected_object.type_uri},
@@ -367,7 +367,7 @@ function Canvas() {
         } else if (canvas_move_in_progress) {
             end_canvas_move()
         } else {
-            var ct = topic_by_position(event)   // ### FIXME: use actionTopic instead of searching again?
+            var ct = find_topic(event)   // ### FIXME: use actionTopic instead of searching again?
             if (ct) {
                 select_topic(ct.id)
             } else if (action_assoc) {
@@ -378,7 +378,7 @@ function Canvas() {
     }
 
     function dblclick(event) {
-        var ct = topic_by_position(event)
+        var ct = find_topic(event)
         if (ct) {
             dm3c.trigger_plugin_hook("topic_doubleclicked", ct)
         }
@@ -386,7 +386,7 @@ function Canvas() {
 
     // ---
 
-    function topic_by_position(event) {
+    function find_topic(event) {
         var x = cx(event, true)
         var y = cy(event, true)
         return iterate_topics(function(ct) {
@@ -398,7 +398,7 @@ function Canvas() {
         })
     }
 
-    function assoc_by_position(event) {
+    function find_association(event) {
         var x = cx(event, true)
         var y = cy(event, true)
         return iterate_associations(function(ca) {
@@ -415,8 +415,17 @@ function Canvas() {
                 return
             }
             // gradient
-            var g1 = (y - ct1.y) / (x - ct1.x)
-            var g2 = (y - ct2.y) / (x - ct2.x)
+            var dx1 = x - ct1.x
+            var dx2 = x - ct2.x
+            var dy1 = y - ct1.y
+            var dy2 = y - ct2.y
+            if (bx2 - bx1 > by2 - by1) {
+                var g1 = dy1 / dx1
+                var g2 = dy2 / dx2
+            } else {
+                var g1 = dx1 / dy1
+                var g2 = dx2 / dy2
+            }
             // dm3c.log(g1 + " " + g2 + " -> " + Math.abs(g1 - g2))
             //
             if (Math.abs(g1 - g2) < ASSOC_CLICK_TOLERANCE) {
@@ -462,11 +471,11 @@ function Canvas() {
         close_context_menu()
         //
         var ct, ca
-        if (ct = topic_by_position(event)) {
+        if (ct = find_topic(event)) {
             select_topic(ct.id, true)
             // Note: only dm3c.selected_object has the auxiliary attributes (the canvas topic has not)
             var commands = dm3c.get_topic_commands(dm3c.selected_object, "context-menu")
-        } else if (ca = assoc_by_position(event)) {
+        } else if (ca = find_association(event)) {
             select_association(ca.id)
             // ### FIXME: use dm3c.selected assoc?
             var commands = dm3c.get_association_commands(ca, "context-menu")
