@@ -251,7 +251,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
                 String assocDefUri = t[0];
                 AssociationDefinition assocDef = getAssocDef(assocDefUri);
                 TopicType childTopicType = dms.getTopicType(assocDef.getPartTopicTypeUri(), null);
-                String assocTypeUri = assocDef.getAssocTypeUri();
+                String assocTypeUri = assocDef.getTypeUri();
                 Object value = comp.get(key);
                 if (assocTypeUri.equals("dm3.core.composition_def")) {
                     if (childTopicType.getDataTypeUri().equals("dm3.core.composite")) {

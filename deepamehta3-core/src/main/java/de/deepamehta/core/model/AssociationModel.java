@@ -53,6 +53,11 @@ public class AssociationModel extends DeepaMehtaObjectModel {
         }
     }
 
+    // ---
+
+    protected AssociationModel() {
+    }
+
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     public RoleModel getRoleModel1() {

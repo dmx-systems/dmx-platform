@@ -1,17 +1,5 @@
 package de.deepamehta.core;
 
-import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
-
 
 
 /**
@@ -20,13 +8,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface AssociationDefinition {
-
-    long getId();
-
-    String getUri();
-
-    String getAssocTypeUri();
+public interface AssociationDefinition extends Association {
 
     String getInstanceLevelAssocTypeUri();
 
@@ -46,15 +28,7 @@ public interface AssociationDefinition {
 
     // ---
 
-    void setId(long id);
-
-    void setAssocTypeUri(String assocTypeUri);
-
     void setWholeCardinalityUri(String wholeCardinalityUri);
 
     void setPartCardinalityUri(String partCardinalityUri);
-
-    // ---
-
-    JSONObject toJSON();
 }

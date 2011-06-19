@@ -35,6 +35,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    AttachedDeepaMehtaObject(EmbeddedService dms) {
+        this(null, dms);    // ### The model remain uninitialized.
+                            // ### They are initialized later on through fetch().
+    }
+
     AttachedDeepaMehtaObject(DeepaMehtaObjectModel model, EmbeddedService dms) {
         this.model = model;
         this.dms = dms;

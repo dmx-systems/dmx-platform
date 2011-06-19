@@ -13,7 +13,7 @@
                 {
                     part_topic_type_uri:  "dm3.core.plugin_migration_nr",
                     part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    assoc_type_uri:       "dm3.core.composition_def"
                 }
             ]
         }

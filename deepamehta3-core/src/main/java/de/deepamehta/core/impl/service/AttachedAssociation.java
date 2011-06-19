@@ -34,6 +34,11 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    AttachedAssociation(EmbeddedService dms) {
+        super(dms);     // ### The model and viewConfig remain uninitialized.
+                        // ### They are initialized later on through fetch().
+    }
+
     AttachedAssociation(AssociationModel model, EmbeddedService dms) {
         super(model, dms);
         this.role1 = createAttachedRole(model.getRoleModel1());

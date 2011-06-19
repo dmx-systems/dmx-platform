@@ -20,7 +20,6 @@ import org.codehaus.jettison.json.JSONObject;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,10 +110,10 @@ class AttachedTopicType extends AttachedType implements TopicType {
     @Override
     public void addAssocDef(AssociationDefinitionModel model) {
         // Note: the predecessor must be determines *before* the memory is updated
-        AssociationDefinition predecessor = findLastAssocDef();
+        AssociationDefinition predecessor = lastAssocDef();
         // 1) update memory
         getModel().addAssocDef(model);                                  // update model
-        AttachedAssociationDefinition assocDef = initAssocDef(model);   // update attached object cache
+        AttachedAssociationDefinition assocDef = _addAssocDef(model);   // update attached object cache
         // 2) update DB
         assocDef.store(predecessor);
     }
@@ -123,7 +122,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
     public void updateAssocDef(AssociationDefinitionModel model) {
         // 1) update memory
         getModel().updateAssocDef(model);                               // update model
-        initAssocDef(model);                                            // update attached object cache
+        _addAssocDef(model);                                            // update attached object cache
         // 2) update DB
         // ### Note: nothing to do for the moment
         // (in case of interactive assoc type change the association is already updated in DB)
@@ -133,6 +132,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
     public void removeAssocDef(String assocDefUri) {
         // 1) update memory
         getModel().removeAssocDef(assocDefUri);                         // update model
+        _removeAssocDef(assocDefUri);                                   // update attached object cache
         // 2) update DB
         // ### TODO: maintain sequence
     }
@@ -341,7 +341,24 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     // === Helper ===
 
-    private AssociationDefinition findLastAssocDef() {
+    /**
+     * Returns the first association definition of this type or
+     * <code>null</code> if there are no association definitions.
+     * ### FIXME: needed?
+     *
+    private AssociationDefinition firstAssocDef() {
+        Iterator<AssociationDefinition> i = getAssocDefs().values().iterator();
+        if (i.hasNext()) {
+            return i.next();
+        }
+        return null;
+    }*/
+
+    /**
+     * Returns the last association definition of this type or
+     * <code>null</code> if there are no association definitions.
+     */
+    private AssociationDefinition lastAssocDef() {
         AssociationDefinition lastAssocDef = null;
         for (AssociationDefinition assocDef : getAssocDefs().values()) {
             lastAssocDef = assocDef;
@@ -354,13 +371,20 @@ class AttachedTopicType extends AttachedType implements TopicType {
     private void initAssocDefs() {
         this.assocDefs = new LinkedHashMap();
         for (AssociationDefinitionModel model : getModel().getAssocDefs().values()) {
-            initAssocDef(model);
+            _addAssocDef(model);
         }
     }
 
-    private AttachedAssociationDefinition initAssocDef(AssociationDefinitionModel model) {
+    private AttachedAssociationDefinition _addAssocDef(AssociationDefinitionModel model) {
         AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(model, dms);
         assocDefs.put(assocDef.getUri(), assocDef);
         return assocDef;
+    }
+
+    private void _removeAssocDef(String assocDefUri) {
+        // error check
+        getAssocDef(assocDefUri);
+        //
+        assocDefs.remove(assocDefUri);
     }
 }

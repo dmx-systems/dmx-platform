@@ -52,6 +52,7 @@ public class TypeEditorPlugin extends Plugin {
             logger.info("### Removing association definition \"" + partTopicTypeUri +
                 "\" from topic type \"" + wholeTopicTypeUri + "\"");
             topicType.removeAssocDef(partTopicTypeUri);
+            directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
         }
     }
 
@@ -62,9 +63,8 @@ public class TypeEditorPlugin extends Plugin {
         String partTopicTypeUri = getPartTopicTypeUri(assoc);
         // Note: the assoc def's ID is already known. Setting it explicitely
         // prevents the core from creating the underlying association.
-        AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(),
+        AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
             wholeTopicTypeUri, partTopicTypeUri);
-        model.setAssocTypeUri(assoc.getTypeUri());
         model.setWholeCardinalityUri("dm3.core.one");           // FIXME: handle cardinality
         model.setPartCardinalityUri("dm3.core.one");            // FIXME: handle cardinality
         model.setViewConfigModel(new ViewConfigurationModel()); // FIXME: this should be the default

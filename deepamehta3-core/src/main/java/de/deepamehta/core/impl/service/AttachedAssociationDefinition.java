@@ -23,26 +23,23 @@ import java.util.logging.Logger;
 /**
  * An association definition that is attached to the {@link DeepaMehtaService}.
  */
-class AttachedAssociationDefinition implements AssociationDefinition {
+class AttachedAssociationDefinition extends AttachedAssociation implements AssociationDefinition {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private AssociationDefinitionModel model;
     private AttachedViewConfiguration viewConfig;
-    private final EmbeddedService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedAssociationDefinition(EmbeddedService dms) {
-        this.dms = dms;     // The model and viewConfig remain uninitialized.
-                            // They are initialized later on through fetch().
+        super(dms);     // The model and viewConfig remain uninitialized.
+                        // They are initialized later on through fetch().
     }
 
     AttachedAssociationDefinition(AssociationDefinitionModel model, EmbeddedService dms) {
-        this.model = model;
-        this.dms = dms;
+        super(model, dms);
         initViewConfig();
     }
 
@@ -53,53 +50,38 @@ class AttachedAssociationDefinition implements AssociationDefinition {
     // === AssociationDefinition Implementation ===
 
     @Override
-    public long getId() {
-        return model.getId();
-    }
-
-    @Override
-    public String getUri() {
-        return model.getUri();
-    }
-
-    @Override
-    public String getAssocTypeUri() {
-        return model.getAssocTypeUri();
-    }
-
-    @Override
     public String getInstanceLevelAssocTypeUri() {
-        return model.getInstanceLevelAssocTypeUri();
+        return getModel().getInstanceLevelAssocTypeUri();
     }
 
     @Override
     public String getWholeTopicTypeUri() {
-        return model.getWholeTopicTypeUri();
+        return getModel().getWholeTopicTypeUri();
     }
 
     @Override
     public String getPartTopicTypeUri() {
-        return model.getPartTopicTypeUri();
+        return getModel().getPartTopicTypeUri();
     }
 
     @Override
     public String getWholeRoleTypeUri() {
-        return model.getWholeRoleTypeUri();
+        return getModel().getWholeRoleTypeUri();
     }
 
     @Override
     public String getPartRoleTypeUri() {
-        return model.getPartRoleTypeUri();
+        return getModel().getPartRoleTypeUri();
     }
 
     @Override
     public String getWholeCardinalityUri() {
-        return model.getWholeCardinalityUri();
+        return getModel().getWholeCardinalityUri();
     }
 
     @Override
     public String getPartCardinalityUri() {
-        return model.getPartCardinalityUri();
+        return getModel().getPartCardinalityUri();
     }
 
     @Override
@@ -110,33 +92,18 @@ class AttachedAssociationDefinition implements AssociationDefinition {
     // ---
 
     @Override
-    public void setId(long id) {
-        model.setId(id);
-    }
-
-    @Override
-    public void setAssocTypeUri(String assocTypeUri) {
-        model.setAssocTypeUri(assocTypeUri);
-    }
-
-    @Override
     public void setWholeCardinalityUri(String wholeCardinalityUri) {
-        model.setWholeCardinalityUri(wholeCardinalityUri);
+        getModel().setWholeCardinalityUri(wholeCardinalityUri);
     }
 
     @Override
     public void setPartCardinalityUri(String partCardinalityUri) {
-        model.setPartCardinalityUri(partCardinalityUri);
-    }
-
-    // ---
-
-    @Override
-    public JSONObject toJSON() {
-        return model.toJSON();
+        getModel().setPartCardinalityUri(partCardinalityUri);
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
+
+
 
     /**
      * @param   topicTypeUri    only used for sanity check
@@ -151,12 +118,11 @@ class AttachedAssociationDefinition implements AssociationDefinition {
                 throw new RuntimeException("jri doesn't understand Neo4j traversal");
             }
             //
-            AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(),
+            AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
                 topicTypes.wholeTopicTypeUri, topicTypes.partTopicTypeUri
                 /* ###, roleTypes.wholeRoleTypeUri, roleTypes.partRoleTypeUri */);
             model.setWholeCardinalityUri(cardinality.wholeCardinalityUri);
             model.setPartCardinalityUri(cardinality.partCardinalityUri);
-            model.setAssocTypeUri(assoc.getTypeUri());
             model.setViewConfigModel(fetchViewConfig(assoc));
             //
             setModel(model);
@@ -176,10 +142,7 @@ class AttachedAssociationDefinition implements AssociationDefinition {
             // Note: creating the underlying association is conditional. It exists already for
             // an interactively created association definition. Its ID is already set.
             if (getId() == -1) {
-                Association assoc = dms.createAssociation(getAssocTypeUri(),
-                    new TopicRoleModel(getWholeTopicTypeUri(), "dm3.core.whole_topic_type"),
-                    new TopicRoleModel(getPartTopicTypeUri(), "dm3.core.part_topic_type"));
-                setId(assoc.getId());
+                dms.createAssociation(getModel(), null);    // clientContext=null
             }
             // role types
             dms.createAssociation("dm3.core.aggregation",
@@ -207,12 +170,9 @@ class AttachedAssociationDefinition implements AssociationDefinition {
 
     // ---
 
-    AssociationDefinitionModel getModel() {
-        return model;
-    }
-
-    private void setModel(AssociationDefinitionModel model) {
-        this.model = model;
+    @Override
+    public AssociationDefinitionModel getModel() {
+        return (AssociationDefinitionModel) super.getModel();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -331,7 +291,7 @@ class AttachedAssociationDefinition implements AssociationDefinition {
     }
 
     private void storeViewConfig() {
-        for (TopicModel configTopic : model.getViewConfigModel().getConfigTopics()) {
+        for (TopicModel configTopic : getModel().getViewConfigModel().getConfigTopics()) {
             Topic topic = dms.createTopic(configTopic, null);   // FIXME: clientContext=null
             dms.createAssociation("dm3.core.aggregation",
                 new AssociationRoleModel(getId(), "dm3.core.assoc_def"),
@@ -345,7 +305,7 @@ class AttachedAssociationDefinition implements AssociationDefinition {
 
     private void initViewConfig() {
         RoleModel configurable = new AssociationRoleModel(getId(), "dm3.core.assoc_def");
-        this.viewConfig = new AttachedViewConfiguration(configurable, model.getViewConfigModel(), dms);
+        this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
     }
 
     // ---

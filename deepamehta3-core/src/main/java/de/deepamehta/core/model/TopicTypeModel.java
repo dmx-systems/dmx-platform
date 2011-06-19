@@ -134,11 +134,11 @@ public class TopicTypeModel extends TypeModel {
         assocDefModels.put(assocDef.getUri(), assocDef);
     }
 
-    public void removeAssocDef(String assocDefUri) {
+    public AssociationDefinitionModel removeAssocDef(String assocDefUri) {
         // error check
         getAssocDef(assocDefUri);
         //
-        assocDefModels.remove(assocDefUri);
+        return assocDefModels.remove(assocDefUri);
     }
 
     // ---
@@ -163,7 +163,7 @@ public class TopicTypeModel extends TypeModel {
     public String toString() {
         return "topic type model (id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + dataTypeUri + "\", indexModes=" + indexModes + ", assocDefs=" + assocDefModels +
-            ",\ntopic type " + getViewConfigModel() + ")";
+            ",\n    topic type " + getViewConfigModel() + ")";
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

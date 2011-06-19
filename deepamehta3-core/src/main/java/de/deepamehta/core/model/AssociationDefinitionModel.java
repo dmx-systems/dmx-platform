@@ -20,13 +20,10 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class AssociationDefinitionModel {
+public class AssociationDefinitionModel extends AssociationModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private long id;                    // ID of the underlying association
-    private String uri;                 // not persistent, value is derived from other values, there is no setter
-    private String assocTypeUri;
     private String instanceLevelAssocTypeUri;
 
     private String wholeTopicTypeUri;
@@ -44,13 +41,10 @@ public class AssociationDefinitionModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public AssociationDefinitionModel(String wholeTopicTypeUri, String partTopicTypeUri) {
-        this(-1, wholeTopicTypeUri, partTopicTypeUri);
-    }
-
-    public AssociationDefinitionModel(long id, String wholeTopicTypeUri, String partTopicTypeUri
+    public AssociationDefinitionModel(long id, String typeUri, String wholeTopicTypeUri, String partTopicTypeUri
                                           /* ### String wholeRoleTypeUri, String partRoleTypeUri */) {
         this.id = id;
+        this.typeUri = typeUri;
         //
         this.wholeTopicTypeUri = wholeTopicTypeUri;
         this.partTopicTypeUri = partTopicTypeUri;
@@ -59,11 +53,15 @@ public class AssociationDefinitionModel {
         this.partRoleTypeUri = "dm3.core.part";  // ### partRoleTypeUri != null ? partRoleTypeUri : partTopicTypeUri;
         // derive uri
         this.uri = partTopicTypeUri;             // ### partRoleTypeUri;
+        //
+        initAssociationModel();
+        initInstanceLevelAssocTypeUri();
     }
 
     public AssociationDefinitionModel(JSONObject assocDef, String wholeTopicTypeUri) {
         try {
             this.id = -1;
+            this.typeUri = assocDef.getString("assoc_type_uri");
             //
             this.wholeTopicTypeUri = wholeTopicTypeUri;
             this.partTopicTypeUri = assocDef.getString("part_topic_type_uri");
@@ -72,34 +70,23 @@ public class AssociationDefinitionModel {
             this.partRoleTypeUri = "dm3.core.part";  // ## assocDef.optString("part_role_type_uri", partTopicTypeUri);
             //
             this.uri = partTopicTypeUri;             // ### partRoleTypeUri;
-            this.assocTypeUri = assocDef.getString("assoc_type_uri");
-            initInstanceLevelAssocTypeUri();
             //
-            if (!assocDef.has("whole_cardinality_uri") && !assocTypeUri.equals("dm3.core.composition_def")) {
+            if (!assocDef.has("whole_cardinality_uri") && !typeUri.equals("dm3.core.composition_def")) {
                 throw new RuntimeException("\"whole_cardinality_uri\" is missing");
             }
             this.wholeCardinalityUri = assocDef.optString("whole_cardinality_uri", "dm3.core.one");
             this.partCardinalityUri = assocDef.getString("part_cardinality_uri");
             //
             this.viewConfigModel = new ViewConfigurationModel(assocDef);
+            //
+            initAssociationModel();
+            initInstanceLevelAssocTypeUri();
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationDefinitionModel failed (JSONObject=" + assocDef + ")", e);
         }
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-    public long getId() {
-        return id;
-    }
-
-    public String getUri() {
-        return uri;
-    }
-
-    public String getAssocTypeUri() {
-        return assocTypeUri;
-    }
 
     public String getInstanceLevelAssocTypeUri() {
         return instanceLevelAssocTypeUri;
@@ -135,12 +122,9 @@ public class AssociationDefinitionModel {
 
     // ---
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setAssocTypeUri(String assocTypeUri) {
-        this.assocTypeUri = assocTypeUri;
+    @Override
+    public void setTypeUri(String typeUri) {
+        super.setTypeUri(typeUri);
         initInstanceLevelAssocTypeUri();
     }
 
@@ -163,7 +147,7 @@ public class AssociationDefinitionModel {
             JSONObject o = new JSONObject();
             o.put("id", id);
             o.put("uri", uri);
-            o.put("assoc_type_uri", assocTypeUri);
+            o.put("assoc_type_uri", typeUri);
             o.put("whole_topic_type_uri", wholeTopicTypeUri);
             o.put("part_topic_type_uri", partTopicTypeUri);
             o.put("whole_role_type_uri", wholeRoleTypeUri);
@@ -181,7 +165,7 @@ public class AssociationDefinitionModel {
 
     @Override
     public String toString() {
-        return "\n    association definition (id=" + id + ", uri=\"" + uri + "\", assocTypeUri=\"" + assocTypeUri +
+        return "\n    association definition (id=" + id + ", uri=\"" + uri + "\", typeUri=\"" + typeUri +
             "\")\n        pos 1: (type=\"" + wholeTopicTypeUri + "\", role=\"" + wholeRoleTypeUri +
             "\", cardinality=\"" + wholeCardinalityUri +
             "\")\n        pos 2: (type=\"" + partTopicTypeUri + "\", role=\"" + partRoleTypeUri +
@@ -201,13 +185,18 @@ public class AssociationDefinitionModel {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private void initAssociationModel() {
+        setRoleModel1(new TopicRoleModel(wholeTopicTypeUri, "dm3.core.whole_topic_type"));
+        setRoleModel2(new TopicRoleModel(partTopicTypeUri,  "dm3.core.part_topic_type"));
+    }
+
     private void initInstanceLevelAssocTypeUri() {
-        if (assocTypeUri.equals("dm3.core.aggregation_def")) {
+        if (typeUri.equals("dm3.core.aggregation_def")) {
             this.instanceLevelAssocTypeUri = "dm3.core.aggregation";
-        } else if (assocTypeUri.equals("dm3.core.composition_def")) {
+        } else if (typeUri.equals("dm3.core.composition_def")) {
             this.instanceLevelAssocTypeUri = "dm3.core.composition";
         } else {
-            throw new RuntimeException("Unexpected association type URI: \"" + assocTypeUri + "\"");
+            throw new RuntimeException("Unexpected association type URI: \"" + typeUri + "\"");
         }
     }
 }

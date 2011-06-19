@@ -31,7 +31,7 @@ public interface DeepaMehtaObject extends JSONEnabled {
 
     String getTypeUri();
 
-    void setTypeUri(String assocTypeUri);
+    void setTypeUri(String typeUri);
 
     // --- Composite ---
 
