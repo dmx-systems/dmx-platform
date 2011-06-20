@@ -134,11 +134,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         }
     }
 
-    /**
-     * @param   predecessor     The predecessor of the new assocdef. The new assocdef is added after this one.
-     *                          <code>null</code> indicates the sequence start. 
-     */
-    void store(AssociationDefinition predecessor) {
+    void store() {
         try {
             // Note: creating the underlying association is conditional. It exists already for
             // an interactively created association definition. Its ID is already set.
@@ -159,8 +155,6 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
             dms.createAssociation("dm3.core.aggregation",
                 new TopicRoleModel(getPartCardinalityUri(), "dm3.core.part_cardinality"),
                 new AssociationRoleModel(getId(), "dm3.core.assoc_def"));
-            //
-            putInSequence(predecessor);
             //
             storeViewConfig();
         } catch (Exception e) {
@@ -274,28 +268,6 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
 
     // === Store ===
-
-    private void putInSequence(AssociationDefinition predecessor) {
-        if (predecessor == null) {
-            // start sequence
-            dms.createAssociation("dm3.core.association",
-                new TopicRoleModel(getWholeTopicTypeUri(), "dm3.core.topic_type"),
-                new AssociationRoleModel(getId(), "dm3.core.first_assoc_def"));
-        } else {
-            // continue sequence
-            dms.createAssociation("dm3.core.sequence",
-                new AssociationRoleModel(predecessor.getId(), "dm3.core.predecessor"),
-                new AssociationRoleModel(getId(), "dm3.core.successor"));
-        }
-    }
-
-    void removeFromSequence() {
-        RelatedAssociation predecessor = getRelatedAssociation("dm3.core.sequence", "dm3.core.successor",
-            "dm3.core.predecessor");
-        RelatedAssociation successor = getRelatedAssociation("dm3.core.sequence", "dm3.core.predecessor",
-            "dm3.core.successor");
-        logger.info("### predecessor=" + predecessor + "\n### successor=" + successor);
-    }
 
     private void storeViewConfig() {
         for (TopicModel configTopic : getModel().getViewConfigModel().getConfigTopics()) {

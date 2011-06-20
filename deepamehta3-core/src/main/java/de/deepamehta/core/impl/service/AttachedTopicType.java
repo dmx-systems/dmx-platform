@@ -9,6 +9,7 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinitionModel;
+import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
@@ -110,13 +111,14 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     @Override
     public void addAssocDef(AssociationDefinitionModel model) {
-        // Note: the predecessor must be determines *before* the memory is updated
+        // Note: the predecessor must be determined *before* the memory is updated
         AssociationDefinition predecessor = lastAssocDef();
         // 1) update memory
         getModel().addAssocDef(model);                                          // update model
         AttachedAssociationDefinition assocDef = _addAssocDef(model);           // update attached object cache
         // 2) update DB
-        assocDef.store(predecessor);
+        assocDef.store();
+        appendToSequence(assocDef, predecessor);
     }
 
     @Override
@@ -135,7 +137,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         getModel().removeAssocDef(assocDefUri);                                 // update model
         AttachedAssociationDefinition assocDef = _removeAssocDef(assocDefUri);  // update attached object cache
         // 2) update DB
-        assocDef.removeFromSequence();
+        rebuildSequence();
     }
 
 
@@ -160,17 +162,17 @@ class AttachedTopicType extends AttachedType implements TopicType {
         //
         Map<Long, AttachedAssociationDefinition> assocDefs = fetchAssociationDefinitions(typeTopic);
         //
-        List<Long> sequenceIds = fetchSequenceIds(typeTopic);
+        List<RelatedAssociation> sequence = fetchSequence(typeTopic);
         // sanity check
-        if (assocDefs.size() != sequenceIds.size()) {
+        if (assocDefs.size() != sequence.size()) {
             throw new RuntimeException("Graph inconsistency: " + assocDefs.size() + " association " +
-                "definitions found but sequence length is " + sequenceIds.size());
+                "definitions found but sequence length is " + sequence.size());
         }
         // build model
         TopicTypeModel model = new TopicTypeModel(typeTopic.getModel(), fetchDataTypeTopic(typeTopic).getUri(),
                                                                         fetchIndexModes(typeTopic),
                                                                         fetchViewConfig(typeTopic));
-        addAssocDefsToModel(model, assocDefs, sequenceIds);
+        addAssocDefsToModel(model, assocDefs, sequence);
         // set model of this topic type
         setModel(model);
         // ### initAssocDefs(); // Note: the assoc defs are already initialized through previous addAssocDefsToModel()
@@ -185,6 +187,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         dms.associateDataType(getUri(), getDataTypeUri());
         storeIndexModes();
         storeAssocDefs();
+        storeSequence();
         getViewConfig().store();
     }
 
@@ -248,40 +251,18 @@ class AttachedTopicType extends AttachedType implements TopicType {
         return assocDefs;
     }
 
-    private List<Long> fetchSequenceIds(Topic typeTopic) {
-        try {
-            List<Long> sequenceIds = new ArrayList();
-            // find sequence start
-            RelatedAssociation assocDef = typeTopic.getRelatedAssociation("dm3.core.association",
-                "dm3.core.topic_type", "dm3.core.first_assoc_def");
-            // iterate through sequence
-            if (assocDef != null) {
-                sequenceIds.add(assocDef.getId());
-                while ((assocDef = assocDef.getRelatedAssociation("dm3.core.sequence",
-                    "dm3.core.predecessor", "dm3.core.successor")) != null) {
-                    //
-                    sequenceIds.add(assocDef.getId());
-                }
-            }
-            //
-            return sequenceIds;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching sequence IDs for topic type \"" + typeTopic.getUri() +
-                "\" failed", e);
-        }
-    }
-
     private void addAssocDefsToModel(TopicTypeModel model, Map<Long, AttachedAssociationDefinition> assocDefs,
-                                                           List<Long> sequenceIds) {
+                                                           List<RelatedAssociation> sequence) {
         this.assocDefs = new LinkedHashMap();
-        for (long assocDefId : sequenceIds) {
+        for (RelatedAssociation relAssoc : sequence) {
+            long assocDefId = relAssoc.getId();
             AttachedAssociationDefinition assocDef = assocDefs.get(assocDefId);
             // sanity check
             if (assocDef == null) {
                 throw new RuntimeException("Graph inconsistency: ID " + assocDefId +
                     " is in sequence but association definition is not found");
             }
-            // Note: the model and the attached object cache is updated together.
+            // Note: the model and the attached object cache is updated together
             model.addAssocDef(assocDef.getModel());             // update model
             this.assocDefs.put(assocDef.getUri(), assocDef);    // update attached object cache
         }
@@ -332,29 +313,14 @@ class AttachedTopicType extends AttachedType implements TopicType {
     }
 
     private void storeAssocDefs() {
-        AssociationDefinition predecessor = null;
         for (AssociationDefinition assocDef : getAssocDefs().values()) {
-            ((AttachedAssociationDefinition) assocDef).store(predecessor);
-            predecessor = assocDef;
+            ((AttachedAssociationDefinition) assocDef).store();
         }
     }
 
 
 
     // === Helper ===
-
-    /**
-     * Returns the first association definition of this type or
-     * <code>null</code> if there are no association definitions.
-     * ### FIXME: needed?
-     *
-    private AssociationDefinition firstAssocDef() {
-        Iterator<AssociationDefinition> i = getAssocDefs().values().iterator();
-        if (i.hasNext()) {
-            return i.next();
-        }
-        return null;
-    }*/
 
     /**
      * Returns the last association definition of this type or
@@ -366,6 +332,76 @@ class AttachedTopicType extends AttachedType implements TopicType {
             lastAssocDef = assocDef;
         }
         return lastAssocDef;
+    }
+
+    // --- Sequence ---
+
+    private List<RelatedAssociation> fetchSequence(Topic typeTopic) {
+        try {
+            List<RelatedAssociation> sequence = new ArrayList();
+            // find sequence start
+            RelatedAssociation assocDef = typeTopic.getRelatedAssociation("dm3.core.association",
+                "dm3.core.topic_type", "dm3.core.first_assoc_def");
+            // fetch sequence segments
+            if (assocDef != null) {
+                sequence.add(assocDef);
+                while ((assocDef = assocDef.getRelatedAssociation("dm3.core.sequence",
+                    "dm3.core.predecessor", "dm3.core.successor")) != null) {
+                    //
+                    sequence.add(assocDef);
+                }
+            }
+            //
+            return sequence;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching sequence for topic type \"" + typeTopic.getUri() + "\" failed", e);
+        }
+    }
+
+    private void storeSequence() {
+        AssociationDefinition predecessor = null;
+        int count = 0;
+        for (AssociationDefinition assocDef : getAssocDefs().values()) {
+            appendToSequence(assocDef, predecessor);
+            predecessor = assocDef;
+            count++;
+        }
+        logger.info("### Storing " + count + " sequence segments for topic type \"" + getUri() + "\"");
+    }
+
+    private void appendToSequence(AssociationDefinition assocDef, AssociationDefinition predecessor) {
+        if (predecessor == null) {
+            storeSequenceStart(assocDef.getId());
+        } else {
+            storeSequenceSegment(predecessor.getId(), assocDef.getId());
+        }
+    }
+
+    private void storeSequenceStart(long assocDefId) {
+        dms.createAssociation("dm3.core.association",
+            new TopicRoleModel(getId(), "dm3.core.topic_type"),
+            new AssociationRoleModel(assocDefId, "dm3.core.first_assoc_def"));
+    }
+
+    private void storeSequenceSegment(long predAssocDefId, long succAssocDefId) {
+        dms.createAssociation("dm3.core.sequence",
+            new AssociationRoleModel(predAssocDefId, "dm3.core.predecessor"),
+            new AssociationRoleModel(succAssocDefId, "dm3.core.successor"));
+    }
+
+    private void rebuildSequence() {
+        deleteSequence();
+        storeSequence();
+    }
+
+    private void deleteSequence() {
+        int count = 0;
+        for (RelatedAssociation relAssoc : fetchSequence(this)) {
+            Association assoc = relAssoc.getRelatingAssociation();
+            dms.deleteAssociation(assoc.getId(), null);    // clientContext=null
+            count++;
+        }
+        logger.info("### Deleting " + count + " sequence segments of topic type \"" + getUri() + "\"");
     }
 
     // --- Attached Object Cache ---
