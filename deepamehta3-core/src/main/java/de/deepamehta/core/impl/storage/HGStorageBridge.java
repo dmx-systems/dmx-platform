@@ -4,6 +4,7 @@ import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
@@ -98,11 +99,11 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     }
 
     @Override
-    public AssociationModel getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                                     String othersRoleTypeUri) {
+    public RelatedAssociationModel getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                              String othersRoleTypeUri) {
         // FIXME: assocTypeUri not respected
         ConnectedHyperEdge edge = hg.getHyperNode(topicId).getConnectedHyperEdge(myRoleTypeUri, othersRoleTypeUri);
-        return edge != null ? buildAssociation(edge.getHyperEdge()) : null;
+        return edge != null ? buildRelatedAssociation(edge) : null;
     }
 
     // ---
@@ -175,7 +176,7 @@ public class HGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public Set<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                                  String othersRoleTypeUri, String othersTopicTypeUri) {
+                                                              String othersRoleTypeUri, String othersTopicTypeUri) {
         Set<ConnectedHyperNode> nodes = hg.getHyperEdge(assocId).getConnectedHyperNodes(myRoleTypeUri,
                                                                                         othersRoleTypeUri);
         if (othersTopicTypeUri != null) {
@@ -190,11 +191,11 @@ public class HGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public AssociationModel getAssociationRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                                                             String othersRoleTypeUri) {
+    public RelatedAssociationModel getAssociationRelatedAssociation(long assocId, String assocTypeUri,
+                                                                    String myRoleTypeUri, String othersRoleTypeUri) {
         // FIXME: assocTypeUri not respected
         ConnectedHyperEdge edge = hg.getHyperEdge(assocId).getConnectedHyperEdge(myRoleTypeUri, othersRoleTypeUri);
-        return edge != null ? buildAssociation(edge.getHyperEdge()) : null;
+        return edge != null ? buildRelatedAssociation(edge) : null;
     }
 
     // ---
@@ -333,6 +334,15 @@ public class HGStorageBridge implements DeepaMehtaStorage {
             assocs.add(buildAssociation(edge));
         }
         return assocs;
+    }
+
+    // ---
+
+    private RelatedAssociationModel buildRelatedAssociation(ConnectedHyperEdge edge) {
+        RelatedAssociationModel relAssoc = new RelatedAssociationModel(
+            buildAssociation(edge.getHyperEdge()),
+            buildAssociation(edge.getConnectingHyperEdge()));
+        return relAssoc;
     }
 
 

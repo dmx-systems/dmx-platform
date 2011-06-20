@@ -3,6 +3,7 @@ package de.deepamehta.core.storage;
 import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicValue;
@@ -46,8 +47,7 @@ public interface DeepaMehtaStorage {
      * @param   othersTopicTypeUri  may be null
      */
     Set<RelatedTopicModel> getTopicRelatedTopics(long topicId, List assocTypeUris, String myRoleTypeUri,
-                                                                                   String othersRoleTypeUri,
-                                                                                   String othersTopicTypeUri);
+                                                 String othersRoleTypeUri, String othersTopicTypeUri);
 
     // ---
 
@@ -55,8 +55,8 @@ public interface DeepaMehtaStorage {
 
     Set<AssociationModel> getAssociations(long topicId, String myRoleTypeUri);
 
-    AssociationModel getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                                   String othersRoleTypeUri);
+    RelatedAssociationModel getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                       String othersRoleTypeUri);
 
     // ---
 
@@ -110,8 +110,6 @@ public interface DeepaMehtaStorage {
 
     AssociationModel getAssociation(long assocId);
 
-    // Set<Relation> getRelations(long topicId);
-
     /**
      * Returns the relation between two topics. If no such relation exists null is returned.
      * If more than one relation exists, an exception is thrown.
@@ -138,13 +136,12 @@ public interface DeepaMehtaStorage {
      * @param   othersTopicTypeUri  may be null
      */
     Set<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                                                          String othersRoleTypeUri,
-                                                                                          String othersTopicTypeUri);
+                                                       String othersRoleTypeUri, String othersTopicTypeUri);
 
     // ---
 
-    AssociationModel getAssociationRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                                                         String othersRoleTypeUri);
+    RelatedAssociationModel getAssociationRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                             String othersRoleTypeUri);
 
     // ---
 

@@ -34,8 +34,7 @@ public interface Topic extends DeepaMehtaObject {
      * @param   othersTopicTypeUri  may be null
      */
     RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                            String othersTopicTypeUri,
-                                                                            boolean fetchComposite);
+                                 String othersTopicTypeUri, boolean fetchComposite);
 
     /**
      * @param   assocTypeUri        may be null
@@ -44,8 +43,7 @@ public interface Topic extends DeepaMehtaObject {
      * @param   othersTopicTypeUri  may be null
      */
     Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                  String othersTopicTypeUri,
-                                                                                  boolean fetchComposite);
+                                       String othersTopicTypeUri, boolean fetchComposite);
 
     /**
      * @param   assocTypeUris       may be null
@@ -54,8 +52,9 @@ public interface Topic extends DeepaMehtaObject {
      * @param   othersTopicTypeUri  may be null
      */
     Set<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                 String othersTopicTypeUri,
-                                                                                 boolean fetchComposite);
+                                       String othersTopicTypeUri, boolean fetchComposite);
 
     Set<Association> getAssociations(String myRoleTypeUri);
+
+    RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri);
 }

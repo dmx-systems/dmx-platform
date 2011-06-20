@@ -1,12 +1,14 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Role;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicRole;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
+import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicRoleModel;
@@ -154,6 +156,16 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
                                                                                          boolean fetchComposite) {
         return dms.attach(dms.storage.getAssociationRelatedTopics(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri), fetchComposite);
+    }
+
+    // ---
+
+    @Override
+    public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
+                                                    String othersRoleTypeUri) {
+        RelatedAssociationModel relAssoc = dms.storage.getAssociationRelatedAssociation(getId(),
+            assocTypeUri, myRoleTypeUri, othersRoleTypeUri);
+        return relAssoc != null ? dms.attach(relAssoc) : null;
     }
 
 

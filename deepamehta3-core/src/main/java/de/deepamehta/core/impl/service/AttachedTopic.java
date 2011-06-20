@@ -2,11 +2,13 @@ package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
+import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
@@ -106,8 +108,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                           String othersTopicTypeUri,
-                                                                                           boolean fetchComposite) {
+                                                String othersTopicTypeUri, boolean fetchComposite) {
         Set<RelatedTopic> topics = getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
                                                                                                     fetchComposite);
         switch (topics.size()) {
@@ -124,16 +125,14 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     public Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                         String othersTopicTypeUri,
-                                                                                         boolean fetchComposite) {
+                                              String othersTopicTypeUri, boolean fetchComposite) {
         List assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
         return getRelatedTopics(assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, fetchComposite);
     }
 
     @Override
     public Set<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                        String othersTopicTypeUri,
-                                                                                        boolean fetchComposite) {
+                                              String othersTopicTypeUri, boolean fetchComposite) {
         return dms.attach(dms.storage.getTopicRelatedTopics(getId(), assocTypeUris, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri), fetchComposite);
     }
@@ -141,6 +140,14 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     @Override
     public Set<Association> getAssociations(String myRoleTypeUri) {
         return dms.attach(dms.storage.getAssociations(getId(), myRoleTypeUri));
+    }
+
+    @Override
+    public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
+                                                    String othersRoleTypeUri) {
+        RelatedAssociationModel relAssoc = dms.storage.getTopicRelatedAssociation(getId(),
+            assocTypeUri, myRoleTypeUri, othersRoleTypeUri);
+        return relAssoc != null ? dms.attach(relAssoc) : null;
     }
 
 

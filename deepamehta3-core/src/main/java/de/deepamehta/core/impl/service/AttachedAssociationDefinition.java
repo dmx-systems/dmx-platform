@@ -2,6 +2,7 @@ package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
+import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.ViewConfiguration;
@@ -277,17 +278,23 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     private void putInSequence(AssociationDefinition predecessor) {
         if (predecessor == null) {
             // start sequence
-            AssociationModel assocModel = new AssociationModel("dm3.core.association");
-            assocModel.setRoleModel1(new TopicRoleModel(getWholeTopicTypeUri(), "dm3.core.topic_type"));
-            assocModel.setRoleModel2(new AssociationRoleModel(getId(), "dm3.core.first_assoc_def"));
-            dms.createAssociation(assocModel, null);            // FIXME: clientContext=null
+            dms.createAssociation("dm3.core.association",
+                new TopicRoleModel(getWholeTopicTypeUri(), "dm3.core.topic_type"),
+                new AssociationRoleModel(getId(), "dm3.core.first_assoc_def"));
         } else {
             // continue sequence
-            AssociationModel assocModel = new AssociationModel("dm3.core.sequence");
-            assocModel.setRoleModel1(new AssociationRoleModel(predecessor.getId(), "dm3.core.predecessor"));
-            assocModel.setRoleModel2(new AssociationRoleModel(getId(), "dm3.core.successor"));
-            dms.createAssociation(assocModel, null);            // FIXME: clientContext=null
+            dms.createAssociation("dm3.core.sequence",
+                new AssociationRoleModel(predecessor.getId(), "dm3.core.predecessor"),
+                new AssociationRoleModel(getId(), "dm3.core.successor"));
         }
+    }
+
+    void removeFromSequence() {
+        RelatedAssociation predecessor = getRelatedAssociation("dm3.core.sequence", "dm3.core.successor",
+            "dm3.core.predecessor");
+        RelatedAssociation successor = getRelatedAssociation("dm3.core.sequence", "dm3.core.predecessor",
+            "dm3.core.successor");
+        logger.info("### predecessor=" + predecessor + "\n### successor=" + successor);
     }
 
     private void storeViewConfig() {

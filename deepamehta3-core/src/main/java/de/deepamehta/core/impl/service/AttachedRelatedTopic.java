@@ -7,7 +7,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
 
 
 /**
- * A topic that is attached to the {@link DeepaMehtaService}.
+ * A Topic-Association pair that is attached to the {@link DeepaMehtaService}.
  */
 class AttachedRelatedTopic extends AttachedTopic implements RelatedTopic {
 

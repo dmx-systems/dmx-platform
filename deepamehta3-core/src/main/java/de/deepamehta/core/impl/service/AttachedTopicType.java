@@ -2,6 +2,7 @@ package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
+import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -112,8 +113,8 @@ class AttachedTopicType extends AttachedType implements TopicType {
         // Note: the predecessor must be determines *before* the memory is updated
         AssociationDefinition predecessor = lastAssocDef();
         // 1) update memory
-        getModel().addAssocDef(model);                                  // update model
-        AttachedAssociationDefinition assocDef = _addAssocDef(model);   // update attached object cache
+        getModel().addAssocDef(model);                                          // update model
+        AttachedAssociationDefinition assocDef = _addAssocDef(model);           // update attached object cache
         // 2) update DB
         assocDef.store(predecessor);
     }
@@ -121,8 +122,8 @@ class AttachedTopicType extends AttachedType implements TopicType {
     @Override
     public void updateAssocDef(AssociationDefinitionModel model) {
         // 1) update memory
-        getModel().updateAssocDef(model);                               // update model
-        _addAssocDef(model);                                            // update attached object cache
+        getModel().updateAssocDef(model);                                       // update model
+        _addAssocDef(model);                                                    // update attached object cache
         // 2) update DB
         // ### Note: nothing to do for the moment
         // (in case of interactive assoc type change the association is already updated in DB)
@@ -131,10 +132,10 @@ class AttachedTopicType extends AttachedType implements TopicType {
     @Override
     public void removeAssocDef(String assocDefUri) {
         // 1) update memory
-        getModel().removeAssocDef(assocDefUri);                         // update model
-        _removeAssocDef(assocDefUri);                                   // update attached object cache
+        getModel().removeAssocDef(assocDefUri);                                 // update model
+        AttachedAssociationDefinition assocDef = _removeAssocDef(assocDefUri);  // update attached object cache
         // 2) update DB
-        // ### TODO: maintain sequence
+        assocDef.removeFromSequence();
     }
 
 
@@ -249,19 +250,20 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     private List<Long> fetchSequenceIds(Topic typeTopic) {
         try {
-            // FIXME: don't make storage low-level calls here
-            // TODO: extend Topic       interface by getRelatedAssociation
-            // TODO: extend Association interface by getRelatedAssociation
             List<Long> sequenceIds = new ArrayList();
-            AssociationModel assocDef = dms.storage.getTopicRelatedAssociation(typeTopic.getId(),
-                "dm3.core.association", "dm3.core.topic_type", "dm3.core.first_assoc_def");
+            // find sequence start
+            RelatedAssociation assocDef = typeTopic.getRelatedAssociation("dm3.core.association",
+                "dm3.core.topic_type", "dm3.core.first_assoc_def");
+            // iterate through sequence
             if (assocDef != null) {
                 sequenceIds.add(assocDef.getId());
-                while ((assocDef = dms.storage.getAssociationRelatedAssociation(assocDef.getId(), "dm3.core.sequence",
-                                                               "dm3.core.predecessor", "dm3.core.successor")) != null) {
+                while ((assocDef = assocDef.getRelatedAssociation("dm3.core.sequence",
+                    "dm3.core.predecessor", "dm3.core.successor")) != null) {
+                    //
                     sequenceIds.add(assocDef.getId());
                 }
             }
+            //
             return sequenceIds;
         } catch (Exception e) {
             throw new RuntimeException("Fetching sequence IDs for topic type \"" + typeTopic.getUri() +
@@ -381,10 +383,10 @@ class AttachedTopicType extends AttachedType implements TopicType {
         return assocDef;
     }
 
-    private void _removeAssocDef(String assocDefUri) {
+    private AttachedAssociationDefinition _removeAssocDef(String assocDefUri) {
         // error check
         getAssocDef(assocDefUri);
         //
-        assocDefs.remove(assocDefUri);
+        return (AttachedAssociationDefinition) assocDefs.remove(assocDefUri);
     }
 }

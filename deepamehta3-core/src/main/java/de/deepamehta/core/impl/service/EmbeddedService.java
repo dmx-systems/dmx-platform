@@ -14,6 +14,7 @@ import de.deepamehta.core.model.CommandParams;
 import de.deepamehta.core.model.CommandResult;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.PluginInfo;
+import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
@@ -831,6 +832,12 @@ public class EmbeddedService implements DeepaMehtaService {
             assocs.add(attach(model));
         }
         return assocs;
+    }
+
+    // ---
+
+    AttachedRelatedAssociation attach(RelatedAssociationModel model) {
+        return new AttachedRelatedAssociation(model, this);
     }
 
     // ---
