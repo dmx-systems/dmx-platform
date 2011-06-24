@@ -195,12 +195,11 @@ var dm3c = new function() {
      * High-level utility method for plugin developers.
      */
     this.delete_association = function(assoc_id) {
-        // update DB
-        dm3c.restc.delete_association(assoc_id)
-        // trigger hook
-        dm3c.trigger_plugin_hook("post_delete_relation", assoc_id)
-        // update GUI
-        dm3c.hide_association(assoc_id, true)     // is_part_of_delete_operation=true
+        // 1) update DB
+        var directives = dm3c.restc.delete_association(assoc_id)
+        process_directives(directives)
+        // 2) trigger hook
+        // ### dm3c.trigger_plugin_hook("post_delete_relation", assoc_id)
     }
 
     /**
@@ -751,6 +750,12 @@ var dm3c = new function() {
                 dm3c.canvas.update_association(assoc)
                 dm3c.canvas.refresh()
                 dm3c.page_panel.display(assoc)
+                break
+            case "delete_association":
+                var assoc = build_association(directive.arg)
+                dm3c.hide_association(assoc.id, true)     // is_part_of_delete_operation=true
+                dm3c.canvas.refresh()
+                dm3c.page_panel.clear()
                 break
             case "update_topic_type":
                 var topic_type = build_topic_type(directive.arg)

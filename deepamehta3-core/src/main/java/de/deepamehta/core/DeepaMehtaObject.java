@@ -38,4 +38,8 @@ public interface DeepaMehtaObject extends JSONEnabled {
     Composite getComposite();
 
     void setComposite(Composite comp);
+
+    // ---
+
+    void delete();
 }

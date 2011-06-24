@@ -112,7 +112,7 @@ public interface DeepaMehtaService {
 
     public Directives updateAssociation(AssociationModel assocModel, ClientContext clientContext);
 
-    public void deleteAssociation(long assocId, ClientContext clientContext);
+    public Directives deleteAssociation(long assocId, ClientContext clientContext);
 
 
 

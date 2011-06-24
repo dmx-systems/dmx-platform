@@ -22,11 +22,7 @@ function default_plugin () {
 
         function do_delete_association() {
             $("#delete-association-dialog").dialog("close")
-            // update model
             dm3c.delete_association(dm3c.selected_object.id)
-            // update view
-            dm3c.canvas.refresh()
-            dm3c.page_panel.clear()
         }
     }
 

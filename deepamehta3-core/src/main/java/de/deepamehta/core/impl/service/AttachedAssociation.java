@@ -168,6 +168,14 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         return relAssoc != null ? dms.attach(relAssoc) : null;
     }
 
+    // ===
+
+    @Override
+    public void delete() {
+        logger.info("Deleting " + this);
+        dms.storage.deleteAssociation(getId());
+    }
+
 
 
     // ----------------------------------------------------------------------------------------------- Protected Methods

@@ -109,8 +109,8 @@ public class EmbeddedService implements DeepaMehtaService {
 
         POST_RETYPE_ASSOCIATION("postRetypeAssociationHook", Association.class, String.class, Directives.class),
 
-         PRE_DELETE_ASSOCIATION("preDeleteAssociationHook",  Long.TYPE),
-        POST_DELETE_ASSOCIATION("postDeleteAssociationHook", Long.TYPE),
+         PRE_DELETE_ASSOCIATION("preDeleteAssociationHook",  Association.class, Directives.class),
+        POST_DELETE_ASSOCIATION("postDeleteAssociationHook", Association.class, Directives.class),
 
         PROVIDE_TOPIC_PROPERTIES("providePropertiesHook", Topic.class),
         PROVIDE_RELATION_PROPERTIES("providePropertiesHook", Association.class),
@@ -305,13 +305,14 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public void deleteTopic(@PathParam("id") long topicId, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
+        Topic topic = null;
         try {
-            Topic topic = getTopic(topicId, true, clientContext);   // fetchComposite=true ### false?
-            deleteTopic(topic);
+            topic = getTopic(topicId, true, clientContext);   // fetchComposite=true ### false?
+            topic.delete();
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Deleting topic " + topicId + " failed", e);
+            throw new RuntimeException("Deleting topic " + topicId + " failed (" + topic + ")", e);
         } finally {
             tx.finish();
         }
@@ -394,7 +395,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Path("/association")
     @Override
     public Directives updateAssociation(AssociationModel model,
-                                         @HeaderParam("Cookie") ClientContext clientContext) {
+                                        @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedAssociation assoc = getAssociation(model.getId());
@@ -424,16 +425,25 @@ public class EmbeddedService implements DeepaMehtaService {
     @DELETE
     @Path("/association/{id}")
     @Override
-    public void deleteAssociation(@PathParam("id") long assocId, @HeaderParam("Cookie") ClientContext clientContext) {
+    public Directives deleteAssociation(@PathParam("id") long assocId,
+                                        @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
+        Association assoc = null;
         try {
-            triggerHook(Hook.PRE_DELETE_ASSOCIATION, assocId);
-            storage.deleteAssociation(assocId);
-            triggerHook(Hook.POST_DELETE_ASSOCIATION, assocId);
+            assoc = getAssociation(assocId);
+            //
+            Directives directives = new Directives();
+            directives.add(Directive.DELETE_ASSOCIATION, assoc);
+            //
+            triggerHook(Hook.PRE_DELETE_ASSOCIATION, assoc, directives);
+            assoc.delete();
+            triggerHook(Hook.POST_DELETE_ASSOCIATION, assoc, directives);
+            //
             tx.success();
+            return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Deleting association " + assocId + " failed", e);
+            throw new RuntimeException("Deleting association " + assocId + " failed (" + assoc + ")", e);
         } finally {
             tx.finish();
         }
@@ -878,29 +888,6 @@ public class EmbeddedService implements DeepaMehtaService {
             throw new RuntimeException("Associating association with association type \"" +
                 assoc.getTypeUri() + "\" failed (" + assoc + ")", e);
         }
-    }
-
-    // ---
-
-    /**
-     * Recursively deletes a topic in its entirety, that is the topic itself (the <i>whole</i>) and all sub-topics
-     * associated via "dm3.core.composition" (the <i>parts</i>).
-     */
-    private void deleteTopic(Topic topic) {
-        // 1) step down recursively
-        Set<RelatedTopic> partTopics = topic.getRelatedTopics("dm3.core.composition",
-            "dm3.core.whole", "dm3.core.part", null, false);
-        for (Topic partTopic : partTopics) {
-            deleteTopic(partTopic);
-        }
-        // 2) delete topic itself
-        // delete all the topic's relationships first
-        for (AssociationModel assoc : storage.getAssociations(topic.getId())) {
-            deleteAssociation(assoc.getId(), null);     // FIXME: clientContext=null
-        }
-        //
-        logger.info("Deleting " + topic);
-        storage.deleteTopic(topic.getId());
     }
 
 

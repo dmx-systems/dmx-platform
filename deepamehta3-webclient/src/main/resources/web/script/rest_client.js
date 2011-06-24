@@ -107,7 +107,7 @@ function RESTClient(core_service_uri) {
     }
 
     this.delete_association = function(id) {
-        request("DELETE", "/association/" + id)
+        return request("DELETE", "/association/" + id)
     }
 
 

@@ -138,6 +138,11 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     }
 
     @Override
+    public Set<Association> getAssociations() {
+        return getAssociations(null);
+    }
+
+    @Override
     public Set<Association> getAssociations(String myRoleTypeUri) {
         return dms.attach(dms.storage.getAssociations(getId(), myRoleTypeUri));
     }
@@ -148,6 +153,30 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         RelatedAssociationModel relAssoc = dms.storage.getTopicRelatedAssociation(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri);
         return relAssoc != null ? dms.attach(relAssoc) : null;
+    }
+
+    // ===
+
+    /**
+     * Recursively deletes a topic in its entirety, that is the topic itself (the <i>whole</i>) and all sub-topics
+     * associated via "dm3.core.composition" (the <i>parts</i>).
+     */
+    @Override
+    public void delete() {
+        // 1) step down recursively
+        Set<RelatedTopic> partTopics = getRelatedTopics("dm3.core.composition", "dm3.core.whole", "dm3.core.part",
+            null, false);
+        for (Topic partTopic : partTopics) {
+            partTopic.delete();
+        }
+        // 2) delete topic itself
+        // delete all the topic's relationships first
+        for (Association assoc : getAssociations()) {
+            assoc.delete();
+        }
+        //
+        logger.info("Deleting " + this);
+        dms.storage.deleteTopic(getId());
     }
 
 

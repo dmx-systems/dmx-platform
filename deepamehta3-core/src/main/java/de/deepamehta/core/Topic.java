@@ -54,6 +54,8 @@ public interface Topic extends DeepaMehtaObject {
     Set<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                        String othersTopicTypeUri, boolean fetchComposite);
 
+    Set<Association> getAssociations();
+
     Set<Association> getAssociations(String myRoleTypeUri);
 
     RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri);

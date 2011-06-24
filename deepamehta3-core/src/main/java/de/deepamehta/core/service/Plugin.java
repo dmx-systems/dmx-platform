@@ -221,10 +221,10 @@ public class Plugin implements BundleActivator {
 
     // ---
 
-    public void preDeleteAssociationHook(long assocId) {
+    public void preDeleteAssociationHook(Association assoc, Directives directives) {
     }
 
-    public void postDeleteAssociationHook(long assocId) {
+    public void postDeleteAssociationHook(Association assoc, Directives directives) {
     }
 
     // ---

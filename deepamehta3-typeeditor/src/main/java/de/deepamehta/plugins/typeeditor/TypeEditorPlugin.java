@@ -46,12 +46,15 @@ public class TypeEditorPlugin extends Plugin {
             }
             directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
         } else if (isAssocDef(oldTypeUri)) {
-            String wholeTopicTypeUri = getWholeTopicTypeUri(assoc);
-            String partTopicTypeUri = getPartTopicTypeUri(assoc);
-            TopicType topicType = dms.getTopicType(wholeTopicTypeUri, null);
-            logger.info("### Removing association definition \"" + partTopicTypeUri +
-                "\" from topic type \"" + wholeTopicTypeUri + "\"");
-            topicType.removeAssocDef(partTopicTypeUri);
+            TopicType topicType = removeAssocDef(assoc);
+            directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
+        }
+    }
+
+    @Override
+    public void postDeleteAssociationHook(Association assoc, Directives directives) {
+        if (isAssocDef(assoc.getTypeUri())) {
+            TopicType topicType = removeAssocDef(assoc);
             directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
         }
     }
@@ -70,6 +73,16 @@ public class TypeEditorPlugin extends Plugin {
         model.setViewConfigModel(new ViewConfigurationModel()); // FIXME: this should be the default
         //
         return model;
+    }
+
+    private TopicType removeAssocDef(Association assoc) {
+        String wholeTopicTypeUri = getWholeTopicTypeUri(assoc);
+        String partTopicTypeUri = getPartTopicTypeUri(assoc);
+        TopicType topicType = dms.getTopicType(wholeTopicTypeUri, null);
+        logger.info("### Removing association definition \"" + partTopicTypeUri +
+            "\" from topic type \"" + wholeTopicTypeUri + "\"");
+        topicType.removeAssocDef(partTopicTypeUri);
+        return topicType;
     }
 
     private boolean isAssocDef(String assocTypeUri) {

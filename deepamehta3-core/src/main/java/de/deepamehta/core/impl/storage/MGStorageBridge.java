@@ -89,11 +89,6 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public Set<AssociationModel> getAssociations(long topicId) {
-        return getAssociations(topicId, null);
-    }
-
-    @Override
     public Set<AssociationModel> getAssociations(long topicId, String myRoleTypeUri) {
         return buildAssociations(hg.getMehtaNode(topicId).getMehtaEdges(myRoleTypeUri));
     }
