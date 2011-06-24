@@ -1,11 +1,11 @@
 package de.deepamehta.core.osgi;
 
 import de.deepamehta.core.impl.service.EmbeddedService;
-import de.deepamehta.core.impl.storage.HGStorageBridge;
+import de.deepamehta.core.impl.storage.MGStorageBridge;
 import de.deepamehta.core.service.DeepaMehtaService;
 
-import de.deepamehta.hypergraph.HyperGraph;
-import de.deepamehta.hypergraph.impl.Neo4jHyperGraph;
+import de.deepamehta.mehtagraph.MehtaGraph;
+import de.deepamehta.mehtagraph.impl.Neo4jMehtaGraph;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
@@ -50,7 +50,7 @@ public class Activator implements BundleActivator {
     public void start(BundleContext context) {
         try {
             logger.info("========== Starting bundle \"DeepaMehta 3 Core\" ==========");
-            dms = new EmbeddedService(new HGStorageBridge(openDB()), context);
+            dms = new EmbeddedService(new MGStorageBridge(openDB()), context);
             dms.setupDB();
             //
             logger.info("Registering DeepaMehta 3 core service at OSGi framework");
@@ -91,12 +91,12 @@ public class Activator implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private HyperGraph openDB() {
+    private MehtaGraph openDB() {
         GraphDatabaseService neo4j = null;
         try {
             logger.info("Creating DB and indexing services");
             neo4j = new EmbeddedGraphDatabase(DATABASE_PATH);
-            return new Neo4jHyperGraph(neo4j);
+            return new Neo4jMehtaGraph(neo4j);
         } catch (Exception e) {
             logger.info("Shutdown DB");
             if (neo4j != null) {

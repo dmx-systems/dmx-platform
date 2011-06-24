@@ -1,10 +1,10 @@
 package de.deepamehta.core.impl.service;
 
-import de.deepamehta.core.impl.storage.HGStorageBridge;
+import de.deepamehta.core.impl.storage.MGStorageBridge;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.util.JavaUtils;
 
-import de.deepamehta.hypergraph.impl.Neo4jHyperGraph;
+import de.deepamehta.mehtagraph.impl.Neo4jMehtaGraph;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
@@ -30,7 +30,7 @@ public class CoreServiceTestEnvironment {
             logger.info("Creating DB and indexing services");
             dbPath = JavaUtils.createTempDirectory("dm3-");
             GraphDatabaseService neo4j = new EmbeddedGraphDatabase(dbPath.getAbsolutePath());
-            dms = new EmbeddedService(new HGStorageBridge(new Neo4jHyperGraph(neo4j)), null);
+            dms = new EmbeddedService(new MGStorageBridge(new Neo4jMehtaGraph(neo4j)), null);
             dms.setupDB();
         } catch (Exception e) {
             throw new RuntimeException("Opening database failed (path=" + dbPath + ")", e);

@@ -156,7 +156,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     // ### This is supposed to be protected, but doesn't compile!
     // ### It is called from the subclasses constructors, but on a differnt TopicBase instance.
-    // ### See de.deepamehta.core.impl.storage.HGTopic and de.deepamehta.core.impl.service.AttachedTopic.
+    // ### See de.deepamehta.core.impl.storage.MGTopic and de.deepamehta.core.impl.service.AttachedTopic.
     public TopicModel getModel() {
         return (TopicModel) super.getModel();
     }

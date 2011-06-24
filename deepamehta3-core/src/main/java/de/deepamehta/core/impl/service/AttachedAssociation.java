@@ -85,14 +85,14 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     // ---
 
-    // compare to Neo4jHyperEdge.getHyperObject()
+    // compare to Neo4jMehtaEdge.getMehtaObject()
     @Override
     public Role getRole(long objectId) {
         long id1 = getObjectId(((AttachedRole) getRole1()).getModel());
         long id2 = getObjectId(((AttachedRole) getRole2()).getModel());
         //
         if (id1 == objectId && id2 == objectId) {
-            throw new RuntimeException("Self-connected hyper objects are not supported (" + this + ")");
+            throw new RuntimeException("Self-connected mehta objects are not supported (" + this + ")");
         }
         //
         if (id1 == objectId) {

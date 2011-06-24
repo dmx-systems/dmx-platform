@@ -2,23 +2,23 @@ package de.deepamehta.core.impl.storage;
 
 import de.deepamehta.core.DeepaMehtaTransaction;
 
-import de.deepamehta.hypergraph.HyperGraph;
-import de.deepamehta.hypergraph.HyperGraphTransaction;
+import de.deepamehta.mehtagraph.MehtaGraph;
+import de.deepamehta.mehtagraph.MehtaGraphTransaction;
 
 
 
 /**
- * Adapts a HyperGraph transaction to a DeepaMehta transaction.
+ * Adapts a MehtaGraph transaction to a DeepaMehta transaction.
  */
-class HGTransactionAdapter implements DeepaMehtaTransaction {
+class MGTransactionAdapter implements DeepaMehtaTransaction {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private HyperGraphTransaction tx;
+    private MehtaGraphTransaction tx;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    HGTransactionAdapter(HyperGraph hg) {
+    MGTransactionAdapter(MehtaGraph hg) {
         tx = hg.beginTx();
     }
 

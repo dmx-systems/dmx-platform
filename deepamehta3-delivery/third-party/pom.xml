@@ -83,8 +83,8 @@
 
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>neo4j-hypergraph</artifactId>
-            <version>0.6-SNAPSHOT</version>
+            <artifactId>neo4j-mehtagraph</artifactId>
+            <version>0.6</version>
         </dependency>
 
         <!-- asm for jersey-core -->
