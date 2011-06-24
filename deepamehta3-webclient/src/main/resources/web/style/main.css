@@ -116,6 +116,18 @@ body {
     padding-bottom: 0;
 }
 
+/*** Association Page ***/
+
+.assoc-role {
+    padding: 0.4em 0.7em;
+    margin-top: 0.4em;
+    margin-right: 0.4em;
+}
+
+.assoc-role .field-label {
+    margin-top: 1em;
+}
+
 /*** Icons ***/
 
 .type-icon {

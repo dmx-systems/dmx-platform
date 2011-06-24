@@ -22,18 +22,12 @@ function AssociationRenderer() {
         dm3c.render.field_value(assoc_type.value)
         //
         topic_1 = assoc.get_topic_1()
-        role_type_1 = assoc.get_role_type_1()
-        dm3c.render.field_label("Topic 1")
-        dm3c.render.field_value("\"" + topic_1.value + "\" (" + topic_1.get_type().value + ")")
-        dm3c.render.field_label("Role Type 1")
-        dm3c.render.field_value(role_type_1.value)
-        //
         topic_2 = assoc.get_topic_2()
+        role_type_1 = assoc.get_role_type_1()
         role_type_2 = assoc.get_role_type_2()
-        dm3c.render.field_label("Topic 2")
-        dm3c.render.field_value("\"" + topic_2.value + "\" (" + topic_2.get_type().value + ")")
-        dm3c.render.field_label("Role Type 2")
-        dm3c.render.field_value(role_type_2.value)
+        //
+        render_assoc_role(topic_1, role_type_1)
+        render_assoc_role(topic_2, role_type_2)
     }
 
     this.render_form = function(assoc) {
@@ -42,16 +36,10 @@ function AssociationRenderer() {
         dm3c.render.field_value(assoc_type_menu.dom)
         //
         role_type_menu_1 = dm3c.render.topic_menu("dm3.core.role_type", assoc.role_1.role_type_uri)
-        dm3c.render.field_label("Topic 1")
-        dm3c.render.field_value("\"" + topic_1.value + "\" (" + topic_1.get_type().value + ")")
-        dm3c.render.field_label("Role Type 1")
-        dm3c.render.field_value(role_type_menu_1.dom)
-        //
         role_type_menu_2 = dm3c.render.topic_menu("dm3.core.role_type", assoc.role_2.role_type_uri)
-        dm3c.render.field_label("Topic 2")
-        dm3c.render.field_value("\"" + topic_2.value + "\" (" + topic_2.get_type().value + ")")
-        dm3c.render.field_label("Role Type 2")
-        dm3c.render.field_value(role_type_menu_2.dom)
+        //
+        render_assoc_role_editor(topic_1, role_type_menu_1)
+        render_assoc_role_editor(topic_2, role_type_menu_2)
     }
 
     this.process_form = function(assoc) {
@@ -85,4 +73,21 @@ function AssociationRenderer() {
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
+
+    function render_assoc_role(topic, role_type) {
+        _render_assoc_role(topic, role_type.value)
+    }
+
+    function render_assoc_role_editor(topic, role_type_menu) {
+        _render_assoc_role(topic, role_type_menu.dom)
+    }
+
+    function _render_assoc_role(topic, role_type_element) {
+        var topic_div = $("<div>").text(topic.get_type().value + ": \"" + topic.value + "\"")
+        var role_type_div = $("<div>")
+            .append($("<div>").addClass("field-label").text("Role Type"))
+            .append($("<div>").append(role_type_element))
+        dm3c.render.page($("<div>").addClass("assoc-role").addClass("ui-state-default")
+            .append(topic_div).append(role_type_div))
+    }
 }
