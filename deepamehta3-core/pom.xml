@@ -52,7 +52,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>neo4j-mehtagraph</artifactId>
-            <version>0.6</version>
+            <version>0.7-SNAPSHOT</version>
         </dependency>
 
         <!-- Neo4j -->

@@ -161,7 +161,7 @@ var dm3c = new function() {
             role_2: role_2
         }
         // FIXME: "create" hooks are not triggered
-        return dm3c.restc.create_association(assoc_model)
+        return build_association(dm3c.restc.create_association(assoc_model))
     }
 
     /**
@@ -454,7 +454,7 @@ var dm3c = new function() {
         // reveal associations
         var assocs = dm3c.restc.get_associations(dm3c.selected_object.id, topic_id)
         for (var i = 0, assoc; assoc = assocs[i]; i++) {
-            dm3c.canvas.add_association(assoc)
+            dm3c.canvas.add_association(build_association(assoc))
         }
         // reveal topic
         dm3c.add_topic_to_canvas(dm3c.fetch_topic(topic_id), "show")

@@ -9,6 +9,11 @@
             data_type_uri: "dm3.core.text"
         },
         {
+            value: "Color",
+            uri: "dm3.webclient.color",
+            data_type_uri: "dm3.core.text"
+        },
+        {
             value: "Add To Create Menu",
             uri: "dm3.webclient.add_to_create_menu",
             data_type_uri: "dm3.core.boolean"
@@ -51,42 +56,47 @@
                 {
                     part_topic_type_uri:  "dm3.webclient.icon_src",
                     part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    assoc_type_uri:       "dm3.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm3.webclient.color",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
                     part_topic_type_uri:  "dm3.webclient.add_to_create_menu",
                     part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
                     part_topic_type_uri:  "dm3.webclient.is_searchable_unit",
                     part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
                     part_topic_type_uri:  "dm3.webclient.editable",
                     part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
                     part_topic_type_uri:  "dm3.webclient.viewable",
                     part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
                     part_topic_type_uri:  "dm3.webclient.js_page_renderer_class",
                     part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
                     part_topic_type_uri:  "dm3.webclient.js_field_renderer_class",
                     part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
                     part_topic_type_uri:  "dm3.webclient.rows",
                     part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    assoc_type_uri:       "dm3.core.composition_def"
                 }
             ]
             ### Note: don't try to add view config topics to the view config type -> endless recursion!
@@ -120,12 +130,12 @@
                 {
                     part_topic_type_uri:  "dm3.webclient.search_term",
                     part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
                     part_topic_type_uri:  "dm3.webclient.search_result",
                     part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:    "dm3.core.composition_def"
+                    assoc_type_uri:       "dm3.core.composition_def"
                 }
             ],
             view_config_topics: [

@@ -10,7 +10,7 @@ function Canvas() {
     var ACTIVE_COLOR = "red"
     var ACTIVE_TOPIC_WIDTH = 3
     var ACTIVE_ASSOC_WIDTH = 10
-    var ASSOC_COLOR = "#b0b0b0"
+    this.ASSOC_COLOR = "#b0b0b0"
     var ASSOC_WIDTH = 4
     var ASSOC_CLICK_TOLERANCE = 0.3
     var CANVAS_ANIMATION_STEPS = 30
@@ -49,6 +49,7 @@ function Canvas() {
     // === Overriding TopicmapRenderer Adapter Methods ===
 
     /**
+     * @param   topic               A Topic object
      * @param   highlight_topic     Optional: if true, the topic is highlighted.
      * @param   refresh_canvas      Optional: if true, the canvas is refreshed.
      * @param   x                   Optional
@@ -83,6 +84,10 @@ function Canvas() {
         }
     }
 
+    /**
+     * @param   assoc               An Associatin object
+     * @param   refresh_canvas      Optional: if true, the canvas is refreshed.
+     */
     this.add_association = function(assoc, refresh_canvas) {
         if (!association_exists(assoc.id)) {
             // update model
@@ -262,7 +267,7 @@ function Canvas() {
                 draw_line(ct1.x, ct1.y, ct2.x, ct2.y, ACTIVE_ASSOC_WIDTH, ACTIVE_COLOR)
             }
             //
-            draw_line(ct1.x, ct1.y, ct2.x, ct2.y, ASSOC_WIDTH, ASSOC_COLOR)
+            draw_line(ct1.x, ct1.y, ct2.x, ct2.y, ASSOC_WIDTH, ca.color)
         })
     }
 
@@ -883,11 +888,20 @@ function Canvas() {
         }
     }
 
+    /**
+     * Properties:
+     *  type_uri
+     *  color       (CSS string)
+     */
     function CanvasAssoc(assoc) {
+
+        var ca = this
+
         this.id = assoc.id
-        this.type_uri = assoc.type_uri
         this.role_1 = assoc.role_1
         this.role_2 = assoc.role_2
+
+        init(assoc)
 
         this.get_topic1_id = function() {
             return this.role_1.topic_id
@@ -900,7 +914,12 @@ function Canvas() {
         // ---
 
         this.update = function(assoc) {
-            this.type_uri = assoc.type_uri
+            init(assoc)
+        }
+
+        function init(assoc) {
+            ca.type_uri = assoc.type_uri
+            ca.color = assoc.get_type().get_color()
         }
     }
 
