@@ -174,7 +174,7 @@ function TopicRenderer() {
         if (handle_special_input(event)) {
             return
         }
-        // assertion
+        // error check
         if (this.id.substr(0, 6) != "field_") {
             alert("WARNING (TopicRenderer.autocomplete):\n\nTopic " + dm3c.selected_object.id +
                 " has unexpected element id: \"" + this.id + "\".\n\nIt is expected to begin with \"field_\".")

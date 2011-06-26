@@ -7,14 +7,12 @@ function Canvas() {
     var self = this
 
     // Settings
-    var ACTIVE_COLOR = "red"
-    var ACTIVE_TOPIC_WIDTH = 3
-    var ACTIVE_ASSOC_WIDTH = 10
-    this.ASSOC_COLOR = "#b0b0b0"
+    this.DEFAULT_ASSOC_COLOR = "#b0b0b0"
     var ASSOC_WIDTH = 4
     var ASSOC_CLICK_TOLERANCE = 0.3
+    var HIGHLIGHT_COLOR = "red"
+    var HIGHLIGHT_BLUR = 32
     var CANVAS_ANIMATION_STEPS = 30
-    var HIGHLIGHT_DIST = 5
     var LABEL_DIST_Y = 5
     var LABEL_MAX_WIDTH = "10em"
 
@@ -113,7 +111,7 @@ function Canvas() {
     this.remove_topic = function(id, refresh_canvas, is_part_of_delete_operation) {
         // 1) update model
         var ct = remove_topic(id)
-        // assertion
+        // error check
         if (!ct) {
             throw "remove_topic: topic not on canvas (" + id + ")"
         }
@@ -224,25 +222,24 @@ function Canvas() {
         draw_associations()
         //
         if (association_in_progress) {
-            draw_line(action_topic.x, action_topic.y, tmp_x - trans_x, tmp_y - trans_y, ASSOC_WIDTH, ACTIVE_COLOR)
+            draw_line(action_topic.x, action_topic.y, tmp_x - trans_x, tmp_y - trans_y, ASSOC_WIDTH, HIGHLIGHT_COLOR)
         }
         //
         draw_topics()
     }
 
     function draw_topics() {
-        ctx.lineWidth = ACTIVE_TOPIC_WIDTH
-        ctx.strokeStyle = ACTIVE_COLOR
         iterate_topics(function(ct) {
             var w = ct.icon.width
             var h = ct.icon.height
             try {
+                // hightlight
+                var is_highlight = highlight_topic_id == ct.id
+                set_highlight_style(is_highlight)
+                //
                 ctx.drawImage(ct.icon, ct.x - w / 2, ct.y - h / 2)
-                // highlight
-                if (highlight_topic_id == ct.id) {
-                    ctx.strokeRect(ct.x - w / 2 - HIGHLIGHT_DIST, ct.y - h / 2 - HIGHLIGHT_DIST,
-                                          w + 2 * HIGHLIGHT_DIST, h + 2 * HIGHLIGHT_DIST)
-                }
+                //
+                reset_highlight_style(is_highlight)
             } catch (e) {
                 dm3c.log("### ERROR at Canvas.draw_topics:\nicon.src=" + ct.icon.src + "\nicon.width=" + ct.icon.width +
                     "\nicon.height=" + ct.icon.height  + "\nicon.complete=" + ct.icon.complete
@@ -255,7 +252,7 @@ function Canvas() {
         iterate_associations(function(ca) {
             var ct1 = get_topic(ca.get_topic1_id())
             var ct2 = get_topic(ca.get_topic2_id())
-            // assertion
+            // error check
             if (!ct1 || !ct2) {
                 // TODO: deleted associations must be removed from all topicmaps.
                 alert("ERROR in draw_associations: association " + ca.id + " is missing a topic")
@@ -263,11 +260,12 @@ function Canvas() {
                 return
             }
             // hightlight
-            if (highlight_assoc_id == ca.id) {
-                draw_line(ct1.x, ct1.y, ct2.x, ct2.y, ACTIVE_ASSOC_WIDTH, ACTIVE_COLOR)
-            }
+            var is_highlight = highlight_assoc_id == ca.id
+            set_highlight_style(is_highlight)
             //
             draw_line(ct1.x, ct1.y, ct2.x, ct2.y, ASSOC_WIDTH, ca.color)
+            //
+            reset_highlight_style(is_highlight)
         })
     }
 
@@ -278,6 +276,23 @@ function Canvas() {
         ctx.moveTo(x1, y1)
         ctx.lineTo(x2, y2)
         ctx.stroke()
+    }
+
+    function set_highlight_style(is_highlight) {
+        if (is_highlight) {
+            ctx.shadowColor = HIGHLIGHT_COLOR
+            ctx.shadowBlur  = HIGHLIGHT_BLUR
+        }
+    }
+
+    function reset_highlight_style(is_highlight) {
+        if (is_highlight) {
+            // Note: according to the HTML5 spec setting the blur to 0 should be sufficient to switch the shadow off.
+            // Works so in Safari 5 but not in Firefox 3.6. Workaround: set the shadow color to fully-transparent.
+            // http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#shadows
+            ctx.shadowColor = "rgba(0, 0, 0, 0)"
+            ctx.shadowBlur = 0
+        }
     }
 
 

@@ -25,6 +25,6 @@ function AssociationType(assoc_type) {
     // === Public API ===
 
     this.get_color = function() {
-        return dm3c.get_view_config(this, "color") || dm3c.canvas.ASSOC_COLOR
+        return dm3c.get_view_config(this, "color") || dm3c.canvas.DEFAULT_ASSOC_COLOR
     }
 }
