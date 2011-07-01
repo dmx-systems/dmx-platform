@@ -94,11 +94,19 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     }
 
     @Override
-    public RelatedAssociationModel getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                              String othersRoleTypeUri) {
-        // FIXME: assocTypeUri not respected
-        ConnectedMehtaEdge edge = hg.getMehtaNode(topicId).getConnectedMehtaEdge(myRoleTypeUri, othersRoleTypeUri);
-        return edge != null ? buildRelatedAssociation(edge) : null;
+    public Set<RelatedAssociationModel> getTopicRelatedAssociations(long topicId, String assocTypeUri,
+                                                                    String myRoleTypeUri, String othersRoleTypeUri,
+                                                                    String othersAssocTypeUri) {
+        Set<ConnectedMehtaEdge> edges = hg.getMehtaNode(topicId).getConnectedMehtaEdges(myRoleTypeUri,
+                                                                                        othersRoleTypeUri);
+        if (othersAssocTypeUri != null) {
+            // TODO
+            throw new RuntimeException("not yet implemented");
+        }
+        if (assocTypeUri != null) {
+            filterConnectedEdgesByAssociationType(edges, assocTypeUri);
+        }
+        return buildRelatedAssociations(edges);
     }
 
     // ---
@@ -340,6 +348,14 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         return relAssoc;
     }
 
+    private Set<RelatedAssociationModel> buildRelatedAssociations(Set<ConnectedMehtaEdge> edges) {
+        Set<RelatedAssociationModel> relAssocs = new LinkedHashSet();
+        for (ConnectedMehtaEdge edge : edges) {
+            relAssocs.add(buildRelatedAssociation(edge));
+        }
+        return relAssocs;
+    }
+
 
 
     // === Type Filter ===
@@ -366,8 +382,6 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         }
     }
 
-    // ---
-
     private void filterNodesByTopicType(Set<ConnectedMehtaNode> nodes, String topicTypeUri) {
         MehtaNode node = null;
         try {
@@ -380,6 +394,24 @@ public class MGStorageBridge implements DeepaMehtaStorage {
             }
         } catch (Exception e) {
             throw new RuntimeException("Applying topic type filter \"" + topicTypeUri + "\" failed (" + node + ")", e);
+        }
+    }
+
+    // ---
+
+    private void filterConnectedEdgesByAssociationType(Set<ConnectedMehtaEdge> edges, String assocTypeUri) {
+        MehtaEdge edge = null;
+        try {
+            Iterator<ConnectedMehtaEdge> i = edges.iterator();
+            while (i.hasNext()) {
+                edge = i.next().getConnectingMehtaEdge();
+                if (!getAssociationTypeUri(edge).equals(assocTypeUri)) {
+                    i.remove();
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Applying association type filter \"" + assocTypeUri +
+                "\" failed (" + edge + ")", e);
         }
     }
 

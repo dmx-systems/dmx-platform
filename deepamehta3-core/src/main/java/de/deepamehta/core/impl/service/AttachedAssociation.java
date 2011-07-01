@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Role;
@@ -12,8 +13,6 @@ import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicRoleModel;
-
-import org.codehaus.jettison.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -104,7 +103,11 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         }
     }
 
+    // ---
 
+    public AssociationModel getModel() {
+        return (AssociationModel) super.getModel();
+    }
 
     // === Traversal ===
 
@@ -168,23 +171,18 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         return relAssoc != null ? dms.attach(relAssoc) : null;
     }
 
-    // ===
+
+
+    // ***************************************
+    // *** DeepaMehtaObject Implementation ***
+    // ***************************************
+
+
 
     @Override
     public void delete() {
         logger.info("Deleting " + this);
         dms.storage.deleteAssociation(getId());
-    }
-
-
-
-    // ----------------------------------------------------------------------------------------------- Protected Methods
-
-    // ### This is supposed to be protected, but doesn't compile!
-    // ### It is called from the subclass constructor, but on a differnt AssociationBase instance.
-    // ### See de.deepamehta.core.impl.service.AttachedAssociation.
-    public AssociationModel getModel() {
-        return (AssociationModel) super.getModel();
     }
 
 
@@ -232,6 +230,13 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         }
         //
         return report;
+    }
+
+    /**
+     * Convenience method.
+     */
+    AssociationType getAssociationType() {
+        return dms.getAssociationType(getTypeUri(), null);    // FIXME: clientContext=null
     }
 
 

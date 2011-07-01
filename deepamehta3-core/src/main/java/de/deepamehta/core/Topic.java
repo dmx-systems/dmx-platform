@@ -1,5 +1,6 @@
 package de.deepamehta.core;
 
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicValue;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Set;
  */
 public interface Topic extends DeepaMehtaObject {
 
-
+    TopicModel getModel();
 
     // === Traversal ===
 
@@ -58,5 +59,9 @@ public interface Topic extends DeepaMehtaObject {
 
     Set<Association> getAssociations(String myRoleTypeUri);
 
-    RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri);
+    RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                     String othersAssocTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
+
+    Set<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                     String othersAssocTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
 }

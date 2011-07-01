@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.topicmaps.model;
 
-import de.deepamehta.core.model.Relation;
+import de.deepamehta.core.model.AssociationModel;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -9,9 +9,9 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 /**
- * A relation as contained in a topicmap.
+ * An association as contained in a topicmap.
  */
-public class TopicmapRelation extends Relation {
+public class TopicmapAssociation extends AssociationModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -19,8 +19,8 @@ public class TopicmapRelation extends Relation {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicmapRelation(Relation relation, long refId) {
-        super(relation);
+    TopicmapAssociation(AssociationModel assoc, long refId) {
+        super(assoc);
         this.refId = refId;
     }
 

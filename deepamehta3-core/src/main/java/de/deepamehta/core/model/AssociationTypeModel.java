@@ -27,12 +27,12 @@ public class AssociationTypeModel extends TypeModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public AssociationTypeModel(String uri, String value) {
-        super(uri, new TopicValue(value), "dm3.core.assoc_type");
+    public AssociationTypeModel(String uri, String value, String dataTypeUri) {
+        super(uri, new TopicValue(value), "dm3.core.assoc_type", dataTypeUri);
     }
 
-    public AssociationTypeModel(TopicModel model, ViewConfigurationModel viewConfigModel) {
-        super(model, viewConfigModel);
+    public AssociationTypeModel(TopicModel model, String dataTypeUri, ViewConfigurationModel viewConfigModel) {
+        super(model, dataTypeUri, viewConfigModel);
     }
 
     public AssociationTypeModel(JSONObject assocTypeModel) {

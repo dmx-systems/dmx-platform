@@ -19,34 +19,51 @@ public abstract class TypeModel extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private String dataTypeUri;
     private ViewConfigurationModel viewConfigModel;         // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TypeModel(String uri, TopicValue value, String topicTypeUri) {
+    public TypeModel(String uri, TopicValue value, String topicTypeUri, String dataTypeUri) {
         super(uri, value, topicTypeUri);
+        this.dataTypeUri = dataTypeUri;
         this.viewConfigModel = new ViewConfigurationModel();
     }
 
-    public TypeModel(TopicModel model, ViewConfigurationModel viewConfigModel) {
+    public TypeModel(TopicModel model, String dataTypeUri, ViewConfigurationModel viewConfigModel) {
         super(model);
+        this.dataTypeUri = dataTypeUri;
         this.viewConfigModel = viewConfigModel;
     }
 
     public TypeModel(TypeModel model) {
         super(model);
+        this.dataTypeUri = model.getDataTypeUri();
         this.viewConfigModel = model.getViewConfigModel();
     }
 
     public TypeModel(JSONObject typeModel) {
         // Note: the super constructor is not called here.
         // The entire object is initialized by the subclass constructors.
+        this.dataTypeUri = typeModel.getString("data_type_uri");
         this.viewConfigModel = new ViewConfigurationModel(typeModel);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    // === Data Type ===
+
+    public String getDataTypeUri() {
+        return dataTypeUri;
+    }
+
+    public void setDataTypeUri(String dataTypeUri) {
+        this.dataTypeUri = dataTypeUri;
+    }
+
+    // === View Configuration ===
 
     public ViewConfigurationModel getViewConfigModel() {
         return viewConfigModel;

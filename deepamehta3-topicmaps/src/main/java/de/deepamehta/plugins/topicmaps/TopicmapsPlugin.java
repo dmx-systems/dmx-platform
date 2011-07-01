@@ -3,9 +3,6 @@ package de.deepamehta.plugins.topicmaps;
 import de.deepamehta.plugins.topicmaps.model.Topicmap;
 import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
-import de.deepamehta.core.model.Properties;
-import de.deepamehta.core.model.PropValue;
-import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.Plugin;
 
@@ -47,27 +44,27 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
 
 
 
-    @Override
+    /* @Override
     public void postDeleteRelationHook(long relationId) {
         // remove the relation from all topicmaps
         List<Topic> refTopics = dms.getTopics("de/deepamehta/core/property/RelationID", relationId);
         logger.info("### Removing relation " + relationId + " from " + refTopics.size() + " topicmaps");
         for (Topic refTopic : refTopics) {
-            removeRelationFromTopicmap(refTopic.id);
+            removeAssociationFromTopicmap(refTopic.id);
         }
-    }
+    } */
 
     // ---
 
-    @Override
+    /* ### @Override
     public void providePropertiesHook(Topic topic) {
         if (topic.typeUri.equals("de/deepamehta/core/topictype/TopicmapRelationRef")) {
             PropValue relation_id = dms.getTopicProperty(topic.id, "de/deepamehta/core/property/RelationID");
             topic.setProperty("de/deepamehta/core/property/RelationID", relation_id);
         }
-    }
+    } */
 
-    @Override
+    /* ### @Override
     public void providePropertiesHook(Relation relation) {
         if (relation.typeId.equals("TOPICMAP_TOPIC")) {
             // transfer all relation properties
@@ -76,7 +73,7 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
                 relation.setProperty(key, properties.get(key));
             }
         }
-    }
+    } */
 
 
 
@@ -93,7 +90,7 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
         return new Topicmap(topicmapId, dms);
     }
 
-    @PUT
+    /* ### @PUT
     @Path("/{id}/topic/{topicId}/{x}/{y}")
     @Override
     public long addTopicToTopicmap(@PathParam("id") long topicmapId,
@@ -104,9 +101,9 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
         properties.put("visibility", true);
         Relation refRel = dms.createRelation("TOPICMAP_TOPIC", topicmapId, topicId, properties);
         return refRel.id;
-    }
+    } */
 
-    @PUT
+    /* @PUT
     @Path("/{id}/relation/{relationId}")
     @Override
     public long addRelationToTopicmap(@PathParam("id") long topicmapId, @PathParam("relationId") long relationId) {
@@ -116,14 +113,15 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
         Topic refTopic = dms.createTopic("de/deepamehta/core/topictype/TopicmapRelationRef", properties, null);
         dms.createRelation("RELATION", topicmapId, refTopic.id, null);
         return refTopic.id;
-    }
+    } */
 
     @DELETE
     @Path("/{id}/relation/{relationId}/{refId}")
     @Override
-    public void removeRelationFromTopicmap(@PathParam("id") long topicmapId,
-                                           @PathParam("relationId") long relationId, @PathParam("refId") long refId) {
-        removeRelationFromTopicmap(refId);
+    public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId,
+                                              @PathParam("relationId") long relationId,
+                                              @PathParam("refId") long refId) {
+        removeAssociationFromTopicmap(refId);
     }
 
 
@@ -131,9 +129,9 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     /**
-     * @param   refId   ID of the "Topicmap Relation Ref" topic of the relation to remove.
+     * @param   refId   ID of the "Association Mapcontext" association that relates to the association to remove.
      */
-    public void removeRelationFromTopicmap(long refId) {
-        dms.deleteTopic(refId);
+    private void removeAssociationFromTopicmap(long refId) {
+        dms.deleteAssociation(refId, null);     // clientContext=null
     }
 }

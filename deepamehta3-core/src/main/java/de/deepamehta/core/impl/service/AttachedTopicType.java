@@ -60,24 +60,13 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
 
 
-    // === TopicType Implementation ===
+    // ********************************
+    // *** TopicType Implementation ***
+    // ********************************
 
-    // --- Data Type ---
 
-    @Override
-    public String getDataTypeUri() {
-        return getModel().getDataTypeUri();
-    }
 
-    @Override
-    public void setDataTypeUri(String dataTypeUri) {
-        // update memory
-        getModel().setDataTypeUri(dataTypeUri);
-        // update DB
-        storeDataTypeUri();
-    }
-
-    // --- Index Modes ---
+    // === Index Modes ===
 
     @Override
     public Set<IndexMode> getIndexModes() {
@@ -92,7 +81,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         storeIndexModes();
     }
 
-    // --- Association Definitions ---
+    // === Association Definitions ===
 
     @Override
     public Map<String, AssociationDefinition> getAssocDefs() {
@@ -142,7 +131,11 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
 
 
-    // === AttachedTopic Overrides ===
+    // *******************************
+    // *** AttachedTopic Overrides ***
+    // *******************************
+
+
 
     @Override
     public TopicTypeModel getModel() {
@@ -270,21 +263,6 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     // ---
 
-    private RelatedTopic fetchDataTypeTopic(Topic typeTopic) {
-        try {
-            RelatedTopic dataType = typeTopic.getRelatedTopic("dm3.core.association", "dm3.core.topic_type",
-                "dm3.core.data_type", "dm3.core.data_type", false);     // fetchComposite=false
-            if (dataType == null) {
-                throw new RuntimeException("No data type topic is associated to topic type \"" + typeTopic.getUri() +
-                    "\"");
-            }
-            return dataType;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching the data type topic for topic type \"" + typeTopic.getUri() +
-                "\" failed", e);
-        }
-    }
-
     private Set<IndexMode> fetchIndexModes(Topic typeTopic) {
         Set<RelatedTopic> topics = typeTopic.getRelatedTopics("dm3.core.association", "dm3.core.topic_type",
             "dm3.core.index_mode", "dm3.core.index_mode", false);       // fetchComposite=false
@@ -294,14 +272,6 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
 
     // === Store ===
-
-    private void storeDataTypeUri() {
-        // remove current assignment
-        long assocId = fetchDataTypeTopic(this).getAssociation().getId();
-        dms.deleteAssociation(assocId, null);  // clientContext=null
-        // create new assignment
-        dms.associateDataType(getUri(), getDataTypeUri());
-    }
 
     private void storeIndexModes() {
         for (IndexMode indexMode : getIndexModes()) {
@@ -341,7 +311,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
             List<RelatedAssociation> sequence = new ArrayList();
             // find sequence start
             RelatedAssociation assocDef = typeTopic.getRelatedAssociation("dm3.core.association",
-                "dm3.core.topic_type", "dm3.core.first_assoc_def");
+                "dm3.core.topic_type", "dm3.core.first_assoc_def", null, false, false);   // othersAssocTypeUri=null
             // fetch sequence segments
             if (assocDef != null) {
                 sequence.add(assocDef);

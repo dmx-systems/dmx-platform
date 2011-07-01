@@ -1,8 +1,9 @@
 package de.deepamehta.plugins.topicmaps.model;
 
+import de.deepamehta.core.Association;
+import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.service.DeepaMehtaService;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -11,18 +12,18 @@ import org.codehaus.jettison.json.JSONObject;
 
 import java.awt.Point;
 
-import static java.util.Arrays.asList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
 
 /**
  * An in-memory representation of a topicmap.
- * That is a collection of topics and relations plus their visualization information.
+ * That is a collection of topics and associations plus their visualization information.
  * <p>
  * The constructor loads the topicmap from the DB.
  * There is a method to get a JSON representation of the topicmap.
@@ -35,7 +36,7 @@ public class Topicmap {
     protected DeepaMehtaService dms;
 
     protected Map<Long, TopicmapTopic> topics = new HashMap();
-    protected Map<Long, TopicmapRelation> relations = new HashMap();
+    protected Map<Long, TopicmapAssociation> assocs = new HashMap();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -50,7 +51,7 @@ public class Topicmap {
         logger.info("Loading topicmap " + topicmapId);
         //
         loadTopics(topicmapId);
-        loadRelations(topicmapId);
+        loadAssociations(topicmapId);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -59,8 +60,8 @@ public class Topicmap {
         return topics.get(topicId) != null;
     }
 
-    public boolean containsRelation(long relationId) {
-        return relations.get(relationId) != null;
+    public boolean containsAssociation(long assocId) {
+        return assocs.get(assocId) != null;
     }
 
     // ---
@@ -71,14 +72,14 @@ public class Topicmap {
             topics.put(topic.toJSON());
         }
         //
-        JSONArray relations = new JSONArray();
-        for (TopicmapRelation relation : this.relations.values()) {
-            relations.put(relation.toJSON());
+        JSONArray assocs = new JSONArray();
+        for (TopicmapAssociation assoc : this.assocs.values()) {
+            assocs.put(assoc.toJSON());
         }
         //
         JSONObject topicmap = new JSONObject();
         topicmap.put("topics", topics);
-        topicmap.put("relations", relations);
+        topicmap.put("assocs", assocs);
         return topicmap;
     }
 
@@ -152,31 +153,33 @@ public class Topicmap {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void loadTopics(long topicmapId) {
-        List<RelatedTopic> relTopics = dms.getRelatedTopics(topicmapId, null, asList("TOPICMAP_TOPIC;INCOMING"), null);
-        for (RelatedTopic relTopic : relTopics) {
-            Relation refRelation = relTopic.getRelation();
-            addTopic(new TopicmapTopic(relTopic.getTopic(), refRelation.getProperties().toMap(), refRelation.id));
+        Topic topicmapTopic = dms.getTopic(topicmapId, false, null);
+        Set<RelatedTopic> mapTopics = topicmapTopic.getRelatedTopics("dm3.topicmaps.topic_mapcontext",
+            "dm3.topicmaps.topicmap", "dm3.topicmaps.topicmap_topic", null, false);     // othersTopicTypeUri=null
+                                                                                        // fetchComposite=false
+        for (RelatedTopic mapTopic : mapTopics) {
+            Association refAssociation = mapTopic.getAssociation();
+            addTopic(new TopicmapTopic(mapTopic, refAssociation.getProperties().toMap(), refAssociation.getId()));
         }
     }
 
-    private void loadRelations(long topicmapId) {
-        List<RelatedTopic> relTopics = dms.getRelatedTopics(topicmapId,
-            asList("de/deepamehta/core/topictype/TopicmapRelationRef"),
-            asList("RELATION;INCOMING"), null);
-        for (RelatedTopic relTopic : relTopics) {
-            Topic refTopic = relTopic.getTopic();
-            long relationId = refTopic.getProperty("de/deepamehta/core/property/RelationID").longValue();
-            addRelation(new TopicmapRelation(dms.getRelation(relationId), refTopic.id));
+    private void loadAssociations(long topicmapId) {
+        Topic topicmapTopic = dms.getTopic(topicmapId, false, null);
+        Set<RelatedAssociation> mapAssocs = topicmapTopic.getRelatedAssociations("dm3.topicmaps.association_mapcontext",
+            "dm3.topicmaps.topicmap", "dm3.topicmaps.topicmap_association", null);      // othersAssocTypeUri=null
+        for (RelatedAssociation mapAssoc : mapAssocs) {
+            long refId = mapAssoc.getRelatingAssociation().getId();
+            addAssociation(new TopicmapAssociation(mapAssoc.getModel(), refId));
         }
     }
 
     // ---
 
     private void addTopic(TopicmapTopic topic) {
-        topics.put(topic.id, topic);
+        topics.put(topic.getId(), topic);
     }
 
-    private void addRelation(TopicmapRelation relation) {
-        relations.put(relation.id, relation);
+    private void addAssociation(TopicmapAssociation assoc) {
+        assocs.put(assoc.getId(), assoc);
     }
 }

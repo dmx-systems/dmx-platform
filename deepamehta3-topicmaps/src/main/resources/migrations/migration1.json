@@ -1,40 +1,66 @@
 {
     topic_types: [
         {
-            label: "Topicmap",
-            uri: "de/deepamehta/core/topictype/Topicmap",
-            icon_src: "/de.deepamehta.3-topicmaps/images/network.png",
-            js_renderer_class: "PlainDocument",
-            fields: [
-                {
-                    label: "Title",
-                    uri: "de/deepamehta/core/property/Title",
-                    data_type: "text",
-                    editor: "single line",
-                    js_renderer_class: "TitleRenderer",
-                    indexing_mode: "FULLTEXT"
-                },
-                {
-                    label: "Description",
-                    uri: "de/deepamehta/core/property/Description",
-                    data_type: "html",
-                    js_renderer_class: "BodyTextRenderer",
-                    indexing_mode: "FULLTEXT"
-                }
-            ]
+            value: "Name",
+            uri: "dm3.topicmaps.name",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
         },
         {
-            label: "Topicmap Relation Ref",
-            uri: "de/deepamehta/core/topictype/TopicmapRelationRef",
-            js_renderer_class: "PlainDocument",
-            fields: [
+            value: "Description",
+            uri: "dm3.topicmaps.description",
+            data_type_uri: "dm3.core.html",
+            index_mode_uris: ["dm3.core.fulltext"]
+        },
+        {
+            value: "Topicmap",
+            uri: "dm3.topicmaps.topicmap",
+            data_type_uri: "dm3.core.composite",
+            assoc_defs: [
                 {
-                    label: "Relation ID",
-                    uri: "de/deepamehta/core/property/RelationID",
-                    data_type: "number",
-                    indexing_mode: "KEY"
+                    part_topic_type_uri:  "dm3.topicmaps.name",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm3.topicmaps.description",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:    "dm3.core.composition_def"
+                }
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm3.webclient.view_config",
+                    composite: {
+                        dm3.webclient.icon_src: "/de.deepamehta.3-topicmaps/images/network.png"
+                    }
                 }
             ]
+        }
+    ]
+
+    assoc_types: [
+        {
+            value: "Topic Mapcontext",
+            uri:   "dm3.topicmaps.topic_mapcontext"
+        },
+        {
+            value: "Association Mapcontext",
+            uri:   "dm3.topicmaps.association_mapcontext"
+        }
+    ]
+
+    topics: [
+        ### Role Types ###
+        {
+            value:    "Topicmap Topic",
+            uri:      "dm3.topicmaps.topicmap_topic",
+            type_uri: "dm3.core.role_type"
+        },
+        {
+            value:    "Topicmap Association",
+            uri:      "dm3.topicmaps.topicmap_association",
+            type_uri: "dm3.core.role_type"
         }
     ]
 }

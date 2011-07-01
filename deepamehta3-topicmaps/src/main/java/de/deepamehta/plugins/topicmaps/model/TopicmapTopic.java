@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.topicmaps.model;
 
-import de.deepamehta.core.Topic;
+import de.deepamehta.core.model.TopicModel;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -16,7 +16,7 @@ import java.util.Map;
  * <p>
  * Note: the topic's own properties are not initialized.
  */
-public class TopicmapTopic extends Topic {
+public class TopicmapTopic extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -25,7 +25,7 @@ public class TopicmapTopic extends Topic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicmapTopic(Topic topic, Map visualizationProperties, long refId) {
+    TopicmapTopic(TopicModel topic, Map visualizationProperties, long refId) {
         super(topic);
         this.visualizationProperties = visualizationProperties;
         this.refId = refId;

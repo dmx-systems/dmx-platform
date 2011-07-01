@@ -15,12 +15,6 @@ import java.util.Set;
  */
 public interface TopicType extends Type {
 
-    // --- Data Type ---
-
-    String getDataTypeUri();
-
-    void setDataTypeUri(String dataTypeUri);
-
     // --- Index Modes ---
 
     Set<IndexMode> getIndexModes();

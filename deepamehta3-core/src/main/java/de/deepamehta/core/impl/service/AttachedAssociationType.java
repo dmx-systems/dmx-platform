@@ -35,7 +35,8 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found");
         }
         // build type model
-        AssociationTypeModel model = new AssociationTypeModel(typeTopic.getModel(), fetchViewConfig(typeTopic));
+        AssociationTypeModel model = new AssociationTypeModel(typeTopic.getModel(),
+            fetchDataTypeTopic(typeTopic).getUri(), fetchViewConfig(typeTopic));
         //
         setModel(model);
         initViewConfig();

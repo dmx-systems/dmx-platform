@@ -3,6 +3,7 @@ package de.deepamehta.core.impl.service;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaTransaction;
+import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -850,12 +851,30 @@ public class EmbeddedService implements DeepaMehtaService {
         return new AttachedRelatedAssociation(model, this);
     }
 
+    Set<RelatedAssociation> attach(Iterable<RelatedAssociationModel> models,
+                                   boolean fetchComposite, boolean fetchRelatingComposite) {
+        // TODO: fetch composite
+        Set<RelatedAssociation> relAssocs = new LinkedHashSet();
+        for (RelatedAssociationModel model : models) {
+            relAssocs.add(attach(model));
+        }
+        return relAssocs;
+    }
+
     // ---
 
     private void fetchComposite(boolean fetchComposite, AttachedTopic topic) {
         if (fetchComposite) {
             if (topic.getTopicType().getDataTypeUri().equals("dm3.core.composite")) {
                 topic.loadComposite();
+            }
+        }
+    }
+
+    private void fetchComposite(boolean fetchComposite, AttachedAssociation assoc) {
+        if (fetchComposite) {
+            if (assoc.getAssociationType().getDataTypeUri().equals("dm3.core.composite")) {
+                assoc.loadComposite();
             }
         }
     }
@@ -991,10 +1010,10 @@ public class EmbeddedService implements DeepaMehtaService {
         _createTopic(type);
         _createTopic(instance);
         // Before data type topics can be associated we must create the association type "Association"
-        TopicModel association = new AssociationTypeModel("dm3.core.association", "Association");
+        TopicModel association = new AssociationTypeModel("dm3.core.association", "Association", "dm3.core.text");
         _createTopic(association);
         //
-        TopicModel instantiation = new AssociationTypeModel("dm3.core.instantiation", "Instantiation");
+        TopicModel instantiation = new AssociationTypeModel("dm3.core.instantiation", "Instantiation", "dm3.core.text");
         _createTopic(instantiation);
         // Postponed data type association
         associateDataType("dm3.core.meta_type",  "dm3.core.text");

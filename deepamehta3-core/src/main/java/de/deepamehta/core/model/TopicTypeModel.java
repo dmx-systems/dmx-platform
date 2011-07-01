@@ -26,7 +26,6 @@ public class TopicTypeModel extends TypeModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String dataTypeUri;
     private Set<IndexMode> indexModes;
     private Map<String, AssociationDefinitionModel> assocDefModels;   // is never null, may be empty
 
@@ -39,23 +38,20 @@ public class TopicTypeModel extends TypeModel {
     }
 
     public TopicTypeModel(String uri, String value, String topicTypeUri, String dataTypeUri) {
-        super(uri, new TopicValue(value), topicTypeUri);
-        this.dataTypeUri = dataTypeUri;
+        super(uri, new TopicValue(value), topicTypeUri, dataTypeUri);
         this.indexModes = new HashSet();
         this.assocDefModels = new LinkedHashMap();
     }
 
     public TopicTypeModel(TopicModel model, String dataTypeUri, Set<IndexMode> indexModes,
                                                                 ViewConfigurationModel viewConfigModel) {
-        super(model, viewConfigModel);
-        this.dataTypeUri = dataTypeUri;
+        super(model, dataTypeUri, viewConfigModel);
         this.indexModes = indexModes;
         this.assocDefModels = new LinkedHashMap();
     }
 
     public TopicTypeModel(TopicTypeModel model) {
         super(model);
-        this.dataTypeUri = model.getDataTypeUri();
         this.indexModes = model.getIndexModes();
         this.assocDefModels = model.getAssocDefs();
     }
@@ -69,7 +65,6 @@ public class TopicTypeModel extends TypeModel {
             this.typeUri = "dm3.core.topic_type";
             this.composite = new Composite();
             //
-            this.dataTypeUri = topicTypeModel.getString("data_type_uri");
             this.indexModes = IndexMode.parse(topicTypeModel);
             this.assocDefModels = new LinkedHashMap();
             parseAssocDefs(topicTypeModel);
@@ -79,16 +74,6 @@ public class TopicTypeModel extends TypeModel {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-    public String getDataTypeUri() {
-        return dataTypeUri;
-    }
-
-    public void setDataTypeUri(String dataTypeUri) {
-        this.dataTypeUri = dataTypeUri;
-    }
-
-    // ---
 
     public Set<IndexMode> getIndexModes() {
         return indexModes;
@@ -148,7 +133,7 @@ public class TopicTypeModel extends TypeModel {
         try {
             JSONObject o = super.toJSON();
             //
-            o.put("data_type_uri", dataTypeUri);
+            o.put("data_type_uri", getDataTypeUri());
             IndexMode.toJSON(indexModes, o);
             AssociationDefinitionModel.toJSON(assocDefModels.values(), o);
             getViewConfigModel().toJSON(o);
@@ -162,7 +147,7 @@ public class TopicTypeModel extends TypeModel {
     @Override
     public String toString() {
         return "topic type model (id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
-            "\", dataTypeUri=\"" + dataTypeUri + "\", indexModes=" + indexModes + ", assocDefs=" + assocDefModels +
+            "\", dataTypeUri=\"" + getDataTypeUri() + "\", indexModes=" + indexModes + ", assocDefs=" + assocDefModels +
             ",\n    topic type " + getViewConfigModel() + ")";
     }
 

@@ -104,12 +104,12 @@
                         ${project.basedir}/../deepamehta3-notes/target,
                         ${project.basedir}/../deepamehta3-contacts/target,
                         ${project.basedir}/../deepamehta3-workspaces/target,
-                        ${project.basedir}/../deepamehta3-typeeditor/target
+                        ${project.basedir}/../deepamehta3-typeeditor/target,
+                        ${project.basedir}/../deepamehta3-topicmaps/target
                     ]]>
                     <!--
                         ${project.basedir}/../deepamehta3-coretypes/target,
                         ${project.basedir}/../deepamehta3-time/target,
-                        ${project.basedir}/../deepamehta3-topicmaps/target,
                         ${project.basedir}/../deepamehta3-iconpicker/target,
                         ${project.basedir}/../deepamehta3-projects/target,
                         ${project.basedir}/../deepamehta3-typesearch/target,

@@ -34,14 +34,35 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    // === Type Implementation ===
+
+
+    // ***************************
+    // *** Type Implementation ***
+    // ***************************
+
+
+
+    // === Data Type ===
+
+    @Override
+    public String getDataTypeUri() {
+        return getModel().getDataTypeUri();
+    }
+
+    @Override
+    public void setDataTypeUri(String dataTypeUri) {
+        // update memory
+        getModel().setDataTypeUri(dataTypeUri);
+        // update DB
+        storeDataTypeUri();
+    }
+
+    // === View Configuration ===
 
     @Override
     public AttachedViewConfiguration getViewConfig() {
         return viewConfig;
     }
-
-    // ---
 
     // FIXME: to be dropped
     @Override
@@ -49,7 +70,13 @@ abstract class AttachedType extends AttachedTopic implements Type {
         return getModel().getViewConfig(typeUri, settingUri);
     }
 
-    // === AttachedTopic Overrides ===
+
+
+    // *******************************
+    // *** AttachedTopic Overrides ***
+    // *******************************
+
+
 
     @Override
     public TypeModel getModel() {
@@ -57,6 +84,23 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     // ----------------------------------------------------------------------------------------------- Protected Methods
+
+    protected final RelatedTopic fetchDataTypeTopic(Topic typeTopic) {
+        try {
+            RelatedTopic dataType = typeTopic.getRelatedTopic("dm3.core.association", "dm3.core.topic_type",
+                "dm3.core.data_type", "dm3.core.data_type", false);     // fetchComposite=false
+            if (dataType == null) {
+                throw new RuntimeException("No data type topic is associated to topic type \"" + typeTopic.getUri() +
+                    "\"");
+            }
+            return dataType;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching the data type topic for topic type \"" + typeTopic.getUri() +
+                "\" failed", e);
+        }
+    }
+
+    // ---
 
     protected final ViewConfigurationModel fetchViewConfig(Topic typeTopic) {
         Set<RelatedTopic> topics = typeTopic.getRelatedTopics("dm3.core.association", typeTopic.getTypeUri(),
@@ -69,5 +113,17 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // Note: this type must be identified by its URI. Types being created have no ID yet.
         RoleModel configurable = new TopicRoleModel(getUri(), getTypeUri());
         this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    // === Store ===
+
+    private void storeDataTypeUri() {
+        // remove current assignment
+        long assocId = fetchDataTypeTopic(this).getAssociation().getId();
+        dms.deleteAssociation(assocId, null);  // clientContext=null
+        // create new assignment
+        dms.associateDataType(getUri(), getDataTypeUri());
     }
 }

@@ -83,6 +83,11 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
 
 
+    @Override
+    public TopicModel getModel() {
+        return (TopicModel) super.getModel();
+    }
+
     // === Traversal ===
 
     @Override
@@ -117,7 +122,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         case 1:
             return (AttachedRelatedTopic) topics.iterator().next();
         default:
-            throw new RuntimeException("Ambiguity: there are " + topics.size() + " related topics " + "(topicId=" +
+            throw new RuntimeException("Ambiguity: there are " + topics.size() + " related topics (topicId=" +
                 getId() + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
                 "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
         }
@@ -149,13 +154,38 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
-                                                    String othersRoleTypeUri) {
-        RelatedAssociationModel relAssoc = dms.storage.getTopicRelatedAssociation(getId(),
-            assocTypeUri, myRoleTypeUri, othersRoleTypeUri);
-        return relAssoc != null ? dms.attach(relAssoc) : null;
+                                                    String othersRoleTypeUri, String othersAssocTypeUri,
+                                                    boolean fetchComposite, boolean fetchRelatingComposite) {
+        Set<RelatedAssociation> assocs = getRelatedAssociations(assocTypeUri, myRoleTypeUri,
+                                                                othersRoleTypeUri, othersAssocTypeUri,
+                                                                fetchComposite, fetchRelatingComposite);
+        switch (assocs.size()) {
+        case 0:
+            return null;
+        case 1:
+            return assocs.iterator().next();
+        default:
+            throw new RuntimeException("Ambiguity: there are " + assocs.size() + " related associations (topicId=" +
+                getId() + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
+                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")");
+        }
     }
 
-    // ===
+    @Override
+    public Set<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
+                                                          String othersRoleTypeUri, String othersAssocTypeUri,
+                                                          boolean fetchComposite, boolean fetchRelatingComposite) {
+        return dms.attach(dms.storage.getTopicRelatedAssociations(getId(), assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersAssocTypeUri), fetchComposite, fetchRelatingComposite);
+    }
+
+
+
+    // ***************************************
+    // *** DeepaMehtaObject Implementation ***
+    // ***************************************
+
+
 
     /**
      * Recursively deletes a topic in its entirety, that is the topic itself (the <i>whole</i>) and all sub-topics
@@ -181,21 +211,6 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
 
 
-    // ----------------------------------------------------------------------------------------------- Protected Methods
-
-    // ### This is supposed to be protected, but doesn't compile!
-    // ### It is called from the subclasses constructors, but on a differnt TopicBase instance.
-    // ### See de.deepamehta.core.impl.storage.MGTopic and de.deepamehta.core.impl.service.AttachedTopic.
-    public TopicModel getModel() {
-        return (TopicModel) super.getModel();
-    }
-
-    protected final void setModel(TopicModel model) {
-        super.setModel(model);
-    }
-
-
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
@@ -217,6 +232,9 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         setUri(topicModel.getUri());
     }
 
+    /**
+     * Convenience method.
+     */
     TopicType getTopicType() {
         return dms.getTopicType(getTypeUri(), null);    // FIXME: clientContext=null
     }

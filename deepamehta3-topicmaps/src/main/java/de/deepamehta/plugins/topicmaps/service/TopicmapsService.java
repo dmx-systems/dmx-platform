@@ -12,9 +12,9 @@ public interface TopicmapsService extends PluginService {
 
     public Topicmap getTopicmap(long topicmapId);
 
-    public long addTopicToTopicmap(long topicmapId, long topicId, int x, int y);
+    // ### public long addTopicToTopicmap(long topicmapId, long topicId, int x, int y);
 
-    public long addRelationToTopicmap(long topicmapId, long relationId);
+    // ### public long addRelationToTopicmap(long topicmapId, long relationId);
 
-    public void removeRelationFromTopicmap(long topicmapId, long relationId, long refId);
+    public void removeAssociationFromTopicmap(long topicmapId, long relationId, long refId);
 }

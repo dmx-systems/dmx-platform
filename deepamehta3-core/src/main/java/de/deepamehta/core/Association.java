@@ -1,9 +1,7 @@
 package de.deepamehta.core;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.HashSet;
-import java.util.Map;
+import de.deepamehta.core.model.AssociationModel;
+
 import java.util.Set;
 
 
@@ -23,7 +21,9 @@ public interface Association extends DeepaMehtaObject {
 
     Role getRole(long objectId);
 
+    // ---
 
+    AssociationModel getModel();
 
     // === Traversal ===
 
