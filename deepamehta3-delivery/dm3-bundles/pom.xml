@@ -1,12 +1,19 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
-    <packaging>pom</packaging>
     <name>DeepaMehta 3 Distribution Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-bundles</artifactId>
     <version>0.5-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <parent>
+        <groupId>de.deepamehta</groupId>
+        <artifactId>deepamehta3-delivery</artifactId>
+        <version>0.5-SNAPSHOT</version>
+    </parent>
 
     <!-- All modules that belong to the DeepaMehta 3 standard installation. -->
     <dependencies>
