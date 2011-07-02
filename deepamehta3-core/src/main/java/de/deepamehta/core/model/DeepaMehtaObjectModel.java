@@ -81,6 +81,19 @@ public abstract class DeepaMehtaObjectModel {
         }
     }
 
+    public DeepaMehtaObjectModel(JSONObject typeModel, String typeUri) {
+        try {
+            this.id = typeModel.optLong("id", -1);
+            this.uri = typeModel.getString("uri");
+            this.value = new TopicValue(typeModel.get("value"));
+            this.typeUri = typeUri;
+            this.composite = new Composite();
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing DeepaMehtaObjectModel failed (JSONObject=" + typeModel +
+                ", typeUri=\"" + typeUri + "\")", e);
+        }
+    }
+
     // ---
 
     // Called from the TypeModel's JSON constructor (indirectly)

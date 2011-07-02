@@ -151,8 +151,9 @@
 
     assoc_types: [
         {
-            value: "Search Result Item",
-            uri:   "dm3.webclient.search_result_item"
+            value:         "Search Result Item",
+            uri:           "dm3.webclient.search_result_item",
+            data_type_uri: "dm3.core.text"
         }
     ]
 }

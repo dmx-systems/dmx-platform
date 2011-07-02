@@ -42,14 +42,14 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private MehtaGraph hg;
+    private MehtaGraph mg;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public MGStorageBridge(MehtaGraph hg) {
-        this.hg = hg;
+    public MGStorageBridge(MehtaGraph mg) {
+        this.mg = mg;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -60,12 +60,12 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public TopicModel getTopic(long topicId) {
-        return buildTopic(hg.getMehtaNode(topicId));
+        return buildTopic(mg.getMehtaNode(topicId));
     }
 
     @Override
     public TopicModel getTopic(String key, TopicValue value) {
-        MehtaNode node = hg.getMehtaNode(key, value.value());
+        MehtaNode node = mg.getMehtaNode(key, value.value());
         return node != null ? buildTopic(node) : null;
     }
 
@@ -73,9 +73,8 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public Set<RelatedTopicModel> getTopicRelatedTopics(long topicId, List assocTypeUris, String myRoleTypeUri,
-                                                                                          String othersRoleTypeUri,
-                                                                                          String othersTopicTypeUri) {
-        Set<ConnectedMehtaNode> nodes = hg.getMehtaNode(topicId).getConnectedMehtaNodes(myRoleTypeUri,
+                                                        String othersRoleTypeUri, String othersTopicTypeUri) {
+        Set<ConnectedMehtaNode> nodes = mg.getMehtaNode(topicId).getConnectedMehtaNodes(myRoleTypeUri,
                                                                                         othersRoleTypeUri);
         if (othersTopicTypeUri != null) {
             filterNodesByTopicType(nodes, othersTopicTypeUri);
@@ -90,14 +89,14 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public Set<AssociationModel> getAssociations(long topicId, String myRoleTypeUri) {
-        return buildAssociations(hg.getMehtaNode(topicId).getMehtaEdges(myRoleTypeUri));
+        return buildAssociations(mg.getMehtaNode(topicId).getMehtaEdges(myRoleTypeUri));
     }
 
     @Override
     public Set<RelatedAssociationModel> getTopicRelatedAssociations(long topicId, String assocTypeUri,
                                                                     String myRoleTypeUri, String othersRoleTypeUri,
                                                                     String othersAssocTypeUri) {
-        Set<ConnectedMehtaEdge> edges = hg.getMehtaNode(topicId).getConnectedMehtaEdges(myRoleTypeUri,
+        Set<ConnectedMehtaEdge> edges = mg.getMehtaNode(topicId).getConnectedMehtaEdges(myRoleTypeUri,
                                                                                         othersRoleTypeUri);
         if (othersAssocTypeUri != null) {
             // TODO
@@ -116,28 +115,28 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         if (!wholeWord) {
             searchTerm += "*";
         }
-        return buildTopics(hg.queryMehtaNodes(fieldUri, searchTerm));
+        return buildTopics(mg.queryMehtaNodes(fieldUri, searchTerm));
     }
 
     // ---
 
     @Override
     public void setTopicUri(long topicId, String uri) {
-        setNodeUri(hg.getMehtaNode(topicId), uri);
+        setNodeUri(mg.getMehtaNode(topicId), uri);
     }
 
     @Override
     public TopicValue setTopicValue(long topicId, TopicValue value) {
-        Object oldValue = hg.getMehtaNode(topicId).setObject("value", value.value());
+        Object oldValue = mg.getMehtaNode(topicId).setObject("value", value.value());
         return oldValue != null ? new TopicValue(oldValue) : null;
     }
 
     @Override
     public void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, TopicValue value,
                                                                                     TopicValue oldValue) {
-        MehtaGraphIndexMode hgIndexMode = fromIndexMode(indexMode);
+        MehtaGraphIndexMode mgIndexMode = fromIndexMode(indexMode);
         Object oldVal = oldValue != null ? oldValue.value() : null;
-        hg.getMehtaNode(topicId).indexAttribute(hgIndexMode, indexKey, value.value(), oldVal);
+        mg.getMehtaNode(topicId).indexAttribute(mgIndexMode, indexKey, value.value(), oldVal);
     }
 
     @Override
@@ -146,7 +145,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         // 1) check uniqueness
         checkUniqueness(uri);
         // 2) create node
-        MehtaNode node = hg.createMehtaNode();
+        MehtaNode node = mg.createMehtaNode();
         topicModel.setId(node.getId());
         // 3) set URI
         setNodeUri(node, uri);
@@ -154,7 +153,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public void deleteTopic(long topicId) {
-        hg.getMehtaNode(topicId).delete();
+        mg.getMehtaNode(topicId).delete();
     }
 
 
@@ -163,12 +162,12 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public AssociationModel getAssociation(long assocId) {
-        return buildAssociation(hg.getMehtaEdge(assocId));
+        return buildAssociation(mg.getMehtaEdge(assocId));
     }
 
     @Override
     public Set<AssociationModel> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
-        Set<MehtaEdge> edges = hg.getMehtaEdges(topic1Id, topic2Id);
+        Set<MehtaEdge> edges = mg.getMehtaEdges(topic1Id, topic2Id);
         if (assocTypeUri != null) {
             filterEdgesByAssociationType(edges, assocTypeUri);
         }
@@ -178,15 +177,15 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public Set<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
+    public Set<RelatedTopicModel> getAssociationRelatedTopics(long assocId, List assocTypeUris, String myRoleTypeUri,
                                                               String othersRoleTypeUri, String othersTopicTypeUri) {
-        Set<ConnectedMehtaNode> nodes = hg.getMehtaEdge(assocId).getConnectedMehtaNodes(myRoleTypeUri,
+        Set<ConnectedMehtaNode> nodes = mg.getMehtaEdge(assocId).getConnectedMehtaNodes(myRoleTypeUri,
                                                                                         othersRoleTypeUri);
         if (othersTopicTypeUri != null) {
             filterNodesByTopicType(nodes, othersTopicTypeUri);
         }
-        if (assocTypeUri != null) {
-            filterNodesByAssociationType(nodes, assocTypeUri);
+        if (assocTypeUris != null) {
+            filterNodesByAssociationType(nodes, assocTypeUris);
         }
         return buildRelatedTopics(nodes);
     }
@@ -197,7 +196,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     public RelatedAssociationModel getAssociationRelatedAssociation(long assocId, String assocTypeUri,
                                                                     String myRoleTypeUri, String othersRoleTypeUri) {
         // FIXME: assocTypeUri not respected
-        ConnectedMehtaEdge edge = hg.getMehtaEdge(assocId).getConnectedMehtaEdge(myRoleTypeUri, othersRoleTypeUri);
+        ConnectedMehtaEdge edge = mg.getMehtaEdge(assocId).getConnectedMehtaEdge(myRoleTypeUri, othersRoleTypeUri);
         return edge != null ? buildRelatedAssociation(edge) : null;
     }
 
@@ -205,7 +204,28 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public void setRoleTypeUri(long assocId, long objectId, String roleTypeUri) {
-        hg.getMehtaEdge(assocId).getMehtaObject(objectId).setRoleType(roleTypeUri);
+        mg.getMehtaEdge(assocId).getMehtaObject(objectId).setRoleType(roleTypeUri);
+    }
+
+    // ---
+
+    @Override
+    public void setAssociationUri(long assocId, String uri) {
+        setEdgeUri(mg.getMehtaEdge(assocId), uri);
+    }
+
+    @Override
+    public TopicValue setAssociationValue(long assocId, TopicValue value) {
+        Object oldValue = mg.getMehtaEdge(assocId).setObject("value", value.value());
+        return oldValue != null ? new TopicValue(oldValue) : null;
+    }
+
+    @Override
+    public void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, TopicValue value,
+                                                                                          TopicValue oldValue) {
+        MehtaGraphIndexMode mgIndexMode = fromIndexMode(indexMode);
+        Object oldVal = oldValue != null ? oldValue.value() : null;
+        mg.getMehtaEdge(assocId).indexAttribute(mgIndexMode, indexKey, value.value(), oldVal);
     }
 
     // ---
@@ -218,7 +238,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
                 "(typeUri=null)");
         }
         //
-        MehtaEdge edge = hg.createMehtaEdge(
+        MehtaEdge edge = mg.createMehtaEdge(
             getMehtaObjectRole(assocModel.getRoleModel1()),
             getMehtaObjectRole(assocModel.getRoleModel2()));
         assocModel.setId(edge.getId());
@@ -226,7 +246,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public void deleteAssociation(long assocId) {
-        hg.getMehtaEdge(assocId).delete();
+        mg.getMehtaEdge(assocId).delete();
     }
 
 
@@ -235,14 +255,14 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public DeepaMehtaTransaction beginTx() {
-        return new MGTransactionAdapter(hg);
+        return new MGTransactionAdapter(mg);
     }
 
     @Override
     public boolean init() {
         // init core migration number
         boolean isCleanInstall = false;
-        if (!hg.getMehtaNode(0).hasAttribute("core_migration_nr")) {
+        if (!mg.getMehtaNode(0).hasAttribute("core_migration_nr")) {
             logger.info("Starting with a fresh DB -- Setting migration number to 0");
             setMigrationNr(0);
             setupMetaTypeNode();
@@ -253,17 +273,17 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public void shutdown() {
-        hg.shutdown();
+        mg.shutdown();
     }
 
     @Override
     public int getMigrationNr() {
-        return hg.getMehtaNode(0).getInteger("core_migration_nr");
+        return mg.getMehtaNode(0).getInteger("core_migration_nr");
     }
 
     @Override
     public void setMigrationNr(int migrationNr) {
-        hg.getMehtaNode(0).setInteger("core_migration_nr", migrationNr);
+        mg.getMehtaNode(0).setInteger("core_migration_nr", migrationNr);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -471,7 +491,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     }
 
     private MehtaNode lookupMehtaNode(String uri) {
-        return hg.getMehtaNode("uri", uri);
+        return mg.getMehtaNode("uri", uri);
     }
 
     // ---
@@ -480,6 +500,12 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         String oldUri = node.getString("uri", null);
         node.setString("uri", uri);
         node.indexAttribute(MehtaGraphIndexMode.KEY, "uri", uri, oldUri);
+    }
+
+    private void setEdgeUri(MehtaEdge edge, String uri) {
+        String oldUri = edge.getString("uri", null);
+        edge.setString("uri", uri);
+        edge.indexAttribute(MehtaGraphIndexMode.KEY, "uri", uri, oldUri);
     }
 
     // ---
@@ -582,12 +608,12 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         if (topicRoleModel.topicIdentifiedByUri()) {
             return lookupTopic(topicRoleModel.getTopicUri());
         } else {
-            return hg.getMehtaNode(topicRoleModel.getTopicId());
+            return mg.getMehtaNode(topicRoleModel.getTopicId());
         }
     }
 
     private MehtaEdge getRoleEdge(AssociationRoleModel assocRoleModel) {
-        return hg.getMehtaEdge(assocRoleModel.getAssociationId());
+        return mg.getMehtaEdge(assocRoleModel.getAssociationId());
     }
 
     // ---
@@ -599,7 +625,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     private void setupMetaTypeNode() {
-        MehtaNode refNode = hg.getMehtaNode(0);
+        MehtaNode refNode = mg.getMehtaNode(0);
         String uri = "dm3.core.meta_type";
         refNode.setString("uri", uri);
         refNode.setString("value", "Meta Type");

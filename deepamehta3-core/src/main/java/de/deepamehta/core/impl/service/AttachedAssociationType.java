@@ -2,9 +2,6 @@ package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.model.AssociationTypeModel;
-import de.deepamehta.core.model.RoleModel;
-import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.model.TopicValue;
 
 
 
@@ -27,26 +24,4 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    void fetch(String assocTypeUri) {
-        AttachedTopic typeTopic = dms.getTopic("uri", new TopicValue(assocTypeUri), false); // fetchComposite=false
-        // error check
-        if (typeTopic == null) {
-            throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found");
-        }
-        // build type model
-        AssociationTypeModel model = new AssociationTypeModel(typeTopic.getModel(),
-            fetchDataTypeTopic(typeTopic).getUri(), fetchViewConfig(typeTopic));
-        //
-        setModel(model);
-        initViewConfig();
-    }
-
-    void store() {
-        dms.storage.createTopic(getModel());
-        dms.associateWithTopicType(getModel());
-        setValue(getValue());
-        //
-        getViewConfig().store();
-    }
 }

@@ -72,16 +72,16 @@ public interface DeepaMehtaStorage {
     // ---
 
     /**
-     * Stores and indexes the topic URI.
+     * Stores and indexes the topic's URI.
      */
     void setTopicUri(long topicId, String uri);
 
     /**
-     * Sets the topic value.
+     * Stores the topic's value.
      * <p>
      * Note: the value is not indexed automatically. Use the {@link indexTopicValue} method.
      *
-     * @return  The previous topic value, or <code>null</code> if no value was set before.
+     * @return  The previous value, or <code>null</code> if no value was stored before.
      */
     TopicValue setTopicValue(long topicId, TopicValue value);
 
@@ -137,12 +137,12 @@ public interface DeepaMehtaStorage {
     // ---
 
     /**
-     * @param   assocTypeUri        may be null
+     * @param   assocTypeUris       may be null
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Set<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
+    Set<RelatedTopicModel> getAssociationRelatedTopics(long assocId, List assocTypeUris, String myRoleTypeUri,
                                                        String othersRoleTypeUri, String othersTopicTypeUri);
 
     // ---
@@ -153,6 +153,28 @@ public interface DeepaMehtaStorage {
     // ---
 
     void setRoleTypeUri(long assocId, long objectId, String roleTypeUri);
+
+    // ---
+
+    /**
+     * Stores and indexes the association's URI.
+     */
+    void setAssociationUri(long assocId, String uri);
+
+    /**
+     * Stores the association's value.
+     * <p>
+     * Note: the value is not indexed automatically. Use the {@link indexAssociationValue} method.
+     *
+     * @return  The previous value, or <code>null</code> if no value was stored before.
+     */
+    TopicValue setAssociationValue(long assocId, TopicValue value);
+
+    /**
+     * @param   oldValue    may be null
+     */
+    void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, TopicValue value,
+                                                                                   TopicValue oldValue);
 
     // ---
 

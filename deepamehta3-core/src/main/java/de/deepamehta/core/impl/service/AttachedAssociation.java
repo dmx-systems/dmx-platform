@@ -7,14 +7,18 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Role;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicRole;
+import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
+import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.model.TopicValue;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import java.util.logging.Logger;
@@ -64,6 +68,28 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         storeTypeUri();
     }
 
+    // === Implementation of the abstract methods ===
+
+    @Override
+    protected void storeUri(String uri) {
+        dms.storage.setAssociationUri(getId(), uri);
+    }
+
+    @Override
+    protected TopicValue storeValue(TopicValue value) {
+        return dms.storage.setAssociationValue(getId(), value);
+    }
+
+    @Override
+    protected void indexValue(IndexMode indexMode, String indexKey, TopicValue value, TopicValue oldValue) {
+        dms.storage.indexAssociationValue(getId(), indexMode, indexKey, value, oldValue);
+    }
+
+    @Override
+    protected Type getType() {
+        return dms.getAssociationType(getTypeUri(), null);    // FIXME: clientContext=null
+    }
+
 
 
     // **********************************
@@ -109,6 +135,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         return (AssociationModel) super.getModel();
     }
 
+
+
     // === Traversal ===
 
     @Override
@@ -136,34 +164,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // ---
 
     @Override
-    public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                           String othersTopicTypeUri,
-                                                                                           boolean fetchComposite) {
-        Set<RelatedTopic> topics = getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-                                                                                                    fetchComposite);
-        switch (topics.size()) {
-        case 0:
-            return null;
-        case 1:
-            return (AttachedRelatedTopic) topics.iterator().next();
-        default:
-            throw new RuntimeException("Ambiguity: there are " + topics.size() + " related topics " + "(assocId=" +
-                getId() + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
-                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
-        }
-    }
-
-    @Override
-    public Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                         String othersTopicTypeUri,
-                                                                                         boolean fetchComposite) {
-        return dms.attach(dms.storage.getAssociationRelatedTopics(getId(), assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri), fetchComposite);
-    }
-
-    // ---
-
-    @Override
     public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
                                                     String othersRoleTypeUri) {
         RelatedAssociationModel relAssoc = dms.storage.getAssociationRelatedAssociation(getId(),
@@ -178,6 +178,21 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // ***************************************
 
 
+
+    // === Traversal ===
+
+    // --- Topic Retrieval ---
+
+    @Override
+    public Set<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+                                              String othersTopicTypeUri, boolean fetchComposite) {
+        return dms.attach(dms.storage.getAssociationRelatedTopics(getId(), assocTypeUris, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri), fetchComposite);
+    }
+
+
+
+    // === Deletion ===
 
     @Override
     public void delete() {
@@ -236,7 +251,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
      * Convenience method.
      */
     AssociationType getAssociationType() {
-        return dms.getAssociationType(getTypeUri(), null);    // FIXME: clientContext=null
+        return (AssociationType) getType();
     }
 
 

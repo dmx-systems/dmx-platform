@@ -598,6 +598,7 @@ public class EmbeddedService implements DeepaMehtaService {
         try {
             AttachedAssociationType assocType = new AttachedAssociationType(assocTypeModel, this);
             assocType.store();
+            typeCache.put(assocType);
             //
             tx.success();
             return assocType;
@@ -984,11 +985,12 @@ public class EmbeddedService implements DeepaMehtaService {
         storage.shutdown();
     }
 
-    // ---
+
+
+    // === Bootstrap ===
 
     private void setupBootstrapContent() {
         // Before topic types and asscociation types can be created the meta types must be created
-        // Note: storage low-level call used here ### explain
         TopicModel tt = new TopicModel("dm3.core.topic_type", new TopicValue("Topic Type"), "dm3.core.meta_type");
         TopicModel at = new TopicModel("dm3.core.assoc_type", new TopicValue("Association Type"), "dm3.core.meta_type");
         _createTopic(tt);
@@ -1009,18 +1011,22 @@ public class EmbeddedService implements DeepaMehtaService {
         TopicModel instance = new TopicModel("dm3.core.instance", new TopicValue("Instance"), "dm3.core.role_type");
         _createTopic(type);
         _createTopic(instance);
-        // Before data type topics can be associated we must create the association type "Association"
+        // Create association type "Association" -- needed to associate topic/association types with data types
         TopicModel association = new AssociationTypeModel("dm3.core.association", "Association", "dm3.core.text");
         _createTopic(association);
-        //
+        // Create association type "Instantiation" -- needed to associate topics with topic types
         TopicModel instantiation = new AssociationTypeModel("dm3.core.instantiation", "Instantiation", "dm3.core.text");
         _createTopic(instantiation);
+        //
         // Postponed data type association
         associateDataType("dm3.core.meta_type",  "dm3.core.text");
         associateDataType("dm3.core.topic_type", "dm3.core.text");
         associateDataType("dm3.core.assoc_type", "dm3.core.text");
         associateDataType("dm3.core.data_type",  "dm3.core.text");
         associateDataType("dm3.core.role_type",  "dm3.core.text");
+        //
+        associateDataType("dm3.core.association",   "dm3.core.text");
+        associateDataType("dm3.core.instantiation", "dm3.core.text");
         // Postponed topic type association
         associateWithTopicType(tt);
         associateWithTopicType(at);
@@ -1034,11 +1040,10 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     private void _createTopic(TopicModel model) {
+        // Note: storage low-level call used here ### explain
         storage.createTopic(model);
         storage.setTopicValue(model.getId(), model.getValue());
     }
-
-    // ---
 
     private void bootstrapTypeCache() {
         typeCache.put(new AttachedTopicType(new TopicTypeModel("dm3.core.meta_meta_type", "Meta Meta Type",

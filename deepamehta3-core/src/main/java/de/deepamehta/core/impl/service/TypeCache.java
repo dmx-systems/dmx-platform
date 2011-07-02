@@ -1,6 +1,9 @@
 package de.deepamehta.core.impl.service;
 
-import de.deepamehta.core.TopicType;
+import de.deepamehta.core.model.AssociationTypeModel;
+import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.model.TopicValue;
+
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +29,7 @@ class TypeCache {
 
     private EmbeddedService dms;
 
-    private int callCount = 0;  // endless recursion protection
+    // private int callCount = 0;  // endless recursion protection ### FIXME: not in use
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -40,13 +43,7 @@ class TypeCache {
     AttachedTopicType getTopicType(String topicTypeUri) {
         AttachedTopicType topicType = topicTypes.get(topicTypeUri);
         if (topicType == null) {
-            // error check
-            endlessRecursionProtection(topicTypeUri);
-            // fetch topic type
-            logger.info("Loading topic type \"" + topicTypeUri + "\"");
-            topicType = new AttachedTopicType(dms);
-            topicType.fetch(topicTypeUri);
-            //
+            topicType = loadTopicType(topicTypeUri);
             put(topicType);
         }
         return topicType;
@@ -55,11 +52,7 @@ class TypeCache {
     AttachedAssociationType getAssociationType(String assocTypeUri) {
         AttachedAssociationType assocType = assocTypes.get(assocTypeUri);
         if (assocType == null) {
-            // fetch association type
-            logger.info("Loading association type \"" + assocTypeUri + "\"");
-            assocType = new AttachedAssociationType(dms);
-            assocType.fetch(assocTypeUri);
-            //
+            assocType = loadAssociationType(assocTypeUri);
             put(assocType);
         }
         return assocType;
@@ -86,6 +79,35 @@ class TypeCache {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private AttachedTopicType loadTopicType(String topicTypeUri) {
+        logger.info("Loading topic type \"" + topicTypeUri + "\"");
+        AttachedTopic typeTopic = dms.getTopic("uri", new TopicValue(topicTypeUri), false);     // fetchComposite=false
+        // error check
+        if (typeTopic == null) {
+            throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
+        }
+        //
+        AttachedTopicType topicType = new AttachedTopicType(dms);
+        topicType.fetch(new TopicTypeModel(typeTopic.getModel()));
+        return topicType;
+    }
+
+    private AttachedAssociationType loadAssociationType(String assocTypeUri) {
+        logger.info("Loading association type \"" + assocTypeUri + "\"");
+        AttachedTopic typeTopic = dms.getTopic("uri", new TopicValue(assocTypeUri), false);     // fetchComposite=false
+        // error check
+        if (typeTopic == null) {
+            throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found");
+        }
+        //
+        AttachedAssociationType assocType = new AttachedAssociationType(dms);
+        assocType.fetch(new AssociationTypeModel(typeTopic.getModel()));
+        return assocType;
+    }
+
+    // ---
+
+    /* FIXME: not in use
     private void endlessRecursionProtection(String topicTypeUri) {
         if (topicTypeUri.equals("dm3.webclient.view_config")) {
             callCount++;
@@ -93,5 +115,5 @@ class TypeCache {
                 throw new RuntimeException("Endless Recursion!");
             }
         }
-    }
+    } */
 }

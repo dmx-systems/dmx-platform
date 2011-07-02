@@ -42,6 +42,10 @@ public class TopicModel extends DeepaMehtaObjectModel {
         super(model);
     }
 
+    public TopicModel(JSONObject typeModel, String typeUri) {
+        super(typeModel, typeUri);
+    }
+
     // ---
 
     // Called from the TypeModel's JSON constructor

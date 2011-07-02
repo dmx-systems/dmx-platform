@@ -33,34 +33,41 @@
         # See EmbeddedService.setupBootstrapContent()
 
         /*{
-            value: "Association",
-            uri:   "dm3.core.association"
+            value:         "Association",
+            uri:           "dm3.core.association",
+            data_type_uri: "dm3.core.text"
         },*/
         {
-            value: "Aggregation",
-            uri:   "dm3.core.aggregation"
+            value:         "Aggregation",
+            uri:           "dm3.core.aggregation",
+            data_type_uri: "dm3.core.text"
         },
         {
-            value: "Composition",
-            uri:   "dm3.core.composition"
+            value:         "Composition",
+            uri:           "dm3.core.composition",
+            data_type_uri: "dm3.core.text"
         },
 
         {
-            value: "Aggregation Definition",
-            uri:   "dm3.core.aggregation_def"
+            value:         "Aggregation Definition",
+            uri:           "dm3.core.aggregation_def",
+            data_type_uri: "dm3.core.text"
         },
         {
-            value: "Composition Definition",
-            uri:   "dm3.core.composition_def"
+            value:         "Composition Definition",
+            uri:           "dm3.core.composition_def",
+            data_type_uri: "dm3.core.text"
         },
 
         /*{
-            value: "Instantiation",
-            uri:   "dm3.core.instantiation"
+            value:         "Instantiation",
+            uri:           "dm3.core.instantiation",
+            data_type_uri: "dm3.core.text"
         },*/
         {
-            value: "Sequence",
-            uri:   "dm3.core.sequence"
+            value:         "Sequence",
+            uri:           "dm3.core.sequence",
+            data_type_uri: "dm3.core.text"
         }
     ],
 
