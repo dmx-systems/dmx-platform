@@ -201,9 +201,9 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     private Cardinality fetchCardinality(Association assoc) {
         Topic wholeCardinality = assoc.getRelatedTopic("dm3.core.aggregation", "dm3.core.assoc_def",
-            "dm3.core.whole_cardinality", "dm3.core.cardinality", false);    // fetchComposite=false
+            "dm3.core.whole_cardinality", "dm3.core.cardinality", false, false);    // fetchComposite=false
         Topic partCardinality = assoc.getRelatedTopic("dm3.core.aggregation", "dm3.core.assoc_def",
-            "dm3.core.part_cardinality", "dm3.core.cardinality", false);    // fetchComposite=false
+            "dm3.core.part_cardinality", "dm3.core.cardinality", false, false);     // fetchComposite=false
         Cardinality cardinality = new Cardinality();
         if (wholeCardinality != null) {
             cardinality.setWholeCardinalityUri(wholeCardinality.getUri());
@@ -219,7 +219,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     private ViewConfigurationModel fetchViewConfig(Association assoc) {
         // ### should we use "dm3.core.association" instead of "dm3.core.aggregation"?
         Set<RelatedTopic> topics = assoc.getRelatedTopics("dm3.core.aggregation", "dm3.core.assoc_def",
-            "dm3.core.view_config", null, true);    // fetchComposite=true
+            "dm3.core.view_config", null, true, false);    // fetchComposite=true, fetchRelatingComposite=false
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
         return new ViewConfigurationModel(dms.getTopicModels(topics));
     }

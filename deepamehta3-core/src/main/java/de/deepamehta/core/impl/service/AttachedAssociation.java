@@ -185,9 +185,10 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     public Set<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                                              String othersTopicTypeUri, boolean fetchComposite) {
-        return dms.attach(dms.storage.getAssociationRelatedTopics(getId(), assocTypeUris, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri), fetchComposite);
+                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite) {
+        Set<RelatedTopicModel> topics = dms.storage.getAssociationRelatedTopics(getId(), assocTypeUris, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
+        return dms.attach(topics, fetchComposite, fetchRelatingComposite);
     }
 
 
@@ -258,14 +259,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private RelatedTopic fetchTypeTopic() {
-        // assocTypeUri=null (supposed to be "dm3.core.instantiation" but not possible ### explain)
-        return getRelatedTopic(null, "dm3.core.instance", "dm3.core.type", "dm3.core.assoc_type",
-            false);     // fetchComposite=false
-    }
-
-    // ---
-
     private void filterTopic(Role role, String roleTypeUri, Set<Topic> topics) {
         if (role instanceof TopicRole && role.getRoleTypeUri().equals(roleTypeUri)) {
             topics.add(fetchRoleTopic((TopicRole) role));
@@ -287,6 +280,12 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         // create new assignment
         dms.associateWithAssociationType(getModel());
     }    
+
+    private RelatedTopic fetchTypeTopic() {
+        // assocTypeUri=null (supposed to be "dm3.core.instantiation" but not possible ### explain)
+        return getRelatedTopic(null, "dm3.core.instance", "dm3.core.type", "dm3.core.assoc_type",
+            false, false);     // fetchComposite=false
+    }
 
 
 

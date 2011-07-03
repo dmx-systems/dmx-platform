@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.topicmaps.model;
 
+import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.TopicModel;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -20,12 +21,12 @@ public class TopicmapTopic extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Map visualizationProperties;
+    private Composite visualizationProperties;
     private long refId;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicmapTopic(TopicModel topic, Map visualizationProperties, long refId) {
+    TopicmapTopic(TopicModel topic, Composite visualizationProperties, long refId) {
         super(topic);
         this.visualizationProperties = visualizationProperties;
         this.refId = refId;
@@ -37,11 +38,11 @@ public class TopicmapTopic extends TopicModel {
     public JSONObject toJSON() {
         try {
             JSONObject o = super.toJSON();
-            o.put("visualization", visualizationProperties);
+            o.put("visualization", visualizationProperties.toJSON());
             o.put("ref_id", refId);
             return o;
         } catch (JSONException e) {
-            throw new RuntimeException("Error while serializing " + this, e);
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
 

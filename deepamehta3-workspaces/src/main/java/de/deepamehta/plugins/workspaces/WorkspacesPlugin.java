@@ -162,7 +162,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     public Set<RelatedTopic> getWorkspaces(long typeId) {
         Topic typeTopic = dms.getTopic(typeId, false, null);    // fetchComposite=false, clientContext=null
         return typeTopic.getRelatedTopics(WORKSPACE_TYPE, ROLE_TYPE_TYPE, ROLE_TYPE_WORKSPACE,
-            "dm3.workspaces.workspace", false);                 // fetchComposite=false
+            "dm3.workspaces.workspace", false, false);          // fetchComposite=false
     }
 
 

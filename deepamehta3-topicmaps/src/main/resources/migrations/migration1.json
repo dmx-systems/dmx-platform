@@ -37,7 +37,7 @@
                 }
             ]
         }
-    ]
+    ],
 
     assoc_types: [
         {
@@ -50,7 +50,7 @@
             uri:           "dm3.topicmaps.association_mapcontext",
             data_type_uri: "dm3.core.text"
         }
-    ]
+    ],
 
     topics: [
         ### Role Types ###

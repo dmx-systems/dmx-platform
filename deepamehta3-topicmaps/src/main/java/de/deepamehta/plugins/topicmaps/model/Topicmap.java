@@ -155,21 +155,21 @@ public class Topicmap {
     private void loadTopics(long topicmapId) {
         Topic topicmapTopic = dms.getTopic(topicmapId, false, null);
         Set<RelatedTopic> mapTopics = topicmapTopic.getRelatedTopics("dm3.topicmaps.topic_mapcontext",
-            "dm3.topicmaps.topicmap", "dm3.topicmaps.topicmap_topic", null, false);     // othersTopicTypeUri=null
-                                                                                        // fetchComposite=false
+            "dm3.topicmaps.topicmap", "dm3.topicmaps.topicmap_topic", null, false, true);   // othersTopicTypeUri=null
+                                                                                            // fetchComposite=false
         for (RelatedTopic mapTopic : mapTopics) {
-            Association refAssociation = mapTopic.getAssociation();
-            addTopic(new TopicmapTopic(mapTopic, refAssociation.getProperties().toMap(), refAssociation.getId()));
+            Association refAssoc = mapTopic.getAssociation();
+            addTopic(new TopicmapTopic(mapTopic.getModel(), refAssoc.getComposite(), refAssoc.getId()));
         }
     }
 
     private void loadAssociations(long topicmapId) {
         Topic topicmapTopic = dms.getTopic(topicmapId, false, null);
         Set<RelatedAssociation> mapAssocs = topicmapTopic.getRelatedAssociations("dm3.topicmaps.association_mapcontext",
-            "dm3.topicmaps.topicmap", "dm3.topicmaps.topicmap_association", null);      // othersAssocTypeUri=null
+            "dm3.topicmaps.topicmap", "dm3.topicmaps.topicmap_association", null, false, false);
         for (RelatedAssociation mapAssoc : mapAssocs) {
-            long refId = mapAssoc.getRelatingAssociation().getId();
-            addAssociation(new TopicmapAssociation(mapAssoc.getModel(), refId));
+            Association refAssoc = mapAssoc.getRelatingAssociation();
+            addAssociation(new TopicmapAssociation(mapAssoc.getModel(), refAssoc.getId()));
         }
     }
 

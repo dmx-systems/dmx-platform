@@ -107,10 +107,20 @@ public class Composite {
         return values;
     }
 
+
+
+    // ****************
+    // *** Java API ***
+    // ****************
+
+
+
     @Override
     public String toString() {
         return values.toString();
     }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

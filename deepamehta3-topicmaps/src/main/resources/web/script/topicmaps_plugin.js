@@ -1,6 +1,6 @@
 function topicmaps_plugin() {
 
-    dm3c.css_stylesheet("/de.deepamehta.3-topicmaps/style/dm3-topicmaps.css")
+    dm3c.register_css_stylesheet("/de.deepamehta.3-topicmaps/style/topicmaps.css")
 
     var LOG_TOPICMAPS = false
 
@@ -142,7 +142,7 @@ function topicmaps_plugin() {
             topicmaps[id].delete_topic(topic.id)
         }
         // 2) Update the topicmap menu if the deleted topic was a topicmap
-        if (topic.type_uri == "de/deepamehta/core/topictype/Topicmap") {
+        if (topic.type_uri == "dm3.topicmaps.topicmap") {
             // remove topicmap model
             delete topicmaps[topic.id]
             //
@@ -228,7 +228,7 @@ function topicmaps_plugin() {
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function get_all_topicmaps() {
-        return dm3c.restc.get_topics("de/deepamehta/core/topictype/Topicmap")
+        return dm3c.restc.get_topics("dm3.topicmaps.topicmap", true)    // sort=true
     }
 
     /**
@@ -286,8 +286,7 @@ function topicmaps_plugin() {
      */
     function create_topicmap_topic(name) {
         if (LOG_TOPICMAPS) dm3c.log("Creating topicmap \"" + name + "\"")
-        var properties = {"de/deepamehta/core/property/Title": name}
-        var topicmap = dm3c.create_topic("de/deepamehta/core/topictype/Topicmap", properties)
+        var topicmap = dm3c.create_topic("dm3.topicmaps.topicmap", {"dm3.topicmaps.name": name})
         if (LOG_TOPICMAPS) dm3c.log("..... " + topicmap.id)
         return topicmap
     }
@@ -332,13 +331,13 @@ function topicmaps_plugin() {
         }
         //
         dm3c.ui.empty_menu("topicmap-menu")
-        var icon_src = dm3c.get_icon_src("de/deepamehta/core/topictype/Topicmap")
+        var icon_src = dm3c.get_icon_src("dm3.topicmaps.topicmap")
         // add topicmaps to menu
         for (var i = 0, topicmap; topicmap = topicmaps[i]; i++) {
             dm3c.ui.add_menu_item("topicmap-menu", {label: topicmap.label, value: topicmap.id, icon: icon_src})
         }
         // add "New..." to menu
-        if (dm3c.has_create_permission("de/deepamehta/core/topictype/Topicmap")) {
+        if (dm3c.has_create_permission("dm3.topicmaps.topicmap")) {
             dm3c.ui.add_menu_separator("topicmap-menu")
             dm3c.ui.add_menu_item("topicmap-menu", {label: "New Topicmap...", value: "_new", is_trigger: true})
         }
@@ -493,7 +492,7 @@ function topicmaps_plugin() {
             if (LOG_TOPICMAPS) dm3c.log("..... " + topicmap.topics.length + " topics")
             load_topics()
 
-            if (LOG_TOPICMAPS) dm3c.log("..... " + topicmap.relations.length + " relations")
+            if (LOG_TOPICMAPS) dm3c.log("..... " + topicmap.assocs.length + " relations")
             load_relations()
 
             function load_topics() {
@@ -508,7 +507,7 @@ function topicmaps_plugin() {
             }
 
             function load_relations() {
-                for (var i = 0, relation; relation = topicmap.relations[i]; i++) {
+                for (var i = 0, relation; relation = topicmap.assocs[i]; i++) {
                     if (LOG_TOPICMAPS)
                         dm3c.log(".......... ID " + relation.id + ": src_topic_id=" + relation.src_topic_id +
                         ", dst_topic_id=" + relation.dst_topic_id + ", ref_id=" + relation.ref_id)

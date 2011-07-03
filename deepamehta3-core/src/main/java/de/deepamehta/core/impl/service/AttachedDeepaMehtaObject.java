@@ -171,14 +171,14 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public Set<RelatedTopic> getRelatedTopics(String assocTypeUri) {
-        return getRelatedTopics(assocTypeUri, null, null, null, false);   // fetchComposite=false
+        return getRelatedTopics(assocTypeUri, null, null, null, false, false);   // fetchComposite=false
     }
 
     @Override
     public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                String othersTopicTypeUri, boolean fetchComposite) {
+                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite) {
         Set<RelatedTopic> topics = getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-                                                                                                    fetchComposite);
+            fetchComposite, fetchRelatingComposite);
         switch (topics.size()) {
         case 0:
             return null;
@@ -193,9 +193,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                              String othersTopicTypeUri, boolean fetchComposite) {
+                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite) {
         List assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
-        return getRelatedTopics(assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, fetchComposite);
+        return getRelatedTopics(assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+            fetchComposite, fetchRelatingComposite);
     }
 
 
@@ -441,7 +442,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         String othersRoleTypeUri  = assocDef.getPartRoleTypeUri();
         String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
         //
-        return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, true);
+        return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, true, false);
         // fetchComposite=true ### false sufficient?
     }
 

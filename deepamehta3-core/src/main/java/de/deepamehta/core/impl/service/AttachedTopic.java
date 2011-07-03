@@ -7,6 +7,8 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedAssociationModel;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicValue;
 
@@ -115,8 +117,9 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     public Set<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
                                                           String othersRoleTypeUri, String othersAssocTypeUri,
                                                           boolean fetchComposite, boolean fetchRelatingComposite) {
-        return dms.attach(dms.storage.getTopicRelatedAssociations(getId(), assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersAssocTypeUri), fetchComposite, fetchRelatingComposite);
+        Set<RelatedAssociationModel> assocs = dms.storage.getTopicRelatedAssociations(getId(), assocTypeUri,
+            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+        return dms.attach(assocs, fetchComposite, fetchRelatingComposite);
     }
 
 
@@ -133,9 +136,10 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     public Set<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                                              String othersTopicTypeUri, boolean fetchComposite) {
-        return dms.attach(dms.storage.getTopicRelatedTopics(getId(), assocTypeUris, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri), fetchComposite);
+                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite) {
+        Set<RelatedTopicModel> topics = dms.storage.getTopicRelatedTopics(getId(), assocTypeUris, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
+        return dms.attach(topics, fetchComposite, fetchRelatingComposite);
     }
 
 
@@ -149,8 +153,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     @Override
     public void delete() {
         // 1) step down recursively
-        Set<RelatedTopic> partTopics = getRelatedTopics("dm3.core.composition", "dm3.core.whole", "dm3.core.part",
-            null, false);
+        Set<RelatedTopic> partTopics = getRelatedTopics("dm3.core.composition",
+            "dm3.core.whole", "dm3.core.part", null, false, false);
         for (Topic partTopic : partTopics) {
             partTopic.delete();
         }

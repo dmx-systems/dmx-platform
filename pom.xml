@@ -20,7 +20,7 @@
         <module>deepamehta3-contacts</module>
         <module>deepamehta3-workspaces</module>
         <module>deepamehta3-typeeditor</module>
-        <!--module>deepamehta3-topicmaps</module-->
+        <module>deepamehta3-topicmaps</module>
 
         <!-- <module>deepamehta3-coretypes</module>
         <module>deepamehta3-typesearch</module>

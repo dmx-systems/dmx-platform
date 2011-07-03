@@ -209,7 +209,8 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             Set<RelatedTopic> topics = getTopicType(typeUri, null).getRelatedTopics("dm3.core.instantiation",
-                "dm3.core.type", "dm3.core.instance", null, false);   // othersTopicTypeUri=null, fetchComposite=false
+                "dm3.core.type", "dm3.core.instance", null, false, false);  // othersTopicTypeUri=null
+                                                                            // fetchComposite=false
             /*
             for (Topic topic : topics) {
                 triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, topic);
@@ -460,7 +461,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public Set<String> getTopicTypeUris() {
         Topic metaType = attach(storage.getTopic("uri", new TopicValue("dm3.core.topic_type")), false);
         Set<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm3.core.instantiation", "dm3.core.type",
-                                                                 "dm3.core.instance", "dm3.core.topic_type", false);
+            "dm3.core.instance", "dm3.core.topic_type", false, false);
         Set<String> topicTypeUris = new HashSet();
         // add meta types
         topicTypeUris.add("dm3.core.topic_type");
@@ -561,7 +562,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public Set<String> getAssociationTypeUris() {
         Topic metaType = attach(storage.getTopic("uri", new TopicValue("dm3.core.assoc_type")), false);
         Set<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm3.core.instantiation", "dm3.core.type",
-                                                                 "dm3.core.instance", "dm3.core.assoc_type", false);
+            "dm3.core.instance", "dm3.core.assoc_type", false, false);
         Set<String> assocTypeUris = new HashSet();
         for (Topic assocType : assocTypes) {
             assocTypeUris.add(assocType.getUri());
@@ -815,21 +816,21 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ---
 
-    AttachedRelatedTopic attach(RelatedTopicModel model, boolean fetchComposite) {
+    AttachedRelatedTopic attach(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite) {
         AttachedRelatedTopic relTopic = new AttachedRelatedTopic(model, this);
-        fetchComposite(fetchComposite, relTopic);
+        fetchComposite(fetchComposite, fetchRelatingComposite, relTopic);
         return relTopic;
     }
 
-    Set<RelatedTopic> attach(Iterable<RelatedTopicModel> models, boolean fetchComposite) {
+    Set<RelatedTopic> attach(Set<RelatedTopicModel> models, boolean fetchComposite, boolean fetchRelatingComposite) {
         Set<RelatedTopic> relTopics = new LinkedHashSet();
         for (RelatedTopicModel model : models) {
-            relTopics.add(attach(model, fetchComposite));
+            relTopics.add(attach(model, fetchComposite, fetchRelatingComposite));
         }
         return relTopics;
     }
 
-    // ---
+    // ===
 
     /**
      * Attaches this core service to an association retrieved from storage layer.
@@ -862,7 +863,7 @@ public class EmbeddedService implements DeepaMehtaService {
         return relAssocs;
     }
 
-    // ---
+    // ===
 
     private void fetchComposite(boolean fetchComposite, AttachedTopic topic) {
         if (fetchComposite) {
@@ -871,6 +872,22 @@ public class EmbeddedService implements DeepaMehtaService {
             }
         }
     }
+
+    private void fetchComposite(boolean fetchComposite, boolean fetchRelatingComposite, AttachedRelatedTopic relTopic) {
+        if (fetchComposite) {
+            if (relTopic.getTopicType().getDataTypeUri().equals("dm3.core.composite")) {
+                relTopic.loadComposite();
+            }
+        }
+        if (fetchRelatingComposite) {
+            AttachedAssociation assoc = (AttachedAssociation) relTopic.getAssociation();
+            if (assoc.getAssociationType().getDataTypeUri().equals("dm3.core.composite")) {
+                assoc.loadComposite();
+            }
+        }
+    }
+
+    // ---
 
     private void fetchComposite(boolean fetchComposite, AttachedAssociation assoc) {
         if (fetchComposite) {

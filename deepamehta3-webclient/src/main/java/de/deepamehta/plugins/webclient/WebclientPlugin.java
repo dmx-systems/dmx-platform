@@ -134,7 +134,7 @@ public class WebclientPlugin extends Plugin {
                 searchableUnits.add(topic);
             } else {
                 Set<Topic> parentTopics = toTopicSet(topic.getRelatedTopics((List) null,
-                    "dm3.core.part", "dm3.core.whole", null, false));
+                    "dm3.core.part", "dm3.core.whole", null, false, false));
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
                 } else {

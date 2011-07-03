@@ -210,7 +210,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         try {
             // ### FIXME: revise role "dm3.core.topic_type" and "topic type" wording in exception messages
             RelatedTopic dataType = getRelatedTopic("dm3.core.association", "dm3.core.topic_type",
-                "dm3.core.data_type", "dm3.core.data_type", false);     // fetchComposite=false
+                "dm3.core.data_type", "dm3.core.data_type", false, false);     // fetchComposite=false
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to topic type \"" + getUri() +
                     "\"");
@@ -224,7 +224,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private Set<IndexMode> fetchIndexModes() {
         Set<RelatedTopic> topics = getRelatedTopics("dm3.core.association", getTypeUri(),
-            "dm3.core.index_mode", "dm3.core.index_mode", false);       // fetchComposite=false
+            "dm3.core.index_mode", "dm3.core.index_mode", false, false);       // fetchComposite=false
         return IndexMode.fromTopics(topics);
     }
 
@@ -234,7 +234,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // fetch part topic types ### TODO: revise "whole_topic_type" role
         List assocTypeFilter = Arrays.asList("dm3.core.aggregation_def", "dm3.core.composition_def");
         Set<RelatedTopic> partTopicTypes = getRelatedTopics(assocTypeFilter, "dm3.core.whole_topic_type",
-            "dm3.core.part_topic_type", "dm3.core.topic_type", false);
+            "dm3.core.part_topic_type", "dm3.core.topic_type", false, false);
         //
         for (RelatedTopic partTopicType : partTopicTypes) {
             AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(dms);
@@ -267,7 +267,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private ViewConfigurationModel fetchViewConfig() {
         Set<RelatedTopic> topics = getRelatedTopics("dm3.core.association", getTypeUri(), "dm3.core.view_config",
-            null, true);    // fetchComposite=true
+            null, true, false);    // fetchComposite=true, fetchRelatingComposite=false
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
         return new ViewConfigurationModel(dms.getTopicModels(topics));
     }

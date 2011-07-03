@@ -65,7 +65,7 @@ public interface DeepaMehtaObject extends JSONEnabled {
      * @param   othersTopicTypeUri  may be null
      */
     RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                 String othersTopicTypeUri, boolean fetchComposite);
+                                 String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
 
     /**
      * @param   assocTypeUri        may be null
@@ -74,7 +74,7 @@ public interface DeepaMehtaObject extends JSONEnabled {
      * @param   othersTopicTypeUri  may be null
      */
     Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                       String othersTopicTypeUri, boolean fetchComposite);
+                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
 
     /**
      * @param   assocTypeUris       may be null
@@ -83,7 +83,7 @@ public interface DeepaMehtaObject extends JSONEnabled {
      * @param   othersTopicTypeUri  may be null
      */
     Set<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                                       String othersTopicTypeUri, boolean fetchComposite);
+                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
 
 
 
