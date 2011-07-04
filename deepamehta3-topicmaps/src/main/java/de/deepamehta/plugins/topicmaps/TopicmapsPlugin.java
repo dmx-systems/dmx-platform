@@ -113,22 +113,22 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
     }
 
     /* @PUT
-    @Path("/{id}/relation/{relationId}")
+    @Path("/{id}/association/{assoc_id}")
     @Override
-    public long addRelationToTopicmap(@PathParam("id") long topicmapId, @PathParam("relationId") long relationId) {
+    public long addRelationToTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
         // FIME: do this in a transaction.
         Properties properties = new Properties();
-        properties.put("de/deepamehta/core/property/RelationID", relationId);
+        properties.put("de/deepamehta/core/property/RelationID", assocId);
         Topic refTopic = dms.createTopic("de/deepamehta/core/topictype/TopicmapRelationRef", properties, null);
         dms.createRelation("RELATION", topicmapId, refTopic.id, null);
         return refTopic.id;
     } */
 
     @DELETE
-    @Path("/{id}/relation/{relationId}/{refId}")
+    @Path("/{id}/association/{assoc_id}/{refId}")
     @Override
     public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId,
-                                              @PathParam("relationId") long relationId,
+                                              @PathParam("assoc_id") long assocId,
                                               @PathParam("refId") long refId) {
         removeAssociationFromTopicmap(refId);
     }

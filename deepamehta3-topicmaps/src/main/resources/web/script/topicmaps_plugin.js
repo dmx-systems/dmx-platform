@@ -34,11 +34,11 @@ function topicmaps_plugin() {
             dm3c.restc.add_topic_to_topicmap = function(topicmap_id, topic_id, x, y) {
                 return this.request("PUT", "/topicmap/" + topicmap_id + "/topic/" + topic_id + "/" + x + "/" + y)
             }
-            dm3c.restc.add_relation_to_topicmap = function(topicmap_id, relation_id) {
-                return this.request("PUT", "/topicmap/" + topicmap_id + "/relation/" + relation_id)
+            dm3c.restc.add_association_to_topicmap = function(topicmap_id, assoc_id) {
+                return this.request("PUT", "/topicmap/" + topicmap_id + "/association/" + assoc_id)
             }
-            dm3c.restc.remove_relation_from_topicmap = function(topicmap_id, relation_id, ref_id) {
-                return this.request("DELETE", "/topicmap/" + topicmap_id + "/relation/" + relation_id + "/" + ref_id)
+            dm3c.restc.remove_association_from_topicmap = function(topicmap_id, assoc_id, ref_id) {
+                return this.request("DELETE", "/topicmap/" + topicmap_id + "/association/" + assoc_id + "/" + ref_id)
             }
         }
 
@@ -87,7 +87,7 @@ function topicmaps_plugin() {
      * @param   topic   a CanvasTopic object
      */
     this.post_add_topic_to_canvas = function(topic) {
-        var pos = topicmap.show_topic(topic.id, topic.type, topic.label, topic.x, topic.y)
+        var pos = topicmap.show_topic(topic.id, topic.type_uri, topic.label, topic.x, topic.y)
         // restore topic position if topic was already contained in this topicmap but hidden
         if (pos) {
             topic.move_to(pos.x, pos.y)
@@ -95,10 +95,10 @@ function topicmaps_plugin() {
     }
 
     /**
-     * @param   relation   a CanvasAssoc object
+     * @param   assoc   a CanvasAssoc object
      */
-    this.post_add_relation_to_canvas = function(relation) {
-        topicmap.add_relation(relation.id, relation.doc1_id, relation.doc2_id)
+    this.post_add_association_to_canvas = function(assoc) {
+        topicmap.add_association(assoc.id, assoc.doc1_id, assoc.doc2_id)
     }
 
     /**
@@ -109,10 +109,10 @@ function topicmaps_plugin() {
     }
 
     /**
-     * @param   relation   a CanvasAssoc object
+     * @param   assoc   a CanvasAssoc object
      */
-    this.post_hide_relation_from_canvas = function(relation) {
-        topicmap.hide_relation(relation.id)
+    this.post_hide_association_from_canvas = function(assoc) {
+        topicmap.hide_association(assoc.id)
     }
 
     /**
@@ -163,11 +163,11 @@ function topicmaps_plugin() {
         }
     }
 
-    this.post_delete_relation = function(relation_id) {
-        // Remove relation from all topicmap models
-        if (LOG_TOPICMAPS) dm3c.log("Deleting relation " + relation_id + " from all topicmaps")
+    this.post_delete_association = function(assoc_id) {
+        // Remove association from all topicmap models
+        if (LOG_TOPICMAPS) dm3c.log("Deleting association " + assoc_id + " from all topicmaps")
         for (var id in topicmaps) {
-            topicmaps[id].delete_relation(relation_id)
+            topicmaps[id].delete_association(assoc_id)
         }
     }
 
@@ -373,14 +373,14 @@ function topicmaps_plugin() {
      * An in-memory representation (model) of a persistent topicmap. There are methods for:
      *  - building the in-memory representation by loading a topicmap from DB.
      *  - displaying the in-memory representation on the canvas.
-     *  - manipulating the in-memory representation by e.g. adding/removing topics and relations,
+     *  - manipulating the in-memory representation by e.g. adding/removing topics and associations,
      *    while synchronizing the DB accordingly.
      */
     function Topicmap(topicmap_id) {
 
         // Model
         var topics = {}     // topics of this topicmap (key: topic ID, value: TopicmapTopic object)
-        var relations = {}  // relations of this topicmap (key: relation ID, value: TopicmapRelation object)
+        var assocs = {}     // associations of this topicmap (key: association ID, value: TopicmapAssociation object)
 
         load()
 
@@ -397,7 +397,7 @@ function topicmaps_plugin() {
             for (var id in topics) {
                 var topic = topics[id]
                 if (topic.visibility) {
-                    image_tracker.add_type(topic.type)
+                    image_tracker.add_type(topic.type_uri)
                 }
             }
             image_tracker.check()
@@ -407,25 +407,27 @@ function topicmaps_plugin() {
                 for (var id in topics) {
                     var topic = topics[id]
                     if (topic.visibility) {
-                        dm3c.canvas.add_topic(topic.id, topic.type, topic.label, false, false, topic.x, topic.y)
+                        // Note: canvas.add_topic() expects an topic object with "value" property (not "label")
+                        var t = {id: topic.id, type_uri: topic.type_uri, value: topic.label}
+                        dm3c.canvas.add_topic(t, false, false, topic.x, topic.y)
                     }
                 }
-                for (var id in relations) {
-                    var rel = relations[id]
-                    dm3c.canvas.add_relation(rel.id, rel.doc1_id, rel.doc2_id)
+                for (var id in assocs) {
+                    var rel = assocs[id]
+                    dm3c.canvas.add_association(rel.id, rel.doc1_id, rel.doc2_id)
                 }
                 dm3c.canvas.refresh()
             }
         }
 
-        this.show_topic = function(id, type, label, x, y) {
+        this.show_topic = function(id, type_uri, label, x, y) {
             var topic = topics[id]
             if (!topic) {
                 if (LOG_TOPICMAPS) dm3c.log("Adding topic " + id + " (\"" + label + "\") to topicmap " + topicmap_id)
                 // update DB
                 var response = dm3c.restc.add_topic_to_topicmap(topicmap_id, id, x, y)
                 // update model
-                topics[id] = new TopicmapTopic(id, type, label, x, y, true, response.ref_id)
+                topics[id] = new TopicmapTopic(id, type_uri, label, x, y, true, response.ref_id)
             } else if (!topic.visibility) {
                 if (LOG_TOPICMAPS)
                     dm3c.log("Showing topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id)
@@ -437,13 +439,13 @@ function topicmaps_plugin() {
             }
         }
 
-        this.add_relation = function(id, doc1_id, doc2_id) {
-            if (!relations[id]) {
-                if (LOG_TOPICMAPS) dm3c.log("Adding relation " + id + " to topicmap " + topicmap_id)
+        this.add_association = function(id, doc1_id, doc2_id) {
+            if (!assocs[id]) {
+                if (LOG_TOPICMAPS) dm3c.log("Adding association " + id + " to topicmap " + topicmap_id)
                 // update DB
-                var response = dm3c.restc.add_relation_to_topicmap(topicmap_id, id)
+                var response = dm3c.restc.add_association_to_topicmap(topicmap_id, id)
                 // update model
-                relations[id] = new TopicmapRelation(id, doc1_id, doc2_id, response.ref_id)
+                assocs[id] = new TopicmapAssociation(id, doc1_id, doc2_id, response.ref_id)
             } else {
                 if (LOG_TOPICMAPS) dm3c.log("Relation " + id + " already in topicmap " + topicmap_id)
             }
@@ -466,15 +468,15 @@ function topicmaps_plugin() {
             delete topics[id]
         }
 
-        this.hide_relation = function(id) {
-            if (LOG_TOPICMAPS) dm3c.log("Removing relation " + id + " from topicmap " + topicmap_id)
-            relations[id].remove()
+        this.hide_association = function(id) {
+            if (LOG_TOPICMAPS) dm3c.log("Removing association " + id + " from topicmap " + topicmap_id)
+            assocs[id].remove()
         }
 
-        this.delete_relation = function(id) {
-            if (LOG_TOPICMAPS) dm3c.log("Removing relation " + id + " from topicmap " + topicmap_id +
+        this.delete_association = function(id) {
+            if (LOG_TOPICMAPS) dm3c.log("Removing association " + id + " from topicmap " + topicmap_id +
                 " (part of delete operation)")
-            delete relations[id]
+            delete assocs[id]
         }
 
         this.get_topic = function(id) {
@@ -492,47 +494,49 @@ function topicmaps_plugin() {
             if (LOG_TOPICMAPS) dm3c.log("..... " + topicmap.topics.length + " topics")
             load_topics()
 
-            if (LOG_TOPICMAPS) dm3c.log("..... " + topicmap.assocs.length + " relations")
-            load_relations()
+            if (LOG_TOPICMAPS) dm3c.log("..... " + topicmap.assocs.length + " associations")
+            load_associations()
 
             function load_topics() {
                 for (var i = 0, topic; topic = topicmap.topics[i]; i++) {
-                    var vis = topic.visualization
+                    var x = topic.visualization["dm3.topicmaps.x"]
+                    var y = topic.visualization["dm3.topicmaps.y"]
+                    var visibility = topic.visualization["dm3.topicmaps.visibility"]
                     if (LOG_TOPICMAPS) dm3c.log(".......... ID " + topic.id + ": type_uri=\"" + topic.type_uri +
-                        "\", label=\"" + topic.label + "\", x=" + vis.x + ", y=" + vis.y + ", visibility=" +
-                        vis.visibility + ", ref_id=" + topic.ref_id)
-                    topics[topic.id] = new TopicmapTopic(topic.id, topic.type_uri, topic.label, vis.x, vis.y,
-                        vis.visibility, topic.ref_id)
+                        "\", label=\"" + topic.value + "\", x=" + x + ", y=" + y + ", visibility=" + visibility +
+                        ", ref_id=" + topic.ref_id)
+                    topics[topic.id] = new TopicmapTopic(topic.id, topic.type_uri, topic.value, x, y, visibility,
+                        topic.ref_id)
                 }
             }
 
-            function load_relations() {
-                for (var i = 0, relation; relation = topicmap.assocs[i]; i++) {
+            function load_associations() {
+                for (var i = 0, assoc; assoc = topicmap.assocs[i]; i++) {
                     if (LOG_TOPICMAPS)
-                        dm3c.log(".......... ID " + relation.id + ": src_topic_id=" + relation.src_topic_id +
-                        ", dst_topic_id=" + relation.dst_topic_id + ", ref_id=" + relation.ref_id)
-                    relations[relation.id] = new TopicmapRelation(relation.id,
-                        relation.src_topic_id, relation.dst_topic_id, relation.ref_id)
+                        dm3c.log(".......... ID " + assoc.id + ": src_topic_id=" + assoc.src_topic_id +
+                        ", dst_topic_id=" + assoc.dst_topic_id + ", ref_id=" + assoc.ref_id)
+                    assocs[assoc.id] = new TopicmapAssociation(assoc.id,
+                        assoc.src_topic_id, assoc.dst_topic_id, assoc.ref_id)
                 }
             }
         }
 
         // --- Private Classes ---
 
-        function TopicmapTopic(id, type, label, x, y, visibility, ref_id) {
+        function TopicmapTopic(id, type_uri, label, x, y, visibility, ref_id) {
 
             this.id = id
-            this.type = type
+            this.type_uri = type_uri
             this.label = label
             this.x = x
             this.y = y
             this.visibility = visibility
-            this.ref_id = ref_id            // ID of the TOPICMAP_TOPIC relation that is used
+            this.ref_id = ref_id            // ID of the TOPICMAP_TOPIC association that is used
                                             // by the topicmap to reference this topic.
 
             this.move_to = function(x, y) {
                 // update DB
-                dm3c.restc.set_relation_properties(ref_id, {x: x, y: y})
+                dm3c.restc.set_association_properties(ref_id, {x: x, y: y})
                 // update model
                 this.x = x
                 this.y = y
@@ -540,25 +544,25 @@ function topicmaps_plugin() {
 
             this.set_visibility = function(visibility) {
                 // update DB
-                dm3c.restc.set_relation_properties(ref_id, {visibility: visibility})
+                dm3c.restc.set_association_properties(ref_id, {visibility: visibility})
                 // update model
                 this.visibility = visibility
             }
         }
 
-        function TopicmapRelation(id, doc1_id, doc2_id, ref_id) {
+        function TopicmapAssociation(id, doc1_id, doc2_id, ref_id) {
 
             this.id = id
             this.doc1_id = doc1_id
             this.doc2_id = doc2_id
             this.ref_id = ref_id            // ID of the "Topicmap Relation Ref" topic that is used
-                                            // by the topicmap to reference this relation.
+                                            // by the topicmap to reference this association.
 
             this.remove = function() {
                 // update DB
-                dm3c.restc.remove_relation_from_topicmap(topicmap_id, id, ref_id)
+                dm3c.restc.remove_association_from_topicmap(topicmap_id, id, ref_id)
                 // update model
-                delete relations[id]
+                delete assocs[id]
             }
         }
     }

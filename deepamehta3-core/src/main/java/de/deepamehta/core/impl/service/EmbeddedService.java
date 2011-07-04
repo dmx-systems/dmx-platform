@@ -1031,9 +1031,10 @@ public class EmbeddedService implements DeepaMehtaService {
         _createTopic(instantiation);
         //
         // 1) Postponed topic type association
-        // Note: associateWithTopicType() creates the associations by low-level (storage) calls.
-        // That's why the associations can be created before their type (here: "dm3.core.instantiation")
-        // is fully initialized (the data type is not yet associated => step 2).
+        //
+        // Note: associateWithTopicType() creates the associations by *low-level* (storage) calls.
+        // That's why the associations can be created *before* their type (here: "dm3.core.instantiation")
+        // is fully constructed (the type's data type is not yet associated => step 2).
         associateWithTopicType(tt);
         associateWithTopicType(at);
         associateWithTopicType(dataType);
@@ -1043,7 +1044,19 @@ public class EmbeddedService implements DeepaMehtaService {
         associateWithTopicType(instance);
         associateWithTopicType(association);
         associateWithTopicType(instantiation);
+        //
         // 2) Postponed data type association
+        //
+        // Note: associateDataType() creates the association by a *high-level* (service) call.
+        // This requires the association type (here: dm3.core.association) to be fully constructed already.
+        // That's why the topic type associations (step 1) must be performed *before* the data type associations.
+        //
+        // Note: at time of the first associateDataType() call the required association type (dm3.core.association)
+        // is *not* fully constructed yet! (it gets constructed through this very call). This works anyway because
+        // the data type assigning association is created *before* the association type is fetched.
+        // (see AttachedAssociation.store(): storage.createAssociation() is called before getType()
+        // in AttachedDeepaMehtaObject.store().)
+        // Important is that associateDataType("dm3.core.association") is the first call here.
         associateDataType("dm3.core.association",   "dm3.core.text");
         associateDataType("dm3.core.instantiation", "dm3.core.text");
         //

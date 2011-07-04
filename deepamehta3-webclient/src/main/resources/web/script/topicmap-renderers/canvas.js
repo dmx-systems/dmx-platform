@@ -48,6 +48,8 @@ function Canvas() {
 
     /**
      * @param   topic               A Topic object
+     *                              ### FIXDOC: a plain JavaScript object with "id", "type_uri", and "value" 
+     *                              ### properties is sufficient
      * @param   highlight_topic     Optional: if true, the topic is highlighted.
      * @param   refresh_canvas      Optional: if true, the canvas is refreshed.
      * @param   x                   Optional
@@ -787,8 +789,9 @@ function Canvas() {
 
     /**
      * Properties:
-     *  x, y            Topic position. Represents the center of the topic's icon.
-     *  width, height   Icon size.
+     *  id, type_uri, label
+     *  x, y                    Topic position. Represents the center of the topic's icon.
+     *  width, height           Icon size.
      */
     function CanvasTopic(topic, x, y) {
 
