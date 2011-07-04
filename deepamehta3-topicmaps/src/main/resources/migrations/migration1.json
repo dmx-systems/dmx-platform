@@ -36,6 +36,22 @@
                     }
                 }
             ]
+        },
+
+        {
+            value:            "X",
+            uri:              "dm3.topicmaps.x",
+            data_type_uri:    "dm3.core.number"
+        },
+        {
+            value:            "Y",
+            uri:              "dm3.topicmaps.y",
+            data_type_uri:    "dm3.core.number"
+        },
+        {
+            value:            "Visibility",
+            uri:              "dm3.topicmaps.visibility",
+            data_type_uri:    "dm3.core.boolean"
         }
     ],
 
@@ -43,7 +59,24 @@
         {
             value:         "Topic Mapcontext",
             uri:           "dm3.topicmaps.topic_mapcontext",
-            data_type_uri: "dm3.core.text"
+            data_type_uri: "dm3.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:  "dm3.topicmaps.x",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:       "dm3.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm3.topicmaps.y",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:       "dm3.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm3.topicmaps.visibility",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:       "dm3.core.composition_def"
+                }
+            ]
         },
         {
             value:         "Association Mapcontext",

@@ -255,11 +255,8 @@ public class EmbeddedService implements DeepaMehtaService {
         try {
             triggerHook(Hook.PRE_CREATE_TOPIC, model, clientContext);
             //
-            storage.createTopic(model);
-            associateWithTopicType(model);
-            AttachedTopic topic = attach(model, false);
-            //
-            topic.update(model);
+            AttachedTopic topic = new AttachedTopic(model, this);
+            topic.store();
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
@@ -286,8 +283,8 @@ public class EmbeddedService implements DeepaMehtaService {
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
             topic.update(model);
-            // ### FIXME: avoid refetching. Required is updating the topic model for aggregations:
-            // replacing $id composite entries with actual values. See AttachedTopic.storeComposite()
+            // ### FIXME: avoid refetching. Required is updating the topic model for aggregations: replacing
+            // $id composite entries with actual values. See AttachedDeepaMehtaObject.storeComposite()
             topic = getTopic(model.getId(), true, clientContext);  // fetchComposite=true
             //
             // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
@@ -379,9 +376,8 @@ public class EmbeddedService implements DeepaMehtaService {
                                          @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.createAssociation(model);
-            associateWithAssociationType(model);
-            Association assoc = attach(model);
+            AttachedAssociation assoc = new AttachedAssociation(model, this);
+            assoc.store();
             //
             tx.success();
             return assoc;
@@ -908,7 +904,7 @@ public class EmbeddedService implements DeepaMehtaService {
             model.setRoleModel2(new TopicRoleModel(topic.getId(), "dm3.core.instance"));
             storage.createAssociation(model);
             associateWithAssociationType(model);
-            // storage low-level call used here ### explain
+            // low-level (storage) call used here ### explain
         } catch (Exception e) {
             throw new RuntimeException("Associating topic with topic type \"" +
                 topic.getTypeUri() + "\" failed (" + topic + ")", e);
@@ -920,7 +916,7 @@ public class EmbeddedService implements DeepaMehtaService {
             AssociationModel model = new AssociationModel("dm3.core.instantiation");
             model.setRoleModel1(new TopicRoleModel(assoc.getTypeUri(), "dm3.core.type"));
             model.setRoleModel2(new AssociationRoleModel(assoc.getId(), "dm3.core.instance"));
-            storage.createAssociation(model);  // storage low-level call used here ### explain
+            storage.createAssociation(model);  // low-level (storage) call used here ### explain
         } catch (Exception e) {
             throw new RuntimeException("Associating association with association type \"" +
                 assoc.getTypeUri() + "\" failed (" + assoc + ")", e);
@@ -933,10 +929,9 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // FIXME: move to AttachedTopicType
     void associateDataType(String topicTypeUri, String dataTypeUri) {
-        AssociationModel model = new AssociationModel("dm3.core.association");
-        model.setRoleModel1(new TopicRoleModel(topicTypeUri, "dm3.core.topic_type"));
-        model.setRoleModel2(new TopicRoleModel(dataTypeUri,  "dm3.core.data_type"));
-        createAssociation(model, null);             // FIXME: clientContext=null
+        createAssociation("dm3.core.association",
+            new TopicRoleModel(topicTypeUri, "dm3.core.topic_type"),
+            new TopicRoleModel(dataTypeUri,  "dm3.core.data_type"));
     }
 
 
@@ -1008,13 +1003,13 @@ public class EmbeddedService implements DeepaMehtaService {
 
     private void setupBootstrapContent() {
         // Before topic types and asscociation types can be created the meta types must be created
-        TopicModel tt = new TopicModel("dm3.core.topic_type", new TopicValue("Topic Type"), "dm3.core.meta_type");
+        TopicModel tt = new TopicModel("dm3.core.topic_type", new TopicValue("Topic Type"),       "dm3.core.meta_type");
         TopicModel at = new TopicModel("dm3.core.assoc_type", new TopicValue("Association Type"), "dm3.core.meta_type");
         _createTopic(tt);
         _createTopic(at);
         // Create topic type "Data Type"
         // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
-        // depends on the topic type "Data Type". To resolve this circle we use a low-level storage call here
+        // depends on the topic type "Data Type". To resolve this circle we use a low-level (storage) call here
         // and postpone the data type association.
         TopicModel dataType = new TopicTypeModel("dm3.core.data_type", "Data Type", "dm3.core.text");
         TopicModel roleType = new TopicTypeModel("dm3.core.role_type", "Role Type", "dm3.core.text");
@@ -1035,16 +1030,10 @@ public class EmbeddedService implements DeepaMehtaService {
         TopicModel instantiation = new AssociationTypeModel("dm3.core.instantiation", "Instantiation", "dm3.core.text");
         _createTopic(instantiation);
         //
-        // Postponed data type association
-        associateDataType("dm3.core.meta_type",  "dm3.core.text");
-        associateDataType("dm3.core.topic_type", "dm3.core.text");
-        associateDataType("dm3.core.assoc_type", "dm3.core.text");
-        associateDataType("dm3.core.data_type",  "dm3.core.text");
-        associateDataType("dm3.core.role_type",  "dm3.core.text");
-        //
-        associateDataType("dm3.core.association",   "dm3.core.text");
-        associateDataType("dm3.core.instantiation", "dm3.core.text");
-        // Postponed topic type association
+        // 1) Postponed topic type association
+        // Note: associateWithTopicType() creates the associations by low-level (storage) calls.
+        // That's why the associations can be created before their type (here: "dm3.core.instantiation")
+        // is fully initialized (the data type is not yet associated => step 2).
         associateWithTopicType(tt);
         associateWithTopicType(at);
         associateWithTopicType(dataType);
@@ -1054,10 +1043,19 @@ public class EmbeddedService implements DeepaMehtaService {
         associateWithTopicType(instance);
         associateWithTopicType(association);
         associateWithTopicType(instantiation);
+        // 2) Postponed data type association
+        associateDataType("dm3.core.association",   "dm3.core.text");
+        associateDataType("dm3.core.instantiation", "dm3.core.text");
+        //
+        associateDataType("dm3.core.meta_type",  "dm3.core.text");
+        associateDataType("dm3.core.topic_type", "dm3.core.text");
+        associateDataType("dm3.core.assoc_type", "dm3.core.text");
+        associateDataType("dm3.core.data_type",  "dm3.core.text");
+        associateDataType("dm3.core.role_type",  "dm3.core.text");
     }
 
     private void _createTopic(TopicModel model) {
-        // Note: storage low-level call used here ### explain
+        // Note: low-level (storage) call used here ### explain
         storage.createTopic(model);
         storage.setTopicValue(model.getId(), model.getValue());
     }

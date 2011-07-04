@@ -3,7 +3,11 @@ package de.deepamehta.plugins.topicmaps;
 import de.deepamehta.plugins.topicmaps.model.Topicmap;
 import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
+import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.Composite;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.Plugin;
 
 import javax.ws.rs.GET;
@@ -90,18 +94,23 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
         return new Topicmap(topicmapId, dms);
     }
 
-    /* ### @PUT
-    @Path("/{id}/topic/{topicId}/{x}/{y}")
+    @PUT
+    @Path("/{id}/topic/{topic_id}/{x}/{y}")
     @Override
-    public long addTopicToTopicmap(@PathParam("id") long topicmapId,
-                                   @PathParam("topicId") long topicId, @PathParam("x") int x, @PathParam("y") int y) {
-        Properties properties = new Properties();
-        properties.put("x", x);
-        properties.put("y", y);
-        properties.put("visibility", true);
-        Relation refRel = dms.createRelation("TOPICMAP_TOPIC", topicmapId, topicId, properties);
-        return refRel.id;
-    } */
+    public long addTopicToTopicmap(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
+                                   @PathParam("x") int x, @PathParam("y") int y) {
+        AssociationModel model = new AssociationModel("dm3.topicmaps.topic_mapcontext",
+            new TopicRoleModel(topicmapId, "dm3.topicmaps.topicmap"),
+            new TopicRoleModel(topicId,    "dm3.topicmaps.topicmap_topic")
+        );
+        model.setComposite(new Composite()
+            .put("dm3.topicmaps.x", x)
+            .put("dm3.topicmaps.y", y)
+            .put("dm3.topicmaps.visibility", true));
+        //
+        Association refAssoc = dms.createAssociation(model, null);     // FIXME: clientContext=null
+        return refAssoc.getId();
+    }
 
     /* @PUT
     @Path("/{id}/relation/{relationId}")

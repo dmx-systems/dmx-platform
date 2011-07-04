@@ -90,6 +90,11 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         return dms.getAssociationType(getTypeUri(), null);    // FIXME: clientContext=null
     }
 
+    @Override
+    protected RoleModel getRoleModel(String roleTypeUri) {
+        return new AssociationRoleModel(getId(), roleTypeUri);
+    }
+
 
 
     // **********************************
@@ -205,8 +210,17 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    @Override
+    void store() {
+        dms.storage.createAssociation(getModel());
+        dms.associateWithAssociationType(getModel());
+        super.store();
+    }
+
     AssociationChangeReport update(AssociationModel assocModel) {
         logger.info("Updating association " + getId() + " (new " + assocModel + ")");
+        //
+        super.update(assocModel);
         //
         // Note: We must lookup the roles individually.
         // The role order (getRole1(), getRole2()) is undeterministic and not fix.

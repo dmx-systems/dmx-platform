@@ -10,7 +10,7 @@ import de.deepamehta.core.Type;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
-import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicValue;
@@ -260,9 +260,29 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     protected abstract Type getType();
 
+    protected abstract RoleModel getRoleModel(String roleTypeUri);
+
 
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    void store() {
+        if (getType().getDataTypeUri().equals("dm3.core.composite")) {
+            storeComposite(getComposite());         // setComposite() includes setValue()
+        } else {
+            storeTopicValue(getValue());
+        }
+    }
+
+    void update(DeepaMehtaObjectModel model) {
+        // ### TODO: compare new model with current one and update only if changed. See AttachedAssociation.update()
+        if (getType().getDataTypeUri().equals("dm3.core.composite")) {
+            setComposite(model.getComposite());     // setComposite() includes setValue()
+        } else {
+            setValue(model.getValue());
+        }
+        setUri(model.getUri());
+    }
 
     /**
      * Called from {@link EmbeddedService#attach}
@@ -374,7 +394,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             //
             updateValue(comp);
         } catch (Exception e) {
-            throw new RuntimeException("Storing the topic's composite failed (" + this +
+            throw new RuntimeException("Storing the " + getClass().getSimpleName() + "'s composite failed (" + this +
                 ",\ncomposite=" + comp + ")", e);
         }
     }
@@ -448,7 +468,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     private void associateChildTopic(AssociationDefinition assocDef, long childTopicId) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
-            new TopicRoleModel(getId(), assocDef.getWholeRoleTypeUri()),
+            getRoleModel(assocDef.getWholeRoleTypeUri()),
             new TopicRoleModel(childTopicId, assocDef.getPartRoleTypeUri()));
     }
 

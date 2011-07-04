@@ -9,7 +9,9 @@ import de.deepamehta.core.Type;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicValue;
 
 import java.util.List;
@@ -63,6 +65,11 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     @Override
     protected Type getType() {
         return dms.getTopicType(getTypeUri(), null);    // FIXME: clientContext=null
+    }
+
+    @Override
+    protected RoleModel getRoleModel(String roleTypeUri) {
+        return new TopicRoleModel(getId(), roleTypeUri);
     }
 
 
@@ -172,13 +179,11 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void update(TopicModel topicModel) {
-        if (getTopicType().getDataTypeUri().equals("dm3.core.composite")) {
-            setComposite(topicModel.getComposite());    // setComposite() includes setValue()
-        } else {
-            setValue(topicModel.getValue());
-        }
-        setUri(topicModel.getUri());
+    @Override
+    void store() {
+        dms.storage.createTopic(getModel());
+        dms.associateWithTopicType(getModel());
+        super.store();
     }
 
     /**

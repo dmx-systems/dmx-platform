@@ -37,6 +37,10 @@ public class AssociationModel extends DeepaMehtaObjectModel {
         this(-1, typeUri, roleModel1, roleModel2);
     }
 
+    public AssociationModel(long id, String typeUri) {
+        super(id, typeUri);
+    }
+
     public AssociationModel(long id, String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
         super(id, typeUri);
         this.roleModel1 = roleModel1;
@@ -55,11 +59,6 @@ public class AssociationModel extends DeepaMehtaObjectModel {
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationModel failed (JSONObject=" + assocModel + ")", e);
         }
-    }
-
-    // ---
-
-    protected AssociationModel() {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -103,8 +102,8 @@ public class AssociationModel extends DeepaMehtaObjectModel {
 
     @Override
     public String toString() {
-        return "association model (id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
-            "\", composite=" + composite + ", roleModel1=" + roleModel1 + ", roleModel2=" + roleModel2 + ")";
+        return "association model (" + super.toString() +
+            ", roleModel1=" + roleModel1 + ", roleModel2=" + roleModel2 + ")";
     }
 
 

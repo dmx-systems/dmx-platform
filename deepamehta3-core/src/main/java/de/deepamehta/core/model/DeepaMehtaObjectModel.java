@@ -94,12 +94,6 @@ public abstract class DeepaMehtaObjectModel {
         }
     }
 
-    // ---
-
-    // Called from the TypeModel's JSON constructor (indirectly)
-    protected DeepaMehtaObjectModel() {
-    }
-
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     // --- ID ---
@@ -208,5 +202,11 @@ public abstract class DeepaMehtaObjectModel {
     @Override
     public int hashCode() {
         return ((Long) id).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
+            "\", composite=" + composite;
     }
 }

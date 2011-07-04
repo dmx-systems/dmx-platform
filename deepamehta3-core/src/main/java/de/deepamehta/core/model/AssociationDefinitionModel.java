@@ -43,8 +43,7 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     public AssociationDefinitionModel(long id, String typeUri, String wholeTopicTypeUri, String partTopicTypeUri
                                           /* ### String wholeRoleTypeUri, String partRoleTypeUri */) {
-        this.id = id;
-        this.typeUri = typeUri;
+        super(id, typeUri);
         //
         this.wholeTopicTypeUri = wholeTopicTypeUri;
         this.partTopicTypeUri = partTopicTypeUri;
@@ -59,6 +58,7 @@ public class AssociationDefinitionModel extends AssociationModel {
     }
 
     public AssociationDefinitionModel(JSONObject assocDef, String wholeTopicTypeUri) {
+        super(-1, null);
         try {
             this.id = -1;
             this.typeUri = assocDef.getString("assoc_type_uri");
@@ -165,8 +165,8 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     @Override
     public String toString() {
-        return "\n    association definition (id=" + id + ", uri=\"" + uri + "\", typeUri=\"" + typeUri +
-            "\")\n        pos 1: (type=\"" + wholeTopicTypeUri + "\", role=\"" + wholeRoleTypeUri +
+        return "\n    association definition (" + super.toString() +
+            ")\n        pos 1: (type=\"" + wholeTopicTypeUri + "\", role=\"" + wholeRoleTypeUri +
             "\", cardinality=\"" + wholeCardinalityUri +
             "\")\n        pos 2: (type=\"" + partTopicTypeUri + "\", role=\"" + partRoleTypeUri +
             "\", cardinality=\"" + partCardinalityUri +

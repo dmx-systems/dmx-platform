@@ -46,19 +46,12 @@ public class TopicModel extends DeepaMehtaObjectModel {
         super(typeModel, typeUri);
     }
 
-    // ---
-
-    // Called from the TypeModel's JSON constructor
-    protected TopicModel() {
-    }
-
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     // === Java API ===
 
     @Override
     public String toString() {
-        return "topic model (id=" + id + ", uri=\"" + uri + "\", value=" + value +
-            ", typeUri=\"" + typeUri + "\", composite=" + composite + ")";
+        return "topic model (" + super.toString() + ")";
     }
 }

@@ -334,7 +334,7 @@ function topicmaps_plugin() {
         var icon_src = dm3c.get_icon_src("dm3.topicmaps.topicmap")
         // add topicmaps to menu
         for (var i = 0, topicmap; topicmap = topicmaps[i]; i++) {
-            dm3c.ui.add_menu_item("topicmap-menu", {label: topicmap.label, value: topicmap.id, icon: icon_src})
+            dm3c.ui.add_menu_item("topicmap-menu", {label: topicmap.value, value: topicmap.id, icon: icon_src})
         }
         // add "New..." to menu
         if (dm3c.has_create_permission("dm3.topicmaps.topicmap")) {
