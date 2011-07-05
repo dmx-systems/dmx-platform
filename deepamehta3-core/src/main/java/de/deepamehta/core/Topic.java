@@ -19,13 +19,9 @@ public interface Topic extends DeepaMehtaObject {
 
     // === Traversal ===
 
-    // ### TODO: move this methods to DeepaMehtaObject.
-
     // --- Association Retrieval ---
 
-    Set<Association> getAssociations();
-
-    Set<Association> getAssociations(String myRoleTypeUri);
+    // ### TODO: move this methods to DeepaMehtaObject.
 
     RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                      String othersAssocTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);

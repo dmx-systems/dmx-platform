@@ -7,10 +7,10 @@ function Canvas() {
     var self = this
 
     // Settings
-    this.DEFAULT_ASSOC_COLOR = "#b0b0b0"
+    this.DEFAULT_ASSOC_COLOR = "#b2b2b2"
     var ASSOC_WIDTH = 4
     var ASSOC_CLICK_TOLERANCE = 0.3
-    var HIGHLIGHT_COLOR = "red"
+    var HIGHLIGHT_COLOR = "#0000ff"
     var HIGHLIGHT_BLUR = 32
     var CANVAS_ANIMATION_STEPS = 30
     var LABEL_DIST_Y = 5
@@ -226,7 +226,8 @@ function Canvas() {
         draw_associations()
         //
         if (association_in_progress) {
-            draw_line(action_topic.x, action_topic.y, tmp_x - trans_x, tmp_y - trans_y, ASSOC_WIDTH, HIGHLIGHT_COLOR)
+            draw_line(action_topic.x, action_topic.y, tmp_x - trans_x, tmp_y - trans_y,
+                ASSOC_WIDTH, self.DEFAULT_ASSOC_COLOR)
         }
         //
         draw_topics()

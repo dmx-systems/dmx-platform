@@ -95,6 +95,17 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         return new AssociationRoleModel(getId(), roleTypeUri);
     }
 
+    // === Deletion ===
+
+    @Override
+    public void delete() {
+        // delete sub-topics and associations
+        super.delete();
+        // delete association itself
+        logger.info("Deleting " + this);
+        dms.storage.deleteAssociation(getId());
+    }
+
 
 
     // **********************************
@@ -196,14 +207,11 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         return dms.attach(topics, fetchComposite, fetchRelatingComposite);
     }
 
-
-
-    // === Deletion ===
+    // --- Association Retrieval ---
 
     @Override
-    public void delete() {
-        logger.info("Deleting " + this);
-        dms.storage.deleteAssociation(getId());
+    public Set<Association> getAssociations(String myRoleTypeUri) {
+        return dms.attach(dms.storage.getAssociationAssociations(getId(), myRoleTypeUri));
     }
 
 

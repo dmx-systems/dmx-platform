@@ -54,7 +54,7 @@ public interface DeepaMehtaStorage {
     /**
      * @param   myRoleTypeUri       may be null
      */
-    Set<AssociationModel> getAssociations(long topicId, String myRoleTypeUri);
+    Set<AssociationModel> getTopicAssociations(long topicId, String myRoleTypeUri);
 
     /**
      * @param   assocTypeUri        may be null
@@ -135,6 +135,11 @@ public interface DeepaMehtaStorage {
     Set<AssociationModel> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
 
     // ---
+
+    /**
+     * @param   myRoleTypeUri       may be null
+     */
+    Set<AssociationModel> getAssociationAssociations(long assocId, String myRoleTypeUri);
 
     /**
      * @param   assocTypeUris       may be null

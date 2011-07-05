@@ -18,7 +18,7 @@ public class Migration2 extends Migration {
         addIconToTopicType("dm3.core.meta_type",   "box-grey.png");
         //
         // Note: on the canvas HSL-specified colors are rendered pale (Safari and Firefox)
-        addColorToAssociationType("dm3.core.association",     "rgb(163, 163, 163)" /*"hsl(  0,  0%, 70%)"*/);
+        addColorToAssociationType("dm3.core.association",     "rgb(178, 178, 178)" /*"hsl(  0,  0%, 75%)"*/);
         addColorToAssociationType("dm3.core.aggregation",     "rgb( 53, 223,  59)" /*"hsl(120, 65%, 90%)"*/);
         addColorToAssociationType("dm3.core.composition",     "rgb(231,  62,  60)" /*"hsl(  0, 65%, 90%)"*/);
         addColorToAssociationType("dm3.core.aggregation_def", "rgb( 44, 178,  48)" /*"hsl(120, 65%, 75%)"*/);

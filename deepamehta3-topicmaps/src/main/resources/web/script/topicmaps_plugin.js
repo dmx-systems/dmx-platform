@@ -410,6 +410,9 @@ function topicmaps_plugin() {
                         // Note: canvas.add_topic() expects an topic object with "value" property (not "label")
                         var t = {id: topic.id, type_uri: topic.type_uri, value: topic.label}
                         dm3c.canvas.add_topic(t, false, false, topic.x, topic.y)
+                        // ### FIXME: instead of calling add_topic() the canvas model should be manipulated directly.
+                        // ### This would suppress the pointless post_add_topic_to_canvas() triggering.
+                        // ### TODO: separate the canvas model and provide public accessors to it.
                     }
                 }
                 for (var id in assocs) {
@@ -421,6 +424,9 @@ function topicmaps_plugin() {
                         role_2: {topic_id: assoc.topic_id_2}
                     }
                     dm3c.canvas.add_association(a)
+                    // ### FIXME: instead of calling add_association() the canvas model should be manipulated directly.
+                    // ### This would suppress the pointless post_add_association_to_canvas() triggering.
+                    // ### TODO: separate the canvas model and provide public accessors to it.
                 }
                 dm3c.canvas.refresh()
             }
@@ -432,6 +438,7 @@ function topicmaps_plugin() {
                 if (LOG_TOPICMAPS) dm3c.log("Adding topic " + id + " (\"" + label + "\") to topicmap " + topicmap_id)
                 // update DB
                 var response = dm3c.restc.add_topic_to_topicmap(topicmap_id, id, x, y)
+                if (LOG_TOPICMAPS) dm3c.log("..... => ref ID " + response.ref_id)
                 // update memory
                 topics[id] = new TopicmapTopic(id, type_uri, label, x, y, true, response.ref_id)
             } else if (!topic.visibility) {
@@ -450,6 +457,7 @@ function topicmaps_plugin() {
                 if (LOG_TOPICMAPS) dm3c.log("Adding association " + id + " to topicmap " + topicmap_id)
                 // update DB
                 var response = dm3c.restc.add_association_to_topicmap(topicmap_id, id)
+                if (LOG_TOPICMAPS) dm3c.log("..... => ref ID " + response.ref_id)
                 // update memory
                 assocs[id] = new TopicmapAssociation(id, type_uri, topic_id_1, topic_id_2, response.ref_id)
             } else {

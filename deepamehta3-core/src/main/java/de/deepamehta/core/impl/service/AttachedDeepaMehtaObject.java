@@ -199,6 +199,37 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             fetchComposite, fetchRelatingComposite);
     }
 
+    // --- Association Retrieval ---
+
+    @Override
+    public Set<Association> getAssociations() {
+        return getAssociations(null);
+    }
+
+
+
+    // === Deletion ===
+
+    /**
+     * Deletes all sub-topics of this DeepaMehta object (associated via "dm3.core.composition", recursively) and
+     * deletes all the remaining direct associations of this DeepaMehta object.
+     * <p>
+     * Note: deletion of the object itself is up to the subclasses.
+     */
+    @Override
+    public void delete() {
+        // recursively delete sub-topics
+        Set<RelatedTopic> partTopics = getRelatedTopics("dm3.core.composition",
+            "dm3.core.whole", "dm3.core.part", null, false, false);
+        for (Topic partTopic : partTopics) {
+            partTopic.delete();
+        }
+        // delete direct associations
+        for (Association assoc : getAssociations()) {
+            assoc.delete();
+        }
+    }
+
 
 
     // **********************************
