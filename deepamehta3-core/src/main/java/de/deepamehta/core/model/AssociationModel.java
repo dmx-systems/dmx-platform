@@ -24,8 +24,8 @@ public class AssociationModel extends DeepaMehtaObjectModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private RoleModel roleModel1;
-    private RoleModel roleModel2;
+    private RoleModel roleModel1;   // may be null in models used for an update operation
+    private RoleModel roleModel2;   // may be null in models used for an update operation
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -54,8 +54,12 @@ public class AssociationModel extends DeepaMehtaObjectModel {
     public AssociationModel(JSONObject assocModel) {
         super(assocModel);
         try {
-            this.roleModel1 = parseRole(assocModel.getJSONObject("role_1"));
-            this.roleModel2 = parseRole(assocModel.getJSONObject("role_2"));
+            if (assocModel.has("role_1")) {
+                this.roleModel1 = parseRole(assocModel.getJSONObject("role_1"));
+            }
+            if (assocModel.has("role_2")) {
+                this.roleModel2 = parseRole(assocModel.getJSONObject("role_2"));
+            }
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationModel failed (JSONObject=" + assocModel + ")", e);
         }

@@ -217,42 +217,36 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         super.store();
     }
 
+    /**
+     * @param   assocModel  The data to update.
+     *                      If the type URI is <code>null</code> it is not updated.
+     *                      If role 1 is <code>null</code> it is not updated.
+     *                      If role 2 is <code>null</code> it is not updated.
+     */
     AssociationChangeReport update(AssociationModel assocModel) {
         logger.info("Updating association " + getId() + " (new " + assocModel + ")");
         //
         super.update(assocModel);
         //
-        // Note: We must lookup the roles individually.
-        // The role order (getRole1(), getRole2()) is undeterministic and not fix.
-        Role role1 = getRole(getObjectId(assocModel.getRoleModel1()));
-        Role role2 = getRole(getObjectId(assocModel.getRoleModel2()));
-        // new values
-        String newTypeUri = assocModel.getTypeUri();
-        String newRoleTypeUri1 = assocModel.getRoleModel1().getRoleTypeUri();
-        String newRoleTypeUri2 = assocModel.getRoleModel2().getRoleTypeUri();
-        // current values
-        String typeUri = getTypeUri();
-        String roleTypeUri1 = role1.getRoleTypeUri();
-        String roleTypeUri2 = role2.getRoleTypeUri();
-        // what has changed?
-        boolean typeUriChanged = !typeUri.equals(newTypeUri);
-        boolean roleType1Changed = !roleTypeUri1.equals(newRoleTypeUri1);
-        boolean roleType2Changed = !roleTypeUri2.equals(newRoleTypeUri2);
-        //
         AssociationChangeReport report = new AssociationChangeReport();
+        boolean typeUriChanged = false;
+        boolean roleType1Changed = false;
+        boolean roleType2Changed = false;
         //
-        if (typeUriChanged) {
-            logger.info("Changing type from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
-            report.typeUriChanged(typeUri, newTypeUri);
-            setTypeUri(newTypeUri);
+        // 1) update type
+        String newTypeUri = assocModel.getTypeUri();
+        if (newTypeUri != null) {
+            typeUriChanged = updateType(newTypeUri, report);
         }
-        if (roleType1Changed) {
-            logger.info("Changing role type 1 from \"" + roleTypeUri1 + "\" -> \"" + newRoleTypeUri1 + "\"");
-            role1.setRoleTypeUri(newRoleTypeUri1);
+        // 2) update role type 1
+        RoleModel roleModel1 = assocModel.getRoleModel1();
+        if (roleModel1 != null) {
+            roleType1Changed = updateRole(roleModel1, 1);
         }
-        if (roleType2Changed) {
-            logger.info("Changing role type 2 from \"" + roleTypeUri2 + "\" -> \"" + newRoleTypeUri2 + "\"");
-            role2.setRoleTypeUri(newRoleTypeUri2);
+        // 3) update role type 2
+        RoleModel roleModel2 = assocModel.getRoleModel2();
+        if (roleModel2 != null) {
+            roleType2Changed = updateRole(roleModel2, 2);
         }
         //
         if (!typeUriChanged && !roleType1Changed && !roleType2Changed) {
@@ -304,6 +298,36 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
 
     // === Helper ===
+
+    private boolean updateType(String newTypeUri, AssociationChangeReport report) {
+        String typeUri = getTypeUri();      // current value
+        if (!typeUri.equals(newTypeUri)) {  // has changed?
+            logger.info("Changing type from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
+            report.typeUriChanged(typeUri, newTypeUri);
+            setTypeUri(newTypeUri);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param   nr      used only for logging
+     */
+    private boolean updateRole(RoleModel newModel, int nr) {
+        // Note: We must lookup the roles individually.
+        // The role order (getRole1(), getRole2()) is undeterministic and not fix.
+        Role role = getRole(getObjectId(newModel));
+        String newRoleTypeUri = newModel.getRoleTypeUri();  // new value
+        String roleTypeUri = role.getRoleTypeUri();         // current value
+        if (!roleTypeUri.equals(newRoleTypeUri)) {          // has changed?
+            logger.info("Changing role type " + nr + " from \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri + "\"");
+            role.setRoleTypeUri(newRoleTypeUri);
+            return true;
+        }
+        return false;
+    }
+
+    // ---
 
     private Role createAttachedRole(RoleModel model) {
         if (model instanceof TopicRoleModel) {

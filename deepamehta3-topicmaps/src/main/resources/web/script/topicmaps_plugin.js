@@ -426,7 +426,7 @@ function topicmaps_plugin() {
                 if (LOG_TOPICMAPS) dm3c.log("Adding topic " + id + " (\"" + label + "\") to topicmap " + topicmap_id)
                 // update DB
                 var response = dm3c.restc.add_topic_to_topicmap(topicmap_id, id, x, y)
-                // update model
+                // update memory
                 topics[id] = new TopicmapTopic(id, type_uri, label, x, y, true, response.ref_id)
             } else if (!topic.visibility) {
                 if (LOG_TOPICMAPS)
@@ -444,7 +444,7 @@ function topicmaps_plugin() {
                 if (LOG_TOPICMAPS) dm3c.log("Adding association " + id + " to topicmap " + topicmap_id)
                 // update DB
                 var response = dm3c.restc.add_association_to_topicmap(topicmap_id, id)
-                // update model
+                // update memory
                 assocs[id] = new TopicmapAssociation(id, doc1_id, doc2_id, response.ref_id)
             } else {
                 if (LOG_TOPICMAPS) dm3c.log("Relation " + id + " already in topicmap " + topicmap_id)
@@ -531,21 +531,21 @@ function topicmaps_plugin() {
             this.x = x
             this.y = y
             this.visibility = visibility
-            this.ref_id = ref_id            // ID of the TOPICMAP_TOPIC association that is used
-                                            // by the topicmap to reference this topic.
+            this.ref_id = ref_id            // ID of the "dm3.topicmaps.topic_mapcontext" association
+                                            // that is used by the topicmap to reference this topic.
 
             this.move_to = function(x, y) {
                 // update DB
-                dm3c.restc.set_association_properties(ref_id, {x: x, y: y})
-                // update model
+                dm3c.restc.update_association({id: ref_id, composite: {"dm3.topicmaps.x": x, "dm3.topicmaps.y": y}})
+                // update memory
                 this.x = x
                 this.y = y
             }
 
             this.set_visibility = function(visibility) {
                 // update DB
-                dm3c.restc.set_association_properties(ref_id, {visibility: visibility})
-                // update model
+                dm3c.restc.update_association({id: ref_id, composite: {"dm3.topicmaps.visibility": visibility}})
+                // update memory
                 this.visibility = visibility
             }
         }
@@ -561,7 +561,7 @@ function topicmaps_plugin() {
             this.remove = function() {
                 // update DB
                 dm3c.restc.remove_association_from_topicmap(topicmap_id, id, ref_id)
-                // update model
+                // update memory
                 delete assocs[id]
             }
         }

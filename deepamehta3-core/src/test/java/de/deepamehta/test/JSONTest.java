@@ -132,6 +132,14 @@ public class JSONTest {
         assertNull(o.optString("value", null));
     }
 
+    @Test
+    public void defaultObject() throws JSONException {
+        JSONObject o = new JSONObject();
+        o.put("id", 123);
+        assertNull(o.optJSONObject("id"));      // the "id" value is not a JSONObject -> null is returned
+        assertNull(o.optJSONObject("value"));
+    }
+
     // --- Iteration ---
 
     @Test
