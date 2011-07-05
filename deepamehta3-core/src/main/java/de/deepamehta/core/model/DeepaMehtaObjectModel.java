@@ -45,7 +45,11 @@ public abstract class DeepaMehtaObjectModel {
     }
 
     public DeepaMehtaObjectModel(long id, String typeUri) {
-        this(id, null, null, typeUri, null);
+        this(id, typeUri, null);
+    }
+
+    public DeepaMehtaObjectModel(long id, String typeUri, Composite composite) {
+        this(id, null, null, typeUri, composite);
     }
 
     /**

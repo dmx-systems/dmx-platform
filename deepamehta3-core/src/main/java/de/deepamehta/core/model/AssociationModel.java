@@ -34,7 +34,11 @@ public class AssociationModel extends DeepaMehtaObjectModel {
     }
 
     public AssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
-        this(-1, typeUri, roleModel1, roleModel2);
+        this(typeUri, roleModel1, roleModel2, null);
+    }
+
+    public AssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2, Composite composite) {
+        this(-1, typeUri, roleModel1, roleModel2, composite);
     }
 
     public AssociationModel(long id, String typeUri) {
@@ -42,7 +46,11 @@ public class AssociationModel extends DeepaMehtaObjectModel {
     }
 
     public AssociationModel(long id, String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
-        super(id, typeUri);
+        this(id, typeUri, roleModel1, roleModel2, null);
+    }
+
+    public AssociationModel(long id, String typeUri, RoleModel roleModel1, RoleModel roleModel2, Composite composite) {
+        super(id, typeUri, composite);
         this.roleModel1 = roleModel1;
         this.roleModel2 = roleModel2;
     }

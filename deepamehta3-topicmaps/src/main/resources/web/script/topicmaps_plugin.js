@@ -2,7 +2,7 @@ function topicmaps_plugin() {
 
     dm3c.register_css_stylesheet("/de.deepamehta.3-topicmaps/style/topicmaps.css")
 
-    var LOG_TOPICMAPS = false
+    var LOG_TOPICMAPS = true
 
     var topicmaps = {}  // The topicmaps cache (key: topicmap ID, value: Topicmap object)
     var topicmap        // Selected topicmap (Topicmap object)
@@ -98,7 +98,7 @@ function topicmaps_plugin() {
      * @param   assoc   a CanvasAssoc object
      */
     this.post_add_association_to_canvas = function(assoc) {
-        topicmap.add_association(assoc.id, assoc.doc1_id, assoc.doc2_id)
+        topicmap.add_association(assoc.id, assoc.type_uri, assoc.role_1.topic_id, assoc.role_2.topic_id)
     }
 
     /**
@@ -413,8 +413,14 @@ function topicmaps_plugin() {
                     }
                 }
                 for (var id in assocs) {
-                    var rel = assocs[id]
-                    dm3c.canvas.add_association(rel.id, rel.doc1_id, rel.doc2_id)
+                    var assoc = assocs[id]
+                    var a = {
+                        id: assoc.id,
+                        type_uri: assoc.type_uri,
+                        role_1: {topic_id: assoc.topic_id_1},
+                        role_2: {topic_id: assoc.topic_id_2}
+                    }
+                    dm3c.canvas.add_association(a)
                 }
                 dm3c.canvas.refresh()
             }
@@ -439,15 +445,15 @@ function topicmaps_plugin() {
             }
         }
 
-        this.add_association = function(id, doc1_id, doc2_id) {
+        this.add_association = function(id, type_uri, topic_id_1, topic_id_2) {
             if (!assocs[id]) {
                 if (LOG_TOPICMAPS) dm3c.log("Adding association " + id + " to topicmap " + topicmap_id)
                 // update DB
                 var response = dm3c.restc.add_association_to_topicmap(topicmap_id, id)
                 // update memory
-                assocs[id] = new TopicmapAssociation(id, doc1_id, doc2_id, response.ref_id)
+                assocs[id] = new TopicmapAssociation(id, type_uri, topic_id_1, topic_id_2, response.ref_id)
             } else {
-                if (LOG_TOPICMAPS) dm3c.log("Relation " + id + " already in topicmap " + topicmap_id)
+                if (LOG_TOPICMAPS) dm3c.log("Association " + id + " already in topicmap " + topicmap_id)
             }
         }
 
@@ -512,11 +518,11 @@ function topicmaps_plugin() {
 
             function load_associations() {
                 for (var i = 0, assoc; assoc = topicmap.assocs[i]; i++) {
-                    if (LOG_TOPICMAPS)
-                        dm3c.log(".......... ID " + assoc.id + ": src_topic_id=" + assoc.src_topic_id +
-                        ", dst_topic_id=" + assoc.dst_topic_id + ", ref_id=" + assoc.ref_id)
-                    assocs[assoc.id] = new TopicmapAssociation(assoc.id,
-                        assoc.src_topic_id, assoc.dst_topic_id, assoc.ref_id)
+                    if (LOG_TOPICMAPS) dm3c.log(".......... ID " + assoc.id + ": type_uri=\"" + assoc.type_uri +
+                            "\", topic_id_1=" + assoc.role_1.topic_id + ", topic_id_2=" + assoc.role_2.topic_id +
+                            ", ref_id=" + assoc.ref_id)
+                    assocs[assoc.id] = new TopicmapAssociation(assoc.id, assoc.type_uri,
+                        assoc.role_1.topic_id, assoc.role_2.topic_id, assoc.ref_id)
                 }
             }
         }
@@ -531,11 +537,13 @@ function topicmaps_plugin() {
             this.x = x
             this.y = y
             this.visibility = visibility
-            this.ref_id = ref_id            // ID of the "dm3.topicmaps.topic_mapcontext" association
-                                            // that is used by the topicmap to reference this topic.
+            this.ref_id = ref_id    // ID of the "dm3.topicmaps.topic_mapcontext" association
+                                    // that is used by the topicmap to reference this topic.
+                                    // ### FIXME: the ref_id should be removed from the client-side model.
+                                    // ### TODO: extend topicmaps REST API instead of exposing internals.
 
             this.move_to = function(x, y) {
-                // update DB
+                // update DB ### TODO: extend topicmaps REST API instead of operating on the DB directly
                 dm3c.restc.update_association({id: ref_id, composite: {"dm3.topicmaps.x": x, "dm3.topicmaps.y": y}})
                 // update memory
                 this.x = x
@@ -543,20 +551,23 @@ function topicmaps_plugin() {
             }
 
             this.set_visibility = function(visibility) {
-                // update DB
+                // update DB ### TODO: extend topicmaps REST API instead of operating on the DB directly
                 dm3c.restc.update_association({id: ref_id, composite: {"dm3.topicmaps.visibility": visibility}})
                 // update memory
                 this.visibility = visibility
             }
         }
 
-        function TopicmapAssociation(id, doc1_id, doc2_id, ref_id) {
+        function TopicmapAssociation(id, type_uri, topic_id_1, topic_id_2, ref_id) {
 
             this.id = id
-            this.doc1_id = doc1_id
-            this.doc2_id = doc2_id
-            this.ref_id = ref_id            // ID of the "Topicmap Relation Ref" topic that is used
-                                            // by the topicmap to reference this association.
+            this.type_uri = type_uri
+            this.topic_id_1 = topic_id_1
+            this.topic_id_2 = topic_id_2
+            this.ref_id = ref_id    // ID of the "dm3.topicmaps.association_mapcontext" association
+                                    // that is used by the topicmap to reference this association.
+                                    // ### FIXME: the ref_id should be removed from the client-side model.
+                                    // ### TODO: extend topicmaps REST API instead of exposing internals.
 
             this.remove = function() {
                 // update DB

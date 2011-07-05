@@ -6,6 +6,7 @@ import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.Plugin;
@@ -48,7 +49,7 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
 
 
 
-    /* @Override
+    /* ### @Override
     public void postDeleteRelationHook(long relationId) {
         // remove the relation from all topicmaps
         List<Topic> refTopics = dms.getTopics("de/deepamehta/core/property/RelationID", relationId);
@@ -101,35 +102,29 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
                                    @PathParam("x") int x, @PathParam("y") int y) {
         AssociationModel model = new AssociationModel("dm3.topicmaps.topic_mapcontext",
             new TopicRoleModel(topicmapId, "dm3.topicmaps.topicmap"),
-            new TopicRoleModel(topicId,    "dm3.topicmaps.topicmap_topic")
-        );
-        model.setComposite(new Composite()
-            .put("dm3.topicmaps.x", x)
-            .put("dm3.topicmaps.y", y)
-            .put("dm3.topicmaps.visibility", true));
-        //
+            new TopicRoleModel(topicId,    "dm3.topicmaps.topicmap_topic"),
+            new Composite().put("dm3.topicmaps.x", x).put("dm3.topicmaps.y", y).put("dm3.topicmaps.visibility", true));
         Association refAssoc = dms.createAssociation(model, null);     // FIXME: clientContext=null
         return refAssoc.getId();
     }
 
-    /* @PUT
+    @PUT
     @Path("/{id}/association/{assoc_id}")
     @Override
-    public long addRelationToTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
-        // FIME: do this in a transaction.
-        Properties properties = new Properties();
-        properties.put("de/deepamehta/core/property/RelationID", assocId);
-        Topic refTopic = dms.createTopic("de/deepamehta/core/topictype/TopicmapRelationRef", properties, null);
-        dms.createRelation("RELATION", topicmapId, refTopic.id, null);
-        return refTopic.id;
-    } */
+    public long addAssociationToTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
+        AssociationModel model = new AssociationModel("dm3.topicmaps.association_mapcontext",
+            new TopicRoleModel(topicmapId,    "dm3.topicmaps.topicmap"),
+            new AssociationRoleModel(assocId, "dm3.topicmaps.topicmap_association"));
+        Association refAssoc = dms.createAssociation(model, null);     // FIXME: clientContext=null
+        return refAssoc.getId();
+    }
 
     @DELETE
-    @Path("/{id}/association/{assoc_id}/{refId}")
+    @Path("/{id}/association/{assoc_id}/{ref_id}")
     @Override
     public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId,
                                               @PathParam("assoc_id") long assocId,
-                                              @PathParam("refId") long refId) {
+                                              @PathParam("ref_id") long refId) {
         removeAssociationFromTopicmap(refId);
     }
 

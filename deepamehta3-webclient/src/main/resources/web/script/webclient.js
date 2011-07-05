@@ -6,7 +6,7 @@ var dm3c = new function() {
     var UPLOAD_DIALOG_WIDTH = "50em"
     this.GENERIC_TOPIC_ICON_SRC = "images/ball-grey.png"
 
-    var ENABLE_LOGGING = false
+    var ENABLE_LOGGING = true
     var LOG_PLUGIN_LOADING = false
     var LOG_IMAGE_LOADING = false
     this.LOG_GUI = false
@@ -671,13 +671,25 @@ var dm3c = new function() {
 
     /**
      * Returns the icon for a topic type.
-     * If no icon is configured for that type the generic topic icon is returned.
+     * If no icon is configured for that type the default topic icon is returned.
      *
      * @return  The icon (JavaScript Image object)
      */
-    this.get_type_icon = function(type_uri) {
-        return dm3c.type_cache.get_icon(type_uri) || generic_topic_icon
+    this.get_type_icon = function(topic_type_uri) {
+        return dm3c.type_cache.get_icon(topic_type_uri) || generic_topic_icon
     }
+
+    /**
+     * Returns the color for an association type.
+     * If no color is configured for that type the default association color is returned.
+     *
+     * @return  The color (CSS string)
+     */
+    this.get_type_color = function(assoc_type_uri) {
+        return dm3c.type_cache.get_association_type(assoc_type_uri).get_color()
+    }
+
+    // ---
 
     this.create_image = function(src) {
         var img = new Image()

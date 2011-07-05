@@ -86,6 +86,8 @@ function Canvas() {
 
     /**
      * @param   assoc               An Associatin object
+     *                              ### FIXDOC: a plain JavaScript object with "id", "type_uri", "role_1", and "role_2"
+     *                              ### properties is sufficient
      * @param   refresh_canvas      Optional: if true, the canvas is refreshed.
      */
     this.add_association = function(assoc, refresh_canvas) {
@@ -908,8 +910,9 @@ function Canvas() {
 
     /**
      * Properties:
-     *  type_uri
-     *  color       (CSS string)
+     *  id, type_uri
+     *  role_1, role_2
+     *  color           (CSS string)
      */
     function CanvasAssoc(assoc) {
 
@@ -937,7 +940,7 @@ function Canvas() {
 
         function init(assoc) {
             ca.type_uri = assoc.type_uri
-            ca.color = assoc.get_type().get_color()
+            ca.color = dm3c.get_type_color(assoc.type_uri)
         }
     }
 
