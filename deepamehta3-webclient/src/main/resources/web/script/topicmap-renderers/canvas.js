@@ -112,7 +112,7 @@ function Canvas() {
         get_association(assoc.id).update(assoc)
     }
 
-    this.remove_topic = function(id, refresh_canvas, is_part_of_delete_operation) {
+    this.remove_topic = function(id, refresh_canvas) {
         // 1) update model
         var ct = remove_topic(id)
         // error check
@@ -124,10 +124,6 @@ function Canvas() {
         if (refresh_canvas) {
             this.refresh()
         }
-        // 3) trigger hook
-        if (!is_part_of_delete_operation) {
-            dm3c.trigger_plugin_hook("post_hide_topic_from_canvas", ct)
-        }
     }
 
     /**
@@ -136,7 +132,7 @@ function Canvas() {
      *
      * @param   refresh_canvas  Optional - if true, the canvas is refreshed.
      */
-    this.remove_association = function(id, refresh_canvas, is_part_of_delete_operation) {
+    this.remove_association = function(id, refresh_canvas) {
         // 1) update model
         var ca = remove_association(id)
         // Note: it is not an error if the association is not present on the canvas. This can happen
@@ -152,17 +148,6 @@ function Canvas() {
         // 2) update GUI
         if (refresh_canvas) {
             this.refresh()
-        }
-        // 3) trigger hook
-        if (!is_part_of_delete_operation) {
-            dm3c.trigger_plugin_hook("post_hide_association_from_canvas", ca)
-        }
-    }
-
-    this.remove_all_associations_of_topic = function(topic_id, is_part_of_delete_operation) {
-        var assoc_ids = assoc_ids_of_topic(topic_id)
-        for (var i = 0; i < assoc_ids.length; i++) {
-            this.remove_association(assoc_ids[i], false, is_part_of_delete_operation)   // refresh_canvas=false
         }
     }
 
@@ -644,14 +629,14 @@ function Canvas() {
 
     // ---
 
-    function assoc_ids_of_topic(topic_id) {
-        var assoc_ids = []
+    this.get_associations = function(topic_id) {
+        var assocs = []
         iterate_associations(function(ca) {
             if (ca.get_topic1_id() == topic_id || ca.get_topic2_id() == topic_id) {
-                assoc_ids.push(ca.id)
+                assocs.push(ca)
             }
         })
-        return assoc_ids
+        return assocs
     }
 
     // ---

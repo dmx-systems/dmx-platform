@@ -24,17 +24,15 @@ function TopicmapRenderer() {
 
     this.update_topic = function(topic) {}
 
-    this.remove_topic = function(id, refresh_canvas, is_part_of_delete_operation) {}
+    this.remove_topic = function(id, refresh_canvas) {}
 
     /**
-     * Removes a relation from the canvas (model) and optionally refreshes the canvas (view).
-     * If the relation is not present on the canvas nothing is performed.
+     * Removes an association from the canvas (model) and optionally refreshes the canvas (view).
+     * If the association is not present on the canvas nothing is performed.
      *
      * @param   refresh_canvas  Optional - if true, the canvas is refreshed.
      */
-    this.remove_association = function(id, refresh_canvas, is_part_of_delete_operation) {}
-
-    this.remove_all_associations_of_topic = function(topic_id, is_part_of_delete_operation) {}
+    this.remove_association = function(id, refresh_canvas) {}
 
     this.scroll_topic_to_center = function(topic_id) {}
 

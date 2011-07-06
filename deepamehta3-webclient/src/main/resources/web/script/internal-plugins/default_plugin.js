@@ -22,7 +22,7 @@ function default_plugin () {
 
         function do_delete_association() {
             $("#delete-association-dialog").dialog("close")
-            dm3c.delete_association(dm3c.selected_object.id)
+            dm3c.delete_association(dm3c.selected_object)
         }
     }
 
@@ -45,7 +45,7 @@ function default_plugin () {
         return commands
 
         function do_hide() {
-            dm3c.hide_topic(topic.id)
+            dm3c.hide_topic(topic)
         }
 
         function do_associate(event) {
@@ -89,11 +89,7 @@ function default_plugin () {
         return commands
 
         function do_hide() {
-            // update model
-            dm3c.hide_association(assoc.id)
-            // update view
-            dm3c.canvas.refresh()
-            dm3c.page_panel.clear()
+            dm3c.hide_association(assoc)
         }
 
         function do_associate(event) {

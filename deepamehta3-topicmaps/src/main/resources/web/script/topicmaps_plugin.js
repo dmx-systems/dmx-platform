@@ -104,14 +104,14 @@ function topicmaps_plugin() {
     /**
      * @param   topic   a CanvasTopic object
      */
-    this.post_hide_topic_from_canvas = function(topic) {
+    this.post_hide_topic = function(topic) {
         topicmap.hide_topic(topic.id)
     }
 
     /**
      * @param   assoc   a CanvasAssoc object
      */
-    this.post_hide_association_from_canvas = function(assoc) {
+    this.post_hide_association = function(assoc) {
         topicmap.hide_association(assoc.id)
     }
 
@@ -163,11 +163,11 @@ function topicmaps_plugin() {
         }
     }
 
-    this.post_delete_association = function(assoc_id) {
+    this.post_delete_association = function(assoc) {
         // Remove association from all topicmap models
-        if (LOG_TOPICMAPS) dm3c.log("Deleting association " + assoc_id + " from all topicmaps")
+        if (LOG_TOPICMAPS) dm3c.log("Deleting association " + assoc.id + " from all topicmaps")
         for (var id in topicmaps) {
-            topicmaps[id].delete_association(assoc_id)
+            topicmaps[id].delete_association(assoc.id)
         }
     }
 
