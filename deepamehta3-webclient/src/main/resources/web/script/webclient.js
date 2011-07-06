@@ -6,7 +6,7 @@ var dm3c = new function() {
     var UPLOAD_DIALOG_WIDTH = "50em"
     this.GENERIC_TOPIC_ICON_SRC = "images/ball-grey.png"
 
-    var ENABLE_LOGGING = true
+    var ENABLE_LOGGING = false
     var LOG_PLUGIN_LOADING = false
     var LOG_IMAGE_LOADING = false
     this.LOG_GUI = false
@@ -47,8 +47,6 @@ var dm3c = new function() {
     /**
      * Creates a topic in the DB.
      *
-     * High-level utility method for plugin developers.
-     *
      * @param   type_uri        The topic type URI, e.g. "dm3.notes.note".
      * @param   composite       Optional.
      *
@@ -73,13 +71,11 @@ var dm3c = new function() {
      * Updates a topic in the DB.
      * Triggers the "post_update_topic" hook.
      *
-     * High-level utility method for plugin developers.
-     *
      * @param   old_topic   the topic that is about to be updated. This "old" version is passed to the
      *                      post_update_topic hook to let plugins compare the old and new ones.
      * @param   new_topic   the new topic that is about to override the old topic.
      *
-     * @return  The updated topic as stored in the DB.
+     * @return  The updated topic as stored in the DB (a Topic object).
      *          Note: the new topic and the updated topic are not necessarily 100% identical. The new topic contains
      *          only the parts that are required for the update, e.g. a composite topic doesn't contain the "value"
      *          field. The updated topic on the other hand is the complete topic as returned by the server.
@@ -97,8 +93,6 @@ var dm3c = new function() {
     /**
      * Deletes a topic (including its associations) from the DB and the GUI.
      * Triggers the "post_delete_topic" hook and the "post_delete_association" hook (several times).
-     *
-     * High-level utility method for plugin developers.
      */
     this.delete_topic = function(topic) {
         // update DB
@@ -110,8 +104,6 @@ var dm3c = new function() {
     /**
      * Hides a topic (including its associations) from the GUI.
      * Triggers the "post_hide_topic" hook and the "post_hide_association" hook (several times).
-     *
-     * High-level utility method for plugin developers.
      */
     this.hide_topic = function(topic) {
         // update model and GUI
@@ -128,8 +120,6 @@ var dm3c = new function() {
 
     /**
      * Creates an association in the DB.
-     *
-     * High-level utility method for plugin developers.
      *
      * @param   type_uri            The association type URI, e.g. "dm3.core.instantiation".
      * @param   role_1              The topic role or association role at one end (an object).
@@ -155,10 +145,8 @@ var dm3c = new function() {
     }
 
     /**
-     * Updates an association in the DB.
-     * ### FIXME: Triggers the "post_update_topic" hook.
-     *
-     * High-level utility method for plugin developers.
+     * Updates an association in the DB and on the GUI.
+     * Triggers the "post_update_association" hook.
      *
      * @param   old_assoc   the association that is about to be updated. ### FIXME: This "old" version is passed to the
      *                      post_update_topic hook to let plugins compare the old and new ones.
@@ -167,13 +155,10 @@ var dm3c = new function() {
      * ### FIXME: @return  The updated association as stored in the DB.
      */
     this.update_association = function(old_assoc, new_assoc) {
-        // 1) update DB
-        // alert("dm3c.update_association(): new_assoc=" + JSON.stringify(new_assoc));
+        // update DB
         var directives = dm3c.restc.update_association(new_assoc)
-        // alert("update_association(): " + directives.length + " directives received\n\n" + JSON.stringify(directives))
+        // update model and GUI
         process_directives(directives)
-        // 2) trigger hook
-        // ### dm3c.trigger_plugin_hook("post_update_topic", updated_assoc, old_assoc)
         //
         // ### return updated_assoc
     }
@@ -181,8 +166,6 @@ var dm3c = new function() {
     /**
      * Deletes an association from the DB and the GUI.
      * Triggers the "post_delete_association" hook.
-     *
-     * High-level utility method for plugin developers.
      */
     this.delete_association = function(assoc) {
         // update DB
@@ -194,8 +177,6 @@ var dm3c = new function() {
     /**
      * Hides an association from the GUI.
      * Triggers the "post_hide_association" hook.
-     *
-     * High-level utility method for plugin developers.
      */
     this.hide_association = function(assoc) {
         // update model and GUI
@@ -749,9 +730,7 @@ var dm3c = new function() {
             switch (directive.type) {
             case "update_association":
                 var assoc = build_association(directive.arg)
-                dm3c.canvas.update_association(assoc)
-                dm3c.canvas.refresh()
-                dm3c.page_panel.display(assoc)
+                update_association(assoc)
                 break
             case "delete_association":
                 var assoc = build_association(directive.arg)
@@ -765,6 +744,23 @@ var dm3c = new function() {
                 throw "UnknownDirectiveError: directive \"" + directive.type + "\" not implemented"
             }
         }
+    }
+
+    // ---
+
+    /**
+     * Updates the model and GUI according to a previously performed "update association" server-request.
+     * Triggers the "post_update_association" hook
+     *
+     * @param   an Association object
+     */
+    function update_association(assoc) {
+        // Note: no model update needed
+        // update GUI 
+        dm3c.canvas.update_association(assoc, true)     // refresh_canvas=true
+        dm3c.page_panel.display(assoc)
+        // trigger hook
+        dm3c.trigger_plugin_hook("post_update_association", assoc, undefined)   // FIXME: old_assoc=undefined
     }
 
     // ---

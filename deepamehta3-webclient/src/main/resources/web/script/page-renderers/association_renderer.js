@@ -43,13 +43,9 @@ function AssociationRenderer() {
     }
 
     this.process_form = function(assoc) {
-        // 1) update DB and memory
         var assoc_model = build_association_model()
-        // alert("association model to update: " + JSON.stringify(assoc_model))
         assoc = dm3c.update_association(assoc, assoc_model)
         dm3c.trigger_plugin_hook("post_submit_form", assoc)
-        // 2) update GUI
-        // ### moved to process_directives
 
         /**
          * Reads out values from GUI elements and builds an association model object from it.

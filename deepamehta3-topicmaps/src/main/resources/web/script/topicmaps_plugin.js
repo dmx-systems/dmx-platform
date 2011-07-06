@@ -122,13 +122,24 @@ function topicmaps_plugin() {
         topicmap.move_topic(topic.id, topic.x, topic.y)
     }
 
-    this.post_set_topic_label = function(topic_id, label) {
-        if (LOG_TOPICMAPS) dm3c.log("Setting label of topic " + topic_id + " to \"" + label + "\"")
+    /**
+     * @param   topic   a Topic object
+     */
+    this.post_update_topic = function(topic, old_topic) {
+        if (LOG_TOPICMAPS) dm3c.log("Updating topic " + topic.id + " on all topicmaps")
         for (var id in topicmaps) {
-            var topic = topicmaps[id].get_topic(topic_id)
-            if (topic) {
-                topic.label = label
-            }
+            topicmaps[id].update_topic(topic)
+        }
+    }
+
+    /**
+     * @param   assoc       an Association object
+     * @param   old_assoc   FIXME: not yet available
+     */
+    this.post_update_association = function(assoc, old_assoc) {
+        if (LOG_TOPICMAPS) dm3c.log("Updating association " + assoc.id + " on all topicmaps")
+        for (var id in topicmaps) {
+            topicmaps[id].update_association(assoc)
         }
     }
 
@@ -477,14 +488,37 @@ function topicmaps_plugin() {
             topic.set_visibility(false)
         }
 
-        this.delete_topic = function(id) {
-            // Note: all topic references are deleted already
-            delete topics[id]
-        }
-
         this.hide_association = function(id) {
             if (LOG_TOPICMAPS) dm3c.log("Removing association " + id + " from topicmap " + topicmap_id)
             assocs[id].remove()
+        }
+
+        /**
+         * @param   topic   a Topic object
+         */
+        this.update_topic = function(topic) {
+            var t = topics[topic.id]
+            if (t) {
+                if (LOG_TOPICMAPS) dm3c.log("Updating topic " + t.id + " (\"" + t.label + "\") on topicmap " +
+                    topicmap_id)
+                t.update(topic)
+            }
+        }
+
+        /**
+         * @param   assoc   an Association object
+         */
+        this.update_association = function(assoc) {
+            var a = assocs[assoc.id]
+            if (a) {
+                if (LOG_TOPICMAPS) dm3c.log("Updating association " + a.id + " on topicmap " + topicmap_id)
+                a.update(assoc)
+            }
+        }
+
+        this.delete_topic = function(id) {
+            // Note: all topic references are deleted already
+            delete topics[id]
         }
 
         this.delete_association = function(id) {
@@ -564,6 +598,13 @@ function topicmaps_plugin() {
                 // update memory
                 this.visibility = visibility
             }
+
+            /**
+             * @param   topic   a Topic object
+             */
+            this.update = function(topic) {
+                this.label = topic.value
+            }
         }
 
         function TopicmapAssociation(id, type_uri, topic_id_1, topic_id_2, ref_id) {
@@ -582,6 +623,13 @@ function topicmaps_plugin() {
                 dm3c.restc.remove_association_from_topicmap(topicmap_id, id, ref_id)
                 // update memory
                 delete assocs[id]
+            }
+
+            /**
+             * @param   assoc   an Association object
+             */
+            this.update = function(assoc) {
+                this.type_uri = assoc.type_uri
             }
         }
     }

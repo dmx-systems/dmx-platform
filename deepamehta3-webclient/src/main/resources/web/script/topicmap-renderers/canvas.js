@@ -108,8 +108,13 @@ function Canvas() {
         get_topic(topic.id).update(topic)
     }
 
-    this.update_association = function(assoc) {
+    this.update_association = function(assoc, refresh_canvas) {
+        // update model
         get_association(assoc.id).update(assoc)
+        // update GUI
+        if (refresh_canvas) {
+            this.refresh()
+        }
     }
 
     this.remove_topic = function(id, refresh_canvas) {
