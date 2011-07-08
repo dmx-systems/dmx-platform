@@ -11,9 +11,9 @@ function topicmaps_plugin() {
 
 
 
-    // *******************************
-    // *** Overriding Client Hooks ***
-    // *******************************
+    // ************************************************************
+    // *** Webclient Hooks (triggered by deepamehta3-webclient) ***
+    // ************************************************************
 
 
 
@@ -84,20 +84,29 @@ function topicmaps_plugin() {
     }
 
     /**
-     * @param   topic   a CanvasTopic object
+     * Restores topic position if topic is already contained in the topicmap but hidden
+     *
+     * @param   topic   a Topic object
      */
-    this.post_add_topic_to_canvas = function(topic) {
-        var pos = topicmap.show_topic(topic.id, topic.type_uri, topic.label, topic.x, topic.y)
-        // restore topic position if topic was already contained in this topicmap but hidden
-        if (pos) {
-            topic.move_to(pos.x, pos.y)
+    this.pre_show_topic = function(topic) {
+        var t = topicmap.get_topic(topic.id)
+        if (t && !t.visibility) {
+            topic.x = t.x
+            topic.y = t.y
         }
+    }
+
+    /**
+     * @param   topic   a Topic object with additional "x" and "y" properties
+     */
+    this.post_show_topic = function(topic) {
+        topicmap.add_topic(topic.id, topic.type_uri, topic.value, topic.x, topic.y)
     }
 
     /**
      * @param   assoc   a CanvasAssoc object
      */
-    this.post_add_association_to_canvas = function(assoc) {
+    this.post_show_association = function(assoc) {
         topicmap.add_association(assoc.id, assoc.type_uri, assoc.role_1.topic_id, assoc.role_2.topic_id)
     }
 
@@ -419,11 +428,8 @@ function topicmaps_plugin() {
                     var topic = topics[id]
                     if (topic.visibility) {
                         // Note: canvas.add_topic() expects an topic object with "value" property (not "label")
-                        var t = {id: topic.id, type_uri: topic.type_uri, value: topic.label}
-                        dm3c.canvas.add_topic(t, false, false, topic.x, topic.y)
-                        // ### FIXME: instead of calling add_topic() the canvas model should be manipulated directly.
-                        // ### This would suppress the pointless post_add_topic_to_canvas() triggering.
-                        // ### TODO: separate the canvas model and provide public accessors to it.
+                        var t = {id: topic.id, type_uri: topic.type_uri, value: topic.label, x: topic.x, y: topic.y}
+                        dm3c.canvas.add_topic(t)
                     }
                 }
                 for (var id in assocs) {
@@ -435,15 +441,12 @@ function topicmaps_plugin() {
                         role_2: {topic_id: assoc.topic_id_2}
                     }
                     dm3c.canvas.add_association(a)
-                    // ### FIXME: instead of calling add_association() the canvas model should be manipulated directly.
-                    // ### This would suppress the pointless post_add_association_to_canvas() triggering.
-                    // ### TODO: separate the canvas model and provide public accessors to it.
                 }
                 dm3c.canvas.refresh()
             }
         }
 
-        this.show_topic = function(id, type_uri, label, x, y) {
+        this.add_topic = function(id, type_uri, label, x, y) {
             var topic = topics[id]
             if (!topic) {
                 if (LOG_TOPICMAPS) dm3c.log("Adding topic " + id + " (\"" + label + "\") to topicmap " + topicmap_id)
@@ -456,7 +459,6 @@ function topicmaps_plugin() {
                 if (LOG_TOPICMAPS)
                     dm3c.log("Showing topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id)
                 topic.set_visibility(true)
-                return {x: topic.x, y: topic.y}
             } else {
                 if (LOG_TOPICMAPS)
                     dm3c.log("Topic " + id + " (\"" + label + "\") already visible in topicmap " + topicmap_id)

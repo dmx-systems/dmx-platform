@@ -15,10 +15,8 @@ function TopicmapRenderer() {
     /**
      * @param   highlight_topic     Optional: if true, the topic is highlighted.
      * @param   refresh_canvas      Optional: if true, the canvas is refreshed.
-     * @param   x                   Optional
-     * @param   y                   Optional
      */
-    this.add_topic = function(topic, highlight_topic, refresh_canvas, x, y) {}
+    this.add_topic = function(topic, highlight_topic, refresh_canvas) {}
 
     this.add_association = function(assoc, refresh_canvas) {}
 

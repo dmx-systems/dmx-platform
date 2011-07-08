@@ -26,7 +26,7 @@ function RenderHelper() {
     this.topic_link = function(topic, link_content) {
         var title = dm3c.type_label(topic.type_uri)
         return $("<a>").attr({href: "#", title: title}).append(link_content).click(function() {
-            dm3c.reveal_related_topic(topic.id)
+            dm3c.do_reveal_related_topic(topic.id)
             return false
         })
     }

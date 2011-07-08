@@ -47,16 +47,9 @@ function TopicRenderer() {
     }
 
     this.process_form = function(topic) {
-        // 1) update DB and memory
         var topic_model = build_topic_model()
-        // alert("topic model to update: " + JSON.stringify(topic_model))
-        topic = dm3c.update_topic(topic, topic_model)
-        // alert("updated topic: " + JSON.stringify(topic))
+        topic = dm3c.do_update_topic(topic, topic_model)
         dm3c.trigger_plugin_hook("post_submit_form", topic)
-        // 2) update GUI
-        dm3c.canvas.update_topic(topic)
-        dm3c.canvas.refresh()
-        dm3c.page_panel.display(topic)
 
         /**
          * Reads out values from GUI elements and builds a topic model object from it.

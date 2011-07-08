@@ -73,19 +73,9 @@ function typeeditor_plugin() {
             label: "New Topic Type...",
             value: "create_topic_type",
             is_trigger: true,
-            handler: create_topic_type
+            handler: function() {
+                dm3c.do_create_topic_type(DEFAULT_TOPIC_TYPE)
+            }
         })
     }
-
-
-
-    // ----------------------------------------------------------------------------------------------- Private Functions
-
-    function create_topic_type() {
-        var topic_type = dm3c.create_topic_type(DEFAULT_TOPIC_TYPE)
-        dm3c.add_topic_to_canvas(topic_type, "edit")
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Classes
-
 }

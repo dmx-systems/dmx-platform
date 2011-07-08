@@ -44,7 +44,7 @@ function AssociationRenderer() {
 
     this.process_form = function(assoc) {
         var assoc_model = build_association_model()
-        assoc = dm3c.update_association(assoc, assoc_model)
+        assoc = dm3c.do_update_association(assoc, assoc_model)
         dm3c.trigger_plugin_hook("post_submit_form", assoc)
 
         /**

@@ -17,12 +17,12 @@ function default_plugin () {
 
         function do_delete_topic() {
             $("#delete-topic-dialog").dialog("close")
-            dm3c.delete_topic(dm3c.selected_object)
+            dm3c.do_delete_topic(dm3c.selected_object)
         }
 
         function do_delete_association() {
             $("#delete-association-dialog").dialog("close")
-            dm3c.delete_association(dm3c.selected_object)
+            dm3c.do_delete_association(dm3c.selected_object)
         }
     }
 
@@ -45,7 +45,7 @@ function default_plugin () {
         return commands
 
         function do_hide() {
-            dm3c.hide_topic(topic)
+            dm3c.do_hide_topic(topic)
         }
 
         function do_associate(event) {
@@ -89,7 +89,7 @@ function default_plugin () {
         return commands
 
         function do_hide() {
-            dm3c.hide_association(assoc)
+            dm3c.do_hide_association(assoc)
         }
 
         function do_associate(event) {
@@ -128,7 +128,7 @@ function default_plugin () {
         return commands
 
         function do_create() {
-            dm3c.create_topic_from_menu(type_uri, cx, cy)
+            dm3c.do_create_topic(type_uri, cx, cy)
         }
     }
 }

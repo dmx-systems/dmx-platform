@@ -20,8 +20,8 @@ function Canvas() {
     var canvas_topics               // topics displayed on canvas (Object, key: topic ID, value: CanvasTopic)
     var canvas_assocs               // associations displayed on canvas (Object, key: assoc ID, value: CanvasAssoc)
     var trans_x, trans_y            // canvas translation (in pixel)
-    var highlight_topic_id          // ID of the highlighted topic (drawn with red frame), if any
-    var highlight_assoc_id          // ID of the highlighted association (drawn with red frame), if any
+    var highlight_topic_id          // ID of the highlighted topic, if any
+    var highlight_assoc_id          // ID of the highlighted association, if any
     var grid_positioning            // while grid positioning is in progress: a GridPositioning object, null otherwise
 
     // View (Canvas)
@@ -47,38 +47,30 @@ function Canvas() {
     // === Overriding TopicmapRenderer Adapter Methods ===
 
     /**
+     * Adds a topic to the canvas. If the topic is already on the canvas it is not added again.
+     *
      * @param   topic               A Topic object
      *                              ### FIXDOC: a plain JavaScript object with "id", "type_uri", and "value" 
-     *                              ### properties is sufficient
-     * @param   highlight_topic     Optional: if true, the topic is highlighted.
+     *                              ### properties is sufficient, plus optional "x" and "y" properties
      * @param   refresh_canvas      Optional: if true, the canvas is refreshed.
-     * @param   x                   Optional
-     * @param   y                   Optional
      */
-    this.add_topic = function(topic, highlight_topic, refresh_canvas, x, y) {
+    this.add_topic = function(topic, refresh_canvas) {
         if (!topic_exists(topic.id)) {
-            // init geometry
-            if (x == undefined && y == undefined) {
+            // positioning
+            if (topic.x == undefined && topic.y == undefined) {
                 if (grid_positioning) {
                     var pos = grid_positioning.next_position()
-                    x = pos.x
-                    y = pos.y
+                    topic.x = pos.x
+                    topic.y = pos.y
                 } else {
-                    x = Math.floor(self.canvas_width  * Math.random()) - trans_x
-                    y = Math.floor(self.canvas_height * Math.random()) - trans_y
+                    topic.x = Math.floor(self.canvas_width  * Math.random()) - trans_x
+                    topic.y = Math.floor(self.canvas_height * Math.random()) - trans_y
                 }
             }
             // update model
-            var ct = new CanvasTopic(topic, x, y)
-            add_topic(ct)
-            // trigger hook
-            dm3c.trigger_plugin_hook("post_add_topic_to_canvas", ct)
+            add_topic(new CanvasTopic(topic))
         }
-        // highlight topic
-        if (highlight_topic) {
-            set_highlight_topic(topic.id)
-        }
-        // update GUI
+        // refresh GUI
         if (refresh_canvas) {
             this.refresh()
         }
@@ -93,25 +85,26 @@ function Canvas() {
     this.add_association = function(assoc, refresh_canvas) {
         if (!association_exists(assoc.id)) {
             // update model
-            var ca = new CanvasAssoc(assoc)
-            add_association(ca)
-            // trigger hook
-            dm3c.trigger_plugin_hook("post_add_association_to_canvas", ca)
+            add_association(new CanvasAssoc(assoc))
         }
-        // update GUI
+        // refresh GUI
         if (refresh_canvas) {
             this.refresh()
         }
     }
 
-    this.update_topic = function(topic) {
+    this.update_topic = function(topic, refresh_canvas) {
         get_topic(topic.id).update(topic)
+        // refresh GUI
+        if (refresh_canvas) {
+            this.refresh()
+        }
     }
 
     this.update_association = function(assoc, refresh_canvas) {
         // update model
         get_association(assoc.id).update(assoc)
-        // update GUI
+        // refresh GUI
         if (refresh_canvas) {
             this.refresh()
         }
@@ -124,7 +117,7 @@ function Canvas() {
         if (!ct) {
             throw "remove_topic: topic not on canvas (" + id + ")"
         }
-        // 2) update GUI
+        // 2) refresh GUI
         ct.label_div.remove()
         if (refresh_canvas) {
             this.refresh()
@@ -150,7 +143,7 @@ function Canvas() {
         if (highlight_assoc_id == id) {
             highlight_assoc_id = -1
         }
-        // 2) update GUI
+        // 2) refresh GUI
         if (refresh_canvas) {
             this.refresh()
         }
@@ -160,6 +153,28 @@ function Canvas() {
         var ct = get_topic(topic_id)
         scroll_to_center(ct.x + trans_x, ct.y + trans_y)
     }
+
+    // ---
+
+    this.set_highlight_topic = function(topic_id, refresh_canvas) {
+        highlight_topic_id = topic_id
+        highlight_assoc_id = -1
+        // refresh GUI
+        if (refresh_canvas) {
+            this.refresh()
+        }
+    }
+
+    this.set_highlight_association = function(assoc_id, refresh_canvas) {
+        highlight_topic_id = -1
+        highlight_assoc_id = assoc_id
+        // refresh GUI
+        if (refresh_canvas) {
+            this.refresh()
+        }
+    }
+
+    // ---
 
     this.refresh = function() {
         draw()
@@ -178,8 +193,18 @@ function Canvas() {
         draw()
     }
 
+    this.get_associations = function(topic_id) {
+        var assocs = []
+        iterate_associations(function(ca) {
+            if (ca.get_topic1_id() == topic_id || ca.get_topic2_id() == topic_id) {
+                assocs.push(ca)
+            }
+        })
+        return assocs
+    }
+
     this.clear = function() {
-        // update GUI
+        // refresh GUI
         translate(-trans_x, -trans_y)                       // reset translation
         $("#canvas-panel .canvas-topic-label").remove()     // remove label divs
         // update model
@@ -368,12 +393,7 @@ function Canvas() {
             //
             var ct = find_topic(event)
             if (ct) {
-                var assoc = dm3c.create_association("dm3.core.association",
-                    {topic_id: dm3c.selected_object.id, role_type_uri: dm3c.selected_object.type_uri},
-                    {topic_id: ct.id,                   role_type_uri: ct.type_uri}
-                )
-                dm3c.canvas.add_association(assoc)
-                select_topic(dm3c.selected_object.id)
+                dm3c.do_create_association("dm3.core.association", ct)
             } else {
                 draw()
             }
@@ -384,9 +404,9 @@ function Canvas() {
         } else {
             var ct = find_topic(event)   // ### FIXME: use actionTopic instead of searching again?
             if (ct) {
-                select_topic(ct.id)
+                dm3c.do_select_topic(ct.id)
             } else if (action_assoc) {
-                select_association(action_assoc.id)
+                dm3c.do_select_association(action_assoc.id)
             }
         }
         end_interaction()
@@ -469,11 +489,6 @@ function Canvas() {
         // remove topic activation
         action_topic = null
         action_assoc = null
-        /* ### remove assoc activation
-        if (dm3c.selected_object) {
-            dm3c.selected_object = null
-            draw()
-        } */
     }
 
 
@@ -487,11 +502,11 @@ function Canvas() {
         //
         var ct, ca
         if (ct = find_topic(event)) {
-            select_topic(ct.id, true)
+            dm3c.do_select_topic(ct.id)
             // Note: only dm3c.selected_object has the auxiliary attributes (the canvas topic has not)
             var commands = dm3c.get_topic_commands(dm3c.selected_object, "context-menu")
         } else if (ca = find_association(event)) {
-            select_association(ca.id)
+            dm3c.do_select_association(ca.id)
             // ### FIXME: use dm3c.selected assoc?
             var commands = dm3c.get_association_commands(ca, "context-menu")
         } else {
@@ -632,51 +647,9 @@ function Canvas() {
         }
     }
 
-    // ---
-
-    this.get_associations = function(topic_id) {
-        var assocs = []
-        iterate_associations(function(ca) {
-            if (ca.get_topic1_id() == topic_id || ca.get_topic2_id() == topic_id) {
-                assocs.push(ca)
-            }
-        })
-        return assocs
-    }
-
-    // ---
-
-    function set_highlight_topic(topic_id) {
-        highlight_topic_id = topic_id
-        highlight_assoc_id = -1
-    }
-
-    function set_highlight_association(assoc_id) {
-        highlight_topic_id = -1
-        highlight_assoc_id = assoc_id
-    }
-
 
 
     // === GUI Helper ===
-
-    function select_topic(topic_id, synchronous) {
-        set_highlight_topic(topic_id)
-        draw()
-        if (synchronous) {
-            dm3c.select_topic(topic_id)
-        } else {
-            setTimeout(dm3c.select_topic, 0, topic_id)
-        }
-    }
-
-    function select_association(assoc_id) {
-        set_highlight_association(assoc_id)
-        draw()
-        dm3c.select_association(assoc_id)
-    }
-
-    // ---
 
     /**
      * Creates the HTML5 canvas element, binds the event handlers, and adds it to the document.
@@ -786,12 +759,12 @@ function Canvas() {
      *  x, y                    Topic position. Represents the center of the topic's icon.
      *  width, height           Icon size.
      */
-    function CanvasTopic(topic, x, y) {
+    function CanvasTopic(topic) {
 
         var ct = this   // Note: variable "self" is already in use (canvas reference)
 
-        this.x = x
-        this.y = y
+        this.x = topic.x
+        this.y = topic.y
 
         init(topic);
         build_label()

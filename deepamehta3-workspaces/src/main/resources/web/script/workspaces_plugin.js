@@ -104,8 +104,8 @@ function workspaces_plugin() {
         if (workspace_id == "_new") {
             open_workspace_dialog()
         } else {
-            var workspace = dm3c.restc.get_topic_by_id(workspace_id)
-            dm3c.add_topic_to_canvas(workspace, "show")
+            var workspace = dm3c.fetch_topic(workspace_id)
+            dm3c.show_topic(workspace, "show")
         }
     }
 
