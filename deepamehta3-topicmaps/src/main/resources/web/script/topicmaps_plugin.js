@@ -4,6 +4,7 @@ function topicmaps_plugin() {
 
     var LOG_TOPICMAPS = true
 
+    // model
     var topicmaps = {}  // The topicmaps cache (key: topicmap ID, value: Topicmap object)
     var topicmap        // Selected topicmap (Topicmap object)
 
@@ -79,8 +80,19 @@ function topicmaps_plugin() {
             } else {
                 var topicmap_id = get_topicmap_id_from_menu()
             }
-            display_topicmap(topicmap_id)
+            // update model
+            select_topicmap(topicmap_id)
+            // update view
+            display_topicmap()
         }
+    }
+
+    this.post_select_topic = function(topic) {
+        topicmap.set_topic_selection(topic)
+    }
+
+    this.post_select_association = function(assoc) {
+        topicmap.set_association_selection(assoc)
     }
 
     /**
@@ -127,7 +139,7 @@ function topicmaps_plugin() {
     /**
      * @param   topic   a CanvasTopic object
      */
-    this.post_move_topic_on_canvas = function(topic) {
+    this.post_move_topic = function(topic) {
         topicmap.move_topic(topic.id, topic.x, topic.y)
     }
 
@@ -174,7 +186,8 @@ function topicmaps_plugin() {
                     create_topicmap_topic("untitled")
                 }
                 rebuild_topicmap_menu()
-                display_topicmap(get_topicmap_id_from_menu())
+                select_topicmap(get_topicmap_id_from_menu())
+                display_topicmap()
             } else {
                 if (LOG_TOPICMAPS) dm3c.log("..... updating the topicmap menu and restoring the selection " +
                     "(the deleted topic was ANOTHER topicmap)")
@@ -193,9 +206,9 @@ function topicmaps_plugin() {
 
 
 
-    // ***************************************
-    // *** Overriding Access Control Hooks ***
-    // ***************************************
+    // *********************************************************************
+    // *** Access Control Hooks (triggered by deepamehta3-accesscontrol) ***
+    // *********************************************************************
 
 
 
@@ -209,7 +222,103 @@ function topicmaps_plugin() {
 
 
 
-    // ------------------------------------------------------------------------------------------------------ Public API
+    /******************/
+    /*** Controller ***/
+    /******************/
+
+
+
+    /**
+     * Selects a topicmap programmatically.
+     * The respective item from the topicmap menu is selected and the topicmap is displayed on the canvas.
+     */
+    this.do_select_topicmap = function(topicmap_id) {
+        // update model
+        select_topicmap(topicmap_id)
+        // update view
+        select_menu_item(topicmap_id)
+        display_topicmap()
+    }
+
+    /**
+     * Invoked when the user made a selection from the topicmap menu.
+     */
+    function do_select_topicmap(menu_item) {
+        var topicmap_id = menu_item.value
+        if (topicmap_id == "_new") {
+            open_topicmap_dialog()
+        } else {
+            // update model
+            select_topicmap(topicmap_id)
+            // update view
+            display_topicmap()
+        }
+    }
+
+    // ---
+
+    /**
+     * Creates a topicmap with the given name, puts it in the topicmap menu, and displays the topicmap.
+     *
+     * @return  the topicmap topic.
+     */
+    this.do_create_topicmap = function(name) {
+        return create_topicmap(name)
+    }
+
+    function do_create_topicmap() {
+        $("#topicmap_dialog").dialog("close")
+        var name = $("#topicmap_name").val()
+        create_topicmap(name)
+        return false
+    }
+
+    // ---
+
+    /**
+     * Reloads a topicmap from DB and displays it on the canvas.
+     *
+     * Prerequisite: the topicmap is already selected in the topicmap menu.
+     */
+    this.do_refresh_topicmap = function(topicmap_id) {
+        // update model
+        delete topicmaps[topicmap_id]
+        select_topicmap(topicmap_id)
+        // update view
+        display_topicmap()
+    }
+
+
+
+    /*************************/
+    /*** Controller Helper ***/
+    /*************************/
+
+
+
+    /**
+     * Creates a topicmap with the given name, puts it in the topicmap menu, and displays the topicmap.
+     *
+     * @return  the topicmap topic.
+     */
+    function create_topicmap(name) {
+        var topicmap_topic = create_topicmap_topic(name)
+        rebuild_topicmap_menu(topicmap_topic.id)
+        // update model
+        select_topicmap(topicmap_topic.id)
+        // update view
+        display_topicmap()
+        //
+        return topicmap_topic
+    }
+
+
+
+    /*************/
+    /*** Model ***/
+    /*************/
+
+
 
     /**
      * @return  ID of the selected topicmap
@@ -218,37 +327,65 @@ function topicmaps_plugin() {
         return topicmap.get_id()
     }
 
-    /**
-     * Creates a topicmap with the given name, puts it in the topicmap menu, and displays the topicmap.
-     *
-     * @return  the topicmap topic.
-     */
-    this.create_topicmap = function(name) {
-        return create_topicmap(name)
+    function select_topicmap(topicmap_id) {
+        if (LOG_TOPICMAPS) dm3c.log("Selecting topicmap " + topicmap_id)
+        // update model
+        topicmap = load_topicmap(topicmap_id)
     }
-
-    /**
-     * Selects a topicmap programmatically.
-     * The respective item from the topicmap menu is selected and the topicmap is displayed on the canvas.
-     */
-    this.select_topicmap = function(topicmap_id) {
-        select_topicmap(topicmap_id)
-    }
-
-    /**
-     * Reloads a topicmap from DB and displays it on the canvas.
-     *
-     * Prerequisite: the topicmap is already selected in the topicmap menu.
-     */
-    this.refresh_topicmap = function(topicmap_id) {
-        delete topicmaps[topicmap_id]
-        display_topicmap(topicmap_id)
-    }
-
-    // ----------------------------------------------------------------------------------------------- Private Functions
 
     function get_all_topicmaps() {
         return dm3c.restc.get_topics("dm3.topicmaps.topicmap", true)    // sort=true
+    }
+
+    /**
+     * Loads a topicmap from DB and caches it.
+     * If already in cache, the cached topicmap is returned.
+     *
+     * @return  a Topicmap object
+     */
+    function load_topicmap(topicmap_id) {
+        if (!topicmaps[topicmap_id]) {
+            // load from DB
+            topicmaps[topicmap_id] = new Topicmap(topicmap_id)
+        }
+        //
+        return topicmaps[topicmap_id]
+    }
+
+    /**
+     * Creates a new empty topicmap in the DB.
+     */
+    function create_topicmap_topic(name) {
+        if (LOG_TOPICMAPS) dm3c.log("Creating topicmap \"" + name + "\"")
+        var topicmap = dm3c.create_topic("dm3.topicmaps.topicmap", {"dm3.topicmaps.name": name})
+        if (LOG_TOPICMAPS) dm3c.log("..... " + topicmap.id)
+        return topicmap
+    }
+
+
+
+    /************/
+    /*** View ***/
+    /************/
+
+
+
+    /**
+     * Displays the selected topicmap on the canvas.
+     *
+     * Prerequisite: the topicmap is already selected in the topicmap menu.
+     */
+    function display_topicmap() {
+        topicmap.display_on_canvas()
+    }
+
+    // ---
+
+    /**
+     * Selects an item from the topicmap menu.
+     */
+    function select_menu_item(topicmap_id) {
+        dm3c.ui.select_menu_item("topicmap-menu", topicmap_id)
     }
 
     /**
@@ -262,81 +399,15 @@ function topicmaps_plugin() {
         }
     }
 
+    // ---
+
     function open_topicmap_dialog() {
         $("#topicmap_dialog").dialog("open")
     }
 
-    function do_create_topicmap() {
-        $("#topicmap_dialog").dialog("close")
-        var name = $("#topicmap_name").val()
-        create_topicmap(name)
-        return false
-    }
 
-    /**
-     * Invoked when the user made a selection from the topicmap menu.
-     */
-    function do_select_topicmap(menu_item) {
-        var topicmap_id = menu_item.value
-        if (topicmap_id == "_new") {
-            open_topicmap_dialog()
-        } else {
-            display_topicmap(topicmap_id)
-        }
-    }
 
-    // ---
-
-    /**
-     * Creates a topicmap with the given name, puts it in the topicmap menu, and displays the topicmap.
-     *
-     * High-level method called from public API.
-     *
-     * @return  the topicmap topic.
-     */
-    function create_topicmap(name) {
-        var topicmap = create_topicmap_topic(name)
-        rebuild_topicmap_menu(topicmap.id)
-        display_topicmap(topicmap.id)
-        return topicmap
-    }
-
-    /**
-     * Creates a new empty topicmap in the DB.
-     */
-    function create_topicmap_topic(name) {
-        if (LOG_TOPICMAPS) dm3c.log("Creating topicmap \"" + name + "\"")
-        var topicmap = dm3c.create_topic("dm3.topicmaps.topicmap", {"dm3.topicmaps.name": name})
-        if (LOG_TOPICMAPS) dm3c.log("..... " + topicmap.id)
-        return topicmap
-    }
-
-    /**
-     * Selects a topicmap programmatically.
-     * The respective item from the topicmap menu is selected and the topicmap is displayed on the canvas.
-     *
-     * High-level method called from public API.
-     */
-    function select_topicmap(topicmap_id) {
-        select_menu_item(topicmap_id)
-        display_topicmap(topicmap_id)
-    }
-
-    /**
-     * Displays a topicmap on the canvas.
-     * If not already in cache, the topicmap is loaded and put in the cache.
-     *
-     * Updates global state: "topicmap", the selected topicmap.
-     *
-     * Prerequisite: the topicmap is already selected in the topicmap menu.
-     */
-    function display_topicmap(topicmap_id) {
-        if (LOG_TOPICMAPS) dm3c.log("Selecting topicmap " + topicmap_id)
-        topicmap = get_topicmap(topicmap_id)    // update global state
-        topicmap.display_on_canvas()
-    }
-
-    // ---
+    // ----------------------------------------------------------------------------------------------- Private Functions
 
     /**
      * @param   topicmap_id     Optional: ID of the topicmap to select.
@@ -365,27 +436,7 @@ function topicmaps_plugin() {
         select_menu_item(topicmap_id)
     }
 
-    /**
-     * Selects an item from the topicmap menu.
-     */
-    function select_menu_item(topicmap_id) {
-        dm3c.ui.select_menu_item("topicmap-menu", topicmap_id)
-    }
 
-    /**
-     * Loads a topicmap from DB, and returns it.
-     *
-     * If already in cache, the cached topicmap is returned.
-     * If not already in cache, the topicmap is loaded from DB and put in the cache.
-     */
-    function get_topicmap(topicmap_id) {
-        // load topicmap on-demand
-        if (!topicmaps[topicmap_id]) {
-            topicmaps[topicmap_id] = new Topicmap(topicmap_id)
-        }
-        //
-        return topicmaps[topicmap_id]
-    }
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
@@ -401,7 +452,9 @@ function topicmaps_plugin() {
         // Model
         var topics = {}     // topics of this topicmap (key: topic ID, value: TopicmapTopic object)
         var assocs = {}     // associations of this topicmap (key: association ID, value: TopicmapAssociation object)
-
+        var selected_object_id = -1     // ID of the selected topic or association, or -1 for no selection
+        var is_topic_selected           // true indicates topic selection, false indicates association selection
+                                        // only evaluated if there is a selection (selected_object_id != -1)
         load()
 
         // --- Public API ---
@@ -423,26 +476,50 @@ function topicmaps_plugin() {
             image_tracker.check()
 
             function display_on_canvas() {
+
                 dm3c.canvas.clear()
-                for (var id in topics) {
-                    var topic = topics[id]
-                    if (topic.visibility) {
+                display_topics()
+                display_associations()
+                dm3c.canvas.refresh()
+                //
+                restore_selection()
+
+                function display_topics() {
+                    for (var id in topics) {
+                        var topic = topics[id]
+                        if (!topic.visibility) {
+                            continue
+                        }
                         // Note: canvas.add_topic() expects an topic object with "value" property (not "label")
                         var t = {id: topic.id, type_uri: topic.type_uri, value: topic.label, x: topic.x, y: topic.y}
                         dm3c.canvas.add_topic(t)
                     }
                 }
-                for (var id in assocs) {
-                    var assoc = assocs[id]
-                    var a = {
-                        id: assoc.id,
-                        type_uri: assoc.type_uri,
-                        role_1: {topic_id: assoc.topic_id_1},
-                        role_2: {topic_id: assoc.topic_id_2}
+
+                function display_associations() {
+                    for (var id in assocs) {
+                        var assoc = assocs[id]
+                        var a = {
+                            id: assoc.id,
+                            type_uri: assoc.type_uri,
+                            role_1: {topic_id: assoc.topic_id_1},
+                            role_2: {topic_id: assoc.topic_id_2}
+                        }
+                        dm3c.canvas.add_association(a)
                     }
-                    dm3c.canvas.add_association(a)
                 }
-                dm3c.canvas.refresh()
+
+                function restore_selection() {
+                    if (selected_object_id != -1) {
+                        if (is_topic_selected) {
+                            dm3c.do_select_topic(selected_object_id)
+                        } else {
+                            dm3c.do_select_association(selected_object_id)
+                        }
+                    } else {
+                        dm3c.do_reset_selection()
+                    }
+                }
             }
         }
 
@@ -458,7 +535,7 @@ function topicmaps_plugin() {
             } else if (!topic.visibility) {
                 if (LOG_TOPICMAPS)
                     dm3c.log("Showing topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id)
-                topic.set_visibility(true)
+                topic.show()
             } else {
                 if (LOG_TOPICMAPS)
                     dm3c.log("Topic " + id + " (\"" + label + "\") already visible in topicmap " + topicmap_id)
@@ -487,12 +564,13 @@ function topicmaps_plugin() {
         this.hide_topic = function(id) {
             var topic = topics[id]
             if (LOG_TOPICMAPS) dm3c.log("Hiding topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id)
-            topic.set_visibility(false)
+            topic.hide()
         }
 
         this.hide_association = function(id) {
-            if (LOG_TOPICMAPS) dm3c.log("Removing association " + id + " from topicmap " + topicmap_id)
-            assocs[id].remove()
+            var assoc = assocs[id]
+            if (LOG_TOPICMAPS) dm3c.log("Hiding association " + id + " from topicmap " + topicmap_id)
+            assoc.hide()
         }
 
         /**
@@ -519,14 +597,31 @@ function topicmaps_plugin() {
         }
 
         this.delete_topic = function(id) {
-            // Note: all topic references are deleted already
-            delete topics[id]
+            var topic = topics[id]
+            if (topic) {
+                if (LOG_TOPICMAPS) dm3c.log("Removing topic " + id + " (\"" + topic.label + "\") from topicmap " +
+                    topicmap_id)
+                topic.remove()
+            }
         }
 
         this.delete_association = function(id) {
-            if (LOG_TOPICMAPS) dm3c.log("Removing association " + id + " from topicmap " + topicmap_id +
-                " (part of delete operation)")
-            delete assocs[id]
+            var assoc = assocs[id]
+            if (assoc) {
+                if (LOG_TOPICMAPS) dm3c.log("Removing association " + id + " from topicmap " + topicmap_id +
+                    " (part of delete operation)")
+                assoc.remove()
+            }
+        }
+
+        this.set_topic_selection = function(topic) {
+            selected_object_id = topic.id
+            is_topic_selected = true
+        }
+
+        this.set_association_selection = function(assoc) {
+            selected_object_id = assoc.id
+            is_topic_selected = false
         }
 
         this.get_topic = function(id) {
@@ -586,6 +681,17 @@ function topicmaps_plugin() {
                                     // ### FIXME: the ref_id should be removed from the client-side model.
                                     // ### TODO: extend topicmaps REST API instead of exposing internals.
 
+            var self = this
+
+            this.show = function() {
+                set_visibility(true)
+            }
+
+            this.hide = function() {
+                set_visibility(false)
+                reset_selection()
+            }
+
             this.move_to = function(x, y) {
                 // update DB ### TODO: extend topicmaps REST API instead of operating on the DB directly
                 dm3c.restc.update_association({id: ref_id, composite: {"dm3.topicmaps.x": x, "dm3.topicmaps.y": y}})
@@ -594,18 +700,32 @@ function topicmaps_plugin() {
                 this.y = y
             }
 
-            this.set_visibility = function(visibility) {
-                // update DB ### TODO: extend topicmaps REST API instead of operating on the DB directly
-                dm3c.restc.update_association({id: ref_id, composite: {"dm3.topicmaps.visibility": visibility}})
-                // update memory
-                this.visibility = visibility
-            }
-
             /**
              * @param   topic   a Topic object
              */
             this.update = function(topic) {
                 this.label = topic.value
+            }
+
+            this.remove = function() {
+                // Note: all topic references are deleted already
+                delete topics[id]
+                reset_selection()
+            }
+
+            // ---
+
+            function set_visibility(visibility) {
+                // update DB ### TODO: extend topicmaps REST API instead of operating on the DB directly
+                dm3c.restc.update_association({id: ref_id, composite: {"dm3.topicmaps.visibility": visibility}})
+                // update memory
+                self.visibility = visibility
+            }
+
+            function reset_selection() {
+                if (is_topic_selected && selected_object_id == id) {
+                    selected_object_id = -1
+                }
             }
         }
 
@@ -620,11 +740,12 @@ function topicmaps_plugin() {
                                     // ### FIXME: the ref_id should be removed from the client-side model.
                                     // ### TODO: extend topicmaps REST API instead of exposing internals.
 
-            this.remove = function() {
+            this.hide = function() {
                 // update DB
                 dm3c.restc.remove_association_from_topicmap(topicmap_id, id, ref_id)
                 // update memory
                 delete assocs[id]
+                reset_selection()
             }
 
             /**
@@ -632,6 +753,19 @@ function topicmaps_plugin() {
              */
             this.update = function(assoc) {
                 this.type_uri = assoc.type_uri
+            }
+
+            this.remove = function() {
+                delete assocs[id]
+                reset_selection()
+            }
+
+            // ---
+
+            function reset_selection() {
+                if (!is_topic_selected && selected_object_id == id) {
+                    selected_object_id = -1
+                }
             }
         }
     }

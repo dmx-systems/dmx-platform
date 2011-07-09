@@ -47,42 +47,52 @@ var dm3c = new function() {
 
     /**
      * Fetches the topic and displays it on the page panel.
+     * Triggers the "post_select_topic" hook (indirectly).
      */
     this.do_select_topic = function(topic_id) {
-        var topic = dm3c.fetch_topic(topic_id)
         // update model
-        set_selected_object(topic)
+        var topic = dm3c.fetch_topic(topic_id)
+        set_selected_topic(topic)
         // update view
-        dm3c.canvas.set_highlight_topic(topic_id, true)         // refresh_canvas=true
+        dm3c.canvas.set_highlight_object(topic_id, true)    // refresh_canvas=true
         dm3c.page_panel.display(topic)
         // Note: the show_topic() helper is not called here
     }
 
     /**
      * Fetches the association and displays it on the page panel.
+     * Triggers the "post_select_association" hook (indirectly).
      */
     this.do_select_association = function(assoc_id) {
-        var assoc = dm3c.fetch_association(assoc_id)
         // update model
-        set_selected_object(assoc)
+        var assoc = dm3c.fetch_association(assoc_id)
+        set_selected_association(assoc)
         // update view
-        dm3c.canvas.set_highlight_association(assoc_id, true)   // refresh_canvas=true
+        dm3c.canvas.set_highlight_object(assoc_id, true)    // refresh_canvas=true
         dm3c.page_panel.display(assoc)
+    }
+
+    this.do_reset_selection = function() {
+        // update model
+        dm3c.selected_object = null
+        // update GUI
+        dm3c.page_panel.clear()
     }
 
     // ---
 
     /**
      * Reveals a topic that is related to the selected topic.
+     * Triggers the "pre_show_topic" and "post_show_topic" hooks.
+     * Triggers the "post_show_association" hook (for each association).
      */
     this.do_reveal_related_topic = function(topic_id) {
-        // retrieve from DB
+        // update model
         var assocs = dm3c.restc.get_associations(dm3c.selected_object.id, topic_id)
-        // update canvas
+        // update view
         for (var i = 0, assoc; assoc = assocs[i]; i++) {
             dm3c.show_association(assoc)
         }
-        // update page panel
         dm3c.show_topic(dm3c.fetch_topic(topic_id), "show")
         dm3c.canvas.scroll_topic_to_center(topic_id)
     }
@@ -166,7 +176,7 @@ var dm3c = new function() {
 
     /**
      * Updates an association in the DB and on the GUI.
-     * Triggers the "post_update_association" hook.
+     * Triggers the "post_update_association" hook (indirectly).
      *
      * @param   old_assoc   the association that is about to be updated. ### FIXME: This "old" version is passed to the
      *                      post_update_topic hook to let plugins compare the old and new ones.
@@ -185,6 +195,7 @@ var dm3c = new function() {
 
     /**
      * Updates a topic type in the DB and on the GUI.
+     * Triggers the "post_update_topic" hook.
      *
      * ### FIXME: move to topictype editor module?
      */
@@ -250,15 +261,15 @@ var dm3c = new function() {
         var do_select = action != "none"
         // update model
         if (do_select) {
-            set_selected_object(topic)
+            set_selected_topic(topic)
         }
         // update canvas
-        dm3c.trigger_plugin_hook("pre_show_topic", topic)   // trigger hook
+        dm3c.trigger_plugin_hook("pre_show_topic", topic)       // trigger hook
         dm3c.canvas.add_topic(topic)
         if (do_select) {
-            dm3c.canvas.set_highlight_topic(topic.id, true) // refresh_canvas=true
+            dm3c.canvas.set_highlight_object(topic.id, true)    // refresh_canvas=true
         }
-        dm3c.trigger_plugin_hook("post_show_topic", topic)  // trigger hook
+        dm3c.trigger_plugin_hook("post_show_topic", topic)      // trigger hook
         // update page panel
         switch (action) {
         case "none":
@@ -339,8 +350,7 @@ var dm3c = new function() {
             dm3c.trigger_plugin_hook(assoc_hook_name, assocs[i])    // trigger hook
         }
         // remove topic
-        dm3c.canvas.remove_topic(topic.id, true)            // refresh_canvas=true
-        dm3c.trigger_plugin_hook(topic_hook_name, topic)    // trigger hook
+        dm3c.canvas.remove_topic(topic.id, true)                    // refresh_canvas=true
         //
         // 2) update page panel
         if (topic.id == dm3c.selected_object.id) {
@@ -352,6 +362,8 @@ var dm3c = new function() {
             alert("WARNING: removed topic which was not selected\n" +
                 "(removed=" + topic.id + " selected=" + dm3c.selected_object.id + ")")
         }
+        // trigger hook
+        dm3c.trigger_plugin_hook(topic_hook_name, topic)
     }
 
     /**
@@ -440,6 +452,20 @@ var dm3c = new function() {
         dm3c.trigger_plugin_hook("post_create_topic", topic_type)
         //
         return topic_type
+    }
+
+    // ---
+
+    function set_selected_topic(topic) {
+        dm3c.selected_object = topic
+        // trigger hook
+        dm3c.trigger_plugin_hook("post_select_topic", topic)
+    }
+
+    function set_selected_association(assoc) {
+        dm3c.selected_object = assoc
+        // trigger hook
+        dm3c.trigger_plugin_hook("post_select_association", assoc)
     }
 
 
@@ -856,12 +882,6 @@ var dm3c = new function() {
 
     function build_association_type(assoc_type) {
         return new AssociationType(assoc_type)
-    }
-
-    // === Model ===
-
-    function set_selected_object(object) {
-        dm3c.selected_object = object
     }
 
     // === GUI ===

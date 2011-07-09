@@ -20,8 +20,7 @@ function Canvas() {
     var canvas_topics               // topics displayed on canvas (Object, key: topic ID, value: CanvasTopic)
     var canvas_assocs               // associations displayed on canvas (Object, key: assoc ID, value: CanvasAssoc)
     var trans_x, trans_y            // canvas translation (in pixel)
-    var highlight_topic_id          // ID of the highlighted topic, if any
-    var highlight_assoc_id          // ID of the highlighted association, if any
+    var highlight_object_id         // ID of the highlighted topic or association, or -1 for no highlighting
     var grid_positioning            // while grid positioning is in progress: a GridPositioning object, null otherwise
 
     // View (Canvas)
@@ -93,6 +92,8 @@ function Canvas() {
         }
     }
 
+    // ---
+
     this.update_topic = function(topic, refresh_canvas) {
         get_topic(topic.id).update(topic)
         // refresh GUI
@@ -110,12 +111,18 @@ function Canvas() {
         }
     }
 
+    // ---
+
     this.remove_topic = function(id, refresh_canvas) {
         // 1) update model
         var ct = remove_topic(id)
         // error check
         if (!ct) {
             throw "remove_topic: topic not on canvas (" + id + ")"
+        }
+        //
+        if (highlight_object_id == id) {
+            this.reset_highlight_object()
         }
         // 2) refresh GUI
         ct.label_div.remove()
@@ -140,8 +147,8 @@ function Canvas() {
             // throw "remove_association: association not on canvas (" + id + ")"
         }
         //
-        if (highlight_assoc_id == id) {
-            highlight_assoc_id = -1
+        if (highlight_object_id == id) {
+            this.reset_highlight_object()
         }
         // 2) refresh GUI
         if (refresh_canvas) {
@@ -149,39 +156,31 @@ function Canvas() {
         }
     }
 
+    // ---
+
+    this.set_highlight_object = function(object_id, refresh_canvas) {
+        // update model
+        highlight_object_id = object_id
+        // refresh GUI
+        if (refresh_canvas) {
+            this.refresh()
+        }
+    }
+
+    this.reset_highlight_object = function(refresh_canvas) {
+        // update model
+        highlight_object_id = -1
+        // refresh GUI
+        if (refresh_canvas) {
+            this.refresh()
+        }
+    }
+
+    // ---
+
     this.scroll_topic_to_center = function(topic_id) {
         var ct = get_topic(topic_id)
         scroll_to_center(ct.x + trans_x, ct.y + trans_y)
-    }
-
-    // ---
-
-    this.set_highlight_topic = function(topic_id, refresh_canvas) {
-        highlight_topic_id = topic_id
-        highlight_assoc_id = -1
-        // refresh GUI
-        if (refresh_canvas) {
-            this.refresh()
-        }
-    }
-
-    this.set_highlight_association = function(assoc_id, refresh_canvas) {
-        highlight_topic_id = -1
-        highlight_assoc_id = assoc_id
-        // refresh GUI
-        if (refresh_canvas) {
-            this.refresh()
-        }
-    }
-
-    // ---
-
-    this.refresh = function() {
-        draw()
-    }
-
-    this.close_context_menu = function() {
-        close_context_menu()
     }
 
     this.begin_association = function(topic_id, event) {
@@ -203,6 +202,10 @@ function Canvas() {
         return assocs
     }
 
+    this.refresh = function() {
+        draw()
+    }
+
     this.clear = function() {
         // refresh GUI
         translate(-trans_x, -trans_y)                       // reset translation
@@ -213,6 +216,10 @@ function Canvas() {
 
     this.resize = function() {
         resize_canvas()
+    }
+
+    this.close_context_menu = function() {
+        close_context_menu()
     }
 
     // --- Grid Positioning ---
@@ -254,7 +261,7 @@ function Canvas() {
             var h = ct.icon.height
             try {
                 // hightlight
-                var is_highlight = highlight_topic_id == ct.id
+                var is_highlight = highlight_object_id == ct.id
                 set_highlight_style(is_highlight)
                 //
                 ctx.drawImage(ct.icon, ct.x - w / 2, ct.y - h / 2)
@@ -280,7 +287,7 @@ function Canvas() {
                 return
             }
             // hightlight
-            var is_highlight = highlight_assoc_id == ca.id
+            var is_highlight = highlight_object_id == ca.id
             set_highlight_style(is_highlight)
             //
             draw_line(ct1.x, ct1.y, ct2.x, ct2.y, ASSOC_WIDTH, ca.color)
@@ -474,7 +481,7 @@ function Canvas() {
     function end_topic_move() {
         topic_move_in_progress = false
         // trigger hook
-        dm3c.trigger_plugin_hook("post_move_topic_on_canvas", action_topic)
+        dm3c.trigger_plugin_hook("post_move_topic", action_topic)
     }
 
     function end_canvas_move() {
@@ -586,6 +593,7 @@ function Canvas() {
     function init_model() {
         canvas_topics = {}
         canvas_assocs = {}
+        highlight_object_id = -1
         trans_x = 0, trans_y = 0
     }
 
