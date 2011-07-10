@@ -23,9 +23,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void getTopicType() {
         TopicType topicType = dms.getTopicType("dm3.core.plugin", null);  // clientContext=null
         logger.info(topicType.toString());
-        assertTrue(topicType.toString().matches("topic type model \\(id=\\d+, uri=\"dm3.core.plugin\", value=Plugin, " +
+        assertTrue(topicType.toString().matches("topic type \\(id=\\d+, uri=\"dm3.core.plugin\", value=Plugin, " +
             "typeUri=\"dm3.core.topic_type\", dataTypeUri=\"dm3.core.composite\", indexModes=\\[\\], assocDefs=" +
-            "\\{dm3.core.plugin_migration_nr=\n    association definition \\(association model \\(id=\\d+, uri=\"dm3." +
+            "\\{dm3.core.plugin_migration_nr=\n    association definition \\(association \\(id=\\d+, uri=\"dm3." +
             "core.plugin_migration_nr\", value=, typeUri=\"dm3.core.composition_def\", composite=\\{\\}, roleModel1=" +
             "\n        topic role \\(roleTypeUri=\"dm3.core.whole_topic_type\", topicId=-1, topicUri=\"dm3.core." +
             "plugin\", topicIdentifiedByUri=true\\), roleModel2=\n        topic role \\(roleTypeUri=\"dm3.core.part_" +

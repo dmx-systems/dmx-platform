@@ -114,8 +114,7 @@ public class AssociationModel extends DeepaMehtaObjectModel {
 
     @Override
     public String toString() {
-        return "association model (" + super.toString() +
-            ", roleModel1=" + roleModel1 + ", roleModel2=" + roleModel2 + ")";
+        return "association (" + super.toString() + ", roleModel1=" + roleModel1 + ", roleModel2=" + roleModel2 + ")";
     }
 
 

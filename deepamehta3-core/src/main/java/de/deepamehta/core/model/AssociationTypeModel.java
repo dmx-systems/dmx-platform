@@ -36,6 +36,6 @@ public class AssociationTypeModel extends TypeModel {
 
     @Override
     public String toString() {
-        return "association type model (" + super.toString() + ")";
+        return "association type (" + super.toString() + ")";
     }
 }

@@ -44,6 +44,6 @@ public class TopicTypeModel extends TypeModel {
 
     @Override
     public String toString() {
-        return "topic type model (" + super.toString() + ")";
+        return "topic type (" + super.toString() + ")";
     }
 }

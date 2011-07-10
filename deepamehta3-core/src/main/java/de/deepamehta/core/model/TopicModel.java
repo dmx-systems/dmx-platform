@@ -52,6 +52,6 @@ public class TopicModel extends DeepaMehtaObjectModel {
 
     @Override
     public String toString() {
-        return "topic model (" + super.toString() + ")";
+        return "topic (" + super.toString() + ")";
     }
 }

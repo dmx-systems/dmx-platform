@@ -325,6 +325,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Path("/association/{id}")
     @Override
     public AttachedAssociation getAssociation(@PathParam("id") long assocId) {
+        logger.info("assocId=" + assocId);
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedAssociation assoc = attach(storage.getAssociation(assocId));
