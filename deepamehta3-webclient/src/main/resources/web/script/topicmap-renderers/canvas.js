@@ -55,7 +55,16 @@ function Canvas() {
      */
     this.add_topic = function(topic, refresh_canvas) {
         if (!topic_exists(topic.id)) {
-            // positioning
+            // update model
+            find_position()
+            add_topic(new CanvasTopic(topic))
+        }
+        // refresh GUI
+        if (refresh_canvas) {
+            this.refresh()
+        }
+
+        function find_position() {
             if (topic.x == undefined && topic.y == undefined) {
                 if (grid_positioning) {
                     var pos = grid_positioning.next_position()
@@ -66,12 +75,6 @@ function Canvas() {
                     topic.y = Math.floor(self.canvas_height * Math.random()) - trans_y
                 }
             }
-            // update model
-            add_topic(new CanvasTopic(topic))
-        }
-        // refresh GUI
-        if (refresh_canvas) {
-            this.refresh()
         }
     }
 
@@ -113,17 +116,19 @@ function Canvas() {
 
     // ---
 
+    /**
+     * Removes a topic from the canvas (model) and optionally refreshes the canvas (view).
+     * If the topic is not present on the canvas nothing is performed.
+     *
+     * @param   refresh_canvas  Optional - if true, the canvas is refreshed.
+     */
     this.remove_topic = function(id, refresh_canvas) {
         // 1) update model
         var ct = remove_topic(id)
-        // error check
         if (!ct) {
-            throw "remove_topic: topic not on canvas (" + id + ")"
+            return
         }
-        //
-        if (highlight_object_id == id) {
-            this.reset_highlight_object()
-        }
+        reset_highlight_object(id)
         // 2) refresh GUI
         ct.label_div.remove()
         if (refresh_canvas) {
@@ -140,16 +145,10 @@ function Canvas() {
     this.remove_association = function(id, refresh_canvas) {
         // 1) update model
         var ca = remove_association(id)
-        // Note: it is not an error if the association is not present on the canvas. This can happen
-        // for prgrammatically deleted associations, e.g. when updating a data field of type "reference".
         if (!ca) {
             return
-            // throw "remove_association: association not on canvas (" + id + ")"
         }
-        //
-        if (highlight_object_id == id) {
-            this.reset_highlight_object()
-        }
+        reset_highlight_object(id)
         // 2) refresh GUI
         if (refresh_canvas) {
             this.refresh()
@@ -161,15 +160,6 @@ function Canvas() {
     this.set_highlight_object = function(object_id, refresh_canvas) {
         // update model
         highlight_object_id = object_id
-        // refresh GUI
-        if (refresh_canvas) {
-            this.refresh()
-        }
-    }
-
-    this.reset_highlight_object = function(refresh_canvas) {
-        // update model
-        highlight_object_id = -1
         // refresh GUI
         if (refresh_canvas) {
             this.refresh()
@@ -590,15 +580,6 @@ function Canvas() {
 
     // === Model Helper ===
 
-    function init_model() {
-        canvas_topics = {}
-        canvas_assocs = {}
-        highlight_object_id = -1
-        trans_x = 0, trans_y = 0
-    }
-
-    // ---
-
     function get_topic(id) {
         return canvas_topics[id]
     }
@@ -652,6 +633,21 @@ function Canvas() {
             if (ret) {
                 return ret
             }
+        }
+    }
+
+    // ---
+
+    function init_model() {
+        canvas_topics = {}
+        canvas_assocs = {}
+        highlight_object_id = -1
+        trans_x = 0, trans_y = 0
+    }
+
+    function reset_highlight_object(object_id) {
+        if (highlight_object_id == object_id) {
+            highlight_object_id = -1
         }
     }
 
@@ -758,6 +754,8 @@ function Canvas() {
         }
         return event.layerY + (as_canvas_coordinate ? -trans_y : 0) + offset
     }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 

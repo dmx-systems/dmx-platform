@@ -2,7 +2,7 @@ function topicmaps_plugin() {
 
     dm3c.register_css_stylesheet("/de.deepamehta.3-topicmaps/style/topicmaps.css")
 
-    var LOG_TOPICMAPS = true
+    var LOG_TOPICMAPS = false
 
     // model
     var topicmaps = {}  // The topicmaps cache (key: topicmap ID, value: Topicmap object)
@@ -557,13 +557,15 @@ function topicmaps_plugin() {
 
         this.move_topic = function(id, x, y) {
             var topic = topics[id]
-            if (LOG_TOPICMAPS) dm3c.log("Moving topic " + id + " (\"" + topic.label + "\") to x=" + x + ", y=" + y)
+            if (LOG_TOPICMAPS) dm3c.log("Moving topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id
+                + " to x=" + x + ", y=" + y)
             topic.move_to(x, y)
         }
 
         this.hide_topic = function(id) {
             var topic = topics[id]
-            if (LOG_TOPICMAPS) dm3c.log("Hiding topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id)
+            if (LOG_TOPICMAPS) dm3c.log("Hiding topic " + id + " (\"" + topic.label + "\") from topicmap " +
+                topicmap_id)
             topic.hide()
         }
 
@@ -579,7 +581,7 @@ function topicmaps_plugin() {
         this.update_topic = function(topic) {
             var t = topics[topic.id]
             if (t) {
-                if (LOG_TOPICMAPS) dm3c.log("Updating topic " + t.id + " (\"" + t.label + "\") on topicmap " +
+                if (LOG_TOPICMAPS) dm3c.log("..... Updating topic " + t.id + " (\"" + t.label + "\") on topicmap " +
                     topicmap_id)
                 t.update(topic)
             }
@@ -591,7 +593,7 @@ function topicmaps_plugin() {
         this.update_association = function(assoc) {
             var a = assocs[assoc.id]
             if (a) {
-                if (LOG_TOPICMAPS) dm3c.log("Updating association " + a.id + " on topicmap " + topicmap_id)
+                if (LOG_TOPICMAPS) dm3c.log("..... Updating association " + a.id + " on topicmap " + topicmap_id)
                 a.update(assoc)
             }
         }
@@ -599,7 +601,7 @@ function topicmaps_plugin() {
         this.delete_topic = function(id) {
             var topic = topics[id]
             if (topic) {
-                if (LOG_TOPICMAPS) dm3c.log("Removing topic " + id + " (\"" + topic.label + "\") from topicmap " +
+                if (LOG_TOPICMAPS) dm3c.log("..... Deleting topic " + id + " (\"" + topic.label + "\") from topicmap " +
                     topicmap_id)
                 topic.remove()
             }
@@ -608,8 +610,7 @@ function topicmaps_plugin() {
         this.delete_association = function(id) {
             var assoc = assocs[id]
             if (assoc) {
-                if (LOG_TOPICMAPS) dm3c.log("Removing association " + id + " from topicmap " + topicmap_id +
-                    " (part of delete operation)")
+                if (LOG_TOPICMAPS) dm3c.log("..... Deleting association " + id + " from topicmap " + topicmap_id)
                 assoc.remove()
             }
         }

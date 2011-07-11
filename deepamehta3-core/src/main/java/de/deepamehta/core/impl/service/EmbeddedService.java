@@ -302,13 +302,18 @@ public class EmbeddedService implements DeepaMehtaService {
     @DELETE
     @Path("/topic/{id}")
     @Override
-    public void deleteTopic(@PathParam("id") long topicId, @HeaderParam("Cookie") ClientContext clientContext) {
+    public Directives deleteTopic(@PathParam("id") long topicId, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         Topic topic = null;
         try {
             topic = getTopic(topicId, true, clientContext);   // fetchComposite=true ### false?
-            topic.delete();
+            //
+            Directives directives = new Directives();
+            //
+            topic.delete(directives);
+            //
             tx.success();
+            return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting topic " + topicId + " failed (" + topic + ")", e);
@@ -432,10 +437,9 @@ public class EmbeddedService implements DeepaMehtaService {
             assoc = getAssociation(assocId);
             //
             Directives directives = new Directives();
-            directives.add(Directive.DELETE_ASSOCIATION, assoc);
             //
             triggerHook(Hook.PRE_DELETE_ASSOCIATION, assoc, directives);
-            assoc.delete();
+            assoc.delete(directives);
             triggerHook(Hook.POST_DELETE_ASSOCIATION, assoc, directives);
             //
             tx.success();

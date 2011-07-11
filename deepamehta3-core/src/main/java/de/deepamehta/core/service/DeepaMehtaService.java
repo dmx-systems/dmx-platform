@@ -76,7 +76,7 @@ public interface DeepaMehtaService {
 
     public Topic updateTopic(TopicModel topicModel, ClientContext clientContext);
 
-    public void deleteTopic(long topicId, ClientContext clientContext);
+    public Directives deleteTopic(long topicId, ClientContext clientContext);
 
 
 

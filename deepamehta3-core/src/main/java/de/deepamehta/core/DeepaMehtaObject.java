@@ -2,6 +2,7 @@ package de.deepamehta.core;
 
 import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.model.TopicValue;
+import de.deepamehta.core.service.Directives;
 
 import java.util.List;
 import java.util.Set;
@@ -101,5 +102,5 @@ public interface DeepaMehtaObject extends JSONEnabled {
      * - all sub-topics associated via "dm3.core.composition" (the <i>parts</i>), recusively
      * - all the remaining direct associations, e.g. "dm3.core.instantiation"
      */
-    void delete();
+    void delete(Directives directives);
 }

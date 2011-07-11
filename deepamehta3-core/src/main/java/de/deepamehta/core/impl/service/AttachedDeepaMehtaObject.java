@@ -15,6 +15,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.util.JavaUtils;
+import de.deepamehta.core.service.Directives;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -217,17 +218,17 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      * Note: deletion of the object itself is up to the subclasses.
      */
     @Override
-    public void delete() {
+    public void delete(Directives directives) {
         // 1) recursively delete sub-topics
         Set<RelatedTopic> partTopics = getRelatedTopics("dm3.core.composition",
             "dm3.core.whole", "dm3.core.part", null, false, false);
         for (Topic partTopic : partTopics) {
-            partTopic.delete();
+            partTopic.delete(directives);
         }
         // 2) delete direct associations
         for (Association assoc : getAssociations()) {
             try {
-                assoc.delete();
+                assoc.delete(directives);
             } catch (IllegalStateException e) {
                 // Note: this can happen in a particular situation and is no problem: let A1 and A2 be direct
                 // associations of this DeepaMehta object and let A2 point to A1. If A1 gets deleted first

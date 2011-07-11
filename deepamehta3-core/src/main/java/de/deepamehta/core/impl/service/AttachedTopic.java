@@ -13,6 +13,8 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicValue;
+import de.deepamehta.core.service.Directive;
+import de.deepamehta.core.service.Directives;
 
 import java.util.List;
 import java.util.Set;
@@ -75,12 +77,13 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // === Deletion ===
 
     @Override
-    public void delete() {
+    public void delete(Directives directives) {
         // delete sub-topics and associations
-        super.delete();
+        super.delete(directives);
         // delete topic itself
         logger.info("Deleting " + this);
         dms.storage.deleteTopic(getId());
+        directives.add(Directive.DELETE_TOPIC, this);
     }
 
 

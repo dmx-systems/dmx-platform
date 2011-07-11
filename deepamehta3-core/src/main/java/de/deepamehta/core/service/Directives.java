@@ -27,7 +27,7 @@ public class Directives {
             JSONArray array = new JSONArray();
             for (Dir directive : directives) {
                 JSONObject dir = new JSONObject();
-                dir.put("type", directive.type.s());
+                dir.put("type", directive.type);
                 dir.put("arg",  directive.arg.toJSON());
                 array.put(dir);
             }

@@ -4,9 +4,10 @@ package de.deepamehta.core.service;
 
 public enum Directive {
 
-    UPDATE_ASSOCIATION, DELETE_ASSOCIATION, UPDATE_TOPIC_TYPE;
+    DELETE_TOPIC,
 
-    String s() {
-        return name().toLowerCase();
-    }
+    UPDATE_ASSOCIATION,
+    DELETE_ASSOCIATION,
+
+    UPDATE_TOPIC_TYPE
 }

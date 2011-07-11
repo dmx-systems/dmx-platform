@@ -59,7 +59,7 @@ function RESTClient(core_service_uri) {
     }
 
     this.delete_topic = function(id) {
-        request("DELETE", "/topic/" + id)
+        return request("DELETE", "/topic/" + id)
     }
 
 

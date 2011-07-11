@@ -73,10 +73,7 @@ var dm3c = new function() {
     }
 
     this.do_reset_selection = function() {
-        // update model
-        dm3c.selected_object = null
-        // update GUI
-        dm3c.page_panel.clear()
+        reset_selection()
     }
 
     // ---
@@ -100,12 +97,17 @@ var dm3c = new function() {
     // ---
 
     /**
-     * Hides a topic and its visible associations from the view (canvas and page panel).
+     * Hides a topic and its visible direct associations from the view (canvas and page panel).
      * Triggers the "post_hide_topic" hook and the "post_hide_association" hook (several times).
      */
     this.do_hide_topic = function(topic) {
-        // update view
-        remove_topic(topic, "post_hide_topic", "post_hide_association")
+        var assocs = dm3c.canvas.get_associations(topic.id)
+        for (var i = 0; i < assocs.length; i++) {
+            dm3c.canvas.remove_association(assocs[i].id, false)             // refresh_canvas=false
+            dm3c.trigger_plugin_hook("post_hide_association", assocs[i])    // trigger hook
+        }
+        //
+        remove_topic(topic, "post_hide_topic")
     }
 
     /**
@@ -113,7 +115,6 @@ var dm3c = new function() {
      * Triggers the "post_hide_association" hook.
      */
     this.do_hide_association = function(assoc) {
-        // update view
         remove_association(assoc, "post_hide_association")
     }
 
@@ -217,10 +218,10 @@ var dm3c = new function() {
      * Triggers the "post_delete_topic" hook and the "post_delete_association" hook (several times).
      */
     this.do_delete_topic = function(topic) {
-        // update model
-        dm3c.restc.delete_topic(topic.id)
-        // update view
-        remove_topic(topic, "post_delete_topic", "post_delete_association")
+        // update DB
+        var directives = dm3c.restc.delete_topic(topic.id)
+        // update model and view
+        process_directives(directives)
     }
 
     /**
@@ -228,9 +229,9 @@ var dm3c = new function() {
      * Triggers the "post_delete_association" hook.
      */
     this.do_delete_association = function(assoc) {
-        // update model
+        // update DB
         var directives = dm3c.restc.delete_association(assoc.id)
-        // update view
+        // update model and view
         process_directives(directives)
     }
 
@@ -294,20 +295,25 @@ var dm3c = new function() {
     // ---
 
     /**
-     * Updates the view according to a set of directives received from server.
+     * Updates the model and view according to a set of directives received from server.
      */
     function process_directives(directives) {
+        // alert("process_directives: " + JSON.stringify(directives))
         for (var i = 0, directive; directive = directives[i]; i++) {
             switch (directive.type) {
-            case "update_association":
-                var assoc = build_association(directive.arg)
-                update_association(assoc)
+            case "DELETE_TOPIC":
+                var topic = build_topic(directive.arg)
+                remove_topic(topic, "post_delete_topic")
                 break
-            case "delete_association":
+            case "DELETE_ASSOCIATION":
                 var assoc = build_association(directive.arg)
                 remove_association(assoc, "post_delete_association")
                 break
-            case "update_topic_type":
+            case "UPDATE_ASSOCIATION":
+                var assoc = build_association(directive.arg)
+                update_association(assoc)
+                break
+            case "UPDATE_TOPIC_TYPE":
                 var topic_type = build_topic_type(directive.arg)
                 dm3c.type_cache.put_topic_type(topic_type)
                 break
@@ -315,6 +321,38 @@ var dm3c = new function() {
                 throw "UnknownDirectiveError: directive \"" + directive.type + "\" not implemented"
             }
         }
+    }
+
+    // ---
+
+    /**
+     * Removes an topic from the view (canvas and page panel).
+     * Triggers the hook.
+     *
+     * Used for both, hide and delete operations.
+     */
+    function remove_topic(topic, hook_name) {
+        // 1) update view (canvas)
+        dm3c.canvas.remove_topic(topic.id, true)            // refresh_canvas=true
+        // 2) update model and view (page panel)
+        reset_selection_conditionally(topic.id)
+        // trigger hook
+        dm3c.trigger_plugin_hook(hook_name, topic)
+    }
+
+    /**
+     * Removes an association from the view (canvas and page panel).
+     * Triggers the hook.
+     *
+     * Used for both, hide and delete operations.
+     */
+    function remove_association(assoc, hook_name) {
+        // 1) update view (canvas)
+        dm3c.canvas.remove_association(assoc.id, true)      // refresh_canvas=true
+        // 2) update model and view (page panel)
+        reset_selection_conditionally(assoc.id)
+        // trigger hook
+        dm3c.trigger_plugin_hook(hook_name, assoc)
     }
 
     // ---
@@ -335,58 +373,17 @@ var dm3c = new function() {
 
     // ---
 
-    /**
-     * Removes a topic and its visible associations from the view (canvas and page panel).
-     * Triggers the topic hook and the association hook (several times).
-     *
-     * Used for both, hide and delete operations.
-     */
-    function remove_topic(topic, topic_hook_name, assoc_hook_name) {
-        // 1) update canvas
-        var assocs = dm3c.canvas.get_associations(topic.id)
-        for (var i = 0; i < assocs.length; i++) {
-            // remove association
-            dm3c.canvas.remove_association(assocs[i].id, false)     // refresh_canvas=false
-            dm3c.trigger_plugin_hook(assoc_hook_name, assocs[i])    // trigger hook
+    function reset_selection_conditionally(object_id) {
+        if (object_id == dm3c.selected_object.id) {
+            reset_selection()
         }
-        // remove topic
-        dm3c.canvas.remove_topic(topic.id, true)                    // refresh_canvas=true
-        //
-        // 2) update page panel
-        if (topic.id == dm3c.selected_object.id) {
-            // update model
-            dm3c.selected_object = null
-            // update GUI
-            dm3c.page_panel.clear()
-        } else {
-            alert("WARNING: removed topic which was not selected\n" +
-                "(removed=" + topic.id + " selected=" + dm3c.selected_object.id + ")")
-        }
-        // trigger hook
-        dm3c.trigger_plugin_hook(topic_hook_name, topic)
     }
 
-    /**
-     * Removes an association from the view (canvas and page panel).
-     * Triggers the association hook.
-     *
-     * Used for both, hide and delete operations.
-     */
-    function remove_association(assoc, assoc_hook_name) {
-        // update canvas
-        dm3c.canvas.remove_association(assoc.id, true)      // refresh_canvas=true
-        dm3c.trigger_plugin_hook(assoc_hook_name, assoc)    // trigger hook
-        //
-        // update page panel
-        if (assoc.id == dm3c.selected_object.id) {
-            // update model
-            dm3c.selected_object = null
-            // update GUI
-            dm3c.page_panel.clear()
-        } else {
-            alert("WARNING: removed association which was not selected\n" +
-                "(removed=" + assoc.id + " selected=" + dm3c.selected_object.id + ")")
-        }
+    function reset_selection() {
+        // update model
+        dm3c.selected_object = null
+        // update view (page panel)
+        dm3c.page_panel.clear()
     }
 
 
