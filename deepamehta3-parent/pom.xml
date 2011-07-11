@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +14,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!-- All modules that belong to the DeepaMehta 3 standard installation. -->
     <dependencyManagement>
         <dependencies>
 
@@ -127,7 +127,7 @@
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
                 <artifactId>wagon-ssh-external</artifactId>
-                <version>1.0-beta-6</version>
+                <version>1.0</version>
             </extension>
         </extensions>
     </build>
@@ -147,6 +147,10 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>deepamehta-public-repository</id>
+            <url>http://www.deepamehta.de/maven2</url>
+        </repository>
     </repositories>
 
     <distributionManagement>
@@ -155,5 +159,4 @@
             <url>scpexe://www.deepamehta.de/var/lib/tomcat-6/webapps/ROOT/maven2</url>
         </repository>
     </distributionManagement>
-
 </project>
