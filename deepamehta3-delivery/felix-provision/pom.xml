@@ -30,7 +30,7 @@
             <artifactId>org.apache.felix.configadmin</artifactId>
             <version>1.2.8</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.gogo.command</artifactId>
             <version>0.6.1</version>
@@ -44,7 +44,7 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.gogo.shell</artifactId>
             <version>0.6.1</version>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>org.apache.felix</groupId>
