@@ -30,6 +30,8 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import java.util.logging.Logger;
 
+
+
 @RunWith(JUnit4TestRunner.class)
 public abstract class CoreServiceTest {
 
@@ -48,8 +50,8 @@ public abstract class CoreServiceTest {
     public static Option[] configuration() {
         return options(cleanCaches(), autoWrap(), //
                 systemProperty("org.osgi.service.http.port").value("8086"), //
-                systemProperty("deepamehta3.database.path").value("dm3-db"), //
-                scanPom("mvn:de.deepamehta/deepamehta3-third-party/0.4.5/pom"), //
+                systemProperty("dm3.database.path").value("dm3-db"), //
+                scanPom("mvn:de.deepamehta/3rd-party-bundles/0.5-SNAPSHOT/pom"), //
                 scanPom("mvn:de.deepamehta/deepamehta3-bundles/0.5-SNAPSHOT/pom"));
     }
 

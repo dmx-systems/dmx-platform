@@ -7,12 +7,6 @@ deepamehta-db/
 runner/
 target/
 
-deepamehta3.wiki/
-deepamehta3-foldercanvas/
-deepamehta3-importer/
-deepamehta3-topicimporter/
-dm3-freifunk-geomap/
-
 *~
 .project
 .classpath

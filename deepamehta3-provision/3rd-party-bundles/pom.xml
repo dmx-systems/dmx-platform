@@ -3,22 +3,19 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 3 Third Party Dependencies</name>
+    <name>3rd Party Bundles</name>
     <groupId>de.deepamehta</groupId>
-    <artifactId>deepamehta3-third-party</artifactId>
+    <artifactId>3rd-party-bundles</artifactId>
     <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
-        <artifactId>deepamehta3-delivery</artifactId>
+        <artifactId>deepamehta3-provision</artifactId>
         <version>0.5-SNAPSHOT</version>
     </parent>
 
-    <!--
-        All third party libraries that belong to the DeepaMehta 3 standard
-        installation.
-    -->
+    <!-- All 3rd party bundles that belong to the DeepaMehta 3 standard distribution. -->
     <dependencies>
 
         <!-- JAX-RS -->

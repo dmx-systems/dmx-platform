@@ -9,12 +9,13 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 
+
+
 @RunWith(JUnit4TestRunner.class)
 public class CoreServiceFelixTestCase extends CoreServiceTest {
 
     @Configuration
     public static Option[] felixConfiguration() {
-        return options(felix(), scanPom("mvn:de.deepamehta/deepamehta3-felix/0.4.5/pom"));
+        return options(felix(), scanPom("mvn:de.deepamehta/felix-bundles/0.5-SNAPSHOT/pom"));
     }
-
 }

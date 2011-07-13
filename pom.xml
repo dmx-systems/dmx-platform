@@ -4,40 +4,157 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 3 Global</name>
+    <name>DeepaMehta 3</name>
     <groupId>de.deepamehta</groupId>
-    <artifactId>deepamehta3-global</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <artifactId>deepamehta3</artifactId>
+    <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <modules>
-        <module>deepamehta3-parent</module>
-        <module>deepamehta3-core</module>
-        <module>deepamehta3-server</module>
-        <module>deepamehta3-webclient</module>
-        <module>deepamehta3-notes</module>
-        <module>deepamehta3-contacts</module>
-        <module>deepamehta3-workspaces</module>
-        <module>deepamehta3-typeeditor</module>
-        <module>deepamehta3-topicmaps</module>
+    <!-- Used by both, the 'run' and the 'neo4j' profile -->
+    <properties>
+        <dm3.database.path>${project.basedir}/deepamehta-db</dm3.database.path>
+    </properties>
 
-        <!-- <module>deepamehta3-coretypes</module>
-        <module>deepamehta3-typesearch</module>
+    <profiles>
+        <profile>
+            <id>run</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <org.osgi.service.http.port>8080</org.osgi.service.http.port>
+                <file.encoding>UTF-8</file.encoding>
+                <java.util.logging.config.file>
+                    ${project.basedir}/deepamehta3-distribution/logging.properties
+                </java.util.logging.config.file>
+                <felix.log.level>1</felix.log.level>
+                <felix.fileinstall.dir>
+                    <![CDATA[
+                        ${project.basedir}/deepamehta3-core/target,
+                        ${project.basedir}/deepamehta3-server/target,
+                        ${project.basedir}/deepamehta3-webclient/target,
+                        ${project.basedir}/deepamehta3-notes/target,
+                        ${project.basedir}/deepamehta3-contacts/target,
+                        ${project.basedir}/deepamehta3-workspaces/target,
+                        ${project.basedir}/deepamehta3-typeeditor/target,
+                        ${project.basedir}/deepamehta3-topicmaps/target
+                    ]]>
+                    <!--
+                        ${project.basedir}/deepamehta3-coretypes/target,
+                        ${project.basedir}/deepamehta3-time/target,
+                        ${project.basedir}/deepamehta3-iconpicker/target,
+                        ${project.basedir}/deepamehta3-projects/target,
+                        ${project.basedir}/deepamehta3-typesearch/target,
+                        ${project.basedir}/deepamehta3-files/target,
+                        ${project.basedir}/deepamehta3-filemanager/target,
+                        ${project.basedir}/deepamehta3-accesscontrol/target
+                    -->
+                </felix.fileinstall.dir>
+                <!-- Watching only for jar files suppresses deployment of exploded bundles (which often fails).    -->
+                <felix.fileinstall.filter>.*\\.jar</felix.fileinstall.filter>
+                <!-- Setting "noInitialDelay" to true causes *synchronous* bundle starts in the order the watch    -->
+                <!-- directories are defined! Furthermore the STARTED framework event is eventually fired. Default -->
+                <!-- is noInitialDelay=false, which causes *asynchronous* bundle starts in arbitrary order.        -->
+                <felix.fileinstall.noInitialDelay>true</felix.fileinstall.noInitialDelay>
+                <!-- To see any File Install logging set the level to at least 4.                                  -->
+                <felix.fileinstall.log.level>0</felix.fileinstall.log.level>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.ops4j</groupId>
+                        <artifactId>maven-pax-plugin</artifactId>
+                        <version>1.4</version>
+                        <configuration>
+                            <deployPoms>
+                                deepamehta3-provision/felix-bundles/pom.xml,
+                                deepamehta3-provision/3rd-party-bundles/pom.xml
+                            </deployPoms>
+                            <runner>1.7.4</runner>
+                        </configuration>
+                    </plugin>
+                    <!-- Deletes OSGi container configuration as created by Pax Runner -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <version>2.4.1</version>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>runner</directory>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-        <module>deepamehta3-time</module>
-        <module>deepamehta3-accesscontrol</module>
+        <profile>
+            <id>all</id>
+            <modules>
+                <module>deepamehta3-parent</module>
+                <module>deepamehta3-core</module>
+                <module>deepamehta3-server</module>
+                <module>deepamehta3-webclient</module>
+                <module>deepamehta3-notes</module>
+                <module>deepamehta3-contacts</module>
+                <module>deepamehta3-workspaces</module>
+                <module>deepamehta3-typeeditor</module>
+                <module>deepamehta3-topicmaps</module>
+                <module>deepamehta3-provision</module>
 
-        <module>deepamehta3-files</module>
-        <module>deepamehta3-filemanager</module>
-        <module>deepamehta3-iconpicker</module>
+                <!-- <module>deepamehta3-coretypes</module>
+                <module>deepamehta3-typesearch</module>
+                <module>deepamehta3-time</module>
+                <module>deepamehta3-accesscontrol</module>
+                <module>deepamehta3-files</module>
+                <module>deepamehta3-filemanager</module>
+                <module>deepamehta3-iconpicker</module>
+                <module>deepamehta3-projects</module>
+                <module>deepamehta3-plugin-parent</module>
+                <module>deepamehta3-plugin-example</module> -->
+            </modules>
+        </profile>
 
-        <module>deepamehta3-projects</module>
-
-        <module>deepamehta3-delivery</module>
-
-        <module>deepamehta3-plugin-parent</module>
-        <module>deepamehta3-plugin-example</module> -->
-    </modules>
+        <profile>
+            <id>neo4j</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.2</version>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <mainClass>org.neo4j.shell.StartClient</mainClass>
+                            <arguments>
+                                <argument>-path=${dm3.database.path}</argument>
+                                <argument>-v</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-shell</artifactId>
+                    <version>1.2-1.2</version>
+                    <!--version>1.3.M04</version-->
+                </dependency>
+                <dependency>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-kernel</artifactId>
+                    <version>1.2-1.2</version>
+                    <!--version>1.3.M04</version-->
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <scm>
         <connection>scm:git:git@github.com:jri/deepamehta3.git</connection>

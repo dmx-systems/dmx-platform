@@ -33,7 +33,7 @@
                 <optional>true</optional>
             </dependency>
 
-            <!-- JAX-RS -->
+            <!-- JAX-RS API-->
             <dependency>
                 <groupId>javax.ws.rs</groupId>
                 <artifactId>jsr311-api</artifactId>
@@ -42,7 +42,7 @@
                 <optional>true</optional>
             </dependency>
 
-            <!-- Servlet -->
+            <!-- Servlet API -->
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>

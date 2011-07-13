@@ -5,38 +5,39 @@
 
     <name>DeepaMehta 3 Distribution</name>
     <groupId>de.deepamehta</groupId>
-    <artifactId>deepamehta3</artifactId>
+    <artifactId>deepamehta3-distribution</artifactId>
     <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <!-- Inherit properties -->
     <parent>
         <groupId>de.deepamehta</groupId>
-        <artifactId>deepamehta3-delivery</artifactId>
+        <artifactId>deepamehta3</artifactId>
         <version>0.5-SNAPSHOT</version>
     </parent>
 
+    <!-- These 2 properties are overridden. We must use relative paths for the distribution. -->
     <properties>
-        <felix.log.level>1</felix.log.level>
         <java.util.logging.config.file>conf/logging.properties</java.util.logging.config.file>
-        <deepamehta3.database.path>deepamehta-db</deepamehta3.database.path>
+        <dm3.database.path>deepamehta-db</dm3.database.path>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.main</artifactId>
-            <version>3.0.8</version>
+            <version>3.2.1</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta3-third-party</artifactId>
-            <version>0.4.5</version>
+            <artifactId>3rd-party-bundles</artifactId>
+            <version>0.5-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta3-felix</artifactId>
-            <version>0.4.5</version>
+            <artifactId>felix-bundles</artifactId>
+            <version>0.5-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
         <dependency>
@@ -49,10 +50,7 @@
 
     <build>
         <finalName>deepamehta3-v${project.version}</finalName>
-
         <plugins>
-
-            <!-- create distribution archives -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -74,5 +72,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

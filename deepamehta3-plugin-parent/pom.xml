@@ -11,7 +11,7 @@
 
     <properties>
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
-        <deepamehta3.database.path>${project.basedir}/../deepamehta-db</deepamehta3.database.path>
+        <dm3.database.path>${project.basedir}/../deepamehta-db</dm3.database.path>
         <file.encoding>UTF-8</file.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -108,7 +108,7 @@
             <!--
                 versions from dependencyManagement of parent POM actually not
                 resolved by Pax provision
-                <provision>mvn:de.deepamehta/deepamehta3-felix/0.4.5-SNAPSHOT/pom</provision>
+                <provision>mvn:de.deepamehta/felix-bundles/0.4.5-SNAPSHOT/pom</provision>
                 => use unpacked destribution versioning POMs as deployPoms in
                 PaxRunner configuration
             -->
@@ -130,14 +130,14 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>de.deepamehta</groupId>
-                                    <artifactId>deepamehta3-third-party</artifactId>
+                                    <artifactId>3rd-party-bundles</artifactId>
                                     <version>0.4.5</version>
                                     <type>pom</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>de.deepamehta</groupId>
-                                    <artifactId>deepamehta3-felix</artifactId>
+                                    <artifactId>felix-bundles</artifactId>
                                     <version>0.4.5</version>
                                     <type>pom</type>
                                     <overWrite>true</overWrite>
@@ -163,8 +163,8 @@
                     <!-- runner>1.6.1</runner -->
                     <widenScope>true</widenScope>
                     <deployPoms><![CDATA[
-                        target/poms/deepamehta3-third-party-0.4.5.pom,
-                        target/poms/deepamehta3-felix-0.4.5.pom,
+                        target/poms/3rd-party-bundles-0.5-SNAPSHOT.pom,
+                        target/poms/felix-bundles-0.5-SNAPSHOT.pom,
                         target/poms/deepamehta3-bundles-0.5-SNAPSHOT.pom
                     ]]></deployPoms>
                 </configuration>

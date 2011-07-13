@@ -1,12 +1,13 @@
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+
     <id>distribution</id>
     <formats>
         <format>zip</format>
     </formats>
 
-    <!-- felix and logging porperties -->
+    <!-- copy Felix and logging porperties to /conf -->
     <files>
         <file>
             <source>${project.basedir}/config.properties</source>
@@ -21,7 +22,7 @@
 
     <dependencySets>
 
-        <!-- felix main jar to bin -->
+        <!-- copy Felix main jar to /bin -->
         <dependencySet>
             <includes>
                 <include>org.apache.felix:org.apache.felix.main</include>
@@ -32,14 +33,12 @@
             <useProjectArtifact>false</useProjectArtifact>
         </dependencySet>
 
-        <!-- copy bundles -->
+        <!-- copy bundles to /bundle -->
         <dependencySet>
             <includes>
                 <include>de.deepamehta:*:jar</include>
-
                 <include>com.sun.jersey:*</include>
                 <include>commons-fileupload:*</include>
-
                 <include>org.apache.felix:org.apache.felix.configadmin</include>
                 <include>org.apache.felix:org.apache.felix.gogo.*</include>
                 <include>org.apache.felix:org.apache.felix.http.jetty</include>
@@ -54,9 +53,8 @@
         </dependencySet>
     </dependencySets>
 
-    <!-- start scripts, license and readme -->
+    <!-- copy start scripts, license and readme to / -->
     <fileSets>
-
         <fileSet>
             <directory>${project.basedir}</directory>
             <fileMode>0555</fileMode>
@@ -74,13 +72,11 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.parent.basedir}/..</directory>
+            <directory>${project.basedir}/..</directory>
             <fileMode>0444</fileMode>
-            <outputDirectory>/</outputDirectory>
             <includes>
                 <include>README.md</include>
             </includes>
         </fileSet>
     </fileSets>
-
 </assembly>
