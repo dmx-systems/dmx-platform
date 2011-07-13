@@ -159,7 +159,7 @@ public class Topicmap {
                                                                                             // fetchComposite=false
         for (RelatedTopic mapTopic : mapTopics) {
             Association refAssoc = mapTopic.getAssociation();
-            addTopic(new TopicmapTopic(mapTopic.getModel(), refAssoc.getComposite(), refAssoc.getId()));
+            addTopic(new TopicmapTopic(mapTopic.getModel(), refAssoc.getCompositeValue(), refAssoc.getId()));
         }
     }
 

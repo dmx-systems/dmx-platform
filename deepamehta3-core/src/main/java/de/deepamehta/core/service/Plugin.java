@@ -4,11 +4,8 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.model.ClientContext;
-import de.deepamehta.core.model.CommandParams;
-import de.deepamehta.core.model.CommandResult;
-import de.deepamehta.core.model.Composite;
-import de.deepamehta.core.model.TopicValue;
+import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.JSONHelper;
@@ -112,7 +109,7 @@ public class Plugin implements BundleActivator {
 
     // FIXME: should be private
     public void setMigrationNr(int migrationNr) {
-        pluginTopic.setChildTopicValue("dm3.core.plugin_migration_nr", new TopicValue(migrationNr));
+        pluginTopic.setChildTopicValue("dm3.core.plugin_migration_nr", new SimpleValue(migrationNr));
     }
 
     /**
@@ -545,14 +542,14 @@ public class Plugin implements BundleActivator {
             return false;
         } else {
             logger.info("Installing " + this);
-            pluginTopic = dms.createTopic(new TopicModel(pluginId, new TopicValue(pluginName), "dm3.core.plugin",
-                new Composite("{dm3.core.plugin_migration_nr: 0}")), null);     // FIXME: clientContext=null
+            pluginTopic = dms.createTopic(new TopicModel(pluginId, new SimpleValue(pluginName), "dm3.core.plugin",
+                new CompositeValue("{dm3.core.plugin_migration_nr: 0}")), null);     // FIXME: clientContext=null
             return true;
         }
     }
 
     private Topic findPluginTopic() {
-        return dms.getTopic("uri", new TopicValue(pluginId), false);    // fetchComposite=false
+        return dms.getTopic("uri", new SimpleValue(pluginId), false);    // fetchComposite=false
     }
 
     /**

@@ -10,9 +10,9 @@ import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 
@@ -55,12 +55,12 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     }
 
     @Override
-    protected TopicValue storeValue(TopicValue value) {
+    protected SimpleValue storeValue(SimpleValue value) {
         return dms.storage.setTopicValue(getId(), value);
     }
 
     @Override
-    protected void indexValue(IndexMode indexMode, String indexKey, TopicValue value, TopicValue oldValue) {
+    protected void indexValue(IndexMode indexMode, String indexKey, SimpleValue value, SimpleValue oldValue) {
         dms.storage.indexTopicValue(getId(), indexMode, indexKey, value, oldValue);
     }
 

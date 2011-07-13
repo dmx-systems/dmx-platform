@@ -7,9 +7,9 @@ import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
 
 import de.deepamehta.mehtagraph.ConnectedMehtaEdge;
@@ -64,7 +64,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     }
 
     @Override
-    public TopicModel getTopic(String key, TopicValue value) {
+    public TopicModel getTopic(String key, SimpleValue value) {
         MehtaNode node = mg.getMehtaNode(key, value.value());
         return node != null ? buildTopic(node) : null;
     }
@@ -126,14 +126,14 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     }
 
     @Override
-    public TopicValue setTopicValue(long topicId, TopicValue value) {
+    public SimpleValue setTopicValue(long topicId, SimpleValue value) {
         Object oldValue = mg.getMehtaNode(topicId).setObject("value", value.value());
-        return oldValue != null ? new TopicValue(oldValue) : null;
+        return oldValue != null ? new SimpleValue(oldValue) : null;
     }
 
     @Override
-    public void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, TopicValue value,
-                                                                                    TopicValue oldValue) {
+    public void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, SimpleValue value,
+                                                                                    SimpleValue oldValue) {
         MehtaGraphIndexMode mgIndexMode = fromIndexMode(indexMode);
         Object oldVal = oldValue != null ? oldValue.value() : null;
         mg.getMehtaNode(topicId).indexAttribute(mgIndexMode, indexKey, value.value(), oldVal);
@@ -220,14 +220,14 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     }
 
     @Override
-    public TopicValue setAssociationValue(long assocId, TopicValue value) {
+    public SimpleValue setAssociationValue(long assocId, SimpleValue value) {
         Object oldValue = mg.getMehtaEdge(assocId).setObject("value", value.value());
-        return oldValue != null ? new TopicValue(oldValue) : null;
+        return oldValue != null ? new SimpleValue(oldValue) : null;
     }
 
     @Override
-    public void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, TopicValue value,
-                                                                                          TopicValue oldValue) {
+    public void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, SimpleValue value,
+                                                                                          SimpleValue oldValue) {
         MehtaGraphIndexMode mgIndexMode = fromIndexMode(indexMode);
         Object oldVal = oldValue != null ? oldValue.value() : null;
         mg.getMehtaEdge(assocId).indexAttribute(mgIndexMode, indexKey, value.value(), oldVal);
@@ -302,11 +302,11 @@ public class MGStorageBridge implements DeepaMehtaStorage {
             throw new IllegalArgumentException("Tried to build a TopicModel from a null MehtaNode");
         }
         //
-        return buildTopic(node.getId(), node.getString("uri"), new TopicValue(node.getObject("value")),
+        return buildTopic(node.getId(), node.getString("uri"), new SimpleValue(node.getObject("value")),
             getTopicTypeUri(node));
     }
 
-    private TopicModel buildTopic(long id, String uri, TopicValue value, String typeUri) {
+    private TopicModel buildTopic(long id, String uri, SimpleValue value, String typeUri) {
         return new TopicModel(id, uri, value, typeUri, null);   // composite=null
     }
 

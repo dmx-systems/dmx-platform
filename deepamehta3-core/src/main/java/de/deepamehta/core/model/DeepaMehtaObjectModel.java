@@ -20,11 +20,11 @@ public abstract class DeepaMehtaObjectModel {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     protected long id;
-    protected String uri;           // is never null, may be empty
-    protected TopicValue value;     // is never null, may be constructed on empty string
-    protected String typeUri;       // is never null in models used for a create operation
-                                    // may be null in models used for an update operation
-    protected Composite composite;  // is never null, may be empty
+    protected String uri;               // is never null, may be empty
+    protected SimpleValue value;        // is never null, may be constructed on empty string
+    protected String typeUri;           // is never null in models used for a create operation
+                                        // may be null in models used for an update operation
+    protected CompositeValue composite; // is never null, may be empty
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -32,15 +32,15 @@ public abstract class DeepaMehtaObjectModel {
         this(typeUri, null);
     }
 
-    public DeepaMehtaObjectModel(String typeUri, Composite composite) {
+    public DeepaMehtaObjectModel(String typeUri, CompositeValue composite) {
         this(null, null, typeUri, composite);
     }
 
-    public DeepaMehtaObjectModel(String uri, TopicValue value, String typeUri) {
+    public DeepaMehtaObjectModel(String uri, SimpleValue value, String typeUri) {
         this(uri, value, typeUri, null);
     }
 
-    public DeepaMehtaObjectModel(String uri, TopicValue value, String typeUri, Composite composite) {
+    public DeepaMehtaObjectModel(String uri, SimpleValue value, String typeUri, CompositeValue composite) {
         this(-1, uri, value, typeUri, composite);
     }
 
@@ -48,7 +48,7 @@ public abstract class DeepaMehtaObjectModel {
         this(id, typeUri, null);
     }
 
-    public DeepaMehtaObjectModel(long id, String typeUri, Composite composite) {
+    public DeepaMehtaObjectModel(long id, String typeUri, CompositeValue composite) {
         this(id, null, null, typeUri, composite);
     }
 
@@ -58,12 +58,12 @@ public abstract class DeepaMehtaObjectModel {
      * @param   typeUri     Mandatory. Note: only the internal meta type topic (ID 0) has no type URI (null).
      * @param   composite   If <code>null</code> an empty composite is set. This is OK.
      */
-    public DeepaMehtaObjectModel(long id, String uri, TopicValue value, String typeUri, Composite composite) {
+    public DeepaMehtaObjectModel(long id, String uri, SimpleValue value, String typeUri, CompositeValue composite) {
         this.id = id;
         this.uri = uri != null ? uri : "";
-        this.value = value != null ? value : new TopicValue("");
+        this.value = value != null ? value : new SimpleValue("");
         this.typeUri = typeUri;
-        this.composite = composite != null ? composite : new Composite();
+        this.composite = composite != null ? composite : new CompositeValue();
     }
 
     public DeepaMehtaObjectModel(DeepaMehtaObjectModel model) {
@@ -74,12 +74,12 @@ public abstract class DeepaMehtaObjectModel {
         try {
             this.id = model.optLong("id", -1);
             this.uri = model.optString("uri");
-            this.value = new TopicValue(model.optString("value"));
+            this.value = new SimpleValue(model.optString("value"));
             this.typeUri = model.optString("type_uri", null);
             if (model.has("composite")) {
-                this.composite = new Composite(model.getJSONObject("composite"));
+                this.composite = new CompositeValue(model.getJSONObject("composite"));
             } else {
-                this.composite = new Composite();
+                this.composite = new CompositeValue();
             }
         } catch (Exception e) {
             throw new RuntimeException("Parsing DeepaMehtaObjectModel failed (JSONObject=" + model + ")", e);
@@ -90,9 +90,9 @@ public abstract class DeepaMehtaObjectModel {
         try {
             this.id = typeModel.optLong("id", -1);
             this.uri = typeModel.getString("uri");
-            this.value = new TopicValue(typeModel.get("value"));
+            this.value = new SimpleValue(typeModel.get("value"));
             this.typeUri = typeUri;
-            this.composite = new Composite();
+            this.composite = new CompositeValue();
         } catch (Exception e) {
             throw new RuntimeException("Parsing DeepaMehtaObjectModel failed (JSONObject=" + typeModel +
                 ", typeUri=\"" + typeUri + "\")", e);
@@ -121,34 +121,6 @@ public abstract class DeepaMehtaObjectModel {
         this.uri = uri;
     }
 
-    // --- Value ---
-
-    public TopicValue getValue() {
-        return value;
-    }
-
-    // ---
-
-    public void setValue(String value) {
-        setValue(new TopicValue(value));
-    }
-
-    public void setValue(int value) {
-        setValue(new TopicValue(value));
-    }
-
-    public void setValue(long value) {
-        setValue(new TopicValue(value));
-    }
-
-    public void setValue(boolean value) {
-        setValue(new TopicValue(value));
-    }
-
-    public void setValue(TopicValue value) {
-        this.value = value;
-    }
-
     // --- Type URI ---
 
     public String getTypeUri() {
@@ -159,13 +131,41 @@ public abstract class DeepaMehtaObjectModel {
         this.typeUri = typeUri;
     }
 
-    // --- Composite ---
+    // --- Simple Value ---
 
-    public Composite getComposite() {
+    public SimpleValue getSimpleValue() {
+        return value;
+    }
+
+    // ---
+
+    public void setSimpleValue(String value) {
+        setSimpleValue(new SimpleValue(value));
+    }
+
+    public void setSimpleValue(int value) {
+        setSimpleValue(new SimpleValue(value));
+    }
+
+    public void setSimpleValue(long value) {
+        setSimpleValue(new SimpleValue(value));
+    }
+
+    public void setSimpleValue(boolean value) {
+        setSimpleValue(new SimpleValue(value));
+    }
+
+    public void setSimpleValue(SimpleValue value) {
+        this.value = value;
+    }
+
+    // --- Composite Value ---
+
+    public CompositeValue getCompositeValue() {
         return composite;
     }
 
-    public void setComposite(Composite comp) {
+    public void setCompositeValue(CompositeValue comp) {
         this.composite = comp;
     }
 

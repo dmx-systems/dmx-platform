@@ -10,9 +10,9 @@ import java.util.Iterator;
 
 /**
  * A recursive composite of key/value pairs.
- * Keys are strings, values are non-null atomic (string, int, long, boolean) or again a <code>Composite</code>.
+ * Keys are strings, values are non-null atomic (string, int, long, boolean) or again a <code>CompositeValue</code>.
  */
-public class Composite {
+public class CompositeValue {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -24,19 +24,19 @@ public class Composite {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public Composite() {
+    public CompositeValue() {
         this.values = new JSONObject();
     }
 
-    public Composite(JSONObject values) {
+    public CompositeValue(JSONObject values) {
         this.values = values;
     }
 
-    public Composite(String json) {
+    public CompositeValue(String json) {
         try {
             this.values = new JSONObject(json);
         } catch (Exception e) {
-            throw new RuntimeException("Constructing a Composite from a string failed (\"" + json + "\")", e);
+            throw new RuntimeException("Constructing a CompositeValue from a string failed (\"" + json + "\")", e);
         }
     }
 
@@ -50,41 +50,41 @@ public class Composite {
         try {
             Object value = values.get(key);
             if (value instanceof JSONObject) {
-                return new Composite((JSONObject) value);
+                return new CompositeValue((JSONObject) value);
             } else {
                 return value;
             }
         } catch (Exception e) {
-            throw new RuntimeException("Getting a value from a Composite failed (key=\"" +
+            throw new RuntimeException("Getting a value from a CompositeValue failed (key=\"" +
                 key + "\", composite=" + this + ")", e);
         }
     }
 
     /**
-     * @param   value   a String, Integer, Long, Boolean, or a Composite.
+     * @param   value   a String, Integer, Long, Boolean, or a CompositeValue.
      *
-     * @return  this Composite.
+     * @return  this CompositeValue.
      */
-    public Composite put(String key, Object value) {
+    public CompositeValue put(String key, Object value) {
         try {
             // check argument
             if (value == null) {
-                throw new IllegalArgumentException("Tried to put a null value in a Composite");
+                throw new IllegalArgumentException("Tried to put a null value in a CompositeValue");
             }
             if (!(value instanceof String || value instanceof Integer || value instanceof Long ||
-                  value instanceof Boolean || value instanceof Composite)) {
+                  value instanceof Boolean || value instanceof CompositeValue)) {
                 throw new IllegalArgumentException("Tried to put a " + value.getClass().getName() +
-                    " value in a Composite (expected are String, Integer, Long, Boolean, or Composite)");
+                    " value in a CompositeValue (expected are String, Integer, Long, Boolean, or CompositeValue)");
             }
             // put value
-            if (value instanceof Composite) {
-                value = ((Composite) value).values;
+            if (value instanceof CompositeValue) {
+                value = ((CompositeValue) value).values;
             }
             values.put(key, value);
             //
             return this;
         } catch (Exception e) {
-            throw new RuntimeException("Putting a value in a Composite failed (key=\"" + key +
+            throw new RuntimeException("Putting a value in a CompositeValue failed (key=\"" + key +
                 "\", value=" + value + ", composite=" + this + ")", e);
         }
     }
@@ -99,7 +99,7 @@ public class Composite {
         try {
             return getLabel(values);
         } catch (Exception e) {
-            throw new RuntimeException("Getting the label of a Composite failed (composite=" + this + ")", e);
+            throw new RuntimeException("Getting the label of a CompositeValue failed (composite=" + this + ")", e);
         }
     }
 

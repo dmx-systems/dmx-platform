@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.server.provider;
 
-import de.deepamehta.core.model.CommandResult;
+import de.deepamehta.core.service.CommandResult;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

@@ -10,23 +10,22 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.AssociationTypeModel;
-import de.deepamehta.core.model.ClientContext;
-import de.deepamehta.core.model.CommandParams;
-import de.deepamehta.core.model.CommandResult;
-import de.deepamehta.core.model.Composite;
-import de.deepamehta.core.model.PluginInfo;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.model.TopicValue;
+import de.deepamehta.core.service.ClientContext;
+import de.deepamehta.core.service.CommandParams;
+import de.deepamehta.core.service.CommandResult;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
 import de.deepamehta.core.util.JSONHelper;
@@ -186,7 +185,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @GET
     @Path("/topic/by_value/{key}/{value}")
     @Override
-    public AttachedTopic getTopic(@PathParam("key") String key, @PathParam("value") TopicValue value,
+    public AttachedTopic getTopic(@PathParam("key") String key, @PathParam("value") SimpleValue value,
                                   @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
         DeepaMehtaTransaction tx = beginTx();
         try {
@@ -460,7 +459,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Path("/topictype")
     @Override
     public Set<String> getTopicTypeUris() {
-        Topic metaType = attach(storage.getTopic("uri", new TopicValue("dm3.core.topic_type")), false);
+        Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm3.core.topic_type")), false);
         Set<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm3.core.instantiation", "dm3.core.type",
             "dm3.core.instance", "dm3.core.topic_type", false, false);
         Set<String> topicTypeUris = new HashSet();
@@ -561,7 +560,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Path("/assoctype")
     @Override
     public Set<String> getAssociationTypeUris() {
-        Topic metaType = attach(storage.getTopic("uri", new TopicValue("dm3.core.assoc_type")), false);
+        Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm3.core.assoc_type")), false);
         Set<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm3.core.instantiation", "dm3.core.type",
             "dm3.core.instance", "dm3.core.assoc_type", false, false);
         Set<String> assocTypeUris = new HashSet();
@@ -1008,10 +1007,10 @@ public class EmbeddedService implements DeepaMehtaService {
 
     private void setupBootstrapContent() {
         // Before topic types and asscociation types can be created the meta types must be created
-        TopicModel tt = new TopicModel("dm3.core.topic_type", new TopicValue("Topic Type"),       "dm3.core.meta_type");
-        TopicModel at = new TopicModel("dm3.core.assoc_type", new TopicValue("Association Type"), "dm3.core.meta_type");
-        _createTopic(tt);
-        _createTopic(at);
+        TopicModel t = new TopicModel("dm3.core.topic_type", new SimpleValue("Topic Type"),       "dm3.core.meta_type");
+        TopicModel a = new TopicModel("dm3.core.assoc_type", new SimpleValue("Association Type"), "dm3.core.meta_type");
+        _createTopic(t);
+        _createTopic(a);
         // Create topic type "Data Type"
         // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
         // depends on the topic type "Data Type". To resolve this circle we use a low-level (storage) call here
@@ -1021,11 +1020,11 @@ public class EmbeddedService implements DeepaMehtaService {
         _createTopic(dataType);
         _createTopic(roleType);
         // Create data type "Text"
-        TopicModel text = new TopicModel("dm3.core.text", new TopicValue("Text"), "dm3.core.data_type");
+        TopicModel text = new TopicModel("dm3.core.text", new SimpleValue("Text"), "dm3.core.data_type");
         _createTopic(text);
         // Create role types "Type" and "Instance"
-        TopicModel type =     new TopicModel("dm3.core.type",     new TopicValue("Type"),     "dm3.core.role_type");
-        TopicModel instance = new TopicModel("dm3.core.instance", new TopicValue("Instance"), "dm3.core.role_type");
+        TopicModel type =     new TopicModel("dm3.core.type",     new SimpleValue("Type"),     "dm3.core.role_type");
+        TopicModel instance = new TopicModel("dm3.core.instance", new SimpleValue("Instance"), "dm3.core.role_type");
         _createTopic(type);
         _createTopic(instance);
         // Create association type "Association" -- needed to associate topic/association types with data types
@@ -1040,8 +1039,8 @@ public class EmbeddedService implements DeepaMehtaService {
         // Note: associateWithTopicType() creates the associations by *low-level* (storage) calls.
         // That's why the associations can be created *before* their type (here: "dm3.core.instantiation")
         // is fully constructed (the type's data type is not yet associated => step 2).
-        associateWithTopicType(tt);
-        associateWithTopicType(at);
+        associateWithTopicType(t);
+        associateWithTopicType(a);
         associateWithTopicType(dataType);
         associateWithTopicType(roleType);
         associateWithTopicType(text);
@@ -1075,7 +1074,7 @@ public class EmbeddedService implements DeepaMehtaService {
     private void _createTopic(TopicModel model) {
         // Note: low-level (storage) call used here ### explain
         storage.createTopic(model);
-        storage.setTopicValue(model.getId(), model.getValue());
+        storage.setTopicValue(model.getId(), model.getSimpleValue());
     }
 
     private void bootstrapTypeCache() {

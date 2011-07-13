@@ -1,9 +1,7 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicValue;
 
-import java.util.List;
 import java.util.Set;
 
 

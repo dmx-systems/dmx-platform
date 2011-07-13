@@ -12,15 +12,15 @@ public class TopicModel extends DeepaMehtaObjectModel {
         super(typeUri);
     }
 
-    public TopicModel(String typeUri, Composite composite) {
+    public TopicModel(String typeUri, CompositeValue composite) {
         super(typeUri, composite);
     }
 
-    public TopicModel(String uri, TopicValue value, String typeUri) {
+    public TopicModel(String uri, SimpleValue value, String typeUri) {
         super(uri, value, typeUri);
     }
 
-    public TopicModel(String uri, TopicValue value, String typeUri, Composite composite) {
+    public TopicModel(String uri, SimpleValue value, String typeUri, CompositeValue composite) {
         super(uri, value, typeUri, composite);
     }
 
@@ -30,7 +30,7 @@ public class TopicModel extends DeepaMehtaObjectModel {
      * @param   typeUri     Mandatory. Note: only the internal meta type topic (ID 0) has no type URI (null).
      * @param   composite   If <code>null</code> an empty composite is set. This is OK.
      */
-    public TopicModel(long id, String uri, TopicValue value, String typeUri, Composite composite) {
+    public TopicModel(long id, String uri, SimpleValue value, String typeUri, CompositeValue composite) {
         super(id, uri, value, typeUri, composite);
     }
 

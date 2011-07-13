@@ -7,13 +7,13 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
-import de.deepamehta.core.model.Composite;
+import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.service.Directives;
 
@@ -83,43 +83,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         storeUri(uri);
     }
 
-    // --- Value ---
-
-    @Override
-    public TopicValue getValue() {
-        return model.getValue();
-    }
-
-    // ---
-
-    @Override
-    public void setValue(String value) {
-        setValue(new TopicValue(value));
-    }
-
-    @Override
-    public void setValue(int value) {
-        setValue(new TopicValue(value));
-    }
-
-    @Override
-    public void setValue(long value) {
-        setValue(new TopicValue(value));
-    }
-
-    @Override
-    public void setValue(boolean value) {
-        setValue(new TopicValue(value));
-    }
-
-    @Override
-    public void setValue(TopicValue value) {
-        // update memory
-        model.setValue(value);
-        // update DB
-        storeTopicValue(value);
-    }
-
     // --- Type URI ---
 
     @Override
@@ -134,32 +97,70 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         // Note: updating the DB is up to the subclasses
     }
 
-    // --- Composite ---
+    // --- Simple Value ---
 
     @Override
-    public Composite getComposite() {
-        return model.getComposite();
+    public SimpleValue getSimpleValue() {
+        return model.getSimpleValue();
+    }
+
+    // ---
+
+    @Override
+    public void setSimpleValue(String value) {
+        setSimpleValue(new SimpleValue(value));
     }
 
     @Override
-    public void setComposite(Composite comp) {
+    public void setSimpleValue(int value) {
+        setSimpleValue(new SimpleValue(value));
+    }
+
+    @Override
+    public void setSimpleValue(long value) {
+        setSimpleValue(new SimpleValue(value));
+    }
+
+    @Override
+    public void setSimpleValue(boolean value) {
+        setSimpleValue(new SimpleValue(value));
+    }
+
+    @Override
+    public void setSimpleValue(SimpleValue value) {
         // update memory
-        model.setComposite(comp);
+        model.setSimpleValue(value);
+        // update DB
+        storeAndIndexValue(value);
+    }
+
+    // --- Composite Value ---
+
+    @Override
+    public CompositeValue getCompositeValue() {
+        return model.getCompositeValue();
+    }
+
+    @Override
+    public void setCompositeValue(CompositeValue comp) {
+        // update memory
+        model.setCompositeValue(comp);
         // update DB
         storeComposite(comp);
     }
 
 
+
     // === Traversal ===
 
     @Override
-    public TopicValue getChildTopicValue(String assocDefUri) {
+    public SimpleValue getChildTopicValue(String assocDefUri) {
         return fetchChildTopicValue(getAssocDef(assocDefUri));
     }
 
     @Override
-    public void setChildTopicValue(String assocDefUri, TopicValue value) {
-        Composite comp = getComposite();
+    public void setChildTopicValue(String assocDefUri, SimpleValue value) {
+        CompositeValue comp = getCompositeValue();
         // update memory
         comp.put(assocDefUri, value.value());
         // update DB
@@ -308,9 +309,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     protected abstract void storeUri(String uri);
 
-    protected abstract TopicValue storeValue(TopicValue value);
+    protected abstract SimpleValue storeValue(SimpleValue value);
 
-    protected abstract void indexValue(IndexMode indexMode, String indexKey, TopicValue value, TopicValue oldValue);
+    protected abstract void indexValue(IndexMode indexMode, String indexKey, SimpleValue value, SimpleValue oldValue);
 
     protected abstract Type getType();
 
@@ -322,18 +323,18 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     void store() {
         if (getType().getDataTypeUri().equals("dm3.core.composite")) {
-            storeComposite(getComposite());         // setComposite() includes setValue()
+            storeComposite(getCompositeValue());         // setCompositeValue() includes setSimpleValue()
         } else {
-            storeTopicValue(getValue());
+            storeAndIndexValue(getSimpleValue());
         }
     }
 
     void update(DeepaMehtaObjectModel model) {
         // ### TODO: compare new model with current one and update only if changed. See AttachedAssociation.update()
         if (getType().getDataTypeUri().equals("dm3.core.composite")) {
-            setComposite(model.getComposite());     // setComposite() includes setValue()
+            setCompositeValue(model.getCompositeValue());     // setCompositeValue() includes setSimpleValue()
         } else {
-            setValue(model.getValue());
+            setSimpleValue(model.getSimpleValue());
         }
         setUri(model.getUri());
     }
@@ -343,9 +344,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      */
     void loadComposite() {
         // fetch from DB
-        Composite comp = fetchComposite();
+        CompositeValue comp = fetchComposite();
         // update memory
-        model.setComposite(comp);
+        model.setCompositeValue(comp);
     }
 
 
@@ -354,9 +355,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // === Fetch ===
 
-    private Composite fetchComposite() {
+    private CompositeValue fetchComposite() {
         try {
-            Composite comp = new Composite();
+            CompositeValue comp = new CompositeValue();
             for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
                 String assocDefUri = assocDef.getUri();
                 TopicType partTopicType = dms.getTopicType(assocDef.getPartTopicTypeUri(), null);  // clientContext=null
@@ -367,7 +368,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                         comp.put(assocDefUri, ((AttachedDeepaMehtaObject) childTopic).fetchComposite());
                     }
                 } else {
-                    TopicValue value = fetchChildTopicValue(assocDef);
+                    SimpleValue value = fetchChildTopicValue(assocDef);
                     if (value != null) {
                         comp.put(assocDefUri, value.value());
                     }
@@ -379,10 +380,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    private TopicValue fetchChildTopicValue(AssociationDefinition assocDef) {
+    private SimpleValue fetchChildTopicValue(AssociationDefinition assocDef) {
         Topic childTopic = fetchChildTopic(assocDef);
         if (childTopic != null) {
-            return childTopic.getValue();
+            return childTopic.getSimpleValue();
         }
         return null;
     }
@@ -390,7 +391,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Store ===
 
     // TODO: factorize this method
-    private void storeComposite(Composite comp) {
+    private void storeComposite(CompositeValue comp) {
         try {
             Iterator<String> i = comp.keys();
             while (i.hasNext()) {
@@ -410,9 +411,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                     if (childTopicType.getDataTypeUri().equals("dm3.core.composite")) {
                         AttachedTopic childTopic = storeChildTopicValue(assocDef, null);
                         // Note: cast required because private method is called on a subclass's instance
-                        ((AttachedDeepaMehtaObject) childTopic).storeComposite((Composite) value);
+                        ((AttachedDeepaMehtaObject) childTopic).storeComposite((CompositeValue) value);
                     } else {
-                        storeChildTopicValue(assocDef, new TopicValue(value));
+                        storeChildTopicValue(assocDef, new SimpleValue(value));
                     }
                 } else if (assocTypeUri.equals("dm3.core.aggregation_def")) {
                     if (childTopicType.getDataTypeUri().equals("dm3.core.composite")) {
@@ -435,10 +436,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                             // ### current workaround: refetch after update, see EmbeddedService.updateTopic()
                             // Topic assignedTopic = dms.getTopic(childTopicId, false, null);  // fetchComposite=false
                             // comp.remove(key);
-                            // comp.put(assocDefUri, assignedTopic.getValue().value());
+                            // comp.put(assocDefUri, assignedTopic.getSimpleValue().value());
                         } else {
                             // create new child topic
-                            storeChildTopicValue(assocDef, new TopicValue(value));
+                            storeChildTopicValue(assocDef, new SimpleValue(value));
                         }
                     }
                 } else {
@@ -462,12 +463,12 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      *
      * @return  The child topic.
      */
-    private AttachedTopic storeChildTopicValue(AssociationDefinition assocDef, final TopicValue value) {
+    private AttachedTopic storeChildTopicValue(AssociationDefinition assocDef, final SimpleValue value) {
         try {
             AttachedTopic childTopic = fetchChildTopic(assocDef);
             if (childTopic != null) {
                 if (value != null) {
-                    childTopic.setValue(value);
+                    childTopic.setSimpleValue(value);
                 }
             } else {
                 // create child topic
@@ -483,19 +484,19 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    private void storeTopicValue(TopicValue value) {
-        TopicValue oldValue = storeValue(value);
-        indexTopicValue(value, oldValue);
+    private void storeAndIndexValue(SimpleValue value) {
+        SimpleValue oldValue = storeValue(value);
+        indexValue(value, oldValue);
     }
 
-    private void indexTopicValue(TopicValue value, TopicValue oldValue) {
+    private void indexValue(SimpleValue value, SimpleValue oldValue) {
         Type type = getType();
         String indexKey = type.getUri();
         // strip HTML tags before indexing
         if (type.getDataTypeUri().equals("dm3.core.html")) {
-            value = new TopicValue(JavaUtils.stripHTML(value.toString()));
+            value = new SimpleValue(JavaUtils.stripHTML(value.toString()));
             if (oldValue != null) {
-                oldValue = new TopicValue(JavaUtils.stripHTML(oldValue.toString()));
+                oldValue = new SimpleValue(JavaUtils.stripHTML(oldValue.toString()));
             }
         }
         //
@@ -504,8 +505,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    private void updateValue(Composite comp) {
-        setValue(comp.getLabel());
+    private void updateValue(CompositeValue comp) {
+        setSimpleValue(comp.getLabel());
     }
 
     // === Helper ===

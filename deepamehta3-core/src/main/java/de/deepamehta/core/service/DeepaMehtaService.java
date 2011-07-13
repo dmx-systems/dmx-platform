@@ -8,11 +8,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
-import de.deepamehta.core.model.ClientContext;
-import de.deepamehta.core.model.CommandParams;
-import de.deepamehta.core.model.CommandResult;
-import de.deepamehta.core.model.PluginInfo;
-import de.deepamehta.core.model.TopicValue;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 
@@ -56,9 +52,9 @@ public interface DeepaMehtaService {
      * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
      * (for dynamically created data fields, typically in migration classes).
      */
-    public Topic getTopic(String key, TopicValue value, boolean fetchComposite);
+    public Topic getTopic(String key, SimpleValue value, boolean fetchComposite);
 
-    // public Topic getTopic(String typeUri, String key, TopicValue value);
+    // public Topic getTopic(String typeUri, String key, SimpleValue value);
 
     public Set<RelatedTopic> getTopics(String typeUri);
 

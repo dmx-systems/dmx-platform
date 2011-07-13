@@ -7,7 +7,7 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
-import de.deepamehta.core.model.Composite;
+import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.Plugin;
 
@@ -103,7 +103,10 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
         AssociationModel model = new AssociationModel("dm3.topicmaps.topic_mapcontext",
             new TopicRoleModel(topicmapId, "dm3.topicmaps.topicmap"),
             new TopicRoleModel(topicId,    "dm3.topicmaps.topicmap_topic"),
-            new Composite().put("dm3.topicmaps.x", x).put("dm3.topicmaps.y", y).put("dm3.topicmaps.visibility", true));
+            new CompositeValue().put("dm3.topicmaps.x", x)
+                                .put("dm3.topicmaps.y", y)
+                                .put("dm3.topicmaps.visibility", true)
+        );
         Association refAssoc = dms.createAssociation(model, null);     // FIXME: clientContext=null
         return refAssoc.getId();
     }

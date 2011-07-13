@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.server.provider;
 
-import de.deepamehta.core.model.CommandParams;
+import de.deepamehta.core.service.CommandParams;
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.JSONHelper;
 import de.deepamehta.core.util.UploadedFile;

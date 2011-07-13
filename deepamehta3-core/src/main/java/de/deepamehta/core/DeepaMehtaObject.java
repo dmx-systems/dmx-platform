@@ -1,7 +1,7 @@
 package de.deepamehta.core;
 
-import de.deepamehta.core.model.Composite;
-import de.deepamehta.core.model.TopicValue;
+import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.service.Directives;
 
 import java.util.List;
@@ -25,35 +25,35 @@ public interface DeepaMehtaObject extends JSONEnabled {
 
     void setUri(String uri);
 
-    // --- Value ---
-
-    TopicValue getValue();
-
-    void setValue(String value);
-    void setValue(int value);
-    void setValue(long value);
-    void setValue(boolean value);
-    void setValue(TopicValue value);
-
     // --- Type URI ---
 
     String getTypeUri();
 
     void setTypeUri(String typeUri);
 
-    // --- Composite ---
+    // --- Simple Value ---
 
-    Composite getComposite();
+    SimpleValue getSimpleValue();
 
-    void setComposite(Composite comp);
+    void setSimpleValue(String value);
+    void setSimpleValue(int value);
+    void setSimpleValue(long value);
+    void setSimpleValue(boolean value);
+    void setSimpleValue(SimpleValue value);
+
+    // --- Composite Value ---
+
+    CompositeValue getCompositeValue();
+
+    void setCompositeValue(CompositeValue comp);
 
 
 
     // === Traversal ===
 
-    TopicValue getChildTopicValue(String assocDefUri);
+    SimpleValue getChildTopicValue(String assocDefUri);
 
-    void setChildTopicValue(String assocDefUri, TopicValue value);
+    void setChildTopicValue(String assocDefUri, SimpleValue value);
 
     // --- Topic Retrieval ---
 

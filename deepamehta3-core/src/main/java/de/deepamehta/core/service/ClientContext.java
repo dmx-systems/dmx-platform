@@ -1,4 +1,4 @@
-package de.deepamehta.core.model;
+package de.deepamehta.core.service;
 
 import java.util.HashMap;
 import java.util.Map;

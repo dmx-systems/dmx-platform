@@ -1,8 +1,7 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.Composite;
-import de.deepamehta.core.model.TopicValue;
+import de.deepamehta.core.model.CompositeValue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -18,7 +17,7 @@ public class CompositeTest {
 
     @Test
     public void composite() {
-        Composite person = new Composite("{" +
+        CompositeValue person = new CompositeValue("{" +
             "\"dm3.core.name\": \"Karl Blum\"," +
             "\"dm3.contacts.home_address\": {" +
                 "\"dm3.contacts.postal_code\": 13206," +
@@ -31,7 +30,7 @@ public class CompositeTest {
         "}");
         assertEquals("Karl Blum", person.get("dm3.core.name"));
         //
-        Composite address = (Composite) person.get("dm3.contacts.home_address");
+        CompositeValue address = (CompositeValue) person.get("dm3.contacts.home_address");
         assertEquals("Berlin", address.get("dm3.contacts.city"));
         //
         Object code = address.get("dm3.contacts.postal_code");

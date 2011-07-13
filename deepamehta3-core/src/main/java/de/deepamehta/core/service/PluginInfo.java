@@ -1,4 +1,4 @@
-package de.deepamehta.core.model;
+package de.deepamehta.core.service;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;

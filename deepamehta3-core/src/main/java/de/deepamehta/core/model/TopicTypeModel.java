@@ -25,7 +25,7 @@ public class TopicTypeModel extends TypeModel {
     }
 
     public TopicTypeModel(String uri, String value, String topicTypeUri, String dataTypeUri) {
-        super(uri, new TopicValue(value), topicTypeUri, dataTypeUri);
+        super(uri, new SimpleValue(value), topicTypeUri, dataTypeUri);
     }
 
     public TopicTypeModel(TopicModel model) {

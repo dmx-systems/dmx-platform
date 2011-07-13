@@ -28,7 +28,7 @@ public abstract class TypeModel extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TypeModel(String uri, TopicValue value, String topicTypeUri, String dataTypeUri) {
+    public TypeModel(String uri, SimpleValue value, String topicTypeUri, String dataTypeUri) {
         super(uri, value, topicTypeUri);
         this.dataTypeUri = dataTypeUri;
         this.indexModes = new HashSet();

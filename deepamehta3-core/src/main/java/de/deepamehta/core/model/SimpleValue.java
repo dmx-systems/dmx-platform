@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 /**
  * A wrapper for the topic value (atomic, non-null). Supported value types are string, int, long, boolean.
  */
-public class TopicValue {
+public class SimpleValue {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -20,30 +20,30 @@ public class TopicValue {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     /**
-     * Called by JAX-RS container to create a TopicValue from a @PathParam or @QueryParam
+     * Called by JAX-RS container to create a SimpleValue from a @PathParam or @QueryParam
      */
-    public TopicValue(String value) {
+    public SimpleValue(String value) {
         if (value == null) {
-            throw new IllegalArgumentException("Tried to build a TopicValue from a null String");
+            throw new IllegalArgumentException("Tried to build a SimpleValue from a null String");
         }
         this.value = value;
     }
 
-    public TopicValue(int value) {
+    public SimpleValue(int value) {
         this.value = value;
     }
 
-    public TopicValue(long value) {
+    public SimpleValue(long value) {
         this.value = value;
     }
 
-    public TopicValue(boolean value) {
+    public SimpleValue(boolean value) {
         this.value = value;
     }
 
-    public TopicValue(Object value) {
+    public SimpleValue(Object value) {
         if (value == null) {
-            throw new IllegalArgumentException("Tried to build a TopicValue from a null Object");
+            throw new IllegalArgumentException("Tried to build a SimpleValue from a null Object");
         }
         this.value = value;
     }
@@ -75,10 +75,10 @@ public class TopicValue {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TopicValue)) {
+        if (!(o instanceof SimpleValue)) {
             return false;
         }
-        return ((TopicValue) o).value.equals(value);
+        return ((SimpleValue) o).value.equals(value);
     }
 
     @Override

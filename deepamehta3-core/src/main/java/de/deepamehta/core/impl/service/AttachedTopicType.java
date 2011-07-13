@@ -1,8 +1,8 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.model.TopicValue;
 
 import java.util.logging.Logger;
 
@@ -56,11 +56,11 @@ class AttachedTopicType extends AttachedType implements TopicType {
     void update(TopicTypeModel model) {
         logger.info("Updating topic type \"" + getUri() + "\" (new " + model + ")");
         String uri = model.getUri();
-        TopicValue value = model.getValue();
+        SimpleValue value = model.getSimpleValue();
         String dataTypeUri = model.getDataTypeUri();
         //
         boolean uriChanged = !getUri().equals(uri);
-        boolean valueChanged = !getValue().equals(value);
+        boolean valueChanged = !getSimpleValue().equals(value);
         boolean dataTypeChanged = !getDataTypeUri().equals(dataTypeUri);
         //
         if (uriChanged || valueChanged) {
@@ -68,7 +68,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
                 logger.info("Changing URI from \"" + getUri() + "\" -> \"" + uri + "\"");
             }
             if (valueChanged) {
-                logger.info("Changing name from \"" + getValue() + "\" -> \"" + value + "\"");
+                logger.info("Changing name from \"" + getSimpleValue() + "\" -> \"" + value + "\"");
             }
             if (uriChanged) {
                 dms.typeCache.invalidate(getUri());

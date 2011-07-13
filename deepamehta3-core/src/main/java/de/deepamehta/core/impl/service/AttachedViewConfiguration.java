@@ -3,9 +3,9 @@ package de.deepamehta.core.impl.service;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.model.TopicValue;
 import de.deepamehta.core.model.ViewConfigurationModel;
 
 
@@ -81,7 +81,7 @@ class AttachedViewConfiguration implements ViewConfiguration {
             storeConfigTopic(configTopic);
         } else {
             Topic topic = new AttachedTopic(configTopic, dms);
-            topic.setChildTopicValue(settingUri, new TopicValue(value));
+            topic.setChildTopicValue(settingUri, new SimpleValue(value));
         }
     }
 }

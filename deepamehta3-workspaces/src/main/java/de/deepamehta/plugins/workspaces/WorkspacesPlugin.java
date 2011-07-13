@@ -2,15 +2,15 @@ package de.deepamehta.plugins.workspaces;
 
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
-import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.ClientContext;
-import de.deepamehta.core.model.Composite;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.TopicType;
+import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.service.ClientContext;
 import de.deepamehta.core.service.Plugin;
 
 import static java.util.Arrays.asList;
@@ -134,7 +134,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     @Override
     public Topic createWorkspace(String name) {
         logger.info("Creating workspace \"" + name + "\"");
-        Composite comp = new Composite("{dm3.workspaces.name: \"" + name + "\"}");
+        CompositeValue comp = new CompositeValue("{dm3.workspaces.name: \"" + name + "\"}");
         return dms.createTopic(new TopicModel("dm3.workspaces.workspace", comp), null);  // clientContext=null
     }
 

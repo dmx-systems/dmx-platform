@@ -5,8 +5,8 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicValue;
 
 import java.util.Map;
 import java.util.List;
@@ -36,7 +36,7 @@ public interface DeepaMehtaStorage {
      * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
      * (for dynamically created data fields, typically in migration classes).
      */
-    TopicModel getTopic(String key, TopicValue value);
+    TopicModel getTopic(String key, SimpleValue value);
 
     // ---
 
@@ -83,12 +83,12 @@ public interface DeepaMehtaStorage {
      *
      * @return  The previous value, or <code>null</code> if no value was stored before.
      */
-    TopicValue setTopicValue(long topicId, TopicValue value);
+    SimpleValue setTopicValue(long topicId, SimpleValue value);
 
     /**
      * @param   oldValue    may be null
      */
-    void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, TopicValue value, TopicValue oldValue);
+    void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, SimpleValue value, SimpleValue oldValue);
 
     /**
      * Creates a topic.
@@ -173,13 +173,13 @@ public interface DeepaMehtaStorage {
      *
      * @return  The previous value, or <code>null</code> if no value was stored before.
      */
-    TopicValue setAssociationValue(long assocId, TopicValue value);
+    SimpleValue setAssociationValue(long assocId, SimpleValue value);
 
     /**
      * @param   oldValue    may be null
      */
-    void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, TopicValue value,
-                                                                                   TopicValue oldValue);
+    void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, SimpleValue value,
+                                                                                   SimpleValue oldValue);
 
     // ---
 

@@ -191,7 +191,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     void store() {
         dms.storage.createTopic(getModel());
         dms.associateWithTopicType(getModel());
-        setValue(getValue());
+        setSimpleValue(getSimpleValue());
         //
         dms.associateDataType(getUri(), getDataTypeUri());
         storeIndexModes();
