@@ -26,8 +26,8 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     private String instanceLevelAssocTypeUri;
 
-    private String wholeTopicTypeUri;
-    private String partTopicTypeUri;
+    private String wholeTopicTypeUri;   // FIXME: wording "wholeTypeUri"
+    private String partTopicTypeUri;    // FIXME: wording "partTypeUri"
 
     private String wholeRoleTypeUri;    // value might be derived, there is not necessarily such a role type topic
     private String partRoleTypeUri;     // value might be derived, there is not necessarily such a role type topic
@@ -186,8 +186,8 @@ public class AssociationDefinitionModel extends AssociationModel {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void initAssociationModel() {
-        setRoleModel1(new TopicRoleModel(wholeTopicTypeUri, "dm3.core.whole_topic_type"));
-        setRoleModel2(new TopicRoleModel(partTopicTypeUri,  "dm3.core.part_topic_type"));
+        setRoleModel1(new TopicRoleModel(wholeTopicTypeUri, "dm3.core.whole_type"));
+        setRoleModel2(new TopicRoleModel(partTopicTypeUri,  "dm3.core.part_type"));
     }
 
     private void initInstanceLevelAssocTypeUri() {

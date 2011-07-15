@@ -27,12 +27,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             "typeUri=\"dm3.core.topic_type\", dataTypeUri=\"dm3.core.composite\", indexModes=\\[\\], assocDefs=" +
             "\\{dm3.core.plugin_migration_nr=\n    association definition \\(association \\(id=\\d+, uri=\"dm3." +
             "core.plugin_migration_nr\", value=, typeUri=\"dm3.core.composition_def\", composite=\\{\\}, roleModel1=" +
-            "\n        topic role \\(roleTypeUri=\"dm3.core.whole_topic_type\", topicId=-1, topicUri=\"dm3.core." +
-            "plugin\", topicIdentifiedByUri=true\\), roleModel2=\n        topic role \\(roleTypeUri=\"dm3.core.part_" +
-            "topic_type\", topicId=-1, topicUri=\"dm3.core.plugin_migration_nr\", topicIdentifiedByUri=true\\)\\)\\)" +
-            "\n        pos 1: \\(type=\"dm3.core.plugin\", role=\"dm3.core.whole\", cardinality=\"dm3.core.one\"\\)\n" +
-            "        pos 2: \\(type=\"dm3.core.plugin_migration_nr\", role=\"dm3.core.part\", cardinality=\"dm3.core." +
-            "one\"\\)\n        association definition view configuration \\{\\}\\},\n    topic type view " +
+            "\n        topic role \\(roleTypeUri=\"dm3.core.whole_type\", topicId=-1, topicUri=\"dm3.core.plugin\", " +
+            "topicIdentifiedByUri=true\\), roleModel2=\n        topic role \\(roleTypeUri=\"dm3.core.part_type\", " +
+            "topicId=-1, topicUri=\"dm3.core.plugin_migration_nr\", topicIdentifiedByUri=true\\)\\)\\)" +
+            "\n        pos 1: \\(type=\"dm3.core.plugin\", role=\"dm3.core.whole\", cardinality=\"dm3.core.one\"\\)" +
+            "\n        pos 2: \\(type=\"dm3.core.plugin_migration_nr\", role=\"dm3.core.part\", cardinality=\"" +
+            "dm3.core.one\"\\)\n        association definition view configuration \\{\\}\\},\n    topic type view " +
             "configuration \\{\\}\\)"));
         assertEquals("dm3.core.composite", topicType.getDataTypeUri());
     }

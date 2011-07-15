@@ -71,7 +71,7 @@ class AttachedViewConfiguration implements ViewConfiguration {
 
     private void storeConfigTopic(TopicModel configTopic) {
         Topic topic = dms.createTopic(configTopic, null);   // FIXME: clientContext=null
-        dms.createAssociation("dm3.core.association", configurable,
+        dms.createAssociation("dm3.core.aggregation", configurable,
             new TopicRoleModel(topic.getId(), "dm3.core.view_config"));
     }
 

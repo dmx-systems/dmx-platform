@@ -94,11 +94,11 @@ public class TypeEditorPlugin extends Plugin {
 
     // ### FIXME: copy in AttachedAssociationDefinition
     private String getWholeTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm3.core.whole_topic_type").getUri();
+        return assoc.getTopic("dm3.core.whole_type").getUri();
     }
 
     // ### FIXME: copy in AttachedAssociationDefinition
     private String getPartTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm3.core.part_topic_type").getUri();
+        return assoc.getTopic("dm3.core.part_type").getUri();
     }
 }

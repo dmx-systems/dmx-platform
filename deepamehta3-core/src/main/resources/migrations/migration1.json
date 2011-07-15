@@ -29,19 +29,19 @@
 
     assoc_types: [
 
-        # Note: The association types "Association" and "Instantiation" are created programmatically.
+        # Note: The association types "Aggregation" and "Instantiation" are created programmatically.
         # See EmbeddedService.setupBootstrapContent()
 
-        /*{
+        {
             value:         "Association",
             uri:           "dm3.core.association",
             data_type_uri: "dm3.core.text"
-        },*/
-        {
+        },
+        /*{
             value:         "Aggregation",
             uri:           "dm3.core.aggregation",
             data_type_uri: "dm3.core.text"
-        },
+        },*/
         {
             value:         "Composition",
             uri:           "dm3.core.composition",
@@ -137,13 +137,13 @@
             type_uri: "dm3.core.role_type"
         },
         {
-            value:    "Whole Topic Type",
-            uri:      "dm3.core.whole_topic_type",
+            value:    "Whole Type",
+            uri:      "dm3.core.whole_type",
             type_uri: "dm3.core.role_type"
         },
         {
-            value:    "Part Topic Type",
-            uri:      "dm3.core.part_topic_type",
+            value:    "Part Type",
+            uri:      "dm3.core.part_type",
             type_uri: "dm3.core.role_type"
         },
         {
@@ -179,8 +179,8 @@
         },
 
         {
-            value:    "First Association Definition",
-            uri:      "dm3.core.first_assoc_def",
+            value:    "Sequence Start",
+            uri:      "dm3.core.sequence_start",
             type_uri: "dm3.core.role_type"
         },
         {

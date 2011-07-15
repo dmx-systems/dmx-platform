@@ -929,13 +929,16 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
-    // === Topic Type Storage ===
+    // === Type Storage ===
 
-    // FIXME: move to AttachedTopicType
-    void associateDataType(String topicTypeUri, String dataTypeUri) {
-        createAssociation("dm3.core.association",
-            new TopicRoleModel(topicTypeUri, "dm3.core.topic_type"),
-            new TopicRoleModel(dataTypeUri,  "dm3.core.data_type"));
+    // FIXME: move to AttachedType
+    /**
+     * @param   typeUri     a topic type URI or a association type URI
+     */
+    void associateDataType(String typeUri, String dataTypeUri) {
+        createAssociation("dm3.core.aggregation",
+            new TopicRoleModel(typeUri,     "dm3.core.type"),
+            new TopicRoleModel(dataTypeUri, "dm3.core.data_type"));
     }
 
 
@@ -1027,9 +1030,9 @@ public class EmbeddedService implements DeepaMehtaService {
         TopicModel instance = new TopicModel("dm3.core.instance", new SimpleValue("Instance"), "dm3.core.role_type");
         _createTopic(type);
         _createTopic(instance);
-        // Create association type "Association" -- needed to associate topic/association types with data types
-        TopicModel association = new AssociationTypeModel("dm3.core.association", "Association", "dm3.core.text");
-        _createTopic(association);
+        // Create association type "Aggregation" -- needed to associate topic/association types with data types
+        TopicModel aggregation = new AssociationTypeModel("dm3.core.aggregation", "Aggregation", "dm3.core.text");
+        _createTopic(aggregation);
         // Create association type "Instantiation" -- needed to associate topics with topic types
         TopicModel instantiation = new AssociationTypeModel("dm3.core.instantiation", "Instantiation", "dm3.core.text");
         _createTopic(instantiation);
@@ -1046,22 +1049,22 @@ public class EmbeddedService implements DeepaMehtaService {
         associateWithTopicType(text);
         associateWithTopicType(type);
         associateWithTopicType(instance);
-        associateWithTopicType(association);
+        associateWithTopicType(aggregation);
         associateWithTopicType(instantiation);
         //
         // 2) Postponed data type association
         //
         // Note: associateDataType() creates the association by a *high-level* (service) call.
-        // This requires the association type (here: dm3.core.association) to be fully constructed already.
+        // This requires the association type (here: dm3.core.aggregation) to be fully constructed already.
         // That's why the topic type associations (step 1) must be performed *before* the data type associations.
         //
-        // Note: at time of the first associateDataType() call the required association type (dm3.core.association)
+        // Note: at time of the first associateDataType() call the required association type (dm3.core.aggregation)
         // is *not* fully constructed yet! (it gets constructed through this very call). This works anyway because
         // the data type assigning association is created *before* the association type is fetched.
         // (see AttachedAssociation.store(): storage.createAssociation() is called before getType()
         // in AttachedDeepaMehtaObject.store().)
-        // Important is that associateDataType("dm3.core.association") is the first call here.
-        associateDataType("dm3.core.association",   "dm3.core.text");
+        // Important is that associateDataType("dm3.core.aggregation") is the first call here.
+        associateDataType("dm3.core.aggregation",   "dm3.core.text");
         associateDataType("dm3.core.instantiation", "dm3.core.text");
         //
         associateDataType("dm3.core.meta_type",  "dm3.core.text");

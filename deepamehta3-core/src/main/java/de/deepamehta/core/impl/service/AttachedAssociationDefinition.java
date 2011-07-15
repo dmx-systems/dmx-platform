@@ -217,7 +217,6 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     }
 
     private ViewConfigurationModel fetchViewConfig(Association assoc) {
-        // ### should we use "dm3.core.association" instead of "dm3.core.aggregation"?
         Set<RelatedTopic> topics = assoc.getRelatedTopics("dm3.core.aggregation", "dm3.core.assoc_def",
             "dm3.core.view_config", null, true, false);    // fetchComposite=true, fetchRelatingComposite=false
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
@@ -291,11 +290,11 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     // ### FIXME: copy in TypeEditorPlugin
     private String getWholeTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm3.core.whole_topic_type").getUri();
+        return assoc.getTopic("dm3.core.whole_type").getUri();
     }
 
     // ### FIXME: copy in TypeEditorPlugin
     private String getPartTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm3.core.part_topic_type").getUri();
+        return assoc.getTopic("dm3.core.part_type").getUri();
     }
 }
