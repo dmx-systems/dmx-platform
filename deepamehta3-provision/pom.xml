@@ -10,6 +10,13 @@
     <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <parent>
+        <groupId>de.deepamehta</groupId>
+        <artifactId>deepamehta3-parent</artifactId>
+        <version>1</version>
+        <relativePath>../deepamehta3-parent/pom.xml</relativePath>
+    </parent>
+
     <modules>
         <module>deepamehta3-bundles</module>
         <module>felix-bundles</module>

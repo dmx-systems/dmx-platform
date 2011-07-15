@@ -10,6 +10,13 @@
     <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <parent>
+        <groupId>de.deepamehta</groupId>
+        <artifactId>deepamehta3-parent</artifactId>
+        <version>1</version>
+        <relativePath>deepamehta3-parent/pom.xml</relativePath>
+    </parent>
+
     <!-- Used by both, the 'run' and the 'neo4j' profile -->
     <properties>
         <dm3.database.path>${project.basedir}/deepamehta-db</dm3.database.path>
@@ -103,6 +110,7 @@
                 <module>deepamehta3-typeeditor</module>
                 <module>deepamehta3-topicmaps</module>
                 <module>deepamehta3-provision</module>
+                <module>deepamehta3-plugin-parent</module>
 
                 <!-- <module>deepamehta3-coretypes</module>
                 <module>deepamehta3-typesearch</module>
@@ -112,7 +120,6 @@
                 <module>deepamehta3-filemanager</module>
                 <module>deepamehta3-iconpicker</module>
                 <module>deepamehta3-projects</module>
-                <module>deepamehta3-plugin-parent</module>
                 <module>deepamehta3-plugin-example</module> -->
             </modules>
         </profile>

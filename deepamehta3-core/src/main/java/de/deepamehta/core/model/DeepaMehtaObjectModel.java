@@ -29,7 +29,11 @@ public abstract class DeepaMehtaObjectModel {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public DeepaMehtaObjectModel(String typeUri) {
-        this(typeUri, null);
+        this(null, null, typeUri);
+    }
+
+    public DeepaMehtaObjectModel(String typeUri, SimpleValue value) {
+        this(null, value, typeUri);
     }
 
     public DeepaMehtaObjectModel(String typeUri, CompositeValue composite) {
