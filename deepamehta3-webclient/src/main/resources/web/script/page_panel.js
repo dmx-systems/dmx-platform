@@ -7,6 +7,7 @@ function PagePanel() {
     var dom = $("<div>").attr("id", "page-panel")
     dom.append($("<div>").attr("id", "page-content"))
     dom.append($("<div>").attr("id", "page-toolbar").addClass("dm-toolbar"))
+    show_splash()
 
     this.dom = dom
 
@@ -31,7 +32,7 @@ function PagePanel() {
         // update model
         displayed_object = null
         // update GUI
-        empty()
+        empty(true)
     }
 
     this.refresh = function() {
@@ -54,9 +55,15 @@ function PagePanel() {
         dm3c.trigger_page_renderer_hook(displayed_object, "render_form", displayed_object)
     }
 
-    function empty() {
+    function empty(do_show_splash) {
         $("#page-content").empty()
         $("#page-toolbar").empty()
+        //
+        if (do_show_splash) {
+            show_splash()
+        } else {
+            hide_splash()
+        }
     }
 
     // ---
@@ -67,5 +74,15 @@ function PagePanel() {
             var button = dm3c.ui.button(undefined, cmd.handler, cmd.label, cmd.ui_icon, cmd.is_submit)
             $("#page-toolbar").append(button)
         }
+    }
+
+    // ---
+
+    function show_splash() {
+        $("#page-content").addClass("splash")
+    }
+
+    function hide_splash() {
+        $("#page-content").removeClass("splash")
     }
 }

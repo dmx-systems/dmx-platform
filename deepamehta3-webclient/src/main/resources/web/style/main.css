@@ -30,6 +30,8 @@ body {
     vertical-align: top;
 }
 
+/*** Canvas ***/
+
 #canvas-panel {
     margin-right: 1.2em;
 }
@@ -37,6 +39,8 @@ body {
 #canvas {
     background: #f8f8f8;
 }
+
+/*** Page Panel Layout ***/
 
 #page-panel {
     line-height: 1.6em;
@@ -63,7 +67,7 @@ body {
     width: 85%;
 }
 
-/*** Page Panel ***/
+/*** Page Panel Style ***/
 
 .title {
     margin-top: 1em;
@@ -98,6 +102,13 @@ body {
 
 .field-value label {
     display: block;
+}
+
+.splash {
+    background-image: url("/de.deepamehta.3-webclient/images/deepamehta-logo.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.5;
 }
 
 /*** Topic Lists ***/
