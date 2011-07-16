@@ -21,7 +21,7 @@ public class AssociationTypeModel extends TypeModel {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public AssociationTypeModel(String uri, String value, String dataTypeUri) {
-        super(uri, new SimpleValue(value), "dm3.core.assoc_type", dataTypeUri);
+        super(uri, "dm3.core.assoc_type", new SimpleValue(value), dataTypeUri);
     }
 
     public AssociationTypeModel(TopicModel model) {

@@ -21,31 +21,31 @@ public abstract class DeepaMehtaObjectModel {
 
     protected long id;
     protected String uri;               // is never null, may be empty
-    protected SimpleValue value;        // is never null, may be constructed on empty string
     protected String typeUri;           // is never null in models used for a create operation
                                         // may be null in models used for an update operation
+    protected SimpleValue value;        // is never null, may be constructed on empty string
     protected CompositeValue composite; // is never null, may be empty
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public DeepaMehtaObjectModel(String typeUri) {
-        this(null, null, typeUri);
+        this(-1, typeUri);
     }
 
     public DeepaMehtaObjectModel(String typeUri, SimpleValue value) {
-        this(null, value, typeUri);
+        this(null, typeUri, value);
     }
 
     public DeepaMehtaObjectModel(String typeUri, CompositeValue composite) {
-        this(null, null, typeUri, composite);
+        this(null, typeUri, composite);
     }
 
-    public DeepaMehtaObjectModel(String uri, SimpleValue value, String typeUri) {
-        this(uri, value, typeUri, null);
+    public DeepaMehtaObjectModel(String uri, String typeUri, SimpleValue value) {
+        this(-1, uri, typeUri, value, null);
     }
 
-    public DeepaMehtaObjectModel(String uri, SimpleValue value, String typeUri, CompositeValue composite) {
-        this(-1, uri, value, typeUri, composite);
+    public DeepaMehtaObjectModel(String uri, String typeUri, CompositeValue composite) {
+        this(-1, uri, typeUri, null, composite);
     }
 
     public DeepaMehtaObjectModel(long id, String typeUri) {
@@ -53,25 +53,25 @@ public abstract class DeepaMehtaObjectModel {
     }
 
     public DeepaMehtaObjectModel(long id, String typeUri, CompositeValue composite) {
-        this(id, null, null, typeUri, composite);
+        this(id, null, typeUri, null, composite);
     }
 
     /**
      * @param   uri         If <code>null</code> an empty string is set. This is OK.
-     * @param   value       If <code>null</code> an empty string value is set. This is OK.
      * @param   typeUri     Mandatory. Note: only the internal meta type topic (ID 0) has no type URI (null).
+     * @param   value       If <code>null</code> an empty string value is set. This is OK.
      * @param   composite   If <code>null</code> an empty composite is set. This is OK.
      */
-    public DeepaMehtaObjectModel(long id, String uri, SimpleValue value, String typeUri, CompositeValue composite) {
+    public DeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value, CompositeValue composite) {
         this.id = id;
         this.uri = uri != null ? uri : "";
-        this.value = value != null ? value : new SimpleValue("");
         this.typeUri = typeUri;
+        this.value = value != null ? value : new SimpleValue("");
         this.composite = composite != null ? composite : new CompositeValue();
     }
 
     public DeepaMehtaObjectModel(DeepaMehtaObjectModel model) {
-        this(model.id, model.uri, model.value, model.typeUri, model.composite);
+        this(model.id, model.uri, model.typeUri, model.value, model.composite);
     }
 
     public DeepaMehtaObjectModel(JSONObject model) {

@@ -473,7 +473,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             } else {
                 // create child topic
                 String topicTypeUri = assocDef.getPartTopicTypeUri();
-                childTopic = dms.createTopic(new TopicModel(null, value, topicTypeUri, null), null);
+                childTopic = dms.createTopic(new TopicModel(topicTypeUri, value), null);
                 // associate child topic
                 associateChildTopic(assocDef, childTopic.getId());
             }

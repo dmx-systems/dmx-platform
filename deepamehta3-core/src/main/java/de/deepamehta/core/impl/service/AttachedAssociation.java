@@ -284,8 +284,13 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         }
     }
 
+    // FIXME: move to AttachedTopicRole / extend TopicRole interface?
     private Topic fetchRoleTopic(TopicRole role) {
-        return dms.getTopic(role.getTopicId(), false, null);    // fetchComposite=false, clientContext=null
+        if (role.topicIdentifiedByUri()) {
+            return dms.getTopic("uri", new SimpleValue(role.getTopicUri()), false);     // fetchComposite=false
+        } else {
+            return dms.getTopic(role.getTopicId(), false, null);    // fetchComposite=false, clientContext=null
+        }
     }
 
 

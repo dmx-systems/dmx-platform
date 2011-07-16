@@ -302,12 +302,12 @@ public class MGStorageBridge implements DeepaMehtaStorage {
             throw new IllegalArgumentException("Tried to build a TopicModel from a null MehtaNode");
         }
         //
-        return buildTopic(node.getId(), node.getString("uri"), new SimpleValue(node.getObject("value")),
-            getTopicTypeUri(node));
+        return buildTopic(node.getId(), node.getString("uri"), getTopicTypeUri(node),
+            new SimpleValue(node.getObject("value")));
     }
 
-    private TopicModel buildTopic(long id, String uri, SimpleValue value, String typeUri) {
-        return new TopicModel(id, uri, value, typeUri, null);   // composite=null
+    private TopicModel buildTopic(long id, String uri, String typeUri, SimpleValue value) {
+        return new TopicModel(id, uri, typeUri, value, null);   // composite=null
     }
 
     // ---

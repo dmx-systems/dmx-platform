@@ -10,12 +10,13 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
+        addIconToTopicType("dm3.core.meta_type",   "box-grey.png");
         addIconToTopicType("dm3.core.topic_type",  "box-blue.png");
         addIconToTopicType("dm3.core.assoc_type",  "box-red.png");
         addIconToTopicType("dm3.core.data_type",   "box-green.png");
         addIconToTopicType("dm3.core.cardinality", "box-yellow.png");
         addIconToTopicType("dm3.core.index_mode",  "box-orange.png");
-        addIconToTopicType("dm3.core.meta_type",   "box-grey.png");
+        addIconToTopicType("dm3.core.plugin",      "puzzle.png");
         //
         // Note: on the canvas HSL-specified colors are rendered pale (Safari and Firefox)
         addColorToAssociationType("dm3.core.association",     "rgb(178, 178, 178)" /*"hsl(  0,  0%, 75%)"*/);

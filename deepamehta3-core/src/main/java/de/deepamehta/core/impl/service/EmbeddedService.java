@@ -1010,8 +1010,8 @@ public class EmbeddedService implements DeepaMehtaService {
 
     private void setupBootstrapContent() {
         // Before topic types and asscociation types can be created the meta types must be created
-        TopicModel t = new TopicModel("dm3.core.topic_type", new SimpleValue("Topic Type"),       "dm3.core.meta_type");
-        TopicModel a = new TopicModel("dm3.core.assoc_type", new SimpleValue("Association Type"), "dm3.core.meta_type");
+        TopicModel t = new TopicModel("dm3.core.topic_type", "dm3.core.meta_type", new SimpleValue("Topic Type"));
+        TopicModel a = new TopicModel("dm3.core.assoc_type", "dm3.core.meta_type", new SimpleValue("Association Type"));
         _createTopic(t);
         _createTopic(a);
         // Create topic type "Data Type"
@@ -1023,11 +1023,11 @@ public class EmbeddedService implements DeepaMehtaService {
         _createTopic(dataType);
         _createTopic(roleType);
         // Create data type "Text"
-        TopicModel text = new TopicModel("dm3.core.text", new SimpleValue("Text"), "dm3.core.data_type");
+        TopicModel text = new TopicModel("dm3.core.text", "dm3.core.data_type", new SimpleValue("Text"));
         _createTopic(text);
         // Create role types "Type" and "Instance"
-        TopicModel type =     new TopicModel("dm3.core.type",     new SimpleValue("Type"),     "dm3.core.role_type");
-        TopicModel instance = new TopicModel("dm3.core.instance", new SimpleValue("Instance"), "dm3.core.role_type");
+        TopicModel type =     new TopicModel("dm3.core.type",     "dm3.core.role_type", new SimpleValue("Type"));
+        TopicModel instance = new TopicModel("dm3.core.instance", "dm3.core.role_type", new SimpleValue("Instance"));
         _createTopic(type);
         _createTopic(instance);
         // Create association type "Aggregation" -- needed to associate topic/association types with data types
@@ -1081,8 +1081,8 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     private void bootstrapTypeCache() {
-        typeCache.put(new AttachedTopicType(new TopicTypeModel("dm3.core.meta_meta_type", "Meta Meta Type",
-            "dm3.core.meta_meta_meta_type", "dm3.core.text"), this));
+        typeCache.put(new AttachedTopicType(new TopicTypeModel("dm3.core.meta_meta_type",
+            "dm3.core.meta_meta_meta_type", "Meta Meta Type", "dm3.core.text"), this));
     }
 
 

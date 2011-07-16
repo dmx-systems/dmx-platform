@@ -542,8 +542,10 @@ public class Plugin implements BundleActivator {
             return false;
         } else {
             logger.info("Installing " + this);
-            pluginTopic = dms.createTopic(new TopicModel(pluginId, new SimpleValue(pluginName), "dm3.core.plugin",
-                new CompositeValue("{dm3.core.plugin_migration_nr: 0}")), null);     // FIXME: clientContext=null
+            pluginTopic = dms.createTopic(new TopicModel(pluginId, "dm3.core.plugin",
+                new CompositeValue().put("dm3.core.plugin_name", pluginName)
+                                    .put("dm3.core.plugin_symbolic_name", pluginId)
+                                    .put("dm3.core.plugin_migration_nr", 0)), null);    // FIXME: clientContext=null
             return true;
         }
     }

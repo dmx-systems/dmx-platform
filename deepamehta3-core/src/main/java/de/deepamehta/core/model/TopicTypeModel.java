@@ -21,11 +21,11 @@ public class TopicTypeModel extends TypeModel {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public TopicTypeModel(String uri, String value, String dataTypeUri) {
-        this(uri, value, "dm3.core.topic_type", dataTypeUri);
+        this(uri, "dm3.core.topic_type", value, dataTypeUri);
     }
 
-    public TopicTypeModel(String uri, String value, String topicTypeUri, String dataTypeUri) {
-        super(uri, new SimpleValue(value), topicTypeUri, dataTypeUri);
+    public TopicTypeModel(String uri, String topicTypeUri, String value, String dataTypeUri) {
+        super(uri, topicTypeUri, new SimpleValue(value), dataTypeUri);
     }
 
     public TopicTypeModel(TopicModel model) {
