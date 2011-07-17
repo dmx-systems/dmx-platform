@@ -70,21 +70,13 @@
             <plugin>
                 <groupId>org.ops4j</groupId>
                 <artifactId>maven-pax-plugin</artifactId>
-                <version>1.4</version>
                 <configuration>
                     <deployURLs>
                         mvn:de.deepamehta/3rd-party-bundles/0.5-SNAPSHOT/pom,
                         mvn:de.deepamehta/felix-bundles/0.5-SNAPSHOT/pom,
                         mvn:de.deepamehta/deepamehta3-bundles/0.5-SNAPSHOT/pom
                     </deployURLs>
-                    <runner>1.7.4</runner>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.5</version>
-                <extensions>true</extensions>
             </plugin>
         </plugins>
     </build>

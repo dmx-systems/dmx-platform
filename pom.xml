@@ -71,13 +71,11 @@
                     <plugin>
                         <groupId>org.ops4j</groupId>
                         <artifactId>maven-pax-plugin</artifactId>
-                        <version>1.4</version>
                         <configuration>
                             <deployPoms>
                                 deepamehta3-provision/felix-bundles/pom.xml,
                                 deepamehta3-provision/3rd-party-bundles/pom.xml
                             </deployPoms>
-                            <runner>1.7.4</runner>
                         </configuration>
                     </plugin>
                     <!-- Deletes OSGi container configuration as created by Pax Runner -->
