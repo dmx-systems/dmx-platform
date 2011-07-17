@@ -74,7 +74,7 @@
             ]
         },
 
-        ### Email & Website ###
+        ### Email ###
 
         {
             value: "Email",
@@ -82,11 +82,41 @@
             data_type_uri: "dm3.core.text",
             index_mode_uris: ["dm3.core.fulltext"]
         },
+
+        ### Resource ###
+
         {
-            value: "Website",
-            uri: "dm3.contacts.website_url",
+            value: "Resource Name",
+            uri: "dm3.contacts.resource_name",
             data_type_uri: "dm3.core.text",
             index_mode_uris: ["dm3.core.fulltext"]
+        },
+        {
+            value: "Resource",
+            uri: "dm3.contacts.resource",
+            data_type_uri: "dm3.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:  "dm3.contacts.resource_name",
+                    part_cardinality_uri: "dm3.core.one",
+                    assoc_type_uri:       "dm3.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:   "dm3.webbrowser.url",
+                    part_cardinality_uri:  "dm3.core.one",
+                    assoc_type_uri:        "dm3.core.composition_def"
+                }
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm3.webclient.view_config",
+                    composite: {
+                        dm3.webclient.icon_src: "/de.deepamehta.3-contacts/images/earth.png",
+                        dm3.webclient.add_to_create_menu: true,
+                        dm3.webclient.is_searchable_unit: true
+                    }
+                }
+            ]
         },
 
         ### Address ###
@@ -171,15 +201,6 @@
             ]
         },
 
-        ### Notes ###
-
-        {
-            value: "Notes",
-            uri: "dm3.contacts.notes",
-            data_type_uri: "dm3.core.html",
-            index_mode_uris: ["dm3.core.fulltext"]
-        },
-
         ### Person ###
 
         {
@@ -203,10 +224,9 @@
                     assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:   "dm3.contacts.website_url",
-                    part_cardinality_uri:  "dm3.core.one",
-                    whole_cardinality_uri: "dm3.core.many",
-                    assoc_type_uri:        "dm3.core.aggregation_def"
+                    part_topic_type_uri:   "dm3.webbrowser.url",
+                    part_cardinality_uri:  "dm3.core.many",
+                    assoc_type_uri:        "dm3.core.composition_def"
                 },
                 {
                     part_topic_type_uri:  "dm3.contacts.address_entry",
@@ -214,7 +234,7 @@
                     assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm3.contacts.notes",
+                    part_topic_type_uri:  "dm3.notes.text",
                     part_cardinality_uri: "dm3.core.one",
                     assoc_type_uri:       "dm3.core.composition_def"
                 }
@@ -254,10 +274,9 @@
                     assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:   "dm3.contacts.website_url",
-                    part_cardinality_uri:  "dm3.core.one",
-                    whole_cardinality_uri: "dm3.core.many",
-                    assoc_type_uri:        "dm3.core.aggregation_def"
+                    part_topic_type_uri:   "dm3.webbrowser.url",
+                    part_cardinality_uri:  "dm3.core.many",
+                    assoc_type_uri:        "dm3.core.composition_def"
                 },
                 {
                     part_topic_type_uri:  "dm3.contacts.address_entry",
@@ -265,7 +284,7 @@
                     assoc_type_uri:       "dm3.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm3.contacts.notes",
+                    part_topic_type_uri:  "dm3.notes.text",
                     part_cardinality_uri: "dm3.core.one",
                     assoc_type_uri:       "dm3.core.composition_def"
                 }

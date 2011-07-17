@@ -1,0 +1,10 @@
+{
+    topic_types: [
+        {
+            value: "URL",
+            uri: "dm3.webbrowser.url",
+            data_type_uri: "dm3.core.text",
+            index_mode_uris: ["dm3.core.fulltext"]
+        }
+    ]
+}
