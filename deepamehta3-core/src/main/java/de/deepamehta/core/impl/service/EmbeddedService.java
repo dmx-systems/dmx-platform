@@ -692,14 +692,14 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public void checkPluginsReady() {
+    public void checkAllPluginsReady() {
         Bundle[] bundles = bundleContext.getBundles();
         int plugins = 0;
         int registered = 0;
         for (Bundle bundle : bundles) {
             if (isDeepaMehtaPlugin(bundle)) {
                 plugins++;
-                if (isPluginRegistered(bundle)) {
+                if (isPluginRegistered(bundle.getSymbolicName())) {
                     registered++;
                 }
             }
@@ -724,7 +724,7 @@ public class EmbeddedService implements DeepaMehtaService {
             runCoreMigrations(isCleanInstall);
             tx.success();
             tx.finish();
-            logger.info("----- Initialization of DeepaMehta 3 Core complete -----");
+            logger.info("----- Completing initialization of DeepaMehta 3 Core -----");
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             tx.finish();
@@ -985,8 +985,8 @@ public class EmbeddedService implements DeepaMehtaService {
             !bundle.getSymbolicName().equals("de.deepamehta.3-core");
     }
 
-    private boolean isPluginRegistered(Bundle bundle) {
-        return pluginCache.contains(bundle.getSymbolicName());
+    private boolean isPluginRegistered(String pluginId) {
+        return pluginCache.contains(pluginId);
     }
 
 
@@ -1089,6 +1089,9 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // === Migrations ===
 
+    /**
+     * Determines the core migrations to be run and run them.
+     */
     private void runCoreMigrations(boolean isCleanInstall) {
         int migrationNr = storage.getMigrationNr();
         int requiredMigrationNr = REQUIRED_CORE_MIGRATION;

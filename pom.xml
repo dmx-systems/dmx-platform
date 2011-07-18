@@ -40,6 +40,7 @@
                         ${project.basedir}/deepamehta3-core/target,
                         ${project.basedir}/deepamehta3-server/target,
                         ${project.basedir}/deepamehta3-webclient/target,
+                        ${project.basedir}/deepamehta3-webbrowser/target,
                         ${project.basedir}/deepamehta3-notes/target,
                         ${project.basedir}/deepamehta3-contacts/target,
                         ${project.basedir}/deepamehta3-workspaces/target,
@@ -98,18 +99,20 @@
         <profile>
             <id>all</id>
             <modules>
-                <module>deepamehta3-parent</module>
                 <module>deepamehta3-core</module>
                 <module>deepamehta3-server</module>
                 <module>deepamehta3-webclient</module>
+                <module>deepamehta3-webbrowser</module>
                 <module>deepamehta3-notes</module>
                 <module>deepamehta3-contacts</module>
                 <module>deepamehta3-workspaces</module>
                 <module>deepamehta3-typeeditor</module>
                 <module>deepamehta3-topicmaps</module>
-                <module>deepamehta3-provision</module>
+                <!-- POM projects -->
+                <module>deepamehta3-parent</module>
                 <module>deepamehta3-plugin-parent</module>
-
+                <module>deepamehta3-provision</module>
+                <!-- not yet adapted to DM3 v0.5 resp. obsolete -->
                 <!-- <module>deepamehta3-coretypes</module>
                 <module>deepamehta3-typesearch</module>
                 <module>deepamehta3-time</module>

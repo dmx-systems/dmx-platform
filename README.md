@@ -67,7 +67,7 @@ Stop
 
 1. Go to the terminal window that opened while startup and type:
 
-        exit 0
+        stop 0
 
    This puts the database in a consistent state.  
    You can close the terminal window now.

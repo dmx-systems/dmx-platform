@@ -16,6 +16,10 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
@@ -25,11 +29,13 @@ import org.codehaus.jettison.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.io.InputStream;
 import java.io.IOException;
@@ -40,14 +46,22 @@ import java.net.URL;
 /**
  * Base class for plugin developers to derive their plugins from.
  */
-public class Plugin implements BundleActivator {
+public class Plugin implements BundleActivator, EventHandler {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
     private static final String STANDARD_PROVIDER_PACKAGE = "de.deepamehta.plugins.server.provider";
 
+    private static final String PLUGIN_READY = "dm3/core/plugin_ready";
+
+    // ------------------------------------------------------------------------------------------------- Class Variables
+
+    private static final Set<String> readyPlugins = new HashSet();
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    private BundleContext context;
 
     private String pluginId;                // This bundle's symbolic name, e.g. "de.deepamehta.3-webclient".
     private String pluginName;              // This bundle's name = POM project name.
@@ -58,8 +72,14 @@ public class Plugin implements BundleActivator {
 
     private Properties configProperties;    // Read from file "plugin.properties"
 
+    // For tracking the state of dependent plugins.
+    // Key: plugin ID, value: availability (true=available)
+    private Map<String, Boolean> dependencyState;
+
+    // Consumed services
     protected DeepaMehtaService dms;
     private HttpService httpService;
+    private EventAdmin eventService;
 
     private List<ServiceTracker> serviceTrackers = new ArrayList();
 
@@ -75,6 +95,10 @@ public class Plugin implements BundleActivator {
         return pluginName;
     }
 
+    /**
+     * Returns a plugin configuration property (as read from file "plugin.properties")
+     * or <code>null</code> if no such property exists.
+     */
     public String getConfigProperty(String key) {
         return getConfigProperty(key, null);
     }
@@ -145,19 +169,26 @@ public class Plugin implements BundleActivator {
     @Override
     public void start(BundleContext context) {
         try {
-            pluginBundle = context.getBundle();
-            pluginId = pluginBundle.getSymbolicName();
-            pluginName = (String) pluginBundle.getHeaders().get("Bundle-Name");
-            pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
+            this.context = context;
+            this.pluginBundle = context.getBundle();
+            this.pluginId = pluginBundle.getSymbolicName();
+            this.pluginName = (String) pluginBundle.getHeaders().get("Bundle-Name");
+            this.pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
             //
             logger.info("========== Starting " + this + " ==========");
             //
-            configProperties = readConfigFile();
-            pluginPackage = getConfigProperty("pluginPackage", getClass().getPackage().getName());
+            this.configProperties = readConfigFile();
+            this.pluginPackage = getConfigProperty("pluginPackage", getClass().getPackage().getName());
+            this.dependencyState = initDependencies();
             //
-            createServiceTracker(DeepaMehtaService.class.getName(), context);
-            createServiceTracker(HttpService.class.getName(), context);
-            createServiceTrackers(context);
+            if (dependencyState.size() > 0) {
+                registerEventListener();
+            }
+            //
+            createServiceTracker(DeepaMehtaService.class.getName());
+            createServiceTracker(HttpService.class.getName());
+            createServiceTracker(EventAdmin.class.getName());
+            createServiceTrackers();
         } catch (Exception e) {
             logger.severe("Starting " + this + " failed:");
             e.printStackTrace();
@@ -284,17 +315,17 @@ public class Plugin implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void createServiceTrackers(BundleContext context) {
+    private void createServiceTrackers() {
         String consumedServiceInterfaces = getConfigProperty("consumedServiceInterfaces");
         if (consumedServiceInterfaces != null) {
             String[] serviceInterfaces = consumedServiceInterfaces.split(", *");
             for (int i = 0; i < serviceInterfaces.length; i++) {
-                createServiceTracker(serviceInterfaces[i], context);
+                createServiceTracker(serviceInterfaces[i]);
             }
         }
     }
 
-    private void createServiceTracker(final String serviceInterface, BundleContext context) {
+    private void createServiceTracker(final String serviceInterface) {
         ServiceTracker serviceTracker = new ServiceTracker(context, serviceInterface, null) {
 
             @Override
@@ -307,6 +338,10 @@ public class Plugin implements BundleActivator {
                 } else if (service instanceof HttpService) {
                     logger.info("Adding HTTP service to plugin \"" + pluginName + "\"");
                     httpService = (HttpService) service;
+                    checkServiceAvailability();
+                } else if (service instanceof EventAdmin) {
+                    logger.info("Adding Event Admin service to plugin \"" + pluginName + "\"");
+                    eventService = (EventAdmin) service;
                     checkServiceAvailability();
                 } else if (service instanceof PluginService) {
                     logger.info("Adding plugin service \"" + serviceInterface + "\" to plugin \"" + pluginName + "\"");
@@ -328,6 +363,9 @@ public class Plugin implements BundleActivator {
                     unregisterWebResources();
                     unregisterRestResources();
                     httpService = null;
+                } else if (service == eventService) {
+                    logger.info("Removing Event Admin service from plugin \"" + pluginName + "\"");
+                    eventService = null;
                 } else if (service instanceof PluginService) {
                     logger.info("Removing plugin service \"" + serviceInterface + "\" from plugin \"" +
                         pluginName + "\"");
@@ -336,20 +374,34 @@ public class Plugin implements BundleActivator {
                 }
                 super.removedService(ref, service);
             }
-
-            /**
-             * Checks if both required OSGi services (DeepaMehtaService and HttpService) are available,
-             * and if so, initializes the plugin.
-             */
-            private void checkServiceAvailability() {
-                if (dms != null && httpService != null) {
-                    initPlugin(context);
-                    dms.checkPluginsReady();
-                }
-            }
         };
         serviceTrackers.add(serviceTracker);
         serviceTracker.open();
+    }
+
+    // ---
+
+    /**
+     * Checks if both required OSGi services (DeepaMehtaService and HttpService) are available,
+     * and if so, initializes the plugin. ### FIXDOC
+     */
+    private void checkServiceAvailability() {
+        if (dms != null && httpService != null && eventService != null && dependenciesAvailable()) {
+            initPlugin();
+            pluginReady();
+            postPluginReadyEvent();
+            dms.checkAllPluginsReady();
+        }
+    }
+
+    // ---
+
+    private void pluginReady() {
+        readyPlugins.add(pluginId);
+    }
+
+    private boolean isPluginReady(String pluginId) {
+        return readyPlugins.contains(pluginId);
     }
 
     // ---
@@ -365,14 +417,14 @@ public class Plugin implements BundleActivator {
      * These are the tasks which rely on both, the DeepaMehtaService and the HttpService.
      * This method is called once both services become available.
      */
-    private void initPlugin(BundleContext context) {
+    private void initPlugin() {
         logger.info("----- Initializing " + this + " -----");
         installPlugin();                    // relies on DeepaMehtaService
         registerPlugin();                   // relies on DeepaMehtaService (and committed migrations)
-        registerPluginService(context);
+        registerPluginService();
         registerWebResources();             // relies on HttpService
         registerRestResources();            // relies on HttpService and DeepaMehtaService (and registered plugin)
-        logger.info("----- Initialization of " + this + " complete -----");
+        logger.info("----- Completing initialization of " + this + " -----");
     }
 
     /**
@@ -400,7 +452,7 @@ public class Plugin implements BundleActivator {
         }
     }
 
-    private void registerPluginService(BundleContext context) {
+    private void registerPluginService() {
         String serviceInterface = getConfigProperty("providedServiceInterface");
         if (serviceInterface != null) {
             logger.info("Registering service \"" + serviceInterface + "\" of " + this + " at OSGi framework");
@@ -523,6 +575,62 @@ public class Plugin implements BundleActivator {
 
     private String getConfigProperty(String key, String defaultValue) {
         return configProperties.getProperty(key, defaultValue);
+    }
+
+    // --- Model Dependencies ---
+
+    private Map<String, Boolean> initDependencies() {
+        Map<String, Boolean> dependencyState = new HashMap();
+        String importModels = getConfigProperty("importModels");
+        if (importModels != null) {
+            String[] pluginIDs = importModels.split(", *");
+            for (int i = 0; i < pluginIDs.length; i++) {
+                if (!isPluginReady(pluginIDs[i])) {
+                    dependencyState.put(pluginIDs[i], false);
+                }
+            }
+        }
+        return dependencyState;
+    }
+
+    private boolean hasDependency(String pluginId) {
+        return dependencyState.get(pluginId) != null;
+    }
+
+    private boolean dependenciesAvailable() {
+        for (boolean available : dependencyState.values()) {
+            if (!available) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void registerEventListener() {
+        String[] topics = new String[] {PLUGIN_READY};
+        Hashtable properties = new Hashtable();
+        properties.put(EventConstants.EVENT_TOPIC, topics);
+        context.registerService(EventHandler.class.getName(), this, properties);
+    }
+
+    @Override
+    public void handleEvent(Event event) {
+        if (event.getTopic().equals(PLUGIN_READY)) {
+            String pluginId = (String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME);
+            if (hasDependency(pluginId)) {
+                logger.info("### Receiving PLUGIN_READY event from \"" + pluginId + "\" for " + this);
+                dependencyState.put(pluginId, true);
+                checkServiceAvailability();
+            }
+        } else {
+            throw new RuntimeException("Unexpected event: " + event);
+        }
+    }
+
+    private void postPluginReadyEvent() {
+        Properties properties = new Properties();
+        properties.put(EventConstants.BUNDLE_SYMBOLICNAME, pluginId);
+        eventService.postEvent(new Event(PLUGIN_READY, properties));
     }
 
     // ---

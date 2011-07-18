@@ -165,7 +165,7 @@ public interface DeepaMehtaService {
      * Called from the Plugin class.
      * Not meant to be called by a plugin developer.
      */
-    public void checkPluginsReady();
+    public void checkAllPluginsReady();
 
     /**
      * Setups the database to be compatible with this core service.

@@ -20,24 +20,8 @@
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta3-core</artifactId>
-            <version>0.5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta3-server</artifactId>
             <version>0.5-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi_R4_compendium</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -58,7 +42,6 @@
                 </includes>
             </resource>
         </resources>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.felix</groupId>
@@ -73,5 +56,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
