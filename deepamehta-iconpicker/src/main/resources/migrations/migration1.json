@@ -1,0 +1,34 @@
+{
+    topic_types: [
+        {
+            label: "Icon",
+            uri: "de/deepamehta/core/topictype/Icon",
+            icon_src: "/de.deepamehta.iconpicker/images/colored-boxes.png",
+            js_renderer_class: "PlainDocument",
+            fields: [
+                {
+                    label: "Name",
+                    uri: "de/deepamehta/core/property/Name",
+                    data_type: "text",
+                    editor: "single line",
+                    js_renderer_class: "TitleRenderer",
+                    indexing_mode: "FULLTEXT"
+                },
+                {
+                    label: "Icon File",
+                    uri: "de/deepamehta/core/property/IconSource",
+                    data_type: "text",
+                    editor: "single line",
+                    indexing_mode: "KEY"
+                },
+                {
+                    label: "Description",
+                    uri: "de/deepamehta/core/property/Description",
+                    data_type: "html",
+                    js_renderer_class: "BodyTextRenderer",
+                    indexing_mode: "FULLTEXT"
+                }
+            ]
+        }
+    ]
+}

@@ -14,7 +14,7 @@ Project website:
 <http://www.deepamehta.de/>
 
 Downloads, wiki, issue tracker, source code:  
-<http://github.com/jri/deepamehta3>
+<http://github.com/jri/deepamehta>
 
 User and developer discussion:  
 <http://groups.google.com/group/deepamehta3>
@@ -37,16 +37,16 @@ Install
 -------
 
 1. Download latest release from here:  
-   <http://github.com/jri/deepamehta3/downloads/>
+   <http://github.com/jri/deepamehta/downloads/>
 
 2. Unpack zip archive.  
-   A folder *deepamehta3-v0.4.5* is created.
+   A folder *deepamehta-v0.4.5* is created.
 
 
 Start
 -----
 
-1. Open the *deepamehta3-v0.4.5* folder and use the respective starter script for your platform:
+1. Open the *deepamehta-v0.4.5* folder and use the respective starter script for your platform:
 
         deepamehta-linux.sh         # choose "Run in terminal"
         deepamehta-macosx.command   # double-click it
@@ -56,7 +56,7 @@ Start
    Then a browser window opens and DeepaMehta is ready to use.
 
    Hint: if no browser window appears open it manually:  
-   <http://localhost:8080/de.deepamehta.3-webclient/index.html>
+   <http://localhost:8080/de.deepamehta.webclient/index.html>
 
 2. Login via the *Special* menu as *admin*. Leave the password field empty.  
    You're enabled to create content now.
@@ -80,7 +80,7 @@ To update a previous DeepaMehta installation and keep your database content:
 
 1. Stop DeepaMehta (if running) and install the new DeepaMehta version (as described above).
 
-2. Copy your *deepamehta-db* folder into the *deepamehta3-v0.4.5* folder (next to the *bin*, *bundle*, and *conf* folders).
+2. Copy your *deepamehta-db* folder into the *deepamehta-v0.4.5* folder (next to the *bin*, *bundle*, and *conf* folders).
 
 3. Start the new DeepaMehta (as described above).  
    Your database automatically migrates to the new format.  
@@ -102,14 +102,14 @@ Hints:
 Uninstall
 ---------
 
-Stop DeepaMehta and delete the *deepamehta3-v0.4.5* folder.  
+Stop DeepaMehta and delete the *deepamehta-v0.4.5* folder.  
 This removes DeepaMehta completely from your computer, including the database.
 
 
 Build from Source
 -----------------
 
-See the wiki page [DeepaMehta 3 Development](https://github.com/jri/deepamehta3/wiki/DeepaMehta-3-Development)
+See the wiki page [DeepaMehta 3 Development](https://github.com/jri/deepamehta/wiki/DeepaMehta-3-Development)
 
 
 Version History

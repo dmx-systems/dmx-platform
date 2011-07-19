@@ -1,0 +1,65 @@
+{
+    topic_types: [
+        {
+            label: "User",
+            uri: "de/deepamehta/core/topictype/user",
+            icon_src: "/de.deepamehta.accesscontrol/images/top-hat.png",
+            js_renderer_class: "PlainDocument",
+            fields: [
+                {
+                    label: "Username",      uri: "de/deepamehta/core/property/username",    indexing_mode: "KEY",
+                    js_renderer_class: "TitleRenderer"
+                },
+                {
+                    label: "Password",      uri: "de/deepamehta/core/property/password"
+                },
+                {
+                    label: "Notes",         uri: "de/deepamehta/core/property/Notes",       indexing_mode: "FULLTEXT",
+                    data_type: "html", lines: 10
+                }
+            ]
+        },
+        {
+            label: "Role",
+            uri: "de/deepamehta/core/topictype/role",
+            icon_src: "/de.deepamehta.accesscontrol/images/silhouette.gif",
+            js_renderer_class: "PlainDocument",
+            fields: [
+                {
+                    label: "Role Name",     uri: "de/deepamehta/core/property/rolename",    indexing_mode: "KEY",
+                    js_renderer_class: "TitleRenderer"
+                },
+                {
+                    label: "Description",   uri: "de/deepamehta/core/property/Description", indexing_mode: "FULLTEXT",
+                    js_renderer_class: "BodyTextRenderer", data_type: "html"
+                }
+            ]
+        }
+    ],
+    topics: [
+        {
+            type_uri: "de/deepamehta/core/topictype/role",
+            properties: {
+                "de/deepamehta/core/property/rolename": "creator"
+            }
+        },
+        {
+            type_uri: "de/deepamehta/core/topictype/role",
+            properties: {
+                "de/deepamehta/core/property/rolename": "owner"
+            }
+        },
+        {
+            type_uri: "de/deepamehta/core/topictype/role",
+            properties: {
+                "de/deepamehta/core/property/rolename": "member"
+            }
+        },
+        {
+            type_uri: "de/deepamehta/core/topictype/role",
+            properties: {
+                "de/deepamehta/core/property/rolename": "everyone"
+            }
+        }
+    ]
+}

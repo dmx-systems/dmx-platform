@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>Felix Bundles</name>
+    <groupId>de.deepamehta</groupId>
+    <artifactId>felix-bundles</artifactId>
+    <version>0.5-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <parent>
+        <groupId>de.deepamehta</groupId>
+        <artifactId>deepamehta-provision</artifactId>
+        <version>0.5-SNAPSHOT</version>
+    </parent>
+
+    <!-- All Apache Felix bundles that belong to the DeepaMehta 4 standard distribution.
+
+        These dependencies are deployed as bundles in Felix when
+            - running pax:run from the deepamehta-provision directory
+            - running pax:run from an external plugin directory
+            - running the deepamehta-plugin-example tests
+    -->
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.http.jetty</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.configadmin</artifactId>
+            <version>1.2.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.eventadmin</artifactId>
+            <version>1.2.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.fileinstall</artifactId>
+            <version>3.1.10</version>
+        </dependency>
+        <!-- FIXME: these bundles are not required when Felix is started via Pax Runner.              -->
+        <!-- The Felix ditribution deployed via Pax Runner brings its own Gogo shell.                 -->
+        <!-- When the version numbers do not match 2 versions of the Gogo shell bundles are deployed. -->
+        <!--                                                                                          -->
+        <!-- The Gogo shell dependencies are required only by the Assembly plugin actually.           -->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.gogo.command</artifactId>
+            <version>0.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.gogo.runtime</artifactId>
+            <version>0.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.gogo.shell</artifactId>
+            <version>0.8.0</version>
+        </dependency>
+    </dependencies>
+
+</project>

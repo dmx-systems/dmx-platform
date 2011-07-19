@@ -1,0 +1,68 @@
+{
+    topic_types: [
+        {
+            label: "File",
+            uri: "de/deepamehta/core/topictype/File",
+            icon_src: "/de.deepamehta.files/images/sheet.png",
+            js_renderer_class: "PlainDocument",
+            topic_label_field_uri: "de/deepamehta/core/property/FileName",
+            fields: [
+                {
+                    label: "Content",
+                    uri: "de/deepamehta/core/property/Content",
+                    data_type: "html",
+                    indexing_mode: "FULLTEXT",
+                    js_renderer_class: "BodyTextRenderer"
+                },
+                {
+                    label: "File Name",
+                    uri: "de/deepamehta/core/property/FileName",
+                    data_type: "text",
+                    editor: "single line",
+                    indexing_mode: "FULLTEXT"
+                },
+                {
+                    label: "Path",
+                    uri: "de/deepamehta/core/property/Path",
+                    data_type: "text",
+                    editor: "single line",
+                    indexing_mode: "KEY"
+                },
+                {
+                    label: "Media Type",
+                    uri: "de/deepamehta/core/property/MediaType",
+                    data_type: "text",
+                    editor: "single line",
+                    indexing_mode: "FULLTEXT"
+                },
+                {
+                    label: "Size",
+                    uri: "de/deepamehta/core/property/Size",
+                    data_type: "number"
+                }
+            ]
+        },
+        {
+            label: "Folder",
+            uri: "de/deepamehta/core/topictype/Folder",
+            icon_src: "/de.deepamehta.files/images/folder.png",
+            js_renderer_class: "PlainDocument",
+            fields: [
+                {
+                    label: "Folder Name",
+                    uri: "de/deepamehta/core/property/FolderName",
+                    data_type: "text",
+                    editor: "single line",
+                    indexing_mode: "FULLTEXT"
+                },
+                {
+                    label: "Path",
+                    uri: "de/deepamehta/core/property/Path",
+                    data_type: "text",
+                    editor: "single line",
+                    indexing_mode: "KEY"
+                }
+            ]
+        }
+    ]
+}

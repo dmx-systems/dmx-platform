@@ -4,17 +4,17 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4</name>
+    <name>DeepaMehta 4 Global</name>
     <groupId>de.deepamehta</groupId>
-    <artifactId>deepamehta3</artifactId>
+    <artifactId>deepamehta-global</artifactId>
     <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
-        <artifactId>deepamehta3-parent</artifactId>
+        <artifactId>deepamehta-parent</artifactId>
         <version>1</version>
-        <relativePath>deepamehta3-parent/pom.xml</relativePath>
+        <relativePath>deepamehta-parent/pom.xml</relativePath>
     </parent>
 
     <!-- Used by both, the 'run' and the 'neo4j' profile -->
@@ -32,30 +32,30 @@
                 <org.osgi.service.http.port>8080</org.osgi.service.http.port>
                 <file.encoding>UTF-8</file.encoding>
                 <java.util.logging.config.file>
-                    ${project.basedir}/deepamehta3-distribution/logging.properties
+                    ${project.basedir}/deepamehta-distribution/logging.properties
                 </java.util.logging.config.file>
                 <felix.log.level>1</felix.log.level>
                 <felix.fileinstall.dir>
                     <![CDATA[
-                        ${project.basedir}/deepamehta3-core/target,
-                        ${project.basedir}/deepamehta3-server/target,
-                        ${project.basedir}/deepamehta3-webclient/target,
-                        ${project.basedir}/deepamehta3-webbrowser/target,
-                        ${project.basedir}/deepamehta3-notes/target,
-                        ${project.basedir}/deepamehta3-contacts/target,
-                        ${project.basedir}/deepamehta3-workspaces/target,
-                        ${project.basedir}/deepamehta3-typeeditor/target,
-                        ${project.basedir}/deepamehta3-topicmaps/target
+                        ${project.basedir}/deepamehta-core/target,
+                        ${project.basedir}/deepamehta-server/target,
+                        ${project.basedir}/deepamehta-webclient/target,
+                        ${project.basedir}/deepamehta-webbrowser/target,
+                        ${project.basedir}/deepamehta-notes/target,
+                        ${project.basedir}/deepamehta-contacts/target,
+                        ${project.basedir}/deepamehta-workspaces/target,
+                        ${project.basedir}/deepamehta-typeeditor/target,
+                        ${project.basedir}/deepamehta-topicmaps/target
                     ]]>
                     <!--
-                        ${project.basedir}/deepamehta3-coretypes/target,
-                        ${project.basedir}/deepamehta3-time/target,
-                        ${project.basedir}/deepamehta3-iconpicker/target,
-                        ${project.basedir}/deepamehta3-projects/target,
-                        ${project.basedir}/deepamehta3-typesearch/target,
-                        ${project.basedir}/deepamehta3-files/target,
-                        ${project.basedir}/deepamehta3-filemanager/target,
-                        ${project.basedir}/deepamehta3-accesscontrol/target
+                        ${project.basedir}/deepamehta-coretypes/target,
+                        ${project.basedir}/deepamehta-time/target,
+                        ${project.basedir}/deepamehta-iconpicker/target,
+                        ${project.basedir}/deepamehta-projects/target,
+                        ${project.basedir}/deepamehta-typesearch/target,
+                        ${project.basedir}/deepamehta-files/target,
+                        ${project.basedir}/deepamehta-filemanager/target,
+                        ${project.basedir}/deepamehta-accesscontrol/target
                     -->
                 </felix.fileinstall.dir>
                 <!-- Watching only for jar files suppresses deployment of exploded bundles (which often fails).    -->
@@ -74,8 +74,8 @@
                         <artifactId>maven-pax-plugin</artifactId>
                         <configuration>
                             <deployPoms>
-                                deepamehta3-provision/felix-bundles/pom.xml,
-                                deepamehta3-provision/3rd-party-bundles/pom.xml
+                                deepamehta-provision/felix-bundles/pom.xml,
+                                deepamehta-provision/3rd-party-bundles/pom.xml
                             </deployPoms>
                         </configuration>
                     </plugin>
@@ -99,29 +99,29 @@
         <profile>
             <id>all</id>
             <modules>
-                <module>deepamehta3-core</module>
-                <module>deepamehta3-server</module>
-                <module>deepamehta3-webclient</module>
-                <module>deepamehta3-webbrowser</module>
-                <module>deepamehta3-notes</module>
-                <module>deepamehta3-contacts</module>
-                <module>deepamehta3-workspaces</module>
-                <module>deepamehta3-typeeditor</module>
-                <module>deepamehta3-topicmaps</module>
+                <module>deepamehta-core</module>
+                <module>deepamehta-server</module>
+                <module>deepamehta-webclient</module>
+                <module>deepamehta-webbrowser</module>
+                <module>deepamehta-notes</module>
+                <module>deepamehta-contacts</module>
+                <module>deepamehta-workspaces</module>
+                <module>deepamehta-typeeditor</module>
+                <module>deepamehta-topicmaps</module>
                 <!-- POM projects -->
-                <module>deepamehta3-parent</module>
-                <module>deepamehta3-plugin-parent</module>
-                <module>deepamehta3-provision</module>
+                <module>deepamehta-parent</module>
+                <module>deepamehta-plugin-parent</module>
+                <module>deepamehta-provision</module>
                 <!-- not yet adapted to DM3 v0.5 resp. obsolete -->
-                <!-- <module>deepamehta3-coretypes</module>
-                <module>deepamehta3-typesearch</module>
-                <module>deepamehta3-time</module>
-                <module>deepamehta3-accesscontrol</module>
-                <module>deepamehta3-files</module>
-                <module>deepamehta3-filemanager</module>
-                <module>deepamehta3-iconpicker</module>
-                <module>deepamehta3-projects</module>
-                <module>deepamehta3-plugin-example</module> -->
+                <!-- <module>deepamehta-coretypes</module>
+                <module>deepamehta-typesearch</module>
+                <module>deepamehta-time</module>
+                <module>deepamehta-accesscontrol</module>
+                <module>deepamehta-files</module>
+                <module>deepamehta-filemanager</module>
+                <module>deepamehta-iconpicker</module>
+                <module>deepamehta-projects</module>
+                <module>deepamehta-plugin-example</module> -->
             </modules>
         </profile>
 
@@ -165,6 +165,6 @@
     </profiles>
 
     <scm>
-        <connection>scm:git:git@github.com:jri/deepamehta3.git</connection>
+        <connection>scm:git:git@github.com:jri/deepamehta.git</connection>
     </scm>
 </project>

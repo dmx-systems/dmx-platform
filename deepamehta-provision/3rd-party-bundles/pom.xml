@@ -1,0 +1,108 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>3rd Party Bundles</name>
+    <groupId>de.deepamehta</groupId>
+    <artifactId>3rd-party-bundles</artifactId>
+    <version>0.5-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <parent>
+        <groupId>de.deepamehta</groupId>
+        <artifactId>deepamehta-provision</artifactId>
+        <version>0.5-SNAPSHOT</version>
+    </parent>
+
+    <!-- All 3rd party bundles that belong to the DeepaMehta 4 standard distribution. -->
+    <dependencies>
+
+        <!-- JAX-RS -->
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+            <version>1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>1.5</version>
+        </dependency>
+
+        <!-- JSON -->
+        <dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <!-- multipart/form-data -->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+
+        <!-- Neo4j -->
+        <dependency>
+            <!--
+                throws java.lang.IllegalArgumentException: Listener is null at
+                org.neo4j.kernel.impl.osgi.OSGiActivator.stop(OSGiActivator.java:64)
+                see
+                http://github.com/neo4j/graphdb/blob/master/kernel/src/main/java/org/neo4j/kernel/impl/osgi/OSGiActivator.java
+            -->
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-kernel</artifactId>
+            <version>1.2-1.2</version>
+            <!--version>1.3.M04</version-->
+        </dependency>
+        <!-- FIXME: new index API doesn't work with OSGi
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-lucene-index</artifactId>
+            <version>1.3.M04</version>
+        </dependency> -->
+        <!-- Using old index API instead -->
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-index</artifactId>
+            <version>1.2-1.2</version>
+            <!--version>1.3-1.3.M01</version-->
+        </dependency>
+
+        <!-- JTA for neo4j-kernel -->
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jta_1.1_spec</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
+        <!-- lucene for neo4j-index -->
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.lucene</artifactId>
+            <version>3.0.1_2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>neo4j-mehtagraph</artifactId>
+            <version>0.7-SNAPSHOT</version>
+        </dependency>
+
+        <!-- asm for jersey-core -->
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.asm</artifactId>
+            <version>3.1_1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.commons-io</artifactId>
+            <version>1.4_1</version>
+        </dependency>
+
+    </dependencies>
+</project>
