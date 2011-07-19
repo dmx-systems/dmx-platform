@@ -53,7 +53,7 @@ public class Plugin implements BundleActivator, EventHandler {
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
     private static final String STANDARD_PROVIDER_PACKAGE = "de.deepamehta.plugins.server.provider";
 
-    private static final String PLUGIN_READY = "dm3/core/plugin_ready";
+    private static final String PLUGIN_READY = "dm4/core/plugin_ready";
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 
@@ -133,7 +133,7 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // FIXME: should be private
     public void setMigrationNr(int migrationNr) {
-        pluginTopic.setChildTopicValue("dm3.core.plugin_migration_nr", new SimpleValue(migrationNr));
+        pluginTopic.setChildTopicValue("dm4.core.plugin_migration_nr", new SimpleValue(migrationNr));
     }
 
     /**
@@ -650,10 +650,10 @@ public class Plugin implements BundleActivator, EventHandler {
             return false;
         } else {
             logger.info("Installing " + this);
-            pluginTopic = dms.createTopic(new TopicModel(pluginId, "dm3.core.plugin",
-                new CompositeValue().put("dm3.core.plugin_name", pluginName)
-                                    .put("dm3.core.plugin_symbolic_name", pluginId)
-                                    .put("dm3.core.plugin_migration_nr", 0)), null);    // FIXME: clientContext=null
+            pluginTopic = dms.createTopic(new TopicModel(pluginId, "dm4.core.plugin",
+                new CompositeValue().put("dm4.core.plugin_name", pluginName)
+                                    .put("dm4.core.plugin_symbolic_name", pluginId)
+                                    .put("dm4.core.plugin_migration_nr", 0)), null);    // FIXME: clientContext=null
             return true;
         }
     }
@@ -666,7 +666,7 @@ public class Plugin implements BundleActivator, EventHandler {
      * Determines the migrations to be run for this plugin and run them.
      */
     private void runPluginMigrations(boolean isCleanInstall) {
-        int migrationNr = pluginTopic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
+        int migrationNr = pluginTopic.getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
         int requiredMigrationNr = Integer.parseInt(getConfigProperty("requiredPluginMigrationNr", "0"));
         int migrationsToRun = requiredMigrationNr - migrationNr;
         logger.info("Running " + migrationsToRun + " plugin migrations (migrationNr=" + migrationNr +

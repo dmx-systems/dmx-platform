@@ -47,12 +47,12 @@ function PagePanel() {
 
     function render_page() {
         empty()
-        dm3c.trigger_page_renderer_hook(displayed_object, "render_page", displayed_object)
+        dm4c.trigger_page_renderer_hook(displayed_object, "render_page", displayed_object)
     }
 
     function render_form() {
         empty()
-        dm3c.trigger_page_renderer_hook(displayed_object, "render_form", displayed_object)
+        dm4c.trigger_page_renderer_hook(displayed_object, "render_form", displayed_object)
     }
 
     function empty(do_show_splash) {
@@ -71,7 +71,7 @@ function PagePanel() {
     function render_buttons(context) {
         var commands = displayed_object.get_commands(context)
         for (var i = 0, cmd; cmd = commands[i]; i++) {
-            var button = dm3c.ui.button(undefined, cmd.handler, cmd.label, cmd.ui_icon, cmd.is_submit)
+            var button = dm4c.ui.button(undefined, cmd.handler, cmd.label, cmd.ui_icon, cmd.is_submit)
             $("#page-toolbar").append(button)
         }
     }

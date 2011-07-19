@@ -22,43 +22,43 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void getTopicType() {
-        TopicType topicType = dms.getTopicType("dm3.core.plugin", null);  // clientContext=null
-        assertEquals("dm3.core.plugin",     topicType.getUri());
-        assertEquals("dm3.core.topic_type", topicType.getTypeUri());
-        assertEquals("dm3.core.composite",  topicType.getDataTypeUri());
+        TopicType topicType = dms.getTopicType("dm4.core.plugin", null);  // clientContext=null
+        assertEquals("dm4.core.plugin",     topicType.getUri());
+        assertEquals("dm4.core.topic_type", topicType.getTypeUri());
+        assertEquals("dm4.core.composite",  topicType.getDataTypeUri());
         assertEquals(3,                     topicType.getAssocDefs().size());
-        AssociationDefinition assocDef =    topicType.getAssocDef("dm3.core.plugin_migration_nr");
-        assertEquals("dm3.core.plugin",              assocDef.getWholeTopicTypeUri());
-        assertEquals("dm3.core.plugin_migration_nr", assocDef.getPartTopicTypeUri());
-        assertEquals("dm3.core.plugin_migration_nr", assocDef.getUri());
-        assertEquals("dm3.core.one",                 assocDef.getWholeCardinalityUri());
-        assertEquals("dm3.core.one",                 assocDef.getPartCardinalityUri());
-        assertEquals("dm3.core.composition_def",     assocDef.getTypeUri());
-        assertEquals("dm3.core.whole",               assocDef.getWholeRoleTypeUri());
-        assertEquals("dm3.core.part",                assocDef.getPartRoleTypeUri());
-        Topic t1 = assocDef.getTopic("dm3.core.whole_type");
-        Topic t2 = assocDef.getTopic("dm3.core.part_type");
-        assertEquals("dm3.core.plugin",              t1.getUri());
-        assertEquals("dm3.core.topic_type",          t1.getTypeUri());
-        assertEquals("dm3.core.plugin_migration_nr", t2.getUri());
-        assertEquals("dm3.core.topic_type",          t2.getTypeUri());
+        AssociationDefinition assocDef =    topicType.getAssocDef("dm4.core.plugin_migration_nr");
+        assertEquals("dm4.core.plugin",              assocDef.getWholeTopicTypeUri());
+        assertEquals("dm4.core.plugin_migration_nr", assocDef.getPartTopicTypeUri());
+        assertEquals("dm4.core.plugin_migration_nr", assocDef.getUri());
+        assertEquals("dm4.core.one",                 assocDef.getWholeCardinalityUri());
+        assertEquals("dm4.core.one",                 assocDef.getPartCardinalityUri());
+        assertEquals("dm4.core.composition_def",     assocDef.getTypeUri());
+        assertEquals("dm4.core.whole",               assocDef.getWholeRoleTypeUri());
+        assertEquals("dm4.core.part",                assocDef.getPartRoleTypeUri());
+        Topic t1 = assocDef.getTopic("dm4.core.whole_type");
+        Topic t2 = assocDef.getTopic("dm4.core.part_type");
+        assertEquals("dm4.core.plugin",              t1.getUri());
+        assertEquals("dm4.core.topic_type",          t1.getTypeUri());
+        assertEquals("dm4.core.plugin_migration_nr", t2.getUri());
+        assertEquals("dm4.core.topic_type",          t2.getTypeUri());
     }
 
     @Test
     public void createWithoutComposite() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic topic = dms.createTopic(new TopicModel("de.deepamehta.3-notes", "dm3.core.plugin",
+            Topic topic = dms.createTopic(new TopicModel("de.deepamehta.3-notes", "dm4.core.plugin",
                 new SimpleValue("DeepaMehta 3 Notes")), null);  // clientContext=null
             //
-            topic.setChildTopicValue("dm3.core.plugin_migration_nr", new SimpleValue(23));
+            topic.setChildTopicValue("dm4.core.plugin_migration_nr", new SimpleValue(23));
             //
-            int nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
+            int nr = topic.getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
             assertEquals(23, nr);
             //
-            topic.setChildTopicValue("dm3.core.plugin_migration_nr", new SimpleValue(42));
+            topic.setChildTopicValue("dm4.core.plugin_migration_nr", new SimpleValue(42));
             //
-            nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
+            nr = topic.getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
             assertEquals(42, nr);
             //
             tx.success();
@@ -74,17 +74,17 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void createWithComposite() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic topic = dms.createTopic(new TopicModel("de.deepamehta.3-notes", "dm3.core.plugin",
-                new CompositeValue().put("dm3.core.plugin_migration_nr", 23)), null);
+            Topic topic = dms.createTopic(new TopicModel("de.deepamehta.3-notes", "dm4.core.plugin",
+                new CompositeValue().put("dm4.core.plugin_migration_nr", 23)), null);
             //
-            assertTrue(topic.getCompositeValue().has("dm3.core.plugin_migration_nr"));
+            assertTrue(topic.getCompositeValue().has("dm4.core.plugin_migration_nr"));
             //
-            int nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
+            int nr = topic.getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
             assertEquals(23, nr);
             //
-            topic.setChildTopicValue("dm3.core.plugin_migration_nr", new SimpleValue(42));
+            topic.setChildTopicValue("dm4.core.plugin_migration_nr", new SimpleValue(42));
             //
-            nr = topic.getChildTopicValue("dm3.core.plugin_migration_nr").intValue();
+            nr = topic.getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
             assertEquals(42, nr);
             //
             tx.success();

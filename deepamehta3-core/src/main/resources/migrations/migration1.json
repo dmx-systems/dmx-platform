@@ -7,23 +7,23 @@
 
         /*{
             value:         "Data Type",
-            uri:           "dm3.core.data_type",
-            data_type_uri: "dm3.core.text"
+            uri:           "dm4.core.data_type",
+            data_type_uri: "dm4.core.text"
         },*/
         /*{
             value:         "Role Type",
-            uri:           "dm3.core.role_type",
-            data_type_uri: "dm3.core.text"
+            uri:           "dm4.core.role_type",
+            data_type_uri: "dm4.core.text"
         },*/
         {
             value:         "Cardinality",
-            uri:           "dm3.core.cardinality",
-            data_type_uri: "dm3.core.text"
+            uri:           "dm4.core.cardinality",
+            data_type_uri: "dm4.core.text"
         },
         {
             value:         "Index Mode",
-            uri:           "dm3.core.index_mode",
-            data_type_uri: "dm3.core.text"
+            uri:           "dm4.core.index_mode",
+            data_type_uri: "dm4.core.text"
         }
     ],
 
@@ -34,40 +34,40 @@
 
         {
             value:         "Association",
-            uri:           "dm3.core.association",
-            data_type_uri: "dm3.core.text"
+            uri:           "dm4.core.association",
+            data_type_uri: "dm4.core.text"
         },
         /*{
             value:         "Aggregation",
-            uri:           "dm3.core.aggregation",
-            data_type_uri: "dm3.core.text"
+            uri:           "dm4.core.aggregation",
+            data_type_uri: "dm4.core.text"
         },*/
         {
             value:         "Composition",
-            uri:           "dm3.core.composition",
-            data_type_uri: "dm3.core.text"
+            uri:           "dm4.core.composition",
+            data_type_uri: "dm4.core.text"
         },
 
         {
             value:         "Aggregation Definition",
-            uri:           "dm3.core.aggregation_def",
-            data_type_uri: "dm3.core.text"
+            uri:           "dm4.core.aggregation_def",
+            data_type_uri: "dm4.core.text"
         },
         {
             value:         "Composition Definition",
-            uri:           "dm3.core.composition_def",
-            data_type_uri: "dm3.core.text"
+            uri:           "dm4.core.composition_def",
+            data_type_uri: "dm4.core.text"
         },
 
         /*{
             value:         "Instantiation",
-            uri:           "dm3.core.instantiation",
-            data_type_uri: "dm3.core.text"
+            uri:           "dm4.core.instantiation",
+            data_type_uri: "dm4.core.text"
         },*/
         {
             value:         "Sequence",
-            uri:           "dm3.core.sequence",
-            data_type_uri: "dm3.core.text"
+            uri:           "dm4.core.sequence",
+            data_type_uri: "dm4.core.text"
         }
     ],
 
@@ -80,28 +80,28 @@
 
         /*{
             value:    "Text",
-            uri:      "dm3.core.text",
-            type_uri: "dm3.core.data_type"
+            uri:      "dm4.core.text",
+            type_uri: "dm4.core.data_type"
         },*/
         {
             value:    "HTML",
-            uri:      "dm3.core.html",
-            type_uri: "dm3.core.data_type"
+            uri:      "dm4.core.html",
+            type_uri: "dm4.core.data_type"
         },
         {
             value:    "Number",
-            uri:      "dm3.core.number",
-            type_uri: "dm3.core.data_type"
+            uri:      "dm4.core.number",
+            type_uri: "dm4.core.data_type"
         },
         {
             value:    "Boolean",
-            uri:      "dm3.core.boolean",
-            type_uri: "dm3.core.data_type"
+            uri:      "dm4.core.boolean",
+            type_uri: "dm4.core.data_type"
         },
         {
             value:    "Composite",
-            uri:      "dm3.core.composite",
-            type_uri: "dm3.core.data_type"
+            uri:      "dm4.core.composite",
+            type_uri: "dm4.core.data_type"
         },
 
         ### Role Types ###
@@ -111,118 +111,118 @@
 
         /*{
             value:    "Type",
-            uri:      "dm3.core.type",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.type",
+            type_uri: "dm4.core.role_type"
         },*/
         /*{
             value:    "Instance",
-            uri:      "dm3.core.instance",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.instance",
+            type_uri: "dm4.core.role_type"
         },*/
 
         {
             value:    "Association Definition",
-            uri:      "dm3.core.assoc_def",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.assoc_def",
+            type_uri: "dm4.core.role_type"
         },
 
         {
             value:    "Whole",
-            uri:      "dm3.core.whole",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.whole",
+            type_uri: "dm4.core.role_type"
         },
         {
             value:    "Part",
-            uri:      "dm3.core.part",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.part",
+            type_uri: "dm4.core.role_type"
         },
         {
             value:    "Whole Type",
-            uri:      "dm3.core.whole_type",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.whole_type",
+            type_uri: "dm4.core.role_type"
         },
         {
             value:    "Part Type",
-            uri:      "dm3.core.part_type",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.part_type",
+            type_uri: "dm4.core.role_type"
         },
         {
             value:    "Whole Role Type",
-            uri:      "dm3.core.whole_role_type",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.whole_role_type",
+            type_uri: "dm4.core.role_type"
         },
         {
             value:    "Part Role Type",
-            uri:      "dm3.core.part_role_type",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.part_role_type",
+            type_uri: "dm4.core.role_type"
         },
         {
             value:    "Whole Cardinality",
-            uri:      "dm3.core.whole_cardinality",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.whole_cardinality",
+            type_uri: "dm4.core.role_type"
         },
         {
             value:    "Part Cardinality",
-            uri:      "dm3.core.part_cardinality",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.part_cardinality",
+            type_uri: "dm4.core.role_type"
         },
 
         {
             value:    "Predecessor",
-            uri:      "dm3.core.predecessor",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.predecessor",
+            type_uri: "dm4.core.role_type"
         },
         {
             value:    "Successor",
-            uri:      "dm3.core.successor",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.successor",
+            type_uri: "dm4.core.role_type"
         },
 
         {
             value:    "Sequence Start",
-            uri:      "dm3.core.sequence_start",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.sequence_start",
+            type_uri: "dm4.core.role_type"
         },
         {
             value:    "View Configuration",
-            uri:      "dm3.core.view_config",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.core.view_config",
+            type_uri: "dm4.core.role_type"
         },
 
         ### Cardinalities ###
 
         {
             value:    "One",
-            uri:      "dm3.core.one",
-            type_uri: "dm3.core.cardinality"
+            uri:      "dm4.core.one",
+            type_uri: "dm4.core.cardinality"
         },
         {
             value:    "Many",
-            uri:      "dm3.core.many",
-            type_uri: "dm3.core.cardinality"
+            uri:      "dm4.core.many",
+            type_uri: "dm4.core.cardinality"
         },
 
         ### Index Modes ###
 
         {
             value:    "Off",
-            uri:      "dm3.core.off",
-            type_uri: "dm3.core.index_mode"
+            uri:      "dm4.core.off",
+            type_uri: "dm4.core.index_mode"
         },
         {
             value:    "Key",
-            uri:      "dm3.core.key",
-            type_uri: "dm3.core.index_mode"
+            uri:      "dm4.core.key",
+            type_uri: "dm4.core.index_mode"
         },
         {
             value:    "Fulltext",
-            uri:      "dm3.core.fulltext",
-            type_uri: "dm3.core.index_mode"
+            uri:      "dm4.core.fulltext",
+            type_uri: "dm4.core.index_mode"
         },
         {
             value:    "Fulltext Key",
-            uri:      "dm3.core.fulltext_key",
-            type_uri: "dm3.core.index_mode"
+            uri:      "dm4.core.fulltext_key",
+            type_uri: "dm4.core.index_mode"
         }
     ]
 }

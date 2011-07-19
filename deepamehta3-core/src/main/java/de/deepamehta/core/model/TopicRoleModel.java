@@ -17,7 +17,7 @@ import java.util.Map;
  * The topic is refered to either by its ID or URI.
  * The role type is refered to by its URI.
  * <p>
- * In the database a role type is represented by a topic of type "dm3.core.role_type".
+ * In the database a role type is represented by a topic of type "dm4.core.role_type".
  */
 public class TopicRoleModel extends RoleModel {
 

@@ -19,7 +19,7 @@ function HTMLFieldRenderer(topic, field, rel_topics) {
 
     this.render_field = function() {
         // render field label
-        dm3c.render.field_label(field)
+        dm4c.render.field_label(field)
         // render field value
         return field.value
     }

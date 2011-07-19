@@ -18,7 +18,7 @@
     </parent>
 
     <properties>
-        <dm3.database.path>${project.basedir}/deepamehta-db</dm3.database.path>
+        <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
         <file.encoding>UTF-8</file.encoding>
         <felix.log.level>1</felix.log.level>

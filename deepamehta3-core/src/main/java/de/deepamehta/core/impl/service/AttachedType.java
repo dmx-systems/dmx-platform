@@ -209,8 +209,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
     private RelatedTopic fetchDataTypeTopic() {
         try {
             // ### FIXME: revise "topic type" wording in exception messages
-            RelatedTopic dataType = getRelatedTopic("dm3.core.aggregation", "dm3.core.type",
-                "dm3.core.data_type", "dm3.core.data_type", false, false);     // fetchComposite=false
+            RelatedTopic dataType = getRelatedTopic("dm4.core.aggregation", "dm4.core.type",
+                "dm4.core.data_type", "dm4.core.data_type", false, false);     // fetchComposite=false
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to topic type \"" + getUri() +
                     "\"");
@@ -223,8 +223,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     private Set<IndexMode> fetchIndexModes() {
-        Set<RelatedTopic> topics = getRelatedTopics("dm3.core.aggregation", "dm3.core.type",
-            "dm3.core.index_mode", "dm3.core.index_mode", false, false);       // fetchComposite=false
+        Set<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type",
+            "dm4.core.index_mode", "dm4.core.index_mode", false, false);       // fetchComposite=false
         return IndexMode.fromTopics(topics);
     }
 
@@ -232,9 +232,9 @@ abstract class AttachedType extends AttachedTopic implements Type {
         Map<Long, AttachedAssociationDefinition> assocDefs = new HashMap();
         //
         // fetch part topic types ### TODO: revise "whole_topic_type" role
-        List assocTypeFilter = Arrays.asList("dm3.core.aggregation_def", "dm3.core.composition_def");
-        Set<RelatedTopic> partTopicTypes = getRelatedTopics(assocTypeFilter, "dm3.core.whole_type",
-            "dm3.core.part_type", "dm3.core.topic_type", false, false);
+        List assocTypeFilter = Arrays.asList("dm4.core.aggregation_def", "dm4.core.composition_def");
+        Set<RelatedTopic> partTopicTypes = getRelatedTopics(assocTypeFilter, "dm4.core.whole_type",
+            "dm4.core.part_type", "dm4.core.topic_type", false, false);
         //
         for (RelatedTopic partTopicType : partTopicTypes) {
             AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(dms);
@@ -266,7 +266,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     private ViewConfigurationModel fetchViewConfig() {
-        Set<RelatedTopic> topics = getRelatedTopics("dm3.core.aggregation", "dm3.core.type", "dm3.core.view_config",
+        Set<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type", "dm4.core.view_config",
             null, true, false);    // fetchComposite=true, fetchRelatingComposite=false
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
         return new ViewConfigurationModel(dms.getTopicModels(topics));
@@ -286,9 +286,9 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private void storeIndexModes() {
         for (IndexMode indexMode : getIndexModes()) {
-            dms.createAssociation("dm3.core.aggregation",
-                new TopicRoleModel(getUri(), "dm3.core.type"),
-                new TopicRoleModel(indexMode.toUri(), "dm3.core.index_mode"));
+            dms.createAssociation("dm4.core.aggregation",
+                new TopicRoleModel(getUri(), "dm4.core.type"),
+                new TopicRoleModel(indexMode.toUri(), "dm4.core.index_mode"));
         }
     }
 
@@ -320,13 +320,13 @@ abstract class AttachedType extends AttachedTopic implements Type {
         try {
             List<RelatedAssociation> sequence = new ArrayList();
             // find sequence start
-            RelatedAssociation assocDef = getRelatedAssociation("dm3.core.aggregation", "dm3.core.type",
-                "dm3.core.sequence_start", null, false, false);   // othersAssocTypeUri=null
+            RelatedAssociation assocDef = getRelatedAssociation("dm4.core.aggregation", "dm4.core.type",
+                "dm4.core.sequence_start", null, false, false);   // othersAssocTypeUri=null
             // fetch sequence segments
             if (assocDef != null) {
                 sequence.add(assocDef);
-                while ((assocDef = assocDef.getRelatedAssociation("dm3.core.sequence",
-                    "dm3.core.predecessor", "dm3.core.successor")) != null) {
+                while ((assocDef = assocDef.getRelatedAssociation("dm4.core.sequence",
+                    "dm4.core.predecessor", "dm4.core.successor")) != null) {
                     //
                     sequence.add(assocDef);
                 }
@@ -358,15 +358,15 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     private void storeSequenceStart(long assocDefId) {
-        dms.createAssociation("dm3.core.aggregation",
-            new TopicRoleModel(getId(), "dm3.core.type"),
-            new AssociationRoleModel(assocDefId, "dm3.core.sequence_start"));
+        dms.createAssociation("dm4.core.aggregation",
+            new TopicRoleModel(getId(), "dm4.core.type"),
+            new AssociationRoleModel(assocDefId, "dm4.core.sequence_start"));
     }
 
     private void storeSequenceSegment(long predAssocDefId, long succAssocDefId) {
-        dms.createAssociation("dm3.core.sequence",
-            new AssociationRoleModel(predAssocDefId, "dm3.core.predecessor"),
-            new AssociationRoleModel(succAssocDefId, "dm3.core.successor"));
+        dms.createAssociation("dm4.core.sequence",
+            new AssociationRoleModel(predAssocDefId, "dm4.core.predecessor"),
+            new AssociationRoleModel(succAssocDefId, "dm4.core.successor"));
     }
 
     private void rebuildSequence() {
@@ -412,7 +412,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private void initViewConfig() {
         // Note: this type must be identified by its URI. Types being created have no ID yet.
-        RoleModel configurable = new TopicRoleModel(getUri(), "dm3.core.type");
+        RoleModel configurable = new TopicRoleModel(getUri(), "dm4.core.type");
         this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
     }
 }

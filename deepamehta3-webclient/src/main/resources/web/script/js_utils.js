@@ -166,7 +166,7 @@ var js = {
     },
 
     /**
-     * "vendor/dm3-time/script/dm3-time.js" -> "dm3-time"
+     * "vendor/dm4-time/script/dm4-time.js" -> "dm4-time"
      */
     basename: function(path) {
         path.match(/.*\/(.*)\..*/)

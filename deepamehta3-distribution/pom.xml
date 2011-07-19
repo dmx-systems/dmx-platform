@@ -19,7 +19,7 @@
     <!-- These 2 properties are overridden. We must use relative paths for the distribution. -->
     <properties>
         <java.util.logging.config.file>conf/logging.properties</java.util.logging.config.file>
-        <dm3.database.path>deepamehta-db</dm3.database.path>
+        <dm4.database.path>deepamehta-db</dm4.database.path>
     </properties>
 
     <dependencies>

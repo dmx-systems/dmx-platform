@@ -2,37 +2,37 @@
     topic_types: [
         {
             value:            "Name",
-            uri:              "dm3.topicmaps.name",
-            data_type_uri:    "dm3.core.text",
-            index_mode_uris: ["dm3.core.fulltext"]
+            uri:              "dm4.topicmaps.name",
+            data_type_uri:    "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"]
         },
         {
             value:            "Description",
-            uri:              "dm3.topicmaps.description",
-            data_type_uri:    "dm3.core.html",
-            index_mode_uris: ["dm3.core.fulltext"]
+            uri:              "dm4.topicmaps.description",
+            data_type_uri:    "dm4.core.html",
+            index_mode_uris: ["dm4.core.fulltext"]
         },
         {
             value:            "Topicmap",
-            uri:              "dm3.topicmaps.topicmap",
-            data_type_uri:    "dm3.core.composite",
+            uri:              "dm4.topicmaps.topicmap",
+            data_type_uri:    "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm3.topicmaps.name",
-                    part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:       "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm4.topicmaps.name",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm3.topicmaps.description",
-                    part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:       "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm4.topicmaps.description",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
                 }
             ],
             view_config_topics: [
                 {
-                    type_uri: "dm3.webclient.view_config",
+                    type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm3.webclient.icon_src: "/de.deepamehta.3-topicmaps/images/network.png"
+                        dm4.webclient.icon_src: "/de.deepamehta.3-topicmaps/images/network.png"
                     }
                 }
             ]
@@ -40,48 +40,48 @@
 
         {
             value:            "X",
-            uri:              "dm3.topicmaps.x",
-            data_type_uri:    "dm3.core.number"
+            uri:              "dm4.topicmaps.x",
+            data_type_uri:    "dm4.core.number"
         },
         {
             value:            "Y",
-            uri:              "dm3.topicmaps.y",
-            data_type_uri:    "dm3.core.number"
+            uri:              "dm4.topicmaps.y",
+            data_type_uri:    "dm4.core.number"
         },
         {
             value:            "Visibility",
-            uri:              "dm3.topicmaps.visibility",
-            data_type_uri:    "dm3.core.boolean"
+            uri:              "dm4.topicmaps.visibility",
+            data_type_uri:    "dm4.core.boolean"
         }
     ],
 
     assoc_types: [
         {
             value:         "Topic Mapcontext",
-            uri:           "dm3.topicmaps.topic_mapcontext",
-            data_type_uri: "dm3.core.composite",
+            uri:           "dm4.topicmaps.topic_mapcontext",
+            data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm3.topicmaps.x",
-                    part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:       "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm4.topicmaps.x",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm3.topicmaps.y",
-                    part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:       "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm4.topicmaps.y",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm3.topicmaps.visibility",
-                    part_cardinality_uri: "dm3.core.one",
-                    assoc_type_uri:       "dm3.core.composition_def"
+                    part_topic_type_uri:  "dm4.topicmaps.visibility",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
                 }
             ]
         },
         {
             value:         "Association Mapcontext",
-            uri:           "dm3.topicmaps.association_mapcontext",
-            data_type_uri: "dm3.core.text"
+            uri:           "dm4.topicmaps.association_mapcontext",
+            data_type_uri: "dm4.core.text"
         }
     ],
 
@@ -89,13 +89,13 @@
         ### Role Types ###
         {
             value:    "Topicmap Topic",
-            uri:      "dm3.topicmaps.topicmap_topic",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.topicmaps.topicmap_topic",
+            type_uri: "dm4.core.role_type"
         },
         {
             value:    "Topicmap Association",
-            uri:      "dm3.topicmaps.topicmap_association",
-            type_uri: "dm3.core.role_type"
+            uri:      "dm4.topicmaps.topicmap_association",
+            type_uri: "dm4.core.role_type"
         }
     ]
 }

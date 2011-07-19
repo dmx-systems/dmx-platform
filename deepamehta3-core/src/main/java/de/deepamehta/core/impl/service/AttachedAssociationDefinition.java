@@ -142,19 +142,19 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
                 dms.createAssociation(getModel(), null);    // clientContext=null
             }
             // role types
-            dms.createAssociation("dm3.core.aggregation",
-                new TopicRoleModel(getWholeRoleTypeUri(), "dm3.core.whole_role_type"),
-                new AssociationRoleModel(getId(), "dm3.core.assoc_def"));
-            dms.createAssociation("dm3.core.aggregation",
-                new TopicRoleModel(getPartRoleTypeUri(), "dm3.core.part_role_type"),
-                new AssociationRoleModel(getId(), "dm3.core.assoc_def"));
+            dms.createAssociation("dm4.core.aggregation",
+                new TopicRoleModel(getWholeRoleTypeUri(), "dm4.core.whole_role_type"),
+                new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
+            dms.createAssociation("dm4.core.aggregation",
+                new TopicRoleModel(getPartRoleTypeUri(), "dm4.core.part_role_type"),
+                new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
             // cardinality
-            dms.createAssociation("dm3.core.aggregation",
-                new TopicRoleModel(getWholeCardinalityUri(), "dm3.core.whole_cardinality"),
-                new AssociationRoleModel(getId(), "dm3.core.assoc_def"));
-            dms.createAssociation("dm3.core.aggregation",
-                new TopicRoleModel(getPartCardinalityUri(), "dm3.core.part_cardinality"),
-                new AssociationRoleModel(getId(), "dm3.core.assoc_def"));
+            dms.createAssociation("dm4.core.aggregation",
+                new TopicRoleModel(getWholeCardinalityUri(), "dm4.core.whole_cardinality"),
+                new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
+            dms.createAssociation("dm4.core.aggregation",
+                new TopicRoleModel(getPartCardinalityUri(), "dm4.core.part_cardinality"),
+                new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
             //
             storeViewConfig();
         } catch (Exception e) {
@@ -186,8 +186,8 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     }
 
     /* ### private RoleTypes fetchRoleTypes(Association assoc) {
-        Topic wholeRoleType = assoc.getTopic("dm3.core.whole_role_type");
-        Topic partRoleType = assoc.getTopic("dm3.core.part_role_type");
+        Topic wholeRoleType = assoc.getTopic("dm4.core.whole_role_type");
+        Topic partRoleType = assoc.getTopic("dm4.core.part_role_type");
         RoleTypes roleTypes = new RoleTypes();
         // role types are optional
         if (wholeRoleType != null) {
@@ -200,10 +200,10 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     } */
 
     private Cardinality fetchCardinality(Association assoc) {
-        Topic wholeCardinality = assoc.getRelatedTopic("dm3.core.aggregation", "dm3.core.assoc_def",
-            "dm3.core.whole_cardinality", "dm3.core.cardinality", false, false);    // fetchComposite=false
-        Topic partCardinality = assoc.getRelatedTopic("dm3.core.aggregation", "dm3.core.assoc_def",
-            "dm3.core.part_cardinality", "dm3.core.cardinality", false, false);     // fetchComposite=false
+        Topic wholeCardinality = assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
+            "dm4.core.whole_cardinality", "dm4.core.cardinality", false, false);    // fetchComposite=false
+        Topic partCardinality = assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
+            "dm4.core.part_cardinality", "dm4.core.cardinality", false, false);     // fetchComposite=false
         Cardinality cardinality = new Cardinality();
         if (wholeCardinality != null) {
             cardinality.setWholeCardinalityUri(wholeCardinality.getUri());
@@ -217,8 +217,8 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     }
 
     private ViewConfigurationModel fetchViewConfig(Association assoc) {
-        Set<RelatedTopic> topics = assoc.getRelatedTopics("dm3.core.aggregation", "dm3.core.assoc_def",
-            "dm3.core.view_config", null, true, false);    // fetchComposite=true, fetchRelatingComposite=false
+        Set<RelatedTopic> topics = assoc.getRelatedTopics("dm4.core.aggregation", "dm4.core.assoc_def",
+            "dm4.core.view_config", null, true, false);    // fetchComposite=true, fetchRelatingComposite=false
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
         return new ViewConfigurationModel(dms.getTopicModels(topics));
     }
@@ -271,9 +271,9 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     private void storeViewConfig() {
         for (TopicModel configTopic : getModel().getViewConfigModel().getConfigTopics()) {
             Topic topic = dms.createTopic(configTopic, null);   // FIXME: clientContext=null
-            dms.createAssociation("dm3.core.aggregation",
-                new AssociationRoleModel(getId(), "dm3.core.assoc_def"),
-                new TopicRoleModel(topic.getId(), "dm3.core.view_config"));
+            dms.createAssociation("dm4.core.aggregation",
+                new AssociationRoleModel(getId(), "dm4.core.assoc_def"),
+                new TopicRoleModel(topic.getId(), "dm4.core.view_config"));
         }
     }
 
@@ -282,7 +282,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     // === Helper ===
 
     private void initViewConfig() {
-        RoleModel configurable = new AssociationRoleModel(getId(), "dm3.core.assoc_def");
+        RoleModel configurable = new AssociationRoleModel(getId(), "dm4.core.assoc_def");
         this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
     }
 
@@ -290,11 +290,11 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     // ### FIXME: copy in TypeEditorPlugin
     private String getWholeTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm3.core.whole_type").getUri();
+        return assoc.getTopic("dm4.core.whole_type").getUri();
     }
 
     // ### FIXME: copy in TypeEditorPlugin
     private String getPartTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm3.core.part_type").getUri();
+        return assoc.getTopic("dm4.core.part_type").getUri();
     }
 }

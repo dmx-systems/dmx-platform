@@ -134,7 +134,7 @@ public class WebclientPlugin extends Plugin {
                 searchableUnits.add(topic);
             } else {
                 Set<Topic> parentTopics = toTopicSet(topic.getRelatedTopics((List) null,
-                    "dm3.core.part", "dm3.core.whole", null, false, false));
+                    "dm4.core.part", "dm4.core.whole", null, false, false));
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
                 } else {
@@ -149,17 +149,17 @@ public class WebclientPlugin extends Plugin {
      * Creates a search result topic (a bucket).
      */
     private Topic createSearchTopic(String searchTerm, Set<Topic> topics, ClientContext clientContext) {
-        // CompositeValue comp = new CompositeValue("{dm3.webclient.search_term: \"" + searchTerm + "\"}");
-        Topic searchTopic = dms.createTopic(new TopicModel("dm3.webclient.search" /*, comp */), clientContext);
-        searchTopic.setChildTopicValue("dm3.webclient.search_term", new SimpleValue(searchTerm));
+        // CompositeValue comp = new CompositeValue("{dm4.webclient.search_term: \"" + searchTerm + "\"}");
+        Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search" /*, comp */), clientContext);
+        searchTopic.setChildTopicValue("dm4.webclient.search_term", new SimpleValue(searchTerm));
         //
         // associate result topics
         logger.fine("Associating " + topics.size() + " result topics to search topic (ID " + searchTopic.getId() + ")");
         for (Topic topic : topics) {
             logger.fine("Associating " + topic);
-            AssociationModel assocModel = new AssociationModel("dm3.webclient.search_result_item");
-            assocModel.setRoleModel1(new TopicRoleModel(searchTopic.getId(), "dm3.webclient.search"));
-            assocModel.setRoleModel2(new TopicRoleModel(topic.getId(), "dm3.webclient.search_result_item"));
+            AssociationModel assocModel = new AssociationModel("dm4.webclient.search_result_item");
+            assocModel.setRoleModel1(new TopicRoleModel(searchTopic.getId(), "dm4.webclient.search"));
+            assocModel.setRoleModel2(new TopicRoleModel(topic.getId(), "dm4.webclient.search_result_item"));
             dms.createAssociation(assocModel, clientContext);
         }
         return searchTopic;
@@ -184,7 +184,7 @@ public class WebclientPlugin extends Plugin {
      * @return  The setting value, or <code>null</code> if there is no such setting
      */
     private Object getViewConfig(TopicType topicType, String setting) {
-        return topicType.getViewConfig("dm3.webclient.view_config", "dm3.webclient." + setting);
+        return topicType.getViewConfig("dm4.webclient.view_config", "dm4.webclient." + setting);
     }
 
     // ---

@@ -1,4 +1,4 @@
-function dm3_typesearch() {
+function dm4_typesearch() {
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -18,15 +18,15 @@ function dm3_typesearch() {
 
     this.search_widget = function(searchmode) {
         if (searchmode == "By Type") {
-            return dm3c.create_type_menu("search-type-menu").dom
+            return dm4c.create_type_menu("search-type-menu").dom
         }
     }
 
     this.search = function(searchmode) {
         if (searchmode == "By Type") {
             // perform type search
-            var type_uri = dm3c.ui.menu_item("search-type-menu").value
-            return dm3c.restc.get_topics_and_create_bucket(type_uri)
+            var type_uri = dm4c.ui.menu_item("search-type-menu").value
+            return dm4c.restc.get_topics_and_create_bucket(type_uri)
         }
     }
 
@@ -54,8 +54,8 @@ function dm3_typesearch() {
 
     function update_type_menu() {
         // Rebuilding the type menu is only required if the "By Type" searchmode is active.
-        if (dm3c.ui.menu_item("searchmode-select").label == "By Type") {
-            dm3c.recreate_type_menu("search-type-menu")
+        if (dm4c.ui.menu_item("searchmode-select").label == "By Type") {
+            dm4c.recreate_type_menu("search-type-menu")
         }
     }
 }

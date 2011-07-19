@@ -28,7 +28,7 @@ public class CoreServiceTestEnvironment {
     public void setup() {
         try {
             logger.info("Creating DB and indexing services");
-            dbPath = JavaUtils.createTempDirectory("dm3-");
+            dbPath = JavaUtils.createTempDirectory("dm4-");
             GraphDatabaseService neo4j = new EmbeddedGraphDatabase(dbPath.getAbsolutePath());
             dms = new EmbeddedService(new MGStorageBridge(new Neo4jMehtaGraph(neo4j)), null);
             dms.setupDB();

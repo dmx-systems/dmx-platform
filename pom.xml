@@ -19,7 +19,7 @@
 
     <!-- Used by both, the 'run' and the 'neo4j' profile -->
     <properties>
-        <dm3.database.path>${project.basedir}/deepamehta-db</dm3.database.path>
+        <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
     </properties>
 
     <profiles>
@@ -140,7 +140,7 @@
                             <includePluginDependencies>true</includePluginDependencies>
                             <mainClass>org.neo4j.shell.StartClient</mainClass>
                             <arguments>
-                                <argument>-path=${dm3.database.path}</argument>
+                                <argument>-path=${dm4.database.path}</argument>
                                 <argument>-v</argument>
                             </arguments>
                         </configuration>

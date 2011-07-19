@@ -27,11 +27,11 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     private static final String DEFAULT_WORKSPACE_NAME = "Default";
 
     // association type semantics ### FIXME: to be dropped. Model-driven manipulators required.
-    private static final String WORKSPACE_TOPIC = "dm3.core.aggregation";   // A topic assigned to a workspace.
-    private static final String WORKSPACE_TYPE  = "dm3.core.aggregation";   // A type assigned to a workspace.
-    private static final String ROLE_TYPE_TOPIC = "dm3.core.whole";
-    private static final String ROLE_TYPE_TYPE = "dm3.core.whole";
-    private static final String ROLE_TYPE_WORKSPACE = "dm3.core.part";
+    private static final String WORKSPACE_TOPIC = "dm4.core.aggregation";   // A topic assigned to a workspace.
+    private static final String WORKSPACE_TYPE  = "dm4.core.aggregation";   // A type assigned to a workspace.
+    private static final String ROLE_TYPE_TOPIC = "dm4.core.whole";
+    private static final String ROLE_TYPE_TYPE = "dm4.core.whole";
+    private static final String ROLE_TYPE_WORKSPACE = "dm4.core.part";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -63,8 +63,8 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
         long workspaceId = -1;
         try {
             // check precondition 1
-            if (topic.getTypeUri().equals("dm3.webclient.search") ||
-                topic.getTypeUri().equals("dm3.workspaces.workspace")) {
+            if (topic.getTypeUri().equals("dm4.webclient.search") ||
+                topic.getTypeUri().equals("dm4.workspaces.workspace")) {
                 // Note 1: we do not relate search topics to a workspace.
                 // Note 2: we do not relate workspaces to a workspace.
                 logger.info("Assigning topic to a workspace ABORTED: searches and workspaces are not assigned (" +
@@ -78,7 +78,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
                 return;
             }
             // check precondition 3
-            String wsId = clientContext.get("dm3_workspace_id");
+            String wsId = clientContext.get("dm4_workspace_id");
             if (wsId == null) {
                 logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +
                     "(no setting found in client context))");
@@ -89,7 +89,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
             assignTopic(workspaceId, topic.getId());
         } catch (Exception e) {
             logger.warning("Assigning " + topic + " to workspace " + workspaceId + " failed (" + e + "). " +
-                "This can happen if there is a stale \"dm3_workspace_id\" cookie.");
+                "This can happen if there is a stale \"dm4_workspace_id\" cookie.");
         }
     }
 
@@ -100,11 +100,11 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     public void modifyTopicTypeHook(TopicType topicType, ClientContext clientContext) {
         String topicTypeUri = topicType.getUri();
         // skip our own types
-        if (topicTypeUri.startsWith("dm3.workspaces.")) {
+        if (topicTypeUri.startsWith("dm4.workspaces.")) {
             return;
         }
         //
-        if (!topicType.getDataTypeUri().equals("dm3.core.composite")) {
+        if (!topicType.getDataTypeUri().equals("dm4.core.composite")) {
             return;
         }
         //
@@ -112,11 +112,11 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
             return;
         }
         //
-        logger.info("########## Associate type \"" + topicTypeUri + "\" with type \"dm3.workspaces.workspace\"");
-        AssociationDefinition assocDef = new AssociationDefinition(topicTypeUri, "dm3.workspaces.workspace");
-        assocDef.setAssocTypeUri("dm3.core.aggregation_def");
-        assocDef.setWholeCardinalityUri("dm3.core.many");
-        assocDef.setPartCardinalityUri("dm3.core.many");
+        logger.info("########## Associate type \"" + topicTypeUri + "\" with type \"dm4.workspaces.workspace\"");
+        AssociationDefinition assocDef = new AssociationDefinition(topicTypeUri, "dm4.workspaces.workspace");
+        assocDef.setAssocTypeUri("dm4.core.aggregation_def");
+        assocDef.setWholeCardinalityUri("dm4.core.many");
+        assocDef.setPartCardinalityUri("dm4.core.many");
         assocDef.setViewConfigModel(new ViewConfigurationModel());  // FIXME: serialization fails if plugin developer
                                                                     // forget to set
         //
@@ -134,8 +134,8 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     @Override
     public Topic createWorkspace(String name) {
         logger.info("Creating workspace \"" + name + "\"");
-        CompositeValue comp = new CompositeValue("{dm3.workspaces.name: \"" + name + "\"}");
-        return dms.createTopic(new TopicModel("dm3.workspaces.workspace", comp), null);  // clientContext=null
+        CompositeValue comp = new CompositeValue("{dm4.workspaces.name: \"" + name + "\"}");
+        return dms.createTopic(new TopicModel("dm4.workspaces.workspace", comp), null);  // clientContext=null
     }
 
     @Override
@@ -162,7 +162,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     public Set<RelatedTopic> getWorkspaces(long typeId) {
         Topic typeTopic = dms.getTopic(typeId, false, null);    // fetchComposite=false, clientContext=null
         return typeTopic.getRelatedTopics(WORKSPACE_TYPE, ROLE_TYPE_TYPE, ROLE_TYPE_WORKSPACE,
-            "dm3.workspaces.workspace", false, false);          // fetchComposite=false
+            "dm4.workspaces.workspace", false, false);          // fetchComposite=false
     }
 
 
@@ -171,7 +171,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
     private void checkWorkspaceId(long workspaceId) {
         String typeUri = dms.getTopic(workspaceId, false, null).getTypeUri();   // fetchComposite=false
-        if (!typeUri.equals("dm3.workspaces.workspace")) {
+        if (!typeUri.equals("dm4.workspaces.workspace")) {
             throw new IllegalArgumentException("Topic " + workspaceId + " is not a workspace (but of type \"" +
                 typeUri + "\")");
         }
@@ -182,8 +182,8 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     // - Code is doubled, see isSearchableUnit() and getViewConfig() in WebclientPlugin.
     // - Dependency on Webclient plugin.
     private boolean isSearchableUnit(TopicType topicType) {
-        Boolean isSearchableUnit = (Boolean) topicType.getViewConfig("dm3.webclient.view_config",
-            "dm3.webclient.is_searchable_unit");
+        Boolean isSearchableUnit = (Boolean) topicType.getViewConfig("dm4.webclient.view_config",
+            "dm4.webclient.is_searchable_unit");
         return isSearchableUnit != null ? isSearchableUnit.booleanValue() : false;  // default is false
     }
 }

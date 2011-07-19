@@ -26,7 +26,7 @@ public class Activator implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String DATABASE_PATH = System.getProperty("dm3.database.path");
+    private static final String DATABASE_PATH = System.getProperty("dm4.database.path");
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 

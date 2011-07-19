@@ -99,8 +99,8 @@ public class ViewConfigurationModel {
      * <p>
      * Compare to client-side counterpart: function get_view_config() in webclient.js
      *
-     * @param   configTypeUri   The type URI of the configuration topic, e.g. "dm3.webclient.view_config"
-     * @param   settingUri      The setting URI, e.g. "dm3.webclient.icon_src"
+     * @param   configTypeUri   The type URI of the configuration topic, e.g. "dm4.webclient.view_config"
+     * @param   settingUri      The setting URI, e.g. "dm4.webclient.icon_src"
      *
      * @return  The setting value, or <code>null</code> if there is no such setting
      */

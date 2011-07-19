@@ -18,7 +18,7 @@ public enum IndexMode {
 
     OFF, KEY, FULLTEXT, FULLTEXT_KEY;
 
-    private static final String INDEX_MODES_NAMESPACE = "dm3.core.";
+    private static final String INDEX_MODES_NAMESPACE = "dm4.core.";
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 

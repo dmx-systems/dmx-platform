@@ -99,8 +99,8 @@ public interface DeepaMehtaObject extends JSONEnabled {
     /**
      * Deletes the DeepaMehta object in its entirety, that is
      * - the object itself (the <i>whole</i>)
-     * - all sub-topics associated via "dm3.core.composition" (the <i>parts</i>), recusively
-     * - all the remaining direct associations, e.g. "dm3.core.instantiation"
+     * - all sub-topics associated via "dm4.core.composition" (the <i>parts</i>), recusively
+     * - all the remaining direct associations, e.g. "dm4.core.instantiation"
      */
     void delete(Directives directives);
 }

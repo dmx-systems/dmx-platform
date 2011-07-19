@@ -213,7 +213,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Deletion ===
 
     /**
-     * Deletes all sub-topics of this DeepaMehta object (associated via "dm3.core.composition", recursively) and
+     * Deletes all sub-topics of this DeepaMehta object (associated via "dm4.core.composition", recursively) and
      * deletes all the remaining direct associations of this DeepaMehta object.
      * <p>
      * Note: deletion of the object itself is up to the subclasses.
@@ -221,8 +221,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     @Override
     public void delete(Directives directives) {
         // 1) recursively delete sub-topics
-        Set<RelatedTopic> partTopics = getRelatedTopics("dm3.core.composition",
-            "dm3.core.whole", "dm3.core.part", null, false, false);
+        Set<RelatedTopic> partTopics = getRelatedTopics("dm4.core.composition",
+            "dm4.core.whole", "dm4.core.part", null, false, false);
         for (Topic partTopic : partTopics) {
             partTopic.delete(directives);
         }
@@ -322,7 +322,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void store() {
-        if (getType().getDataTypeUri().equals("dm3.core.composite")) {
+        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
             storeComposite(getCompositeValue());         // setCompositeValue() includes setSimpleValue()
         } else {
             storeAndIndexValue(getSimpleValue());
@@ -331,7 +331,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     void update(DeepaMehtaObjectModel model) {
         // ### TODO: compare new model with current one and update only if changed. See AttachedAssociation.update()
-        if (getType().getDataTypeUri().equals("dm3.core.composite")) {
+        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
             setCompositeValue(model.getCompositeValue());     // setCompositeValue() includes setSimpleValue()
         } else {
             setSimpleValue(model.getSimpleValue());
@@ -361,7 +361,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
                 String assocDefUri = assocDef.getUri();
                 TopicType partTopicType = dms.getTopicType(assocDef.getPartTopicTypeUri(), null);  // clientContext=null
-                if (partTopicType.getDataTypeUri().equals("dm3.core.composite")) {
+                if (partTopicType.getDataTypeUri().equals("dm4.core.composite")) {
                     AttachedTopic childTopic = fetchChildTopic(assocDef);
                     if (childTopic != null) {
                         // Note: cast required because private method is called on a subclass's instance
@@ -407,16 +407,16 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 TopicType childTopicType = dms.getTopicType(assocDef.getPartTopicTypeUri(), null);
                 String assocTypeUri = assocDef.getTypeUri();
                 Object value = comp.get(key);
-                if (assocTypeUri.equals("dm3.core.composition_def")) {
-                    if (childTopicType.getDataTypeUri().equals("dm3.core.composite")) {
+                if (assocTypeUri.equals("dm4.core.composition_def")) {
+                    if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
                         AttachedTopic childTopic = storeChildTopicValue(assocDef, null);
                         // Note: cast required because private method is called on a subclass's instance
                         ((AttachedDeepaMehtaObject) childTopic).storeComposite((CompositeValue) value);
                     } else {
                         storeChildTopicValue(assocDef, new SimpleValue(value));
                     }
-                } else if (assocTypeUri.equals("dm3.core.aggregation_def")) {
-                    if (childTopicType.getDataTypeUri().equals("dm3.core.composite")) {
+                } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
+                    if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
                         throw new RuntimeException("Aggregation of composite topic types not yet supported");
                     } else {
                         // remove current assignment
@@ -493,7 +493,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         Type type = getType();
         String indexKey = type.getUri();
         // strip HTML tags before indexing
-        if (type.getDataTypeUri().equals("dm3.core.html")) {
+        if (type.getDataTypeUri().equals("dm4.core.html")) {
             value = new SimpleValue(JavaUtils.stripHTML(value.toString()));
             if (oldValue != null) {
                 oldValue = new SimpleValue(JavaUtils.stripHTML(oldValue.toString()));

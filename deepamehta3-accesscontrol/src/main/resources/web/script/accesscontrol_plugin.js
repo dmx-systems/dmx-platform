@@ -4,8 +4,8 @@ function accesscontrol_plugin() {
     var DEFAULT_PASSWORD = ""
     var ENCRYPTED_PASSWORD_PREFIX = "-SHA256-"  // don't change this
 
-    dm3c.css_stylesheet("/de.deepamehta.3-accesscontrol/style/dm3-accesscontrol.css")
-    dm3c.javascript_source("/de.deepamehta.3-accesscontrol/script/vendor/sha256.js")
+    dm4c.css_stylesheet("/de.deepamehta.3-accesscontrol/style/dm4-accesscontrol.css")
+    dm4c.javascript_source("/de.deepamehta.3-accesscontrol/script/vendor/sha256.js")
 
     var self = this
 
@@ -21,7 +21,7 @@ function accesscontrol_plugin() {
 
     this.init = function() {
 
-        dm3c.add_to_special_menu({value: "loginout-item", label: menu_item_label()})
+        dm4c.add_to_special_menu({value: "loginout-item", label: menu_item_label()})
         create_login_dialog()
         extend_rest_client()
 
@@ -72,19 +72,19 @@ function accesscontrol_plugin() {
         }
 
         function extend_rest_client() {
-            dm3c.restc.get_user = function() {
+            dm4c.restc.get_user = function() {
                 return this.request("GET", "/accesscontrol/user")
             }
-            dm3c.restc.get_topic_by_owner = function(user_id, type_uri) {
+            dm4c.restc.get_topic_by_owner = function(user_id, type_uri) {
                 return this.request("GET", "/accesscontrol/owner/" + user_id + "/" + encodeURIComponent(type_uri))
             }
-            dm3c.restc.set_owner = function(topic_id, user_id) {
+            dm4c.restc.set_owner = function(topic_id, user_id) {
                 return this.request("POST", "/accesscontrol/topic/" + topic_id + "/owner/" + user_id)
             }
-            dm3c.restc.create_acl_entry = function(topic_id, role, permissions) {
+            dm4c.restc.create_acl_entry = function(topic_id, role, permissions) {
                 return this.request("POST", "/accesscontrol/topic/" + topic_id + "/role/" + role, permissions)
             }
-            dm3c.restc.join_workspace = function(workspace_id, user_id) {
+            dm4c.restc.join_workspace = function(workspace_id, user_id) {
                 return this.request("POST", "/accesscontrol/user/" + user_id + "/" + workspace_id)
             }
         }
@@ -118,12 +118,12 @@ function accesscontrol_plugin() {
 
     this.user_logged_in = function(user) {
         refresh_menu_item()
-        dm3c.render_topic()
+        dm4c.render_topic()
     }
 
     this.user_logged_out = function() {
         refresh_menu_item()
-        dm3c.render_topic()
+        dm4c.render_topic()
     }
 
 
@@ -139,48 +139,48 @@ function accesscontrol_plugin() {
             "de/deepamehta/core/property/username": username,
             "de/deepamehta/core/property/password": encrypt_password(password)
         }
-        return dm3c.create_topic("de/deepamehta/core/topictype/user", properties)
+        return dm4c.create_topic("de/deepamehta/core/topictype/user", properties)
     }
 
     // ---
 
     this.get_user = function() {
-        return dm3c.restc.get_user()
+        return dm4c.restc.get_user()
     }
 
     this.get_topic_by_owner = function(user_id, type_uri) {
-        return dm3c.restc.get_topic_by_owner(user_id, type_uri)
+        return dm4c.restc.get_topic_by_owner(user_id, type_uri)
     }
 
     this.set_owner = function(topic_id, user_id) {
-        dm3c.restc.set_owner(topic_id, user_id)
+        dm4c.restc.set_owner(topic_id, user_id)
     }
 
     this.create_acl_entry = function(topic_id, role, permissions) {
-        dm3c.restc.create_acl_entry(topic_id, role, permissions)
+        dm4c.restc.create_acl_entry(topic_id, role, permissions)
     }
 
     this.join_workspace = function(workspace_id, user_id) {
-        dm3c.restc.join_workspace(workspace_id, user_id)
+        dm4c.restc.join_workspace(workspace_id, user_id)
     }
 
     // ---
 
     this.login = function(user) {
         var username = user.properties["de/deepamehta/core/property/username"]
-        js.set_cookie("dm3_username", username)
+        js.set_cookie("dm4_username", username)
         //
         adjust_create_widget()
         //
-        dm3c.trigger_hook("user_logged_in", user)
+        dm4c.trigger_hook("user_logged_in", user)
     }
 
     this.logout = function() {
-        js.remove_cookie("dm3_username")
+        js.remove_cookie("dm4_username")
         //
         adjust_create_widget()
         //
-        dm3c.trigger_hook("user_logged_out")
+        dm4c.trigger_hook("user_logged_out")
     }
 
 
@@ -188,7 +188,7 @@ function accesscontrol_plugin() {
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function lookup_user(username, password) {
-        var user = dm3c.restc.get_topic_by_property("de/deepamehta/core/property/username", username)
+        var user = dm4c.restc.get_topic_by_property("de/deepamehta/core/property/username", username)
         if (user && user.properties["de/deepamehta/core/property/password"] == encrypt_password(password)) {
             return user
         }
@@ -198,7 +198,7 @@ function accesscontrol_plugin() {
      * Returns the username of the logged in user, or null/undefined if no user is logged in.
      */
     function get_username() {
-        return js.get_cookie("dm3_username")
+        return js.get_cookie("dm4_username")
     }
 
     function encrypt_password(password) {
@@ -208,7 +208,7 @@ function accesscontrol_plugin() {
     // ---
 
     function refresh_menu_item() {
-        dm3c.ui.set_menu_item_label("special-menu", "loginout-item", menu_item_label())
+        dm4c.ui.set_menu_item_label("special-menu", "loginout-item", menu_item_label())
     }
 
     function menu_item_label() {
@@ -218,8 +218,8 @@ function accesscontrol_plugin() {
     // ---
 
     function adjust_create_widget() {
-        dm3c.reload_types()
-        var menu = dm3c.recreate_type_menu("create-type-menu")
+        dm4c.reload_types()
+        var menu = dm4c.recreate_type_menu("create-type-menu")
         if (menu.get_item_count()) {
             $("#create-widget").show()
         } else {

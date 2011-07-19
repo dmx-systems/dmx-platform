@@ -1,18 +1,18 @@
 function typeeditor_plugin() {
 
-    dm3c.register_page_renderer("/de.deepamehta.3-typeeditor/script/topictype_renderer.js")
-    dm3c.register_css_stylesheet("/de.deepamehta.3-typeeditor/style/typeeditor.css")
+    dm4c.register_page_renderer("/de.deepamehta.3-typeeditor/script/topictype_renderer.js")
+    dm4c.register_css_stylesheet("/de.deepamehta.3-typeeditor/style/typeeditor.css")
 
     var DEFAULT_TOPIC_TYPE = {
         value: "Topic Type 1",
         uri: "domain.project.topic_type_1",
-        data_type_uri: "dm3.core.text",
-        index_mode_uris: ["dm3.core.fulltext"],
+        data_type_uri: "dm4.core.text",
+        index_mode_uris: ["dm4.core.fulltext"],
         view_config_topics: [
             {
-                type_uri: "dm3.webclient.view_config",
+                type_uri: "dm4.webclient.view_config",
                 composite: {
-                    "dm3.webclient.add_to_create_menu": true
+                    "dm4.webclient.add_to_create_menu": true
                 }
             }
         ]
@@ -37,12 +37,12 @@ function typeeditor_plugin() {
      *                  Note: in case the just created topic is a type, the entire type definition is passed.
      */
     this.post_create_topic = function(topic) {
-        // ### FIXME: move code to dm3c.create_topic_type()?
-        if (topic.type_uri == "dm3.core.topic_type") {
+        // ### FIXME: move code to dm4c.create_topic_type()?
+        if (topic.type_uri == "dm4.core.topic_type") {
             // 1) Update type cache
-            dm3c.type_cache.put_topic_type(topic)
+            dm4c.type_cache.put_topic_type(topic)
             // 2) Rebuild type menu
-            dm3c.recreate_type_menu("create-type-menu")
+            dm4c.recreate_type_menu("create-type-menu")
         }
     }
 
@@ -52,18 +52,18 @@ function typeeditor_plugin() {
      * 2) Rebuild the "Create" button's type menu.
      */
     this.post_update_topic = function(topic, old_topic) {
-        if (topic.type_uri == "dm3.core.topic_type") {
+        if (topic.type_uri == "dm4.core.topic_type") {
             // alert("post_update_topic:\n\nnew topic type=\n" + JSON.stringify(topic) +
             //     "\n\nold topic type=\n" + JSON.stringify(old_topic))
             // 1) Update type cache
             var uri_changed = topic.uri != old_topic.uri
             if (uri_changed) {
                 // alert("Type URI changed: " + old_topic.uri + " -> " + topic.uri)
-                dm3c.type_cache.remove(old_topic.uri)
+                dm4c.type_cache.remove(old_topic.uri)
             }
-            dm3c.type_cache.put_topic_type(topic)
+            dm4c.type_cache.put_topic_type(topic)
             // 2) Rebuild type menu
-            dm3c.recreate_type_menu("create-type-menu")
+            dm4c.recreate_type_menu("create-type-menu")
         }
     }
 
@@ -74,7 +74,7 @@ function typeeditor_plugin() {
             value: "create_topic_type",
             is_trigger: true,
             handler: function() {
-                dm3c.do_create_topic_type(DEFAULT_TOPIC_TYPE)
+                dm4c.do_create_topic_type(DEFAULT_TOPIC_TYPE)
             }
         })
     }

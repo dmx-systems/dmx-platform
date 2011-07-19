@@ -2,7 +2,7 @@ function DateFieldRenderer(topic, field, rel_topics) {
 
     this.render_field = function() {
         // field label
-        dm3c.render.field_label(field)
+        dm4c.render.field_label(field)
         // field value
         return js.format_date(field.value)
     }

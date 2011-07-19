@@ -68,8 +68,8 @@ public class TypeEditorPlugin extends Plugin {
         // prevents the core from creating the underlying association.
         AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
             wholeTopicTypeUri, partTopicTypeUri);
-        model.setWholeCardinalityUri("dm3.core.one");           // FIXME: handle cardinality
-        model.setPartCardinalityUri("dm3.core.one");            // FIXME: handle cardinality
+        model.setWholeCardinalityUri("dm4.core.one");           // FIXME: handle cardinality
+        model.setPartCardinalityUri("dm4.core.one");            // FIXME: handle cardinality
         model.setViewConfigModel(new ViewConfigurationModel()); // FIXME: this should be the default
         //
         return model;
@@ -86,19 +86,19 @@ public class TypeEditorPlugin extends Plugin {
     }
 
     private boolean isAssocDef(String assocTypeUri) {
-        return assocTypeUri.equals("dm3.core.aggregation_def") ||
-               assocTypeUri.equals("dm3.core.composition_def");
+        return assocTypeUri.equals("dm4.core.aggregation_def") ||
+               assocTypeUri.equals("dm4.core.composition_def");
     }
 
     // ---
 
     // ### FIXME: copy in AttachedAssociationDefinition
     private String getWholeTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm3.core.whole_type").getUri();
+        return assoc.getTopic("dm4.core.whole_type").getUri();
     }
 
     // ### FIXME: copy in AttachedAssociationDefinition
     private String getPartTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm3.core.part_type").getUri();
+        return assoc.getTopic("dm4.core.part_type").getUri();
     }
 }

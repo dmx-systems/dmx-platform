@@ -306,8 +306,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     }    
 
     private RelatedTopic fetchTypeTopic() {
-        // assocTypeUri=null (supposed to be "dm3.core.instantiation" but not possible ### explain)
-        return getRelatedTopic(null, "dm3.core.instance", "dm3.core.type", "dm3.core.assoc_type",
+        // assocTypeUri=null (supposed to be "dm4.core.instantiation" but not possible ### explain)
+        return getRelatedTopic(null, "dm4.core.instance", "dm4.core.type", "dm4.core.assoc_type",
             false, false);     // fetchComposite=false
     }
 

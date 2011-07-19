@@ -34,7 +34,7 @@ public abstract class Migration {
     // ---
 
     protected final void addTypeSetting(Type type, String setting, Object value) {
-        type.getViewConfig().addSetting("dm3.webclient.view_config", "dm3.webclient." + setting, value);
+        type.getViewConfig().addSetting("dm4.webclient.view_config", "dm4.webclient." + setting, value);
     }
 
     // ---

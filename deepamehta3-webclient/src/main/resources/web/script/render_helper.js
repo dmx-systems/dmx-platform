@@ -12,7 +12,7 @@ function RenderHelper() {
             // label
             var topic_td = $("<td>").addClass("topic-label").addClass(i == topics.length - 1 ? "last-topic" : undefined)
             var list_item = $("<div>").append(this.topic_link(topic, topic.value))
-            dm3c.trigger_plugin_hook("render_topic_list_item", topic, list_item)
+            dm4c.trigger_plugin_hook("render_topic_list_item", topic, list_item)
             topic_td.append(list_item)
             //
             table.append($("<tr>").append(icon_td).append(topic_td))
@@ -24,9 +24,9 @@ function RenderHelper() {
      * @param   topic       Topic to render (a Topic object).
      */
     this.topic_link = function(topic, link_content) {
-        var title = dm3c.type_label(topic.type_uri)
+        var title = dm4c.type_label(topic.type_uri)
         return $("<a>").attr({href: "#", title: title}).append(link_content).click(function() {
-            dm3c.do_reveal_related_topic(topic.id)
+            dm4c.do_reveal_related_topic(topic.id)
             return false
         })
     }
@@ -35,7 +35,7 @@ function RenderHelper() {
      * @return  The <img> element (jQuery object).
      */
     this.type_icon = function(type_uri, css_class) {
-        return this.image(dm3c.get_icon_src(type_uri), css_class)
+        return this.image(dm4c.get_icon_src(type_uri), css_class)
     }
 
     /**
@@ -65,9 +65,9 @@ function RenderHelper() {
      */
     this.topic_menu = function(topic_type_uri, selected_uri) {
         // retrieve all instances
-        var topics = dm3c.restc.get_topics(topic_type_uri, true)    // sort=true
+        var topics = dm4c.restc.get_topics(topic_type_uri, true)    // sort=true
         //
-        var menu = dm3c.ui.menu(topic_type_uri)
+        var menu = dm4c.ui.menu(topic_type_uri)
         for (var i in topics) {
             menu.add_item({label: topics[i].value, value: topics[i].uri})
         }
@@ -81,7 +81,7 @@ function RenderHelper() {
     // === Direct-to-page Rendering ===
 
     this.associations = function(topic_id) {
-        var topics = dm3c.restc.get_related_topics(topic_id, undefined, true)   // assoc_type_uri=undefined, sort=true
+        var topics = dm4c.restc.get_related_topics(topic_id, undefined, true)   // assoc_type_uri=undefined, sort=true
         //
         this.field_label("Associations (" + topics.length + ")")
         this.field_value(this.topic_list(topics))

@@ -105,7 +105,7 @@ public abstract class TypeModel extends TopicModel {
     public void addAssocDef(AssociationDefinitionModel assocDef) {
         String assocDefUri = assocDef.getUri();
         // sanity check ### FIXME: drop this check or provide proper feedback to the type editor user
-        if (!getDataTypeUri().equals("dm3.core.composite")) {
+        if (!getDataTypeUri().equals("dm4.core.composite")) {
             throw new RuntimeException("Association definitions can only be added to composite topic types. " +
                 "Topic type \"" + getUri() + "\" is of data type \"" + getDataTypeUri() + "\". (" + assocDef + ")");
         }

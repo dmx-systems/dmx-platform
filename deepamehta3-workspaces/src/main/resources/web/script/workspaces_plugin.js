@@ -1,6 +1,6 @@
 function workspaces_plugin() {
 
-    dm3c.register_css_stylesheet("/de.deepamehta.3-workspaces/style/dm3-workspaces.css")
+    dm4c.register_css_stylesheet("/de.deepamehta.3-workspaces/style/workspaces.css")
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -23,7 +23,7 @@ function workspaces_plugin() {
             var workspace_menu = $("<div>").attr("id", "workspace-menu")
             var workspace_form = $("<div>").attr("id", "workspace-form").append(workspace_label).append(workspace_menu)
             $("#upper-toolbar").prepend(workspace_form)
-            dm3c.ui.menu("workspace-menu", do_select_workspace)
+            dm4c.ui.menu("workspace-menu", do_select_workspace)
             rebuild_workspace_menu(undefined, workspaces)
             update_cookie()
         }
@@ -43,7 +43,7 @@ function workspaces_plugin() {
      * @param   topic   a Topic object
      */
     this.post_delete_topic = function(topic) {
-        if (topic.type_uri == "dm3.workspaces.workspace") {
+        if (topic.type_uri == "dm4.workspaces.workspace") {
             rebuild_workspace_menu()
         }
     }
@@ -69,7 +69,7 @@ function workspaces_plugin() {
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function get_all_workspaces() {
-        return dm3c.restc.get_topics("dm3.workspaces.workspace", true)  // sort=true
+        return dm4c.restc.get_topics("dm4.workspaces.workspace", true)  // sort=true
     }
 
     /**
@@ -77,7 +77,7 @@ function workspaces_plugin() {
      * If the workspace menu has no items yet, undefined is returned.
      */
     function get_workspace_id_from_menu() {
-        var item = dm3c.ui.menu_item("workspace-menu")
+        var item = dm4c.ui.menu_item("workspace-menu")
         if (item) {
             return item.value
         }
@@ -99,13 +99,13 @@ function workspaces_plugin() {
      */
     function do_select_workspace(menu_item) {
         var workspace_id = menu_item.value
-        dm3c.log("Workspace selected: " + workspace_id)
+        dm4c.log("Workspace selected: " + workspace_id)
         update_cookie()
         if (workspace_id == "_new") {
             open_workspace_dialog()
         } else {
-            var workspace = dm3c.fetch_topic(workspace_id)
-            dm3c.show_topic(workspace, "show")
+            var workspace = dm4c.fetch_topic(workspace_id)
+            dm4c.show_topic(workspace, "show")
         }
     }
 
@@ -123,7 +123,7 @@ function workspaces_plugin() {
      * Creates a new workspace in the DB.
      */
     function create_workspace_topic(name) {
-        return dm3c.create_topic("dm3.workspaces.workspace", {"dm3.workspaces.name": name})
+        return dm4c.create_topic("dm4.workspaces.workspace", {"dm4.workspaces.name": name})
     }
 
     // ---
@@ -140,16 +140,16 @@ function workspaces_plugin() {
             workspaces = get_all_workspaces()
         }
         //
-        dm3c.ui.empty_menu("workspace-menu")
-        var icon_src = dm3c.get_icon_src("dm3.workspaces.workspace")
+        dm4c.ui.empty_menu("workspace-menu")
+        var icon_src = dm4c.get_icon_src("dm4.workspaces.workspace")
         // add workspaces to menu
         for (var i = 0, workspace; workspace = workspaces[i]; i++) {
-            dm3c.ui.add_menu_item("workspace-menu", {label: workspace.value, value: workspace.id, icon: icon_src})
+            dm4c.ui.add_menu_item("workspace-menu", {label: workspace.value, value: workspace.id, icon: icon_src})
         }
         // add "New..." to menu
-        if (dm3c.has_create_permission("dm3.workspaces.workspace")) {
-            dm3c.ui.add_menu_separator("workspace-menu")
-            dm3c.ui.add_menu_item("workspace-menu", {label: "New Workspace...", value: "_new", is_trigger: true})
+        if (dm4c.has_create_permission("dm4.workspaces.workspace")) {
+            dm4c.ui.add_menu_separator("workspace-menu")
+            dm4c.ui.add_menu_item("workspace-menu", {label: "New Workspace...", value: "_new", is_trigger: true})
         }
         //
         select_menu_item(workspace_id)
@@ -159,7 +159,7 @@ function workspaces_plugin() {
      * Selects an item from the workspace menu.
      */
     function select_menu_item(workspace_id) {
-        dm3c.ui.select_menu_item("workspace-menu", workspace_id)
+        dm4c.ui.select_menu_item("workspace-menu", workspace_id)
         update_cookie()
     }
 
@@ -167,6 +167,6 @@ function workspaces_plugin() {
      * Sets a cookie that reflects the selected workspace.
      */
     function update_cookie() {
-        js.set_cookie("dm3_workspace_id", get_workspace_id_from_menu())
+        js.set_cookie("dm4_workspace_id", get_workspace_id_from_menu())
     }
 }

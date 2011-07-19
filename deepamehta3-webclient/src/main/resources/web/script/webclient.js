@@ -1,4 +1,4 @@
-var dm3c = new function() {
+var dm4c = new function() {
 
     var CORE_SERVICE_URI = "/core"
     this.SEARCH_FIELD_WIDTH = 16    // in chars
@@ -51,11 +51,11 @@ var dm3c = new function() {
      */
     this.do_select_topic = function(topic_id) {
         // update model
-        var topic = dm3c.fetch_topic(topic_id)
+        var topic = dm4c.fetch_topic(topic_id)
         set_selected_topic(topic)
         // update view
-        dm3c.canvas.set_highlight_object(topic_id, true)    // refresh_canvas=true
-        dm3c.page_panel.display(topic)
+        dm4c.canvas.set_highlight_object(topic_id, true)    // refresh_canvas=true
+        dm4c.page_panel.display(topic)
         // Note: the show_topic() helper is not called here
     }
 
@@ -65,11 +65,11 @@ var dm3c = new function() {
      */
     this.do_select_association = function(assoc_id) {
         // update model
-        var assoc = dm3c.fetch_association(assoc_id)
+        var assoc = dm4c.fetch_association(assoc_id)
         set_selected_association(assoc)
         // update view
-        dm3c.canvas.set_highlight_object(assoc_id, true)    // refresh_canvas=true
-        dm3c.page_panel.display(assoc)
+        dm4c.canvas.set_highlight_object(assoc_id, true)    // refresh_canvas=true
+        dm4c.page_panel.display(assoc)
     }
 
     this.do_reset_selection = function() {
@@ -85,13 +85,13 @@ var dm3c = new function() {
      */
     this.do_reveal_related_topic = function(topic_id) {
         // update model
-        var assocs = dm3c.restc.get_associations(dm3c.selected_object.id, topic_id)
+        var assocs = dm4c.restc.get_associations(dm4c.selected_object.id, topic_id)
         // update view
         for (var i = 0, assoc; assoc = assocs[i]; i++) {
-            dm3c.show_association(assoc)
+            dm4c.show_association(assoc)
         }
-        dm3c.show_topic(dm3c.fetch_topic(topic_id), "show")
-        dm3c.canvas.scroll_topic_to_center(topic_id)
+        dm4c.show_topic(dm4c.fetch_topic(topic_id), "show")
+        dm4c.canvas.scroll_topic_to_center(topic_id)
     }
 
     // ---
@@ -101,10 +101,10 @@ var dm3c = new function() {
      * Triggers the "post_hide_topic" hook and the "post_hide_association" hook (several times).
      */
     this.do_hide_topic = function(topic) {
-        var assocs = dm3c.canvas.get_associations(topic.id)
+        var assocs = dm4c.canvas.get_associations(topic.id)
         for (var i = 0; i < assocs.length; i++) {
-            dm3c.canvas.remove_association(assocs[i].id, false)             // refresh_canvas=false
-            dm3c.trigger_plugin_hook("post_hide_association", assocs[i])    // trigger hook
+            dm4c.canvas.remove_association(assocs[i].id, false)             // refresh_canvas=false
+            dm4c.trigger_plugin_hook("post_hide_association", assocs[i])    // trigger hook
         }
         //
         remove_topic(topic, "post_hide_topic")
@@ -126,27 +126,27 @@ var dm3c = new function() {
      */
     this.do_create_topic = function(type_uri, x, y) {
         // update model
-        var topic = dm3c.create_topic(type_uri)
+        var topic = dm4c.create_topic(type_uri)
         // update view
-        dm3c.show_topic(topic, "edit", x, y)
+        dm4c.show_topic(topic, "edit", x, y)
     }
 
     this.do_create_association = function(type_uri, topic) {
         // update model
-        var assoc = dm3c.create_association(type_uri,
-            {topic_id: dm3c.selected_object.id, role_type_uri: dm3c.selected_object.type_uri},
+        var assoc = dm4c.create_association(type_uri,
+            {topic_id: dm4c.selected_object.id, role_type_uri: dm4c.selected_object.type_uri},
             {topic_id: topic.id,                role_type_uri: topic.type_uri}
         )
         // update view
-        dm3c.show_association(assoc, true)                      // refresh_canvas=true
-        dm3c.page_panel.display(dm3c.selected_object)
+        dm4c.show_association(assoc, true)                      // refresh_canvas=true
+        dm4c.page_panel.display(dm4c.selected_object)
     }
 
     this.do_create_topic_type = function(topic_type_model) {
         // update model
-        var topic_type = dm3c.create_topic_type(topic_type_model)
+        var topic_type = dm4c.create_topic_type(topic_type_model)
         // update view
-        dm3c.show_topic(topic_type, "edit")
+        dm4c.show_topic(topic_type, "edit")
     }
 
     // ---
@@ -166,11 +166,11 @@ var dm3c = new function() {
      */
     this.do_update_topic = function(old_topic, new_topic) {
         // update model
-        var updated_topic = build_topic(dm3c.restc.update_topic(new_topic))
-        dm3c.trigger_plugin_hook("post_update_topic", updated_topic, old_topic)     // trigger hook
+        var updated_topic = build_topic(dm4c.restc.update_topic(new_topic))
+        dm4c.trigger_plugin_hook("post_update_topic", updated_topic, old_topic)     // trigger hook
         // update view
-        dm3c.canvas.update_topic(updated_topic, true)   // refresh_canvas=true
-        dm3c.page_panel.display(updated_topic)
+        dm4c.canvas.update_topic(updated_topic, true)   // refresh_canvas=true
+        dm4c.page_panel.display(updated_topic)
         //
         return updated_topic
     }
@@ -187,7 +187,7 @@ var dm3c = new function() {
      */
     this.do_update_association = function(old_assoc, new_assoc) {
         // update model
-        var directives = dm3c.restc.update_association(new_assoc)
+        var directives = dm4c.restc.update_association(new_assoc)
         // update view
         process_directives(directives)
         //
@@ -202,11 +202,11 @@ var dm3c = new function() {
      */
     this.do_update_topic_type = function(old_topic_type, new_topic_type) {
         // update model
-        var updated_topic_type = build_topic_type(dm3c.restc.update_topic_type(new_topic_type))
-        dm3c.trigger_plugin_hook("post_update_topic", updated_topic_type, old_topic_type)   // trigger hook
+        var updated_topic_type = build_topic_type(dm4c.restc.update_topic_type(new_topic_type))
+        dm4c.trigger_plugin_hook("post_update_topic", updated_topic_type, old_topic_type)   // trigger hook
         // update view
-        dm3c.canvas.update_topic(updated_topic_type, true)
-        dm3c.page_panel.display(updated_topic_type)
+        dm4c.canvas.update_topic(updated_topic_type, true)
+        dm4c.page_panel.display(updated_topic_type)
         //
         return updated_topic_type
     }
@@ -219,7 +219,7 @@ var dm3c = new function() {
      */
     this.do_delete_topic = function(topic) {
         // update DB
-        var directives = dm3c.restc.delete_topic(topic.id)
+        var directives = dm4c.restc.delete_topic(topic.id)
         // update model and view
         process_directives(directives)
     }
@@ -230,7 +230,7 @@ var dm3c = new function() {
      */
     this.do_delete_association = function(assoc) {
         // update DB
-        var directives = dm3c.restc.delete_association(assoc.id)
+        var directives = dm4c.restc.delete_association(assoc.id)
         // update model and view
         process_directives(directives)
     }
@@ -265,21 +265,21 @@ var dm3c = new function() {
             set_selected_topic(topic)
         }
         // update canvas
-        dm3c.trigger_plugin_hook("pre_show_topic", topic)       // trigger hook
-        dm3c.canvas.add_topic(topic)
+        dm4c.trigger_plugin_hook("pre_show_topic", topic)       // trigger hook
+        dm4c.canvas.add_topic(topic)
         if (do_select) {
-            dm3c.canvas.set_highlight_object(topic.id, true)    // refresh_canvas=true
+            dm4c.canvas.set_highlight_object(topic.id, true)    // refresh_canvas=true
         }
-        dm3c.trigger_plugin_hook("post_show_topic", topic)      // trigger hook
+        dm4c.trigger_plugin_hook("post_show_topic", topic)      // trigger hook
         // update page panel
         switch (action) {
         case "none":
             break
         case "show":
-            dm3c.page_panel.display(topic)
+            dm4c.page_panel.display(topic)
             break
         case "edit":
-            dm3c.begin_editing(topic)
+            dm4c.begin_editing(topic)
             break
         default:
             alert("WARNING (show_topic):\n\nUnexpected action: \"" + action + "\"")
@@ -288,8 +288,8 @@ var dm3c = new function() {
 
     this.show_association = function(assoc, refresh_canvas) {
         // update canvas
-        dm3c.canvas.add_association(assoc, refresh_canvas)          // refresh_canvas=true
-        dm3c.trigger_plugin_hook("post_show_association", assoc)    // trigger hook
+        dm4c.canvas.add_association(assoc, refresh_canvas)          // refresh_canvas=true
+        dm4c.trigger_plugin_hook("post_show_association", assoc)    // trigger hook
     }
 
     // ---
@@ -315,7 +315,7 @@ var dm3c = new function() {
                 break
             case "UPDATE_TOPIC_TYPE":
                 var topic_type = build_topic_type(directive.arg)
-                dm3c.type_cache.put_topic_type(topic_type)
+                dm4c.type_cache.put_topic_type(topic_type)
                 break
             default:
                 throw "UnknownDirectiveError: directive \"" + directive.type + "\" not implemented"
@@ -333,11 +333,11 @@ var dm3c = new function() {
      */
     function remove_topic(topic, hook_name) {
         // 1) update view (canvas)
-        dm3c.canvas.remove_topic(topic.id, true)            // refresh_canvas=true
+        dm4c.canvas.remove_topic(topic.id, true)            // refresh_canvas=true
         // 2) update model and view (page panel)
         reset_selection_conditionally(topic.id)
         // trigger hook
-        dm3c.trigger_plugin_hook(hook_name, topic)
+        dm4c.trigger_plugin_hook(hook_name, topic)
     }
 
     /**
@@ -348,11 +348,11 @@ var dm3c = new function() {
      */
     function remove_association(assoc, hook_name) {
         // 1) update view (canvas)
-        dm3c.canvas.remove_association(assoc.id, true)      // refresh_canvas=true
+        dm4c.canvas.remove_association(assoc.id, true)      // refresh_canvas=true
         // 2) update model and view (page panel)
         reset_selection_conditionally(assoc.id)
         // trigger hook
-        dm3c.trigger_plugin_hook(hook_name, assoc)
+        dm4c.trigger_plugin_hook(hook_name, assoc)
     }
 
     // ---
@@ -365,25 +365,25 @@ var dm3c = new function() {
      */
     function update_association(assoc) {
         // update view
-        dm3c.canvas.update_association(assoc, true)     // refresh_canvas=true
-        dm3c.page_panel.display(assoc)
+        dm4c.canvas.update_association(assoc, true)     // refresh_canvas=true
+        dm4c.page_panel.display(assoc)
         // trigger hook
-        dm3c.trigger_plugin_hook("post_update_association", assoc, undefined)   // FIXME: old_assoc=undefined
+        dm4c.trigger_plugin_hook("post_update_association", assoc, undefined)   // FIXME: old_assoc=undefined
     }
 
     // ---
 
     function reset_selection_conditionally(object_id) {
-        if (object_id == dm3c.selected_object.id) {
+        if (object_id == dm4c.selected_object.id) {
             reset_selection()
         }
     }
 
     function reset_selection() {
         // update model
-        dm3c.selected_object = null
+        dm4c.selected_object = null
         // update view (page panel)
-        dm3c.page_panel.clear()
+        dm4c.page_panel.clear()
     }
 
 
@@ -397,7 +397,7 @@ var dm3c = new function() {
     /**
      * Creates a topic in the DB.
      *
-     * @param   type_uri        The topic type URI, e.g. "dm3.notes.note".
+     * @param   type_uri        The topic type URI, e.g. "dm4.notes.note".
      * @param   composite       Optional.
      *
      * @return  The topic as stored in the DB.
@@ -409,9 +409,9 @@ var dm3c = new function() {
             type_uri: type_uri,
             composite: composite    // not serialized to request body if undefined
         }
-        var topic = build_topic(dm3c.restc.create_topic(topic_model))
+        var topic = build_topic(dm4c.restc.create_topic(topic_model))
         // trigger hook
-        dm3c.trigger_plugin_hook("post_create_topic", topic)
+        dm4c.trigger_plugin_hook("post_create_topic", topic)
         //
         return topic
     }
@@ -419,14 +419,14 @@ var dm3c = new function() {
     /**
      * Creates an association in the DB.
      *
-     * @param   type_uri            The association type URI, e.g. "dm3.core.instantiation".
+     * @param   type_uri            The association type URI, e.g. "dm4.core.instantiation".
      * @param   role_1              The topic role or association role at one end (an object).
      *                              Examples for a topic role:
-     *                                  {topic_uri: "dm3.core.cardinality", role_type_uri: "dm3.core.type"},
-     *                                  {topic_id: 123,                     role_type_uri: "dm3.core.instance"},
+     *                                  {topic_uri: "dm4.core.cardinality", role_type_uri: "dm4.core.type"},
+     *                                  {topic_id: 123,                     role_type_uri: "dm4.core.instance"},
      *                              The topic can be identified either by URI or by ID.
      *                              Example for an association role:
-     *                                  {assoc_id: 456, role_type_uri: "dm3.core.assoc_def"},
+     *                                  {assoc_id: 456, role_type_uri: "dm4.core.assoc_def"},
      *                              The association is identified by ID.
      * @param   role_2              The topic role or association role at the other end (an object, like role_1).
      *
@@ -439,14 +439,14 @@ var dm3c = new function() {
             role_2: role_2
         }
         // FIXME: "create" hooks are not triggered
-        return build_association(dm3c.restc.create_association(assoc_model))
+        return build_association(dm4c.restc.create_association(assoc_model))
     }
 
     this.create_topic_type = function(topic_type_model) {
         // update DB
-        var topic_type = build_topic_type(dm3c.restc.create_topic_type(topic_type_model))
+        var topic_type = build_topic_type(dm4c.restc.create_topic_type(topic_type_model))
         // trigger hook
-        dm3c.trigger_plugin_hook("post_create_topic", topic_type)
+        dm4c.trigger_plugin_hook("post_create_topic", topic_type)
         //
         return topic_type
     }
@@ -454,15 +454,15 @@ var dm3c = new function() {
     // ---
 
     function set_selected_topic(topic) {
-        dm3c.selected_object = topic
+        dm4c.selected_object = topic
         // trigger hook
-        dm3c.trigger_plugin_hook("post_select_topic", topic)
+        dm4c.trigger_plugin_hook("post_select_topic", topic)
     }
 
     function set_selected_association(assoc) {
-        dm3c.selected_object = assoc
+        dm4c.selected_object = assoc
         // trigger hook
-        dm3c.trigger_plugin_hook("post_select_association", assoc)
+        dm4c.trigger_plugin_hook("post_select_association", assoc)
     }
 
 
@@ -512,7 +512,7 @@ var dm3c = new function() {
     this.trigger_plugin_hook = function(hook_name) {
         var result = []
         for (var plugin_class in plugins) {
-            var plugin = dm3c.get_plugin(plugin_class)
+            var plugin = dm4c.get_plugin(plugin_class)
             if (plugin[hook_name]) {
                 // 1) Trigger hook ### FIXME: use apply()
                 if (arguments.length == 1) {
@@ -539,7 +539,7 @@ var dm3c = new function() {
 
     this.trigger_page_renderer_hook = function(topic_or_association, hook_name, args) {
         // Lookup page renderer
-        var page_renderer = dm3c.get_page_renderer(topic_or_association)
+        var page_renderer = dm4c.get_page_renderer(topic_or_association)
         // Trigger the hook only if it is defined (a page renderer must not define all hooks).
         if (page_renderer[hook_name]) {
             return page_renderer[hook_name](args)
@@ -590,11 +590,11 @@ var dm3c = new function() {
      * Convenience method that returns the topic type's label.
      */
     this.type_label = function(type_uri) {
-        return dm3c.type_cache.get_topic_type(type_uri).value
+        return dm4c.type_cache.get_topic_type(type_uri).value
     }
 
     this.reload_types = function() {
-        dm3c.type_cache.clear()
+        dm4c.type_cache.clear()
         load_types()
     }
 
@@ -605,7 +605,7 @@ var dm3c = new function() {
      * @return  The icon source (string).
      */
     this.get_icon_src = function(type_uri) {
-        var topic_type = dm3c.type_cache.get_topic_type(type_uri)
+        var topic_type = dm4c.type_cache.get_topic_type(type_uri)
         // Note: topic_type is undefined if plugin is deactivated and content still exist.
         if (topic_type) {
             return topic_type.get_icon_src()
@@ -630,37 +630,37 @@ var dm3c = new function() {
             throw "InvalidConfigurable: no \"view_config_topics\" property found in " + JSON.stringify(configurable)
         }
         // every configurable has an view_config_topics object, however it might be empty
-        var view_config = configurable.view_config_topics["dm3.webclient.view_config"]
+        var view_config = configurable.view_config_topics["dm4.webclient.view_config"]
         if (view_config) {
-            return view_config.composite["dm3.webclient." + setting]
+            return view_config.composite["dm4.webclient." + setting]
         }
     }
 
     // === Commands ===
 
     this.get_topic_commands = function(topic, context) {
-        return get_commands(dm3c.trigger_plugin_hook("add_topic_commands", topic), context)
+        return get_commands(dm4c.trigger_plugin_hook("add_topic_commands", topic), context)
     }
 
     this.get_association_commands = function(assoc, context) {
-        return get_commands(dm3c.trigger_plugin_hook("add_association_commands", assoc), context)
+        return get_commands(dm4c.trigger_plugin_hook("add_association_commands", assoc), context)
     }
 
     this.get_canvas_commands = function(cx, cy, context) {
-        return get_commands(dm3c.trigger_plugin_hook("add_canvas_commands", cx, cy), context)
+        return get_commands(dm4c.trigger_plugin_hook("add_canvas_commands", cx, cy), context)
     }
 
     // === Persmissions ===
 
     // ### TODO: handle associations as well
     this.has_write_permission = function(topic) {
-        var result = dm3c.trigger_plugin_hook("has_write_permission", topic)
+        var result = dm4c.trigger_plugin_hook("has_write_permission", topic)
         return !js.contains(result, false)
     }
 
     // ### TODO: handle association types as well
     this.has_create_permission = function(type_uri) {
-        var result = dm3c.trigger_plugin_hook("has_create_permission", dm3c.type_cache.get_topic_type(type_uri))
+        var result = dm4c.trigger_plugin_hook("has_create_permission", dm4c.type_cache.get_topic_type(type_uri))
         return !js.contains(result, false)
     }
 
@@ -668,7 +668,7 @@ var dm3c = new function() {
 
     this.begin_editing = function(object) {
         // update GUI
-        dm3c.page_panel.edit(object)
+        dm4c.page_panel.edit(object)
     }
 
     // ---
@@ -681,12 +681,12 @@ var dm3c = new function() {
      * @return  The menu (a UIHelper Menu object).
      */
     this.create_type_menu = function(menu_id, handler) {
-        var type_menu = dm3c.ui.menu(menu_id, handler)
-        var type_uris = dm3c.type_cache.get_type_uris()
+        var type_menu = dm4c.ui.menu(menu_id, handler)
+        var type_uris = dm4c.type_cache.get_type_uris()
         for (var i = 0; i < type_uris.length; i++) {
             var type_uri = type_uris[i]
-            var topic_type = dm3c.type_cache.get_topic_type(type_uri)
-            if (dm3c.has_create_permission(type_uri) && topic_type.get_menu_config(menu_id)) {
+            var topic_type = dm4c.type_cache.get_topic_type(type_uri)
+            if (dm4c.has_create_permission(type_uri) && topic_type.get_menu_config(menu_id)) {
                 // add type to menu
                 type_menu.add_item({
                     label: topic_type.value,
@@ -696,7 +696,7 @@ var dm3c = new function() {
             }
         }
         //
-        dm3c.trigger_plugin_hook("post_create_type_menu", type_menu)
+        dm4c.trigger_plugin_hook("post_create_type_menu", type_menu)
         //
         return type_menu
     }
@@ -709,12 +709,12 @@ var dm3c = new function() {
      * @return  The menu (a UIHelper Menu object).
      */
     this.recreate_type_menu = function(menu_id) {
-        var selection = dm3c.ui.menu_item(menu_id)
-        var type_menu = dm3c.create_type_menu(menu_id)
+        var selection = dm4c.ui.menu_item(menu_id)
+        var type_menu = dm4c.create_type_menu(menu_id)
         // restore selection
         // Note: selection is undefined if the menu has no items.
         if (selection) {
-            dm3c.ui.select_menu_item(menu_id, selection.value)
+            dm4c.ui.select_menu_item(menu_id, selection.value)
         }
         return type_menu
     }
@@ -788,7 +788,7 @@ var dm3c = new function() {
             // Checks if the tracked images are loaded completely.
             // If so, the callback is triggered and this tracker is removed.
             this.check = function() {
-                if (types.every(function(type) {return dm3c.get_type_icon(type).complete})) {
+                if (types.every(function(type) {return dm4c.get_type_icon(type).complete})) {
                     callback_func()
                     image_tracker = undefined
                 }
@@ -805,7 +805,7 @@ var dm3c = new function() {
      * @return  The icon (JavaScript Image object)
      */
     this.get_type_icon = function(topic_type_uri) {
-        return dm3c.type_cache.get_icon(topic_type_uri) || generic_topic_icon
+        return dm4c.type_cache.get_icon(topic_type_uri) || generic_topic_icon
     }
 
     /**
@@ -815,7 +815,7 @@ var dm3c = new function() {
      * @return  The color (CSS string)
      */
     this.get_type_color = function(assoc_type_uri) {
-        return dm3c.type_cache.get_association_type(assoc_type_uri).get_color()
+        return dm4c.type_cache.get_association_type(assoc_type_uri).get_color()
     }
 
     // ---
@@ -825,7 +825,7 @@ var dm3c = new function() {
         img.src = src   // Note: if src is a relative URL JavaScript extends img.src to an absolute URL
         img.onload = function(arg0) {
             // Note: "this" is the image. The argument is the "load" event.
-            if (LOG_IMAGE_LOADING) dm3c.log("Image ready: " + src)
+            if (LOG_IMAGE_LOADING) dm4c.log("Image ready: " + src)
             notify_image_trackers()
         }
         return img
@@ -848,19 +848,19 @@ var dm3c = new function() {
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     this.fetch_topic = function(topic_id) {
-        return build_topic(dm3c.restc.get_topic_by_id(topic_id))
+        return build_topic(dm4c.restc.get_topic_by_id(topic_id))
     }
 
     this.fetch_association = function(assoc_id) {
-        return build_association(dm3c.restc.get_association(assoc_id))
+        return build_association(dm4c.restc.get_association(assoc_id))
     }
 
     function fetch_topic_type(topic_type_uri) {
-        return build_topic_type(dm3c.restc.get_topic_type(topic_type_uri))
+        return build_topic_type(dm4c.restc.get_topic_type(topic_type_uri))
     }
 
     function fetch_association_type(assoc_type_uri) {
-        return build_association_type(dm3c.restc.get_association_type(assoc_type_uri))
+        return build_association_type(dm4c.restc.get_association_type(assoc_type_uri))
     }
 
     // ---
@@ -896,16 +896,16 @@ var dm3c = new function() {
         // -- including its event handlers -- and the append() would eventually add the crippled type menu.
         $("#search-widget").empty()
         var searchmode = menu_item.label
-        var search_widget = dm3c.trigger_plugin_hook("search_widget", searchmode)[0]
+        var search_widget = dm4c.trigger_plugin_hook("search_widget", searchmode)[0]
         $("#search-widget").append(search_widget)
     }
 
     function search() {
         try {
-            var searchmode = dm3c.ui.menu_item("searchmode-select").label
-            var search_topic = build_topic(dm3c.trigger_plugin_hook("search", searchmode)[0])
+            var searchmode = dm4c.ui.menu_item("searchmode-select").label
+            var search_topic = build_topic(dm4c.trigger_plugin_hook("search", searchmode)[0])
             // alert("search_topic=" + JSON.stringify(search_topic))
-            dm3c.show_topic(search_topic, "show")
+            dm4c.show_topic(search_topic, "show")
         } catch (e) {
             alert("ERROR while searching:\n\n" + JSON.stringify(e))
         }
@@ -930,7 +930,7 @@ var dm3c = new function() {
 
     function special_selected(menu_item) {
         var command = menu_item.label
-        dm3c.trigger_plugin_hook("handle_special_command", command)
+        dm4c.trigger_plugin_hook("handle_special_command", command)
     }
 
     // === Plugin Support ===
@@ -945,15 +945,15 @@ var dm3c = new function() {
      * Registers server-side plugins to the list of plugins to load at client-side.
      */
     function register_plugins() {
-        var plugins = dm3c.restc.get_plugins()
-        if (LOG_PLUGIN_LOADING) dm3c.log("Plugins installed at server-side: " + plugins.length)
+        var plugins = dm4c.restc.get_plugins()
+        if (LOG_PLUGIN_LOADING) dm4c.log("Plugins installed at server-side: " + plugins.length)
         for (var i = 0, plugin; plugin = plugins[i]; i++) {
             if (plugin.plugin_file) {
-                if (LOG_PLUGIN_LOADING) dm3c.log("..... plugin \"" + plugin.plugin_id +
+                if (LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_id +
                     "\" contains client-side parts -- to be loaded")
                 register_plugin("/" + plugin.plugin_id + "/script/" + plugin.plugin_file)
             } else {
-                if (LOG_PLUGIN_LOADING) dm3c.log("..... plugin \"" + plugin.plugin_id +
+                if (LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_id +
                     "\" contains no client-side parts -- nothing to load")
             }
         }
@@ -977,14 +977,14 @@ var dm3c = new function() {
 
     function load_types() {
         // topic types
-        var type_uris = dm3c.restc.get_topic_type_uris()
+        var type_uris = dm4c.restc.get_topic_type_uris()
         for (var i = 0; i < type_uris.length; i++) {
-            dm3c.type_cache.put_topic_type(fetch_topic_type(type_uris[i]))
+            dm4c.type_cache.put_topic_type(fetch_topic_type(type_uris[i]))
         }
         // association types
-        var type_uris = dm3c.restc.get_association_type_uris()
+        var type_uris = dm4c.restc.get_association_type_uris()
         for (var i = 0; i < type_uris.length; i++) {
-            dm3c.type_cache.put_association_type(fetch_association_type(type_uris[i]))
+            dm4c.type_cache.put_association_type(fetch_association_type(type_uris[i]))
         }
     }
 
@@ -1021,17 +1021,17 @@ var dm3c = new function() {
         $("#upper-toolbar").addClass("ui-widget-header").addClass("ui-corner-all")
         // the search form
         $("#searchmode-select-placeholder").replaceWith(searchmode_select())
-        $("#search_field").attr({size: dm3c.SEARCH_FIELD_WIDTH})
+        $("#search_field").attr({size: dm4c.SEARCH_FIELD_WIDTH})
         $("#search-form").submit(search)
-        dm3c.ui.button("search-button", search, "Search", "gear")
+        dm4c.ui.button("search-button", search, "Search", "gear")
         // the special form
         $("#special-menu-placeholder").replaceWith(create_special_select())
         // the page panel
-        dm3c.page_panel = new PagePanel()
-        $("#split-panel > tbody > tr > td").eq(1).append(dm3c.page_panel.dom)
+        dm4c.page_panel = new PagePanel()
+        $("#split-panel > tbody > tr > td").eq(1).append(dm4c.page_panel.dom)
         // ### $("#document-form").submit(submit_document)
         detail_panel_width = $("#page-content").width()
-        if (dm3c.LOG_GUI) dm3c.log("Mesuring page panel width: " + detail_panel_width)
+        if (dm4c.LOG_GUI) dm4c.log("Mesuring page panel width: " + detail_panel_width)
         // the upload dialog
         $("#upload-dialog").dialog({
             modal: true, autoOpen: false, draggable: false, resizable: false, width: UPLOAD_DIALOG_WIDTH
@@ -1050,24 +1050,24 @@ var dm3c = new function() {
          */
         function load_plugins() {
 
-            if (LOG_PLUGIN_LOADING) dm3c.log("Loading " + plugin_sources.length + " plugins:")
+            if (LOG_PLUGIN_LOADING) dm4c.log("Loading " + plugin_sources.length + " plugins:")
             var plugins_complete = 0
             for (var i = 0, plugin_source; plugin_source = plugin_sources[i]; i++) {
                 load_plugin(plugin_source)
             }
 
             function load_plugin(plugin_source) {
-                if (LOG_PLUGIN_LOADING) dm3c.log("..... " + plugin_source)
+                if (LOG_PLUGIN_LOADING) dm4c.log("..... " + plugin_source)
                 // load plugin asynchronously
-                dm3c.javascript_source(plugin_source, function() {
+                dm4c.javascript_source(plugin_source, function() {
                     // instantiate
                     var plugin_class = js.basename(plugin_source)
-                    if (LOG_PLUGIN_LOADING) dm3c.log(".......... instantiating \"" + plugin_class + "\"")
+                    if (LOG_PLUGIN_LOADING) dm4c.log(".......... instantiating \"" + plugin_class + "\"")
                     plugins[plugin_class] = js.new_object(plugin_class)
                     // all plugins complete?
                     plugins_complete++
                     if (plugins_complete == plugin_sources.length) {
-                        if (LOG_PLUGIN_LOADING) dm3c.log("PLUGINS COMPLETE!")
+                        if (LOG_PLUGIN_LOADING) dm4c.log("PLUGINS COMPLETE!")
                         setup_gui()
                     }
                 })
@@ -1078,25 +1078,25 @@ var dm3c = new function() {
             load_page_renderers()
             load_field_renderers()
             load_stylesheets()
-            // Note: in order to let a plugin provide a custom canvas renderer (the dm3-freifunk-geomap plugin does!)
+            // Note: in order to let a plugin provide a custom canvas renderer (the dm4-freifunk-geomap plugin does!)
             // the canvas is created *after* loading the plugins.
-            dm3c.canvas = dm3c.trigger_plugin_hook("get_canvas_renderer")[0] || new Canvas()
+            dm4c.canvas = dm4c.trigger_plugin_hook("get_canvas_renderer")[0] || new Canvas()
             // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta3-topicmaps plugin
             // does!) the "init" hook is triggered *after* creating the canvas.
-            dm3c.trigger_plugin_hook("init")
+            dm4c.trigger_plugin_hook("init")
             //
             // setup create widget
-            var menu = dm3c.create_type_menu("create-type-menu")
+            var menu = dm4c.create_type_menu("create-type-menu")
             $("#create-type-menu-placeholder").replaceWith(menu.dom)
-            dm3c.ui.button("create-button", do_create_topic, "Create", "plus")
+            dm4c.ui.button("create-button", do_create_topic, "Create", "plus")
             if (!menu.get_item_count()) {
                 $("#create-widget").hide()
             }
             //
-            dm3c.ui.menu("searchmode-select", searchmode_selected)
-            dm3c.ui.menu("special-menu", special_selected, undefined, "Special")
+            dm4c.ui.menu("searchmode-select", searchmode_selected)
+            dm4c.ui.menu("special-menu", special_selected, undefined, "Special")
             // the page panel
-            if (dm3c.LOG_GUI) dm3c.log("Setting page panel height: " + $("#canvas").height())
+            if (dm4c.LOG_GUI) dm4c.log("Setting page panel height: " + $("#canvas").height())
             $("#page-content").height($("#canvas").height())
             //
             $(window).resize(window_resized)
@@ -1104,53 +1104,53 @@ var dm3c = new function() {
 
         function load_page_renderers() {
 
-            if (LOG_PLUGIN_LOADING) dm3c.log("Loading " + page_renderer_sources.length + " page renderers:")
+            if (LOG_PLUGIN_LOADING) dm4c.log("Loading " + page_renderer_sources.length + " page renderers:")
             for (var i = 0, page_renderer_src; page_renderer_src = page_renderer_sources[i]; i++) {
                 load_page_renderer(page_renderer_src)
             }
 
             function load_page_renderer(page_renderer_src) {
-                if (LOG_PLUGIN_LOADING) dm3c.log("..... " + page_renderer_src)
+                if (LOG_PLUGIN_LOADING) dm4c.log("..... " + page_renderer_src)
                 // load page renderer asynchronously
-                dm3c.javascript_source(page_renderer_src, function() {
+                dm4c.javascript_source(page_renderer_src, function() {
                     // instantiate
                     var page_renderer_class = js.to_camel_case(js.basename(page_renderer_src))
-                    if (LOG_PLUGIN_LOADING) dm3c.log(".......... instantiating \"" + page_renderer_class + "\"")
+                    if (LOG_PLUGIN_LOADING) dm4c.log(".......... instantiating \"" + page_renderer_class + "\"")
                     page_renderers[page_renderer_class] = js.new_object(page_renderer_class)
                 })
             }
         }
 
         function load_field_renderers() {
-            if (LOG_PLUGIN_LOADING) dm3c.log("Loading " + field_renderer_sources.length + " data field renderers:")
+            if (LOG_PLUGIN_LOADING) dm4c.log("Loading " + field_renderer_sources.length + " data field renderers:")
             for (var i = 0, field_renderer_source; field_renderer_source = field_renderer_sources[i]; i++) {
-                if (LOG_PLUGIN_LOADING) dm3c.log("..... " + field_renderer_source)
+                if (LOG_PLUGIN_LOADING) dm4c.log("..... " + field_renderer_source)
                 // load field renderer asynchronously
-                dm3c.javascript_source(field_renderer_source, function() {})
+                dm4c.javascript_source(field_renderer_source, function() {})
             }
         }
 
         function load_stylesheets() {
-            if (LOG_PLUGIN_LOADING) dm3c.log("Loading " + css_stylesheets.length + " CSS stylesheets:")
+            if (LOG_PLUGIN_LOADING) dm4c.log("Loading " + css_stylesheets.length + " CSS stylesheets:")
             for (var i = 0, css_stylesheet; css_stylesheet = css_stylesheets[i]; i++) {
-                if (LOG_PLUGIN_LOADING) dm3c.log("..... " + css_stylesheet)
+                if (LOG_PLUGIN_LOADING) dm4c.log("..... " + css_stylesheet)
                 $("head").append($("<link>").attr({rel: "stylesheet", href: css_stylesheet, type: "text/css"}))
             }
         }
 
         function do_create_topic() {
-            var type_uri = dm3c.ui.menu_item("create-type-menu").value
-            dm3c.do_create_topic(type_uri)
+            var type_uri = dm4c.ui.menu_item("create-type-menu").value
+            dm4c.do_create_topic(type_uri)
         }
 
         function window_resized() {
-            dm3c.canvas.adjust_size()
+            dm4c.canvas.adjust_size()
             $("#page-content").height($("#canvas").height())
         }
 
         function extend_rest_client() {
 
-            dm3c.restc.search_topics_and_create_bucket = function(text, field_uri, whole_word) {
+            dm4c.restc.search_topics_and_create_bucket = function(text, field_uri, whole_word) {
                 var params = this.createRequestParameter({search: text, field: field_uri, wholeword: whole_word})
                 return this.request("GET", "/webclient/search?" + params.to_query_string())
             }
@@ -1158,7 +1158,7 @@ var dm3c = new function() {
             // Note: this method is actually part of the Type Search plugin.
             // TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
             // another namespace again) or make the Type Search plugin an integral part of the Client plugin.
-            dm3c.restc.get_topics_and_create_bucket = function(type_uri) {
+            dm4c.restc.get_topics_and_create_bucket = function(type_uri) {
                 return this.request("GET", "/webclient/search/by_type/" + type_uri)
             }
         }

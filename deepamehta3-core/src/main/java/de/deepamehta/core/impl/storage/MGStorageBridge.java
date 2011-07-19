@@ -472,7 +472,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         // Note: the meta meta type is not stored in the DB (in memory only). It can't be looked up from DB.
         // However, the meta meta type is used as role type to connect the meta meta type's instance (node 0)
         // with its view configuration.
-        if (roleTypeUri.equals("dm3.core.meta_meta_type")) {
+        if (roleTypeUri.equals("dm4.core.meta_meta_type")) {
             return;
         }
         MehtaNode roleType = lookupMehtaNode(roleTypeUri);
@@ -521,8 +521,8 @@ public class MGStorageBridge implements DeepaMehtaStorage {
      * @return  The topic type's URI.
      */
     private String getTopicTypeUri(MehtaNode node) {
-        if (node.getString("uri").equals("dm3.core.meta_type")) {
-            return "dm3.core.meta_meta_type";
+        if (node.getString("uri").equals("dm4.core.meta_type")) {
+            return "dm4.core.meta_meta_type";
         } else {
             return fetchTypeNode(node).getString("uri");
         }
@@ -535,7 +535,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
      */
     private String getAssociationTypeUri(MehtaEdge edge) {
         MehtaNode typeNode = fetchTypeNode(edge);
-        // typeNode is null for "dm3.core.instantiation" edges of edges
+        // typeNode is null for "dm4.core.instantiation" edges of edges
         return typeNode != null ? typeNode.getString("uri") : "";
     }
 
@@ -547,7 +547,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
      * @return  The mehta node that represents the topic type.
      */
     private MehtaNode fetchTypeNode(MehtaNode node) {
-        ConnectedMehtaNode typeNode = node.getConnectedMehtaNode("dm3.core.instance", "dm3.core.type");
+        ConnectedMehtaNode typeNode = node.getConnectedMehtaNode("dm4.core.instance", "dm4.core.type");
         if (typeNode == null) {
             throw new RuntimeException("No type node is connected to " + node);
         }
@@ -560,10 +560,10 @@ public class MGStorageBridge implements DeepaMehtaStorage {
      * @return  The mehta node that represents the association type.
      */
     private MehtaNode fetchTypeNode(MehtaEdge edge) {
-        ConnectedMehtaNode typeNode = edge.getConnectedMehtaNode("dm3.core.instance", "dm3.core.type");
+        ConnectedMehtaNode typeNode = edge.getConnectedMehtaNode("dm4.core.instance", "dm4.core.type");
         if (typeNode == null) {
             return null;
-            // "dm3.core.instantiation" edges of edges are deliberately not connected to a type node
+            // "dm4.core.instantiation" edges of edges are deliberately not connected to a type node
             // ### throw new RuntimeException("No type node is connected to " + edge);
         }
         return typeNode.getMehtaNode();
@@ -631,7 +631,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     private void setupMetaTypeNode() {
         MehtaNode refNode = mg.getMehtaNode(0);
-        String uri = "dm3.core.meta_type";
+        String uri = "dm4.core.meta_type";
         refNode.setString("uri", uri);
         refNode.setString("value", "Meta Type");
         //

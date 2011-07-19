@@ -24,7 +24,7 @@ function TopicRenderer() {
     this.render_page = function(topic) {
 
         render_page_model(create_page_model(topic), render_field)
-        dm3c.render.associations(topic.id)
+        dm4c.render.associations(topic.id)
 
         function render_field(field) {
             if (field.viewable) {
@@ -35,7 +35,7 @@ function TopicRenderer() {
 
     this.render_form = function(topic) {
 
-        dm3c.trigger_plugin_hook("pre_render_form", topic)
+        dm4c.trigger_plugin_hook("pre_render_form", topic)
         page_model = create_page_model(topic)
         render_page_model(page_model, render_field)
 
@@ -48,8 +48,8 @@ function TopicRenderer() {
 
     this.process_form = function(topic) {
         var topic_model = build_topic_model()
-        topic = dm3c.do_update_topic(topic, topic_model)
-        dm3c.trigger_plugin_hook("post_submit_form", topic)
+        topic = dm4c.do_update_topic(topic, topic_model)
+        dm4c.trigger_plugin_hook("post_submit_form", topic)
 
         /**
          * Reads out values from GUI elements and builds a topic model object from it.
@@ -128,11 +128,11 @@ function TopicRenderer() {
         return create_fields("", topic.composite, topic.get_type())
 
         function create_fields(field_uri, composite, topic_type, assoc_def) {
-            if (topic_type.data_type_uri == "dm3.core.composite") {
+            if (topic_type.data_type_uri == "dm4.core.composite") {
                 var fields = {}
                 for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                    var part_topic_type = dm3c.type_cache.get_topic_type(assoc_def.part_topic_type_uri)
-                    var child_field_uri = field_uri + dm3c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
+                    var part_topic_type = dm4c.type_cache.get_topic_type(assoc_def.part_topic_type_uri)
+                    var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
                     var comp = composite && composite[assoc_def.uri]
                     var child_fields = create_fields(child_field_uri, comp, part_topic_type, assoc_def)
                     fields[assoc_def.uri] = child_fields
@@ -163,13 +163,13 @@ function TopicRenderer() {
      * Auto-Completion main function. Triggered for every keystroke.
      */
     this.autocomplete = function(event) {
-        // dm3c.log("autocomplete: which=" + event.which)
+        // dm4c.log("autocomplete: which=" + event.which)
         if (handle_special_input(event)) {
             return
         }
         // error check
         if (this.id.substr(0, 6) != "field_") {
-            alert("WARNING (TopicRenderer.autocomplete):\n\nTopic " + dm3c.selected_object.id +
+            alert("WARNING (TopicRenderer.autocomplete):\n\nTopic " + dm4c.selected_object.id +
                 " has unexpected element id: \"" + this.id + "\".\n\nIt is expected to begin with \"field_\".")
             return
         }
@@ -184,7 +184,7 @@ function TopicRenderer() {
             if (searchterm) {
                 // --- trigger search for each fulltext index ---
                 for (var i = 0, index; index = field.autocomplete_indexes[i]; i++) {
-                    var result = dm3c.restc.search_topics(index, searchterm + "*")
+                    var result = dm4c.restc.search_topics(index, searchterm + "*")
                     //
                     if (result.rows.length && !autocomplete_items.length) {
                         show_autocomplete_list(this)
@@ -201,7 +201,7 @@ function TopicRenderer() {
                         // --- Add item to model ---
                         autocomplete_items.push(item)
                         // --- Add item to view ---
-                        var ac_item = dm3c.trigger_page_renderer_hook(dm3c.selected_object,
+                        var ac_item = dm4c.trigger_page_renderer_hook(dm4c.selected_object,
                             "render_autocomplete_item", item)
                         var a = $("<a>").attr({href: "", id: item_id++}).append(ac_item)
                         a.mousemove(item_hovered)
@@ -226,7 +226,7 @@ function TopicRenderer() {
         function searchterm(field, input_element) {
             if (field.autocomplete_style == "item list") {
                 var searchterm = current_term(input_element)
-                // dm3c.log("pos=" + searchterm[1] + "cpos=" + searchterm[2] + " searchterm=\"" + searchterm[0] + "\"")
+                // dm4c.log("pos=" + searchterm[1] + "cpos=" + searchterm[2] + " searchterm=\"" + searchterm[0] + "\"")
                 return $.trim(searchterm[0])
             } else {
                 // autocomplete_style "default"
@@ -236,7 +236,7 @@ function TopicRenderer() {
     }
 
     function handle_special_input(event) {
-        // dm3c.log("handle_special_input: event.which=" + event.which)
+        // dm4c.log("handle_special_input: event.which=" + event.which)
         if (event.which == 13) {            // return
             process_selection()
             return true
@@ -248,7 +248,7 @@ function TopicRenderer() {
             if (autocomplete_item == -2) {
                 autocomplete_item = autocomplete_items.length -1
             }
-            // dm3c.log("handle_special_input: cursor up, autocomplete_item=" + autocomplete_item)
+            // dm4c.log("handle_special_input: cursor up, autocomplete_item=" + autocomplete_item)
             activate_list_item()
             return true
         } else if (event.which == 40) {     // cursor down
@@ -256,7 +256,7 @@ function TopicRenderer() {
             if (autocomplete_item == autocomplete_items.length) {
                 autocomplete_item = -1
             }
-            // dm3c.log("handle_special_input: cursor down, autocomplete_item=" + autocomplete_item)
+            // dm4c.log("handle_special_input: cursor down, autocomplete_item=" + autocomplete_item)
             activate_list_item()
             return true
         }
@@ -266,7 +266,7 @@ function TopicRenderer() {
         if (autocomplete_item != -1) {
             var input_element = get_input_element()
             // trigger hook to get the item (string) to insert into the input element
-            var item = dm3c.trigger_page_renderer_hook(dm3c.selected_object, "process_autocomplete_selection",
+            var item = dm4c.trigger_page_renderer_hook(dm4c.selected_object, "process_autocomplete_selection",
                 autocomplete_items[autocomplete_item])
             //
             var field = get_field(input_element)
@@ -304,7 +304,7 @@ function TopicRenderer() {
 
     function get_field(input_element) {
         var field_uri = input_element.id.substr(6)            // 6 = "field_".length
-        var field = dm3c.type_cache.get_data_field(dm3c.type_cache.get(dm3c.selected_object.type_uri), field_uri)
+        var field = dm4c.type_cache.get_data_field(dm4c.type_cache.get(dm4c.selected_object.type_uri), field_uri)
         return field
     }
 
@@ -363,7 +363,7 @@ function TopicRenderer() {
 
 /**
  * @param   uri         The field URI. Unique within the page/form. The field URI is a path composed of association
- *                      definition URIs that leads to this field, e.g. "/dm3.contacts.address/dm3.contacts.street".
+ *                      definition URIs that leads to this field, e.g. "/dm4.contacts.address/dm4.contacts.street".
  *                      For a non-composite topic the field URI is an empty string.
  * @param   value       The value to be rendered.
  *                      May be null/undefined, in this case an empty string is rendered.
@@ -421,7 +421,7 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
         // create renderer
         renderer = js.new_object(js_field_renderer_class, topic, this)
         // render field label
-        dm3c.render.field_label(this)
+        dm4c.render.field_label(this)
         // render form element
         var field_value_div = $("<div>").addClass("field-value")
         var html = trigger_renderer_hook("render_form_element")
@@ -465,7 +465,7 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
 
     function get_view_config(setting) {
 
-        var val = assoc_def && dm3c.get_view_config(assoc_def, setting) || dm3c.get_view_config(topic_type, setting)
+        var val = assoc_def && dm4c.get_view_config(assoc_def, setting) || dm4c.get_view_config(topic_type, setting)
         return val != undefined ? val : get_default_value()
 
         function get_default_value() {
@@ -485,13 +485,13 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
 
         function get_default_renderer_class() {
             switch (topic_type.data_type_uri) {
-            case "dm3.core.text":
+            case "dm4.core.text":
                 return "TextFieldRenderer"
-            case "dm3.core.html":
+            case "dm4.core.html":
                 return "HTMLFieldRenderer"
-            case "dm3.core.number":
+            case "dm4.core.number":
                 return "NumberFieldRenderer"
-            case "dm3.core.boolean":
+            case "dm4.core.boolean":
                 return "TextFieldRenderer"  // TODO: boolean renderer (a checkbox)
             default:
                 alert("Field.get_view_config: data type \"" + topic_type.data_type_uri +

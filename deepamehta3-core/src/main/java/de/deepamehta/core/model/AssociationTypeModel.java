@@ -21,7 +21,7 @@ public class AssociationTypeModel extends TypeModel {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public AssociationTypeModel(String uri, String value, String dataTypeUri) {
-        super(uri, "dm3.core.assoc_type", new SimpleValue(value), dataTypeUri);
+        super(uri, "dm4.core.assoc_type", new SimpleValue(value), dataTypeUri);
     }
 
     public AssociationTypeModel(TopicModel model) {
@@ -29,7 +29,7 @@ public class AssociationTypeModel extends TypeModel {
     }
 
     public AssociationTypeModel(JSONObject assocTypeModel) {
-        super(assocTypeModel, "dm3.core.assoc_type");
+        super(assocTypeModel, "dm4.core.assoc_type");
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

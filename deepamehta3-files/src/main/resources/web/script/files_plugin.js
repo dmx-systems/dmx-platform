@@ -18,7 +18,7 @@ function files_plugin() {
             }
             // Note: if an error occurred "files" is not initialized
             if (files) {
-                dm3c.trigger_hook("process_files_drop", files)
+                dm4c.trigger_hook("process_files_drop", files)
             }
         } else if (js.contains(data_transfer.types, "text/plain")) {
             alert("WARNING: drag'n'drop operation is ignored.\n\nType: text/plain " +
@@ -37,7 +37,7 @@ function files_plugin() {
                     netscape.security.PrivilegeManager.enablePrivilege("UniversalFileRead")
                     var path = file.mozFullPath
                     if (is_directory(file)) {
-                        var dropped_dir = dm3c.restc.get_resource("file:" + path)
+                        var dropped_dir = dm4c.restc.get_resource("file:" + path)
                         files.add_directory(dropped_dir)
                         continue
                     }
@@ -56,7 +56,7 @@ function files_plugin() {
                     return false
                 }
                 // Otherwise we involve the server to get information about the item
-                var info = dm3c.restc.get_resource_info("file:" + file.mozFullPath)
+                var info = dm4c.restc.get_resource_info("file:" + file.mozFullPath)
                 return info.kind == "directory"
             }
         }
@@ -68,7 +68,7 @@ function files_plugin() {
             for (var i = 0, file; file = data_transfer.files[i]; i++) {
                 var path = uri_to_path(uri_list[i])
                 if (is_directory(path)) {
-                    var dropped_dir = dm3c.restc.get_resource("file:" + path)
+                    var dropped_dir = dm4c.restc.get_resource("file:" + path)
                     files.add_directory(dropped_dir)
                     continue
                 }
@@ -98,7 +98,7 @@ function files_plugin() {
     this.topic_doubleclicked = function(topic) {
         if (topic.type == "de/deepamehta/core/topictype/File" ||
             topic.type == "de/deepamehta/core/topictype/Folder") {
-            dm3c.restc.execute_command("deepamehta3-files.open-file", {topic_id: topic.id})
+            dm4c.restc.execute_command("deepamehta3-files.open-file", {topic_id: topic.id})
         }
     }
 
@@ -111,8 +111,8 @@ function files_plugin() {
      * @param   do_select   Optional: if evaluates to true the File topic is selected on the canvas.
      */
     this.create_file_topic = function(file, do_select) {
-        var file_topic = dm3c.restc.execute_command("deepamehta3-files.create-file-topic", {path: file.path})
-        dm3c.add_topic_to_canvas(file_topic, do_select ? "show" : "none")
+        var file_topic = dm4c.restc.execute_command("deepamehta3-files.create-file-topic", {path: file.path})
+        dm4c.add_topic_to_canvas(file_topic, do_select ? "show" : "none")
     }
 
     /**
@@ -122,8 +122,8 @@ function files_plugin() {
      * @param   do_select   Optional: if evaluates to true the Folder topic is selected on the canvas.
      */
     this.create_folder_topic = function(dir, do_select) {
-        var folder_topic = dm3c.restc.execute_command("deepamehta3-files.create-folder-topic", {path: dir.path})
-        dm3c.add_topic_to_canvas(folder_topic, do_select ? "show" : "none")
+        var folder_topic = dm4c.restc.execute_command("deepamehta3-files.create-folder-topic", {path: dir.path})
+        dm4c.add_topic_to_canvas(folder_topic, do_select ? "show" : "none")
     }
 
     /**
@@ -154,7 +154,7 @@ function files_plugin() {
         /**
          * @param   uri     Must not be URI-encoded!
          */
-        dm3c.restc.get_resource = function(uri, type, size) {
+        dm4c.restc.get_resource = function(uri, type, size) {
             var params = this.createRequestParameter({type: type, size: size})
             return this.request("GET", "/resource/" + encodeURIComponent(uri) + "?" + params.to_query_string())
         }
@@ -162,7 +162,7 @@ function files_plugin() {
         /**
          * @param   uri     Must not be URI-encoded!
          */
-        dm3c.restc.get_resource_info = function(uri) {
+        dm4c.restc.get_resource_info = function(uri) {
             return this.request("GET", "/resource/" + encodeURIComponent(uri) + "/info")
         }
     }

@@ -9,7 +9,7 @@ function TextFieldRenderer(topic, field, rel_topics) {
 
     this.render_field = function() {
         // field label
-        dm3c.render.field_label(field)
+        dm4c.render.field_label(field)
         // field value
         return js.render_text(field.value)
     }
@@ -23,9 +23,9 @@ function TextFieldRenderer(topic, field, rel_topics) {
             case undefined:
                 // Note: for non-composite topics the field's assoc_def is undefined.
                 // We treat this like a composition here.
-            case "dm3.core.composition_def":
+            case "dm4.core.composition_def":
                 return gui_element = render_input()
-            case "dm3.core.aggregation_def":
+            case "dm4.core.aggregation_def":
                 gui_element = render_combobox()
                 return gui_element.dom
             default:
@@ -50,9 +50,9 @@ function TextFieldRenderer(topic, field, rel_topics) {
     // ---
 
     function render_input() {
-        var input = dm3c.render.input(field)
+        var input = dm4c.render.input(field)
         if (field.autocomplete_indexes) {
-            var page_renderer = dm3c.get_page_renderer(topic)
+            var page_renderer = dm4c.get_page_renderer(topic)
             input.keyup(page_renderer.autocomplete)
             input.blur(page_renderer.lost_focus)
             input.attr({autocomplete: "off"})
@@ -67,13 +67,13 @@ function TextFieldRenderer(topic, field, rel_topics) {
     function render_combobox() {
 
         // retrieve all instances
-        var topics = dm3c.restc.get_topics(field.topic_type.uri, true)  // sort=true
+        var topics = dm4c.restc.get_topics(field.topic_type.uri, true)  // sort=true
         return create_combobox();
 
         function create_combobox() {
             //
-            // var menu = dm3c.ui.menu(field.uri)
-            var combobox = dm3c.ui.combobox(field.uri)
+            // var menu = dm4c.ui.menu(field.uri)
+            var combobox = dm4c.ui.combobox(field.uri)
             // add items
             for (var i in topics) {
                 combobox.add_item({label: topics[i].value, value: topics[i].id})

@@ -21,7 +21,7 @@ public class TopicTypeModel extends TypeModel {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public TopicTypeModel(String uri, String value, String dataTypeUri) {
-        this(uri, "dm3.core.topic_type", value, dataTypeUri);
+        this(uri, "dm4.core.topic_type", value, dataTypeUri);
     }
 
     public TopicTypeModel(String uri, String topicTypeUri, String value, String dataTypeUri) {
@@ -37,7 +37,7 @@ public class TopicTypeModel extends TypeModel {
     }
 
     public TopicTypeModel(JSONObject topicTypeModel) {
-        super(topicTypeModel, "dm3.core.topic_type");
+        super(topicTypeModel, "dm4.core.topic_type");
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

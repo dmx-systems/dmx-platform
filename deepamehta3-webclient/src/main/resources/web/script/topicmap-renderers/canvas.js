@@ -258,7 +258,7 @@ function Canvas() {
                 //
                 reset_highlight_style(is_highlight)
             } catch (e) {
-                dm3c.log("### ERROR at Canvas.draw_topics:\nicon.src=" + ct.icon.src + "\nicon.width=" + ct.icon.width +
+                dm4c.log("### ERROR at Canvas.draw_topics:\nicon.src=" + ct.icon.src + "\nicon.width=" + ct.icon.width +
                     "\nicon.height=" + ct.icon.height  + "\nicon.complete=" + ct.icon.complete
                     /* + "\n" + JSON.stringify(e) */)
             }
@@ -323,7 +323,7 @@ function Canvas() {
     // === Mouse Events ===
 
     function mousedown(event) {
-        if (dm3c.LOG_GUI) dm3c.log("Mouse down!")
+        if (dm4c.LOG_GUI) dm4c.log("Mouse down!")
         //
         if (event.which == 1) {
             tmp_x = cx(event)
@@ -367,7 +367,7 @@ function Canvas() {
     }
 
     function mouseleave(event) {
-        if (dm3c.LOG_GUI) dm3c.log("Mouse leave!")
+        if (dm4c.LOG_GUI) dm4c.log("Mouse leave!")
         //
         if (association_in_progress) {
             end_association_in_progress()
@@ -381,7 +381,7 @@ function Canvas() {
     }
 
     function mouseup(event) {
-        if (dm3c.LOG_GUI) dm3c.log("Mouse up!")
+        if (dm4c.LOG_GUI) dm4c.log("Mouse up!")
         //
         close_context_menu()
         //
@@ -390,7 +390,7 @@ function Canvas() {
             //
             var ct = find_topic(event)
             if (ct) {
-                dm3c.do_create_association("dm3.core.association", ct)
+                dm4c.do_create_association("dm4.core.association", ct)
             } else {
                 draw()
             }
@@ -401,9 +401,9 @@ function Canvas() {
         } else {
             var ct = find_topic(event)   // ### FIXME: use actionTopic instead of searching again?
             if (ct) {
-                dm3c.do_select_topic(ct.id)
+                dm4c.do_select_topic(ct.id)
             } else if (action_assoc) {
-                dm3c.do_select_association(action_assoc.id)
+                dm4c.do_select_association(action_assoc.id)
             }
         }
         end_interaction()
@@ -412,7 +412,7 @@ function Canvas() {
     function dblclick(event) {
         var ct = find_topic(event)
         if (ct) {
-            dm3c.trigger_plugin_hook("topic_doubleclicked", ct)
+            dm4c.trigger_plugin_hook("topic_doubleclicked", ct)
         }
     }
 
@@ -458,7 +458,7 @@ function Canvas() {
                 var g1 = dx1 / dy1
                 var g2 = dx2 / dy2
             }
-            // dm3c.log(g1 + " " + g2 + " -> " + Math.abs(g1 - g2))
+            // dm4c.log(g1 + " " + g2 + " -> " + Math.abs(g1 - g2))
             //
             if (Math.abs(g1 - g2) < ASSOC_CLICK_TOLERANCE) {
                 return ca
@@ -471,7 +471,7 @@ function Canvas() {
     function end_topic_move() {
         topic_move_in_progress = false
         // trigger hook
-        dm3c.trigger_plugin_hook("post_move_topic", action_topic)
+        dm4c.trigger_plugin_hook("post_move_topic", action_topic)
     }
 
     function end_canvas_move() {
@@ -493,23 +493,23 @@ function Canvas() {
     // === Context Menu Events ===
 
     function contextmenu(event) {
-        if (dm3c.LOG_GUI) dm3c.log("Contextmenu!")
+        if (dm4c.LOG_GUI) dm4c.log("Contextmenu!")
         //
         close_context_menu()
         //
         var ct, ca
         if (ct = find_topic(event)) {
-            dm3c.do_select_topic(ct.id)
-            // Note: only dm3c.selected_object has the auxiliary attributes (the canvas topic has not)
-            var commands = dm3c.get_topic_commands(dm3c.selected_object, "context-menu")
+            dm4c.do_select_topic(ct.id)
+            // Note: only dm4c.selected_object has the auxiliary attributes (the canvas topic has not)
+            var commands = dm4c.get_topic_commands(dm4c.selected_object, "context-menu")
         } else if (ca = find_association(event)) {
-            dm3c.do_select_association(ca.id)
-            // ### FIXME: use dm3c.selected assoc?
-            var commands = dm3c.get_association_commands(ca, "context-menu")
+            dm4c.do_select_association(ca.id)
+            // ### FIXME: use dm4c.selected assoc?
+            var commands = dm4c.get_association_commands(ca, "context-menu")
         } else {
             var x = cx(event, true)
             var y = cy(event, true)
-            var commands = dm3c.get_canvas_commands(x, y, "context-menu")
+            var commands = dm4c.get_canvas_commands(x, y, "context-menu")
         }
         //
         open_context_menu(commands, event)
@@ -543,7 +543,7 @@ function Canvas() {
         function context_menu_handler(handler) {
             return function(event) {
                 handler(event)
-                dm3c.canvas.close_context_menu()
+                dm4c.canvas.close_context_menu()
                 return false
             }
         }
@@ -566,7 +566,7 @@ function Canvas() {
 
     function drop(e) {
         // e.preventDefault();  // Useful for debugging when exception is thrown before false is returned.
-        dm3c.trigger_plugin_hook("process_drop", e.dataTransfer)
+        dm4c.trigger_plugin_hook("process_drop", e.dataTransfer)
         return false
     }
 
@@ -685,7 +685,7 @@ function Canvas() {
      * @param   size    the new canvas size.
      */
     function resize_canvas() {
-        if (dm3c.LOG_GUI) dm3c.log("Rebuilding canvas")
+        if (dm4c.LOG_GUI) dm4c.log("Rebuilding canvas")
         // Note: we don't empty the entire canvas-panel to keep the resizable-handle element.
         $("#canvas-panel #canvas").remove()
         $("#canvas-panel .canvas-topic-label").remove()
@@ -808,7 +808,7 @@ function Canvas() {
             ct.type_uri = topic.type_uri
             ct.label    = topic.value
             //
-            ct.icon = dm3c.get_type_icon(topic.type_uri)
+            ct.icon = dm4c.get_type_icon(topic.type_uri)
             var w = ct.icon.width
             var h = ct.icon.height
             ct.width = w
@@ -910,7 +910,7 @@ function Canvas() {
 
         function init(assoc) {
             ca.type_uri = assoc.type_uri
-            ca.color = dm3c.get_type_color(assoc.type_uri)
+            ca.color = dm4c.get_type_color(assoc.type_uri)
         }
     }
 

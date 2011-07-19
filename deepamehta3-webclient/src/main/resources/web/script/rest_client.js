@@ -201,7 +201,7 @@ function RESTClient(core_service_uri) {
         var responseData            // in case of successful request: the response data (response body)
         var exception               // in case of unsuccessful request: possibly an exception
         //
-        if (LOG_AJAX_REQUESTS) dm3c.log(method + " " + uri + "\n..... " + JSON.stringify(data))
+        if (LOG_AJAX_REQUESTS) dm4c.log(method + " " + uri + "\n..... " + JSON.stringify(data))
         //
         content_type = content_type || "application/json"       // set default
         if (content_type == "application/json") {
@@ -216,12 +216,12 @@ function RESTClient(core_service_uri) {
             processData: false,
             async: false,
             success: function(data, textStatus, xhr) {
-                if (LOG_AJAX_REQUESTS) dm3c.log("..... " + xhr.status + " " + xhr.statusText +
+                if (LOG_AJAX_REQUESTS) dm4c.log("..... " + xhr.status + " " + xhr.statusText +
                     "\n..... " + JSON.stringify(data))
                 responseData = data
             },
             error: function(xhr, textStatus, ex) {
-                if (LOG_AJAX_REQUESTS) dm3c.log("..... " + xhr.status + " " + xhr.statusText +
+                if (LOG_AJAX_REQUESTS) dm4c.log("..... " + xhr.status + " " + xhr.statusText +
                     "\n..... exception: " + JSON.stringify(ex))
                 exception = ex
             },

@@ -76,9 +76,9 @@ function TopicmapRenderer() {
         self.canvas_width = w_w - detail_panel_width - 50   // 35px = 1.2em + 2 * 8px = 19(.2)px + 16px.
                                             // Update: Safari 4 needs 15 extra pixel (for potential vertical scrollbar?)
         self.canvas_height = w_h - t_h - 76 // was 60, then 67 (healing login dialog), then 76 (healing datepicker)
-        if (dm3c.LOG_GUI) {
-            dm3c.log("Calculating canvas size: window size=" + w_w + "x" + w_h + " toolbar height=" + t_h)
-            dm3c.log("..... resulting canvas size=" + self.canvas_width + "x" + self.canvas_height)
+        if (dm4c.LOG_GUI) {
+            dm4c.log("Calculating canvas size: window size=" + w_w + "x" + w_h + " toolbar height=" + t_h)
+            dm4c.log("..... resulting canvas size=" + self.canvas_width + "x" + self.canvas_height)
         }
     }
 
@@ -93,7 +93,7 @@ function TopicmapRenderer() {
      * Triggered when the user resizes the canvas (by moving the split pane's resizable-handle).
      */
     function resize(event, ui_event) {
-        if (dm3c.LOG_GUI) dm3c.log("Canvas resized: original with=" + ui_event.originalSize.width +
+        if (dm4c.LOG_GUI) dm4c.log("Canvas resized: original with=" + ui_event.originalSize.width +
                                                    " current with=" + ui_event.size.width)
         // resize canvas
         self.canvas_width = ui_event.size.width

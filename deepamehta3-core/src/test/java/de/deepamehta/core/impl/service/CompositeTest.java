@@ -18,22 +18,22 @@ public class CompositeTest {
     @Test
     public void composite() {
         CompositeValue person = new CompositeValue("{" +
-            "\"dm3.core.name\": \"Karl Blum\"," +
-            "\"dm3.contacts.home_address\": {" +
-                "\"dm3.contacts.postal_code\": 13206," +
-                "\"dm3.contacts.city\": \"Berlin\"" +
+            "\"dm4.core.name\": \"Karl Blum\"," +
+            "\"dm4.contacts.home_address\": {" +
+                "\"dm4.contacts.postal_code\": 13206," +
+                "\"dm4.contacts.city\": \"Berlin\"" +
             "}," +
-            "\"dm3.contacts.office_address\": {" +
-                "\"dm3.contacts.postal_code\": 14345," +
-                "\"dm3.contacts.city\": \"Berlin\"" +
+            "\"dm4.contacts.office_address\": {" +
+                "\"dm4.contacts.postal_code\": 14345," +
+                "\"dm4.contacts.city\": \"Berlin\"" +
             "}" +
         "}");
-        assertEquals("Karl Blum", person.get("dm3.core.name"));
+        assertEquals("Karl Blum", person.get("dm4.core.name"));
         //
-        CompositeValue address = (CompositeValue) person.get("dm3.contacts.home_address");
-        assertEquals("Berlin", address.get("dm3.contacts.city"));
+        CompositeValue address = (CompositeValue) person.get("dm4.contacts.home_address");
+        assertEquals("Berlin", address.get("dm4.contacts.city"));
         //
-        Object code = address.get("dm3.contacts.postal_code");
+        Object code = address.get("dm4.contacts.postal_code");
         assertSame(Integer.class, code.getClass());
         assertEquals(13206, code);  // autoboxing
     }

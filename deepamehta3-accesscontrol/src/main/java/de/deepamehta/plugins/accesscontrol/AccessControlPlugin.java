@@ -187,7 +187,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         if (clientContext == null) {    // some callers to dms.getTopic() doesn't pass a client context
             return null;
         }
-        String username = clientContext.get("dm3_username");
+        String username = clientContext.get("dm4_username");
         if (username == null) {
             return null;
         }

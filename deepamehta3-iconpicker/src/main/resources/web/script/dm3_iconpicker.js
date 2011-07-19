@@ -1,6 +1,6 @@
-function dm3_iconpicker() {
+function dm4_iconpicker() {
 
-    dm3c.register_field_renderer("/de.deepamehta.3-iconpicker/script/icon_field_renderer.js")
+    dm4c.register_field_renderer("/de.deepamehta.3-iconpicker/script/icon_field_renderer.js")
 
     var plugin = this
 
@@ -34,7 +34,7 @@ function dm3_iconpicker() {
 
     this.open_icon_dialog = function() {
         // query icon topics
-        var icon_topics = dm3c.restc.get_topics("de/deepamehta/core/topictype/Icon")
+        var icon_topics = dm4c.restc.get_topics("de/deepamehta/core/topictype/Icon")
         // fill dialog with icons
         $("#icon_dialog").empty()
         for (var i = 0, icon_topic; icon_topic = icon_topics[i]; i++) {

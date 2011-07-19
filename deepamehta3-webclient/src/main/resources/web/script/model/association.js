@@ -8,30 +8,30 @@ function Association(assoc) {
     // === "Page Displayable" implementation ===
 
     this.get_type = function() {
-        return dm3c.type_cache.get_association_type(this.type_uri)
+        return dm4c.type_cache.get_association_type(this.type_uri)
     }
 
     this.get_commands = function(context) {
-        return dm3c.get_association_commands(this, context)
+        return dm4c.get_association_commands(this, context)
     }
 
     // === Public API ===
 
     this.get_topic_1 = function() {
-        return dm3c.fetch_topic(this.role_1.topic_id)
+        return dm4c.fetch_topic(this.role_1.topic_id)
     }
 
     this.get_topic_2 = function() {
-        return dm3c.fetch_topic(this.role_2.topic_id)
+        return dm4c.fetch_topic(this.role_2.topic_id)
     }
 
     // ---
 
     this.get_role_type_1 = function() {
-        return dm3c.restc.get_topic_by_value("uri", this.role_1.role_type_uri)
+        return dm4c.restc.get_topic_by_value("uri", this.role_1.role_type_uri)
     }
 
     this.get_role_type_2 = function() {
-        return dm3c.restc.get_topic_by_value("uri", this.role_2.role_type_uri)
+        return dm4c.restc.get_topic_by_value("uri", this.role_2.role_type_uri)
     }
 }

@@ -48,8 +48,8 @@ public class AssociationDefinitionModel extends AssociationModel {
         this.wholeTopicTypeUri = wholeTopicTypeUri;
         this.partTopicTypeUri = partTopicTypeUri;
         // set default role types
-        this.wholeRoleTypeUri = "dm3.core.whole";// ### wholeRoleTypeUri != null ? wholeRoleTypeUri : wholeTopicTypeUri;
-        this.partRoleTypeUri = "dm3.core.part";  // ### partRoleTypeUri != null ? partRoleTypeUri : partTopicTypeUri;
+        this.wholeRoleTypeUri = "dm4.core.whole";// ### wholeRoleTypeUri != null ? wholeRoleTypeUri : wholeTopicTypeUri;
+        this.partRoleTypeUri = "dm4.core.part";  // ### partRoleTypeUri != null ? partRoleTypeUri : partTopicTypeUri;
         // derive uri
         this.uri = partTopicTypeUri;             // ### partRoleTypeUri;
         //
@@ -66,15 +66,15 @@ public class AssociationDefinitionModel extends AssociationModel {
             this.wholeTopicTypeUri = wholeTopicTypeUri;
             this.partTopicTypeUri = assocDef.getString("part_topic_type_uri");
             //
-            this.wholeRoleTypeUri = "dm3.core.whole";// ## assocDef.optString("whole_role_type_uri", wholeTopicTypeUri);
-            this.partRoleTypeUri = "dm3.core.part";  // ## assocDef.optString("part_role_type_uri", partTopicTypeUri);
+            this.wholeRoleTypeUri = "dm4.core.whole";// ## assocDef.optString("whole_role_type_uri", wholeTopicTypeUri);
+            this.partRoleTypeUri = "dm4.core.part";  // ## assocDef.optString("part_role_type_uri", partTopicTypeUri);
             //
             this.uri = partTopicTypeUri;             // ### partRoleTypeUri;
             //
-            if (!assocDef.has("whole_cardinality_uri") && !typeUri.equals("dm3.core.composition_def")) {
+            if (!assocDef.has("whole_cardinality_uri") && !typeUri.equals("dm4.core.composition_def")) {
                 throw new RuntimeException("\"whole_cardinality_uri\" is missing");
             }
-            this.wholeCardinalityUri = assocDef.optString("whole_cardinality_uri", "dm3.core.one");
+            this.wholeCardinalityUri = assocDef.optString("whole_cardinality_uri", "dm4.core.one");
             this.partCardinalityUri = assocDef.getString("part_cardinality_uri");
             //
             this.viewConfigModel = new ViewConfigurationModel(assocDef);
@@ -186,15 +186,15 @@ public class AssociationDefinitionModel extends AssociationModel {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void initAssociationModel() {
-        setRoleModel1(new TopicRoleModel(wholeTopicTypeUri, "dm3.core.whole_type"));
-        setRoleModel2(new TopicRoleModel(partTopicTypeUri,  "dm3.core.part_type"));
+        setRoleModel1(new TopicRoleModel(wholeTopicTypeUri, "dm4.core.whole_type"));
+        setRoleModel2(new TopicRoleModel(partTopicTypeUri,  "dm4.core.part_type"));
     }
 
     private void initInstanceLevelAssocTypeUri() {
-        if (typeUri.equals("dm3.core.aggregation_def")) {
-            this.instanceLevelAssocTypeUri = "dm3.core.aggregation";
-        } else if (typeUri.equals("dm3.core.composition_def")) {
-            this.instanceLevelAssocTypeUri = "dm3.core.composition";
+        if (typeUri.equals("dm4.core.aggregation_def")) {
+            this.instanceLevelAssocTypeUri = "dm4.core.aggregation";
+        } else if (typeUri.equals("dm4.core.composition_def")) {
+            this.instanceLevelAssocTypeUri = "dm4.core.composition";
         } else {
             throw new RuntimeException("Unexpected association type URI: \"" + typeUri + "\"");
         }
