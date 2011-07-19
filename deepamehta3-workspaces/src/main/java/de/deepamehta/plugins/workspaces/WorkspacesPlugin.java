@@ -42,7 +42,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
 
     // **************************************************
-    // *** Core Hooks (called from DeepaMehta 3 Core) ***
+    // *** Core Hooks (called from DeepaMehta 4 Core) ***
     // **************************************************
 
 

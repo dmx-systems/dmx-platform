@@ -49,14 +49,14 @@ public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext context) {
         try {
-            logger.info("========== Starting bundle \"DeepaMehta 3 Core\" ==========");
+            logger.info("========== Starting bundle \"DeepaMehta 4 Core\" ==========");
             dms = new EmbeddedService(new MGStorageBridge(openDB()), context);
             dms.setupDB();
             //
-            logger.info("Registering DeepaMehta 3 core service at OSGi framework");
+            logger.info("Registering DeepaMehta 4 core service at OSGi framework");
             context.registerService(DeepaMehtaService.class.getName(), dms, null);
         } catch (Exception e) {
-            logger.severe("Activation of DeepaMehta 3 Core failed:");
+            logger.severe("Activation of DeepaMehta 4 Core failed:");
             e.printStackTrace();
             // Note: an exception thrown from here is swallowed by the container without reporting
             // and let File Install retry to start the bundle endlessly.
@@ -65,7 +65,7 @@ public class Activator implements BundleActivator {
 
     @Override
     public void stop(BundleContext context) {
-        logger.info("========== Stopping DeepaMehta 3 Core ==========");
+        logger.info("========== Stopping DeepaMehta 4 Core ==========");
         if (dms != null) {
             dms.shutdown();
         }
@@ -82,7 +82,7 @@ public class Activator implements BundleActivator {
     public static DeepaMehtaService getService() {
         // DeepaMehtaService dms = (DeepaMehtaService) deepamehtaServiceTracker.getService();
         if (dms == null) {
-            throw new RuntimeException("DeepaMehta 3 core service is not yet available");
+            throw new RuntimeException("DeepaMehta 4 core service is not yet available");
         }
         return dms;
     }

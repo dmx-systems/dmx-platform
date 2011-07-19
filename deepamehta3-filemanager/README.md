@@ -1,17 +1,17 @@
 
-DeepaMehta 3 File Manager
+DeepaMehta 4 File Manager
 =========================
 
-This DeepaMehta 3 plugin provides a drag'n'drop feature for files. The user can drag files and folders from the OS's file manager and drop them right into the DeepaMehta browser window. The DeepaMehta 3 File Manager plugin builds on services provided by the [DeepaMehta 3 Files](http://github.com/jri/deepamehta3-files) plugin.
+This DeepaMehta 4 plugin provides a drag'n'drop feature for files. The user can drag files and folders from the OS's file manager and drop them right into the DeepaMehta browser window. The DeepaMehta 4 File Manager plugin builds on services provided by the [DeepaMehta 4 Files](http://github.com/jri/deepamehta3-files) plugin.
 
-DeepaMehta 3 is a platform for collaboration and knowledge management.  
+DeepaMehta 4 is a platform for collaboration and knowledge management.  
 <http://github.com/jri/deepamehta3>
 
 
 Installing
 ----------
 
-The DeepaMehta 3 File Manager plugin is typically installed while the DeepaMehta 3 standard installation.  
+The DeepaMehta 4 File Manager plugin is typically installed while the DeepaMehta 4 standard installation.  
 <http://github.com/jri/deepamehta3>
 
 

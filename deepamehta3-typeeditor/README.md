@@ -1,23 +1,23 @@
 
-DeepaMehta 3 Type Editor
+DeepaMehta 4 Type Editor
 ========================
 
-This DeepaMehta 3 plugin allows interactive creation and modification of topic types. You can e.g. create a topic type "Book" along with its data fields "Title", "Author", "Abstract", and "Publication Date". Once the topic type "Book" is created you can create books and search for books.
+This DeepaMehta 4 plugin allows interactive creation and modification of topic types. You can e.g. create a topic type "Book" along with its data fields "Title", "Author", "Abstract", and "Publication Date". Once the topic type "Book" is created you can create books and search for books.
 
 Data fields carry data of different types. There are 5 types: *Text*, *Number*, *Date* (backed by a date picker widget), *Styled Text* (backed by a WYSIWYG editor), and *Reference*. The latter is special: a reference data field carries a reference to one or more other topics (of a certain type). The data field "Author" e.g. could carry a reference to a *Person* topic.
 
-The DeepaMehta 3 Type Editor plugin allows modification of existing topic types as well, like e.g. the topic types *Note*, *Person*, and *Institution* as provided by the DeepaMehta 3 standard installation.
+The DeepaMehta 4 Type Editor plugin allows modification of existing topic types as well, like e.g. the topic types *Note*, *Person*, and *Institution* as provided by the DeepaMehta 4 standard installation.
 
-The DeepaMehta 3 Type Editor plugin works in conjunction with 2 other plugins: 1) The [DeepaMehta 3 Icon Picker](http://github.com/jri/deepamehta3-iconpicker) plugin lets you attatch an icon to a topic type, and 2) The [DeepaMehta 3 Type Search](http://github.com/jri/deepamehta3-typesearch) plugin to perform a type-based search. Both plugins are part of the DeepaMehta 3 standard installation.
+The DeepaMehta 4 Type Editor plugin works in conjunction with 2 other plugins: 1) The [DeepaMehta 4 Icon Picker](http://github.com/jri/deepamehta3-iconpicker) plugin lets you attatch an icon to a topic type, and 2) The [DeepaMehta 4 Type Search](http://github.com/jri/deepamehta3-typesearch) plugin to perform a type-based search. Both plugins are part of the DeepaMehta 4 standard installation.
 
-DeepaMehta 3 is a platform for collaboration and knowledge management.  
+DeepaMehta 4 is a platform for collaboration and knowledge management.  
 <http://github.com/jri/deepamehta3>
 
 
 Installing
 ----------
 
-The DeepaMehta 3 Type Editor plugin is typically installed while the DeepaMehta 3 standard installation.  
+The DeepaMehta 4 Type Editor plugin is typically installed while the DeepaMehta 4 standard installation.  
 <http://github.com/jri/deepamehta3>
 
 

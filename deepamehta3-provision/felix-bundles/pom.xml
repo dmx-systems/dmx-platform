@@ -15,7 +15,7 @@
         <version>0.5-SNAPSHOT</version>
     </parent>
 
-    <!-- All Apache Felix bundles that belong to the DeepaMehta 3 standard distribution.
+    <!-- All Apache Felix bundles that belong to the DeepaMehta 4 standard distribution.
 
         These dependencies are deployed as bundles in Felix when
             - running pax:run from the deepamehta3-provision directory

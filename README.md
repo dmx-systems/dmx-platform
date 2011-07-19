@@ -1,14 +1,14 @@
 
-DeepaMehta 3
+DeepaMehta 4
 ============
 
-DeepaMehta 3 is a platform for collaboration and knowledge management.
+DeepaMehta 4 is a platform for collaboration and knowledge management.
 
-Technically DeepaMehta 3 is made of  
+Technically DeepaMehta 4 is made of  
 Java, Neo4j, Apache Lucene, Apache Felix, Jetty, Jersey (server-side),  
 Javascript/AJAX, jQuery, jQuery-UI, HTML5 Canvas, and TinyMCE (client-side).
 
-DeepaMehta 3 is a rewrite of DeepaMehta 2.
+DeepaMehta 4 is a rewrite of DeepaMehta 2.
 
 Project website:  
 <http://www.deepamehta.de/>

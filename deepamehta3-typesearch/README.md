@@ -1,17 +1,17 @@
 
-DeepaMehta 3 Type Search
+DeepaMehta 4 Type Search
 ========================
 
-This plugin adds a *By Type* search mode to DeepaMehta 3.
+This plugin adds a *By Type* search mode to DeepaMehta 4.
 
-DeepaMehta 3 is a platform for collaboration and knowledge management.  
+DeepaMehta 4 is a platform for collaboration and knowledge management.  
 <http://github.com/jri/deepamehta3>
 
 
 Installing
 ----------
 
-The DeepaMehta 3 Type Search plugin is typically installed while the DeepaMehta 3 standard installation.  
+The DeepaMehta 4 Type Search plugin is typically installed while the DeepaMehta 4 standard installation.  
 See link above.
 
 

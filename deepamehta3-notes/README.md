@@ -1,17 +1,17 @@
 
-DeepaMehta 3 Notes
+DeepaMehta 4 Notes
 ==================
 
-This plugin adds the topic type *Note* to DeepaMehta 3 -- so you can use DeepaMehta as a note taker.
+This plugin adds the topic type *Note* to DeepaMehta 4 -- so you can use DeepaMehta as a note taker.
 
-DeepaMehta 3 is a platform for collaboration and knowledge management.  
+DeepaMehta 4 is a platform for collaboration and knowledge management.  
 <http://github.com/jri/deepamehta3>
 
 
 Installing
 ----------
 
-The DeepaMehta 3 Notes plugin is typically installed while the DeepaMehta 3 standard installation.  
+The DeepaMehta 4 Notes plugin is typically installed while the DeepaMehta 4 standard installation.  
 See link above.
 
 

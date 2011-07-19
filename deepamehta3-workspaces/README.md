@@ -1,20 +1,20 @@
 
-DeepaMehta 3 Workspaces
+DeepaMehta 4 Workspaces
 =======================
 
-The Workspaces Plugin allows you to divide the DeepaMehta 3 knowledge base into thematic subsets.
+The Workspaces Plugin allows you to divide the DeepaMehta 4 knowledge base into thematic subsets.
 Every topic and every relation is assigned to one or more (or no) workspaces.
 By switching between workspaces you can instantly reveal subsets of your knowledge base.
 For every topic DeepaMehta tells you the workspace(s) it belongs to.
 
-DeepaMehta 3 is a platform for collaboration and knowledge management.  
+DeepaMehta 4 is a platform for collaboration and knowledge management.  
 <http://github.com/jri/deepamehta3>
 
 
 Installing
 ----------
 
-The DeepaMehta 3 Workspaces plugin is typically installed while the DeepaMehta 3 standard installation.  
+The DeepaMehta 4 Workspaces plugin is typically installed while the DeepaMehta 4 standard installation.  
 See link above.
 
 

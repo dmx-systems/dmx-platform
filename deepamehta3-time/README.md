@@ -1,17 +1,17 @@
 
-DeepaMehta 3 Time
+DeepaMehta 4 Time
 =================
 
-This DeepaMehta 3 plugin attaches topics by timestamps and provides a *By Time* search mode.
+This DeepaMehta 4 plugin attaches topics by timestamps and provides a *By Time* search mode.
 
-DeepaMehta 3 is a platform for collaboration and knowledge management.  
+DeepaMehta 4 is a platform for collaboration and knowledge management.  
 <http://github.com/jri/deepamehta3>
 
 
 Installing
 ----------
 
-The DeepaMehta 3 Time plugin is typically installed while the DeepaMehta 3 standard installation.  
+The DeepaMehta 4 Time plugin is typically installed while the DeepaMehta 4 standard installation.  
 See link above.
 
 

@@ -15,7 +15,7 @@
         <version>0.5-SNAPSHOT</version>
     </parent>
 
-    <!-- All 3rd party bundles that belong to the DeepaMehta 3 standard distribution. -->
+    <!-- All 3rd party bundles that belong to the DeepaMehta 4 standard distribution. -->
     <dependencies>
 
         <!-- JAX-RS -->

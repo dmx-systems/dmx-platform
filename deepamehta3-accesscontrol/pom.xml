@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 3 Access Control</name>
+    <name>DeepaMehta 4 Access Control</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-accesscontrol</artifactId>
     <version>0.4.2</version>

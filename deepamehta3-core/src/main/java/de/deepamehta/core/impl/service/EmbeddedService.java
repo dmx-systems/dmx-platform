@@ -716,7 +716,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public void setupDB() {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            logger.info("----- Initializing DeepaMehta 3 Core -----");
+            logger.info("----- Initializing DeepaMehta 4 Core -----");
             boolean isCleanInstall = initDB();
             if (isCleanInstall) {
                 setupBootstrapContent();
@@ -724,7 +724,7 @@ public class EmbeddedService implements DeepaMehtaService {
             runCoreMigrations(isCleanInstall);
             tx.success();
             tx.finish();
-            logger.info("----- Completing initialization of DeepaMehta 3 Core -----");
+            logger.info("----- Completing initialization of DeepaMehta 4 Core -----");
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             tx.finish();

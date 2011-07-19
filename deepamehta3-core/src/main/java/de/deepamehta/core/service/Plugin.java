@@ -289,9 +289,9 @@ public class Plugin implements BundleActivator, EventHandler {
      * <p>
      * Examples of plugins which use this hook:
      * <ul>
-     *  <li>The "DeepaMehta 3 Workspaces" plugin adds a "Workspaces" field to all types.
-     *  <li>The "DeepaMehta 3 Time" plugin adds timestamp fields to all types.
-     *  <li>The "DeepaMehta 3 Access Control" plugin adds a "Creator" field to all types and relates them to a user.
+     *  <li>The "DeepaMehta 4 Workspaces" plugin adds a "Workspaces" field to all types.
+     *  <li>The "DeepaMehta 4 Time" plugin adds timestamp fields to all types.
+     *  <li>The "DeepaMehta 4 Access Control" plugin adds a "Creator" field to all types and relates them to a user.
      * </ul>
      *
      * @param   topicType   the type to be modified. The passed object is actually an instance of a {@link TopicType}
@@ -332,7 +332,7 @@ public class Plugin implements BundleActivator, EventHandler {
             public Object addingService(ServiceReference serviceRef) {
                 Object service = super.addingService(serviceRef);
                 if (service instanceof DeepaMehtaService) {
-                    logger.info("Adding DeepaMehta 3 core service to plugin \"" + pluginName + "\"");
+                    logger.info("Adding DeepaMehta 4 core service to plugin \"" + pluginName + "\"");
                     dms = (DeepaMehtaService) service;
                     checkServiceAvailability();
                 } else if (service instanceof HttpService) {
@@ -355,7 +355,7 @@ public class Plugin implements BundleActivator, EventHandler {
             @Override
             public void removedService(ServiceReference ref, Object service) {
                 if (service == dms) {
-                    logger.info("Removing DeepaMehta 3 core service from plugin \"" + pluginName + "\"");
+                    logger.info("Removing DeepaMehta 4 core service from plugin \"" + pluginName + "\"");
                     unregisterPlugin();
                     dms = null;
                 } else if (service == httpService) {
@@ -467,12 +467,12 @@ public class Plugin implements BundleActivator, EventHandler {
      * core service control flow, that is the plugin's hooks are triggered.
      */
     private void registerPlugin() {
-        logger.info("Registering " + this + " at DeepaMehta 3 core service");
+        logger.info("Registering " + this + " at DeepaMehta 4 core service");
         dms.registerPlugin(this);
     }
 
     private void unregisterPlugin() {
-        logger.info("Unregistering " + this + " at DeepaMehta 3 core service");
+        logger.info("Unregistering " + this + " at DeepaMehta 4 core service");
         dms.unregisterPlugin(pluginId);
     }
 

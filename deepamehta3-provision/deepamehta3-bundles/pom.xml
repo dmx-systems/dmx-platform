@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 3 Bundles</name>
+    <name>DeepaMehta 4 Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-bundles</artifactId>
     <version>0.5-SNAPSHOT</version>
@@ -15,7 +15,7 @@
         <version>0.5-SNAPSHOT</version>
     </parent>
 
-    <!-- All DeepaMehta bundles that belong to the DeepaMehta 3 standard distribution. -->
+    <!-- All DeepaMehta bundles that belong to the DeepaMehta 4 standard distribution. -->
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>

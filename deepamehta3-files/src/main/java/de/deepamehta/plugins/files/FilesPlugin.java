@@ -49,7 +49,7 @@ public class FilesPlugin extends Plugin implements FilesService {
 
 
     // **************************************************
-    // *** Core Hooks (called from DeepaMehta 3 Core) ***
+    // *** Core Hooks (called from DeepaMehta 4 Core) ***
     // **************************************************
 
 

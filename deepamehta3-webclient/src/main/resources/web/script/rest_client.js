@@ -167,7 +167,7 @@ function RESTClient(core_service_uri) {
      *
      * This utility method is called by plugins who register additional REST resources at an individual
      * namespace (server-side) and add corresponding service calls to the REST client instance.
-     * For example, see the DeepaMehta 3 Topicmaps plugin.
+     * For example, see the DeepaMehta 4 Topicmaps plugin.
      */
     this.request = function(method, uri, data, content_type) {
         return request(method, uri, data, content_type, true)

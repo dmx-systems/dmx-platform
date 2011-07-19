@@ -1,17 +1,17 @@
 
-DeepaMehta 3 Topicmaps
+DeepaMehta 4 Topicmaps
 ======================
 
-This plugin provides persistent topicmaps in DeepaMehta 3. A topicmap is an arrangement of topics and relations (as displayed on the canvas, left hand side). A user can create any number of topicmaps and switch between them instantly. Topicmaps can be shared with other users.
+This plugin provides persistent topicmaps in DeepaMehta 4. A topicmap is an arrangement of topics and relations (as displayed on the canvas, left hand side). A user can create any number of topicmaps and switch between them instantly. Topicmaps can be shared with other users.
 
-DeepaMehta 3 is a platform for collaboration and knowledge management.  
+DeepaMehta 4 is a platform for collaboration and knowledge management.  
 <http://github.com/jri/deepamehta3>
 
 
 Installing
 ----------
 
-The DeepaMehta 3 Topicmaps plugin is typically installed while the DeepaMehta 3 standard installation.  
+The DeepaMehta 4 Topicmaps plugin is typically installed while the DeepaMehta 4 standard installation.  
 See link above.
 
 
@@ -34,7 +34,7 @@ Usage
 * Get a list of all the topics of a certain topicmap by revealing it (see note below).
   The topics are listed in the detail panel's *Relations* section.
 
-For the moment the Topicmap menu lists _all_ topicmaps regardless of ownership or selected workspace. Future versions of the DeepaMehta 3 Topicmaps plugin will list only the topicmaps belonging to the selected workspace resp. the logged in user.
+For the moment the Topicmap menu lists _all_ topicmaps regardless of ownership or selected workspace. Future versions of the DeepaMehta 4 Topicmaps plugin will list only the topicmaps belonging to the selected workspace resp. the logged in user.
 
 **Note:** A topicmap can not be revealed inside the topicmap itself. To reveal a certain topicmap go to another topicmap (or create another one) before.
 

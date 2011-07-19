@@ -1,17 +1,17 @@
 
-DeepaMehta 3 Projects
+DeepaMehta 4 Projects
 =====================
 
-The aim of this plugin is to provide project management capabilities in DeepaMehta 3. For the moment just a *To Do* topic type is provided. More to come.
+The aim of this plugin is to provide project management capabilities in DeepaMehta 4. For the moment just a *To Do* topic type is provided. More to come.
 
-DeepaMehta 3 is a platform for collaboration and knowledge management.  
+DeepaMehta 4 is a platform for collaboration and knowledge management.  
 <http://github.com/jri/deepamehta3>
 
 
 Installing
 ----------
 
-The DeepaMehta 3 Projects plugin is typically installed while the DeepaMehta 3 standard installation.  
+The DeepaMehta 4 Projects plugin is typically installed while the DeepaMehta 4 standard installation.  
 See link above.
 
 

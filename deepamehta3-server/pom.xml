@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 3 Server</name>
+    <name>DeepaMehta 4 Server</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta3-server</artifactId>
     <version>0.5-SNAPSHOT</version>
