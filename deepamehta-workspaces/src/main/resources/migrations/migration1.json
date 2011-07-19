@@ -37,5 +37,27 @@
                 }
             ]
         }
+    ],
+
+    assoc_types: [
+        {
+            value:         "Workspace Context",
+            uri:           "dm4.workspaces.workspace_context",
+            data_type_uri: "dm4.core.text"
+        }
+    ],
+
+    topics: [
+        ### Role Types ###
+        {
+            value:    "Workspace Topic",
+            uri:      "dm4.workspaces.workspace_topic",
+            type_uri: "dm4.core.role_type"
+        },
+        {
+            value:    "Workspace Type",
+            uri:      "dm4.workspaces.workspace_type",
+            type_uri: "dm4.core.role_type"
+        }
     ]
 }
