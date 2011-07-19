@@ -38,7 +38,7 @@
                 <felix.fileinstall.dir>
                     <![CDATA[
                         ${project.basedir}/deepamehta-core/target,
-                        ${project.basedir}/deepamehta-server/target,
+                        ${project.basedir}/deepamehta-webservice/target,
                         ${project.basedir}/deepamehta-webclient/target,
                         ${project.basedir}/deepamehta-webbrowser/target,
                         ${project.basedir}/deepamehta-notes/target,
@@ -100,7 +100,7 @@
             <id>all</id>
             <modules>
                 <module>deepamehta-core</module>
-                <module>deepamehta-server</module>
+                <module>deepamehta-webservice</module>
                 <module>deepamehta-webclient</module>
                 <module>deepamehta-webbrowser</module>
                 <module>deepamehta-notes</module>

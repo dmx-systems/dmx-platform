@@ -5,7 +5,7 @@
 
     <name>DeepaMehta 4 Server</name>
     <groupId>de.deepamehta</groupId>
-    <artifactId>deepamehta-server</artifactId>
+    <artifactId>deepamehta-webservice</artifactId>
     <version>0.5-SNAPSHOT</version>
     <packaging>bundle</packaging>
 

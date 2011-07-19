@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-server</artifactId>
+            <artifactId>deepamehta-webservice</artifactId>
             <version>0.4.4</version>
         </dependency>
         <dependency>

@@ -538,7 +538,7 @@ public class Plugin implements BundleActivator, EventHandler {
      * These comprise:
      * 1) The plugin's "resource" package.
      * 2) The plugin's "provider" package.
-     * 3) The deepamehta-server's "provider" package.
+     * 3) The deepamehta-webservice's "provider" package.
      *    This contains providers for DeepaMehta's core model classes, e.g. "Topic".
      */
     private String packagesToScan() {
@@ -548,7 +548,7 @@ public class Plugin implements BundleActivator, EventHandler {
         if (!pluginProviderPackage.equals(STANDARD_PROVIDER_PACKAGE)) {
             packages.append(pluginProviderPackage + ";");
         }
-        // The standard provider classes of the deepamehta-server module are available to every plugin
+        // The standard provider classes of the deepamehta-webservice module are available to every plugin
         packages.append(STANDARD_PROVIDER_PACKAGE);
         //
         return packages.toString();
