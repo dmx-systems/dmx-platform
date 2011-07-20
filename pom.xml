@@ -77,6 +77,10 @@
                                 deepamehta-provision/felix-bundles/pom.xml,
                                 deepamehta-provision/3rd-party-bundles/pom.xml
                             </deployPoms>
+                            <provision>
+                                <param>--autoWrap</param>
+                                <param>mvn:org.apache.lucene/lucene-core/3.1.0</param>
+                            </provision>
                         </configuration>
                     </plugin>
                     <!-- Deletes OSGi container configuration as created by Pax Runner -->

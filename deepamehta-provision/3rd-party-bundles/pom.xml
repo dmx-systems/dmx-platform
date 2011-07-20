@@ -54,22 +54,21 @@
             -->
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-kernel</artifactId>
-            <version>1.2-1.2</version>
-            <!--version>1.3.M04</version-->
+            <!--version>1.2-1.2</version-->
+            <version>1.4</version>
         </dependency>
-        <!-- FIXME: new index API doesn't work with OSGi
+        <!-- FIXME: new index API doesn't work with OSGi -->
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-lucene-index</artifactId>
-            <version>1.3.M04</version>
-        </dependency> -->
+            <version>1.4</version>
+        </dependency>
         <!-- Using old index API instead -->
-        <dependency>
+        <!--dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-index</artifactId>
             <version>1.2-1.2</version>
-            <!--version>1.3-1.3.M01</version-->
-        </dependency>
+        </dependency-->
 
         <!-- JTA for neo4j-kernel -->
         <dependency>
@@ -79,11 +78,16 @@
         </dependency>
 
         <!-- lucene for neo4j-index -->
-        <dependency>
+        <!-- dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.lucene</artifactId>
             <version>3.0.1_2</version>
-        </dependency>
+        </dependency-->
+        <!--dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>3.1.0</version>
+        </dependency-->
 
         <dependency>
             <groupId>de.deepamehta</groupId>
