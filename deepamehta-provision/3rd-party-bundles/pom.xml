@@ -6,13 +6,13 @@
     <name>3rd Party Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>3rd-party-bundles</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>4.0.RC1</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-provision</artifactId>
-        <version>0.5-SNAPSHOT</version>
+        <version>4.0.RC1</version>
     </parent>
 
     <!-- All 3rd party bundles that belong to the DeepaMehta 4 standard distribution. -->

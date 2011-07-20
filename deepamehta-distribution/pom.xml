@@ -6,14 +6,14 @@
     <name>DeepaMehta 4 Distribution</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-distribution</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>4.0.RC1</version>
     <packaging>pom</packaging>
 
     <!-- Inherit properties -->
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-global</artifactId>
-        <version>0.5-SNAPSHOT</version>
+        <version>4.0.RC1</version>
     </parent>
 
     <!-- These 2 properties are overridden. We must use relative paths for the distribution. -->
@@ -31,19 +31,19 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>3rd-party-bundles</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>4.0.RC1</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>felix-bundles</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>4.0.RC1</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-bundles</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>4.0.RC1</version>
             <type>pom</type>
         </dependency>
     </dependencies>
