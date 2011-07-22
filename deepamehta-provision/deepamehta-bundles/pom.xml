@@ -6,13 +6,13 @@
     <name>DeepaMehta 4 Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-bundles</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>4.0.RC1</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-provision</artifactId>
-        <version>0.5-SNAPSHOT</version>
+        <version>4.0.RC1</version>
     </parent>
 
     <!-- All DeepaMehta bundles that belong to the DeepaMehta 4 standard distribution. -->
@@ -20,47 +20,47 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-core</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>4.0.RC1</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webservice</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>4.0.RC1</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webclient</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>4.0.RC1</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webbrowser</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>4.0.RC1</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-notes</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>4.0.RC1</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-contacts</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>4.0.RC1</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-workspaces</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>4.0.RC1</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-typeeditor</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>4.0.RC1</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-topicmaps</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>4.0.RC1</version>
         </dependency>
         <!--dependency>
             <groupId>de.deepamehta</groupId>

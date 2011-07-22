@@ -23,5 +23,18 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
         super(model, dms);
     }
 
-    // ----------------------------------------------------------------------------------------- Package Private Methods
+    // ----------------------------------------------------------------------------------------------- Protected Methods
+
+
+
+    // *******************************
+    // *** AttachedTopic Overrides ***
+    // *******************************
+
+
+
+    @Override
+    protected String className() {
+        return "association type";
+    }
 }

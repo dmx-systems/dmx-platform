@@ -208,17 +208,16 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private RelatedTopic fetchDataTypeTopic() {
         try {
-            // ### FIXME: revise "topic type" wording in exception messages
             RelatedTopic dataType = getRelatedTopic("dm4.core.aggregation", "dm4.core.type",
                 "dm4.core.data_type", "dm4.core.data_type", false, false);     // fetchComposite=false
             if (dataType == null) {
-                throw new RuntimeException("No data type topic is associated to topic type \"" + getUri() +
-                    "\"");
+                throw new RuntimeException("No data type topic is associated to " + className() + " \"" +
+                    getUri() + "\"");
             }
             return dataType;
         } catch (Exception e) {
-            throw new RuntimeException("Fetching the data type topic for topic type \"" + getUri() +
-                "\" failed", e);
+            throw new RuntimeException("Fetching the data type topic for " + className() + " \"" +
+                getUri() + "\" failed", e);
         }
     }
 
@@ -231,7 +230,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     private Map<Long, AttachedAssociationDefinition> fetchAssociationDefinitions() {
         Map<Long, AttachedAssociationDefinition> assocDefs = new HashMap();
         //
-        // fetch part topic types ### TODO: revise "whole_topic_type" role
+        // fetch part topic types
         List assocTypeFilter = Arrays.asList("dm4.core.aggregation_def", "dm4.core.composition_def");
         Set<RelatedTopic> partTopicTypes = getRelatedTopics(assocTypeFilter, "dm4.core.whole_type",
             "dm4.core.part_type", "dm4.core.topic_type", false, false);
@@ -334,7 +333,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
             //
             return sequence;
         } catch (Exception e) {
-            throw new RuntimeException("Fetching sequence for topic type \"" + getUri() + "\" failed", e);
+            throw new RuntimeException("Fetching sequence for " + className() + " \"" + getUri() + "\" failed", e);
         }
     }
 
@@ -346,7 +345,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
             predecessor = assocDef;
             count++;
         }
-        logger.fine("Storing " + count + " sequence segments for topic type \"" + getUri() + "\"");
+        logger.fine("Storing " + count + " sequence segments for " + className() + " \"" + getUri() + "\"");
     }
 
     private void appendToSequence(AssociationDefinition assocDef, AssociationDefinition predecessor) {
@@ -381,7 +380,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
             dms.deleteAssociation(assoc.getId(), null);    // clientContext=null
             count++;
         }
-        logger.info("### Deleting " + count + " sequence segments of topic type \"" + getUri() + "\"");
+        logger.info("### Deleting " + count + " sequence segments of " + className() + " \"" + getUri() + "\"");
     }
 
 

@@ -8,16 +8,20 @@ Technically DeepaMehta 4 is made of
 Java, Neo4j, Apache Lucene, Apache Felix, Jetty, Jersey (server-side),  
 Javascript/AJAX, jQuery, jQuery-UI, HTML5 Canvas, and TinyMCE (client-side).
 
-DeepaMehta 4 is a rewrite of DeepaMehta 2.
+DeepaMehta 4 is a rewrite of DeepaMehta 2.  
+(DeepaMehta 3 was a research & development effort.)
 
 Project website:  
 <http://www.deepamehta.de/>
 
-Downloads, wiki, issue tracker, source code:  
-<http://github.com/jri/deepamehta>
+Downloads, source code:  
+<https://github.com/jri/deepamehta>
+
+Wiki, issue tracker:  
+<https://trac.deepamehta.de/>
 
 User and developer discussion:  
-<http://groups.google.com/group/deepamehta3>
+<https://groups.google.com/group/deepamehta3>
 
 Licensed under GNU General Public License Version 3.
 
@@ -29,7 +33,7 @@ Requirements
 
 * A "modern" webbrowser.
 
-  Works fine with Firefox 3.6 and Safari 5. Works mostly fine with Chrome 5 or higher.  
+  Works fine with Firefox 3.6 (or newer) and Safari 5. Works mostly fine with Chrome 5 (or newer).  
   Doesn't work with IE8. Potentially works with IE9.
 
 
@@ -37,83 +41,72 @@ Install
 -------
 
 1. Download latest release from here:  
-   <http://github.com/jri/deepamehta/downloads/>
+   <https://github.com/jri/deepamehta/downloads/>
 
 2. Unpack zip archive.  
-   A folder *deepamehta-v0.4.5* is created.
+   A folder *deepamehta-4.0* is created.
 
 
 Start
 -----
 
-1. Open the *deepamehta-v0.4.5* folder and use the respective starter script for your platform:
+Open the *deepamehta-4.0* folder and use the respective starter script for your platform:
 
-        deepamehta-linux.sh         # choose "Run in terminal"
-        deepamehta-macosx.command   # double-click it
-        deepamehta-windows.bat      # double-click it
+    deepamehta-linux.sh         # choose "Run in terminal"
+    deepamehta-macosx.command   # double-click it
+    deepamehta-windows.bat      # double-click it
 
-   While the server starts a terminal window opens and you see some information logged.  
-   Then a browser window opens and DeepaMehta is ready to use.
+While the server starts a terminal window opens and you see some information logged.  
+Then a browser window opens and DeepaMehta is ready to use.
 
-   Hint: if no browser window appears open it manually:  
-   <http://localhost:8080/de.deepamehta.webclient/index.html>
-
-2. Login via the *Special* menu as *admin*. Leave the password field empty.  
-   You're enabled to create content now.
+Hint: if no browser window appears open it manually:  
+<http://localhost:8080/de.deepamehta.webclient/index.html>
 
 
 Stop
 ----
 
-1. Go to the terminal window that opened while startup and type:
+Go to the terminal window that opened while startup and type:
 
-        stop 0
+    stop 0
 
-   This puts the database in a consistent state.  
-   You can close the terminal window now.
+This puts the database in a consistent state.  
+You can close the terminal window now.
 
 
 Update
 ------
 
-To update a previous DeepaMehta installation and keep your database content:
-
-1. Stop DeepaMehta (if running) and install the new DeepaMehta version (as described above).
-
-2. Copy your *deepamehta-db* folder into the *deepamehta-v0.4.5* folder (next to the *bin*, *bundle*, and *conf* folders).
-
-3. Start the new DeepaMehta (as described above).  
-   Your database automatically migrates to the new format.  
-   Wait until the logging has finished.
-
-4. Stop DeepaMehta and start it again (as described above).  
-   (Now the memory cache is up-to-date.) Sorry for this extra step!
-
-   You're done. The DeepaMehta browser window opens automatically.
-
-Hints:
-
-* The first updatable version is DeepaMehta 3 v0.4. Updating DeepaMehta v0.3 is not suppported.
-
-* Keep your old *deepamehta-db* folder at a safe place.  
-  You'll need it as a backup when something went wrong while migration.
+Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is currently not supported.
 
 
 Uninstall
 ---------
 
-Stop DeepaMehta and delete the *deepamehta-v0.4.5* folder.  
+Stop DeepaMehta and delete the *deepamehta-4.0* folder.  
 This removes DeepaMehta completely from your computer, including the database.
 
 
 Build from Source
 -----------------
 
-See the wiki page [DeepaMehta 3 Development](https://github.com/jri/deepamehta/wiki/DeepaMehta-3-Development)
+<https://github.com/jri/deepamehta/wiki/Build-From-Source>
 
 
 Version History
 ---------------
+
+**4.0** -- upcoming
+
+* Complete new property-less data format.  
+  <https://groups.google.com/group/deepamehta3/browse_thread/thread/a77704d35e7af539>
+
+  The version planned as "DeepaMehta 3 v0.5" eventually become "DeepaMehta 4.0".  
+  From now on DeepaMehta version numbers follow the classic *major*.*minor*.*bugfix* schema.
+
+---
+
+**DeepaMehta 3** (research & development) versions:
 
 **v0.4.5** -- May 1, 2011
 
@@ -189,4 +182,4 @@ Version History
 
 ------------
 Jörg Richter  
-May 1, 2011
+July 20, 2011
