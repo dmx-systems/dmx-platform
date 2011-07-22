@@ -73,6 +73,11 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // === Implementation of the abstract methods ===
 
     @Override
+    protected String className() {
+        return "association";
+    }
+
+    @Override
     protected void storeUri(String uri) {
         dms.storage.setAssociationUri(getId(), uri);
     }

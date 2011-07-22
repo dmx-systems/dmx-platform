@@ -10,7 +10,9 @@ import java.util.Iterator;
 
 /**
  * A recursive composite of key/value pairs.
- * Keys are strings, values are non-null atomic (string, int, long, boolean) or again a <code>CompositeValue</code>.
+ * <p>
+ * Keys are strings, values are non-null atomic (string, int, long, double, boolean)
+ * or again a <code>CompositeValue</code>.
  */
 public class CompositeValue {
 
@@ -18,7 +20,7 @@ public class CompositeValue {
 
     /**
      * Internal representation.
-     * Key: String, value: non-null atomic (String, Integer, Long, Boolean) or composite (JSONObject).
+     * Key: String, value: non-null atomic (String, Integer, Long, Double, Boolean) or composite (JSONObject).
      */
     private JSONObject values;
 
@@ -61,7 +63,7 @@ public class CompositeValue {
     }
 
     /**
-     * @param   value   a String, Integer, Long, Boolean, or a CompositeValue.
+     * @param   value   a String, Integer, Long, Double, Boolean, or a CompositeValue.
      *
      * @return  this CompositeValue.
      */
@@ -72,9 +74,9 @@ public class CompositeValue {
                 throw new IllegalArgumentException("Tried to put a null value in a CompositeValue");
             }
             if (!(value instanceof String || value instanceof Integer || value instanceof Long ||
-                  value instanceof Boolean || value instanceof CompositeValue)) {
-                throw new IllegalArgumentException("Tried to put a " + value.getClass().getName() +
-                    " value in a CompositeValue (expected are String, Integer, Long, Boolean, or CompositeValue)");
+                  value instanceof Double || value instanceof Boolean || value instanceof CompositeValue)) {
+                throw new IllegalArgumentException("Tried to put a " + value.getClass().getName() + " value in " +
+                    "a CompositeValue (expected are String, Integer, Long, Double, Boolean, or CompositeValue)");
             }
             // put value
             if (value instanceof CompositeValue) {

@@ -307,6 +307,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---
 
+    protected abstract String className();
+
     protected abstract void storeUri(String uri);
 
     protected abstract SimpleValue storeValue(SimpleValue value);
@@ -376,7 +378,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             }
             return comp;
         } catch (Exception e) {
-            throw new RuntimeException("Fetching the topic's composite failed (" + this + ")", e);
+            throw new RuntimeException("Fetching the " + className() + "'s composite failed (" + this + ")", e);
         }
     }
 
