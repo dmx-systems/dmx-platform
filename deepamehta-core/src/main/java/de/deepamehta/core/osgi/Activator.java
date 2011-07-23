@@ -5,10 +5,7 @@ import de.deepamehta.core.impl.storage.MGStorageBridge;
 import de.deepamehta.core.service.DeepaMehtaService;
 
 import de.deepamehta.mehtagraph.MehtaGraph;
-import de.deepamehta.mehtagraph.impl.Neo4jMehtaGraph;
-
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
+import de.deepamehta.mehtagraph.MehtaGraphFactory;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -50,11 +47,26 @@ public class Activator implements BundleActivator {
     public void start(BundleContext context) {
         try {
             logger.info("========== Starting bundle \"DeepaMehta 4 Core\" ==========");
-            dms = new EmbeddedService(new MGStorageBridge(openDB()), context);
-            dms.setupDB();
-            //
-            logger.info("Registering DeepaMehta 4 core service at OSGi framework");
-            context.registerService(DeepaMehtaService.class.getName(), dms, null);
+            ServiceTracker serviceTracker = new ServiceTracker(context, MehtaGraph.class.getName(), null) {
+                @Override
+                public Object addingService(ServiceReference serviceRef) {
+                    Object service = super.addingService(serviceRef);
+                    if (service instanceof MehtaGraph) {
+                        createCoreService((MehtaGraph) service);
+                    }
+                    return service;
+                }
+
+                private void createCoreService(MehtaGraph mg) {
+                    logger.info("Adding MehtaGraph service to DeepaMehta 4 core service");
+                    dms = new EmbeddedService(new MGStorageBridge(mg), context);
+                    dms.setupDB();
+                    //
+                    logger.info("Registering DeepaMehta 4 core service at OSGi framework");
+                    context.registerService(DeepaMehtaService.class.getName(), dms, null);
+                }
+            };
+            serviceTracker.open();
         } catch (Exception e) {
             logger.severe("Activation of DeepaMehta 4 Core failed:");
             e.printStackTrace();
@@ -92,17 +104,11 @@ public class Activator implements BundleActivator {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private MehtaGraph openDB() {
-        GraphDatabaseService neo4j = null;
         try {
-            logger.info("Creating DB and indexing services");
-            neo4j = new EmbeddedGraphDatabase(DATABASE_PATH);
-            return new Neo4jMehtaGraph(neo4j);
+            logger.info("Opening DB and indexing services (path=" + DATABASE_PATH + ")");
+            return MehtaGraphFactory.createInstance(DATABASE_PATH);
         } catch (Exception e) {
-            logger.info("Shutdown DB");
-            if (neo4j != null) {
-                neo4j.shutdown();
-            }
-            throw new RuntimeException("Opening database failed (path=" + DATABASE_PATH + ")", e);
+            throw new RuntimeException("Opening DB and indexing services failed (path=" + DATABASE_PATH + ")", e);
         }
     }
 }

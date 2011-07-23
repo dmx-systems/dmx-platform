@@ -1,6 +1,6 @@
 
-DeepaMehta 4 Server
-===================
+DeepaMehta 4 Webservice
+=======================
 
 This module provides a HTTP/REST interface to the [DeepaMehta 4 core service](http://github.com/jri/deepamehta3-core) by utilizing Jetty (servlet container) and Jersey (REST toolkit).
 
@@ -11,7 +11,7 @@ DeepaMehta 4 is a platform for collaboration and knowledge management.
 Installing
 ----------
 
-The DeepaMehta 4 Server module is typically installed while the DeepaMehta 4 standard installation.  
+The DeepaMehta 4 Webservice module is typically installed while the DeepaMehta 4 standard installation.  
 <http://github.com/jri/deepamehta>
 
 

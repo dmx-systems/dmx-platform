@@ -44,38 +44,12 @@
             <version>1.2.2</version>
         </dependency>
 
-        <!-- Neo4j -->
-        <dependency>
-            <!--
-                throws java.lang.IllegalArgumentException: Listener is null at
-                org.neo4j.kernel.impl.osgi.OSGiActivator.stop(OSGiActivator.java:64)
-                see
-                http://github.com/neo4j/graphdb/blob/master/kernel/src/main/java/org/neo4j/kernel/impl/osgi/OSGiActivator.java
-            -->
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-kernel</artifactId>
-            <!--version>1.2-1.2</version-->
-            <version>1.4</version>
-        </dependency>
-        <!-- FIXME: new index API doesn't work with OSGi -->
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-lucene-index</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <!-- Using old index API instead -->
-        <!--dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-index</artifactId>
-            <version>1.2-1.2</version>
-        </dependency-->
-
         <!-- JTA for neo4j-kernel -->
-        <dependency>
+        <!--dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jta_1.1_spec</artifactId>
             <version>1.1.1</version>
-        </dependency>
+        </dependency-->
 
         <!-- lucene for neo4j-index -->
         <!-- dependency>

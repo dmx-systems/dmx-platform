@@ -56,13 +56,12 @@
         </dependency>
 
         <!-- Neo4j -->
-        <dependency>
+        <!--dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-kernel</artifactId>
             <version>1.2-1.2</version>
-            <!--version>1.3.M04</version-->
             <scope>provided</scope>
-        </dependency>
+        </dependency-->
         <!-- FIXME: new index API doesn't work with OSGi
         <dependency>
             <groupId>org.neo4j</groupId>
@@ -71,13 +70,12 @@
             <scope>provided</scope>
         </dependency> -->
         <!-- Using old index API instead -->
-        <dependency>
+        <!--dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-index</artifactId>
             <version>1.2-1.2</version>
-            <!--version>1.3-1.3.M01</version-->
             <scope>provided</scope>
-        </dependency>
+        </dependency-->
 
         <!-- servlet container for plugin -->
         <dependency>
