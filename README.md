@@ -90,23 +90,33 @@ This removes DeepaMehta completely from your computer, including the database.
 Build from Source
 -----------------
 
-<https://github.com/jri/deepamehta/wiki/Build-From-Source>
+<https://trac.deepamehta.de/wiki/BuildFromSource>
 
 
 Version History
 ---------------
 
-**4.0** -- upcoming
+**4.0** -- July 24, 2011
 
-* Complete new property-less data format.  
+* Complete new property-less data format. All values are represented as reusable semantics-attached topics.  
   <https://groups.google.com/group/deepamehta3/browse_thread/thread/a77704d35e7af539>
+* Improvements for users:
+    * new type editor
+    * new topic type "Resource" for collecting web resources
+    * cleaner display, less clutter
+    * new icons
+* Improvements for developers:
+    * New core service API. All the domain objects (Topic, Association, ...) are attached to the database.
+      So, the developer must not care about DB-updates.
+    * Domain models (type definitions) provided by a plugin can be build upon the domain models
+      provided by other plugins. The dependencies are handled by the framework.
 
-  The version planned as "DeepaMehta 3 v0.5" eventually become "DeepaMehta 4.0".  
+  The version planned as "DeepaMehta 3 v0.5" eventually become **DeepaMehta 4.0**.  
   From now on DeepaMehta version numbers follow the classic *major*.*minor*.*bugfix* schema.
 
 ---
 
-**DeepaMehta 3** (research & development) versions:
+**DeepaMehta 3** versions:
 
 **v0.4.5** -- May 1, 2011
 
@@ -179,7 +189,13 @@ Version History
 
 * Basic functionality (Creating notes, edit, delete. Relate notes to other notes, navigate alongside relations. Attach files to notes. Fulltext searching in notes, also in attachments. Graphical network display of related notes.)
 
+---
+
+Version history of **DeepaMehta 1** and **DeepaMehta 2**:  
+<http://www.deepamehta.de/docs/milestones.html>
+
+
 
 ------------
 Jörg Richter  
-July 20, 2011
+July 24, 2011

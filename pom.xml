@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Global</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-global</artifactId>
-    <version>4.0.RC1</version>
+    <version>4.0</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -112,7 +112,7 @@
                 <module>deepamehta-parent</module>
                 <module>deepamehta-plugin-parent</module>
                 <module>deepamehta-provision</module>
-                <!-- not yet adapted to DM3 v0.5 resp. obsolete -->
+                <!-- not yet adapted to DeepaMehta 4.0 resp. obsolete -->
                 <!-- <module>deepamehta-coretypes</module>
                 <module>deepamehta-typesearch</module>
                 <module>deepamehta-time</module>

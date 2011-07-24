@@ -9,7 +9,7 @@ This module provides the DeepaMehta 4 core service -- the heart of DeepaMehta. T
 3. acts as a plugin execution framework, according to the *Inversion of Control* pattern.
 4. provides a migration facility to keep the database model in-sync with the applications.
 
-The DeepaMehta 4 core service is embeddable in any Java application. The accompanying [DeepaMehta 4 Server](http://github.com/jri/deepamehta3-server) module makes the DeepaMehta 4 core service available to any HTTP/REST client.
+The DeepaMehta 4 core service is embeddable in any Java application. The accompanying [DeepaMehta 4 Webservice](http://github.com/jri/deepamehta3-server) module makes the DeepaMehta 4 core service available to any HTTP/REST client.
 
 DeepaMehta 4 is a platform for collaboration and knowledge management.  
 <http://github.com/jri/deepamehta>
