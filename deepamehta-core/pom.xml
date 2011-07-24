@@ -6,7 +6,7 @@
     <name>DeepaMehta 4 Core</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-core</artifactId>
-    <version>4.0.RC1</version>
+    <version>4.0</version>
     <packaging>bundle</packaging>
 
     <parent>
@@ -52,7 +52,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>neo4j-mehtagraph</artifactId>
-            <version>0.7-SNAPSHOT</version>
+            <version>0.7</version>
         </dependency>
 
         <!-- Neo4j -->

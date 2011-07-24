@@ -1,6 +1,6 @@
 
-DeepaMehta 4 Client
-===================
+DeepaMehta 4 Webclient
+======================
 
 This plugin provides the typical DeepaMehta 4 web frontend based on Javascript/AJAX, jQuery, jQuery-UI, HTML5 Canvas, and TinyMCE. The DeepaMehta 4 Client talks to the [DeepaMehta 4 Webservice](http://github.com/jri/deepamehta3-server) by sending XHR requests.
 
