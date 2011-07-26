@@ -131,11 +131,14 @@ var dm4c = new function() {
         dm4c.show_topic(topic, "edit", x, y)
     }
 
+    /**
+     * Creates an association between the selected topic and the given topic.
+     */
     this.do_create_association = function(type_uri, topic) {
         // update model
         var assoc = dm4c.create_association(type_uri,
-            {topic_id: dm4c.selected_object.id, role_type_uri: dm4c.selected_object.type_uri},
-            {topic_id: topic.id,                role_type_uri: topic.type_uri}
+            {topic_id: dm4c.selected_object.id, role_type_uri: "dm4.core.default"},
+            {topic_id: topic.id,                role_type_uri: "dm4.core.default"}
         )
         // update view
         dm4c.show_association(assoc, true)                      // refresh_canvas=true
@@ -396,6 +399,7 @@ var dm4c = new function() {
 
     /**
      * Creates a topic in the DB.
+     * Triggers the "post_create_topic" hook.
      *
      * @param   type_uri        The topic type URI, e.g. "dm4.notes.note".
      * @param   composite       Optional.

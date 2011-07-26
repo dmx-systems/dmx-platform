@@ -8,7 +8,7 @@ public abstract class RoleModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected String roleTypeUri;
+    protected String roleTypeUri;   // is never null
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -16,16 +16,20 @@ public abstract class RoleModel {
     }
 
     protected RoleModel(String roleTypeUri) {
-        this.roleTypeUri = roleTypeUri;
+        setRoleTypeUri(roleTypeUri);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public String getRoleTypeUri() {
+    public final String getRoleTypeUri() {
         return roleTypeUri;
     }
 
-    public void setRoleTypeUri(String roleTypeUri) {
+    public final void setRoleTypeUri(String roleTypeUri) {
+        if (roleTypeUri == null) {
+            throw new IllegalArgumentException("\"roleTypeUri\" must not be null");
+        }
+        //
         this.roleTypeUri = roleTypeUri;
     }
 

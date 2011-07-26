@@ -75,7 +75,7 @@ public class EmbeddedService implements DeepaMehtaService {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String CORE_MIGRATIONS_PACKAGE = "de.deepamehta.core.migrations";
-    private static final int REQUIRED_CORE_MIGRATION = 2;
+    private static final int REQUIRED_CORE_MIGRATION = 3;
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
