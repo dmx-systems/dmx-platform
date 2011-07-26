@@ -6,13 +6,13 @@
     <name>DeepaMehta 4 Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-bundles</artifactId>
-    <version>4.0</version>
+    <version>4.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-provision</artifactId>
-        <version>4.0</version>
+        <version>4.0.1-SNAPSHOT</version>
     </parent>
 
     <!-- All DeepaMehta bundles that belong to the DeepaMehta 4 standard distribution. -->
@@ -20,48 +20,49 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-core</artifactId>
-            <version>4.0</version>
+            <version>4.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webservice</artifactId>
-            <version>4.0</version>
+            <version>4.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webclient</artifactId>
-            <version>4.0</version>
+            <version>4.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webbrowser</artifactId>
-            <version>4.0</version>
+            <version>4.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-notes</artifactId>
-            <version>4.0</version>
+            <version>4.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-contacts</artifactId>
-            <version>4.0</version>
+            <version>4.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-workspaces</artifactId>
-            <version>4.0</version>
+            <version>4.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-typeeditor</artifactId>
-            <version>4.0</version>
+            <version>4.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-topicmaps</artifactId>
-            <version>4.0</version>
+            <version>4.0.1-SNAPSHOT</version>
         </dependency>
+        <!-- not yet adapted to DeepaMehta 4.0 resp. obsolete -->
         <!--dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-coretypes</artifactId>
@@ -69,18 +70,8 @@
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-accesscontrol</artifactId>
-            <version>0.4.2</version>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-files</artifactId>
+            <artifactId>deepamehta-time</artifactId>
             <version>0.4.3</version>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-filemanager</artifactId>
-            <version>0.4.2</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
@@ -94,12 +85,22 @@
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-time</artifactId>
+            <artifactId>deepamehta-typesearch</artifactId>
+            <version>0.4.2</version>
+        </dependency
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-files</artifactId>
             <version>0.4.3</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-typesearch</artifactId>
+            <artifactId>deepamehta-filemanager</artifactId>
+            <version>0.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-accesscontrol</artifactId>
             <version>0.4.2</version>
         </dependency-->
     </dependencies>

@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
     <name>DeepaMehta 4 Distribution</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-distribution</artifactId>
-    <version>4.0</version>
+    <version>4.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <!-- Inherit properties -->
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-global</artifactId>
-        <version>4.0</version>
+        <version>4.0.1-SNAPSHOT</version>
     </parent>
 
     <!-- These 2 properties are overridden. We must use relative paths for the distribution. -->
@@ -31,19 +32,19 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>3rd-party-bundles</artifactId>
-            <version>4.0</version>
+            <version>4.0.1-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>felix-bundles</artifactId>
-            <version>4.0</version>
+            <version>4.0.1-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-bundles</artifactId>
-            <version>4.0</version>
+            <version>4.0.1-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
     </dependencies>

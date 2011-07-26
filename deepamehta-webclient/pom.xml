@@ -7,13 +7,13 @@
     <name>DeepaMehta 4 Webclient</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-webclient</artifactId>
-    <version>4.0</version>
+    <version>4.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-parent</artifactId>
-        <version>1</version>
+        <version>2</version>
         <relativePath>../deepamehta-parent/pom.xml</relativePath>
     </parent>
 
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webservice</artifactId>
-            <version>4.0</version>
+            <version>4.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

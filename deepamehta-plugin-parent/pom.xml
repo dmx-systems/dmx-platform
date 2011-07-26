@@ -7,13 +7,13 @@
     <name>DeepaMehta 4 Plugin Parent</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-plugin-parent</artifactId>
-    <version>4.0</version>
+    <version>4.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-parent</artifactId>
-        <version>1</version>
+        <version>2</version>
         <relativePath>../deepamehta-parent/pom.xml</relativePath>
     </parent>
 
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-core</artifactId>
-            <version>4.0</version>
+            <version>4.0.1-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
 
@@ -72,9 +72,9 @@
                 <artifactId>maven-pax-plugin</artifactId>
                 <configuration>
                     <deployURLs>
-                        mvn:de.deepamehta/3rd-party-bundles/4.0/pom,
-                        mvn:de.deepamehta/felix-bundles/4.0/pom,
-                        mvn:de.deepamehta/deepamehta-bundles/4.0/pom
+                        mvn:de.deepamehta/3rd-party-bundles/4.0.1-SNAPSHOT/pom,
+                        mvn:de.deepamehta/felix-bundles/4.0.1-SNAPSHOT/pom,
+                        mvn:de.deepamehta/deepamehta-bundles/4.0.1-SNAPSHOT/pom
                     </deployURLs>
                 </configuration>
             </plugin>
