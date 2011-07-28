@@ -5,10 +5,7 @@ import de.deepamehta.core.impl.storage.MGStorageBridge;
 import de.deepamehta.core.service.DeepaMehtaService;
 
 import de.deepamehta.mehtagraph.MehtaGraph;
-import de.deepamehta.mehtagraph.impl.Neo4jMehtaGraph;
-
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
+import de.deepamehta.mehtagraph.MehtaGraphFactory;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -92,16 +89,10 @@ public class Activator implements BundleActivator {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private MehtaGraph openDB() {
-        GraphDatabaseService neo4j = null;
         try {
-            logger.info("Creating DB and indexing services");
-            neo4j = new EmbeddedGraphDatabase(DATABASE_PATH);
-            return new Neo4jMehtaGraph(neo4j);
+            logger.info("Creating database and indexing services (path=" + DATABASE_PATH + ")");
+            return MehtaGraphFactory.createInstance(DATABASE_PATH);
         } catch (Exception e) {
-            logger.info("Shutdown DB");
-            if (neo4j != null) {
-                neo4j.shutdown();
-            }
             throw new RuntimeException("Opening database failed (path=" + DATABASE_PATH + ")", e);
         }
     }
