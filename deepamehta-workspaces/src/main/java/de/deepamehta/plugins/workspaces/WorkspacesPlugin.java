@@ -31,7 +31,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     private static final String WORKSPACE_TYPE      = "dm4.workspaces.workspace_context";
     private static final String ROLE_TYPE_TOPIC     = "dm4.workspaces.workspace_topic";
     private static final String ROLE_TYPE_TYPE      = "dm4.workspaces.workspace_type";
-    private static final String ROLE_TYPE_WORKSPACE = "dm4.workspaces.workspace";
+    private static final String ROLE_TYPE_WORKSPACE = "dm4.core.default";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -161,7 +161,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     @Override
     public Set<RelatedTopic> getWorkspaces(long typeId) {
         Topic typeTopic = dms.getTopic(typeId, false, null);    // fetchComposite=false, clientContext=null
-        return typeTopic.getRelatedTopics(WORKSPACE_TYPE, ROLE_TYPE_TYPE, ROLE_TYPE_WORKSPACE,
+        return typeTopic.getRelatedTopics(WORKSPACE_TYPE, ROLE_TYPE_TYPE, null,
             "dm4.workspaces.workspace", false, false);          // fetchComposite=false
     }
 

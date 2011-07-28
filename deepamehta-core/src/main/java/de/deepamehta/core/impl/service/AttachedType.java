@@ -208,8 +208,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private RelatedTopic fetchDataTypeTopic() {
         try {
-            RelatedTopic dataType = getRelatedTopic("dm4.core.aggregation", "dm4.core.type",
-                "dm4.core.data_type", "dm4.core.data_type", false, false);     // fetchComposite=false
+            RelatedTopic dataType = getRelatedTopic("dm4.core.aggregation", "dm4.core.type", null,
+                "dm4.core.data_type", false, false);     // fetchComposite=false
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to " + className() + " \"" +
                     getUri() + "\"");
@@ -222,8 +222,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     private Set<IndexMode> fetchIndexModes() {
-        Set<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type",
-            "dm4.core.index_mode", "dm4.core.index_mode", false, false);       // fetchComposite=false
+        Set<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type", null,
+            "dm4.core.index_mode", false, false);       // fetchComposite=false
         return IndexMode.fromTopics(topics);
     }
 
@@ -287,7 +287,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         for (IndexMode indexMode : getIndexModes()) {
             dms.createAssociation("dm4.core.aggregation",
                 new TopicRoleModel(getUri(), "dm4.core.type"),
-                new TopicRoleModel(indexMode.toUri(), "dm4.core.index_mode"));
+                new TopicRoleModel(indexMode.toUri(), "dm4.core.default"));
         }
     }
 

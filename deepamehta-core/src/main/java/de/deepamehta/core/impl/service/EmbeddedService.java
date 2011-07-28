@@ -938,7 +938,7 @@ public class EmbeddedService implements DeepaMehtaService {
     void associateDataType(String typeUri, String dataTypeUri) {
         createAssociation("dm4.core.aggregation",
             new TopicRoleModel(typeUri,     "dm4.core.type"),
-            new TopicRoleModel(dataTypeUri, "dm4.core.data_type"));
+            new TopicRoleModel(dataTypeUri, "dm4.core.default"));
     }
 
 
@@ -1025,9 +1025,11 @@ public class EmbeddedService implements DeepaMehtaService {
         // Create data type "Text"
         TopicModel text = new TopicModel("dm4.core.text", "dm4.core.data_type", new SimpleValue("Text"));
         _createTopic(text);
-        // Create role types "Type" and "Instance"
+        // Create role types "Default", "Type", and "Instance"
+        TopicModel deflt =    new TopicModel("dm4.core.default",  "dm4.core.role_type", new SimpleValue("Default"));
         TopicModel type =     new TopicModel("dm4.core.type",     "dm4.core.role_type", new SimpleValue("Type"));
         TopicModel instance = new TopicModel("dm4.core.instance", "dm4.core.role_type", new SimpleValue("Instance"));
+        _createTopic(deflt);
         _createTopic(type);
         _createTopic(instance);
         // Create association type "Aggregation" -- needed to associate topic/association types with data types
@@ -1047,6 +1049,7 @@ public class EmbeddedService implements DeepaMehtaService {
         associateWithTopicType(dataType);
         associateWithTopicType(roleType);
         associateWithTopicType(text);
+        associateWithTopicType(deflt);
         associateWithTopicType(type);
         associateWithTopicType(instance);
         associateWithTopicType(aggregation);
@@ -1150,7 +1153,7 @@ public class EmbeddedService implements DeepaMehtaService {
                 }
                 logger.info("Completing " + mi.migrationInfo);
             } else {
-                logger.info("Do NOT run " + mi.migrationInfo + runInfo);
+                logger.info("Running " + mi.migrationInfo + " ABORTED" + runInfo);
             }
             logger.info("Updating migration number (" + migrationNr + ")");
         } catch (Exception e) {

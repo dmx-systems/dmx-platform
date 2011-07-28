@@ -101,7 +101,7 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
     public long addTopicToTopicmap(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                    @PathParam("x") int x, @PathParam("y") int y) {
         AssociationModel model = new AssociationModel("dm4.topicmaps.topic_mapcontext",
-            new TopicRoleModel(topicmapId, "dm4.topicmaps.topicmap"),
+            new TopicRoleModel(topicmapId, "dm4.core.default"),
             new TopicRoleModel(topicId,    "dm4.topicmaps.topicmap_topic"),
             new CompositeValue().put("dm4.topicmaps.x", x)
                                 .put("dm4.topicmaps.y", y)
@@ -116,7 +116,7 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
     @Override
     public long addAssociationToTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
         AssociationModel model = new AssociationModel("dm4.topicmaps.association_mapcontext",
-            new TopicRoleModel(topicmapId,    "dm4.topicmaps.topicmap"),
+            new TopicRoleModel(topicmapId,    "dm4.core.default"),
             new AssociationRoleModel(assocId, "dm4.topicmaps.topicmap_association"));
         Association refAssoc = dms.createAssociation(model, null);     // FIXME: clientContext=null
         return refAssoc.getId();

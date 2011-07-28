@@ -155,8 +155,8 @@ public class Topicmap {
     private void loadTopics(long topicmapId) {
         Topic topicmapTopic = dms.getTopic(topicmapId, false, null);
         Set<RelatedTopic> mapTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
-            "dm4.topicmaps.topicmap", "dm4.topicmaps.topicmap_topic", null, false, true);   // othersTopicTypeUri=null
-                                                                                            // fetchComposite=false
+            null, "dm4.topicmaps.topicmap_topic", null, false, true);   // othersTopicTypeUri=null
+                                                                        // fetchComposite=false
         for (RelatedTopic mapTopic : mapTopics) {
             Association refAssoc = mapTopic.getAssociation();
             addTopic(new TopicmapTopic(mapTopic.getModel(), refAssoc.getCompositeValue(), refAssoc.getId()));
@@ -166,7 +166,7 @@ public class Topicmap {
     private void loadAssociations(long topicmapId) {
         Topic topicmapTopic = dms.getTopic(topicmapId, false, null);
         Set<RelatedAssociation> mapAssocs = topicmapTopic.getRelatedAssociations("dm4.topicmaps.association_mapcontext",
-            "dm4.topicmaps.topicmap", "dm4.topicmaps.topicmap_association", null, false, false);
+            null, "dm4.topicmaps.topicmap_association", null, false, false);
         for (RelatedAssociation mapAssoc : mapAssocs) {
             Association refAssoc = mapAssoc.getRelatingAssociation();
             addAssociation(new TopicmapAssociation(mapAssoc.getModel(), refAssoc.getId()));
