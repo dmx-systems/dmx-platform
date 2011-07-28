@@ -29,34 +29,31 @@ Licensed under GNU General Public License Version 3.
 Requirements
 ------------
 
-* Java 1.6
+**Java 1.6** and a "modern" **webbrowser**.
 
-* A "modern" webbrowser.
-
-  Works fine with Firefox 3.6 (or newer) and Safari 5. Works mostly fine with Chrome 5 (or newer).  
-  Doesn't work with IE8. Potentially works with IE9.
+Works fine with Firefox 3.6 (or newer) and Safari 5. Works mostly fine with Chrome 5 (or newer).  
+Doesn't work with IE8. Potentially works with IE9.
 
 
 Install
 -------
 
-1. Download latest release from here:  
-   <https://github.com/jri/deepamehta/downloads/>
+Download the latest release and unzip it.  
+<https://github.com/jri/deepamehta/downloads/>
 
-2. Unpack zip archive.  
-   A folder *deepamehta-4.0* is created.
+A folder `deepamehta-4.0.1` is created.
 
 
 Start
 -----
 
-Open the *deepamehta-4.0* folder and use the respective starter script for your platform:
+Open the `deepamehta-4.0.1` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
     deepamehta-windows.bat      # double-click it
 
-While the server starts a terminal window opens and you see some information logged.  
+While DeepaMehta starts a terminal window opens and you see some information logged.  
 Then a browser window opens and DeepaMehta is ready to use.
 
 Hint: if no browser window appears open it manually:  
@@ -77,13 +74,27 @@ You can close the terminal window now.
 Update
 ------
 
+To update from DeepaMehta 4.0 to 4.0.1 while keeping your content: before starting DeepaMehta copy your `deepamehta-db` folder into the `deepamehta-4.0.1` folder. (If you've started DeepaMehta 4.0.1 already, stop it, and replace its `deepamehta-db` with your one, and start again.)
+
 Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is currently not supported.
+
+
+Start with a fresh database
+---------------------------
+
+Stop DeepaMehta, remove the `deepamehta-db` folder, and start again.
+
+
+Troubleshooting
+---------------
+
+If the browser shows 404 or 503 while an exception appears in the terminal: refresh the `Apache Felix Http Jetty` bundle by typing `refresh 1` in the terminal (checkout the proper bundle ID before by using the `lb` command).
 
 
 Uninstall
 ---------
 
-Stop DeepaMehta and delete the *deepamehta-4.0* folder.  
+Stop DeepaMehta and delete the `deepamehta-4.0.1` folder.  
 This removes DeepaMehta completely from your computer, including the database.
 
 
@@ -96,9 +107,13 @@ Build from Source
 Version History
 ---------------
 
-**4.0** -- July 24, 2011
+**4.0.1** -- Jul 28, 2011
 
-* Complete new property-less data format. All values are represented as reusable semantics-attached topics.  
+* Bug fix: retyping an association does not corrupt role types
+
+**4.0** -- Jul 24, 2011
+
+* Complete new property-less data model. All values are represented as reusable semantics-attached topics.  
   <https://groups.google.com/group/deepamehta3/browse_thread/thread/a77704d35e7af539>
 * Improvements for users:
     * new type editor
@@ -111,12 +126,12 @@ Version History
     * Domain models (type definitions) provided by a plugin can be build upon the domain models
       provided by other plugins. The dependencies are handled by the framework.
 
-  The version planned as "DeepaMehta 3 v0.5" eventually become **DeepaMehta 4.0**.  
+  The version planned as "DeepaMehta 3 v0.5" eventually become "DeepaMehta 4.0".  
   From now on DeepaMehta version numbers follow the classic *major*.*minor*.*bugfix* schema.
 
 ---
 
-**DeepaMehta 3** versions:
+**DeepaMehta 3**:
 
 **v0.4.5** -- May 1, 2011
 
@@ -198,4 +213,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-July 24, 2011
+July 28, 2011

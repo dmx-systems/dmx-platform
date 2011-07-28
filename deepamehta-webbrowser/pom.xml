@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Webbrowser</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-webbrowser</artifactId>
-    <version>4.0.1-SNAPSHOT</version>
+    <version>4.0.1</version>
     <packaging>bundle</packaging>
 
     <parent>
