@@ -6,7 +6,7 @@
     <name>DeepaMehta 4 Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-bundles</artifactId>
-    <version>4.0.1</version>
+    <version>4.0.2</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webclient</artifactId>
-            <version>4.0.1</version>
+            <version>4.0.2</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>

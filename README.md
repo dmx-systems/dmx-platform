@@ -41,13 +41,13 @@ Install
 Download the latest release and unzip it.  
 <https://github.com/jri/deepamehta/downloads/>
 
-A folder `deepamehta-4.0.1` is created.
+A folder `deepamehta-4.0.2` is created.
 
 
 Start
 -----
 
-Open the `deepamehta-4.0.1` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.0.2` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -74,7 +74,7 @@ You can close the terminal window now.
 Update
 ------
 
-To update from DeepaMehta 4.0 to 4.0.1 while keeping your content: before starting DeepaMehta copy your `deepamehta-db` folder into the `deepamehta-4.0.1` folder. (If you've started DeepaMehta 4.0.1 already, stop it, and replace its `deepamehta-db` with your one, and start again.)
+To update from DeepaMehta 4.0 or 4.0.1 to 4.0.2 while keeping your content: before starting DeepaMehta copy your `deepamehta-db` folder into the `deepamehta-4.0.2` folder. (If you've started DeepaMehta 4.0.2 already, stop it, and replace its `deepamehta-db` folder with your one, and start again.)
 
 Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is currently not supported.
 
@@ -94,7 +94,7 @@ If the browser shows 404 or 503 while an exception appears in the terminal: refr
 Uninstall
 ---------
 
-Stop DeepaMehta and delete the `deepamehta-4.0.1` folder.  
+Stop DeepaMehta and delete the `deepamehta-4.0.2` folder.  
 This removes DeepaMehta completely from your computer, including the database.
 
 
@@ -107,9 +107,13 @@ Build from Source
 Version History
 ---------------
 
+**4.0.2** -- Aug 2, 2011
+
+* Bug fix: proper character encoding (when using the binary distribution in a client/server setup)
+
 **4.0.1** -- Jul 28, 2011
 
-* Bug fix: retyping an association does not corrupt role types
+* Bug fix: retyping an association does not compromise role types
 
 **4.0** -- Jul 24, 2011
 
@@ -213,4 +217,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-July 28, 2011
+Aug 2, 2011
