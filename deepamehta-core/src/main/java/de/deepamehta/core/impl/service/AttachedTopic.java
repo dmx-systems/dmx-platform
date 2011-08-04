@@ -16,6 +16,8 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -25,6 +27,7 @@ import java.util.logging.Logger;
 /**
  * A topic that is attached to the {@link DeepaMehtaService}.
  */
+@XmlRootElement(name="topic")
 class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -35,6 +38,12 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     AttachedTopic(TopicModel model, EmbeddedService dms) {
         super(model, dms);
+    }
+
+    // ---
+
+    // Called by JAXB
+    AttachedTopic() {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

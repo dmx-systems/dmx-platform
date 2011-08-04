@@ -1,5 +1,7 @@
 package de.deepamehta.core.model;
 
+import javax.xml.bind.annotation.XmlElement;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -13,6 +15,7 @@ public class SimpleValue {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    @XmlElement
     private Object value;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -46,6 +49,12 @@ public class SimpleValue {
             throw new IllegalArgumentException("Tried to build a SimpleValue from a null Object");
         }
         this.value = value;
+    }
+
+    // ---
+
+    // Called by JAXB
+    private SimpleValue() {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

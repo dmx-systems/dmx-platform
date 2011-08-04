@@ -69,7 +69,7 @@ import java.util.logging.Logger;
  */
 @Path("/")
 @Consumes("application/json")
-@Produces("application/json")
+@Produces({"application/json", "application/xml"})
 public class EmbeddedService implements DeepaMehtaService {
 
     // ------------------------------------------------------------------------------------------------------- Constants

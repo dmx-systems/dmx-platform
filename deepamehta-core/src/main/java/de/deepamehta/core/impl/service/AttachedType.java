@@ -49,6 +49,12 @@ abstract class AttachedType extends AttachedTopic implements Type {
         initViewConfig();
     }
 
+    // ---
+
+    // Called by JAXB
+    AttachedType() {
+    }
+
     // -------------------------------------------------------------------------------------------------- Public Methods
 
 

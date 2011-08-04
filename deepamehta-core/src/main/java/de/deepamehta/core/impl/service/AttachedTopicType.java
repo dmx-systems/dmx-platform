@@ -4,6 +4,8 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicTypeModel;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import java.util.logging.Logger;
 
 
@@ -11,6 +13,7 @@ import java.util.logging.Logger;
 /**
  * A topic type that is attached to the {@link DeepaMehtaService}.
  */
+@XmlRootElement(name="topicType")
 class AttachedTopicType extends AttachedType implements TopicType {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -26,6 +29,12 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     AttachedTopicType(TopicTypeModel model, EmbeddedService dms) {
         super(model, dms);
+    }
+
+    // ---
+
+    // Called by JAXB
+    private AttachedTopicType() {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

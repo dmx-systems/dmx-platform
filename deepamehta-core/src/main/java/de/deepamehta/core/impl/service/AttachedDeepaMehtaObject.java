@@ -19,6 +19,8 @@ import de.deepamehta.core.service.Directives;
 
 import org.codehaus.jettison.json.JSONObject;
 
+import javax.xml.bind.annotation.XmlElement;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,7 +35,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private DeepaMehtaObjectModel model;
-    protected final EmbeddedService dms;
+    protected EmbeddedService dms = null;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -47,6 +49,12 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     AttachedDeepaMehtaObject(DeepaMehtaObjectModel model, EmbeddedService dms) {
         this.model = model;
         this.dms = dms;
+    }
+
+    // ---
+
+    // Called by JAXB
+    AttachedDeepaMehtaObject() {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -64,6 +72,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // --- ID ---
 
     @Override
+    @XmlElement
     public long getId() {
         return model.getId();
     }

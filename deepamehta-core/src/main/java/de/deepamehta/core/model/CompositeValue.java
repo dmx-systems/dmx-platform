@@ -4,6 +4,8 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONException;
 
+import javax.xml.bind.annotation.XmlElement;
+
 import java.util.Iterator;
 
 
@@ -22,6 +24,7 @@ public class CompositeValue {
      * Internal representation.
      * Key: String, value: non-null atomic (String, Integer, Long, Double, Boolean) or composite (JSONObject).
      */
+    @XmlElement
     private JSONObject values;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
