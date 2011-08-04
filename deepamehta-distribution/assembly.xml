@@ -10,12 +10,12 @@
     <!-- copy Felix and logging porperties to /conf -->
     <files>
         <file>
-            <source>${project.basedir}/config.properties</source>
+            <source>${project.basedir}/conf/config.properties</source>
             <outputDirectory>conf</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
-            <source>${project.basedir}/logging.properties</source>
+            <source>${project.basedir}/conf/logging.properties</source>
             <outputDirectory>conf</outputDirectory>
         </file>
     </files>
@@ -57,8 +57,9 @@
     <!-- copy start scripts, license and readme to / -->
     <fileSets>
         <fileSet>
-            <directory>${project.basedir}</directory>
+            <directory>${project.basedir}/script</directory>
             <fileMode>0555</fileMode>
+            <outputDirectory>.</outputDirectory>
             <includes>
                 <include>deepamehta-linux.sh</include>
                 <include>deepamehta-macosx.command</include>
@@ -66,7 +67,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}</directory>
+            <directory>${project.basedir}/..</directory>
             <fileMode>0444</fileMode>
             <includes>
                 <include>LICENSE.txt</include>

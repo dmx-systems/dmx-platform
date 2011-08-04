@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Global</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-global</artifactId>
-    <version>4.0.1</version>
+    <version>4.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -32,7 +32,7 @@
                 <org.osgi.service.http.port>8080</org.osgi.service.http.port>
                 <file.encoding>UTF-8</file.encoding>
                 <java.util.logging.config.file>
-                    ${project.basedir}/deepamehta-distribution/logging.properties
+                    ${project.basedir}/deepamehta-distribution/conf/logging.properties
                 </java.util.logging.config.file>
                 <felix.log.level>1</felix.log.level>
                 <felix.fileinstall.dir>
