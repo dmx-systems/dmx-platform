@@ -21,10 +21,17 @@ Wiki, issue tracker:
 <https://trac.deepamehta.de/>
 
 Mailing lists:  
-<https://lists.berlios.de/mailman/listinfo/deepamehta-users> -- for users and developers  
-<https://lists.berlios.de/mailman/listinfo/deepamehta-devel> -- mainly for developers
+<https://lists.berlios.de/mailman/listinfo/deepamehta-users>  
+<https://lists.berlios.de/mailman/listinfo/deepamehta-devel>
 
 Licensed under GNU General Public License Version 3.
+
+
+**Important Notice:**  
+    +++ DeepaMehta is still under heavy development! +++  
+Do not use it in any productive and/or professional environment!  
+Currently we can not provide an update mechanism for your data. Data you put into the current version of DeepaMehta might not be usable in a later version of DeepaMehta. Please keep this in mind when using this software.  
+Thank you for your understanding!
 
 
 Requirements
