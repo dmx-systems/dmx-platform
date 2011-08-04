@@ -20,8 +20,9 @@ Downloads, source code:
 Wiki, issue tracker:  
 <https://trac.deepamehta.de/>
 
-User and developer discussion:  
-<https://groups.google.com/group/deepamehta3>
+Mailing lists:  
+<https://lists.berlios.de/mailman/listinfo/deepamehta-users> -- for users and developers  
+<https://lists.berlios.de/mailman/listinfo/deepamehta-devel> -- mainly for developers
 
 Licensed under GNU General Public License Version 3.
 
