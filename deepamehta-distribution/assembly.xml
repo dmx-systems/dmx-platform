@@ -70,14 +70,9 @@
             <directory>${project.basedir}/..</directory>
             <fileMode>0444</fileMode>
             <includes>
-                <include>LICENSE.txt</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/..</directory>
-            <fileMode>0444</fileMode>
-            <includes>
                 <include>README.md</include>
+                <include>COPYRIGHT.txt</include>
+                <include>LICENSE.txt</include>
             </includes>
         </fileSet>
     </fileSets>
