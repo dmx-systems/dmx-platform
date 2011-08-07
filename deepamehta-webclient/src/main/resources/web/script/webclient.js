@@ -20,6 +20,7 @@ var dm4c = new function() {
     this.type_cache = new TypeCache()
 
     // View
+    this.toolbar = null                 // the upper toolbar GUI component (a ToolbarPanel object)
     this.canvas = null                  // the canvas GUI component that displays the topicmap (a Canvas object)
     this.page_panel = null              // the page panel GUI component on the right hand side (a PagePanel object)
 
@@ -44,6 +45,29 @@ var dm4c = new function() {
     /******************/
 
 
+
+    this.do_search = function(searchmode) {
+        try {
+            var search_topic = build_topic(dm4c.trigger_plugin_hook("search", searchmode)[0])
+            // alert("search_topic=" + JSON.stringify(search_topic))
+            dm4c.show_topic(search_topic, "show")
+        } catch (e) {
+            alert("ERROR while searching:\n\n" + JSON.stringify(e))
+        }
+    }
+
+    this.do_select_searchmode = function(searchmode) {
+        // Note: we must empty the current search widget _before_ the new search widget is build. Otherwise the
+        // search widget's event handlers might get lost.
+        // Consider this case: the "by Type" searchmode is currently selected and the user selects it again. The
+        // ui_menu() call for building the type menu will unnecessarily add the menu to the DOM because it finds
+        // an element with the same ID on the page. A subsequent empty() would dispose the just added type menu
+        // -- including its event handlers -- and the append() would eventually add the crippled type menu.
+        $("#search-widget").empty()
+        $("#search-widget").append(dm4c.trigger_plugin_hook("search_widget", searchmode)[0])
+    }
+
+    // ---
 
     /**
      * Fetches the topic and displays it on the page panel.
@@ -678,49 +702,13 @@ var dm4c = new function() {
     // ---
 
     /**
-     * @param   menu_id     Used IDs are e.g.
+     * @param   menu_id     Used IDs are e.g. ### FIXDOC
      *                      "create-type-menu"
      *                      "search-type-menu" - introduced by typesearch plugin
-     *
-     * @return  The menu (a UIHelper Menu object).
      */
-    this.create_type_menu = function(menu_id, handler) {
-        var type_menu = dm4c.ui.menu(menu_id, handler)
-        var type_uris = dm4c.type_cache.get_type_uris()
-        for (var i = 0; i < type_uris.length; i++) {
-            var type_uri = type_uris[i]
-            var topic_type = dm4c.type_cache.get_topic_type(type_uri)
-            if (dm4c.has_create_permission(type_uri) && topic_type.get_menu_config(menu_id)) {
-                // add type to menu
-                type_menu.add_item({
-                    label: topic_type.value,
-                    value: type_uri,
-                    icon: topic_type.get_icon_src()
-                })
-            }
-        }
-        //
-        dm4c.trigger_plugin_hook("post_create_type_menu", type_menu)
-        //
-        return type_menu
-    }
-
-    /**
-     * @param   menu_id     Used IDs are e.g.
-     *                      "create-type-menu"
-     *                      "search-type-menu" - introduced by typesearch plugin
-     *
-     * @return  The menu (a UIHelper Menu object).
-     */
-    this.recreate_type_menu = function(menu_id) {
-        var selection = dm4c.ui.menu_item(menu_id)
-        var type_menu = dm4c.create_type_menu(menu_id)
-        // restore selection
-        // Note: selection is undefined if the menu has no items.
-        if (selection) {
-            dm4c.ui.select_menu_item(menu_id, selection.value)
-        }
-        return type_menu
+    this.refresh_create_menu = function() {
+        dm4c.toolbar.refresh_create_menu()
+        dm4c.trigger_plugin_hook("post_refresh_create_menu", dm4c.toolbar.create_menu)
     }
 
     // ---
@@ -887,54 +875,12 @@ var dm4c = new function() {
 
     // === GUI ===
 
-    function searchmode_select() {
-        return $("<select>").attr("id", "searchmode-select")
-    }
-
-    function searchmode_selected(menu_item) {
-        // Note: we must empty the current search widget _before_ the new search widget is build. Otherwise the
-        // search widget's event handlers might get lost.
-        // Consider this case: the "by Type" searchmode is currently selected and the user selects it again. The
-        // ui_menu() call for building the type menu will unnecessarily add the menu to the DOM because it finds
-        // an element with the same ID on the page. A subsequent empty() would dispose the just added type menu
-        // -- including its event handlers -- and the append() would eventually add the crippled type menu.
-        $("#search-widget").empty()
-        var searchmode = menu_item.label
-        var search_widget = dm4c.trigger_plugin_hook("search_widget", searchmode)[0]
-        $("#search-widget").append(search_widget)
-    }
-
-    function search() {
-        try {
-            var searchmode = dm4c.ui.menu_item("searchmode-select").label
-            var search_topic = build_topic(dm4c.trigger_plugin_hook("search", searchmode)[0])
-            // alert("search_topic=" + JSON.stringify(search_topic))
-            dm4c.show_topic(search_topic, "show")
-        } catch (e) {
-            alert("ERROR while searching:\n\n" + JSON.stringify(e))
-        }
-        return false
-    }
-
-    // ---
-
     // ### TODO: rework
     function submit_document() {
         var submit_button = $("#page-panel button[submit=true]")
         // alert("submit_document: submit button id=" + submit_button.attr("id"))
         submit_button.click()
         return false
-    }
-
-    // --- Special Menu ---
-
-    function create_special_select() {
-        return $("<select>").attr("id", "special-menu")
-    }
-
-    function special_selected(menu_item) {
-        var command = menu_item.label
-        dm4c.trigger_plugin_hook("handle_special_command", command)
     }
 
     // === Plugin Support ===
@@ -1022,14 +968,9 @@ var dm4c = new function() {
     $(function() {
         //
         // --- 1) Prepare GUI ---
-        $("#upper-toolbar").addClass("ui-widget-header").addClass("ui-corner-all")
-        // the search form
-        $("#searchmode-select-placeholder").replaceWith(searchmode_select())
-        $("#search_field").attr({size: dm4c.SEARCH_FIELD_WIDTH})
-        $("#search-form").submit(search)
-        dm4c.ui.button("search-button", search, "Search", "gear")
-        // the special form
-        $("#special-menu-placeholder").replaceWith(create_special_select())
+        // the toolbar
+        dm4c.toolbar = new ToolbarPanel()
+        $("body").prepend(dm4c.toolbar.dom)
         // the page panel
         dm4c.page_panel = new PagePanel()
         $("#split-panel > tbody > tr > td").eq(1).append(dm4c.page_panel.dom)
@@ -1078,6 +1019,9 @@ var dm4c = new function() {
             }
         }
 
+        /**
+         * Called once all plugins are loaded.
+         */
         function setup_gui() {
             load_page_renderers()
             load_field_renderers()
@@ -1090,15 +1034,10 @@ var dm4c = new function() {
             dm4c.trigger_plugin_hook("init")
             //
             // setup create widget
-            var menu = dm4c.create_type_menu("create-type-menu")
-            $("#create-type-menu-placeholder").replaceWith(menu.dom)
-            dm4c.ui.button("create-button", do_create_topic, "Create", "plus")
-            if (!menu.get_item_count()) {
+            dm4c.refresh_create_menu()
+            if (!dm4c.toolbar.create_menu.get_item_count()) {
                 $("#create-widget").hide()
             }
-            //
-            dm4c.ui.menu("searchmode-select", searchmode_selected)
-            dm4c.ui.menu("special-menu", special_selected, undefined, "Special")
             // the page panel
             if (dm4c.LOG_GUI) dm4c.log("Setting page panel height: " + $("#canvas").height())
             $("#page-content").height($("#canvas").height())
@@ -1140,11 +1079,6 @@ var dm4c = new function() {
                 if (LOG_PLUGIN_LOADING) dm4c.log("..... " + css_stylesheet)
                 $("head").append($("<link>").attr({rel: "stylesheet", href: css_stylesheet, type: "text/css"}))
             }
-        }
-
-        function do_create_topic() {
-            var type_uri = dm4c.ui.menu_item("create-type-menu").value
-            dm4c.do_create_topic(type_uri)
         }
 
         function window_resized() {

@@ -16,7 +16,7 @@ function UIHelper() {
      * @param   id          Optional: ID of the <button> element that is transformed to a jQuery UI button.
      *                      If no such DOM element exists in the document (or if "id" is undefined), a button element
      *                      is created and the caller is responsible for adding the returned button to the DOM tree.
-     * @param   handler     The callback function.
+     * @param   handler     The callback function. The generic JavaScript event arguments are passed to it.
      *
      * @return              The button (a jQuery object).
      */

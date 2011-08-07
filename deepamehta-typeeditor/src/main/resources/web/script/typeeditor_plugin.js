@@ -42,7 +42,7 @@ function typeeditor_plugin() {
             // 1) Update type cache
             dm4c.type_cache.put_topic_type(topic)
             // 2) Rebuild type menu
-            dm4c.recreate_type_menu("create-type-menu")
+            dm4c.refresh_create_menu()
         }
     }
 
@@ -63,11 +63,11 @@ function typeeditor_plugin() {
             }
             dm4c.type_cache.put_topic_type(topic)
             // 2) Rebuild type menu
-            dm4c.recreate_type_menu("create-type-menu")
+            dm4c.refresh_create_menu()
         }
     }
 
-    this.post_create_type_menu = function(type_menu) {
+    this.post_refresh_create_menu = function(type_menu) {
         type_menu.add_separator()
         type_menu.add_item({
             label: "New Topic Type...",

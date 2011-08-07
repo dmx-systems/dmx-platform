@@ -116,7 +116,7 @@ function default_plugin () {
 
     this.add_canvas_commands = function(cx, cy) {
         var commands = []
-        var type_item = dm4c.ui.menu_item("create-type-menu")
+        var type_item = dm4c.toolbar.create_menu.get_selection()
         // Note: if the user has no create permission the type menu is empty (no items).
         if (type_item) {
             var type_uri = type_item.value
