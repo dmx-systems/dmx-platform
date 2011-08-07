@@ -12,8 +12,10 @@ function default_plugin () {
 
     this.init = function() {
 
-        dm4c.ui.dialog("delete-topic-dialog",       "Delete Topic?",       "Delete", do_delete_topic)
-        dm4c.ui.dialog("delete-association-dialog", "Delete Association?", "Delete", do_delete_association)
+        dm4c.ui.dialog("delete-topic-dialog",       "Delete Topic?",       undefined, undefined,
+            "Delete", do_delete_topic)
+        dm4c.ui.dialog("delete-association-dialog", "Delete Association?", undefined, undefined,
+            "Delete", do_delete_association)
 
         function do_delete_topic() {
             $("#delete-topic-dialog").dialog("close")

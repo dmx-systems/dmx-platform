@@ -24,6 +24,7 @@
         <script type="text/javascript" src="script/topicmap-renderers/canvas.js"></script>
         <script type="text/javascript" src="script/gui_panels/toolbar_panel.js"></script>
         <script type="text/javascript" src="script/gui_panels/page_panel.js"></script>
+        <script type="text/javascript" src="script/gui_panels/upload_dialog.js"></script>
         <script type="text/javascript" src="script/webclient.js"></script>
     </head>
     <body>
@@ -36,13 +37,5 @@
                 <td></td>
             </tr>
         </table>
-        <div id="upload-dialog" title="Upload File">
-            File:
-            <form method="post" enctype="multipart/form-data" target="upload-target">
-                <input type="file" name="file" size="60">
-                <input type="submit" value="Upload">
-            </form>
-        </div>
-        <iframe id="upload-target" name="upload-target"></iframe>
     </body>
 </html>

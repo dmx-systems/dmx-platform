@@ -3,7 +3,6 @@ var dm4c = new function() {
     var CORE_SERVICE_URI = "/core"
     this.SEARCH_FIELD_WIDTH = 16    // in chars
     this.COMPOSITE_PATH_SEPARATOR = "/"
-    var UPLOAD_DIALOG_WIDTH = "50em"
     this.GENERIC_TOPIC_ICON_SRC = "images/ball-grey.png"
 
     var ENABLE_LOGGING = false
@@ -23,6 +22,7 @@ var dm4c = new function() {
     this.toolbar = null                 // the upper toolbar GUI component (a ToolbarPanel object)
     this.canvas = null                  // the canvas GUI component that displays the topicmap (a Canvas object)
     this.page_panel = null              // the page panel GUI component on the right hand side (a PagePanel object)
+    this.upload_dialog = null           // the upload dialog (an UploadDialog object)
 
     var plugin_sources = []
     var plugins = {}                // key: plugin class name, base name of source file (string), value: plugin instance
@@ -711,54 +711,6 @@ var dm4c = new function() {
         dm4c.trigger_plugin_hook("post_refresh_create_menu", dm4c.toolbar.create_menu)
     }
 
-    // ---
-
-    /**
-     * Adds a menu item to the special menu.
-     *
-     * @param   item    The menu item to add. An object with this properties:
-     *                      "label" - The label to be displayed in the special menu.
-     *                      "value" - Optional: the value to be examined by the caller.
-     *                          Note: if this item is about to be selected programatically or re-labeled
-     *                          the value must be specified.
-     */
-    this.add_to_special_menu = function(item) {
-        var option = $("<option>").text(item.label)
-        if (item.value) {
-            option.attr("value", item.value)
-        }
-        $("#special-menu").append(option)
-    }
-
-    // --- File upload ---
-
-    /**
-     * @param   command     the command (a string) send to the server along with the selected file.
-     * @param   callback    the function that is invoked once the file has been uploaded and processed at server-side.
-     *                      One argument is passed to that function: the object (deserialzed JSON) returned by the
-     *                      (server-side) executeCommandHook.
-     */
-    this.show_upload_dialog = function(command, callback) {
-        $("#upload-dialog form").attr("action", "/core/command/" + command)
-        $("#upload-dialog").dialog("open")
-        // bind callback function, using artifact ID as event namespace
-        $("#upload-target").unbind("load.deepamehta-webclient")
-        $("#upload-target").bind("load.deepamehta-webclient", upload_complete(callback))
-
-        function upload_complete(callback) {
-            return function() {
-                $("#upload-dialog").dialog("close")
-                // Note: iframes (the upload target) must be DOM manipulated as frames
-                var result = $("pre", window.frames["upload-target"].document).text()
-                try {
-                    callback(JSON.parse(result))
-                } catch (e) {
-                    alert("No valid server response: \"" + result + "\"\n\nException=" + JSON.stringify(e))
-                }
-            }
-        }
-    }
-
     // --- Image Tracker ---
 
     var image_tracker
@@ -968,19 +920,17 @@ var dm4c = new function() {
     $(function() {
         //
         // --- 1) Prepare GUI ---
-        // the toolbar
+        // create toolbar
         dm4c.toolbar = new ToolbarPanel()
         $("body").prepend(dm4c.toolbar.dom)
-        // the page panel
+        // create page panel
         dm4c.page_panel = new PagePanel()
         $("#split-panel > tbody > tr > td").eq(1).append(dm4c.page_panel.dom)
         // ### $("#document-form").submit(submit_document)
         detail_panel_width = $("#page-content").width()
         if (dm4c.LOG_GUI) dm4c.log("Mesuring page panel width: " + detail_panel_width)
-        // the upload dialog
-        $("#upload-dialog").dialog({
-            modal: true, autoOpen: false, draggable: false, resizable: false, width: UPLOAD_DIALOG_WIDTH
-        })
+        // create upload dialog
+        dm4c.upload_dialog = new UploadDialog()
         //
         // --- 2) Load Plugins ---
         // Note: in order to let a plugin DOM manipulate the GUI the plugins are loaded *after* the GUI is prepared.

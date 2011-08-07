@@ -55,14 +55,20 @@ function UIHelper() {
     // === Dialog Box ===
 
     // Settings
-    var DIALOG_WIDTH = 350   // in pixel
+    var DEFAULT_DIALOG_WIDTH = 350   // in pixel
 
-    this.dialog = function(id, title, button_label, button_handler) {
-        var dialog = $("<div>", {id: id})
-        var buttons = {}; buttons[button_label] = button_handler
+    this.dialog = function(id, title, content, width, button_label, button_handler) {
+        var dialog = $("<div>", {id: id}).append(content)
+        width = width || DEFAULT_DIALOG_WIDTH
+        //
+        var buttons = {}
+        if (button_label && button_handler) {
+            buttons[button_label] = button_handler
+        }
+        //
         $("body").append(dialog)
         dialog.dialog({
-            modal: true, autoOpen: false, draggable: false, resizable: false, width: DIALOG_WIDTH,
+            modal: true, autoOpen: false, draggable: false, resizable: false, width: width,
             title: title, buttons: buttons
         })
     }

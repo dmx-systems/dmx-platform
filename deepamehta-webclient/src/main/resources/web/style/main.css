@@ -204,9 +204,3 @@ body {
     color: white;
     background: #555;
 }
-
-/*** Upload Target ***/
-
-#upload-target {
-    display: none;
-}
