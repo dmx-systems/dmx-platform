@@ -17,8 +17,13 @@
 
 .dm-toolbar   .ui-button-icon-only .ui-button-text,
 #page-content .ui-button-icon-only .ui-button-text {
-    padding-top: 0.6em;
-    padding-bottom: 0.6em;
+    padding-top: 0.8em;
+    padding-bottom: 0.9em;
+}
+
+.dm-toolbar   .ui-button-icon-only,
+#page-content .ui-button-icon-only {
+    vertical-align: middle;
 }
 
 .ui-resizable-handle {

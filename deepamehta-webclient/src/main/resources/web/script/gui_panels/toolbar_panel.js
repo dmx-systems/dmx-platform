@@ -1,6 +1,8 @@
 function ToolbarPanel() {
 
-    // the "Search" widget
+    var recent_type_uri
+
+    // create "Search" widget
     var searchmode_menu = dm4c.ui.menu("searchmode-select", do_select_searchmode)
     var search_button = dm4c.ui.button(undefined, do_search, "Search", "gear")
     var search_form = $("<form>").attr({action: "#", id: "search-form"})
@@ -8,17 +10,17 @@ function ToolbarPanel() {
         .append($("<span>").attr(                   {id: "search-widget"})
             .append($('<input type="text">').attr(  {id: "search-field", size: dm4c.SEARCH_FIELD_WIDTH})))
         .append(search_button).submit(do_search)
-    // the "Create" widget
-    var create_menu = dm4c.ui.menu("create-type-menu")
-    var create_button = dm4c.ui.button(undefined, do_create_topic, "Create", "plus")
+    // create "Create" widget
+    var create_menu = dm4c.ui.menu("create-type-menu", do_create_topic, undefined, "Create")
+    var create_another_button = dm4c.ui.button(undefined, do_create_another_topic, undefined, "plus").button("disable")
     var create_widget = $("<div>").attr(            {id: "create-widget"})
         .append(create_menu.dom)
-        .append(create_button)
-    // the "Special" menu
+        .append(create_another_button)
+    // create "Special" menu
     var special_menu = dm4c.ui.menu("special-menu", undefined, undefined, "Special")
     var special_form = $("<div>").attr(             {id: "special-form"})
         .append(special_menu.dom)
-    //
+    // create toolbar
     var dom = $("<div>").attr({id: "upper-toolbar"}).addClass("dm-toolbar")
         .addClass("ui-widget-header").addClass("ui-corner-all")
         .append(search_form)
@@ -35,10 +37,9 @@ function ToolbarPanel() {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     this.refresh_create_menu = function() {
-        // save selection and remove all items
-        var selection = create_menu.get_selection()
+        // remove all items
         create_menu.empty()
-        // add topic types
+        // add topic type items
         var type_uris = dm4c.type_cache.get_type_uris()
         for (var i = 0; i < type_uris.length; i++) {
             var type_uri = type_uris[i]
@@ -51,11 +52,10 @@ function ToolbarPanel() {
                 })
             }
         }
-        // restore selection
-        // Note: selection is undefined if the menu has no items.
-        if (selection) {
-            create_menu.select(selection.value)
-        }
+    }
+
+    this.get_recent_type_uri = function() {
+        return recent_type_uri
     }
 
     // ---
@@ -72,9 +72,16 @@ function ToolbarPanel() {
 
     // ---
 
-    function do_create_topic() {
-        var type_uri = create_menu.get_selection().value
+    function do_create_topic(menu_item) {
+        var type_uri = menu_item.value
         dm4c.do_create_topic(type_uri)
+        // enable "create another one"
+        recent_type_uri = type_uri
+        create_another_button.button("enable")
+    }
+
+    function do_create_another_topic() {
+        dm4c.do_create_topic(recent_type_uri)
     }
 
     // ---

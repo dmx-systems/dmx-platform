@@ -64,7 +64,8 @@ body {
 }
 
 #page-content input.combobox {
-    width: 85%;
+    width: 75%;
+    vertical-align: middle;
 }
 
 /*** Page Panel Style ***/

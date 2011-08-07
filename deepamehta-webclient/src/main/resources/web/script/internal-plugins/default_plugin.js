@@ -118,10 +118,9 @@ function default_plugin () {
 
     this.add_canvas_commands = function(cx, cy) {
         var commands = []
-        var type_item = dm4c.toolbar.create_menu.get_selection()
-        // Note: if the user has no create permission the type menu is empty (no items).
-        if (type_item) {
-            var type_uri = type_item.value
+        // Note: type_uri is undefined if the user has no create permission or has nothing created yet
+        var type_uri = dm4c.toolbar.get_recent_type_uri()
+        if (type_uri) {
             var type_label = dm4c.type_label(type_uri)
             commands.push({
                 label: "Create " + type_label, handler: do_create, context: "context-menu"

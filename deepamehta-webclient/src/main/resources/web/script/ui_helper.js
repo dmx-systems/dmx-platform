@@ -38,15 +38,19 @@ function UIHelper() {
         }
         // Note: pseudo-attribute "submit" TODO: explain
         button.attr({submit: is_submit}).click(handler)
-        button.button()
+        //
+        var options = {}
         if (label) {
-            button.button("option", "label", label)
+            options.label = label
         } else {
-            button.button("option", "text", false)
+            options.text = false
         }
         if (icon) {
-            button.button("option", "icons", {primary: "ui-icon-" + icon})
+            options.icons = {primary: "ui-icon-" + icon}
         }
+        //
+        button.button(options)
+        //
         return button
     }
 
@@ -474,7 +478,7 @@ function UIHelper() {
         return new Combobox()
 
         function Combobox() {
-            var menu = self.menu(menu_id, item_selected, undefined, "x")
+            var menu = self.menu(menu_id, item_selected, undefined, "Choose")
             var input = $("<input>").attr("type", "text").addClass("combobox")
             menu.dom.append(input)
             this.dom = menu.dom
