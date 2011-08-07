@@ -1004,6 +1004,8 @@ var dm4c = new function() {
             if (dm4c.LOG_GUI) dm4c.log("Setting page panel height: " + $("#canvas").height())
             $("#page-content").height($("#canvas").height())
             //
+            $("body").removeClass("progress")
+            //
             $(window).resize(window_resized)
         }
 

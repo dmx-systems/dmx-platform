@@ -2,6 +2,12 @@ body {
     font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
 }
 
+.progress {
+    background-image: url("/de.deepamehta.webclient/images/progress.gif");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 /*** Main Layout ***/
 
 #upper-toolbar {
