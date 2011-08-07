@@ -920,6 +920,7 @@ var dm4c = new function() {
     $(function() {
         //
         // --- 1) Prepare GUI ---
+        create_split_panel()
         // create toolbar
         dm4c.toolbar = new ToolbarPanel()
         $("body").prepend(dm4c.toolbar.dom)
@@ -939,6 +940,17 @@ var dm4c = new function() {
         //
         register_plugins()
         load_plugins()
+
+        function create_split_panel() {
+            $("body").append($("<table>", {id: "split-panel"})
+                .append($("<tr>")
+                    .append($("<td>")
+                        .append($("<div>", {id: "canvas-panel"}))
+                    )
+                    .append($("<td>"))
+                )
+            )
+        }
 
         /**
          * Loads and instantiates all registered plugins.
