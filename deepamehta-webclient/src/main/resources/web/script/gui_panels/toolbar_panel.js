@@ -1,5 +1,8 @@
 function ToolbarPanel() {
 
+    var CREATE_ANOTHER_BUTTON_TITLE_DIS = "Once a topic is created this button creates another one of the same type [n]"
+    var CREATE_ANOTHER_BUTTON_TITLE_EN  = "Create another "
+
     var recent_type_uri
 
     // create "Search" widget
@@ -13,7 +16,7 @@ function ToolbarPanel() {
     // create "Create" widget
     var create_menu = dm4c.ui.menu("create-type-menu", do_create_topic, undefined, "Create")
     var create_another_button = dm4c.ui.button(undefined, do_create_another_topic, undefined, "plus")
-        .attr("accesskey", "n").button("disable")
+        .button("disable").attr({title: CREATE_ANOTHER_BUTTON_TITLE_DIS, accesskey: "n"})
     var create_widget = $("<div>").attr(            {id: "create-widget"})
         .append(create_menu.dom)
         .append(create_another_button)
@@ -78,7 +81,8 @@ function ToolbarPanel() {
         dm4c.do_create_topic(type_uri)
         // enable "create another one"
         recent_type_uri = type_uri
-        create_another_button.button("enable")
+        var title = CREATE_ANOTHER_BUTTON_TITLE_EN + menu_item.label + " [n]"
+        create_another_button.button("enable").attr("title", title)
     }
 
     function do_create_another_topic() {
