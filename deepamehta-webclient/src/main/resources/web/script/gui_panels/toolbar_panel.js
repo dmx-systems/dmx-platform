@@ -12,7 +12,8 @@ function ToolbarPanel() {
         .append(search_button).submit(do_search)
     // create "Create" widget
     var create_menu = dm4c.ui.menu("create-type-menu", do_create_topic, undefined, "Create")
-    var create_another_button = dm4c.ui.button(undefined, do_create_another_topic, undefined, "plus").button("disable")
+    var create_another_button = dm4c.ui.button(undefined, do_create_another_topic, undefined, "plus")
+        .attr("accesskey", "n").button("disable")
     var create_widget = $("<div>").attr(            {id: "create-widget"})
         .append(create_menu.dom)
         .append(create_another_button)
