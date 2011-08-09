@@ -8,6 +8,9 @@ function topicmaps_plugin() {
     var topicmaps = {}  // The topicmaps cache (key: topicmap ID, value: Topicmap object)
     var topicmap        // Selected topicmap (Topicmap object)
 
+    // view
+    var topicmap_menu
+
     // ------------------------------------------------------------------------------------------------ Overriding Hooks
 
 
@@ -51,15 +54,19 @@ function topicmaps_plugin() {
         }
 
         function create_topicmap_menu() {
+            // build topicmap widget
             var topicmap_label = $("<span>").attr("id", "topicmap-label").text("Topicmap")
-            var topicmap_menu = $("<div>").attr("id", "topicmap-menu")
-            var topicmap_form = $("<div>").attr("id", "topicmap-form").append(topicmap_label).append(topicmap_menu)
+            topicmap_menu = dm4c.ui.menu("topicmap-menu", do_select_topicmap)
+            var topicmap_form = $("<div>").attr("id", "topicmap-form")
+                .append(topicmap_label)
+                .append(topicmap_menu.dom)
+            // put in toolbar
             if ($("#workspace-form").size()) {
                 $("#workspace-form").after(topicmap_form)
             } else {
                 $("#upper-toolbar").prepend(topicmap_form)
             }
-            dm4c.ui.menu("topicmap-menu", do_select_topicmap)
+            //
             rebuild_topicmap_menu(undefined, topicmaps)
         }
 
@@ -385,7 +392,7 @@ function topicmaps_plugin() {
      * Selects an item from the topicmap menu.
      */
     function select_menu_item(topicmap_id) {
-        dm4c.ui.select_menu_item("topicmap-menu", topicmap_id)
+        topicmap_menu.select(topicmap_id)
     }
 
     /**
@@ -393,7 +400,7 @@ function topicmaps_plugin() {
      * If the topicmap menu has no items yet, undefined is returned.
      */
     function get_topicmap_id_from_menu() {
-        var item = dm4c.ui.menu_item("topicmap-menu")
+        var item = topicmap_menu.get_selection()
         if (item) {
             return item.value
         }
@@ -421,16 +428,16 @@ function topicmaps_plugin() {
             topicmaps = get_all_topicmaps()
         }
         //
-        dm4c.ui.empty_menu("topicmap-menu")
+        topicmap_menu.empty()
         var icon_src = dm4c.get_icon_src("dm4.topicmaps.topicmap")
         // add topicmaps to menu
         for (var i = 0, topicmap; topicmap = topicmaps[i]; i++) {
-            dm4c.ui.add_menu_item("topicmap-menu", {label: topicmap.value, value: topicmap.id, icon: icon_src})
+            topicmap_menu.add_item({label: topicmap.value, value: topicmap.id, icon: icon_src})
         }
         // add "New..." to menu
         if (dm4c.has_create_permission("dm4.topicmaps.topicmap")) {
-            dm4c.ui.add_menu_separator("topicmap-menu")
-            dm4c.ui.add_menu_item("topicmap-menu", {label: "New Topicmap...", value: "_new", is_trigger: true})
+            topicmap_menu.add_separator()
+            topicmap_menu.add_item({label: "New Topicmap...", value: "_new", is_trigger: true})
         }
         //
         select_menu_item(topicmap_id)

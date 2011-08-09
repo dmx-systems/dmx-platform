@@ -2,6 +2,9 @@ function workspaces_plugin() {
 
     dm4c.register_css_stylesheet("/de.deepamehta.workspaces/style/workspaces.css")
 
+    // view
+    var workspace_menu
+
     // ------------------------------------------------------------------------------------------------------ Public API
 
 
@@ -19,11 +22,15 @@ function workspaces_plugin() {
         create_workspace_dialog()
 
         function create_workspace_menu() {
+            // build workspace widget
             var workspace_label = $("<span>").attr("id", "workspace-label").text("Workspace")
-            var workspace_menu = $("<div>").attr("id", "workspace-menu")
-            var workspace_form = $("<div>").attr("id", "workspace-form").append(workspace_label).append(workspace_menu)
+            workspace_menu = dm4c.ui.menu("workspace-menu", do_select_workspace)
+            var workspace_form = $("<div>").attr("id", "workspace-form")
+                .append(workspace_label)
+                .append(workspace_menu.dom)
+            // put in toolbar
             $("#upper-toolbar").prepend(workspace_form)
-            dm4c.ui.menu("workspace-menu", do_select_workspace)
+            //
             rebuild_workspace_menu(undefined, workspaces)
             update_cookie()
         }
@@ -77,7 +84,7 @@ function workspaces_plugin() {
      * If the workspace menu has no items yet, undefined is returned.
      */
     function get_workspace_id_from_menu() {
-        var item = dm4c.ui.menu_item("workspace-menu")
+        var item = workspace_menu.get_selection()
         if (item) {
             return item.value
         }
@@ -140,16 +147,16 @@ function workspaces_plugin() {
             workspaces = get_all_workspaces()
         }
         //
-        dm4c.ui.empty_menu("workspace-menu")
+        workspace_menu.empty()
         var icon_src = dm4c.get_icon_src("dm4.workspaces.workspace")
         // add workspaces to menu
         for (var i = 0, workspace; workspace = workspaces[i]; i++) {
-            dm4c.ui.add_menu_item("workspace-menu", {label: workspace.value, value: workspace.id, icon: icon_src})
+            workspace_menu.add_item({label: workspace.value, value: workspace.id, icon: icon_src})
         }
         // add "New..." to menu
         if (dm4c.has_create_permission("dm4.workspaces.workspace")) {
-            dm4c.ui.add_menu_separator("workspace-menu")
-            dm4c.ui.add_menu_item("workspace-menu", {label: "New Workspace...", value: "_new", is_trigger: true})
+            workspace_menu.add_separator()
+            workspace_menu.add_item({label: "New Workspace...", value: "_new", is_trigger: true})
         }
         //
         select_menu_item(workspace_id)
@@ -159,7 +166,7 @@ function workspaces_plugin() {
      * Selects an item from the workspace menu.
      */
     function select_menu_item(workspace_id) {
-        dm4c.ui.select_menu_item("workspace-menu", workspace_id)
+        workspace_menu.select(workspace_id)
         update_cookie()
     }
 

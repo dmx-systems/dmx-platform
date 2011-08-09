@@ -50,7 +50,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-workspaces</artifactId>
-            <version>4.0.1</version>
+            <version>4.0.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-topicmaps</artifactId>
-            <version>4.0.1</version>
+            <version>4.0.3-SNAPSHOT</version>
         </dependency>
         <!-- not yet adapted to DeepaMehta 4.0 resp. obsolete -->
         <!--dependency>

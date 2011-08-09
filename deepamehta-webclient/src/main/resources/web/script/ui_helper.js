@@ -60,7 +60,6 @@ function UIHelper() {
 
     // === Menu ===
 
-    var menus = {}          // key: menu ID, value: a Menu object ### FIXME: to be dropped
     var opened_menu = null  // global state: the menu currently open, or null if no menu is open
 
     $(function() {
@@ -113,7 +112,7 @@ function UIHelper() {
      */
     this.menu = function(menu_id, handler, items, menu_title) {
 
-        return menus[menu_id] = new Menu()
+        return new Menu()
 
         function Menu() {
 
@@ -199,6 +198,7 @@ function UIHelper() {
 
             // ---
 
+            /* FIXME: not in use
             this.set_item_label = function(item_value, new_label) {
                 find_item(item_value, function(item, item_id) {
                     // update model
@@ -206,7 +206,7 @@ function UIHelper() {
                     // update GUI
                     $("#" + anchor_id(item_id)).text(new_label)
                 })
-            }
+            } */
 
             /**
              * Returns the selected menu item (object with "value" and "label" properties).
@@ -431,37 +431,6 @@ function UIHelper() {
                 return menu_id + "_item_" + item_id
             }
         }
-    }
-
-    /**
-     * @param   item    object with "value" and "label" properties.
-     */
-    this.add_menu_item = function(menu_id, item) {
-        menus[menu_id].add_item(item)
-    }
-
-    this.add_menu_separator = function(menu_id) {
-        menus[menu_id].add_separator()
-    }
-
-    this.empty_menu = function(menu_id) {
-        menus[menu_id].empty()
-    }
-
-    this.select_menu_item = function(menu_id, item_value) {
-        menus[menu_id].select(item_value)
-    }
-
-    this.set_menu_item_label = function(menu_id, item_value, new_label) {
-        menus[menu_id].set_item_label(item_value, new_label)
-    }
-
-    /**
-     * Returns the selected menu item.
-     * If the menu has no items, undefined/null is returned.
-     */
-    this.menu_item = function(menu_id) {
-        return menus[menu_id].get_selection()
     }
 
 
