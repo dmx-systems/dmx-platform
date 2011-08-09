@@ -173,12 +173,12 @@ function Canvas() {
         scroll_to_center(ct.x + trans_x, ct.y + trans_y)
     }
 
-    this.begin_association = function(topic_id, event) {
+    this.begin_association = function(topic_id, x, y) {
         association_in_progress = true
         action_topic = get_topic(topic_id)
         //
-        tmp_x = cx(event)
-        tmp_y = cy(event)
+        tmp_x = x
+        tmp_y = y
         draw()
     }
 
@@ -492,7 +492,7 @@ function Canvas() {
 
     // === Context Menu Events ===
 
-    function contextmenu(event) {
+    function do_contextmenu(event) {
         if (dm4c.LOG_GUI) dm4c.log("Contextmenu!")
         //
         close_context_menu()
@@ -518,16 +518,21 @@ function Canvas() {
     }
 
     /**
+     * Builds a context menu from a set of commands and shows it.
+     *
      * @param   commands    Array of commands. May be empty. Must not be null/undefined.
+     * @param   event       The mouse event that triggered the context menu.
      */
     function open_context_menu(commands, event) {
         if (!commands.length) {
             return
         }
+        var cm_x = cx(event)
+        var cm_y = cy(event)
         var contextmenu = $("<div>").addClass("contextmenu").css({
             position: "absolute",
-            top:  event.layerY + "px",
-            left: event.layerX + "px"
+            top:  cm_y + "px",
+            left: cm_x + "px"
         })
         for (var i = 0, cmd; cmd = commands[i]; i++) {
             if (cmd.is_separator) {
@@ -542,7 +547,8 @@ function Canvas() {
 
         function context_menu_handler(handler) {
             return function(event) {
-                handler(event)
+                // pass the coordinates of the command selecting mouse click to the command handler
+                handler(cx(event) + cm_x, cy(event) + cm_y)
                 dm4c.canvas.close_context_menu()
                 return false
             }
@@ -670,7 +676,7 @@ function Canvas() {
         // bind event handlers
         canvas_elem.mousedown(mousedown)
         canvas_elem.mouseup(mouseup)
-        canvas.oncontextmenu = contextmenu
+        canvas.oncontextmenu = do_contextmenu
         canvas.ondragover = dragover
         canvas.ondrop = drop
     }

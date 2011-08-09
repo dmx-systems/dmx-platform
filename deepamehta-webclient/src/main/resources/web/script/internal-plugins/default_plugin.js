@@ -46,12 +46,15 @@ function default_plugin () {
         //
         return commands
 
+        // Note: all command handlers receive the coordinates of the command selecting mouse click,
+        // however, most of them doesn't care. See function open_context_menu() in canvas.js
+
         function do_hide() {
             dm4c.do_hide_topic(topic)
         }
 
-        function do_associate(event) {
-            dm4c.canvas.begin_association(topic.id, event)
+        function do_associate(x, y) {
+            dm4c.canvas.begin_association(topic.id, x, y)
         }
 
         function do_edit() {
@@ -76,8 +79,8 @@ function default_plugin () {
         var commands = []
         //
         commands.push({label: "Hide",       handler: do_hide,      context: "context-menu"})
-        commands.push({is_separator: true,                         context: "context-menu"})
-        commands.push({label: "Associate",  handler: do_associate, context: "context-menu"})
+        // commands.push({is_separator: true,                         context: "context-menu"})
+        // commands.push({label: "Associate",  handler: do_associate, context: "context-menu"})     // TODO: implement
         //
         if (dm4c.has_write_permission(assoc)) {
             commands.push({label: "Edit",   handler: do_edit,      context: "detail-panel-show", ui_icon: "pencil"})
@@ -94,9 +97,9 @@ function default_plugin () {
             dm4c.do_hide_association(assoc)
         }
 
-        function do_associate(event) {
-            dm4c.canvas.begin_association(assoc.id, event)  // TODO
-        }
+        /* function do_associate(event) {   // TODO: implement
+            dm4c.canvas.begin_association(assoc.id, event)
+        } */
 
         function do_edit() {
             dm4c.begin_editing(assoc)
