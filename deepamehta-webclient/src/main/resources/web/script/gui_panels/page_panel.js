@@ -26,6 +26,11 @@ function PagePanel() {
         // update GUI
         render_form()
         render_buttons("detail-panel-edit")
+        // set focus
+        $("#page-content input, #page-content iframe").eq(0).focus()
+        // FIXME: "iframe" is TinyMCE specific. Another WYSIWYG editor plugin might be in use.
+        // FIXME: multiline plain text fields (<textarea>) should be considered too. Omitted for the
+        // moment because a TinyMCE's textarea is hidden ("display: none") and can't be focused.
     }
 
     this.clear = function() {
