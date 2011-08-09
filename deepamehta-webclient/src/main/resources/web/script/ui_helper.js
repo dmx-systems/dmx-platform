@@ -60,15 +60,16 @@ function UIHelper() {
 
     // === Menu ===
 
-    var menus = {}          // key: menu ID, value: a Menu object
+    var menus = {}          // key: menu ID, value: a Menu object ### FIXME: to be dropped
+    var opened_menu = null  // global state: the menu currently open, or null if no menu is open
 
     $(function() {
-        // Close open menus when clicked elsewhere.
+        // Close the open menu when clicked elsewhere.
         // Note: a neater approach would be to let the menu close itself by let its button react on blur.
         // This would work in Firefox but unfortunately Safari doesn't fire blur events for buttons.
         $("body").click(function() {
-            if (dm4c.LOG_GUI) dm4c.log("Body clicked -- hide all menus")
-            hide_all_menus()
+            if (dm4c.LOG_GUI) dm4c.log("Body clicked -- close opened menu")
+            close_opened_menu()
         })
     })
 
@@ -115,6 +116,8 @@ function UIHelper() {
         return menus[menu_id] = new Menu()
 
         function Menu() {
+
+            var self = this
 
             // Model
             // Note: the surrounding "menu_id", "handler", "items", and "menu_title" are also part of the menu's model.
@@ -232,8 +235,14 @@ function UIHelper() {
                 }
             }
 
-            this.hide = function() {
-                hide_menu()
+            /**
+             * Closes this menu.
+             * <p>
+             * Not meant to be called by the application developer.
+             * It is a public method anyway to let an outside click perform the closing.
+             */
+            this.close = function() {
+                close_menu()
             }
 
             this.dom = dom
@@ -264,7 +273,7 @@ function UIHelper() {
                         add_item({label: $(this).text(), value: this.value})
                     })
                 }
-                hide_menu()
+                close_menu()
             }
 
             /**
@@ -313,8 +322,8 @@ function UIHelper() {
                 return function item_selected() {
                     // 1) remember selection
                     select_item(item)
-                    // 2) hide menu
-                    hide_menu()
+                    // 2) close menu
+                    close_menu()
                     // 3) call handler
                     var h = item.handler || handler     // individual item handler has precedence
                     if (h) {
@@ -325,17 +334,24 @@ function UIHelper() {
             }
 
             /**
-             * Calculates the position of the menu and shows it.
+             * Calculates the position of the menu and opens it. Updates global state.
              */
-            function show_menu() {
+            function open_menu() {
                 var pos = button.position()
                 var height = button.outerHeight()
                 menu.css({top: pos.top + height, left: pos.left})
                 menu.show()
+                // update global state
+                opened_menu = self
             }
 
-            function hide_menu() {
+            /**
+             * Closes this menu. Updates global state.
+             */
+            function close_menu() {
                 menu.hide()
+                // update global state
+                opened_menu = null
             }
 
 
@@ -349,7 +365,7 @@ function UIHelper() {
             function build_button() {
                 // Note: type="button" is required. Otherwise the button acts as submit button (if contained in a form).
                 // Update: type="button" moved into element because attr("type", ...) is ignored in jQuery 1.4/Safari.
-                button = $('<button type="button">').click(do_show_menu)
+                button = $('<button type="button">').click(do_open_menu)
                 button.button({icons: {primary: "ui-icon-triangle-1-s"}})
                 // set button label
                 if (menu_title) {
@@ -361,13 +377,13 @@ function UIHelper() {
                 button.button("option", "label", label)
             }
 
-            function do_show_menu() {
+            function do_open_menu() {
                 if (dm4c.LOG_GUI) dm4c.log("Button of menu \"" + menu_id + "\" clicked")
                 if (menu.css("display") == "none") {
-                    hide_all_menus()
-                    show_menu()
+                    close_opened_menu()
+                    open_menu()
                 } else {
-                    hide_menu()
+                    close_menu()
                 }
                 return false
             }
@@ -501,9 +517,9 @@ function UIHelper() {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function hide_all_menus() {
-        for (var menu_id in menus) {
-            menus[menu_id].hide()
+    function close_opened_menu() {
+        if (opened_menu) {
+            opened_menu.close()
         }
     }
 }
