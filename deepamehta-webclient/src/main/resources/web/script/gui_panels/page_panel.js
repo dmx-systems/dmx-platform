@@ -5,8 +5,8 @@ function PagePanel() {
 
     // View
     var dom = $("<div>").attr("id", "page-panel")
-    dom.append($("<div>").attr("id", "page-content"))
-    dom.append($("<div>").attr("id", "page-toolbar").addClass("dm-toolbar"))
+        .append($("<div>").attr("id", "page-content").keyup(do_process_key))
+        .append($("<div>").attr("id", "page-toolbar").addClass("dm-toolbar"))
     show_splash()
 
     this.dom = dom
@@ -76,9 +76,24 @@ function PagePanel() {
     function render_buttons(context) {
         var commands = displayed_object.get_commands(context)
         for (var i = 0, cmd; cmd = commands[i]; i++) {
-            var button = dm4c.ui.button(undefined, cmd.handler, cmd.label, cmd.ui_icon, cmd.is_submit)
+            var button = dm4c.ui.button(cmd.handler, cmd.label, cmd.ui_icon, cmd.is_submit)
             $("#page-toolbar").append(button)
         }
+    }
+
+    // ---
+
+    /**
+     * Return key triggers submit button.
+     */
+    function do_process_key(event) {
+        // dm4c.log("Key up " + event.which)
+        if (event.which == 13) {
+            var submit_button = $("#page-toolbar button[type=submit]")
+            // alert("do_process_key: submit button=\"" + submit_button.text() + "\"")
+            submit_button.click()
+        }
+        return false
     }
 
     // ---

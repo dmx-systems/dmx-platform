@@ -49,6 +49,8 @@ function RenderHelper() {
 
     /**
      * @param   field   a Field object or a string.
+     *
+     * @return  The <input> element (jQuery object).
      */
     this.input = function(field) {
         var value

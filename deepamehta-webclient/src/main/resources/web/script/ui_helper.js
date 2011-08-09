@@ -6,38 +6,19 @@ function UIHelper() {
     // === Button ===
 
     /**
-     * Creates and returns a button.
+     * Creates and returns a jQuery UI button.
      *
-     * The button's DOM structure is as follows:
-     *      <button id="button_id">     - the top-level container (gets the provided menu ID)
-     *          <span>                  - the button's icon (provided it has an icon)
-     *          button_label            - the button's label (a text node)
-     *
-     * @param   id          Optional: ID of the <button> element that is transformed to a jQuery UI button.
-     *                      If no such DOM element exists in the document (or if "id" is undefined), a button element
-     *                      is created and the caller is responsible for adding the returned button to the DOM tree.
      * @param   handler     The callback function. The generic JavaScript event arguments are passed to it.
      *
      * @return              The button (a jQuery object).
      */
-    this.button = function(id, handler, label, icon, is_submit) {
+    this.button = function(handler, label, icon, is_submit) {
         //
         if (!handler) {
-            alert("WARNING (UIHelper.button): No handler specified for button \"" + id + "\"");
+            alert("WARNING (UIHelper.button): No handler specified for button");
         }
         //
-        if (id) {
-            var button = $("#" + id)
-            if (button.length == 0) {
-                // Note: type="button" is required. Otherwise the button acts as submit button (if contained in a form).
-                // Update: type="button" moved into element because attr("type", ...) is ignored in jQuery 1.4/Safari.
-                button = $("<button type='button'>").attr("id", id)
-            }
-        } else {
-            button = $("<button type='button'>")
-        }
-        // Note: pseudo-attribute "submit" TODO: explain
-        button.attr({submit: is_submit}).click(handler)
+        button = $('<button type="' + (is_submit ? "submit" : "button") + '">').click(handler)
         //
         var options = {}
         if (label) {
@@ -49,9 +30,7 @@ function UIHelper() {
             options.icons = {primary: "ui-icon-" + icon}
         }
         //
-        button.button(options)
-        //
-        return button
+        return button.button(options)
     }
 
 
@@ -370,7 +349,7 @@ function UIHelper() {
             function build_button() {
                 // Note: type="button" is required. Otherwise the button acts as submit button (if contained in a form).
                 // Update: type="button" moved into element because attr("type", ...) is ignored in jQuery 1.4/Safari.
-                button = $("<button type='button'>").click(button_clicked)
+                button = $('<button type="button">').click(do_show_menu)
                 button.button({icons: {primary: "ui-icon-triangle-1-s"}})
                 // set button label
                 if (menu_title) {
@@ -382,7 +361,7 @@ function UIHelper() {
                 button.button("option", "label", label)
             }
 
-            function button_clicked() {
+            function do_show_menu() {
                 if (dm4c.LOG_GUI) dm4c.log("Button of menu \"" + menu_id + "\" clicked")
                 if (menu.css("display") == "none") {
                     hide_all_menus()

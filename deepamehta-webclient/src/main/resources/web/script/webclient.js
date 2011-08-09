@@ -825,16 +825,6 @@ var dm4c = new function() {
         return new AssociationType(assoc_type)
     }
 
-    // === GUI ===
-
-    // ### TODO: rework
-    function submit_document() {
-        var submit_button = $("#page-panel button[submit=true]")
-        // alert("submit_document: submit button id=" + submit_button.attr("id"))
-        submit_button.click()
-        return false
-    }
-
     // === Plugin Support ===
 
     function register_plugin(source_path) {
@@ -927,7 +917,6 @@ var dm4c = new function() {
         // create page panel
         dm4c.page_panel = new PagePanel()
         $("#split-panel > tbody > tr > td").eq(1).append(dm4c.page_panel.dom)
-        // ### $("#document-form").submit(submit_document)
         detail_panel_width = $("#page-content").width()
         if (dm4c.LOG_GUI) dm4c.log("Mesuring page panel width: " + detail_panel_width)
         // create upload dialog

@@ -7,7 +7,7 @@ function ToolbarPanel() {
 
     // create "Search" widget
     var searchmode_menu = dm4c.ui.menu("searchmode-select", do_select_searchmode)
-    var search_button = dm4c.ui.button(undefined, do_search, "Search", "gear")
+    var search_button = dm4c.ui.button(do_search, "Search", "gear")
     var search_form = $("<form>").attr({action: "#", id: "search-form"})
         .append(searchmode_menu.dom)
         .append($("<span>").attr(                   {id: "search-widget"})
@@ -15,7 +15,7 @@ function ToolbarPanel() {
         .append(search_button).submit(do_search)
     // create "Create" widget
     var create_menu = dm4c.ui.menu("create-type-menu", do_create_topic, undefined, "Create")
-    var create_another_button = dm4c.ui.button(undefined, do_create_another_topic, undefined, "plus")
+    var create_another_button = dm4c.ui.button(do_create_another_topic, undefined, "plus")
         .button("disable").attr({title: CREATE_ANOTHER_BUTTON_TITLE_DIS, accesskey: "n"})
     var create_widget = $("<div>").attr(            {id: "create-widget"})
         .append(create_menu.dom)
