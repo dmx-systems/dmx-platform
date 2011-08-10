@@ -71,9 +71,7 @@ function TextFieldRenderer(topic, field, rel_topics) {
         return create_combobox();
 
         function create_combobox() {
-            //
-            // var menu = dm4c.ui.menu(field.uri)
-            var combobox = dm4c.ui.combobox(field.uri)
+            var combobox = dm4c.ui.combobox()
             // add items
             for (var i in topics) {
                 combobox.add_item({label: topics[i].value, value: topics[i].id})

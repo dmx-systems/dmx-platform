@@ -69,7 +69,7 @@ function RenderHelper() {
         // retrieve all instances
         var topics = dm4c.restc.get_topics(topic_type_uri, true)    // sort=true
         //
-        var menu = dm4c.ui.menu(topic_type_uri)
+        var menu = dm4c.ui.menu()
         for (var i in topics) {
             menu.add_item({label: topics[i].value, value: topics[i].uri})
         }

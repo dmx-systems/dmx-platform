@@ -1,6 +1,6 @@
 function UIHelper() {
 
-    var self = this
+    var gui = this
 
 
     // === Button ===
@@ -78,30 +78,19 @@ function UIHelper() {
      * Creates and returns a menu.
      *
      * The menu's DOM structure is as follows:
-     *      <span id="menu_id">     - the top-level container (gets the provided menu ID)
-     *          <button>            - the menu-triggering button
-     *              <span>          - the button's icon (a triangle)
-     *              <span>          - the button's label
-     *          <div>               - the actual menu (hidden until triggered)
-     *              <a>             - a menu item
+     *      <span>              - the top-level container
+     *          <button>        - the menu-triggering button
+     *              <span>      - the button's icon (a triangle)
+     *              <span>      - the button's label
+     *          <div>           - the actual menu (hidden until triggered)
+     *              <a>         - a menu item
      *
      * The menu's DOM structure is accessible through the menu's "dom" attribute (a jQuery object).
-     * Note: the top-level container's id attribute allows easy DOM selection of the menu, e.g. to replace it with
-     * another menu.
      *
-     * @param   menu_id     The menu ID. Can be used later on to identify the menu, e.g. for adding items to it.
-     *                      If a DOM element with such an ID exists it is replaced by the menu.
-     *                      If no such DOM element exists, the caller is responsible for adding the menu to the
-     *                      DOM tree.
-     * @param   handler     Optional: The callback function. 2 arguments are passed to it:
-     *                      1) The selected menu item (an object with "value" and "label" properties).
-     *                      2) The menu ID.
+     * @param   handler     Optional: The callback function. One argument is passed to it:
+     *                      the selected menu item (an object with "value" and "label" properties).
      *                      If not specified your application can not react on the menu selection, which is
      *                      reasonable in case of stateful select-like menus.
-     * @param   items       Optional: The menu items (an array of objects with "value" and "label" properties).
-     *                      If not specified the DOM element specified by menu_id is expected to be a <select> element.
-     *                      Its <option> elements are taken as menu items. If there are no <select> <option> elements,
-     *                      the menu will be created with no items (items are expected to be added later on).
      * @param   menu_title  Optional: The menu title (string).
      *                      If specified a stateless action-trigger menu with a static menu title is created.
      *                      If not specified a stateful select-like menu is created with the selected item as
@@ -110,7 +99,7 @@ function UIHelper() {
      * @return              The created menu (a Menu object). The caller can add the menu to the page by accessing the
      *                      menu's "dom" attribute (a jQuery object).
      */
-    this.menu = function(menu_id, handler, items, menu_title) {
+    this.menu = function(handler, menu_title) {
 
         return new Menu()
 
@@ -119,23 +108,16 @@ function UIHelper() {
             var self = this
 
             // Model
-            // Note: the surrounding "menu_id", "handler", "items", and "menu_title" are also part of the menu's model.
+            // Note: the surrounding "handler" and "menu_title" are also part of the menu's model.
+            var items = []
             var stateful = !menu_title
             var selection   // selected item (object with "value" and "label" properties).
                             // Used only for stateful select-like menus.
 
             // GUI
-            var menu        // the actual menu (jQuery <div> object)
-            var button      // the menu-triggering button (jQuery <button> object)
-            var dom         // the top-level container (jQuery <span> object)
-
-            // Note: the button must be build _before_ the menu is build
-            // because adding menu items might affect the button label (in case of a stateful select-like menu).
-            build_button()
-            build_menu()
-            // Note: the button must be added to the page _after_ the menu ís build because the menu might rely on the
-            // placeholder element (in case the menu is build from a <select> element).
-            add_to_page()
+            var menu = $("<div>").addClass("contextmenu").css({position: "absolute"}).hide()
+            var button = gui.button(do_open_menu, menu_title, "triangle-1-s")
+            var dom = $("<span>").append(button).append(menu)
 
             // ---------------------------------------------------------------------------------------------- Public API
 
@@ -198,16 +180,6 @@ function UIHelper() {
 
             // ---
 
-            /* FIXME: not in use
-            this.set_item_label = function(item_value, new_label) {
-                find_item(item_value, function(item, item_id) {
-                    // update model
-                    item.label = new_label
-                    // update GUI
-                    $("#" + anchor_id(item_id)).text(new_label)
-                })
-            } */
-
             /**
              * Returns the selected menu item (object with "value" and "label" properties).
              * If the menu has no items, undefined/null is returned.
@@ -227,7 +199,7 @@ function UIHelper() {
              * Finds a menu item by label.
              * If there is no such menu item undefined is returned.
              */
-            this.find_item_by_label = function(label, func) {
+            this.find_item_by_label = function(label) {
                 for (var i = 0, item; item = items[i]; i++) {
                     if (item.label == label) {
                         return item
@@ -251,31 +223,6 @@ function UIHelper() {
 
 
 
-            /****************/
-            /*** The Menu ***/
-            /****************/
-
-
-
-            function build_menu() {
-                menu = $("<div>").addClass("contextmenu").css({position: "absolute"})
-                if (items) {
-                    $.each(items, function(i, item) {
-                        add_item(item)
-                    })
-                } else {
-                    //
-                    items = []
-                    //
-                    $("#" + menu_id + " option").each(function() {
-                        // Note 1: "this" references the <option> DOM element.
-                        // Note 2: if there is no explicit "value" attribute the value equals the label.
-                        add_item({label: $(this).text(), value: this.value})
-                    })
-                }
-                close_menu()
-            }
-
             /**
              * @param   item    object with "value" (optional) and "label" properties.
              */
@@ -283,9 +230,7 @@ function UIHelper() {
                 // 1) update model
                 items.push(item)
                 // 2) update GUI
-                var item_id = items.length - 1
-                // FIXME: using a closure as event handler would free us from fiddling with id attributes
-                var anchor = $("<a>").attr({href: "#", id: anchor_id(item_id)}).click(create_handler(item))
+                var anchor = $("<a>").attr("href", "#").click(create_handler(item))
                 if (item.icon) {
                     anchor.append(dm4c.render.image(item.icon, "menu-icon"))
                 }
@@ -327,7 +272,7 @@ function UIHelper() {
                     // 3) call handler
                     var h = item.handler || handler     // individual item handler has precedence
                     if (h) {
-                         h(item, menu_id)
+                         h(item)
                     }
                     return false
                 }
@@ -354,31 +299,15 @@ function UIHelper() {
                 opened_menu = null
             }
 
-
-
-            /******************/
-            /*** The Button ***/
-            /******************/
-
-
-
-            function build_button() {
-                // Note: type="button" is required. Otherwise the button acts as submit button (if contained in a form).
-                // Update: type="button" moved into element because attr("type", ...) is ignored in jQuery 1.4/Safari.
-                button = $('<button type="button">').click(do_open_menu)
-                button.button({icons: {primary: "ui-icon-triangle-1-s"}})
-                // set button label
-                if (menu_title) {
-                    set_button_label(menu_title)
-                }
-            }
+            // ---
 
             function set_button_label(label) {
-                button.button("option", "label", label)
+                // Note: we must set the "text" option to true.
+                // It is false if the button had no label while creation.
+                button.button("option", {label: label, text: true})
             }
 
             function do_open_menu() {
-                if (dm4c.LOG_GUI) dm4c.log("Button of menu \"" + menu_id + "\" clicked")
                 if (menu.css("display") == "none") {
                     close_opened_menu()
                     open_menu()
@@ -388,47 +317,18 @@ function UIHelper() {
                 return false
             }
 
-
-
-            /********************/
-            /*** The Compound ***/
-            /********************/
-
-
-
-            function add_to_page() {
-                dom = $("<span>").attr("id", menu_id).append(button).append(menu)
-                $("#" + menu_id).replaceWith(dom)
-            }
-
-
-
-            /**************/
-            /*** Helper ***/
-            /**************/
-
-
+            // ---
 
             /**
              * Finds a menu item by value.
              * If there is no such menu item undefined is returned.
              */
-            function find_item(value, func) {
+            function find_item(value) {
                 for (var i = 0, item; item = items[i]; i++) {
                     if (item.value == value) {
-                        if (func) {
-                            func(item, i)
-                        } else {
-                            return item
-                        }
+                        return item
                     }
                 }
-            }
-
-            // ---
-
-            function anchor_id(item_id) {
-                return menu_id + "_item_" + item_id
             }
         }
     }
@@ -437,12 +337,12 @@ function UIHelper() {
 
     // === Combobox ===
 
-    this.combobox = function(menu_id) {
+    this.combobox = function() {
 
         return new Combobox()
 
         function Combobox() {
-            var menu = self.menu(menu_id, item_selected, undefined, "Choose")
+            var menu = gui.menu(item_selected, "Choose")
             var input = $("<input>").attr("type", "text").addClass("combobox")
             menu.dom.append(input)
             this.dom = menu.dom
@@ -472,7 +372,7 @@ function UIHelper() {
                 return item || text
             }
 
-            function item_selected(item, menu_id) {
+            function item_selected(item) {
                 setInputText(item.label)
             }
 

@@ -76,7 +76,7 @@ function TopictypeRenderer() {
                 .append($("<div>").append(assoc_type_label).append(assoc_type_menu.dom))
 
             function create_assoc_type_menu(selected_uri) {
-                var menu = dm4c.ui.menu(assoc_def.part_topic_type_uri, refresh_opional_card_div)
+                var menu = dm4c.ui.menu(refresh_opional_card_div)
                 menu.add_item({label: "Composition Definition", value: "dm4.core.composition_def"})
                 menu.add_item({label: "Aggregation Definition", value: "dm4.core.aggregation_def"})
                 menu.select(selected_uri)

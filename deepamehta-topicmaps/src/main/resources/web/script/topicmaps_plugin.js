@@ -56,7 +56,7 @@ function topicmaps_plugin() {
         function create_topicmap_menu() {
             // build topicmap widget
             var topicmap_label = $("<span>").attr("id", "topicmap-label").text("Topicmap")
-            topicmap_menu = dm4c.ui.menu("topicmap-menu", do_select_topicmap)
+            topicmap_menu = dm4c.ui.menu(do_select_topicmap)
             var topicmap_form = $("<div>").attr("id", "topicmap-form")
                 .append(topicmap_label)
                 .append(topicmap_menu.dom)
