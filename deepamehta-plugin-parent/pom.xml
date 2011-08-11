@@ -24,7 +24,7 @@
         <felix.log.level>1</felix.log.level>
         <felix.fileinstall.dir>${project.basedir}/target</felix.fileinstall.dir>
         <felix.fileinstall.filter>.*\\.jar</felix.fileinstall.filter>
-        <felix.fileinstall.noInitialDelay>true</felix.fileinstall.noInitialDelay>
+        <felix.fileinstall.noInitialDelay>false</felix.fileinstall.noInitialDelay>
         <felix.fileinstall.log.level>0</felix.fileinstall.log.level>
     </properties>
 
