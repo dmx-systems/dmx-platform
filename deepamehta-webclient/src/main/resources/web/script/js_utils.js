@@ -161,6 +161,10 @@ var js = {
 
 
 
+    begins_with: function(text, str) {
+        return text.search("^" + str) != -1
+    },
+
     render_text: function(text) {
         return text.replace ? text.replace(/\n/g, "<br>") : text
     },
@@ -212,6 +216,13 @@ var js = {
 
     format_timestamp: function(timestamp) {
         return new Date(timestamp).toLocaleString()
+    },
+
+    absolute_http_url: function(url) {
+        if (!js.begins_with(url, "http://") && !js.begins_with(url, "https://")) {
+            return "http://" + url
+        }
+        return url
     },
 
 
