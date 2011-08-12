@@ -1,0 +1,25 @@
+{
+    topic_types: [
+        {
+            value: "Webpage",
+            uri: "dm4.webbrowser.webpage",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:  "dm4.webbrowser.url",
+                    part_cardinality_uri: "dm4.core.one",
+                    whole_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:    "dm4.core.aggregation_def"
+                }
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.js_page_renderer_class: "WebpageRenderer"
+                    }
+                }
+            ]
+        }
+    ]
+}

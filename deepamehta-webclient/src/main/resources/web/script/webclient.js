@@ -566,12 +566,7 @@ var dm4c = new function() {
     }
 
     this.trigger_page_renderer_hook = function(topic_or_association, hook_name, args) {
-        // Lookup page renderer
-        var page_renderer = dm4c.get_page_renderer(topic_or_association)
-        // Trigger the hook only if it is defined (a page renderer must not define all hooks).
-        if (page_renderer[hook_name]) {
-            return page_renderer[hook_name](args)
-        }
+        return dm4c.get_page_renderer(topic_or_association)[hook_name](args)
     }
 
     this.get_plugin = function(plugin_class) {
@@ -676,6 +671,18 @@ var dm4c = new function() {
 
     this.get_canvas_commands = function(cx, cy, context) {
         return get_commands(dm4c.trigger_plugin_hook("add_canvas_commands", cx, cy), context)
+    }
+
+    function get_commands(cmd_lists, context) {
+        var commands = []
+        for (var i = 0, cmds; cmds = cmd_lists[i]; i++) {
+            for (var j = 0, cmd; cmd = cmds[j]; j++) {
+                if (cmd.context == context) {
+                    commands.push(cmd)
+                }
+            }
+        }
+        return commands
     }
 
     // === Persmissions ===
@@ -851,20 +858,6 @@ var dm4c = new function() {
         }
     }
 
-    // ---
-
-    function get_commands(cmd_lists, context) {
-        var commands = []
-        for (var i = 0, cmds; cmds = cmd_lists[i]; i++) {
-            for (var j = 0, cmd; cmd = cmds[j]; j++) {
-                if (cmd.context == context) {
-                    commands.push(cmd)
-                }
-            }
-        }
-        return commands
-    }
-
     // --- Types ---
 
     function load_types() {
@@ -888,22 +881,22 @@ var dm4c = new function() {
 
     // --- register default modules ---
     //
-    this.register_page_renderer("script/page-renderers/topic_renderer.js")
-    this.register_page_renderer("script/page-renderers/association_renderer.js")
+    this.register_page_renderer("script/page_renderers/topic_renderer.js")
+    this.register_page_renderer("script/page_renderers/association_renderer.js")
     //
-    this.register_field_renderer("script/field-renderers/text_field_renderer.js")
-    this.register_field_renderer("script/field-renderers/number_field_renderer.js")
-    this.register_field_renderer("script/field-renderers/date_field_renderer.js")
-    this.register_field_renderer("script/field-renderers/html_field_renderer.js")
-    this.register_field_renderer("script/field-renderers/reference_field_renderer.js")
+    this.register_field_renderer("script/value_renderers/text_field_renderer.js")
+    this.register_field_renderer("script/value_renderers/number_field_renderer.js")
+    this.register_field_renderer("script/value_renderers/date_field_renderer.js")
+    this.register_field_renderer("script/value_renderers/html_field_renderer.js")
+    this.register_field_renderer("script/value_renderers/reference_field_renderer.js")
     //
-    this.register_field_renderer("script/field-renderers/title_renderer.js")
-    this.register_field_renderer("script/field-renderers/body_text_renderer.js")
-    this.register_field_renderer("script/field-renderers/search_result_renderer.js")
+    this.register_field_renderer("script/value_renderers/title_renderer.js")
+    this.register_field_renderer("script/value_renderers/body_text_renderer.js")
+    this.register_field_renderer("script/value_renderers/search_result_renderer.js")
     //
-    register_plugin("script/internal-plugins/default_plugin.js")
-    register_plugin("script/internal-plugins/fulltext_plugin.js")
-    register_plugin("script/internal-plugins/tinymce_plugin.js")
+    register_plugin("script/internal_plugins/default_plugin.js")
+    register_plugin("script/internal_plugins/fulltext_plugin.js")
+    register_plugin("script/internal_plugins/tinymce_plugin.js")
 
     var generic_topic_icon = this.create_image(this.GENERIC_TOPIC_ICON_SRC)
 
@@ -1010,7 +1003,7 @@ var dm4c = new function() {
                     // instantiate
                     var page_renderer_class = js.to_camel_case(js.basename(page_renderer_src))
                     if (LOG_PLUGIN_LOADING) dm4c.log(".......... instantiating \"" + page_renderer_class + "\"")
-                    page_renderers[page_renderer_class] = js.new_object(page_renderer_class)
+                    page_renderers[page_renderer_class] = js.instantiate(PageRenderer, page_renderer_class)
                 })
             }
         }

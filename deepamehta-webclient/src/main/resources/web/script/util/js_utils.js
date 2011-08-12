@@ -149,8 +149,14 @@ var js = {
         return new Function(argstr, "return new " + class_name + "(" + argstr + ")").apply(undefined, argvals)
     },
 
-    set_class: function(obj, clazz) {
-        clazz.apply(obj)
+    /**
+     * @param   baseclass       the baseclass constructor (a function)
+     * @param   subclass_name   (a string)
+     */
+    instantiate: function(superclass, subclass_name) {
+        var obj = new superclass()
+        eval(subclass_name).apply(obj)
+        return obj
     },
 
 

@@ -52,6 +52,8 @@ function PagePanel() {
 
     function render_page() {
         empty()
+        var css = dm4c.trigger_page_renderer_hook(displayed_object, "page_css")
+        $("#page-content").css(css)
         dm4c.trigger_page_renderer_hook(displayed_object, "render_page", displayed_object)
     }
 

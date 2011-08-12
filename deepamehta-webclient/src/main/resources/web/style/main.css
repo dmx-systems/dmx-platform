@@ -48,7 +48,6 @@ body {
 
 #page-content {
     width: 33em;
-    overflow: auto;
 }
 
 #page-content input[type=text],
