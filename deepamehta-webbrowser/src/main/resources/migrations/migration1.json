@@ -4,7 +4,7 @@
             value: "URL",
             uri: "dm4.webbrowser.url",
             data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext"]
+            index_mode_uris: ["dm4.core.fulltext", "dm4.core.key"]
         }
     ]
 }
