@@ -10,12 +10,24 @@ function webbrowser_plugin() {
 
 
 
-    this.add_topic_commands = function(topic) {
+    this.topic_commands = function(topic) {
 
         if (topic.type_uri == "dm4.webbrowser.url") {
             return [
-                {label: "Open URL",               handler: do_open_url,          context: "detail-panel-show"},
-                {label: "Open URL in new window", handler: do_open_url_external, context: "detail-panel-show"}
+                {
+                    is_separator: true,
+                    context: "context-menu"
+                },
+                {
+                    label:   "Open URL",
+                    handler: do_open_url,
+                    context: ["context-menu", "detail-panel-show"]
+                },
+                {
+                    label:   "Open URL in new window",
+                    handler: do_open_url_external,
+                    context: ["context-menu", "detail-panel-show"]
+                }
             ]
         }
 

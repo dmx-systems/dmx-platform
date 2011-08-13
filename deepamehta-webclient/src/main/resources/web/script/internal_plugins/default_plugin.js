@@ -28,7 +28,7 @@ function default_plugin () {
         }
     }
 
-    this.add_topic_commands = function(topic) {
+    this.topic_commands = function(topic) {
         var commands = []
         //
         commands.push({label: "Hide",       handler: do_hide,      context: "context-menu"})
@@ -75,7 +75,7 @@ function default_plugin () {
         }
     }
 
-    this.add_association_commands = function(assoc) {
+    this.association_commands = function(assoc) {
         var commands = []
         //
         commands.push({label: "Hide",       handler: do_hide,      context: "context-menu"})
@@ -119,7 +119,7 @@ function default_plugin () {
         }
     }
 
-    this.add_canvas_commands = function(cx, cy) {
+    this.canvas_commands = function(cx, cy) {
         var commands = []
         // Note: type_uri is undefined if the user has no create permission or has nothing created yet
         var type_uri = dm4c.toolbar.get_recent_type_uri()
