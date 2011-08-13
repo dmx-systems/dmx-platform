@@ -5,13 +5,13 @@ import de.deepamehta.plugins.files.model.Resource;
 import de.deepamehta.plugins.files.model.ResourceInfo;
 import de.deepamehta.plugins.files.service.FilesService;
 
-import de.deepamehta.core.model.ClientContext;
-import de.deepamehta.core.model.CommandParams;
-import de.deepamehta.core.model.CommandResult;
-import de.deepamehta.core.model.Properties;
-import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.Relation;
+import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.service.ClientContext;
+import de.deepamehta.core.service.CommandParams;
+import de.deepamehta.core.service.CommandResult;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.util.JavaUtils;
 
@@ -40,7 +40,8 @@ public class FilesPlugin extends Plugin implements FilesService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private @Context HttpServletRequest request;
+    @Context
+    private HttpServletRequest request;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -89,7 +90,8 @@ public class FilesPlugin extends Plugin implements FilesService {
     public void openFile(long fileTopicId) {
         String path = null;
         try {
-            path = dms.getTopicProperty(fileTopicId, "de/deepamehta/core/property/Path").toString();
+            Topic fileTopic = dms.getTopic(fileTopicId, false, null);    // fetchComposite=false, clientContext=null
+            path = fileTopic.getChildTopicValue("dm4.files.path").toString();
             logger.info("### Opening file \"" + path + "\"");
             Desktop.getDesktop().open(new File(path));
         } catch (Throwable e) {
@@ -107,7 +109,7 @@ public class FilesPlugin extends Plugin implements FilesService {
 
     @Override
     public Topic createFileTopic(String path) {
-        Topic topic = dms.getTopic("de/deepamehta/core/property/Path", new PropValue(path));
+        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false);     // fetchComposite=false
         if (topic != null) {
             return topic;
         }
@@ -117,40 +119,40 @@ public class FilesPlugin extends Plugin implements FilesService {
         String fileType = JavaUtils.getFileType(fileName);
         long fileSize = file.length();
         //
-        Properties properties = new Properties();
-        properties.put("de/deepamehta/core/property/FileName", fileName);
-        properties.put("de/deepamehta/core/property/Path", path);
+        CompositeValue comp = new CompositeValue();
+        comp.put("dm4.files.file_name", fileName);
+        comp.put("dm4.files.path", path);
         if (fileType != null) {
-            properties.put("de/deepamehta/core/property/MediaType", fileType);
+            comp.put("dm4.files.media_type", fileType);
         }
-        properties.put("de/deepamehta/core/property/Size", fileSize);
+        comp.put("dm4.files.size", fileSize);
         //
         String content = renderFileContent(file, fileType, fileSize);
         if (content != null) {
-            properties.put("de/deepamehta/core/property/Content", content);
+            comp.put("dm4.files.content", content);
         }
         //
-        return dms.createTopic("de/deepamehta/core/topictype/File", properties, null);
+        return dms.createTopic(new TopicModel("dm4.files.file", comp), null);           // clientContext=null
     }
 
     @Override
     public Topic createFolderTopic(String path) {
-        Topic topic = dms.getTopic("de/deepamehta/core/property/Path", new PropValue(path));
+        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false);     // fetchComposite=false
         if (topic != null) {
             return topic;
         }
         //
-        Properties properties = new Properties();
-        properties.put("de/deepamehta/core/property/FolderName", new File(path).getName());
-        properties.put("de/deepamehta/core/property/Path", path);
+        CompositeValue comp = new CompositeValue();
+        comp.put("dm4.files.folder_name", new File(path).getName());
+        comp.put("dm4.files.path", path);
         //
-        return dms.createTopic("de/deepamehta/core/topictype/Folder", properties, null);
+        return dms.createTopic(new TopicModel("dm4.files.folder", comp), null);         // clientContext=null
     }
 
     // ---
 
     @GET
-    @Path("/{uri}")
+    @Path("/{uri:.+}")
     public Resource getResource(@PathParam("uri") URL uri, @QueryParam("type") String mediaType,
                                                            @QueryParam("size") long size) {
         logger.info("Retrieving resource " + uri + " (mediaType=\"" + mediaType + "\", size=" + size + ")");
@@ -168,7 +170,7 @@ public class FilesPlugin extends Plugin implements FilesService {
     }
 
     @GET
-    @Path("/{uri}/info")
+    @Path("/{uri:.+}/info")
     @Produces("application/json")
     public ResourceInfo getResourceInfo(@PathParam("uri") URL uri) {
         logger.info("Requesting resource info for " + uri);
@@ -212,7 +214,7 @@ public class FilesPlugin extends Plugin implements FilesService {
     }
 
     private String localResourceURI(String path, String type, long size) {
-        return "/resource/file:" + JavaUtils.encodeURIComponent(path) + "?type=" + type + "&size=" + size;
+        return "/proxy/file:" + JavaUtils.encodeURIComponent(path) + "?type=" + type + "&size=" + size;
     }
 
     // ---

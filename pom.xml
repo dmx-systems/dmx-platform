@@ -45,7 +45,8 @@
                         ${project.basedir}/deepamehta-contacts/target,
                         ${project.basedir}/deepamehta-workspaces/target,
                         ${project.basedir}/deepamehta-typeeditor/target,
-                        ${project.basedir}/deepamehta-topicmaps/target
+                        ${project.basedir}/deepamehta-topicmaps/target,
+                        ${project.basedir}/deepamehta-files/target
                     ]]>
                     <!-- not yet adapted to DeepaMehta 4.0 resp. obsolete -->
                     <!--
@@ -54,7 +55,6 @@
                         ${project.basedir}/deepamehta-iconpicker/target,
                         ${project.basedir}/deepamehta-projects/target,
                         ${project.basedir}/deepamehta-typesearch/target,
-                        ${project.basedir}/deepamehta-files/target,
                         ${project.basedir}/deepamehta-filemanager/target,
                         ${project.basedir}/deepamehta-accesscontrol/target
                     -->
@@ -109,6 +109,7 @@
                 <module>deepamehta-workspaces</module>
                 <module>deepamehta-typeeditor</module>
                 <module>deepamehta-topicmaps</module>
+                <module>deepamehta-files</module>
                 <!-- POM projects -->
                 <module>deepamehta-parent</module>
                 <module>deepamehta-plugin-parent</module>
@@ -119,7 +120,6 @@
                 <module>deepamehta-iconpicker</module>
                 <module>deepamehta-projects</module>
                 <module>deepamehta-typesearch</module>
-                <module>deepamehta-files</module>
                 <module>deepamehta-filemanager</module>
                 <module>deepamehta-accesscontrol</module> -->
             </modules>
