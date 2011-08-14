@@ -31,6 +31,8 @@ function webbrowser_plugin() {
             ]
         }
 
+        // === Event Handler ===
+
         function do_open_url() {
             var webpage = dm4c.create_topic("dm4.webbrowser.webpage", {"dm4.webbrowser.url$id": topic.id})
             dm4c.do_reveal_related_topic(webpage.id)
@@ -39,5 +41,11 @@ function webbrowser_plugin() {
         function do_open_url_external() {
             window.open(js.absolute_http_url(topic.value), "_blank")
         }
+    }
+
+    // ----------------------------------------------------------------------------------------------- Private Functions
+
+    function lookup_webpage(url) {
+        
     }
 }

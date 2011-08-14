@@ -1,6 +1,7 @@
+/**
+ * Provides the standard commands ("Create", "Edit", "Delete", "Hide", "Associate").
+ */
 function default_plugin () {
-
-    // ------------------------------------------------------------------------------------------------------ Public API
 
 
 
