@@ -64,7 +64,7 @@ function topicmaps_plugin() {
             if ($("#workspace-form").size()) {
                 $("#workspace-form").after(topicmap_form)
             } else {
-                $("#upper-toolbar").prepend(topicmap_form)
+                dm4c.toolbar.dom.prepend(topicmap_form)
             }
             //
             rebuild_topicmap_menu(undefined, topicmaps)

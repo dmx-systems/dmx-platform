@@ -4,10 +4,10 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Notes</name>
+    <name>DeepaMehta 4 Help</name>
     <groupId>de.deepamehta</groupId>
-    <artifactId>deepamehta-notes</artifactId>
-    <version>4.0.1</version>
+    <artifactId>deepamehta-help</artifactId>
+    <version>4.0.3-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
