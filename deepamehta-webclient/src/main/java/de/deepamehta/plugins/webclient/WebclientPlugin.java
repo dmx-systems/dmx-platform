@@ -146,20 +146,20 @@ public class WebclientPlugin extends Plugin {
     }
 
     /**
-     * Creates a search result topic (a bucket).
+     * Creates a "Search" topic (a bucket).
      */
-    private Topic createSearchTopic(String searchTerm, Set<Topic> topics, ClientContext clientContext) {
+    private Topic createSearchTopic(String searchTerm, Set<Topic> resultItems, ClientContext clientContext) {
         // CompositeValue comp = new CompositeValue("{dm4.webclient.search_term: \"" + searchTerm + "\"}");
         Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search" /*, comp */), clientContext);
         searchTopic.setChildTopicValue("dm4.webclient.search_term", new SimpleValue(searchTerm));
         //
-        // associate result topics
-        logger.fine("Associating " + topics.size() + " result topics to search topic (ID " + searchTopic.getId() + ")");
-        for (Topic topic : topics) {
-            logger.fine("Associating " + topic);
+        // associate result items
+        logger.fine("Associating " + resultItems.size() + " result items to search (ID " + searchTopic.getId() + ")");
+        for (Topic resultItem : resultItems) {
+            logger.fine("Associating " + resultItem);
             AssociationModel assocModel = new AssociationModel("dm4.webclient.search_result_item");
-            assocModel.setRoleModel1(new TopicRoleModel(searchTopic.getId(), "dm4.webclient.search"));
-            assocModel.setRoleModel2(new TopicRoleModel(topic.getId(), "dm4.webclient.search_result_item"));
+            assocModel.setRoleModel1(new TopicRoleModel(searchTopic.getId(), "dm4.core.default"));
+            assocModel.setRoleModel2(new TopicRoleModel(resultItem.getId(), "dm4.core.default"));
             dms.createAssociation(assocModel, clientContext);
         }
         return searchTopic;
