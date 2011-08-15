@@ -9,6 +9,19 @@ body {
     padding: 0.3em;
 }
 
+#upper-toolbar input[type=text] {
+    margin: 0;
+    height: 1.3em;
+}
+
+#page-toolbar {
+    margin-top: 1em;
+}
+
+#page-toolbar button {
+    margin-right: 1em;
+}
+
 #search-form {
     float: left;
     margin-right: 3em;
@@ -17,6 +30,13 @@ body {
 #create-widget {
     float: left;
     margin-right: 3em;
+}
+
+.splash {
+    background-image: url("/de.deepamehta.webclient/images/deepamehta-logo.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.5;
 }
 
 /*** Split Panel ***/
@@ -32,10 +52,6 @@ body {
 
 /*** Canvas ***/
 
-#canvas-panel {
-    margin-right: 1.2em;
-}
-
 #canvas {
     background: #f8f8f8;
 }
@@ -43,6 +59,7 @@ body {
 /*** Page Panel Layout ***/
 
 #page-panel {
+    margin-left: 1.6em;
     line-height: 1.6em;
 }
 
@@ -102,13 +119,6 @@ body {
 
 .field-value label {
     display: block;
-}
-
-.splash {
-    background-image: url("/de.deepamehta.webclient/images/deepamehta-logo.png");
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.5;
 }
 
 /*** Topic Lists ***/
