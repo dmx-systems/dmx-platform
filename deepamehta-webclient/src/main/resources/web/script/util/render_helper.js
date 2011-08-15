@@ -83,7 +83,7 @@ function RenderHelper() {
     // === Direct-to-page Rendering ===
 
     this.associations = function(topic_id) {
-        var topics = dm4c.restc.get_related_topics(topic_id, undefined, true)   // assoc_type_uri=undefined, sort=true
+        var topics = dm4c.restc.get_related_topics(topic_id, undefined, true)   // traversal_filter=undefined, sort=true
         //
         this.field_label("Associations (" + topics.length + ")")
         this.field_value(this.topic_list(topics))

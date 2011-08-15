@@ -72,9 +72,8 @@ function TopicmapRenderer() {
     function calculate_canvas_size() {
         var w_w = window.innerWidth
         var w_h = window.innerHeight
-        var t_h = $("#upper-toolbar").height()
-        self.canvas_width = w_w - detail_panel_width - 50   // 35px = 1.2em + 2 * 8px = 19(.2)px + 16px.
-                                            // Update: Safari 4 needs 15 extra pixel (for potential vertical scrollbar?)
+        var t_h = dm4c.toolbar.dom.height()
+        self.canvas_width = w_w - detail_panel_width - 41   // 41px = 1.6em + 2 * 8px = 25(.6)px + 16px.
         self.canvas_height = w_h - t_h - 76 // was 60, then 67 (healing login dialog), then 76 (healing datepicker)
         if (dm4c.LOG_GUI) {
             dm4c.log("Calculating canvas size: window size=" + w_w + "x" + w_h + " toolbar height=" + t_h)
@@ -84,7 +83,7 @@ function TopicmapRenderer() {
 
     function calculate_detail_panel_size() {
         var w_w = window.innerWidth
-        detail_panel_width = w_w - self.canvas_width - 50   // -50px: see above
+        detail_panel_width = w_w - self.canvas_width - 41   // 41px: see above
     }
 
     // === Event Handling ===

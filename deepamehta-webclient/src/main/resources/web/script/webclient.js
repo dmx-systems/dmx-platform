@@ -104,8 +104,11 @@ var dm4c = new function() {
 
     /**
      * Reveals a topic that is related to the selected topic.
+     * <p>
      * Triggers the "pre_show_topic" and "post_show_topic" hooks.
      * Triggers the "post_show_association" hook (for each association).
+     *
+     * @param   topic_id    ID of the related topic.
      */
     this.do_reveal_related_topic = function(topic_id) {
         // update model
@@ -662,27 +665,35 @@ var dm4c = new function() {
     // === Commands ===
 
     this.get_topic_commands = function(topic, context) {
-        return get_commands(dm4c.trigger_plugin_hook("add_topic_commands", topic), context)
+        return get_commands(dm4c.trigger_plugin_hook("topic_commands", topic), context)
     }
 
     this.get_association_commands = function(assoc, context) {
-        return get_commands(dm4c.trigger_plugin_hook("add_association_commands", assoc), context)
+        return get_commands(dm4c.trigger_plugin_hook("association_commands", assoc), context)
     }
 
     this.get_canvas_commands = function(cx, cy, context) {
-        return get_commands(dm4c.trigger_plugin_hook("add_canvas_commands", cx, cy), context)
+        return get_commands(dm4c.trigger_plugin_hook("canvas_commands", cx, cy), context)
     }
 
     function get_commands(cmd_lists, context) {
         var commands = []
         for (var i = 0, cmds; cmds = cmd_lists[i]; i++) {
             for (var j = 0, cmd; cmd = cmds[j]; j++) {
-                if (cmd.context == context) {
+                if (matches(cmd, context)) {
                     commands.push(cmd)
                 }
             }
         }
         return commands
+
+        function matches(cmd, context) {
+            if (typeof cmd.context == "string") {
+                return cmd.context == context
+            } else {
+                return js.contains(cmd.context, context)
+            }
+        }
     }
 
     // === Persmissions ===

@@ -1,0 +1,11 @@
+#about-dialog {
+    font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+    font-size: 0.9em;
+    line-height: 1.6em;
+    padding: 3em;
+}
+
+#about-dialog img {
+    float: left;
+    margin-right: 5em;
+}

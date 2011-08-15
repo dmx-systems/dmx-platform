@@ -4,9 +4,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Contacts</name>
+    <name>DeepaMehta 4 Help</name>
     <groupId>de.deepamehta</groupId>
-    <artifactId>deepamehta-contacts</artifactId>
+    <artifactId>deepamehta-help</artifactId>
     <version>4.0.3-SNAPSHOT</version>
     <packaging>bundle</packaging>
 

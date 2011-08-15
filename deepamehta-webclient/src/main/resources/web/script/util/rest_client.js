@@ -34,13 +34,19 @@ function RESTClient(core_service_uri) {
     }
 
     /**
-     * @param   assoc_type_uri  Association type filter (optional).
-     *                          Pass <code>null</code>/<code>undefined</code> to switch filter off.
+     * @param   traversal_filter    Optional: Traversal Filtering (if not specified no filter is applied).
+     *                              An object with 4 possible properties (each one is optional):
+     *                                  "assoc_type_uri"
+     *                                  "my_role_type_uri"
+     *                                  "others_role_type_uri"
+     *                                  "others_topic_type_uri"
+     * @param   sort                Optional: Result sorting.
+     *                              If evaluates to true the returned topics are sorted.
      *
      * @return  array of topics, possibly empty.
      */
-    this.get_related_topics = function(topic_id, assoc_type_uri, sort) {
-        var params = new RequestParameter({assoc_type_uri: assoc_type_uri})
+    this.get_related_topics = function(topic_id, traversal_filter, sort) {
+        var params = new RequestParameter(traversal_filter)
         return sort_topics(request("GET", "/topic/" + topic_id + "/related_topics?" + params.to_query_string()), sort)
     }
 
@@ -239,6 +245,9 @@ function RESTClient(core_service_uri) {
         }
     }
 
+    /**
+     * @params      Optional: initial set of parameters
+     */
     function RequestParameter(params) {
 
         var param_array = []

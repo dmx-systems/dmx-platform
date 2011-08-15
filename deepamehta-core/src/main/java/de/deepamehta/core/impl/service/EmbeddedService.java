@@ -741,39 +741,42 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
-    // ----------------------------------------------------------------------------------------- Package Private Methods
+    // **********************
+    // *** Topic REST API ***
+    // **********************
 
 
-
-    // === Topic REST API ===
 
     @GET
     @Path("/topic/{id}/related_topics")
-    public Set<RelatedTopic> getRelatedTopics(@PathParam("id") long topicId,
-                                              @QueryParam("assoc_type_uri") String assocTypeUri) {
-        logger.info("topicId=" + topicId + ", assocTypeUri=\"" + assocTypeUri + "\"");
+    public Set<RelatedTopic> getRelatedTopics(@PathParam("id")                     long topicId,
+                                              @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                              @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                              @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                              @QueryParam("others_topic_type_uri") String othersTopicTypeUri) {
+        logger.info("topicId=" + topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
+            "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\"");
         try {
-            return getTopic(topicId, false, null).getRelatedTopics(assocTypeUri);   // fetchComposite=false
+            return getTopic(topicId, false, null).getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+                othersTopicTypeUri, false, false);  // fetchComposite=false (3x)
         } catch (Exception e) {
-            throw new RuntimeException("Retrieving related topics of topic " + topicId +
-                " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
+            throw new RuntimeException("Retrieving related topics of topic " + topicId + " failed (assocTypeUri=\"" +
+                assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", othersRoleTypeUri=\"" + othersRoleTypeUri +
+                "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")", e);
         }
     }
 
-    /* TODO: activate for REST API
-    Set<RelatedTopic> getRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                          String othersRoleTypeUri,
-                                                                          String othersTopicTypeUri,
-                                                                          boolean fetchComposite) {
-        return getTopic(topicId, null).getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri, fetchComposite);
-    } */
+
+
+    // ****************************
+    // *** Association REST API ***
+    // ****************************
+
+    // ### TODO
 
 
 
-    // === Association REST API ===
-
-
+    // ----------------------------------------------------------------------------------------- Package Private Methods
 
     // === Helper ===
 

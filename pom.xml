@@ -46,7 +46,8 @@
                         ${project.basedir}/deepamehta-workspaces/target,
                         ${project.basedir}/deepamehta-typeeditor/target,
                         ${project.basedir}/deepamehta-topicmaps/target,
-                        ${project.basedir}/deepamehta-files/target
+                        ${project.basedir}/deepamehta-files/target,
+                        ${project.basedir}/deepamehta-help/target
                     ]]>
                     <!-- not yet adapted to DeepaMehta 4.0 resp. obsolete -->
                     <!--
@@ -110,6 +111,7 @@
                 <module>deepamehta-typeeditor</module>
                 <module>deepamehta-topicmaps</module>
                 <module>deepamehta-files</module>
+                <module>deepamehta-help</module>
                 <!-- POM projects -->
                 <module>deepamehta-parent</module>
                 <module>deepamehta-plugin-parent</module>

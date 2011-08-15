@@ -3,6 +3,11 @@
     font-size: 75%;
 }
 
+.dm-toolbar   .ui-button,
+#page-content .ui-button {
+    margin: 0;
+}
+
 .dm-toolbar   .ui-button-text-icon .ui-button-text,
 #page-content .ui-button-text-icon .ui-button-text {
     padding-top: 0.2em;

@@ -29,7 +29,7 @@ function workspaces_plugin() {
                 .append(workspace_label)
                 .append(workspace_menu.dom)
             // put in toolbar
-            $("#upper-toolbar").prepend(workspace_form)
+            dm4c.toolbar.dom.prepend(workspace_form)
             //
             rebuild_workspace_menu(undefined, workspaces)
             update_cookie()

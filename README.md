@@ -24,7 +24,7 @@ Mailing lists:
 <https://lists.berlios.de/mailman/listinfo/deepamehta-users>  
 <https://lists.berlios.de/mailman/listinfo/deepamehta-devel>
 
-Licensed under GNU General Public License Version 3.
+Licensed under GNU General Public License, version 3.
 
 
 **Important Notice:**  

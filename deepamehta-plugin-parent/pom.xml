@@ -33,7 +33,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-core</artifactId>
-            <version>4.0.1</version>
+            <version>4.0.3-SNAPSHOT</version>
         </dependency>
 
         <!-- OSGi integration test -->
