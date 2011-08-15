@@ -49,11 +49,15 @@ function UIHelper() {
             buttons[button_label] = button_handler
         }
         //
-        $("body").append(dialog)
-        dialog.dialog({
+        var options = {
             modal: true, autoOpen: false, draggable: false, resizable: false, width: width,
             title: title, buttons: buttons
-        })
+        }
+        // Firefox workaround, see http://bugs.jqueryui.com/ticket/3623
+        options.open = function() {$("body").css("overflow", "hidden")}
+        //
+        $("body").append(dialog)
+        dialog.dialog(options)
     }
 
 

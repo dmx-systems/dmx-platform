@@ -71,13 +71,11 @@ function topicmaps_plugin() {
         }
 
         function create_topicmap_dialog() {
-            var topicmap_dialog = $("<div>").attr("id", "topicmap_dialog")
-            var input = $("<input>").attr({id: "topicmap_name", size: 30})
-            topicmap_dialog.append("Title:")
-            topicmap_dialog.append($("<form>").attr("action", "#").submit(do_create_topicmap).append(input))
-            $("body").append(topicmap_dialog)
-            $("#topicmap_dialog").dialog({modal: true, autoOpen: false, draggable: false, resizable: false, width: 350,
-                title: "New Topicmap", buttons: {"OK": do_create_topicmap}})
+            var topicmap_dialog = $("<div>")
+                .append($("<div>").addClass("field-label").text("Title"))
+                .append($("<form>").attr("action", "#").submit(do_create_topicmap)
+                    .append($("<input>").attr({id: "topicmap_name", size: 30})))
+            dm4c.ui.dialog("topicmap-dialog", "New Topicmap", topicmap_dialog, "auto", "OK", do_create_topicmap)
         }
 
         function select_initial_topicmap() {
@@ -274,7 +272,7 @@ function topicmaps_plugin() {
     }
 
     function do_create_topicmap() {
-        $("#topicmap_dialog").dialog("close")
+        $("#topicmap-dialog").dialog("close")
         var name = $("#topicmap_name").val()
         create_topicmap(name)
         return false
@@ -409,7 +407,7 @@ function topicmaps_plugin() {
     // ---
 
     function open_topicmap_dialog() {
-        $("#topicmap_dialog").dialog("open")
+        $("#topicmap-dialog").dialog("open")
     }
 
 

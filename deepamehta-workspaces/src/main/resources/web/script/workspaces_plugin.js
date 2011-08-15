@@ -36,13 +36,11 @@ function workspaces_plugin() {
         }
 
         function create_workspace_dialog() {
-            var workspace_dialog = $("<div>").attr("id", "workspace_dialog")
-            var input = $("<input>").attr({id: "workspace_name", size: 30})
-            workspace_dialog.append("Name:")
-            workspace_dialog.append($("<form>").attr("action", "#").submit(do_create_workspace).append(input))
-            $("body").append(workspace_dialog)
-            $("#workspace_dialog").dialog({modal: true, autoOpen: false, draggable: false, resizable: false, width: 350,
-                title: "New Workspace", buttons: {"OK": do_create_workspace}})
+            var workspace_dialog = $("<div>")
+                .append($("<div>").addClass("field-label").text("Name"))
+                .append($("<form>").attr("action", "#").submit(do_create_workspace)
+                    .append($("<input>").attr({id: "workspace_name", size: 30})))
+            dm4c.ui.dialog("workspace-dialog", "New Workspace", workspace_dialog, "auto", "OK", do_create_workspace)
         }
     }
 
@@ -91,11 +89,11 @@ function workspaces_plugin() {
     }
 
     function open_workspace_dialog() {
-        $("#workspace_dialog").dialog("open")
+        $("#workspace-dialog").dialog("open")
     }
 
     function do_create_workspace() {
-        $("#workspace_dialog").dialog("close")
+        $("#workspace-dialog").dialog("close")
         var name = $("#workspace_name").val()
         create_workspace(name)
         return false
