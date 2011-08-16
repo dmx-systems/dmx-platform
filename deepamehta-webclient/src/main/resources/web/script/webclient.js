@@ -1,7 +1,6 @@
 var dm4c = new function() {
 
     var CORE_SERVICE_URI = "/core"
-    this.SEARCH_FIELD_WIDTH = 16    // in chars
     this.COMPOSITE_PATH_SEPARATOR = "/"
     this.GENERIC_TOPIC_ICON_SRC = "images/ball-grey.png"
 
@@ -54,17 +53,6 @@ var dm4c = new function() {
         } catch (e) {
             alert("ERROR while searching:\n\n" + JSON.stringify(e))
         }
-    }
-
-    this.do_select_searchmode = function(searchmode) {
-        // Note: we must empty the current search widget _before_ the new search widget is build. Otherwise the
-        // search widget's event handlers might get lost.
-        // Consider this case: the "by Type" searchmode is currently selected and the user selects it again. The
-        // ui_menu() call for building the type menu will unnecessarily add the menu to the DOM because it finds
-        // an element with the same ID on the page. A subsequent empty() would dispose the just added type menu
-        // -- including its event handlers -- and the append() would eventually add the crippled type menu.
-        $("#search-widget").empty()
-        $("#search-widget").append(dm4c.trigger_plugin_hook("search_widget", searchmode)[0])
     }
 
     // ---

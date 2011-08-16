@@ -4,15 +4,16 @@ function ToolbarPanel() {
     var CREATE_ANOTHER_BUTTON_TITLE_EN  = "Create another "
 
     var recent_type_uri
+    var self = this
 
     // create "Search" widget
     var searchmode_menu = dm4c.ui.menu(do_select_searchmode)
+    var searchmode_widget = $("<span>")
     var search_button = dm4c.ui.button(do_search, "Search", "gear")
-    var search_form = $("<form>").attr({action: "#", id: "search-form"})
+    var search_widget = $("<div>").attr("id", "search-widget")
         .append(searchmode_menu.dom)
-        .append($("<span>").attr(                   {id: "search-widget"})
-            .append($('<input type="text">').attr(  {id: "search-field", size: dm4c.SEARCH_FIELD_WIDTH})))
-        .append(search_button).submit(do_search)
+        .append(searchmode_widget)
+        .append(search_button)
     // create "Create" widget
     var create_menu = dm4c.ui.menu(do_create_topic, "Create")
     var create_another_button = dm4c.ui.button(do_create_another_topic, undefined, "plus")
@@ -27,18 +28,24 @@ function ToolbarPanel() {
     // create toolbar
     var dom = $("<div>").attr({id: "upper-toolbar"}).addClass("dm-toolbar")
         .addClass("ui-widget-header").addClass("ui-corner-all")
-        .append(search_form)
+        .append(search_widget)
         .append(create_widget)
         .append(special_form)
 
     // ----------------------------------------------------------------------------------------------- Public Properties
 
     this.searchmode_menu = searchmode_menu
+    this.search_button = search_button
     this.create_menu = create_menu
     this.special_menu = special_menu
     this.dom = dom
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    this.select_searchmode = function(searchmode) {
+        searchmode_widget.empty()
+        searchmode_widget.append(dm4c.trigger_plugin_hook("searchmode_widget", searchmode)[0])
+    }
 
     this.refresh_create_menu = function() {
         // remove all items
@@ -62,16 +69,17 @@ function ToolbarPanel() {
         return recent_type_uri
     }
 
-    // ---
+    // ----------------------------------------------------------------------------------------------- Private Functions
+
+    // === Event Handler ===
 
     function do_search() {
-        var menu_item = searchmode_menu.get_selection()
-        dm4c.do_search(get_searchmode(menu_item))
-        return false    // suppress form submission
+        var searchmode = get_searchmode(searchmode_menu.get_selection())
+        dm4c.do_search(searchmode)
     }
 
     function do_select_searchmode(menu_item) {
-        dm4c.do_select_searchmode(get_searchmode(menu_item))
+        self.select_searchmode(get_searchmode(menu_item))
     }
 
     // ---
@@ -89,7 +97,7 @@ function ToolbarPanel() {
         dm4c.do_create_topic(recent_type_uri)
     }
 
-    // ---
+    // === Helper ===
 
     function get_searchmode(menu_item) {
         return menu_item.value
