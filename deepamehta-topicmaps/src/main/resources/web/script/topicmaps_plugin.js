@@ -152,9 +152,14 @@ function topicmaps_plugin() {
      * @param   topic   a Topic object
      */
     this.post_update_topic = function(topic, old_topic) {
+        // 1) Update all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Updating topic " + topic.id + " on all topicmaps")
         for (var id in topicmaps) {
             topicmaps[id].update_topic(topic)
+        }
+        // 2) Update the topicmap menu
+        if (topic.type_uri == "dm4.topicmaps.topicmap") {
+            rebuild_topicmap_menu()
         }
     }
 
@@ -173,12 +178,12 @@ function topicmaps_plugin() {
      * @param   topic   a Topic object
      */
     this.post_delete_topic = function(topic) {
-        // 1) Remove topic from all topicmap models
+        // 1) Update all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Deleting topic " + topic.id + " from all topicmaps")
         for (var id in topicmaps) {
             topicmaps[id].delete_topic(topic.id)
         }
-        // 2) Update the topicmap menu if the deleted topic was a topicmap
+        // 2) Update the topicmap menu
         if (topic.type_uri == "dm4.topicmaps.topicmap") {
             // remove topicmap model
             delete topicmaps[topic.id]
@@ -416,7 +421,7 @@ function topicmaps_plugin() {
 
     /**
      * @param   topicmap_id     Optional: ID of the topicmap to select.
-     *                          If not given, the current selection is maintained.
+     *                          If not given, the current selection is preserved.
      */
     function rebuild_topicmap_menu(topicmap_id, topicmaps) {
         if (!topicmap_id) {

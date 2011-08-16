@@ -47,6 +47,15 @@ function workspaces_plugin() {
     /**
      * @param   topic   a Topic object
      */
+    this.post_update_topic = function(topic, old_topic) {
+        if (topic.type_uri == "dm4.workspaces.workspace") {
+            rebuild_workspace_menu()
+        }
+    }
+
+    /**
+     * @param   topic   a Topic object
+     */
     this.post_delete_topic = function(topic) {
         if (topic.type_uri == "dm4.workspaces.workspace") {
             rebuild_workspace_menu()
@@ -135,7 +144,7 @@ function workspaces_plugin() {
 
     /**
      * @param   workspace_id    Optional: ID of the workspace to select.
-     *                          If not given, the current selection is maintained.
+     *                          If not given, the current selection is preserved.
      */
     function rebuild_workspace_menu(workspace_id, workspaces) {
         if (!workspace_id) {
