@@ -16,4 +16,23 @@
         <version>2</version>
         <relativePath>../deepamehta-parent/pom.xml</relativePath>
     </parent>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>web/script/help_plugin.js</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>web/script/help_plugin.js</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
 </project>

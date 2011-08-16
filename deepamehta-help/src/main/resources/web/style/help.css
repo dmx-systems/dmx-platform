@@ -2,10 +2,14 @@
     font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
     font-size: 0.9em;
     line-height: 1.6em;
-    padding: 3em;
+    padding: 2em 2em 1em 3em;
 }
 
 #about-dialog img {
-    float: left;
     margin-right: 5em;
+}
+
+#about-dialog a:link,
+#about-dialog a:visited {
+    color: blue;
 }

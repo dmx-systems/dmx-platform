@@ -979,7 +979,7 @@ var dm4c = new function() {
             // setup create widget
             dm4c.refresh_create_menu()
             if (!dm4c.toolbar.create_menu.get_item_count()) {
-                $("#create-widget").hide()
+                dm4c.toolbar.create_widget.hide()
             }
             // the page panel
             if (dm4c.LOG_GUI) dm4c.log("Setting page panel height: " + $("#canvas").height())

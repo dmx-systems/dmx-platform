@@ -18,24 +18,23 @@ function ToolbarPanel() {
     var create_menu = dm4c.ui.menu(do_create_topic, "Create")
     var create_another_button = dm4c.ui.button(do_create_another_topic, undefined, "plus")
         .button("disable").attr({title: CREATE_ANOTHER_BUTTON_TITLE_DIS, accesskey: "n"})
-    var create_widget = $("<div>").attr(            {id: "create-widget"})
+    var create_widget = $("<div>").attr({id: "create-widget"})
         .append(create_menu.dom)
         .append(create_another_button)
     // create "Special" menu
-    var special_menu = dm4c.ui.menu(undefined, "Special")
-    var special_form = $("<div>").attr(             {id: "special-form"})
-        .append(special_menu.dom)
+    var special_menu = dm4c.ui.menu(undefined, "Help")  // renamed "Special" -> "Help" ### TODO: proper concept
     // create toolbar
     var dom = $("<div>").attr({id: "upper-toolbar"}).addClass("dm-toolbar")
         .addClass("ui-widget-header").addClass("ui-corner-all")
         .append(search_widget)
         .append(create_widget)
-        .append(special_form)
+        .append(special_menu.dom)
 
     // ----------------------------------------------------------------------------------------------- Public Properties
 
     this.searchmode_menu = searchmode_menu
     this.search_button = search_button
+    this.create_widget = create_widget
     this.create_menu = create_menu
     this.special_menu = special_menu
     this.dom = dom
