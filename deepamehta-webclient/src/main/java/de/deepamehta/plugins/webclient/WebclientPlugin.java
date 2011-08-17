@@ -37,10 +37,6 @@ import java.util.logging.Logger;
 @Produces("application/json")
 public class WebclientPlugin extends Plugin {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    public static final String WEBCLIENT_URL = "/index.html";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private boolean webclientLaunched = false;
@@ -202,6 +198,6 @@ public class WebclientPlugin extends Plugin {
     private String getWebclientUrl() {
         String host = "localhost";
         String port = System.getProperty("org.osgi.service.http.port");
-        return  "http://" + host + ":" + port + WEBCLIENT_URL;
+        return  "http://" + host + ":" + port + "/";
     }
 }
