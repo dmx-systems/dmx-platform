@@ -39,7 +39,7 @@ public class WebclientPlugin extends Plugin {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    public static final String WEBCLIENT_URL = "/de.deepamehta.webclient/index.html";
+    public static final String WEBCLIENT_URL = "/index.html";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

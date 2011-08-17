@@ -33,7 +33,7 @@ body {
 }
 
 .splash {
-    background-image: url("/de.deepamehta.webclient/images/deepamehta-logo.png");
+    background-image: url("/images/deepamehta-logo.png");
     background-repeat: no-repeat;
     background-position: center;
     opacity: 0.5;

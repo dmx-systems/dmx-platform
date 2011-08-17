@@ -26,7 +26,7 @@ function help_plugin() {
             '<table>' +
                 '<tr>' +
                     '<td>' +
-                        '<img src="/de.deepamehta.webclient/images/deepamehta-logo.png">' +
+                        '<img src="/images/deepamehta-logo.png">' +
                     '</td>' +
                     '<td>' +
                         '<div class="field-label">Version</div>' +

@@ -20,11 +20,15 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
+import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
 
 import org.codehaus.jettison.json.JSONObject;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -39,6 +43,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.io.InputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 
@@ -476,13 +481,13 @@ public class Plugin implements BundleActivator, EventHandler {
         dms.unregisterPlugin(pluginId);
     }
 
-    // ---
+    // === Web Resources ===
 
     private void registerWebResources() {
-        String namespace = "/" + pluginId;
+        String namespace = getWebResourcesNamespace();
         try {
             logger.info("Registering web resources of " + this + " at namespace " + namespace);
-            httpService.registerResources(namespace, "/web", null);
+            httpService.registerResources(namespace, "/web", new PluginHTTPContext());
         } catch (NamespaceException e) {
             throw new RuntimeException("Registering web resources of " + this + " failed " +
                 "(namespace=" + namespace + ")", e);
@@ -490,12 +495,63 @@ public class Plugin implements BundleActivator, EventHandler {
     }
 
     private void unregisterWebResources() {
-        String namespace = "/" + pluginId;
+        String namespace = getWebResourcesNamespace();
         logger.info("Unregistering web resources of " + this);
         httpService.unregister(namespace);
     }
 
     // ---
+
+    private String getWebResourcesNamespace() {
+        return getConfigProperty("webResourcesNamespace", "/" + pluginId);
+    }
+
+    // ---
+
+    /**
+     * Custom HttpContext to map resource name "/" to URL "/index.html"
+     */
+    private class PluginHTTPContext implements HttpContext {
+
+        private HttpContext httpContext;
+
+        private PluginHTTPContext() {
+            httpContext = httpService.createDefaultHttpContext();
+        }
+
+        // ---
+
+        @Override
+        public URL getResource(String name) {
+            try {
+                URL url;
+                if (name.equals("web/")) {
+                    url = new URL("bundle://" + pluginBundle.getBundleId() + ".0:1/web/index.html");
+                } else {
+                    url = httpContext.getResource(name);
+                }
+                // logger.info("### Mapping resource name \"" + name + "\" for plugin \"" +
+                //     pluginName + "\"\n          => URL \"" + url + "\"");
+                return url;
+            } catch (MalformedURLException e) {
+                throw new RuntimeException("Mapping resource name \"" + name + "\" for plugin \"" +
+                    pluginName + "\" to an URL failed");
+            }
+        }
+
+        @Override
+        public String getMimeType(String name) {
+            return httpContext.getMimeType(name);
+        }
+
+        @Override
+        public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response)
+                                                                            throws java.io.IOException {
+            return httpContext.handleSecurity(request, response);
+        }
+    }
+
+    // === REST Resources ===
 
     private void registerRestResources() {
         String namespace = getConfigProperty("restResourcesNamespace");
@@ -554,7 +610,7 @@ public class Plugin implements BundleActivator, EventHandler {
         return packages.toString();
     }
 
-    // --- Config Properties ---
+    // === Config Properties ===
 
     private Properties readConfigFile() {
         try {
@@ -577,7 +633,7 @@ public class Plugin implements BundleActivator, EventHandler {
         return configProperties.getProperty(key, defaultValue);
     }
 
-    // --- Model Dependencies ---
+    // === Model Dependencies ===
 
     private Map<String, Boolean> initDependencies() {
         Map<String, Boolean> dependencyState = new HashMap();
