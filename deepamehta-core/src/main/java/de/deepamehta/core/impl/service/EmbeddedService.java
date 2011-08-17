@@ -939,9 +939,14 @@ public class EmbeddedService implements DeepaMehtaService {
      * @param   typeUri     a topic type URI or a association type URI
      */
     void associateDataType(String typeUri, String dataTypeUri) {
-        createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(typeUri,     "dm4.core.type"),
-            new TopicRoleModel(dataTypeUri, "dm4.core.default"));
+        try {
+            createAssociation("dm4.core.aggregation",
+                new TopicRoleModel(typeUri,     "dm4.core.type"),
+                new TopicRoleModel(dataTypeUri, "dm4.core.default"));
+        } catch (Exception e) {
+            throw new RuntimeException("Associating type \"" + typeUri + "\" with data type \"" +
+                dataTypeUri + "\" failed", e);
+        }
     }
 
 

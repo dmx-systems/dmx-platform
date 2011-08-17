@@ -325,7 +325,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     void store() {
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            storeComposite(getCompositeValue());         // setCompositeValue() includes setSimpleValue()
+            storeComposite(getCompositeValue());            // setCompositeValue() includes setSimpleValue()
         } else {
             storeAndIndexValue(getSimpleValue());
         }
@@ -334,7 +334,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     void update(DeepaMehtaObjectModel model) {
         // ### TODO: compare new model with current one and update only if changed. See AttachedAssociation.update()
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            setCompositeValue(model.getCompositeValue());     // setCompositeValue() includes setSimpleValue()
+            setCompositeValue(model.getCompositeValue());   // setCompositeValue() includes setSimpleValue()
         } else {
             setSimpleValue(model.getSimpleValue());
         }

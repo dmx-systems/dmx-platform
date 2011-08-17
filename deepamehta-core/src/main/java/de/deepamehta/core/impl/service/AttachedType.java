@@ -29,6 +29,8 @@ import java.util.logging.Logger;
 
 abstract class AttachedType extends AttachedTopic implements Type {
 
+    private static final String DEFAULT_URI_PREFIX = "domain.project.topic_type_";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Map<String, AssociationDefinition> assocDefs;   // Attached object cache
@@ -39,14 +41,13 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedType(EmbeddedService dms) {
-        super((TopicModel) null, dms);  // The model (and thus the attached object cache) remain uninitialized.
-                                        // They are initialized later on through fetch().
+        this(null, dms);
+        // Note: the model and the attached object cache are initialized through fetch().
     }
 
     AttachedType(TypeModel model, EmbeddedService dms) {
         super(model, dms);
-        initAssocDefs();
-        initViewConfig();
+        // Note: the attached object cache is initialized through store().
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -185,14 +186,27 @@ abstract class AttachedType extends AttachedTopic implements Type {
         //
         // init attached object cache
         // ### initAssocDefs(); // Note: the assoc defs are already initialized through previous addAssocDefsSorted()
-        initViewConfig();       // defined in superclass
+        initViewConfig();
     }
 
     void store() {
+        // 1) store the base-topic parts
         dms.storage.createTopic(getModel());
         dms.associateWithTopicType(getModel());
         setSimpleValue(getSimpleValue());
+        // Note: if no URI is set a default URI is generated
+        if (getUri().equals("")) {
+            setUri(DEFAULT_URI_PREFIX + getId());
+        }
+        // init attached object cache
+        initAssocDefs();
+        initViewConfig();
+        // Note: the attached object cache must be initialized *after* storing the base-topic parts because
+        // initViewConfig() relies on the type's ID (unknown before stored) or URI (possibly unknown before stored).
+        // Note: the attached object cache must be initialized *before* storing the type-specific parts because
+        // storeAssocDefs() relies on the association definitions.
         //
+        // 2) store the type-specific parts
         dms.associateDataType(getUri(), getDataTypeUri());
         storeIndexModes();
         storeAssocDefs();
@@ -410,8 +424,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // ---
 
     private void initViewConfig() {
-        // Note: this type must be identified by its URI. Types being created have no ID yet.
-        RoleModel configurable = new TopicRoleModel(getUri(), "dm4.core.type");
+        RoleModel configurable = new TopicRoleModel(getId(), "dm4.core.type");
         this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
     }
 }

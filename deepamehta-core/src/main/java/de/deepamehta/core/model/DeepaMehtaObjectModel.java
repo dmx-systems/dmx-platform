@@ -74,6 +74,9 @@ public abstract class DeepaMehtaObjectModel {
         this(model.id, model.uri, model.typeUri, model.value, model.composite);
     }
 
+    /**
+     * Used for regular objects: topics and associations.
+     */
     public DeepaMehtaObjectModel(JSONObject model) {
         try {
             this.id = model.optLong("id", -1);
@@ -90,10 +93,13 @@ public abstract class DeepaMehtaObjectModel {
         }
     }
 
+    /**
+     * Used for types: topic types and association types.
+     */
     public DeepaMehtaObjectModel(JSONObject typeModel, String typeUri) {
         try {
             this.id = typeModel.optLong("id", -1);
-            this.uri = typeModel.getString("uri");
+            this.uri = typeModel.optString("uri");
             this.value = new SimpleValue(typeModel.get("value"));
             this.typeUri = typeUri;
             this.composite = new CompositeValue();

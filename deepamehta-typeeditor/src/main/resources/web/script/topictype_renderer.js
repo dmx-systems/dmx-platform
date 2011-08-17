@@ -17,7 +17,7 @@ function TopictypeRenderer() {
     this.render_page = function(topic) {
         var topic_type = dm4c.type_cache.get_topic_type(topic.uri)
         //
-        dm4c.render.field_label("Topic Type")
+        dm4c.render.field_label("Name")
         dm4c.render.field_value(topic_type.value)
         //
         dm4c.render.field_label("URI")
@@ -34,7 +34,7 @@ function TopictypeRenderer() {
         var topic_type = dm4c.type_cache.get_topic_type(topic.uri)
         //
         value_input = dm4c.render.input(topic_type.value)
-        dm4c.render.field_label("Topic Type")
+        dm4c.render.field_label("Name")
         dm4c.render.field_value(value_input)
         //
         uri_input = dm4c.render.input(topic_type.uri)
