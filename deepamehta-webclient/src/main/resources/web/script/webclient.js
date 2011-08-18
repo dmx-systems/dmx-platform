@@ -10,7 +10,7 @@ var dm4c = new function() {
     this.LOG_GUI = false
 
     this.restc = new RESTClient(CORE_SERVICE_URI)
-    this.ui = new UIHelper()
+    this.ui = new GUIToolkit()
     this.render = new RenderHelper()
 
     // Model

@@ -3,7 +3,7 @@ function TextFieldRenderer(topic, field, rel_topics) {
     /**
      * Input field: a jQuery object
      * Text area:   a jQuery object
-     * Combo box:   a UIHelper Combobox object
+     * Combo box:   a GUIToolkit Combobox object
      */
     var gui_element
 

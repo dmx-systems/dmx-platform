@@ -2,7 +2,7 @@ function TopictypeRenderer() {
 
     var value_input     // a jQuery <input> element
     var uri_input       // a jQuery <input> element
-    var data_type_menu  // a UIHelper Menu object
+    var data_type_menu  // a GUIToolkit Menu object
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 

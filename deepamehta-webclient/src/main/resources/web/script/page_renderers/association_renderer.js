@@ -1,6 +1,6 @@
 function AssociationRenderer() {
 
-    var assoc_type_menu   // a UIHelper Menu object
+    var assoc_type_menu   // a GUIToolkit Menu object
     var role_type_menu_1, role_type_menu_2
 
     var topic_1, topic_2

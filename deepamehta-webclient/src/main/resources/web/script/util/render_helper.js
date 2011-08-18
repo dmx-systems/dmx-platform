@@ -63,7 +63,7 @@ function RenderHelper() {
     }
 
     /**
-     * @return  a UIHelper Menu object
+     * @return  a GUIToolkit Menu object
      */
     this.topic_menu = function(topic_type_uri, selected_uri) {
         // retrieve all instances

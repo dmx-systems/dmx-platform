@@ -1,4 +1,4 @@
-function UIHelper() {
+function GUIToolkit() {
 
     var gui = this
 
@@ -15,7 +15,7 @@ function UIHelper() {
     this.button = function(handler, label, icon, is_submit) {
         //
         if (!handler) {
-            alert("WARNING (UIHelper.button): No handler specified for button");
+            alert("WARNING (GUIToolkit.button): No handler specified for button");
         }
         //
         button = $('<button type="' + (is_submit ? "submit" : "button") + '">').click(handler)
