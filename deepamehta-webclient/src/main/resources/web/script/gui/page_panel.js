@@ -50,40 +50,7 @@ function PagePanel() {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function render_page() {
-        empty()
-        var css = dm4c.trigger_page_renderer_hook(displayed_object, "page_css")
-        $("#page-content").css(css)
-        dm4c.trigger_page_renderer_hook(displayed_object, "render_page", displayed_object)
-    }
-
-    function render_form() {
-        empty()
-        dm4c.trigger_page_renderer_hook(displayed_object, "render_form", displayed_object)
-    }
-
-    function empty(do_show_splash) {
-        $("#page-content").empty()
-        $("#page-toolbar").empty()
-        //
-        if (do_show_splash) {
-            show_splash()
-        } else {
-            hide_splash()
-        }
-    }
-
-    // ---
-
-    function render_buttons(context) {
-        var commands = displayed_object.get_commands(context)
-        for (var i = 0, cmd; cmd = commands[i]; i++) {
-            var button = dm4c.ui.button(cmd.handler, cmd.label, cmd.ui_icon, cmd.is_submit)
-            $("#page-toolbar").append(button)
-        }
-    }
-
-    // ---
+    // === Event Handler ===
 
     /**
      * Return key triggers submit button.
@@ -96,6 +63,46 @@ function PagePanel() {
             submit_button.click()
         }
         return false
+    }
+
+    // === Helper ===
+
+    function render_page() {
+        empty()
+        prepare_page()
+        dm4c.trigger_page_renderer_hook(displayed_object, "render_page", displayed_object)
+    }
+
+    function render_form() {
+        empty()
+        prepare_page()
+        dm4c.trigger_page_renderer_hook(displayed_object, "render_form", displayed_object)
+    }
+
+    function render_buttons(context) {
+        var commands = displayed_object.get_commands(context)
+        for (var i = 0, cmd; cmd = commands[i]; i++) {
+            var button = dm4c.ui.button(cmd.handler, cmd.label, cmd.ui_icon, cmd.is_submit)
+            $("#page-toolbar").append(button)
+        }
+    }
+
+    // ---
+
+    function empty(do_show_splash) {
+        $("#page-content").empty()
+        $("#page-toolbar").empty()
+        //
+        if (do_show_splash) {
+            show_splash()
+        } else {
+            hide_splash()
+        }
+    }
+
+    function prepare_page() {
+        var css = dm4c.trigger_page_renderer_hook(displayed_object, "page_css")
+        $("#page-content").css(css)
     }
 
     // ---
