@@ -1,5 +1,7 @@
 function TypeCache() {
 
+    var self = this
+
     var topic_types = {}        // key: Type URI, value: a TopicType object
     var topic_type_icons = {}   // key: Type URI, value: icon (JavaScript Image object)
                                 // FIXME: maintain icons in TopicType class
@@ -56,10 +58,34 @@ function TypeCache() {
         return topic_type_icons[type_uri]
     }
 
+    this.iterate = function(visitor_func) {
+        var type_uris = get_type_uris(true)     // sort=true
+        for (var i = 0; i < type_uris.length; i++) {
+            var topic_type = self.get_topic_type(type_uris[i])
+            visitor_func(topic_type)
+        }
+    }
+
     /**
      * Returns an array of all type URIs in the cache.
      */
-    this.get_type_uris = function() {
-        return js.keys(topic_types)
+    function get_type_uris(sort) {
+        var type_uris = js.keys(topic_types)
+        // sort by type name
+        if (sort) {
+            type_uris.sort(function(uri_1, uri_2) {
+                var name_1 = self.get_topic_type(uri_1).value
+                var name_2 = self.get_topic_type(uri_2).value
+                if (name_1 < name_2) {
+                    return -1
+                } else if (name_1 == name_2) {
+                    return 0
+                } else {
+                    return 1
+                }
+            })
+        }
+        //
+        return type_uris
     }
 }

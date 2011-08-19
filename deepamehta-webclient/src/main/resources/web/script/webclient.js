@@ -731,18 +731,15 @@ var dm4c = new function() {
         // remove all items
         type_menu.empty()
         // add topic type items
-        var type_uris = dm4c.type_cache.get_type_uris()
-        for (var i = 0; i < type_uris.length; i++) {
-            var type_uri = type_uris[i]
-            var topic_type = dm4c.type_cache.get_topic_type(type_uri)
+        dm4c.type_cache.iterate(function(topic_type) {
             if (filter_func(topic_type)) {
                 type_menu.add_item({
                     label: topic_type.value,
-                    value: type_uri,
-                    icon: topic_type.get_icon_src()
+                    value: topic_type.uri,
+                    icon:  topic_type.get_icon_src()
                 })
             }
-        }
+        })
         // restore selection
         if (item) {
             type_menu.select(item.value)
