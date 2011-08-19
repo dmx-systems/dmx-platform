@@ -46,24 +46,6 @@ function ToolbarPanel() {
         searchmode_widget.append(dm4c.trigger_plugin_hook("searchmode_widget", searchmode)[0])
     }
 
-    this.refresh_create_menu = function() {
-        // remove all items
-        create_menu.empty()
-        // add topic type items
-        var type_uris = dm4c.type_cache.get_type_uris()
-        for (var i = 0; i < type_uris.length; i++) {
-            var type_uri = type_uris[i]
-            var topic_type = dm4c.type_cache.get_topic_type(type_uri)
-            if (dm4c.has_create_permission(type_uri) && topic_type.get_menu_config("create-type-menu")) {
-                create_menu.add_item({
-                    label: topic_type.value,
-                    value: type_uri,
-                    icon: topic_type.get_icon_src()
-                })
-            }
-        }
-    }
-
     this.get_recent_type_uri = function() {
         return recent_type_uri
     }

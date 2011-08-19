@@ -16,14 +16,15 @@ function fulltext_plugin() {
 
     this.init = function() {
         dm4c.toolbar.searchmode_menu.add_item({label: "By Text", value: "by-text"})
-        dm4c.toolbar.search_button.button("disable")
         search_field = $('<input type="text">').attr("size", SEARCH_FIELD_WIDTH)
         // select initial searchmode
+        dm4c.toolbar.searchmode_menu.select("by-text")
         dm4c.toolbar.select_searchmode("by-text")
     }
 
     this.searchmode_widget = function(searchmode) {
         if (searchmode == "by-text") {
+            update_search_button_state()
             return search_field.keyup(do_process_key)
         }
     }
@@ -39,15 +40,18 @@ function fulltext_plugin() {
     // === Event Handler ===
 
     function do_process_key(event) {
-        var searchterm = get_searchterm()
-        if (event.which == 13 && searchterm) {
+        if (event.which == 13 && get_searchterm()) {
             dm4c.do_search("by-text")
         } else {
-            dm4c.toolbar.search_button.button("option", "disabled", !searchterm)
+            update_search_button_state()
         }
     }
 
     // === Helper ===
+
+    function update_search_button_state() {
+        dm4c.toolbar.search_button.button("option", "disabled", !get_searchterm())
+    }
 
     function get_searchterm() {
         return $.trim(search_field.val())

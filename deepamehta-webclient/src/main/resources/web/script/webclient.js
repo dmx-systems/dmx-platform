@@ -708,12 +708,33 @@ var dm4c = new function() {
     // ---
 
     /**
-     * @param   menu_id     Used IDs are e.g. ### FIXDOC
-     *                      "create-type-menu"
-     *                      "search-type-menu" - introduced by typesearch plugin
+     * Utility method for plugin developers.
+     */
+    this.refresh_type_menu = function(type_menu, filter_func) {
+        // remove all items
+        type_menu.empty()
+        // add topic type items
+        var type_uris = dm4c.type_cache.get_type_uris()
+        for (var i = 0; i < type_uris.length; i++) {
+            var type_uri = type_uris[i]
+            var topic_type = dm4c.type_cache.get_topic_type(type_uri)
+            if (filter_func(topic_type)) {
+                type_menu.add_item({
+                    label: topic_type.value,
+                    value: type_uri,
+                    icon: topic_type.get_icon_src()
+                })
+            }
+        }
+    }
+
+    /**
+     * Utility method for plugin developers.
      */
     this.refresh_create_menu = function() {
-        dm4c.toolbar.refresh_create_menu()
+        dm4c.refresh_type_menu(dm4c.toolbar.create_menu, function(topic_type) {
+            return dm4c.has_create_permission(topic_type.uri) && topic_type.get_menu_config("create-type-menu")
+        })
         dm4c.trigger_plugin_hook("post_refresh_create_menu", dm4c.toolbar.create_menu)
     }
 

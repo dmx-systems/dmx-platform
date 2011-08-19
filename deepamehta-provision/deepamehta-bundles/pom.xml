@@ -59,6 +59,11 @@
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-typesearch</artifactId>
+            <version>4.0.3-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-topicmaps</artifactId>
             <version>4.0.3-SNAPSHOT</version>
         </dependency>
@@ -88,11 +93,6 @@
             <artifactId>deepamehta-projects</artifactId>
             <version>0.4.3</version>
         </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-typesearch</artifactId>
-            <version>0.4.2</version>
-        </dependency
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-files</artifactId>

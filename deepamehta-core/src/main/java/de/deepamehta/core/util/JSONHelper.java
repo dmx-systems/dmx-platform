@@ -1,6 +1,5 @@
 package de.deepamehta.core.util;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
@@ -18,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +28,30 @@ import java.util.logging.Logger;
 public class JSONHelper {
 
     private static Logger logger = Logger.getLogger("de.deepamehta.core.util.JSONHelper");
+
+
+
+    // *******************
+    // *** Collections ***
+    // *******************
+
+
+
+    public static Set<Topic> toTopicSet(Set<RelatedTopic> relTopics) {
+        Set<Topic> topics = new LinkedHashSet();
+        for (Topic topic : relTopics) {
+            topics.add(topic);
+        }
+        return topics;
+    }
+
+
+
+    // ************
+    // *** JSON ***
+    // ************
+
+
 
     // === Generic ===
 

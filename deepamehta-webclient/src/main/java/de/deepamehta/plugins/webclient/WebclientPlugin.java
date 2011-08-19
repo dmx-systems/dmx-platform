@@ -11,6 +11,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientContext;
 import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.util.JSONHelper;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -94,7 +95,7 @@ public class WebclientPlugin extends Plugin {
             Set<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri, wholeWord, clientContext);
             Set<Topic> searchableUnits = findSearchableUnits(singleTopics);
             logger.info(singleTopics.size() + " single topics found, " + searchableUnits.size() + " searchable units");
-            Topic searchTopic = createSearchTopic(searchTerm, searchableUnits, clientContext);
+            Topic searchTopic = createSearchTopic("\"" + searchTerm + "\"", searchableUnits, clientContext);
             tx.success();
             return searchTopic;
         } catch (Exception e) {
@@ -115,8 +116,19 @@ public class WebclientPlugin extends Plugin {
     @GET
     @Path("/search/by_type/{typeUri}")
     public Topic getTopics(@PathParam("typeUri") String typeUri) {
-        logger.info("typeUri=" + typeUri);
-        return null;    // ### createSearchTopic(typeUri, dms.getTopics(typeUri), null);
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            logger.info("typeUri=" + typeUri);
+            String searchTerm = dms.getTopicType(typeUri, null).getSimpleValue() + "(s)";       // clientContext=null
+            Topic searchTopic = createSearchTopic(searchTerm, dms.getTopics(typeUri), null);    // clientContext=null
+            tx.success();
+            return searchTopic;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Searching topics failed", e);
+        } finally {
+            tx.finish();
+        }
     }
 
 
@@ -129,7 +141,7 @@ public class WebclientPlugin extends Plugin {
             if (isSearchableUnit(topic)) {
                 searchableUnits.add(topic);
             } else {
-                Set<Topic> parentTopics = toTopicSet(topic.getRelatedTopics((List) null,
+                Set<Topic> parentTopics = JSONHelper.toTopicSet(topic.getRelatedTopics((List) null,
                     "dm4.core.part", "dm4.core.whole", null, false, false));
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
@@ -181,16 +193,6 @@ public class WebclientPlugin extends Plugin {
      */
     private Object getViewConfig(TopicType topicType, String setting) {
         return topicType.getViewConfig("dm4.webclient.view_config", "dm4.webclient." + setting);
-    }
-
-    // ---
-
-    private Set<Topic> toTopicSet(Set<RelatedTopic> relTopics) {
-        Set<Topic> topics = new LinkedHashSet();
-        for (Topic topic : relTopics) {
-            topics.add(topic);
-        }
-        return topics;
     }
 
     // ---
