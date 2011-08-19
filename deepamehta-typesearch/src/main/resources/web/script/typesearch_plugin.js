@@ -36,6 +36,15 @@ function typesearch_plugin() {
     }
 
     /**
+     * Once a "Topic Type" topic is created we refresh the type menu.
+     */
+    this.post_create_topic = function(topic) {
+        if (topic.type_uri == "dm4.core.topic_type") {
+            refresh_type_menu()
+        }
+    }
+
+    /**
      * Once a "Topic Type" topic is updated we refresh the type menu.
      */
     this.post_update_topic = function(topic, old_topic) {

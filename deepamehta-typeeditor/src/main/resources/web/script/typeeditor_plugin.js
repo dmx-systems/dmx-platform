@@ -29,40 +29,22 @@ function typeeditor_plugin() {
 
 
     /**
-     * Once a topic type is created we must
-     * 1) Update the type cache.
-     * 2) Rebuild the "Create" button's type menu.
+     * Once a topic type is created we must refresh the "Create" type menu.
      *
      * @param   topic   The topic just created.
      *                  Note: in case the just created topic is a type, the entire type definition is passed.
      */
     this.post_create_topic = function(topic) {
-        // ### FIXME: move code to dm4c.create_topic_type()?
         if (topic.type_uri == "dm4.core.topic_type") {
-            // 1) Update type cache
-            dm4c.type_cache.put_topic_type(topic)
-            // 2) Rebuild type menu
             dm4c.refresh_create_menu()
         }
     }
 
     /**
-     * Once a topic type is updated we must
-     * 1) Update the type cache.
-     * 2) Rebuild the "Create" button's type menu.
+     * Once a topic type is updated we must refresh the "Create" type menu.
      */
     this.post_update_topic = function(topic, old_topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
-            // alert("post_update_topic:\n\nnew topic type=\n" + JSON.stringify(topic) +
-            //     "\n\nold topic type=\n" + JSON.stringify(old_topic))
-            // 1) Update type cache
-            var uri_changed = topic.uri != old_topic.uri
-            if (uri_changed) {
-                // alert("Type URI changed: " + old_topic.uri + " -> " + topic.uri)
-                dm4c.type_cache.remove(old_topic.uri)
-            }
-            dm4c.type_cache.put_topic_type(topic)
-            // 2) Rebuild type menu
             dm4c.refresh_create_menu()
         }
     }

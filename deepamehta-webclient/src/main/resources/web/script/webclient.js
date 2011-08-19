@@ -215,18 +215,29 @@ var dm4c = new function() {
     /**
      * Updates a topic type in the DB and on the GUI.
      * Triggers the "post_update_topic" hook.
-     *
-     * ### FIXME: move to topictype editor module?
      */
     this.do_update_topic_type = function(old_topic_type, new_topic_type) {
-        // update model
-        var updated_topic_type = build_topic_type(dm4c.restc.update_topic_type(new_topic_type))
-        dm4c.trigger_plugin_hook("post_update_topic", updated_topic_type, old_topic_type)   // trigger hook
-        // update view
-        dm4c.canvas.update_topic(updated_topic_type, true)
-        dm4c.page_panel.display(updated_topic_type)
+        // 1) update model
+        var topic_type = build_topic_type(dm4c.restc.update_topic_type(new_topic_type))
         //
-        return updated_topic_type
+        // 2) Update type cache
+        // Note: the type cache must be updated *before* the "post_update_topic" hook is triggered.
+        // Other plugins might rely on an up-to-date type cache (e.g. the Type Search plugin does).
+        var uri_changed = topic_type.uri != old_topic_type.uri
+        if (uri_changed) {
+            // alert("Type URI changed: " + old_topic_type.uri + " -> " + topic_type.uri)
+            dm4c.type_cache.remove(old_topic_type.uri)
+        }
+        dm4c.type_cache.put_topic_type(topic_type)
+        //
+        // 3) trigger hook
+        dm4c.trigger_plugin_hook("post_update_topic", topic_type, old_topic_type)   // trigger hook
+        //
+        // 4) update view
+        dm4c.canvas.update_topic(topic_type, true)
+        dm4c.page_panel.display(topic_type)
+        //
+        return topic_type
     }
 
     // ---
@@ -462,9 +473,13 @@ var dm4c = new function() {
     }
 
     this.create_topic_type = function(topic_type_model) {
-        // update DB
+        // 1) update DB
         var topic_type = build_topic_type(dm4c.restc.create_topic_type(topic_type_model))
-        // trigger hook
+        // 2) Update type cache
+        // Note: the type cache must be updated *before* the "post_create_topic" hook is triggered.
+        // Other plugins might rely on an up-to-date type cache (e.g. the Type Search plugin does).
+        dm4c.type_cache.put_topic_type(topic_type)
+        // 3) trigger hook
         dm4c.trigger_plugin_hook("post_create_topic", topic_type)
         //
         return topic_type
@@ -711,6 +726,8 @@ var dm4c = new function() {
      * Utility method for plugin developers.
      */
     this.refresh_type_menu = function(type_menu, filter_func) {
+        // save selection
+        var item = type_menu.get_selection()
         // remove all items
         type_menu.empty()
         // add topic type items
@@ -725,6 +742,10 @@ var dm4c = new function() {
                     icon: topic_type.get_icon_src()
                 })
             }
+        }
+        // restore selection
+        if (item) {
+            type_menu.select(item.value)
         }
     }
 
