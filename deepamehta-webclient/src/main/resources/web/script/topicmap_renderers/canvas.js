@@ -530,7 +530,6 @@ function Canvas() {
         var cm_x = cx(event)
         var cm_y = cy(event)
         var contextmenu = $("<div>").addClass("contextmenu").css({
-            position: "absolute",
             top:  cm_y + "px",
             left: cm_x + "px"
         })
@@ -544,6 +543,7 @@ function Canvas() {
             }
         }
         $("#canvas-panel").append(contextmenu)
+        contextmenu.show()
 
         function context_menu_handler(handler) {
             return function(event) {
