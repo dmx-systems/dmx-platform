@@ -12,35 +12,45 @@ function help_plugin() {
 
     this.init = function() {
         dm4c.toolbar.special_menu.add_item({label: "About DeepaMehta", handler: do_about})
-        dm4c.ui.dialog("about-dialog", "About DeepaMehta", build_dialog(), "auto")
+        dm4c.ui.dialog("about-dialog", "About DeepaMehta", dialog_content(), "auto")
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function do_about() {
-        \$("#about-dialog").dialog("open")  // Note: $ is escaped for Maven resource filtering
+        \$("#about-dialog").dialog("open")  // Note: $ is escaped from Maven resource filtering
     }
 
-    function build_dialog() {
+    function dialog_content() {
         return $(
             '<table>' +
                 '<tr>' +
                     '<td>' +
                         '<img src="/images/deepamehta-logo.png">' +
-                    '</td>' +
-                    '<td>' +
                         '<div class="field-label">Version</div>' +
                         '<div class="field-value">${project.version}</div>' +
-                        '<div class="field-label">Developers</div>' +
-                        '<div class="field-value">' +
-                            'Jörg Richter<br>' +
-                            'Danny Gräf<br>' +
-                            'Malte Reißig<br>' +
-                            'Torsten Ziegler<br>' +
-                            'Enrico Schnepel<br>' +
-                        '</div>' +
+                        '<div class="field-label">Copyright</div>' +
+                        '<div class="field-value">2000-2011 Jörg Richter</div>' +
                         '<div class="field-label">License</div>' +
                         '<div class="field-value">GNU General Public License, v3</div>' +
+                    '</td>' +
+                    '<td>' +
+                        '<div class="field-label">Contributors</div>' +
+                        '<div class="field-value">' +
+                            'Andreas Gebhard<br>' +
+                            'Danny Gräf<br>' +
+                            'Annette Leeb<br>' +
+                            'Christiane Müller<br>' +
+                            'Jürgen Neumann<br>' +
+                            'Jurij Poelchau<br>' +
+                            'Ingo Rau<br>' +
+                            'Malte Reißig<br>' +
+                            'Jörg Richter<br>' +
+                            'Enrico Schnepel<br>' +
+                            'Matthias Staps<br>' +
+                            'Andreas Wichmann<br>' +
+                            '... <i>and many others</i><br>' +
+                        '</div>' +
                         '<div class="field-label">Website</div>' +
                         '<div class="field-value">' +
                             '<a href="http://www.deepamehta.de/" target="_blank">www.deepamehta.de</a>' +
