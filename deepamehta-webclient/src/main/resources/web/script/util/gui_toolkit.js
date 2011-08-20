@@ -64,6 +64,10 @@ function GUIToolkit() {
 
     // === Menu ===
 
+    // Settings
+    var D = 8               // size of one scroll step in pixel
+    var SCROLL_DELAY = 15   // delay between scroll steps in milliseconds
+
     var opened_menu = null  // global state: the menu currently open, or null if no menu is open
 
     $(function() {
@@ -71,7 +75,7 @@ function GUIToolkit() {
         // Note: a neater approach would be to let the menu close itself by let its button react on blur.
         // This would work in Firefox but unfortunately Safari doesn't fire blur events for buttons.
         $("body").click(function() {
-            if (dm4c.LOG_GUI) dm4c.log("Body clicked -- close opened menu")
+            // ### if (dm4c.LOG_GUI) dm4c.log("Body clicked -- close opened menu")
             close_opened_menu()
         })
     })
@@ -117,11 +121,15 @@ function GUIToolkit() {
             var stateful = !menu_title
             var selection   // selected item (object with "value" and "label" properties).
                             // Used only for stateful select-like menus.
+            var scroll_animation
+            var scroll_area_height
 
             // GUI
-            var menu = $("<div>").addClass("contextmenu").css({position: "absolute"}).hide()
             var button = gui.button(do_open_menu, menu_title, "triangle-1-s")
-            var dom = $("<span>").append(button).append(menu)
+            var menu          = $("<div>").addClass("contextmenu")
+            var up_scroller   = $("<div>").addClass("scroll-area up")  .hover(create_scroll_handler(+D), do_end_scroll)
+            var down_scroller = $("<div>").addClass("scroll-area down").hover(create_scroll_handler(-D), do_end_scroll)
+            var dom = $("<span>").append(button).append(menu).append(up_scroller).append(down_scroller)
 
             // ---------------------------------------------------------------------------------------------- Public API
 
@@ -227,19 +235,49 @@ function GUIToolkit() {
 
 
 
+            // === Event Handler ===
+
+            function do_open_menu(event) {
+                if (!is_visible(menu)) {
+                    var mouse_y = event.layerY + $(this).position().top
+                    close_opened_menu()
+                    open_menu(mouse_y)
+                } else {
+                    close_menu()
+                }
+                return false
+            }
+
+            // ---
+
+            function create_scroll_handler(distance) {
+                return function() {
+                    scroll_animation = setInterval(function() {
+                        scroll_to(menu.position().top + distance)
+                    }, SCROLL_DELAY)
+                }
+            }
+
+            function do_end_scroll() {
+                clearInterval(scroll_animation)
+            }
+
+            // === Helper ===
+
             /**
              * @param   item    object with "value" (optional) and "label" properties.
              */
             function add_item(item) {
-                // 1) update model
-                items.push(item)
-                // 2) update GUI
+                // 1) update GUI
                 var anchor = $("<a>").attr("href", "#").click(create_handler(item))
                 if (item.icon) {
                     anchor.append(dm4c.render.image(item.icon, "menu-icon"))
                 }
                 anchor.append(item.label)
                 menu.append(anchor)
+                // 2) update model
+                item.dom = anchor
+                items.push(item)
                 // select the item if there is no selection yet
                 if (!selection) {
                     // Note: this sets also the button label (in case of stateful select-like menus)
@@ -285,11 +323,21 @@ function GUIToolkit() {
             /**
              * Calculates the position of the menu and opens it. Updates global state.
              */
-            function open_menu() {
-                var pos = button.position()
-                var height = button.outerHeight()
-                menu.css({top: pos.top + height, left: pos.left})
-                menu.show()
+            function open_menu(mouse_y) {
+                var button_pos = button.position()
+                var button_x = button_pos.left
+                var button_y = button_pos.top
+                menu         .css({left: button_x, clip: "rect(auto, auto, auto, auto)"}).show()
+                up_scroller  .css({left: button_x, width: menu.width()})
+                down_scroller.css({left: button_x, width: menu.width()})
+                scroll_area_height = up_scroller.outerHeight()
+                if (selection) {
+                    var item_height = selection.dom.outerHeight()
+                    var menu_y = mouse_y - selection.dom.position().top - item_height / 2
+                } else {
+                    var menu_y = button_y + button.outerHeight()
+                }
+                scroll_to(menu_y)
                 // update global state
                 opened_menu = self
             }
@@ -299,8 +347,56 @@ function GUIToolkit() {
              */
             function close_menu() {
                 menu.hide()
+                up_scroller.hide()
+                down_scroller.hide()
                 // update global state
                 opened_menu = null
+            }
+
+            function scroll_to(menu_y) {
+
+                trim_top()
+                trim_bottom()
+                menu.css("top", menu_y)
+
+                function trim_top() {
+                    if (menu_y < 0) {
+                        // Note: we trim the menu top by cliping
+                        var clip_top = -menu_y + scroll_area_height
+                        menu.css("clip", "rect(" + clip_top + "px, auto, auto, auto)")
+                        // show up scroller
+                        if (!is_visible(up_scroller)) {
+                            up_scroller.show()
+                        }
+                    } else {
+                        // hide up scroller
+                        if (is_visible(up_scroller)) {
+                            up_scroller.hide()
+                            menu.css("clip", "rect(auto, auto, auto, auto)")
+                            clearInterval(scroll_animation)
+                        }
+                    }
+                }
+
+                function trim_bottom() {
+                    var w_h = window.innerHeight
+                    menu.css("height", "auto")  // reset height for measurement
+                    if (menu_y + menu.outerHeight() > w_h) {
+                        // Note: we trim the menu bottom by reducing the menu height
+                        var height = w_h - menu_y - 8 - scroll_area_height  // 8px = padding (2*0.3em=9px)-1px overlap
+                        menu.css("height", height + "px")
+                        // show down scroller
+                        if (!is_visible(down_scroller)) {
+                            down_scroller.show()
+                        }
+                    } else {
+                        // hide down scroller
+                        if (is_visible(down_scroller)) {
+                            down_scroller.hide()
+                            clearInterval(scroll_animation)
+                        }
+                    }
+                }
             }
 
             // ---
@@ -311,14 +407,8 @@ function GUIToolkit() {
                 button.button("option", {label: label, text: true})
             }
 
-            function do_open_menu() {
-                if (menu.css("display") == "none") {
-                    close_opened_menu()
-                    open_menu()
-                } else {
-                    close_menu()
-                }
-                return false
+            function is_visible(dom) {
+                return dom.css("display") != "none"
             }
 
             // ---

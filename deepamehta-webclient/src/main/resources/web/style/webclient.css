@@ -33,7 +33,7 @@ body {
 }
 
 .splash {
-    background-image: url("/images/deepamehta-logo.png");
+    background-image: url("../images/deepamehta-logo.png");
     background-repeat: no-repeat;
     background-position: center;
     opacity: 0.5;
@@ -164,6 +164,7 @@ body {
 /*** Contextmenu ***/
 
 .contextmenu {
+    position: absolute;
     background: white;
     border: 1px solid darkgray;
     font-size: 85%;
@@ -171,6 +172,8 @@ body {
     padding-top: 0.3em;
     padding-bottom: 0.3em;
     z-index: 1000;
+    overflow: hidden;
+    display: none;
 }
 
 .contextmenu a {
@@ -191,6 +194,27 @@ body {
 .contextmenu hr {
     margin-top: 0.3em;
     margin-bottom: 0.3em;
+}
+
+.scroll-area {
+    position: absolute;
+    height: 0.9em;
+    background: #f0f0f0;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 1px solid darkgray;
+    z-index: 1000;
+    display: none;
+}
+
+.scroll-area.up {
+    top: 0;
+    background-image: url("../images/triangle-up.png");
+}
+
+.scroll-area.down {
+    bottom: 0;
+    background-image: url("../images/triangle-down.png");
 }
 
 /*** Autocomplete List ***/
