@@ -2,18 +2,19 @@
     font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
     font-size: 0.9em;
     line-height: 1.6em;
-    padding: 2em 4em 1em 3em;
+}
+
+#about-dialog table {
+    border-spacing: 3em;
 }
 
 #about-dialog table tr {
-    vertical-align: bottom;
+    vertical-align: top;
 }
 
 #about-dialog img {
     position: relative;
-    left: -6px;
-    padding-right: 10em;
-    padding-bottom: 1.8em;
+    left: -1em;
 }
 
 #about-dialog a:link,
