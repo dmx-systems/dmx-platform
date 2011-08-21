@@ -11,9 +11,11 @@ function Canvas() {
     var ASSOC_WIDTH = 4
     var ASSOC_CLICK_TOLERANCE = 0.3
     var HIGHLIGHT_COLOR = "#0000ff"
-    var HIGHLIGHT_BLUR = 32
+    var HIGHLIGHT_BLUR = 16
     var CANVAS_ANIMATION_STEPS = 30
-    var LABEL_DIST_Y = 5
+    var LABEL_FONT = "1em 'Lucida Grande', Verdana, Arial, Helvetica, sans-serif"   // copied from webclient.css
+    var LABEL_COLOR = "black"
+    var LABEL_DIST_Y = 4
     var LABEL_MAX_WIDTH = "10em"
 
     // Model
@@ -130,7 +132,6 @@ function Canvas() {
         }
         reset_highlight_object(id)
         // 2) refresh GUI
-        ct.label_div.remove()
         if (refresh_canvas) {
             this.refresh()
         }
@@ -199,7 +200,6 @@ function Canvas() {
     this.clear = function() {
         // refresh GUI
         translate(-trans_x, -trans_y)                       // reset translation
-        $("#canvas-panel .canvas-topic-label").remove()     // remove label divs
         // update model
         init_model()
     }
@@ -246,15 +246,17 @@ function Canvas() {
     }
 
     function draw_topics() {
+        // set label style
+        ctx.font      = LABEL_FONT
+        ctx.fillStyle = LABEL_COLOR
+        //
         iterate_topics(function(ct) {
-            var w = ct.icon.width
-            var h = ct.icon.height
             try {
                 // hightlight
                 var is_highlight = highlight_object_id == ct.id
                 set_highlight_style(is_highlight)
                 //
-                ctx.drawImage(ct.icon, ct.x - w / 2, ct.y - h / 2)
+                ct.draw()
                 //
                 reset_highlight_style(is_highlight)
             } catch (e) {
@@ -704,32 +706,17 @@ function Canvas() {
         if (dm4c.LOG_GUI) dm4c.log("Rebuilding canvas")
         // Note: we don't empty the entire canvas-panel to keep the resizable-handle element.
         $("#canvas-panel #canvas").remove()
-        $("#canvas-panel .canvas-topic-label").remove()
         // Note: in order to resize the canvas element we must recreate it.
         // Otherwise the browsers would just distort the canvas rendering.
         create_canvas_element()
         ctx.translate(trans_x, trans_y)
         draw()
-        rebuild_topic_labels()
     }
 
     function translate(tx, ty) {
         ctx.translate(tx, ty)
-        move_topic_labels_by(tx, ty)
         trans_x += tx
         trans_y += ty
-    }
-
-    function move_topic_labels_by(tx, ty) {
-         iterate_topics(function(ct) {
-             ct.move_label_by(tx, ty)
-         })
-    }
-
-    function rebuild_topic_labels() {
-        iterate_topics(function(ct) {
-             ct.build_label()
-        })
     }
 
     function scroll_to_center(x, y) {
@@ -754,21 +741,11 @@ function Canvas() {
      *                          true: returned as canvas coordinate (involves canvas viewport).
      */
     function cx(event, as_canvas_coordinate) {
-        if ($(event.target).hasClass("canvas-topic-label")) {
-            var offset = $(event.target).position().left
-        } else {
-            var offset = 0
-        }
-        return event.layerX + (as_canvas_coordinate ? -trans_x : 0) + offset
+        return event.layerX + (as_canvas_coordinate ? -trans_x : 0)
     }
 
     function cy(event, as_canvas_coordinate) {
-        if ($(event.target).hasClass("canvas-topic-label")) {
-            var offset = $(event.target).position().top
-        } else {
-            var offset = 0
-        }
-        return event.layerY + (as_canvas_coordinate ? -trans_y : 0) + offset
+        return event.layerY + (as_canvas_coordinate ? -trans_y : 0)
     }
 
 
@@ -779,6 +756,7 @@ function Canvas() {
      * Properties:
      *  id, type_uri, label
      *  x, y                    Topic position. Represents the center of the topic's icon.
+     *  icon
      *  width, height           Icon size.
      */
     function CanvasTopic(topic) {
@@ -789,35 +767,30 @@ function Canvas() {
         this.y = topic.y
 
         init(topic);
-        build_label()
+
+        this.draw = function() {
+            var x = this.x - this.width / 2
+            var y = this.y - this.height / 2
+            ctx.drawImage(this.icon, x, y)
+            //
+            ctx.fillText(this.label, x, y + this.height + LABEL_DIST_Y + 16)    // 16px = 1em
+        }
 
         this.move_to = function(x, y) {
             this.x = x
             this.y = y
-            init_label_pos()
-            this.label_div.css(label_position_css())
         }
 
         this.move_by = function(tx, ty) {
             this.x += tx
             this.y += ty
-            this.move_label_by(tx, ty)
-        }
-
-        this.move_label_by = function(tx, ty) {
-            this.label_x += tx
-            this.label_y += ty
-            this.label_div.css(label_position_css())
-        }
-
-        this.build_label = function() {
-            build_label()
         }
 
         this.update = function(topic) {
             init(topic)
-            this.label_div.text(this.label)
         }
+
+        // ---
 
         function init(topic) {
             ct.id       = topic.id
@@ -829,68 +802,6 @@ function Canvas() {
             var h = ct.icon.height
             ct.width = w
             ct.height = h
-            // label div
-            ct.lox = -w / 2                   // label offset
-            ct.loy = h / 2 + LABEL_DIST_Y     // label offset
-            init_label_pos()
-        }
-
-        function init_label_pos() {
-            ct.label_x = ct.x + ct.lox + trans_x
-            ct.label_y = ct.y + ct.loy + trans_y
-        }
-
-        /**
-         * Called in 2 situations:
-         * - the topic is build initially.
-         * - all label div's are rebuild (in reaction of resizing the canvas).
-         */
-        function build_label() {
-            // Note: we must add the label div to the document (along with text content and max-width
-            // setting) _before_ the clipping is applied. Otherwise the clipping can't be calculated
-            // because the size of the label div is unknown.
-            ct.label_div = $("<div>").addClass("canvas-topic-label").text(ct.label)
-            ct.label_div.css({"max-width": LABEL_MAX_WIDTH})
-            ct.label_div.mouseup(mouseup)       // to not block mouse gestures when mouse-up over the label div
-            $("#canvas-panel").append(ct.label_div)
-            ct.label_div.css(label_position_css())
-            // Note: we must add the label div as a canvas sibling. As a canvas child element it doesn't appear.
-        }
-
-        /**
-         * Builds the CSS for positioning and clipping the label div.
-         *
-         * Called in 3 situations:
-         * - the label div is build initially.
-         * - the topic has moved.
-         * - the label div has moved.
-         */
-        function label_position_css() {
-            // 1) Positioning
-            var css = {position: "absolute", top: ct.label_y + "px", left: ct.label_x + "px"}
-            // 2) Clipping
-            // Note: we do clip each label div instead of "overflow: hidden" for the context panel
-            // because "overflow: hidden" only works with absolute positioning the context panel
-            // which in turn has a lot of consequences, e.g. the context menu items doesn't
-            // occupy the entire context menu width anymore and I don't know how to fix it.
-            var lx = ct.label_x;
-            var ly = ct.label_y;
-            // Note: if the label div is completely out of sight we must set it to "display: none".
-            // Otherwise the document would grow and produce window scrollbars.
-            if (lx > self.canvas_width || ly > self.canvas_height) {
-                css.display = "none"
-            } else {
-                var lw = ct.label_div.width()
-                var lh = ct.label_div.height()
-                var top = ly < 0 ? -ly + "px" : "auto"
-                var bottom = ly + lh > self.canvas_height ? self.canvas_height - ly + "px" : "auto"
-                var left = lx < 0 ? -lx + "px" : "auto"
-                var right = lx + lw > self.canvas_width ? self.canvas_width - lx + "px" : "auto"
-                css.clip = "rect(" + top + ", " + right + ", " + bottom + ", " + left + ")"
-                css.display = "block"
-            }
-            //
-            return css
         }
     }
 
