@@ -94,7 +94,7 @@ public class Topicmap {
     public class GridPositioning {
 
         // Settings
-        private final int GRID_DIST_X = 180;           // 10em (see LABEL_MAX_WIDTH) + 20 pixel padding
+        private final int GRID_DIST_X = 220;    // LABEL_MAX_WIDTH + 20 pixel padding
         private final int GRID_DIST_Y = 80;
         private final int START_X;
         private final int START_Y = 50;

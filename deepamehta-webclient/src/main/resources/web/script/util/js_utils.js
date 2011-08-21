@@ -231,6 +231,48 @@ var js = {
         return url
     },
 
+    TextWrapper: function(text, max_width, line_height, ctx) {
+
+        var wrapped_lines = []
+        wrap_text()
+
+        // ---
+
+        this.draw = function(x, y, ctx) {
+            var dy = y
+            for (var i = 0, line; line = wrapped_lines[i]; i++) {
+                ctx.fillText(line, x, dy)
+                dy += line_height
+            }
+        }
+
+        // ---
+
+        function wrap_text() {
+            var line = ""   // current line
+            var width = 0   // current line's width
+            var words = text.split(" ")
+            for (var i = 0, word; word = words[i]; i++) {
+                wrap_word(word + " ")
+            }
+            wrapped_lines.push(line)
+
+            function wrap_word(word) {
+                var w = ctx.measureText(word).width
+                if (width + w <= max_width) {
+                    line  += word
+                    width += w
+                } else {
+                    if (line) {
+                        wrapped_lines.push(line)
+                    }
+                    line = word
+                    width = w
+                }
+            }
+        }
+    },
+
 
 
     // ***************

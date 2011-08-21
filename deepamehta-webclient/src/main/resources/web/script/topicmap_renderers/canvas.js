@@ -15,8 +15,8 @@ function Canvas() {
     var CANVAS_ANIMATION_STEPS = 30
     var LABEL_FONT = "1em 'Lucida Grande', Verdana, Arial, Helvetica, sans-serif"   // copied from webclient.css
     var LABEL_COLOR = "black"
-    var LABEL_DIST_Y = 4
-    var LABEL_MAX_WIDTH = "10em"
+    var LABEL_DIST_Y = 4            // in pixel
+    var LABEL_MAX_WIDTH = 200       // in pixel
 
     // Model
     var canvas_topics               // topics displayed on canvas (Object, key: topic ID, value: CanvasTopic)
@@ -247,7 +247,6 @@ function Canvas() {
 
     function draw_topics() {
         // set label style
-        ctx.font      = LABEL_FONT
         ctx.fillStyle = LABEL_COLOR
         //
         iterate_topics(function(ct) {
@@ -685,6 +684,10 @@ function Canvas() {
         var canvas_elem = $(canvas).attr({id: "canvas", width: self.canvas_width, height: self.canvas_height})
         $("#canvas-panel").append(canvas_elem)  // add to document
         ctx = canvas.getContext("2d")
+        // Note: the canvas font must be set early.
+        // Topic label measurement takes place *before* drawing.
+        ctx.font = LABEL_FONT
+        //
         // bind event handlers
         canvas_elem.mousedown(mousedown)
         canvas_elem.mouseup(mouseup)
@@ -761,7 +764,8 @@ function Canvas() {
      */
     function CanvasTopic(topic) {
 
-        var ct = this   // Note: variable "self" is already in use (canvas reference)
+        var self = this
+        var label_wrapper
 
         this.x = topic.x
         this.y = topic.y
@@ -769,11 +773,14 @@ function Canvas() {
         init(topic);
 
         this.draw = function() {
+            // icon
             var x = this.x - this.width / 2
             var y = this.y - this.height / 2
             ctx.drawImage(this.icon, x, y)
-            //
-            ctx.fillText(this.label, x, y + this.height + LABEL_DIST_Y + 16)    // 16px = 1em
+            // label
+            label_wrapper.draw(x, y + this.height + LABEL_DIST_Y + 16, ctx)    // 16px = 1em
+            // Note: the context must be passed to every draw() call.
+            // The context changes when the canvas is resized.
         }
 
         this.move_to = function(x, y) {
@@ -793,15 +800,15 @@ function Canvas() {
         // ---
 
         function init(topic) {
-            ct.id       = topic.id
-            ct.type_uri = topic.type_uri
-            ct.label    = topic.value
+            self.id       = topic.id
+            self.type_uri = topic.type_uri
+            self.label    = topic.value
             //
-            ct.icon = dm4c.get_type_icon(topic.type_uri)
-            var w = ct.icon.width
-            var h = ct.icon.height
-            ct.width = w
-            ct.height = h
+            self.icon = dm4c.get_type_icon(topic.type_uri)
+            self.width  = self.icon.width
+            self.height = self.icon.height
+            //
+            label_wrapper = new js.TextWrapper(self.label, LABEL_MAX_WIDTH, 16, ctx)    // line height 1em = 16px
         }
     }
 
@@ -846,7 +853,7 @@ function Canvas() {
     function GridPositioning() {
 
         // Settings
-        var GRID_DIST_X = 180           // 10em (see LABEL_MAX_WIDTH) + 20 pixel padding
+        var GRID_DIST_X = 220   // LABEL_MAX_WIDTH + 20 pixel padding
         var GRID_DIST_Y = 80
         var START_X = 50 - trans_x
         var START_Y = 50
