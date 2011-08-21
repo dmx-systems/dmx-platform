@@ -65,10 +65,10 @@ function GUIToolkit() {
     // === Menu ===
 
     // Settings
-    var D = 8               // size of one scroll step in pixel
-    var SCROLL_DELAY = 15   // delay between scroll steps in milliseconds
+    var SCROLL_DISTANCE = 8     // distance of one scroll step in pixel
+    var SCROLL_DELAY = 15       // delay between scroll steps in milliseconds
 
-    var opened_menu = null  // global state: the menu currently open, or null if no menu is open
+    var opened_menu = null      // global state: the menu currently open, or null if no menu is open
 
     $(function() {
         // Close the open menu when clicked elsewhere.
@@ -121,17 +121,28 @@ function GUIToolkit() {
             var stateful = !menu_title
             var selection   // selected item (object with "value" and "label" properties).
                             // Used only for stateful select-like menus.
+
+            // short-term interaction state
+            var menu_height
+            var scroller_height
+            var window_height
             var scroll_animation
-            var scroll_area_height
 
             // GUI
             var button = gui.button(do_open_menu, menu_title, "triangle-1-s")
-            var menu          = $("<div>").addClass("contextmenu")
-            var up_scroller   = $("<div>").addClass("scroll-area up")  .hover(create_scroll_handler(+D), do_end_scroll)
-            var down_scroller = $("<div>").addClass("scroll-area down").hover(create_scroll_handler(-D), do_end_scroll)
-            var dom = $("<span>").append(button).append(menu).append(up_scroller).append(down_scroller)
+            var menu            = $("<div>").addClass("contextmenu")
+            var top_scroller    = $("<div>").addClass("scroll-area top")
+            var bottom_scroller = $("<div>").addClass("scroll-area bottom")
+            // Note: clicking a scroller is meant to have no effect. However, the event must be consumed by the
+            // scroller in order to avoid it bubbling up to the body (where it would cause the menu to be closed).
+            top_scroller   .hover(create_scroll_handler(+SCROLL_DISTANCE), do_end_scroll).click(consume)
+            bottom_scroller.hover(create_scroll_handler(-SCROLL_DISTANCE), do_end_scroll).click(consume)
+            //
+            var dom = $("<span>").append(button).append(menu).append(top_scroller).append(bottom_scroller)
 
             // ---------------------------------------------------------------------------------------------- Public API
+
+            this.dom = dom
 
             /**
              * @param   item    The menu item to add. An object with these properties:
@@ -229,8 +240,6 @@ function GUIToolkit() {
                 close_menu()
             }
 
-            this.dom = dom
-
             // --------------------------------------------------------------------------------------- Private Functions
 
 
@@ -248,18 +257,37 @@ function GUIToolkit() {
                 return false
             }
 
+            function create_selection_handler(item) {
+                return function() {
+                    // 1) remember selection
+                    select_item(item)
+                    // 2) close menu
+                    close_menu()
+                    // 3) call handler
+                    var h = item.handler || handler     // individual item handler has precedence
+                    if (h) {
+                         h(item)
+                    }
+                    return false
+                }
+            }
+
             // ---
 
             function create_scroll_handler(distance) {
                 return function() {
                     scroll_animation = setInterval(function() {
-                        scroll_to(menu.position().top + distance)
+                        move_to(menu.position().top + distance)
                     }, SCROLL_DELAY)
                 }
             }
 
             function do_end_scroll() {
                 clearInterval(scroll_animation)
+            }
+
+            function consume() {
+                return false
             }
 
             // === Helper ===
@@ -269,7 +297,7 @@ function GUIToolkit() {
              */
             function add_item(item) {
                 // 1) update GUI
-                var anchor = $("<a>").attr("href", "#").click(create_handler(item))
+                var anchor = $("<a>").attr("href", "#").click(create_selection_handler(item))
                 if (item.icon) {
                     anchor.append(dm4c.render.image(item.icon, "menu-icon"))
                 }
@@ -305,21 +333,6 @@ function GUIToolkit() {
                 selection = null
             }
 
-            function create_handler(item) {
-                return function item_selected() {
-                    // 1) remember selection
-                    select_item(item)
-                    // 2) close menu
-                    close_menu()
-                    // 3) call handler
-                    var h = item.handler || handler     // individual item handler has precedence
-                    if (h) {
-                         h(item)
-                    }
-                    return false
-                }
-            }
-
             /**
              * Calculates the position of the menu and opens it. Updates global state.
              */
@@ -327,17 +340,25 @@ function GUIToolkit() {
                 var button_pos = button.position()
                 var button_x = button_pos.left
                 var button_y = button_pos.top
-                menu         .css({left: button_x, clip: "rect(auto, auto, auto, auto)"}).show()
-                up_scroller  .css({left: button_x, width: menu.width()})
-                down_scroller.css({left: button_x, width: menu.width()})
-                scroll_area_height = up_scroller.outerHeight()
+                //
+                menu           .css({left: button_x}).show()
+                top_scroller   .css({left: button_x, width: menu.width()})
+                bottom_scroller.css({left: button_x, width: menu.width()})
+                // the menu might be trimmed from previous opening
+                reset_top_trim()
+                reset_bottom_trim()
+                //
+                menu_height = menu.outerHeight()
+                scroller_height = top_scroller.outerHeight()
+                window_height = window.innerHeight
+                //
                 if (selection) {
                     var item_height = selection.dom.outerHeight()
                     var menu_y = mouse_y - selection.dom.position().top - item_height / 2
                 } else {
                     var menu_y = button_y + button.outerHeight()
                 }
-                scroll_to(menu_y)
+                move_to(menu_y)
                 // update global state
                 opened_menu = self
             }
@@ -347,56 +368,68 @@ function GUIToolkit() {
              */
             function close_menu() {
                 menu.hide()
-                up_scroller.hide()
-                down_scroller.hide()
+                top_scroller.hide()
+                bottom_scroller.hide()
                 // update global state
                 opened_menu = null
             }
 
-            function scroll_to(menu_y) {
+            function move_to(menu_y) {
+
+                if (!is_visible(menu)) {
+                    alert("WARNING: scroll thread is still running while menu is not shown")
+                }
 
                 trim_top()
                 trim_bottom()
                 menu.css("top", menu_y)
 
+                // Note: we trim the menu top by cliping
                 function trim_top() {
                     if (menu_y < 0) {
-                        // Note: we trim the menu top by cliping
-                        var clip_top = -menu_y + scroll_area_height
-                        menu.css("clip", "rect(" + clip_top + "px, auto, auto, auto)")
-                        // show up scroller
-                        if (!is_visible(up_scroller)) {
-                            up_scroller.show()
+                        var top = -menu_y + scroller_height
+                        menu.css("clip", "rect(" + top + "px, auto, auto, auto)")
+                        // show top scroller
+                        if (!is_visible(top_scroller)) {
+                            top_scroller.show()
                         }
                     } else {
-                        // hide up scroller
-                        if (is_visible(up_scroller)) {
-                            up_scroller.hide()
-                            menu.css("clip", "rect(auto, auto, auto, auto)")
+                        // hide top scroller
+                        if (is_visible(top_scroller)) {
+                            top_scroller.hide()
+                            reset_top_trim()
                             clearInterval(scroll_animation)
                         }
                     }
                 }
 
+                // Note: we trim the menu bottom by reducing the menu height
                 function trim_bottom() {
-                    var w_h = window.innerHeight
-                    menu.css("height", "auto")  // reset height for measurement
-                    if (menu_y + menu.outerHeight() > w_h) {
-                        // Note: we trim the menu bottom by reducing the menu height
-                        var height = w_h - menu_y - 8 - scroll_area_height  // 8px = padding (2*0.3em=9px)-1px overlap
+                    if (menu_y + menu_height > window_height) {
+                        // 8px = menu's top/bottom padding (2 * 0.3em = 9px) - 1px scroller overlap
+                        var height = window_height - menu_y - 8 - scroller_height
                         menu.css("height", height + "px")
-                        // show down scroller
-                        if (!is_visible(down_scroller)) {
-                            down_scroller.show()
+                        // show bottom scroller
+                        if (!is_visible(bottom_scroller)) {
+                            bottom_scroller.show()
                         }
                     } else {
-                        // hide down scroller
-                        if (is_visible(down_scroller)) {
-                            down_scroller.hide()
+                        // hide bottom scroller
+                        if (is_visible(bottom_scroller)) {
+                            bottom_scroller.hide()
+                            reset_bottom_trim()
                             clearInterval(scroll_animation)
                         }
                     }
                 }
+            }
+
+            function reset_top_trim() {
+                menu.css("clip", "rect(auto, auto, auto, auto)")
+            }
+
+            function reset_bottom_trim() {
+                menu.css("height", "auto")
             }
 
             // ---

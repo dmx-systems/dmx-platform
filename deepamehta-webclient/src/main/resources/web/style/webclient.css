@@ -207,12 +207,12 @@ body {
     display: none;
 }
 
-.scroll-area.up {
+.scroll-area.top {
     top: 0;
     background-image: url("../images/triangle-up.png");
 }
 
-.scroll-area.down {
+.scroll-area.bottom {
     bottom: 0;
     background-image: url("../images/triangle-down.png");
 }
