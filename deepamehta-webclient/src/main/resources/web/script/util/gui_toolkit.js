@@ -130,7 +130,7 @@ function GUIToolkit() {
 
             // GUI
             var button = gui.button(do_open_menu, menu_title, "triangle-1-s")
-            var menu            = $("<div>").addClass("contextmenu")
+            var menu            = $("<div>").addClass("menu")
             var top_scroller    = $("<div>").addClass("scroll-area top")
             var bottom_scroller = $("<div>").addClass("scroll-area bottom")
             // Note: clicking a scroller is meant to have no effect. However, the event must be consumed by the
@@ -297,19 +297,28 @@ function GUIToolkit() {
              */
             function add_item(item) {
                 // 1) update GUI
-                var anchor = $("<a>").attr("href", "#").click(create_selection_handler(item))
+                var item_dom = $("<a>").attr("href", "#").click(create_selection_handler(item))
+                add_hovering()
                 if (item.icon) {
-                    anchor.append(dm4c.render.image(item.icon, "menu-icon"))
+                    item_dom.append(dm4c.render.image(item.icon, "menu-icon"))
                 }
-                anchor.append(item.label)
-                menu.append(anchor)
+                item_dom.append(item.label)
+                menu.append(item_dom)
                 // 2) update model
-                item.dom = anchor
+                item.dom = item_dom
                 items.push(item)
+                // 3) adjust selection
                 // select the item if there is no selection yet
                 if (!selection) {
                     // Note: this sets also the button label (in case of stateful select-like menus)
                     select_item(item)
+                }
+
+                function add_hovering() {
+                    item_dom.hover(
+                        function() {$(this).addClass("hover")},
+                        function() {$(this).removeClass("hover")}
+                    )
                 }
             }
 
@@ -355,9 +364,11 @@ function GUIToolkit() {
                 if (selection) {
                     var item_height = selection.dom.outerHeight()
                     var menu_y = mouse_y - selection.dom.position().top - item_height / 2
+                    selection.dom.addClass("hover")
                 } else {
                     var menu_y = button_y + button.outerHeight()
                 }
+                //
                 move_to(menu_y)
                 // update global state
                 opened_menu = self

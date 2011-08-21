@@ -496,7 +496,7 @@ function Canvas() {
         if (dm4c.LOG_GUI) dm4c.log("Contextmenu!")
         //
         close_context_menu()
-        //
+        // 1) assemble commands
         var ct, ca
         if (ct = find_topic(event)) {
             dm4c.do_select_topic(ct.id)
@@ -511,7 +511,7 @@ function Canvas() {
             var y = cy(event, true)
             var commands = dm4c.get_canvas_commands(x, y, "context-menu")
         }
-        //
+        // 2) show menu
         open_context_menu(commands, event)
         //
         return false
@@ -529,7 +529,7 @@ function Canvas() {
         }
         var cm_x = cx(event)
         var cm_y = cy(event)
-        var contextmenu = $("<div>").addClass("contextmenu").css({
+        var contextmenu = $("<div>").addClass("menu").css({
             top:  cm_y + "px",
             left: cm_x + "px"
         })
@@ -538,8 +538,9 @@ function Canvas() {
                 contextmenu.append("<hr>")
             } else {
                 var handler = context_menu_handler(cmd.handler)
-                var a = $("<a>").attr("href", "#").click(handler).text(cmd.label)
-                contextmenu.append(a)
+                var item_dom = $("<a>").attr("href", "#").click(handler).text(cmd.label)
+                add_hovering()
+                contextmenu.append(item_dom)
             }
         }
         $("#canvas-panel").append(contextmenu)
@@ -553,11 +554,20 @@ function Canvas() {
                 return false
             }
         }
+
+        // ### FIXME: copy in GUIToolkit
+        // ### TODO: refactor canvas context menu to make use of GUIToolkit Menu class
+        function add_hovering() {
+            item_dom.hover(
+                function() {$(this).addClass("hover")},
+                function() {$(this).removeClass("hover")}
+            )
+        }
     }
 
     function close_context_menu() {
         // remove context menu
-        $("#canvas-panel .contextmenu").remove()
+        $("#canvas-panel .menu").remove()
     }
 
 
