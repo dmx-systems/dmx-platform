@@ -49,13 +49,13 @@ Install
 Download the latest release and unzip it.  
 <https://github.com/jri/deepamehta/downloads/>
 
-A folder `deepamehta-4.0.2` is created.
+A folder `deepamehta-4.0.3` is created.
 
 
 Start
 -----
 
-Open the `deepamehta-4.0.2` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.0.3` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -65,7 +65,7 @@ While DeepaMehta starts a terminal window opens and you see some information log
 Then a browser window opens and DeepaMehta is ready to use.
 
 Hint: if no browser window appears open it manually:  
-<http://localhost:8080/de.deepamehta.webclient/index.html>
+<http://localhost:8080/>
 
 
 Stop
@@ -82,9 +82,9 @@ You can close the terminal window now.
 Update
 ------
 
-To update from DeepaMehta 4.0 or 4.0.1 to 4.0.2 while keeping your content: before starting DeepaMehta copy your `deepamehta-db` folder into the `deepamehta-4.0.2` folder. (If you've started DeepaMehta 4.0.2 already, stop it, and replace its `deepamehta-db` folder with your one, and start again.)
-
 Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is currently not supported.
+Even updating from 4.0.x to 4.0.3 is currently not supported.
+Please see the "Important Notice" at the top.
 
 
 Start with a fresh database
@@ -102,7 +102,7 @@ If the browser shows 404 or 503 while an exception appears in the terminal: refr
 Uninstall
 ---------
 
-Stop DeepaMehta and delete the `deepamehta-4.0.2` folder.  
+Stop DeepaMehta and delete the `deepamehta-4.0.3` folder.  
 This removes DeepaMehta completely from your computer, including the database.
 
 
@@ -114,6 +114,17 @@ Build from Source
 
 Version History
 ---------------
+
+**4.0.3** -- Aug 22, 2011
+
+* New features:
+    * Webbrowsing: render webpages directly in the content panel or in a separate window/tab.
+    * Type search: query all topics of a given type
+* Improvements:
+    * More intuitive Create menu
+    * Create topics via keyboard
+* For more GUI improvements and fixes, also for developers, see the release notes:
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.2** -- Aug 2, 2011
 
@@ -225,4 +236,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Aug 2, 2011
+Aug 22, 2011
