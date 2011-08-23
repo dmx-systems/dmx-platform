@@ -8,8 +8,9 @@ function RESTClient(core_service_uri) {
 
     // === Topics ===
 
-    this.get_topic_by_id = function(topic_id) {
-        return request("GET", "/topic/" + topic_id)
+    this.get_topic_by_id = function(topic_id, fetch_composite) {
+        var params = new RequestParameter({fetch_composite: fetch_composite})
+        return request("GET", "/topic/" + topic_id + "?" + params.to_query_string())
     }
 
     /**
@@ -254,10 +255,7 @@ function RESTClient(core_service_uri) {
 
         if (params && !params.length) {
             for (var param_name in params) {
-                // do not add null or undefined values
-                if (params[param_name]) {
-                    add(param_name, params[param_name])
-                }
+                add(param_name, params[param_name])
             }
         }
 
@@ -278,9 +276,16 @@ function RESTClient(core_service_uri) {
         }
 
         function add(param_name, value) {
+            // Do not add null or undefined values.
+            // On the other hand false *is* added.
+            if (value == null || value == undefined) {
+                return
+            }
+            //
             if (typeof(value) == "object") {
                 value = JSON.stringify(value)
             }
+            //
             param_array.push(param_name + "=" + value)
         }
     }

@@ -836,8 +836,8 @@ var dm4c = new function() {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    this.fetch_topic = function(topic_id) {
-        return build_topic(dm4c.restc.get_topic_by_id(topic_id))
+    this.fetch_topic = function(topic_id, fetch_composite) {
+        return build_topic(dm4c.restc.get_topic_by_id(topic_id, fetch_composite))
     }
 
     this.fetch_association = function(assoc_id) {

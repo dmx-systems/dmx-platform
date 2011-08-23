@@ -18,11 +18,11 @@ function Association(assoc) {
     // === Public API ===
 
     this.get_topic_1 = function() {
-        return dm4c.fetch_topic(this.role_1.topic_id)
+        return dm4c.fetch_topic(this.role_1.topic_id, false)    // fetch_composite=false
     }
 
     this.get_topic_2 = function() {
-        return dm4c.fetch_topic(this.role_2.topic_id)
+        return dm4c.fetch_topic(this.role_2.topic_id, false)    // fetch_composite=false
     }
 
     // ---
