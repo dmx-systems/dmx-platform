@@ -3,7 +3,6 @@ package de.deepamehta.plugins.files.service;
 import de.deepamehta.plugins.files.model.Resource;
 import de.deepamehta.plugins.files.model.ResourceInfo;
 
-import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.PluginService;
 

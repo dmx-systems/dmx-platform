@@ -1,66 +1,110 @@
 {
     topic_types: [
+
+        ### File ###
+
         {
-            label: "File",
-            uri: "de/deepamehta/core/topictype/File",
-            icon_src: "/de.deepamehta.files/images/sheet.png",
-            js_renderer_class: "PlainDocument",
-            topic_label_field_uri: "de/deepamehta/core/property/FileName",
-            fields: [
+            value: "Content",
+            uri: "dm4.files.content",
+            data_type_uri: "dm4.core.html",
+            index_mode_uris: ["dm4.core.fulltext"]
+            ### TODO: BodyTextRenderer
+        },
+        {
+            value: "File Name",
+            uri: "dm4.files.file_name",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"]
+            ### TODO: topic_label_field_uri
+        },
+        {
+            value: "Path",
+            uri: "dm4.files.path",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.key"]
+        },
+        {
+            value: "Media Type",
+            uri: "dm4.files.media_type",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"]
+        },
+        {
+            value: "Size",
+            uri: "dm4.files.size",
+            data_type_uri: "dm4.core.number"
+        },
+        {
+            value: "File",
+            uri: "dm4.files.file",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
                 {
-                    label: "Content",
-                    uri: "de/deepamehta/core/property/Content",
-                    data_type: "html",
-                    indexing_mode: "FULLTEXT",
-                    js_renderer_class: "BodyTextRenderer"
+                    part_topic_type_uri:  "dm4.files.content",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    label: "File Name",
-                    uri: "de/deepamehta/core/property/FileName",
-                    data_type: "text",
-                    editor: "single line",
-                    indexing_mode: "FULLTEXT"
+                    part_topic_type_uri:  "dm4.files.file_name",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    label: "Path",
-                    uri: "de/deepamehta/core/property/Path",
-                    data_type: "text",
-                    editor: "single line",
-                    indexing_mode: "KEY"
+                    part_topic_type_uri:  "dm4.files.path",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    label: "Media Type",
-                    uri: "de/deepamehta/core/property/MediaType",
-                    data_type: "text",
-                    editor: "single line",
-                    indexing_mode: "FULLTEXT"
+                    part_topic_type_uri:  "dm4.files.media_type",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    label: "Size",
-                    uri: "de/deepamehta/core/property/Size",
-                    data_type: "number"
+                    part_topic_type_uri:  "dm4.files.size",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.icon_src: "/de.deepamehta.files/images/sheet.png"
+                    }
                 }
             ]
         },
+
+        ### Folder ###
+
         {
-            label: "Folder",
-            uri: "de/deepamehta/core/topictype/Folder",
-            icon_src: "/de.deepamehta.files/images/folder.png",
-            js_renderer_class: "PlainDocument",
-            fields: [
+            value: "Folder Name",
+            uri: "dm4.files.folder_name",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"]
+        },
+        {
+            value: "Folder",
+            uri: "dm4.files.folder",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
                 {
-                    label: "Folder Name",
-                    uri: "de/deepamehta/core/property/FolderName",
-                    data_type: "text",
-                    editor: "single line",
-                    indexing_mode: "FULLTEXT"
+                    part_topic_type_uri:  "dm4.files.folder_name",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    label: "Path",
-                    uri: "de/deepamehta/core/property/Path",
-                    data_type: "text",
-                    editor: "single line",
-                    indexing_mode: "KEY"
+                    part_topic_type_uri:  "dm4.files.path",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                }
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.icon_src: "/de.deepamehta.files/images/folder.png"
+                    }
                 }
             ]
         }

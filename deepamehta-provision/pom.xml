@@ -18,8 +18,8 @@
     </parent>
 
     <modules>
-        <module>deepamehta-bundles</module>
-        <module>felix-bundles</module>
         <module>3rd-party-bundles</module>
+        <module>felix-bundles</module>
+        <module>deepamehta-bundles</module>
     </modules>
 </project>
