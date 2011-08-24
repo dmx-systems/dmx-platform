@@ -1,4 +1,4 @@
-function TextFieldRenderer(topic, field, rel_topics) {
+function TextFieldRenderer(topic, field) {
 
     /**
      * Input field: a jQuery object

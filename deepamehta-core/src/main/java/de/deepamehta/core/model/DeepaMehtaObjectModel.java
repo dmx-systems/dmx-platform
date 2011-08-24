@@ -23,7 +23,9 @@ public abstract class DeepaMehtaObjectModel {
     protected String uri;               // is never null, may be empty
     protected String typeUri;           // is never null in models used for a create operation
                                         // may be null in models used for an update operation
-    protected SimpleValue value;        // is never null, may be constructed on empty string
+    protected SimpleValue value;        // is never null in models used for a create operation, may be constructed
+                                        //                                                      on empty string
+                                        // may be null in models used for an update operation
     protected CompositeValue composite; // is never null, may be empty
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -81,7 +83,11 @@ public abstract class DeepaMehtaObjectModel {
         try {
             this.id = model.optLong("id", -1);
             this.uri = model.optString("uri");
-            this.value = new SimpleValue(model.optString("value"));
+            if (model.has("value")) {
+                this.value = new SimpleValue(model.get("value"));
+            } else {
+                this.value = null;
+            }
             this.typeUri = model.optString("type_uri", null);
             if (model.has("composite")) {
                 this.composite = new CompositeValue(model.getJSONObject("composite"));

@@ -41,13 +41,11 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedType(EmbeddedService dms) {
-        this(null, dms);
-        // Note: the model and the attached object cache are initialized through fetch().
+        super(dms);         // Note: the model and the attached object cache are initialized through fetch().
     }
 
     AttachedType(TypeModel model, EmbeddedService dms) {
-        super(model, dms);
-        // Note: the attached object cache is initialized through store().
+        super(model, dms);  // Note: the attached object cache is initialized through store().
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

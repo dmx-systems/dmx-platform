@@ -249,6 +249,12 @@ var js = {
         // ---
 
         function wrap_text() {
+            // do not wrap "text" if it's a number
+            if (!text.split) {
+                wrapped_lines.push(text)
+                return
+            }
+            //
             var line = ""   // current line
             var width = 0   // current line's width
             var words = text.split(" ")

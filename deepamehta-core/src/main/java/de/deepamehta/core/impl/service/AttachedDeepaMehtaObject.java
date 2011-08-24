@@ -40,11 +40,16 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedDeepaMehtaObject(EmbeddedService dms) {
-        this(null, dms);    // ### The model remain uninitialized.
-                            // ### They are initialized later on through fetch().
+        this.model = null;      // ### initialized through fetch().
+        this.dms = dms;
     }
 
     AttachedDeepaMehtaObject(DeepaMehtaObjectModel model, EmbeddedService dms) {
+        // set default value
+        if (model.getSimpleValue() == null) {
+            model.setSimpleValue("");
+        }
+        //
         this.model = model;
         this.dms = dms;
     }
@@ -128,6 +133,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public void setSimpleValue(SimpleValue value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Tried to set a null SimpleValue (" + this + ")");
+        }
         // update memory
         model.setSimpleValue(value);
         // update DB
@@ -336,7 +344,12 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
             setCompositeValue(model.getCompositeValue());   // setCompositeValue() includes setSimpleValue()
         } else {
-            setSimpleValue(model.getSimpleValue());
+            SimpleValue value = model.getSimpleValue();
+            if (value != null) {
+                setSimpleValue(value);
+            } else {
+                logger.info("### Updating simple value ABORTED -- no value is given");
+            }
         }
         setUri(model.getUri());
     }
