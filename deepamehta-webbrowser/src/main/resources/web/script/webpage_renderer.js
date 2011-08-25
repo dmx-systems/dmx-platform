@@ -19,8 +19,7 @@ function WebpageRenderer() {
             activate_trailblazer()
         }
         //
-        iframe.attr("src", url)
-        dm4c.render.page(iframe)
+        dm4c.render.page(iframe.attr("src", url))
 
         function activate_trailblazer() {
 

@@ -74,6 +74,11 @@
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-filemanager</artifactId>
+            <version>4.0.4-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-help</artifactId>
             <version>4.0.4-SNAPSHOT</version>
         </dependency>
@@ -97,11 +102,6 @@
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-projects</artifactId>
             <version>0.4.3</version>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-filemanager</artifactId>
-            <version>0.4.2</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>

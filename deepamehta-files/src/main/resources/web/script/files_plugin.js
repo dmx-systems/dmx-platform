@@ -1,6 +1,12 @@
 function files_plugin() {
 
-    // ------------------------------------------------------------------------------------------------ Overriding Hooks
+
+
+    // ***********************************************************
+    // *** Webclient Hooks (triggered by deepamehta-webclient) ***
+    // ***********************************************************
+
+
 
     this.init = function() {
         extend_rest_client()
@@ -18,7 +24,7 @@ function files_plugin() {
             }
             // Note: if an error occurred "files" is not initialized
             if (files) {
-                dm4c.trigger_hook("process_files_drop", files)
+                dm4c.trigger_plugin_hook("process_files_drop", files)
             }
         } else if (js.contains(data_transfer.types, "text/plain")) {
             alert("WARNING: drag'n'drop operation is ignored.\n\nType: text/plain " +
@@ -96,8 +102,8 @@ function files_plugin() {
      * @param   topic   a CanvasTopic object
      */
     this.topic_doubleclicked = function(topic) {
-        if (topic.type == "de/deepamehta/core/topictype/File" ||
-            topic.type == "de/deepamehta/core/topictype/Folder") {
+        if (topic.type_uri == "dm4.files.file" ||
+            topic.type_uri == "dm4.files.folder") {
             dm4c.restc.execute_command("deepamehta-files.open-file", {topic_id: topic.id})
         }
     }
@@ -107,30 +113,30 @@ function files_plugin() {
     /**
      * Creates a File topic for the given file and shows the topic on the canvas.
      *
-     * @param   file        A File object (with "name", "path", "type", and "size" attributes).
+     * @param   file        A File object (with "name", "path", "type", and "size" properties).
      * @param   do_select   Optional: if evaluates to true the File topic is selected on the canvas.
      */
     this.create_file_topic = function(file, do_select) {
         var file_topic = dm4c.restc.execute_command("deepamehta-files.create-file-topic", {path: file.path})
-        dm4c.add_topic_to_canvas(file_topic, do_select ? "show" : "none")
+        dm4c.show_topic(new Topic(file_topic), do_select ? "show" : "none")
     }
 
     /**
      * Creates a Folder topic for the given directory and shows the topic on the canvas.
      *
-     * @param   dir         A Directory object (with "name", "path", and "items" attributes).
+     * @param   dir         A Directory object (with "name", "path", and "items" properties).
      * @param   do_select   Optional: if evaluates to true the Folder topic is selected on the canvas.
      */
     this.create_folder_topic = function(dir, do_select) {
         var folder_topic = dm4c.restc.execute_command("deepamehta-files.create-folder-topic", {path: dir.path})
-        dm4c.add_topic_to_canvas(folder_topic, do_select ? "show" : "none")
+        dm4c.show_topic(new Topic(folder_topic), do_select ? "show" : "none")
     }
 
     /**
      * Creates respective File and Folder topics for all items contained in the given directory
      * and shows the topics on the canvas.
      *
-     * @param   dir                 A Directory object (with "name", "path", and "items" attributes).
+     * @param   dir                 A Directory object (with "name", "path", and "items" properties).
      * @param   select_first_topic  Optional: if evaluates to true the first created topic is selected on the canvas.
      */
     this.create_file_topics = function(dir, select_first_topic) {

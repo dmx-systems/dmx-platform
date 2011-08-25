@@ -1,6 +1,12 @@
-function dm4_filemanager() {
+function filemanager_plugin() {
 
-    // ------------------------------------------------------------------------------------------------ Overriding Hooks
+
+
+    // ***********************************************************
+    // *** Webclient Hooks (triggered by deepamehta-webclient) ***
+    // ***********************************************************
+
+
 
     this.process_files_drop = function(files) {
         dm4c.canvas.start_grid_positioning()

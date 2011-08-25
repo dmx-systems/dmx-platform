@@ -109,9 +109,9 @@ public class FilesPlugin extends Plugin implements FilesService {
 
     @Override
     public Topic createFileTopic(String path) {
-        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false);     // fetchComposite=false
-        if (topic != null) {
-            return topic;
+        Topic fileTopic = getFileTopic(path);
+        if (fileTopic != null) {
+            return fileTopic;
         }
         //
         File file = new File(path);
@@ -184,6 +184,15 @@ public class FilesPlugin extends Plugin implements FilesService {
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private Topic getFileTopic(String path) {
+        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false);     // fetchComposite=false
+        if (topic != null) {
+            return topic.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole", "dm4.files.file",
+                true, false);
+        }
+        return null;
+    }
 
     private String renderFileContent(File file, String fileType, long fileSize) {
         // Note: for unknown file types fileType is null

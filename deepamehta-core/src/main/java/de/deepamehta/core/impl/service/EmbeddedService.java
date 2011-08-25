@@ -623,6 +623,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public CommandResult executeCommand(@PathParam("command") String command, CommandParams params,
                                         @HeaderParam("Cookie") ClientContext clientContext) {
+        logger.info("command=\"" + command + "\", params=" + params);
         DeepaMehtaTransaction tx = beginTx();
         try {
             Iterator i = triggerHook(Hook.EXECUTE_COMMAND, command, params, clientContext).values().iterator();
