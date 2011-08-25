@@ -73,8 +73,8 @@ function Canvas() {
                     topic.x = pos.x
                     topic.y = pos.y
                 } else {
-                    topic.x = Math.floor(self.canvas_width  * Math.random()) - trans_x
-                    topic.y = Math.floor(self.canvas_height * Math.random()) - trans_y
+                    topic.x = Math.floor(self.canvas_width  * Math.random() - trans_x)
+                    topic.y = Math.floor(self.canvas_height * Math.random() - trans_y)
                 }
             }
         }
