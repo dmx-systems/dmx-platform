@@ -249,9 +249,9 @@ var js = {
         // ---
 
         function wrap_text() {
-            // do not wrap "text" if it's a number
+            // do not wrap "text" if it's a number or a boolean
             if (!text.split) {
-                wrapped_lines.push(text)
+                wrapped_lines.push(text.toString())
                 return
             }
             //

@@ -381,7 +381,7 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
     var DEFAULT_FIELD_ROWS = 1
 
     this.uri = uri
-    this.value = value || ""
+    this.value = value != null && value != undefined ? value : ""
     this.topic_type = topic_type
     this.assoc_def = assoc_def
     this.label = topic_type.value
@@ -493,7 +493,7 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
             case "dm4.core.number":
                 return "NumberFieldRenderer"
             case "dm4.core.boolean":
-                return "TextFieldRenderer"  // TODO: boolean renderer (a checkbox)
+                return "BooleanFieldRenderer"
             default:
                 alert("Field.get_view_config: data type \"" + topic_type.data_type_uri +
                     "\" has no default renderer class")

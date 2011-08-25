@@ -59,8 +59,18 @@ function RenderHelper() {
         } else {
             value = field.value
         }
-        return $("<input>").attr({type: "text", value: value})
+        return $('<input type="text">').attr("value", value)
     }
+
+    this.checkbox = function(field) {
+        var dom = $('<input type="checkbox">')
+        if (field.value) {
+            dom.attr("checked", "checked")
+        }
+        return dom
+    }
+
+    // ---
 
     /**
      * @return  a GUIToolkit Menu object
