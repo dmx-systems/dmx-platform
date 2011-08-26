@@ -29,7 +29,7 @@ class TypeCache {
 
     private EmbeddedService dms;
 
-    // private int callCount = 0;  // endless recursion protection ### FIXME: not in use
+    private int callCount = 0;  // endless recursion protection ### FIXME: not in use
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -41,6 +41,7 @@ class TypeCache {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     AttachedTopicType getTopicType(String topicTypeUri) {
+        endlessRecursionProtection(topicTypeUri);
         AttachedTopicType topicType = topicTypes.get(topicTypeUri);
         if (topicType == null) {
             topicType = loadTopicType(topicTypeUri);
@@ -107,13 +108,13 @@ class TypeCache {
 
     // ---
 
-    /* FIXME: not in use
+    // FIXME: not in use
     private void endlessRecursionProtection(String topicTypeUri) {
-        if (topicTypeUri.equals("dm4.webclient.view_config")) {
+        if (topicTypeUri.equals("dm4.webclient.icon_src")) {
             callCount++;
             if (callCount >= 3) {
                 throw new RuntimeException("Endless Recursion!");
             }
         }
-    } */
+    }
 }

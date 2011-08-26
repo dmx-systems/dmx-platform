@@ -1141,12 +1141,17 @@ public class EmbeddedService implements DeepaMehtaService {
             }
             // error checks
             if (!mi.isDeclarative && !mi.isImperative) {
-                throw new RuntimeException("Neither a types file (" + mi.migrationFile +
-                    ") nor a migration class (" + mi.migrationClassName + ") is found");
+                String message = "Neither a migration file (" + mi.migrationFile + ") nor a migration class ";
+                if (mi.migrationClassName != null) {
+                    throw new RuntimeException(message + "(" + mi.migrationClassName + ") is found");
+                } else {
+                    throw new RuntimeException(message + "is found. Note: a possible migration class can't be located" +
+                        " (plugin package is unknown). Consider setting \"pluginPackage\" in plugin.properties");
+                }
             }
             if (mi.isDeclarative && mi.isImperative) {
-                throw new RuntimeException("Ambiguity: a types file (" + mi.migrationFile +
-                    ") AND a migration class (" + mi.migrationClassName + ") are found");
+                throw new RuntimeException("Ambiguity: a migration file (" + mi.migrationFile + ") AND a migration " +
+                    "class (" + mi.migrationClassName + ") are found. Consider using two different migration numbers.");
             }
             // run migration
             String runInfo = " (runMode=" + mi.runMode + ", isCleanInstall=" + isCleanInstall + ")";
