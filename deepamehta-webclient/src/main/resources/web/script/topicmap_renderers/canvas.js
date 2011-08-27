@@ -808,7 +808,7 @@ function Canvas() {
             self.width  = self.icon.width
             self.height = self.icon.height
             //
-            label_wrapper = new js.TextWrapper(self.label, LABEL_MAX_WIDTH, 16, ctx)    // line height 1em = 16px
+            label_wrapper = new js.TextWrapper(self.label, LABEL_MAX_WIDTH, 19, ctx)    // line height 19px = 1.2em
         }
     }
 

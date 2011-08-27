@@ -48,7 +48,7 @@ function IconFieldRenderer(topic, field) {
     function render_icon(icon_topic) {
         var icon_src = icon_topic.value
         return $("<img>")
-            .attr({"icon-topic-id": icon_topic.id, src: icon_src, title: icon_src})
+            .attr({src: icon_src, title: icon_src})
             .addClass("type-icon")
     }
 }
