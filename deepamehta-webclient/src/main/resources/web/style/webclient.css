@@ -153,6 +153,8 @@ body {
 
 .type-icon {
     border-style: none;
+    vertical-align: middle;
+    padding-right: 1em;
 }
 
 .menu-icon {

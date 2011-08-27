@@ -300,7 +300,7 @@ function GUIToolkit() {
                 var item_dom = $("<a>").attr("href", "#").click(create_selection_handler(item))
                 add_hovering()
                 if (item.icon) {
-                    item_dom.append(dm4c.render.image(item.icon, "menu-icon"))
+                    item_dom.append(dm4c.render.image(item.icon, undefined, "menu-icon"))
                 }
                 item_dom.append(item.label)
                 menu.append(item_dom)
