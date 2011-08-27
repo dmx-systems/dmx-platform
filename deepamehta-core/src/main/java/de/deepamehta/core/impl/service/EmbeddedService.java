@@ -1252,7 +1252,7 @@ public class EmbeddedService implements DeepaMehtaService {
                 MigrationRunMode.valueOf(runMode);  // check if value is valid
             } catch (IllegalArgumentException e) {
                 throw new RuntimeException("Error in config file \"" + configFile + "\": \"" + runMode +
-                    "\" is an invalid value for \"migrationRunMode\"");
+                    "\" is an invalid value for \"migrationRunMode\"", e);
             } catch (IOException e) {
                 throw new RuntimeException("Config file \"" + configFile + "\" can't be read", e);
             }

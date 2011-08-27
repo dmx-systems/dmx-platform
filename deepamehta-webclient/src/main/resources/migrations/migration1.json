@@ -100,6 +100,8 @@
                 }
             ]
             ### Note: don't try to add view config topics to the view config type -> endless recursion!
+            ### FIXME: Still true? At least view config's child types can have a view config meanwhile.
+            ### See comment in TypeCache.loadTopicType()
         },
 
         ### Search ###

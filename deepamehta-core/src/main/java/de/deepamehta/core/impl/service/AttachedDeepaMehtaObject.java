@@ -464,7 +464,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             //
             updateValue(comp);
         } catch (Exception e) {
-            throw new RuntimeException("Storing the " + getClass().getSimpleName() + "'s composite failed (" + this +
+            throw new RuntimeException("Storing the " + className() + "'s composite failed (" + this +
                 ",\ncomposite=" + comp + ")", e);
         }
     }
