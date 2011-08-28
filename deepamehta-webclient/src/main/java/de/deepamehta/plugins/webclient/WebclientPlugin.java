@@ -1,11 +1,10 @@
 package de.deepamehta.plugins.webclient;
 
 import de.deepamehta.core.DeepaMehtaTransaction;
-import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
@@ -66,6 +65,18 @@ public class WebclientPlugin extends Plugin {
                 logger.warning("### Launching webclient failed (" + e + ")");
                 logger.info("### Please launch webclient manually: " + webclientUrl);
             }
+        }
+    }
+
+    /**
+     * Once a view configuration is updated in the DB we must update the cached view configuration model.
+     */
+    @Override
+    public void postUpdateHook(Topic topic, TopicModel oldTopic) {
+        if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
+            Type type = getType(topic);
+            logger.info("### Updating view configuration for topic type \"" + type.getUri() + "\" (" + topic + ")");
+            type.getViewConfig().getModel().updateConfigTopic(topic.getModel());
         }
     }
 
@@ -135,6 +146,8 @@ public class WebclientPlugin extends Plugin {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    // === Search ===
+
     private Set<Topic> findSearchableUnits(Set<Topic> topics) {
         Set<Topic> searchableUnits = new LinkedHashSet();
         for (Topic topic : topics) {
@@ -195,7 +208,15 @@ public class WebclientPlugin extends Plugin {
         return topicType.getViewConfig("dm4.webclient.view_config", "dm4.webclient." + setting);
     }
 
-    // ---
+    // === View Configuration ===
+
+    private Type getType(Topic viewConfig) {
+        Topic typeTopic = viewConfig.getRelatedTopic("dm4.core.aggregation",
+            "dm4.core.view_config", "dm4.core.type", null, false, false);
+        return dms.getTopicType(typeTopic.getUri(), null);  // ### FIXME: handle assoc types
+    }
+
+    // === Client Start ===
 
     private String getWebclientUrl() {
         String host = "localhost";

@@ -75,6 +75,17 @@ public class ViewConfigurationModel {
         viewConfig.put(configTypeUri, configTopic);
     }
 
+    public void updateConfigTopic(TopicModel configTopic) {
+        String configTypeUri = configTopic.getTypeUri();
+        // error check
+        TopicModel existing = getConfigTopic(configTypeUri);
+        if (existing == null) {
+            throw new RuntimeException("There is no configuration topic of type \"" + configTypeUri + "\"");
+        }
+        //
+        viewConfig.put(configTypeUri, configTopic);
+    }
+
     public boolean addSetting(String configTypeUri, String settingUri, Object value) {
         boolean configTopicCreated = false;
         // create config topic if not exists

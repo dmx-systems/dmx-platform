@@ -59,6 +59,13 @@ class AttachedViewConfiguration implements ViewConfiguration {
         storeSetting(configTopicCreated, configTypeUri, settingUri, value);
     }
 
+    // ---
+
+    @Override
+    public ViewConfigurationModel getModel() {
+        return model;
+    }
+
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void store() {
