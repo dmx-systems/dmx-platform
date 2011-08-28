@@ -171,26 +171,24 @@ var dm4c = new function() {
 
     /**
      * Updates a topic in the DB and on the GUI.
-     * Triggers the "post_update_topic" hook.
+     * Triggers the "post_update_topic" hook (indirectly).
      *
-     * @param   old_topic   the topic that is about to be updated. This "old" version is passed to the
+     * @param   old_topic   the topic that is about to be updated. ### FIXME: This "old" version is passed to the
      *                      post_update_topic hook to let plugins compare the old and new ones.
      * @param   new_topic   the new topic that is about to override the old topic.
      *
-     * @return  The updated topic as stored in the DB (a Topic object).
+     * @return  ### FIXME: The updated topic as stored in the DB (a Topic object).
      *          Note: the new topic and the updated topic are not necessarily 100% identical. The new topic contains
      *          only the parts that are required for the update, e.g. a composite topic doesn't contain the "value"
      *          field. The updated topic on the other hand is the complete topic as returned by the server.
      */
     this.do_update_topic = function(old_topic, new_topic) {
         // update model
-        var updated_topic = build_topic(dm4c.restc.update_topic(new_topic))
-        dm4c.trigger_plugin_hook("post_update_topic", updated_topic, old_topic)     // trigger hook
+        var directives = dm4c.restc.update_topic(new_topic)
         // update view
-        dm4c.canvas.update_topic(updated_topic, true)   // refresh_canvas=true
-        dm4c.page_panel.display(updated_topic)
+        process_directives(directives)
         //
-        return updated_topic
+        // ### return updated_topic
     }
 
     /**
@@ -198,10 +196,10 @@ var dm4c = new function() {
      * Triggers the "post_update_association" hook (indirectly).
      *
      * @param   old_assoc   the association that is about to be updated. ### FIXME: This "old" version is passed to the
-     *                      post_update_topic hook to let plugins compare the old and new ones.
+     *                      post_update_association hook to let plugins compare the old and new ones.
      * @param   new_assoc   the new association that is about to override the old association.
      *
-     * ### FIXME: @return  The updated association as stored in the DB.
+     * @return  ### FIXME: The updated association as stored in the DB.
      */
     this.do_update_association = function(old_assoc, new_assoc) {
         // update model
@@ -330,17 +328,21 @@ var dm4c = new function() {
         // alert("process_directives: " + JSON.stringify(directives))
         for (var i = 0, directive; directive = directives[i]; i++) {
             switch (directive.type) {
+            case "UPDATE_TOPIC":
+                var topic = build_topic(directive.arg)
+                update_topic(topic)
+                break
             case "DELETE_TOPIC":
                 var topic = build_topic(directive.arg)
                 remove_topic(topic, "post_delete_topic")
                 break
-            case "DELETE_ASSOCIATION":
-                var assoc = build_association(directive.arg)
-                remove_association(assoc, "post_delete_association")
-                break
             case "UPDATE_ASSOCIATION":
                 var assoc = build_association(directive.arg)
                 update_association(assoc)
+                break
+            case "DELETE_ASSOCIATION":
+                var assoc = build_association(directive.arg)
+                remove_association(assoc, "post_delete_association")
                 break
             case "UPDATE_TOPIC_TYPE":
                 var topic_type = build_topic_type(directive.arg)
@@ -385,6 +387,20 @@ var dm4c = new function() {
     }
 
     // ---
+
+    /**
+     * Updates a topic on the view (canvas and page panel).
+     * Triggers the "post_update_topic" hook.
+     *
+     * @param   an Association object
+     */
+    function update_topic(topic) {
+        // update view
+        dm4c.canvas.update_topic(topic, true)           // refresh_canvas=true
+        dm4c.page_panel.display(topic)
+        // trigger hook
+        dm4c.trigger_plugin_hook("post_update_topic", topic, undefined)         // FIXME: old_topic=undefined
+    }
 
     /**
      * Updates an association on the view (canvas and page panel).

@@ -274,7 +274,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @PUT
     @Path("/topic")
     @Override
-    public Topic updateTopic(TopicModel model, @HeaderParam("Cookie") ClientContext clientContext) {
+    public Directives updateTopic(TopicModel model, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedTopic topic = getTopic(model.getId(), true, clientContext);   // fetchComposite=true ### false?
@@ -287,10 +287,13 @@ public class EmbeddedService implements DeepaMehtaService {
             // $id composite entries with actual values. See AttachedDeepaMehtaObject.storeComposite()
             topic = getTopic(model.getId(), true, clientContext);  // fetchComposite=true
             //
+            Directives directives = new Directives();
+            directives.add(Directive.UPDATE_TOPIC, topic);
+            //
             // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
             //
             tx.success();
-            return topic;
+            return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Updating topic failed (" + model + ")", e);
