@@ -1,6 +1,6 @@
 function IconFieldRenderer(topic, field) {
 
-    var picked_icon
+    var picked_icon = null
 
     this.render_field = function() {
         // field label
@@ -37,7 +37,14 @@ function IconFieldRenderer(topic, field) {
     }
 
     this.read_form_value = function() {
-        return {topic_id: picked_icon.id}
+        if (field.uri) {
+            // An instance of an Icon's parent type is edited.
+            // Note: aggregation is assumed ### FIXME: support composition as well
+            return picked_icon && {topic_id: picked_icon.id}
+        } else {
+            // An Icon instance itself is edited.
+            return picked_icon && picked_icon.value
+        }
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
