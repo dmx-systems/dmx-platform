@@ -2,7 +2,7 @@ var dm4c = new function() {
 
     var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
-    this.GENERIC_TOPIC_ICON_SRC = "images/ball-grey.png"
+    this.GENERIC_TOPIC_ICON_SRC = "images/ball-gray.png"
 
     var ENABLE_LOGGING = false
     var LOG_PLUGIN_LOADING = false
@@ -649,7 +649,7 @@ var dm4c = new function() {
      *
      * @param   configurable    A topic type, an association type, or an association definition.
      *                          Must not be null/undefined.
-     * @param   setting         Last component of the setting URI, e.g. "icon_src".
+     * @param   setting         Last component of the setting URI, e.g. "icon".
      *
      * @return  The setting value, or <code>undefined</code> if there is no such setting
      */

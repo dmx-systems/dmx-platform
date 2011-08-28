@@ -32,7 +32,7 @@
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm4.webclient.icon_src: "/de.deepamehta.webbrowser/images/earth.png",
+                        dm4.webclient.icon: "/de.deepamehta.webbrowser/images/earth.png",
                         dm4.webclient.add_to_create_menu: true,
                         dm4.webclient.is_searchable_unit: true
                     }

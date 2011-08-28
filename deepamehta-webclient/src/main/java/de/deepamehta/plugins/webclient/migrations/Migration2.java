@@ -10,7 +10,7 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
-        addIconToTopicType("dm4.core.meta_type",   "box-grey.png");
+        addIconToTopicType("dm4.core.meta_type",   "box-gray.png");
         addIconToTopicType("dm4.core.topic_type",  "box-blue.png");
         addIconToTopicType("dm4.core.assoc_type",  "box-red.png");
         addIconToTopicType("dm4.core.data_type",   "box-green.png");
@@ -31,7 +31,7 @@ public class Migration2 extends Migration {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void addIconToTopicType(String topicTypeUri, String iconfile) {
-        addTopicTypeSetting(topicTypeUri, "icon_src", "/images/" + iconfile);
+        addTopicTypeSetting(topicTypeUri, "icon", "/images/" + iconfile);
     }
 
     private void addColorToAssociationType(String assocTypeUri, String color) {

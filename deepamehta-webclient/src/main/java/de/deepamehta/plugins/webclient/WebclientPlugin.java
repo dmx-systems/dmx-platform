@@ -187,7 +187,7 @@ public class WebclientPlugin extends Plugin {
      * Compare to client-side counterpart: function get_view_config() in webclient.js
      *
      * @param   topicType   The topic type whose view configuration is read out.
-     * @param   setting     Last component of the setting URI, e.g. "icon_src".
+     * @param   setting     Last component of the setting URI, e.g. "icon".
      *
      * @return  The setting value, or <code>null</code> if there is no such setting
      */

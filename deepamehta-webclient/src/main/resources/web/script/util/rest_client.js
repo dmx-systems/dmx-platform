@@ -308,10 +308,10 @@ function RESTClient(core_service_uri) {
         function compare(val_1, val_2) {
             if (val_1 < val_2) {
                 return -1
-            } else if (val_1 > val_2) {
-                return 1
-            } else {
+            } else if (val_1 == val_2) {
                 return 0
+            } else {
+                return 1
             }
         }
     }

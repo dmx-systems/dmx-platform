@@ -34,7 +34,7 @@ function TopicType(topic_type) {
      * @return  The icon source (string).
      */
     this.get_icon_src = function() {
-        return dm4c.get_view_config(this, "icon_src") || dm4c.GENERIC_TOPIC_ICON_SRC
+        return dm4c.get_view_config(this, "icon") || dm4c.GENERIC_TOPIC_ICON_SRC
     }
 
     this.get_menu_config = function(menu_id) {

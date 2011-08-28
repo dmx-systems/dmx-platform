@@ -89,12 +89,12 @@ class TypeCache {
         AttachedTopicType topicType = new AttachedTopicType(dms);
         topicType.fetch(new TopicTypeModel(typeTopic.getModel()));
         put(topicType);
-        // Note: the topic type must be put in cache *before* its view configuration is fetched. Othewise endless
-        // recursion might occur. Consider this case: fetching the topic type "Icon Source" implies fetching
-        // its view configuration which in turn implies fetching the topic type "Icon Source"! This is because
-        // "Icon Source" *is part of* "View Configuration" and has a view configuration itself (provided by the
-        // deepamehta-iconpicker module).
-        // We resolve that circle by postponing the view configuration retrieval. This works because Icon Source's
+        // Note: the topic type must be put in cache *before* its view configuration is fetched.
+        // Othewise endless recursion might occur. Consider this case: fetching the topic type "Icon"
+        // implies fetching its view configuration which in turn implies fetching the topic type "Icon"!
+        // This is because "Icon" *is part of* "View Configuration" and has a view configuration itself
+        // (provided by the deepamehta-iconpicker module).
+        // We resolve that circle by postponing the view configuration retrieval. This works because Icon's
         // view configuration is actually not required while fetching, but solely its data type is
         // (see AttachedDeepaMehtaObject.fetchComposite()).
         topicType.fetchViewConfig();
@@ -123,9 +123,9 @@ class TypeCache {
 
     /* ### FIXME: not in use
     private void endlessRecursionProtection(String topicTypeUri) {
-        if (topicTypeUri.equals("dm4.webclient.icon_src")) {
+        if (topicTypeUri.equals("dm4.webclient.icon")) {
             callCount++;
-            logger.info("########## Loading topic type \"dm4.webclient.icon_src\" => count=" + callCount);
+            logger.info("########## Loading topic type \"dm4.webclient.icon\" => count=" + callCount);
             if (callCount >= 2) {
                 throw new RuntimeException("Endless Recursion!");
             }
