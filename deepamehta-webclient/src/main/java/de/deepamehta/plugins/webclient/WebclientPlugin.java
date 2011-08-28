@@ -9,6 +9,8 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientContext;
+import de.deepamehta.core.service.Directive;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.util.JSONHelper;
 
@@ -72,11 +74,12 @@ public class WebclientPlugin extends Plugin {
      * Once a view configuration is updated in the DB we must update the cached view configuration model.
      */
     @Override
-    public void postUpdateHook(Topic topic, TopicModel oldTopic) {
+    public void postUpdateHook(Topic topic, TopicModel oldTopic, Directives directives) {
         if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
             Type type = getType(topic);
             logger.info("### Updating view configuration for topic type \"" + type.getUri() + "\" (" + topic + ")");
             type.getViewConfig().getModel().updateConfigTopic(topic.getModel());
+            directives.add(Directive.UPDATE_TOPIC_TYPE, type);
         }
     }
 

@@ -105,7 +105,7 @@ public class EmbeddedService implements DeepaMehtaService {
          PRE_CREATE_TOPIC("preCreateHook",  TopicModel.class, ClientContext.class),
         POST_CREATE_TOPIC("postCreateHook", Topic.class, ClientContext.class),
         // ### PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, Properties.class),
-        POST_UPDATE_TOPIC("postUpdateHook", Topic.class, TopicModel.class),
+        POST_UPDATE_TOPIC("postUpdateHook", Topic.class, TopicModel.class, Directives.class),
 
         POST_RETYPE_ASSOCIATION("postRetypeAssociationHook", Association.class, String.class, Directives.class),
 
@@ -290,7 +290,7 @@ public class EmbeddedService implements DeepaMehtaService {
             Directives directives = new Directives();
             directives.add(Directive.UPDATE_TOPIC, topic);
             //
-            triggerHook(Hook.POST_UPDATE_TOPIC, topic, null);   // ### FIXME: oldTopic=null
+            triggerHook(Hook.POST_UPDATE_TOPIC, topic, null, directives);   // ### FIXME: oldTopic=null
             //
             tx.success();
             return directives;

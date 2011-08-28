@@ -250,19 +250,13 @@ function Canvas() {
         ctx.fillStyle = LABEL_COLOR
         //
         iterate_topics(function(ct) {
-            try {
-                // hightlight
-                var is_highlight = highlight_object_id == ct.id
-                set_highlight_style(is_highlight)
-                //
-                ct.draw()
-                //
-                reset_highlight_style(is_highlight)
-            } catch (e) {
-                dm4c.log("### ERROR at Canvas.draw_topics:\nicon.src=" + ct.icon.src + "\nicon.width=" + ct.icon.width +
-                    "\nicon.height=" + ct.icon.height  + "\nicon.complete=" + ct.icon.complete
-                    /* + "\n" + JSON.stringify(e) */)
-            }
+            // hightlight
+            var is_highlight = highlight_object_id == ct.id
+            set_highlight_style(is_highlight)
+            //
+            ct.draw()
+            //
+            reset_highlight_style(is_highlight)
         })
     }
 
@@ -759,7 +753,6 @@ function Canvas() {
      * Properties:
      *  id, type_uri, label
      *  x, y                    Topic position. Represents the center of the topic's icon.
-     *  icon
      *  width, height           Icon size.
      */
     function CanvasTopic(topic) {
@@ -773,14 +766,21 @@ function Canvas() {
         init(topic);
 
         this.draw = function() {
-            // icon
-            var x = this.x - this.width / 2
-            var y = this.y - this.height / 2
-            ctx.drawImage(this.icon, x, y)
-            // label
-            label_wrapper.draw(x, y + this.height + LABEL_DIST_Y + 16, ctx)    // 16px = 1em
-            // Note: the context must be passed to every draw() call.
-            // The context changes when the canvas is resized.
+            try {
+                // icon
+                var icon = dm4c.get_type_icon(this.type_uri)
+                var x = this.x - this.width / 2
+                var y = this.y - this.height / 2
+                ctx.drawImage(icon, x, y)
+                // label
+                label_wrapper.draw(x, y + this.height + LABEL_DIST_Y + 16, ctx)    // 16px = 1em
+                // Note: the context must be passed to every draw() call.
+                // The context changes when the canvas is resized.
+            } catch (e) {
+                dm4c.log("### ERROR at Canvas.draw_topics:\nicon.src=" + icon.src + "\nicon.width=" + icon.width +
+                    "\nicon.height=" + icon.height  + "\nicon.complete=" + icon.complete
+                    /* + "\n" + JSON.stringify(e) */)
+            }
         }
 
         this.move_to = function(x, y) {
@@ -804,9 +804,9 @@ function Canvas() {
             self.type_uri = topic.type_uri
             self.label    = topic.value
             //
-            self.icon = dm4c.get_type_icon(topic.type_uri)
-            self.width  = self.icon.width
-            self.height = self.icon.height
+            var icon = dm4c.get_type_icon(topic.type_uri)
+            self.width  = icon.width
+            self.height = icon.height
             //
             label_wrapper = new js.TextWrapper(self.label, LABEL_MAX_WIDTH, 19, ctx)    // line height 19px = 1.2em
         }

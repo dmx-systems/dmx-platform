@@ -329,29 +329,54 @@ var dm4c = new function() {
         for (var i = 0, directive; directive = directives[i]; i++) {
             switch (directive.type) {
             case "UPDATE_TOPIC":
-                var topic = build_topic(directive.arg)
-                update_topic(topic)
+                update_topic(build_topic(directive.arg))
                 break
             case "DELETE_TOPIC":
-                var topic = build_topic(directive.arg)
-                remove_topic(topic, "post_delete_topic")
+                remove_topic(build_topic(directive.arg), "post_delete_topic")
                 break
             case "UPDATE_ASSOCIATION":
-                var assoc = build_association(directive.arg)
-                update_association(assoc)
+                update_association(build_association(directive.arg))
                 break
             case "DELETE_ASSOCIATION":
-                var assoc = build_association(directive.arg)
-                remove_association(assoc, "post_delete_association")
+                remove_association(build_association(directive.arg), "post_delete_association")
                 break
             case "UPDATE_TOPIC_TYPE":
-                var topic_type = build_topic_type(directive.arg)
-                dm4c.type_cache.put_topic_type(topic_type)
+                update_topic_type(build_topic_type(directive.arg))
                 break
             default:
                 throw "UnknownDirectiveError: directive \"" + directive.type + "\" not implemented"
             }
         }
+    }
+
+    // ---
+
+    /**
+     * Updates a topic on the view (canvas and page panel).
+     * Triggers the "post_update_topic" hook.
+     *
+     * @param   an Association object
+     */
+    function update_topic(topic) {
+        // update view
+        dm4c.canvas.update_topic(topic, true)           // refresh_canvas=true
+        dm4c.page_panel.display(topic)
+        // trigger hook
+        dm4c.trigger_plugin_hook("post_update_topic", topic, undefined)         // FIXME: old_topic=undefined
+    }
+
+    /**
+     * Updates an association on the view (canvas and page panel).
+     * Triggers the "post_update_association" hook.
+     *
+     * @param   an Association object
+     */
+    function update_association(assoc) {
+        // update view
+        dm4c.canvas.update_association(assoc, true)     // refresh_canvas=true
+        dm4c.page_panel.display(assoc)
+        // trigger hook
+        dm4c.trigger_plugin_hook("post_update_association", assoc, undefined)   // FIXME: old_assoc=undefined
     }
 
     // ---
@@ -388,32 +413,10 @@ var dm4c = new function() {
 
     // ---
 
-    /**
-     * Updates a topic on the view (canvas and page panel).
-     * Triggers the "post_update_topic" hook.
-     *
-     * @param   an Association object
-     */
-    function update_topic(topic) {
-        // update view
-        dm4c.canvas.update_topic(topic, true)           // refresh_canvas=true
-        dm4c.page_panel.display(topic)
-        // trigger hook
-        dm4c.trigger_plugin_hook("post_update_topic", topic, undefined)         // FIXME: old_topic=undefined
-    }
-
-    /**
-     * Updates an association on the view (canvas and page panel).
-     * Triggers the "post_update_association" hook.
-     *
-     * @param   an Association object
-     */
-    function update_association(assoc) {
-        // update view
-        dm4c.canvas.update_association(assoc, true)     // refresh_canvas=true
-        dm4c.page_panel.display(assoc)
-        // trigger hook
-        dm4c.trigger_plugin_hook("post_update_association", assoc, undefined)   // FIXME: old_assoc=undefined
+    function update_topic_type(topic_type) {
+        dm4c.type_cache.put_topic_type(topic_type)
+        dm4c.refresh_create_menu()
+        dm4c.canvas.refresh()
     }
 
     // ---
