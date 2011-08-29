@@ -168,7 +168,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public AttachedTopic getTopic(@PathParam("id") long topicId,
                                   @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite,
                                   @HeaderParam("Cookie") ClientContext clientContext) {
-        logger.info("topicId=" + topicId + ", fetchComposite=" + fetchComposite);
+        // logger.info("topicId=" + topicId + ", fetchComposite=" + fetchComposite);
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedTopic topic = attach(storage.getTopic(topicId), fetchComposite);
