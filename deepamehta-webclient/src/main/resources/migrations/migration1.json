@@ -4,8 +4,8 @@
         ### View Configuration ###
 
         {
-            value: "Icon Source",
-            uri: "dm4.webclient.icon_src",
+            value: "Icon",
+            uri: "dm4.webclient.icon",
             data_type_uri: "dm4.core.text"
         },
         {
@@ -54,9 +54,10 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.webclient.icon_src",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    part_topic_type_uri:   "dm4.webclient.icon",
+                    part_cardinality_uri:  "dm4.core.one",
+                    whole_cardinality_uri: "dm4.core.many",
+                    assoc_type_uri:        "dm4.core.aggregation_def"
                 },
                 {
                     part_topic_type_uri:  "dm4.webclient.color",
@@ -100,6 +101,8 @@
                 }
             ]
             ### Note: don't try to add view config topics to the view config type -> endless recursion!
+            ### FIXME: Still true? At least view config's child types can have a view config meanwhile.
+            ### See comment in TypeCache.loadTopicType()
         },
 
         ### Search ###
@@ -142,7 +145,7 @@
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm4.webclient.icon_src: "/images/bucket.png"
+                        dm4.webclient.icon: "/images/bucket.png"
                     }
                 }
             ]
@@ -154,6 +157,47 @@
             value:         "Search Result Item",
             uri:           "dm4.webclient.search_result_item",
             data_type_uri: "dm4.core.text"
+        }
+    ],
+
+    topics: [
+
+        ### Icons ###
+
+        {
+            value:    "/images/ball-blue.png",
+            uri:      "dm4.webclient.icons.ball_blue",
+            type_uri: "dm4.webclient.icon"
+        },
+        {
+            value:    "/images/ball-gray.png",
+            uri:      "dm4.webclient.icons.ball_gray",
+            type_uri: "dm4.webclient.icon"
+        },
+        {
+            value:    "/images/ball-green.png",
+            uri:      "dm4.webclient.icons.ball_green",
+            type_uri: "dm4.webclient.icon"
+        },
+        {
+            value:    "/images/ball-orange.png",
+            uri:      "dm4.webclient.icons.ball_orange",
+            type_uri: "dm4.webclient.icon"
+        },
+        {
+            value:    "/images/ball-purple.png",
+            uri:      "dm4.webclient.icons.ball_purple",
+            type_uri: "dm4.webclient.icon"
+        },
+        {
+            value:    "/images/ball-red.png",
+            uri:      "dm4.webclient.icons.ball_red",
+            type_uri: "dm4.webclient.icon"
+        },
+        {
+            value:    "/images/ball-yellow.png",
+            uri:      "dm4.webclient.icons.ball_yellow",
+            type_uri: "dm4.webclient.icon"
         }
     ]
 }

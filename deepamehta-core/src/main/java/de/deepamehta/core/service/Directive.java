@@ -4,6 +4,7 @@ package de.deepamehta.core.service;
 
 public enum Directive {
 
+    UPDATE_TOPIC,
     DELETE_TOPIC,
 
     UPDATE_ASSOCIATION,

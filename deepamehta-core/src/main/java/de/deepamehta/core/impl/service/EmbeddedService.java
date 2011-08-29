@@ -105,7 +105,7 @@ public class EmbeddedService implements DeepaMehtaService {
          PRE_CREATE_TOPIC("preCreateHook",  TopicModel.class, ClientContext.class),
         POST_CREATE_TOPIC("postCreateHook", Topic.class, ClientContext.class),
         // ### PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, Properties.class),
-        // ### POST_UPDATE_TOPIC("postUpdateHook", Topic.class, Properties.class),
+        POST_UPDATE_TOPIC("postUpdateHook", Topic.class, TopicModel.class, Directives.class),
 
         POST_RETYPE_ASSOCIATION("postRetypeAssociationHook", Association.class, String.class, Directives.class),
 
@@ -274,7 +274,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @PUT
     @Path("/topic")
     @Override
-    public Topic updateTopic(TopicModel model, @HeaderParam("Cookie") ClientContext clientContext) {
+    public Directives updateTopic(TopicModel model, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedTopic topic = getTopic(model.getId(), true, clientContext);   // fetchComposite=true ### false?
@@ -287,10 +287,13 @@ public class EmbeddedService implements DeepaMehtaService {
             // $id composite entries with actual values. See AttachedDeepaMehtaObject.storeComposite()
             topic = getTopic(model.getId(), true, clientContext);  // fetchComposite=true
             //
-            // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
+            Directives directives = new Directives();
+            directives.add(Directive.UPDATE_TOPIC, topic);
+            //
+            triggerHook(Hook.POST_UPDATE_TOPIC, topic, null, directives);   // ### FIXME: oldTopic=null
             //
             tx.success();
-            return topic;
+            return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Updating topic failed (" + model + ")", e);
@@ -1141,12 +1144,17 @@ public class EmbeddedService implements DeepaMehtaService {
             }
             // error checks
             if (!mi.isDeclarative && !mi.isImperative) {
-                throw new RuntimeException("Neither a types file (" + mi.migrationFile +
-                    ") nor a migration class (" + mi.migrationClassName + ") is found");
+                String message = "Neither a migration file (" + mi.migrationFile + ") nor a migration class ";
+                if (mi.migrationClassName != null) {
+                    throw new RuntimeException(message + "(" + mi.migrationClassName + ") is found");
+                } else {
+                    throw new RuntimeException(message + "is found. Note: a possible migration class can't be located" +
+                        " (plugin package is unknown). Consider setting \"pluginPackage\" in plugin.properties");
+                }
             }
             if (mi.isDeclarative && mi.isImperative) {
-                throw new RuntimeException("Ambiguity: a types file (" + mi.migrationFile +
-                    ") AND a migration class (" + mi.migrationClassName + ") are found");
+                throw new RuntimeException("Ambiguity: a migration file (" + mi.migrationFile + ") AND a migration " +
+                    "class (" + mi.migrationClassName + ") are found. Consider using two different migration numbers.");
             }
             // run migration
             String runInfo = " (runMode=" + mi.runMode + ", isCleanInstall=" + isCleanInstall + ")";
@@ -1247,7 +1255,7 @@ public class EmbeddedService implements DeepaMehtaService {
                 MigrationRunMode.valueOf(runMode);  // check if value is valid
             } catch (IllegalArgumentException e) {
                 throw new RuntimeException("Error in config file \"" + configFile + "\": \"" + runMode +
-                    "\" is an invalid value for \"migrationRunMode\"");
+                    "\" is an invalid value for \"migrationRunMode\"", e);
             } catch (IOException e) {
                 throw new RuntimeException("Config file \"" + configFile + "\" can't be read", e);
             }

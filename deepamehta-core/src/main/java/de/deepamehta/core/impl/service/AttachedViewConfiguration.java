@@ -59,11 +59,22 @@ class AttachedViewConfiguration implements ViewConfiguration {
         storeSetting(configTopicCreated, configTypeUri, settingUri, value);
     }
 
+    // ---
+
+    @Override
+    public ViewConfigurationModel getModel() {
+        return model;
+    }
+
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void store() {
-        for (TopicModel configTopic : getConfigTopics()) {
-            storeConfigTopic(configTopic);
+        try {
+            for (TopicModel configTopic : getConfigTopics()) {
+                storeConfigTopic(configTopic);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Storing view configuration failed (configurable=" + configurable + ")", e);
         }
     }
 

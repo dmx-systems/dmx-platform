@@ -1,6 +1,7 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.ViewConfigurationModel;
 
 
 
@@ -16,4 +17,8 @@ public interface ViewConfiguration {
     void addConfigTopic(TopicModel configTopic);
 
     void addSetting(String configTypeUri, String settingUri, Object value);
+
+    // ---
+
+    ViewConfigurationModel getModel();
 }

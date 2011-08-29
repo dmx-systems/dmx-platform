@@ -69,7 +69,7 @@ public interface DeepaMehtaService {
 
     public Topic createTopic(TopicModel topicModel, ClientContext clientContext);
 
-    public Topic updateTopic(TopicModel topicModel, ClientContext clientContext);
+    public Directives updateTopic(TopicModel topicModel, ClientContext clientContext);
 
     public Directives deleteTopic(long topicId, ClientContext clientContext);
 

@@ -2,7 +2,7 @@ var dm4c = new function() {
 
     var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
-    this.GENERIC_TOPIC_ICON_SRC = "images/ball-grey.png"
+    this.GENERIC_TOPIC_ICON_SRC = "images/ball-gray.png"
 
     var ENABLE_LOGGING = false
     var LOG_PLUGIN_LOADING = false
@@ -171,26 +171,24 @@ var dm4c = new function() {
 
     /**
      * Updates a topic in the DB and on the GUI.
-     * Triggers the "post_update_topic" hook.
+     * Triggers the "post_update_topic" hook (indirectly).
      *
-     * @param   old_topic   the topic that is about to be updated. This "old" version is passed to the
+     * @param   old_topic   the topic that is about to be updated. ### FIXME: This "old" version is passed to the
      *                      post_update_topic hook to let plugins compare the old and new ones.
      * @param   new_topic   the new topic that is about to override the old topic.
      *
-     * @return  The updated topic as stored in the DB (a Topic object).
+     * @return  ### FIXME: The updated topic as stored in the DB (a Topic object).
      *          Note: the new topic and the updated topic are not necessarily 100% identical. The new topic contains
      *          only the parts that are required for the update, e.g. a composite topic doesn't contain the "value"
      *          field. The updated topic on the other hand is the complete topic as returned by the server.
      */
     this.do_update_topic = function(old_topic, new_topic) {
         // update model
-        var updated_topic = build_topic(dm4c.restc.update_topic(new_topic))
-        dm4c.trigger_plugin_hook("post_update_topic", updated_topic, old_topic)     // trigger hook
+        var directives = dm4c.restc.update_topic(new_topic)
         // update view
-        dm4c.canvas.update_topic(updated_topic, true)   // refresh_canvas=true
-        dm4c.page_panel.display(updated_topic)
+        process_directives(directives)
         //
-        return updated_topic
+        // ### return updated_topic
     }
 
     /**
@@ -198,10 +196,10 @@ var dm4c = new function() {
      * Triggers the "post_update_association" hook (indirectly).
      *
      * @param   old_assoc   the association that is about to be updated. ### FIXME: This "old" version is passed to the
-     *                      post_update_topic hook to let plugins compare the old and new ones.
+     *                      post_update_association hook to let plugins compare the old and new ones.
      * @param   new_assoc   the new association that is about to override the old association.
      *
-     * ### FIXME: @return  The updated association as stored in the DB.
+     * @return  ### FIXME: The updated association as stored in the DB.
      */
     this.do_update_association = function(old_assoc, new_assoc) {
         // update model
@@ -330,26 +328,55 @@ var dm4c = new function() {
         // alert("process_directives: " + JSON.stringify(directives))
         for (var i = 0, directive; directive = directives[i]; i++) {
             switch (directive.type) {
-            case "DELETE_TOPIC":
-                var topic = build_topic(directive.arg)
-                remove_topic(topic, "post_delete_topic")
+            case "UPDATE_TOPIC":
+                update_topic(build_topic(directive.arg))
                 break
-            case "DELETE_ASSOCIATION":
-                var assoc = build_association(directive.arg)
-                remove_association(assoc, "post_delete_association")
+            case "DELETE_TOPIC":
+                remove_topic(build_topic(directive.arg), "post_delete_topic")
                 break
             case "UPDATE_ASSOCIATION":
-                var assoc = build_association(directive.arg)
-                update_association(assoc)
+                update_association(build_association(directive.arg))
+                break
+            case "DELETE_ASSOCIATION":
+                remove_association(build_association(directive.arg), "post_delete_association")
                 break
             case "UPDATE_TOPIC_TYPE":
-                var topic_type = build_topic_type(directive.arg)
-                dm4c.type_cache.put_topic_type(topic_type)
+                update_topic_type(build_topic_type(directive.arg))
                 break
             default:
                 throw "UnknownDirectiveError: directive \"" + directive.type + "\" not implemented"
             }
         }
+    }
+
+    // ---
+
+    /**
+     * Updates a topic on the view (canvas and page panel).
+     * Triggers the "post_update_topic" hook.
+     *
+     * @param   an Association object
+     */
+    function update_topic(topic) {
+        // update view
+        dm4c.canvas.update_topic(topic, true)           // refresh_canvas=true
+        dm4c.page_panel.display(topic)
+        // trigger hook
+        dm4c.trigger_plugin_hook("post_update_topic", topic, undefined)         // FIXME: old_topic=undefined
+    }
+
+    /**
+     * Updates an association on the view (canvas and page panel).
+     * Triggers the "post_update_association" hook.
+     *
+     * @param   an Association object
+     */
+    function update_association(assoc) {
+        // update view
+        dm4c.canvas.update_association(assoc, true)     // refresh_canvas=true
+        dm4c.page_panel.display(assoc)
+        // trigger hook
+        dm4c.trigger_plugin_hook("post_update_association", assoc, undefined)   // FIXME: old_assoc=undefined
     }
 
     // ---
@@ -386,18 +413,10 @@ var dm4c = new function() {
 
     // ---
 
-    /**
-     * Updates an association on the view (canvas and page panel).
-     * Triggers the "post_update_association" hook.
-     *
-     * @param   an Association object
-     */
-    function update_association(assoc) {
-        // update view
-        dm4c.canvas.update_association(assoc, true)     // refresh_canvas=true
-        dm4c.page_panel.display(assoc)
-        // trigger hook
-        dm4c.trigger_plugin_hook("post_update_association", assoc, undefined)   // FIXME: old_assoc=undefined
+    function update_topic_type(topic_type) {
+        dm4c.type_cache.put_topic_type(topic_type)
+        dm4c.refresh_create_menu()
+        dm4c.canvas.refresh()
     }
 
     // ---
@@ -649,7 +668,7 @@ var dm4c = new function() {
      *
      * @param   configurable    A topic type, an association type, or an association definition.
      *                          Must not be null/undefined.
-     * @param   setting         Last component of the setting URI, e.g. "icon_src".
+     * @param   setting         Last component of the setting URI, e.g. "icon".
      *
      * @return  The setting value, or <code>undefined</code> if there is no such setting
      */

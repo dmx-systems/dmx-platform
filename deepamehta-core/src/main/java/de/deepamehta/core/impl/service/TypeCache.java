@@ -43,8 +43,8 @@ class TypeCache {
     AttachedTopicType getTopicType(String topicTypeUri) {
         AttachedTopicType topicType = topicTypes.get(topicTypeUri);
         if (topicType == null) {
+            // endlessRecursionProtection(topicTypeUri);    // ### FIXME: not in use
             topicType = loadTopicType(topicTypeUri);
-            put(topicType);
         }
         return topicType;
     }
@@ -53,7 +53,6 @@ class TypeCache {
         AttachedAssociationType assocType = assocTypes.get(assocTypeUri);
         if (assocType == null) {
             assocType = loadAssociationType(assocTypeUri);
-            put(assocType);
         }
         return assocType;
     }
@@ -89,6 +88,17 @@ class TypeCache {
         //
         AttachedTopicType topicType = new AttachedTopicType(dms);
         topicType.fetch(new TopicTypeModel(typeTopic.getModel()));
+        put(topicType);
+        // Note: the topic type must be put in cache *before* its view configuration is fetched.
+        // Othewise endless recursion might occur. Consider this case: fetching the topic type "Icon"
+        // implies fetching its view configuration which in turn implies fetching the topic type "Icon"!
+        // This is because "Icon" *is part of* "View Configuration" and has a view configuration itself
+        // (provided by the deepamehta-iconpicker module).
+        // We resolve that circle by postponing the view configuration retrieval. This works because Icon's
+        // view configuration is actually not required while fetching, but solely its data type is
+        // (see AttachedDeepaMehtaObject.fetchComposite()).
+        topicType.fetchViewConfig();
+        //
         return topicType;
     }
 
@@ -102,16 +112,21 @@ class TypeCache {
         //
         AttachedAssociationType assocType = new AttachedAssociationType(dms);
         assocType.fetch(new AssociationTypeModel(typeTopic.getModel()));
+        // Note: the association type must be put in cache *before* its view configuration is fetched. See above.
+        put(assocType);
+        assocType.fetchViewConfig();
+        //
         return assocType;
     }
 
     // ---
 
-    /* FIXME: not in use
+    /* ### FIXME: not in use
     private void endlessRecursionProtection(String topicTypeUri) {
-        if (topicTypeUri.equals("dm4.webclient.view_config")) {
+        if (topicTypeUri.equals("dm4.webclient.icon")) {
             callCount++;
-            if (callCount >= 3) {
+            logger.info("########## Loading topic type \"dm4.webclient.icon\" => count=" + callCount);
+            if (callCount >= 2) {
                 throw new RuntimeException("Endless Recursion!");
             }
         }

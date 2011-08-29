@@ -242,10 +242,10 @@ public class Plugin implements BundleActivator, EventHandler {
     }
 
     /* ### public void preUpdateHook(Topic topic, Properties newProperties) {
-    }
+    } */
 
-    public void postUpdateHook(Topic topic, Properties oldProperties) {
-    } ### */
+    public void postUpdateHook(Topic topic, TopicModel oldTopic, Directives directives) {
+    }
 
     // ---
 

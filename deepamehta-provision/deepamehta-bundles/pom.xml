@@ -40,12 +40,12 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-notes</artifactId>
-            <version>4.0.1</version>
+            <version>4.0.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-contacts</artifactId>
-            <version>4.0.3</version>
+            <version>4.0.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
@@ -55,6 +55,11 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-typeeditor</artifactId>
+            <version>4.0.4-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-iconpicker</artifactId>
             <version>4.0.4-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -91,11 +96,6 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-time</artifactId>
-            <version>0.4.3</version>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-iconpicker</artifactId>
             <version>0.4.3</version>
         </dependency>
         <dependency>

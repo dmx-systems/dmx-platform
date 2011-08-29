@@ -166,6 +166,13 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    /**
+     * Fetches this type from DB and initializes its model.
+     * <p>
+     * Called from {@link TypeCache#loadTopicType}.
+     *
+     * @param   model   A type model with only the base-topic parts initialized.
+     */
     void fetch(TypeModel model) {
         setModel(model);
         //
@@ -179,12 +186,24 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // init model
         getModel().setDataTypeUri(fetchDataTypeTopic().getUri());
         getModel().setIndexModes(fetchIndexModes());
-        getModel().setViewConfig(fetchViewConfig());
         addAssocDefsSorted(assocDefs, sequence);
         //
         // init attached object cache
-        // ### initAssocDefs(); // Note: the assoc defs are already initialized through previous addAssocDefsSorted()
-        initViewConfig();
+        // ### initAssocDefs();    // Note: the assoc defs are already initialized through previous addAssocDefsSorted()
+        // ### initViewConfig();   // Note: initialized later on through fetchViewConfig() (called by TypeCache)
+    }
+
+    void fetchViewConfig() {
+        try {
+            Set<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type", "dm4.core.view_config",
+                null, true, false);    // fetchComposite=true, fetchRelatingComposite=false
+            // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
+            getModel().setViewConfig(new ViewConfigurationModel(dms.getTopicModels(topics)));
+            initViewConfig();
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching view configuration for " + className() + " \"" + getUri() +
+                "\" failed", e);
+        }
     }
 
     void store() {
@@ -274,13 +293,6 @@ abstract class AttachedType extends AttachedTopic implements Type {
             getModel().addAssocDef(assocDef.getModel());        // update model
             this.assocDefs.put(assocDef.getUri(), assocDef);    // update attached object cache
         }
-    }
-
-    private ViewConfigurationModel fetchViewConfig() {
-        Set<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type", "dm4.core.view_config",
-            null, true, false);    // fetchComposite=true, fetchRelatingComposite=false
-        // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
-        return new ViewConfigurationModel(dms.getTopicModels(topics));
     }
 
 
