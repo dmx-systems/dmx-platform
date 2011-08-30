@@ -85,7 +85,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         // update memory
         model.setUri(uri);
         // update DB
-        storeUri(uri);
+        storeUri(uri);      // abstract
     }
 
     // --- Type URI ---
@@ -96,10 +96,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     @Override
-    public void setTypeUri(String assocTypeUri) {
+    public void setTypeUri(String typeUri) {
         // update memory
-        model.setTypeUri(assocTypeUri);
-        // Note: updating the DB is up to the subclasses
+        model.setTypeUri(typeUri);
+        // update DB
+        storeTypeUri();     // abstract
     }
 
     // --- Simple Value ---
@@ -319,6 +320,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     protected abstract void storeUri(String uri);
 
+    protected abstract void storeTypeUri();
+
     protected abstract SimpleValue storeValue(SimpleValue value);
 
     protected abstract void indexValue(IndexMode indexMode, String indexKey, SimpleValue value, SimpleValue oldValue);
@@ -339,7 +342,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    void update(DeepaMehtaObjectModel model) {
+    ChangeReport update(DeepaMehtaObjectModel model) {
         // ### TODO: compare new model with current one and update only if changed. See AttachedAssociation.update()
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
             setCompositeValue(model.getCompositeValue());   // setCompositeValue() includes setSimpleValue()
@@ -348,10 +351,15 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             if (value != null) {
                 setSimpleValue(value);
             } else {
-                logger.info("### Updating simple value ABORTED -- no value is given");
+                logger.info("### Updating simple value ABORTED -- not contained in update request");
             }
         }
-        setUri(model.getUri());
+        //
+        ChangeReport report = new ChangeReport();
+        updateUri(model.getUri());
+        updateTypeUri(model.getTypeUri(), report);
+        //
+        return report;
     }
 
     /**
@@ -500,7 +508,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     private void storeAndIndexValue(SimpleValue value) {
-        SimpleValue oldValue = storeValue(value);
+        SimpleValue oldValue = storeValue(value);               // abstract
         indexValue(value, oldValue);
     }
 
@@ -516,12 +524,43 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
         //
         for (IndexMode indexMode : type.getIndexModes()) {
-            indexValue(indexMode, indexKey, value, oldValue);
+            indexValue(indexMode, indexKey, value, oldValue);   // abstract
         }
     }
 
     private void updateValue(CompositeValue comp) {
         setSimpleValue(comp.getLabel());
+    }
+
+    // === Update ===
+
+    private void updateUri(String newUri) {
+        if (newUri != null) {
+            String uri = getUri();
+            if (!uri.equals(newUri)) {
+                logger.info("### Changing URI from \"" + uri + "\" -> \"" + newUri + "\"");
+                setUri(newUri);
+            } else {
+                logger.info("### Updating URI ABORTED -- no changes made by user");
+            }
+        } else {
+            logger.info("### Updating URI ABORTED -- not contained in update request");
+        }
+    }
+
+    private void updateTypeUri(String newTypeUri, ChangeReport report) {
+        if (newTypeUri != null) {
+            String typeUri = getTypeUri();
+            if (!typeUri.equals(newTypeUri)) {
+                logger.info("### Changing type URI from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
+                report.typeUriChanged(typeUri, newTypeUri);
+                setTypeUri(newTypeUri);
+            } else {
+                logger.info("### Updating type URI ABORTED -- no changes made by user");
+            }
+        } else {
+            logger.info("### Updating type URI ABORTED -- not contained in update request");
+        }
     }
 
     // === Helper ===

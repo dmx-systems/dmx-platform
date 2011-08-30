@@ -62,14 +62,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
 
 
-    @Override
-    public void setTypeUri(String assocTypeUri) {
-        // update memory
-        super.setTypeUri(assocTypeUri);
-        // update DB
-        storeTypeUri();
-    }
-
     // === Implementation of the abstract methods ===
 
     @Override
@@ -81,6 +73,15 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     protected void storeUri(String uri) {
         dms.storage.setAssociationUri(getId(), uri);
     }
+
+    @Override
+    protected void storeTypeUri() {
+        // remove current assignment
+        long assocId = fetchTypeTopic().getAssociation().getId();
+        dms.deleteAssociation(assocId, null);  // clientContext=null
+        // create new assignment
+        dms.associateWithAssociationType(getModel());
+    }    
 
     @Override
     protected SimpleValue storeValue(SimpleValue value) {
@@ -239,35 +240,12 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
      *                      If role 1 is <code>null</code> it is not updated.
      *                      If role 2 is <code>null</code> it is not updated.
      */
-    AssociationChangeReport update(AssociationModel assocModel) {
+    ChangeReport update(AssociationModel assocModel) {
         logger.info("Updating association " + getId() + " (new " + assocModel + ")");
         //
-        super.update(assocModel);
-        //
-        AssociationChangeReport report = new AssociationChangeReport();
-        boolean typeUriChanged = false;
-        boolean roleType1Changed = false;
-        boolean roleType2Changed = false;
-        //
-        // 1) update type
-        String newTypeUri = assocModel.getTypeUri();
-        if (newTypeUri != null) {
-            typeUriChanged = updateType(newTypeUri, report);
-        }
-        // 2) update role type 1
-        RoleModel roleModel1 = assocModel.getRoleModel1();
-        if (roleModel1 != null) {
-            roleType1Changed = updateRole(roleModel1, 1);
-        }
-        // 3) update role type 2
-        RoleModel roleModel2 = assocModel.getRoleModel2();
-        if (roleModel2 != null) {
-            roleType2Changed = updateRole(roleModel2, 2);
-        }
-        //
-        if (!typeUriChanged && !roleType1Changed && !roleType2Changed) {
-            logger.info("Updating association " + getId() + " ABORTED -- no changes made by user");
-        }
+        ChangeReport report = super.update(assocModel);
+        updateRole(assocModel.getRoleModel1(), 1);
+        updateRole(assocModel.getRoleModel2(), 2);
         //
         return report;
     }
@@ -283,72 +261,26 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void filterTopic(Role role, String roleTypeUri, Set<Topic> topics) {
-        if (role instanceof TopicRole && role.getRoleTypeUri().equals(roleTypeUri)) {
-            topics.add(fetchRoleTopic((TopicRole) role));
-        }
-    }
-
-    // FIXME: move to AttachedTopicRole / extend TopicRole interface?
-    private Topic fetchRoleTopic(TopicRole role) {
-        if (role.topicIdentifiedByUri()) {
-            return dms.getTopic("uri", new SimpleValue(role.getTopicUri()), false);     // fetchComposite=false
-        } else {
-            return dms.getTopic(role.getTopicId(), false, null);    // fetchComposite=false, clientContext=null
-        }
-    }
-
-
-
-    // === Store ===
-
-    private void storeTypeUri() {
-        // remove current assignment
-        long assocId = fetchTypeTopic().getAssociation().getId();
-        dms.deleteAssociation(assocId, null);  // clientContext=null
-        // create new assignment
-        dms.associateWithAssociationType(getModel());
-    }    
-
-    private RelatedTopic fetchTypeTopic() {
-        // assocTypeUri=null (supposed to be "dm4.core.instantiation" but not possible ### explain)
-        return getRelatedTopic(null, "dm4.core.instance", "dm4.core.type", "dm4.core.assoc_type",
-            false, false);     // fetchComposite=false
-    }
-
-
-
-    // === Helper ===
-
-    private boolean updateType(String newTypeUri, AssociationChangeReport report) {
-        String typeUri = getTypeUri();      // current value
-        if (!typeUri.equals(newTypeUri)) {  // has changed?
-            logger.info("Changing type from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
-            report.typeUriChanged(typeUri, newTypeUri);
-            setTypeUri(newTypeUri);
-            return true;
-        }
-        return false;
-    }
+    // === Update ===
 
     /**
      * @param   nr      used only for logging
      */
-    private boolean updateRole(RoleModel newModel, int nr) {
-        // Note: We must lookup the roles individually.
-        // The role order (getRole1(), getRole2()) is undeterministic and not fix.
-        Role role = getRole(getObjectId(newModel));
-        String newRoleTypeUri = newModel.getRoleTypeUri();  // new value
-        String roleTypeUri = role.getRoleTypeUri();         // current value
-        if (!roleTypeUri.equals(newRoleTypeUri)) {          // has changed?
-            logger.info("Changing role type " + nr + " from \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri + "\"");
-            role.setRoleTypeUri(newRoleTypeUri);
-            return true;
+    private void updateRole(RoleModel newModel, int nr) {
+        if (newModel != null) {
+            // Note: We must lookup the roles individually.
+            // The role order (getRole1(), getRole2()) is undeterministic and not fix.
+            Role role = getRole(getObjectId(newModel));
+            String newRoleTypeUri = newModel.getRoleTypeUri();  // new value
+            String roleTypeUri = role.getRoleTypeUri();         // current value
+            if (!roleTypeUri.equals(newRoleTypeUri)) {          // has changed?
+                logger.info("Changing role type " + nr + " from \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri + "\"");
+                role.setRoleTypeUri(newRoleTypeUri);
+            }
         }
-        return false;
     }
 
-    // ---
+    // === Helper ===
 
     private Role createAttachedRole(RoleModel model) {
         if (model instanceof TopicRoleModel) {
@@ -369,5 +301,30 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         } else {
             throw new RuntimeException("Unexpected RoleModel object (" + model + ")");
         }
+    }
+
+    // ---
+
+    private void filterTopic(Role role, String roleTypeUri, Set<Topic> topics) {
+        if (role instanceof TopicRole && role.getRoleTypeUri().equals(roleTypeUri)) {
+            topics.add(fetchRoleTopic((TopicRole) role));
+        }
+    }
+
+    // FIXME: move to AttachedTopicRole / extend TopicRole interface?
+    private Topic fetchRoleTopic(TopicRole role) {
+        if (role.topicIdentifiedByUri()) {
+            return dms.getTopic("uri", new SimpleValue(role.getTopicUri()), false);     // fetchComposite=false
+        } else {
+            return dms.getTopic(role.getTopicId(), false, null);    // fetchComposite=false, clientContext=null
+        }
+    }
+
+    // ---
+
+    private RelatedTopic fetchTypeTopic() {
+        // assocTypeUri=null (supposed to be "dm4.core.instantiation" but not possible ### explain)
+        return getRelatedTopic(null, "dm4.core.instance", "dm4.core.type", "dm4.core.assoc_type",
+            false, false);     // fetchComposite=false
     }
 }

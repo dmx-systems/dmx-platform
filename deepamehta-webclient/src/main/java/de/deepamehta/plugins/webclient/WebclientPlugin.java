@@ -65,7 +65,7 @@ public class WebclientPlugin extends Plugin {
                 webclientLaunched = true;
             } catch (Exception e) {
                 logger.warning("### Launching webclient failed (" + e + ")");
-                logger.info("### Please launch webclient manually: " + webclientUrl);
+                logger.warning("### Please launch webclient manually: " + webclientUrl);
             }
         }
     }

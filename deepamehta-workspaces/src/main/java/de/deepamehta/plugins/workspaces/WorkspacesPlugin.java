@@ -73,8 +73,8 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
             }
             // check precondition 2
             if (clientContext == null) {
-                logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +
-                    "(client context is not initialzed))");
+                // ### logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +
+                // ###     "(client context is not initialzed))");
                 return;
             }
             // check precondition 3
@@ -89,7 +89,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
             assignTopic(workspaceId, topic.getId());
         } catch (Exception e) {
             logger.warning("Assigning " + topic + " to workspace " + workspaceId + " failed (" + e + "). " +
-                "This can happen if there is a stale \"dm4_workspace_id\" cookie.");
+                "This can happen after a DB reset if there is a stale \"dm4_workspace_id\" browser cookie.");
         }
     }
 

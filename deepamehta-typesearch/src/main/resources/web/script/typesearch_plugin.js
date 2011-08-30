@@ -75,9 +75,7 @@ function typesearch_plugin() {
     function refresh_type_menu() {
         // Note: refreshing the type menu is only required if the "By Type" searchmode is selected
         if (is_searchmode_selected()) {
-            dm4c.refresh_type_menu(type_menu, function(topic_type) {
-                return true     // all types are added
-            })
+            dm4c.refresh_type_menu(type_menu)   // no filter_func specified
         }
     }
 

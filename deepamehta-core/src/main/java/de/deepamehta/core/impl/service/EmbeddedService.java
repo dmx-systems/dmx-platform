@@ -410,7 +410,7 @@ public class EmbeddedService implements DeepaMehtaService {
             // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
-            AssociationChangeReport report = assoc.update(model);
+            ChangeReport report = assoc.update(model);
             //
             Directives directives = new Directives();
             directives.add(Directive.UPDATE_ASSOCIATION, assoc);

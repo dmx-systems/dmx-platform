@@ -64,6 +64,15 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     }
 
     @Override
+    protected void storeTypeUri() {
+        // remove current assignment
+        long assocId = fetchTypeTopic().getAssociation().getId();
+        dms.deleteAssociation(assocId, null);  // clientContext=null
+        // create new assignment
+        dms.associateWithTopicType(getModel());
+    }    
+
+    @Override
     protected SimpleValue storeValue(SimpleValue value) {
         return dms.storage.setTopicValue(getId(), value);
     }
@@ -188,4 +197,9 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private RelatedTopic fetchTypeTopic() {
+        return getRelatedTopic("dm4.core.instantiation", "dm4.core.instance", "dm4.core.type", "dm4.core.topic_type",
+            false, false);     // fetchComposite=false
+    }
 }

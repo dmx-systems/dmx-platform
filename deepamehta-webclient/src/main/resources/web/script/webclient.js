@@ -240,6 +240,15 @@ var dm4c = new function() {
 
     // ---
 
+    this.do_retype_topic = function(topic, type_uri) {
+        // update model
+        var directives = dm4c.restc.update_topic({id: topic.id, type_uri: type_uri})
+        // update view
+        process_directives(directives)
+    }
+
+    // ---
+
     /**
      * Deletes a topic (including its associations) from the DB and the GUI.
      * Triggers the "post_delete_topic" hook and the "post_delete_association" hook (several times).
@@ -742,7 +751,14 @@ var dm4c = new function() {
     // ---
 
     /**
+     * Refreshes a menu so it reflects the current set of known topic types.
+     * <p>
      * Utility method for plugin developers.
+     *
+     * @param   type_menu       a GUIToolkit's Menu object.
+     * @param   filter_func     Optional: a function that filters the topic types to add to the menu.
+     *                          One argument is passed: the topic type (a TopicType object).
+     *                          If not specified no filter is applied (all topic types are added).
      */
     this.refresh_type_menu = function(type_menu, filter_func) {
         // save selection
@@ -751,7 +767,7 @@ var dm4c = new function() {
         type_menu.empty()
         // add topic type items
         dm4c.type_cache.iterate(function(topic_type) {
-            if (filter_func(topic_type)) {
+            if (!filter_func || filter_func(topic_type)) {
                 type_menu.add_item({
                     label: topic_type.value,
                     value: topic_type.uri,

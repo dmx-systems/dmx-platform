@@ -2,7 +2,7 @@ package de.deepamehta.core.impl.service;
 
 
 
-class AssociationChangeReport {
+class ChangeReport {
 
     boolean typeUriChanged = false;
     String oldTypeUri;

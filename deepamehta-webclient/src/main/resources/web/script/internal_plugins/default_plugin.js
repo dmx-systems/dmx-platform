@@ -3,6 +3,8 @@
  */
 function default_plugin () {
 
+    var type_menu
+
 
 
     // ***********************************************************
@@ -17,6 +19,10 @@ function default_plugin () {
             "Delete", do_delete_topic)
         dm4c.ui.dialog("delete-association-dialog", "Delete Association?", undefined, undefined,
             "Delete", do_delete_association)
+        //
+        type_menu = dm4c.ui.menu()
+        dm4c.ui.dialog("retype-topic-dialog",       "Retype Topic",        type_menu.dom, undefined,
+            "Retype", do_retype_topic)
 
         function do_delete_topic() {
             $("#delete-topic-dialog").dialog("close")
@@ -26,6 +32,12 @@ function default_plugin () {
         function do_delete_association() {
             $("#delete-association-dialog").dialog("close")
             dm4c.do_delete_association(dm4c.selected_object)
+        }
+
+        function do_retype_topic() {
+            var type_uri = type_menu.get_selection().value
+            $("#retype-topic-dialog").dialog("close")
+            dm4c.do_retype_topic(dm4c.selected_object, type_uri)
         }
     }
 
@@ -37,8 +49,9 @@ function default_plugin () {
         commands.push({label: "Associate",  handler: do_associate, context: "context-menu"})
         //
         if (dm4c.has_write_permission(topic)) {
-            commands.push({label: "Edit",   handler: do_edit,      context: "detail-panel-show", ui_icon: "pencil"})
-            commands.push({label: "Delete", handler: do_confirm,   context: "detail-panel-show", ui_icon: "trash"})
+            commands.push({label: "Edit",   handler: do_edit,    context: "detail-panel-show", ui_icon: "pencil"})
+            commands.push({label: "Retype", handler: do_retype,  context: "detail-panel-show", ui_icon: "transfer-e-w"})
+            commands.push({label: "Delete", handler: do_confirm, context: "detail-panel-show", ui_icon: "trash"})
         }
         //
         commands.push({label: "Save",   handler: do_save,   context: "detail-panel-edit", ui_icon: "circle-check",
@@ -60,6 +73,11 @@ function default_plugin () {
 
         function do_edit() {
             dm4c.begin_editing(topic)
+        }
+
+        function do_retype() {
+            dm4c.refresh_type_menu(type_menu)   // no filter_func specified
+            $("#retype-topic-dialog").dialog("open")
         }
 
         function do_confirm() {
