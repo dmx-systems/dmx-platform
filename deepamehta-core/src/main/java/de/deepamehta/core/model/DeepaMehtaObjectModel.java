@@ -20,13 +20,14 @@ public abstract class DeepaMehtaObjectModel {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     protected long id;
-    protected String uri;               // is never null, may be empty
-    protected String typeUri;           // is never null in models used for a create operation
-                                        // may be null in models used for an update operation
+    protected String uri;               // is never null in models used for a create operation, may be empty.
+                                        // may be null in models used for an update operation.
+    protected String typeUri;           // is never null in models used for a create operation.
+                                        // may be null in models used for an update operation.
     protected SimpleValue value;        // is never null in models used for a create operation, may be constructed
-                                        //                                                      on empty string
-                                        // may be null in models used for an update operation
-    protected CompositeValue composite; // is never null, may be empty
+                                        //                                                      on empty string.
+                                        // may be null in models used for an update operation.
+    protected CompositeValue composite; // is never null, may be empty.
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -82,7 +83,7 @@ public abstract class DeepaMehtaObjectModel {
     public DeepaMehtaObjectModel(JSONObject model) {
         try {
             this.id = model.optLong("id", -1);
-            this.uri = model.optString("uri");
+            this.uri = model.optString("uri", null);
             if (model.has("value")) {
                 this.value = new SimpleValue(model.get("value"));
             } else {

@@ -45,7 +45,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     AttachedDeepaMehtaObject(DeepaMehtaObjectModel model, EmbeddedService dms) {
-        // set default value
+        // set default values
+        if (model.getUri() == null) {
+            model.setUri("");
+        }
         if (model.getSimpleValue() == null) {
             model.setSimpleValue("");
         }
@@ -347,12 +350,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
             setCompositeValue(model.getCompositeValue());   // setCompositeValue() includes setSimpleValue()
         } else {
-            SimpleValue value = model.getSimpleValue();
-            if (value != null) {
-                setSimpleValue(value);
-            } else {
-                logger.info("### Updating simple value ABORTED -- not contained in update request");
-            }
+            updateValue(model.getSimpleValue());
         }
         //
         ChangeReport report = new ChangeReport();
@@ -560,6 +558,20 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             }
         } else {
             logger.info("### Updating type URI ABORTED -- not contained in update request");
+        }
+    }
+
+    private void updateValue(SimpleValue newValue) {
+        if (newValue != null) {
+            SimpleValue value = getSimpleValue();
+            if (!value.equals(newValue)) {
+                logger.info("### Changing simple value from \"" + value + "\" -> \"" + newValue + "\"");
+                setSimpleValue(newValue);
+            } else {
+                logger.info("### Updating simple value ABORTED -- no changes made by user");
+            }
+        } else {
+            logger.info("### Updating simple value ABORTED -- not contained in update request");
         }
     }
 

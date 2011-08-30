@@ -99,13 +99,14 @@ function default_plugin () {
     this.association_commands = function(assoc) {
         var commands = []
         //
-        commands.push({label: "Hide",       handler: do_hide,      context: "context-menu"})
+        commands.push({label: "Hide",       handler: do_hide,    context: "context-menu"})
         // commands.push({is_separator: true,                         context: "context-menu"})
         // commands.push({label: "Associate",  handler: do_associate, context: "context-menu"})     // TODO: implement
         //
         if (dm4c.has_write_permission(assoc)) {
-            commands.push({label: "Edit",   handler: do_edit,      context: "detail-panel-show", ui_icon: "pencil"})
-            commands.push({label: "Delete", handler: do_confirm,   context: "detail-panel-show", ui_icon: "trash"})
+            commands.push({label: "Edit",   handler: do_edit,    context: "detail-panel-show", ui_icon: "pencil"})
+            commands.push({is_separator: true,                   context: "context-menu"})
+            commands.push({label: "Delete", handler: do_confirm, context: "context-menu", ui_icon: "trash"})
         }
         //
         commands.push({label: "Save",   handler: do_save,   context: "detail-panel-edit", ui_icon: "circle-check",
