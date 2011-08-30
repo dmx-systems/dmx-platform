@@ -50,8 +50,10 @@ function default_plugin () {
         //
         if (dm4c.has_write_permission(topic)) {
             commands.push({label: "Edit",   handler: do_edit,    context: "detail-panel-show", ui_icon: "pencil"})
-            commands.push({label: "Retype", handler: do_retype,  context: "detail-panel-show", ui_icon: "transfer-e-w"})
-            commands.push({label: "Delete", handler: do_confirm, context: "detail-panel-show", ui_icon: "trash"})
+            commands.push({is_separator: true,                   context: "context-menu"})
+            commands.push({label: "Retype", handler: do_retype,  context: "context-menu", ui_icon: "transfer-e-w"})
+            commands.push({is_separator: true,                   context: "context-menu"})
+            commands.push({label: "Delete", handler: do_confirm, context: "context-menu", ui_icon: "trash"})
         }
         //
         commands.push({label: "Save",   handler: do_save,   context: "detail-panel-edit", ui_icon: "circle-check",
