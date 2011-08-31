@@ -65,8 +65,17 @@ public class WebclientPlugin extends Plugin {
                 webclientLaunched = true;
             } catch (Exception e) {
                 logger.warning("### Launching webclient failed (" + e + ")");
-                logger.warning("### Please launch webclient manually: " + webclientUrl);
+                logger.warning("### Use this URL to launch the webclient manually: " + webclientUrl);
             }
+        }
+    }
+
+    @Override
+    public void preUpdateHook(Topic topic, TopicModel newTopic, Directives directives) {
+        if (topic.getTypeUri().equals("dm4.files.file") && newTopic.getTypeUri().equals("dm4.webclient.icon")) {
+            String iconUrl = "/proxy/file:" + topic.getCompositeValue().get("dm4.files.path");
+            logger.info("### Retyping a file to an icon (iconUrl=" + iconUrl + ")");
+            newTopic.setSimpleValue(iconUrl);
         }
     }
 

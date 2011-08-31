@@ -346,16 +346,15 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     ChangeReport update(DeepaMehtaObjectModel model) {
-        // ### TODO: compare new model with current one and update only if changed. See AttachedAssociation.update()
+        ChangeReport report = new ChangeReport();
+        updateUri(model.getUri());
+        updateTypeUri(model.getTypeUri(), report);
+        // ### TODO: compare new model with current one and update only if changed.
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
             setCompositeValue(model.getCompositeValue());   // setCompositeValue() includes setSimpleValue()
         } else {
             updateValue(model.getSimpleValue());
         }
-        //
-        ChangeReport report = new ChangeReport();
-        updateUri(model.getUri());
-        updateTypeUri(model.getTypeUri(), report);
         //
         return report;
     }

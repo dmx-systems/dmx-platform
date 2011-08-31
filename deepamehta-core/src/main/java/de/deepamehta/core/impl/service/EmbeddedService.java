@@ -90,6 +90,7 @@ public class EmbeddedService implements DeepaMehtaService {
         // Note: this hook is triggered only by the plugin itself
         // (see {@link de.deepamehta.core.service.Plugin#initPlugin}).
         // It is declared here for documentation purpose only.
+        // ### FIXME: remove hook. Use migration 1 instead.
         POST_INSTALL_PLUGIN("postInstallPluginHook"),
         ALL_PLUGINS_READY("allPluginsReadyHook"),
 
@@ -103,10 +104,11 @@ public class EmbeddedService implements DeepaMehtaService {
         SERVICE_GONE("serviceGone", PluginService.class),
 
          PRE_CREATE_TOPIC("preCreateHook",  TopicModel.class, ClientContext.class),
-        POST_CREATE_TOPIC("postCreateHook", Topic.class, ClientContext.class),
-        // ### PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, Properties.class),
+        POST_CREATE_TOPIC("postCreateHook", Topic.class,      ClientContext.class),
+         PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, TopicModel.class, Directives.class),
         POST_UPDATE_TOPIC("postUpdateHook", Topic.class, TopicModel.class, Directives.class),
 
+        // ### FIXME: remove hook. Retype is special case of update.
         POST_RETYPE_ASSOCIATION("postRetypeAssociationHook", Association.class, String.class, Directives.class),
 
          PRE_DELETE_ASSOCIATION("preDeleteAssociationHook",  Association.class, Directives.class),
@@ -277,17 +279,15 @@ public class EmbeddedService implements DeepaMehtaService {
     public Directives updateTopic(TopicModel model, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopic topic = getTopic(model.getId(), true, clientContext);   // fetchComposite=true ### false?
-            //
-            // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
-            // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
+            AttachedTopic topic = getTopic(model.getId(), true, clientContext);
+            Directives directives = new Directives();
+            triggerHook(Hook.PRE_UPDATE_TOPIC, topic, model, directives);
             //
             topic.update(model);
+            //
             // ### FIXME: avoid refetching. Required is updating the topic model for aggregations: replacing
             // $id composite entries with actual values. See AttachedDeepaMehtaObject.storeComposite()
             topic = getTopic(model.getId(), true, clientContext);  // fetchComposite=true
-            //
-            Directives directives = new Directives();
             directives.add(Directive.UPDATE_TOPIC, topic);
             //
             triggerHook(Hook.POST_UPDATE_TOPIC, topic, null, directives);   // ### FIXME: oldTopic=null
