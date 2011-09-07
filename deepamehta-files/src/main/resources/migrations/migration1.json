@@ -4,18 +4,24 @@
         ### File ###
 
         {
-            value: "Content",
-            uri: "dm4.files.content",
+            value: "File Content",
+            uri: "dm4.files.file_content",
             data_type_uri: "dm4.core.html",
-            index_mode_uris: ["dm4.core.fulltext"]
-            ### TODO: BodyTextRenderer
+            index_mode_uris: ["dm4.core.fulltext"],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.js_field_renderer_class: "FileContentRenderer"
+                    }
+                }
+            ]
         },
         {
             value: "File Name",
             uri: "dm4.files.file_name",
             data_type_uri: "dm4.core.text",
             index_mode_uris: ["dm4.core.fulltext"]
-            ### TODO: topic_label_field_uri
         },
         {
             value: "Path",
@@ -40,7 +46,7 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.files.content",
+                    part_topic_type_uri:  "dm4.files.file_content",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
@@ -84,6 +90,20 @@
             index_mode_uris: ["dm4.core.fulltext"]
         },
         {
+            value: "Folder Content",
+            uri: "dm4.files.folder_content",
+            data_type_uri: "dm4.core.html",
+            index_mode_uris: ["dm4.core.fulltext"],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.js_field_renderer_class: "FolderContentRenderer"
+                    }
+                }
+            ]
+        },
+        {
             value: "Folder",
             uri: "dm4.files.folder",
             data_type_uri: "dm4.core.composite",
@@ -95,6 +115,11 @@
                 },
                 {
                     part_topic_type_uri:  "dm4.files.path",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.files.folder_content",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }

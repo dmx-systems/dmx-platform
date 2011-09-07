@@ -3,12 +3,13 @@ function RenderHelper() {
     /**
      * @param   topics      Topics to render (array of Topic objects).
      */
-    this.topic_list = function(topics) {
+    this.topic_list = function(topics, click_handler) {
         var table = $("<table>").addClass("topic-list")
         for (var i = 0, topic; topic = topics[i]; i++) {
+            var handler = click_handler && click_handler(topic) || reveal_handler(topic)
             table.append($("<tr>")
-                .append($("<td>").append(this.icon_link(topic)))
-                .append($("<td>").append(this.topic_link(topic)))
+                .append($("<td>").append(this.icon_link(topic, handler)))
+                .append($("<td>").append(this.topic_link(topic, handler)))
             )
         }
         return table
@@ -17,13 +18,13 @@ function RenderHelper() {
     /**
      * @param   topic       Topic to render (a Topic object).
      */
-    this.topic_link = function(topic) {
+    this.topic_link = function(topic, handler) {
         var title = dm4c.type_label(topic.type_uri)
-        return $("<a>").attr({href: "#", title: title}).append(topic.value).click(reveal_handler(topic))
+        return $("<a>").attr({href: "#", title: title}).append(topic.value).click(handler)
     }
 
-    this.icon_link = function(topic) {
-        return this.type_icon(topic.type_uri).click(reveal_handler(topic))
+    this.icon_link = function(topic, handler) {
+        return this.type_icon(topic.type_uri).click(handler)
     }
 
     function reveal_handler(topic) {

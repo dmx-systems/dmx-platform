@@ -129,7 +129,7 @@ public class FilesPlugin extends Plugin implements FilesService {
         //
         String content = renderFileContent(file, fileType, fileSize);
         if (content != null) {
-            comp.put("dm4.files.content", content);
+            comp.put("dm4.files.file_content", content);
         }
         //
         return dms.createTopic(new TopicModel("dm4.files.file", comp), null);           // clientContext=null
@@ -137,9 +137,9 @@ public class FilesPlugin extends Plugin implements FilesService {
 
     @Override
     public Topic createFolderTopic(String path) {
-        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false);     // fetchComposite=false
-        if (topic != null) {
-            return topic;
+        Topic folderTopic = getFolderTopic(path);
+        if (folderTopic != null) {
+            return folderTopic;
         }
         //
         CompositeValue comp = new CompositeValue();
@@ -194,6 +194,18 @@ public class FilesPlugin extends Plugin implements FilesService {
         return null;
     }
 
+    private Topic getFolderTopic(String path) {
+        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false);     // fetchComposite=false
+        if (topic != null) {
+            return topic.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole", "dm4.files.folder",
+                true, false);
+        }
+        return null;
+    }
+
+    // ---
+
+    // ### FIXME: to be dropped
     private String renderFileContent(File file, String fileType, long fileSize) {
         // Note: for unknown file types fileType is null
         if (fileType == null) {

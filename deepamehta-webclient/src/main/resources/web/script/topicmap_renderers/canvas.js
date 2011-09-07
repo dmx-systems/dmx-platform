@@ -12,7 +12,8 @@ function Canvas() {
     var ASSOC_CLICK_TOLERANCE = 0.3
     var HIGHLIGHT_COLOR = "#0000ff"
     var HIGHLIGHT_BLUR = 16
-    var CANVAS_ANIMATION_STEPS = 30
+    var ANIMATION_STEPS = 30
+    var ANIMATION_DELAY = 10
     var LABEL_FONT = "1em 'Lucida Grande', Verdana, Arial, Helvetica, sans-serif"   // copied from webclient.css
     var LABEL_COLOR = "black"
     var LABEL_DIST_Y = 4            // in pixel
@@ -58,7 +59,7 @@ function Canvas() {
     this.add_topic = function(topic, refresh_canvas) {
         if (!topic_exists(topic.id)) {
             // update model
-            find_position()
+            init_position()
             add_topic(new CanvasTopic(topic))
         }
         // refresh GUI
@@ -66,17 +67,19 @@ function Canvas() {
             this.refresh()
         }
 
-        function find_position() {
+        function init_position() {
             if (topic.x == undefined && topic.y == undefined) {
                 if (grid_positioning) {
                     var pos = grid_positioning.next_position()
                     topic.x = pos.x
                     topic.y = pos.y
                 } else {
-                    topic.x = Math.floor(self.canvas_width  * Math.random() - trans_x)
-                    topic.y = Math.floor(self.canvas_height * Math.random() - trans_y)
+                    topic.x = self.canvas_width  * Math.random() - trans_x
+                    topic.y = self.canvas_height * Math.random() - trans_y
                 }
             }
+            topic.x = Math.floor(topic.x)
+            topic.y = Math.floor(topic.y)
         }
     }
 
@@ -718,16 +721,16 @@ function Canvas() {
 
     function scroll_to_center(x, y) {
         if (x < 0 || x >= self.canvas_width || y < 0 || y >= self.canvas_height) {
-            var dx = (self.canvas_width / 2 - x) / CANVAS_ANIMATION_STEPS
-            var dy = (self.canvas_height / 2 - y) / CANVAS_ANIMATION_STEPS
+            var dx = (self.canvas_width / 2 - x) / ANIMATION_STEPS
+            var dy = (self.canvas_height / 2 - y) / ANIMATION_STEPS
             var animation_count = 0;
             var animation = setInterval(function() {
                 translate(dx, dy)
                 draw()
-                if (++animation_count == CANVAS_ANIMATION_STEPS) {
+                if (++animation_count == ANIMATION_STEPS) {
                     clearInterval(animation)
                 }
-            }, 0)
+            }, ANIMATION_DELAY)
         }
     }
 

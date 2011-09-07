@@ -105,8 +105,7 @@ var dm4c = new function() {
         for (var i = 0, assoc; assoc = assocs[i]; i++) {
             dm4c.show_association(assoc)
         }
-        dm4c.show_topic(dm4c.fetch_topic(topic_id), "show")
-        dm4c.canvas.scroll_topic_to_center(topic_id)
+        dm4c.show_topic(dm4c.fetch_topic(topic_id), "show", undefined, true)
     }
 
     // ---
@@ -143,7 +142,7 @@ var dm4c = new function() {
         // update model
         var topic = dm4c.create_topic(type_uri)
         // update view
-        dm4c.show_topic(topic, "edit", x, y)
+        dm4c.show_topic(topic, "edit", {x: x, y: y})
     }
 
     /**
@@ -291,10 +290,12 @@ var dm4c = new function() {
      * @param   x, y        Optional: the coordinates for placing the topic on the canvas.
      *                      If not specified, placement is up to the canvas.
      */
-    this.show_topic = function(topic, action, x, y) {
+    this.show_topic = function(topic, action, coordinates, scroll_to_center) {
         action = action || "none"   // set default
-        topic.x = x
-        topic.y = y
+        if (coordinates) {
+            topic.x = coordinates.x
+            topic.y = coordinates.y
+        }
         var do_select = action != "none"
         // update model
         if (do_select) {
@@ -305,6 +306,9 @@ var dm4c = new function() {
         dm4c.canvas.add_topic(topic)
         if (do_select) {
             dm4c.canvas.set_highlight_object(topic.id, true)    // refresh_canvas=true
+        }
+        if (scroll_to_center) {
+            dm4c.canvas.scroll_topic_to_center(topic.id)
         }
         dm4c.trigger_plugin_hook("post_show_topic", topic)      // trigger hook
         // update page panel

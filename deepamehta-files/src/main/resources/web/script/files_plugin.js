@@ -1,5 +1,8 @@
 function files_plugin() {
 
+    dm4c.register_field_renderer("/de.deepamehta.files/script/field_renderers/file_content_renderer.js")
+    dm4c.register_field_renderer("/de.deepamehta.files/script/field_renderers/folder_content_renderer.js")
+
 
 
     // ***********************************************************
@@ -118,7 +121,7 @@ function files_plugin() {
      */
     this.create_file_topic = function(file, do_select) {
         var file_topic = dm4c.restc.execute_command("deepamehta-files.create-file-topic", {path: file.path})
-        dm4c.show_topic(new Topic(file_topic), do_select ? "show" : "none")
+        dm4c.show_topic(new Topic(file_topic), do_select ? "show" : "none", undefined, true)
     }
 
     /**
@@ -129,7 +132,7 @@ function files_plugin() {
      */
     this.create_folder_topic = function(dir, do_select) {
         var folder_topic = dm4c.restc.execute_command("deepamehta-files.create-folder-topic", {path: dir.path})
-        dm4c.show_topic(new Topic(folder_topic), do_select ? "show" : "none")
+        dm4c.show_topic(new Topic(folder_topic), do_select ? "show" : "none", undefined, true)
     }
 
     /**

@@ -8,6 +8,16 @@ function filemanager_plugin() {
 
 
 
+    this.post_refresh_create_menu = function(type_menu) {
+        type_menu.add_separator()
+        type_menu.add_item({
+            label: "New File Browser",
+            handler: function() {
+                dm4c.get_plugin("files_plugin").create_folder_topic({path: "/"}, true)
+            }
+        })
+    }
+
     this.process_files_drop = function(files) {
         dm4c.canvas.start_grid_positioning()
         //

@@ -52,7 +52,7 @@ function typeeditor_plugin() {
     this.post_refresh_create_menu = function(type_menu) {
         type_menu.add_separator()
         type_menu.add_item({
-            label: "New Topic Type...",
+            label: "New Topic Type",
             value: "create_topic_type",
             is_trigger: true,
             handler: function() {
