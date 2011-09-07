@@ -172,6 +172,16 @@ function files_plugin() {
 
         // ---
 
+        dm4c.restc.create_child_file_topic = function(folder_topic_id, path) {
+            return this.request("POST", "/files/" + folder_topic_id + "/file/" + encodeURIComponent(path))
+        }
+
+        dm4c.restc.create_child_folder_topic = function(folder_topic_id, path) {
+            return this.request("POST", "/files/" + folder_topic_id + "/folder/" + encodeURIComponent(path))
+        }
+
+        // ---
+
         dm4c.restc.open_file = function(file_topic_id) {
             return this.request("GET", "/files/" + file_topic_id)
         }

@@ -23,5 +23,11 @@ public interface FilesService extends PluginService {
 
     // ---
 
+    Topic createChildFileTopic(long folderTopicId, String path);
+
+    Topic createChildFolderTopic(long folderTopicId, String path);
+
+    // ---
+
     void openFile(long fileTopicId);
 }
