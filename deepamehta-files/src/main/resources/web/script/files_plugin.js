@@ -107,7 +107,7 @@ function files_plugin() {
     this.topic_doubleclicked = function(topic) {
         if (topic.type_uri == "dm4.files.file" ||
             topic.type_uri == "dm4.files.folder") {
-            dm4c.restc.execute_command("deepamehta-files.open-file", {topic_id: topic.id})
+            dm4c.restc.open_file(topic.id)
         }
     }
 
@@ -121,7 +121,7 @@ function files_plugin() {
      * @param   do_center   Optional: if evaluates to true the File topic is centered on the canvas.
      */
     this.create_file_topic = function(file, do_select, do_center) {
-        var file_topic = dm4c.restc.execute_command("deepamehta-files.create-file-topic", {path: file.path})
+        var file_topic = dm4c.restc.create_file_topic(file.path)
         dm4c.show_topic(new Topic(file_topic), do_select ? "show" : "none", undefined, do_center)
     }
 
@@ -133,7 +133,7 @@ function files_plugin() {
      * @param   do_center   Optional: if evaluates to true the Folder topic is centered on the canvas.
      */
     this.create_folder_topic = function(dir, do_select, do_center) {
-        var folder_topic = dm4c.restc.execute_command("deepamehta-files.create-folder-topic", {path: dir.path})
+        var folder_topic = dm4c.restc.create_folder_topic(dir.path)
         dm4c.show_topic(new Topic(folder_topic), do_select ? "show" : "none", undefined, do_center)
     }
 
@@ -162,19 +162,18 @@ function files_plugin() {
 
     function extend_rest_client() {
 
-        /**
-         * @param   uri     Must not be URI-encoded!
-         */
-        dm4c.restc.get_resource = function(uri, type, size) {
-            var params = this.createRequestParameter({type: type, size: size})
-            return this.request("GET", "/proxy/" + encodeURIComponent(uri) + "?" + params.to_query_string())
+        dm4c.restc.create_file_topic = function(path) {
+            return this.request("POST", "/files/file/" + encodeURIComponent(path))
         }
 
-        /**
-         * @param   uri     Must not be URI-encoded!
-         */
-        dm4c.restc.get_resource_info = function(uri) {
-            return this.request("GET", "/proxy/" + encodeURIComponent(uri) + "/info")
+        dm4c.restc.create_folder_topic = function(path) {
+            return this.request("POST", "/files/folder/" + encodeURIComponent(path))
+        }
+
+        // ---
+
+        dm4c.restc.open_file = function(file_topic_id) {
+            return this.request("GET", "/files/" + file_topic_id)
         }
     }
 

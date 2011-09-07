@@ -13,11 +13,15 @@ public interface FilesService extends PluginService {
      * Creates a File topic for a given path.
      * If a File topic for that path exists already that topic is returned.
      */
-    public Topic createFileTopic(String path);
+    Topic createFileTopic(String path);
 
     /**
      * Creates a Folder topic for a given path.
      * If a Folder topic for that path exists already that topic is returned.
      */
-    public Topic createFolderTopic(String path);
+    Topic createFolderTopic(String path);
+
+    // ---
+
+    void openFile(long fileTopicId);
 }

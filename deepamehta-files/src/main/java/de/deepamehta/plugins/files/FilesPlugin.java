@@ -15,6 +15,7 @@ import de.deepamehta.core.util.JavaUtils;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
@@ -31,6 +32,7 @@ import java.util.logging.Logger;
 
 
 @Path("/")
+@Produces("application/json")
 public class FilesPlugin extends Plugin implements FilesService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -41,46 +43,72 @@ public class FilesPlugin extends Plugin implements FilesService {
 
 
 
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
+    // **********************
+    // *** Plugin Service ***
+    // **********************
 
 
 
-    // ### TODO: replace commands by resource methods
+    @POST
+    @Path("/file/{path}")
     @Override
-    public CommandResult executeCommandHook(String command, CommandParams params, ClientContext clientContext) {
-        if (command.equals("deepamehta-files.open-file")) {
-            long fileTopicId = params.getInt("topic_id");    // topic_id deserializes as Integer (not Long)
-            openFile(fileTopicId);
-            return new CommandResult("message", "OK");
-        } else if (command.equals("deepamehta-files.create-file-topic")) {
-            String path = params.getString("path");
-            try {
-                return new CommandResult(createFileTopic(path).toJSON());
-            } catch (Throwable e) {
-                throw new RuntimeException("Error while creating file topic for \"" + path + "\"", e);
+    public Topic createFileTopic(@PathParam("path") String path) {
+        try {
+            Topic fileTopic = getFileTopic(path);
+            if (fileTopic != null) {
+                return fileTopic;
             }
-        } else if (command.equals("deepamehta-files.create-folder-topic")) {
-            String path = (String) params.getString("path");
-            try {
-                return new CommandResult(createFolderTopic(path).toJSON());
-            } catch (Throwable e) {
-                throw new RuntimeException("Error while creating folder topic for \"" + path + "\"", e);
+            //
+            File file = new File(path);
+            String fileName = file.getName();
+            String fileType = JavaUtils.getFileType(fileName);
+            long fileSize = file.length();
+            //
+            CompositeValue comp = new CompositeValue();
+            comp.put("dm4.files.file_name", fileName);
+            comp.put("dm4.files.path", path);
+            if (fileType != null) {
+                comp.put("dm4.files.media_type", fileType);
             }
+            comp.put("dm4.files.size", fileSize);
+            //
+            String content = renderFileContent(file, fileType, fileSize);
+            if (content != null) {
+                comp.put("dm4.files.file_content", content);
+            }
+            //
+            return dms.createTopic(new TopicModel("dm4.files.file", comp), null);       // clientContext=null
+        } catch (Throwable e) {
+            throw new RuntimeException("Creating file topic for path \"" + path + "\" failed", e);
         }
-        return null;
     }
 
+    @POST
+    @Path("/folder/{path}")
+    @Override
+    public Topic createFolderTopic(@PathParam("path") String path) {
+        try {
+            Topic folderTopic = getFolderTopic(path);
+            if (folderTopic != null) {
+                return folderTopic;
+            }
+            //
+            CompositeValue comp = new CompositeValue();
+            comp.put("dm4.files.folder_name", new File(path).getName());
+            comp.put("dm4.files.path", path);
+            //
+            return dms.createTopic(new TopicModel("dm4.files.folder", comp), null);     // clientContext=null
+        } catch (Throwable e) {
+            throw new RuntimeException("Creating folder topic for path \"" + path + "\" failed", e);
+        }
+    }
 
+    // ---
 
-    // ***********************
-    // *** Command Handler ***
-    // ***********************
-
-
-
-    public void openFile(long fileTopicId) {
+    @GET
+    @Path("/{id}")
+    @Override
+    public void openFile(@PathParam("id") long fileTopicId) {
         String path = null;
         try {
             Topic fileTopic = dms.getTopic(fileTopicId, false, null);    // fetchComposite=false, clientContext=null
@@ -88,58 +116,8 @@ public class FilesPlugin extends Plugin implements FilesService {
             logger.info("### Opening file \"" + path + "\"");
             Desktop.getDesktop().open(new File(path));
         } catch (Throwable e) {
-            throw new RuntimeException("Error while opening file \"" + path + "\"", e);
+            throw new RuntimeException("Opening file \"" + path + "\" failed", e);
         }
-    }
-
-
-
-    // **********************
-    // *** Plugin Service ***
-    // **********************
-
-
-
-    @Override
-    public Topic createFileTopic(String path) {
-        Topic fileTopic = getFileTopic(path);
-        if (fileTopic != null) {
-            return fileTopic;
-        }
-        //
-        File file = new File(path);
-        String fileName = file.getName();
-        String fileType = JavaUtils.getFileType(fileName);
-        long fileSize = file.length();
-        //
-        CompositeValue comp = new CompositeValue();
-        comp.put("dm4.files.file_name", fileName);
-        comp.put("dm4.files.path", path);
-        if (fileType != null) {
-            comp.put("dm4.files.media_type", fileType);
-        }
-        comp.put("dm4.files.size", fileSize);
-        //
-        String content = renderFileContent(file, fileType, fileSize);
-        if (content != null) {
-            comp.put("dm4.files.file_content", content);
-        }
-        //
-        return dms.createTopic(new TopicModel("dm4.files.file", comp), null);           // clientContext=null
-    }
-
-    @Override
-    public Topic createFolderTopic(String path) {
-        Topic folderTopic = getFolderTopic(path);
-        if (folderTopic != null) {
-            return folderTopic;
-        }
-        //
-        CompositeValue comp = new CompositeValue();
-        comp.put("dm4.files.folder_name", new File(path).getName());
-        comp.put("dm4.files.path", path);
-        //
-        return dms.createTopic(new TopicModel("dm4.files.folder", comp), null);         // clientContext=null
     }
 
 
