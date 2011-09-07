@@ -282,15 +282,16 @@ var dm4c = new function() {
      * Shows a topic on the canvas, and refreshes the page panel according to the specified action.
      * Triggers the "pre_show_topic" and "post_show_topic" hooks.
      *
-     * @param   topic       Topic to add (a Topic object).
-     * @param   action      Optional: action to perform, 3 possible values:
-     *                      "none" - do not select the topic (page panel doesn't change) -- the default.
-     *                      "show" - select the topic and show its info in the page panel.
-     *                      "edit" - select the topic and show its form in the page panel.
-     * @param   x, y        Optional: the coordinates for placing the topic on the canvas.
-     *                      If not specified, placement is up to the canvas.
+     * @param   topic           Topic to add (a Topic object).
+     * @param   action          Optional: action to perform, 3 possible values:
+     *                              "none" - do not select the topic (page panel doesn't change) -- the default.
+     *                              "show" - select the topic and show its info in the page panel.
+     *                              "edit" - select the topic and show its form in the page panel.
+     * @param   coordinates     Optional: the coordinates for placing the topic on the canvas (an object with
+     *                          "x" and "y" properties). If not specified, placement is up to the canvas.
+     * @param   do_center       Optional: if evaluates to true the topic is centered on the canvas.
      */
-    this.show_topic = function(topic, action, coordinates, scroll_to_center) {
+    this.show_topic = function(topic, action, coordinates, do_center) {
         action = action || "none"   // set default
         if (coordinates) {
             topic.x = coordinates.x
@@ -307,7 +308,7 @@ var dm4c = new function() {
         if (do_select) {
             dm4c.canvas.set_highlight_object(topic.id, true)    // refresh_canvas=true
         }
-        if (scroll_to_center) {
+        if (do_center) {
             dm4c.canvas.scroll_topic_to_center(topic.id)
         }
         dm4c.trigger_plugin_hook("post_show_topic", topic)      // trigger hook

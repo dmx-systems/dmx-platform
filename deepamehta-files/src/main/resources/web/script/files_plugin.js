@@ -118,10 +118,11 @@ function files_plugin() {
      *
      * @param   file        A File object (with "name", "path", "type", and "size" properties).
      * @param   do_select   Optional: if evaluates to true the File topic is selected on the canvas.
+     * @param   do_center   Optional: if evaluates to true the File topic is centered on the canvas.
      */
-    this.create_file_topic = function(file, do_select) {
+    this.create_file_topic = function(file, do_select, do_center) {
         var file_topic = dm4c.restc.execute_command("deepamehta-files.create-file-topic", {path: file.path})
-        dm4c.show_topic(new Topic(file_topic), do_select ? "show" : "none", undefined, true)
+        dm4c.show_topic(new Topic(file_topic), do_select ? "show" : "none", undefined, do_center)
     }
 
     /**
@@ -129,10 +130,11 @@ function files_plugin() {
      *
      * @param   dir         A Directory object (with "name", "path", and "items" properties).
      * @param   do_select   Optional: if evaluates to true the Folder topic is selected on the canvas.
+     * @param   do_center   Optional: if evaluates to true the File topic is centered on the canvas.
      */
-    this.create_folder_topic = function(dir, do_select) {
+    this.create_folder_topic = function(dir, do_select, do_center) {
         var folder_topic = dm4c.restc.execute_command("deepamehta-files.create-folder-topic", {path: dir.path})
-        dm4c.show_topic(new Topic(folder_topic), do_select ? "show" : "none", undefined, true)
+        dm4c.show_topic(new Topic(folder_topic), do_select ? "show" : "none", undefined, do_center)
     }
 
     /**

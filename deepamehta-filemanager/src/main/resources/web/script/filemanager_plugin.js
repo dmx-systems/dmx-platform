@@ -13,7 +13,7 @@ function filemanager_plugin() {
         type_menu.add_item({
             label: "New File Browser",
             handler: function() {
-                dm4c.get_plugin("files_plugin").create_folder_topic({path: "/"}, true)
+                dm4c.get_plugin("files_plugin").create_folder_topic({path: "/"}, true, true)
             }
         })
     }
