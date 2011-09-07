@@ -1,6 +1,6 @@
-package de.deepamehta.plugins.files.provider;
+package de.deepamehta.plugins.proxy.provider;
 
-import de.deepamehta.plugins.files.model.Resource;
+import de.deepamehta.plugins.proxy.model.Resource;
 
 import org.apache.commons.io.IOUtils;
 

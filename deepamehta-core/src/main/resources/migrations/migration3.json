@@ -1,9 +1,0 @@
-{
-    topics: [
-        {
-            value:    "Default",
-            uri:      "dm4.core.default",
-            type_uri: "dm4.core.role_type"
-        }
-    ]
-}

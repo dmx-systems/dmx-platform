@@ -130,7 +130,7 @@ function files_plugin() {
      *
      * @param   dir         A Directory object (with "name", "path", and "items" properties).
      * @param   do_select   Optional: if evaluates to true the Folder topic is selected on the canvas.
-     * @param   do_center   Optional: if evaluates to true the File topic is centered on the canvas.
+     * @param   do_center   Optional: if evaluates to true the Folder topic is centered on the canvas.
      */
     this.create_folder_topic = function(dir, do_select, do_center) {
         var folder_topic = dm4c.restc.execute_command("deepamehta-files.create-folder-topic", {path: dir.path})

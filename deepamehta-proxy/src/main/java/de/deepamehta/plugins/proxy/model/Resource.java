@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.files.model;
+package de.deepamehta.plugins.proxy.model;
 
 import java.net.URL;
 

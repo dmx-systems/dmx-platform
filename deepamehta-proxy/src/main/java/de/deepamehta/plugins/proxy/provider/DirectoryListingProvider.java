@@ -1,6 +1,6 @@
-package de.deepamehta.plugins.files.provider;
+package de.deepamehta.plugins.proxy.provider;
 
-import de.deepamehta.plugins.files.model.DirectoryListing;
+import de.deepamehta.plugins.proxy.model.DirectoryListing;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

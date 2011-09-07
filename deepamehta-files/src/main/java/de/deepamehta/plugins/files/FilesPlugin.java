@@ -1,8 +1,5 @@
 package de.deepamehta.plugins.files;
 
-import de.deepamehta.plugins.files.model.DirectoryListing;
-import de.deepamehta.plugins.files.model.Resource;
-import de.deepamehta.plugins.files.model.ResourceInfo;
 import de.deepamehta.plugins.files.service.FilesService;
 
 import de.deepamehta.core.Topic;
@@ -24,8 +21,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 
-import javax.servlet.http.HttpServletRequest;
-
 import java.awt.Desktop;
 import java.io.File;
 import java.net.URL;
@@ -40,9 +35,6 @@ public class FilesPlugin extends Plugin implements FilesService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    @Context
-    private HttpServletRequest request;
-
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -55,6 +47,7 @@ public class FilesPlugin extends Plugin implements FilesService {
 
 
 
+    // ### TODO: replace commands by resource methods
     @Override
     public CommandResult executeCommandHook(String command, CommandParams params, ClientContext clientContext) {
         if (command.equals("deepamehta-files.open-file")) {
@@ -149,38 +142,6 @@ public class FilesPlugin extends Plugin implements FilesService {
         return dms.createTopic(new TopicModel("dm4.files.folder", comp), null);         // clientContext=null
     }
 
-    // ---
-
-    @GET
-    @Path("/{uri:.+}")
-    public Resource getResource(@PathParam("uri") URL uri, @QueryParam("type") String mediaType,
-                                                           @QueryParam("size") long size) {
-        logger.info("Retrieving resource " + uri + " (mediaType=\"" + mediaType + "\", size=" + size + ")");
-        if (isRequestAllowed(request)) {
-            if (uri.getProtocol().equals("file")) {
-                File file = new File(uri.getPath());
-                if (file.isDirectory()) {
-                    return new Resource(new DirectoryListing(file));
-                }
-            }
-            return new Resource(uri, mediaType, size);
-        } else {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
-    }
-
-    @GET
-    @Path("/{uri:.+}/info")
-    @Produces("application/json")
-    public ResourceInfo getResourceInfo(@PathParam("uri") URL uri) {
-        logger.info("Requesting resource info for " + uri);
-        if (isRequestAllowed(request)) {
-            return new ResourceInfo(uri);
-        } else {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
-    }
-
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -236,16 +197,5 @@ public class FilesPlugin extends Plugin implements FilesService {
 
     private String localResourceURI(String path, String type, long size) {
         return "/proxy/file:" + JavaUtils.encodeURIComponent(path) + "?type=" + type + "&size=" + size;
-    }
-
-    // ---
-
-    private boolean isRequestAllowed(HttpServletRequest request) {
-        String localAddr = request.getLocalAddr();
-        String remoteAddr = request.getRemoteAddr();
-        boolean allowed = localAddr.equals(remoteAddr);
-        logger.info(request.getRequestURL() + "\nlocal address: " + localAddr + ", remote address: " + remoteAddr +
-            " => " + (allowed ? "ALLOWED" : "FORBIDDEN"));
-        return allowed;
     }
 }

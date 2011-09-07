@@ -1,6 +1,5 @@
 function FileContentRenderer(topic, field) {
 
-
     this.render_field = function() {
         // field label
         dm4c.render.field_label(field)

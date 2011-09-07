@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.files.model;
+package de.deepamehta.plugins.proxy.model;
 
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONException;

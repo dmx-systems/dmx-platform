@@ -50,6 +50,7 @@
                         ${project.basedir}/deepamehta-topicmaps/target,
                         ${project.basedir}/deepamehta-files/target,
                         ${project.basedir}/deepamehta-filemanager/target,
+                        ${project.basedir}/deepamehta-proxy/target,
                         ${project.basedir}/deepamehta-help/target
                     ]]>
                     <!-- not yet adapted to DeepaMehta 4.0 resp. obsolete -->
@@ -114,6 +115,7 @@
                 <module>deepamehta-topicmaps</module>
                 <module>deepamehta-files</module>
                 <module>deepamehta-filemanager</module>
+                <module>deepamehta-proxy</module>
                 <module>deepamehta-help</module>
                 <!-- POM projects -->
                 <module>deepamehta-parent</module>

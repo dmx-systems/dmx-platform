@@ -1,6 +1,6 @@
-package de.deepamehta.plugins.files.provider;
+package de.deepamehta.plugins.proxy.provider;
 
-import de.deepamehta.plugins.files.model.ResourceInfo;
+import de.deepamehta.plugins.proxy.model.ResourceInfo;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
