@@ -25,7 +25,7 @@ function FileContentRenderer(topic, field) {
                 return "<pre>" + text + "</pre>"
             } else if (js.begins_with(media_type, "image/")) {
                 return "<img src=\"" + local_resource_URI() + "\"></img>"
-            } else if (media_type.equals("application/pdf")) {
+            } else if (media_type == "application/pdf") {
                 return "<embed src=\"" + local_resource_URI() +
                     "\" width=\"100%\" height=\"100%\"></embed>"
             } else if (js.begins_with(media_type, "audio/")) {
