@@ -1,15 +1,15 @@
 function FileContentRenderer(topic, field) {
 
-    this.render_field = function() {
+    this.render_field = function(field_value_div) {
         // field label
         dm4c.render.field_label(field)
         // field value
-        return render_content()
+        return render_content(field_value_div)
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function render_content() {
+    function render_content(field_value_div) {
         try {
             var path       = topic.composite["dm4.files.path"]
             var size       = topic.composite["dm4.files.size"]
@@ -37,7 +37,8 @@ function FileContentRenderer(topic, field) {
             }
             throw "media type \"" + media_type + "\" is not supported"
         } catch (e) {
-            return $("<div>").addClass("ui-state-error").text("FileContentRendererError: " + e)
+            field_value_div.addClass("ui-state-error")
+            return "FileContentRendererError: " + e
         }
 
         function local_resource_URI() {

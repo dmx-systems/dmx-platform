@@ -129,7 +129,7 @@ body {
 
 .topic-list > tbody > tr > td {
     padding: 0.3em 0;
-    vertical-align: baseline;
+    vertical-align: top;
 }
 
 .topic-list p {
@@ -139,6 +139,8 @@ body {
 
 .topic-list .type-icon {
     padding-left: 1em;
+    padding-right: 0.75em;
+    width: 24px;
 }
 
 /*** Association Page ***/
@@ -158,13 +160,13 @@ body {
 .type-icon {
     border-style: none;
     vertical-align: middle;
-    padding-right: 1em;
 }
 
 .menu-icon {
     border-style: none;
     vertical-align: middle;
     padding-right: 12px;
+    width: 24px;
 }
 
 /*** Menus ***/

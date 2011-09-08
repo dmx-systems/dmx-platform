@@ -1,3 +1,8 @@
+.field-value > .type-icon {
+    padding-right:  1em;
+}
+
 #iconpicker-dialog .type-icon {
+    padding-right:  1em;
     padding-bottom: 1em;
 }
