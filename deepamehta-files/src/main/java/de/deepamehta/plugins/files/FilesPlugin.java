@@ -64,11 +64,6 @@ public class FilesPlugin extends Plugin implements FilesService {
             }
             comp.put("dm4.files.size", fileSize);
             //
-            String content = renderFileContent(file, fileType, fileSize);
-            if (content != null) {
-                comp.put("dm4.files.file_content", content);
-            }
-            //
             return dms.createTopic(new TopicModel("dm4.files.file", comp), null);       // clientContext=null
         } catch (Throwable e) {
             throw new RuntimeException("Creating file topic for path \"" + path + "\" failed", e);

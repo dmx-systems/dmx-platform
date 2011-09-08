@@ -65,6 +65,7 @@ public class ResourceProvider implements MessageBodyWriter<Resource> {
                 if (resource.size != 0) {
                     httpHeaders.putSingle("Content-Length", resource.size);
                 }
+                // ### httpHeaders.putSingle("Content-Disposition", "inline");
                 IOUtils.copy(resource.uri.openStream(), entityStream);
             }
         } catch (Exception e) {
