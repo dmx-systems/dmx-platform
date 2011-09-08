@@ -113,8 +113,10 @@ body {
 }
 
 .field-value pre {
-    font-size: 100%;
+    /* Relative or no font-size yields to different sizes in Safari and Firefox */
+    font-size: 16px;
     line-height: 1.3em;
+    white-space: pre-wrap;
 }
 
 .field-value label {
