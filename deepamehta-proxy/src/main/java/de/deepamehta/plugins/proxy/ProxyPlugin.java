@@ -90,11 +90,13 @@ public class ProxyPlugin extends Plugin implements ProxyService {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private boolean isRequestAllowed(HttpServletRequest request) {
-        String localAddr = request.getLocalAddr();
+        String filter = System.getProperty("dm4.proxy.net.filter");
         String remoteAddr = request.getRemoteAddr();
-        boolean allowed = localAddr.equals(remoteAddr);
-        logger.info(request.getRequestURL() + "\nlocal address: " + localAddr + ", remote address: " + remoteAddr +
-            " => " + (allowed ? "ALLOWED" : "FORBIDDEN"));
+        // apply net filter
+        boolean allowed = JavaUtils.isInRange(remoteAddr, filter);
+        //
+        logger.info(request.getRequestURL() + "\n      remote address=\"" + remoteAddr + "\", range=\"" + filter +
+            "\" => " + (allowed ? "ALLOWED" : "FORBIDDEN"));
         return allowed;
     }
 }

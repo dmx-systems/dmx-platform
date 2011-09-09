@@ -32,6 +32,8 @@ public class JavaUtils {
         return html.replaceAll("<.*?>", "");    // *? is the reluctant version of the * quantifier (which is greedy)
     }
 
+
+
     // === Files ===
 
     private static FileNameMap fileTypeMap = URLConnection.getFileNameMap();
@@ -103,6 +105,34 @@ public class JavaUtils {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("Encoding of URI component \"" + uriComp + "\" failed", e);
         }
+    }
+
+
+
+    // === Networking ===
+
+    /**
+     * @param   inetAddress     e.g. "172.68.8.12"
+     * @param   range           e.g. "172.68.8.0/24"
+     */
+    public static boolean isInRange(String inetAddress, String range) {
+        String[] r = range.split("/");
+        int networkAddr = inetAddress(r[0]);
+        int networkMask = networkMask(Integer.parseInt(r[1]));
+        //
+        return ((inetAddress(inetAddress) ^ networkAddr) & networkMask) == 0;
+    }
+
+    public static int inetAddress(String inetAddress) {
+        String[] a = inetAddress.split("\\.");
+        return (Integer.parseInt(a[0]) << 24) +
+               (Integer.parseInt(a[1]) << 16) +
+               (Integer.parseInt(a[2]) << 8) +
+               Integer.parseInt(a[3]);
+    }
+
+    public static int networkMask(int maskNr) {
+        return -1 << 32 - maskNr;
     }
 
 
