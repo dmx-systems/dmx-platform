@@ -45,6 +45,10 @@ public class JavaUtils {
         String extension = getExtension(fileName);
         if (extension.equals("mp3")) {
             return "audio/mpeg";
+        } else if (extension.equals("flv")) {
+            return "video/x-flv";
+        } else if (extension.equals("svg")) {
+            return "image/svg+xml";
         }
         //
         return null;

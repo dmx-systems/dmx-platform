@@ -162,39 +162,4 @@ public class FilesPlugin extends Plugin implements FilesService {
     private boolean childAssociationExists(long folderTopicId, long childTopicId) {
         return dms.getAssociations(folderTopicId, childTopicId, "dm4.core.aggregation").size() > 0;
     }
-
-    // ---
-
-    // ### FIXME: to be dropped
-    private String renderFileContent(File file, String fileType, long fileSize) {
-        // Note: for unknown file types fileType is null
-        if (fileType == null) {
-            return null;
-        }
-        // TODO: let plugins render the file content
-        String content = null;
-        String path = file.getPath();
-        if (fileType.equals("text/plain")) {
-            content = "<pre>" + JavaUtils.readTextFile(file) + "</pre>";
-        } else if (fileType.startsWith("image/")) {
-            content = "<img src=\"" + localResourceURI(path, fileType, fileSize) + "\"></img>";
-        } else if (fileType.equals("application/pdf")) {
-            content = "<embed src=\"" + localResourceURI(path, fileType, fileSize) +
-                "\" width=\"100%\" height=\"100%\"></embed>";
-        } else if (fileType.startsWith("audio/")) {
-            content = "<embed src=\"" + localResourceURI(path, fileType, fileSize) +
-                "\" width=\"95%\" height=\"80\"></embed>";
-            // var content = "<audio controls=\"\" src=\"" + localResourceURI(path, fileType, fileSize) +
-            // "\"></audio>"
-        } else if (fileType.startsWith("video/")) {
-            content = "<embed src=\"" + localResourceURI(path, fileType, fileSize) + "\"></embed>";
-            // var content = "<video controls=\"\" src=\"" + localResourceURI(path, fileType, fileSize) +
-            // "\"></video>"
-        }
-        return content;
-    }
-
-    private String localResourceURI(String path, String type, long size) {
-        return "/proxy/file:" + JavaUtils.encodeURIComponent(path) + "?type=" + type + "&size=" + size;
-    }
 }

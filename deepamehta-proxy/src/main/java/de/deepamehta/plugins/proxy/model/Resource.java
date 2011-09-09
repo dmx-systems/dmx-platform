@@ -34,4 +34,8 @@ public class Resource {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    @Override
+    public String toString() {
+        return "resource (uri=\"" + uri + "\", mediaType=\"" + mediaType + "\", size=" + size + ", dir=" + dir + ")";
+    }
 }

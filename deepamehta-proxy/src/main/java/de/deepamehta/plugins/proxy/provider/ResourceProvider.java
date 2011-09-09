@@ -69,6 +69,7 @@ public class ResourceProvider implements MessageBodyWriter<Resource> {
                 IOUtils.copy(resource.uri.openStream(), entityStream);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new IOException("Writing message body failed (" + resource + ")", e);
         }
     }

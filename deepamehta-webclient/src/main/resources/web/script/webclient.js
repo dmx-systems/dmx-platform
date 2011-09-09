@@ -988,7 +988,7 @@ var dm4c = new function() {
         // create page panel
         dm4c.page_panel = new PagePanel()
         $("#split-panel > tbody > tr > td").eq(1).append(dm4c.page_panel.dom)
-        detail_panel_width = $("#page-content").width()
+        detail_panel_width = $("#page-content").width()     // ### FIXME: make global variable a PagePanel property!
         if (dm4c.LOG_GUI) dm4c.log("Mesuring page panel width: " + detail_panel_width)
         // create upload dialog
         dm4c.upload_dialog = new UploadDialog()
