@@ -14,6 +14,11 @@ import java.util.List;
 
 public class DirectoryListing {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.proxy.files.path");
+    private static final int FILE_REPOSITORY_PATH_LENGTH = FILE_REPOSITORY_PATH.length();
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private FileItem dirInfo;
@@ -66,7 +71,7 @@ public class DirectoryListing {
         FileItem(String name, String path) {
             this.kind = "directory";
             this.name = name;
-            this.path = path;
+            this.path = truncate(path);
         }
 
         /**
@@ -75,9 +80,20 @@ public class DirectoryListing {
         FileItem(String name, String path, long size, String type) {
             this.kind = "file";
             this.name = name;
-            this.path = path;
+            this.path = truncate(path);
             this.size = size;
             this.type = type;
+        }
+
+        // ---
+
+        private String truncate(String path) {
+            // error check
+            if (!path.startsWith(FILE_REPOSITORY_PATH)) {
+                throw new RuntimeException("Path \"" + path + "\" is not a file repository path");
+            }
+            //
+            return path.substring(FILE_REPOSITORY_PATH_LENGTH);
         }
 
         // ---

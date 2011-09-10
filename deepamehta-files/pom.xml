@@ -23,6 +23,11 @@
             <artifactId>deepamehta-webservice</artifactId>
             <version>4.0.4-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-proxy</artifactId>
+            <version>4.0.4-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

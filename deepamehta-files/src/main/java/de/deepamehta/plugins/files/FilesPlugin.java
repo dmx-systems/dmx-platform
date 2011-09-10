@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.files;
 
 import de.deepamehta.plugins.files.service.FilesService;
+import de.deepamehta.plugins.proxy.service.ProxyService;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
@@ -9,6 +10,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.GET;
@@ -29,9 +31,35 @@ public class FilesPlugin extends Plugin implements FilesService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private ProxyService proxyService;
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+
+
+    // **************************************************
+    // *** Core Hooks (called from DeepaMehta 4 Core) ***
+    // **************************************************
+
+
+
+    @Override
+    public void serviceArrived(PluginService service) {
+        logger.info("########## Service arrived: " + service);
+        if (service instanceof ProxyService) {
+            proxyService = (ProxyService) service;
+        }
+    }
+
+    @Override
+    public void serviceGone(PluginService service) {
+        logger.info("########## Service gone: " + service);
+        if (service == proxyService) {
+            proxyService = null;
+        }
+    }
 
 
 
@@ -51,7 +79,7 @@ public class FilesPlugin extends Plugin implements FilesService {
                 return fileTopic;
             }
             //
-            File file = new File(path);
+            File file = proxyService.locateFile(path);
             String fileName = file.getName();
             String fileType = JavaUtils.getFileType(fileName);
             long fileSize = file.length();
@@ -116,14 +144,15 @@ public class FilesPlugin extends Plugin implements FilesService {
     @Path("/{id}")
     @Override
     public void openFile(@PathParam("id") long fileTopicId) {
-        String path = null;
+        File file = null;
         try {
-            Topic fileTopic = dms.getTopic(fileTopicId, false, null);    // fetchComposite=false, clientContext=null
-            path = fileTopic.getChildTopicValue("dm4.files.path").toString();
-            logger.info("### Opening file \"" + path + "\"");
-            Desktop.getDesktop().open(new File(path));
+            Topic fileTopic = dms.getTopic(fileTopicId, true, null);    // fetchComposite=true, clientContext=null
+            String path = fileTopic.getCompositeValue().get("dm4.files.path").toString();
+            file = proxyService.locateFile(path);
+            logger.info("### Opening file \"" + file + "\"");
+            Desktop.getDesktop().open(file);
         } catch (Throwable e) {
-            throw new RuntimeException("Opening file \"" + path + "\" failed", e);
+            throw new RuntimeException("Opening file \"" + file + "\" failed", e);
         }
     }
 

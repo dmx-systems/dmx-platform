@@ -128,7 +128,7 @@ public class JavaUtils {
         return (Integer.parseInt(a[0]) << 24) +
                (Integer.parseInt(a[1]) << 16) +
                (Integer.parseInt(a[2]) << 8) +
-               Integer.parseInt(a[3]);
+                Integer.parseInt(a[3]);
     }
 
     public static int networkMask(int maskNr) {
