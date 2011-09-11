@@ -35,20 +35,18 @@ function FileContentRenderer(topic, field) {
                 } else if (js.begins_with(media_type, "video/")) {
                     // Note: default embed element is used
                     // var content = "<video controls=\"\" src=\"" + src + "\"></video>"
+                } else {
+                    // Note: default embed element is used
+                    // throw "media type \"" + media_type + "\" is not supported"
                 }
             }
-            return default_embed_element()
-            // throw "media type \"" + media_type + "\" is not supported"
-        } catch (e) {
-            field_value_div.addClass("ui-state-error")
-            return "FileContentRendererError: " + e
-        }
-
-        function default_embed_element() {
             return $("<embed>").attr({src: src, type: media_type, width: "100%",
                 height: 0.75 * detail_panel_width, bgcolor: "#ffffff"})
             // Note: "bgcolor" is a quicktime plugin attribute.
             // We want a white background also in Chrome (in Chrome default background is black).
+        } catch (e) {
+            field_value_div.addClass("ui-state-error")
+            return "FileContentRendererError: " + e
         }
 
         function local_resource_URI() {

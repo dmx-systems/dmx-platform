@@ -62,11 +62,11 @@ public class ProxyPlugin extends Plugin implements ProxyService {
         checkRemoteAccess(request);
         //
         if (uri.getProtocol().equals("file")) {
-            uri = fileRepositoryURL(uri.getPath());
-            File file = new File(uri.getPath());
+            File file = locateFile(uri.getPath());
             if (file.isDirectory()) {
                 return new Resource(new DirectoryListing(file));
             }
+            uri = fileRepositoryURL(file);
         }
         return new Resource(uri, mediaType, size);
     }
@@ -87,11 +87,7 @@ public class ProxyPlugin extends Plugin implements ProxyService {
 
     @Override
     public File locateFile(String relativePath) {
-        File file = new File(FILE_REPOSITORY_PATH, relativePath);
-        //
-        checkFileAccess(file);
-        //
-        return file;
+        return checkFileAccess(new File(FILE_REPOSITORY_PATH, relativePath));
     }
 
 
@@ -110,9 +106,15 @@ public class ProxyPlugin extends Plugin implements ProxyService {
         }
     }
 
-    private void checkFileAccess(File file) {
+    /**
+     * @return  The canonical file.
+     */
+    private File checkFileAccess(File file) {
         try {
-            // Note: a directory path returned by getCanonicalPath() never contains a "/" at the end.
+            // 1) Check path
+            //
+            // Note 1: we use getCanonicalPath() to fight directory traversal attacks (../../).
+            // Note 2: A directory path returned by getCanonicalPath() never contains a "/" at the end.
             // Thats why "dm4.proxy.files.path" is expected to have no "/" at the end as well.
             String path = file.getCanonicalPath();
             boolean pointsToRepository = path.startsWith(FILE_REPOSITORY_PATH);
@@ -124,6 +126,15 @@ public class ProxyPlugin extends Plugin implements ProxyService {
             if (!pointsToRepository) {
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
+            //
+            // 2) Check existence
+            //
+            if (!file.exists()) {
+                logger.info("Requested file/directory \"" + path + "\" does not exist => NOT FOUND");
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
+            //
+            return new File(path);
         } catch (IOException e) {
             throw new RuntimeException("Checking file repository access failed (file=\"" + file + "\")", e);
         }
@@ -131,9 +142,9 @@ public class ProxyPlugin extends Plugin implements ProxyService {
 
     // ---
 
-    private URL fileRepositoryURL(String relativePath) {
+    private URL fileRepositoryURL(File file) {
         try {
-            URL url = new URL("file:" + locateFile(relativePath));
+            URL url = new URL("file:" + file);
             logger.info("Mapping request to file repository URL \"" + url + "\"");
             return url;
         } catch (MalformedURLException e) {
