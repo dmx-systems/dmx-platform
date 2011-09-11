@@ -39,19 +39,29 @@ public class JavaUtils {
     private static FileNameMap fileTypeMap = URLConnection.getFileNameMap();
 
     public static String getFileType(String fileName) {
-        String fileType = fileTypeMap.getContentTypeFor(fileName);
-        if (fileType != null) {
-            return fileType;
+        String extension = getExtension(fileName);
+        if (!extension.equals("avi")) {
+            // Note: for .avi Sun's file type map returns strange media type "application/x-troff-msvideo"
+            String fileType = fileTypeMap.getContentTypeFor(fileName);
+            if (fileType != null) {
+                return fileType;
+            }
         }
         // fallback
-        String extension = getExtension(fileName);
         if (extension.equals("mp3")) {
             return "audio/mpeg";
+        } else if (extension.equals("mp4")) {
+            return "video/mp4";
+        } else if (extension.equals("avi")) {
+            return "video/avi";
+        } else if (extension.equals("wmv")) {
+            return "video/x-ms-wmv";
         } else if (extension.equals("flv")) {
             return "video/x-flv";
         } else if (extension.equals("svg")) {
             return "image/svg+xml";
         }
+        // TODO: use a system property instead a hardcoded list
         //
         return null;
     }

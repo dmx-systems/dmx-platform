@@ -33,16 +33,22 @@ function FileContentRenderer(topic, field) {
                         .css({"margin-top": "3em", "margin-bottom": "1em"})
                     // var content = "<audio controls=\"\" src=\"" + src + "\"></audio>"
                 } else if (js.begins_with(media_type, "video/")) {
-                    return $("<embed>").attr({src: src, type: media_type, width: "100%",
-                        height: 0.75 * detail_panel_width, bgcolor: "#ffffff"})
+                    // Note: default embed element is used
                     // var content = "<video controls=\"\" src=\"" + src + "\"></video>"
                 }
             }
-            return $("<embed>").attr({src: src, width: "100%", height: dm4c.canvas.canvas_height})
+            return default_embed_element()
             // throw "media type \"" + media_type + "\" is not supported"
         } catch (e) {
             field_value_div.addClass("ui-state-error")
             return "FileContentRendererError: " + e
+        }
+
+        function default_embed_element() {
+            return $("<embed>").attr({src: src, type: media_type, width: "100%",
+                height: 0.75 * detail_panel_width, bgcolor: "#ffffff"})
+            // Note: "bgcolor" is a quicktime plugin attribute.
+            // We want a white background also in Chrome (in Chrome default background is black).
         }
 
         function local_resource_URI() {
