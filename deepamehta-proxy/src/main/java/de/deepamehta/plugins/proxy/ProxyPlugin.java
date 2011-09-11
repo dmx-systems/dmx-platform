@@ -80,6 +80,9 @@ public class ProxyPlugin extends Plugin implements ProxyService {
         //
         checkRemoteAccess(request);
         //
+        if (uri.getProtocol().equals("file")) {
+            return new ResourceInfo(locateFile(uri.getPath()));
+        }
         return new ResourceInfo(uri);
     }
 
@@ -130,7 +133,7 @@ public class ProxyPlugin extends Plugin implements ProxyService {
             // 2) Check existence
             //
             if (!file.exists()) {
-                logger.info("Requested file/directory \"" + path + "\" does not exist => NOT FOUND");
+                logger.info("Requested file/directory \"" + file.getPath() + "\" does not exist => NOT FOUND");
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
             //

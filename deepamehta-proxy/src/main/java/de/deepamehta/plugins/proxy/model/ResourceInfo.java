@@ -13,23 +13,21 @@ public class ResourceInfo {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private String kind;    // "file", "directory", "remote"
-    private boolean error;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public ResourceInfo(URL url) {
-        if (url.getProtocol().equals("file")) {
-            File file = new File(url.getPath());
-            if (!file.exists()) {
-                error = true;
-            } else if (file.isDirectory()) {
-                kind = "directory";
-            } else {
-                kind = "file";
-            }
-        } else {
-            kind = "remote";
-        }
+    /**
+     * Precondition: the URL is a remote URL.
+     */
+    public ResourceInfo(URL uri) {
+        kind = "remote";
+    }
+
+    /**
+     * Precondition: the file exists.
+     */
+    public ResourceInfo(File file) {
+        kind = file.isDirectory() ? "directory" : "file";
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -37,11 +35,7 @@ public class ResourceInfo {
     public JSONObject toJSON() {
         try {
             JSONObject info = new JSONObject();
-            if (error) {
-                info.put("error", "not found");
-            } else {
-                info.put("kind", kind);
-            }
+            info.put("kind", kind);
             return info;
         } catch (JSONException e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
@@ -50,6 +44,6 @@ public class ResourceInfo {
 
     @Override
     public String toString() {
-        return "resource info (kind=\"" + kind + "\" error=" + error + ")";
+        return "resource info (kind=\"" + kind + "\")";
     }
 }
