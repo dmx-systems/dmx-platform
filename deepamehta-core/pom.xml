@@ -74,7 +74,8 @@
                             de.deepamehta.core.model,
                             de.deepamehta.core.osgi,
                             de.deepamehta.core.service,
-                            de.deepamehta.core.util
+                            de.deepamehta.core.util,
+                            org.osgi.service.log
                         </Export-Package>
                         <Bundle-Activator>
                             de.deepamehta.core.osgi.Activator
