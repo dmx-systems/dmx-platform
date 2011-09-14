@@ -101,8 +101,9 @@ public class ProxyPlugin extends Plugin implements ProxyService {
         String remoteAddr = request.getRemoteAddr();
         boolean isInRange = JavaUtils.isInRange(remoteAddr, REMOTE_ACCESS_FILTER);
         //
-        logger.info("Checking remote access to \"" + request.getRequestURL() + "\"\n      remote address=\"" +
-            remoteAddr + "\", range=\"" + REMOTE_ACCESS_FILTER + "\" => " + (isInRange ? "ALLOWED" : "FORBIDDEN"));
+        logger.info("Checking remote access to \"" + request.getRequestURL() + "\"\n      dm4.proxy.net.filter=\"" +
+            REMOTE_ACCESS_FILTER + "\", remote address=\"" + remoteAddr + "\" => " +
+            (isInRange ? "ALLOWED" : "FORBIDDEN"));
         //
         if (!isInRange) {
             throw new WebApplicationException(Status.FORBIDDEN);

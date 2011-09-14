@@ -7,7 +7,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
+import java.math.BigInteger;
+
 import java.net.FileNameMap;
+import java.net.InetAddress;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 
@@ -30,6 +35,14 @@ public class JavaUtils {
 
     public static String stripHTML(String html) {
         return html.replaceAll("<.*?>", "");    // *? is the reluctant version of the * quantifier (which is greedy)
+    }
+
+    public static String times(String str, int times) {
+        StringBuilder sb = new StringBuilder(times * str.length());
+        for (int i = 0; i < times; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
     }
 
 
@@ -122,27 +135,53 @@ public class JavaUtils {
     // === Networking ===
 
     /**
-     * @param   inetAddress     e.g. "172.68.8.12"
-     * @param   range           e.g. "172.68.8.0/24"
+     * @param   inetAddress     IPv4 or IPv6 address or a machine name, e.g. "172.68.8.12"
+     * @param   range           IPv4 or IPv6 address range in CIDR notation, e.g. "172.68.8.0/24"
      */
     public static boolean isInRange(String inetAddress, String range) {
-        String[] r = range.split("/");
-        int networkAddr = inetAddress(r[0]);
-        int networkMask = networkMask(Integer.parseInt(r[1]));
-        //
-        return ((inetAddress(inetAddress) ^ networkAddr) & networkMask) == 0;
+        try {
+            String[] r = range.split("/");
+            BigInteger networkAddr = inetAddress(r[0]);
+            int maskNumber = Integer.parseInt(r[1]);
+            InetAddress addr = InetAddress.getByName(inetAddress);
+            BigInteger networkMask = networkMask(addr, maskNumber);
+            //
+            return inetAddress(addr).xor(networkAddr).and(networkMask).equals(BigInteger.ZERO);
+        } catch (Exception e) {
+            throw new RuntimeException("Checking IP range failed (inetAddress=\"" + inetAddress +
+                "\", range=\"" + range + "\"", e);
+        }
     }
 
-    public static int inetAddress(String inetAddress) {
-        String[] a = inetAddress.split("\\.");
-        return (Integer.parseInt(a[0]) << 24) +
-               (Integer.parseInt(a[1]) << 16) +
-               (Integer.parseInt(a[2]) << 8) +
-                Integer.parseInt(a[3]);
+    // ---
+
+    public static BigInteger inetAddress(String inetAddress) {
+        try {
+            return inetAddress(InetAddress.getByName(inetAddress));
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing inet address \"" + inetAddress + "\" failed", e);
+        }
     }
 
-    public static int networkMask(int maskNr) {
-        return -1 << 32 - maskNr;
+    public static BigInteger inetAddress(InetAddress inetAddress) {
+        return new BigInteger(1, inetAddress.getAddress());     // signum=1 (positive)
+    }
+
+    // ---
+
+    public static BigInteger networkMask(InetAddress addr, int maskNumber) {
+        if (addr instanceof Inet4Address) {
+            return networkMask(maskNumber, 32);
+        } else if (addr instanceof Inet6Address) {
+            return networkMask(maskNumber, 128);
+        } else {
+            throw new RuntimeException("Unexpected InetAddress object: " + addr.getClass().getName());
+        }
+    }
+
+    public static BigInteger networkMask(int maskNumber, int size) {
+        String networkMask = times("1", maskNumber) + times("0", size - maskNumber);
+        return new BigInteger(networkMask, 2);      // radix=2 (binary)
     }
 
 
