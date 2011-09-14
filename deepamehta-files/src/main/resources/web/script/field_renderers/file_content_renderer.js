@@ -28,9 +28,8 @@ function FileContentRenderer(topic, field) {
                     // return $("<iframe>").attr({src: src, width: "100%",
                     //     height: dm4c.canvas.canvas_height, frameborder: 0})
                 } else if (js.begins_with(media_type, "audio/")) {
-                    // Note: 16px is the height of the Quicktime control. ### FIXME for other players
-                    return $("<embed>").attr({src: src, width: "95%", height: 16, bgcolor: "#ffffff"})
-                        .css({"margin-top": "3em", "margin-bottom": "1em"})
+                    return $("<embed>").attr({src: src, width: "95%", height: 64, bgcolor: "#ffffff"})
+                        .css("margin-top", "2em")
                     // var content = "<audio controls=\"\" src=\"" + src + "\"></audio>"
                 } else if (js.begins_with(media_type, "video/")) {
                     // Note: default embed element is used
