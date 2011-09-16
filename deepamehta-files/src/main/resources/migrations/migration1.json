@@ -75,7 +75,8 @@
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm4.webclient.icon: "/de.deepamehta.files/images/sheet.png"
+                        dm4.webclient.icon: "/de.deepamehta.files/images/sheet.png",
+                        dm4.webclient.editable: false
                     }
                 }
             ]
@@ -128,7 +129,8 @@
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm4.webclient.icon: "/de.deepamehta.files/images/folder.png"
+                        dm4.webclient.icon: "/de.deepamehta.files/images/folder.png",
+                        dm4.webclient.editable: false
                     }
                 }
             ]

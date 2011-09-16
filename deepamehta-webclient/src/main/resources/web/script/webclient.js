@@ -2,7 +2,8 @@ var dm4c = new function() {
 
     var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
-    this.GENERIC_TOPIC_ICON_SRC = "images/ball-gray.png"
+    var DEFAULT_TOPIC_ICON = "images/ball-gray.png"
+    var DEFAULT_FIELD_ROWS = 1
 
     var ENABLE_LOGGING = false
     var LOG_PLUGIN_LOADING = false
@@ -672,8 +673,10 @@ var dm4c = new function() {
         if (topic_type) {
             return topic_type.get_icon_src()
         }
-        return this.GENERIC_TOPIC_ICON_SRC
+        return DEFAULT_TOPIC_ICON
     }
+
+    // === View Configuration ===
 
     /**
      * Read out a view configuration setting.
@@ -683,10 +686,12 @@ var dm4c = new function() {
      * @param   configurable    A topic type, an association type, or an association definition.
      *                          Must not be null/undefined.
      * @param   setting         Last component of the setting URI, e.g. "icon".
+     * @paran   no_defaults     Optional: if evaluates to true no default values are looked up.
+     *                          Instead undefined is returned if no setting was made.
      *
-     * @return  The setting value, or <code>undefined</code> if there is no such setting
+     * @return  The setting value, or <code>undefined</code> if no setting was made and no_defaults evaluates to true.
      */
-    this.get_view_config = function(configurable, setting) {
+    this.get_view_config = function(configurable, setting, no_defaults) {
         // error check
         if (!configurable.view_config_topics) {
             throw "InvalidConfigurable: no \"view_config_topics\" property found in " + JSON.stringify(configurable)
@@ -694,7 +699,54 @@ var dm4c = new function() {
         // every configurable has an view_config_topics object, however it might be empty
         var view_config = configurable.view_config_topics["dm4.webclient.view_config"]
         if (view_config) {
-            return view_config.composite["dm4.webclient." + setting]
+            var value = view_config.composite["dm4.webclient." + setting]
+        }
+        // lookup default
+        if (value == undefined && !no_defaults) {
+            return dm4c.get_view_config_default(configurable, setting)
+        }
+        //
+        return value
+    }
+
+    this.get_view_config_default = function(configurable, setting) {
+        switch (setting) {
+        case "icon":
+            return DEFAULT_TOPIC_ICON;
+        case "color":
+            return dm4c.canvas.DEFAULT_ASSOC_COLOR;
+        case "add_to_create_menu":
+            return false;
+        case "is_searchable_unit":
+            return false;
+        case "editable":
+            return true
+        case "viewable":
+            return true
+        case "js_page_renderer_class":
+            return configurable.default_page_renderer_class()
+        case "js_field_renderer_class":
+            return default_field_renderer_class()
+        case "rows":
+            return DEFAULT_FIELD_ROWS
+        default:
+            alert("get_view_config_default: setting \"" + setting + "\" not implemented")
+        }
+
+        function default_field_renderer_class() {
+            switch (configurable.data_type_uri) {
+            case "dm4.core.text":
+                return "TextFieldRenderer"
+            case "dm4.core.html":
+                return "HTMLFieldRenderer"
+            case "dm4.core.number":
+                return "NumberFieldRenderer"
+            case "dm4.core.boolean":
+                return "BooleanFieldRenderer"
+            default:
+                alert("get_view_config_default: data type \"" + configurable.data_type_uri +
+                    "\" has no default field renderer class")
+            }
         }
     }
 
@@ -834,7 +886,7 @@ var dm4c = new function() {
      * @return  The icon (JavaScript Image object)
      */
     this.get_type_icon = function(topic_type_uri) {
-        return dm4c.type_cache.get_icon(topic_type_uri) || generic_topic_icon
+        return dm4c.type_cache.get_icon(topic_type_uri) || default_topic_icon
     }
 
     /**
@@ -976,7 +1028,7 @@ var dm4c = new function() {
     register_plugin("script/internal_plugins/fulltext_plugin.js")
     register_plugin("script/internal_plugins/tinymce_plugin.js")
 
-    var generic_topic_icon = this.create_image(this.GENERIC_TOPIC_ICON_SRC)
+    var default_topic_icon = this.create_image(DEFAULT_TOPIC_ICON)
 
     $(function() {
         //

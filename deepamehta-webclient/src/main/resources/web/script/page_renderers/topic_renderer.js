@@ -377,9 +377,6 @@ function TopicRenderer() {
  */
 TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
 
-    // preference
-    var DEFAULT_FIELD_ROWS = 1
-
     this.uri = uri
     this.value = value != null && value != undefined ? value : ""
     this.topic_type = topic_type
@@ -465,39 +462,9 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
     }
 
     function get_view_config(setting) {
-
-        var val = assoc_def && dm4c.get_view_config(assoc_def, setting) || dm4c.get_view_config(topic_type, setting)
-        return val != undefined ? val : get_default_value()
-
-        function get_default_value() {
-            switch (setting) {
-            case "editable":
-                return true
-            case "viewable":
-                return true
-            case "js_field_renderer_class":
-                return get_default_renderer_class()
-            case "rows":
-                return DEFAULT_FIELD_ROWS
-            default:
-                alert("Field.get_view_config: setting \"" + setting + "\" not implemented")
-            }
-        }
-
-        function get_default_renderer_class() {
-            switch (topic_type.data_type_uri) {
-            case "dm4.core.text":
-                return "TextFieldRenderer"
-            case "dm4.core.html":
-                return "HTMLFieldRenderer"
-            case "dm4.core.number":
-                return "NumberFieldRenderer"
-            case "dm4.core.boolean":
-                return "BooleanFieldRenderer"
-            default:
-                alert("Field.get_view_config: data type \"" + topic_type.data_type_uri +
-                    "\" has no default renderer class")
-            }
-        }
+        // the assoc def's config has precedence
+        var val = assoc_def && dm4c.get_view_config(assoc_def, setting, true) ||    // no_defaults=true
+                               dm4c.get_view_config(topic_type, setting, true)      // no_defaults=true
+        return val != undefined ? val : dm4c.get_view_config_default(topic_type, setting)
     }
 }

@@ -22,10 +22,20 @@ function TopicType(topic_type) {
     }
 
     this.get_page_renderer_class = function() {
-        return dm4c.get_view_config(this, "js_page_renderer_class") || "TopicRenderer"
+        return dm4c.get_view_config(this, "js_page_renderer_class")
+    }
+
+    // === "View Configurable" implementation ===
+
+    this.default_page_renderer_class = function() {
+        return "TopicRenderer"
     }
 
     // === Public API ===
+
+    this.is_editable = function() {
+        return dm4c.get_view_config(this, "editable")
+    }
 
     /**
      * Returns the icon source.
@@ -34,7 +44,7 @@ function TopicType(topic_type) {
      * @return  The icon source (string).
      */
     this.get_icon_src = function() {
-        return dm4c.get_view_config(this, "icon") || dm4c.GENERIC_TOPIC_ICON_SRC
+        return dm4c.get_view_config(this, "icon")
     }
 
     this.get_menu_config = function(menu_id) {

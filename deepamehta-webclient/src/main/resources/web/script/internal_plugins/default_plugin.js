@@ -49,7 +49,9 @@ function default_plugin () {
         commands.push({label: "Associate",  handler: do_associate, context: "context-menu"})
         //
         if (dm4c.has_write_permission(topic)) {
-            commands.push({label: "Edit",   handler: do_edit,    context: "detail-panel-show", ui_icon: "pencil"})
+            if (topic.get_type().is_editable()) {
+                commands.push({label: "Edit",   handler: do_edit,    context: "detail-panel-show", ui_icon: "pencil"})
+            }
             commands.push({is_separator: true,                   context: "context-menu"})
             commands.push({label: "Retype", handler: do_retype,  context: "context-menu", ui_icon: "transfer-e-w"})
             commands.push({is_separator: true,                   context: "context-menu"})
