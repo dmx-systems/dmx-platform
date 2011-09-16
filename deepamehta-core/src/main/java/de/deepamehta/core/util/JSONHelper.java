@@ -1,6 +1,7 @@
 package de.deepamehta.core.util;
 
 import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
@@ -37,12 +38,12 @@ public class JSONHelper {
 
 
 
-    public static Set<Topic> toTopicSet(Set<RelatedTopic> relTopics) {
+    public static ResultSet<Topic> toTopicSet(ResultSet<RelatedTopic> relTopics) {
         Set<Topic> topics = new LinkedHashSet();
         for (Topic topic : relTopics) {
             topics.add(topic);
         }
-        return topics;
+        return new ResultSet(relTopics.getTotalCount(), topics);
     }
 
 

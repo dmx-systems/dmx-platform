@@ -3,6 +3,7 @@ package de.deepamehta.plugins.topicmaps.model;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.DeepaMehtaService;
 
@@ -154,9 +155,9 @@ public class Topicmap {
 
     private void loadTopics(long topicmapId) {
         Topic topicmapTopic = dms.getTopic(topicmapId, false, null);
-        Set<RelatedTopic> mapTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
-            null, "dm4.topicmaps.topicmap_topic", null, false, true);   // othersTopicTypeUri=null
-                                                                        // fetchComposite=false
+        ResultSet<RelatedTopic> mapTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
+            null, "dm4.topicmaps.topicmap_topic", null, false, true, 0);    // othersTopicTypeUri=null
+                                                                            // fetchComposite=false
         for (RelatedTopic mapTopic : mapTopics) {
             Association refAssoc = mapTopic.getAssociation();
             addTopic(new TopicmapTopic(mapTopic.getModel(), refAssoc.getCompositeValue(), refAssoc.getId()));

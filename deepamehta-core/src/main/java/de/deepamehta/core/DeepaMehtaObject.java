@@ -57,7 +57,7 @@ public interface DeepaMehtaObject extends JSONEnabled {
 
     // --- Topic Retrieval ---
 
-    Set<RelatedTopic> getRelatedTopics(String assocTypeUri);
+    ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize);
 
     /**
      * @param   assocTypeUri        may be null
@@ -74,8 +74,8 @@ public interface DeepaMehtaObject extends JSONEnabled {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
+    ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                  String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite, int maxResultSize);
 
     /**
      * @param   assocTypeUris       may be null
@@ -83,8 +83,8 @@ public interface DeepaMehtaObject extends JSONEnabled {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Set<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
+    ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+                  String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite, int maxResultSize);
 
      // --- Association Retrieval ---
 

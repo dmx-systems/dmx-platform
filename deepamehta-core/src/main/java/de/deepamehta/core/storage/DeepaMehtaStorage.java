@@ -1,6 +1,7 @@
 package de.deepamehta.core.storage;
 
 import de.deepamehta.core.DeepaMehtaTransaction;
+import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
@@ -46,8 +47,9 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Set<RelatedTopicModel> getTopicRelatedTopics(long topicId, List assocTypeUris, String myRoleTypeUri,
-                                                 String othersRoleTypeUri, String othersTopicTypeUri);
+    ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, List assocTypeUris, String myRoleTypeUri,
+                                                       String othersRoleTypeUri, String othersTopicTypeUri,
+                                                       int maxResultSize);
 
     // ---
 
@@ -147,8 +149,9 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Set<RelatedTopicModel> getAssociationRelatedTopics(long assocId, List assocTypeUris, String myRoleTypeUri,
-                                                       String othersRoleTypeUri, String othersTopicTypeUri);
+    ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, List assocTypeUris, String myRoleTypeUri,
+                                                             String othersRoleTypeUri, String othersTopicTypeUri,
+                                                             int maxResultSize);
 
     // ---
 

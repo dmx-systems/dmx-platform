@@ -5,6 +5,7 @@ import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
@@ -207,11 +208,12 @@ public class EmbeddedService implements DeepaMehtaService {
     @GET
     @Path("/topic/by_type/{type_uri}")
     @Override
-    public Set<Topic> getTopics(@PathParam("type_uri") String typeUri) {
+    public ResultSet<Topic> getTopics(@PathParam("type_uri") String typeUri,
+                                      @QueryParam("max_result_size") int maxResultSize) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Set<Topic> topics = JSONHelper.toTopicSet(getTopicType(typeUri, null).getRelatedTopics(
-                "dm4.core.instantiation", "dm4.core.type", "dm4.core.instance", null, false, false));
+            ResultSet<Topic> topics = JSONHelper.toTopicSet(getTopicType(typeUri, null).getRelatedTopics(
+                "dm4.core.instantiation", "dm4.core.type", "dm4.core.instance", null, false, false, maxResultSize));
                 // othersTopicTypeUri=null, fetchComposite=false
             /*
             for (Topic topic : topics) {
@@ -464,8 +466,8 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Set<String> getTopicTypeUris() {
         Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm4.core.topic_type")), false);
-        Set<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-            "dm4.core.instance", "dm4.core.topic_type", false, false);
+        ResultSet<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
+            "dm4.core.instance", "dm4.core.topic_type", false, false, 0);
         Set<String> topicTypeUris = new HashSet();
         // add meta types
         topicTypeUris.add("dm4.core.topic_type");
@@ -565,8 +567,8 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Set<String> getAssociationTypeUris() {
         Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm4.core.assoc_type")), false);
-        Set<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-            "dm4.core.instance", "dm4.core.assoc_type", false, false);
+        ResultSet<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
+            "dm4.core.instance", "dm4.core.assoc_type", false, false, 0);
         Set<String> assocTypeUris = new HashSet();
         for (Topic assocType : assocTypes) {
             assocTypeUris.add(assocType.getUri());
@@ -754,20 +756,22 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @GET
     @Path("/topic/{id}/related_topics")
-    public Set<RelatedTopic> getRelatedTopics(@PathParam("id")                     long topicId,
-                                              @QueryParam("assoc_type_uri")        String assocTypeUri,
-                                              @QueryParam("my_role_type_uri")      String myRoleTypeUri,
-                                              @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
-                                              @QueryParam("others_topic_type_uri") String othersTopicTypeUri) {
+    public ResultSet<RelatedTopic> getRelatedTopics(@PathParam("id")                     long topicId,
+                                                    @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                    @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                    @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                    @QueryParam("others_topic_type_uri") String othersTopicTypeUri,
+                                                    @QueryParam("max_result_size")       int maxResultSize) {
         logger.info("topicId=" + topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
-            "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\"");
+            "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri +
+            "\", maxResultSize=" + maxResultSize);
         try {
             return getTopic(topicId, false, null).getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-                othersTopicTypeUri, false, false);  // fetchComposite=false (3x)
+                othersTopicTypeUri, false, false, maxResultSize);  // fetchComposite=false (3x)
         } catch (Exception e) {
             throw new RuntimeException("Retrieving related topics of topic " + topicId + " failed (assocTypeUri=\"" +
                 assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", othersRoleTypeUri=\"" + othersRoleTypeUri +
-                "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")", e);
+                "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\", maxResultSize=" + maxResultSize + ")", e);
         }
     }
 
@@ -830,12 +834,13 @@ public class EmbeddedService implements DeepaMehtaService {
         return relTopic;
     }
 
-    Set<RelatedTopic> attach(Set<RelatedTopicModel> models, boolean fetchComposite, boolean fetchRelatingComposite) {
+    ResultSet<RelatedTopic> attach(ResultSet<RelatedTopicModel> models, boolean fetchComposite,
+                                                                        boolean fetchRelatingComposite) {
         Set<RelatedTopic> relTopics = new LinkedHashSet();
         for (RelatedTopicModel model : models) {
             relTopics.add(attach(model, fetchComposite, fetchRelatingComposite));
         }
-        return relTopics;
+        return new ResultSet<RelatedTopic>(models.getTotalCount(), relTopics);
     }
 
     // ===

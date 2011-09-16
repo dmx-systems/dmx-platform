@@ -3,6 +3,7 @@ package de.deepamehta.core.service;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaTransaction;
+import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
@@ -55,7 +56,7 @@ public interface DeepaMehtaService {
 
     // public Topic getTopic(String typeUri, String key, SimpleValue value);
 
-    public Set<Topic> getTopics(String typeUri);
+    public ResultSet<Topic> getTopics(String typeUri, int maxResultSize);
 
     /**
      * Performs a fulltext search.

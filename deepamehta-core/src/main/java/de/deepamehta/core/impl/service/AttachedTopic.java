@@ -3,6 +3,7 @@ package de.deepamehta.core.impl.service;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
@@ -164,10 +165,10 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // --- Topic Retrieval ---
 
     @Override
-    public Set<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite) {
-        Set<RelatedTopicModel> topics = dms.storage.getTopicRelatedTopics(getId(), assocTypeUris, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri);
+    public ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+                 String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite, int maxResultSize) {
+        ResultSet<RelatedTopicModel> topics = dms.storage.getTopicRelatedTopics(getId(), assocTypeUris, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
         return dms.attach(topics, fetchComposite, fetchRelatingComposite);
     }
 

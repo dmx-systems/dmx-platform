@@ -4,6 +4,7 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.ViewConfiguration;
@@ -195,10 +196,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     void fetchViewConfig() {
         try {
-            Set<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type", "dm4.core.view_config",
-                null, true, false);    // fetchComposite=true, fetchRelatingComposite=false
+            ResultSet<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type",
+                "dm4.core.view_config", null, true, false, 0);    // fetchComposite=true, fetchRelatingComposite=false
             // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
-            getModel().setViewConfig(new ViewConfigurationModel(dms.getTopicModels(topics)));
+            getModel().setViewConfig(new ViewConfigurationModel(dms.getTopicModels(topics.getItems())));
             initViewConfig();
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for " + className() + " \"" + getUri() +
@@ -253,9 +254,9 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     private Set<IndexMode> fetchIndexModes() {
-        Set<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type", null,
-            "dm4.core.index_mode", false, false);       // fetchComposite=false
-        return IndexMode.fromTopics(topics);
+        ResultSet<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type", null,
+            "dm4.core.index_mode", false, false, 0);       // fetchComposite=false
+        return IndexMode.fromTopics(topics.getItems());
     }
 
     private Map<Long, AttachedAssociationDefinition> fetchAssociationDefinitions() {
@@ -263,8 +264,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
         //
         // fetch part topic types
         List assocTypeFilter = Arrays.asList("dm4.core.aggregation_def", "dm4.core.composition_def");
-        Set<RelatedTopic> partTopicTypes = getRelatedTopics(assocTypeFilter, "dm4.core.whole_type",
-            "dm4.core.part_type", "dm4.core.topic_type", false, false);
+        ResultSet<RelatedTopic> partTopicTypes = getRelatedTopics(assocTypeFilter, "dm4.core.whole_type",
+            "dm4.core.part_type", "dm4.core.topic_type", false, false, 0);
         //
         for (RelatedTopic partTopicType : partTopicTypes) {
             AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(dms);

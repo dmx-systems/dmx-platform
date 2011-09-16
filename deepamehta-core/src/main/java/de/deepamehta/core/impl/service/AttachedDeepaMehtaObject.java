@@ -4,6 +4,7 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
@@ -184,33 +185,33 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // --- Topic Retrieval ---
 
     @Override
-    public Set<RelatedTopic> getRelatedTopics(String assocTypeUri) {
-        return getRelatedTopics(assocTypeUri, null, null, null, false, false);   // fetchComposite=false
+    public ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize) {
+        return getRelatedTopics(assocTypeUri, null, null, null, false, false, maxResultSize);   // fetchComposite=false
     }
 
     @Override
     public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite) {
-        Set<RelatedTopic> topics = getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-            fetchComposite, fetchRelatingComposite);
-        switch (topics.size()) {
+        ResultSet<RelatedTopic> topics = getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri, fetchComposite, fetchRelatingComposite, 0);
+        switch (topics.getSize()) {
         case 0:
             return null;
         case 1:
-            return (AttachedRelatedTopic) topics.iterator().next();
+            return (AttachedRelatedTopic) topics.getIterator().next();
         default:
-            throw new RuntimeException("Ambiguity: there are " + topics.size() + " related topics (object ID=" +
+            throw new RuntimeException("Ambiguity: there are " + topics.getSize() + " related topics (object ID=" +
                 getId() + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
                 "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
         }
     }
 
     @Override
-    public Set<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite) {
+    public ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                 String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite, int maxResultSize) {
         List assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
         return getRelatedTopics(assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-            fetchComposite, fetchRelatingComposite);
+            fetchComposite, fetchRelatingComposite, maxResultSize);
     }
 
     // --- Association Retrieval ---
@@ -233,8 +234,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     @Override
     public void delete(Directives directives) {
         // 1) recursively delete sub-topics
-        Set<RelatedTopic> partTopics = getRelatedTopics("dm4.core.composition",
-            "dm4.core.whole", "dm4.core.part", null, false, false);
+        ResultSet<RelatedTopic> partTopics = getRelatedTopics("dm4.core.composition",
+            "dm4.core.whole", "dm4.core.part", null, false, false, 0);
         for (Topic partTopic : partTopics) {
             partTopic.delete(directives);
         }

@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.webclient;
 
 import de.deepamehta.core.DeepaMehtaTransaction;
+import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
@@ -138,12 +139,13 @@ public class WebclientPlugin extends Plugin {
      */
     @GET
     @Path("/search/by_type/{typeUri}")
-    public Topic getTopics(@PathParam("typeUri") String typeUri) {
+    public Topic getTopics(@PathParam("typeUri") String typeUri, @QueryParam("max_result_size") int maxResultSize) {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            logger.info("typeUri=" + typeUri);
-            String searchTerm = dms.getTopicType(typeUri, null).getSimpleValue() + "(s)";       // clientContext=null
-            Topic searchTopic = createSearchTopic(searchTerm, dms.getTopics(typeUri), null);    // clientContext=null
+            logger.info("typeUri=\"" + typeUri + "\", maxResultSize=" + maxResultSize);
+            String searchTerm = dms.getTopicType(typeUri, null).getSimpleValue() + "(s)";   // clientContext=null
+            ResultSet<Topic> result = dms.getTopics(typeUri, maxResultSize);
+            Topic searchTopic = createSearchTopic(searchTerm, result.getItems(), null);     // clientContext=null
             tx.success();
             return searchTopic;
         } catch (Exception e) {
@@ -167,7 +169,7 @@ public class WebclientPlugin extends Plugin {
                 searchableUnits.add(topic);
             } else {
                 Set<Topic> parentTopics = JSONHelper.toTopicSet(topic.getRelatedTopics((List) null,
-                    "dm4.core.part", "dm4.core.whole", null, false, false));
+                    "dm4.core.part", "dm4.core.whole", null, false, false, 0)).getItems();
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
                 } else {
