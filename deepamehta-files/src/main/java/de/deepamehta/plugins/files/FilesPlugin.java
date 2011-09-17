@@ -140,6 +140,7 @@ public class FilesPlugin extends Plugin implements FilesService {
 
     // ---
 
+    // ### FIXME: Jersey WARNING: A HTTP GET method MUST return a non-void type
     @GET
     @Path("/{id}")
     @Override

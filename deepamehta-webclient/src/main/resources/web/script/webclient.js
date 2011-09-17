@@ -1,14 +1,18 @@
 var dm4c = new function() {
 
-    var CORE_SERVICE_URI = "/core"
-    this.COMPOSITE_PATH_SEPARATOR = "/"
+    // preferences
+    this.MAX_RESULT_SIZE = 100
     var DEFAULT_TOPIC_ICON = "images/ball-gray.png"
     var DEFAULT_FIELD_ROWS = 1
 
+    // logger preferences
     var ENABLE_LOGGING = false
     var LOG_PLUGIN_LOADING = false
     var LOG_IMAGE_LOADING = false
     this.LOG_GUI = false
+
+    var CORE_SERVICE_URI = "/core"
+    this.COMPOSITE_PATH_SEPARATOR = "/"
 
     this.restc = new RESTClient(CORE_SERVICE_URI)
     this.ui = new GUIToolkit()
@@ -1170,8 +1174,9 @@ var dm4c = new function() {
             // Note: this method is actually part of the Type Search plugin.
             // TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
             // another namespace again) or make the Type Search plugin an integral part of the Client plugin.
-            dm4c.restc.get_topics_and_create_bucket = function(type_uri) {
-                return this.request("GET", "/webclient/search/by_type/" + type_uri)
+            dm4c.restc.get_topics_and_create_bucket = function(type_uri, max_result_size) {
+                var params = this.createRequestParameter({max_result_size: max_result_size})
+                return this.request("GET", "/webclient/search/by_type/" + type_uri + "?" + params.to_query_string())
             }
         }
     })

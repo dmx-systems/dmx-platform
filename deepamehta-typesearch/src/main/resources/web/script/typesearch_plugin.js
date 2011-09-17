@@ -31,7 +31,7 @@ function typesearch_plugin() {
 
     this.search = function(searchmode) {
         if (searchmode == "by-type") {
-            return dm4c.restc.get_topics_and_create_bucket(get_type_uri())
+            return dm4c.restc.get_topics_and_create_bucket(get_type_uri(), dm4c.MAX_RESULT_SIZE)
         }
     }
 

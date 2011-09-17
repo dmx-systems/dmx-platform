@@ -75,7 +75,7 @@ function RenderHelper() {
      */
     this.topic_menu = function(topic_type_uri, selected_uri) {
         // retrieve all instances
-        var topics = dm4c.restc.get_topics(topic_type_uri, true)    // sort=true
+        var topics = dm4c.restc.get_topics(topic_type_uri, true).items      // sort=true
         //
         var menu = dm4c.ui.menu()
         for (var i in topics) {
@@ -91,10 +91,10 @@ function RenderHelper() {
     // === Direct-to-page Rendering ===
 
     this.associations = function(topic_id) {
-        var topics = dm4c.restc.get_related_topics(topic_id, undefined, true)   // traversal_filter=undefined, sort=true
-        //
-        this.field_label("Associations (" + topics.length + ")")
-        this.field_value(this.topic_list(topics))
+        var result = dm4c.restc.get_related_topics(topic_id, undefined, true, dm4c.MAX_RESULT_SIZE)
+                                                             // traversal_filter=undefined, sort=true
+        this.field_label("Associations (" + result.items.length + " of " + result.total_count + ")")
+        this.field_value(this.topic_list(result.items))
     }
 
     // ---

@@ -336,7 +336,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         Set<RelatedTopicModel> relTopics = new LinkedHashSet();
         for (ConnectedMehtaNode node : nodes) {
             relTopics.add(buildRelatedTopic(node));
-            // truncate result set
+            // limit result set
             if (relTopics.size() == maxResultSize) {
                 break;
             }

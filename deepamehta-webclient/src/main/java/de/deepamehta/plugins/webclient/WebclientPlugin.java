@@ -135,11 +135,11 @@ public class WebclientPlugin extends Plugin {
      * <p>
      * Note: this resource method is actually part of the Type Search plugin.
      * TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
-     * another namespace again) or make the Type Search plugin an integral part of the Client plugin.
+     * another namespace again) or make the Type Search plugin an integral part of the Webclient plugin.
      */
     @GET
-    @Path("/search/by_type/{typeUri}")
-    public Topic getTopics(@PathParam("typeUri") String typeUri, @QueryParam("max_result_size") int maxResultSize) {
+    @Path("/search/by_type/{type_uri}")
+    public Topic getTopics(@PathParam("type_uri") String typeUri, @QueryParam("max_result_size") int maxResultSize) {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             logger.info("typeUri=\"" + typeUri + "\", maxResultSize=" + maxResultSize);

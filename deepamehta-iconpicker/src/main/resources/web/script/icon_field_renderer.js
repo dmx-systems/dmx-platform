@@ -15,7 +15,7 @@ function IconFieldRenderer(topic, field) {
 
         function do_open_iconpicker() {
             // query icon topics
-            var icon_topics = dm4c.restc.get_topics("dm4.webclient.icon", true)     // sort=true
+            var icon_topics = dm4c.restc.get_topics("dm4.webclient.icon", true).items   // sort=true
             // fill dialog with icons
             $("#iconpicker-dialog").empty()
             for (var i = 0, icon_topic; icon_topic = icon_topics[i]; i++) {

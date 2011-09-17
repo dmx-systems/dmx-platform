@@ -30,8 +30,21 @@ function RESTClient(core_service_uri) {
         return request("GET", "/topic/" + type_uri + "/" + key + "/" + encodeURIComponent(value))
     }
 
-    this.get_topics = function(type_uri, sort) {
-        return sort_topics(request("GET", "/topic/by_type/" + type_uri), sort)
+    /**
+     * @param   sort                Optional: Result sorting.
+     *                              If evaluates to true the returned topics are sorted.
+     * @param   max_result_size     Optional: Result limitation (a number).
+     *                              If 0 or if not specified the result is not limited.
+     *
+     * @return  An object with 2 properties:
+     *              "items"       - array of topics, possibly empty.
+     *              "total_count" - result set size before limitation.
+     */
+    this.get_topics = function(type_uri, sort, max_result_size) {
+        var params = new RequestParameter({max_result_size: max_result_size})
+        var result = request("GET", "/topic/by_type/" + type_uri + "?" + params.to_query_string())
+        sort_topics(result.items, sort)
+        return result
     }
 
     /**
@@ -43,12 +56,19 @@ function RESTClient(core_service_uri) {
      *                                  "others_topic_type_uri"
      * @param   sort                Optional: Result sorting.
      *                              If evaluates to true the returned topics are sorted.
+     * @param   max_result_size     Optional: Result limitation (a number).
+     *                              If 0 or if not specified the result is not limited.
      *
-     * @return  array of topics, possibly empty.
+     * @return  An object with 2 properties:
+     *              "items"       - array of topics, possibly empty.
+     *              "total_count" - result set size before limitation.
      */
-    this.get_related_topics = function(topic_id, traversal_filter, sort) {
+    this.get_related_topics = function(topic_id, traversal_filter, sort, max_result_size) {
         var params = new RequestParameter(traversal_filter)
-        return sort_topics(request("GET", "/topic/" + topic_id + "/related_topics?" + params.to_query_string()), sort)
+        params.add("max_result_size", max_result_size)
+        var result = request("GET", "/topic/" + topic_id + "/related_topics?" + params.to_query_string())
+        sort_topics(result.items, sort)
+        return result
     }
 
     // FIXME: index parameter not used
@@ -296,7 +316,6 @@ function RESTClient(core_service_uri) {
         if (sort) {
             topics.sort(topics_sort_function)
         }
-        return topics
     }
 
     function topics_sort_function(topic_1, topic_2) {

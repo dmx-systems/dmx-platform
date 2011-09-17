@@ -344,7 +344,7 @@ function topicmaps_plugin() {
     }
 
     function get_all_topicmaps() {
-        return dm4c.restc.get_topics("dm4.topicmaps.topicmap", true)    // sort=true
+        return dm4c.restc.get_topics("dm4.topicmaps.topicmap", true).items  // sort=true
     }
 
     /**

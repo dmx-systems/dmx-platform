@@ -58,7 +58,7 @@ function webbrowser_plugin() {
             my_role_type_uri: "dm4.core.part",
             others_role_type_uri: "dm4.core.whole",
             others_topic_type_uri: "dm4.webbrowser.webpage"
-        })
+        }).items
         //
         if (webpages.length > 1) {
             alert("WARNING: data inconsistency\n\nThere are " + webpages.length + " webpages for URL \"" +
