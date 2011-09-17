@@ -93,7 +93,7 @@ function RenderHelper() {
     this.associations = function(topic_id) {
         var result = dm4c.restc.get_related_topics(topic_id, undefined, true, dm4c.MAX_RESULT_SIZE)
                                                              // traversal_filter=undefined, sort=true
-        this.field_label("Associations (" + result.items.length + " of " + result.total_count + ")")
+        this.field_label("Associations", result)
         this.field_value(this.topic_list(result.items))
     }
 
@@ -102,16 +102,19 @@ function RenderHelper() {
     /**
      * @param   field   a Field object or a string.
      */
-    this.field_label = function(field, suffix) {
-        var label
+    this.field_label = function(field, result_set) {
         if (typeof(field) == "string") {
-            label = field
+            var label = field
         } else {
-            label = field.label
-            if (suffix) {
-                label += suffix
-            }
+            var label = field.label
         }
+        //
+        if (result_set) {
+            var c = result_set.items.length
+            var tc = result_set.total_count
+            label += " (" + c + (tc > c ? " of " + tc : "") + ")"
+        }
+        //
         this.page($("<div>").addClass("field-label").text(label))
     }
 
