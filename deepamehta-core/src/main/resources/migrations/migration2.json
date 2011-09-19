@@ -1,37 +1,36 @@
 {
+    # Note: Boolean topic types must be created *after* migration 1 has run.
+    # Otherwise the data type "Boolean" does not exist.
     topic_types: [
         {
-            value:         "Plugin Name",
-            uri:           "dm4.core.plugin_name",
-            data_type_uri: "dm4.core.text"
-        },
+            value:         "Include in Label",
+            uri:           "dm4.core.include_in_label",
+            data_type_uri: "dm4.core.boolean"
+        }
+    ],
+
+    # Note: Both association types relies on association type "Composition Definition".
+    # It must be defined first. See also EmbeddedService.createAssociationType().
+    assoc_types: [
         {
-            value:         "Symbolic Name",
-            uri:           "dm4.core.plugin_symbolic_name",
-            data_type_uri: "dm4.core.text"
-        },
-        {
-            value:         "Migration Nr.",
-            uri:           "dm4.core.plugin_migration_nr",
-            data_type_uri: "dm4.core.number"
-        },
-        {
-            value:         "Plugin",
-            uri:           "dm4.core.plugin",
+            value:         "Composition Definition",
+            uri:           "dm4.core.composition_def",
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.core.plugin_name",
+                    part_topic_type_uri:  "dm4.core.include_in_label",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
-                },
+                }
+            ]
+        },
+        {
+            value:         "Aggregation Definition",
+            uri:           "dm4.core.aggregation_def",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.core.plugin_symbolic_name",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
-                },
-                {
-                    part_topic_type_uri:  "dm4.core.plugin_migration_nr",
+                    part_topic_type_uri:  "dm4.core.include_in_label",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }

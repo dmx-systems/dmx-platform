@@ -1,0 +1,41 @@
+{
+    topic_types: [
+        {
+            value:         "Plugin Name",
+            uri:           "dm4.core.plugin_name",
+            data_type_uri: "dm4.core.text"
+        },
+        {
+            value:         "Symbolic Name",
+            uri:           "dm4.core.plugin_symbolic_name",
+            data_type_uri: "dm4.core.text"
+        },
+        {
+            value:         "Migration Nr.",
+            uri:           "dm4.core.plugin_migration_nr",
+            data_type_uri: "dm4.core.number"
+        },
+        {
+            value:         "Plugin",
+            uri:           "dm4.core.plugin",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:  "dm4.core.plugin_name",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.core.plugin_symbolic_name",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.core.plugin_migration_nr",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                }
+            ]
+        }
+    ]
+}

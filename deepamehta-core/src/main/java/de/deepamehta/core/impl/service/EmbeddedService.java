@@ -76,7 +76,7 @@ public class EmbeddedService implements DeepaMehtaService {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String CORE_MIGRATIONS_PACKAGE = "de.deepamehta.core.migrations";
-    private static final int REQUIRED_CORE_MIGRATION = 2;
+    private static final int REQUIRED_CORE_MIGRATION = 3;
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -511,8 +511,9 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedTopicType topicType = new AttachedTopicType(topicTypeModel, this);
-            topicType.store();
+            // Note: the topic type is put in type cache *before* it is stored. See createAssociationType().
             typeCache.put(topicType);
+            topicType.store();
             //
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
@@ -604,8 +605,11 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedAssociationType assocType = new AttachedAssociationType(assocTypeModel, this);
-            assocType.store();
+            // Note: the association type must be put in type cache *before* it is stored.
+            // Storing an object requires its data type to be known. See AttachedDeepaMehtaObject.store()
+            // Consider creation of association type "Composition Definition": it has a composition definition itself.
             typeCache.put(assocType);
+            assocType.store();
             //
             tx.success();
             return assocType;

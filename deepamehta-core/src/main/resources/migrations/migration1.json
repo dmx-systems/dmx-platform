@@ -31,6 +31,7 @@
 
         # Note: The association types "Aggregation" and "Instantiation" are created programmatically.
         # See EmbeddedService.setupBootstrapContent()
+        # Note: The association types "Aggregation Definition" and "Composition Definition" are created in migration 2.
 
         {
             value:         "Association",
@@ -47,18 +48,6 @@
             uri:           "dm4.core.composition",
             data_type_uri: "dm4.core.text"
         },
-
-        {
-            value:         "Aggregation Definition",
-            uri:           "dm4.core.aggregation_def",
-            data_type_uri: "dm4.core.text"
-        },
-        {
-            value:         "Composition Definition",
-            uri:           "dm4.core.composition_def",
-            data_type_uri: "dm4.core.text"
-        },
-
         /*{
             value:         "Instantiation",
             uri:           "dm4.core.instantiation",
