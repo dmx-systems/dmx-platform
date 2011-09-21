@@ -51,6 +51,9 @@ public interface DeepaMehtaObject extends JSONEnabled {
 
     // === Traversal ===
 
+    /**
+     * Returns a child topic's value or <code>null</code> if the child topic doesn't exist.
+     */
     SimpleValue getChildTopicValue(String assocDefUri);
 
     void setChildTopicValue(String assocDefUri, SimpleValue value);
@@ -60,6 +63,8 @@ public interface DeepaMehtaObject extends JSONEnabled {
     ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize);
 
     /**
+     * Retrieves and returns a related topic or <code>null</code> if no such topic extists.
+     *
      * @param   assocTypeUri        may be null
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null

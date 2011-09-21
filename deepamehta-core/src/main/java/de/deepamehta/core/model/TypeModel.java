@@ -1,5 +1,7 @@
 package de.deepamehta.core.model;
 
+import de.deepamehta.core.util.JSONHelper;
+
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -22,6 +24,7 @@ public abstract class TypeModel extends TopicModel {
     private String dataTypeUri;
     private Set<IndexMode> indexModes;
     private Map<String, AssociationDefinitionModel> assocDefModels; // is never null, may be empty
+    private List<String> labelConfig;                               // is never null, may be empty
     private ViewConfigurationModel viewConfigModel;                 // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -33,11 +36,13 @@ public abstract class TypeModel extends TopicModel {
         this.dataTypeUri = dataTypeUri;
         this.indexModes = new HashSet();
         this.assocDefModels = new LinkedHashMap();
+        this.labelConfig = new ArrayList();
         this.viewConfigModel = new ViewConfigurationModel();
     }
 
     public TypeModel(TopicModel model) {
         super(model);
+        // ### FIXME: initialization
     }
 
     public TypeModel(TypeModel model) {
@@ -45,6 +50,7 @@ public abstract class TypeModel extends TopicModel {
         this.dataTypeUri = model.getDataTypeUri();
         this.indexModes = model.getIndexModes();
         this.assocDefModels = model.getAssocDefs();
+        this.labelConfig = model.getLabelConfig();
         this.viewConfigModel = model.getViewConfigModel();
     }
 
@@ -54,6 +60,7 @@ public abstract class TypeModel extends TopicModel {
             this.dataTypeUri = typeModel.getString("data_type_uri");
             this.indexModes = IndexMode.parse(typeModel);
             this.assocDefModels = new LinkedHashMap();
+            this.labelConfig = parseLabelConfig(typeModel);
             this.viewConfigModel = new ViewConfigurationModel(typeModel);
             parseAssocDefs(typeModel);
         } catch (Exception e) {
@@ -130,6 +137,16 @@ public abstract class TypeModel extends TopicModel {
         return assocDefModels.remove(assocDefUri);
     }
 
+    // === Label Configuration ===
+
+    public List<String> getLabelConfig() {
+        return labelConfig;
+    }
+
+    public void setLabelConfig(List<String> labelConfig) {
+        this.labelConfig = labelConfig;
+    }
+
     // === View Configuration ===
 
     public ViewConfigurationModel getViewConfigModel() {
@@ -162,6 +179,7 @@ public abstract class TypeModel extends TopicModel {
             o.put("data_type_uri", getDataTypeUri());
             IndexMode.toJSON(indexModes, o);
             AssociationDefinitionModel.toJSON(assocDefModels.values(), o);
+            o.put("label_config", JSONHelper.stringsToJson(getLabelConfig()));
             getViewConfigModel().toJSON(o);
             //
             return o;
@@ -182,13 +200,20 @@ public abstract class TypeModel extends TopicModel {
     public String toString() {
         return "id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + getDataTypeUri() + "\", indexModes=" + getIndexModes() + ", assocDefs=" +
-            getAssocDefs() + ",\n    topic type " + getViewConfigModel();
+            getAssocDefs() + ", labelConfig=" + getLabelConfig() + ",\n    topic type " + getViewConfigModel();
         // FIXME: "topic type" is not generic wording
     }
 
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private List<String> parseLabelConfig(JSONObject typeModel) throws Exception {
+        if (typeModel.has("label_config")) {
+            return JSONHelper.toList(typeModel.getJSONArray("label_config"));
+        }
+        return new ArrayList();
+    }
 
     private void parseAssocDefs(JSONObject typeModel) throws Exception {
         JSONArray models = typeModel.optJSONArray("assoc_defs");

@@ -97,7 +97,7 @@ public class CompositeValue {
 
     // ---
 
-    public String getLabel() {
+    public String getDefaultLabel() {
         try {
             return getLabel(values);
         } catch (Exception e) {

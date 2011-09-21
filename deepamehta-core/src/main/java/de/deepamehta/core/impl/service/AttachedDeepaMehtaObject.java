@@ -31,6 +31,10 @@ import java.util.logging.Logger;
 
 abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String LABEL_SEPARATOR = " ";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private DeepaMehtaObjectModel model;
@@ -160,6 +164,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         model.setCompositeValue(comp);
         // update DB
         storeComposite(comp);
+        refreshLabel(comp);
     }
 
 
@@ -179,7 +184,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         // update DB
         storeChildTopicValue(getAssocDef(assocDefUri), value);
         //
-        updateValue(comp);
+        refreshLabel(comp);
     }
 
     // --- Topic Retrieval ---
@@ -340,7 +345,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     void store() {
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            storeComposite(getCompositeValue());            // setCompositeValue() includes setSimpleValue()
+            CompositeValue comp = getCompositeValue();
+            storeComposite(comp);   // setCompositeValue() includes setSimpleValue()
+            refreshLabel(comp);
         } else {
             storeAndIndexValue(getSimpleValue());
         }
@@ -467,8 +474,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                     throw new RuntimeException("Association type \"" + assocTypeUri + "\" not supported");
                 }
             }
-            //
-            updateValue(comp);
         } catch (Exception e) {
             throw new RuntimeException("Storing the " + className() + "'s composite failed (" + this +
                 ",\ncomposite=" + comp + ")", e);
@@ -501,7 +506,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             return childTopic;
         } catch (Exception e) {
             throw new RuntimeException("Storing child topic value failed (parentTopic=" + this +
-                ", assocDef=" + assocDef + ", value=" + value + ")", e);
+                ",\nassocDefUri=" + assocDef.getUri() + ",\nvalue=" + value + ")", e);
         }
     }
 
@@ -526,8 +531,46 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    private void updateValue(CompositeValue comp) {
-        setSimpleValue(comp.getLabel());
+    // === Label ===
+
+    /**
+     * Prerequsite: this is a composite object.
+     */
+    private void refreshLabel(CompositeValue comp) {
+        try {
+            String label;
+            // does the type have a label configuration?
+            if (getType().getLabelConfig().size() > 0) {
+                label = buildLabel();
+            } else {
+                label = comp.getDefaultLabel();
+            }
+            //
+            setSimpleValue(label);
+        } catch (Exception e) {
+            throw new RuntimeException("Refreshing the " + className() + "'s label failed (composite=" + comp + ")", e);
+        }
+    }
+
+    /**
+     * Builds this object's label according to its type's label configuration.
+     */
+    protected String buildLabel() {
+        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
+            StringBuilder label = new StringBuilder();
+            for (String assocDefUri : getType().getLabelConfig()) {
+                String l = fetchChildTopic(assocDefUri).buildLabel();
+                // add separator
+                if (label.length() > 0 && l.length() > 0) {
+                    label.append(LABEL_SEPARATOR);
+                }
+                //
+                label.append(l);
+            }
+            return label.toString();
+        } else {
+            return getSimpleValue().toString();
+        }
     }
 
     // === Update ===
@@ -577,6 +620,16 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // === Helper ===
 
+    /**
+     * Fetches and returns a child topic or <code>null</code> if no such topic extists.
+     */
+    private AttachedRelatedTopic fetchChildTopic(String assocDefUri) {
+        return fetchChildTopic(getAssocDef(assocDefUri));
+    }
+
+    /**
+     * Fetches and returns a child topic or <code>null</code> if no such topic extists.
+     */
     private AttachedRelatedTopic fetchChildTopic(AssociationDefinition assocDef) {
         String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
         String myRoleTypeUri      = assocDef.getWholeRoleTypeUri();
@@ -586,6 +639,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, true, false);
         // fetchComposite=true ### false sufficient?
     }
+
+    // ---
 
     private void associateChildTopic(AssociationDefinition assocDef, long childTopicId) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),

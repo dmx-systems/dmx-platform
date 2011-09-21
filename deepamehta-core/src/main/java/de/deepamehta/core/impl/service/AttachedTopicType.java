@@ -30,31 +30,28 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-
-
-    // ********************************
-    // *** TopicType Implementation ***
-    // ********************************
-
-
-
-    // *******************************
-    // *** AttachedTopic Overrides ***
-    // *******************************
-
-
-
-    @Override
-    protected String className() {
-        return "topic type";
-    }
+    // === AttachedType Overrides ===
 
     @Override
     public TopicTypeModel getModel() {
         return (TopicTypeModel) super.getModel();
     }
 
+    // ----------------------------------------------------------------------------------------------- Protected Methods
 
+    // === AttachedType Overrides ===
+
+    @Override
+    protected void putInTypeCache() {
+        dms.typeCache.put(this);
+    }
+
+    // === AttachedTopic Overrides ===
+
+    @Override
+    protected String className() {
+        return "topic type";
+    }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
@@ -92,6 +89,4 @@ class AttachedTopicType extends AttachedType implements TopicType {
             logger.info("Updating topic type \"" + getUri() + "\" ABORTED -- no changes made by user");
         }
     }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
 }

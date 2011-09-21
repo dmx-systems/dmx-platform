@@ -10,8 +10,6 @@ import de.deepamehta.core.model.AssociationTypeModel;
  */
 class AttachedAssociationType extends AttachedType implements AssociationType {
 
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedAssociationType(EmbeddedService dms) {
@@ -23,15 +21,25 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
         super(model, dms);
     }
 
+    // -------------------------------------------------------------------------------------------------- Public Methods
+
+    // === AttachedType Overrides ===
+
+    @Override
+    public AssociationTypeModel getModel() {
+        return (AssociationTypeModel) super.getModel();
+    }
+
     // ----------------------------------------------------------------------------------------------- Protected Methods
 
+    // === AttachedType Overrides ===
 
+    @Override
+    protected void putInTypeCache() {
+        dms.typeCache.put(this);
+    }
 
-    // *******************************
-    // *** AttachedTopic Overrides ***
-    // *******************************
-
-
+    // === AttachedTopic Overrides ===
 
     @Override
     protected String className() {

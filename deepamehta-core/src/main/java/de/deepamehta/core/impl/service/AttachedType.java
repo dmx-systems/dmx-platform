@@ -7,12 +7,11 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
-import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;
-import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
@@ -137,6 +136,13 @@ abstract class AttachedType extends AttachedTopic implements Type {
         rebuildSequence();
     }
 
+    // === Label Configuration ===
+
+    @Override
+    public List<String> getLabelConfig() {
+        return getModel().getLabelConfig();
+    }
+
     // === View Configuration ===
 
     @Override
@@ -165,10 +171,16 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
 
 
+    // ----------------------------------------------------------------------------------------------- Protected Methods
+
+    protected abstract void putInTypeCache();
+
+
+
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
-     * Fetches this type from DB and initializes its model.
+     * Fetches this type from DB, initializes its model, and puts the type in the type cache.
      * <p>
      * Called from {@link TypeCache#loadTopicType}.
      *
@@ -177,34 +189,35 @@ abstract class AttachedType extends AttachedTopic implements Type {
     void fetch(TypeModel model) {
         setModel(model);
         //
-        Map<Long, AttachedAssociationDefinition> assocDefs = fetchAssociationDefinitions();
-        List<RelatedAssociation> sequence = fetchSequence();
-        // sanity check
-        if (assocDefs.size() != sequence.size()) {
-            throw new RuntimeException("Graph inconsistency: " + assocDefs.size() + " association " +
-                "definitions found but sequence length is " + sequence.size());
-        }
-        // init model
+        // 1) init data type
         getModel().setDataTypeUri(fetchDataTypeTopic().getUri());
+        // 2) init index modes
         getModel().setIndexModes(fetchIndexModes());
-        addAssocDefsSorted(assocDefs, sequence);
+        // 3) init association definitions
+        initAssociationDefinitions();
+        //
+        // Note 1: the type's association definitions must be initialized and the type must be
+        // put in cache *before* its label configuration is fetched.
+        //
+        // Note 2: the type must be put in cache *before* its view configuration is fetched.
+        // Othewise endless recursion might occur. Consider this case: fetching the topic type "Icon"
+        // implies fetching its view configuration which in turn implies fetching the topic type "Icon"!
+        // This is because "Icon" *is part of* "View Configuration" and has a view configuration itself
+        // (provided by the deepamehta-iconpicker module).
+        // We resolve that circle by postponing the view configuration retrieval. This works because Icon's
+        // view configuration is actually not required while fetching, but solely its data type is
+        // (see AttachedDeepaMehtaObject.fetchComposite()).
+        //
+        putInTypeCache();   // abstract
+        //
+        // 4) init label configuration
+        getModel().setLabelConfig(buildLabelConfig());
+        // 5) init view configuration
+        fetchViewConfig();
         //
         // init attached object cache
         // ### initAssocDefs();    // Note: the assoc defs are already initialized through previous addAssocDefsSorted()
-        // ### initViewConfig();   // Note: initialized later on through fetchViewConfig() (called by TypeCache)
-    }
-
-    void fetchViewConfig() {
-        try {
-            ResultSet<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type",
-                "dm4.core.view_config", null, true, false, 0);    // fetchComposite=true, fetchRelatingComposite=false
-            // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
-            getModel().setViewConfig(new ViewConfigurationModel(dms.getTopicModels(topics.getItems())));
-            initViewConfig();
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching view configuration for " + className() + " \"" + getUri() +
-                "\" failed", e);
-        }
+        // ### initViewConfig();   // Note: initialized through fetchViewConfig()
     }
 
     void store() {
@@ -259,6 +272,20 @@ abstract class AttachedType extends AttachedTopic implements Type {
         return IndexMode.fromTopics(topics.getItems());
     }
 
+    // ---
+
+    private void initAssociationDefinitions() {
+        Map<Long, AttachedAssociationDefinition> assocDefs = fetchAssociationDefinitions();
+        List<RelatedAssociation> sequence = fetchSequence();
+        // sanity check
+        if (assocDefs.size() != sequence.size()) {
+            throw new RuntimeException("Graph inconsistency: " + assocDefs.size() + " association " +
+                "definitions found but sequence length is " + sequence.size());
+        }
+        //
+        addAssocDefsSorted(assocDefs, sequence);
+    }
+
     private Map<Long, AttachedAssociationDefinition> fetchAssociationDefinitions() {
         Map<Long, AttachedAssociationDefinition> assocDefs = new HashMap();
         //
@@ -293,6 +320,32 @@ abstract class AttachedType extends AttachedTopic implements Type {
             // Note: the model and the attached object cache is updated together
             getModel().addAssocDef(assocDef.getModel());        // update model
             this.assocDefs.put(assocDef.getUri(), assocDef);    // update attached object cache
+        }
+    }
+
+    private List<String> buildLabelConfig() {
+        List<String> labelConfig = new ArrayList();
+        for (AssociationDefinition assocDef : getAssocDefs().values()) {
+            SimpleValue includeInLabel = assocDef.getChildTopicValue("dm4.core.include_in_label");
+            if (includeInLabel != null && includeInLabel.booleanValue()) {
+                labelConfig.add(assocDef.getUri());
+            }
+        }
+        return labelConfig;
+    }
+
+    // ---
+
+    private void fetchViewConfig() {
+        try {
+            ResultSet<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type",
+                "dm4.core.view_config", null, true, false, 0);    // fetchComposite=true, fetchRelatingComposite=false
+            // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
+            getModel().setViewConfig(new ViewConfigurationModel(dms.getTopicModels(topics.getItems())));
+            initViewConfig();
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching view configuration for " + className() + " \"" + getUri() +
+                "\" failed", e);
         }
     }
 

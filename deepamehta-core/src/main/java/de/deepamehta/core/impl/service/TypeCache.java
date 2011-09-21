@@ -88,16 +88,6 @@ class TypeCache {
         //
         AttachedTopicType topicType = new AttachedTopicType(dms);
         topicType.fetch(new TopicTypeModel(typeTopic.getModel()));
-        put(topicType);
-        // Note: the topic type must be put in cache *before* its view configuration is fetched.
-        // Othewise endless recursion might occur. Consider this case: fetching the topic type "Icon"
-        // implies fetching its view configuration which in turn implies fetching the topic type "Icon"!
-        // This is because "Icon" *is part of* "View Configuration" and has a view configuration itself
-        // (provided by the deepamehta-iconpicker module).
-        // We resolve that circle by postponing the view configuration retrieval. This works because Icon's
-        // view configuration is actually not required while fetching, but solely its data type is
-        // (see AttachedDeepaMehtaObject.fetchComposite()).
-        topicType.fetchViewConfig();
         //
         return topicType;
     }
@@ -112,9 +102,6 @@ class TypeCache {
         //
         AttachedAssociationType assocType = new AttachedAssociationType(dms);
         assocType.fetch(new AssociationTypeModel(typeTopic.getModel()));
-        // Note: the association type must be put in cache *before* its view configuration is fetched. See above.
-        put(assocType);
-        assocType.fetchViewConfig();
         //
         return assocType;
     }

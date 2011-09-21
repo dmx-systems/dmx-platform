@@ -3,6 +3,7 @@ package de.deepamehta.core;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.IndexMode;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,19 +11,19 @@ import java.util.Set;
 
 public interface Type extends Topic {
 
-    // --- Data Type ---
+    // === Data Type ===
 
     String getDataTypeUri();
 
     void setDataTypeUri(String dataTypeUri);
 
-    // --- Index Modes ---
+    // === Index Modes ===
 
     Set<IndexMode> getIndexModes();
 
     void setIndexModes(Set<IndexMode> indexModes);
 
-    // --- Association Definitions ---
+    // === Association Definitions ===
 
     Map<String, AssociationDefinition> getAssocDefs();
 
@@ -34,7 +35,11 @@ public interface Type extends Topic {
 
     void removeAssocDef(String assocDefUri);
 
-    // --- View Configuration ---
+    // === Label Configuration ===
+
+    List<String> getLabelConfig();
+
+    // === View Configuration ===
 
     ViewConfiguration getViewConfig();
 

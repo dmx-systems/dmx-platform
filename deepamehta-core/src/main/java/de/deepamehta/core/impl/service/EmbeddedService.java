@@ -47,6 +47,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -298,7 +299,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Updating topic failed (" + model + ")", e);
+            throw new WebApplicationException(new RuntimeException("Updating topic failed (" + model + ")", e));
         } finally {
             tx.finish();
         }

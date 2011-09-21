@@ -30,6 +30,10 @@
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
+            ],
+            label_config: [
+                dm4.contacts.first_name,
+                dm4.contacts.last_name
             ]
         },
 

@@ -15,6 +15,7 @@ import org.codehaus.jettison.json.JSONObject;
 import java.io.InputStream;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -89,7 +90,7 @@ public class JSONHelper {
 
     // ---
 
-    public static JSONArray stringsToJson(Set<String> strings) {
+    public static JSONArray stringsToJson(Collection<String> strings) {
         JSONArray array = new JSONArray();
         for (String string : strings) {
             array.put(string);
