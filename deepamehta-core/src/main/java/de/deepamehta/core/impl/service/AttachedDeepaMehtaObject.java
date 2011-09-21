@@ -163,8 +163,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         // update memory
         model.setCompositeValue(comp);
         // update DB
-        storeComposite(comp);
-        refreshLabel(comp);
+        storeComposite();
+        refreshLabel();
     }
 
 
@@ -184,7 +184,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         // update DB
         storeChildTopicValue(getAssocDef(assocDefUri), value);
         //
-        refreshLabel(comp);
+        refreshLabel();
     }
 
     // --- Topic Retrieval ---
@@ -345,9 +345,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     void store() {
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            CompositeValue comp = getCompositeValue();
-            storeComposite(comp);   // setCompositeValue() includes setSimpleValue()
-            refreshLabel(comp);
+            storeComposite();       // setCompositeValue() includes setSimpleValue()
+            refreshLabel();
         } else {
             storeAndIndexValue(getSimpleValue());
         }
@@ -419,7 +418,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Store ===
 
     // TODO: factorize this method
-    private void storeComposite(CompositeValue comp) {
+    private void storeComposite() {
+        CompositeValue comp = getCompositeValue();
         try {
             Iterator<String> i = comp.keys();
             while (i.hasNext()) {
@@ -432,14 +432,23 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 //
                 String assocDefUri = t[0];
                 AssociationDefinition assocDef = getAssocDef(assocDefUri);
-                TopicType childTopicType = dms.getTopicType(assocDef.getPartTopicTypeUri(), null);
+                String childTopicTypeUri = assocDef.getPartTopicTypeUri();
+                TopicType childTopicType = dms.getTopicType(childTopicTypeUri, null);
                 String assocTypeUri = assocDef.getTypeUri();
                 Object value = comp.get(key);
                 if (assocTypeUri.equals("dm4.core.composition_def")) {
                     if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
-                        AttachedTopic childTopic = storeChildTopicValue(assocDef, null);
-                        // Note: cast required because private method is called on a subclass's instance
-                        ((AttachedDeepaMehtaObject) childTopic).storeComposite((CompositeValue) value);
+                        AttachedTopic childTopic = fetchChildTopic(assocDef);
+                        CompositeValue childTopicComp = (CompositeValue) value;
+                        if (childTopic != null) {
+                            childTopic.setCompositeValue(childTopicComp);
+                        } else {
+                            // create and associate child topic
+                            childTopic = dms.createTopic(new TopicModel(childTopicTypeUri, childTopicComp), null);
+                            associateChildTopic(assocDef, childTopic.getId());
+                            // Note: the child topic must be created right with its composite value.
+                            // Otherwise its label can't be calculated.
+                        }
                     } else {
                         storeChildTopicValue(assocDef, new SimpleValue(value));
                     }
@@ -536,36 +545,40 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     /**
      * Prerequsite: this is a composite object.
      */
-    private void refreshLabel(CompositeValue comp) {
+    private void refreshLabel() {
         try {
             String label;
             // does the type have a label configuration?
             if (getType().getLabelConfig().size() > 0) {
                 label = buildLabel();
             } else {
-                label = comp.getDefaultLabel();
+                label = getCompositeValue().getDefaultLabel();
             }
             //
             setSimpleValue(label);
         } catch (Exception e) {
-            throw new RuntimeException("Refreshing the " + className() + "'s label failed (composite=" + comp + ")", e);
+            throw new RuntimeException("Refreshing the " + className() + "'s label failed", e);
         }
     }
 
     /**
      * Builds this object's label according to its type's label configuration.
      */
-    protected String buildLabel() {
+    private String buildLabel() {
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
             StringBuilder label = new StringBuilder();
             for (String assocDefUri : getType().getLabelConfig()) {
-                String l = fetchChildTopic(assocDefUri).buildLabel();
-                // add separator
-                if (label.length() > 0 && l.length() > 0) {
-                    label.append(LABEL_SEPARATOR);
+                AttachedDeepaMehtaObject childTopic = fetchChildTopic(assocDefUri);
+                // Note: topics just created have no child topics yet
+                if (childTopic != null) {
+                    String l = childTopic.buildLabel();
+                    // add separator
+                    if (label.length() > 0 && l.length() > 0) {
+                        label.append(LABEL_SEPARATOR);
+                    }
+                    //
+                    label.append(l);
                 }
-                //
-                label.append(l);
             }
             return label.toString();
         } else {

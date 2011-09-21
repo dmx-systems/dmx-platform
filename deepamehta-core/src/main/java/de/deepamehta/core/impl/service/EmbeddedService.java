@@ -270,7 +270,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating topic failed (" + model + ")", e);
+            throw new WebApplicationException(new RuntimeException("Creating topic failed (" + model + ")", e));
         } finally {
             tx.finish();
         }

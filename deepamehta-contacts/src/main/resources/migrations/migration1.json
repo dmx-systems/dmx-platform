@@ -207,6 +207,9 @@
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
             ],
+            label_config: [
+                dm4.contacts.person_name
+            ],
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",

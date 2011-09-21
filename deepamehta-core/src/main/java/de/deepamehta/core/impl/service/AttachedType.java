@@ -211,7 +211,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         putInTypeCache();   // abstract
         //
         // 4) init label configuration
-        getModel().setLabelConfig(buildLabelConfig());
+        getModel().setLabelConfig(fetchLabelConfig());
         // 5) init view configuration
         fetchViewConfig();
         //
@@ -241,7 +241,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         dms.associateDataType(getUri(), getDataTypeUri());
         storeIndexModes();
         storeAssocDefs();
-        storeSequence();
+        storeLabelConfig();
         getViewConfig().store();
     }
 
@@ -323,7 +323,9 @@ abstract class AttachedType extends AttachedTopic implements Type {
         }
     }
 
-    private List<String> buildLabelConfig() {
+    // ---
+
+    private List<String> fetchLabelConfig() {
         List<String> labelConfig = new ArrayList();
         for (AssociationDefinition assocDef : getAssocDefs().values()) {
             SimpleValue includeInLabel = assocDef.getChildTopicValue("dm4.core.include_in_label");
@@ -333,8 +335,6 @@ abstract class AttachedType extends AttachedTopic implements Type {
         }
         return labelConfig;
     }
-
-    // ---
 
     private void fetchViewConfig() {
         try {
@@ -372,6 +372,15 @@ abstract class AttachedType extends AttachedTopic implements Type {
     private void storeAssocDefs() {
         for (AssociationDefinition assocDef : getAssocDefs().values()) {
             ((AttachedAssociationDefinition) assocDef).store();
+        }
+        storeSequence();
+    }
+
+    private void storeLabelConfig() {
+        List<String> labelConfig = getLabelConfig();
+        for (AssociationDefinition assocDef : getAssocDefs().values()) {
+            boolean includeInLabel = labelConfig.contains(assocDef.getUri());
+            assocDef.setChildTopicValue("dm4.core.include_in_label", new SimpleValue(includeInLabel));
         }
     }
 
