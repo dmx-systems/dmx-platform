@@ -9,7 +9,7 @@ import java.util.Set;
 
 
 
-public interface DeepaMehtaObject extends JSONEnabled {
+public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
 
 

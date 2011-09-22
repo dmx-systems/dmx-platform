@@ -60,7 +60,7 @@ public class AssociationDefinitionModel extends AssociationModel {
     public AssociationDefinitionModel(JSONObject assocDef, String wholeTopicTypeUri) {
         super(-1, null);
         try {
-            this.id = -1;
+            this.id = assocDef.optLong("id", -1);
             this.typeUri = assocDef.getString("assoc_type_uri");
             //
             this.wholeTopicTypeUri = wholeTopicTypeUri;

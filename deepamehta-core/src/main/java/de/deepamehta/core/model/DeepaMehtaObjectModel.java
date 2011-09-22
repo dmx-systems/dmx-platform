@@ -1,6 +1,7 @@
 package de.deepamehta.core.model;
 
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.Identifiable;
 import de.deepamehta.core.JSONEnabled;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -15,7 +16,7 @@ import java.util.Set;
 
 
 
-public abstract class DeepaMehtaObjectModel {
+public abstract class DeepaMehtaObjectModel implements Identifiable {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

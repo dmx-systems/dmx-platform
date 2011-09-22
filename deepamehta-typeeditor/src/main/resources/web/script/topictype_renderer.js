@@ -3,6 +3,7 @@ function TopictypeRenderer() {
     var value_input     // a jQuery <input> element
     var uri_input       // a jQuery <input> element
     var data_type_menu  // a GUIToolkit Menu object
+    var editors_list    // a jQuery <ul> element
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -51,12 +52,12 @@ function TopictypeRenderer() {
         }
 
         function render_assoc_def_editors() {
-            var editors_list = $("<ul>").attr("id", "assoc-def-editors")
+            editors_list = $("<ul>").attr("id", "assoc-def-editors")
             dm4c.render.page(editors_list)
             for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
                 editors_list.append(new AssociationDefEditor(assoc_def).dom)
             }
-            $("#assoc-def-editors").sortable()
+            editors_list.sortable()
         }
 
         function AssociationDefEditor(assoc_def) {
@@ -74,16 +75,17 @@ function TopictypeRenderer() {
                 .append($("<div>").append(part_type_label).append(part_card_menu.dom))
                 .append(optional_card_div)
                 .append($("<div>").append(assoc_type_label).append(assoc_type_menu.dom))
+                .data("read_func", read_assoc_def)
 
             function create_assoc_type_menu(selected_uri) {
-                var menu = dm4c.ui.menu(refresh_opional_card_div)
+                var menu = dm4c.ui.menu(do_refresh_opional_card_div)
                 menu.add_item({label: "Composition Definition", value: "dm4.core.composition_def"})
                 menu.add_item({label: "Aggregation Definition", value: "dm4.core.aggregation_def"})
                 menu.select(selected_uri)
                 return menu
             }
 
-            function refresh_opional_card_div() {
+            function do_refresh_opional_card_div() {
                 if (is_aggregation_selected()) {
                     optional_card_div.show(500)
                 } else {
@@ -94,12 +96,22 @@ function TopictypeRenderer() {
             function is_aggregation_selected() {
                 return assoc_type_menu.get_selection().value == "dm4.core.aggregation_def"
             }
+
+            function read_assoc_def() {
+                return {
+                    id:                    assoc_def.id,
+                    part_topic_type_uri:   assoc_def.part_topic_type_uri,
+                    part_cardinality_uri:  part_card_menu.get_selection().value,
+                    whole_cardinality_uri: whole_card_menu.get_selection().value,
+                    assoc_type_uri:        assoc_type_menu.get_selection().value
+                }
+            }
         }
     }
 
     this.process_form = function(topic) {
         var topic_type_model = build_topic_type_model()
-        var topic_type = dm4c.do_update_topic_type(topic, topic_type_model)
+        dm4c.do_update_topic_type(topic, topic_type_model)
         dm4c.trigger_plugin_hook("post_submit_form", topic)
 
         /**
@@ -114,10 +126,19 @@ function TopictypeRenderer() {
                 value: $.trim(value_input.val()),
                 data_type_uri: data_type_menu.get_selection().value
             }
+            var topic_type = dm4c.type_cache.get_topic_type(topic.uri)
+            if (topic_type.data_type_uri == "dm4.core.composite") {
+                topic_type_model.assoc_defs = assoc_defs()
+            }
             return topic_type_model
+
+            function assoc_defs() {
+                var assoc_defs = []
+                editors_list.children().each(function() {
+                    assoc_defs.push($(this).data("read_func")())
+                })
+                return assoc_defs
+            }
         }
     }
-
-    // ----------------------------------------------------------------------------------------------- Private Functions
-
 }

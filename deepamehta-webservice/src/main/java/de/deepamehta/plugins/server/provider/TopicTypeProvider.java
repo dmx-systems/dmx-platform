@@ -55,7 +55,8 @@ public class TopicTypeProvider implements MessageBodyReader<TopicTypeModel>, Mes
             String json = JavaUtils.readText(entityStream);
             return new TopicTypeModel(new JSONObject(json));
         } catch (Exception e) {
-            throw new IOException("Creating TopicTypeModel from message body failed", e);
+            throw new WebApplicationException(new RuntimeException(
+                "Creating TopicTypeModel from message body failed", e));
         }
     }
 

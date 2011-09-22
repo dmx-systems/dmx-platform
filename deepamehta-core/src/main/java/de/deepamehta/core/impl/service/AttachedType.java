@@ -15,6 +15,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.util.JSONHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -283,7 +284,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
                 "definitions found but sequence length is " + sequence.size());
         }
         //
-        addAssocDefsSorted(assocDefs, sequence);
+        addAssocDefsSorted(assocDefs, JSONHelper.idList(sequence));
     }
 
     private Map<Long, AttachedAssociationDefinition> fetchAssociationDefinitions() {
@@ -305,12 +306,14 @@ abstract class AttachedType extends AttachedTopic implements Type {
         return assocDefs;
     }
 
-    private void addAssocDefsSorted(Map<Long, AttachedAssociationDefinition> assocDefs,
-                                    List<RelatedAssociation> sequence) {
+    /**
+     * Updates model and attached object cache.
+     * ### FIXME: should be private
+     */
+    protected void addAssocDefsSorted(Map<Long, AttachedAssociationDefinition> assocDefs, List<Long> sequence) {
         getModel().setAssocDefs(new LinkedHashMap());           // init model
         this.assocDefs = new LinkedHashMap();                   // init attached object cache
-        for (RelatedAssociation relAssoc : sequence) {
-            long assocDefId = relAssoc.getId();
+        for (long assocDefId : sequence) {
             AttachedAssociationDefinition assocDef = assocDefs.get(assocDefId);
             // sanity check
             if (assocDef == null) {
@@ -455,7 +458,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
             new AssociationRoleModel(succAssocDefId, "dm4.core.successor"));
     }
 
-    private void rebuildSequence() {
+    // ### FIXME: should be private
+    protected void rebuildSequence() {
         deleteSequence();
         storeSequence();
     }

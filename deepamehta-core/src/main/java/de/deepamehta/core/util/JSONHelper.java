@@ -1,5 +1,7 @@
 package de.deepamehta.core.util;
 
+import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.Identifiable;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
@@ -38,6 +40,14 @@ public class JSONHelper {
     // *******************
 
 
+
+    public static List<Long> idList(Collection objects) {
+        List<Long> ids = new ArrayList();
+        for (Object object : objects) {
+            ids.add(((Identifiable) object).getId());
+        }
+        return ids;
+    }
 
     public static ResultSet<Topic> toTopicSet(ResultSet<RelatedTopic> relTopics) {
         Set<Topic> topics = new LinkedHashSet();

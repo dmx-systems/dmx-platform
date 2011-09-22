@@ -1,9 +1,16 @@
 package de.deepamehta.core.impl.service;
 
+import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.util.JSONHelper;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -85,8 +92,50 @@ class AttachedTopicType extends AttachedType implements TopicType {
             setDataTypeUri(dataTypeUri);
         }
         //
+        updateSequence(model);
+        //
         if (!uriChanged && !valueChanged && !dataTypeChanged) {
             logger.info("Updating topic type \"" + getUri() + "\" ABORTED -- no changes made by user");
         }
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void updateSequence(TopicTypeModel newModel) {
+        Collection<AssociationDefinitionModel> newAssocDefs = newModel.getAssocDefs().values();
+        if (sequenceChanged(newAssocDefs)) {
+            logger.info("### Changing assoc def sequence!");
+            // update memory
+            addAssocDefsSorted(hashAssocDefsById(), JSONHelper.idList(newAssocDefs));
+            // update DB
+            rebuildSequence();
+        } else {
+            logger.info("### Updating assoc def sequence ABORTED -- no changes made by user");
+        }
+    }
+
+    private boolean sequenceChanged(Collection<AssociationDefinitionModel> newAssocDefs) {
+        Collection<AssociationDefinition> assocDefs = getAssocDefs().values();
+        if (assocDefs.size() != newAssocDefs.size()) {
+            throw new RuntimeException("adding/removing of assoc defs not yet supported via updateTopicType() call");
+        }
+        //
+        Iterator<AssociationDefinitionModel> i = newAssocDefs.iterator();
+        for (AssociationDefinition assocDef : assocDefs) {
+            AssociationDefinitionModel newAssocDef = i.next();
+            if (!assocDef.getUri().equals(newAssocDef.getUri())) {
+                return true;
+            }
+        }
+        //
+        return false;
+    }
+
+    private Map<Long, AttachedAssociationDefinition> hashAssocDefsById() {
+        Map assocDefs = new HashMap();
+        for (AssociationDefinition assocDef : getAssocDefs().values()) {
+            assocDefs.put(assocDef.getId(), assocDef);
+        }
+        return assocDefs;
     }
 }

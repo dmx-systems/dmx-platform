@@ -554,7 +554,8 @@ public class EmbeddedService implements DeepaMehtaService {
             return topicType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Updating topic type failed (" + topicTypeModel + ")", e);
+            throw new WebApplicationException(new RuntimeException(
+                "Updating topic type failed (" + topicTypeModel + ")", e));
         } finally {
             tx.finish();
         }
