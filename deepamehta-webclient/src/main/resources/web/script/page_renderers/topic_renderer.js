@@ -463,8 +463,8 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
 
     function get_view_config(setting) {
         // the assoc def's config has precedence
-        var val = assoc_def && dm4c.get_view_config(assoc_def, setting, true) ||    // no_defaults=true
-                               dm4c.get_view_config(topic_type, setting, true)      // no_defaults=true
-        return val != undefined ? val : dm4c.get_view_config_default(topic_type, setting)
+        // ### FIXME: assoc def can't override with falsish values
+        return assoc_def && dm4c.get_view_config(assoc_def,  setting) ||
+                            dm4c.get_view_config(topic_type, setting, true)
     }
 }

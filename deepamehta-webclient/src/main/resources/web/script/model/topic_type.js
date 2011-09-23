@@ -22,19 +22,13 @@ function TopicType(topic_type) {
     }
 
     this.get_page_renderer_class = function() {
-        return dm4c.get_view_config(this, "js_page_renderer_class")
-    }
-
-    // === "View Configurable" implementation ===
-
-    this.default_page_renderer_class = function() {
-        return "TopicRenderer"
+        return dm4c.get_view_config(this, "js_page_renderer_class") || "TopicRenderer"
     }
 
     // === Public API ===
 
     this.is_editable = function() {
-        return dm4c.get_view_config(this, "editable")
+        return dm4c.get_view_config(this, "editable", true)
     }
 
     /**
@@ -44,13 +38,13 @@ function TopicType(topic_type) {
      * @return  The icon source (string).
      */
     this.get_icon_src = function() {
-        return dm4c.get_view_config(this, "icon")
+        return dm4c.get_view_config(this, "icon") || dm4c.DEFAULT_TOPIC_ICON
     }
 
     this.get_menu_config = function(menu_id) {
         switch (menu_id) {
         case "create-type-menu":
-            return dm4c.get_view_config(this, "add_to_create_menu")
+            return dm4c.get_view_config(this, "add_to_create_menu", true)
         case "search-type-menu":
             return true
         default:

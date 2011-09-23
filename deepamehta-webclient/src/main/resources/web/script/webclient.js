@@ -2,7 +2,7 @@ var dm4c = new function() {
 
     // preferences
     this.MAX_RESULT_SIZE = 100
-    var DEFAULT_TOPIC_ICON = "images/ball-gray.png"
+    this.DEFAULT_TOPIC_ICON = "images/ball-gray.png"
     var DEFAULT_FIELD_ROWS = 1
 
     // logger preferences
@@ -677,7 +677,7 @@ var dm4c = new function() {
         if (topic_type) {
             return topic_type.get_icon_src()
         }
-        return DEFAULT_TOPIC_ICON
+        return this.DEFAULT_TOPIC_ICON
     }
 
     // === View Configuration ===
@@ -690,12 +690,12 @@ var dm4c = new function() {
      * @param   configurable    A topic type, an association type, or an association definition.
      *                          Must not be null/undefined.
      * @param   setting         Last component of the setting URI, e.g. "icon".
-     * @paran   no_defaults     Optional: if evaluates to true no default values are looked up.
-     *                          Instead undefined is returned if no setting was made.
+     * @paran   lookup_default  Optional: if evaluates to true a default value is looked up in case no setting was made.
+     *                          If evaluates to false and no setting was made undefined is returned.
      *
-     * @return  The setting value, or <code>undefined</code> if no setting was made and no_defaults evaluates to true.
+     * @return  The set value, or <code>undefined</code> if no setting was made and lookup_default evaluates to false.
      */
-    this.get_view_config = function(configurable, setting, no_defaults) {
+    this.get_view_config = function(configurable, setting, lookup_default) {
         // error check
         if (!configurable.view_config_topics) {
             throw "InvalidConfigurable: no \"view_config_topics\" property found in " + JSON.stringify(configurable)
@@ -706,19 +706,19 @@ var dm4c = new function() {
             var value = view_config.composite["dm4.webclient." + setting]
         }
         // lookup default
-        if (value == undefined && !no_defaults) {
+        if ((value === undefined || value === "") && lookup_default) {
             return dm4c.get_view_config_default(configurable, setting)
         }
         //
         return value
     }
 
+    // Note: for these settings the default is provided by the configurable itself:
+    //     "icon"
+    //     "color"
+    //     "js_page_renderer_class"
     this.get_view_config_default = function(configurable, setting) {
         switch (setting) {
-        case "icon":
-            return DEFAULT_TOPIC_ICON;
-        case "color":
-            return dm4c.canvas.DEFAULT_ASSOC_COLOR;
         case "add_to_create_menu":
             return false;
         case "is_searchable_unit":
@@ -727,8 +727,6 @@ var dm4c = new function() {
             return true
         case "viewable":
             return true
-        case "js_page_renderer_class":
-            return configurable.default_page_renderer_class()
         case "js_field_renderer_class":
             return default_field_renderer_class()
         case "rows":
@@ -1032,7 +1030,7 @@ var dm4c = new function() {
     register_plugin("script/internal_plugins/fulltext_plugin.js")
     register_plugin("script/internal_plugins/tinymce_plugin.js")
 
-    var default_topic_icon = this.create_image(DEFAULT_TOPIC_ICON)
+    var default_topic_icon = this.create_image(this.DEFAULT_TOPIC_ICON)
 
     $(function() {
         //

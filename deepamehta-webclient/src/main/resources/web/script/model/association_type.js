@@ -19,18 +19,12 @@ function AssociationType(assoc_type) {
     }
 
     this.get_page_renderer_class = function() {
-        return dm4c.get_view_config(this, "js_page_renderer_class")
-    }
-
-    // === "View Configurable" implementation ===
-
-    this.default_page_renderer_class = function() {
-        return "AssociationRenderer"
+        return dm4c.get_view_config(this, "js_page_renderer_class") || "AssociationRenderer"
     }
 
     // === Public API ===
 
     this.get_color = function() {
-        return dm4c.get_view_config(this, "color")
+        return dm4c.get_view_config(this, "color") || dm4c.canvas.DEFAULT_ASSOC_COLOR
     }
 }
