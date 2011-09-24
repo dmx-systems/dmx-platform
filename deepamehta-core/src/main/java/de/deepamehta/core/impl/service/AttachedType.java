@@ -110,30 +110,30 @@ abstract class AttachedType extends AttachedTopic implements Type {
     public void addAssocDef(AssociationDefinitionModel model) {
         // Note: the predecessor must be determined *before* the memory is updated
         AssociationDefinition predecessor = lastAssocDef();
-        // 1) update memory
+        // update memory
         getModel().addAssocDef(model);                                          // update model
         AttachedAssociationDefinition assocDef = _addAssocDef(model);           // update attached object cache
-        // 2) update DB
+        // update DB
         assocDef.store();
         appendToSequence(assocDef, predecessor);
     }
 
     @Override
     public void updateAssocDef(AssociationDefinitionModel model) {
-        // 1) update memory
+        // update memory
         getModel().updateAssocDef(model);                                       // update model
         _addAssocDef(model);                                                    // update attached object cache
-        // 2) update DB
+        // update DB
         // ### Note: nothing to do for the moment
         // (in case of interactive assoc type change the association is already updated in DB)
     }
 
     @Override
     public void removeAssocDef(String assocDefUri) {
-        // 1) update memory
+        // update memory
         getModel().removeAssocDef(assocDefUri);                                 // update model
         AttachedAssociationDefinition assocDef = _removeAssocDef(assocDefUri);  // update attached object cache
-        // 2) update DB
+        // update DB
         rebuildSequence();
     }
 
@@ -142,6 +142,14 @@ abstract class AttachedType extends AttachedTopic implements Type {
     @Override
     public List<String> getLabelConfig() {
         return getModel().getLabelConfig();
+    }
+
+    @Override
+    public void setLabelConfig(List<String> labelConfig) {
+        // update memory
+        getModel().setLabelConfig(labelConfig);
+        // update DB
+        storeLabelConfig();
     }
 
     // === View Configuration ===

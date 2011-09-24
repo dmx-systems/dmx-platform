@@ -10,6 +10,7 @@ import de.deepamehta.core.util.JSONHelper;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -92,7 +93,9 @@ class AttachedTopicType extends AttachedType implements TopicType {
             setDataTypeUri(dataTypeUri);
         }
         //
-        updateSequence(model);
+        updateSequence(model.getAssocDefs().values());
+        //
+        updateLabelConfig(model.getLabelConfig());
         //
         if (!uriChanged && !valueChanged && !dataTypeChanged) {
             logger.info("Updating topic type \"" + getUri() + "\" ABORTED -- no changes made by user");
@@ -101,10 +104,11 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void updateSequence(TopicTypeModel newModel) {
-        Collection<AssociationDefinitionModel> newAssocDefs = newModel.getAssocDefs().values();
-        if (sequenceChanged(newAssocDefs)) {
-            logger.info("### Changing assoc def sequence!");
+    // === Association Definitions ===
+
+    private void updateSequence(Collection<AssociationDefinitionModel> newAssocDefs) {
+        if (hasSequenceChanged(newAssocDefs)) {
+            logger.info("### Changing assoc def sequence");
             // update memory
             addAssocDefsSorted(hashAssocDefsById(), JSONHelper.idList(newAssocDefs));
             // update DB
@@ -114,7 +118,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         }
     }
 
-    private boolean sequenceChanged(Collection<AssociationDefinitionModel> newAssocDefs) {
+    private boolean hasSequenceChanged(Collection<AssociationDefinitionModel> newAssocDefs) {
         Collection<AssociationDefinition> assocDefs = getAssocDefs().values();
         if (assocDefs.size() != newAssocDefs.size()) {
             throw new RuntimeException("adding/removing of assoc defs not yet supported via updateTopicType() call");
@@ -137,5 +141,16 @@ class AttachedTopicType extends AttachedType implements TopicType {
             assocDefs.put(assocDef.getId(), assocDef);
         }
         return assocDefs;
+    }
+
+    // === Label Configuration ===
+
+    private void updateLabelConfig(List<String> newLabelConfig) {
+        if (!getLabelConfig().equals(newLabelConfig)) {
+            logger.info("### Changing label configuration");
+            setLabelConfig(newLabelConfig);
+        } else {
+            logger.info("### Updating label configuration ABORTED -- no changes made by user");
+        }
     }
 }

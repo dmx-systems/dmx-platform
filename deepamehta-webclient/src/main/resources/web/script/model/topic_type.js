@@ -9,6 +9,7 @@ function TopicType(topic_type) {
     this.data_type_uri      = topic_type.data_type_uri
     this.index_mode_uris    = topic_type.index_mode_uris
     this.assoc_defs         = deserialize(topic_type.assoc_defs)
+    this.label_config       = topic_type.label_config
     this.view_config_topics = dm4c.hash_by_type(topic_type.view_config_topics)
 
     // === "Page Displayable" implementation ===
@@ -27,9 +28,11 @@ function TopicType(topic_type) {
 
     // === Public API ===
 
-    this.is_editable = function() {
-        return dm4c.get_view_config(this, "editable", true)
+    this.get_label_config = function(assoc_def_uri) {
+        return js.contains(this.label_config, assoc_def_uri)
     }
+
+    // --- View Configuration ---
 
     /**
      * Returns the icon source.
@@ -50,6 +53,10 @@ function TopicType(topic_type) {
         default:
             alert("TopicType.get_menu_config: menu \"" + menu_id + "\" not implemented")
         }
+    }
+
+    this.is_editable = function() {
+        return dm4c.get_view_config(this, "editable", true)
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions

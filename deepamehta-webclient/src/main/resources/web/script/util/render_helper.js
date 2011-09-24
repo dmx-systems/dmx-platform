@@ -46,23 +46,30 @@ function RenderHelper() {
     // ---
 
     /**
-     * @param   field   a Field object or a string.
+     * @param   field   a TopicRenderer.Field object or a string.
      *
      * @return  The <input> element (jQuery object).
      */
     this.input = function(field) {
-        var value
         if (typeof(field) == "string") {
-            value = field
+            var value = field
         } else {
-            value = field.value
+            var value = field.value
         }
         return $('<input type="text">').attr("value", value)
     }
 
+    /**
+     * @param   field   a TopicRenderer.Field object or a boolean.
+     */
     this.checkbox = function(field) {
-        var dom = $('<input type="checkbox">')
-        if (field.value) {
+        var dom = $("<input type='checkbox'>")
+        if (typeof(field) == "boolean") {
+            var checked = field
+        } else {
+            var checked = field.value
+        }
+        if (checked) {
             dom.attr("checked", "checked")
         }
         return dom
@@ -100,7 +107,7 @@ function RenderHelper() {
     // ---
 
     /**
-     * @param   field   a Field object or a string.
+     * @param   field   a TopicRenderer.Field object or a string.
      */
     this.field_label = function(field, result_set) {
         if (typeof(field) == "string") {

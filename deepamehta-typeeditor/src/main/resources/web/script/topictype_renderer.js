@@ -55,27 +55,34 @@ function TopictypeRenderer() {
             editors_list = $("<ul>").attr("id", "assoc-def-editors")
             dm4c.render.page(editors_list)
             for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                editors_list.append(new AssociationDefEditor(assoc_def).dom)
+                var label_state = topic_type.get_label_config(assoc_def.uri)
+                editors_list.append(new AssociationDefEditor(assoc_def, label_state).dom)
             }
             editors_list.sortable()
         }
 
-        function AssociationDefEditor(assoc_def) {
+        /**
+         * @param   label_state     a boolean
+         */
+        function AssociationDefEditor(assoc_def, label_state) {
             var whole_type_label = $("<span>").addClass("label").text(topic_type.value)
             var part_type_label = $("<span>").addClass("label").text(dm4c.type_label(assoc_def.part_topic_type_uri))
             var whole_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.whole_cardinality_uri)
             var part_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.part_cardinality_uri)
             var assoc_type_label = $("<span>").addClass("label").addClass("field-label").text("Association Type")
             var assoc_type_menu = create_assoc_type_menu(assoc_def.assoc_type_uri)
+            var label_config_checkbox = dm4c.render.checkbox(label_state)
+            var label_config_label = $("<span>").addClass("label").addClass("field-label").text("Include in Label")
             //
             var optional_card_div = $("<div>").append(whole_type_label).append(whole_card_menu.dom)
             optional_card_div.toggle(is_aggregation_selected())
             //
             this.dom = $("<li>").addClass("assoc-def-editor").addClass("ui-state-default")
-                .append($("<div>").append(part_type_label).append(part_card_menu.dom))
+                .append($("<div>").append(part_type_label).append(part_card_menu.dom)
+                                  .append(label_config_checkbox).append(label_config_label))
                 .append(optional_card_div)
                 .append($("<div>").append(assoc_type_label).append(assoc_type_menu.dom))
-                .data("read_func", read_assoc_def)
+                .data("model_func", get_model)
 
             function create_assoc_type_menu(selected_uri) {
                 var menu = dm4c.ui.menu(do_refresh_opional_card_div)
@@ -83,13 +90,13 @@ function TopictypeRenderer() {
                 menu.add_item({label: "Aggregation Definition", value: "dm4.core.aggregation_def"})
                 menu.select(selected_uri)
                 return menu
-            }
 
-            function do_refresh_opional_card_div() {
-                if (is_aggregation_selected()) {
-                    optional_card_div.show(500)
-                } else {
-                    optional_card_div.hide(500)
+                function do_refresh_opional_card_div() {
+                    if (is_aggregation_selected()) {
+                        optional_card_div.show(500)
+                    } else {
+                        optional_card_div.hide(500)
+                    }
                 }
             }
 
@@ -97,13 +104,16 @@ function TopictypeRenderer() {
                 return assoc_type_menu.get_selection().value == "dm4.core.aggregation_def"
             }
 
-            function read_assoc_def() {
+            function get_model() {
                 return {
-                    id:                    assoc_def.id,
-                    part_topic_type_uri:   assoc_def.part_topic_type_uri,
-                    part_cardinality_uri:  part_card_menu.get_selection().value,
-                    whole_cardinality_uri: whole_card_menu.get_selection().value,
-                    assoc_type_uri:        assoc_type_menu.get_selection().value
+                    assoc_def: {
+                        id:                    assoc_def.id,
+                        part_topic_type_uri:   assoc_def.part_topic_type_uri,
+                        part_cardinality_uri:  part_card_menu.get_selection().value,
+                        whole_cardinality_uri: whole_card_menu.get_selection().value,
+                        assoc_type_uri:        assoc_type_menu.get_selection().value
+                    },
+                    label_state: label_config_checkbox.get(0).checked
                 }
             }
         }
@@ -126,18 +136,31 @@ function TopictypeRenderer() {
                 value: $.trim(value_input.val()),
                 data_type_uri: data_type_menu.get_selection().value
             }
+            //
             var topic_type = dm4c.type_cache.get_topic_type(topic.uri)
             if (topic_type.data_type_uri == "dm4.core.composite") {
-                topic_type_model.assoc_defs = assoc_defs()
+                var model = composite_model()
+                topic_type_model.assoc_defs   = model.assoc_defs
+                topic_type_model.label_config = model.label_config
             }
+            //
             return topic_type_model
 
-            function assoc_defs() {
+            function composite_model() {
                 var assoc_defs = []
+                var label_config = []
                 editors_list.children().each(function() {
-                    assoc_defs.push($(this).data("read_func")())
+                    var editor_model = $(this).data("model_func")()
+                    var assoc_def = editor_model.assoc_def
+                    assoc_defs.push(assoc_def)
+                    if (editor_model.label_state) {
+                        label_config.push(assoc_def.part_topic_type_uri)
+                    }
                 })
-                return assoc_defs
+                return {
+                    assoc_defs: assoc_defs,
+                    label_config: label_config
+                }
             }
         }
     }

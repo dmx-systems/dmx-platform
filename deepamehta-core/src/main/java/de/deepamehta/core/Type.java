@@ -39,6 +39,8 @@ public interface Type extends Topic {
 
     List<String> getLabelConfig();
 
+    void setLabelConfig(List<String> labelConfig);
+
     // === View Configuration ===
 
     ViewConfiguration getViewConfig();
