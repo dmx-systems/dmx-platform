@@ -7,21 +7,7 @@
         <format>zip</format>
     </formats>
 
-    <!-- copy Felix and logging porperties to /conf -->
-    <files>
-        <file>
-            <source>${project.basedir}/conf/config.properties</source>
-            <outputDirectory>conf</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>${project.basedir}/conf/logging.properties</source>
-            <outputDirectory>conf</outputDirectory>
-        </file>
-    </files>
-
     <dependencySets>
-
         <!-- copy Felix main jar to /bin -->
         <dependencySet>
             <includes>
@@ -32,7 +18,6 @@
             <outputFileNameMapping>felix.jar</outputFileNameMapping>
             <useProjectArtifact>false</useProjectArtifact>
         </dependencySet>
-
         <!-- copy bundles to /bundle -->
         <dependencySet>
             <includes>
@@ -53,23 +38,41 @@
         </dependencySet>
     </dependencySets>
 
-    <!-- copy start scripts, license and readme to / -->
+    <files>
+        <!-- copy README to / -->
+        <file>
+            <source>../README.md</source>
+            <destName>README.txt</destName>
+        </file>
+        <!-- copy config files to /conf -->
+        <file>
+            <source>conf/config.properties</source>
+            <outputDirectory>conf</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>conf/logging.properties</source>
+            <outputDirectory>conf</outputDirectory>
+        </file>
+    </files>
+
     <fileSets>
+        <!-- copy start scripts to / -->
         <fileSet>
-            <directory>${project.basedir}/script</directory>
+            <directory>script</directory>
             <fileMode>0555</fileMode>
-            <outputDirectory>.</outputDirectory>
+            <outputDirectory>/</outputDirectory>
             <includes>
                 <include>deepamehta-linux.sh</include>
                 <include>deepamehta-macosx.command</include>
                 <include>deepamehta-windows.bat</include>
             </includes>
         </fileSet>
+        <!-- copy COPYRIGHT and LICENSE to / -->
         <fileSet>
-            <directory>${project.basedir}/..</directory>
+            <directory>..</directory>
             <fileMode>0444</fileMode>
             <includes>
-                <include>README.md</include>
                 <include>COPYRIGHT.txt</include>
                 <include>LICENSE.txt</include>
             </includes>
