@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Topicmaps</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-topicmaps</artifactId>
-    <version>4.0.4-SNAPSHOT</version>
+    <version>4.0.4</version>
     <packaging>bundle</packaging>
 
     <parent>
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-core</artifactId>
-            <version>4.0.4-SNAPSHOT</version>
+            <version>4.0.4</version>
         </dependency>
     </dependencies>
 

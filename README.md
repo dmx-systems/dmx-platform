@@ -2,7 +2,7 @@
 DeepaMehta 4
 ============
 
-DeepaMehta 4 is a platform for collaboration and knowledge management.
+DeepaMehta 4 is a platform for collaboration and knowledge management. The vision of DeepaMehta is a Post-Desktop Metaphor user interface that abolishes applications, windows, files, and folders in favor of stable personal views of contextual content. The goal of DeepaMehta is to provide knowledge workers of all kind a cognitive adequate work environment, right after booting.
 
 Technically DeepaMehta 4 is made of  
 Java, Neo4j, Apache Lucene, Apache Felix, Jetty, Jersey (server-side),  
@@ -14,7 +14,7 @@ DeepaMehta 4 is a rewrite of DeepaMehta 2.
 Project website:  
 <http://www.deepamehta.de/>
 
-Downloads, source code:  
+Download, source code:  
 <https://github.com/jri/deepamehta>
 
 Wiki, issue tracker:  
@@ -27,8 +27,7 @@ Mailing lists:
 Licensed under GNU General Public License, version 3.
 
 
-**Important Notice:**  
-    +++ DeepaMehta is still under heavy development! +++  
+**+++ DeepaMehta is still under heavy development! +++**  
 Do not use it in any productive and/or professional environment!  
 Currently we can not provide an update mechanism for your data. Data you put into the current version of DeepaMehta might not be usable in a later version of DeepaMehta. Please keep this in mind when using this software.  
 Thank you for your understanding!
@@ -49,13 +48,13 @@ Install
 Download the latest release and unzip it.  
 <https://github.com/jri/deepamehta/downloads/>
 
-A folder `deepamehta-4.0.3` is created.
+A folder `deepamehta-4.0.4` is created.
 
 
 Start
 -----
 
-Open the `deepamehta-4.0.3` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.0.4` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -64,45 +63,40 @@ Open the `deepamehta-4.0.3` folder and use the respective starter script for you
 While DeepaMehta starts a terminal window opens and you see some information logged.  
 Then a browser window opens and DeepaMehta is ready to use.
 
-Hint: if no browser window appears open it manually:  
+If no browser window appears open it manually:  
 <http://localhost:8080/>
 
 
 Stop
 ----
 
-Go to the terminal window that opened while startup and type:
+Go to the terminal window that opened while startup and press:
 
-    stop 0
+    Ctrl-C
 
-This puts the database in a consistent state.  
+This puts the database in a consistent state and shuts down the webserver.  
 You can close the terminal window now.
 
 
 Update
 ------
 
-Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is currently not supported.
-Even updating from 4.0.x to 4.0.3 is currently not supported.
-Please see the "Important Notice" at the top.
+Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is currently not supported.  
+Even updating from 4.0.x to 4.0.4 is currently not supported.  
+Please see the note at the top.
 
 
-Start with a fresh database
----------------------------
+Reset the database
+------------------
 
-Stop DeepaMehta, remove the `deepamehta-db` folder, and start again.
-
-
-Troubleshooting
----------------
-
-If the browser shows 404 or 503 while an exception appears in the terminal: refresh the `Apache Felix Http Jetty` bundle by typing `refresh 1` in the terminal (checkout the proper bundle ID before by using the `lb` command).
+Sometimes you might required to restart DeepaMehta with a fresh database.  
+To do so a) stop DeepaMehta, b) delete the `deepamehta-db` folder, and c) start again.
 
 
 Uninstall
 ---------
 
-Stop DeepaMehta and delete the `deepamehta-4.0.3` folder.  
+Stop DeepaMehta and delete the `deepamehta-4.0.4` folder.  
 This removes DeepaMehta completely from your computer, including the database.
 
 
@@ -115,6 +109,17 @@ Build from Source
 Version History
 ---------------
 
+**4.0.4** -- Sep 27, 2011
+
+* New features:
+    * File management: View/play your text/image/audio/video/PDF files.
+    * GUI customization (user-defined icons and topic labeling rules).
+    * Daemon support.
+* Improvements:
+    * First support for larger topic amounts
+* See details in the release notes:
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
+
 **4.0.3** -- Aug 22, 2011
 
 * New features:
@@ -123,7 +128,7 @@ Version History
 * Improvements:
     * More intuitive Create menu
     * Create topics via keyboard
-* For more GUI improvements and fixes, also for developers, see the release notes:
+* See details in the release notes:
   <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.2** -- Aug 2, 2011
@@ -236,4 +241,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Aug 22, 2011
+Sep 27, 2011
