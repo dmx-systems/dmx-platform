@@ -56,7 +56,7 @@ public class Plugin implements BundleActivator, EventHandler {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
-    private static final String STANDARD_PROVIDER_PACKAGE = "de.deepamehta.plugins.server.provider";
+    private static final String STANDARD_PROVIDER_PACKAGE = "de.deepamehta.plugins.webservice.provider";
 
     private static final String PLUGIN_READY = "dm4/core/plugin_ready";
 

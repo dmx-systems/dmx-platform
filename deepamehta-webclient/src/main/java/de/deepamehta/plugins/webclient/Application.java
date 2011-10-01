@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.webclient;
 
 import de.deepamehta.core.osgi.Activator;
-import de.deepamehta.plugins.server.provider.TopicProvider;
+import de.deepamehta.plugins.webservice.provider.TopicProvider;
 
 import java.util.HashSet;
 import java.util.Set;

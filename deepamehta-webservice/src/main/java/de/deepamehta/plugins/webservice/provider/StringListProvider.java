@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.server.provider;
+package de.deepamehta.plugins.webservice.provider;
 
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.JSONHelper;

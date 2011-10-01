@@ -1,8 +1,12 @@
-package de.deepamehta.plugins.server.provider;
+package de.deepamehta.plugins.webservice.provider;
 
-import de.deepamehta.core.service.CommandResult;
+import de.deepamehta.core.JSONEnabled;
+import de.deepamehta.core.util.JavaUtils;
+
+import org.codehaus.jettison.json.JSONObject;
 
 import java.io.BufferedWriter;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -13,13 +17,14 @@ import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 
 
 @Provider
-public class CommandResultProvider implements MessageBodyWriter<CommandResult> {
+public class JSONEnabledProvider implements MessageBodyWriter<JSONEnabled> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -38,25 +43,25 @@ public class CommandResultProvider implements MessageBodyWriter<CommandResult> {
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
-        return type == CommandResult.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
+        return JSONEnabled.class.isAssignableFrom(type) && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Override
-    public long getSize(CommandResult result, Class<?> type, Type genericType, Annotation[] annotations,
+    public long getSize(JSONEnabled jsonEnabled, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(CommandResult result, Class<?> type, Type genericType, Annotation[] annotations,
+    public void writeTo(JSONEnabled jsonEnabled, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            result.toJSON().write(writer);
+            jsonEnabled.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing message body failed (" + result + ")", e);
+            throw new IOException("Writing message body failed (" + jsonEnabled + ")", e);
         }
     }
 }

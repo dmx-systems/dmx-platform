@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.server.provider;
+package de.deepamehta.plugins.webservice.provider;
 
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.TopicTypeModel;

@@ -1,7 +1,7 @@
-package de.deepamehta.plugins.server.provider;
+package de.deepamehta.plugins.webservice.provider;
 
-import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.Association;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -25,7 +25,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class TopicProvider implements MessageBodyReader<TopicModel>, MessageBodyWriter<Topic> {
+public class AssociationProvider implements MessageBodyReader<AssociationModel>, MessageBodyWriter<Association> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -44,18 +44,18 @@ public class TopicProvider implements MessageBodyReader<TopicModel>, MessageBody
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
-        return type == TopicModel.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
+        return type == AssociationModel.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Override
-    public TopicModel readFrom(Class<TopicModel> type, Type genericType, Annotation[] annotations,
+    public AssociationModel readFrom(Class<AssociationModel> type, Type genericType, Annotation[] annotations,
             MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
                                                                 throws IOException, WebApplicationException {
         try {
             String json = JavaUtils.readText(entityStream);
-            return new TopicModel(new JSONObject(json));
+            return new AssociationModel(new JSONObject(json));
         } catch (Exception e) {
-            throw new IOException("Creating TopicModel from message body failed", e);
+            throw new IOException("Creating AssociationModel from message body failed", e);
         }
     }
 
@@ -70,24 +70,25 @@ public class TopicProvider implements MessageBodyReader<TopicModel>, MessageBody
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
-        return Topic.class.isAssignableFrom(type) && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
+        return Association.class.isAssignableFrom(type) && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Override
-    public long getSize(Topic topic, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+    public long getSize(Association assoc, Class<?> type, Type genericType, Annotation[] annotations,
+                        MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(Topic topic, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
-                        MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
+    public void writeTo(Association assoc, Class<?> type, Type genericType, Annotation[] annotations,
+                        MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            topic.toJSON().write(writer);
+            assoc.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing message body failed (" + topic + ")", e);
+            throw new IOException("Writing message body failed (" + assoc + ")", e);
         }
     }
 }

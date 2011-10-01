@@ -1,6 +1,6 @@
-package de.deepamehta.plugins.server.provider;
+package de.deepamehta.plugins.webservice.provider;
 
-import de.deepamehta.core.JSONEnabled;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -24,7 +24,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class JSONEnabledProvider implements MessageBodyWriter<JSONEnabled> {
+public class DirectivesProvider implements MessageBodyWriter<Directives> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -43,25 +43,25 @@ public class JSONEnabledProvider implements MessageBodyWriter<JSONEnabled> {
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
-        return JSONEnabled.class.isAssignableFrom(type) && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
+        return type == Directives.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Override
-    public long getSize(JSONEnabled jsonEnabled, Class<?> type, Type genericType, Annotation[] annotations,
+    public long getSize(Directives directives, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(JSONEnabled jsonEnabled, Class<?> type, Type genericType, Annotation[] annotations,
+    public void writeTo(Directives directives, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            jsonEnabled.toJSON().write(writer);
+            directives.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing message body failed (" + jsonEnabled + ")", e);
+            throw new IOException("Writing message body failed (" + directives + ")", e);
         }
     }
 }

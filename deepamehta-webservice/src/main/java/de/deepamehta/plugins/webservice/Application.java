@@ -1,17 +1,17 @@
-package de.deepamehta.plugins.server;
+package de.deepamehta.plugins.webservice;
 
-import de.deepamehta.plugins.server.provider.AssociationProvider;
-import de.deepamehta.plugins.server.provider.CommandParamsProvider;
-import de.deepamehta.plugins.server.provider.CommandResultProvider;
-import de.deepamehta.plugins.server.provider.DirectivesProvider;
-import de.deepamehta.plugins.server.provider.JSONEnabledCollectionProvider;
-import de.deepamehta.plugins.server.provider.JSONEnabledProvider;
-import de.deepamehta.plugins.server.provider.PluginInfoProvider;
-import de.deepamehta.plugins.server.provider.RelatedTopicCollectionProvider;
-import de.deepamehta.plugins.server.provider.StringListProvider;
-import de.deepamehta.plugins.server.provider.StringSetProvider;
-import de.deepamehta.plugins.server.provider.TopicProvider;
-import de.deepamehta.plugins.server.provider.TopicTypeProvider;
+import de.deepamehta.plugins.webservice.provider.AssociationProvider;
+import de.deepamehta.plugins.webservice.provider.CommandParamsProvider;
+import de.deepamehta.plugins.webservice.provider.CommandResultProvider;
+import de.deepamehta.plugins.webservice.provider.DirectivesProvider;
+import de.deepamehta.plugins.webservice.provider.JSONEnabledCollectionProvider;
+import de.deepamehta.plugins.webservice.provider.JSONEnabledProvider;
+import de.deepamehta.plugins.webservice.provider.PluginInfoProvider;
+import de.deepamehta.plugins.webservice.provider.RelatedTopicCollectionProvider;
+import de.deepamehta.plugins.webservice.provider.StringListProvider;
+import de.deepamehta.plugins.webservice.provider.StringSetProvider;
+import de.deepamehta.plugins.webservice.provider.TopicProvider;
+import de.deepamehta.plugins.webservice.provider.TopicTypeProvider;
 
 import de.deepamehta.core.osgi.Activator;
 

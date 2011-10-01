@@ -1,6 +1,5 @@
-package de.deepamehta.plugins.server.provider;
+package de.deepamehta.plugins.webservice.provider;
 
-import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.util.JSONHelper;
 
 import java.io.BufferedWriter;
@@ -22,7 +21,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class PluginInfoProvider implements MessageBodyWriter<Set<PluginInfo>> {
+public class StringSetProvider implements MessageBodyWriter<Set<String>> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -43,7 +42,7 @@ public class PluginInfoProvider implements MessageBodyWriter<Set<PluginInfo>> {
         if (genericType instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) genericType;
             Type[] typeArgs = pt.getActualTypeArguments();
-            if (pt.getRawType() == Set.class && typeArgs.length == 1 && typeArgs[0] == PluginInfo.class) {
+            if (pt.getRawType() == Set.class && typeArgs.length == 1 && typeArgs[0] == String.class) {
                 // Note: unlike equals() isCompatible() ignores parameters
                 // like "charset" in "application/json;charset=UTF-8"
                 if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
@@ -55,21 +54,21 @@ public class PluginInfoProvider implements MessageBodyWriter<Set<PluginInfo>> {
     }
 
     @Override
-    public long getSize(Set<PluginInfo> pluginInfo, Class<?> type, Type genericType, Annotation[] annotations,
+    public long getSize(Set<String> strings, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(Set<PluginInfo> pluginInfo, Class<?> type, Type genericType, Annotation[] annotations,
+    public void writeTo(Set<String> strings, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            PluginInfo.pluginInfoToJson(pluginInfo).write(writer);
+            JSONHelper.stringsToJson(strings).write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing message body failed (" + pluginInfo + ")", e);
+            throw new IOException("Writing message body failed (" + strings + ")", e);
         }
     }
 }

@@ -1,15 +1,13 @@
-package de.deepamehta.plugins.server.provider;
+package de.deepamehta.plugins.webservice.provider;
 
-import de.deepamehta.core.util.JSONHelper;
+import de.deepamehta.core.service.CommandResult;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
@@ -21,7 +19,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class StringSetProvider implements MessageBodyWriter<Set<String>> {
+public class CommandResultProvider implements MessageBodyWriter<CommandResult> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -39,36 +37,26 @@ public class StringSetProvider implements MessageBodyWriter<Set<String>> {
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        if (genericType instanceof ParameterizedType) {
-            ParameterizedType pt = (ParameterizedType) genericType;
-            Type[] typeArgs = pt.getActualTypeArguments();
-            if (pt.getRawType() == Set.class && typeArgs.length == 1 && typeArgs[0] == String.class) {
-                // Note: unlike equals() isCompatible() ignores parameters
-                // like "charset" in "application/json;charset=UTF-8"
-                if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
+        return type == CommandResult.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Override
-    public long getSize(Set<String> strings, Class<?> type, Type genericType, Annotation[] annotations,
+    public long getSize(CommandResult result, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(Set<String> strings, Class<?> type, Type genericType, Annotation[] annotations,
+    public void writeTo(CommandResult result, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            JSONHelper.stringsToJson(strings).write(writer);
+            result.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing message body failed (" + strings + ")", e);
+            throw new IOException("Writing message body failed (" + result + ")", e);
         }
     }
 }
