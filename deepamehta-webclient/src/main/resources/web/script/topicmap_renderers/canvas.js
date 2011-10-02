@@ -133,7 +133,7 @@ function Canvas() {
         if (!ct) {
             return
         }
-        reset_highlight_object(id)
+        reset_highlighting_conditionally(id)
         // 2) refresh GUI
         if (refresh_canvas) {
             this.refresh()
@@ -152,7 +152,7 @@ function Canvas() {
         if (!ca) {
             return
         }
-        reset_highlight_object(id)
+        reset_highlighting_conditionally(id)
         // 2) refresh GUI
         if (refresh_canvas) {
             this.refresh()
@@ -164,6 +164,15 @@ function Canvas() {
     this.set_highlight_object = function(object_id, refresh_canvas) {
         // update model
         highlight_object_id = object_id
+        // refresh GUI
+        if (refresh_canvas) {
+            this.refresh()
+        }
+    }
+
+    this.reset_highlighting = function(refresh_canvas) {
+        // update model
+        reset_highlighting()
         // refresh GUI
         if (refresh_canvas) {
             this.refresh()
@@ -655,14 +664,18 @@ function Canvas() {
     function init_model() {
         canvas_topics = {}
         canvas_assocs = {}
-        highlight_object_id = -1
+        reset_highlighting()
         trans_x = 0, trans_y = 0
     }
 
-    function reset_highlight_object(object_id) {
+    function reset_highlighting_conditionally(object_id) {
         if (highlight_object_id == object_id) {
-            highlight_object_id = -1
+            reset_highlighting()
         }
+    }
+
+    function reset_highlighting() {
+        highlight_object_id = -1
     }
 
 

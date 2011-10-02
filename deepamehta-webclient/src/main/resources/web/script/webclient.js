@@ -2,7 +2,7 @@ var dm4c = new function() {
 
     // preferences
     this.MAX_RESULT_SIZE = 100
-    this.DEFAULT_TOPIC_ICON = "images/ball-gray.png"
+    this.DEFAULT_TOPIC_ICON = "/images/ball-gray.png"
     var DEFAULT_FIELD_ROWS = 1
 
     // logger preferences
@@ -10,6 +10,7 @@ var dm4c = new function() {
     var LOG_PLUGIN_LOADING = false
     var LOG_IMAGE_LOADING = false
     this.LOG_GUI = false
+    this.LOG_HISTORY = false
 
     var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
@@ -50,6 +51,16 @@ var dm4c = new function() {
 
 
 
+    // Note: the controller methods are the top-level entry points to be called by event handlers.
+    // The controller methods are responsible for
+    //     a) updating the database,
+    //     b) updating the (view) model,
+    //     c) updating the view,
+    //     d) triggering hooks
+    // The names of the controller methods begins with "do_".
+
+
+
     this.do_search = function(searchmode) {
         try {
             var search_topic = build_topic(dm4c.trigger_plugin_hook("search", searchmode)[0])
@@ -65,11 +76,13 @@ var dm4c = new function() {
     /**
      * Fetches the topic and displays it on the page panel.
      * Triggers the "post_select_topic" hook (indirectly).
+     *
+     * @param   no_history_update   Optional: boolean.
      */
-    this.do_select_topic = function(topic_id) {
-        // update model
+    this.do_select_topic = function(topic_id, no_history_update) {
         var topic = dm4c.fetch_topic(topic_id)
-        set_selected_topic(topic)
+        // update model
+        set_selected_topic(topic, no_history_update)
         // update view
         dm4c.canvas.set_highlight_object(topic_id, true)    // refresh_canvas=true
         dm4c.page_panel.display(topic)
@@ -79,18 +92,23 @@ var dm4c = new function() {
     /**
      * Fetches the association and displays it on the page panel.
      * Triggers the "post_select_association" hook (indirectly).
+     *
+     * @param   no_history_update   Optional: boolean.
      */
-    this.do_select_association = function(assoc_id) {
-        // update model
+    this.do_select_association = function(assoc_id, no_history_update) {
         var assoc = dm4c.fetch_association(assoc_id)
-        set_selected_association(assoc)
+        // update model
+        set_selected_association(assoc, no_history_update)
         // update view
         dm4c.canvas.set_highlight_object(assoc_id, true)    // refresh_canvas=true
         dm4c.page_panel.display(assoc)
     }
 
-    this.do_reset_selection = function() {
-        reset_selection()
+    /**
+     * @param   no_history_update   Optional: boolean.
+     */
+    this.do_reset_selection = function(no_history_update) {
+        reset_selection(no_history_update)
     }
 
     // ---
@@ -438,6 +456,28 @@ var dm4c = new function() {
         dm4c.canvas.refresh()
     }
 
+
+
+    // === Selection ===
+
+    function set_selected_topic(topic, no_history_update) {
+        // update model
+        dm4c.selected_object = topic
+        //
+        if (!no_history_update) {
+            push_history(topic)
+        }
+        // trigger hook
+        dm4c.trigger_plugin_hook("post_select_topic", topic)
+    }
+
+    function set_selected_association(assoc, no_history_update) {
+        // update model
+        dm4c.selected_object = assoc
+        // trigger hook
+        dm4c.trigger_plugin_hook("post_select_association", assoc)
+    }
+
     // ---
 
     function reset_selection_conditionally(object_id) {
@@ -446,18 +486,29 @@ var dm4c = new function() {
         }
     }
 
-    function reset_selection() {
+    /**
+     * @param   no_history_update   Optional: boolean.
+     */
+    function reset_selection(no_history_update) {
+        if (dm4c.LOG_HISTORY) dm4c.log("Resetting selection (no_history_update=" + no_history_update + ")")
         // update model
         dm4c.selected_object = null
-        // update view (page panel)
+        //
+        if (!no_history_update) {
+            push_history()
+        }
+        // update view
+        dm4c.canvas.reset_highlighting(true)    // refresh_canvas=true
         dm4c.page_panel.clear()
+        // trigger hook
+        dm4c.trigger_plugin_hook("post_reset_selection")
     }
 
 
 
-    /*************/
-    /*** Model ***/
-    /*************/
+    /***********************/
+    /*** Database Helper ***/
+    /***********************/
 
 
 
@@ -521,20 +572,6 @@ var dm4c = new function() {
         dm4c.trigger_plugin_hook("post_create_topic", topic_type)
         //
         return topic_type
-    }
-
-    // ---
-
-    function set_selected_topic(topic) {
-        dm4c.selected_object = topic
-        // trigger hook
-        dm4c.trigger_plugin_hook("post_select_topic", topic)
-    }
-
-    function set_selected_association(assoc) {
-        dm4c.selected_object = assoc
-        // trigger hook
-        dm4c.trigger_plugin_hook("post_select_association", assoc)
     }
 
 
@@ -850,7 +887,7 @@ var dm4c = new function() {
         dm4c.trigger_plugin_hook("post_refresh_create_menu", dm4c.toolbar.create_menu)
     }
 
-    // --- Image Tracker ---
+    // === Image Tracker ===
 
     var image_tracker
 
@@ -879,7 +916,7 @@ var dm4c = new function() {
         }
     }
 
-    // ---
+    // === Misc ===
 
     /**
      * Returns the icon for a topic type.
@@ -924,6 +961,63 @@ var dm4c = new function() {
                 log_window.document.writeln(js.render_text(text) + "<br>")
             }
         }
+    }
+
+    // === History ===
+
+    /**
+     * Is trueish if the browser supports the HTML5 History API.
+     */
+    var history_api_supported = window.history.pushState;
+
+    if (this.LOG_HISTORY) this.log("HTML5 History API " + (history_api_supported ? "*is*" : "is *not*") +
+        " supported by this browser")
+
+    if (history_api_supported) {
+        window.addEventListener("popstate", function(e) {
+            // Note: state is null if a) this is the initial popstate event or
+            // b) if back is pressed while the begin of history is reached.
+            if (e.state) {
+                pop_history(e.state)
+            } else {
+                if (dm4c.LOG_HISTORY) dm4c.log("Popped history state is " + e.state)
+            }
+        })
+    }
+
+    function pop_history(state) {
+        if (dm4c.LOG_HISTORY) dm4c.log("Popping history state: " + JSON.stringify(state))
+        var result = dm4c.trigger_plugin_hook("pre_pop_history", state)
+        if (!js.contains(result, false)) {
+            var topic_id = state.topic_id
+            dm4c.do_select_topic(topic_id, true)    // no_history_update=true
+        } else {
+            if (dm4c.LOG_HISTORY) dm4c.log("Generic popping behavoir suppressed by plugin")
+        }
+    }
+
+    function push_history(topic) {
+        if (!history_api_supported) {
+            return
+        }
+        // build history entry
+        if (topic) {
+            var state = {
+                topic_id: topic.id
+            }
+            var url = "/topic/" + state.topic_id
+        } else {
+            var state = {}
+            var url = ""
+        }
+        var history_entry = {state: state, url: url}
+        // trigger hook
+        dm4c.trigger_plugin_hook("pre_push_history", history_entry)
+        //
+        if (dm4c.LOG_HISTORY) dm4c.log("Pushing history state: " + JSON.stringify(history_entry.state) +
+            ", url=\"" + history_entry.url + "\"")
+        // push history entry
+        history.pushState(history_entry.state, null, history_entry.url)
     }
 
 

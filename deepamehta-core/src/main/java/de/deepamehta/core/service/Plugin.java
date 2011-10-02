@@ -592,7 +592,7 @@ public class Plugin implements BundleActivator, EventHandler {
     /**
      * Returns the packages Jersey have to scan (for root resource and provider classes) for this plugin.
      * These comprise:
-     * 1) The plugin's "resource" package.
+     * 1) The plugin's "resources" package.
      * 2) The plugin's "provider" package.
      * 3) The deepamehta-webservice's "provider" package.
      *    This contains providers for DeepaMehta's core model classes, e.g. "Topic".

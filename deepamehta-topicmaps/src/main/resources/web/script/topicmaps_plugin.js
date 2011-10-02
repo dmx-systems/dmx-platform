@@ -4,11 +4,11 @@ function topicmaps_plugin() {
 
     var LOG_TOPICMAPS = false
 
-    // model
+    // Model
     var topicmaps = {}  // The topicmaps cache (key: topicmap ID, value: Topicmap object)
     var topicmap        // Selected topicmap (Topicmap object)
 
-    // view
+    // View
     var topicmap_menu
 
     // ------------------------------------------------------------------------------------------------ Overriding Hooks
@@ -98,6 +98,10 @@ function topicmaps_plugin() {
 
     this.post_select_association = function(assoc) {
         topicmap.set_association_selection(assoc)
+    }
+
+    this.post_reset_selection = function() {
+        topicmap.reset_selection()
     }
 
     /**
@@ -214,6 +218,26 @@ function topicmaps_plugin() {
         }
     }
 
+    this.pre_push_history = function(history_entry) {
+        history_entry.state.topicmap_id = topicmap.get_id()
+        history_entry.url = "/topicmap/" + topicmap.get_id() + history_entry.url
+    }
+
+    this.pre_pop_history = function(state) {
+        if (dm4c.LOG_HISTORY) dm4c.log("..... topicmaps_plugin.pre_pop_history()")
+        if (state.topicmap_id != topicmap.get_id()) {
+            if (dm4c.LOG_HISTORY) dm4c.log(".......... switch from topicmap " + topicmap.get_id() +
+                " to " + state.topicmap_id)
+            this.do_select_topicmap(state.topicmap_id, true)    // no_history_update=true
+            return false
+        } else if (!state.topic_id) {
+            if (dm4c.LOG_HISTORY) dm4c.log(".......... topicmap not changed and no topic in popstate " +
+                "=> resetting selection")
+            dm4c.do_reset_selection(true)                       // no_history_update=true
+            return false
+        }
+    }
+
 
 
     // ********************************************************************
@@ -241,13 +265,15 @@ function topicmaps_plugin() {
     /**
      * Selects a topicmap programmatically.
      * The respective item from the topicmap menu is selected and the topicmap is displayed on the canvas.
+     *
+     * @param   no_history_update   Optional: boolean.
      */
-    this.do_select_topicmap = function(topicmap_id) {
+    this.do_select_topicmap = function(topicmap_id, no_history_update) {
         // update model
         select_topicmap(topicmap_id)
         // update view
         select_menu_item(topicmap_id)
-        display_topicmap()
+        display_topicmap(no_history_update)
     }
 
     /**
@@ -384,9 +410,11 @@ function topicmaps_plugin() {
      * Displays the selected topicmap on the canvas.
      *
      * Prerequisite: the topicmap is already selected in the topicmap menu.
+     *
+     * @param   no_history_update   Optional: boolean.
      */
-    function display_topicmap() {
-        topicmap.display_on_canvas()
+    function display_topicmap(no_history_update) {
+        topicmap.display_on_canvas(no_history_update)
     }
 
     // ---
@@ -473,7 +501,10 @@ function topicmaps_plugin() {
             return topicmap_id
         }
 
-        this.display_on_canvas = function() {
+        /**
+         * @param   no_history_update   Optional: boolean.
+         */
+        this.display_on_canvas = function(no_history_update) {
 
             // track loading of topic type images
             var image_tracker = dm4c.create_image_tracker(display_on_canvas)
@@ -522,12 +553,12 @@ function topicmaps_plugin() {
                 function restore_selection() {
                     if (selected_object_id != -1) {
                         if (is_topic_selected) {
-                            dm4c.do_select_topic(selected_object_id)
+                            dm4c.do_select_topic(selected_object_id, no_history_update)
                         } else {
-                            dm4c.do_select_association(selected_object_id)
+                            dm4c.do_select_association(selected_object_id, no_history_update)
                         }
                     } else {
-                        dm4c.do_reset_selection()
+                        dm4c.do_reset_selection(no_history_update)
                     }
                 }
             }
@@ -633,6 +664,10 @@ function topicmaps_plugin() {
         this.set_association_selection = function(assoc) {
             selected_object_id = assoc.id
             is_topic_selected = false
+        }
+
+        this.reset_selection = function() {
+            selected_object_id = -1
         }
 
         this.get_topic = function(id) {
