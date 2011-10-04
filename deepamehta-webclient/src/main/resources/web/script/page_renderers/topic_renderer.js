@@ -22,28 +22,17 @@ function TopicRenderer() {
 
 
     this.render_page = function(topic) {
-
-        render_page_model(create_page_model(topic), render_field)
+        page_model = create_page_model(topic, "viewable")
+        render_page_model(page_model, "render_field")
+        //
         dm4c.render.associations(topic.id)
-
-        function render_field(field) {
-            if (field.viewable) {
-                field.render_field()
-            }
-        }
     }
 
     this.render_form = function(topic) {
-
         dm4c.trigger_plugin_hook("pre_render_form", topic)
-        page_model = create_page_model(topic)
-        render_page_model(page_model, render_field)
-
-        function render_field(field) {
-            if (field.editable) {
-                field.render_form_element()
-            }
-        }
+        //
+        page_model = create_page_model(topic, "editable")
+        render_page_model(page_model, "render_form_element")
     }
 
     this.process_form = function(topic) {
@@ -124,34 +113,53 @@ function TopicRenderer() {
 
     // === Page Model ===
 
-    function create_page_model(topic) {
+    /**
+     * @param   setting     "viewable" or "editable"
+     */
+    function create_page_model(topic, setting) {
 
         return create_fields("", topic.composite, topic.get_type())
 
         function create_fields(field_uri, composite, topic_type, assoc_def) {
-            if (topic_type.data_type_uri == "dm4.core.composite") {
-                var fields = {}
-                for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                    var part_topic_type = dm4c.type_cache.get_topic_type(assoc_def.part_topic_type_uri)
-                    var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
-                    var comp = composite && composite[assoc_def.uri]
-                    var child_fields = create_fields(child_field_uri, comp, part_topic_type, assoc_def)
-                    fields[assoc_def.uri] = child_fields
+            if (get_view_config()) {
+                if (topic_type.data_type_uri == "dm4.core.composite") {
+                    var fields = {}
+                    for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
+                        var part_topic_type = dm4c.type_cache.get_topic_type(assoc_def.part_topic_type_uri)
+                        var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
+                        var comp = composite && composite[assoc_def.uri]
+                        var child_fields = create_fields(child_field_uri, comp, part_topic_type, assoc_def)
+                        if (child_fields) {
+                            fields[assoc_def.uri] = child_fields
+                        }
+                    }
+                    return fields;
+                } else {
+                    var value = field_uri == "" ? topic.value : composite
+                    return new TopicRenderer.Field(field_uri, value, topic, topic_type, assoc_def)
                 }
-                return fields;
-            } else {
-                var value = field_uri == "" ? topic.value : composite
-                return new TopicRenderer.Field(field_uri, value, topic, topic_type, assoc_def)
+            }
+
+            // compare to get_view_config() in TopicRenderer.Field
+            function get_view_config() {
+                // the assoc def's config has precedence
+                if (assoc_def) {
+                    var value = dm4c.get_view_config(assoc_def, setting)
+                    if (value != undefined) {
+                        return value
+                    }
+                }
+                return dm4c.get_view_config(topic_type, setting, true)
             }
         }
     }
 
-    function render_page_model(page_model, render_func) {
+    function render_page_model(page_model, render_func_name) {
         if (page_model instanceof TopicRenderer.Field) {
-            render_func(page_model)
+            page_model[render_func_name]()
         } else {
             for (var assoc_def_uri in page_model) {
-                render_page_model(page_model[assoc_def_uri], render_func)
+                render_page_model(page_model[assoc_def_uri], render_func_name)
             }
         }
     }
@@ -382,10 +390,8 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
     this.topic_type = topic_type
     this.assoc_def = assoc_def
     this.label = topic_type.value
-    this.editable               = get_view_config("editable")
-    this.viewable               = get_view_config("viewable")
-    var js_field_renderer_class = get_view_config("js_field_renderer_class")
     this.rows                   = get_view_config("rows")
+    var js_field_renderer_class = get_view_config("js_field_renderer_class")
     var renderer
 
     this.render_field = function() {
@@ -453,6 +459,7 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
     function trigger_renderer_hook(hook_name) {
         // Trigger the hook only if it is defined (a renderer must not define all hooks).
         if (renderer[hook_name]) {
+            // ### FIXME: use apply() instead of limiting arguments
             if (arguments.length == 1) {
                 return renderer[hook_name]()
             } else if (arguments.length == 2) {
@@ -463,8 +470,15 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
 
     function get_view_config(setting) {
         // the assoc def's config has precedence
-        // ### FIXME: assoc def can't override with falsish values
-        return assoc_def && dm4c.get_view_config(assoc_def,  setting) ||
-                            dm4c.get_view_config(topic_type, setting, true)
+        if (assoc_def) {
+            var value = dm4c.get_view_config(assoc_def, setting)
+            // Note 1: we explicitely compare to undefined to let assoc defs override with falsish values.
+            // Note 2: we must regard an empty string as "not set" to not loose the default rendering classes.
+            if (value !== undefined && value !== "") {      // compare to get_view_config() in webclient.js
+                // regard the assoc def's value as set
+                return value
+            }
+        }
+        return dm4c.get_view_config(topic_type, setting, true)
     }
 }

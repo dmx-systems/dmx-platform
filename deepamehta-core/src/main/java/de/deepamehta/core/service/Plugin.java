@@ -671,15 +671,21 @@ public class Plugin implements BundleActivator, EventHandler {
 
     @Override
     public void handleEvent(Event event) {
-        if (event.getTopic().equals(PLUGIN_READY)) {
-            String pluginId = (String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME);
-            if (hasDependency(pluginId)) {
-                logger.info("### Receiving PLUGIN_READY event from \"" + pluginId + "\" for " + this);
-                dependencyState.put(pluginId, true);
-                checkServiceAvailability();
+        try {
+            if (event.getTopic().equals(PLUGIN_READY)) {
+                String pluginId = (String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME);
+                if (hasDependency(pluginId)) {
+                    logger.info("### Receiving PLUGIN_READY event from \"" + pluginId + "\" for " + this);
+                    dependencyState.put(pluginId, true);
+                    checkServiceAvailability();
+                }
+            } else {
+                throw new RuntimeException("Unexpected event: " + event);
             }
-        } else {
-            throw new RuntimeException("Unexpected event: " + event);
+        } catch (Exception e) {
+            logger.severe("Handling OSGi event for " + this + " failed (event=" + event + ")");
+            e.printStackTrace();
+            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
         }
     }
 
