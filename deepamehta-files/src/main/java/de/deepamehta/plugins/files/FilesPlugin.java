@@ -70,7 +70,7 @@ public class FilesPlugin extends Plugin implements FilesService {
 
 
     @POST
-    @Path("/file/{path}")
+    @Path("/file/{path:.*}")
     @Override
     public Topic createFileTopic(@PathParam("path") String path) {
         String text = "Creating file topic for path \"" + path + "\"";
@@ -127,7 +127,7 @@ public class FilesPlugin extends Plugin implements FilesService {
     // ---
 
     @POST
-    @Path("/{id}/file/{path}")
+    @Path("/{id}/file/{path:.*}")
     @Override
     public Topic createChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
         Topic childTopic = createFileTopic(path);
@@ -136,7 +136,7 @@ public class FilesPlugin extends Plugin implements FilesService {
     }
 
     @POST
-    @Path("/{id}/folder/{path}")
+    @Path("/{id}/folder/{path:.*}")
     @Override
     public Topic createChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
         Topic childTopic = createFolderTopic(path);
