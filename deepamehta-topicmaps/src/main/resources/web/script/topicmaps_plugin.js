@@ -238,6 +238,10 @@ function topicmaps_plugin() {
         }
     }
 
+    this.pre_draw_canvas = function(ctx) {
+        topicmap.draw_background(ctx)
+    }
+
 
 
     // ********************************************************************
@@ -488,11 +492,15 @@ function topicmaps_plugin() {
     function Topicmap(topicmap_id) {
 
         // Model
+        var info            // the Topicmap topic (a JavaScript object)
         var topics = {}     // topics of this topicmap (key: topic ID, value: TopicmapTopic object)
         var assocs = {}     // associations of this topicmap (key: association ID, value: TopicmapAssociation object)
         var selected_object_id = -1     // ID of the selected topic or association, or -1 for no selection
         var is_topic_selected           // true indicates topic selection, false indicates association selection
                                         // only evaluated if there is a selection (selected_object_id != -1)
+        // View
+        var background_image
+
         load()
 
         // --- Public API ---
@@ -674,6 +682,12 @@ function topicmaps_plugin() {
             return topics[id]
         }
 
+        this.draw_background = function(ctx) {
+            if (background_image) {
+                ctx.drawImage(background_image, 0, 0)
+            }
+        }
+
         // --- Private Functions ---
 
         function load() {
@@ -681,12 +695,15 @@ function topicmaps_plugin() {
             if (LOG_TOPICMAPS) dm4c.log("Loading topicmap " + topicmap_id)
 
             var topicmap = dm4c.restc.get_topicmap(topicmap_id)
+            info = topicmap.info
 
             if (LOG_TOPICMAPS) dm4c.log("..... " + topicmap.topics.length + " topics")
             load_topics()
 
             if (LOG_TOPICMAPS) dm4c.log("..... " + topicmap.assocs.length + " associations")
             load_associations()
+
+            load_background_image()
 
             function load_topics() {
                 for (var i = 0, topic; topic = topicmap.topics[i]; i++) {
@@ -708,6 +725,13 @@ function topicmaps_plugin() {
                             ", ref_id=" + assoc.ref_id)
                     assocs[assoc.id] = new TopicmapAssociation(assoc.id, assoc.type_uri,
                         assoc.role_1.topic_id, assoc.role_2.topic_id, assoc.ref_id)
+                }
+            }
+
+            function load_background_image() {
+                var file = info.composite["dm4.files.file"]
+                if (file) {
+                    background_image = dm4c.create_image("/proxy/file:" + file["dm4.files.path"])
                 }
             }
         }

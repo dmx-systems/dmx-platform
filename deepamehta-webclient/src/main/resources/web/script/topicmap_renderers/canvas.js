@@ -246,6 +246,8 @@ function Canvas() {
 
     function draw() {
         ctx.clearRect(-trans_x, -trans_y, self.canvas_width, self.canvas_height)
+        // trigger hook
+        dm4c.trigger_plugin_hook("pre_draw_canvas", ctx)
         //
         draw_associations()
         //

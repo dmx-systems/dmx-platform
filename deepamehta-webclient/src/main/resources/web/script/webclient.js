@@ -887,9 +887,24 @@ var dm4c = new function() {
         dm4c.trigger_plugin_hook("post_refresh_create_menu", dm4c.toolbar.create_menu)
     }
 
-    // === Image Tracker ===
+    // === Images ===
 
     var image_tracker
+
+    this.create_image = function(src) {
+        var img = new Image()
+        img.src = src   // Note: if src is a relative URL JavaScript extends img.src to an absolute URL
+        img.onload = function() {
+            // Note: "this" is the image. The argument is the "load" event.
+            if (LOG_IMAGE_LOADING) dm4c.log("Image ready: " + src)
+            notify_image_trackers()
+        }
+        return img
+
+        function notify_image_trackers() {
+            image_tracker && image_tracker.check()
+        }
+    }
 
     this.create_image_tracker = function(callback_func) {
 
@@ -936,19 +951,6 @@ var dm4c = new function() {
      */
     this.get_type_color = function(assoc_type_uri) {
         return dm4c.type_cache.get_association_type(assoc_type_uri).get_color()
-    }
-
-    // ---
-
-    this.create_image = function(src) {
-        var img = new Image()
-        img.src = src   // Note: if src is a relative URL JavaScript extends img.src to an absolute URL
-        img.onload = function(arg0) {
-            // Note: "this" is the image. The argument is the "load" event.
-            if (LOG_IMAGE_LOADING) dm4c.log("Image ready: " + src)
-            notify_image_trackers()
-        }
-        return img
     }
 
     // ---
@@ -1097,10 +1099,6 @@ var dm4c = new function() {
         for (var i = 0; i < type_uris.length; i++) {
             dm4c.type_cache.put_association_type(fetch_association_type(type_uris[i]))
         }
-    }
-
-    function notify_image_trackers() {
-        image_tracker && image_tracker.check()
     }
 
     // ------------------------------------------------------------------------------------------------ Constructor Code
