@@ -53,7 +53,7 @@ public class ProxyPlugin extends Plugin implements ProxyService {
 
 
     @GET
-    @Path("/{uri:.*}")
+    @Path("/{uri:.+}")      // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public Resource getResource(@PathParam("uri") URL uri, @QueryParam("type") String mediaType,
                                                            @QueryParam("size") long size) {
@@ -72,7 +72,7 @@ public class ProxyPlugin extends Plugin implements ProxyService {
     }
 
     @GET
-    @Path("/{uri:.*}/info")
+    @Path("/{uri:.+}/info") // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Produces("application/json")
     @Override
     public ResourceInfo getResourceInfo(@PathParam("uri") URL uri) {

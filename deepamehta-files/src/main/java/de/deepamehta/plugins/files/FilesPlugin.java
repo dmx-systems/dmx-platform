@@ -70,7 +70,7 @@ public class FilesPlugin extends Plugin implements FilesService {
 
 
     @POST
-    @Path("/file/{path:.*}")
+    @Path("/file/{path:.+}")       // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public Topic createFileTopic(@PathParam("path") String path) {
         String text = "Creating file topic for path \"" + path + "\"";
@@ -102,7 +102,7 @@ public class FilesPlugin extends Plugin implements FilesService {
     }
 
     @POST
-    @Path("/folder/{path:.*}")
+    @Path("/folder/{path:.+}")     // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public Topic createFolderTopic(@PathParam("path") String path) {
         String text = "Creating folder topic for path \"" + path + "\"";
@@ -127,7 +127,7 @@ public class FilesPlugin extends Plugin implements FilesService {
     // ---
 
     @POST
-    @Path("/{id}/file/{path:.*}")
+    @Path("/{id}/file/{path:.+}")  // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public Topic createChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
         Topic childTopic = createFileTopic(path);
@@ -136,7 +136,7 @@ public class FilesPlugin extends Plugin implements FilesService {
     }
 
     @POST
-    @Path("/{id}/folder/{path:.*}")
+    @Path("/{id}/folder/{path:.+}")// Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public Topic createChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
         Topic childTopic = createFolderTopic(path);

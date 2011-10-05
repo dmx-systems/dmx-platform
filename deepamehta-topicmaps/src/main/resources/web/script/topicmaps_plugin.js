@@ -741,7 +741,8 @@ function topicmaps_plugin() {
             function load_background_image() {
                 var file = topicmap.info.composite["dm4.files.file"]
                 if (file) {
-                    background_image = dm4c.create_image("/proxy/file:" + file["dm4.files.path"])
+                    var image_url = "/proxy/file:" + file["dm4.files.path"]
+                    background_image = dm4c.create_image(image_url)
                 }
             }
         }
