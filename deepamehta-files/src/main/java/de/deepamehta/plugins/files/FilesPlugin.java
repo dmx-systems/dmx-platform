@@ -102,7 +102,7 @@ public class FilesPlugin extends Plugin implements FilesService {
     }
 
     @POST
-    @Path("/folder/{path}")
+    @Path("/folder/{path:.*}")
     @Override
     public Topic createFolderTopic(@PathParam("path") String path) {
         String text = "Creating folder topic for path \"" + path + "\"";
