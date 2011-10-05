@@ -418,7 +418,7 @@ function topicmaps_plugin() {
      * @param   no_history_update   Optional: boolean.
      */
     function display_topicmap(no_history_update) {
-        topicmap.display_on_canvas(no_history_update)
+        topicmap.put_on_canvas(no_history_update)
     }
 
     // ---
@@ -485,14 +485,13 @@ function topicmaps_plugin() {
     /**
      * An in-memory representation (model) of a persistent topicmap. There are methods for:
      *  - building the in-memory representation by loading a topicmap from DB.
-     *  - displaying the in-memory representation on the canvas.
-     *  - manipulating the in-memory representation by e.g. adding/removing topics and associations,
+     *  - manipulating the topicmap by e.g. adding/removing topics and associations,
      *    while synchronizing the DB accordingly.
+     *  - putting the topicmap on the canvas.
      */
     function Topicmap(topicmap_id) {
 
         // Model
-        var info            // the Topicmap topic (a JavaScript object)
         var topics = {}     // topics of this topicmap (key: topic ID, value: TopicmapTopic object)
         var assocs = {}     // associations of this topicmap (key: association ID, value: TopicmapAssociation object)
         var selected_object_id = -1     // ID of the selected topic or association, or -1 for no selection
@@ -512,19 +511,31 @@ function topicmaps_plugin() {
         /**
          * @param   no_history_update   Optional: boolean.
          */
-        this.display_on_canvas = function(no_history_update) {
+        this.put_on_canvas = function(no_history_update) {
 
-            // track loading of topic type images
-            var image_tracker = dm4c.create_image_tracker(display_on_canvas)
-            for (var id in topics) {
-                var topic = topics[id]
-                if (topic.visibility) {
-                    image_tracker.add_type(topic.type_uri)
+            track_images()
+
+            /**
+             * Defers "put_on_canvas" until all topicmap images are loaded.
+             */
+            function track_images() {
+                var image_tracker = dm4c.create_image_tracker(put_on_canvas)
+                // add type icons
+                for (var id in topics) {
+                    var topic = topics[id]
+                    if (topic.visibility) {
+                        image_tracker.add_image(dm4c.get_type_icon(topic.type_uri))
+                    }
                 }
+                // add background image
+                if (background_image) {
+                    image_tracker.add_image(background_image)
+                }
+                //
+                image_tracker.check()
             }
-            image_tracker.check()
 
-            function display_on_canvas() {
+            function put_on_canvas() {
 
                 dm4c.canvas.clear()
                 display_topics()
@@ -695,7 +706,6 @@ function topicmaps_plugin() {
             if (LOG_TOPICMAPS) dm4c.log("Loading topicmap " + topicmap_id)
 
             var topicmap = dm4c.restc.get_topicmap(topicmap_id)
-            info = topicmap.info
 
             if (LOG_TOPICMAPS) dm4c.log("..... " + topicmap.topics.length + " topics")
             load_topics()
@@ -729,7 +739,7 @@ function topicmaps_plugin() {
             }
 
             function load_background_image() {
-                var file = info.composite["dm4.files.file"]
+                var file = topicmap.info.composite["dm4.files.file"]
                 if (file) {
                     background_image = dm4c.create_image("/proxy/file:" + file["dm4.files.path"])
                 }

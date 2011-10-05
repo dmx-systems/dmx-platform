@@ -889,7 +889,7 @@ var dm4c = new function() {
 
     // === Images ===
 
-    var image_tracker
+    var image_tracker   // ### FIXME: the image tracker is global. There can only be one at a time.
 
     this.create_image = function(src) {
         var img = new Image()
@@ -897,13 +897,10 @@ var dm4c = new function() {
         img.onload = function() {
             // Note: "this" is the image. The argument is the "load" event.
             if (LOG_IMAGE_LOADING) dm4c.log("Image ready: " + src)
-            notify_image_trackers()
-        }
-        return img
-
-        function notify_image_trackers() {
+            // notify image tracker
             image_tracker && image_tracker.check()
         }
+        return img
     }
 
     this.create_image_tracker = function(callback_func) {
@@ -912,21 +909,33 @@ var dm4c = new function() {
 
         function ImageTracker() {
 
-            var types = []      // topic types whose images are tracked
+            var images = []      // tracked images
 
-            this.add_type = function(type) {
-                if (!js.contains(types, type)) {
-                    types.push(type)
+            this.add_image = function(image) {
+                if (!is_tracked(image)) {
+                    images.push(image)
                 }
             }
 
             // Checks if the tracked images are loaded completely.
             // If so, the callback is triggered and this tracker is removed.
             this.check = function() {
-                if (types.every(function(type) {return dm4c.get_type_icon(type).complete})) {
+                if (is_all_complete()) {
                     callback_func()
-                    image_tracker = undefined
+                    image_tracker = null
                 }
+            }
+
+            function is_all_complete() {
+                return images.every(function(img) {
+                    return img.complete
+                })
+            }
+
+            function is_tracked(image) {
+                return js.includes(images, function(img) {
+                    return img.src == image.src
+                })
             }
         }
     }

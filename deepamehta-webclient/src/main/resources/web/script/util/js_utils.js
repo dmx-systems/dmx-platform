@@ -87,9 +87,9 @@ var js = {
     /**
      * Returns true if the array contains a positive element according to the indicator function.
      */
-    includes: function(array, fn) {
+    includes: function(array, indicator_func) {
         for (var i = 0, e; e = array[i]; i++) {
-            if (fn(e)) {
+            if (indicator_func(e)) {
                 return true
             }
         }
