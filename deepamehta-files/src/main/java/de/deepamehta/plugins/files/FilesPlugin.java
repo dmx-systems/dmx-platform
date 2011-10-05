@@ -73,11 +73,14 @@ public class FilesPlugin extends Plugin implements FilesService {
     @Path("/file/{path}")
     @Override
     public Topic createFileTopic(@PathParam("path") String path) {
+        String text = "Creating file topic for path \"" + path + "\"";
         try {
             Topic fileTopic = getFileTopic(path);
             if (fileTopic != null) {
+                logger.info(text + " ABORTED -- already exists");
                 return fileTopic;
             }
+            logger.info(text);
             //
             File file = proxyService.locateFile(path);
             String fileName = file.getName();
@@ -94,7 +97,7 @@ public class FilesPlugin extends Plugin implements FilesService {
             //
             return dms.createTopic(new TopicModel("dm4.files.file", comp), null);       // clientContext=null
         } catch (Throwable e) {
-            throw new RuntimeException("Creating file topic for path \"" + path + "\" failed", e);
+            throw new RuntimeException(text + " failed", e);
         }
     }
 
@@ -102,11 +105,14 @@ public class FilesPlugin extends Plugin implements FilesService {
     @Path("/folder/{path}")
     @Override
     public Topic createFolderTopic(@PathParam("path") String path) {
+        String text = "Creating folder topic for path \"" + path + "\"";
         try {
             Topic folderTopic = getFolderTopic(path);
             if (folderTopic != null) {
+                logger.info(text + " ABORTED -- already exists");
                 return folderTopic;
             }
+            logger.info(text);
             //
             CompositeValue comp = new CompositeValue();
             comp.put("dm4.files.folder_name", new File(path).getName());
@@ -114,7 +120,7 @@ public class FilesPlugin extends Plugin implements FilesService {
             //
             return dms.createTopic(new TopicModel("dm4.files.folder", comp), null);     // clientContext=null
         } catch (Throwable e) {
-            throw new RuntimeException("Creating folder topic for path \"" + path + "\" failed", e);
+            throw new RuntimeException(text + " failed", e);
         }
     }
 

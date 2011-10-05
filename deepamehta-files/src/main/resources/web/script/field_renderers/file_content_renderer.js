@@ -49,7 +49,7 @@ function FileContentRenderer(topic, field) {
         }
 
         function local_resource_URI() {
-            var uri = "/proxy/file:" + encodeURIComponent(path) + "?size=" + size
+            var uri = "/proxy/" + encodeURIComponent("file:" + path) + "?size=" + size
             if (media_type) {
                 uri += "&type=" + encodeURIComponent(media_type)  // media_type might contain + char ("image/svg+xml")
             }

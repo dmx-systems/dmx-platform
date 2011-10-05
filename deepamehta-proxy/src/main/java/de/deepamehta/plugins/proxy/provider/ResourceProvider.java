@@ -67,6 +67,7 @@ public class ResourceProvider implements MessageBodyWriter<Resource> {
                 }
                 // ### httpHeaders.putSingle("Content-Disposition", "inline");
                 IOUtils.copy(resource.uri.openStream(), entityStream);
+                entityStream.flush();
             }
         } catch (Exception e) {
             e.printStackTrace();
