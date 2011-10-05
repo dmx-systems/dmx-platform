@@ -1,11 +1,13 @@
 package de.deepamehta.plugins.topicmaps.model;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.util.JSONHelper;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -14,6 +16,7 @@ import org.codehaus.jettison.json.JSONObject;
 import java.awt.Point;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +36,11 @@ public class Topicmap {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected long topicmapId;
-    protected DeepaMehtaService dms;
-
+    protected Topic topicmapTopic;
     protected Map<Long, TopicmapTopic> topics = new HashMap();
     protected Map<Long, TopicmapAssociation> assocs = new HashMap();
+
+    protected DeepaMehtaService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -47,15 +50,21 @@ public class Topicmap {
      * Loads a topicmap from the DB.
      */
     public Topicmap(long topicmapId, DeepaMehtaService dms) {
-        this.topicmapId = topicmapId;
+        this.topicmapTopic = dms.getTopic(topicmapId, true, null);  // fetchComposite=true
         this.dms = dms;
-        logger.info("Loading topicmap " + topicmapId);
         //
-        loadTopics(topicmapId);
-        loadAssociations(topicmapId);
+        logger.info("Loading topicmap " + getId());
+        loadTopics();
+        loadAssociations();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    public long getId() {
+        return topicmapTopic.getId();
+    }
+
+    // ---
 
     public boolean containsTopic(long topicId) {
         return topics.get(topicId) != null;
@@ -68,25 +77,16 @@ public class Topicmap {
     // ---
 
     public JSONObject toJSON() throws JSONException {
-        JSONArray topics = new JSONArray();
-        for (TopicmapTopic topic : this.topics.values()) {
-            topics.put(topic.toJSON());
-        }
-        //
-        JSONArray assocs = new JSONArray();
-        for (TopicmapAssociation assoc : this.assocs.values()) {
-            assocs.put(assoc.toJSON());
-        }
-        //
         JSONObject topicmap = new JSONObject();
-        topicmap.put("topics", topics);
-        topicmap.put("assocs", assocs);
+        topicmap.put("info", topicmapTopic.toJSON());
+        topicmap.put("topics", JSONHelper.objectsToJSON(topics.values()));
+        topicmap.put("assocs", JSONHelper.objectsToJSON(assocs.values()));
         return topicmap;
     }
 
     @Override
     public String toString() {
-        return "topicmap " + topicmapId;
+        return "topicmap " + getId();
     }
 
     // -------------------------------------------------------------------------------------------- Public Inner Classes
@@ -153,19 +153,19 @@ public class Topicmap {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void loadTopics(long topicmapId) {
-        Topic topicmapTopic = dms.getTopic(topicmapId, false, null);
+    private void loadTopics() {
         ResultSet<RelatedTopic> mapTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
             null, "dm4.topicmaps.topicmap_topic", null, false, true, 0);    // othersTopicTypeUri=null
                                                                             // fetchComposite=false
+                                                                            // fetchRelatingComposite=true
+                                                                            // maxResultSize=0
         for (RelatedTopic mapTopic : mapTopics) {
             Association refAssoc = mapTopic.getAssociation();
             addTopic(new TopicmapTopic(mapTopic.getModel(), refAssoc.getCompositeValue(), refAssoc.getId()));
         }
     }
 
-    private void loadAssociations(long topicmapId) {
-        Topic topicmapTopic = dms.getTopic(topicmapId, false, null);
+    private void loadAssociations() {
         Set<RelatedAssociation> mapAssocs = topicmapTopic.getRelatedAssociations("dm4.topicmaps.association_mapcontext",
             null, "dm4.topicmaps.topicmap_association", null, false, false);
         for (RelatedAssociation mapAssoc : mapAssocs) {

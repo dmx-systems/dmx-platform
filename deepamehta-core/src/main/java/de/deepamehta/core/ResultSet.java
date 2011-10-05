@@ -1,6 +1,6 @@
 package de.deepamehta.core;
 
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.util.JSONHelper;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -12,7 +12,7 @@ import java.util.Set;
 
 
 
-public class ResultSet<T> implements JSONEnabled, Iterable<T> {
+public class ResultSet<T extends JSONEnabled> implements JSONEnabled, Iterable<T> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -35,7 +35,7 @@ public class ResultSet<T> implements JSONEnabled, Iterable<T> {
         try {
             JSONObject o = new JSONObject();
             o.put("total_count", totalCount);
-            o.put("items", DeepaMehtaObjectModel.objectsToJSON((Collection<JSONEnabled>) items));
+            o.put("items", JSONHelper.objectsToJSON(items));
             return o;
         } catch (JSONException e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);

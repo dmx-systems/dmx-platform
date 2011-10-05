@@ -1,7 +1,7 @@
 package de.deepamehta.core.util;
 
-import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Identifiable;
+import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
@@ -110,12 +110,21 @@ public class JSONHelper {
 
     // === DeepaMehta specific ===
 
+    // ### FIXME: could objectsToJSON() be used instead?
     public static JSONArray relatedTopicsToJson(Iterable<RelatedTopic> relTopics) {
         JSONArray array = new JSONArray();
         for (RelatedTopic relTopic : relTopics) {
             // FIXME: for the moment it is sufficient to serialize the topics only.
             // The respective associations are omitted.
             array.put(relTopic.toJSON());
+        }
+        return array;
+    }
+
+    public static JSONArray objectsToJSON(Collection<? extends JSONEnabled> objects) {
+        JSONArray array = new JSONArray();
+        for (JSONEnabled object : objects) {
+            array.put(object.toJSON());
         }
         return array;
     }

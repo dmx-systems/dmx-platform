@@ -16,7 +16,7 @@ import java.util.Set;
 
 
 
-public abstract class DeepaMehtaObjectModel implements Identifiable {
+public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -191,6 +191,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable {
 
     // === Serialization ===
 
+    @Override
     public JSONObject toJSON() {
         try {
             JSONObject o = new JSONObject();
@@ -203,14 +204,6 @@ public abstract class DeepaMehtaObjectModel implements Identifiable {
         } catch (JSONException e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
-    }
-
-    public static JSONArray objectsToJSON(Collection<JSONEnabled> objects) {
-        JSONArray array = new JSONArray();
-        for (JSONEnabled object : objects) {
-            array.put(object.toJSON());
-        }
-        return array;
     }
 
 
