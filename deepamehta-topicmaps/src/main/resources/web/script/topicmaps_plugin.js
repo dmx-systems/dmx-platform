@@ -5,11 +5,12 @@ function topicmaps_plugin() {
     var LOG_TOPICMAPS = false
 
     // Model
-    var topicmaps = {}  // The topicmaps cache (key: topicmap ID, value: Topicmap object)
-    var topicmap        // Selected topicmap (Topicmap object)
+    var topicmaps = {}              // The topicmaps cache (key: topicmap ID, value: Topicmap object)
+    var topicmap                    // Selected topicmap (Topicmap object)
+    var topicmap_renderers = []     // Custom topicmap renderers as provided by plugins (TopicmapRenderer objects)
 
     // View
-    var topicmap_menu
+    var topicmap_menu               // A GUIToolkit Menu object
 
     // ------------------------------------------------------------------------------------------------ Overriding Hooks
 
@@ -22,9 +23,11 @@ function topicmaps_plugin() {
 
 
     this.init = function() {
-
+        topicmap_renderers = dm4c.trigger_plugin_hook("topicmap_renderer")
+        topicmap_renderers.push(dm4c.canvas)
+        //
         extend_rest_client()
-
+        //
         var topicmaps = get_all_topicmaps()
         create_default_topicmap()
         create_topicmap_menu()
@@ -71,11 +74,31 @@ function topicmaps_plugin() {
         }
 
         function create_topicmap_dialog() {
-            var topicmap_dialog = $("<div>")
+            var title_input = dm4c.render.input(undefined, 30)
+            var type_menu = create_maptype_menu()
+            var topicmap_dialog = $("<form>").attr("action", "#").submit(do_create_topicmap)
                 .append($("<div>").addClass("field-label").text("Title"))
-                .append($("<form>").attr("action", "#").submit(do_create_topicmap)
-                    .append($("<input>").attr({id: "topicmap_name", size: 30})))
+                .append(title_input)
+                .append($("<div>").addClass("field-label").text("Type"))
+                .append(type_menu.dom)
             dm4c.ui.dialog("topicmap-dialog", "New Topicmap", topicmap_dialog, "auto", "OK", do_create_topicmap)
+
+            function create_maptype_menu() {
+                var menu = dm4c.ui.menu()
+                topicmap_renderers.forEach(function(renderer) {
+                    var info = renderer.get_info()
+                    menu.add_item({label: info.name, value: info.uri})
+                })
+                return menu
+            }
+
+            function do_create_topicmap() {
+                $("#topicmap-dialog").dialog("close")
+                var name = title_input.val()
+                var topicmap_renderer_uri = type_menu.get_selection().value
+                create_topicmap(name, topicmap_renderer_uri)
+                return false
+            }
         }
 
         function select_initial_topicmap() {
@@ -300,17 +323,13 @@ function topicmaps_plugin() {
     /**
      * Creates a topicmap with the given name, puts it in the topicmap menu, and displays the topicmap.
      *
+     * @param   topicmap_renderer_uri   Optional: the topicmap renderer to attach to the topicmap.
+     *                                  Default is "dm4.topicmap_renderer.canvas".
+     *
      * @return  the topicmap topic.
      */
-    this.do_create_topicmap = function(name) {
-        return create_topicmap(name)
-    }
-
-    function do_create_topicmap() {
-        $("#topicmap-dialog").dialog("close")
-        var name = $("#topicmap_name").val()
-        create_topicmap(name)
-        return false
+    this.do_create_topicmap = function(name, topicmap_renderer_uri) {
+        return create_topicmap(name, topicmap_renderer_uri)
     }
 
     // ---
@@ -339,10 +358,13 @@ function topicmaps_plugin() {
     /**
      * Creates a topicmap with the given name, puts it in the topicmap menu, and displays the topicmap.
      *
+     * @param   topicmap_renderer_uri   Optional: the topicmap renderer to attach to the topicmap.
+     *                                  Default is "dm4.topicmap_renderer.canvas".
+     *
      * @return  the topicmap topic.
      */
-    function create_topicmap(name) {
-        var topicmap_topic = create_topicmap_topic(name)
+    function create_topicmap(name, topicmap_renderer_uri) {
+        var topicmap_topic = create_topicmap_topic(name, topicmap_renderer_uri)
         rebuild_topicmap_menu(topicmap_topic.id)
         // update model
         select_topicmap(topicmap_topic.id)
@@ -393,12 +415,26 @@ function topicmaps_plugin() {
     }
 
     /**
-     * Creates a new empty topicmap in the DB.
+     * Creates a Topicmap topic in the DB.
+     *
+     * @param   topicmap_renderer_uri   Optional: the topicmap renderer to attach to the topicmap.
+     *                                  Default is "dm4.topicmap_renderer.canvas".
+     *
+     * @return  The created topic.
      */
-    function create_topicmap_topic(name) {
-        if (LOG_TOPICMAPS) dm4c.log("Creating topicmap \"" + name + "\"")
-        var topicmap = dm4c.create_topic("dm4.topicmaps.topicmap", {"dm4.topicmaps.name": name})
+    function create_topicmap_topic(name, topicmap_renderer_uri) {
+        topicmap_renderer_uri = topicmap_renderer_uri || "dm4.topicmap_renderer.canvas"
+        //
+        if (LOG_TOPICMAPS) dm4c.log("Creating topicmap \"" + name + "\" (topicmap_renderer_uri=\"" +
+            topicmap_renderer_uri + "\")")
+        //
+        var topicmap = dm4c.create_topic("dm4.topicmaps.topicmap", {
+            "dm4.topicmaps.name": name,
+            "dm4.topicmaps.topicmap_renderer_uri": topicmap_renderer_uri
+        })
+        //
         if (LOG_TOPICMAPS) dm4c.log("..... " + topicmap.id)
+        //
         return topicmap
     }
 
@@ -422,34 +458,6 @@ function topicmaps_plugin() {
     }
 
     // ---
-
-    /**
-     * Selects an item from the topicmap menu.
-     */
-    function select_menu_item(topicmap_id) {
-        topicmap_menu.select(topicmap_id)
-    }
-
-    /**
-     * Reads out the topicmap menu and returns the topicmap ID.
-     * If the topicmap menu has no items yet, undefined is returned.
-     */
-    function get_topicmap_id_from_menu() {
-        var item = topicmap_menu.get_selection()
-        if (item) {
-            return item.value
-        }
-    }
-
-    // ---
-
-    function open_topicmap_dialog() {
-        $("#topicmap-dialog").dialog("open")
-    }
-
-
-
-    // ----------------------------------------------------------------------------------------------- Private Functions
 
     /**
      * @param   topicmap_id     Optional: ID of the topicmap to select.
@@ -476,6 +484,30 @@ function topicmaps_plugin() {
         }
         //
         select_menu_item(topicmap_id)
+    }
+
+    /**
+     * Selects an item from the topicmap menu.
+     */
+    function select_menu_item(topicmap_id) {
+        topicmap_menu.select(topicmap_id)
+    }
+
+    /**
+     * Reads out the topicmap menu and returns the topicmap ID.
+     * If the topicmap menu has no items yet, undefined is returned.
+     */
+    function get_topicmap_id_from_menu() {
+        var item = topicmap_menu.get_selection()
+        if (item) {
+            return item.value
+        }
+    }
+
+    // ---
+
+    function open_topicmap_dialog() {
+        $("#topicmap-dialog").dialog("open")
     }
 
 

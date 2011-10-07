@@ -48,6 +48,13 @@ function Canvas() {
 
     // === Overriding TopicmapRenderer Adapter Methods ===
 
+    this.get_info = function() {
+        return {
+            uri: "dm4.topicmap_renderer.canvas",
+            name: "Topicmap"
+        }
+    }
+
     /**
      * Adds a topic to the canvas. If the topic is already on the canvas it is not added again.
      *
@@ -161,6 +168,7 @@ function Canvas() {
 
     // ---
 
+    // ### FIXME: not in interface
     this.set_highlight_object = function(object_id, refresh_canvas) {
         // update model
         highlight_object_id = object_id
@@ -170,6 +178,7 @@ function Canvas() {
         }
     }
 
+    // ### FIXME: not in interface
     this.reset_highlighting = function(refresh_canvas) {
         // update model
         reset_highlighting()
@@ -195,6 +204,7 @@ function Canvas() {
         draw()
     }
 
+    // ### FIXME: not in interface
     this.get_associations = function(topic_id) {
         var assocs = []
         iterate_associations(function(ca) {

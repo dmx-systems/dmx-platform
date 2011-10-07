@@ -12,15 +12,18 @@ function TopicmapRenderer() {
 
     // ------------------------------------------------------------------------------------------------- Adapter Methods
 
+    this.get_info = function() {}
+
     /**
-     * @param   highlight_topic     Optional: if true, the topic is highlighted.
      * @param   refresh_canvas      Optional: if true, the canvas is refreshed.
      */
-    this.add_topic = function(topic, highlight_topic, refresh_canvas) {}
+    this.add_topic = function(topic, refresh_canvas) {}
 
     this.add_association = function(assoc, refresh_canvas) {}
 
-    this.update_topic = function(topic) {}
+    this.update_topic = function(topic, refresh_canvas) {}
+
+    this.update_association = function(assoc, refresh_canvas) {}
 
     this.remove_topic = function(id, refresh_canvas) {}
 
@@ -32,17 +35,21 @@ function TopicmapRenderer() {
      */
     this.remove_association = function(id, refresh_canvas) {}
 
+    // ### FIXME: highlight methods?
+
     this.scroll_topic_to_center = function(topic_id) {}
 
+    this.begin_association = function(topic_id, x, y) {}
+
+    // ### FIXME: get_associations()?
+
     this.refresh = function() {}
-
-    this.close_context_menu = function() {}
-
-    this.begin_association = function(doc_id, event) {}
 
     this.clear = function() {}
 
     this.resize = function() {}
+
+    this.close_context_menu = function() {}
 
     // --- Grid Positioning ---
 

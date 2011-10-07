@@ -24,10 +24,10 @@ var dm4c = new function() {
     this.type_cache = new TypeCache()
 
     // View
-    this.toolbar = null                 // the upper toolbar GUI component (a ToolbarPanel object)
-    this.canvas = null                  // the canvas GUI component that displays the topicmap (a Canvas object)
-    this.page_panel = null              // the page panel GUI component on the right hand side (a PagePanel object)
-    this.upload_dialog = null           // the upload dialog (an UploadDialog object)
+    this.toolbar = null             // the upper toolbar GUI component (a ToolbarPanel object)
+    this.canvas = null              // the canvas GUI component that displays the topicmap (a TopicmapRenderer object)
+    this.page_panel = null          // the page panel GUI component on the right hand side (a PagePanel object)
+    this.upload_dialog = null       // the upload dialog (an UploadDialog object)
 
     var plugin_sources = []
     var plugins = {}                // key: plugin class name, base name of source file (string), value: plugin instance
@@ -851,7 +851,7 @@ var dm4c = new function() {
      * <p>
      * Utility method for plugin developers.
      *
-     * @param   type_menu       a GUIToolkit's Menu object.
+     * @param   type_menu       a GUIToolkit Menu object.
      * @param   filter_func     Optional: a function that filters the topic types to add to the menu.
      *                          One argument is passed: the topic type (a TopicType object).
      *                          If not specified no filter is applied (all topic types are added).
@@ -1204,8 +1204,8 @@ var dm4c = new function() {
             load_field_renderers()
             load_stylesheets()
             // Note: in order to let a plugin provide a custom canvas renderer (the dm4-freifunk-geomap plugin does!)
-            // the canvas is created *after* loading the plugins.
-            dm4c.canvas = dm4c.trigger_plugin_hook("get_canvas_renderer")[0] || new Canvas()
+            // the canvas is created *after* loading the plugins. ### FIXDOC
+            dm4c.canvas = new Canvas()
             // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta-topicmaps plugin
             // does!) the "init" hook is triggered *after* creating the canvas.
             dm4c.trigger_plugin_hook("init")
