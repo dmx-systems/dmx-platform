@@ -47,7 +47,9 @@ function TopicmapRenderer() {
 
     this.clear = function() {}
 
-    this.resize = function() {}
+    this.resize = function() {
+        if (dm4c.LOG_GUI) dm4c.log("WARNING in TopicmapRenderer: empty resize() method called")
+    }
 
     this.close_context_menu = function() {}
 

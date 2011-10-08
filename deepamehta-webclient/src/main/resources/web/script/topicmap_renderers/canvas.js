@@ -704,7 +704,7 @@ function Canvas() {
     function create_canvas_element() {
         var canvas = document.createElement("canvas")
         var canvas_elem = $(canvas).attr({id: "canvas", width: self.canvas_width, height: self.canvas_height})
-        $("#canvas-panel").append(canvas_elem)  // add to document
+        dm4c.split_panel.set_left_panel(canvas_elem)    // add to page
         ctx = canvas.getContext("2d")
         // Note: the canvas font must be set early.
         // Topic label measurement takes place *before* drawing.

@@ -24,6 +24,7 @@ var dm4c = new function() {
     this.type_cache = new TypeCache()
 
     // View
+    this.split_panel = null         // a SplitPanel object
     this.toolbar = null             // the upper toolbar GUI component (a ToolbarPanel object)
     this.canvas = null              // the canvas GUI component that displays the topicmap (a TopicmapRenderer object)
     this.page_panel = null          // the page panel GUI component on the right hand side (a PagePanel object)
@@ -1136,13 +1137,15 @@ var dm4c = new function() {
     $(function() {
         //
         // --- 1) Prepare GUI ---
-        create_split_panel()
+        // create split panel
+        dm4c.split_panel = new SplitPanel()
+        $("body").append(dm4c.split_panel.dom)
         // create toolbar
         dm4c.toolbar = new ToolbarPanel()
         $("body").prepend(dm4c.toolbar.dom)
         // create page panel
         dm4c.page_panel = new PagePanel()
-        $("#split-panel > tbody > tr > td").eq(1).append(dm4c.page_panel.dom)
+        dm4c.split_panel.set_right_panel(dm4c.page_panel.dom)
         detail_panel_width = $("#page-content").width()     // ### FIXME: make global variable a PagePanel property!
         if (dm4c.LOG_GUI) dm4c.log("Mesuring page panel width: " + detail_panel_width)
         // create upload dialog
@@ -1155,17 +1158,6 @@ var dm4c = new function() {
         //
         register_plugins()
         load_plugins()
-
-        function create_split_panel() {
-            $("body").append($("<table>", {id: "split-panel"})
-                .append($("<tr>")
-                    .append($("<td>")
-                        .append($("<div>", {id: "canvas-panel"}))
-                    )
-                    .append($("<td>"))
-                )
-            )
-        }
 
         /**
          * Loads and instantiates all registered plugins.
