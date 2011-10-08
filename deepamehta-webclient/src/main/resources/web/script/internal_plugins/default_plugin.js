@@ -3,8 +3,6 @@
  */
 function default_plugin () {
 
-    dm4c.javascript_source("/script/topicmap_renderers/canvas.js")
-
     var type_menu
 
 

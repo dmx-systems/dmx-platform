@@ -1146,6 +1146,9 @@ var dm4c = new function() {
         // create page panel
         dm4c.page_panel = new PagePanel()
         dm4c.split_panel.set_right_panel(dm4c.page_panel)
+        // create canvas
+        var size = dm4c.split_panel.get_left_panel_size()
+        dm4c.canvas = new Canvas(size.width, size.height)   // Note: the canvas adds itself to the page
         // create upload dialog
         dm4c.upload_dialog = new UploadDialog()
         //
@@ -1193,10 +1196,6 @@ var dm4c = new function() {
             load_page_renderers()
             load_field_renderers()
             load_stylesheets()
-            // Note: in order to let a plugin provide a custom canvas renderer (the dm4-freifunk-geomap plugin does!)
-            // the canvas is created *after* loading the plugins. ### FIXDOC
-            var size = dm4c.split_panel.get_left_panel_size()
-            dm4c.canvas = new Canvas(size.width, size.height)
             // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta-topicmaps plugin
             // does!) the "init" hook is triggered *after* creating the canvas.
             dm4c.trigger_plugin_hook("init")
@@ -1206,9 +1205,6 @@ var dm4c = new function() {
             if (!dm4c.toolbar.create_menu.get_item_count()) {
                 dm4c.toolbar.create_widget.hide()
             }
-            // the page panel
-            if (dm4c.LOG_GUI) dm4c.log("Setting page panel height: " + $("#canvas").height())
-            $("#page-content").height($("#canvas").height())
         }
 
         function load_page_renderers() {
