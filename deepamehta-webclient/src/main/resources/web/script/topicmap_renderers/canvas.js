@@ -1,4 +1,4 @@
-function Canvas() {
+function Canvas(width, height) {
 
     // ------------------------------------------------------------------------------------------------ Constructor Code
 
@@ -81,8 +81,8 @@ function Canvas() {
                     topic.x = pos.x
                     topic.y = pos.y
                 } else {
-                    topic.x = self.canvas_width  * Math.random() - trans_x
-                    topic.y = self.canvas_height * Math.random() - trans_y
+                    topic.x = width  * Math.random() - trans_x
+                    topic.y = height * Math.random() - trans_y
                 }
             }
             topic.x = Math.floor(topic.x)
@@ -226,8 +226,8 @@ function Canvas() {
         init_model()
     }
 
-    this.resize = function() {
-        resize_canvas()
+    this.resize = function(size) {
+        resize_canvas(size)
     }
 
     this.close_context_menu = function() {
@@ -255,7 +255,7 @@ function Canvas() {
 
 
     function draw() {
-        ctx.clearRect(-trans_x, -trans_y, self.canvas_width, self.canvas_height)
+        ctx.clearRect(-trans_x, -trans_y, width, height)
         // trigger hook
         dm4c.trigger_plugin_hook("pre_draw_canvas", ctx)
         //
@@ -703,16 +703,16 @@ function Canvas() {
      */
     function create_canvas_element() {
         var canvas = document.createElement("canvas")
-        var canvas_elem = $(canvas).attr({id: "canvas", width: self.canvas_width, height: self.canvas_height})
-        dm4c.split_panel.set_left_panel(canvas_elem)    // add to page
+        self.dom = $(canvas).attr({id: "canvas", width: width, height: height})
+        dm4c.split_panel.set_left_panel(self)
         ctx = canvas.getContext("2d")
         // Note: the canvas font must be set early.
         // Topic label measurement takes place *before* drawing.
         ctx.font = LABEL_FONT
         //
         // bind event handlers
-        canvas_elem.mousedown(mousedown)
-        canvas_elem.mouseup(mouseup)
+        self.dom.mousedown(mousedown)
+        self.dom.mouseup(mouseup)
         canvas.oncontextmenu = do_contextmenu
         canvas.ondragover = dragover
         canvas.ondrop = drop
@@ -727,8 +727,10 @@ function Canvas() {
      *
      * @param   size    the new canvas size.
      */
-    function resize_canvas() {
+    function resize_canvas(size) {
         if (dm4c.LOG_GUI) dm4c.log("Rebuilding canvas")
+        width  = size.width
+        height = size.height
         // Note: we don't empty the entire canvas-panel to keep the resizable-handle element.
         $("#canvas-panel #canvas").remove()
         // Note: in order to resize the canvas element we must recreate it.
@@ -745,9 +747,9 @@ function Canvas() {
     }
 
     function scroll_to_center(x, y) {
-        if (x < 0 || x >= self.canvas_width || y < 0 || y >= self.canvas_height) {
-            var dx = (self.canvas_width / 2 - x) / ANIMATION_STEPS
-            var dy = (self.canvas_height / 2 - y) / ANIMATION_STEPS
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            var dx = (width  / 2 - x) / ANIMATION_STEPS
+            var dy = (height / 2 - y) / ANIMATION_STEPS
             var animation_count = 0;
             var animation = setInterval(function() {
                 translate(dx, dy)
@@ -895,7 +897,7 @@ function Canvas() {
         this.next_position = function() {
             var pos = {x: grid_x, y: grid_y}
             if (item_count == 0) {
-                scroll_to_center(self.canvas_width / 2, pos.y + trans_y)
+                scroll_to_center(width / 2, pos.y + trans_y)
             }
             //
             advance_position()
@@ -917,7 +919,7 @@ function Canvas() {
         }
 
         function advance_position() {
-            if (grid_x + GRID_DIST_X + trans_x > self.canvas_width) {
+            if (grid_x + GRID_DIST_X + trans_x > width) {
                 grid_x = START_X
                 grid_y += GRID_DIST_Y
             } else {

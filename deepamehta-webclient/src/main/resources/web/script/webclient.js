@@ -1145,9 +1145,7 @@ var dm4c = new function() {
         $("body").prepend(dm4c.toolbar.dom)
         // create page panel
         dm4c.page_panel = new PagePanel()
-        dm4c.split_panel.set_right_panel(dm4c.page_panel.dom)
-        detail_panel_width = $("#page-content").width()     // ### FIXME: make global variable a PagePanel property!
-        if (dm4c.LOG_GUI) dm4c.log("Mesuring page panel width: " + detail_panel_width)
+        dm4c.split_panel.set_right_panel(dm4c.page_panel)
         // create upload dialog
         dm4c.upload_dialog = new UploadDialog()
         //
@@ -1197,7 +1195,8 @@ var dm4c = new function() {
             load_stylesheets()
             // Note: in order to let a plugin provide a custom canvas renderer (the dm4-freifunk-geomap plugin does!)
             // the canvas is created *after* loading the plugins. ### FIXDOC
-            dm4c.canvas = new Canvas()
+            var size = dm4c.split_panel.get_left_panel_size()
+            dm4c.canvas = new Canvas(size.width, size.height)
             // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta-topicmaps plugin
             // does!) the "init" hook is triggered *after* creating the canvas.
             dm4c.trigger_plugin_hook("init")
@@ -1210,8 +1209,6 @@ var dm4c = new function() {
             // the page panel
             if (dm4c.LOG_GUI) dm4c.log("Setting page panel height: " + $("#canvas").height())
             $("#page-content").height($("#canvas").height())
-            //
-            $(window).resize(window_resized)
         }
 
         function load_page_renderers() {
@@ -1248,11 +1245,6 @@ var dm4c = new function() {
                 if (LOG_PLUGIN_LOADING) dm4c.log("..... " + css_stylesheet)
                 $("head").append($("<link>").attr({rel: "stylesheet", href: css_stylesheet, type: "text/css"}))
             }
-        }
-
-        function window_resized() {
-            dm4c.canvas.adjust_size()
-            $("#page-content").height($("#canvas").height())
         }
 
         function extend_rest_client() {
