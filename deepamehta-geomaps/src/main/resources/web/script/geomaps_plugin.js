@@ -1,6 +1,6 @@
 function geomaps_plugin() {
 
-    dm4c.javascript_source("/de.deepamehta.geomaps/script/geomap_renderer.js")
+    dm4c.javascript_source("/de.deepamehta.geomaps/script/topicmap_renderers/geomap_renderer.js")
 
 
 

@@ -1,16 +1,16 @@
 var dm4c = new function() {
 
-    // preferences
-    this.MAX_RESULT_SIZE = 100
-    this.DEFAULT_TOPIC_ICON = "/images/ball-gray.png"
-    var DEFAULT_FIELD_ROWS = 1
-
     // logger preferences
     var ENABLE_LOGGING = false
     var LOG_PLUGIN_LOADING = false
     var LOG_IMAGE_LOADING = false
     this.LOG_GUI = false
     this.LOG_HISTORY = false
+
+    // preferences
+    this.MAX_RESULT_SIZE = 100
+    this.DEFAULT_TOPIC_ICON = "/images/ball-gray.png"
+    var DEFAULT_FIELD_ROWS = 1
 
     var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
@@ -20,7 +20,7 @@ var dm4c = new function() {
     this.render = new RenderHelper()
 
     // Model
-    this.selected_object = null         // a Topic or an Association object, or null if there is no selection
+    this.selected_object = null     // a Topic or an Association object, or null if there is no selection
     this.type_cache = new TypeCache()
 
     // View
@@ -1137,12 +1137,12 @@ var dm4c = new function() {
     $(function() {
         //
         // --- 1) Prepare GUI ---
+        // create toolbar
+        dm4c.toolbar = new ToolbarPanel()
+        $("body").append(dm4c.toolbar.dom)
         // create split panel
         dm4c.split_panel = new SplitPanel()
         $("body").append(dm4c.split_panel.dom)
-        // create toolbar
-        dm4c.toolbar = new ToolbarPanel()
-        $("body").prepend(dm4c.toolbar.dom)
         // create page panel
         dm4c.page_panel = new PagePanel()
         dm4c.split_panel.set_right_panel(dm4c.page_panel)

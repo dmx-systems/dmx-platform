@@ -5,9 +5,9 @@ function topicmaps_plugin() {
     var LOG_TOPICMAPS = false
 
     // Model
-    var topicmaps = {}              // The topicmaps cache (key: topicmap ID, value: Topicmap object)
+    var topicmaps = {}              // Topicmaps cache (key: topicmap ID, value: Topicmap object)
     var topicmap                    // Selected topicmap (Topicmap object)
-    var topicmap_renderers = []     // Custom topicmap renderers as provided by plugins (TopicmapRenderer objects)
+    var topicmap_renderers = {}     // Registered topicmap renderers (key: renderer URI, value: TopicmapRenderer object)
 
     // View
     var topicmap_menu               // A GUIToolkit Menu object
@@ -23,16 +23,14 @@ function topicmaps_plugin() {
 
 
     this.init = function() {
-        topicmap_renderers = dm4c.trigger_plugin_hook("topicmap_renderer")
-        topicmap_renderers.push(dm4c.canvas)
-        //
-        extend_rest_client()
-        //
         var topicmaps = get_all_topicmaps()
+        register_topicmap_renderers()
         create_default_topicmap()
         create_topicmap_menu()
         create_topicmap_dialog()
+        extend_rest_client()
         select_initial_topicmap()
+        display_topicmap()
 
         function extend_rest_client() {
             dm4c.restc.get_topicmap = function(topicmap_id) {
@@ -81,11 +79,11 @@ function topicmaps_plugin() {
                 .append(title_input)
                 .append($("<div>").addClass("field-label").text("Type"))
                 .append(type_menu.dom)
-            dm4c.ui.dialog("topicmap-dialog", "New Topicmap", topicmap_dialog, "auto", "OK", do_create_topicmap)
+            dm4c.ui.dialog("topicmap-dialog", "New Topicmap", topicmap_dialog, "auto", "Create", do_create_topicmap)
 
             function create_maptype_menu() {
                 var menu = dm4c.ui.menu()
-                topicmap_renderers.forEach(function(renderer) {
+                iterate_topicmap_renderers(function(renderer) {
                     var info = renderer.get_info()
                     menu.add_item({label: info.name, value: info.uri})
                 })
@@ -109,9 +107,7 @@ function topicmaps_plugin() {
                 var topicmap_id = get_topicmap_id_from_menu()
             }
             // update model
-            select_topicmap(topicmap_id)
-            // update view
-            display_topicmap()
+            set_selected_topicmap(topicmap_id)
         }
     }
 
@@ -223,7 +219,7 @@ function topicmaps_plugin() {
                     create_topicmap_topic("untitled")
                 }
                 rebuild_topicmap_menu()
-                select_topicmap(get_topicmap_id_from_menu())
+                set_selected_topicmap(get_topicmap_id_from_menu())
                 display_topicmap()
             } else {
                 if (LOG_TOPICMAPS) dm4c.log("..... updating the topicmap menu and restoring the selection " +
@@ -297,7 +293,7 @@ function topicmaps_plugin() {
      */
     this.do_select_topicmap = function(topicmap_id, no_history_update) {
         // update model
-        select_topicmap(topicmap_id)
+        set_selected_topicmap(topicmap_id)
         // update view
         select_menu_item(topicmap_id)
         display_topicmap(no_history_update)
@@ -312,7 +308,7 @@ function topicmaps_plugin() {
             open_topicmap_dialog()
         } else {
             // update model
-            select_topicmap(topicmap_id)
+            set_selected_topicmap(topicmap_id)
             // update view
             display_topicmap()
         }
@@ -342,7 +338,7 @@ function topicmaps_plugin() {
     this.do_refresh_topicmap = function(topicmap_id) {
         // update model
         delete topicmaps[topicmap_id]
-        select_topicmap(topicmap_id)
+        set_selected_topicmap(topicmap_id)
         // update view
         display_topicmap()
     }
@@ -367,7 +363,7 @@ function topicmaps_plugin() {
         var topicmap_topic = create_topicmap_topic(name, topicmap_renderer_uri)
         rebuild_topicmap_menu(topicmap_topic.id)
         // update model
-        select_topicmap(topicmap_topic.id)
+        set_selected_topicmap(topicmap_topic.id)
         // update view
         display_topicmap()
         //
@@ -389,7 +385,7 @@ function topicmaps_plugin() {
         return topicmap.get_id()
     }
 
-    function select_topicmap(topicmap_id) {
+    function set_selected_topicmap(topicmap_id) {
         if (LOG_TOPICMAPS) dm4c.log("Selecting topicmap " + topicmap_id)
         // update model
         topicmap = load_topicmap(topicmap_id)
@@ -440,6 +436,52 @@ function topicmaps_plugin() {
 
 
 
+    // === Topicmap Renderers ===
+
+    function register_topicmap_renderers() {
+        // default renderer
+        register(dm4c.canvas)
+        // custom renderers
+        var renderers = dm4c.trigger_plugin_hook("topicmap_renderer")
+        renderers.forEach(function(renderer) {
+            register(renderer)
+        })
+
+        function register(renderer) {
+            topicmap_renderers[renderer.get_info().uri] = renderer
+        }
+    }
+
+    function get_topicmap_renderer(renderer_uri) {
+        var renderer = topicmap_renderers[renderer_uri]
+        // error check
+        if (!renderer) {
+            throw "UnknownTopicmapRendererException: topicmap renderer \"" + renderer_uri + "\" is not registered"
+        }
+        //
+        return renderer
+    }
+
+    function iterate_topicmap_renderers(visitor_func) {
+        for (var renderer_uri in topicmap_renderers) {
+            visitor_func(topicmap_renderers[renderer_uri])
+        }
+    }
+
+    function switch_topicmap_renderer() {
+        var renderer_uri = dm4c.canvas.get_info().uri
+        var new_renderer_uri = topicmap.get_renderer_uri()
+        if (renderer_uri != new_renderer_uri) {
+            if (LOG_TOPICMAPS) dm4c.log("Switching topicmap renderer \"" +
+                renderer_uri + "\" => \"" + new_renderer_uri + "\"")
+            var renderer = get_topicmap_renderer(new_renderer_uri)
+            dm4c.canvas = renderer
+            dm4c.split_panel.set_left_panel(renderer)
+        }
+    }
+
+
+
     /************/
     /*** View ***/
     /************/
@@ -454,6 +496,7 @@ function topicmaps_plugin() {
      * @param   no_history_update   Optional: boolean.
      */
     function display_topicmap(no_history_update) {
+        switch_topicmap_renderer()
         topicmap.put_on_canvas(no_history_update)
     }
 
@@ -524,6 +567,7 @@ function topicmaps_plugin() {
     function Topicmap(topicmap_id) {
 
         // Model
+        var info            // The underlying Topicmap topic (a JavaScript object)
         var topics = {}     // topics of this topicmap (key: topic ID, value: TopicmapTopic object)
         var assocs = {}     // associations of this topicmap (key: association ID, value: TopicmapAssociation object)
         var selected_object_id = -1     // ID of the selected topic or association, or -1 for no selection
@@ -538,6 +582,10 @@ function topicmaps_plugin() {
 
         this.get_id = function() {
             return topicmap_id
+        }
+
+        this.get_renderer_uri = function() {
+            return info.composite["dm4.topicmaps.topicmap_renderer_uri"]
         }
 
         /**
@@ -738,6 +786,7 @@ function topicmaps_plugin() {
             if (LOG_TOPICMAPS) dm4c.log("Loading topicmap " + topicmap_id)
 
             var topicmap = dm4c.restc.get_topicmap(topicmap_id)
+            info = topicmap.info
 
             if (LOG_TOPICMAPS) dm4c.log("..... " + topicmap.topics.length + " topics")
             load_topics()
@@ -771,7 +820,7 @@ function topicmaps_plugin() {
             }
 
             function load_background_image() {
-                var file = topicmap.info.composite["dm4.files.file"]
+                var file = info.composite["dm4.files.file"]
                 if (file) {
                     var image_url = "/proxy/file:" + file["dm4.files.path"]
                     background_image = dm4c.create_image(image_url)

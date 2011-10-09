@@ -30,7 +30,9 @@ function TopicmapRenderer() {
      */
     this.remove_association = function(id, refresh_canvas) {}
 
-    // ### FIXME: highlight methods?
+    this.set_highlight_object = function(object_id, refresh_canvas) {}
+
+    this.reset_highlighting = function(refresh_canvas) {}
 
     this.scroll_topic_to_center = function(topic_id) {}
 
@@ -41,6 +43,8 @@ function TopicmapRenderer() {
     this.refresh = function() {}
 
     this.clear = function() {}
+
+    this.resize = function(size) {}
 
     this.close_context_menu = function() {}
 
