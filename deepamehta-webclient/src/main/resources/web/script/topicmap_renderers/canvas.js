@@ -40,9 +40,6 @@ function Canvas(width, height) {
     // build the canvas
     init_model()
     create_canvas_element()
-    $("#canvas-panel").dblclick(dblclick)
-    $("#canvas-panel").mousemove(mousemove)
-    $("#canvas-panel").mouseleave(mouseleave)
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -54,6 +51,21 @@ function Canvas(width, height) {
             name: "Topicmap"
         }
     }
+
+    this.init = function() {
+        if (dm4c.LOG_GUI) dm4c.log("Initializing canvas")
+        ctx = this.dom.get(0).getContext("2d")
+        // Note: the canvas font must be set early.
+        // Topic label measurement takes place *before* drawing.
+        ctx.font = LABEL_FONT
+    }
+
+    this.activate = function() {
+        if (dm4c.LOG_GUI) dm4c.log("Activating canvas")
+        bind_event_handlers()
+    }
+
+    // ---
 
     /**
      * Adds a topic to the canvas. If the topic is already on the canvas it is not added again.
@@ -339,10 +351,21 @@ function Canvas(width, height) {
 
 
 
+    function bind_event_handlers() {
+        self.dom.mousedown(do_mousedown)
+        self.dom.mouseup(do_mouseup)
+        self.dom.mousemove(do_mousemove)
+        self.dom.mouseleave(do_mouseleave)
+        self.dom.dblclick(do_doubleclick)
+        self.dom.get(0).oncontextmenu = do_contextmenu
+        self.dom.get(0).ondragover = do_dragover
+        self.dom.get(0).ondrop = do_drop
+    }
+
     // === Mouse Events ===
 
-    function mousedown(event) {
-        if (dm4c.LOG_GUI) dm4c.log("Mouse down!")
+    function do_mousedown(event) {
+        if (dm4c.LOG_GUI) dm4c.log("Mouse down on canvas!")
         //
         if (event.which == 1) {
             tmp_x = cx(event)
@@ -362,7 +385,8 @@ function Canvas(width, height) {
         }
     }
 
-    function mousemove(event) {
+    function do_mousemove(event) {
+        // if (dm4c.LOG_GUI) dm4c.log("Mouse moves on canvas!")
         if (action_topic || canvas_move_in_progress) {
             if (association_in_progress) {
                 tmp_x = cx(event)
@@ -385,8 +409,8 @@ function Canvas(width, height) {
         }
     }
 
-    function mouseleave(event) {
-        if (dm4c.LOG_GUI) dm4c.log("Mouse leave!")
+    function do_mouseleave(event) {
+        if (dm4c.LOG_GUI) dm4c.log("Mouse leaves canvas!")
         //
         if (association_in_progress) {
             end_association_in_progress()
@@ -399,8 +423,8 @@ function Canvas(width, height) {
         end_interaction()
     }
 
-    function mouseup(event) {
-        if (dm4c.LOG_GUI) dm4c.log("Mouse up!")
+    function do_mouseup(event) {
+        if (dm4c.LOG_GUI) dm4c.log("Mouse up on canvas!")
         //
         close_context_menu()
         //
@@ -428,7 +452,8 @@ function Canvas(width, height) {
         end_interaction()
     }
 
-    function dblclick(event) {
+    function do_doubleclick(event) {
+        if (dm4c.LOG_GUI) dm4c.log("Canvas double clicked!")
         var ct = find_topic(event)
         if (ct) {
             dm4c.trigger_plugin_hook("topic_doubleclicked", ct)
@@ -506,8 +531,6 @@ function Canvas(width, height) {
         action_topic = null
         action_assoc = null
     }
-
-
 
     // === Context Menu Events ===
 
@@ -589,17 +612,15 @@ function Canvas(width, height) {
         $("#canvas-panel .menu").remove()
     }
 
-
-
     // === Drag and Drop Events ===
 
     // Required. Otherwise we don't receive a drop.
-    function dragover () {
+    function do_dragover () {
         // Return false is Required. Otherwise we don't receive a drop.
         return false
     }
 
-    function drop(e) {
+    function do_drop(e) {
         // e.preventDefault();  // Useful for debugging when exception is thrown before false is returned.
         dm4c.trigger_plugin_hook("process_drop", e.dataTransfer)
         return false
@@ -704,18 +725,6 @@ function Canvas(width, height) {
     function create_canvas_element() {
         var canvas = document.createElement("canvas")
         self.dom = $(canvas).attr({id: "canvas", width: width, height: height})
-        dm4c.split_panel.set_left_panel(self)
-        ctx = canvas.getContext("2d")
-        // Note: the canvas font must be set early.
-        // Topic label measurement takes place *before* drawing.
-        ctx.font = LABEL_FONT
-        //
-        // bind event handlers
-        self.dom.mousedown(mousedown)
-        self.dom.mouseup(mouseup)
-        canvas.oncontextmenu = do_contextmenu
-        canvas.ondragover = dragover
-        canvas.ondrop = drop
     }
 
     /**
@@ -736,6 +745,8 @@ function Canvas(width, height) {
         // Note: in order to resize the canvas element we must recreate it.
         // Otherwise the browsers would just distort the canvas rendering.
         create_canvas_element()
+        dm4c.split_panel.set_left_panel(self)
+        self.init()
         ctx.translate(trans_x, trans_y)
         draw()
     }

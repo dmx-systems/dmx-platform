@@ -10,6 +10,18 @@ function TopicmapRenderer() {
     this.get_info = function() {}
 
     /**
+     * Triggered once the renderer has been added to the DOM.
+     */
+    this.init = function() {}
+
+    /**
+     * Triggered every time the renderer has been added to the DOM.
+     */
+    this.activate = function() {}
+
+    // ---
+
+    /**
      * @param   refresh_canvas      Optional: if true, the canvas is refreshed.
      */
     this.add_topic = function(topic, refresh_canvas) {}

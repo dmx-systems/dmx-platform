@@ -1148,7 +1148,8 @@ var dm4c = new function() {
         dm4c.split_panel.set_right_panel(dm4c.page_panel)
         // create canvas
         var size = dm4c.split_panel.get_left_panel_size()
-        dm4c.canvas = new Canvas(size.width, size.height)   // Note: the canvas adds itself to the page
+        dm4c.canvas = new Canvas(size.width, size.height)
+        dm4c.split_panel.set_left_panel(dm4c.canvas)
         // create upload dialog
         dm4c.upload_dialog = new UploadDialog()
         //

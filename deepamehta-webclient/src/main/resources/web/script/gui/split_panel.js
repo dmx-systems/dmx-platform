@@ -9,6 +9,8 @@ function SplitPanel() {
     var panel_height
     var left_panel_width
 
+    var left_panel_uris = []    // keeps track of panel initialization
+
     this.dom = $("<table>", {id: "split-panel"}).append($("<tr>")
         .append(left_panel_parent)
         .append(right_panel_parent)
@@ -17,16 +19,26 @@ function SplitPanel() {
     // ------------------------------------------------------------------------------------------------------ Public API
 
     /**
-     * @param   panel   an object width a "dom" property and a "resize" method.
+     * @param   panel   an object with a "dom" property and "get_info", "init", and "resize" methods.
      */
     this.set_left_panel = function(panel) {
+        // 1) add panel to page (by replacing the existing one)
         left_panel = panel
         $("#canvas").remove()               // FIXME: don't rely on ID #canvas
         $("#canvas-panel").append(panel.dom)
+        // 2) init panel
+        var panel_uri = panel.get_info().uri
+        // Note: each panel is initialized only once. We recognize panels by their URIs.
+        if (!js.contains(left_panel_uris, panel_uri)) {
+            left_panel_uris.push(panel_uri)
+            panel.init()
+        }
+        // 3) activate panel
+        panel.activate()
     }
 
     /**
-     * @param   panel   an object width a "dom" property.
+     * @param   panel   an object with a "dom" property.
      */
     this.set_right_panel = function(panel) {
         right_panel = panel
@@ -34,7 +46,7 @@ function SplitPanel() {
         //
         adjust_right_panel_height()
         right_panel.width = panel.dom.width()
-        if (dm4c.LOG_GUI) dm4c.log("Mesuring page panel width: " + right_panel.width)
+        if (dm4c.LOG_GUI) dm4c.log("Page panel width=" + right_panel.width)
         //
         calculate_left_panel_width()
         // alert("TopicmapRenderer(): width=" + this.canvas_width + " height=" + this.canvas_height)

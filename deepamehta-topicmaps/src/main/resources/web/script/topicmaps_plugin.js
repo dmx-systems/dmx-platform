@@ -25,10 +25,10 @@ function topicmaps_plugin() {
     this.init = function() {
         var topicmaps = get_all_topicmaps()
         register_topicmap_renderers()
+        extend_rest_client()
         create_default_topicmap()
         create_topicmap_menu()
         create_topicmap_dialog()
-        extend_rest_client()
         select_initial_topicmap()
         display_topicmap()
 
