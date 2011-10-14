@@ -90,7 +90,11 @@ public class ProxyPlugin extends Plugin implements ProxyService {
 
     @Override
     public File locateFile(String relativePath) {
-        return checkFileAccess(new File(FILE_REPOSITORY_PATH, relativePath));
+        File file = new File(FILE_REPOSITORY_PATH, relativePath);
+        checkFileAccess(file);
+        // Note: we return the file directly, not the canonical one. On Windows a canonical path always contains
+        // the drive letter which would confuse subsequent processing.
+        return file;
     }
 
 
