@@ -75,6 +75,11 @@ public class FilesPlugin extends Plugin implements FilesService {
     public Topic createFileTopic(@PathParam("path") String path) {
         String text = "Creating file topic for path \"" + path + "\"";
         try {
+            // ### FIXME: drag'n'drop files from arbitrary locations (in particular different Windows drives)
+            // collides with the concept of a single-rooted file repository (as realized by the proxy module).
+            // For the moment we just strip a possible drive letter to be compatible with the proxy moudle.
+            path = JavaUtils.stripDriveLetter(path);
+            //
             Topic fileTopic = getFileTopic(path);
             if (fileTopic != null) {
                 logger.info(text + " ABORTED -- already exists");
@@ -107,6 +112,11 @@ public class FilesPlugin extends Plugin implements FilesService {
     public Topic createFolderTopic(@PathParam("path") String path) {
         String text = "Creating folder topic for path \"" + path + "\"";
         try {
+            // ### FIXME: drag'n'drop folders from arbitrary locations (in particular different Windows drives)
+            // collides with the concept of a single-rooted file repository (as realized by the proxy module).
+            // For the moment we just strip a possible drive letter to be compatible with the proxy moudle.
+            path = JavaUtils.stripDriveLetter(path);
+            //
             Topic folderTopic = getFolderTopic(path);
             if (folderTopic != null) {
                 logger.info(text + " ABORTED -- already exists");

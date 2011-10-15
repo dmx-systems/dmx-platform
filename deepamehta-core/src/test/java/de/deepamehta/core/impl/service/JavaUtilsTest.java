@@ -31,6 +31,15 @@ public class JavaUtilsTest {
     // ---
 
     @Test
+    public void stripDriveLetter() {
+        assertEquals("/my/path", JavaUtils.stripDriveLetter("/my/path"));
+        assertEquals("/my/path", JavaUtils.stripDriveLetter("A:/my/path"));
+        assertEquals("/my/A:path", JavaUtils.stripDriveLetter("/my/A:path"));
+    }
+
+    // ---
+
+    @Test
     public void isInRangeIPv4() {
         assertTrue(JavaUtils.isInRange("172.68.8.0",   "172.68.8.0/24"));
         assertTrue(JavaUtils.isInRange("172.68.8.12",  "172.68.8.0/24"));

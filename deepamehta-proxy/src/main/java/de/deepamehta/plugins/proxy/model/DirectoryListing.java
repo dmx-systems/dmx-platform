@@ -93,7 +93,7 @@ public class DirectoryListing {
                 throw new RuntimeException("Path \"" + path + "\" is not a file repository path");
             }
             //
-            return path.substring(FILE_REPOSITORY_PATH_LENGTH);
+            return JavaUtils.stripDriveLetter(path.substring(FILE_REPOSITORY_PATH_LENGTH));
         }
 
         // ---

@@ -83,6 +83,10 @@ public class JavaUtils {
         return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
     }
 
+    public static String stripDriveLetter(String path) {
+        return path.replaceFirst("^[A-Z]:", "");
+    }
+
     // ---
 
     public static String readTextFile(File file) {
