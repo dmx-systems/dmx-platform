@@ -4,7 +4,6 @@ import de.deepamehta.plugins.topicmaps.model.Topicmap;
 import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.CompositeValue;
@@ -16,13 +15,12 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,45 +38,6 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-
-
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
-
-
-
-    /* ### @Override
-    public void postDeleteRelationHook(long relationId) {
-        // remove the relation from all topicmaps
-        List<Topic> refTopics = dms.getTopics("de/deepamehta/core/property/RelationID", relationId);
-        logger.info("### Removing relation " + relationId + " from " + refTopics.size() + " topicmaps");
-        for (Topic refTopic : refTopics) {
-            removeAssociationFromTopicmap(refTopic.id);
-        }
-    } */
-
-    // ---
-
-    /* ### @Override
-    public void providePropertiesHook(Topic topic) {
-        if (topic.typeUri.equals("de/deepamehta/core/topictype/TopicmapRelationRef")) {
-            PropValue relation_id = dms.getTopicProperty(topic.id, "de/deepamehta/core/property/RelationID");
-            topic.setProperty("de/deepamehta/core/property/RelationID", relation_id);
-        }
-    } */
-
-    /* ### @Override
-    public void providePropertiesHook(Relation relation) {
-        if (relation.typeId.equals("TOPICMAP_TOPIC")) {
-            // transfer all relation properties
-            Properties properties = dms.getRelation(relation.id).getProperties();
-            for (String key : properties.keySet()) {
-                relation.setProperty(key, properties.get(key));
-            }
-        }
-    } */
 
 
 
@@ -131,6 +90,26 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
         removeAssociationFromTopicmap(refId);
     }
 
+    // ---
+
+    // Note: not part of topicmaps service
+    @GET
+    @Path("/{id}")
+    @Produces("text/html")
+    public InputStream getTopicmapInWebclient() {
+        // Note: the template parameter is evaluated at client-side
+        return invokeWebclient();
+    }
+
+    // Note: not part of topicmaps service
+    @GET
+    @Path("/{id}/topic/{topic_id}")
+    @Produces("text/html")
+    public InputStream getTopicmapAndTopicInWebclient() {
+        // Note: the template parameters are evaluated at client-side
+        return invokeWebclient();
+    }
+
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -140,5 +119,15 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
      */
     private void removeAssociationFromTopicmap(long refId) {
         dms.deleteAssociation(refId, null);     // clientContext=null
+    }
+
+    // ---
+
+    private InputStream invokeWebclient() {
+        try {
+            return dms.getPlugin("de.deepamehta.webclient").getResourceAsStream("web/index.html");
+        } catch (Exception e) {
+            throw new WebApplicationException(e);
+        }
     }
 }

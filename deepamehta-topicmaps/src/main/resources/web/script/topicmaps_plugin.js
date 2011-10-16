@@ -79,16 +79,24 @@ function topicmaps_plugin() {
         }
 
         function select_initial_topicmap() {
-            if (location.search.match(/topicmap=(\d+)/)) {
-                var topicmap_id = RegExp.$1
+            var groups = location.pathname.match(/\/topicmap\/(\d+)(\/topic\/(\d+))?/)
+            if (groups) {
+                var topicmap_id = groups[1]
+                var topic_id    = groups[3]
+                var no_history_update = false   // ### FIXME: rethink about history
                 select_menu_item(topicmap_id)
             } else {
                 var topicmap_id = get_topicmap_id_from_menu()
+                var no_history_update = false   // ### FIXME: rethink about history
             }
             // update model
             select_topicmap(topicmap_id)
             // update view
-            display_topicmap()
+            display_topicmap(no_history_update)
+            //
+            if (topic_id) {
+                dm4c.do_select_topic(topic_id, no_history_update)
+            }
         }
     }
 

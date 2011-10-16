@@ -2,7 +2,7 @@ function HTMLFieldRenderer(topic, field, rel_topics) {
 
     tinymce_options = {
         theme: "advanced",
-        content_css: "style/tinymce.css",
+        content_css: "/style/tinymce.css",
         plugins: "autoresize",
         width: "98%",
         extended_valid_elements: "iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|" +

@@ -598,7 +598,7 @@ var dm4c = new function() {
      * Loads a Javascript file dynamically. Synchronous and asynchronous loading is supported.
      *
      * @param   script_url      The URL (absolute or relative) of the Javascript file to load.
-     * @param   callback        The function to invoke when asynchronous loading is complete.
+     * @param   callback        Optional: the function to invoke when asynchronous loading is complete.
      *                          If not given loading is performed synchronously.
      */
     this.javascript_source = function(script_url, callback) {
@@ -1114,22 +1114,22 @@ var dm4c = new function() {
 
     // --- register default modules ---
     //
-    this.register_page_renderer("script/page_renderers/topic_renderer.js")
-    this.register_page_renderer("script/page_renderers/association_renderer.js")
+    this.register_page_renderer("/script/page_renderers/topic_renderer.js")
+    this.register_page_renderer("/script/page_renderers/association_renderer.js")
     //
-    this.register_field_renderer("script/field_renderers/text_field_renderer.js")
-    this.register_field_renderer("script/field_renderers/number_field_renderer.js")
-    this.register_field_renderer("script/field_renderers/boolean_field_renderer.js")
-    this.register_field_renderer("script/field_renderers/html_field_renderer.js")
-    // ### this.register_field_renderer("script/field_renderers/date_field_renderer.js")
-    // ### this.register_field_renderer("script/field_renderers/reference_field_renderer.js")
-    this.register_field_renderer("script/field_renderers/title_renderer.js")
-    this.register_field_renderer("script/field_renderers/body_text_renderer.js")
-    this.register_field_renderer("script/field_renderers/search_result_renderer.js")
+    this.register_field_renderer("/script/field_renderers/text_field_renderer.js")
+    this.register_field_renderer("/script/field_renderers/number_field_renderer.js")
+    this.register_field_renderer("/script/field_renderers/boolean_field_renderer.js")
+    this.register_field_renderer("/script/field_renderers/html_field_renderer.js")
+    // ### this.register_field_renderer("/script/field_renderers/date_field_renderer.js")
+    // ### this.register_field_renderer("/script/field_renderers/reference_field_renderer.js")
+    this.register_field_renderer("/script/field_renderers/title_renderer.js")
+    this.register_field_renderer("/script/field_renderers/body_text_renderer.js")
+    this.register_field_renderer("/script/field_renderers/search_result_renderer.js")
     //
-    register_plugin("script/internal_plugins/default_plugin.js")
-    register_plugin("script/internal_plugins/fulltext_plugin.js")
-    register_plugin("script/internal_plugins/tinymce_plugin.js")
+    register_plugin("/script/internal_plugins/default_plugin.js")
+    register_plugin("/script/internal_plugins/fulltext_plugin.js")
+    register_plugin("/script/internal_plugins/tinymce_plugin.js")
 
     var default_topic_icon = this.create_image(this.DEFAULT_TOPIC_ICON)
 
@@ -1206,9 +1206,6 @@ var dm4c = new function() {
             // Note: in order to let a plugin provide a custom canvas renderer (the dm4-freifunk-geomap plugin does!)
             // the canvas is created *after* loading the plugins.
             dm4c.canvas = dm4c.trigger_plugin_hook("get_canvas_renderer")[0] || new Canvas()
-            // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta-topicmaps plugin
-            // does!) the "init" hook is triggered *after* creating the canvas.
-            dm4c.trigger_plugin_hook("init")
             //
             // setup create widget
             dm4c.refresh_create_menu()
@@ -1220,6 +1217,11 @@ var dm4c = new function() {
             $("#page-content").height($("#canvas").height())
             //
             $(window).resize(window_resized)
+            // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta-topicmaps plugin
+            // does!) the "init" hook is triggered *after* creating the canvas.
+            // Note: for displaying an initial topic (the deepamehta-topicmaps plugin does!) the "init" hook must
+            // be triggered *after* the GUI setup is complete.
+            dm4c.trigger_plugin_hook("init")
         }
 
         function load_page_renderers() {
@@ -1231,13 +1233,12 @@ var dm4c = new function() {
 
             function load_page_renderer(page_renderer_src) {
                 if (LOG_PLUGIN_LOADING) dm4c.log("..... " + page_renderer_src)
-                // load page renderer asynchronously
-                dm4c.javascript_source(page_renderer_src, function() {
-                    // instantiate
-                    var page_renderer_class = js.to_camel_case(js.basename(page_renderer_src))
-                    if (LOG_PLUGIN_LOADING) dm4c.log(".......... instantiating \"" + page_renderer_class + "\"")
-                    page_renderers[page_renderer_class] = js.instantiate(PageRenderer, page_renderer_class)
-                })
+                // load page renderer synchronously (Note: synchronous is required for displaying initial topic)
+                dm4c.javascript_source(page_renderer_src)
+                // instantiate
+                var page_renderer_class = js.to_camel_case(js.basename(page_renderer_src))
+                if (LOG_PLUGIN_LOADING) dm4c.log(".......... instantiating \"" + page_renderer_class + "\"")
+                page_renderers[page_renderer_class] = js.instantiate(PageRenderer, page_renderer_class)
             }
         }
 
@@ -1245,8 +1246,8 @@ var dm4c = new function() {
             if (LOG_PLUGIN_LOADING) dm4c.log("Loading " + field_renderer_sources.length + " data field renderers:")
             for (var i = 0, field_renderer_source; field_renderer_source = field_renderer_sources[i]; i++) {
                 if (LOG_PLUGIN_LOADING) dm4c.log("..... " + field_renderer_source)
-                // load field renderer asynchronously
-                dm4c.javascript_source(field_renderer_source, function() {})
+                // load field renderer synchronously (Note: synchronous is required for displaying initial topic)
+                dm4c.javascript_source(field_renderer_source)
             }
         }
 
