@@ -20,7 +20,8 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected long id;
+    protected long id;                  // is -1 in models used for a create operation.
+                                        // is never -1 in models used for an update operation.
     protected String uri;               // is never null in models used for a create operation, may be empty.
                                         // may be null in models used for an update operation.
     protected String typeUri;           // is never null in models used for a create operation.
@@ -60,6 +61,10 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
         this(id, null, typeUri, null, composite);
     }
 
+    public DeepaMehtaObjectModel(long id, CompositeValue composite) {
+        this(id, null, null, null, composite);
+    }
+
     /**
      * @param   uri         If <code>null</code> an empty string is set. This is OK.
      * @param   typeUri     Mandatory. Note: only the internal meta type topic (ID 0) has no type URI (null).
@@ -68,9 +73,9 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
      */
     public DeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value, CompositeValue composite) {
         this.id = id;
-        this.uri = uri != null ? uri : "";
+        this.uri = uri != null ? uri : "";                          // ### FIXME: don't set default at this level
         this.typeUri = typeUri;
-        this.value = value != null ? value : new SimpleValue("");
+        this.value = value != null ? value : new SimpleValue("");   // ### FIXME: don't set default at this level
         this.composite = composite != null ? composite : new CompositeValue();
     }
 

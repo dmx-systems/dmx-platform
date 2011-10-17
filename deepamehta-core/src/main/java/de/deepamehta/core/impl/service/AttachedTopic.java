@@ -186,10 +186,10 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override
-    void store() {
+    void store(ClientContext clientContext, Directives directives) {
         dms.storage.createTopic(getModel());
         dms.associateWithTopicType(getModel());
-        super.store();
+        super.store(clientContext, directives);
     }
 
     // ### @Override

@@ -160,11 +160,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     @Override
-    public void setCompositeValue(CompositeValue comp) {
+    public void setCompositeValue(CompositeValue comp, ClientContext clientContext, Directives directives) {
         // update memory
         model.setCompositeValue(comp);
         // update DB
-        storeComposite();
+        storeComposite(clientContext, directives);
         refreshLabel();
     }
 
@@ -344,9 +344,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void store() {
+    void store(ClientContext clientContext, Directives directives) {
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            storeComposite();       // setCompositeValue() includes setSimpleValue()
+            storeComposite(clientContext, directives);       // setCompositeValue() includes setSimpleValue()
             refreshLabel();
         } else {
             storeAndIndexValue(getSimpleValue());
@@ -359,7 +359,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         updateTypeUri(model.getTypeUri(), report);
         // ### TODO: compare new model with current one and update only if changed.
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            setCompositeValue(model.getCompositeValue());   // setCompositeValue() includes setSimpleValue()
+            setCompositeValue(model.getCompositeValue(), clientContext, directives);
+            // setCompositeValue() includes setSimpleValue()
         } else {
             updateValue(model.getSimpleValue());
         }
@@ -419,7 +420,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Store ===
 
     // TODO: factorize this method
-    private void storeComposite() {
+    private void storeComposite(ClientContext clientContext, Directives directives) {
         CompositeValue comp = getCompositeValue();
         try {
             Iterator<String> i = comp.keys();
@@ -442,7 +443,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                         AttachedTopic childTopic = fetchChildTopic(assocDef);
                         CompositeValue childTopicComp = (CompositeValue) value;
                         if (childTopic != null) {
-                            childTopic.setCompositeValue(childTopicComp);
+                            TopicModel model = new TopicModel(childTopic.getId(), childTopicComp);
+                            childTopic.update(model, clientContext, directives);
                         } else {
                             // create and associate child topic
                             childTopic = dms.createTopic(new TopicModel(childTopicTypeUri, childTopicComp), null);

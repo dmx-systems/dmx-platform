@@ -230,10 +230,10 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override
-    void store() {
+    void store(ClientContext clientContext, Directives directives) {
         dms.storage.createAssociation(getModel());
         dms.associateWithAssociationType(getModel());
-        super.store();
+        super.store(clientContext, directives);
     }
 
     /**

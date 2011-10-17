@@ -121,17 +121,32 @@ function Canvas(width, height) {
 
     // ---
 
+    /**
+     * Updates a topic. If the topic is not on the canvas nothing is performed.
+     */
     this.update_topic = function(topic, refresh_canvas) {
-        get_topic(topic.id).update(topic)
+        var ct = get_topic(topic.id)
+        if (!ct) {
+            return
+        }
+        // update model
+        ct.update(topic)
         // refresh GUI
         if (refresh_canvas) {
             this.refresh()
         }
     }
 
+    /**
+     * Updates an association. If the association is not on the canvas nothing is performed.
+     */
     this.update_association = function(assoc, refresh_canvas) {
+        var ca = get_association(assoc.id)
+        if (!ca) {
+            return
+        }
         // update model
-        get_association(assoc.id).update(assoc)
+        ca.update(assoc)
         // refresh GUI
         if (refresh_canvas) {
             this.refresh()

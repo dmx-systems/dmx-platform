@@ -20,6 +20,12 @@ function PagePanel() {
         this.refresh()
     }
 
+    this.display_conditionally = function(topic_or_association) {
+        if (displayed_object.id == topic_or_association.id) {
+            this.display(topic_or_association)
+        }
+    }
+
     this.edit = function(topic_or_association) {
         // update model
         displayed_object = topic_or_association

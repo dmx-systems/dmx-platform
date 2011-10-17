@@ -28,6 +28,10 @@ public class TopicModel extends DeepaMehtaObjectModel {
         super(uri, typeUri, composite);
     }
 
+    public TopicModel(long id, CompositeValue composite) {
+        super(id, composite);
+    }
+
     /**
      * @param   uri         If <code>null</code> an empty string is set. This is OK.
      * @param   typeUri     Mandatory. Note: only the internal meta type topic (ID 0) has no type URI (null).

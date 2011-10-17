@@ -211,7 +211,7 @@ public class EmbeddedService implements DeepaMehtaService {
             triggerHook(Hook.PRE_CREATE_TOPIC, model, clientContext);
             //
             AttachedTopic topic = new AttachedTopic(model, this);
-            topic.store();
+            topic.store(clientContext, new Directives());
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
@@ -332,7 +332,7 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedAssociation assoc = new AttachedAssociation(model, this);
-            assoc.store();
+            assoc.store(clientContext, new Directives());
             //
             tx.success();
             return assoc;

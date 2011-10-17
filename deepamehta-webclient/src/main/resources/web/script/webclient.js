@@ -393,12 +393,12 @@ var dm4c = new function() {
      * Updates a topic on the view (canvas and page panel).
      * Triggers the "post_update_topic" hook.
      *
-     * @param   an Association object
+     * @param   a Topic object
      */
     function update_topic(topic) {
         // update view
         dm4c.canvas.update_topic(topic, true)           // refresh_canvas=true
-        dm4c.page_panel.display(topic)
+        dm4c.page_panel.display_conditionally(topic)
         // trigger hook
         dm4c.trigger_plugin_hook("post_update_topic", topic, undefined)         // FIXME: old_topic=undefined
     }
@@ -412,7 +412,7 @@ var dm4c = new function() {
     function update_association(assoc) {
         // update view
         dm4c.canvas.update_association(assoc, true)     // refresh_canvas=true
-        dm4c.page_panel.display(assoc)
+        dm4c.page_panel.display_conditionally(assoc)
         // trigger hook
         dm4c.trigger_plugin_hook("post_update_association", assoc, undefined)   // FIXME: old_assoc=undefined
     }
