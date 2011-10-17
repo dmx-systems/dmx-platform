@@ -52,6 +52,7 @@
                         ${project.basedir}/deepamehta-typesearch/target,
                         ${project.basedir}/deepamehta-topicmaps/target,
                         ${project.basedir}/deepamehta-geomaps/target,
+                        ${project.basedir}/deepamehta-facets/target,
                         ${project.basedir}/deepamehta-files/target,
                         ${project.basedir}/deepamehta-filemanager/target,
                         ${project.basedir}/deepamehta-proxy/target,
@@ -118,6 +119,7 @@
                 <module>deepamehta-typesearch</module>
                 <module>deepamehta-topicmaps</module>
                 <module>deepamehta-geomaps</module>
+                <module>deepamehta-facets</module>
                 <module>deepamehta-files</module>
                 <module>deepamehta-filemanager</module>
                 <module>deepamehta-proxy</module>
