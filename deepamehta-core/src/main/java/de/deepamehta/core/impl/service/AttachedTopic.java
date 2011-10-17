@@ -14,8 +14,10 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.service.ClientContext;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.Hook;
 
 import java.util.List;
 import java.util.Set;
@@ -188,6 +190,24 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         dms.storage.createTopic(getModel());
         dms.associateWithTopicType(getModel());
         super.store();
+    }
+
+    // ### @Override
+    ChangeReport update(TopicModel model, ClientContext clientContext, Directives directives) {
+        logger.info("Updating topic " + getId() + " (new " + model + ")");
+        //
+        dms.triggerHook(Hook.PRE_UPDATE_TOPIC, this, model, directives);
+        //
+        ChangeReport report = super.update(model, clientContext, directives);
+        //
+        // ### FIXME: avoid refetching. Required is updating the topic model for aggregations: replacing
+        // $id composite entries with actual values. See AttachedDeepaMehtaObject.storeComposite()
+        Topic topic = dms.getTopic(model.getId(), true, clientContext);     // fetchComposite=true
+        directives.add(Directive.UPDATE_TOPIC, topic);
+        //
+        dms.triggerHook(Hook.POST_UPDATE_TOPIC, this, null, directives);    // ### FIXME: oldTopic=null
+        //
+        return report;
     }
 
     /**

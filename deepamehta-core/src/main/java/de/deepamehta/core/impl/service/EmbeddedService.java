@@ -24,6 +24,7 @@ import de.deepamehta.core.service.CommandResult;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.Hook;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
@@ -86,57 +87,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
     private PluginCache pluginCache;
     private BundleContext bundleContext;
-
-    private enum Hook {
-
-        // Note: this hook is triggered only by the plugin itself
-        // (see {@link de.deepamehta.core.service.Plugin#initPlugin}).
-        // It is declared here for documentation purpose only.
-        // ### FIXME: remove hook. Use migration 1 instead.
-        POST_INSTALL_PLUGIN("postInstallPluginHook"),
-        ALL_PLUGINS_READY("allPluginsReadyHook"),
-
-        // Note: this hook is triggered only by the plugin itself
-        // (see {@link de.deepamehta.core.service.Plugin#createServiceTracker}).
-        // It is declared here for documentation purpose only.
-        SERVICE_ARRIVED("serviceArrived", PluginService.class),
-        // Note: this hook is triggered only by the plugin itself
-        // (see {@link de.deepamehta.core.service.Plugin#createServiceTracker}).
-        // It is declared here for documentation purpose only.
-        SERVICE_GONE("serviceGone", PluginService.class),
-
-         PRE_CREATE_TOPIC("preCreateHook",  TopicModel.class, ClientContext.class),
-        POST_CREATE_TOPIC("postCreateHook", Topic.class,      ClientContext.class),
-         PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, TopicModel.class, Directives.class),
-        POST_UPDATE_TOPIC("postUpdateHook", Topic.class, TopicModel.class, Directives.class),
-
-        // ### FIXME: remove hook. Retype is special case of update.
-        POST_RETYPE_ASSOCIATION("postRetypeAssociationHook", Association.class, String.class, Directives.class),
-
-         PRE_DELETE_ASSOCIATION("preDeleteAssociationHook",  Association.class, Directives.class),
-        POST_DELETE_ASSOCIATION("postDeleteAssociationHook", Association.class, Directives.class),
-
-        PROVIDE_TOPIC_PROPERTIES("providePropertiesHook", Topic.class),
-        PROVIDE_RELATION_PROPERTIES("providePropertiesHook", Association.class),
-
-        ENRICH_TOPIC("enrichTopicHook", Topic.class, ClientContext.class),
-        ENRICH_TOPIC_TYPE("enrichTopicTypeHook", TopicType.class, ClientContext.class),
-
-        // Note: besides regular triggering (see {@link #createTopicType})
-        // this hook is triggered by the plugin itself
-        // (see {@link de.deepamehta.core.service.Plugin#introduceTypesToPlugin}).
-        MODIFY_TOPIC_TYPE("modifyTopicTypeHook", TopicType.class, ClientContext.class),
-
-        EXECUTE_COMMAND("executeCommandHook", String.class, CommandParams.class, ClientContext.class);
-
-        private final String methodName;
-        private final Class[] paramClasses;
-
-        private Hook(String methodName, Class... paramClasses) {
-            this.methodName = methodName;
-            this.paramClasses = paramClasses;
-        }
-    }
 
     private enum MigrationRunMode {
         CLEAN_INSTALL, UPDATE, ALWAYS
@@ -282,18 +232,10 @@ public class EmbeddedService implements DeepaMehtaService {
     public Directives updateTopic(TopicModel model, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopic topic = getTopic(model.getId(), true, clientContext);
+            AttachedTopic topic = getTopic(model.getId(), true, clientContext);     // fetchComposite=true
             Directives directives = new Directives();
-            triggerHook(Hook.PRE_UPDATE_TOPIC, topic, model, directives);
             //
-            topic.update(model);
-            //
-            // ### FIXME: avoid refetching. Required is updating the topic model for aggregations: replacing
-            // $id composite entries with actual values. See AttachedDeepaMehtaObject.storeComposite()
-            topic = getTopic(model.getId(), true, clientContext);  // fetchComposite=true
-            directives.add(Directive.UPDATE_TOPIC, topic);
-            //
-            triggerHook(Hook.POST_UPDATE_TOPIC, topic, null, directives);   // ### FIXME: oldTopic=null
+            topic.update(model, clientContext, directives);
             //
             tx.success();
             return directives;
@@ -322,7 +264,8 @@ public class EmbeddedService implements DeepaMehtaService {
             return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Deleting topic " + topicId + " failed (" + topic + ")", e);
+            throw new WebApplicationException(new RuntimeException("Deleting topic " + topicId + " failed (" +
+                topic + ")", e));
         } finally {
             tx.finish();
         }
@@ -395,7 +338,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return assoc;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating association failed (" + model + ")", e);
+            throw new WebApplicationException(new RuntimeException("Creating association failed (" + model + ")", e));
         } finally {
             tx.finish();
         }
@@ -409,13 +352,13 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedAssociation assoc = getAssociation(model.getId());
+            Directives directives = new Directives();
             //
             // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
-            ChangeReport report = assoc.update(model);
+            ChangeReport report = assoc.update(model, clientContext, directives);
             //
-            Directives directives = new Directives();
             directives.add(Directive.UPDATE_ASSOCIATION, assoc);
             //
             if (report.typeUriChanged) {
@@ -426,7 +369,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Updating association failed (" + model + ")", e);
+            throw new WebApplicationException(new RuntimeException("Updating association failed (" + model + ")", e));
         } finally {
             tx.finish();
         }
@@ -452,7 +395,8 @@ public class EmbeddedService implements DeepaMehtaService {
             return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Deleting association " + assocId + " failed (" + assoc + ")", e);
+            throw new WebApplicationException(new RuntimeException("Deleting association " + assocId + " failed ("
+                + assoc + ")", e));
         } finally {
             tx.finish();
         }
@@ -525,8 +469,8 @@ public class EmbeddedService implements DeepaMehtaService {
             return topicType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating topic type \"" + topicTypeModel.getUri() +
-                "\" failed (" + topicTypeModel + ")", e);
+            throw new WebApplicationException(new RuntimeException("Creating topic type \"" + topicTypeModel.getUri() +
+                "\" failed (" + topicTypeModel + ")", e));
         } finally {
             tx.finish();
         }
@@ -546,7 +490,7 @@ public class EmbeddedService implements DeepaMehtaService {
             // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
-            topicType.update(topicTypeModel);
+            topicType.update(topicTypeModel, clientContext, null);  // ### FIXME: directives=null
             //
             // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
             //
@@ -972,7 +916,7 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * Triggers a hook for all installed plugins.
      */
-    private Map<String, Object> triggerHook(final Hook hook, final Object... params) {
+    Map<String, Object> triggerHook(final Hook hook, final Object... params) {
         final Map resultMap = new HashMap();
         new PluginCache.Iterator() {
             @Override
@@ -996,7 +940,7 @@ public class EmbeddedService implements DeepaMehtaService {
      * @throws  InvocationTargetException
      */
     private Object triggerHook(Plugin plugin, Hook hook, Object... params) throws Exception {
-        Method hookMethod = plugin.getClass().getMethod(hook.methodName, hook.paramClasses);
+        Method hookMethod = plugin.getClass().getMethod(hook.getMethodName(), hook.getParamClasses());
         return hookMethod.invoke(plugin, params);
     }
 

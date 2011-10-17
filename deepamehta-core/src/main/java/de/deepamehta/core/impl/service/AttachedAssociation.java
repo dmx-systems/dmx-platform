@@ -17,6 +17,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.service.ClientContext;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 
@@ -241,12 +242,13 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
      *                      If role 1 is <code>null</code> it is not updated.
      *                      If role 2 is <code>null</code> it is not updated.
      */
-    ChangeReport update(AssociationModel assocModel) {
-        logger.info("Updating association " + getId() + " (new " + assocModel + ")");
+    // ### @Override
+    ChangeReport update(AssociationModel model, ClientContext clientContext, Directives directives) {
+        logger.info("Updating association " + getId() + " (new " + model + ")");
         //
-        ChangeReport report = super.update(assocModel);
-        updateRole(assocModel.getRoleModel1(), 1);
-        updateRole(assocModel.getRoleModel2(), 2);
+        ChangeReport report = super.update(model, clientContext, directives);
+        updateRole(model.getRoleModel1(), 1);
+        updateRole(model.getRoleModel2(), 2);
         //
         return report;
     }
