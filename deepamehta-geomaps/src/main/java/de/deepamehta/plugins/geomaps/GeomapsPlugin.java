@@ -29,7 +29,7 @@ public class GeomapsPlugin extends Plugin {
     @Override
     public void postUpdateHook(Topic topic, TopicModel oldTopic, Directives directives) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
-            logger.info("### Updating \"Address\" " + topic);
+            logger.info("### Updating \"Address\" " + topic + " (old " + oldTopic + ")");
         }
     }
 }

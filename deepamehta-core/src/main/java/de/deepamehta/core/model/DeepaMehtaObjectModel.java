@@ -16,7 +16,7 @@ import java.util.Set;
 
 
 
-public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled {
+public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled, Cloneable {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -214,6 +214,15 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
 
 
     // === Java API ===
+
+    @Override
+    public DeepaMehtaObjectModel clone() {
+        try {
+            return (DeepaMehtaObjectModel) super.clone();
+        } catch (Exception e) {
+            throw new RuntimeException("Cloning a DeepaMehtaObjectModel failed", e);
+        }
+    }
 
     @Override
     public boolean equals(Object o) {

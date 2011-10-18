@@ -198,6 +198,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         //
         dms.triggerHook(Hook.PRE_UPDATE_TOPIC, this, model, directives);
         //
+        TopicModel oldModel = (TopicModel) getModel().clone();
         ChangeReport report = super.update(model, clientContext, directives);
         //
         // ### FIXME: avoid refetching. Required is updating the topic model for aggregations: replacing
@@ -205,7 +206,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         Topic topic = dms.getTopic(model.getId(), true, clientContext);     // fetchComposite=true
         directives.add(Directive.UPDATE_TOPIC, topic);
         //
-        dms.triggerHook(Hook.POST_UPDATE_TOPIC, this, null, directives);    // ### FIXME: oldTopic=null
+        dms.triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldModel, directives);
         //
         return report;
     }
