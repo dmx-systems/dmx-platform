@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.webservice;
 
 import de.deepamehta.plugins.webservice.provider.AssociationProvider;
+import de.deepamehta.plugins.webservice.provider.AssociationTypeProvider;
 import de.deepamehta.plugins.webservice.provider.CommandParamsProvider;
 import de.deepamehta.plugins.webservice.provider.CommandResultProvider;
 import de.deepamehta.plugins.webservice.provider.DirectivesProvider;
@@ -27,6 +28,7 @@ public class Application extends javax.ws.rs.core.Application {
         Set classes = new HashSet();
         // provider classes
         classes.add(AssociationProvider.class);
+        classes.add(AssociationTypeProvider.class);
         classes.add(CommandParamsProvider.class);
         classes.add(CommandResultProvider.class);
         classes.add(DirectivesProvider.class);

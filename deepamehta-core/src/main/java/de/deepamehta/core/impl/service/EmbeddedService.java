@@ -601,6 +601,8 @@ public class EmbeddedService implements DeepaMehtaService {
         }
     }
 
+    @POST
+    @Path("/assoctype")
     @Override
     public AssociationType createAssociationType(AssociationTypeModel assocTypeModel,
                                                  @HeaderParam("Cookie") ClientContext clientContext) {
