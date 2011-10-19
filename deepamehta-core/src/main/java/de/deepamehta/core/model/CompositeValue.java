@@ -118,6 +118,11 @@ public class CompositeValue {
 
 
     @Override
+    public CompositeValue clone() {
+        return new CompositeValue(toString());
+    }
+
+    @Override
     public String toString() {
         return values.toString();
     }

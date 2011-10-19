@@ -201,12 +201,9 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         TopicModel oldModel = (TopicModel) getModel().clone();
         ChangeReport report = super.update(model, clientContext, directives);
         //
-        // ### FIXME: avoid refetching. Required is updating the topic model for aggregations: replacing
-        // $id composite entries with actual values. See AttachedDeepaMehtaObject.storeComposite()
-        Topic topic = dms.getTopic(model.getId(), true, clientContext);     // fetchComposite=true
-        directives.add(Directive.UPDATE_TOPIC, topic);
+        directives.add(Directive.UPDATE_TOPIC, this);
         //
-        dms.triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldModel, directives);
+        dms.triggerHook(Hook.POST_UPDATE_TOPIC, this, oldModel, directives);
         //
         return report;
     }

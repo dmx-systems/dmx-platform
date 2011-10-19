@@ -161,10 +161,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public void setCompositeValue(CompositeValue comp, ClientContext clientContext, Directives directives) {
-        // update memory
-        model.setCompositeValue(comp);
-        // update DB
-        storeComposite(clientContext, directives);
+        updateCompositeValue(comp, clientContext, directives);
         refreshLabel();
     }
 
@@ -179,11 +176,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public void setChildTopicValue(String assocDefUri, SimpleValue value) {
-        CompositeValue comp = getCompositeValue();
         // update memory
-        comp.put(assocDefUri, value.value());
+        getCompositeValue().put(assocDefUri, value.value());
         // update DB
-        storeChildTopicValue(getAssocDef(assocDefUri), value);
+        storeChildTopicValue(assocDefUri, value);
         //
         refreshLabel();
     }
@@ -346,7 +342,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     void store(ClientContext clientContext, Directives directives) {
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            storeComposite(clientContext, directives);       // setCompositeValue() includes setSimpleValue()
+            CompositeValue comp = getCompositeValue();
+            model.setCompositeValue(new CompositeValue());
+            updateCompositeValue(comp, clientContext, directives);
             refreshLabel();
         } else {
             storeAndIndexValue(getSimpleValue());
@@ -359,8 +357,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         updateTypeUri(model.getTypeUri(), report);
         // ### TODO: compare new model with current one and update only if changed.
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            setCompositeValue(model.getCompositeValue(), clientContext, directives);
-            // setCompositeValue() includes setSimpleValue()
+            updateCompositeValue(model.getCompositeValue(), clientContext, directives);
+            // ### FIXME: refreshLabel() required?
         } else {
             updateValue(model.getSimpleValue());
         }
@@ -394,6 +392,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                     AttachedTopic childTopic = fetchChildTopic(assocDef);
                     if (childTopic != null) {
                         // Note: cast required because private method is called on a subclass's instance
+                        // ### FIXME: fetchComposite() should not be required as fetchChildTopic() already fetches
+                        // the composite value.
                         comp.put(assocDefUri, ((AttachedDeepaMehtaObject) childTopic).fetchComposite());
                     }
                 } else {
@@ -420,10 +420,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Store ===
 
     // TODO: factorize this method
-    private void storeComposite(ClientContext clientContext, Directives directives) {
-        CompositeValue comp = getCompositeValue();
+    private void updateCompositeValue(CompositeValue newComp, ClientContext clientContext, Directives directives) {
         try {
-            Iterator<String> i = comp.keys();
+            CompositeValue comp = getCompositeValue();
+            Iterator<String> i = newComp.keys();
             while (i.hasNext()) {
                 String key = i.next();
                 String[] t = key.split("\\$");
@@ -437,7 +437,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 String childTopicTypeUri = assocDef.getPartTopicTypeUri();
                 TopicType childTopicType = dms.getTopicType(childTopicTypeUri, null);
                 String assocTypeUri = assocDef.getTypeUri();
-                Object value = comp.get(key);
+                Object value = newComp.get(key);
                 if (assocTypeUri.equals("dm4.core.composition_def")) {
                     if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
                         AttachedTopic childTopic = fetchChildTopic(assocDef);
@@ -452,8 +452,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                             // Note: the child topic must be created right with its composite value.
                             // Otherwise its label can't be calculated.
                         }
+                        // update memory
+                        comp.put(assocDefUri, childTopic.getCompositeValue());
                     } else {
-                        storeChildTopicValue(assocDef, new SimpleValue(value));
+                        setChildTopicValue(assocDefUri, new SimpleValue(value));
                     }
                 } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
                     if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
@@ -471,15 +473,14 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                             // update DB
                             long childTopicId = (Integer) value;   // Note: the JSON parser creates Integers (not Longs)
                             associateChildTopic(assocDef, childTopicId);
-                            // adjust memory
-                            // ### FIXME: ConcurrentModificationException
-                            // ### current workaround: refetch after update, see EmbeddedService.updateTopic()
+                            // update memory
                             // Topic assignedTopic = dms.getTopic(childTopicId, false, null);  // fetchComposite=false
-                            // comp.remove(key);
                             // comp.put(assocDefUri, assignedTopic.getSimpleValue().value());
+                            SimpleValue childTopicValue = fetchChildTopicValue(assocDef);
+                            comp.put(assocDefUri, childTopicValue.value());
                         } else {
                             // create new child topic
-                            storeChildTopicValue(assocDef, new SimpleValue(value));
+                            setChildTopicValue(assocDefUri, new SimpleValue(value));
                         }
                     }
                 } else {
@@ -487,8 +488,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Storing the " + className() + "'s composite failed (" + this +
-                ",\ncomposite=" + comp + ")", e);
+            throw new RuntimeException("Storing the composite of " + className() + " " + getId() + " failed (" +
+                newComp + ")", e);
         }
     }
 
@@ -501,8 +502,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      *
      * @return  The child topic.
      */
-    private AttachedTopic storeChildTopicValue(AssociationDefinition assocDef, final SimpleValue value) {
+    private AttachedTopic storeChildTopicValue(String assocDefUri, final SimpleValue value) {
         try {
+            AssociationDefinition assocDef = getAssocDef(assocDefUri);
             AttachedTopic childTopic = fetchChildTopic(assocDef);
             if (childTopic != null) {
                 if (value != null) {
@@ -518,7 +520,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             return childTopic;
         } catch (Exception e) {
             throw new RuntimeException("Storing child topic value failed (parentTopic=" + this +
-                ",\nassocDefUri=" + assocDef.getUri() + ",\nvalue=" + value + ")", e);
+                ",\nassocDefUri=" + assocDefUri + ",\nvalue=" + value + ")", e);
         }
     }
 
@@ -653,7 +655,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
         //
         return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, true, false);
-        // fetchComposite=true ### false sufficient?
+        // fetchComposite=true ### FIXME: make fetchComposite a parameter
     }
 
     // ---

@@ -218,7 +218,9 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
     @Override
     public DeepaMehtaObjectModel clone() {
         try {
-            return (DeepaMehtaObjectModel) super.clone();
+            DeepaMehtaObjectModel model = (DeepaMehtaObjectModel) super.clone();
+            model.composite = composite.clone();
+            return model;
         } catch (Exception e) {
             throw new RuntimeException("Cloning a DeepaMehtaObjectModel failed", e);
         }

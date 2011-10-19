@@ -2,6 +2,7 @@ package de.deepamehta.plugins.geomaps;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.service.ClientContext;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
@@ -25,6 +26,13 @@ public class GeomapsPlugin extends Plugin {
     // **************************************************
 
 
+
+    @Override
+    public void postCreateHook(Topic topic, ClientContext clientContext) {
+        if (topic.getTypeUri().equals("dm4.contacts.address")) {
+            logger.info("### Creating \"Address\" " + topic);
+        }
+    }
 
     @Override
     public void postUpdateHook(Topic topic, TopicModel oldTopic, Directives directives) {
