@@ -48,13 +48,13 @@ Install
 Download the latest release and unzip it.  
 <https://github.com/jri/deepamehta/downloads/>
 
-A folder `deepamehta-4.0.4` is created.
+A folder `deepamehta-4.0.5` is created.
 
 
 Start
 -----
 
-Open the `deepamehta-4.0.4` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.0.5` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -82,7 +82,7 @@ Update
 ------
 
 Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is currently not supported.  
-Even updating from 4.0.x to 4.0.4 is currently not supported.  
+Even updating from 4.0.x to 4.0.5 is currently not supported.  
 Please see the note at the top.
 
 
@@ -96,7 +96,7 @@ To do so a) stop DeepaMehta, b) delete the `deepamehta-db` folder, and c) start 
 Uninstall
 ---------
 
-Stop DeepaMehta and delete the `deepamehta-4.0.4` folder.  
+Stop DeepaMehta and delete the `deepamehta-4.0.5` folder.  
 This removes DeepaMehta completely from your computer, including the database.
 
 
@@ -108,6 +108,18 @@ Build from Source
 
 Version History
 ---------------
+
+**4.0.5** -- Oct 20, 2011
+
+* New features:
+	* Custom topicmap backgrounds.
+	* Functional browser back/forward buttons.
+	* Permalinks.
+* Fixes:
+	* The file related features work on Windows.
+	* The file related features work if DeepaMehta runs behind an Apache reverse proxy.
+* See details in the release notes:
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.4** -- Sep 27, 2011
 
@@ -241,4 +253,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Sep 27, 2011
+Oct 20, 2011
