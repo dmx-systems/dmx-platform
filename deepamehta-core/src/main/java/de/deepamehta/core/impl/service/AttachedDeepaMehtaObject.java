@@ -488,8 +488,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Storing the composite of " + className() + " " + getId() + " failed (" +
-                newComp + ")", e);
+            throw new RuntimeException("Storing the composite of " + className() + " " + getId() +
+                " failed (composite=" + newComp + ")", e);
         }
     }
 
@@ -599,11 +599,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             if (!uri.equals(newUri)) {
                 logger.info("### Changing URI from \"" + uri + "\" -> \"" + newUri + "\"");
                 setUri(newUri);
-            } else {
-                logger.info("### Updating URI ABORTED -- no changes made by user");
             }
-        } else {
-            logger.info("### Updating URI ABORTED -- not contained in update request");
         }
     }
 
@@ -614,11 +610,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 logger.info("### Changing type URI from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
                 report.typeUriChanged(typeUri, newTypeUri);
                 setTypeUri(newTypeUri);
-            } else {
-                logger.info("### Updating type URI ABORTED -- no changes made by user");
             }
-        } else {
-            logger.info("### Updating type URI ABORTED -- not contained in update request");
         }
     }
 
@@ -628,11 +620,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             if (!value.equals(newValue)) {
                 logger.info("### Changing simple value from \"" + value + "\" -> \"" + newValue + "\"");
                 setSimpleValue(newValue);
-            } else {
-                logger.info("### Updating simple value ABORTED -- no changes made by user");
             }
-        } else {
-            logger.info("### Updating simple value ABORTED -- not contained in update request");
         }
     }
 

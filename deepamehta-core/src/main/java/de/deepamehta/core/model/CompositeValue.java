@@ -48,6 +48,9 @@ public class CompositeValue {
         return values.keys();
     }
 
+    /**
+     * @return  a String, Integer, Long, Double, Boolean, or a CompositeValue.
+     */
     public Object get(String key) {
         try {
             Object value = values.get(key);
@@ -93,6 +96,32 @@ public class CompositeValue {
 
     public boolean has(String key) {
         return values.has(key);
+    }
+
+    // ---
+
+    public String getString(String key) {
+        return (String) get(key);
+    }
+
+    public int getInt(String key) {
+        return (Integer) get(key);
+    }
+
+    public long getLong(String key) {
+        return (Long) get(key);
+    }
+
+    public double getDouble(String key) {
+        return (Double) get(key);
+    }
+
+    public boolean getBoolean(String key) {
+        return (Boolean) get(key);
+    }
+
+    public CompositeValue getComposite(String key) {
+        return (CompositeValue) get(key);
     }
 
     // ---
