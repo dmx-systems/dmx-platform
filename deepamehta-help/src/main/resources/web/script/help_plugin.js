@@ -30,7 +30,7 @@ function help_plugin() {
                     '</td>' +
                     '<td>' +
                         '<div class="field-label">Version</div>' +
-                        '<div class="field-value">${project.version}</div>' +
+                        '<div class="field-value">${project.version} / Oct 20, 2011</div>' +
                         '<div class="field-label">Copyright</div>' +
                         '<div class="field-value">2000-2011 Jörg Richter</div>' +
                         '<div class="field-label">License</div>' +
@@ -46,17 +46,19 @@ function help_plugin() {
                             'Martin Delius<br>' +
                             'Andreas Gebhard<br>' +
                             'Danny Gräf<br>' +
+                            'Rolf Kutz<br>' +
                             'Annette Leeb<br>' +
                             'Urs Lerch<br>' +
                             'Matthias Melcher<br>' +
+                            'Silke Meyer<br>' +
                             'Christiane Müller<br>' +
                             'Jürgen Neumann<br>' +
-                            'Jurij Poelchau<br>' +
                         '</div>' +
                     '</td>' +
                     '<td>' +
                         '<div class="field-label" style="visibility: hidden">Contributors</div>' +
                         '<div class="field-value">' +
+                            'Jurij Poelchau<br>' +
                             'Ingo Rau<br>' +
                             'Malte Reißig<br>' +
                             'Jörg Richter<br>' +
