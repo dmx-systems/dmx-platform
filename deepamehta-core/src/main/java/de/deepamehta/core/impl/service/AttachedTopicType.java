@@ -6,6 +6,8 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.util.JSONHelper;
+import de.deepamehta.core.service.ClientContext;
+import de.deepamehta.core.service.Directives;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -63,7 +65,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void update(TopicTypeModel model) {
+    void update(TopicTypeModel model, ClientContext clientContext, Directives directives) {
         logger.info("Updating topic type \"" + getUri() + "\" (new " + model + ")");
         String uri = model.getUri();
         SimpleValue value = model.getSimpleValue();
@@ -82,10 +84,10 @@ class AttachedTopicType extends AttachedType implements TopicType {
             }
             if (uriChanged) {
                 dms.typeCache.invalidate(getUri());
-                super.update(model);
+                super.update(model, clientContext, directives);
                 dms.typeCache.put(this);
             } else {
-                super.update(model);
+                super.update(model, clientContext, directives);
             }
         }
         if (dataTypeChanged) {

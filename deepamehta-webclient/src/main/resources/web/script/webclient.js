@@ -1,16 +1,16 @@
 var dm4c = new function() {
 
-    // preferences
-    this.MAX_RESULT_SIZE = 100
-    this.DEFAULT_TOPIC_ICON = "/images/ball-gray.png"
-    var DEFAULT_FIELD_ROWS = 1
-
     // logger preferences
     var ENABLE_LOGGING = false
     var LOG_PLUGIN_LOADING = false
     var LOG_IMAGE_LOADING = false
     this.LOG_GUI = false
     this.LOG_HISTORY = false
+
+    // preferences
+    this.MAX_RESULT_SIZE = 100
+    this.DEFAULT_TOPIC_ICON = "/images/ball-gray.png"
+    var DEFAULT_FIELD_ROWS = 1
 
     var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
@@ -20,14 +20,15 @@ var dm4c = new function() {
     this.render = new RenderHelper()
 
     // Model
-    this.selected_object = null         // a Topic or an Association object, or null if there is no selection
+    this.selected_object = null     // a Topic or an Association object, or null if there is no selection
     this.type_cache = new TypeCache()
 
     // View
-    this.toolbar = null                 // the upper toolbar GUI component (a ToolbarPanel object)
-    this.canvas = null                  // the canvas GUI component that displays the topicmap (a Canvas object)
-    this.page_panel = null              // the page panel GUI component on the right hand side (a PagePanel object)
-    this.upload_dialog = null           // the upload dialog (an UploadDialog object)
+    this.split_panel = null         // a SplitPanel object
+    this.toolbar = null             // the upper toolbar GUI component (a ToolbarPanel object)
+    this.canvas = null              // the canvas GUI component that displays the topicmap (a TopicmapRenderer object)
+    this.page_panel = null          // the page panel GUI component on the right hand side (a PagePanel object)
+    this.upload_dialog = null       // the upload dialog (an UploadDialog object)
 
     var plugin_sources = []
     var plugins = {}                // key: plugin class name, base name of source file (string), value: plugin instance
@@ -392,12 +393,12 @@ var dm4c = new function() {
      * Updates a topic on the view (canvas and page panel).
      * Triggers the "post_update_topic" hook.
      *
-     * @param   an Association object
+     * @param   a Topic object
      */
     function update_topic(topic) {
         // update view
         dm4c.canvas.update_topic(topic, true)           // refresh_canvas=true
-        dm4c.page_panel.display(topic)
+        dm4c.page_panel.display_conditionally(topic)
         // trigger hook
         dm4c.trigger_plugin_hook("post_update_topic", topic, undefined)         // FIXME: old_topic=undefined
     }
@@ -411,7 +412,7 @@ var dm4c = new function() {
     function update_association(assoc) {
         // update view
         dm4c.canvas.update_association(assoc, true)     // refresh_canvas=true
-        dm4c.page_panel.display(assoc)
+        dm4c.page_panel.display_conditionally(assoc)
         // trigger hook
         dm4c.trigger_plugin_hook("post_update_association", assoc, undefined)   // FIXME: old_assoc=undefined
     }
@@ -851,7 +852,7 @@ var dm4c = new function() {
      * <p>
      * Utility method for plugin developers.
      *
-     * @param   type_menu       a GUIToolkit's Menu object.
+     * @param   type_menu       a GUIToolkit Menu object.
      * @param   filter_func     Optional: a function that filters the topic types to add to the menu.
      *                          One argument is passed: the topic type (a TopicType object).
      *                          If not specified no filter is applied (all topic types are added).
@@ -1136,15 +1137,19 @@ var dm4c = new function() {
     $(function() {
         //
         // --- 1) Prepare GUI ---
-        create_split_panel()
         // create toolbar
         dm4c.toolbar = new ToolbarPanel()
-        $("body").prepend(dm4c.toolbar.dom)
+        $("body").append(dm4c.toolbar.dom)
+        // create split panel
+        dm4c.split_panel = new SplitPanel()
+        $("body").append(dm4c.split_panel.dom)
         // create page panel
         dm4c.page_panel = new PagePanel()
-        $("#split-panel > tbody > tr > td").eq(1).append(dm4c.page_panel.dom)
-        detail_panel_width = $("#page-content").width()     // ### FIXME: make global variable a PagePanel property!
-        if (dm4c.LOG_GUI) dm4c.log("Mesuring page panel width: " + detail_panel_width)
+        dm4c.split_panel.set_right_panel(dm4c.page_panel)
+        // create canvas
+        var size = dm4c.split_panel.get_left_panel_size()
+        dm4c.canvas = new Canvas(size.width, size.height)
+        dm4c.split_panel.set_left_panel(dm4c.canvas)
         // create upload dialog
         dm4c.upload_dialog = new UploadDialog()
         //
@@ -1155,17 +1160,6 @@ var dm4c = new function() {
         //
         register_plugins()
         load_plugins()
-
-        function create_split_panel() {
-            $("body").append($("<table>", {id: "split-panel"})
-                .append($("<tr>")
-                    .append($("<td>")
-                        .append($("<div>", {id: "canvas-panel"}))
-                    )
-                    .append($("<td>"))
-                )
-            )
-        }
 
         /**
          * Loads and instantiates all registered plugins.
@@ -1203,20 +1197,12 @@ var dm4c = new function() {
             load_page_renderers()
             load_field_renderers()
             load_stylesheets()
-            // Note: in order to let a plugin provide a custom canvas renderer (the dm4-freifunk-geomap plugin does!)
-            // the canvas is created *after* loading the plugins.
-            dm4c.canvas = dm4c.trigger_plugin_hook("get_canvas_renderer")[0] || new Canvas()
             //
             // setup create widget
             dm4c.refresh_create_menu()
             if (!dm4c.toolbar.create_menu.get_item_count()) {
                 dm4c.toolbar.create_widget.hide()
             }
-            // the page panel
-            if (dm4c.LOG_GUI) dm4c.log("Setting page panel height: " + $("#canvas").height())
-            $("#page-content").height($("#canvas").height())
-            //
-            $(window).resize(window_resized)
             // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta-topicmaps plugin
             // does!) the "init" hook is triggered *after* creating the canvas.
             // Note: for displaying an initial topic (the deepamehta-topicmaps plugin does!) the "init" hook must
@@ -1257,11 +1243,6 @@ var dm4c = new function() {
                 if (LOG_PLUGIN_LOADING) dm4c.log("..... " + css_stylesheet)
                 $("head").append($("<link>").attr({rel: "stylesheet", href: css_stylesheet, type: "text/css"}))
             }
-        }
-
-        function window_resized() {
-            dm4c.canvas.adjust_size()
-            $("#page-content").height($("#canvas").height())
         }
 
         function extend_rest_client() {

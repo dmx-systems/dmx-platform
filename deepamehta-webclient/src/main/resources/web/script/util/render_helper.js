@@ -46,17 +46,20 @@ function RenderHelper() {
     // ---
 
     /**
-     * @param   field   a TopicRenderer.Field object or a string.
+     * @param   field   Optional: the initial value (a TopicRenderer.Field object or a non-object value).
+     *                  If not specified the text field will be empty.
      *
      * @return  The <input> element (jQuery object).
      */
-    this.input = function(field) {
-        if (typeof(field) == "string") {
-            var value = field
-        } else {
+    this.input = function(field, size) {
+        if (typeof(field) == "object") {
             var value = field.value
+        } else {
+            var value = field
         }
-        return $('<input type="text">').attr("value", value)
+        // Note: we use an object argument for attr().
+        // attr("value", value) would be interpreted as 1-argument attr() call if value is undefined.
+        return $('<input type="text">').attr({value: value, size: size})
     }
 
     /**

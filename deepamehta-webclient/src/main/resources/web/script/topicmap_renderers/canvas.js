@@ -1,4 +1,4 @@
-function Canvas() {
+function Canvas(width, height) {
 
     // ------------------------------------------------------------------------------------------------ Constructor Code
 
@@ -40,13 +40,32 @@ function Canvas() {
     // build the canvas
     init_model()
     create_canvas_element()
-    $("#canvas-panel").dblclick(dblclick)
-    $("#canvas-panel").mousemove(mousemove)
-    $("#canvas-panel").mouseleave(mouseleave)
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
     // === Overriding TopicmapRenderer Adapter Methods ===
+
+    this.get_info = function() {
+        return {
+            uri: "dm4.topicmap_renderer.canvas",
+            name: "Topicmap"
+        }
+    }
+
+    this.init = function() {
+        if (dm4c.LOG_GUI) dm4c.log("Initializing canvas")
+        ctx = this.dom.get(0).getContext("2d")
+        // Note: the canvas font must be set early.
+        // Topic label measurement takes place *before* drawing.
+        ctx.font = LABEL_FONT
+    }
+
+    this.activate = function() {
+        if (dm4c.LOG_GUI) dm4c.log("Activating canvas")
+        bind_event_handlers()
+    }
+
+    // ---
 
     /**
      * Adds a topic to the canvas. If the topic is already on the canvas it is not added again.
@@ -74,8 +93,8 @@ function Canvas() {
                     topic.x = pos.x
                     topic.y = pos.y
                 } else {
-                    topic.x = self.canvas_width  * Math.random() - trans_x
-                    topic.y = self.canvas_height * Math.random() - trans_y
+                    topic.x = width  * Math.random() - trans_x
+                    topic.y = height * Math.random() - trans_y
                 }
             }
             topic.x = Math.floor(topic.x)
@@ -102,17 +121,32 @@ function Canvas() {
 
     // ---
 
+    /**
+     * Updates a topic. If the topic is not on the canvas nothing is performed.
+     */
     this.update_topic = function(topic, refresh_canvas) {
-        get_topic(topic.id).update(topic)
+        var ct = get_topic(topic.id)
+        if (!ct) {
+            return
+        }
+        // update model
+        ct.update(topic)
         // refresh GUI
         if (refresh_canvas) {
             this.refresh()
         }
     }
 
+    /**
+     * Updates an association. If the association is not on the canvas nothing is performed.
+     */
     this.update_association = function(assoc, refresh_canvas) {
+        var ca = get_association(assoc.id)
+        if (!ca) {
+            return
+        }
         // update model
-        get_association(assoc.id).update(assoc)
+        ca.update(assoc)
         // refresh GUI
         if (refresh_canvas) {
             this.refresh()
@@ -161,6 +195,7 @@ function Canvas() {
 
     // ---
 
+    // ### FIXME: not in interface
     this.set_highlight_object = function(object_id, refresh_canvas) {
         // update model
         highlight_object_id = object_id
@@ -170,6 +205,7 @@ function Canvas() {
         }
     }
 
+    // ### FIXME: not in interface
     this.reset_highlighting = function(refresh_canvas) {
         // update model
         reset_highlighting()
@@ -195,6 +231,7 @@ function Canvas() {
         draw()
     }
 
+    // ### FIXME: not in interface
     this.get_associations = function(topic_id) {
         var assocs = []
         iterate_associations(function(ca) {
@@ -216,8 +253,8 @@ function Canvas() {
         init_model()
     }
 
-    this.resize = function() {
-        resize_canvas()
+    this.resize = function(size) {
+        resize_canvas(size)
     }
 
     this.close_context_menu = function() {
@@ -245,7 +282,7 @@ function Canvas() {
 
 
     function draw() {
-        ctx.clearRect(-trans_x, -trans_y, self.canvas_width, self.canvas_height)
+        ctx.clearRect(-trans_x, -trans_y, width, height)
         // trigger hook
         dm4c.trigger_plugin_hook("pre_draw_canvas", ctx)
         //
@@ -329,10 +366,21 @@ function Canvas() {
 
 
 
+    function bind_event_handlers() {
+        self.dom.mousedown(do_mousedown)
+        self.dom.mouseup(do_mouseup)
+        self.dom.mousemove(do_mousemove)
+        self.dom.mouseleave(do_mouseleave)
+        self.dom.dblclick(do_doubleclick)
+        self.dom.get(0).oncontextmenu = do_contextmenu
+        self.dom.get(0).ondragover = do_dragover
+        self.dom.get(0).ondrop = do_drop
+    }
+
     // === Mouse Events ===
 
-    function mousedown(event) {
-        if (dm4c.LOG_GUI) dm4c.log("Mouse down!")
+    function do_mousedown(event) {
+        if (dm4c.LOG_GUI) dm4c.log("Mouse down on canvas!")
         //
         if (event.which == 1) {
             tmp_x = cx(event)
@@ -352,7 +400,8 @@ function Canvas() {
         }
     }
 
-    function mousemove(event) {
+    function do_mousemove(event) {
+        // if (dm4c.LOG_GUI) dm4c.log("Mouse moves on canvas!")
         if (action_topic || canvas_move_in_progress) {
             if (association_in_progress) {
                 tmp_x = cx(event)
@@ -375,8 +424,8 @@ function Canvas() {
         }
     }
 
-    function mouseleave(event) {
-        if (dm4c.LOG_GUI) dm4c.log("Mouse leave!")
+    function do_mouseleave(event) {
+        if (dm4c.LOG_GUI) dm4c.log("Mouse leaves canvas!")
         //
         if (association_in_progress) {
             end_association_in_progress()
@@ -389,8 +438,8 @@ function Canvas() {
         end_interaction()
     }
 
-    function mouseup(event) {
-        if (dm4c.LOG_GUI) dm4c.log("Mouse up!")
+    function do_mouseup(event) {
+        if (dm4c.LOG_GUI) dm4c.log("Mouse up on canvas!")
         //
         close_context_menu()
         //
@@ -418,7 +467,8 @@ function Canvas() {
         end_interaction()
     }
 
-    function dblclick(event) {
+    function do_doubleclick(event) {
+        if (dm4c.LOG_GUI) dm4c.log("Canvas double clicked!")
         var ct = find_topic(event)
         if (ct) {
             dm4c.trigger_plugin_hook("topic_doubleclicked", ct)
@@ -496,8 +546,6 @@ function Canvas() {
         action_topic = null
         action_assoc = null
     }
-
-
 
     // === Context Menu Events ===
 
@@ -579,17 +627,15 @@ function Canvas() {
         $("#canvas-panel .menu").remove()
     }
 
-
-
     // === Drag and Drop Events ===
 
     // Required. Otherwise we don't receive a drop.
-    function dragover () {
+    function do_dragover () {
         // Return false is Required. Otherwise we don't receive a drop.
         return false
     }
 
-    function drop(e) {
+    function do_drop(e) {
         // e.preventDefault();  // Useful for debugging when exception is thrown before false is returned.
         dm4c.trigger_plugin_hook("process_drop", e.dataTransfer)
         return false
@@ -693,19 +739,7 @@ function Canvas() {
      */
     function create_canvas_element() {
         var canvas = document.createElement("canvas")
-        var canvas_elem = $(canvas).attr({id: "canvas", width: self.canvas_width, height: self.canvas_height})
-        $("#canvas-panel").append(canvas_elem)  // add to document
-        ctx = canvas.getContext("2d")
-        // Note: the canvas font must be set early.
-        // Topic label measurement takes place *before* drawing.
-        ctx.font = LABEL_FONT
-        //
-        // bind event handlers
-        canvas_elem.mousedown(mousedown)
-        canvas_elem.mouseup(mouseup)
-        canvas.oncontextmenu = do_contextmenu
-        canvas.ondragover = dragover
-        canvas.ondrop = drop
+        self.dom = $(canvas).attr({id: "canvas", width: width, height: height})
     }
 
     /**
@@ -717,13 +751,17 @@ function Canvas() {
      *
      * @param   size    the new canvas size.
      */
-    function resize_canvas() {
+    function resize_canvas(size) {
         if (dm4c.LOG_GUI) dm4c.log("Rebuilding canvas")
+        width  = size.width
+        height = size.height
         // Note: we don't empty the entire canvas-panel to keep the resizable-handle element.
         $("#canvas-panel #canvas").remove()
         // Note: in order to resize the canvas element we must recreate it.
         // Otherwise the browsers would just distort the canvas rendering.
         create_canvas_element()
+        dm4c.split_panel.set_left_panel(self)
+        self.init()
         ctx.translate(trans_x, trans_y)
         draw()
     }
@@ -735,9 +773,9 @@ function Canvas() {
     }
 
     function scroll_to_center(x, y) {
-        if (x < 0 || x >= self.canvas_width || y < 0 || y >= self.canvas_height) {
-            var dx = (self.canvas_width / 2 - x) / ANIMATION_STEPS
-            var dy = (self.canvas_height / 2 - y) / ANIMATION_STEPS
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            var dx = (width  / 2 - x) / ANIMATION_STEPS
+            var dy = (height / 2 - y) / ANIMATION_STEPS
             var animation_count = 0;
             var animation = setInterval(function() {
                 translate(dx, dy)
@@ -885,7 +923,7 @@ function Canvas() {
         this.next_position = function() {
             var pos = {x: grid_x, y: grid_y}
             if (item_count == 0) {
-                scroll_to_center(self.canvas_width / 2, pos.y + trans_y)
+                scroll_to_center(width / 2, pos.y + trans_y)
             }
             //
             advance_position()
@@ -907,7 +945,7 @@ function Canvas() {
         }
 
         function advance_position() {
-            if (grid_x + GRID_DIST_X + trans_x > self.canvas_width) {
+            if (grid_x + GRID_DIST_X + trans_x > width) {
                 grid_x = START_X
                 grid_y += GRID_DIST_Y
             } else {

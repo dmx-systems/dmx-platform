@@ -48,6 +48,9 @@ public class CompositeValue {
         return values.keys();
     }
 
+    /**
+     * @return  a String, Integer, Long, Double, Boolean, or a CompositeValue.
+     */
     public Object get(String key) {
         try {
             Object value = values.get(key);
@@ -97,6 +100,32 @@ public class CompositeValue {
 
     // ---
 
+    public String getString(String key) {
+        return (String) get(key);
+    }
+
+    public int getInt(String key) {
+        return (Integer) get(key);
+    }
+
+    public long getLong(String key) {
+        return (Long) get(key);
+    }
+
+    public double getDouble(String key) {
+        return (Double) get(key);
+    }
+
+    public boolean getBoolean(String key) {
+        return (Boolean) get(key);
+    }
+
+    public CompositeValue getComposite(String key) {
+        return (CompositeValue) get(key);
+    }
+
+    // ---
+
     public String getDefaultLabel() {
         try {
             return getLabel(values);
@@ -116,6 +145,11 @@ public class CompositeValue {
     // ****************
 
 
+
+    @Override
+    public CompositeValue clone() {
+        return new CompositeValue(toString());
+    }
 
     @Override
     public String toString() {

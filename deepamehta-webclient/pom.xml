@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Webclient</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-webclient</artifactId>
-    <version>4.0.5</version>
+    <version>4.0.6-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webservice</artifactId>
-            <version>4.0.5</version>
+            <version>4.0.6-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

@@ -30,7 +30,7 @@ function help_plugin() {
                     '</td>' +
                     '<td>' +
                         '<div class="field-label">Version</div>' +
-                        '<div class="field-value">${project.version} / Oct 20, 2011</div>' +
+                        '<div class="field-value">${project.version} / Oct 22, 2011</div>' +
                         '<div class="field-label">Copyright</div>' +
                         '<div class="field-value">2000-2011 Jörg Richter</div>' +
                         '<div class="field-label">License</div>' +

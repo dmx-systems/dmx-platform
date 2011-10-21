@@ -1,0 +1,10 @@
+{
+	topics: [
+	    ### Role Types ###
+	    {
+	        value:    "Facet",
+	        uri:      "dm4.facets.facet",
+	        type_uri: "dm4.core.role_type"
+	    }
+	]
+}

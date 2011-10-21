@@ -13,6 +13,7 @@ import java.net.FileNameMap;
 import java.net.InetAddress;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
+import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 
@@ -92,8 +93,8 @@ public class JavaUtils {
     public static String readTextFile(File file) {
         try {
             return readText(new FileInputStream(file));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("Error wile reading text file " + file, e);
+        } catch (Exception e) {
+            throw new RuntimeException("Reading text file \"" + file + "\" failed", e);
         }
     }
 
@@ -126,11 +127,19 @@ public class JavaUtils {
 
     // === URLs ===
 
+    public static String readTextURL(URL url) {
+        try {
+            return readText(url.openStream());
+        } catch (Exception e) {
+            throw new RuntimeException("Reading from URL \"" + url + "\" failed", e);
+        }
+    }
+
     public static String encodeURIComponent(String uriComp) {
         try {
             return URLEncoder.encode(uriComp, "UTF-8").replaceAll("\\+", "%20");
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Encoding of URI component \"" + uriComp + "\" failed", e);
+            throw new RuntimeException("Encoding URI component \"" + uriComp + "\" failed", e);
         }
     }
 
@@ -206,7 +215,7 @@ public class JavaUtils {
             MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
             return new String(encodeHex(sha256.digest(data.getBytes())));
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error while SHA256 encoding", e);
+            throw new RuntimeException("SHA256 encoding failed", e);
         }
     }
 
