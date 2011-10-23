@@ -26,9 +26,9 @@ public enum Hook {
     SERVICE_GONE("serviceGone", PluginService.class),
 
      PRE_CREATE_TOPIC("preCreateHook",  TopicModel.class, ClientContext.class),
-    POST_CREATE_TOPIC("postCreateHook", Topic.class,      ClientContext.class),
+    POST_CREATE_TOPIC("postCreateHook", Topic.class,      ClientContext.class, Directives.class),
      PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, TopicModel.class, Directives.class),
-    POST_UPDATE_TOPIC("postUpdateHook", Topic.class, TopicModel.class, Directives.class),
+    POST_UPDATE_TOPIC("postUpdateHook", Topic.class, TopicModel.class, ClientContext.class, Directives.class),
 
     // ### FIXME: remove hook. Retype is special case of update.
     POST_RETYPE_ASSOCIATION("postRetypeAssociationHook", Association.class, String.class, Directives.class),

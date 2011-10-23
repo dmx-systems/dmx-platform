@@ -16,6 +16,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.util.JavaUtils;
+import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientContext;
 import de.deepamehta.core.service.Directives;
 
@@ -351,7 +352,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    ChangeReport update(DeepaMehtaObjectModel model, ClientContext clientContext, Directives directives) {
+    // ### move up
+    @Override
+    public ChangeReport update(DeepaMehtaObjectModel model, ClientContext clientContext, Directives directives) {
         ChangeReport report = new ChangeReport();
         updateUri(model.getUri());
         updateTypeUri(model.getTypeUri(), report);

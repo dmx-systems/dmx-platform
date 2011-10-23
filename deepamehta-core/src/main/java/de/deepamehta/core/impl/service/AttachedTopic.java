@@ -14,6 +14,7 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientContext;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
@@ -203,7 +204,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         //
         directives.add(Directive.UPDATE_TOPIC, this);
         //
-        dms.triggerHook(Hook.POST_UPDATE_TOPIC, this, oldModel, directives);
+        dms.triggerHook(Hook.POST_UPDATE_TOPIC, this, oldModel, clientContext, directives);
         //
         return report;
     }

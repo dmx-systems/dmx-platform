@@ -18,6 +18,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientContext;
 import de.deepamehta.core.service.CommandParams;
 import de.deepamehta.core.service.CommandResult;
@@ -211,9 +212,10 @@ public class EmbeddedService implements DeepaMehtaService {
             triggerHook(Hook.PRE_CREATE_TOPIC, model, clientContext);
             //
             AttachedTopic topic = new AttachedTopic(model, this);
-            topic.store(clientContext, new Directives());
+            Directives directives = new Directives();
+            topic.store(clientContext, directives);
             //
-            triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext);
+            triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext, directives);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
             //
             tx.success();

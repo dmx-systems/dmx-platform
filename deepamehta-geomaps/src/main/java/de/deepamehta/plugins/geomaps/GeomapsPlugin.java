@@ -1,5 +1,7 @@
 package de.deepamehta.plugins.geomaps;
 
+import de.deepamehta.plugins.facets.service.FacetsService;
+
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
@@ -7,6 +9,7 @@ import de.deepamehta.core.service.ClientContext;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -23,6 +26,8 @@ public class GeomapsPlugin extends Plugin {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private FacetsService facetsService;
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -36,12 +41,34 @@ public class GeomapsPlugin extends Plugin {
 
 
     @Override
-    public void postCreateHook(Topic topic, ClientContext clientContext) {
+    public void serviceArrived(PluginService service) {
+        logger.info("########## Service arrived: " + service);
+        if (service instanceof FacetsService) {
+            facetsService = (FacetsService) service;
+        }
+    }
+
+    @Override
+    public void serviceGone(PluginService service) {
+        logger.info("########## Service gone: " + service);
+        if (service == facetsService) {
+            facetsService = null;
+        }
+    }
+
+    // ---
+
+    @Override
+    public void postCreateHook(Topic topic, ClientContext clientContext, Directives directives) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
+            //
+            facetsService.associateWithFacetType(topic.getId(), "dm4.geomaps.geo_coordinate_facet");
+            //
             Address address = new Address(topic.getCompositeValue());
             if (!address.isEmpty()) {
                 logger.info("### New " + address);
-                address.geocode();
+                LonLat geoCoordinate = address.geocode();
+                addGeoFacet(topic, geoCoordinate, clientContext, directives);
             } else {
                 logger.info("### New empty address");
             }
@@ -49,13 +76,14 @@ public class GeomapsPlugin extends Plugin {
     }
 
     @Override
-    public void postUpdateHook(Topic topic, TopicModel oldTopic, Directives directives) {
+    public void postUpdateHook(Topic topic, TopicModel oldTopic, ClientContext clientContext, Directives directives) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
             Address address    = new Address(topic.getCompositeValue());
             Address oldAddress = new Address(oldTopic.getCompositeValue());
             if (!address.equals(oldAddress)) {
                 logger.info("### Address changed:" + address.changeReport(oldAddress));
-                address.geocode();
+                LonLat geoCoordinate = address.geocode();
+                addGeoFacet(topic, geoCoordinate, clientContext, directives);
             } else {
                 logger.info("### Address not changed");
             }
@@ -63,6 +91,21 @@ public class GeomapsPlugin extends Plugin {
     }
 
 
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void addGeoFacet(Topic addressTopic, LonLat geoCoordinate, ClientContext clientContext,
+                                                                       Directives directives) {
+        try {
+            logger.info("Adding geo facet (" + geoCoordinate + ") to address " + addressTopic);
+            CompositeValue comp = new CompositeValue().put("dm4.geomaps.longitude", geoCoordinate.lon)
+                                                      .put("dm4.geomaps.latitude",  geoCoordinate.lat);
+            TopicModel facet = new TopicModel("dm4.geomaps.geo_coordinate", comp);
+            facetsService.addFacet(addressTopic, "dm4.geomaps.geo_coordinate_facet", facet, clientContext, directives);
+        } catch (Exception e) {
+            throw new RuntimeException("Adding geo facet to address topic failed");
+        }
+    }
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
@@ -81,11 +124,13 @@ public class GeomapsPlugin extends Plugin {
 
         // ---
 
-        void geocode() {
+        LonLat geocode() {
             URL url = null;
             try {
+                // perform request
                 String address = street + ", " + postalCode + " " + city + ", " + country;
                 url = new URL(String.format(GEOCODER_URL, JavaUtils.encodeURIComponent(address)));
+                logger.info("Geocoding \"" + address + "\"\n        " + url);
                 JSONObject response = new JSONObject(JavaUtils.readTextURL(url));
                 // check response status
                 String status = response.getString("status");
@@ -95,10 +140,12 @@ public class GeomapsPlugin extends Plugin {
                 // parse response
                 JSONObject location = response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry")
                     .getJSONObject("location");
-                double lat = location.getDouble("lat");
                 double lng = location.getDouble("lng");
+                double lat = location.getDouble("lat");
                 //
-                logger.info("Geocoding \"" + address + "\"\n    " + url + "\n    => lat=" + lat + ", lng=" + lng);
+                LonLat geoCoordinate = new LonLat(lng, lat);
+                logger.info("  => " + geoCoordinate);
+                return geoCoordinate;
             } catch (Exception e) {
                 throw new RuntimeException("Geocoding failed (url=\"" + url + "\")", e);
             }
@@ -111,16 +158,16 @@ public class GeomapsPlugin extends Plugin {
         String changeReport(Address oldAddr) {
             StringBuilder report = new StringBuilder();
             if (!street.equals(oldAddr.street)) {
-                report.append("\n    Street: \"" + oldAddr.street + "\" -> \"" + street + "\"");
+                report.append("\n        Street: \"" + oldAddr.street + "\" -> \"" + street + "\"");
             }
             if (!postalCode.equals(oldAddr.postalCode)) {
-                report.append("\n    Postal Code: \"" + oldAddr.postalCode + "\" -> \"" + postalCode + "\"");
+                report.append("\n        Postal Code: \"" + oldAddr.postalCode + "\" -> \"" + postalCode + "\"");
             }
             if (!city.equals(oldAddr.city)) {
-                report.append("\n    City: \"" + oldAddr.city + "\" -> \"" + city + "\"");
+                report.append("\n        City: \"" + oldAddr.city + "\" -> \"" + city + "\"");
             }
             if (!country.equals(oldAddr.country)) {
-                report.append("\n    Country: \"" + oldAddr.country + "\" -> \"" + country + "\"");
+                report.append("\n        Country: \"" + oldAddr.country + "\" -> \"" + country + "\"");
             }
             return report.toString();
         }
@@ -146,6 +193,20 @@ public class GeomapsPlugin extends Plugin {
         public String toString() {
             return "address (street=\"" + street + "\", postalCode=\"" + postalCode +
                 "\", city=\"" + city + "\", country=\"" + country + "\")";
+        }
+    }
+
+    private class LonLat {
+
+        double lon, lat;
+
+        LonLat(double lon, double lat) {
+            this.lon = lon;
+            this.lat = lat;
+        }
+
+        public String toString() {
+            return "long=" + lon + ", lat=" + lat;
         }
     }
 }

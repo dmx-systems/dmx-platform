@@ -70,10 +70,8 @@ function Canvas(width, height) {
     /**
      * Adds a topic to the canvas. If the topic is already on the canvas it is not added again.
      *
-     * @param   topic               A Topic object
-     *                              ### FIXDOC: a plain JavaScript object with "id", "type_uri", and "value" 
-     *                              ### properties is sufficient, plus optional "x" and "y" properties
-     * @param   refresh_canvas      Optional: if true, the canvas is refreshed.
+     * @param   topic           an object with "id", "type_uri", "value" properties and optional "x", "y" properties.
+     * @param   refresh_canvas  Optional: if true, the canvas is refreshed.
      */
     this.add_topic = function(topic, refresh_canvas) {
         if (!topic_exists(topic.id)) {
@@ -810,6 +808,8 @@ function Canvas(width, height) {
      *  id, type_uri, label
      *  x, y                    Topic position. Represents the center of the topic's icon.
      *  width, height           Icon size.
+     *
+     * @param   topic   an object with "id", "type_uri", "value", "x", "y" properties.
      */
     function CanvasTopic(topic) {
 

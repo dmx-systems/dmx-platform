@@ -11,6 +11,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.ClientContext;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
 
 import static java.util.Arrays.asList;
@@ -59,7 +60,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
      * Assigns a newly created topic to the current workspace.
      */
     @Override
-    public void postCreateHook(Topic topic, ClientContext clientContext) {
+    public void postCreateHook(Topic topic, ClientContext clientContext, Directives directives) {
         long workspaceId = -1;
         try {
             // check precondition 1

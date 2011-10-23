@@ -238,13 +238,13 @@ public class Plugin implements BundleActivator, EventHandler {
     public void preCreateHook(TopicModel topicModel, ClientContext clientContext) {
     }
 
-    public void postCreateHook(Topic topic, ClientContext clientContext) {
+    public void postCreateHook(Topic topic, ClientContext clientContext, Directives directives) {
     }
 
     public void preUpdateHook(Topic topic, TopicModel newTopic, Directives directives) {
     }
 
-    public void postUpdateHook(Topic topic, TopicModel oldTopic, Directives directives) {
+    public void postUpdateHook(Topic topic, TopicModel oldTopic, ClientContext clientContext, Directives directives) {
     }
 
     // ---

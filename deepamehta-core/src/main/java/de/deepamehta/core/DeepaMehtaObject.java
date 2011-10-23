@@ -1,7 +1,9 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientContext;
 import de.deepamehta.core.service.Directives;
 
@@ -47,6 +49,10 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
     CompositeValue getCompositeValue();
 
     void setCompositeValue(CompositeValue comp, ClientContext clientContext, Directives directives);
+
+    // ---
+
+    ChangeReport update(DeepaMehtaObjectModel model, ClientContext clientContext, Directives directives);
 
 
 

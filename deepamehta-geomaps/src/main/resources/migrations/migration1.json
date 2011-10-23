@@ -1,0 +1,43 @@
+{
+    topic_types: [
+        {
+            value:         "Longitude",
+            uri:           "dm4.geomaps.longitude",
+            data_type_uri: "dm4.core.number"
+        },
+        {
+            value:         "Latitude",
+            uri:           "dm4.geomaps.latitude",
+            data_type_uri: "dm4.core.number"
+        },
+        {
+            value:         "Geo Coordinate",
+            uri:           "dm4.geomaps.geo_coordinate",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:  "dm4.geomaps.longitude",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.geomaps.latitude",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                }
+			]
+		},
+        {
+            value:         "Geo Coordinate Facet",
+            uri:           "dm4.geomaps.geo_coordinate_facet",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:  "dm4.geomaps.geo_coordinate",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                }
+			]
+		}
+	]
+}

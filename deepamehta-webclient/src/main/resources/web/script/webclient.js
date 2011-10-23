@@ -117,7 +117,7 @@ var dm4c = new function() {
     /**
      * Reveals a topic that is related to the selected topic.
      * <p>
-     * Triggers the "pre_show_topic" and "post_show_topic" hooks.
+     * Triggers the "pre_show_topic" and "post_show_topic" hooks (indirectly).
      * Triggers the "post_show_association" hook (for each association).
      *
      * @param   topic_id    ID of the related topic.

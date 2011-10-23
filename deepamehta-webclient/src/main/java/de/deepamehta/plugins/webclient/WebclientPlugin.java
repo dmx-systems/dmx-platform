@@ -84,7 +84,7 @@ public class WebclientPlugin extends Plugin {
      * Once a view configuration is updated in the DB we must update the cached view configuration model.
      */
     @Override
-    public void postUpdateHook(Topic topic, TopicModel oldTopic, Directives directives) {
+    public void postUpdateHook(Topic topic, TopicModel oldTopic, ClientContext clientContext, Directives directives) {
         if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
             Type type = getType(topic);
             logger.info("### Updating view configuration for topic type \"" + type.getUri() + "\" (" + topic + ")");
