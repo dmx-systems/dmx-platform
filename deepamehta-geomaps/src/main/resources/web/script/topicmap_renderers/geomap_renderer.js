@@ -20,7 +20,7 @@ function GeoMapRenderer() {
 
     this.get_info = function() {
         return {
-            uri: "dm4.topicmap_renderer.geomap",
+            uri: "dm4.geomaps.geomap_renderer",
             name: "Geomap"
         }
     }
@@ -28,6 +28,10 @@ function GeoMapRenderer() {
     this.init = function() {
         this.resize(dm4c.split_panel.get_left_panel_size())     // we must already in DOM
         init()                                                  // we must already in DOM
+    }
+
+    this.load_topicmap = function(topicmap_id) {
+        return new Geomap(topicmap_id)
     }
 
     this.resize = function(size) {
@@ -49,7 +53,7 @@ function GeoMapRenderer() {
         ])
         map.addControl(new OpenLayers.Control.Navigation({'zoomWheelEnabled': false}))
         map.addControl(new OpenLayers.Control.ZoomPanel())
-        map.addControl(new OpenLayers.Control.LayerSwitcher())
+        // map.addControl(new OpenLayers.Control.LayerSwitcher())
         map.setCenter(transform(11, 51), 6)
         //
         /*for (var i = 0, ml; ml = marker_layer_info[i]; i++) {
@@ -81,4 +85,49 @@ function GeoMapRenderer() {
             )
         }
     }()
+
+    // ------------------------------------------------------------------------------------------------- Private Classes
+
+    /**
+     * An in-memory representation (model) of a persistent topicmap. There are methods for:
+     *  - building the in-memory representation by loading a topicmap from DB.
+     *  - manipulating the topicmap by e.g. adding/removing topics and associations,
+     *    while synchronizing the DB accordingly.
+     *  - putting the topicmap on the canvas.
+     *
+     * ### FIXME: introduce common base class for Topicmap and Geomap
+     */
+    function Geomap(topicmap_id) {
+
+        // Model
+        var info                        // The underlying Topicmap topic (a JavaScript object)
+        var selected_object_id = -1     // ID of the selected topic or association, or -1 for no selection
+
+        load()
+
+        // --- Public API ---
+
+        this.get_id = function() {
+            return topicmap_id
+        }
+
+        this.get_renderer_uri = function() {
+            return info.composite["dm4.topicmaps.topicmap_renderer_uri"]
+        }
+
+        this.put_on_canvas = function(no_history_update) {
+            dm4c.do_reset_selection(no_history_update)
+        }
+
+        this.reset_selection = function() {
+            selected_object_id = -1
+        }
+
+        // --- Private Functions ---
+
+        function load() {
+            var topicmap = dm4c.restc.get_topicmap(topicmap_id)
+            info = topicmap.info
+        }
+    }
 }

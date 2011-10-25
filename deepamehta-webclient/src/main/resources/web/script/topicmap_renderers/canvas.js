@@ -47,7 +47,7 @@ function Canvas(width, height) {
 
     this.get_info = function() {
         return {
-            uri: "dm4.topicmap_renderer.canvas",
+            uri: "dm4.webclient.canvas_renderer",
             name: "Topicmap"
         }
     }

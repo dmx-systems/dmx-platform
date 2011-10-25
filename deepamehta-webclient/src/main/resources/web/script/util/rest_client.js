@@ -40,8 +40,8 @@ function RESTClient(core_service_uri) {
      *              "items"       - array of topics, possibly empty.
      *              "total_count" - result set size before limitation.
      */
-    this.get_topics = function(type_uri, sort, max_result_size) {
-        var params = new RequestParameter({max_result_size: max_result_size})
+    this.get_topics = function(type_uri, fetch_composite, sort, max_result_size) {
+        var params = new RequestParameter({fetch_composite: fetch_composite, max_result_size: max_result_size})
         var result = request("GET", "/topic/by_type/" + type_uri + "?" + params.to_query_string())
         sort_topics(result.items, sort)
         return result

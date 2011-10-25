@@ -144,7 +144,7 @@ public class WebclientPlugin extends Plugin {
         try {
             logger.info("typeUri=\"" + typeUri + "\", maxResultSize=" + maxResultSize);
             String searchTerm = dms.getTopicType(typeUri, null).getSimpleValue() + "(s)";   // clientContext=null
-            ResultSet<Topic> result = dms.getTopics(typeUri, maxResultSize);
+            ResultSet<Topic> result = dms.getTopics(typeUri, false, maxResultSize);         // fetchComposite=false
             Topic searchTopic = createSearchTopic(searchTerm, result.getItems(), null);     // clientContext=null
             tx.success();
             return searchTopic;

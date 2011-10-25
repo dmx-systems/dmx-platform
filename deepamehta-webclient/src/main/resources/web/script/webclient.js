@@ -681,6 +681,14 @@ var dm4c = new function() {
 
     // === Topics ===
 
+    this.hash_by_id = function(topics) {
+        var hashed_topics = {}
+        for (var i = 0, topic; topic = topics[i]; i++) {
+            hashed_topics[topic.id] = topic
+        }
+        return hashed_topics
+    }
+
     this.hash_by_type = function(topics) {
         var hashed_topics = {}
         for (var i = 0, topic; topic = topics[i]; i++) {

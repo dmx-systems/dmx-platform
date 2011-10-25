@@ -150,13 +150,23 @@ var js = {
     },
 
     /**
-     * @param   baseclass       the baseclass constructor (a function)
+     * @param   superclass      the baseclass constructor (a function)
      * @param   subclass_name   (a string)
      */
     instantiate: function(superclass, subclass_name) {
         var obj = new superclass()
         eval(subclass_name).apply(obj)
         return obj
+    },
+
+    /**
+     * Extends an object with all the methods defined in a superclass.
+     *
+     * @param   obj         The object to be extended
+     * @param   superclass  The superclass (a function)
+     */
+    extend: function(obj, superclass) {
+        superclass.apply(obj)
     },
 
 

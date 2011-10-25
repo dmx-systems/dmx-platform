@@ -19,6 +19,10 @@ function TopicmapRenderer() {
      */
     this.activate = function() {}
 
+    this.load_topicmap = function(topicmap_id) {
+        throw "MissingTopicmapLoaderError: topicmap renderer \"" + this.get_info().uri + "\" provides no loader"
+    }
+
     // ---
 
     /**

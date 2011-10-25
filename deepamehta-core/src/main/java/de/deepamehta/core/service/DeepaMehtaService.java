@@ -54,7 +54,7 @@ public interface DeepaMehtaService {
 
     // public Topic getTopic(String typeUri, String key, SimpleValue value);
 
-    public ResultSet<Topic> getTopics(String typeUri, int maxResultSize);
+    public ResultSet<Topic> getTopics(String typeUri, boolean fetchComposite, int maxResultSize);
 
     /**
      * Performs a fulltext search.
