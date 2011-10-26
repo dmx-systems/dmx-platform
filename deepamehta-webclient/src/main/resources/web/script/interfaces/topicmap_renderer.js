@@ -1,11 +1,14 @@
 /**
- * Base class for widgets that render a topicmap (in general the left part of the DeepaMehta window).
+ * This interface is implemented by classes who render the left part of the DeepaMehta window (the "canvas").
  *
- * Subclasses override specific adapter methods.
+ * The Webclient is coded to this interface.
+ *
+ * Note: the concept of a (persistent) topicmap does not appear here.
+ * It is only introduced by the Topicmaps module.
+ *
+ * ### FIXME: consider renaming to "CanvasRenderer"
  */
 function TopicmapRenderer() {
-
-    // ------------------------------------------------------------------------------------------------- Adapter Methods
 
     this.get_info = function() {}
 
@@ -18,10 +21,6 @@ function TopicmapRenderer() {
      * Triggered every time the renderer has been added to the DOM.
      */
     this.activate = function() {}
-
-    this.load_topicmap = function(topicmap_id) {
-        throw "MissingTopicmapLoaderError: topicmap renderer \"" + this.get_info().uri + "\" provides no loader"
-    }
 
     // ---
 

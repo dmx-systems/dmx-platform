@@ -10,6 +10,7 @@ function topicmaps_plugin() {
     var topicmaps = {}              // Loaded topicmaps (key: topicmap ID, value: Topicmap object)
     var topicmap                    // Selected topicmap (Topicmap object)
     var topicmap_renderers = {}     // Registered topicmap renderers (key: renderer URI, value: TopicmapRenderer object)
+    var topicmap_renderer           // The topicmap renderer of the selected topicmap
 
     // View
     var topicmap_menu               // A GUIToolkit Menu object
@@ -143,11 +144,7 @@ function topicmaps_plugin() {
      * @param   topic   a Topic object
      */
     this.pre_show_topic = function(topic) {
-        var t = topicmap.get_topic(topic.id)
-        if (t && !t.visibility) {
-            topic.x = t.x
-            topic.y = t.y
-        }
+        topicmap_renderer.prepare_topic_for_display(topicmap, topic)
     }
 
     /**
@@ -402,6 +399,8 @@ function topicmaps_plugin() {
     function set_selected_topicmap(topicmap_id) {
         if (LOG_TOPICMAPS) dm4c.log("Selecting topicmap " + topicmap_id)
         // update model
+        var renderer_uri = topicmap_topics[topicmap_id].composite["dm4.topicmaps.topicmap_renderer_uri"]
+        topicmap_renderer = get_topicmap_renderer(renderer_uri)
         topicmap = load_topicmap(topicmap_id)
     }
 
@@ -419,9 +418,7 @@ function topicmaps_plugin() {
      */
     function load_topicmap(topicmap_id) {
         if (!topicmaps[topicmap_id]) {
-            var renderer_uri = topicmap_topics[topicmap_id].composite["dm4.topicmaps.topicmap_renderer_uri"]
-            // load from DB
-            topicmaps[topicmap_id] = get_topicmap_renderer(renderer_uri).load_topicmap(topicmap_id)
+            topicmaps[topicmap_id] = topicmap_renderer.load_topicmap(topicmap_id)
         }
         //
         return topicmaps[topicmap_id]
@@ -517,7 +514,7 @@ function topicmaps_plugin() {
         topicmap.put_on_canvas(no_history_update)
     }
 
-    // ---
+    // === Topicmap Menu ===
 
     /**
      * @param   topicmap_id     Optional: ID of the topicmap to select.

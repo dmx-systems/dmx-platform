@@ -2,8 +2,7 @@ function Canvas(width, height) {
 
     // ------------------------------------------------------------------------------------------------ Constructor Code
 
-    this.superclass = TopicmapRenderer
-    this.superclass()
+    js.extend(this, TopicmapRenderer)
     var self = this
 
     // Settings
@@ -43,7 +42,7 @@ function Canvas(width, height) {
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
-    // === Overriding TopicmapRenderer Adapter Methods ===
+    // === TopicmapRenderer Implementation ===
 
     this.get_info = function() {
         return {

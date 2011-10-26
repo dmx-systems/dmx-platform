@@ -1,18 +1,30 @@
+/**
+ * Extends the default topicmap renderer (as provided by the webclient module) by persistence.
+ */
 function CanvasRendererExtension() {
 
     var LOG_TOPICMAPS = false
+
+    // === TopicmapRenderer Topicmaps Extension ===
 
     this.load_topicmap = function(topicmap_id) {
         return new Topicmap(topicmap_id)
     }
 
+    this.prepare_topic_for_display = function(topicmap, topic) {
+        var t = topicmap.get_topic(topic.id)
+        if (t && !t.visibility) {
+            topic.x = t.x
+            topic.y = t.y
+        }
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Classes
 
     /**
-     * An in-memory representation (model) of a persistent topicmap. There are methods for:
-     *  - building the in-memory representation by loading a topicmap from DB.
-     *  - manipulating the topicmap by e.g. adding/removing topics and associations,
-     *    while synchronizing the DB accordingly.
+     * A topicmap model that is attached to the database. There are methods for:
+     *  - loading a topicmap from DB
+     *  - manipulating the topicmap by e.g. adding/removing topics and associations
      *  - putting the topicmap on the canvas.
      */
     function Topicmap(topicmap_id) {

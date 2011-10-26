@@ -7,8 +7,7 @@ function GeoMapRenderer() {
 
     // ------------------------------------------------------------------------------------------------ Constructor Code
 
-    this.superclass = TopicmapRenderer
-    this.superclass()
+    js.extend(this, TopicmapRenderer)
 
     this.dom = $("<div>", {id: "canvas"})
 
@@ -16,7 +15,7 @@ function GeoMapRenderer() {
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
-    // === Overriding TopicmapRenderer Adapter Methods ===
+    // === TopicmapRenderer Implementation ===
 
     this.get_info = function() {
         return {
@@ -30,13 +29,18 @@ function GeoMapRenderer() {
         init()                                                  // we must already in DOM
     }
 
+    this.resize = function(size) {
+        if (dm4c.LOG_GUI) dm4c.log("Resizing geomap canvas to " + size.width + "x" + size.height)
+        this.dom.width(size.width).height(size.height)
+    }
+
+    // === TopicmapRenderer Topicmaps Extension ===
+
     this.load_topicmap = function(topicmap_id) {
         return new Geomap(topicmap_id)
     }
 
-    this.resize = function(size) {
-        if (dm4c.LOG_GUI) dm4c.log("Resizing geomap canvas to " + size.width + "x" + size.height)
-        this.dom.width(size.width).height(size.height)
+    this.prepare_topic_for_display = function(topicmap, topic) {
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
@@ -89,13 +93,9 @@ function GeoMapRenderer() {
     // ------------------------------------------------------------------------------------------------- Private Classes
 
     /**
-     * An in-memory representation (model) of a persistent topicmap. There are methods for:
-     *  - building the in-memory representation by loading a topicmap from DB.
-     *  - manipulating the topicmap by e.g. adding/removing topics and associations,
-     *    while synchronizing the DB accordingly.
-     *  - putting the topicmap on the canvas.
+     * A topicmap model that is attached to the database.
      *
-     * ### FIXME: introduce common base class for Topicmap and Geomap
+     * ### FIXME: introduce common base class for Geomap and Topicmap (see deepamehta-topicmaps module)
      */
     function Geomap(topicmap_id) {
 
@@ -117,6 +117,25 @@ function GeoMapRenderer() {
 
         this.put_on_canvas = function(no_history_update) {
             dm4c.do_reset_selection(no_history_update)
+        }
+
+        this.add_topic = function(id, type_uri, label, x, y) {
+        }
+
+        this.add_association = function(id, type_uri, topic_id_1, topic_id_2) {
+        }
+
+        this.update_topic = function(topic) {
+        }
+
+        this.set_topic_selection = function(topic) {
+            selected_object_id = topic.id
+            is_topic_selected = true
+        }
+
+        this.set_association_selection = function(assoc) {
+            selected_object_id = assoc.id
+            is_topic_selected = false
         }
 
         this.reset_selection = function() {

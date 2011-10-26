@@ -208,6 +208,7 @@ var dm4c = new function() {
     this.do_update_topic = function(old_topic, new_topic) {
         // update model
         var directives = dm4c.restc.update_topic(new_topic)
+        // ### alert(JSON.stringify(directives))
         // update view
         process_directives(directives)
         //
@@ -337,17 +338,21 @@ var dm4c = new function() {
         }
         dm4c.trigger_plugin_hook("post_show_topic", topic)      // trigger hook
         // update page panel
-        switch (action) {
-        case "none":
-            break
-        case "show":
-            dm4c.page_panel.display(topic)
-            break
-        case "edit":
-            dm4c.begin_editing(topic)
-            break
-        default:
-            alert("WARNING (show_topic):\n\nUnexpected action: \"" + action + "\"")
+        update_page_panel()
+
+        function update_page_panel() {
+            switch (action) {
+            case "none":
+                break
+            case "show":
+                dm4c.page_panel.display(topic)
+                break
+            case "edit":
+                dm4c.begin_editing(topic)
+                break
+            default:
+                throw "WebclientError: \"" + action + "\" is an unexpected page panel action"
+            }
         }
     }
 
