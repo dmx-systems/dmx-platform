@@ -49,7 +49,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             Topic topic = dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-                new SimpleValue("DeepaMehta 4 Notes")), null);  // clientContext=null
+                new SimpleValue("DeepaMehta 4 Notes")), null).getCreatedTopic();    // clientContext=null
             //
             topic.setChildTopicValue("dm4.core.plugin_migration_nr", new SimpleValue(23));
             //
@@ -75,7 +75,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             Topic topic = dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-                new CompositeValue().put("dm4.core.plugin_migration_nr", 23)), null);
+                new CompositeValue().put("dm4.core.plugin_migration_nr", 23)), null).getCreatedTopic();
             //
             assertTrue(topic.getCompositeValue().has("dm4.core.plugin_migration_nr"));
             //

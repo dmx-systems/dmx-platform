@@ -81,7 +81,8 @@ class AttachedViewConfiguration implements ViewConfiguration {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     private void storeConfigTopic(TopicModel configTopic) {
-        Topic topic = dms.createTopic(configTopic, null);   // FIXME: clientContext=null
+        Topic topic = dms.createTopic(configTopic, null).getCreatedTopic();     // FIXME: clientContext=null
+                                                                                // FIXME: process directives
         dms.createAssociation("dm4.core.aggregation", configurable,
             new TopicRoleModel(topic.getId(), "dm4.core.view_config"));
     }

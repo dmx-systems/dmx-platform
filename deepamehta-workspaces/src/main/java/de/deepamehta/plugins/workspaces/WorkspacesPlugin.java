@@ -136,7 +136,9 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     public Topic createWorkspace(String name) {
         logger.info("Creating workspace \"" + name + "\"");
         CompositeValue comp = new CompositeValue("{dm4.workspaces.name: \"" + name + "\"}");
-        return dms.createTopic(new TopicModel("dm4.workspaces.workspace", comp), null);  // clientContext=null
+        return dms.createTopic(new TopicModel("dm4.workspaces.workspace", comp), null).getCreatedTopic();
+                                                                                    // FIXME: clientContext=null
+                                                                                    // FIXME: process directives
     }
 
     @Override

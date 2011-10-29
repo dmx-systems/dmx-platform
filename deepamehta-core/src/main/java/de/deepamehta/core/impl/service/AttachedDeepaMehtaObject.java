@@ -443,14 +443,16 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 Object value = newComp.get(key);
                 if (assocTypeUri.equals("dm4.core.composition_def")) {
                     if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
-                        AttachedTopic childTopic = fetchChildTopic(assocDef);
+                        Topic childTopic = fetchChildTopic(assocDef);
                         CompositeValue childTopicComp = (CompositeValue) value;
                         if (childTopic != null) {
                             TopicModel model = new TopicModel(childTopic.getId(), childTopicComp);
                             childTopic.update(model, clientContext, directives);
                         } else {
                             // create and associate child topic
-                            childTopic = dms.createTopic(new TopicModel(childTopicTypeUri, childTopicComp), null);
+                            Directives dirs = dms.createTopic(new TopicModel(childTopicTypeUri, childTopicComp), null);
+                            directives.add(dirs);
+                            childTopic = dirs.getCreatedTopic();
                             associateChildTopic(assocDef, childTopic.getId());
                             // Note: the child topic must be created right with its composite value.
                             // Otherwise its label can't be calculated.
@@ -505,10 +507,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      *
      * @return  The child topic.
      */
-    private AttachedTopic storeChildTopicValue(String assocDefUri, final SimpleValue value) {
+    private Topic storeChildTopicValue(String assocDefUri, final SimpleValue value) {
         try {
             AssociationDefinition assocDef = getAssocDef(assocDefUri);
-            AttachedTopic childTopic = fetchChildTopic(assocDef);
+            Topic childTopic = fetchChildTopic(assocDef);
             if (childTopic != null) {
                 if (value != null) {
                     childTopic.setSimpleValue(value);
@@ -516,7 +518,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             } else {
                 // create child topic
                 String topicTypeUri = assocDef.getPartTopicTypeUri();
-                childTopic = dms.createTopic(new TopicModel(topicTypeUri, value), null);
+                Directives dirs = dms.createTopic(new TopicModel(topicTypeUri, value), null);
+                                                                    // FIXME: process directives
+                childTopic = dirs.getCreatedTopic();
                 // associate child topic
                 associateChildTopic(assocDef, childTopic.getId());
             }

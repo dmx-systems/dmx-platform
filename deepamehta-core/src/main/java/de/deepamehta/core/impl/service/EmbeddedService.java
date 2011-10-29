@@ -22,8 +22,8 @@ import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientContext;
 import de.deepamehta.core.service.CommandParams;
 import de.deepamehta.core.service.CommandResult;
+import de.deepamehta.core.service.CoreDirective;
 import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Hook;
 import de.deepamehta.core.service.Migration;
@@ -208,7 +208,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @POST
     @Path("/topic")
     @Override
-    public AttachedTopic createTopic(TopicModel model, @HeaderParam("Cookie") ClientContext clientContext) {
+    public Directives createTopic(TopicModel model, @HeaderParam("Cookie") ClientContext clientContext) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             triggerHook(Hook.PRE_CREATE_TOPIC, model, clientContext);
@@ -219,9 +219,12 @@ public class EmbeddedService implements DeepaMehtaService {
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext, directives);
             triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
+            // Note: the CREATE_TOPIC directive must be added last (and in particular *after* triggering
+            // the POST_CREATE_TOPIC hook). This order is expected by Directives.getCreatedTopic().
+            directives.add(CoreDirective.CREATE_TOPIC, topic);
             //
             tx.success();
-            return topic;
+            return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new WebApplicationException(new RuntimeException("Creating topic failed (" + model + ")", e));
@@ -363,7 +366,7 @@ public class EmbeddedService implements DeepaMehtaService {
             //
             ChangeReport report = assoc.update(model, clientContext, directives);
             //
-            directives.add(Directive.UPDATE_ASSOCIATION, assoc);
+            directives.add(CoreDirective.UPDATE_ASSOCIATION, assoc);
             //
             if (report.typeUriChanged) {
                 triggerHook(Hook.POST_RETYPE_ASSOCIATION, assoc, report.oldTypeUri, directives);

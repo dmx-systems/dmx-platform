@@ -41,8 +41,8 @@ public class FacetsPlugin extends Plugin implements FacetsService {
     }
 
     @Override
-    public void addFacet(Topic topic, String facetTypeUri, TopicModel facet, ClientContext clientContext,
-                                                                             Directives directives) {
+    public Topic addFacet(Topic topic, String facetTypeUri, TopicModel facet, ClientContext clientContext,
+                                                                              Directives directives) {
         String assocDefUri = facet.getTypeUri();
         AssociationDefinition assocDef = dms.getTopicType(facetTypeUri, null).getAssocDef(assocDefUri);
         String childTopicTypeUri = assocDef.getPartTopicTypeUri();
@@ -57,11 +57,14 @@ public class FacetsPlugin extends Plugin implements FacetsService {
                     childTopic.update(model, clientContext, directives);
                 } else {
                     // create and associate child topic
-                    childTopic = dms.createTopic(new TopicModel(childTopicTypeUri, childTopicComp), null);
+                    Directives dirs = dms.createTopic(new TopicModel(childTopicTypeUri, childTopicComp), null);
+                    directives.add(dirs);
+                    childTopic = dirs.getCreatedTopic();
                     associateChildTopic(topic, assocDef, childTopic.getId());
                     // Note: the child topic must be created right with its composite value.
                     // Otherwise its label can't be calculated.
                 }
+                return childTopic;
             } else {
                 throw new RuntimeException("Simple facets not yet supported");
                 // ### setChildTopicValue(assocDefUri, new SimpleValue(value));

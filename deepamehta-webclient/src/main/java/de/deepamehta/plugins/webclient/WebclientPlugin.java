@@ -10,7 +10,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientContext;
-import de.deepamehta.core.service.Directive;
+import de.deepamehta.core.service.CoreDirective;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.util.JSONHelper;
@@ -89,7 +89,7 @@ public class WebclientPlugin extends Plugin {
             Type type = getType(topic);
             logger.info("### Updating view configuration for topic type \"" + type.getUri() + "\" (" + topic + ")");
             type.getViewConfig().getModel().updateConfigTopic(topic.getModel());
-            directives.add(Directive.UPDATE_TOPIC_TYPE, type);
+            directives.add(CoreDirective.UPDATE_TOPIC_TYPE, type);
         }
     }
 
@@ -185,7 +185,8 @@ public class WebclientPlugin extends Plugin {
      */
     private Topic createSearchTopic(String searchTerm, Set<Topic> resultItems, ClientContext clientContext) {
         // CompositeValue comp = new CompositeValue("{dm4.webclient.search_term: \"" + searchTerm + "\"}");
-        Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search" /*, comp */), clientContext);
+        Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search" /*, comp */), clientContext)
+            .getCreatedTopic();     // FIXME: process directives
         searchTopic.setChildTopicValue("dm4.webclient.search_term", new SimpleValue(searchTerm));
         //
         // associate result items

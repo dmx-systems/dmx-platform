@@ -128,6 +128,12 @@ function GeoMapRenderer() {
         this.update_topic = function(topic) {
         }
 
+        this.delete_topic = function(id) {
+        }
+
+        this.delete_association = function(id) {
+        }
+
         this.set_topic_selection = function(topic) {
             selected_object_id = topic.id
             is_topic_selected = true

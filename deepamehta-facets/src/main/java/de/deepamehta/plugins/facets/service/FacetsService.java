@@ -12,6 +12,9 @@ public interface FacetsService extends PluginService {
 
     void associateWithFacetType(long topicId, String facetTypeUri);
 
-    void addFacet(Topic topic, String facetTypeUri, TopicModel facet, ClientContext clientContext,
-                                                                      Directives directives);
+    /**
+     * @return  The facet added.
+     */
+    Topic addFacet(Topic topic, String facetTypeUri, TopicModel facet, ClientContext clientContext,
+                                                                       Directives directives);
 }

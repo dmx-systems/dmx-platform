@@ -32,6 +32,10 @@ public class GeomapsPlugin extends Plugin {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    public enum GeomapDirective implements Directive {
+        ADD_MARKER
+    }
+
 
 
     // **************************************************
@@ -100,8 +104,11 @@ public class GeomapsPlugin extends Plugin {
             logger.info("Adding geo facet (" + geoCoordinate + ") to address " + addressTopic);
             CompositeValue comp = new CompositeValue().put("dm4.geomaps.longitude", geoCoordinate.lon)
                                                       .put("dm4.geomaps.latitude",  geoCoordinate.lat);
-            TopicModel facet = new TopicModel("dm4.geomaps.geo_coordinate", comp);
-            facetsService.addFacet(addressTopic, "dm4.geomaps.geo_coordinate_facet", facet, clientContext, directives);
+            TopicModel model = new TopicModel("dm4.geomaps.geo_coordinate", comp);
+            Topic facet = facetsService.addFacet(addressTopic, "dm4.geomaps.geo_coordinate_facet", model,
+                clientContext, directives);
+            //
+            directives.add(GeomapDirective.ADD_MARKER, facet);
         } catch (Exception e) {
             throw new RuntimeException("Adding geo facet to address topic failed");
         }

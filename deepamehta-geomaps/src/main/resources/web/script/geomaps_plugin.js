@@ -17,6 +17,12 @@ function geomaps_plugin() {
         return new GeoMapRenderer()
     }
 
+    this.process_directive = function(directive) {
+        if (directive.type == "ADD_MARKER") {
+            alert("Geomaps module: process ADD_MARKER directive\n\n" + JSON.stringify(directive.arg))
+        }
+    }
+
     // ----------------------------------------------------------------------------------------------- Private Functions
 
 }

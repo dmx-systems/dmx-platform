@@ -1,6 +1,9 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.service.ChangeReport;
+import de.deepamehta.core.service.ClientContext;
+import de.deepamehta.core.service.Directives;
 
 import java.util.Set;
 
@@ -14,6 +17,8 @@ import java.util.Set;
 public interface Topic extends DeepaMehtaObject {
 
     TopicModel getModel();
+
+    ChangeReport update(TopicModel model, ClientContext clientContext, Directives directives);
 
     // === Traversal ===
 

@@ -16,7 +16,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientContext;
-import de.deepamehta.core.service.Directive;
+import de.deepamehta.core.service.CoreDirective;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Hook;
 
@@ -105,7 +105,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         // delete topic itself
         logger.info("Deleting " + this);
         dms.storage.deleteTopic(getId());
-        directives.add(Directive.DELETE_TOPIC, this);
+        directives.add(CoreDirective.DELETE_TOPIC, this);
     }
 
 
@@ -193,8 +193,9 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         super.store(clientContext, directives);
     }
 
-    // ### @Override
-    ChangeReport update(TopicModel model, ClientContext clientContext, Directives directives) {
+    // ### move up
+    @Override
+    public ChangeReport update(TopicModel model, ClientContext clientContext, Directives directives) {
         logger.info("Updating topic " + getId() + " (new " + model + ")");
         //
         dms.triggerHook(Hook.PRE_UPDATE_TOPIC, this, model, directives);
@@ -202,7 +203,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         TopicModel oldModel = (TopicModel) getModel().clone();
         ChangeReport report = super.update(model, clientContext, directives);
         //
-        directives.add(Directive.UPDATE_TOPIC, this);
+        directives.add(CoreDirective.UPDATE_TOPIC, this);
         //
         dms.triggerHook(Hook.POST_UPDATE_TOPIC, this, oldModel, clientContext, directives);
         //

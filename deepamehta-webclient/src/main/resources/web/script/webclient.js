@@ -207,7 +207,7 @@ var dm4c = new function() {
      */
     this.do_update_topic = function(old_topic, new_topic) {
         // update model
-        var directives = dm4c.restc.update_topic(new_topic)
+        var directives = build_directives(dm4c.restc.update_topic(new_topic))
         // ### alert(JSON.stringify(directives))
         // update view
         process_directives(directives)
@@ -227,7 +227,7 @@ var dm4c = new function() {
      */
     this.do_update_association = function(old_assoc, new_assoc) {
         // update model
-        var directives = dm4c.restc.update_association(new_assoc)
+        var directives = build_directives(dm4c.restc.update_association(new_assoc))
         // update view
         process_directives(directives)
         //
@@ -266,7 +266,7 @@ var dm4c = new function() {
 
     this.do_retype_topic = function(topic, type_uri) {
         // update model
-        var directives = dm4c.restc.update_topic({id: topic.id, type_uri: type_uri})
+        var directives = build_directives(dm4c.restc.update_topic({id: topic.id, type_uri: type_uri}))
         // update view
         process_directives(directives)
     }
@@ -279,7 +279,7 @@ var dm4c = new function() {
      */
     this.do_delete_topic = function(topic) {
         // update DB
-        var directives = dm4c.restc.delete_topic(topic.id)
+        var directives = build_directives(dm4c.restc.delete_topic(topic.id))
         // update model and view
         process_directives(directives)
     }
@@ -290,7 +290,7 @@ var dm4c = new function() {
      */
     this.do_delete_association = function(assoc) {
         // update DB
-        var directives = dm4c.restc.delete_association(assoc.id)
+        var directives = build_directives(dm4c.restc.delete_association(assoc.id))
         // update model and view
         process_directives(directives)
     }
@@ -369,8 +369,11 @@ var dm4c = new function() {
      */
     function process_directives(directives) {
         // alert("process_directives: " + JSON.stringify(directives))
-        for (var i = 0, directive; directive = directives[i]; i++) {
+        directives.iterate(function(directive) {
             switch (directive.type) {
+            case "CREATE_TOPIC":
+                create_topic(build_topic(directive.arg))
+                break
             case "UPDATE_TOPIC":
                 update_topic(build_topic(directive.arg))
                 break
@@ -387,9 +390,18 @@ var dm4c = new function() {
                 update_topic_type(build_topic_type(directive.arg))
                 break
             default:
-                throw "UnknownDirectiveError: directive \"" + directive.type + "\" not implemented"
+                dm4c.trigger_plugin_hook("process_directive", directive)    // trigger hook
             }
-        }
+        })
+    }
+
+    // ---
+
+    function create_topic(topic) {
+        // Note: no view update is performed here
+        //
+        // trigger hook
+        dm4c.trigger_plugin_hook("post_create_topic", topic)
     }
 
     // ---
@@ -520,7 +532,7 @@ var dm4c = new function() {
 
     /**
      * Creates a topic in the DB.
-     * Triggers the "post_create_topic" hook.
+     * Triggers the "post_create_topic" hook (indirectly).
      *
      * @param   type_uri        The topic type URI, e.g. "dm4.notes.note".
      * @param   composite       Optional.
@@ -534,11 +546,10 @@ var dm4c = new function() {
             type_uri: type_uri,
             composite: composite    // not serialized to request body if undefined
         }
-        var topic = build_topic(dm4c.restc.create_topic(topic_model))
-        // trigger hook
-        dm4c.trigger_plugin_hook("post_create_topic", topic)
+        var directives = build_directives(dm4c.restc.create_topic(topic_model))
+        process_directives(directives)
         //
-        return topic
+        return directives.get_created_topic()
     }
 
     /**
@@ -1081,6 +1092,10 @@ var dm4c = new function() {
 
     function build_association_type(assoc_type) {
         return new AssociationType(assoc_type)
+    }
+
+    function build_directives(directives) {
+        return new Directives(directives)
     }
 
     // === Plugin Support ===
