@@ -15,7 +15,14 @@ function topicmaps_plugin() {
     // View
     var topicmap_menu               // A GUIToolkit Menu object
 
-    // ------------------------------------------------------------------------------------------------ Overriding Hooks
+    // ------------------------------------------------------------------------------------------------------ Public API
+
+    /**
+     * @return  The selected topicmap
+     */
+    this.get_topicmap = function() {
+        return topicmap
+    }
 
 
 
@@ -388,13 +395,6 @@ function topicmaps_plugin() {
     /*************/
 
 
-
-    /**
-     * @return  ID of the selected topicmap
-     */
-    this.get_topicmap_id = function() {
-        return topicmap.get_id()
-    }
 
     function set_selected_topicmap(topicmap_id) {
         if (LOG_TOPICMAPS) dm4c.log("Selecting topicmap " + topicmap_id)

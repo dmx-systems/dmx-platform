@@ -19,7 +19,17 @@ function geomaps_plugin() {
 
     this.process_directive = function(directive) {
         if (directive.type == "ADD_MARKER") {
-            alert("Geomaps module: process ADD_MARKER directive\n\n" + JSON.stringify(directive.arg))
+            var topicmap = dm4c.get_plugin("topicmaps_plugin").get_topicmap()
+            if (topicmap.get_renderer_uri() == "dm4.geomaps.geomap_renderer") {
+                // ### alert("geomaps_plugin(): process ADD_MARKER directive\n\n" + JSON.stringify(directive.arg))
+                var topic = directive.arg
+                topic.x = topic.composite["dm4.geomaps.longitude"]
+                topic.y = topic.composite["dm4.geomaps.latitude"]
+                // update model
+                topicmap.add_topic(topic.id, topic.type_uri, "", topic.x, topic.y)
+                // update view
+                dm4c.canvas.add_topic(topic)
+            }
         }
     }
 

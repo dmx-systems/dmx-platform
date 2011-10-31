@@ -25,7 +25,8 @@ function TopicmapRenderer() {
     // ---
 
     /**
-     * @param   refresh_canvas      Optional: if true, the canvas is refreshed.
+     * @param   topic           an object with "id", "type_uri", "value" properties and optional "x", "y" properties.
+     * @param   refresh_canvas  Optional: if true, the canvas is refreshed.
      */
     this.add_topic = function(topic, refresh_canvas) {}
 
