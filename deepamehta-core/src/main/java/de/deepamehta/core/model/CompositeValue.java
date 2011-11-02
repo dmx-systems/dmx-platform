@@ -160,6 +160,7 @@ public class CompositeValue {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    // ### FIXME: calculation should respect type definition for child-type order (#145)
     private String getLabel(Object value) throws Exception {
         if (value instanceof JSONObject) {
             JSONObject comp = (JSONObject) value;

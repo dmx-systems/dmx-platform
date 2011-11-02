@@ -394,10 +394,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 if (partTopicType.getDataTypeUri().equals("dm4.core.composite")) {
                     AttachedTopic childTopic = fetchChildTopic(assocDef);
                     if (childTopic != null) {
-                        // Note: cast required because private method is called on a subclass's instance
-                        // ### FIXME: fetchComposite() should not be required as fetchChildTopic() already fetches
-                        // the composite value.
-                        comp.put(assocDefUri, ((AttachedDeepaMehtaObject) childTopic).fetchComposite());
+                        comp.put(assocDefUri, childTopic.getCompositeValue());
                     }
                 } else {
                     SimpleValue value = fetchChildTopicValue(assocDef);
