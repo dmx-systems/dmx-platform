@@ -5,6 +5,17 @@ function geomaps_plugin() {
     dm4c.javascript_source("/de.deepamehta.geomaps/script/topicmap_renderers/geomap_renderer.js")
     dm4c.javascript_source("/de.deepamehta.geomaps/script/vendor/openlayers/OpenLayers.js")
 
+    // extend REST client
+    //
+    // Note: this is done at plugin instantiation time (*before* the webclient's init() hook is triggered)
+    // because a geomap might be loaded at init() time through the topicmaps plugin.
+    dm4c.restc.get_geomap = function(geomap_id) {
+        return this.request("GET", "/geomap/" + geomap_id)
+    }
+    dm4c.restc.add_topic_to_geomap = function(geomap_id, topic_id) {
+        return this.request("PUT", "/geomap/" + geomap_id + "/topic/" + topic_id)
+    }
+
 
 
     // ***********************************************************

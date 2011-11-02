@@ -26,11 +26,11 @@ import java.util.logging.Logger;
 
 
 /**
- * An in-memory representation of a topicmap.
- * That is a collection of topics and associations plus their visualization information.
+ * A topicmap model: a collection of topics and associations plus their visualization information.
  * <p>
- * The constructor loads the topicmap from the DB.
- * There is a method to get a JSON representation of the topicmap.
+ * Features:
+ * - load from DB (by constructor).
+ * - Serialization to JSON.
  */
 public class Topicmap {
 
@@ -155,10 +155,10 @@ public class Topicmap {
 
     private void loadTopics() {
         ResultSet<RelatedTopic> mapTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
-            null, "dm4.topicmaps.topicmap_topic", null, false, true, 0);    // othersTopicTypeUri=null
-                                                                            // fetchComposite=false
-                                                                            // fetchRelatingComposite=true
-                                                                            // maxResultSize=0
+            "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, false, true, 0);  // othersTopicTypeUri=null
+                                                                                        // fetchComposite=false
+                                                                                        // fetchRelatingComposite=true
+                                                                                        // maxResultSize=0
         for (RelatedTopic mapTopic : mapTopics) {
             Association refAssoc = mapTopic.getAssociation();
             addTopic(new TopicmapTopic(mapTopic.getModel(), refAssoc.getCompositeValue(), refAssoc.getId()));
@@ -167,7 +167,7 @@ public class Topicmap {
 
     private void loadAssociations() {
         Set<RelatedAssociation> mapAssocs = topicmapTopic.getRelatedAssociations("dm4.topicmaps.association_mapcontext",
-            null, "dm4.topicmaps.topicmap_association", null, false, false);
+            "dm4.core.default", "dm4.topicmaps.topicmap_association", null, false, false);
         for (RelatedAssociation mapAssoc : mapAssocs) {
             Association refAssoc = mapAssoc.getRelatingAssociation();
             addAssociation(new TopicmapAssociation(mapAssoc.getModel(), refAssoc.getId()));

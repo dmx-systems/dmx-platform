@@ -36,8 +36,12 @@ function GeoMapRenderer() {
     }
 
     this.add_topic = function(topic, refresh_canvas) {
-        // ### alert("GeoMapRenderer.add_topic(): topic=" + JSON.stringify(topic))
-        marker_layers["markers"].add_marker({lon: topic.x, lat: topic.y}, topic)
+        if (topic.x != undefined && topic.y != undefined) {
+            // ### alert("GeoMapRenderer.add_topic(): topic=" + JSON.stringify(topic))
+            marker_layers["markers"].add_marker({lon: topic.x, lat: topic.y}, topic)
+        } else {
+            // # alert("GeoMapRenderer.add_topic(): IGNORE topic without coordinates\n\ntopic=" + JSON.stringify(topic))
+        }
     }
 
     // === TopicmapRenderer Topicmaps Extension ===
@@ -129,7 +133,7 @@ function GeoMapRenderer() {
                 markers_layer.addMarker(marker)
 
                 function marker_clicked() {
-                    dm4c.render_topic(this.id)
+                    alert(JSON.stringify(this))
                 }
             }
         }()
@@ -137,19 +141,6 @@ function GeoMapRenderer() {
         this.remove_marker = function(topic_id) {
             markers_layer.removeMarker(markers[topic_id])
         }
-
-        // show_topics()
-
-        // === Private Functions ===
-
-        /* function show_topics() {
-            var topics = dm4c.restc.get_topics(type_uri)
-            for (var i = 0, topic; topic = topics[i]; i++) {
-                var lon = topic.properties["de/deepamehta/core/property/longitude"]
-                var lat = topic.properties["de/deepamehta/core/property/latitude"]
-                self.add_marker({lon: lon, lat: lat}, topic)
-            }
-        } */
     }
 
     /**
@@ -179,15 +170,31 @@ function GeoMapRenderer() {
         }
 
         this.put_on_canvas = function(no_history_update) {
-            dm4c.do_reset_selection(no_history_update)
+            display_topics()
+            restore_selection()
+
+            function display_topics() {
+                for (var id in topics) {
+                    dm4c.canvas.add_topic(topics[id])
+                }
+            }
+
+            function restore_selection() {
+                dm4c.do_reset_selection(no_history_update)
+            }
         }
 
-        this.add_topic = function(id, type_uri, label, x, y) {
-            // ### alert("Geomap.add_topic(): id=" + id + ", x=" + x + ", y=" + y)
-            // update DB
-            // ### TODO
-            // update memory
-            topics[id] = new GeomapTopic(id, type_uri, label, x, y)
+        this.add_topic = function(id, type_uri, value, x, y) {
+            if (x != undefined && y != undefined) {
+                // ### alert("Geomap.add_topic(): id=" + id + ", x=" + x + ", y=" + y)
+                // update DB
+                dm4c.restc.add_topic_to_geomap(topicmap_id, id)
+                // update memory
+                topics[id] = new GeomapTopic(id, type_uri, value, x, y)
+            } else {
+                /* ### alert("Geomap.add_topic(): IGNORE topic without coordinates\n\nid=" +
+                    id + "\ntype_uri=\"" + type_uri + "\"\nvalue=\"" + value + "\"") */
+            }
         }
 
         this.add_association = function(id, type_uri, topic_id_1, topic_id_2) {
@@ -221,16 +228,26 @@ function GeoMapRenderer() {
         // --- Private Functions ---
 
         function load() {
-            var topicmap = dm4c.restc.get_topicmap(topicmap_id)
+            var topicmap = dm4c.restc.get_geomap(topicmap_id)
             info = topicmap.info
+            //
+            load_topics()
+
+            function load_topics() {
+                for (var i = 0, topic; topic = topicmap.topics[i]; i++) {
+                    var x = topic.composite["dm4.geomaps.longitude"]
+                    var y = topic.composite["dm4.geomaps.latitude"]
+                    topics[topic.id] = new GeomapTopic(topic.id, topic.type_uri, topic.value, x, y)
+                }
+            }
         }
 
         // --- Private Classes ---
 
-        function GeomapTopic(id, type_uri, label, x, y) {
+        function GeomapTopic(id, type_uri, value, x, y) {
             this.id = id
             this.type_uri = type_uri
-            this.label = label
+            this.value = value
             this.x = x
             this.y = y
         }

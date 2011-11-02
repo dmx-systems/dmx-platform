@@ -41,9 +41,9 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
 
 
 
-    // **********************
-    // *** Plugin Service ***
-    // **********************
+    // ***************************************
+    // *** TopicmapsService Implementation ***
+    // ***************************************
 
 
 

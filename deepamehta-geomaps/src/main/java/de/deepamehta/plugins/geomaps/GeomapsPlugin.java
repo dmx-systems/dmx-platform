@@ -1,10 +1,15 @@
 package de.deepamehta.plugins.geomaps;
 
+import de.deepamehta.plugins.geomaps.model.Geomap;
+import de.deepamehta.plugins.geomaps.service.GeomapsService;
 import de.deepamehta.plugins.facets.service.FacetsService;
 
+import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientContext;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
@@ -14,12 +19,25 @@ import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.WebApplicationException;
+
 import java.net.URL;
 import java.util.logging.Logger;
 
 
 
-public class GeomapsPlugin extends Plugin {
+@Path("/")
+@Consumes("application/json")
+@Produces("application/json")
+public class GeomapsPlugin extends Plugin implements GeomapsService {
 
     private static final String GEOCODER_URL = "http://maps.googleapis.com/maps/api/geocode/json?" +
         "address=%s&sensor=false";
@@ -34,6 +52,32 @@ public class GeomapsPlugin extends Plugin {
 
     public enum GeomapDirective implements Directive {
         ADD_MARKER
+    }
+
+
+
+    // *************************************
+    // *** GeomapsService Implementation ***
+    // *************************************
+
+
+
+    @GET
+    @Path("/{id}")
+    @Override
+    public Geomap getGeomap(@PathParam("id") long geomapId) {
+        return new Geomap(geomapId, dms);
+    }
+
+    @PUT
+    @Path("/{id}/topic/{topic_id}")
+    @Override
+    public void addTopicToGeomap(@PathParam("id") long geomapId, @PathParam("topic_id") long topicId) {
+        AssociationModel model = new AssociationModel("dm4.geomaps.geotopic_mapcontext",
+            new TopicRoleModel(geomapId, "dm4.core.default"),
+            new TopicRoleModel(topicId,  "dm4.topicmaps.topicmap_topic"));
+        Association refAssoc = dms.createAssociation(model, null);     // FIXME: clientContext=null
+        // ### return refAssoc.getId();
     }
 
 

@@ -39,5 +39,13 @@
                 }
             ]
         }
+    ],
+
+    assoc_types: [
+        {
+            value:         "Geotopic Mapcontext",
+            uri:           "dm4.geomaps.geotopic_mapcontext",
+            data_type_uri: "dm4.core.text"
+        }
     ]
 }
