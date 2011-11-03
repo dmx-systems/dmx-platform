@@ -168,7 +168,7 @@ public class FilesPlugin extends Plugin implements FilesService {
         File file = null;
         try {
             Topic fileTopic = dms.getTopic(fileTopicId, true, null);    // fetchComposite=true, clientContext=null
-            String path = fileTopic.getCompositeValue().get("dm4.files.path").toString();
+            String path = fileTopic.getCompositeValue().getString("dm4.files.path");
             file = proxyService.locateFile(path);
             logger.info("### Opening file \"" + file + "\"");
             Desktop.getDesktop().open(file);

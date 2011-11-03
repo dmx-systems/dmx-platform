@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A wrapper for the topic value (atomic, non-null). Supported value types are string, int, long, boolean.
+ * A wrapper for the topic value (atomic, non-null). Supported value types are string, int, long, double, boolean.
  */
 public class SimpleValue {
 
@@ -37,6 +37,10 @@ public class SimpleValue {
         this.value = value;
     }
 
+    public SimpleValue(double value) {
+        this.value = value;
+    }
+
     public SimpleValue(boolean value) {
         this.value = value;
     }
@@ -61,6 +65,10 @@ public class SimpleValue {
 
     public long longValue() {
         return (Long) value;
+    }
+
+    public double doubleValue() {
+        return (Double) value;
     }
 
     public boolean booleanValue() {

@@ -4,7 +4,9 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONException;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 
 
@@ -22,50 +24,65 @@ public class CompositeValue {
      * Internal representation.
      * Key: String, value: non-null atomic (String, Integer, Long, Double, Boolean) or composite (JSONObject).
      */
-    private JSONObject values;
+    // ### private JSONObject values;
+
+    private Map<String, TopicModel> values = new HashMap();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public CompositeValue() {
-        this.values = new JSONObject();
     }
 
     public CompositeValue(JSONObject values) {
-        this.values = values;
+        throw new RuntimeException("Constructing a CompositeValue from a JSONObject not yet implemented (" +
+            values + ")");
     }
 
-    public CompositeValue(String json) {
+    /* ### public CompositeValue(String json) {
         try {
             this.values = new JSONObject(json);
         } catch (Exception e) {
             throw new RuntimeException("Constructing a CompositeValue from a string failed (\"" + json + "\")", e);
         }
-    }
+    } */
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public Iterator<String> keys() {
-        return values.keys();
+    public Iterable<String> keys() {
+        return values.keySet();
     }
 
     /**
      * @return  a String, Integer, Long, Double, Boolean, or a CompositeValue.
      */
-    public Object get(String key) {
+    public TopicModel getTopic(String key) {
         try {
-            Object value = values.get(key);
-            if (value instanceof JSONObject) {
-                return new CompositeValue((JSONObject) value);
-            } else {
-                return value;
-            }
-        } catch (Exception e) {
+            return values.get(key);
+        } catch (Exception e) { // ### catch what?
             throw new RuntimeException("Getting a value from a CompositeValue failed (key=\"" +
                 key + "\", composite=" + this + ")", e);
         }
     }
 
+    public CompositeValue put(String key, TopicModel value) {
+        try {
+            // check argument
+            if (value == null) {
+                throw new IllegalArgumentException("Tried to put a null value in a CompositeValue");
+            }
+            // put value
+            values.put(key, value);
+            //
+            return this;
+        } catch (Exception e) {
+            throw new RuntimeException("Putting a value in a CompositeValue failed (key=\"" + key +
+                "\", value=" + value + ", composite=" + this + ")", e);
+        }
+    }
+
     /**
+     * Convenience method.
+     *
      * @param   value   a String, Integer, Long, Double, Boolean, or a CompositeValue.
      *
      * @return  this CompositeValue.
@@ -82,10 +99,13 @@ public class CompositeValue {
                     "a CompositeValue (expected are String, Integer, Long, Double, Boolean, or CompositeValue)");
             }
             // put value
+            TopicModel model;
             if (value instanceof CompositeValue) {
-                value = ((CompositeValue) value).values;
+                model = new TopicModel(null, (CompositeValue) value);   // typeUri=null
+            } else {
+                model = new TopicModel(null, new SimpleValue(value));   // typeUri=null
             }
-            values.put(key, value);
+            put(key, model);
             //
             return this;
         } catch (Exception e) {
@@ -95,47 +115,81 @@ public class CompositeValue {
     }
 
     public boolean has(String key) {
-        return values.has(key);
+        return values.containsKey(key);
     }
 
     // ---
 
+    /**
+     * Convenience method.
+     */
     public String getString(String key) {
-        return (String) get(key);
+        return getTopic(key).getSimpleValue().toString();
     }
 
+    /**
+     * Convenience method.
+     */
     public int getInt(String key) {
-        return (Integer) get(key);
+        return getTopic(key).getSimpleValue().intValue();
     }
 
+    /**
+     * Convenience method.
+     */
     public long getLong(String key) {
-        return (Long) get(key);
+        return getTopic(key).getSimpleValue().longValue();
     }
 
+    /**
+     * Convenience method.
+     */
     public double getDouble(String key) {
-        return (Double) get(key);
+        return getTopic(key).getSimpleValue().doubleValue();
     }
 
+    /**
+     * Convenience method.
+     */
     public boolean getBoolean(String key) {
-        return (Boolean) get(key);
+        return getTopic(key).getSimpleValue().booleanValue();
     }
 
+    /**
+     * Convenience method.
+     */
+    public Object get(String key) {
+        return getTopic(key).getSimpleValue().value();
+    }
+
+    /**
+     * Convenience method.
+     */
     public CompositeValue getComposite(String key) {
-        return (CompositeValue) get(key);
+        return getTopic(key).getCompositeValue();
     }
 
     // ---
 
     public String getDefaultLabel() {
         try {
-            return getLabel(values);
+            return "Default Label";
+            // ### return getLabel(values);
         } catch (Exception e) {
             throw new RuntimeException("Getting the label of a CompositeValue failed (composite=" + this + ")", e);
         }
     }
 
     public JSONObject toJSON() {
-        return values;
+        try {
+            JSONObject json = new JSONObject();
+            for (String key : keys()) {
+                json.put(key, getTopic(key).toJSON());
+            }
+            return json;
+        } catch (JSONException e) {
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
+        }
     }
 
 
@@ -146,22 +200,22 @@ public class CompositeValue {
 
 
 
-    @Override
+    /* ### @Override
     public CompositeValue clone() {
         return new CompositeValue(toString());
-    }
+    } */
 
-    @Override
+    /* ### @Override
     public String toString() {
         return values.toString();
-    }
+    } */
 
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // ### FIXME: calculation should respect type definition for child-type order (#145)
-    private String getLabel(Object value) throws Exception {
+    /* ### private String getLabel(Object value) throws Exception {
         if (value instanceof JSONObject) {
             JSONObject comp = (JSONObject) value;
             Iterator<String> i = comp.keys();
@@ -173,5 +227,5 @@ public class CompositeValue {
         } else {
             return value.toString();
         }
-    }
+    } */
 }

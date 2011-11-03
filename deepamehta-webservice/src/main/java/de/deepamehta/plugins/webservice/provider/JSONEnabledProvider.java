@@ -61,7 +61,8 @@ public class JSONEnabledProvider implements MessageBodyWriter<JSONEnabled> {
             jsonEnabled.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing message body failed (" + jsonEnabled + ")", e);
+            throw new WebApplicationException(new RuntimeException("Writing message body failed (" +
+                jsonEnabled + ")", e));
         }
     }
 }

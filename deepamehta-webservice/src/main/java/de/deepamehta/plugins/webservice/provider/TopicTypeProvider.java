@@ -89,7 +89,8 @@ public class TopicTypeProvider implements MessageBodyReader<TopicTypeModel>, Mes
             topicType.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing message body failed (" + topicType + ")", e);
+            throw new WebApplicationException(new RuntimeException("Writing message body failed (" +
+                topicType + ")", e));
         }
     }
 }

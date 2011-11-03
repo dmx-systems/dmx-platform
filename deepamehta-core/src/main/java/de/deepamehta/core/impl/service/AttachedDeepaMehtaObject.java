@@ -389,18 +389,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         try {
             CompositeValue comp = new CompositeValue();
             for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
-                String assocDefUri = assocDef.getUri();
-                TopicType partTopicType = dms.getTopicType(assocDef.getPartTopicTypeUri(), null);  // clientContext=null
-                if (partTopicType.getDataTypeUri().equals("dm4.core.composite")) {
-                    AttachedTopic childTopic = fetchChildTopic(assocDef);
-                    if (childTopic != null) {
-                        comp.put(assocDefUri, childTopic.getCompositeValue());
-                    }
-                } else {
-                    SimpleValue value = fetchChildTopicValue(assocDef);
-                    if (value != null) {
-                        comp.put(assocDefUri, value.value());
-                    }
+                AttachedTopic childTopic = fetchChildTopic(assocDef);
+                if (childTopic != null) {
+                    comp.put(assocDef.getUri(), childTopic.getModel());
                 }
             }
             return comp;
@@ -423,9 +414,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     private void updateCompositeValue(CompositeValue newComp, ClientContext clientContext, Directives directives) {
         try {
             CompositeValue comp = getCompositeValue();
-            Iterator<String> i = newComp.keys();
-            while (i.hasNext()) {
-                String key = i.next();
+            for (String key : newComp.keys()) {
                 String[] t = key.split("\\$");
                 //
                 if (t.length < 1 || t.length > 2 || t.length == 2 && !t[1].equals("id")) {
@@ -437,11 +426,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 String childTopicTypeUri = assocDef.getPartTopicTypeUri();
                 TopicType childTopicType = dms.getTopicType(childTopicTypeUri, null);
                 String assocTypeUri = assocDef.getTypeUri();
-                Object value = newComp.get(key);
+                TopicModel valueTopic = newComp.getTopic(key);
                 if (assocTypeUri.equals("dm4.core.composition_def")) {
                     if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
                         Topic childTopic = fetchChildTopic(assocDef);
-                        CompositeValue childTopicComp = (CompositeValue) value;
+                        CompositeValue childTopicComp = valueTopic.getCompositeValue();
                         if (childTopic != null) {
                             TopicModel model = new TopicModel(childTopic.getId(), childTopicComp);
                             childTopic.update(model, clientContext, directives);
@@ -457,7 +446,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                         // update memory
                         comp.put(assocDefUri, childTopic.getCompositeValue());
                     } else {
-                        setChildTopicValue(assocDefUri, new SimpleValue(value));
+                        setChildTopicValue(assocDefUri, valueTopic.getSimpleValue());
                     }
                 } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
                     if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
@@ -473,8 +462,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                         boolean assignExistingTopic = t.length == 2;
                         if (assignExistingTopic) {
                             // update DB
-                            long childTopicId = (Integer) value;   // Note: the JSON parser creates Integers (not Longs)
-                            associateChildTopic(assocDef, childTopicId);
+                            long childTopicId = valueTopic.getSimpleValue().intValue(); // Note: the JSON parser creates
+                            associateChildTopic(assocDef, childTopicId);                //       Integers (not Longs)
                             // update memory
                             // Topic assignedTopic = dms.getTopic(childTopicId, false, null);  // fetchComposite=false
                             // comp.put(assocDefUri, assignedTopic.getSimpleValue().value());
@@ -482,7 +471,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                             comp.put(assocDefUri, childTopicValue.value());
                         } else {
                             // create new child topic
-                            setChildTopicValue(assocDefUri, new SimpleValue(value));
+                            setChildTopicValue(assocDefUri, valueTopic.getSimpleValue());
                         }
                     }
                 } else {

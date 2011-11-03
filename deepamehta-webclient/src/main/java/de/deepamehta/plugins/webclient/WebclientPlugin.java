@@ -74,7 +74,7 @@ public class WebclientPlugin extends Plugin {
     @Override
     public void preUpdateHook(Topic topic, TopicModel newTopic, Directives directives) {
         if (topic.getTypeUri().equals("dm4.files.file") && newTopic.getTypeUri().equals("dm4.webclient.icon")) {
-            String iconUrl = "/proxy/file:" + topic.getCompositeValue().get("dm4.files.path");
+            String iconUrl = "/proxy/file:" + topic.getCompositeValue().getString("dm4.files.path");
             logger.info("### Retyping a file to an icon (iconUrl=" + iconUrl + ")");
             newTopic.setSimpleValue(iconUrl);
         }
