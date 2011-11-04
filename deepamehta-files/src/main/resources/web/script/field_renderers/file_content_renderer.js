@@ -8,9 +8,9 @@ function FileContentRenderer(topic, field) {
 
     function render_content(field_value_div) {
         try {
-            var path       = topic.composite["dm4.files.path"]
-            var size       = topic.composite["dm4.files.size"]
-            var media_type = topic.composite["dm4.files.media_type"]
+            var path       = topic.get("dm4.files.path")
+            var size       = topic.get("dm4.files.size")
+            var media_type = topic.get("dm4.files.media_type")
             var src = local_resource_URI()
             // Note: for unknown file types media_type is null
             /*if (!media_type) {

@@ -10,7 +10,7 @@ function TopicType(topic_type) {
     this.index_mode_uris    = topic_type.index_mode_uris
     this.assoc_defs         = deserialize(topic_type.assoc_defs)
     this.label_config       = topic_type.label_config
-    this.view_config_topics = dm4c.hash_by_type(topic_type.view_config_topics)
+    this.view_config_topics = dm4c.hash_by_type(dm4c.build_topics(topic_type.view_config_topics))
 
     // === "Page Displayable" implementation ===
 
@@ -63,7 +63,7 @@ function TopicType(topic_type) {
 
     function deserialize(assoc_defs) {
         for (var i = 0, assoc_def; assoc_def = assoc_defs[i]; i++) {
-            assoc_def.view_config_topics = dm4c.hash_by_type(assoc_def.view_config_topics)
+            assoc_def.view_config_topics = dm4c.hash_by_type(dm4c.build_topics(assoc_def.view_config_topics))
         }
         return assoc_defs
     }

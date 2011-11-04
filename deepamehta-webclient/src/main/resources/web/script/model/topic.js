@@ -17,4 +17,12 @@ function Topic(topic) {
     }
 
     // === Public API ===
+
+    /**
+     * Convenience method to lookup a simple value from this topic's composite.
+     */
+    this.get = function(key) {
+        var topic = this.composite[key]
+        return topic && topic.value
+    }
 }

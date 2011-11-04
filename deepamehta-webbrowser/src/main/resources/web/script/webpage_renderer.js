@@ -12,7 +12,7 @@ function WebpageRenderer() {
 
 
     this.render_page = function(topic) {
-        var url = js.absolute_http_url(topic.composite["dm4.webbrowser.url"])
+        var url = js.absolute_http_url(topic.get("dm4.webbrowser.url"))
         var iframe = $("<iframe>").attr({width: "100%", height: "100%", frameborder: 0})
         //
         if (TRAILBLAZER_FEATURE) {

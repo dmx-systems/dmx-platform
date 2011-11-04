@@ -32,7 +32,7 @@ function CanvasRendererExtension() {
     function Topicmap(topicmap_id) {
 
         // Model
-        var info            // The underlying Topicmap topic (a JavaScript object)
+        var info            // The underlying Topicmap topic (a Topic object)
         var topics = {}     // topics of this topicmap (key: topic ID, value: TopicmapTopic object)
         var assocs = {}     // associations of this topicmap (key: association ID, value: TopicmapAssociation object)
         var selected_object_id = -1     // ID of the selected topic or association, or -1 for no selection
@@ -50,7 +50,7 @@ function CanvasRendererExtension() {
         }
 
         this.get_renderer_uri = function() {
-            return info.composite["dm4.topicmaps.topicmap_renderer_uri"]
+            return info.get("dm4.topicmaps.topicmap_renderer_uri")
         }
 
         /**
@@ -251,7 +251,7 @@ function CanvasRendererExtension() {
             if (LOG_TOPICMAPS) dm4c.log("Loading topicmap " + topicmap_id)
 
             var topicmap = dm4c.restc.get_topicmap(topicmap_id)
-            info = topicmap.info
+            info = new Topic(topicmap.info)
 
             if (LOG_TOPICMAPS) dm4c.log("..... " + topicmap.topics.length + " topics")
             load_topics()
@@ -263,9 +263,9 @@ function CanvasRendererExtension() {
 
             function load_topics() {
                 for (var i = 0, topic; topic = topicmap.topics[i]; i++) {
-                    var x = topic.visualization["dm4.topicmaps.x"]
-                    var y = topic.visualization["dm4.topicmaps.y"]
-                    var visibility = topic.visualization["dm4.topicmaps.visibility"]
+                    var x = topic.visualization["dm4.topicmaps.x"].value
+                    var y = topic.visualization["dm4.topicmaps.y"].value
+                    var visibility = topic.visualization["dm4.topicmaps.visibility"].value
                     if (LOG_TOPICMAPS) dm4c.log(".......... ID " + topic.id + ": type_uri=\"" + topic.type_uri +
                         "\", label=\"" + topic.value + "\", x=" + x + ", y=" + y + ", visibility=" + visibility +
                         ", ref_id=" + topic.ref_id)
@@ -287,7 +287,7 @@ function CanvasRendererExtension() {
             function load_background_image() {
                 var file = info.composite["dm4.files.file"]
                 if (file) {
-                    var image_url = "/proxy/file:" + file["dm4.files.path"]
+                    var image_url = "/proxy/file:" + new Topic(file).get("dm4.files.path")  // ### new Topic bad API
                     background_image = dm4c.create_image(image_url)
                 }
             }
@@ -321,6 +321,7 @@ function CanvasRendererExtension() {
 
             this.move_to = function(x, y) {
                 // update DB ### TODO: extend topicmaps REST API instead of operating on the DB directly
+                //           ### FIXME: adapt composite to extended format
                 dm4c.restc.update_association({id: ref_id, composite: {"dm4.topicmaps.x": x, "dm4.topicmaps.y": y}})
                 // update memory
                 this.x = x
@@ -344,6 +345,7 @@ function CanvasRendererExtension() {
 
             function set_visibility(visibility) {
                 // update DB ### TODO: extend topicmaps REST API instead of operating on the DB directly
+                //           ### FIXME: adapt composite to extended format
                 dm4c.restc.update_association({id: ref_id, composite: {"dm4.topicmaps.visibility": visibility}})
                 // update memory
                 self.visibility = visibility

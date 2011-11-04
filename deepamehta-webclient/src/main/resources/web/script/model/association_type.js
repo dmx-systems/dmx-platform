@@ -6,7 +6,7 @@ function AssociationType(assoc_type) {
     this.type_uri  = assoc_type.type_uri
     this.composite = assoc_type.composite
     //
-    this.view_config_topics = dm4c.hash_by_type(assoc_type.view_config_topics)
+    this.view_config_topics = dm4c.hash_by_type(dm4c.build_topics(assoc_type.view_config_topics))
 
     // === "Page Displayable" implementation ===
 

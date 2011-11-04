@@ -765,7 +765,7 @@ var dm4c = new function() {
         // every configurable has an view_config_topics object, however it might be empty
         var view_config = configurable.view_config_topics["dm4.webclient.view_config"]
         if (view_config) {
-            var value = view_config.composite["dm4.webclient." + setting]
+            var value = view_config.get("dm4.webclient." + setting)
         }
         // lookup default
         if ((value === undefined || value === "") && lookup_default) {
@@ -1080,6 +1080,14 @@ var dm4c = new function() {
 
     function build_topic(topic) {
         return new Topic(topic)
+    }
+
+    this.build_topics = function(topics) {
+        var topics_array = []
+        for (var i = 0, topic; topic = topics[i]; i++) {
+            topics_array.push(build_topic(topic))
+        }
+        return topics_array
     }
 
     function build_association(assoc) {

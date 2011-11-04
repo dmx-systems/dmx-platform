@@ -151,7 +151,7 @@ function GeoMapRenderer() {
     function Geomap(topicmap_id) {
 
         // Model
-        var info                        // The underlying Topicmap topic (a JavaScript object)
+        var info                        // The underlying Topicmap topic (a Topic object)
         var topics = {}                 // topics of this topicmap (key: topic ID, value: GeomapTopic object)
         var selected_object_id = -1     // ID of the selected topic or association, or -1 for no selection
 
@@ -166,7 +166,7 @@ function GeoMapRenderer() {
         }
 
         this.get_renderer_uri = function() {
-            return info.composite["dm4.topicmaps.topicmap_renderer_uri"]
+            return info.get("dm4.topicmaps.topicmap_renderer_uri")
         }
 
         this.put_on_canvas = function(no_history_update) {
@@ -229,14 +229,14 @@ function GeoMapRenderer() {
 
         function load() {
             var topicmap = dm4c.restc.get_geomap(topicmap_id)
-            info = topicmap.info
+            info = new Topic(topicmap.info)
             //
             load_topics()
 
             function load_topics() {
                 for (var i = 0, topic; topic = topicmap.topics[i]; i++) {
-                    var x = topic.composite["dm4.geomaps.longitude"]
-                    var y = topic.composite["dm4.geomaps.latitude"]
+                    var x = topic.composite["dm4.geomaps.longitude"].value
+                    var y = topic.composite["dm4.geomaps.latitude"].value
                     topics[topic.id] = new GeomapTopic(topic.id, topic.type_uri, topic.value, x, y)
                 }
             }

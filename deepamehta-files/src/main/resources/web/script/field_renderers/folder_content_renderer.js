@@ -11,7 +11,7 @@ function FolderContentRenderer(topic, field) {
 
     function render_content(field_value_div) {
         try {
-            var path = topic.composite["dm4.files.path"]
+            var path = topic.get("dm4.files.path")
             var items = dm4c.restc.get_resource("file:" + path).items
             var topics = []
             for (var i = 0, item; item = items[i]; i++) {

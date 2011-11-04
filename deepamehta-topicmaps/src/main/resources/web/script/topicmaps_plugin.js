@@ -399,14 +399,14 @@ function topicmaps_plugin() {
     function set_selected_topicmap(topicmap_id) {
         if (LOG_TOPICMAPS) dm4c.log("Selecting topicmap " + topicmap_id)
         // update model
-        var renderer_uri = topicmap_topics[topicmap_id].composite["dm4.topicmaps.topicmap_renderer_uri"]
+        var renderer_uri = topicmap_topics[topicmap_id].get("dm4.topicmaps.topicmap_renderer_uri")
         topicmap_renderer = get_topicmap_renderer(renderer_uri)
         topicmap = load_topicmap(topicmap_id)
     }
 
     function fetch_topicmap_topics() {
-        var topics = dm4c.restc.get_topics("dm4.topicmaps.topicmap", true).items  // fetch_composite=true
-        topicmap_topics = dm4c.hash_by_id(topics)
+        var topics = dm4c.restc.get_topics("dm4.topicmaps.topicmap", true).items    // fetch_composite=true
+        topicmap_topics = dm4c.hash_by_id(dm4c.build_topics(topics))
         // ### FIXME: object properties are not sorted
     }
 

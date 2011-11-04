@@ -34,8 +34,8 @@ function geomaps_plugin() {
             if (topicmap.get_renderer_uri() == "dm4.geomaps.geomap_renderer") {
                 // ### alert("geomaps_plugin(): process ADD_MARKER directive\n\n" + JSON.stringify(directive.arg))
                 var topic = directive.arg
-                topic.x = topic.composite["dm4.geomaps.longitude"]
-                topic.y = topic.composite["dm4.geomaps.latitude"]
+                topic.x = topic.get("dm4.geomaps.longitude")
+                topic.y = topic.get("dm4.geomaps.latitude")
                 // update model
                 topicmap.add_topic(topic.id, topic.type_uri, "", topic.x, topic.y)
                 // update view
