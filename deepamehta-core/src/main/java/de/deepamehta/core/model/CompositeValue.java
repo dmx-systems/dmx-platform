@@ -34,8 +34,22 @@ public class CompositeValue {
     }
 
     public CompositeValue(JSONObject values) {
-        throw new RuntimeException("Constructing a CompositeValue from a JSONObject not yet implemented (" +
-            values + ")");
+        try {
+            Iterator<String> i = values.keys();
+            while (i.hasNext()) {
+                String key = i.next();
+                Object value = values.get(key);
+                TopicModel model;
+                if (value instanceof JSONObject) {
+                    model = new TopicModel(null, new CompositeValue((JSONObject) value));   // typeUri=null
+                } else {
+                    model = new TopicModel(null, new SimpleValue(value));                   // typeUri=null
+                }
+                put(key, model);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing CompositeValue failed (JSONObject=" + values + ")", e);
+        }
     }
 
     /* ### public CompositeValue(String json) {
