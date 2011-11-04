@@ -238,7 +238,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
 
     @Override
     public String toString() {
-        return "id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
+        return "id=" + id + ", uri=\"" + uri + "\", value=\"" + value + "\", typeUri=\"" + typeUri +
             "\", composite=" + composite;
     }
 }

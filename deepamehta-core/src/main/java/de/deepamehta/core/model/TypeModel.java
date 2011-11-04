@@ -198,7 +198,7 @@ public abstract class TypeModel extends TopicModel {
 
     @Override
     public String toString() {
-        return "id=" + id + ", uri=\"" + uri + "\", value=" + value + ", typeUri=\"" + typeUri +
+        return "id=" + id + ", uri=\"" + uri + "\", value=\"" + value + "\", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + getDataTypeUri() + "\", indexModes=" + getIndexModes() + ", assocDefs=" +
             getAssocDefs() + ", labelConfig=" + getLabelConfig() + ",\n    topic type " + getViewConfigModel();
         // FIXME: "topic type" is not generic wording

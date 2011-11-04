@@ -185,15 +185,6 @@ public class CompositeValue {
 
     // ---
 
-    public String getDefaultLabel() {
-        try {
-            return "Default Label";
-            // ### return getLabel(values);
-        } catch (Exception e) {
-            throw new RuntimeException("Getting the label of a CompositeValue failed (composite=" + this + ")", e);
-        }
-    }
-
     public JSONObject toJSON() {
         try {
             JSONObject json = new JSONObject();
@@ -219,27 +210,8 @@ public class CompositeValue {
         return new CompositeValue(toString());
     } */
 
-    /* ### @Override
+    @Override
     public String toString() {
         return values.toString();
-    } */
-
-
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    // ### FIXME: calculation should respect type definition for child-type order (#145)
-    /* ### private String getLabel(Object value) throws Exception {
-        if (value instanceof JSONObject) {
-            JSONObject comp = (JSONObject) value;
-            Iterator<String> i = comp.keys();
-            if (i.hasNext()) {
-                return getLabel(comp.get(i.next()));
-            } else {
-                return "";
-            }
-        } else {
-            return value.toString();
-        }
-    } */
+    }
 }

@@ -151,7 +151,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return attachedTopic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving topic failed (key=\"" + key + "\", value=" + value + ")", e);
+            throw new RuntimeException("Retrieving topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         } finally {
             tx.finish();
         }

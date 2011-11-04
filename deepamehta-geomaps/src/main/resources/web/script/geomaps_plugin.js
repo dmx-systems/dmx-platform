@@ -33,7 +33,7 @@ function geomaps_plugin() {
             var topicmap = dm4c.get_plugin("topicmaps_plugin").get_topicmap()
             if (topicmap.get_renderer_uri() == "dm4.geomaps.geomap_renderer") {
                 // ### alert("geomaps_plugin(): process ADD_MARKER directive\n\n" + JSON.stringify(directive.arg))
-                var topic = directive.arg
+                var topic = new Topic(directive.arg)
                 topic.x = topic.get("dm4.geomaps.longitude")
                 topic.y = topic.get("dm4.geomaps.latitude")
                 // update model
