@@ -321,7 +321,6 @@ function CanvasRendererExtension() {
 
             this.move_to = function(x, y) {
                 // update DB ### TODO: extend topicmaps REST API instead of operating on the DB directly
-                //           ### FIXME: adapt composite to extended format
                 dm4c.restc.update_association({id: ref_id, composite: {"dm4.topicmaps.x": x, "dm4.topicmaps.y": y}})
                 // update memory
                 this.x = x
@@ -345,7 +344,6 @@ function CanvasRendererExtension() {
 
             function set_visibility(visibility) {
                 // update DB ### TODO: extend topicmaps REST API instead of operating on the DB directly
-                //           ### FIXME: adapt composite to extended format
                 dm4c.restc.update_association({id: ref_id, composite: {"dm4.topicmaps.visibility": visibility}})
                 // update memory
                 self.visibility = visibility

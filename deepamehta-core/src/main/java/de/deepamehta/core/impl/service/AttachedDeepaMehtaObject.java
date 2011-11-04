@@ -361,7 +361,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         // ### TODO: compare new model with current one and update only if changed.
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
             updateCompositeValue(model.getCompositeValue(), clientContext, directives);
-            // ### FIXME: refreshLabel() required?
+            refreshLabel();
         } else {
             updateValue(model.getSimpleValue());
         }
