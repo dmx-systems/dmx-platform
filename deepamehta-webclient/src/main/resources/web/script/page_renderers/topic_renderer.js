@@ -118,24 +118,30 @@ function TopicRenderer() {
      */
     function create_page_model(topic, setting) {
 
-        return create_fields("", topic.composite, topic.get_type())
+        return create_fields(topic.get_type(), undefined, "", topic)
 
-        function create_fields(field_uri, composite, topic_type, assoc_def) {
+        /**
+         * @param   topic_type      The type to create the fields for.
+         * @param   assoc_def       The association definition that leads to the type.
+         * @param   field_uri       The (base) URI for the field(s) to create.
+         * @param   value_topic     The topic that supplies the field values. May be undefined.
+         */
+        function create_fields(topic_type, assoc_def, field_uri, value_topic) {
             if (get_view_config()) {
                 if (topic_type.data_type_uri == "dm4.core.composite") {
                     var fields = {}
                     for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                        var part_topic_type = dm4c.type_cache.get_topic_type(assoc_def.part_topic_type_uri)
+                        var child_topic_type = dm4c.type_cache.get_topic_type(assoc_def.part_topic_type_uri)
                         var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
-                        var comp = composite && composite[assoc_def.uri]
-                        var child_fields = create_fields(child_field_uri, comp, part_topic_type, assoc_def)
+                        var child_topic = value_topic && value_topic.composite[assoc_def.uri]
+                        var child_fields = create_fields(child_topic_type, assoc_def, child_field_uri, child_topic)
                         if (child_fields) {
                             fields[assoc_def.uri] = child_fields
                         }
                     }
                     return fields;
                 } else {
-                    var value = field_uri == "" ? topic.value : composite
+                    var value = value_topic && value_topic.value
                     return new TopicRenderer.Field(field_uri, value, topic, topic_type, assoc_def)
                 }
             }
