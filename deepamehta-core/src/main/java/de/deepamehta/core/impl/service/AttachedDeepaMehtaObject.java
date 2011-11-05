@@ -439,9 +439,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                             childTopic.update(model, clientContext, directives);
                         } else {
                             // create and associate child topic
-                            Directives dirs = dms.createTopic(new TopicModel(childTopicTypeUri, childTopicComp), null);
-                            directives.add(dirs);
-                            childTopic = dirs.getCreatedTopic();
+                            childTopic = dms.createTopic(new TopicModel(childTopicTypeUri, childTopicComp), null);
                             associateChildTopic(assocDef, childTopic.getId());
                             // Note: the child topic must be created right with its composite value.
                             // Otherwise its label can't be calculated. ### still true?
@@ -507,9 +505,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             } else {
                 // create child topic
                 String topicTypeUri = assocDef.getPartTopicTypeUri();
-                Directives dirs = dms.createTopic(new TopicModel(topicTypeUri, value), null);
-                                                                    // FIXME: process directives
-                childTopic = dirs.getCreatedTopic();
+                childTopic = dms.createTopic(new TopicModel(topicTypeUri, value), null);
                 // associate child topic
                 associateChildTopic(assocDef, childTopic.getId());
             }

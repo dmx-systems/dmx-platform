@@ -100,9 +100,7 @@ public class FilesPlugin extends Plugin implements FilesService {
             }
             comp.put("dm4.files.size", fileSize);
             //
-            return dms.createTopic(new TopicModel("dm4.files.file", comp), null).getCreatedTopic();
-                                                                            // FIXME: clientContext=null
-                                                                            // FIXME: process directives
+            return dms.createTopic(new TopicModel("dm4.files.file", comp), null);       // FIXME: clientContext=null
         } catch (Throwable e) {
             throw new RuntimeException(text + " failed", e);
         }
@@ -130,9 +128,7 @@ public class FilesPlugin extends Plugin implements FilesService {
             comp.put("dm4.files.folder_name", new File(path).getName());
             comp.put("dm4.files.path", path);
             //
-            return dms.createTopic(new TopicModel("dm4.files.folder", comp), null).getCreatedTopic();
-                                                                            // FIXME: clientContext=null
-                                                                            // FIXME: process directives
+            return dms.createTopic(new TopicModel("dm4.files.folder", comp), null);     // FIXME: clientContext=null
         } catch (Throwable e) {
             throw new RuntimeException(text + " failed", e);
         }

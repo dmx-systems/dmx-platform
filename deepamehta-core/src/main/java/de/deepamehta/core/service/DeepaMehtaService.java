@@ -66,7 +66,7 @@ public interface DeepaMehtaService {
     public Set<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord,
                                                                        ClientContext clientContext);
 
-    public Directives createTopic(TopicModel topicModel, ClientContext clientContext);
+    public Topic createTopic(TopicModel topicModel, ClientContext clientContext);
 
     public Directives updateTopic(TopicModel topicModel, ClientContext clientContext);
 

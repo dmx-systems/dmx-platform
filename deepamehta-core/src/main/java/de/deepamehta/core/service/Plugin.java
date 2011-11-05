@@ -715,9 +715,7 @@ public class Plugin implements BundleActivator, EventHandler {
             pluginTopic = dms.createTopic(new TopicModel(pluginId, "dm4.core.plugin",
                 new CompositeValue().put("dm4.core.plugin_name", pluginName)
                                     .put("dm4.core.plugin_symbolic_name", pluginId)
-                                    .put("dm4.core.plugin_migration_nr", 0)), null).getCreatedTopic();
-                // FIXME: clientContext=null
-                // FIXME: process directives
+                                    .put("dm4.core.plugin_migration_nr", 0)), null);    // FIXME: clientContext=null
             return true;
         }
     }

@@ -28,6 +28,7 @@ function geomaps_plugin() {
         return new GeoMapRenderer()
     }
 
+    // ### FIXME: process_directive is no hook. ADD_MARKER is no directive.
     this.process_directive = function(directive) {
         if (directive.type == "ADD_MARKER") {
             var topicmap = dm4c.get_plugin("topicmaps_plugin").get_topicmap()

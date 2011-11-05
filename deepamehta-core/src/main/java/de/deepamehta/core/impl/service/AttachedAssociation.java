@@ -19,7 +19,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientContext;
-import de.deepamehta.core.service.CoreDirective;
+import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 
 import java.util.HashSet;
@@ -115,7 +115,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         // delete association itself
         logger.info("Deleting " + this);
         dms.storage.deleteAssociation(getId());
-        directives.add(CoreDirective.DELETE_ASSOCIATION, this);
+        directives.add(Directive.DELETE_ASSOCIATION, this);
     }
 
 

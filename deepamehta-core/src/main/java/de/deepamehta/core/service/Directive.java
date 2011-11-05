@@ -1,5 +1,12 @@
 package de.deepamehta.core.service;
 
-public interface Directive {
-    String name();
+public enum Directive {
+
+    UPDATE_TOPIC,
+    DELETE_TOPIC,
+
+    UPDATE_ASSOCIATION,
+    DELETE_ASSOCIATION,
+
+    UPDATE_TOPIC_TYPE
 }

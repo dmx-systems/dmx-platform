@@ -4,7 +4,7 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
-import de.deepamehta.core.service.CoreDirective;
+import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
 
@@ -44,10 +44,10 @@ public class TypeEditorPlugin extends Plugin {
                     "\" to topic type \"" + topicTypeUri + "\" (" + assocDef + ")");
                 topicType.addAssocDef(assocDef);
             }
-            directives.add(CoreDirective.UPDATE_TOPIC_TYPE, topicType);
+            directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
         } else if (isAssocDef(oldTypeUri)) {
             TopicType topicType = removeAssocDef(assoc);
-            directives.add(CoreDirective.UPDATE_TOPIC_TYPE, topicType);
+            directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
         }
     }
 
@@ -55,7 +55,7 @@ public class TypeEditorPlugin extends Plugin {
     public void postDeleteAssociationHook(Association assoc, Directives directives) {
         if (isAssocDef(assoc.getTypeUri())) {
             TopicType topicType = removeAssocDef(assoc);
-            directives.add(CoreDirective.UPDATE_TOPIC_TYPE, topicType);
+            directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
         }
     }
 

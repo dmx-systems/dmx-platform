@@ -27,9 +27,9 @@ public class FacetsPlugin extends Plugin implements FacetsService {
 
 
 
-    // **********************
-    // *** Plugin Service ***
-    // **********************
+    // ************************************
+    // *** FacetsService Implementation ***
+    // ************************************
 
 
 
@@ -57,9 +57,7 @@ public class FacetsPlugin extends Plugin implements FacetsService {
                     childTopic.update(model, clientContext, directives);
                 } else {
                     // create and associate child topic
-                    Directives dirs = dms.createTopic(new TopicModel(childTopicTypeUri, childTopicComp), null);
-                    directives.add(dirs);
-                    childTopic = dirs.getCreatedTopic();
+                    childTopic = dms.createTopic(new TopicModel(childTopicTypeUri, childTopicComp), null);
                     associateChildTopic(topic, assocDef, childTopic.getId());
                     // Note: the child topic must be created right with its composite value.
                     // Otherwise its label can't be calculated.

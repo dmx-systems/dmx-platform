@@ -180,7 +180,7 @@ public class JSONHelper {
     public static void createTopics(JSONArray topics, DeepaMehtaService dms) throws Exception {
         for (int i = 0; i < topics.length(); i++) {
             TopicModel topicModel = new TopicModel(topics.getJSONObject(i));
-            dms.createTopic(topicModel, null);                  // clientContext=null   // FIXME: process directives
+            dms.createTopic(topicModel, null);                  // clientContext=null
         }
     }
 

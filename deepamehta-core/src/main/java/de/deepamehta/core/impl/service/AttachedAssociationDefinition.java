@@ -271,8 +271,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     private void storeViewConfig() {
         for (TopicModel configTopic : getModel().getViewConfigModel().getConfigTopics()) {
-            Topic topic = dms.createTopic(configTopic, null).getCreatedTopic();     // FIXME: clientContext=null
-                                                                                    // FIXME: process directives
+            Topic topic = dms.createTopic(configTopic, null);   // FIXME: clientContext=null
             dms.createAssociation("dm4.core.aggregation",
                 new AssociationRoleModel(getId(), "dm4.core.assoc_def"),
                 new TopicRoleModel(topic.getId(), "dm4.core.view_config"));
