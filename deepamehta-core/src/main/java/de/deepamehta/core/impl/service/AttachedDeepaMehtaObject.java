@@ -429,9 +429,12 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 TopicModel valueTopic = newComp.getTopic(key);
                 if (assocTypeUri.equals("dm4.core.composition_def")) {
                     if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
-                        Topic childTopic = fetchChildTopic(assocDef, false);            // fetchComposite=false
+                        // Note: the child topic's composite must be fetched. It needs to be passed to the
+                        // POST_UPDATE_TOPIC hook as part of the "old model" (when the child topic is updated).
+                        Topic childTopic = fetchChildTopic(assocDef, true);             // fetchComposite=true
                         CompositeValue childTopicComp = valueTopic.getCompositeValue();
                         if (childTopic != null) {
+                            // update child topic
                             TopicModel model = new TopicModel(childTopic.getId(), childTopicComp);
                             childTopic.update(model, clientContext, directives);
                         } else {
@@ -441,7 +444,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                             childTopic = dirs.getCreatedTopic();
                             associateChildTopic(assocDef, childTopic.getId());
                             // Note: the child topic must be created right with its composite value.
-                            // Otherwise its label can't be calculated.
+                            // Otherwise its label can't be calculated. ### still true?
                         }
                         // update memory
                         comp.put(assocDefUri, childTopic.getCompositeValue());

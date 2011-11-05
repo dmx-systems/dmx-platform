@@ -11,7 +11,7 @@ import java.util.Map;
 
 
 /**
- * A recursive composite of key/value pairs.
+ * A recursive composite of key/value pairs. ### FIXDOC
  * <p>
  * Keys are strings, values are non-null atomic (string, int, long, double, boolean)
  * or again a <code>CompositeValue</code>.
@@ -21,11 +21,9 @@ public class CompositeValue {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     /**
-     * Internal representation.
+     * Internal representation. ### FIXDOC
      * Key: String, value: non-null atomic (String, Integer, Long, Double, Boolean) or composite (JSONObject).
      */
-    // ### private JSONObject values;
-
     private Map<String, TopicModel> values = new HashMap();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -52,31 +50,23 @@ public class CompositeValue {
         }
     }
 
-    /* ### public CompositeValue(String json) {
-        try {
-            this.values = new JSONObject(json);
-        } catch (Exception e) {
-            throw new RuntimeException("Constructing a CompositeValue from a string failed (\"" + json + "\")", e);
-        }
-    } */
-
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     public Iterable<String> keys() {
         return values.keySet();
     }
 
-    /**
-     * @return  a String, Integer, Long, Double, Boolean, or a CompositeValue.
-     */
     public TopicModel getTopic(String key) {
-        try {
-            return values.get(key);
-        } catch (Exception e) { // ### catch what?
-            throw new RuntimeException("Getting a value from a CompositeValue failed (key=\"" +
-                key + "\", composite=" + this + ")", e);
+        TopicModel topic = values.get(key);
+        // error check
+        if (topic == null) {
+            throw new RuntimeException("No entry \"" + key + "\" in composite value " + this);
         }
+        //
+        return topic;
     }
+
+    // ---
 
     public CompositeValue put(String key, TopicModel value) {
         try {
@@ -127,6 +117,8 @@ public class CompositeValue {
                 "\", value=" + value + ", composite=" + this + ")", e);
         }
     }
+
+    // ---
 
     public boolean has(String key) {
         return values.containsKey(key);
@@ -205,10 +197,15 @@ public class CompositeValue {
 
 
 
-    /* ### @Override
+    @Override
     public CompositeValue clone() {
-        return new CompositeValue(toString());
-    } */
+        CompositeValue clone = new CompositeValue();
+        for (String key : keys()) {
+            TopicModel model = (TopicModel) getTopic(key).clone();
+            clone.put(key, model);
+        }
+        return clone;
+    }
 
     @Override
     public String toString() {
