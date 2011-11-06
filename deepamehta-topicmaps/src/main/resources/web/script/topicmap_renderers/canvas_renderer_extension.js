@@ -11,14 +11,6 @@ function CanvasRendererExtension() {
         return new Topicmap(topicmap_id)
     }
 
-    this.prepare_topic_for_display = function(topicmap, topic) {
-        var t = topicmap.get_topic(topic.id)
-        if (t && !t.visibility) {
-            topic.x = t.x
-            topic.y = t.y
-        }
-    }
-
     // ------------------------------------------------------------------------------------------------- Private Classes
 
     /**
@@ -236,6 +228,15 @@ function CanvasRendererExtension() {
 
         this.get_topic = function(id) {
             return topics[id]
+        }
+
+        this.prepare_topic_for_display = function(topic) {
+            // restores topic position if topic is already contained in this topicmap but hidden
+            var t = this.get_topic(topic.id)
+            if (t && !t.visibility) {
+                topic.x = t.x
+                topic.y = t.y
+            }
         }
 
         this.draw_background = function(ctx) {

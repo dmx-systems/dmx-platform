@@ -146,12 +146,10 @@ function topicmaps_plugin() {
     }
 
     /**
-     * Restores topic position if topic is already contained in the topicmap but hidden
-     *
      * @param   topic   a Topic object
      */
     this.pre_show_topic = function(topic) {
-        topicmap_renderer.prepare_topic_for_display(topicmap, topic)
+        return topicmap.prepare_topic_for_display(topic)
     }
 
     /**

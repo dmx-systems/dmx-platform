@@ -25,6 +25,10 @@
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
+            ],
+            label_config: [
+                dm4.geomaps.longitude,
+                dm4.geomaps.latitude
             ]
         },
         {

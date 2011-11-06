@@ -323,12 +323,18 @@ var dm4c = new function() {
             topic.y = coordinates.y
         }
         var do_select = action != "none"
+        // Note: the pre_show_topic() hook allows plugins to do both:
+        // - manipulate the topic, e.g. by setting coordinates
+        // - return a completely different topic to proceed with
+        var topic_to_show = dm4c.trigger_plugin_hook("pre_show_topic", topic)[0]    // trigger hook
+        if (topic_to_show) {
+            topic = topic_to_show
+        }
         // update model
         if (do_select) {
             set_selected_topic(topic)
         }
         // update canvas
-        dm4c.trigger_plugin_hook("pre_show_topic", topic)       // trigger hook
         dm4c.canvas.add_topic(topic)
         if (do_select) {
             dm4c.canvas.set_highlight_object(topic.id, true)    // refresh_canvas=true

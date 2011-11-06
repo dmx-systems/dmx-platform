@@ -7,6 +7,8 @@ function GeoMapRenderer() {
 
     // ------------------------------------------------------------------------------------------------ Constructor Code
 
+    var LOG_GEOMAPS = false
+
     js.extend(this, TopicmapRenderer)
 
     this.dom = $("<div>", {id: "canvas"})
@@ -37,10 +39,12 @@ function GeoMapRenderer() {
 
     this.add_topic = function(topic, refresh_canvas) {
         if (topic.x != undefined && topic.y != undefined) {
-            alert("GeoMapRenderer.add_topic(): topic=" + JSON.stringify(topic))
+            if (dm4c.LOG_GEOMAPS) dm4c.log("GeoMapRenderer.add_topic(): displaying marker at x=" +
+                topic.x + ", y=" + topic.y + "\n\nTopic=" + JSON.stringify(topic))
             marker_layers["markers"].add_marker({lon: topic.x, lat: topic.y}, topic)
         } else {
-            alert("GeoMapRenderer.add_topic(): IGNORE topic without coordinates\n\ntopic=" + JSON.stringify(topic))
+            if (dm4c.LOG_GEOMAPS) dm4c.log("GeoMapRenderer.add_topic(): displaying marker ABORTED -- " +
+                "topic has no coordinates\n\nTopic=" + JSON.stringify(topic))
         }
     }
 
@@ -48,9 +52,6 @@ function GeoMapRenderer() {
 
     this.load_topicmap = function(topicmap_id) {
         return new Geomap(topicmap_id)
-    }
-
-    this.prepare_topic_for_display = function(topicmap, topic) {
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
@@ -133,7 +134,7 @@ function GeoMapRenderer() {
                 markers_layer.addMarker(marker)
 
                 function marker_clicked() {
-                    alert(JSON.stringify(this))
+                    dm4c.do_select_topic(this.id)
                 }
             }
         }()
@@ -186,14 +187,15 @@ function GeoMapRenderer() {
 
         this.add_topic = function(id, type_uri, value, x, y) {
             if (x != undefined && y != undefined) {
-                alert("Geomap.add_topic(): id=" + id + ", x=" + x + ", y=" + y)
+                if (dm4c.LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): adding topic to model\n\nid=" + id +
+                    "\ntype_uri=\"" + type_uri + "\"\nx=" + x + "\ny=" + y)
                 // update DB
                 dm4c.restc.add_topic_to_geomap(topicmap_id, id)
                 // update memory
                 topics[id] = new GeomapTopic(id, type_uri, value, x, y)
             } else {
-                alert("Geomap.add_topic(): IGNORE topic without coordinates\n\nid=" +
-                    id + "\ntype_uri=\"" + type_uri + "\"\nvalue=\"" + value + "\"")
+                if (dm4c.LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): adding topic to model ABORTED -- topic has " +
+                    "no coordinates\n\nid=" + id + "\ntype_uri=\"" + type_uri + "\"\nvalue=\"" + value + "\"")
             }
         }
 
@@ -201,7 +203,7 @@ function GeoMapRenderer() {
         }
 
         this.update_topic = function(topic) {
-            alert("Geomap.update_topic(): topic=" + JSON.stringify(topic))
+            if (dm4c.LOG_GEOMAPS) dm4c.log("Geomap.update_topic(): topic=" + JSON.stringify(topic))
         }
 
         this.delete_topic = function(id) {
@@ -224,6 +226,28 @@ function GeoMapRenderer() {
             selected_object_id = -1
         }
 
+        this.prepare_topic_for_display = function(topic) {
+            var address = topic.find_child_topic("dm4.contacts.address")
+            if (address) {
+                var geo_facet = address.composite["dm4.geomaps.geo_coordinate"]
+                if (geo_facet) {
+                    var pos = position(geo_facet)
+                    geo_facet = new Topic(geo_facet)
+                    geo_facet.x = pos.x
+                    geo_facet.y = pos.y
+                    if (dm4c.LOG_GEOMAPS) dm4c.log("Geomap.prepare_topic_for_display(): setting up proxy topic at x=" +
+                        pos.x + ", y=" + pos.y + "\n\nOriginal address topic=" + JSON.stringify(address))
+                    return geo_facet
+                } else {
+                    if (dm4c.LOG_GEOMAPS) dm4c.log("Geomap.prepare_topic_for_display(): setting up proxy topic " +
+                        "ABORTED -- address has no geo facet\n\nAddress topic=" + JSON.stringify(address))
+                }
+            } else {
+                if (dm4c.LOG_GEOMAPS) dm4c.log("Geomap.prepare_topic_for_display(): setting up proxy topic " +
+                    "ABORTED -- topic has no address child\n\nTopic=" + JSON.stringify(topic))
+            }
+        }
+
         // ===
 
         // --- Private Functions ---
@@ -236,10 +260,16 @@ function GeoMapRenderer() {
 
             function load_topics() {
                 for (var i = 0, topic; topic = topicmap.topics[i]; i++) {
-                    var x = topic.composite["dm4.geomaps.longitude"].value
-                    var y = topic.composite["dm4.geomaps.latitude"].value
-                    topics[topic.id] = new GeomapTopic(topic.id, topic.type_uri, topic.value, x, y)
+                    var pos = position(topic)
+                    topics[topic.id] = new GeomapTopic(topic.id, topic.type_uri, topic.value, pos.x, pos.y)
                 }
+            }
+        }
+
+        function position(geo_facet) {
+            return {
+                x: geo_facet.composite["dm4.geomaps.longitude"].value,
+                y: geo_facet.composite["dm4.geomaps.latitude"].value
             }
         }
 

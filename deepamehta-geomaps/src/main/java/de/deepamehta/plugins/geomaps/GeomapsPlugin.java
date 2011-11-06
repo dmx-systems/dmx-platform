@@ -107,7 +107,10 @@ public class GeomapsPlugin extends Plugin implements GeomapsService {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
             Topic geoFacet = facetsService.getFacet(topic, "dm4.geomaps.geo_coordinate_facet");
             if (geoFacet != null) {
-                topic.getCompositeValue().put("dm4.geomaps.geo_coordinate", geoFacet.getCompositeValue());
+                logger.info("### Enriching composite of address " + topic.getId() + " with geo facet");
+                topic.getCompositeValue().put("dm4.geomaps.geo_coordinate", geoFacet.getModel());
+            } else {
+                logger.info("### Enriching composite of address " + topic.getId() + " ABORTED -- no geo facet in DB");
             }
         }
     }
@@ -148,6 +151,9 @@ public class GeomapsPlugin extends Plugin implements GeomapsService {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    /**
+     * Stores a geo facet for an address topic in the DB.
+     */
     private void addGeoFacet(Topic addressTopic, LonLat geoCoordinate, ClientContext clientContext,
                                                                        Directives directives) {
         try {
