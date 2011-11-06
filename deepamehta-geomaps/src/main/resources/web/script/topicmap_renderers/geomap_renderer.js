@@ -37,10 +37,10 @@ function GeoMapRenderer() {
 
     this.add_topic = function(topic, refresh_canvas) {
         if (topic.x != undefined && topic.y != undefined) {
-            // ### alert("GeoMapRenderer.add_topic(): topic=" + JSON.stringify(topic))
+            alert("GeoMapRenderer.add_topic(): topic=" + JSON.stringify(topic))
             marker_layers["markers"].add_marker({lon: topic.x, lat: topic.y}, topic)
         } else {
-            // # alert("GeoMapRenderer.add_topic(): IGNORE topic without coordinates\n\ntopic=" + JSON.stringify(topic))
+            alert("GeoMapRenderer.add_topic(): IGNORE topic without coordinates\n\ntopic=" + JSON.stringify(topic))
         }
     }
 
@@ -186,14 +186,14 @@ function GeoMapRenderer() {
 
         this.add_topic = function(id, type_uri, value, x, y) {
             if (x != undefined && y != undefined) {
-                // ### alert("Geomap.add_topic(): id=" + id + ", x=" + x + ", y=" + y)
+                alert("Geomap.add_topic(): id=" + id + ", x=" + x + ", y=" + y)
                 // update DB
                 dm4c.restc.add_topic_to_geomap(topicmap_id, id)
                 // update memory
                 topics[id] = new GeomapTopic(id, type_uri, value, x, y)
             } else {
-                /* ### alert("Geomap.add_topic(): IGNORE topic without coordinates\n\nid=" +
-                    id + "\ntype_uri=\"" + type_uri + "\"\nvalue=\"" + value + "\"") */
+                alert("Geomap.add_topic(): IGNORE topic without coordinates\n\nid=" +
+                    id + "\ntype_uri=\"" + type_uri + "\"\nvalue=\"" + value + "\"")
             }
         }
 
@@ -201,6 +201,7 @@ function GeoMapRenderer() {
         }
 
         this.update_topic = function(topic) {
+            alert("Geomap.update_topic(): topic=" + JSON.stringify(topic))
         }
 
         this.delete_topic = function(id) {

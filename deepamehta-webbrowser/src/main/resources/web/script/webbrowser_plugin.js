@@ -49,7 +49,7 @@ function webbrowser_plugin() {
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     /**
-     * Retrieves and returns the Webpage topic for the given URL.
+     * Fetches and returns the Webpage topic for the given URL.
      * If there is no such Webpage topic undefined is returned.
      */
     function get_webpage(url_topic) {

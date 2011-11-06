@@ -103,6 +103,16 @@ public class GeomapsPlugin extends Plugin implements GeomapsService {
     // ---
 
     @Override
+    public void postFetchTopicHook(Topic topic) {
+        if (topic.getTypeUri().equals("dm4.contacts.address")) {
+            Topic geoFacet = facetsService.getFacet(topic, "dm4.geomaps.geo_coordinate_facet");
+            if (geoFacet != null) {
+                topic.getCompositeValue().put("dm4.geomaps.geo_coordinate", geoFacet.getCompositeValue());
+            }
+        }
+    }
+
+    @Override
     public void postCreateHook(Topic topic, ClientContext clientContext, Directives directives) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
             //
@@ -142,10 +152,11 @@ public class GeomapsPlugin extends Plugin implements GeomapsService {
                                                                        Directives directives) {
         try {
             logger.info("Adding geo facet (" + geoCoordinate + ") to address " + addressTopic);
-            CompositeValue comp = new CompositeValue().put("dm4.geomaps.longitude", geoCoordinate.lon)
-                                                      .put("dm4.geomaps.latitude",  geoCoordinate.lat);
-            TopicModel facet = new TopicModel("dm4.geomaps.geo_coordinate", comp);
-            facetsService.addFacet(addressTopic, "dm4.geomaps.geo_coordinate_facet", facet, clientContext, directives);
+            TopicModel geoFacet = new TopicModel("dm4.geomaps.geo_coordinate", new CompositeValue()
+                .put("dm4.geomaps.longitude", geoCoordinate.lon)
+                .put("dm4.geomaps.latitude",  geoCoordinate.lat));
+            facetsService.addFacet(addressTopic, "dm4.geomaps.geo_coordinate_facet", geoFacet,
+                clientContext, directives);
         } catch (Exception e) {
             throw new RuntimeException("Adding geo facet to address topic failed");
         }

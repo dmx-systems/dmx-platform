@@ -66,7 +66,7 @@ function TextFieldRenderer(topic, field) {
 
     function render_combobox() {
 
-        // retrieve all instances
+        // fetch all instances
         var topics = dm4c.restc.get_topics(field.topic_type.uri, false, true).items  // fetch_composite=false, sort=true
         return create_combobox();
 

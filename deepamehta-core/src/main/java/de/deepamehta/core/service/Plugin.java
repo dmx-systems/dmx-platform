@@ -235,11 +235,18 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // ---
 
+    public void postFetchTopicHook(Topic topic) {
+    }
+
+    // ---
+
     public void preCreateHook(TopicModel topicModel, ClientContext clientContext) {
     }
 
     public void postCreateHook(Topic topic, ClientContext clientContext, Directives directives) {
     }
+
+    // ---
 
     public void preUpdateHook(Topic topic, TopicModel newTopic, Directives directives) {
     }
@@ -266,14 +273,6 @@ public class Plugin implements BundleActivator, EventHandler {
     }
 
     public void providePropertiesHook(Association assoc) {
-    }
-
-    // ---
-
-    public void enrichTopicHook(Topic topic, ClientContext clientContext) {
-    }
-
-    public void enrichTopicTypeHook(TopicType topicType, ClientContext clientContext) {
     }
 
     // ---

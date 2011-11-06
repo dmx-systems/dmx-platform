@@ -40,11 +40,11 @@ public class FacetsPlugin extends Plugin implements FacetsService {
             new TopicRoleModel(facetTypeUri, "dm4.facets.facet")), null);   // clientContext=null
     }
 
+    // ### FIXME: partly copied from AttachedDeepaMehtaObject.updateCompositeValue()
     @Override
     public Topic addFacet(Topic topic, String facetTypeUri, TopicModel facet, ClientContext clientContext,
                                                                               Directives directives) {
-        String assocDefUri = facet.getTypeUri();
-        AssociationDefinition assocDef = dms.getTopicType(facetTypeUri, null).getAssocDef(assocDefUri);
+        AssociationDefinition assocDef = getAssocDef(facetTypeUri);
         String childTopicTypeUri = assocDef.getPartTopicTypeUri();
         TopicType childTopicType = dms.getTopicType(childTopicTypeUri, null);
         String assocTypeUri = assocDef.getTypeUri();
@@ -74,9 +74,21 @@ public class FacetsPlugin extends Plugin implements FacetsService {
         }
     }
 
+    @Override
+    public Topic getFacet(Topic topic, String facetTypeUri) {
+        // ### TODO: integrity check: is the topic an instance of that facet type?
+        // ### TODO: many cardinality
+        return fetchChildTopic(topic, getAssocDef(facetTypeUri));
+    }
+
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private AssociationDefinition getAssocDef(String facetTypeUri) {
+        // Note: a facet type has exactly *one* association definition
+        return dms.getTopicType(facetTypeUri, null).getAssocDefs().values().iterator().next();
+    }
 
     /**
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.

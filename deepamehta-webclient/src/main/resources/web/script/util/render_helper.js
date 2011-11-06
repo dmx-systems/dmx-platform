@@ -84,7 +84,7 @@ function RenderHelper() {
      * @return  a GUIToolkit Menu object
      */
     this.topic_menu = function(topic_type_uri, selected_uri) {
-        // retrieve all instances
+        // fetch all instances
         var topics = dm4c.restc.get_topics(topic_type_uri, false, true).items   // fetch_composite=false, sort=true
         //
         var menu = dm4c.ui.menu()

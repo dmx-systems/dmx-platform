@@ -370,7 +370,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     /**
-     * Called from {@link EmbeddedService#attach}
+     * Called from {@link EmbeddedService#attach} (indirectly)
      */
     void loadComposite() {
         // fetch from DB

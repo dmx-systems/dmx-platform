@@ -70,7 +70,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
     ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize);
 
     /**
-     * Retrieves and returns a related topic or <code>null</code> if no such topic extists.
+     * Fetches and returns a related topic or <code>null</code> if no such topic extists.
      *
      * @param   assocTypeUri        may be null
      * @param   myRoleTypeUri       may be null

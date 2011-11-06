@@ -127,7 +127,6 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedTopic topic = attach(storage.getTopic(topicId), fetchComposite);
-            triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
             tx.success();
             return topic;
         } catch (Exception e) {
@@ -218,7 +217,6 @@ public class EmbeddedService implements DeepaMehtaService {
             topic.store(clientContext, directives);
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext, directives);
-            triggerHook(Hook.ENRICH_TOPIC, topic, clientContext);
             //
             tx.success();
             return topic;
@@ -441,7 +439,6 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedTopicType topicType = typeCache.getTopicType(uri);
-            triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
             tx.success();
             return topicType;
         } catch (Exception e) {
@@ -467,7 +464,6 @@ public class EmbeddedService implements DeepaMehtaService {
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
             triggerHook(Hook.MODIFY_TOPIC_TYPE, topicType, clientContext);
-            triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
             //
             tx.success();
             return topicType;
@@ -538,7 +534,6 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedAssociationType assocType = typeCache.getAssociationType(uri);
-            // ### triggerHook(Hook.ENRICH_TOPIC_TYPE, topicType, clientContext);
             tx.success();
             return assocType;
         } catch (Exception e) {
@@ -766,11 +761,15 @@ public class EmbeddedService implements DeepaMehtaService {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     /**
-     * Attaches this core service to a topic retrieved from storage layer.
+     * Attaches this core service to a topic model fetched from storage layer.
+     * Optionally fetches the topic's composite value from storage layer.
      */
     AttachedTopic attach(TopicModel model, boolean fetchComposite) {
         AttachedTopic topic = new AttachedTopic(model, this);
         fetchComposite(fetchComposite, topic);
+        //
+        triggerHook(Hook.POST_FETCH_TOPIC, topic);
+        //
         return topic;
     }
 
@@ -787,6 +786,9 @@ public class EmbeddedService implements DeepaMehtaService {
     AttachedRelatedTopic attach(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite) {
         AttachedRelatedTopic relTopic = new AttachedRelatedTopic(model, this);
         fetchComposite(fetchComposite, fetchRelatingComposite, relTopic);
+        //
+        triggerHook(Hook.POST_FETCH_TOPIC, relTopic);
+        //
         return relTopic;
     }
 
@@ -802,7 +804,7 @@ public class EmbeddedService implements DeepaMehtaService {
     // ===
 
     /**
-     * Attaches this core service to an association retrieved from storage layer.
+     * Attaches this core service to an association fetched from storage layer.
      */
     private AttachedAssociation attach(AssociationModel model) {
         return new AttachedAssociation(model, this);
