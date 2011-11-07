@@ -30,13 +30,18 @@ Topic.prototype = {
 
     find_child_topic: function(type_uri) {
 
+        if (this.type_uri == type_uri) {
+            return this
+        }
         return find_child_topic(this.composite)
 
         function find_child_topic(composite) {
             // alert("find_child_topic(): composite=" + JSON.stringify(composite))
             for (var assoc_def_uri in composite) {
                 var child_topic = composite[assoc_def_uri]
-                if (child_topic.type_uri == type_uri) {
+                // ### FIXME: should be if (child_topic.type_uri == type_uri)
+                // ### but type_uri is not initialized in compact composite format
+                if (assoc_def_uri == type_uri) {
                     return child_topic
                 }
                 child_topic = find_child_topic(child_topic.composite)

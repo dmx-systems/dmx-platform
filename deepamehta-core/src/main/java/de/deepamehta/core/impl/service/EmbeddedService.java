@@ -217,6 +217,7 @@ public class EmbeddedService implements DeepaMehtaService {
             topic.store(clientContext, directives);
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext, directives);
+            triggerHook(Hook.POST_FETCH_TOPIC, topic);
             //
             tx.success();
             return topic;

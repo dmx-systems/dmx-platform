@@ -206,6 +206,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         directives.add(Directive.UPDATE_TOPIC, this);
         //
         dms.triggerHook(Hook.POST_UPDATE_TOPIC, this, oldModel, clientContext, directives);
+        dms.triggerHook(Hook.POST_FETCH_TOPIC, this);
         //
         return report;
     }

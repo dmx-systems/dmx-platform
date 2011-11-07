@@ -28,23 +28,5 @@ function geomaps_plugin() {
         return new GeoMapRenderer()
     }
 
-    // ### FIXME: process_directive is no hook. ADD_MARKER is no directive.
-    this.process_directive = function(directive) {
-        if (directive.type == "ADD_MARKER") {
-            var topicmap = dm4c.get_plugin("topicmaps_plugin").get_topicmap()
-            if (topicmap.get_renderer_uri() == "dm4.geomaps.geomap_renderer") {
-                // ### alert("geomaps_plugin(): process ADD_MARKER directive\n\n" + JSON.stringify(directive.arg))
-                var topic = new Topic(directive.arg)
-                topic.x = topic.get("dm4.geomaps.longitude")
-                topic.y = topic.get("dm4.geomaps.latitude")
-                // update model
-                topicmap.add_topic(topic.id, topic.type_uri, "", topic.x, topic.y)
-                // update view
-                dm4c.canvas.add_topic(topic)
-            }
-        }
-    }
-
     // ----------------------------------------------------------------------------------------------- Private Functions
-
 }

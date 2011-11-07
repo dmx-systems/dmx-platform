@@ -39,12 +39,12 @@ function GeoMapRenderer() {
 
     this.add_topic = function(topic, refresh_canvas) {
         if (topic.x != undefined && topic.y != undefined) {
-            if (dm4c.LOG_GEOMAPS) dm4c.log("GeoMapRenderer.add_topic(): displaying marker at x=" +
-                topic.x + ", y=" + topic.y + "\n\nTopic=" + JSON.stringify(topic))
+            if (LOG_GEOMAPS) dm4c.log("GeoMapRenderer.add_topic(): displaying marker at x=" +
+                topic.x + ", y=" + topic.y + "\n..... Topic=" + JSON.stringify(topic))
             marker_layers["markers"].add_marker({lon: topic.x, lat: topic.y}, topic)
         } else {
-            if (dm4c.LOG_GEOMAPS) dm4c.log("GeoMapRenderer.add_topic(): displaying marker ABORTED -- " +
-                "topic has no coordinates\n\nTopic=" + JSON.stringify(topic))
+            if (LOG_GEOMAPS) dm4c.log("GeoMapRenderer.add_topic(): displaying marker ABORTED -- " +
+                "topic has no coordinates\n..... Topic=" + JSON.stringify(topic))
         }
     }
 
@@ -187,15 +187,15 @@ function GeoMapRenderer() {
 
         this.add_topic = function(id, type_uri, value, x, y) {
             if (x != undefined && y != undefined) {
-                if (dm4c.LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): adding topic to model\n\nid=" + id +
-                    "\ntype_uri=\"" + type_uri + "\"\nx=" + x + "\ny=" + y)
+                if (LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): adding topic to model\n..... id=" + id +
+                    ", type_uri=\"" + type_uri + "\", x=" + x + ", y=" + y)
                 // update DB
-                dm4c.restc.add_topic_to_geomap(topicmap_id, id)
+                dm4c.restc.add_topic_to_geomap(topicmap_id, id)     // ### FIXME: add only once
                 // update memory
                 topics[id] = new GeomapTopic(id, type_uri, value, x, y)
             } else {
-                if (dm4c.LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): adding topic to model ABORTED -- topic has " +
-                    "no coordinates\n\nid=" + id + "\ntype_uri=\"" + type_uri + "\"\nvalue=\"" + value + "\"")
+                if (LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): adding topic to model ABORTED -- topic has " +
+                    "no coordinates\n..... id=" + id + ", type_uri=\"" + type_uri + "\", value=\"" + value + "\"")
             }
         }
 
@@ -203,7 +203,19 @@ function GeoMapRenderer() {
         }
 
         this.update_topic = function(topic) {
-            if (dm4c.LOG_GEOMAPS) dm4c.log("Geomap.update_topic(): topic=" + JSON.stringify(topic))
+            // ### Compare to prepare_topic_for_display()
+            // ### FIXME: can we use dm4c.show_topic() here?
+            if (LOG_GEOMAPS) dm4c.log("Geomap.update_topic(): topic=" + JSON.stringify(topic))
+            var address = topic.find_child_topic("dm4.contacts.address")
+            if (address) {
+                var geo_facet = get_geo_facet(address)
+                if (geo_facet) {
+                    // update model
+                    this.add_topic(geo_facet.id, geo_facet.type_uri, "", geo_facet.x, geo_facet.y)
+                    // update view
+                    dm4c.canvas.add_topic(geo_facet)
+                }
+            }
         }
 
         this.delete_topic = function(id) {
@@ -229,22 +241,19 @@ function GeoMapRenderer() {
         this.prepare_topic_for_display = function(topic) {
             var address = topic.find_child_topic("dm4.contacts.address")
             if (address) {
-                var geo_facet = address.composite["dm4.geomaps.geo_coordinate"]
+                var geo_facet = get_geo_facet(address)
                 if (geo_facet) {
-                    var pos = position(geo_facet)
-                    geo_facet = new Topic(geo_facet)
-                    geo_facet.x = pos.x
-                    geo_facet.y = pos.y
-                    if (dm4c.LOG_GEOMAPS) dm4c.log("Geomap.prepare_topic_for_display(): setting up proxy topic at x=" +
-                        pos.x + ", y=" + pos.y + "\n\nOriginal address topic=" + JSON.stringify(address))
+                    if (LOG_GEOMAPS) dm4c.log("Geomap.prepare_topic_for_display(): setting up proxy topic " +
+                        "at x=" + geo_facet.x + ", y=" + geo_facet.y + "\n..... Original address topic=" +
+                        JSON.stringify(address))
                     return geo_facet
                 } else {
-                    if (dm4c.LOG_GEOMAPS) dm4c.log("Geomap.prepare_topic_for_display(): setting up proxy topic " +
-                        "ABORTED -- address has no geo facet\n\nAddress topic=" + JSON.stringify(address))
+                    if (LOG_GEOMAPS) dm4c.log("Geomap.prepare_topic_for_display(): setting up proxy topic " +
+                        "ABORTED -- address has no geo facet\n..... Address topic=" + JSON.stringify(address))
                 }
             } else {
-                if (dm4c.LOG_GEOMAPS) dm4c.log("Geomap.prepare_topic_for_display(): setting up proxy topic " +
-                    "ABORTED -- topic has no address child\n\nTopic=" + JSON.stringify(topic))
+                if (LOG_GEOMAPS) dm4c.log("Geomap.prepare_topic_for_display(): setting up proxy topic " +
+                    "ABORTED -- topic has no address child\n..... Topic=" + JSON.stringify(topic))
             }
         }
 
@@ -263,6 +272,24 @@ function GeoMapRenderer() {
                     var pos = position(topic)
                     topics[topic.id] = new GeomapTopic(topic.id, topic.type_uri, topic.value, pos.x, pos.y)
                 }
+            }
+        }
+
+        /**
+         * Returns the geo facet of an address.
+         *
+         * @param   address     An "Address" topic (a JavaScript object).
+         *
+         * @return  A "Geo Coordinate" topic extended with "x" and "y" properties (a Topic object).
+         */
+        function get_geo_facet(address) {
+            var geo_facet = address.composite["dm4.geomaps.geo_coordinate"]
+            if (geo_facet) {
+                var pos = position(geo_facet)
+                geo_facet = new Topic(geo_facet)
+                geo_facet.x = pos.x
+                geo_facet.y = pos.y
+                return geo_facet
             }
         }
 

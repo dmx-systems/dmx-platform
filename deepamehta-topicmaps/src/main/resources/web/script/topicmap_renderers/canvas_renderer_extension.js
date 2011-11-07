@@ -300,7 +300,7 @@ function CanvasRendererExtension() {
 
             this.id = id
             this.type_uri = type_uri
-            this.label = label
+            this.label = label      // ### FIXME: rename to "value"
             this.x = x
             this.y = y
             this.visibility = visibility
