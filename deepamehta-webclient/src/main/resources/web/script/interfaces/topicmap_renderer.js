@@ -25,10 +25,10 @@ function TopicmapRenderer() {
     // ---
 
     /**
-     * @param   topic           an object with "id", "type_uri", "value" properties and optional "x", "y" properties.
-     * @param   refresh_canvas  Optional: if true, the canvas is refreshed.
+     * @param   topic       an object with "id", "type_uri", "value" properties and optional "x", "y" properties.
+     * @param   do_select   Optional: if true, the topic is selected.
      */
-    this.add_topic = function(topic, refresh_canvas) {}
+    this.add_topic = function(topic, do_select) {}
 
     this.add_association = function(assoc, refresh_canvas) {}
 
@@ -36,7 +36,7 @@ function TopicmapRenderer() {
 
     this.update_association = function(assoc, refresh_canvas) {}
 
-    this.remove_topic = function(id, refresh_canvas) {}
+    this.remove_topic = function(topic_id, refresh_canvas) {}
 
     /**
      * Removes an association from the canvas (model) and optionally refreshes the canvas (view).
@@ -44,11 +44,17 @@ function TopicmapRenderer() {
      *
      * @param   refresh_canvas  Optional - if true, the canvas is refreshed.
      */
-    this.remove_association = function(id, refresh_canvas) {}
+    this.remove_association = function(assoc_id, refresh_canvas) {}
 
-    this.set_highlight_object = function(object_id, refresh_canvas) {}
+    // ---
 
-    this.reset_highlighting = function(refresh_canvas) {}
+    this.select_topic = function(topic_id) {}
+
+    this.select_association = function(assoc_id) {}
+
+    this.reset_selection = function(refresh_canvas) {}
+
+    // ---
 
     this.scroll_topic_to_center = function(topic_id) {}
 

@@ -78,30 +78,34 @@ var dm4c = new function() {
      * Fetches the topic and displays it on the page panel.
      * Triggers the "post_select_topic" hook (indirectly).
      *
+     * Precondition: the topic is shown on the canvas.
+     *
      * @param   no_history_update   Optional: boolean.
      */
     this.do_select_topic = function(topic_id, no_history_update) {
-        var topic = dm4c.fetch_topic(topic_id)
+        var topics = dm4c.canvas.select_topic(topic_id)
         // update model
-        set_selected_topic(topic, no_history_update)
+        set_selected_topic(topics.select, no_history_update)
         // update view
-        dm4c.canvas.set_highlight_object(topic_id, true)    // refresh_canvas=true
-        dm4c.page_panel.display(topic)
-        // Note: the show_topic() helper is not called here
+        dm4c.canvas.refresh()
+        dm4c.page_panel.display(topics.display)
+        // Note: the show_topic() helper is not called here as the topic is already shown on the canvas.
     }
 
     /**
      * Fetches the association and displays it on the page panel.
      * Triggers the "post_select_association" hook (indirectly).
      *
+     * Precondition: the association is shown on the canvas.
+     *
      * @param   no_history_update   Optional: boolean.
      */
     this.do_select_association = function(assoc_id, no_history_update) {
-        var assoc = dm4c.fetch_association(assoc_id)
+        var assoc = dm4c.canvas.select_association(assoc_id)
         // update model
         set_selected_association(assoc, no_history_update)
         // update view
-        dm4c.canvas.set_highlight_object(assoc_id, true)    // refresh_canvas=true
+        dm4c.canvas.refresh()
         dm4c.page_panel.display(assoc)
     }
 
@@ -306,6 +310,12 @@ var dm4c = new function() {
     /**
      * Shows a topic on the canvas, and refreshes the page panel according to the specified action.
      * Triggers the "pre_show_topic" and "post_show_topic" hooks.
+     * <p>
+     * Preconditions:
+     * - the topic exists in the DB.
+     * - the topic is (typically) not yet shown on the canvas, and thus:
+     *     - the topic is not selected
+     *     - the topic has no gemetry yet
      *
      * @param   topic           Topic to add (a Topic object).
      * @param   action          Optional: action to perform, 3 possible values:
@@ -334,16 +344,14 @@ var dm4c = new function() {
         if (do_select) {
             set_selected_topic(topic)
         }
-        // update canvas
-        dm4c.canvas.add_topic(topic)
-        if (do_select) {
-            dm4c.canvas.set_highlight_object(topic.id, true)    // refresh_canvas=true
-        }
+        // update view (canvas)
+        dm4c.canvas.add_topic(topic, do_select)
         if (do_center) {
             dm4c.canvas.scroll_topic_to_center(topic.id)
         }
-        dm4c.trigger_plugin_hook("post_show_topic", topic)      // trigger hook
-        // update page panel
+        dm4c.canvas.refresh()
+        dm4c.trigger_plugin_hook("post_show_topic", topic)                          // trigger hook
+        // update view (page panel)
         update_page_panel()
 
         function update_page_panel() {
@@ -364,7 +372,7 @@ var dm4c = new function() {
 
     this.show_association = function(assoc, refresh_canvas) {
         // update canvas
-        dm4c.canvas.add_association(assoc, refresh_canvas)          // refresh_canvas=true
+        dm4c.canvas.add_association(assoc, refresh_canvas)
         dm4c.trigger_plugin_hook("post_show_association", assoc)    // trigger hook
     }
 
@@ -510,7 +518,7 @@ var dm4c = new function() {
             push_history()
         }
         // update view
-        dm4c.canvas.reset_highlighting(true)    // refresh_canvas=true
+        dm4c.canvas.reset_selection(true)    // refresh_canvas=true
         dm4c.page_panel.clear()
         // trigger hook
         dm4c.trigger_plugin_hook("post_reset_selection")

@@ -68,19 +68,20 @@ function Canvas(width, height) {
 
     /**
      * Adds a topic to the canvas. If the topic is already on the canvas it is not added again.
+     * Note: the canvas is not refreshed.
      *
-     * @param   topic           an object with "id", "type_uri", "value" properties and optional "x", "y" properties.
-     * @param   refresh_canvas  Optional: if true, the canvas is refreshed.
+     * @param   topic       an object with "id", "type_uri", "value" properties and optional "x", "y" properties.
+     * @param   do_select   Optional: if true, the topic is selected.
      */
-    this.add_topic = function(topic, refresh_canvas) {
+    this.add_topic = function(topic, do_select) {
         if (!topic_exists(topic.id)) {
             // update model
             init_position()
             add_topic(new CanvasTopic(topic))
         }
-        // refresh GUI
-        if (refresh_canvas) {
-            this.refresh()
+        //
+        if (do_select) {
+            set_highlight_object(topic.id)
         }
 
         function init_position() {
@@ -192,18 +193,19 @@ function Canvas(width, height) {
 
     // ---
 
-    // ### FIXME: not in interface
-    this.set_highlight_object = function(object_id, refresh_canvas) {
-        // update model
-        highlight_object_id = object_id
-        // refresh GUI
-        if (refresh_canvas) {
-            this.refresh()
-        }
+    this.select_topic = function(topic_id) {
+        var topic = dm4c.fetch_topic(topic_id)
+        set_highlight_object(topic_id)
+        return {select: topic, display: topic}
     }
 
-    // ### FIXME: not in interface
-    this.reset_highlighting = function(refresh_canvas) {
+    this.select_association = function(assoc_id) {
+        var assoc = dm4c.fetch_association(assoc_id)
+        set_highlight_object(assoc_id)
+        return assoc
+    }
+
+    this.reset_selection = function(refresh_canvas) {
         // update model
         reset_highlighting()
         // refresh GUI
@@ -640,13 +642,20 @@ function Canvas(width, height) {
 
 
 
-    /**********************/
-    /*** Helper Methods ***/
-    /**********************/
+    // *************
+    // *** Model ***
+    // *************
 
 
 
-    // === Model Helper ===
+    function init_model() {
+        canvas_topics = {}
+        canvas_assocs = {}
+        reset_highlighting()
+        trans_x = 0, trans_y = 0
+    }
+
+    // ---
 
     function get_topic(id) {
         return canvas_topics[id]
@@ -704,13 +713,10 @@ function Canvas(width, height) {
         }
     }
 
-    // ---
+    // === Highlighting ===
 
-    function init_model() {
-        canvas_topics = {}
-        canvas_assocs = {}
-        reset_highlighting()
-        trans_x = 0, trans_y = 0
+    function set_highlight_object(object_id) {
+        highlight_object_id = object_id
     }
 
     function reset_highlighting_conditionally(object_id) {
@@ -725,7 +731,11 @@ function Canvas(width, height) {
 
 
 
-    // === GUI Helper ===
+    // ***********
+    // *** GUI ***
+    // ***********
+
+
 
     /**
      * Creates the HTML5 canvas element, binds the event handlers, and adds it to the document.

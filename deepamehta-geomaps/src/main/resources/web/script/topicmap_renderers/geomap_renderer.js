@@ -37,7 +37,7 @@ function GeoMapRenderer() {
         this.dom.width(size.width).height(size.height)
     }
 
-    this.add_topic = function(topic, refresh_canvas) {
+    this.add_topic = function(topic, do_select) {
         if (topic.x != undefined && topic.y != undefined) {
             if (LOG_GEOMAPS) dm4c.log("GeoMapRenderer.add_topic(): displaying marker at x=" +
                 topic.x + ", y=" + topic.y + "\n..... Topic=" + JSON.stringify(topic))
@@ -46,6 +46,12 @@ function GeoMapRenderer() {
             if (LOG_GEOMAPS) dm4c.log("GeoMapRenderer.add_topic(): displaying marker ABORTED -- " +
                 "topic has no coordinates\n..... Topic=" + JSON.stringify(topic))
         }
+    }
+
+    this.select_topic = function(topic_id) {
+        var topic = dm4c.fetch_topic(topic_id)
+        // ### set_highlight_object(topic_id)
+        return {select: topic, display: topic}
     }
 
     // === TopicmapRenderer Topicmaps Extension ===
