@@ -45,6 +45,18 @@ function CanvasRendererExtension() {
             return info.get("dm4.topicmaps.topicmap_renderer_uri")
         }
 
+        this.get_topic = function(id) {
+            return topics[id]
+        }
+
+        this.iterate_topics = function(visitor_func) {
+            iterate_topics(visitor_func)
+        }
+
+        this.iterate_associations = function(visitor_func) {
+            iterate_associations(visitor_func)
+        }
+
         /**
          * @param   no_history_update   Optional: boolean.
          */
@@ -58,12 +70,11 @@ function CanvasRendererExtension() {
             function track_images() {
                 var image_tracker = dm4c.create_image_tracker(put_on_canvas)
                 // add type icons
-                for (var id in topics) {
-                    var topic = topics[id]
+                iterate_topics(function(topic) {
                     if (topic.visibility) {
                         image_tracker.add_image(dm4c.get_type_icon(topic.type_uri))
                     }
-                }
+                })
                 // add background image
                 if (background_image) {
                     image_tracker.add_image(background_image)
@@ -82,20 +93,17 @@ function CanvasRendererExtension() {
                 restore_selection()
 
                 function display_topics() {
-                    for (var id in topics) {
-                        var topic = topics[id]
-                        if (!topic.visibility) {
-                            continue
+                    iterate_topics(function(topic) {
+                        if (topic.visibility) {
+                            // Note: canvas.add_topic() expects an topic object with "value" property (not "label")
+                            var t = {id: topic.id, type_uri: topic.type_uri, value: topic.label, x: topic.x, y: topic.y}
+                            dm4c.canvas.add_topic(t)
                         }
-                        // Note: canvas.add_topic() expects an topic object with "value" property (not "label")
-                        var t = {id: topic.id, type_uri: topic.type_uri, value: topic.label, x: topic.x, y: topic.y}
-                        dm4c.canvas.add_topic(t)
-                    }
+                    })
                 }
 
                 function display_associations() {
-                    for (var id in assocs) {
-                        var assoc = assocs[id]
+                    iterate_associations(function(assoc) {
                         var a = {
                             id: assoc.id,
                             type_uri: assoc.type_uri,
@@ -103,7 +111,7 @@ function CanvasRendererExtension() {
                             role_2: {topic_id: assoc.topic_id_2}
                         }
                         dm4c.canvas.add_association(a)
-                    }
+                    })
                 }
 
                 function restore_selection() {
@@ -226,10 +234,6 @@ function CanvasRendererExtension() {
             selected_object_id = -1
         }
 
-        this.get_topic = function(id) {
-            return topics[id]
-        }
-
         this.prepare_topic_for_display = function(topic) {
             // restores topic position if topic is already contained in this topicmap but hidden
             var t = this.get_topic(topic.id)
@@ -291,6 +295,20 @@ function CanvasRendererExtension() {
                     var image_url = "/proxy/file:" + new Topic(file).get("dm4.files.path")  // ### new Topic bad API
                     background_image = dm4c.create_image(image_url)
                 }
+            }
+        }
+
+        // ---
+
+        function iterate_topics(visitor_func) {
+            for (var id in topics) {
+                visitor_func(topics[id])
+            }
+        }
+
+        function iterate_associations(visitor_func) {
+            for (var id in assocs) {
+                visitor_func(assocs[id])
             }
         }
 

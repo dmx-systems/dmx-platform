@@ -66,6 +66,9 @@ function TopicmapRenderer() {
 
     this.clear = function() {}
 
+    /**
+     * @param   size    an object with "width" and "height" properties.
+     */
     this.resize = function(size) {}
 
     this.close_context_menu = function() {}
