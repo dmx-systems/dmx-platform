@@ -57,13 +57,39 @@ function SplitPanel() {
 
     // ---
 
+    this.get_slider_position = function() {
+        return get_left_panel_size().width
+    }
+
+    this.set_slider_position = function(pos) {
+        set_slider_position(pos)
+    }
+
+    // ---
+
+    /**
+     * @return  an object with "width" and "height" properties.
+     */
     this.get_left_panel_size = function() {
         return get_left_panel_size()
     }
 
+
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // === Size Management ===
+
+    function set_slider_position(pos) {
+        // Note: the left panel must be updated first. The left panel width is calculated there.
+        // Updating the right panel relies on it.
+        //
+        // update left panel
+        left_panel_width = pos
+        left_panel.resize(get_left_panel_size())
+        // update right panel
+        adjust_right_panel_width()
+    }
 
     // --- Left Panel ---
 
@@ -81,6 +107,10 @@ function SplitPanel() {
         left_panel_width  = w_w - right_panel.width - 41   // 41px = 1.6em + 2 * 8px = 25(.6)px + 16px.
         if (dm4c.LOG_GUI) dm4c.log("Canvas width=" + left_panel_width + " (based on window width " + w_w +
             " and page panel width " + right_panel.width + ")")
+    }
+
+    function get_left_panel_size() {
+        return {width: left_panel_width, height: panel_height}
     }
 
     // --- Right Panel ---
@@ -119,11 +149,7 @@ function SplitPanel() {
         }
     }
 
-    // ---
 
-    function get_left_panel_size() {
-        return {width: left_panel_width, height: panel_height}
-    }
 
     // === Event Handling ===
 
@@ -133,14 +159,7 @@ function SplitPanel() {
     function do_resize(event, ui_event) {
         if (dm4c.LOG_GUI) dm4c.log("Canvas resized: original with=" + ui_event.originalSize.width +
                                                    " current with=" + ui_event.size.width)
-        // Note: the left panel must be updated first. The left panel width is calculated there.
-        // Updating the right panel relies on it.
-        //
-        // update left panel
-        left_panel_width = ui_event.size.width
-        left_panel.resize(get_left_panel_size())
-        // update right panel
-        adjust_right_panel_width()
+        set_slider_position(ui_event.size.width)
     }
 
     /**
