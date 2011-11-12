@@ -5,6 +5,7 @@ import de.deepamehta.plugins.geomaps.service.GeomapsService;
 import de.deepamehta.plugins.facets.service.FacetsService;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
@@ -74,6 +75,23 @@ public class GeomapsPlugin extends Plugin implements GeomapsService {
             new TopicRoleModel(topicId,  "dm4.topicmaps.topicmap_topic"));
         Association refAssoc = dms.createAssociation(model, null);     // FIXME: clientContext=null
         // ### return refAssoc.getId();
+    }
+
+    @GET
+    @Path("/topic/{id}")
+    @Override
+    public Topic getGeoTopic(@PathParam("id") long topicId) {
+        try {
+            Topic topic = dms.getTopic(topicId, true, null);
+            RelatedTopic parentTopic;
+            while ((parentTopic = topic.getRelatedTopic(null, "dm4.core.part", "dm4.core.whole", null,
+                    true, false)) != null) {
+                topic = parentTopic;
+            }
+            return topic;
+        } catch (Exception e) {
+            throw new RuntimeException("Finding the geo coordinate's parent topic failed (topicId=" + topicId + ")");
+        }
     }
 
 

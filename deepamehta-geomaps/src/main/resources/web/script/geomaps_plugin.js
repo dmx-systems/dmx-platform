@@ -9,6 +9,10 @@ function geomaps_plugin() {
     //
     // Note: this is done at plugin instantiation time (*before* the webclient's init() hook is triggered)
     // because a geomap might be loaded at init() time through the topicmaps plugin.
+    //
+    dm4c.restc.get_geotopic = function(topic_id) {
+        return this.request("GET", "/geomap/topic/" + topic_id)
+    }
     dm4c.restc.get_geomap = function(geomap_id) {
         return this.request("GET", "/geomap/" + geomap_id)
     }

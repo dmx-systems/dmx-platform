@@ -48,6 +48,9 @@ function TopicmapRenderer() {
 
     // ---
 
+    /**
+     * @return  an object with "select" and "display" properties (both values are Topic objects).
+     */
     this.select_topic = function(topic_id) {}
 
     this.select_association = function(assoc_id) {}

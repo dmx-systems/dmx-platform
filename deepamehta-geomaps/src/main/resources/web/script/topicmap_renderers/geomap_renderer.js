@@ -49,9 +49,11 @@ function GeoMapRenderer() {
     }
 
     this.select_topic = function(topic_id) {
-        var topic = dm4c.fetch_topic(topic_id)
         // ### set_highlight_object(topic_id)
-        return {select: topic, display: topic}
+        return {
+            select: dm4c.fetch_topic(topic_id),
+            display: new Topic(dm4c.restc.get_geotopic(topic_id))
+        }
     }
 
     // === TopicmapRenderer Topicmaps Extension ===
