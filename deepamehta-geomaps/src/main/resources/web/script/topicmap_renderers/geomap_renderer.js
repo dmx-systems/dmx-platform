@@ -48,6 +48,10 @@ function GeoMapRenderer() {
         }
     }
 
+    this.clear = function() {
+        marker_layers["markers"].remove_all_markers()
+    }
+
     this.select_topic = function(topic_id) {
         // ### set_highlight_object(topic_id)
         return {
@@ -150,6 +154,20 @@ function GeoMapRenderer() {
         this.remove_marker = function(topic_id) {
             markers_layer.removeMarker(markers[topic_id])
         }
+
+        this.remove_all_markers = function() {
+            iterate_markers(function(marker) {
+                markers_layer.removeMarker(marker)
+            })
+        }
+
+        // ---
+
+        function iterate_markers(visitor_func) {
+            for (var topic_id in markers) {
+                visitor_func(markers[topic_id])
+            }
+        }
     }
 
     /**
@@ -179,6 +197,7 @@ function GeoMapRenderer() {
         }
 
         this.put_on_canvas = function(no_history_update) {
+            dm4c.canvas.clear()
             display_topics()
             restore_selection()
 
@@ -195,15 +214,16 @@ function GeoMapRenderer() {
 
         this.add_topic = function(id, type_uri, value, x, y) {
             if (x != undefined && y != undefined) {
-                if (LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): adding topic to model\n..... id=" + id +
-                    ", type_uri=\"" + type_uri + "\", x=" + x + ", y=" + y)
+                if (LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): adding topic to model of geomap " + topicmap_id +
+                    "\n..... id=" + id + ", type_uri=\"" + type_uri + "\", x=" + x + ", y=" + y)
                 // update DB
                 dm4c.restc.add_topic_to_geomap(topicmap_id, id)     // ### FIXME: add only once
                 // update memory
                 topics[id] = new GeomapTopic(id, type_uri, value, x, y)
             } else {
-                if (LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): adding topic to model ABORTED -- topic has " +
-                    "no coordinates\n..... id=" + id + ", type_uri=\"" + type_uri + "\", value=\"" + value + "\"")
+                if (LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): adding topic to model of geomap " + topicmap_id +
+                    " ABORTED -- topic has no coordinates\n..... id=" + id + ", type_uri=\"" + type_uri +
+                    "\", value=\"" + value + "\"")
             }
         }
 

@@ -1,5 +1,10 @@
 /**
- * This interface is implemented by classes who render the left part of the DeepaMehta window (the "canvas").
+ * An abstraction of the view component that occupies the left part of the DeepaMehta window (the "canvas").
+ * The abstraction comprises:
+ *     - A model of the topics and association that are currently displayed.
+ *     - A model for the current selection.
+ *     - A model for the current translation.
+ *     - The view element (the "dom" property).
  *
  * The Webclient is coded to this interface.
  *
@@ -46,6 +51,11 @@ function TopicmapRenderer() {
      */
     this.remove_association = function(assoc_id, refresh_canvas) {}
 
+    /**
+     * Clears the model: removes all topics and associations. Resets the selection and translation.
+     */
+    this.clear = function() {}
+
     // ---
 
     /**
@@ -66,8 +76,6 @@ function TopicmapRenderer() {
     // ### FIXME: get_associations()?
 
     this.refresh = function() {}
-
-    this.clear = function() {}
 
     /**
      * @param   size    an object with "width" and "height" properties.

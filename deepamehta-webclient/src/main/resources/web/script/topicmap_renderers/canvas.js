@@ -193,6 +193,15 @@ function Canvas(width, height) {
 
     // ---
 
+    this.clear = function() {
+        // refresh GUI
+        translate(-trans_x, -trans_y)                       // reset translation
+        // update model
+        init_model()
+    }
+
+    // ---
+
     this.select_topic = function(topic_id) {
         var topic = dm4c.fetch_topic(topic_id)
         set_highlight_object(topic_id)
@@ -243,13 +252,6 @@ function Canvas(width, height) {
 
     this.refresh = function() {
         draw()
-    }
-
-    this.clear = function() {
-        // refresh GUI
-        translate(-trans_x, -trans_y)                       // reset translation
-        // update model
-        init_model()
     }
 
     this.resize = function(size) {

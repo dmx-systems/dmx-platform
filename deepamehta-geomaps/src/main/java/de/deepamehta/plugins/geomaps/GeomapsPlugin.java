@@ -70,6 +70,7 @@ public class GeomapsPlugin extends Plugin implements GeomapsService {
     @Path("/{id}/topic/{topic_id}")
     @Override
     public void addTopicToGeomap(@PathParam("id") long geomapId, @PathParam("topic_id") long topicId) {
+        logger.info("### Adding topic " + topicId + " to geomap " + geomapId);
         AssociationModel model = new AssociationModel("dm4.geomaps.geotopic_mapcontext",
             new TopicRoleModel(geomapId, "dm4.core.default"),
             new TopicRoleModel(topicId,  "dm4.topicmaps.topicmap_topic"));
