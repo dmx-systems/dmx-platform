@@ -213,13 +213,18 @@ function GeoMapRenderer() {
         }
 
         this.add_topic = function(id, type_uri, value, x, y) {
+            // Add the topic to this map if all applies:
+            // 1) The topic has coordinates
+            // 2) The topic is not already added to this map 
             if (x != undefined && y != undefined) {
-                if (LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): adding topic to model of geomap " + topicmap_id +
-                    "\n..... id=" + id + ", type_uri=\"" + type_uri + "\", x=" + x + ", y=" + y)
-                // update DB
-                dm4c.restc.add_topic_to_geomap(topicmap_id, id)     // ### FIXME: add only once
-                // update memory
-                topics[id] = new GeomapTopic(id, type_uri, value, x, y)
+                if (!topics[id]) {
+                    if (LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): adding topic to model of geomap " + topicmap_id +
+                        "\n..... id=" + id + ", type_uri=\"" + type_uri + "\", x=" + x + ", y=" + y)
+                    // update DB
+                    dm4c.restc.add_topic_to_geomap(topicmap_id, id)
+                    // update memory
+                    topics[id] = new GeomapTopic(id, type_uri, value, x, y)
+                }
             } else {
                 if (LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): adding topic to model of geomap " + topicmap_id +
                     " ABORTED -- topic has no coordinates\n..... id=" + id + ", type_uri=\"" + type_uri +
@@ -231,17 +236,24 @@ function GeoMapRenderer() {
         }
 
         this.update_topic = function(topic) {
-            // ### Compare to prepare_topic_for_display()
-            // ### FIXME: can we use dm4c.show_topic() here?
-            if (LOG_GEOMAPS) dm4c.log("Geomap.update_topic(): topic=" + JSON.stringify(topic))
-            var address = topic.find_child_topic("dm4.contacts.address")
-            if (address) {
-                var geo_facet = get_geo_facet(address)
-                if (geo_facet) {
-                    // update model
-                    this.add_topic(geo_facet.id, geo_facet.type_uri, "", geo_facet.x, geo_facet.y)
-                    // update view
-                    dm4c.canvas.add_topic(geo_facet)
+            // Add the topic's geo facet to this map if all applies:
+            // 1) This map is selected
+            // 2) The topic has an Address topic as child
+            // 3) The Address has a geo facet
+            // 4) The geo facet is not already added to this map 
+            if (dm4c.get_plugin("topicmaps_plugin").get_topicmap() == this) {
+                // ### Compare to prepare_topic_for_display()
+                // ### FIXME: can we use dm4c.show_topic() here?
+                if (LOG_GEOMAPS) dm4c.log("Geomap.update_topic(): topic=" + JSON.stringify(topic))
+                var address = topic.find_child_topic("dm4.contacts.address")
+                if (address) {
+                    var geo_facet = get_geo_facet(address)
+                    if (geo_facet && !topics[geo_facet.id]) {
+                        // update model
+                        this.add_topic(geo_facet.id, geo_facet.type_uri, "", geo_facet.x, geo_facet.y)
+                        // update view
+                        dm4c.canvas.add_topic(geo_facet)
+                    }
                 }
             }
         }
