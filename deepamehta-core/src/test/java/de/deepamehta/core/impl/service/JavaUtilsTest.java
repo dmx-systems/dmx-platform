@@ -41,6 +41,10 @@ public class JavaUtilsTest {
 
     @Test
     public void isInRangeIPv4() {
+        assertTrue(JavaUtils.isInRange("0.0.0.0",         "0.0.0.0/0"));
+        assertTrue(JavaUtils.isInRange("255.255.255.255", "0.0.0.0/0"));
+        assertTrue(JavaUtils.isInRange("0.0.0.0",         "127.0.0.1/0"));
+        assertTrue(JavaUtils.isInRange("255.255.255.255", "127.0.0.1/0"));
         assertTrue(JavaUtils.isInRange("172.68.8.0",   "172.68.8.0/24"));
         assertTrue(JavaUtils.isInRange("172.68.8.12",  "172.68.8.0/24"));
         assertTrue(JavaUtils.isInRange("172.68.8.255", "172.68.8.0/24"));

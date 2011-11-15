@@ -1,4 +1,4 @@
-function Canvas(width, height) {
+function Canvas() {
 
     // ------------------------------------------------------------------------------------------------ Constructor Code
 
@@ -21,6 +21,7 @@ function Canvas(width, height) {
     // Model
     var canvas_topics               // topics displayed on canvas (Object, key: topic ID, value: CanvasTopic)
     var canvas_assocs               // associations displayed on canvas (Object, key: assoc ID, value: CanvasAssoc)
+    var width, height               // canvas size (in pixel)
     var trans_x, trans_y            // canvas translation (in pixel)
     var highlight_object_id         // ID of the highlighted topic or association, or -1 for no highlighting
     var grid_positioning            // while grid positioning is in progress: a GridPositioning object, null otherwise
@@ -38,7 +39,6 @@ function Canvas(width, height) {
 
     // build the canvas
     init_model()
-    create_canvas_element()
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -49,19 +49,6 @@ function Canvas(width, height) {
             uri: "dm4.webclient.canvas_renderer",
             name: "Topicmap"
         }
-    }
-
-    this.init = function() {
-        if (dm4c.LOG_GUI) dm4c.log("Initializing canvas")
-        ctx = this.dom.get(0).getContext("2d")
-        // Note: the canvas font must be set early.
-        // Topic label measurement takes place *before* drawing.
-        ctx.font = LABEL_FONT
-    }
-
-    this.activate = function() {
-        if (dm4c.LOG_GUI) dm4c.log("Activating canvas")
-        bind_event_handlers()
     }
 
     // ---
@@ -254,6 +241,11 @@ function Canvas(width, height) {
         draw()
     }
 
+    /**
+     * Called in 2 situations:
+     * 1) The user resizes the main window.
+     * 2) The user moves the split panel's slider.
+     */
     this.resize = function(size) {
         resize_canvas(size)
     }
@@ -740,38 +732,31 @@ function Canvas(width, height) {
 
 
     /**
-     * Creates the HTML5 canvas element, binds the event handlers, and adds it to the document.
-     *
-     * Called in 2 situations:
-     * 1) When the main GUI is build initially.
-     * 2) When the canvas is resized interactively.
-     */
-    function create_canvas_element() {
-        var canvas = document.createElement("canvas")
-        self.dom = $(canvas).attr({id: "canvas", width: width, height: height})
-    }
-
-    /**
      * Resizes the HTML5 canvas element.
-     *
-     * Called in 2 situations:
-     * 1) The user resizes the main window.
-     * 2) The user resizes the canvas (by moving the split pane's resizable-handle).
      *
      * @param   size    the new canvas size.
      */
     function resize_canvas(size) {
-        if (dm4c.LOG_GUI) dm4c.log("Rebuilding canvas")
+        if (dm4c.LOG_GUI) dm4c.log("Resizing canvas to " + JSON.stringify(size))
         width  = size.width
         height = size.height
-        // Note: we don't empty the entire canvas-panel to keep the resizable-handle element.
-        $("#canvas-panel #canvas").remove()
+        //
+        // 1) create canvas element
         // Note: in order to resize the canvas element we must recreate it.
         // Otherwise the browsers would just distort the canvas rendering.
-        create_canvas_element()
-        dm4c.split_panel.set_left_panel(self)
-        self.init()
+        self.dom = $("<canvas>").attr({id: "canvas", width: width, height: height})
+        // replace existing canvas element
+        // Note: we can't call dm4c.split_panel.set_left_panel() here (-> endless recursion)
+        $("#canvas").remove()
+        $("#canvas-panel").append(self.dom)
+        //
+        // 2) initialize the 2D context
+        // Note: the canvas element must be already on the page
+        ctx = self.dom.get(0).getContext("2d")
+        ctx.font = LABEL_FONT   // the canvas font must be set early. Label measurement takes place *before* drawing.
         ctx.translate(trans_x, trans_y)
+        //
+        bind_event_handlers()
         draw()
     }
 

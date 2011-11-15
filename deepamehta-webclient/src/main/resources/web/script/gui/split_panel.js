@@ -22,10 +22,18 @@ function SplitPanel() {
      * @param   panel   an object with a "dom" property and "get_info", "init", and "resize" methods.
      */
     this.set_left_panel = function(panel) {
-        // 1) add panel to page (by replacing the existing one)
         left_panel = panel
-        $("#canvas").remove()               // FIXME: don't rely on ID #canvas
+        //
+        // 1) add panel to page (by replacing the existing one)
+        $("#canvas").remove()
         $("#canvas-panel").append(panel.dom)
+        // Note: re-added panels must be resized to adapt to possibly changed slider position.
+        resize_left_panel()
+        // Note: resizing takes place *after* replacing. This allows panels to recreate their DOM
+        // to realize resizing. Otherwise the panel's event handlers would be lost while replacing.
+        if (dm4c.LOG_GUI) dm4c.log("Setting left panel, dom.width()=" + panel.dom.width() +
+            ", left_panel_width=" + left_panel_width)
+        //
         // 2) init panel
         var panel_uri = panel.get_info().uri
         // Note: each panel is initialized only once. We recognize panels by their URIs.
@@ -33,8 +41,6 @@ function SplitPanel() {
             left_panel_uris.push(panel_uri)
             panel.init()
         }
-        // 3) activate panel
-        panel.activate()
     }
 
     /**
@@ -74,9 +80,9 @@ function SplitPanel() {
         return get_left_panel_size()
     }
 
-
-
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
 
     // === Size Management ===
 
@@ -86,7 +92,7 @@ function SplitPanel() {
         //
         // update left panel
         left_panel_width = pos
-        left_panel.resize(get_left_panel_size())
+        resize_left_panel()
         // update right panel
         adjust_right_panel_width()
     }
@@ -113,6 +119,10 @@ function SplitPanel() {
         return {width: left_panel_width, height: panel_height}
     }
 
+    function resize_left_panel() {
+        left_panel.resize(get_left_panel_size())
+    }
+
     // --- Right Panel ---
 
     /**
@@ -129,9 +139,9 @@ function SplitPanel() {
     }
 
     /**
-    * Called in 2 situations:
-    *     1) initial setup
-    *     2) the browser window is resized
+     * Called in 2 situations:
+     *     1) initial setup
+     *     2) the browser window is resized
      */
     function adjust_right_panel_height() {
         // update model
@@ -185,6 +195,6 @@ function SplitPanel() {
         adjust_right_panel_height()
         // update left panel
         calculate_left_panel_width()
-        left_panel.resize(get_left_panel_size())
+        resize_left_panel()
     }
 }

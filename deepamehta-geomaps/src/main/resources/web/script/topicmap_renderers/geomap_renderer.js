@@ -28,12 +28,11 @@ function GeoMapRenderer() {
     }
 
     this.init = function() {
-        this.resize(dm4c.split_panel.get_left_panel_size())     // we must already in DOM
         init()                                                  // we must already in DOM
     }
 
     this.resize = function(size) {
-        if (dm4c.LOG_GUI) dm4c.log("Resizing geomap canvas to " + size.width + "x" + size.height)
+        if (dm4c.LOG_GUI) dm4c.log("Resizing geomap to " + size.width + "x" + size.height)
         this.dom.width(size.width).height(size.height)
     }
 

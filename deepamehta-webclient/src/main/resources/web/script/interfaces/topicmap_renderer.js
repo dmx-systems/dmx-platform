@@ -22,11 +22,6 @@ function TopicmapRenderer() {
      */
     this.init = function() {}
 
-    /**
-     * Triggered every time the renderer has been added to the DOM.
-     */
-    this.activate = function() {}
-
     // ---
 
     /**
