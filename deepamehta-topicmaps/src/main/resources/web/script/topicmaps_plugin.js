@@ -274,7 +274,9 @@ function topicmaps_plugin() {
     }
 
     this.pre_draw_canvas = function(ctx) {
-        topicmap.draw_background(ctx)
+        // Note: topicmap is undefined if canvas draw() is performed
+        // before the Topicmaps plugin is initialized.
+        topicmap && topicmap.draw_background(ctx)
     }
 
 
