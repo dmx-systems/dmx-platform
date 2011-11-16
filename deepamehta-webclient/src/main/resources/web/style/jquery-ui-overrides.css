@@ -8,8 +8,8 @@
     margin: 0;
 }
 
-.dm-toolbar   .ui-button-text-icon .ui-button-text,
-#page-content .ui-button-text-icon .ui-button-text {
+.dm-toolbar   .ui-button-text-icon-primary .ui-button-text,
+#page-content .ui-button-text-icon-primary .ui-button-text {
     padding-top: 0.2em;
     padding-bottom: 0.2em;
 }
