@@ -72,12 +72,12 @@ function topicmaps_plugin() {
             // build topicmap widget
             var topicmap_label = $("<span>").attr("id", "topicmap-label").text("Topicmap")
             topicmap_menu = dm4c.ui.menu(do_select_topicmap)
-            var topicmap_form = $("<div>").attr("id", "topicmap-form")
+            var topicmap_form = $("<div>").attr("id", "topicmap-widget")
                 .append(topicmap_label)
                 .append(topicmap_menu.dom)
             // put in toolbar
-            if ($("#workspace-form").size()) {
-                $("#workspace-form").after(topicmap_form)
+            if ($("#workspace-widget").size()) {
+                $("#workspace-widget").after(topicmap_form)
             } else {
                 dm4c.toolbar.dom.prepend(topicmap_form)
             }

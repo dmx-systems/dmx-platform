@@ -1,11 +1,11 @@
-#topicmap-form {
+#topicmap-widget {
     float: left;
     margin-right: 3em;
 }
 
 #topicmap-label {
-    color: #555555;
-    font-size: 81.25%;
+    color: #555;
+    font-size: 75%;
     font-weight: normal;
     margin-left: 0em;
     margin-right: 0.4em;

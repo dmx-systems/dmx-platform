@@ -24,8 +24,7 @@ function ToolbarPanel() {
     // create "Special" menu
     var special_menu = dm4c.ui.menu(undefined, "Help")  // renamed "Special" -> "Help" ### TODO: proper concept
     // create toolbar
-    var dom = $("<div>").attr({id: "upper-toolbar"}).addClass("dm-toolbar")
-        .addClass("ui-widget-header").addClass("ui-corner-all")
+    var dom = $("<div>").attr({id: "main-toolbar"}).addClass("dm-toolbar")
         .append(search_widget)
         .append(create_widget)
         .append(special_menu.dom)

@@ -25,7 +25,7 @@ function workspaces_plugin() {
             // build workspace widget
             var workspace_label = $("<span>").attr("id", "workspace-label").text("Workspace")
             workspace_menu = dm4c.ui.menu(do_select_workspace)
-            var workspace_form = $("<div>").attr("id", "workspace-form")
+            var workspace_form = $("<div>").attr("id", "workspace-widget")
                 .append(workspace_label)
                 .append(workspace_menu.dom)
             // put in toolbar

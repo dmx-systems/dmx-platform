@@ -1,5 +1,8 @@
 function SplitPanel() {
 
+    var PADDING_MIDDLE = 25     // 25px = 1.6em = 1.6 * 16px = 25(.6)
+    var PADDING_BOTTOM = 60     // was 60px, then 67 (healing login dialog), then 76 (healing datepicker)
+
     var left_panel_parent  = $("<td>").append($("<div>", {id: "canvas-panel"}))
     var right_panel_parent = $("<td>")
 
@@ -110,7 +113,7 @@ function SplitPanel() {
     function calculate_left_panel_width() {
         // update model
         var w_w = window.innerWidth
-        left_panel_width  = w_w - right_panel.width - 41   // 41px = 1.6em + 2 * 8px = 25(.6)px + 16px.
+        left_panel_width  = w_w - right_panel.width - PADDING_MIDDLE
         if (dm4c.LOG_GUI) dm4c.log("Canvas width=" + left_panel_width + " (based on window width " + w_w +
             " and page panel width " + right_panel.width + ")")
     }
@@ -133,7 +136,7 @@ function SplitPanel() {
     function adjust_right_panel_width() {
         // update model
         var w_w = window.innerWidth
-        right_panel.width = w_w - left_panel_width - 41   // 41px: see above
+        right_panel.width = w_w - left_panel_width - PADDING_MIDDLE
         // update view
         $("#page-content").width(right_panel.width)
     }
@@ -153,7 +156,7 @@ function SplitPanel() {
         function calculate_panel_height() {
             var w_h = window.innerHeight
             var t_h = dm4c.toolbar.dom.height()
-            panel_height = w_h - t_h - 76 // was 60, then 67 (healing login dialog), then 76 (healing datepicker)
+            panel_height = w_h - t_h - PADDING_BOTTOM
             if (dm4c.LOG_GUI) dm4c.log("Panel height=" + panel_height + " (based on window height " + w_h +
                 " and toolbar height " + t_h + ")")
         }
