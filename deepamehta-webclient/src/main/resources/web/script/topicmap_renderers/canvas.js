@@ -360,14 +360,14 @@ function Canvas() {
 
 
     function bind_event_handlers() {
-        self.dom.mousedown(do_mousedown)
-        self.dom.mouseup(do_mouseup)
-        self.dom.mousemove(do_mousemove)
-        self.dom.mouseleave(do_mouseleave)
-        self.dom.dblclick(do_doubleclick)
-        self.dom.get(0).oncontextmenu = do_contextmenu
-        self.dom.get(0).ondragover = do_dragover
-        self.dom.get(0).ondrop = do_drop
+        self.dom.bind("mousedown",   do_mousedown)
+        self.dom.bind("mouseup",     do_mouseup)
+        self.dom.bind("mousemove",   do_mousemove)
+        self.dom.bind("mouseleave",  do_mouseleave)
+        self.dom.bind("dblclick",    do_doubleclick)
+        self.dom.bind("contextmenu", do_contextmenu)
+        self.dom.bind("dragover",    do_dragover)
+        self.dom.bind("drop",        do_drop)
     }
 
     // === Mouse Events ===
@@ -628,9 +628,9 @@ function Canvas() {
         return false
     }
 
-    function do_drop(e) {
+    function do_drop(event) {
         // e.preventDefault();  // Useful for debugging when exception is thrown before false is returned.
-        dm4c.trigger_plugin_hook("process_drop", e.dataTransfer)
+        dm4c.trigger_plugin_hook("process_drop", event.originalEvent.dataTransfer)
         return false
     }
 
@@ -788,11 +788,11 @@ function Canvas() {
      *                          true: returned as canvas coordinate (involves canvas viewport).
      */
     function cx(event, as_canvas_coordinate) {
-        return event.layerX + (as_canvas_coordinate ? -trans_x : 0)
+        return event.originalEvent.layerX + (as_canvas_coordinate ? -trans_x : 0)
     }
 
     function cy(event, as_canvas_coordinate) {
-        return event.layerY + (as_canvas_coordinate ? -trans_y : 0)
+        return event.originalEvent.layerY + (as_canvas_coordinate ? -trans_y : 0)
     }
 
 

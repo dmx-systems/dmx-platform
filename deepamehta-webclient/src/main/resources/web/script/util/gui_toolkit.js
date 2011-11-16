@@ -248,7 +248,7 @@ function GUIToolkit() {
 
             function do_open_menu(event) {
                 if (!is_visible(menu)) {
-                    var mouse_y = event.layerY + $(this).position().top
+                    var mouse_y = event.originalEvent.layerY + $(this).position().top
                     close_opened_menu()
                     open_menu(mouse_y)
                 } else {
