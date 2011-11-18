@@ -66,13 +66,8 @@ public class TypeEditorPlugin extends Plugin {
         String partTopicTypeUri = getPartTopicTypeUri(assoc);
         // Note: the assoc def's ID is already known. Setting it explicitely
         // prevents the core from creating the underlying association.
-        AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
-            wholeTopicTypeUri, partTopicTypeUri);
-        model.setWholeCardinalityUri("dm4.core.one");           // FIXME: handle cardinality
-        model.setPartCardinalityUri("dm4.core.one");            // FIXME: handle cardinality
-        model.setViewConfigModel(new ViewConfigurationModel()); // FIXME: this should be the default
-        //
-        return model;
+        return new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(), wholeTopicTypeUri, partTopicTypeUri,
+            "dm4.core.one", "dm4.core.one", null);  // viewConfigModel=null ### FIXME: handle cardinality
     }
 
     private TopicType removeAssocDef(Association assoc) {

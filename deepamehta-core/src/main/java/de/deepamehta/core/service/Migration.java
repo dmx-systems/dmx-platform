@@ -23,16 +23,19 @@ public abstract class Migration {
 
     // ----------------------------------------------------------------------------------------------- Protected Methods
 
+    // Convenience method ### FIXME: belongs to Webclient module
     protected final void addTopicTypeSetting(String topicTypeUri, String setting, Object value) {
         addTypeSetting(dms.getTopicType(topicTypeUri, null), setting, value);
     }
 
+    // Convenience method ### FIXME: belongs to Webclient module
     protected final void addAssociationTypeSetting(String assocTypeUri, String setting, Object value) {
         addTypeSetting(dms.getAssociationType(assocTypeUri, null), setting, value);
     }
 
     // ---
 
+    // Convenience method ### FIXME: belongs to Webclient module
     protected final void addTypeSetting(Type type, String setting, Object value) {
         type.getViewConfig().addSetting("dm4.webclient.view_config", "dm4.webclient." + setting, value);
     }

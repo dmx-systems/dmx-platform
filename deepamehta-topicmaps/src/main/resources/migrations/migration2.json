@@ -1,0 +1,62 @@
+{
+    topic_types: [
+        {
+            value:         "X",
+            uri:           "dm4.topicmaps.translation_x",
+            data_type_uri: "dm4.core.number"
+        },
+        {
+            value:         "Y",
+            uri:           "dm4.topicmaps.translation_y",
+            data_type_uri: "dm4.core.number"
+        },
+        {
+            value:         "Translation",
+            uri:           "dm4.topicmaps.translation",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:  "dm4.topicmaps.translation_x",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.topicmaps.translation_y",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                }
+            ]
+        },
+        {
+            value:         "Zoom Level",
+            uri:           "dm4.topicmaps.zoom_level",
+            data_type_uri: "dm4.core.number"
+        },
+        {
+            value:         "State",
+            uri:           "dm4.topicmaps.state",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:  "dm4.topicmaps.translation",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.topicmaps.zoom_level",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                }
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.viewable: false,
+                        dm4.webclient.editable: false
+                    }
+                }
+            ]
+        }
+    ]
+}

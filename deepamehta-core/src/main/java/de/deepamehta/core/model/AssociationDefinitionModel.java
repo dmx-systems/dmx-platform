@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 /**
  * Definition of an association between 2 topic types -- part of DeepaMehta's type system,
  * like an association in a class diagram. Used to represent both, aggregations and compositions.
+ * ### FIXDOC: also assoc types have assoc defs
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
@@ -29,8 +30,8 @@ public class AssociationDefinitionModel extends AssociationModel {
     private String wholeTopicTypeUri;   // FIXME: wording "wholeTypeUri"
     private String partTopicTypeUri;    // FIXME: wording "partTypeUri"
 
-    private String wholeRoleTypeUri;    // value might be derived, there is not necessarily such a role type topic
-    private String partRoleTypeUri;     // value might be derived, there is not necessarily such a role type topic
+    private String wholeRoleTypeUri;    // fixed: "dm4.core.whole"
+    private String partRoleTypeUri;     // fixed: "dm4.core.part"
 
     private String wholeCardinalityUri;
     private String partCardinalityUri;
@@ -41,8 +42,14 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public AssociationDefinitionModel(long id, String typeUri, String wholeTopicTypeUri, String partTopicTypeUri
-                                          /* ### String wholeRoleTypeUri, String partRoleTypeUri */) {
+    public AssociationDefinitionModel(String typeUri, String wholeTopicTypeUri, String partTopicTypeUri,
+                                                      String wholeCardinalityUri, String partCardinalityUri) {
+        this(-1, typeUri, wholeTopicTypeUri, partTopicTypeUri, wholeCardinalityUri, partCardinalityUri, null);
+    }
+
+    public AssociationDefinitionModel(long id, String typeUri, String wholeTopicTypeUri, String partTopicTypeUri,
+                                                               String wholeCardinalityUri, String partCardinalityUri,
+                                                               ViewConfigurationModel viewConfigModel) {
         super(id, typeUri);
         //
         this.wholeTopicTypeUri = wholeTopicTypeUri;
@@ -50,8 +57,13 @@ public class AssociationDefinitionModel extends AssociationModel {
         // set default role types
         this.wholeRoleTypeUri = "dm4.core.whole";// ### wholeRoleTypeUri != null ? wholeRoleTypeUri : wholeTopicTypeUri;
         this.partRoleTypeUri = "dm4.core.part";  // ### partRoleTypeUri != null ? partRoleTypeUri : partTopicTypeUri;
+        //
+        this.wholeCardinalityUri = wholeCardinalityUri;
+        this.partCardinalityUri = partCardinalityUri;
         // derive uri
         this.uri = partTopicTypeUri;             // ### partRoleTypeUri;
+        //
+        this.viewConfigModel = viewConfigModel != null ? viewConfigModel : new ViewConfigurationModel();
         //
         initAssociationModel();
         initInstanceLevelAssocTypeUri();

@@ -120,14 +120,11 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
                 throw new RuntimeException("jri doesn't understand Neo4j traversal");
             }
             //
-            AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
-                topicTypes.wholeTopicTypeUri, topicTypes.partTopicTypeUri
-                /* ###, roleTypes.wholeRoleTypeUri, roleTypes.partRoleTypeUri */);
-            model.setWholeCardinalityUri(cardinality.wholeCardinalityUri);
-            model.setPartCardinalityUri(cardinality.partCardinalityUri);
-            model.setViewConfigModel(fetchViewConfig(assoc));
+            setModel(new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
+                topicTypes.wholeTopicTypeUri, topicTypes.partTopicTypeUri,
+                cardinality.wholeCardinalityUri, cardinality.partCardinalityUri,
+                fetchViewConfig(assoc)));
             //
-            setModel(model);
             initViewConfig();
         } catch (Exception e) {
             throw new RuntimeException("Fetching association definition for topic type \"" + topicTypeUri +
@@ -270,11 +267,16 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     // === Store ===
 
     private void storeViewConfig() {
-        for (TopicModel configTopic : getModel().getViewConfigModel().getConfigTopics()) {
-            Topic topic = dms.createTopic(configTopic, null);   // FIXME: clientContext=null
-            dms.createAssociation("dm4.core.aggregation",
-                new AssociationRoleModel(getId(), "dm4.core.assoc_def"),
-                new TopicRoleModel(topic.getId(), "dm4.core.view_config"));
+        try {
+            for (TopicModel configTopic : getModel().getViewConfigModel().getConfigTopics()) {
+                Topic topic = dms.createTopic(configTopic, null);   // FIXME: clientContext=null
+                dms.createAssociation("dm4.core.aggregation",
+                    new AssociationRoleModel(getId(), "dm4.core.assoc_def"),
+                    new TopicRoleModel(topic.getId(), "dm4.core.view_config"));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Storing view configuration of association definition \"" +
+                getUri() + "\" failed", e);
         }
     }
 
