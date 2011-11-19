@@ -33,7 +33,7 @@
             data_type_uri: "dm4.core.number"
         },
         {
-            value:         "State",
+            value:         "Topicmap State",
             uri:           "dm4.topicmaps.state",
             data_type_uri: "dm4.core.composite",
             assoc_defs: [

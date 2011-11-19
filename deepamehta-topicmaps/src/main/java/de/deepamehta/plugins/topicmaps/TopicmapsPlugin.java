@@ -96,11 +96,11 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
     @Override
     public void setTopicmapTranslation(@PathParam("id") long topicmapId, @PathParam("x") int trans_x,
                                                                          @PathParam("y") int trans_y) {
-        CompositeValue comp = new CompositeValue().put("dm4.topicmaps.state", new CompositeValue()
+        CompositeValue topicmapState = new CompositeValue().put("dm4.topicmaps.state", new CompositeValue()
             .put("dm4.topicmaps.translation", new CompositeValue()
                 .put("dm4.topicmaps.translation_x", trans_x)
                 .put("dm4.topicmaps.translation_y", trans_y)));
-        dms.updateTopic(new TopicModel(topicmapId, comp), null);
+        dms.updateTopic(new TopicModel(topicmapId, topicmapState), null);
     }
 
     // ---

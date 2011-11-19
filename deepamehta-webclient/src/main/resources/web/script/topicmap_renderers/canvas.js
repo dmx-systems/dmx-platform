@@ -182,7 +182,7 @@ function Canvas() {
 
     this.clear = function() {
         // refresh GUI
-        translate(-trans_x, -trans_y)                       // reset translation
+        translate(-trans_x, -trans_y)       // reset translation
         // update model
         init_model()
     }
@@ -211,6 +211,11 @@ function Canvas() {
     }
 
     // ---
+
+    // ### FIXME: not in interface
+    this.translate = function(trans_x, trans_y) {
+        translate(trans_x, trans_y)
+    }
 
     this.scroll_topic_to_center = function(topic_id) {
         var ct = get_topic(topic_id)

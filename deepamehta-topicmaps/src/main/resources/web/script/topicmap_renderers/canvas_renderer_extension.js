@@ -27,6 +27,7 @@ function CanvasRendererExtension() {
         var info            // The underlying Topicmap topic (a Topic object)
         var topics = {}     // topics of this topicmap (key: topic ID, value: TopicmapTopic object)
         var assocs = {}     // associations of this topicmap (key: association ID, value: TopicmapAssociation object)
+        var trans_x, trans_y            // topicmap translation (in pixel)
         var selected_object_id = -1     // ID of the selected topic or association, or -1 for no selection
         var is_topic_selected           // true indicates topic selection, false indicates association selection
                                         // only evaluated if there is a selection (selected_object_id != -1)
@@ -86,11 +87,10 @@ function CanvasRendererExtension() {
             function put_on_canvas() {
 
                 dm4c.canvas.clear()
+                dm4c.canvas.translate(trans_x, trans_y)
                 display_topics()
                 display_associations()
-                dm4c.canvas.refresh()
-                //
-                restore_selection()
+                restore_selection()     // includes canvas refreshing
 
                 function display_topics() {
                     iterate_topics(function(topic) {
@@ -117,12 +117,12 @@ function CanvasRendererExtension() {
                 function restore_selection() {
                     if (selected_object_id != -1) {
                         if (is_topic_selected) {
-                            dm4c.do_select_topic(selected_object_id, no_history_update)
+                            dm4c.do_select_topic(selected_object_id, no_history_update)    // includes canvas refreshing
                         } else {
-                            dm4c.do_select_association(selected_object_id, no_history_update)
+                            dm4c.do_select_association(selected_object_id, no_history_update) // includes canvas refr.
                         }
                     } else {
-                        dm4c.do_reset_selection(no_history_update)
+                        dm4c.do_reset_selection(no_history_update)                         // includes canvas refreshing
                     }
                 }
             }
@@ -243,7 +243,11 @@ function CanvasRendererExtension() {
             }
         }
 
-        this.set_translation = function(trans_x, trans_y) {
+        this.set_translation = function(t_x, t_y) {
+            // update memory
+            trans_x = t_x
+            trans_y = t_y
+            // update DB
             dm4c.restc.set_topicmap_translation(topicmap_id, trans_x, trans_y)
         }
 
@@ -263,14 +267,15 @@ function CanvasRendererExtension() {
             info = new Topic(topicmap.info)
 
             if (LOG_TOPICMAPS) dm4c.log("..... " + topicmap.topics.length + " topics")
-            load_topics()
+            init_topics()
 
             if (LOG_TOPICMAPS) dm4c.log("..... " + topicmap.assocs.length + " associations")
-            load_associations()
+            init_associations()
 
-            load_background_image()
+            init_translation()
+            init_background_image()
 
-            function load_topics() {
+            function init_topics() {
                 for (var i = 0, topic; topic = topicmap.topics[i]; i++) {
                     var x = topic.visualization["dm4.topicmaps.x"].value
                     var y = topic.visualization["dm4.topicmaps.y"].value
@@ -283,17 +288,25 @@ function CanvasRendererExtension() {
                 }
             }
 
-            function load_associations() {
+            function init_associations() {
                 for (var i = 0, assoc; assoc = topicmap.assocs[i]; i++) {
                     if (LOG_TOPICMAPS) dm4c.log(".......... ID " + assoc.id + ": type_uri=\"" + assoc.type_uri +
-                            "\", topic_id_1=" + assoc.role_1.topic_id + ", topic_id_2=" + assoc.role_2.topic_id +
-                            ", ref_id=" + assoc.ref_id)
+                        "\", topic_id_1=" + assoc.role_1.topic_id + ", topic_id_2=" + assoc.role_2.topic_id +
+                        ", ref_id=" + assoc.ref_id)
                     assocs[assoc.id] = new TopicmapAssociation(assoc.id, assoc.type_uri,
                         assoc.role_1.topic_id, assoc.role_2.topic_id, assoc.ref_id)
                 }
             }
 
-            function load_background_image() {
+            // ---
+
+            function init_translation() {
+                var trans = new Topic(info.composite["dm4.topicmaps.state"].composite["dm4.topicmaps.translation"])
+                trans_x = trans.get("dm4.topicmaps.translation_x")
+                trans_y = trans.get("dm4.topicmaps.translation_y")
+            }
+
+            function init_background_image() {
                 var file = info.composite["dm4.files.file"]
                 if (file) {
                     var image_url = "/proxy/file:" + new Topic(file).get("dm4.files.path")  // ### new Topic bad API
