@@ -55,6 +55,9 @@ function topicmaps_plugin() {
             dm4c.restc.remove_association_from_topicmap = function(topicmap_id, assoc_id, ref_id) {
                 return this.request("DELETE", "/topicmap/" + topicmap_id + "/association/" + assoc_id + "/" + ref_id)
             }
+            dm4c.restc.set_topicmap_translation = function(topicmap_id, trans_x, trans_y) {
+                return this.request("PUT", "/topicmap/" + topicmap_id + "/translation/" + trans_x + "/" + trans_y)
+            }
         }
 
         function extend_canvas_renderer() {
@@ -271,6 +274,10 @@ function topicmaps_plugin() {
             dm4c.do_reset_selection(true)                       // no_history_update=true
             return false
         }
+    }
+
+    this.post_move_canvas = function(trans_x, trans_y) {
+        topicmap.set_translation(trans_x, trans_y)
     }
 
     this.pre_draw_canvas = function(ctx) {

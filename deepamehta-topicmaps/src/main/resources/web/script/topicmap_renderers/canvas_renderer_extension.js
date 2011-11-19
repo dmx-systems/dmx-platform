@@ -243,6 +243,10 @@ function CanvasRendererExtension() {
             }
         }
 
+        this.set_translation = function(trans_x, trans_y) {
+            dm4c.restc.set_topicmap_translation(topicmap_id, trans_x, trans_y)
+        }
+
         this.draw_background = function(ctx) {
             if (background_image) {
                 ctx.drawImage(background_image, 0, 0)

@@ -14,4 +14,6 @@ public interface TopicmapsService extends PluginService {
     long addAssociationToTopicmap(long topicmapId, long assocId);
 
     void removeAssociationFromTopicmap(long topicmapId, long assocId, long refId);
+
+    void setTopicmapTranslation(long topicmapId, int trans_x, int trans_y);
 }

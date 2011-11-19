@@ -395,24 +395,18 @@ function Canvas() {
 
     function do_mousemove(event) {
         // if (dm4c.LOG_GUI) dm4c.log("Mouse moves on canvas!")
+        // Note: action_topic is defined for a) topic move, and b) association in progress
         if (action_topic || canvas_move_in_progress) {
-            if (association_in_progress) {
-                tmp_x = cx(event)
-                tmp_y = cy(event)
-            } else if (canvas_move_in_progress) {
-                var x = cx(event)
-                var y = cy(event)
+            var x = cx(event)
+            var y = cy(event)
+            if (canvas_move_in_progress) {
                 translate(x - tmp_x, y - tmp_y)
-                tmp_x = x
-                tmp_y = y
-            } else {
+            } else if (!association_in_progress) {
                 topic_move_in_progress = true
-                var x = cx(event)
-                var y = cy(event)
                 action_topic.move_by(x - tmp_x, y - tmp_y)
-                tmp_x = x
-                tmp_y = y
             }
+            tmp_x = x
+            tmp_y = y
             draw()
         }
     }
@@ -528,6 +522,8 @@ function Canvas() {
 
     function end_canvas_move() {
         canvas_move_in_progress = false
+        // trigger_hook
+        dm4c.trigger_plugin_hook("post_move_canvas", trans_x, trans_y)
     }
 
     function end_association_in_progress() {
