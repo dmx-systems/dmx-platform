@@ -11,6 +11,15 @@ function CanvasRendererExtension() {
         return new Topicmap(topicmap_id)
     }
 
+    this.initial_topicmap_state = function() {
+        return {
+            "dm4.topicmaps.translation": {
+                "dm4.topicmaps.translation_x": 0,
+                "dm4.topicmaps.translation_y": 0
+            }
+        }
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Classes
 
     /**

@@ -19,6 +19,10 @@ function geomaps_plugin() {
     dm4c.restc.add_topic_to_geomap = function(geomap_id, topic_id) {
         return this.request("PUT", "/geomap/" + geomap_id + "/topic/" + topic_id)
     }
+    dm4c.restc.set_geomap_state = function(geomap_id, center, zoom) {
+        return this.request("PUT", "/geomap/" + geomap_id + "/center/" + center.lon + "/" + center.lat +
+            "/zoom/" + zoom)
+    }
 
 
 

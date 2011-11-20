@@ -13,4 +13,6 @@ public interface GeomapsService extends PluginService {
     void addTopicToGeomap(long geomapId, long topicId);
 
     Topic getGeoTopic(long topicId);
+
+    void setGeomapState(long geomapId, double lon, double lat, int zoom);
 }

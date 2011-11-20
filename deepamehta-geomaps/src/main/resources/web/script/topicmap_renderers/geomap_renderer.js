@@ -16,6 +16,8 @@ function GeoMapRenderer() {
     var map                     // OpenLayers.Map object
     var marker_layers = {}      // Key: layer name, value: MarkerLayer object
 
+    init_open_layers()
+
     // ------------------------------------------------------------------------------------------------------ Public API
 
     // === TopicmapRenderer Implementation ===
@@ -28,7 +30,7 @@ function GeoMapRenderer() {
     }
 
     this.init = function() {
-        init()                                                  // we must already in DOM
+        map.render("canvas")
     }
 
     this.resize = function(size) {
@@ -65,12 +67,23 @@ function GeoMapRenderer() {
         return new Geomap(topicmap_id)
     }
 
+    this.initial_topicmap_state = function() {
+        var center = transform(11, 51)  // default state is "Germany"
+        return {
+            "dm4.topicmaps.translation": {
+                "dm4.topicmaps.translation_x": center.lon,
+                "dm4.topicmaps.translation_y": center.lat
+            },
+            "dm4.topicmaps.zoom_level": 6
+        }
+    }
+
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function init() {
+    function init_open_layers() {
         OpenLayers.ImgPath = "/de.deepamehta.geomaps/script/vendor/openlayers/img/"
         //
-        map = new OpenLayers.Map("canvas", {
+        map = new OpenLayers.Map(/* "canvas", */ {
             controls: []
         })
         map.addLayers([
@@ -80,7 +93,8 @@ function GeoMapRenderer() {
         map.addControl(new OpenLayers.Control.Navigation({'zoomWheelEnabled': false}))
         map.addControl(new OpenLayers.Control.ZoomPanel())
         // map.addControl(new OpenLayers.Control.LayerSwitcher())
-        map.setCenter(transform(11, 51), 6)
+        map.events.register("moveend", undefined, on_move)
+        // map.setCenter(transform(11, 51), 6)
         //
         // for (var i = 0, ml; ml = marker_layer_info[i]; i++) {
         marker_layers["markers"] = new MarkerLayer("markers", "marker.png")
@@ -100,17 +114,30 @@ function GeoMapRenderer() {
         }*/
     }
 
+    function get_geomap() {
+        return dm4c.get_plugin("topicmaps_plugin").get_topicmap()
+    }
+
     /**
      * Transforms lon/lat coordinates according to this map's projection.
      */
     var transform = function() {
-        var projection = new OpenLayers.Projection("EPSG:4326")     // EPSG:4326 is *lon/lat* projection
+        var projection = new OpenLayers.Projection("EPSG:4326")     // EPSG:4326 is lon/lat projection
         return function(lon, lat) {
             return new OpenLayers.LonLat(lon, lat).transform(
                 projection, map.getProjectionObject()
             )
         }
     }()
+
+    // === Event Handler ===
+
+    function on_move(event) {
+        // alert("on_move():\n\nevent=" + js.inspect(event) + "\n\nevent.object=" + js.inspect(event.object))
+        // var center = map.getCenter()
+        // alert("on_move():\n\ncenter: long=" + center.lon + ", lat=" + center.lat + "\n\nzoom=" + map.getZoom())
+        get_geomap().set_state(map.getCenter(), map.getZoom())
+    }
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
@@ -152,6 +179,7 @@ function GeoMapRenderer() {
 
         this.remove_marker = function(topic_id) {
             markers_layer.removeMarker(markers[topic_id])
+            // ### TODO: delete from markers object
         }
 
         this.remove_all_markers = function() {
@@ -179,6 +207,8 @@ function GeoMapRenderer() {
         // Model
         var info                        // The underlying Topicmap topic (a Topic object)
         var topics = {}                 // topics of this topicmap (key: topic ID, value: GeomapTopic object)
+        var center                      // map center (a OpenLayers.LonLat object)
+        var zoom                        // zoom level (integer)
         var selected_object_id = -1     // ID of the selected topic or association, or -1 for no selection
 
         load()
@@ -197,6 +227,7 @@ function GeoMapRenderer() {
 
         this.put_on_canvas = function(no_history_update) {
             dm4c.canvas.clear()
+            map.setCenter(center, zoom)
             display_topics()
             restore_selection()
 
@@ -240,7 +271,7 @@ function GeoMapRenderer() {
             // 2) The topic has an Address topic as child
             // 3) The Address has a geo facet
             // 4) The geo facet is not already added to this map 
-            if (dm4c.get_plugin("topicmaps_plugin").get_topicmap() == this) {
+            if (get_geomap() == this) {
                 // ### Compare to prepare_topic_for_display()
                 // ### FIXME: can we use dm4c.show_topic() here?
                 if (LOG_GEOMAPS) dm4c.log("Geomap.update_topic(): topic=" + JSON.stringify(topic))
@@ -298,19 +329,37 @@ function GeoMapRenderer() {
 
         // ===
 
+        this.set_state = function(centr, zooom) {
+            // update memory
+            center = centr
+            zoom = zooom
+            // update DB
+            dm4c.restc.set_geomap_state(topicmap_id, center, zoom)
+        }
+
         // --- Private Functions ---
 
         function load() {
             var topicmap = dm4c.restc.get_geomap(topicmap_id)
             info = new Topic(topicmap.info)
             //
-            load_topics()
+            init_topics()
+            init_state()
 
-            function load_topics() {
+            function init_topics() {
                 for (var i = 0, topic; topic = topicmap.topics[i]; i++) {
                     var pos = position(topic)
                     topics[topic.id] = new GeomapTopic(topic.id, topic.type_uri, topic.value, pos.x, pos.y)
                 }
+            }
+
+            function init_state() {
+                var state = info.composite["dm4.topicmaps.state"]
+                var trans = new Topic(state.composite["dm4.topicmaps.translation"])
+                var lon = trans.get("dm4.topicmaps.translation_x")
+                var lat = trans.get("dm4.topicmaps.translation_y")
+                center = new OpenLayers.LonLat(lon, lat)
+                zoom = state.composite["dm4.topicmaps.zoom_level"].value
             }
         }
 

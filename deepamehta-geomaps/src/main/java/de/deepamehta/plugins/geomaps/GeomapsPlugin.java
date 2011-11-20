@@ -95,6 +95,19 @@ public class GeomapsPlugin extends Plugin implements GeomapsService {
         }
     }
 
+    @PUT
+    @Path("/{id}/center/{lon}/{lat}/zoom/{zoom}")
+    @Override
+    public void setGeomapState(@PathParam("id") long geomapId, @PathParam("lon") double lon,
+                               @PathParam("lat") double lat, @PathParam("zoom") int zoom) {
+        CompositeValue geomapState = new CompositeValue().put("dm4.topicmaps.state", new CompositeValue()
+           .put("dm4.topicmaps.translation", new CompositeValue()
+               .put("dm4.topicmaps.translation_x", lon)
+               .put("dm4.topicmaps.translation_y", lat))
+           .put("dm4.topicmaps.zoom_level", zoom));
+        dms.updateTopic(new TopicModel(geomapId, geomapState), null);
+    }
+
 
 
     // **************************************************

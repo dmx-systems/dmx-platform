@@ -445,15 +445,11 @@ function topicmaps_plugin() {
         if (LOG_TOPICMAPS) dm4c.log("Creating topicmap \"" + name + "\" (topicmap_renderer_uri=\"" +
             topicmap_renderer_uri + "\")")
         //
+        var topicmap_state = get_topicmap_renderer(topicmap_renderer_uri).initial_topicmap_state()
         var topicmap = dm4c.create_topic("dm4.topicmaps.topicmap", {
             "dm4.topicmaps.name": name,
             "dm4.topicmaps.topicmap_renderer_uri": topicmap_renderer_uri,
-            "dm4.topicmaps.state": {
-                "dm4.topicmaps.translation": {
-                    "dm4.topicmaps.translation_x": 0,
-                    "dm4.topicmaps.translation_y": 0
-                }
-            }
+            "dm4.topicmaps.state": topicmap_state
         })
         //
         if (LOG_TOPICMAPS) dm4c.log("..... " + topicmap.id)
