@@ -29,15 +29,6 @@ function GeoMapRenderer() {
         }
     }
 
-    this.init = function() {
-        map.render("canvas")
-    }
-
-    this.resize = function(size) {
-        if (dm4c.LOG_GUI) dm4c.log("Resizing geomap to " + size.width + "x" + size.height)
-        this.dom.width(size.width).height(size.height)
-    }
-
     this.add_topic = function(topic, do_select) {
         if (topic.x != undefined && topic.y != undefined) {
             if (LOG_GEOMAPS) dm4c.log("GeoMapRenderer.add_topic(): displaying marker at x=" +
@@ -78,12 +69,27 @@ function GeoMapRenderer() {
         }
     }
 
+    // === Left SplitPanel Component Implementation ===
+
+    this.init = function() {
+        map.render("canvas")
+    }
+
+    this.resize = function(size) {
+        if (dm4c.LOG_GUI) dm4c.log("Resizing geomap to " + size.width + "x" + size.height)
+        this.dom.width(size.width).height(size.height)
+    }
+
+    this.resize_end = function() {
+        map.updateSize()
+    }
+
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function init_open_layers() {
         OpenLayers.ImgPath = "/de.deepamehta.geomaps/script/vendor/openlayers/img/"
         //
-        map = new OpenLayers.Map(/* "canvas", */ {
+        map = new OpenLayers.Map({
             controls: []
         })
         map.addLayers([

@@ -22,7 +22,7 @@ function SplitPanel() {
     // ------------------------------------------------------------------------------------------------------ Public API
 
     /**
-     * @param   panel   an object with a "dom" property and "get_info", "init", and "resize" methods.
+     * @param   panel   an object with a "dom" property and "get_info", "init", "resize", "resize_end" methods.
      */
     this.set_left_panel = function(panel) {
         left_panel = panel
@@ -183,6 +183,7 @@ function SplitPanel() {
         // This stops its flexible sizing (that follows the canvas element's size) and breaks the layout once the main
         // window is resized. Removing that style attribute once resizing-via-handle is finished solves that problem.
         $("#canvas-panel").removeAttr("style")
+        left_panel.resize_end()
     }
 
     // ---

@@ -6,21 +6,14 @@
  *     - A model for the current translation.
  *     - The view element (the "dom" property).
  *
- * The Webclient is coded to this interface.
+ * The Webclient and the Topicmaps modules, as well as the SplitPanel is coded to this interface.
  *
  * Note: the concept of a (persistent) topicmap does not appear here.
  * It is only introduced by the Topicmaps module.
- *
- * ### FIXME: consider renaming to "CanvasRenderer"
  */
 function TopicmapRenderer() {
 
     this.get_info = function() {}
-
-    /**
-     * Triggered once the renderer has been added to the DOM.
-     */
-    this.init = function() {}
 
     // ---
 
@@ -51,7 +44,7 @@ function TopicmapRenderer() {
      */
     this.clear = function() {}
 
-    // ---
+    // === Selection ===
 
     /**
      * @return  an object with "select" and "display" properties (both values are Topic objects).
@@ -72,16 +65,25 @@ function TopicmapRenderer() {
 
     this.refresh = function() {}
 
+    this.close_context_menu = function() {}
+
+    // === Grid Positioning ===
+
+    this.start_grid_positioning = function() {}
+
+    this.stop_grid_positioning = function() {}
+
+    // === Left SplitPanel Component ===
+
+    /**
+     * Called by the SplitPanel once this renderer has been added to the DOM.
+     */
+    this.init = function() {}
+
     /**
      * @param   size    an object with "width" and "height" properties.
      */
     this.resize = function(size) {}
 
-    this.close_context_menu = function() {}
-
-    // --- Grid Positioning ---
-
-    this.start_grid_positioning = function() {}
-
-    this.stop_grid_positioning = function() {}
+    this.resize_end = function() {}
 }

@@ -1,6 +1,6 @@
 .DS_Store
 commit-message.txt
-DeepaMehta 3.tmproj
+*.tmproj
 
 bin/
 deepamehta-db/
@@ -12,4 +12,3 @@ target/
 .classpath
 .settings
 .shell_history
-

@@ -246,15 +246,6 @@ function Canvas() {
         draw()
     }
 
-    /**
-     * Called in 2 situations:
-     * 1) The user resizes the main window.
-     * 2) The user moves the split panel's slider.
-     */
-    this.resize = function(size) {
-        resize_canvas(size)
-    }
-
     this.close_context_menu = function() {
         close_context_menu()
     }
@@ -267,6 +258,17 @@ function Canvas() {
 
     this.stop_grid_positioning = function() {
         grid_positioning = null
+    }
+
+    // === Left SplitPanel Component Implementation ===
+
+    /**
+     * Called in 2 situations:
+     * 1) The user resizes the main window.
+     * 2) The user moves the split panel's slider.
+     */
+    this.resize = function(size) {
+        resize_canvas(size)
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
