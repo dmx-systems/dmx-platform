@@ -37,6 +37,14 @@ function Canvas() {
     var action_assoc                // the association being clicked (CanvasAssoc)
     var tmp_x, tmp_y                // coordinates while action is in progress
 
+    // Coordinate systems (for mouse event interpretation)
+    // Note: constants begin at 1 as 0 could be interpreted as "not set"
+    var Coord = {
+        WINDOW: 1,          // browser window display area
+        CANVAS: 2,          // canvas display area -- the default
+        CANVAS_SPACE: 3     // canvas space (involves canvas translation)
+    }
+
     // build the canvas
     init_model()
 
@@ -383,8 +391,9 @@ function Canvas() {
         if (dm4c.LOG_GUI) dm4c.log("Mouse down on canvas!")
         //
         if (event.which == 1) {
-            tmp_x = cx(event)
-            tmp_y = cy(event)
+            var p = pos(event)
+            tmp_x = p.x
+            tmp_y = p.y
             //
             var ct = find_topic(event)
             if (ct) {
@@ -404,16 +413,15 @@ function Canvas() {
         // if (dm4c.LOG_GUI) dm4c.log("Mouse moves on canvas!")
         // Note: action_topic is defined for a) topic move, and b) association in progress
         if (action_topic || canvas_move_in_progress) {
-            var x = cx(event)
-            var y = cy(event)
+            var p = pos(event)
             if (canvas_move_in_progress) {
-                translate(x - tmp_x, y - tmp_y)
+                translate(p.x - tmp_x, p.y - tmp_y)
             } else if (!association_in_progress) {
                 topic_move_in_progress = true
-                action_topic.move_by(x - tmp_x, y - tmp_y)
+                action_topic.move_by(p.x - tmp_x, p.y - tmp_y)
             }
-            tmp_x = x
-            tmp_y = y
+            tmp_x = p.x
+            tmp_y = p.y
             draw()
         }
     }
@@ -472,11 +480,10 @@ function Canvas() {
     // ---
 
     function find_topic(event) {
-        var x = cx(event, true)
-        var y = cy(event, true)
+        var p = pos(event, Coord.CANVAS_SPACE)
         return iterate_topics(function(ct) {
-            if (x >= ct.x - ct.width / 2 && x < ct.x + ct.width / 2 &&
-                y >= ct.y - ct.height / 2 && y < ct.y + ct.height / 2) {
+            if (p.x >= ct.x - ct.width  / 2 && p.x < ct.x + ct.width  / 2 &&
+                p.y >= ct.y - ct.height / 2 && p.y < ct.y + ct.height / 2) {
                 //
                 return ct
             }
@@ -484,8 +491,9 @@ function Canvas() {
     }
 
     function find_association(event) {
-        var x = cx(event, true)
-        var y = cy(event, true)
+        var p = pos(event, Coord.CANVAS_SPACE)
+        var x = p.x
+        var y = p.y
         return iterate_associations(function(ca) {
             var ct1 = get_topic(ca.get_topic1_id())
             var ct2 = get_topic(ca.get_topic2_id())
@@ -560,9 +568,8 @@ function Canvas() {
             // ### FIXME: use dm4c.selected assoc?
             var commands = dm4c.get_association_commands(ca, "context-menu")
         } else {
-            var x = cx(event, true)
-            var y = cy(event, true)
-            var commands = dm4c.get_canvas_commands(x, y, "context-menu")
+            var p = pos(event, Coord.CANVAS_SPACE)
+            var commands = dm4c.get_canvas_commands(p.x, p.y, "context-menu")
         }
         // 2) show menu
         open_context_menu(commands, event)
@@ -580,11 +587,13 @@ function Canvas() {
         if (!commands.length) {
             return
         }
-        var cm_x = cx(event)
-        var cm_y = cy(event)
+        if (dm4c.LOG_GUI) dm4c.log("Opening context nenu: event.screenY=" + event.screenY +
+            ", event.clientY=" + event.clientY + ", event.pageY=" + event.pageY +
+            ", event.originalEvent.layerY=" + event.originalEvent.layerY)
+        var cm_pos = pos(event, Coord.WINDOW)
         var contextmenu = $("<div>").addClass("menu").css({
-            top:  cm_y + "px",
-            left: cm_x + "px"
+            top:  cm_pos.y + "px",
+            left: cm_pos.x + "px"
         })
         for (var i = 0, cmd; cmd = commands[i]; i++) {
             if (cmd.is_separator) {
@@ -602,7 +611,8 @@ function Canvas() {
         function context_menu_handler(handler) {
             return function(event) {
                 // pass the coordinates of the command selecting mouse click to the command handler
-                handler(cx(event) + cm_x, cy(event) + cm_y)
+                var item_offset = pos(event)
+                handler(cm_pos.x + item_offset.x, cm_pos.y + item_offset.y)
                 dm4c.canvas.close_context_menu()
                 return false
             }
@@ -785,17 +795,35 @@ function Canvas() {
     }
 
     /**
-     * Returns the x coordinate of the mouse event.
+     * Interprets a mouse event according to a coordinate system.
      *
-     * @as_canvas_coordinate    false: returned as screen coordinate.
-     *                          true: returned as canvas coordinate (involves canvas viewport).
+     * @param   coordinate_system   Coord.WINDOW, Coord.CANVAS, Coord.CANVAS_SPACE
+     *
+     * @return  an object with "x" and "y" properties.
      */
-    function cx(event, as_canvas_coordinate) {
-        return event.originalEvent.layerX + (as_canvas_coordinate ? -trans_x : 0)
-    }
-
-    function cy(event, as_canvas_coordinate) {
-        return event.originalEvent.layerY + (as_canvas_coordinate ? -trans_y : 0)
+    function pos(event, coordinate_system) {
+        // set default
+        coordinate_system = coordinate_system || Coord.CANVAS
+        //
+        switch (coordinate_system) {
+        case Coord.WINDOW:
+            return {
+                x: event.clientX,
+                y: event.clientY
+            }
+        case Coord.CANVAS:
+            return {
+                x: event.originalEvent.layerX,
+                y: event.originalEvent.layerY
+            }
+        case Coord.CANVAS_SPACE:
+            return {
+                x: event.originalEvent.layerX - trans_x,
+                y: event.originalEvent.layerY - trans_y
+            }
+        default:
+            throw "UnknownCoordinateSystem: " + coordinate_system
+        }
     }
 
 

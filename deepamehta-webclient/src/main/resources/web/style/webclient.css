@@ -176,7 +176,7 @@ body {
 /*** Menus ***/
 
 .menu {
-    position: absolute;
+    position: fixed;
     background: white;
     border: 1px solid darkgray;
     font-size: 85%;
@@ -209,7 +209,7 @@ body {
 }
 
 .scroll-area {
-    position: absolute;
+    position: fixed;
     height: 0.9em;
     background: #f0f0f0;
     background-repeat: no-repeat;

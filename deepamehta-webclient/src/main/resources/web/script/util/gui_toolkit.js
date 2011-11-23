@@ -247,9 +247,21 @@ function GUIToolkit() {
             // === Event Handler ===
 
             function do_open_menu(event) {
+                // W3C DOM level 3 mouse events:
+                // (see http://www.w3.org/TR/2003/WD-DOM-Level-3-Events-20030331/ecma-script-binding.html)
+                //     event.screenY              - related to entire computer screen
+                //     event.clientY              - related to client window display area
+                // Non-normative:
+                //     event.pageY                - related to document (involves scroll position)
+                //                                  (the same as clientX if there is no scrolling)
+                //     event.originalEvent.layerY - related to positioned parent
                 if (!is_visible(menu)) {
-                    var mouse_y = event.originalEvent.layerY + $(this).position().top
                     close_opened_menu()
+                    //
+                    if (dm4c.LOG_GUI) dm4c.log("Opening nenu: event.screenY=" + event.screenY +
+                        ", event.clientY=" + event.clientY + ", event.pageY=" + event.pageY +
+                        ", event.originalEvent.layerY=" + event.originalEvent.layerY)
+                    var mouse_y = event.clientY
                     open_menu(mouse_y)
                 } else {
                     close_menu()
@@ -346,7 +358,7 @@ function GUIToolkit() {
              * Calculates the position of the menu and opens it. Updates global state.
              */
             function open_menu(mouse_y) {
-                var button_pos = button.position()
+                var button_pos = button.offset()
                 var button_x = button_pos.left
                 var button_y = button_pos.top
                 //
@@ -362,6 +374,7 @@ function GUIToolkit() {
                 window_height = window.innerHeight
                 //
                 if (selection) {
+                    // if (dm4c.LOG_GUI) dm4c.log("Opening nenu (there is a selection): mouse_y=" + mouse_y)
                     var item_height = selection.dom.outerHeight()
                     var menu_y = mouse_y - selection.dom.position().top - item_height / 2
                     selection.dom.addClass("hover")
