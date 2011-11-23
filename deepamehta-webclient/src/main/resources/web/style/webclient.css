@@ -8,6 +8,7 @@ body {
 #main-toolbar {
     background: #ddd;
     padding: 0.35em;
+    margin-bottom: 0.1em;
 }
 
 #main-toolbar input[type=text] {
