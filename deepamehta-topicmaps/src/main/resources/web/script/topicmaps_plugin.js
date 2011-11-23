@@ -93,7 +93,7 @@ function topicmaps_plugin() {
             var type_menu = create_maptype_menu()
             var topicmap_dialog = $("<form>").attr("action", "#").submit(do_create_topicmap)
                 .append($("<div>").addClass("field-label").text("Title"))
-                .append(title_input)
+                .append(title_input.addClass("field-value"))
                 .append($("<div>").addClass("field-label").text("Type"))
                 .append(type_menu.dom)
             dm4c.ui.dialog("topicmap-dialog", "New Topicmap", topicmap_dialog, "auto", "Create", do_create_topicmap)
