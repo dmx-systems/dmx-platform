@@ -335,7 +335,8 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedAssociation assoc = new AttachedAssociation(model, this);
-            assoc.store(clientContext, new Directives());
+            Directives directives = new Directives();   // ### FIXME: directives are ignored
+            assoc.store(clientContext, directives);
             //
             tx.success();
             return assoc;
@@ -487,11 +488,12 @@ public class EmbeddedService implements DeepaMehtaService {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
             String topicTypeUri = getTopic(topicTypeModel.getId(), false, clientContext).getUri();  // fetchComp..=false
             AttachedTopicType topicType = getTopicType(topicTypeUri, clientContext);
+            Directives directives = new Directives();   // ### FIXME: directives are ignored
             //
             // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
-            topicType.update(topicTypeModel, clientContext, null);  // ### FIXME: directives=null
+            topicType.update(topicTypeModel, clientContext, directives);
             //
             // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
             //

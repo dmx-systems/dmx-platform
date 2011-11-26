@@ -1,7 +1,3 @@
-.DS_Store
-commit-message.txt
-*.tmproj
-
 bin/
 deepamehta-db/
 runner/
@@ -12,3 +8,8 @@ target/
 .classpath
 .settings
 .shell_history
+
+modules-external/
+.DS_Store
+commit-message.txt
+*.tmproj
