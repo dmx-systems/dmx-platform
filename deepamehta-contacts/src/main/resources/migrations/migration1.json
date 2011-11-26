@@ -169,6 +169,15 @@
             ]
         },
 
+        ### Notes ###
+
+        {
+            value: "Notes",
+            uri: "dm4.contacts.notes",
+            data_type_uri: "dm4.core.html",
+            index_mode_uris: ["dm4.core.fulltext"]
+        },
+
         ### Person ###
 
         {
@@ -202,7 +211,7 @@
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.notes.text",
+                    part_topic_type_uri:  "dm4.contacts.notes",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
@@ -255,7 +264,7 @@
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.notes.text",
+                    part_topic_type_uri:  "dm4.contacts.notes",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
