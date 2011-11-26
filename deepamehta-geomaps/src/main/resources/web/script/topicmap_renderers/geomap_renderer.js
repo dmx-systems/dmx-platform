@@ -302,7 +302,11 @@ function GeoMapRenderer() {
             }
 
             function restore_selection() {
-                dm4c.do_reset_selection(no_history_update)
+                if (selected_object_id != -1) {
+                    dm4c.do_select_topic(selected_object_id, no_history_update)
+                } else {
+                    dm4c.do_reset_selection(no_history_update)
+                }
             }
         }
 
@@ -360,12 +364,9 @@ function GeoMapRenderer() {
 
         this.set_topic_selection = function(topic) {
             selected_object_id = topic.id
-            is_topic_selected = true
         }
 
         this.set_association_selection = function(assoc) {
-            selected_object_id = assoc.id
-            is_topic_selected = false
         }
 
         this.reset_selection = function() {
