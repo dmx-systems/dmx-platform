@@ -30,6 +30,30 @@ function GeoMapRenderer() {
     }
 
     this.add_topic = function(topic, do_select) {
+        var select = topic
+        //
+        var address = topic.find_child_topic("dm4.contacts.address")
+        if (address) {
+            var geo_facet = get_geo_facet(address)
+            if (geo_facet) {
+                if (LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): setting up replacement topic " +
+                    "at x=" + geo_facet.x + ", y=" + geo_facet.y + "\n..... Original address topic=" +
+                    JSON.stringify(address))
+                // update view
+                add_marker(geo_facet)
+                // setup replacement topic for selection model
+                select = geo_facet
+            } else {
+                if (LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): setting up replacement topic " +
+                    "ABORTED -- address has no geo facet\n..... Address topic=" + JSON.stringify(address))
+            }
+        } else {
+            if (LOG_GEOMAPS) dm4c.log("Geomap.add_topic(): setting up replacement topic " +
+                "ABORTED -- topic has no address child\n..... Topic=" + JSON.stringify(topic))
+        }
+        //
+        return {select: select, display: topic}
+        /*
         if (topic.x != undefined && topic.y != undefined) {
             if (LOG_GEOMAPS) dm4c.log("GeoMapRenderer.add_topic(): displaying marker at x=" +
                 topic.x + ", y=" + topic.y + "\n..... Topic=" + JSON.stringify(topic))
@@ -37,7 +61,7 @@ function GeoMapRenderer() {
         } else {
             if (LOG_GEOMAPS) dm4c.log("GeoMapRenderer.add_topic(): displaying marker ABORTED -- " +
                 "topic has no coordinates\n..... Topic=" + JSON.stringify(topic))
-        }
+        } */
     }
 
     this.clear = function() {
@@ -125,7 +149,37 @@ function GeoMapRenderer() {
     }
 
     /**
+     * Returns the geo facet of an address.
+     *
+     * @param   address     An "Address" topic (a JavaScript object).
+     *
+     * @return  A "Geo Coordinate" topic extended with "x" and "y" properties (a Topic object).
+     */
+    function get_geo_facet(address) {
+        var geo_facet = address.composite["dm4.geomaps.geo_coordinate"]
+        if (geo_facet) {
+            var pos = position(geo_facet)
+            geo_facet = new Topic(geo_facet)
+            geo_facet.x = pos.x
+            geo_facet.y = pos.y
+            return geo_facet
+        }
+    }
+
+    function position(geo_facet) {
+        return {
+            x: geo_facet.composite["dm4.geomaps.longitude"].value,
+            y: geo_facet.composite["dm4.geomaps.latitude"].value
+        }
+    }
+
+    /**
      * Transforms lon/lat coordinates according to this map's projection.
+     *
+     * @param   lon     (float)
+     * @param   lat     (float)
+     *
+     * @return  an OpenLayers.LonLat object
      */
     var transform = function() {
         var projection = new OpenLayers.Projection("EPSG:4326")     // EPSG:4326 is lon/lat projection
@@ -135,6 +189,10 @@ function GeoMapRenderer() {
             )
         }
     }()
+
+    function add_marker(geo_facet) {
+        marker_layers["markers"].add_marker({lon: geo_facet.x, lat: geo_facet.y}, geo_facet)
+    }
 
     // === Event Handler ===
 
@@ -239,7 +297,7 @@ function GeoMapRenderer() {
 
             function display_topics() {
                 for (var id in topics) {
-                    dm4c.canvas.add_topic(topics[id])
+                    add_marker(topics[id])
                 }
             }
 
@@ -278,8 +336,8 @@ function GeoMapRenderer() {
             // 3) The Address has a geo facet
             // 4) The geo facet is not already added to this map 
             if (get_geomap() == this) {
-                // ### Compare to prepare_topic_for_display()
-                // ### FIXME: can we use dm4c.show_topic() here?
+                // ### Compare to GeoMapRenderer add_topic(). Can we call it from here?
+                // ### FIXME: or can we call dm4c.show_topic() here?
                 if (LOG_GEOMAPS) dm4c.log("Geomap.update_topic(): topic=" + JSON.stringify(topic))
                 var address = topic.find_child_topic("dm4.contacts.address")
                 if (address) {
@@ -288,7 +346,7 @@ function GeoMapRenderer() {
                         // update model
                         this.add_topic(geo_facet.id, geo_facet.type_uri, "", geo_facet.x, geo_facet.y)
                         // update view
-                        dm4c.canvas.add_topic(geo_facet)
+                        add_marker(geo_facet)
                     }
                 }
             }
@@ -315,22 +373,6 @@ function GeoMapRenderer() {
         }
 
         this.prepare_topic_for_display = function(topic) {
-            var address = topic.find_child_topic("dm4.contacts.address")
-            if (address) {
-                var geo_facet = get_geo_facet(address)
-                if (geo_facet) {
-                    if (LOG_GEOMAPS) dm4c.log("Geomap.prepare_topic_for_display(): setting up proxy topic " +
-                        "at x=" + geo_facet.x + ", y=" + geo_facet.y + "\n..... Original address topic=" +
-                        JSON.stringify(address))
-                    return geo_facet
-                } else {
-                    if (LOG_GEOMAPS) dm4c.log("Geomap.prepare_topic_for_display(): setting up proxy topic " +
-                        "ABORTED -- address has no geo facet\n..... Address topic=" + JSON.stringify(address))
-                }
-            } else {
-                if (LOG_GEOMAPS) dm4c.log("Geomap.prepare_topic_for_display(): setting up proxy topic " +
-                    "ABORTED -- topic has no address child\n..... Topic=" + JSON.stringify(topic))
-            }
         }
 
         // ===
@@ -366,31 +408,6 @@ function GeoMapRenderer() {
                 var lat = trans.get("dm4.topicmaps.translation_y")
                 center = new OpenLayers.LonLat(lon, lat)
                 zoom = state.composite["dm4.topicmaps.zoom_level"].value
-            }
-        }
-
-        /**
-         * Returns the geo facet of an address.
-         *
-         * @param   address     An "Address" topic (a JavaScript object).
-         *
-         * @return  A "Geo Coordinate" topic extended with "x" and "y" properties (a Topic object).
-         */
-        function get_geo_facet(address) {
-            var geo_facet = address.composite["dm4.geomaps.geo_coordinate"]
-            if (geo_facet) {
-                var pos = position(geo_facet)
-                geo_facet = new Topic(geo_facet)
-                geo_facet.x = pos.x
-                geo_facet.y = pos.y
-                return geo_facet
-            }
-        }
-
-        function position(geo_facet) {
-            return {
-                x: geo_facet.composite["dm4.geomaps.longitude"].value,
-                y: geo_facet.composite["dm4.geomaps.latitude"].value
             }
         }
 

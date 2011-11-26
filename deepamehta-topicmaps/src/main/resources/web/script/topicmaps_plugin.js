@@ -152,7 +152,7 @@ function topicmaps_plugin() {
      * @param   topic   a Topic object
      */
     this.pre_show_topic = function(topic) {
-        return topicmap.prepare_topic_for_display(topic)
+        topicmap.prepare_topic_for_display(topic)
     }
 
     /**

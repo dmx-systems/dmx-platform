@@ -333,36 +333,32 @@ var dm4c = new function() {
             topic.y = coordinates.y
         }
         var do_select = action != "none"
-        // Note: the pre_show_topic() hook allows plugins to do both:
-        // - manipulate the topic, e.g. by setting coordinates
-        // - return a completely different topic to proceed with
-        var topic_to_show = dm4c.trigger_plugin_hook("pre_show_topic", topic)[0]    // trigger hook
-        if (topic_to_show) {
-            topic = topic_to_show
-        }
-        // update model
-        if (do_select) {
-            set_selected_topic(topic)
-        }
+        // Note: the pre_show_topic() hook allows plugins to manipulate the topic, e.g. by setting coordinates
+        dm4c.trigger_plugin_hook("pre_show_topic", topic)           // trigger hook
         // update view (canvas)
-        dm4c.canvas.add_topic(topic, do_select)
+        var topics = dm4c.canvas.add_topic(topic, do_select)
         if (do_center) {
-            dm4c.canvas.scroll_topic_to_center(topic.id)
+            dm4c.canvas.scroll_topic_to_center(topics.select.id)
         }
         dm4c.canvas.refresh()
-        dm4c.trigger_plugin_hook("post_show_topic", topic)                          // trigger hook
         // update view (page panel)
         update_page_panel()
+        // update model
+        if (do_select) {
+            set_selected_topic(topics.select)
+        }
+        //
+        dm4c.trigger_plugin_hook("post_show_topic", topics.select)  // trigger hook
 
         function update_page_panel() {
             switch (action) {
             case "none":
                 break
             case "show":
-                dm4c.page_panel.display(topic)
+                dm4c.page_panel.display(topics.display)
                 break
             case "edit":
-                dm4c.begin_editing(topic)
+                dm4c.begin_editing(topics.display)
                 break
             default:
                 throw "WebclientError: \"" + action + "\" is an unexpected page panel action"

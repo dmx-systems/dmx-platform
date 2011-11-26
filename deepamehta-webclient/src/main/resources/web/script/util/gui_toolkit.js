@@ -249,12 +249,12 @@ function GUIToolkit() {
             function do_open_menu(event) {
                 // W3C DOM level 3 mouse events:
                 // (see http://www.w3.org/TR/2003/WD-DOM-Level-3-Events-20030331/ecma-script-binding.html)
-                //     event.screenY              - related to entire computer screen
-                //     event.clientY              - related to client window display area
+                //     event.screenX/Y              - related to entire computer screen
+                //     event.clientX/Y              - related to client window display area
                 // Non-normative:
-                //     event.pageY                - related to document (involves scroll position)
-                //                                  (the same as clientX if there is no scrolling)
-                //     event.originalEvent.layerY - related to positioned parent
+                //     event.pageX/Y                - related to document (involves scroll position)
+                //                                    (the same as clientX if there is no scrolling)
+                //     event.originalEvent.layerX/Y - related to positioned parent
                 if (!is_visible(menu)) {
                     close_opened_menu()
                     //

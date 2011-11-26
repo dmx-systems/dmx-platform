@@ -20,6 +20,8 @@ function TopicmapRenderer() {
     /**
      * @param   topic       an object with "id", "type_uri", "value" properties and optional "x", "y" properties.
      * @param   do_select   Optional: if true, the topic is selected.
+     *
+     * @return  an object with "select" and "display" properties (both values are Topic objects).
      */
     this.add_topic = function(topic, do_select) {}
 
