@@ -28,7 +28,7 @@ function CanvasRendererExtension() {
      *  - manipulating the topicmap by e.g. adding/removing topics and associations
      *  - putting the topicmap on the canvas.
      *
-     * ### FIXME: introduce common base class for Topicmap and Geomap (see deepamehta-geomaps module)
+     * ### FIXME: introduce common base class for Topicmap and Geomap (see external deepamehta-geomaps module)
      */
     function Topicmap(topicmap_id) {
 

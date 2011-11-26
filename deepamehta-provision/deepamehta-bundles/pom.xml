@@ -74,16 +74,6 @@
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-geomaps</artifactId>
-            <version>4.0.6-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-facets</artifactId>
-            <version>4.0.6-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-files</artifactId>
             <version>4.0.6-SNAPSHOT</version>
         </dependency>
