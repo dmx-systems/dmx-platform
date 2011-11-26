@@ -35,12 +35,12 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webbrowser</artifactId>
-            <version>4.0.5</version>
+            <version>4.0.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-notes</artifactId>
-            <version>4.0.5</version>
+            <version>4.0.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
@@ -65,7 +65,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-typesearch</artifactId>
-            <version>4.0.5</version>
+            <version>4.0.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
@@ -90,7 +90,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-filemanager</artifactId>
-            <version>4.0.5</version>
+            <version>4.0.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
