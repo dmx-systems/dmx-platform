@@ -75,14 +75,14 @@ function topicmaps_plugin() {
             // build topicmap widget
             var topicmap_label = $("<span>").attr("id", "topicmap-label").text("Topicmap")
             topicmap_menu = dm4c.ui.menu(do_select_topicmap)
-            var topicmap_form = $("<div>").attr("id", "topicmap-widget")
+            var topicmap_widget = $("<div>").attr("id", "topicmap-widget")
                 .append(topicmap_label)
                 .append(topicmap_menu.dom)
             // put in toolbar
             if ($("#workspace-widget").size()) {
-                $("#workspace-widget").after(topicmap_form)
+                $("#workspace-widget").after(topicmap_widget)
             } else {
-                dm4c.toolbar.dom.prepend(topicmap_form)
+                dm4c.toolbar.dom.prepend(topicmap_widget)
             }
             //
             rebuild_topicmap_menu(undefined, true)  // no_refetch=true
@@ -94,8 +94,11 @@ function topicmaps_plugin() {
             var topicmap_dialog = $("<form>").attr("action", "#").submit(do_create_topicmap)
                 .append($("<div>").addClass("field-label").text("Title"))
                 .append(title_input.addClass("field-value"))
+            if (type_menu.get_item_count() > 1) {
+                topicmap_dialog
                 .append($("<div>").addClass("field-label").text("Type"))
                 .append(type_menu.dom)
+            }
             dm4c.ui.dialog("topicmap-dialog", "New Topicmap", topicmap_dialog, "auto", "Create", do_create_topicmap)
 
             function create_maptype_menu() {
