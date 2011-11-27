@@ -81,6 +81,7 @@ function default_plugin () {
 
         function do_retype() {
             dm4c.refresh_type_menu(type_menu)   // no filter_func specified
+            type_menu.select(topic.type_uri)
             $("#retype-topic-dialog").dialog("open")
         }
 

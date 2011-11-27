@@ -176,7 +176,8 @@ function GUIToolkit() {
             // ---
 
             /**
-             * Selects a menu item by its value.
+             * Sets the selected menu item by value.
+             * Note: no handler is triggered.
              * <p>
              * Only applicable for stateful select-like menus.
              * (For stateless action-trigger menus nothing is performed.)
@@ -189,7 +190,8 @@ function GUIToolkit() {
             }
 
             /**
-             * Selects a menu item by its label.
+             * Sets the selected menu item by label.
+             * Note: no handler is triggered.
              * <p>
              * Only applicable for stateful select-like menus.
              * (For stateless action-trigger menus nothing is performed.)
