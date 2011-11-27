@@ -48,13 +48,13 @@ Install
 Download the latest release and unzip it.  
 <https://github.com/jri/deepamehta/downloads/>
 
-A folder `deepamehta-4.0.5` is created.
+A folder `deepamehta-4.0.6` is created.
 
 
 Start
 -----
 
-Open the `deepamehta-4.0.5` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.0.6` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -78,11 +78,19 @@ This puts the database in a consistent state and shuts down the webserver.
 You can close the terminal window now.
 
 
+Install plugins
+---------------
+
+You can extend DeepaMehta's functionality by installing plugins.
+See the list of available plugins:  
+<https://trac.deepamehta.de/wiki/Plugins>
+
+
 Update
 ------
 
 Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is currently not supported.  
-Even updating from 4.0.x to 4.0.5 is currently not supported.  
+Even updating from 4.0.x to 4.0.6 is currently not supported.  
 Please see the note at the top.
 
 
@@ -96,7 +104,7 @@ To do so a) stop DeepaMehta, b) delete the `deepamehta-db` folder, and c) start 
 Uninstall
 ---------
 
-Stop DeepaMehta and delete the `deepamehta-4.0.5` folder.  
+Stop DeepaMehta and delete the `deepamehta-4.0.6` folder.  
 This removes DeepaMehta completely from your computer, including the database.
 
 
@@ -108,6 +116,19 @@ Build from Source
 
 Version History
 ---------------
+
+**4.0.6** -- Nov 27, 2011
+
+* New feature for plugin developers:
+    * Map type extension architecture: plugins can provide additional map types, e.g. a geo map or a time map.
+* Improvements/Fixes:
+    * Topicmaps remember their translation.
+    * Menus opened within dialog boxes are not constrained to the dialog box dimension.
+* Compatible with 2 new plugins (optional install):
+    * DM4 Geomaps: displays topics on a geographical map.
+    * DM4 Facets: introduces multi-typing to the DM data model.
+* See details in the release notes:
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.5** -- Oct 20, 2011
 
@@ -253,4 +274,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Oct 20, 2011
+Nov 27, 2011
