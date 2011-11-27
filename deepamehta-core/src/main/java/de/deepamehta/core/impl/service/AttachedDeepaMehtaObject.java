@@ -587,14 +587,17 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     private String buildDefaultLabel() {
         Type type = getType();
         if (type.getDataTypeUri().equals("dm4.core.composite")) {
-            AssociationDefinition assocDef = type.getAssocDefs().values().iterator().next();
-            AttachedDeepaMehtaObject childTopic = fetchChildTopic(assocDef, false);         // fetchComposite=false
-            // Note: topics just created have no child topics yet
-            if (childTopic != null) {
-                return childTopic.buildDefaultLabel();
-            } else {
-                return "";
+            Iterator<AssociationDefinition> i = type.getAssocDefs().values().iterator();
+            // Note: types just created might have no child types yet
+            if (i.hasNext()) {
+                AssociationDefinition assocDef = i.next();
+                AttachedDeepaMehtaObject childTopic = fetchChildTopic(assocDef, false);     // fetchComposite=false
+                // Note: topics just created have no child topics yet
+                if (childTopic != null) {
+                    return childTopic.buildDefaultLabel();
+                }
             }
+            return "";
         } else {
             return getSimpleValue().toString();
         }
