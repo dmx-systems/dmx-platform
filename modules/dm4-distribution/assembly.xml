@@ -41,7 +41,7 @@
     <files>
         <!-- copy README to / -->
         <file>
-            <source>../README.md</source>
+            <source>../../README.md</source>
             <destName>README.txt</destName>
         </file>
         <!-- copy config files to /conf -->
@@ -70,8 +70,9 @@
         </fileSet>
         <!-- copy COPYRIGHT and LICENSE to / -->
         <fileSet>
-            <directory>..</directory>
+            <directory>../..</directory>
             <fileMode>0444</fileMode>
+            <outputDirectory>/</outputDirectory>
             <includes>
                 <include>COPYRIGHT.txt</include>
                 <include>LICENSE.txt</include>

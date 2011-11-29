@@ -14,7 +14,7 @@
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-parent</artifactId>
         <version>2</version>
-        <relativePath>deepamehta-parent/pom.xml</relativePath>
+        <relativePath>modules/dm4-parent/pom.xml</relativePath>
     </parent>
 
     <!-- Note: the dm4.database.path property is required by both, the 'run' and the 'neo4j' profile. -->
@@ -35,33 +35,33 @@
                 <org.osgi.service.http.port>8080</org.osgi.service.http.port>
                 <file.encoding>UTF-8</file.encoding>
                 <java.util.logging.config.file>
-                    ${project.basedir}/deepamehta-distribution/conf/logging.properties
+                    ${project.basedir}/modules/dm4-distribution/conf/logging.properties
                 </java.util.logging.config.file>
                 <felix.log.level>1</felix.log.level>
                 <felix.fileinstall.dir>
                     <![CDATA[
-                        ${project.basedir}/deepamehta-core/target,
-                        ${project.basedir}/deepamehta-webservice/target,
-                        ${project.basedir}/deepamehta-webclient/target,
-                        ${project.basedir}/deepamehta-webbrowser/target,
-                        ${project.basedir}/deepamehta-notes/target,
-                        ${project.basedir}/deepamehta-contacts/target,
-                        ${project.basedir}/deepamehta-workspaces/target,
-                        ${project.basedir}/deepamehta-typeeditor/target,
-                        ${project.basedir}/deepamehta-iconpicker/target,
-                        ${project.basedir}/deepamehta-typesearch/target,
-                        ${project.basedir}/deepamehta-topicmaps/target,
-                        ${project.basedir}/deepamehta-files/target,
-                        ${project.basedir}/deepamehta-filemanager/target,
-                        ${project.basedir}/deepamehta-proxy/target,
-                        ${project.basedir}/deepamehta-help/target
+                        ${project.basedir}/modules/dm4-core/target,
+                        ${project.basedir}/modules/dm4-webservice/target,
+                        ${project.basedir}/modules/dm4-webclient/target,
+                        ${project.basedir}/modules/dm4-webbrowser/target,
+                        ${project.basedir}/modules/dm4-notes/target,
+                        ${project.basedir}/modules/dm4-contacts/target,
+                        ${project.basedir}/modules/dm4-workspaces/target,
+                        ${project.basedir}/modules/dm4-typeeditor/target,
+                        ${project.basedir}/modules/dm4-iconpicker/target,
+                        ${project.basedir}/modules/dm4-typesearch/target,
+                        ${project.basedir}/modules/dm4-topicmaps/target,
+                        ${project.basedir}/modules/dm4-files/target,
+                        ${project.basedir}/modules/dm4-filemanager/target,
+                        ${project.basedir}/modules/dm4-proxy/target,
+                        ${project.basedir}/modules/dm4-help/target
                     ]]>
                     <!-- not yet adapted to DeepaMehta 4.0 resp. obsolete -->
                     <!--
-                        ${project.basedir}/deepamehta-coretypes/target,
-                        ${project.basedir}/deepamehta-time/target,
-                        ${project.basedir}/deepamehta-projects/target,
-                        ${project.basedir}/deepamehta-accesscontrol/target
+                        ${project.basedir}/modules/dm4-coretypes/target,
+                        ${project.basedir}/modules/dm4-time/target,
+                        ${project.basedir}/modules/dm4-projects/target,
+                        ${project.basedir}/modules/dm4-accesscontrol/target
                     -->
                 </felix.fileinstall.dir>
                 <!-- Watching only for jar files suppresses deployment of exploded bundles (which often fails).    -->
@@ -80,8 +80,8 @@
                         <artifactId>maven-pax-plugin</artifactId>
                         <configuration>
                             <deployPoms>
-                                deepamehta-provision/3rd-party-bundles/pom.xml,
-                                deepamehta-provision/felix-bundles/pom.xml
+                                modules/dm4-provision/3rd-party-bundles/pom.xml,
+                                modules/dm4-provision/felix-bundles/pom.xml
                             </deployPoms>
                         </configuration>
                     </plugin>
@@ -105,30 +105,32 @@
         <profile>
             <id>all</id>
             <modules>
-                <module>deepamehta-core</module>
-                <module>deepamehta-webservice</module>
-                <module>deepamehta-webclient</module>
-                <module>deepamehta-webbrowser</module>
-                <module>deepamehta-notes</module>
-                <module>deepamehta-contacts</module>
-                <module>deepamehta-workspaces</module>
-                <module>deepamehta-typeeditor</module>
-                <module>deepamehta-iconpicker</module>
-                <module>deepamehta-typesearch</module>
-                <module>deepamehta-topicmaps</module>
-                <module>deepamehta-files</module>
-                <module>deepamehta-filemanager</module>
-                <module>deepamehta-proxy</module>
-                <module>deepamehta-help</module>
+                <module>modules/dm4-core</module>
+                <module>modules/dm4-webservice</module>
+                <module>modules/dm4-webclient</module>
+                <module>modules/dm4-webbrowser</module>
+                <module>modules/dm4-notes</module>
+                <module>modules/dm4-contacts</module>
+                <module>modules/dm4-workspaces</module>
+                <module>modules/dm4-typeeditor</module>
+                <module>modules/dm4-iconpicker</module>
+                <module>modules/dm4-typesearch</module>
+                <module>modules/dm4-topicmaps</module>
+                <module>modules/dm4-files</module>
+                <module>modules/dm4-filemanager</module>
+                <module>modules/dm4-proxy</module>
+                <module>modules/dm4-help</module>
                 <!-- POM projects -->
-                <module>deepamehta-parent</module>
-                <module>deepamehta-plugin-parent</module>
-                <module>deepamehta-provision</module>
+                <!-- Note: modules/dm4-distribution is not listed here.                -->
+                <!-- We don't want to build the distribution with every reactor build. -->
+                <module>modules/dm4-parent</module>
+                <module>modules/dm4-plugin-parent</module>
+                <module>modules/dm4-provision</module>
                 <!-- not yet adapted to DeepaMehta 4.0 resp. obsolete -->
-                <!-- <module>deepamehta-coretypes</module>
-                <module>deepamehta-time</module>
-                <module>deepamehta-projects</module>
-                <module>deepamehta-accesscontrol</module> -->
+                <!-- <module>modules/dm4-coretypes</module>
+                <module>modules/dm4-time</module>
+                <module>modules/dm4-projects</module>
+                <module>modules/dm4-accesscontrol</module> -->
             </modules>
         </profile>
 
