@@ -6,7 +6,7 @@
  *     - A model for the current translation.
  *     - The view element (the "dom" property).
  *
- * The Webclient and the Topicmaps modules, as well as the SplitPanel is coded to this interface.
+ * The Webclient and the Topicmaps modules, as well as the SplitPanel are coded to this interface.
  *
  * Note: the concept of a (persistent) topicmap does not appear here.
  * It is only introduced by the Topicmaps module.

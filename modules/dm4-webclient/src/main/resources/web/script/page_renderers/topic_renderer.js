@@ -23,6 +23,9 @@ function TopicRenderer() {
 
     this.render_page = function(topic) {
         page_model = create_page_model(topic, "viewable")
+        // trigger hook
+        dm4c.trigger_plugin_hook("pre_render_page", topic, page_model)
+        //
         render_page_model(page_model, "render_field")
         //
         dm4c.render.associations(topic.id)
@@ -91,9 +94,9 @@ function TopicRenderer() {
 
 
 
-    /******************/
-    /*** Public API ***/
-    /******************/
+    // ******************
+    // *** Public API ***
+    // ******************
 
 
 
@@ -105,9 +108,9 @@ function TopicRenderer() {
 
 
 
-    /**************/
-    /*** Helper ***/
-    /**************/
+    // **************
+    // *** Helper ***
+    // **************
 
 
 

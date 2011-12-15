@@ -636,25 +636,15 @@ var dm4c = new function() {
      */
     this.trigger_plugin_hook = function(hook_name) {
         var result = []
+        var args = Array.prototype.slice.call(arguments)    // create real array from arguments object
+        args.shift()                                        // drop hook_name argument
         for (var plugin_class in plugins) {
             var plugin = dm4c.get_plugin(plugin_class)
             if (plugin[hook_name]) {
-                // 1) Trigger hook ### FIXME: use apply()
-                if (arguments.length == 1) {
-                    var res = plugin[hook_name]()
-                } else if (arguments.length == 2) {
-                    var res = plugin[hook_name](arguments[1])
-                } else if (arguments.length == 3) {
-                    var res = plugin[hook_name](arguments[1], arguments[2])
-                } else if (arguments.length == 4) {
-                    var res = plugin[hook_name](arguments[1], arguments[2], arguments[3])
-                } else {
-                    alert("ERROR (trigger_plugin_hook): too much arguments (" +
-                        (arguments.length - 1) + "), maximum is 3.\nhook=" + hook_name)
-                }
-                // 2) Store result
-                // Note: undefined is not added to the result, but null is.
-                if (res !== undefined) {
+                // trigger hook
+                var res = plugin[hook_name].apply(plugin, args)
+                // store result
+                if (res !== undefined) {    // Note: undefined is not added to the result, but null is
                     result.push(res)
                 }
             }
