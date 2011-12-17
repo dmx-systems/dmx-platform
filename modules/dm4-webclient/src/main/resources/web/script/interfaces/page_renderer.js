@@ -10,10 +10,10 @@
  * PageRenderer instances are singletons. They are created and cached by the Webclient main class.
  *
  * The DeepaMehta standard distribution provides the following page renderers:
- *     - TopicRenderer: the default renderer for topics (part of the Webclient module)
- *     - AssociationRenderer: the default renderer for associations (part of the Webclient module)
- *     - TopictypeRenderer (part of the Type Editor module)
- *     - WebpageRenderer (part of the Webbrowser module)
+ *     - TopicRenderer: the default renderer for topics (provided by the Webclient module)
+ *     - AssociationRenderer: the default renderer for associations (provided by the Webclient module)
+ *     - TopictypeRenderer (provided by the Type Editor module)
+ *     - WebpageRenderer (provided by the Webbrowser module)
  */
 function PageRenderer() {
 

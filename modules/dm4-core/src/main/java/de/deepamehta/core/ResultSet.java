@@ -2,11 +2,9 @@ package de.deepamehta.core;
 
 import de.deepamehta.core.util.JSONHelper;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 

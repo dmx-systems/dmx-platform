@@ -120,47 +120,7 @@ function TopicRenderer() {
      * @param   setting     "viewable" or "editable"
      */
     function create_page_model(topic, setting) {
-
-        return create_fields(topic.get_type(), undefined, "", topic)
-
-        /**
-         * @param   topic_type      The type to create the fields for.
-         * @param   assoc_def       The association definition that leads to the type.
-         * @param   field_uri       The (base) URI for the field(s) to create.
-         * @param   value_topic     The topic that supplies the field values. May be undefined.
-         */
-        function create_fields(topic_type, assoc_def, field_uri, value_topic) {
-            if (get_view_config()) {
-                if (topic_type.data_type_uri == "dm4.core.composite") {
-                    var fields = {}
-                    for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                        var child_topic_type = dm4c.type_cache.get_topic_type(assoc_def.part_topic_type_uri)
-                        var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
-                        var child_topic = value_topic && value_topic.composite[assoc_def.uri]
-                        var child_fields = create_fields(child_topic_type, assoc_def, child_field_uri, child_topic)
-                        if (child_fields) {
-                            fields[assoc_def.uri] = child_fields
-                        }
-                    }
-                    return fields;
-                } else {
-                    var value = value_topic && value_topic.value
-                    return new TopicRenderer.Field(field_uri, value, topic, topic_type, assoc_def)
-                }
-            }
-
-            // compare to get_view_config() in TopicRenderer.Field
-            function get_view_config() {
-                // the assoc def's config has precedence
-                if (assoc_def) {
-                    var value = dm4c.get_view_config(assoc_def, setting)
-                    if (value != undefined) {
-                        return value
-                    }
-                }
-                return dm4c.get_view_config(topic_type, setting, true)
-            }
-        }
+        return TopicRenderer.create_fields(topic.get_type(), undefined, "", topic, topic, setting)
     }
 
     function render_page_model(page_model, render_func_name) {
@@ -383,12 +343,21 @@ function TopicRenderer() {
  * @param   uri         The field URI. Unique within the page/form. The field URI is a path composed of association
  *                      definition URIs that leads to this field, e.g. "/dm4.contacts.address/dm4.contacts.street".
  *                      For a non-composite topic the field URI is an empty string.
+ *                      This URI is passed to the field renderer constructors (as a property of the "field" argument).
+ *                      The particular field renderers are free to operate on it. Field renderers which do so:
+ *                          - HTMLFieldRenderer (provided by the Webclient module)
+ *                          - IconFieldRenderer (provided by the Icon Picker module)
  * @param   value       The value to be rendered.
  *                      May be null/undefined, in this case an empty string is rendered.
- * @param   topic       The topic the page/form is rendered for.
- *                      Note: that is the same topic for all the Field objects of one page/form.
+ * @param   topic       The topic the page/form is rendered for. Usually that is the selected topic.
+ *                      (So, that is the same topic for all the Field objects making up one page/form.)
+ *                      This topic is passed to the field renderer constructors.
+ *                      The particular field renderers are free to operate on it. Field renderers which do so:
+ *                          - SearchResultRenderer  (provided by the Webclient module)
+ *                          - FileContentRenderer   (provided by the Files module)
+ *                          - FolderContentRenderer (provided by the Files module)
  * @param   topic_type  The topic type underlying this field.
- *                      Note: in general the topic type is different for the Field objects of one page/form.
+ *                      Note: in general the topic type is different for the Field objects making up one page/form.
  * @param   assoc_def   The direct association definition that leads to this field.
  *                      For a non-composite topic it is <code>undefined</code>.
  */
@@ -459,6 +428,8 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
         }
     }
 
+    // ---
+
     /**
      * Triggers a renderer hook for this field.
      *
@@ -485,6 +456,46 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
             // Note 2: we must regard an empty string as "not set" to not loose the default rendering classes.
             if (value !== undefined && value !== "") {      // compare to get_view_config() in webclient.js
                 // regard the assoc def's value as set
+                return value
+            }
+        }
+        return dm4c.get_view_config(topic_type, setting, true)
+    }
+}
+
+/**
+ * @param   topic_type      The type to create the fields for.
+ * @param   assoc_def       The association definition that leads to the type.
+ * @param   field_uri       The (base) URI for the field(s) to create.
+ * @param   value_topic     The topic that supplies the field values. May be undefined.
+ */
+TopicRenderer.create_fields = function(topic_type, assoc_def, field_uri, value_topic, topic, setting) {
+    if (get_view_config()) {
+        if (topic_type.data_type_uri == "dm4.core.composite") {
+            var fields = {}
+            for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
+                var child_topic_type = dm4c.type_cache.get_topic_type(assoc_def.part_topic_type_uri)
+                var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
+                var child_topic = value_topic && value_topic.composite[assoc_def.uri]
+                var child_fields = TopicRenderer.create_fields(child_topic_type, assoc_def, child_field_uri,
+                    child_topic, topic, setting)
+                if (child_fields) {
+                    fields[assoc_def.uri] = child_fields
+                }
+            }
+            return fields;
+        } else {
+            var value = value_topic && value_topic.value
+            return new TopicRenderer.Field(field_uri, value, topic, topic_type, assoc_def)
+        }
+    }
+
+    // compare to get_view_config() in TopicRenderer.Field
+    function get_view_config() {
+        // the assoc def's config has precedence
+        if (assoc_def) {
+            var value = dm4c.get_view_config(assoc_def, setting)
+            if (value != undefined) {
                 return value
             }
         }
