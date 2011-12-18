@@ -14,6 +14,7 @@ var dm4c = new function() {
 
     var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
+    this.REF_PREFIX = "ref_id:"
 
     this.restc = new RESTClient(CORE_SERVICE_URI)
     this.ui = new GUIToolkit()

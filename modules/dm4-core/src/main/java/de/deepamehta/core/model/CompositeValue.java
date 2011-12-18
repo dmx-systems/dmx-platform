@@ -56,6 +56,8 @@ public class CompositeValue {
         return values.keySet();
     }
 
+    // ---
+
     public TopicModel getTopic(String key) {
         TopicModel topic = values.get(key);
         // error check
@@ -64,6 +66,11 @@ public class CompositeValue {
         }
         //
         return topic;
+    }
+
+    public TopicModel getTopic(String key, TopicModel defaultValue) {
+        TopicModel topic = values.get(key);
+        return topic != null ? topic : defaultValue;
     }
 
     // ---

@@ -36,7 +36,9 @@ function webbrowser_plugin() {
         function do_open_url() {
             var webpage = get_webpage(topic)
             if (!webpage) {
-                webpage = dm4c.create_topic("dm4.webbrowser.webpage", {"dm4.webbrowser.url$id": topic.id})
+                webpage = dm4c.create_topic("dm4.webbrowser.webpage", {
+                    "dm4.webbrowser.url": dm4c.REF_PREFIX + topic.id
+                })
             }
             dm4c.do_reveal_related_topic(webpage.id)
         }

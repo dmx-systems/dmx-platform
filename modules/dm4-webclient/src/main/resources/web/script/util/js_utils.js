@@ -150,6 +150,8 @@ var js = {
     },
 
     /**
+     * ### FIXME: drop this method? eval() is evil.
+     *
      * @param   superclass      the baseclass constructor (a function)
      * @param   subclass_name   (a string)
      */

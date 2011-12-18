@@ -36,6 +36,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String LABEL_SEPARATOR = " ";
+    private static final String REF_PREFIX = "ref_id:";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -414,19 +415,17 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     private void updateCompositeValue(CompositeValue newComp, ClientContext clientContext, Directives directives) {
         try {
             CompositeValue comp = getCompositeValue();
-            for (String key : newComp.keys()) {
-                String[] t = key.split("\\$");
-                //
-                if (t.length < 1 || t.length > 2 || t.length == 2 && !t[1].equals("id")) {
-                    throw new RuntimeException("Invalid composite key (\"" + key + "\")");
+            for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
+                String assocDefUri = assocDef.getUri();
+                TopicModel valueTopic = newComp.getTopic(assocDefUri, null);    // defaultValue=null
+                // skip if not contained in update request
+                if (valueTopic == null) {
+                    continue;
                 }
                 //
-                String assocDefUri = t[0];
-                AssociationDefinition assocDef = getAssocDef(assocDefUri);
                 String childTopicTypeUri = assocDef.getPartTopicTypeUri();
                 TopicType childTopicType = dms.getTopicType(childTopicTypeUri, null);
                 String assocTypeUri = assocDef.getTypeUri();
-                TopicModel valueTopic = newComp.getTopic(key);
                 if (assocTypeUri.equals("dm4.core.composition_def")) {
                     if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
                         // Note: the child topic's composite must be fetched. It needs to be passed to the
@@ -460,11 +459,12 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                             dms.deleteAssociation(assocId, null);  // clientContext=null
                         }
                         //
-                        boolean assignExistingTopic = t.length == 2;
+                        String value = valueTopic.getSimpleValue().toString();
+                        boolean assignExistingTopic = value.startsWith(REF_PREFIX);
                         if (assignExistingTopic) {
                             // update DB
-                            long childTopicId = valueTopic.getSimpleValue().intValue(); // Note: the JSON parser creates
-                            associateChildTopic(assocDef, childTopicId);                //       Integers (not Longs)
+                            long childTopicId = Long.parseLong(value.substring(REF_PREFIX.length()));
+                            associateChildTopic(assocDef, childTopicId);
                             // update memory
                             // Topic assignedTopic = dms.getTopic(childTopicId, false, null);  // fetchComposite=false
                             // comp.put(assocDefUri, assignedTopic.getSimpleValue().value());
@@ -480,8 +480,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Storing the composite of " + className() + " " + getId() +
-                " failed (composite=" + newComp + ")", e);
+            throw new RuntimeException("Updating the composite value of " + className() + " " + getId() +
+                " failed (newComp=" + newComp + ")", e);
         }
     }
 

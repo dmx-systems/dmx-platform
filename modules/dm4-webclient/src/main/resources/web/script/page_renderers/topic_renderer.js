@@ -79,7 +79,7 @@ function TopicRenderer() {
                     if (form_value != null) {
                         if (typeof(form_value) == "object") {
                             // store reference to existing topic
-                            composite[assoc_def_uri + "$id"] = form_value.topic_id
+                            composite[assoc_def_uri] = dm4c.REF_PREFIX + form_value.topic_id
                         } else {
                             // store value for new topic
                             composite[assoc_def_uri] = form_value
