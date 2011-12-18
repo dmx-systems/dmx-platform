@@ -32,9 +32,10 @@ function TopicRenderer() {
     }
 
     this.render_form = function(topic) {
-        dm4c.trigger_plugin_hook("pre_render_form", topic)
-        //
         page_model = create_page_model(topic, "editable")
+        // trigger hook
+        dm4c.trigger_plugin_hook("pre_render_form", topic, page_model)
+        //
         render_page_model(page_model, "render_form_element")
     }
 
