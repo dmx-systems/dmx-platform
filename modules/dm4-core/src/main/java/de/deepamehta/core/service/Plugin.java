@@ -240,10 +240,10 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // ---
 
-    public void preCreateHook(TopicModel topicModel, ClientContext clientContext) {
+    public void preCreateHook(TopicModel topicModel, ClientState clientState) {
     }
 
-    public void postCreateHook(Topic topic, ClientContext clientContext, Directives directives) {
+    public void postCreateHook(Topic topic, ClientState clientState, Directives directives) {
     }
 
     // ---
@@ -251,7 +251,7 @@ public class Plugin implements BundleActivator, EventHandler {
     public void preUpdateHook(Topic topic, TopicModel newTopic, Directives directives) {
     }
 
-    public void postUpdateHook(Topic topic, TopicModel oldTopic, ClientContext clientContext, Directives directives) {
+    public void postUpdateHook(Topic topic, TopicModel oldTopic, ClientState clientState, Directives directives) {
     }
 
     // ---
@@ -306,12 +306,12 @@ public class Plugin implements BundleActivator, EventHandler {
      *                      particular the underlying type topic has an ID already. That is, the type is ready for
      *                      e.g. being related to other topics.
      */
-    public void modifyTopicTypeHook(TopicType topicType, ClientContext clientContext) {
+    public void modifyTopicTypeHook(TopicType topicType, ClientState clientState) {
     }
 
     // ---
 
-    public CommandResult executeCommandHook(String command, CommandParams params, ClientContext clientContext) {
+    public CommandResult executeCommandHook(String command, CommandParams params, ClientState clientState) {
         return null;
     }
 
@@ -714,7 +714,7 @@ public class Plugin implements BundleActivator, EventHandler {
             pluginTopic = dms.createTopic(new TopicModel(pluginId, "dm4.core.plugin",
                 new CompositeValue().put("dm4.core.plugin_name", pluginName)
                                     .put("dm4.core.plugin_symbolic_name", pluginId)
-                                    .put("dm4.core.plugin_migration_nr", 0)), null);    // FIXME: clientContext=null
+                                    .put("dm4.core.plugin_migration_nr", 0)), null);    // FIXME: clientState=null
             return true;
         }
     }
@@ -741,7 +741,7 @@ public class Plugin implements BundleActivator, EventHandler {
         try {
             for (String topicTypeUri : dms.getTopicTypeUris()) {
                 // trigger hook
-                modifyTopicTypeHook(dms.getTopicType(topicTypeUri, null), null);   // clientContext=null (2x)
+                modifyTopicTypeHook(dms.getTopicType(topicTypeUri, null), null);   // clientState=null (2x)
             }
         } catch (Exception e) {
             throw new RuntimeException("Introducing topic types to " + this + " failed", e);

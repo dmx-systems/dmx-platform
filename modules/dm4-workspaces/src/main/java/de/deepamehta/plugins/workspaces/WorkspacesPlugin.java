@@ -10,7 +10,7 @@ import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
-import de.deepamehta.core.service.ClientContext;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
 
@@ -60,7 +60,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
      * Assigns a newly created topic to the current workspace.
      */
     @Override
-    public void postCreateHook(Topic topic, ClientContext clientContext, Directives directives) {
+    public void postCreateHook(Topic topic, ClientState clientState, Directives directives) {
         long workspaceId = -1;
         try {
             // check precondition 1
@@ -73,13 +73,13 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
                 return;
             }
             // check precondition 2
-            if (clientContext == null) {
+            if (clientState == null) {
                 // ### logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +
                 // ###     "(client context is not initialzed))");
                 return;
             }
             // check precondition 3
-            String wsId = clientContext.get("dm4_workspace_id");
+            String wsId = clientState.get("dm4_workspace_id");
             if (wsId == null) {
                 logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +
                     "(no setting found in client context))");
@@ -98,7 +98,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
      * Adds a "Workspace" association to all topic types.
      * FIXME: not ready for the prime time
     @Override
-    public void modifyTopicTypeHook(TopicType topicType, ClientContext clientContext) {
+    public void modifyTopicTypeHook(TopicType topicType, ClientState clientState) {
         String topicTypeUri = topicType.getUri();
         // skip our own types
         if (topicTypeUri.startsWith("dm4.workspaces.")) {
@@ -136,7 +136,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
     public Topic createWorkspace(String name) {
         logger.info("Creating workspace \"" + name + "\"");
         CompositeValue comp = new CompositeValue().put("dm4.workspaces.name", name);
-        return dms.createTopic(new TopicModel("dm4.workspaces.workspace", comp), null); // FIXME: clientContext=null
+        return dms.createTopic(new TopicModel("dm4.workspaces.workspace", comp), null); // FIXME: clientState=null
     }
 
     @Override
@@ -146,7 +146,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
         AssociationModel assocModel = new AssociationModel(WORKSPACE_TOPIC);
         assocModel.setRoleModel1(new TopicRoleModel(workspaceId, ROLE_TYPE_WORKSPACE));
         assocModel.setRoleModel2(new TopicRoleModel(topicId, ROLE_TYPE_TOPIC));
-        dms.createAssociation(assocModel, null);         // clientContext=null
+        dms.createAssociation(assocModel, null);         // clientState=null
     }
 
     @Override
@@ -156,12 +156,12 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
         AssociationModel assocModel = new AssociationModel(WORKSPACE_TYPE);
         assocModel.setRoleModel1(new TopicRoleModel(workspaceId, ROLE_TYPE_WORKSPACE));
         assocModel.setRoleModel2(new TopicRoleModel(typeId, ROLE_TYPE_TYPE));
-        dms.createAssociation(assocModel, null);         // clientContext=null
+        dms.createAssociation(assocModel, null);         // clientState=null
     }
 
     @Override
     public Set<RelatedTopic> getWorkspaces(long typeId) {
-        Topic typeTopic = dms.getTopic(typeId, false, null);            // fetchComposite=false, clientContext=null
+        Topic typeTopic = dms.getTopic(typeId, false, null);            // fetchComposite=false, clientState=null
         return typeTopic.getRelatedTopics(WORKSPACE_TYPE, ROLE_TYPE_TYPE, null,
             "dm4.workspaces.workspace", false, false, 0).getItems();    // fetchComposite=false
     }

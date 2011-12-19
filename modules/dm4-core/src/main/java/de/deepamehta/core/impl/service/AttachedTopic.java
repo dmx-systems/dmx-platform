@@ -15,7 +15,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ChangeReport;
-import de.deepamehta.core.service.ClientContext;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Hook;
@@ -71,7 +71,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     protected void storeTypeUri() {
         // remove current assignment
         long assocId = fetchTypeTopic().getAssociation().getId();
-        dms.deleteAssociation(assocId, null);  // clientContext=null
+        dms.deleteAssociation(assocId, null);  // clientState=null
         // create new assignment
         dms.associateWithTopicType(getModel());
     }    
@@ -88,7 +88,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     protected Type getType() {
-        return dms.getTopicType(getTypeUri(), null);    // FIXME: clientContext=null
+        return dms.getTopicType(getTypeUri(), null);    // FIXME: clientState=null
     }
 
     @Override
@@ -187,25 +187,25 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override
-    void store(ClientContext clientContext, Directives directives) {
+    void store(ClientState clientState, Directives directives) {
         dms.storage.createTopic(getModel());
         dms.associateWithTopicType(getModel());
-        super.store(clientContext, directives);
+        super.store(clientState, directives);
     }
 
     // ### move up
     @Override
-    public ChangeReport update(TopicModel model, ClientContext clientContext, Directives directives) {
+    public ChangeReport update(TopicModel model, ClientState clientState, Directives directives) {
         logger.info("Updating topic " + getId() + " (new " + model + ")");
         //
         dms.triggerHook(Hook.PRE_UPDATE_TOPIC, this, model, directives);
         //
         TopicModel oldModel = (TopicModel) getModel().clone();
-        ChangeReport report = super.update(model, clientContext, directives);
+        ChangeReport report = super.update(model, clientState, directives);
         //
         directives.add(Directive.UPDATE_TOPIC, this);
         //
-        dms.triggerHook(Hook.POST_UPDATE_TOPIC, this, oldModel, clientContext, directives);
+        dms.triggerHook(Hook.POST_UPDATE_TOPIC, this, oldModel, clientState, directives);
         dms.triggerHook(Hook.POST_FETCH_TOPIC, this);
         //
         return report;

@@ -67,7 +67,7 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
                                 .put("dm4.topicmaps.y", y)
                                 .put("dm4.topicmaps.visibility", true)
         );
-        Association refAssoc = dms.createAssociation(model, null);     // FIXME: clientContext=null
+        Association refAssoc = dms.createAssociation(model, null);     // FIXME: clientState=null
         return refAssoc.getId();
     }
 
@@ -78,7 +78,7 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
         AssociationModel model = new AssociationModel("dm4.topicmaps.association_mapcontext",
             new TopicRoleModel(topicmapId,    "dm4.core.default"),
             new AssociationRoleModel(assocId, "dm4.topicmaps.topicmap_association"));
-        Association refAssoc = dms.createAssociation(model, null);     // FIXME: clientContext=null
+        Association refAssoc = dms.createAssociation(model, null);     // FIXME: clientState=null
         return refAssoc.getId();
     }
 
@@ -131,7 +131,7 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
      * @param   refId   ID of the "Association Mapcontext" association that relates to the association to remove.
      */
     private void removeAssociationFromTopicmap(long refId) {
-        dms.deleteAssociation(refId, null);     // clientContext=null
+        dms.deleteAssociation(refId, null);     // clientState=null
     }
 
     // ---

@@ -100,7 +100,7 @@ public class FilesPlugin extends Plugin implements FilesService {
             }
             comp.put("dm4.files.size", fileSize);
             //
-            return dms.createTopic(new TopicModel("dm4.files.file", comp), null);       // FIXME: clientContext=null
+            return dms.createTopic(new TopicModel("dm4.files.file", comp), null);       // FIXME: clientState=null
         } catch (Throwable e) {
             throw new RuntimeException(text + " failed", e);
         }
@@ -128,7 +128,7 @@ public class FilesPlugin extends Plugin implements FilesService {
             comp.put("dm4.files.folder_name", new File(path).getName());
             comp.put("dm4.files.path", path);
             //
-            return dms.createTopic(new TopicModel("dm4.files.folder", comp), null);     // FIXME: clientContext=null
+            return dms.createTopic(new TopicModel("dm4.files.folder", comp), null);     // FIXME: clientState=null
         } catch (Throwable e) {
             throw new RuntimeException(text + " failed", e);
         }
@@ -163,7 +163,7 @@ public class FilesPlugin extends Plugin implements FilesService {
     public void openFile(@PathParam("id") long fileTopicId) {
         File file = null;
         try {
-            Topic fileTopic = dms.getTopic(fileTopicId, true, null);    // fetchComposite=true, clientContext=null
+            Topic fileTopic = dms.getTopic(fileTopicId, true, null);    // fetchComposite=true, clientState=null
             String path = fileTopic.getCompositeValue().getString("dm4.files.path");
             file = proxyService.locateFile(path);
             logger.info("### Opening file \"" + file + "\"");
@@ -201,7 +201,7 @@ public class FilesPlugin extends Plugin implements FilesService {
         if (!childAssociationExists(folderTopicId, childTopicId)) {
             dms.createAssociation(new AssociationModel("dm4.core.aggregation",
                 new TopicRoleModel(folderTopicId, "dm4.core.whole"),
-                new TopicRoleModel(childTopicId,  "dm4.core.part")), null);    // clientContext=null
+                new TopicRoleModel(childTopicId,  "dm4.core.part")), null);    // clientState=null
         }
     }
 

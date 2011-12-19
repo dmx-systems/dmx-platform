@@ -22,7 +22,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void getTopicType() {
-        TopicType topicType = dms.getTopicType("dm4.core.plugin", null);  // clientContext=null
+        TopicType topicType = dms.getTopicType("dm4.core.plugin", null);  // clientState=null
         assertEquals("dm4.core.plugin",     topicType.getUri());
         assertEquals("dm4.core.topic_type", topicType.getTypeUri());
         assertEquals("dm4.core.composite",  topicType.getDataTypeUri());
@@ -49,7 +49,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             Topic topic = dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-                new SimpleValue("DeepaMehta 4 Notes")), null);  // clientContext=null
+                new SimpleValue("DeepaMehta 4 Notes")), null);  // clientState=null
             //
             topic.setChildTopicValue("dm4.core.plugin_migration_nr", new SimpleValue(23));
             //

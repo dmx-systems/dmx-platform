@@ -37,7 +37,7 @@ public interface DeepaMehtaService {
 
     // === Topics ===
 
-    public Topic getTopic(long id, boolean fetchComposite, ClientContext clientContext);
+    public Topic getTopic(long id, boolean fetchComposite, ClientState clientState);
 
     /**
      * Looks up a single topic by exact property value.
@@ -63,14 +63,13 @@ public interface DeepaMehtaService {
      * @param   wholeWord   If true the searchTerm is regarded as whole word.
      *                      If false the searchTerm is regarded as begin-of-word substring.
      */
-    public Set<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord,
-                                                                       ClientContext clientContext);
+    public Set<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, ClientState clientState);
 
-    public Topic createTopic(TopicModel topicModel, ClientContext clientContext);
+    public Topic createTopic(TopicModel topicModel, ClientState clientState);
 
-    public Directives updateTopic(TopicModel topicModel, ClientContext clientContext);
+    public Directives updateTopic(TopicModel topicModel, ClientState clientState);
 
-    public Directives deleteTopic(long topicId, ClientContext clientContext);
+    public Directives deleteTopic(long topicId, ClientState clientState);
 
 
 
@@ -102,11 +101,11 @@ public interface DeepaMehtaService {
 
     // ---
 
-    public Association createAssociation(AssociationModel assocModel, ClientContext clientContext);
+    public Association createAssociation(AssociationModel assocModel, ClientState clientState);
 
-    public Directives updateAssociation(AssociationModel assocModel, ClientContext clientContext);
+    public Directives updateAssociation(AssociationModel assocModel, ClientState clientState);
 
-    public Directives deleteAssociation(long assocId, ClientContext clientContext);
+    public Directives deleteAssociation(long assocId, ClientState clientState);
 
 
 
@@ -114,11 +113,11 @@ public interface DeepaMehtaService {
 
     public Set<String> getTopicTypeUris();
 
-    public TopicType getTopicType(String topicTypeUri, ClientContext clientContext);
+    public TopicType getTopicType(String topicTypeUri, ClientState clientState);
 
-    public TopicType createTopicType(TopicTypeModel topicTypeModel, ClientContext clientContext);
+    public TopicType createTopicType(TopicTypeModel topicTypeModel, ClientState clientState);
 
-    public TopicType updateTopicType(TopicTypeModel topicTypeModel, ClientContext clientContext);
+    public TopicType updateTopicType(TopicTypeModel topicTypeModel, ClientState clientState);
 
 
 
@@ -126,15 +125,15 @@ public interface DeepaMehtaService {
 
     public Set<String> getAssociationTypeUris();
 
-    public AssociationType getAssociationType(String assocTypeUri, ClientContext clientContext);
+    public AssociationType getAssociationType(String assocTypeUri, ClientState clientState);
 
-    public AssociationType createAssociationType(AssociationTypeModel assocTypeModel, ClientContext clientContext);
+    public AssociationType createAssociationType(AssociationTypeModel assocTypeModel, ClientState clientState);
 
 
 
     // === Commands ===
 
-    public CommandResult executeCommand(String command, CommandParams params, ClientContext clientContext);
+    public CommandResult executeCommand(String command, CommandParams params, ClientState clientState);
 
 
 

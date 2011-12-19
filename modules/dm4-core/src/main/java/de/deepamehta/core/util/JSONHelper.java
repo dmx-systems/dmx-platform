@@ -166,28 +166,28 @@ public class JSONHelper {
     public static void createTopicTypes(JSONArray topicTypes, DeepaMehtaService dms) throws Exception {
         for (int i = 0; i < topicTypes.length(); i++) {
             TopicTypeModel topicTypeModel = new TopicTypeModel(topicTypes.getJSONObject(i));
-            dms.createTopicType(topicTypeModel, null);          // clientContext=null
+            dms.createTopicType(topicTypeModel, null);          // clientState=null
         }
     }
 
     public static void createAssociationTypes(JSONArray assocTypes, DeepaMehtaService dms) throws Exception {
         for (int i = 0; i < assocTypes.length(); i++) {
             AssociationTypeModel assocTypeModel = new AssociationTypeModel(assocTypes.getJSONObject(i));
-            dms.createAssociationType(assocTypeModel, null);     // clientContext=null
+            dms.createAssociationType(assocTypeModel, null);    // clientState=null
         }
     }
 
     public static void createTopics(JSONArray topics, DeepaMehtaService dms) throws Exception {
         for (int i = 0; i < topics.length(); i++) {
             TopicModel topicModel = new TopicModel(topics.getJSONObject(i));
-            dms.createTopic(topicModel, null);                  // clientContext=null
+            dms.createTopic(topicModel, null);                  // clientState=null
         }
     }
 
     public static void createAssociations(JSONArray assocs, DeepaMehtaService dms) throws Exception {
         for (int i = 0; i < assocs.length(); i++) {
             AssociationModel assocModel = new AssociationModel(assocs.getJSONObject(i));
-            dms.createAssociation(assocModel, null);            // clientContext=null
+            dms.createAssociation(assocModel, null);            // clientState=null
         }
     }
 }

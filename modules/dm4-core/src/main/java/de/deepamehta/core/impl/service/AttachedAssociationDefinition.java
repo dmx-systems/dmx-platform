@@ -137,7 +137,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
             // Note: creating the underlying association is conditional. It exists already for
             // an interactively created association definition. Its ID is already set.
             if (getId() == -1) {
-                dms.createAssociation(getModel(), null);    // clientContext=null
+                dms.createAssociation(getModel(), null);    // clientState=null
             }
             // role types
             dms.createAssociation("dm4.core.aggregation",
@@ -269,7 +269,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     private void storeViewConfig() {
         try {
             for (TopicModel configTopic : getModel().getViewConfigModel().getConfigTopics()) {
-                Topic topic = dms.createTopic(configTopic, null);   // FIXME: clientContext=null
+                Topic topic = dms.createTopic(configTopic, null);   // FIXME: clientState=null
                 dms.createAssociation("dm4.core.aggregation",
                     new AssociationRoleModel(getId(), "dm4.core.assoc_def"),
                     new TopicRoleModel(topic.getId(), "dm4.core.view_config"));

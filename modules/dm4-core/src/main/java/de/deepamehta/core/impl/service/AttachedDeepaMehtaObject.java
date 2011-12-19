@@ -17,7 +17,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.service.ChangeReport;
-import de.deepamehta.core.service.ClientContext;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -162,8 +162,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     @Override
-    public void setCompositeValue(CompositeValue comp, ClientContext clientContext, Directives directives) {
-        updateCompositeValue(comp, clientContext, directives);
+    public void setCompositeValue(CompositeValue comp, ClientState clientState, Directives directives) {
+        updateCompositeValue(comp, clientState, directives);
         refreshLabel();
     }
 
@@ -342,11 +342,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void store(ClientContext clientContext, Directives directives) {
+    void store(ClientState clientState, Directives directives) {
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
             CompositeValue comp = getCompositeValue();
             model.setCompositeValue(new CompositeValue());
-            updateCompositeValue(comp, clientContext, directives);
+            updateCompositeValue(comp, clientState, directives);
             refreshLabel();
         } else {
             storeAndIndexValue(getSimpleValue());
@@ -355,13 +355,13 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ### move up
     @Override
-    public ChangeReport update(DeepaMehtaObjectModel model, ClientContext clientContext, Directives directives) {
+    public ChangeReport update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives) {
         ChangeReport report = new ChangeReport();
         updateUri(model.getUri());
         updateTypeUri(model.getTypeUri(), report);
         // ### TODO: compare new model with current one and update only if changed.
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            updateCompositeValue(model.getCompositeValue(), clientContext, directives);
+            updateCompositeValue(model.getCompositeValue(), clientState, directives);
             refreshLabel();
         } else {
             updateValue(model.getSimpleValue());
@@ -412,7 +412,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Store ===
 
     // TODO: factorize this method
-    private void updateCompositeValue(CompositeValue newComp, ClientContext clientContext, Directives directives) {
+    private void updateCompositeValue(CompositeValue newComp, ClientState clientState, Directives directives) {
         try {
             CompositeValue comp = getCompositeValue();
             for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
@@ -435,7 +435,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                         if (childTopic != null) {
                             // update child topic
                             TopicModel model = new TopicModel(childTopic.getId(), childTopicComp);
-                            childTopic.update(model, clientContext, directives);
+                            childTopic.update(model, clientState, directives);
                         } else {
                             // create and associate child topic
                             childTopic = dms.createTopic(new TopicModel(childTopicTypeUri, childTopicComp), null);
@@ -456,7 +456,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                         RelatedTopic childTopic = fetchChildTopic(assocDef, false);     // fetchComposite=false
                         if (childTopic != null) {
                             long assocId = childTopic.getAssociation().getId();
-                            dms.deleteAssociation(assocId, null);  // clientContext=null
+                            dms.deleteAssociation(assocId, null);  // clientState=null
                         }
                         //
                         String value = valueTopic.getSimpleValue().toString();

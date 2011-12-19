@@ -18,7 +18,7 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ChangeReport;
-import de.deepamehta.core.service.ClientContext;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 
@@ -81,7 +81,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     protected void storeTypeUri() {
         // remove current assignment
         long assocId = fetchTypeTopic().getAssociation().getId();
-        dms.deleteAssociation(assocId, null);  // clientContext=null
+        dms.deleteAssociation(assocId, null);  // clientState=null
         // create new assignment
         dms.associateWithAssociationType(getModel());
     }    
@@ -98,7 +98,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     protected Type getType() {
-        return dms.getAssociationType(getTypeUri(), null);    // FIXME: clientContext=null
+        return dms.getAssociationType(getTypeUri(), null);    // FIXME: clientState=null
     }
 
     @Override
@@ -231,10 +231,10 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override
-    void store(ClientContext clientContext, Directives directives) {
+    void store(ClientState clientState, Directives directives) {
         dms.storage.createAssociation(getModel());
         dms.associateWithAssociationType(getModel());
-        super.store(clientContext, directives);
+        super.store(clientState, directives);
     }
 
     /**
@@ -244,10 +244,10 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
      *                      If role 2 is <code>null</code> it is not updated.
      */
     // ### @Override
-    ChangeReport update(AssociationModel model, ClientContext clientContext, Directives directives) {
+    ChangeReport update(AssociationModel model, ClientState clientState, Directives directives) {
         logger.info("Updating association " + getId() + " (new " + model + ")");
         //
-        ChangeReport report = super.update(model, clientContext, directives);
+        ChangeReport report = super.update(model, clientState, directives);
         updateRole(model.getRoleModel1(), 1);
         updateRole(model.getRoleModel2(), 2);
         //
@@ -320,7 +320,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         if (role.topicIdentifiedByUri()) {
             return dms.getTopic("uri", new SimpleValue(role.getTopicUri()), false);     // fetchComposite=false
         } else {
-            return dms.getTopic(role.getTopicId(), false, null);    // fetchComposite=false, clientContext=null
+            return dms.getTopic(role.getTopicId(), false, null);    // fetchComposite=false, clientState=null
         }
     }
 

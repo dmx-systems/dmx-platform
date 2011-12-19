@@ -9,7 +9,7 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.service.ClientContext;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
@@ -84,7 +84,7 @@ public class WebclientPlugin extends Plugin {
      * Once a view configuration is updated in the DB we must update the cached view configuration model.
      */
     @Override
-    public void postUpdateHook(Topic topic, TopicModel oldTopic, ClientContext clientContext, Directives directives) {
+    public void postUpdateHook(Topic topic, TopicModel oldTopic, ClientState clientState, Directives directives) {
         if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
             Type type = getType(topic);
             logger.info("### Updating view configuration for topic type \"" + type.getUri() + "\" (" + topic + ")");
@@ -111,15 +111,15 @@ public class WebclientPlugin extends Plugin {
     public Topic searchTopics(@QueryParam("search") String searchTerm,
                               @QueryParam("field")  String fieldUri,
                               @QueryParam("wholeword") boolean wholeWord,
-                              @HeaderParam("Cookie") ClientContext clientContext) {
+                              @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\", wholeWord=" + wholeWord +
-                ", clientContext=" + clientContext);
-            Set<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri, wholeWord, clientContext);
+                ", clientState=" + clientState);
+            Set<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri, wholeWord, clientState);
             Set<Topic> searchableUnits = findSearchableUnits(singleTopics);
             logger.info(singleTopics.size() + " single topics found, " + searchableUnits.size() + " searchable units");
-            Topic searchTopic = createSearchTopic("\"" + searchTerm + "\"", searchableUnits, clientContext);
+            Topic searchTopic = createSearchTopic("\"" + searchTerm + "\"", searchableUnits, clientState);
             tx.success();
             return searchTopic;
         } catch (Exception e) {
@@ -143,9 +143,9 @@ public class WebclientPlugin extends Plugin {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             logger.info("typeUri=\"" + typeUri + "\", maxResultSize=" + maxResultSize);
-            String searchTerm = dms.getTopicType(typeUri, null).getSimpleValue() + "(s)";   // clientContext=null
+            String searchTerm = dms.getTopicType(typeUri, null).getSimpleValue() + "(s)";   // clientState=null
             ResultSet<Topic> result = dms.getTopics(typeUri, false, maxResultSize);         // fetchComposite=false
-            Topic searchTopic = createSearchTopic(searchTerm, result.getItems(), null);     // clientContext=null
+            Topic searchTopic = createSearchTopic(searchTerm, result.getItems(), null);     // clientState=null
             tx.success();
             return searchTopic;
         } catch (Exception e) {
@@ -183,9 +183,9 @@ public class WebclientPlugin extends Plugin {
     /**
      * Creates a "Search" topic (a bucket).
      */
-    private Topic createSearchTopic(String searchTerm, Set<Topic> resultItems, ClientContext clientContext) {
+    private Topic createSearchTopic(String searchTerm, Set<Topic> resultItems, ClientState clientState) {
         // CompositeValue comp = new CompositeValue("{dm4.webclient.search_term: \"" + searchTerm + "\"}");
-        Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search" /*, comp */), clientContext);
+        Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search" /*, comp */), clientState);
         searchTopic.setChildTopicValue("dm4.webclient.search_term", new SimpleValue(searchTerm));
         //
         // associate result items
@@ -195,7 +195,7 @@ public class WebclientPlugin extends Plugin {
             AssociationModel assocModel = new AssociationModel("dm4.webclient.search_result_item");
             assocModel.setRoleModel1(new TopicRoleModel(searchTopic.getId(), "dm4.core.default"));
             assocModel.setRoleModel2(new TopicRoleModel(resultItem.getId(), "dm4.core.default"));
-            dms.createAssociation(assocModel, clientContext);
+            dms.createAssociation(assocModel, clientState);
         }
         return searchTopic;
     }
@@ -203,7 +203,7 @@ public class WebclientPlugin extends Plugin {
     // ---
 
     private boolean isSearchableUnit(Topic topic) {
-        TopicType topicType = dms.getTopicType(topic.getTypeUri(), null);           // FIXME: clientContext=null
+        TopicType topicType = dms.getTopicType(topic.getTypeUri(), null);           // FIXME: clientState=null
         Boolean isSearchableUnit = (Boolean) getViewConfig(topicType, "is_searchable_unit");
         return isSearchableUnit != null ? isSearchableUnit.booleanValue() : false;  // default is false
     }

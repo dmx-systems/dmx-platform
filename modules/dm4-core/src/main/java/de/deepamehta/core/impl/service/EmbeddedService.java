@@ -19,7 +19,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.ChangeReport;
-import de.deepamehta.core.service.ClientContext;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.CommandParams;
 import de.deepamehta.core.service.CommandResult;
 import de.deepamehta.core.service.DeepaMehtaService;
@@ -122,7 +122,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public AttachedTopic getTopic(@PathParam("id") long topicId,
                                   @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite,
-                                  @HeaderParam("Cookie") ClientContext clientContext) {
+                                  @HeaderParam("Cookie") ClientState clientState) {
         // logger.info("topicId=" + topicId + ", fetchComposite=" + fetchComposite);
         DeepaMehtaTransaction tx = beginTx();
         try {
@@ -189,7 +189,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public Set<Topic> searchTopics(@QueryParam("search")    String searchTerm,
                                    @QueryParam("field")     String fieldUri,
                                    @QueryParam("wholeword") boolean wholeWord,
-                                   @HeaderParam("Cookie")   ClientContext clientContext) {
+                                   @HeaderParam("Cookie")   ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             Set<Topic> topics = attach(storage.searchTopics(searchTerm, fieldUri, wholeWord), false);
@@ -198,7 +198,7 @@ public class EmbeddedService implements DeepaMehtaService {
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Searching topics failed (searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
-                fieldUri + "\", wholeWord=" + wholeWord + ", clientContext=" + clientContext + ")", e);
+                fieldUri + "\", wholeWord=" + wholeWord + ", clientState=" + clientState + ")", e);
         } finally {
             tx.finish();
         }
@@ -207,16 +207,16 @@ public class EmbeddedService implements DeepaMehtaService {
     @POST
     @Path("/topic")
     @Override
-    public AttachedTopic createTopic(TopicModel model, @HeaderParam("Cookie") ClientContext clientContext) {
+    public AttachedTopic createTopic(TopicModel model, @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            triggerHook(Hook.PRE_CREATE_TOPIC, model, clientContext);
+            triggerHook(Hook.PRE_CREATE_TOPIC, model, clientState);
             //
             AttachedTopic topic = new AttachedTopic(model, this);
             Directives directives = new Directives();   // ### FIXME: directives are ignored
-            topic.store(clientContext, directives);
+            topic.store(clientState, directives);
             //
-            triggerHook(Hook.POST_CREATE_TOPIC, topic, clientContext, directives);
+            triggerHook(Hook.POST_CREATE_TOPIC, topic, clientState, directives);
             triggerHook(Hook.POST_FETCH_TOPIC, topic);
             //
             tx.success();
@@ -232,13 +232,13 @@ public class EmbeddedService implements DeepaMehtaService {
     @PUT
     @Path("/topic")
     @Override
-    public Directives updateTopic(TopicModel model, @HeaderParam("Cookie") ClientContext clientContext) {
+    public Directives updateTopic(TopicModel model, @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopic topic = getTopic(model.getId(), true, clientContext);     // fetchComposite=true
+            AttachedTopic topic = getTopic(model.getId(), true, clientState);     // fetchComposite=true
             Directives directives = new Directives();
             //
-            topic.update(model, clientContext, directives);
+            topic.update(model, clientState, directives);
             //
             tx.success();
             return directives;
@@ -253,11 +253,11 @@ public class EmbeddedService implements DeepaMehtaService {
     @DELETE
     @Path("/topic/{id}")
     @Override
-    public Directives deleteTopic(@PathParam("id") long topicId, @HeaderParam("Cookie") ClientContext clientContext) {
+    public Directives deleteTopic(@PathParam("id") long topicId, @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         Topic topic = null;
         try {
-            topic = getTopic(topicId, true, clientContext);   // fetchComposite=true ### false?
+            topic = getTopic(topicId, true, clientState);   // fetchComposite=true ### false?
             //
             Directives directives = new Directives();
             //
@@ -330,13 +330,12 @@ public class EmbeddedService implements DeepaMehtaService {
     @POST
     @Path("/association")
     @Override
-    public Association createAssociation(AssociationModel model,
-                                         @HeaderParam("Cookie") ClientContext clientContext) {
+    public Association createAssociation(AssociationModel model, @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedAssociation assoc = new AttachedAssociation(model, this);
             Directives directives = new Directives();   // ### FIXME: directives are ignored
-            assoc.store(clientContext, directives);
+            assoc.store(clientState, directives);
             //
             tx.success();
             return assoc;
@@ -351,8 +350,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @PUT
     @Path("/association")
     @Override
-    public Directives updateAssociation(AssociationModel model,
-                                        @HeaderParam("Cookie") ClientContext clientContext) {
+    public Directives updateAssociation(AssociationModel model, @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedAssociation assoc = getAssociation(model.getId());
@@ -361,7 +359,7 @@ public class EmbeddedService implements DeepaMehtaService {
             // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
-            ChangeReport report = assoc.update(model, clientContext, directives);
+            ChangeReport report = assoc.update(model, clientState, directives);
             //
             directives.add(Directive.UPDATE_ASSOCIATION, assoc);
             //
@@ -382,8 +380,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @DELETE
     @Path("/association/{id}")
     @Override
-    public Directives deleteAssociation(@PathParam("id") long assocId,
-                                        @HeaderParam("Cookie") ClientContext clientContext) {
+    public Directives deleteAssociation(@PathParam("id") long assocId, @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         Association assoc = null;
         try {
@@ -434,7 +431,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Path("/topictype/{uri}")
     @Override
     public AttachedTopicType getTopicType(@PathParam("uri") String uri,
-                                          @HeaderParam("Cookie") ClientContext clientContext) {
+                                          @HeaderParam("Cookie") ClientState clientState) {
         if (uri == null) {
             throw new IllegalArgumentException("Tried to get a topic type with null URI");
         }
@@ -454,8 +451,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @POST
     @Path("/topictype")
     @Override
-    public TopicType createTopicType(TopicTypeModel topicTypeModel,
-                                     @HeaderParam("Cookie") ClientContext clientContext) {
+    public TopicType createTopicType(TopicTypeModel topicTypeModel, @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedTopicType topicType = new AttachedTopicType(topicTypeModel, this);
@@ -465,7 +461,7 @@ public class EmbeddedService implements DeepaMehtaService {
             //
             // Note: the modification must be applied *before* the enrichment.
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
-            triggerHook(Hook.MODIFY_TOPIC_TYPE, topicType, clientContext);
+            triggerHook(Hook.MODIFY_TOPIC_TYPE, topicType, clientState);
             //
             tx.success();
             return topicType;
@@ -481,19 +477,18 @@ public class EmbeddedService implements DeepaMehtaService {
     @PUT
     @Path("/topictype")
     @Override
-    public TopicType updateTopicType(TopicTypeModel topicTypeModel,
-                                     @HeaderParam("Cookie") ClientContext clientContext) {
+    public TopicType updateTopicType(TopicTypeModel topicTypeModel, @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            String topicTypeUri = getTopic(topicTypeModel.getId(), false, clientContext).getUri();  // fetchComp..=false
-            AttachedTopicType topicType = getTopicType(topicTypeUri, clientContext);
+            String topicTypeUri = getTopic(topicTypeModel.getId(), false, clientState).getUri();  // fetchComp..=false
+            AttachedTopicType topicType = getTopicType(topicTypeUri, clientState);
             Directives directives = new Directives();   // ### FIXME: directives are ignored
             //
             // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
             // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
             //
-            topicType.update(topicTypeModel, clientContext, directives);
+            topicType.update(topicTypeModel, clientState, directives);
             //
             // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
             //
@@ -530,7 +525,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Path("/assoctype/{uri}")
     @Override
     public AttachedAssociationType getAssociationType(@PathParam("uri") String uri,
-                                                      @HeaderParam("Cookie") ClientContext clientContext) {
+                                                      @HeaderParam("Cookie") ClientState clientState) {
         if (uri == null) {
             throw new IllegalArgumentException("Tried to get an association type with null URI");
         }
@@ -551,7 +546,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Path("/assoctype")
     @Override
     public AssociationType createAssociationType(AssociationTypeModel assocTypeModel,
-                                                 @HeaderParam("Cookie") ClientContext clientContext) {
+                                                 @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedAssociationType assocType = new AttachedAssociationType(assocTypeModel, this);
@@ -581,11 +576,11 @@ public class EmbeddedService implements DeepaMehtaService {
     @Consumes("application/json, multipart/form-data")
     @Override
     public CommandResult executeCommand(@PathParam("command") String command, CommandParams params,
-                                        @HeaderParam("Cookie") ClientContext clientContext) {
+                                        @HeaderParam("Cookie") ClientState clientState) {
         logger.info("command=\"" + command + "\", params=" + params);
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Iterator i = triggerHook(Hook.EXECUTE_COMMAND, command, params, clientContext).values().iterator();
+            Iterator i = triggerHook(Hook.EXECUTE_COMMAND, command, params, clientState).values().iterator();
             if (!i.hasNext()) {
                 throw new RuntimeException("Command is not handled by any plugin");
             }
@@ -755,7 +750,7 @@ public class EmbeddedService implements DeepaMehtaService {
      * Convenience method.
      */
     Association createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
-        // FIXME: clientContext=null
+        // FIXME: clientState=null
         return createAssociation(new AssociationModel(typeUri, roleModel1, roleModel2), null);
     }
 

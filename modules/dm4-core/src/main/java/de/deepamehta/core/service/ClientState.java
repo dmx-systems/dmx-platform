@@ -5,7 +5,7 @@ import java.util.Map;
 
 
 
-public class ClientContext {
+public class ClientState {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -17,9 +17,9 @@ public class ClientContext {
       * Converts a "Cookie" header value (String) to a map (key=String, value=String).
       * E.g. "user=jri; workspace_id=123" => {"user"="jri", "workspace_id"="123"}
       * <p>
-      * Called by JAX-RS container to create a ClientContext from a "Cookie" @HeaderParam
+      * Called by JAX-RS container to create a ClientState from a "Cookie" @HeaderParam
       */
-    public ClientContext(String cookie) {
+    public ClientState(String cookie) {
         if (cookie != null) {
             for (String value : cookie.split("; ")) {
                 String[] val = value.split("=");

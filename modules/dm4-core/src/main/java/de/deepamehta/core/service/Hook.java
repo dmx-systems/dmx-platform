@@ -27,11 +27,11 @@ public enum Hook {
 
     POST_FETCH_TOPIC("postFetchTopicHook", Topic.class),
 
-     PRE_CREATE_TOPIC("preCreateHook",  TopicModel.class, ClientContext.class),
-    POST_CREATE_TOPIC("postCreateHook", Topic.class,      ClientContext.class, Directives.class),
+     PRE_CREATE_TOPIC("preCreateHook",  TopicModel.class, ClientState.class),
+    POST_CREATE_TOPIC("postCreateHook", Topic.class,      ClientState.class, Directives.class),
 
      PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, TopicModel.class, Directives.class),
-    POST_UPDATE_TOPIC("postUpdateHook", Topic.class, TopicModel.class, ClientContext.class, Directives.class),
+    POST_UPDATE_TOPIC("postUpdateHook", Topic.class, TopicModel.class, ClientState.class, Directives.class),
 
      PRE_DELETE_ASSOCIATION("preDeleteAssociationHook",  Association.class, Directives.class),
     POST_DELETE_ASSOCIATION("postDeleteAssociationHook", Association.class, Directives.class),
@@ -45,9 +45,9 @@ public enum Hook {
     // Note: besides regular triggering (see {@link #createTopicType})
     // this hook is triggered by the plugin itself
     // (see {@link de.deepamehta.core.service.Plugin#introduceTypesToPlugin}).
-    MODIFY_TOPIC_TYPE("modifyTopicTypeHook", TopicType.class, ClientContext.class),
+    MODIFY_TOPIC_TYPE("modifyTopicTypeHook", TopicType.class, ClientState.class),
 
-    EXECUTE_COMMAND("executeCommandHook", String.class, CommandParams.class, ClientContext.class);
+    EXECUTE_COMMAND("executeCommandHook", String.class, CommandParams.class, ClientState.class);
 
     private final String methodName;
     private final Class[] paramClasses;

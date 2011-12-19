@@ -367,7 +367,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     private void storeDataTypeUri() {
         // remove current assignment
         long assocId = fetchDataTypeTopic().getAssociation().getId();
-        dms.deleteAssociation(assocId, null);  // clientContext=null
+        dms.deleteAssociation(assocId, null);  // clientState=null
         // create new assignment
         dms.associateDataType(getUri(), getDataTypeUri());
     }
@@ -476,7 +476,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         int count = 0;
         for (RelatedAssociation relAssoc : fetchSequence()) {
             Association assoc = relAssoc.getRelatingAssociation();
-            dms.deleteAssociation(assoc.getId(), null);    // clientContext=null
+            dms.deleteAssociation(assoc.getId(), null);    // clientState=null
             count++;
         }
         logger.info("### Deleting " + count + " sequence segments of " + className() + " \"" + getUri() + "\"");
