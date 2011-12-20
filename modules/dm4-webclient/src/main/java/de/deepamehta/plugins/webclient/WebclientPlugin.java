@@ -72,11 +72,11 @@ public class WebclientPlugin extends Plugin {
     }
 
     @Override
-    public void preUpdateHook(Topic topic, TopicModel newTopic, Directives directives) {
-        if (topic.getTypeUri().equals("dm4.files.file") && newTopic.getTypeUri().equals("dm4.webclient.icon")) {
+    public void preUpdateHook(Topic topic, TopicModel newModel, Directives directives) {
+        if (topic.getTypeUri().equals("dm4.files.file") && newModel.getTypeUri().equals("dm4.webclient.icon")) {
             String iconUrl = "/proxy/file:" + topic.getCompositeValue().getString("dm4.files.path");
             logger.info("### Retyping a file to an icon (iconUrl=" + iconUrl + ")");
-            newTopic.setSimpleValue(iconUrl);
+            newModel.setSimpleValue(iconUrl);
         }
     }
 
@@ -84,7 +84,8 @@ public class WebclientPlugin extends Plugin {
      * Once a view configuration is updated in the DB we must update the cached view configuration model.
      */
     @Override
-    public void postUpdateHook(Topic topic, TopicModel oldTopic, ClientState clientState, Directives directives) {
+    public void postUpdateHook(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
+                                                                                      Directives directives) {
         if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
             Type type = getType(topic);
             logger.info("### Updating view configuration for topic type \"" + type.getUri() + "\" (" + topic + ")");

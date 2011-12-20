@@ -240,7 +240,7 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // ---
 
-    public void preCreateHook(TopicModel topicModel, ClientState clientState) {
+    public void preCreateHook(TopicModel model, ClientState clientState) {
     }
 
     public void postCreateHook(Topic topic, ClientState clientState, Directives directives) {
@@ -248,10 +248,11 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // ---
 
-    public void preUpdateHook(Topic topic, TopicModel newTopic, Directives directives) {
+    public void preUpdateHook(Topic topic, TopicModel newModel, Directives directives) {
     }
 
-    public void postUpdateHook(Topic topic, TopicModel oldTopic, ClientState clientState, Directives directives) {
+    public void postUpdateHook(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
+                                                                                      Directives directives) {
     }
 
     // ---

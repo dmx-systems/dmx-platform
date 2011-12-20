@@ -31,7 +31,8 @@ public enum Hook {
     POST_CREATE_TOPIC("postCreateHook", Topic.class,      ClientState.class, Directives.class),
 
      PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, TopicModel.class, Directives.class),
-    POST_UPDATE_TOPIC("postUpdateHook", Topic.class, TopicModel.class, ClientState.class, Directives.class),
+    POST_UPDATE_TOPIC("postUpdateHook", Topic.class, TopicModel.class, TopicModel.class,
+                                        ClientState.class, Directives.class),
 
      PRE_DELETE_ASSOCIATION("preDeleteAssociationHook",  Association.class, Directives.class),
     POST_DELETE_ASSOCIATION("postDeleteAssociationHook", Association.class, Directives.class),
