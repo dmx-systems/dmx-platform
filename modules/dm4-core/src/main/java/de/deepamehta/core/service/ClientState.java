@@ -34,6 +34,15 @@ public class ClientState {
         return values.get(key);
     }
 
+    /**
+     * Convenience method.
+     */
+    public long getLong(String key) {
+        return Long.parseLong(get(key));
+    }
+
+    // ---
+
     @Override
     public String toString() {
         return values.toString();

@@ -9,8 +9,8 @@ function topicmaps_plugin() {
     var topicmap_topics             // All topicmaps in the DB (object, key: topicmap ID, value: topicmap topic)
     var topicmaps = {}              // Loaded topicmaps (key: topicmap ID, value: Topicmap object)
     var topicmap                    // Selected topicmap (Topicmap object)
-    var topicmap_renderers = {}     // Registered topicmap renderers (key: renderer URI, value: TopicmapRenderer object)
     var topicmap_renderer           // The topicmap renderer of the selected topicmap
+    var topicmap_renderers = {}     // Registered topicmap renderers (key: renderer URI, value: TopicmapRenderer object)
 
     // View
     var topicmap_menu               // A GUIToolkit Menu object
@@ -412,6 +412,7 @@ function topicmaps_plugin() {
         var renderer_uri = topicmap_topics[topicmap_id].get("dm4.topicmaps.topicmap_renderer_uri")
         topicmap_renderer = get_topicmap_renderer(renderer_uri)
         topicmap = load_topicmap(topicmap_id)
+        js.set_cookie("dm4_topicmap_id", topicmap_id)
     }
 
     function fetch_topicmap_topics() {
