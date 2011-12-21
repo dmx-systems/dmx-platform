@@ -263,7 +263,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     private RelatedTopic fetchDataTypeTopic() {
         try {
             RelatedTopic dataType = getRelatedTopic("dm4.core.aggregation", "dm4.core.type", null,
-                "dm4.core.data_type", false, false);     // fetchComposite=false
+                "dm4.core.data_type", false, false, null);      // fetchComposite=false
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to " + className() + " \"" +
                     getUri() + "\"");
@@ -277,7 +277,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private Set<IndexMode> fetchIndexModes() {
         ResultSet<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type", null,
-            "dm4.core.index_mode", false, false, 0);       // fetchComposite=false
+            "dm4.core.index_mode", false, false, 0, null);      // fetchComposite=false
         return IndexMode.fromTopics(topics.getItems());
     }
 
@@ -301,7 +301,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // fetch part topic types
         List assocTypeFilter = Arrays.asList("dm4.core.aggregation_def", "dm4.core.composition_def");
         ResultSet<RelatedTopic> partTopicTypes = getRelatedTopics(assocTypeFilter, "dm4.core.whole_type",
-            "dm4.core.part_type", "dm4.core.topic_type", false, false, 0);
+            "dm4.core.part_type", "dm4.core.topic_type", false, false, 0, null);
         //
         for (RelatedTopic partTopicType : partTopicTypes) {
             AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(dms);
@@ -350,7 +350,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     private void fetchViewConfig() {
         try {
             ResultSet<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type",
-                "dm4.core.view_config", null, true, false, 0);    // fetchComposite=true, fetchRelatingComposite=false
+                "dm4.core.view_config", null, true, false, 0, null);
             // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
             getModel().setViewConfig(new ViewConfigurationModel(dms.getTopicModels(topics.getItems())));
             initViewConfig();

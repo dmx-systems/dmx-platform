@@ -178,19 +178,19 @@ public class FilesPlugin extends Plugin implements FilesService {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Topic getFileTopic(String path) {
-        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false);     // fetchComposite=false
+        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false, null);   // fetchComposite=false
         if (topic != null) {
             return topic.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole", "dm4.files.file",
-                true, false);
+                true, false, null);
         }
         return null;
     }
 
     private Topic getFolderTopic(String path) {
-        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false);     // fetchComposite=false
+        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false, null);   // fetchComposite=false
         if (topic != null) {
             return topic.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole", "dm4.files.folder",
-                true, false);
+                true, false, null);
         }
         return null;
     }

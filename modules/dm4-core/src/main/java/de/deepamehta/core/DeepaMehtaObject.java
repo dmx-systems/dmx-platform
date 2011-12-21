@@ -67,7 +67,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // --- Topic Retrieval ---
 
-    ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize);
+    ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize, ClientState clientState);
 
     /**
      * Fetches and returns a related topic or <code>null</code> if no such topic extists.
@@ -78,7 +78,8 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * @param   othersTopicTypeUri  may be null
      */
     RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                 String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
+                                 String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+                                 ClientState clientState);
 
     /**
      * @param   assocTypeUri        may be null
@@ -87,7 +88,8 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * @param   othersTopicTypeUri  may be null
      */
     ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                  String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite, int maxResultSize);
+                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+                                    int maxResultSize, ClientState clientState);
 
     /**
      * @param   assocTypeUris       may be null
@@ -96,7 +98,8 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * @param   othersTopicTypeUri  may be null
      */
     ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                  String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite, int maxResultSize);
+                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+                                    int maxResultSize, ClientState clientState);
 
      // --- Association Retrieval ---
 

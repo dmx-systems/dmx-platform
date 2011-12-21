@@ -1,13 +1,14 @@
 package de.deepamehta.plugins.topicmaps.service;
 
 import de.deepamehta.plugins.topicmaps.model.Topicmap;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
 
 
 
 public interface TopicmapsService extends PluginService {
 
-    Topicmap getTopicmap(long topicmapId);
+    Topicmap getTopicmap(long topicmapId, ClientState clientState);
 
     long addTopicToTopicmap(long topicmapId, long topicId, int x, int y);
 

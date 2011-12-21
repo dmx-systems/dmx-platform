@@ -25,7 +25,7 @@ public enum Hook {
     // It is declared here for documentation purpose only.
     SERVICE_GONE("serviceGone", PluginService.class),
 
-    POST_FETCH_TOPIC("postFetchTopicHook", Topic.class),
+    POST_FETCH_TOPIC("postFetchTopicHook", Topic.class, ClientState.class, Directives.class),
 
      PRE_CREATE_TOPIC("preCreateHook",  TopicModel.class, ClientState.class),
     POST_CREATE_TOPIC("postCreateHook", Topic.class,      ClientState.class, Directives.class),

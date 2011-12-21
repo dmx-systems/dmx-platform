@@ -235,7 +235,7 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // ---
 
-    public void postFetchTopicHook(Topic topic) {
+    public void postFetchTopicHook(Topic topic, ClientState clientState, Directives directives) {
     }
 
     // ---
@@ -721,7 +721,7 @@ public class Plugin implements BundleActivator, EventHandler {
     }
 
     private Topic findPluginTopic() {
-        return dms.getTopic("uri", new SimpleValue(pluginId), false);    // fetchComposite=false
+        return dms.getTopic("uri", new SimpleValue(pluginId), false, null);     // fetchComposite=false
     }
 
     /**

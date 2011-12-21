@@ -50,7 +50,7 @@ public interface DeepaMehtaService {
      * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
      * (for dynamically created data fields, typically in migration classes).
      */
-    public Topic getTopic(String key, SimpleValue value, boolean fetchComposite);
+    public Topic getTopic(String key, SimpleValue value, boolean fetchComposite, ClientState clientState);
 
     // public Topic getTopic(String typeUri, String key, SimpleValue value);
 

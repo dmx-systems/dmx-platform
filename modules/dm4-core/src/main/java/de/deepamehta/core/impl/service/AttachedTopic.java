@@ -169,10 +169,11 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     public ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                 String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite, int maxResultSize) {
+                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+                                    int maxResultSize, ClientState clientState) {
         ResultSet<RelatedTopicModel> topics = dms.storage.getTopicRelatedTopics(getId(), assocTypeUris, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
-        return dms.attach(topics, fetchComposite, fetchRelatingComposite);
+        return dms.attach(topics, fetchComposite, fetchRelatingComposite, clientState);
     }
 
     // --- Association Retrieval ---
@@ -206,7 +207,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         directives.add(Directive.UPDATE_TOPIC, this);
         //
         dms.triggerHook(Hook.POST_UPDATE_TOPIC, this, model, oldModel, clientState, directives);
-        dms.triggerHook(Hook.POST_FETCH_TOPIC, this);
+        dms.triggerHook(Hook.POST_FETCH_TOPIC, this, clientState, directives);
         //
         return report;
     }
@@ -222,6 +223,6 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     private RelatedTopic fetchTypeTopic() {
         return getRelatedTopic("dm4.core.instantiation", "dm4.core.instance", "dm4.core.type", "dm4.core.topic_type",
-            false, false);     // fetchComposite=false
+            false, false, null);     // fetchComposite=false
     }
 }

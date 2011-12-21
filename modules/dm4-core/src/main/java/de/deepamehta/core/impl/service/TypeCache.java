@@ -80,7 +80,7 @@ class TypeCache {
 
     private AttachedTopicType loadTopicType(String topicTypeUri) {
         logger.info("Loading topic type \"" + topicTypeUri + "\"");
-        AttachedTopic typeTopic = dms.getTopic("uri", new SimpleValue(topicTypeUri), false);     // fetchComposite=false
+        AttachedTopic typeTopic = dms.getTopic("uri", new SimpleValue(topicTypeUri), false, null);
         // error check
         if (typeTopic == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
@@ -94,7 +94,7 @@ class TypeCache {
 
     private AttachedAssociationType loadAssociationType(String assocTypeUri) {
         logger.info("Loading association type \"" + assocTypeUri + "\"");
-        AttachedTopic typeTopic = dms.getTopic("uri", new SimpleValue(assocTypeUri), false);     // fetchComposite=false
+        AttachedTopic typeTopic = dms.getTopic("uri", new SimpleValue(assocTypeUri), false, null);
         // error check
         if (typeTopic == null) {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found");

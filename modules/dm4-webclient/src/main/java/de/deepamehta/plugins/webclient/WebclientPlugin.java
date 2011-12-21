@@ -170,7 +170,7 @@ public class WebclientPlugin extends Plugin {
                 searchableUnits.add(topic);
             } else {
                 Set<Topic> parentTopics = JSONHelper.toTopicSet(topic.getRelatedTopics((List) null,
-                    "dm4.core.part", "dm4.core.whole", null, false, false, 0)).getItems();
+                    "dm4.core.part", "dm4.core.whole", null, false, false, 0, null)).getItems();
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
                 } else {
@@ -227,7 +227,7 @@ public class WebclientPlugin extends Plugin {
 
     private Type getType(Topic viewConfig) {
         Topic typeTopic = viewConfig.getRelatedTopic("dm4.core.aggregation",
-            "dm4.core.view_config", "dm4.core.type", null, false, false);
+            "dm4.core.view_config", "dm4.core.type", null, false, false, null);
         return dms.getTopicType(typeTopic.getUri(), null);  // ### FIXME: handle assoc types
     }
 

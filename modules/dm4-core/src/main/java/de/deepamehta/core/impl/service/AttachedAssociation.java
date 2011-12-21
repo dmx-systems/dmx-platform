@@ -213,10 +213,11 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     public ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                 String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite, int maxResultSize) {
+                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+                                    int maxResultSize, ClientState clientState) {
         ResultSet<RelatedTopicModel> topics = dms.storage.getAssociationRelatedTopics(getId(), assocTypeUris,
             myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
-        return dms.attach(topics, fetchComposite, fetchRelatingComposite);
+        return dms.attach(topics, fetchComposite, fetchRelatingComposite, clientState);
     }
 
     // --- Association Retrieval ---
@@ -318,7 +319,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // FIXME: move to AttachedTopicRole / extend TopicRole interface?
     private Topic fetchRoleTopic(TopicRole role) {
         if (role.topicIdentifiedByUri()) {
-            return dms.getTopic("uri", new SimpleValue(role.getTopicUri()), false);     // fetchComposite=false
+            return dms.getTopic("uri", new SimpleValue(role.getTopicUri()), false, null);   // fetchComposite=false
         } else {
             return dms.getTopic(role.getTopicId(), false, null);    // fetchComposite=false, clientState=null
         }
@@ -329,6 +330,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     private RelatedTopic fetchTypeTopic() {
         // assocTypeUri=null (supposed to be "dm4.core.instantiation" but not possible ### explain)
         return getRelatedTopic(null, "dm4.core.instance", "dm4.core.type", "dm4.core.assoc_type",
-            false, false);     // fetchComposite=false
+            false, false, null);    // fetchComposite=false
     }
 }

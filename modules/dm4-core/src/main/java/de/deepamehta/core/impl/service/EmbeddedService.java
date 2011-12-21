@@ -126,7 +126,7 @@ public class EmbeddedService implements DeepaMehtaService {
         // logger.info("topicId=" + topicId + ", fetchComposite=" + fetchComposite);
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopic topic = attach(storage.getTopic(topicId), fetchComposite);
+            AttachedTopic topic = attach(storage.getTopic(topicId), fetchComposite, clientState);
             tx.success();
             return topic;
         } catch (Exception e) {
@@ -141,11 +141,12 @@ public class EmbeddedService implements DeepaMehtaService {
     @Path("/topic/by_value/{key}/{value}")
     @Override
     public AttachedTopic getTopic(@PathParam("key") String key, @PathParam("value") SimpleValue value,
-                                  @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
+                                  @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite,
+                                  @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             TopicModel topic = storage.getTopic(key, value);
-            AttachedTopic attachedTopic = topic != null ? attach(topic, fetchComposite) : null;
+            AttachedTopic attachedTopic = topic != null ? attach(topic, fetchComposite, clientState) : null;
             tx.success();
             return attachedTopic;
         } catch (Exception e) {
@@ -166,7 +167,7 @@ public class EmbeddedService implements DeepaMehtaService {
         try {
             ResultSet<Topic> topics = JSONHelper.toTopicSet(getTopicType(typeUri, null).getRelatedTopics(
                 "dm4.core.instantiation", "dm4.core.type", "dm4.core.instance", null, fetchComposite, false,
-                maxResultSize));
+                maxResultSize, null));
                 // othersTopicTypeUri=null
             /*
             for (Topic topic : topics) {
@@ -192,7 +193,7 @@ public class EmbeddedService implements DeepaMehtaService {
                                    @HeaderParam("Cookie")   ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Set<Topic> topics = attach(storage.searchTopics(searchTerm, fieldUri, wholeWord), false);
+            Set<Topic> topics = attach(storage.searchTopics(searchTerm, fieldUri, wholeWord), false, clientState);
             tx.success();
             return topics;
         } catch (Exception e) {
@@ -217,7 +218,7 @@ public class EmbeddedService implements DeepaMehtaService {
             topic.store(clientState, directives);
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientState, directives);
-            triggerHook(Hook.POST_FETCH_TOPIC, topic);
+            triggerHook(Hook.POST_FETCH_TOPIC, topic, clientState, directives);
             //
             tx.success();
             return topic;
@@ -411,9 +412,9 @@ public class EmbeddedService implements DeepaMehtaService {
     @Path("/topictype")
     @Override
     public Set<String> getTopicTypeUris() {
-        Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm4.core.topic_type")), false);
+        Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm4.core.topic_type")), false, null);
         ResultSet<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-            "dm4.core.instance", "dm4.core.topic_type", false, false, 0);
+            "dm4.core.instance", "dm4.core.topic_type", false, false, 0, null);
         Set<String> topicTypeUris = new HashSet();
         // add meta types
         topicTypeUris.add("dm4.core.topic_type");
@@ -511,9 +512,9 @@ public class EmbeddedService implements DeepaMehtaService {
     @Path("/assoctype")
     @Override
     public Set<String> getAssociationTypeUris() {
-        Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm4.core.assoc_type")), false);
+        Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm4.core.assoc_type")), false, null);
         ResultSet<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-            "dm4.core.instance", "dm4.core.assoc_type", false, false, 0);
+            "dm4.core.instance", "dm4.core.assoc_type", false, false, 0, null);
         Set<String> assocTypeUris = new HashSet();
         for (Topic assocType : assocTypes) {
             assocTypeUris.add(assocType.getUri());
@@ -710,13 +711,14 @@ public class EmbeddedService implements DeepaMehtaService {
                                                     @QueryParam("my_role_type_uri")      String myRoleTypeUri,
                                                     @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
                                                     @QueryParam("others_topic_type_uri") String othersTopicTypeUri,
-                                                    @QueryParam("max_result_size")       int maxResultSize) {
+                                                    @QueryParam("max_result_size")       int maxResultSize,
+                                                    @HeaderParam("Cookie")               ClientState clientState) {
         logger.info("topicId=" + topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
             "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri +
             "\", maxResultSize=" + maxResultSize);
         try {
-            return getTopic(topicId, false, null).getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-                othersTopicTypeUri, false, false, maxResultSize);  // fetchComposite=false (3x)
+            return getTopic(topicId, false, clientState).getRelatedTopics(assocTypeUri, myRoleTypeUri,
+                othersRoleTypeUri, othersTopicTypeUri, false, false, maxResultSize, clientState);
         } catch (Exception e) {
             throw new RuntimeException("Retrieving related topics of topic " + topicId + " failed (assocTypeUri=\"" +
                 assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", othersRoleTypeUri=\"" + othersRoleTypeUri +
@@ -762,39 +764,40 @@ public class EmbeddedService implements DeepaMehtaService {
      * Attaches this core service to a topic model fetched from storage layer.
      * Optionally fetches the topic's composite value from storage layer.
      */
-    AttachedTopic attach(TopicModel model, boolean fetchComposite) {
+    AttachedTopic attach(TopicModel model, boolean fetchComposite, ClientState clientState) {
         AttachedTopic topic = new AttachedTopic(model, this);
         fetchComposite(fetchComposite, topic);
         //
-        triggerHook(Hook.POST_FETCH_TOPIC, topic);
+        triggerHook(Hook.POST_FETCH_TOPIC, topic, clientState, null);       // directives=null
         //
         return topic;
     }
 
-    private Set<Topic> attach(Set<TopicModel> models, boolean fetchComposite) {
+    private Set<Topic> attach(Set<TopicModel> models, boolean fetchComposite, ClientState clientState) {
         Set<Topic> topics = new LinkedHashSet();
         for (TopicModel model : models) {
-            topics.add(attach(model, fetchComposite));
+            topics.add(attach(model, fetchComposite, clientState));
         }
         return topics;
     }
 
     // ---
 
-    AttachedRelatedTopic attach(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite) {
+    AttachedRelatedTopic attach(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite,
+                                                                                 ClientState clientState) {
         AttachedRelatedTopic relTopic = new AttachedRelatedTopic(model, this);
         fetchComposite(fetchComposite, fetchRelatingComposite, relTopic);
         //
-        triggerHook(Hook.POST_FETCH_TOPIC, relTopic);
+        triggerHook(Hook.POST_FETCH_TOPIC, relTopic, clientState, null);    // directives=null
         //
         return relTopic;
     }
 
     ResultSet<RelatedTopic> attach(ResultSet<RelatedTopicModel> models, boolean fetchComposite,
-                                                                        boolean fetchRelatingComposite) {
+                                   boolean fetchRelatingComposite, ClientState clientState) {
         Set<RelatedTopic> relTopics = new LinkedHashSet();
         for (RelatedTopicModel model : models) {
-            relTopics.add(attach(model, fetchComposite, fetchRelatingComposite));
+            relTopics.add(attach(model, fetchComposite, fetchRelatingComposite, clientState));
         }
         return new ResultSet<RelatedTopic>(models.getTotalCount(), relTopics);
     }

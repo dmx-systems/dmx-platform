@@ -199,9 +199,9 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     private Cardinality fetchCardinality(Association assoc) {
         Topic wholeCardinality = assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
-            "dm4.core.whole_cardinality", "dm4.core.cardinality", false, false);    // fetchComposite=false
+            "dm4.core.whole_cardinality", "dm4.core.cardinality", false, false, null);    // fetchComposite=false
         Topic partCardinality = assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
-            "dm4.core.part_cardinality", "dm4.core.cardinality", false, false);     // fetchComposite=false
+            "dm4.core.part_cardinality", "dm4.core.cardinality", false, false, null);     // fetchComposite=false
         Cardinality cardinality = new Cardinality();
         if (wholeCardinality != null) {
             cardinality.setWholeCardinalityUri(wholeCardinality.getUri());
@@ -216,7 +216,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     private ViewConfigurationModel fetchViewConfig(Association assoc) {
         ResultSet<RelatedTopic> topics = assoc.getRelatedTopics("dm4.core.aggregation", "dm4.core.assoc_def",
-            "dm4.core.view_config", null, true, false, 0);    // fetchComposite=true, fetchRelatingComposite=false
+            "dm4.core.view_config", null, true, false, 0, null);    // fetchComposite=true, fetchRelatingComposite=false
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
         return new ViewConfigurationModel(dms.getTopicModels(topics.getItems()));
     }

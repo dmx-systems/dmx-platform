@@ -9,12 +9,14 @@ import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Plugin;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -51,8 +53,8 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
     @GET
     @Path("/{id}")
     @Override
-    public Topicmap getTopicmap(@PathParam("id") long topicmapId) {
-        return new Topicmap(topicmapId, dms);
+    public Topicmap getTopicmap(@PathParam("id") long topicmapId, @HeaderParam("Cookie") ClientState clientState) {
+        return new Topicmap(topicmapId, dms, clientState);
     }
 
     @PUT
