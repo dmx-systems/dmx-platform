@@ -49,6 +49,7 @@ public class JSONHelper {
         return ids;
     }
 
+    // ### FIXME: can we drop this method? Work with "? extends Topic" instead?
     public static ResultSet<Topic> toTopicSet(ResultSet<RelatedTopic> relTopics) {
         Set<Topic> topics = new LinkedHashSet();
         for (Topic topic : relTopics) {

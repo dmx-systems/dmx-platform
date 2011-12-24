@@ -162,13 +162,13 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public ResultSet<Topic> getTopics(@PathParam("type_uri") String typeUri,
                                       @QueryParam("fetch_composite") @DefaultValue("false") boolean fetchComposite,
-                                      @QueryParam("max_result_size") int maxResultSize) {
+                                      @QueryParam("max_result_size") int maxResultSize,
+                                      @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            ResultSet<Topic> topics = JSONHelper.toTopicSet(getTopicType(typeUri, null).getRelatedTopics(
+            ResultSet<Topic> topics = JSONHelper.toTopicSet(getTopicType(typeUri, clientState).getRelatedTopics(
                 "dm4.core.instantiation", "dm4.core.type", "dm4.core.instance", null, fetchComposite, false,
-                maxResultSize, null));
-                // othersTopicTypeUri=null
+                maxResultSize, clientState));   // othersTopicTypeUri=null
             /*
             for (Topic topic : topics) {
                 triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, topic);
