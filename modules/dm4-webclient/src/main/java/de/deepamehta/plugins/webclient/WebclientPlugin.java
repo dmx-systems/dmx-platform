@@ -119,7 +119,7 @@ public class WebclientPlugin extends Plugin {
             logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\", wholeWord=" + wholeWord +
                 ", clientState=" + clientState);
             Set<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri, wholeWord, clientState);
-            Set<Topic> searchableUnits = findSearchableUnits(singleTopics);
+            Set<Topic> searchableUnits = findSearchableUnits(singleTopics, clientState);
             logger.info(singleTopics.size() + " single topics found, " + searchableUnits.size() + " searchable units");
             Topic searchTopic = createSearchTopic("\"" + searchTerm + "\"", searchableUnits, clientState);
             tx.success();
@@ -166,18 +166,18 @@ public class WebclientPlugin extends Plugin {
 
     // === Search ===
 
-    private Set<Topic> findSearchableUnits(Set<Topic> topics) {
+    private Set<Topic> findSearchableUnits(Set<Topic> topics, ClientState clientState) {
         Set<Topic> searchableUnits = new LinkedHashSet();
         for (Topic topic : topics) {
             if (isSearchableUnit(topic)) {
                 searchableUnits.add(topic);
             } else {
                 Set<Topic> parentTopics = JSONHelper.toTopicSet(topic.getRelatedTopics((List) null,
-                    "dm4.core.part", "dm4.core.whole", null, false, false, 0, null)).getItems();
+                    "dm4.core.part", "dm4.core.whole", null, false, false, 0, clientState)).getItems();
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
                 } else {
-                    searchableUnits.addAll(findSearchableUnits(parentTopics));
+                    searchableUnits.addAll(findSearchableUnits(parentTopics, clientState));
                 }
             }
         }
