@@ -406,13 +406,20 @@ function topicmaps_plugin() {
 
 
 
+    /**
+     * Updates the model to reflect the given topicmap is now selected.
+     */
     function set_selected_topicmap(topicmap_id) {
         if (LOG_TOPICMAPS) dm4c.log("Selecting topicmap " + topicmap_id)
-        // update model
+        // 1) update cookie
+        // Note: the cookie must be set *before* the topicmap is loaded.
+        // Server-side topic loading might depend on the topicmap type (postFetchTopicHook()).
+        js.set_cookie("dm4_topicmap_id", topicmap_id)
+        // 2) update "topicmap_renderer"
         var renderer_uri = topicmap_topics[topicmap_id].get("dm4.topicmaps.topicmap_renderer_uri")
         topicmap_renderer = get_topicmap_renderer(renderer_uri)
+        // 3) update "topicmap"
         topicmap = load_topicmap(topicmap_id)
-        js.set_cookie("dm4_topicmap_id", topicmap_id)
     }
 
     function fetch_topicmap_topics() {
