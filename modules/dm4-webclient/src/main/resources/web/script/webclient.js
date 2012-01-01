@@ -16,6 +16,7 @@ var dm4c = new function() {
     this.COMPOSITE_PATH_SEPARATOR = "/"
     this.REF_PREFIX = "ref_id:"
 
+    // Utilities
     this.restc = new RESTClient(CORE_SERVICE_URI)
     this.ui = new GUIToolkit()
     this.render = new RenderHelper()
@@ -47,9 +48,9 @@ var dm4c = new function() {
 
 
 
-    /******************/
-    /*** Controller ***/
-    /******************/
+    // ******************
+    // *** Controller ***
+    // ******************
 
 
 
@@ -62,18 +63,6 @@ var dm4c = new function() {
     // The names of the controller methods begins with "do_".
 
 
-
-    this.do_search = function(searchmode) {
-        try {
-            var search_topic = build_topic(dm4c.trigger_plugin_hook("search", searchmode)[0])
-            // alert("search_topic=" + JSON.stringify(search_topic))
-            dm4c.show_topic(search_topic, "show")
-        } catch (e) {
-            alert("ERROR while searching:\n\n" + JSON.stringify(e))
-        }
-    }
-
-    // ---
 
     /**
      * Fetches the topic and displays it on the page panel.
@@ -90,7 +79,6 @@ var dm4c = new function() {
         // update view
         dm4c.canvas.refresh()
         dm4c.page_panel.display(topics.display)
-        // Note: the show_topic() helper is not called here as the topic is already shown on the canvas.
     }
 
     /**
@@ -111,10 +99,29 @@ var dm4c = new function() {
     }
 
     /**
+     * Triggers the "post_reset_selection" hook (indirectly).
+     *
      * @param   no_history_update   Optional: boolean.
      */
     this.do_reset_selection = function(no_history_update) {
+        if (dm4c.LOG_HISTORY) dm4c.log("Resetting selection (no_history_update=" + no_history_update + ")")
+        // update model
         reset_selection(no_history_update)
+        // update view
+        dm4c.canvas.reset_selection(true)    // refresh_canvas=true
+        dm4c.page_panel.clear()
+    }
+
+    // ---
+
+    this.do_search = function(searchmode) {
+        try {
+            var search_topic = build_topic(dm4c.trigger_plugin_hook("search", searchmode)[0])
+            // alert("search_topic=" + JSON.stringify(search_topic))
+            dm4c.show_topic(search_topic, "show")
+        } catch (e) {
+            alert("ERROR while searching:\n\n" + JSON.stringify(e))
+        }
     }
 
     // ---
@@ -302,9 +309,9 @@ var dm4c = new function() {
 
 
 
-    /*************************/
-    /*** Controller Helper ***/
-    /*************************/
+    // *************************
+    // *** Controller Helper ***
+    // *************************
 
 
 
@@ -406,6 +413,8 @@ var dm4c = new function() {
     // ---
 
     /**
+     * Processes an UPDATE_TOPIC directive.
+     * 
      * Updates a topic on the view (canvas and page panel).
      * Triggers the "post_update_topic" hook.
      *
@@ -420,6 +429,8 @@ var dm4c = new function() {
     }
 
     /**
+     * Processes an UPDATE_ASSOCIATION directive.
+     * 
      * Updates an association on the view (canvas and page panel).
      * Triggers the "post_update_association" hook.
      *
@@ -473,6 +484,20 @@ var dm4c = new function() {
         dm4c.canvas.refresh()
     }
 
+    // ---
+
+    function reset_selection_conditionally(object_id) {
+        if (object_id == dm4c.selected_object.id) {
+            dm4c.do_reset_selection()
+        }
+    }
+
+
+
+    // *************
+    // *** Model ***
+    // *************
+
 
 
     // === Selection ===
@@ -495,37 +520,22 @@ var dm4c = new function() {
         dm4c.trigger_plugin_hook("post_select_association", assoc)
     }
 
-    // ---
-
-    function reset_selection_conditionally(object_id) {
-        if (object_id == dm4c.selected_object.id) {
-            reset_selection()
-        }
-    }
-
-    /**
-     * @param   no_history_update   Optional: boolean.
-     */
     function reset_selection(no_history_update) {
-        if (dm4c.LOG_HISTORY) dm4c.log("Resetting selection (no_history_update=" + no_history_update + ")")
         // update model
         dm4c.selected_object = null
         //
         if (!no_history_update) {
             push_history()
         }
-        // update view
-        dm4c.canvas.reset_selection(true)    // refresh_canvas=true
-        dm4c.page_panel.clear()
         // trigger hook
         dm4c.trigger_plugin_hook("post_reset_selection")
     }
 
 
 
-    /***********************/
-    /*** Database Helper ***/
-    /***********************/
+    // ***********************
+    // *** Database Helper ***
+    // ***********************
 
 
 
@@ -593,9 +603,9 @@ var dm4c = new function() {
 
 
 
-    /**********************/
-    /*** Plugin Support ***/
-    /**********************/
+    // *********************
+    // *** Plugin Helper ***
+    // *********************
 
 
 
@@ -679,9 +689,9 @@ var dm4c = new function() {
 
 
 
-    /**************/
-    /*** Helper ***/
-    /**************/
+    // **************
+    // *** Helper ***
+    // **************
 
 
 
