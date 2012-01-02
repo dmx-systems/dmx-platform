@@ -3,6 +3,8 @@
  */
 function default_plugin () {
 
+    var type_menu
+
     dm4c.register_page_renderer("/script/page_renderers/topic_renderer.js")
     dm4c.register_page_renderer("/script/page_renderers/association_renderer.js")
 
@@ -16,17 +18,9 @@ function default_plugin () {
     dm4c.register_field_renderer("/script/field_renderers/body_text_renderer.js")
     dm4c.register_field_renderer("/script/field_renderers/search_result_renderer.js")
 
-    var type_menu
+    // === Webclient Handler ===
 
-
-
-    // ***********************************************************
-    // *** Webclient Hooks (triggered by deepamehta-webclient) ***
-    // ***********************************************************
-
-
-
-    this.init = function() {
+    dm4c.register_plugin_handler("init", function() {
 
         dm4c.ui.dialog("delete-topic-dialog",       "Delete Topic?",       undefined, undefined,
             "Delete", do_delete_topic)
@@ -52,9 +46,9 @@ function default_plugin () {
             $("#retype-topic-dialog").dialog("close")
             dm4c.do_retype_topic(dm4c.selected_object, type_uri)
         }
-    }
+    })
 
-    this.topic_commands = function(topic) {
+    dm4c.register_plugin_handler("topic_commands", function(topic) {
         var commands = []
         //
         commands.push({label: "Hide",       handler: do_hide,      context: "context-menu"})
@@ -110,9 +104,9 @@ function default_plugin () {
             dm4c.trigger_plugin_hook("post_submit_form", topic)
             dm4c.page_panel.refresh()
         }
-    }
+    })
 
-    this.association_commands = function(assoc) {
+    dm4c.register_plugin_handler("association_commands", function(assoc) {
         var commands = []
         //
         commands.push({label: "Hide",       handler: do_hide,    context: "context-menu"})
@@ -155,9 +149,9 @@ function default_plugin () {
             dm4c.trigger_plugin_hook("post_submit_form", assoc)
             dm4c.page_panel.refresh()
         }
-    }
+    })
 
-    this.canvas_commands = function(cx, cy) {
+    dm4c.register_plugin_handler("canvas_commands", function(cx, cy) {
         var commands = []
         // Note: type_uri is undefined if the user has no create permission or has nothing created yet
         var type_uri = dm4c.toolbar.get_recent_type_uri()
@@ -172,5 +166,5 @@ function default_plugin () {
         function do_create() {
             dm4c.do_create_topic(type_uri, cx, cy)
         }
-    }
+    })
 }

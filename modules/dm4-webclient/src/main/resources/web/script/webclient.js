@@ -16,6 +16,11 @@ var dm4c = new function() {
     this.COMPOSITE_PATH_SEPARATOR = "/"
     this.REF_PREFIX = "ref_id:"
 
+    // log window
+    if (ENABLE_LOGGING) {
+        var log_window = window.open()
+    }
+
     var pm = new PluginManager({
         embedded_plugins: [
             "/script/embedded_plugins/default_plugin.js",
@@ -24,26 +29,21 @@ var dm4c = new function() {
         ]
     })
 
-    // Utilities
+    // utilities
     this.restc = new RESTClient(CORE_SERVICE_URI)
     this.ui = new GUIToolkit()
     this.render = new RenderHelper()
 
-    // Model
+    // model
     this.selected_object = null     // a Topic or an Association object, or null if there is no selection
     this.type_cache = new TypeCache()
 
-    // View
+    // view
     this.split_panel = null         // a SplitPanel object
     this.toolbar = null             // the upper toolbar GUI component (a ToolbarPanel object)
     this.canvas = null              // the canvas GUI component that displays the topicmap (a TopicmapRenderer object)
     this.page_panel = null          // the page panel GUI component on the right hand side (a PagePanel object)
     this.upload_dialog = null       // the upload dialog (an UploadDialog object)
-
-    // log window
-    if (ENABLE_LOGGING) {
-        var log_window = window.open()
-    }
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -622,6 +622,10 @@ var dm4c = new function() {
         pm.register_css_stylesheet(css_path)
     }
 
+    this.register_plugin_handler = function(hook_name, plugin_handler) {
+        pm.register_plugin_handler(hook_name, plugin_handler)
+    }
+
     /**
      * Loads a Javascript file dynamically. Synchronous and asynchronous loading is supported.
      *
@@ -647,7 +651,7 @@ var dm4c = new function() {
      * @param   <varargs>   Variable number of arguments. Passed to the hook.
      */
     this.trigger_plugin_hook = function(hook_name) {
-        return pm.trigger_plugin_hook.apply(undefined, arguments)
+        return pm.trigger_plugin_handlers.apply(undefined, arguments)
     }
 
     this.trigger_page_renderer_hook = function(topic_or_association, hook_name, args) {

@@ -1,14 +1,60 @@
 function PluginManager(config) {
 
     var plugin_sources = config.embedded_plugins
-    var plugins = {}                // key: plugin class name, base name of source file (string), value: plugin instance
+    var plugins = {}            // key: plugin class name, base name of source file (string), value: plugin instance
 
     var page_renderer_sources = []
-    var page_renderers = {}         // key: page renderer class name, camel case (string), value: renderer instance
+    var page_renderers = {}     // key: page renderer class name, camel case (string), value: renderer instance
 
     var field_renderer_sources = []
 
     var css_stylesheets = []
+
+    // key: hook name, value: registered handlers (array of functions)
+    var plugin_handlers = {
+        // Plugin
+        init: [],
+        // Commands
+        topic_commands: [],
+        association_commands: [],
+        canvas_commands: [],
+        // Storage
+        post_create_topic: [],
+        post_update_topic: [],
+        post_update_association: [],
+        post_delete_topic: [],
+        post_delete_association: [],
+        // Selection
+        post_select_topic: [],
+        post_select_association: [],
+        post_reset_selection: [],
+        // Show/Hide
+        pre_show_topic: [],
+        post_show_topic: [],
+        post_show_association: [],
+        post_hide_topic: [],
+        post_hide_association: [],
+        // Toolbar
+        searchmode_widget: [],
+        search: [],
+        post_refresh_create_menu: [],
+        // Page Panel
+        pre_render_page: [],
+        pre_render_form: [],
+        post_submit_form: [],
+        // Canvas
+        topic_doubleclicked: [],
+        post_move_topic: [],
+        post_move_canvas: [],
+        pre_draw_canvas: [],
+        process_drop: [],
+        // History
+        pre_push_history: [],
+        pre_pop_history: [],
+        // Permissions
+        has_write_permission: [],
+        has_create_permission: []
+    }
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -51,7 +97,16 @@ function PluginManager(config) {
         css_stylesheets.push(css_path)
     }
 
-    // ---
+    // === Plugin Handlers ===
+
+    this.register_plugin_handler = function(hook_name, plugin_handler) {
+        //
+        if (!plugin_handlers[hook_name]) {
+            throw "PluginManagerError: \"" + hook_name + "\" is an unsupported hook"
+        }
+        //
+        plugin_handlers[hook_name].push(plugin_handler)
+    }
 
     /**
      * Triggers the named hook of all installed plugins.
@@ -59,21 +114,21 @@ function PluginManager(config) {
      * @param   hook_name   Name of the plugin hook to trigger.
      * @param   <varargs>   Variable number of arguments. Passed to the hook.
      */
-    this.trigger_plugin_hook = function(hook_name) {
+    this.trigger_plugin_handlers = function(hook_name) {
         var result = []
-        var args = Array.prototype.slice.call(arguments)    // create real array from arguments object
-        args.shift()                                        // drop hook_name argument
-        for (var plugin_class in plugins) {
-            var plugin = dm4c.get_plugin(plugin_class)
-            if (plugin[hook_name]) {
-                // trigger hook
-                var res = plugin[hook_name].apply(plugin, args)
-                // store result
-                if (res !== undefined) {    // Note: undefined is not added to the result, but null is
-                    result.push(res)
-                }
+        //
+        var args = Array.prototype.slice.call(arguments)        // create real array from arguments object
+        args.shift()                                            // drop hook_name argument
+        //
+        for (var i = 0, plugin_handler; plugin_handler = plugin_handlers[hook_name][i]; i++) {
+            // trigger hook
+            var res = plugin_handler.apply(undefined, args)     // FIXME: pass plugin reference for "this"?
+            // store result
+            if (res !== undefined) {    // Note: undefined is not added to the result, but null is
+                result.push(res)
             }
         }
+        //
         return result
     }
 
@@ -126,12 +181,12 @@ function PluginManager(config) {
                 plugins_complete++
                 if (plugins_complete == plugin_sources.length) {
                     if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("PLUGINS COMPLETE!")
-                    all_plugins_complete()
+                    all_plugins_loaded()
                 }
             })
         }
 
-        function all_plugins_complete() {
+        function all_plugins_loaded() {
             load_page_renderers()
             load_field_renderers()
             load_stylesheets()
