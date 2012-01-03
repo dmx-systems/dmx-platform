@@ -26,9 +26,9 @@ function help_plugin() {
                         '<div class="field-label">Version</div>' +
                         '<div class="field-value">${project.version}</div>' +
                         '<div class="field-label">Release Date</div>' +
-                        '<div class="field-value">Jan 2, 2012</div>' +
+                        '<div class="field-value">Jan 3, 2012</div>' +
                         '<div class="field-label">Copyright</div>' +
-                        '<div class="field-value">2000-2011 Jörg Richter</div>' +
+                        '<div class="field-value">2000-2012 Jörg Richter</div>' +
                         '<div class="field-label">License</div>' +
                         '<div class="field-value">GNU General Public License, v3</div>' +
                         '<div class="field-label">Website</div>' +

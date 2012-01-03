@@ -10,51 +10,55 @@ function PluginManager(config) {
 
     var css_stylesheets = []
 
-    // key: hook name, value: registered handlers (array of functions)
-    var plugin_handlers = {
+    // key: hook name (string), value: registered handlers (array of functions)
+    var plugin_handlers = {}
+
+    // ### FIXME: drop this. Not in use. Only here for documentation purposes.
+    // ### TODO: move to wiki documentation.
+    var hook_names = [
         // Plugin
-        init: [],
+        "init",
         // Commands
-        topic_commands: [],
-        association_commands: [],
-        canvas_commands: [],
+        "topic_commands",
+        "association_commands",
+        "canvas_commands",
         // Storage
-        post_create_topic: [],
-        post_update_topic: [],
-        post_update_association: [],
-        post_delete_topic: [],
-        post_delete_association: [],
+        "post_create_topic",
+        "post_update_topic",
+        "post_update_association",
+        "post_delete_topic",
+        "post_delete_association",
         // Selection
-        post_select_topic: [],
-        post_select_association: [],
-        post_reset_selection: [],
+        "post_select_topic",
+        "post_select_association",
+        "post_reset_selection",
         // Show/Hide
-        pre_show_topic: [],
-        post_show_topic: [],
-        post_show_association: [],
-        post_hide_topic: [],
-        post_hide_association: [],
+        "pre_show_topic",
+        "post_show_topic",
+        "post_show_association",
+        "post_hide_topic",
+        "post_hide_association",
         // Toolbar
-        searchmode_widget: [],
-        search: [],
-        post_refresh_create_menu: [],
+        "searchmode_widget",
+        "search",
+        "post_refresh_create_menu",
         // Page Panel
-        pre_render_page: [],
-        pre_render_form: [],
-        post_submit_form: [],
+        "pre_render_page",
+        "pre_render_form",
+        "post_submit_form",
         // Canvas
-        topic_doubleclicked: [],
-        post_move_topic: [],
-        post_move_canvas: [],
-        pre_draw_canvas: [],
-        process_drop: [],
+        "topic_doubleclicked",
+        "post_move_topic",
+        "post_move_canvas",
+        "pre_draw_canvas",
+        "process_drop",
         // History
-        pre_push_history: [],
-        pre_pop_history: [],
+        "pre_push_history",
+        "pre_pop_history",
         // Permissions
-        has_write_permission: [],
-        has_create_permission: []
-    }
+        "has_write_permission",
+        "has_create_permission"
+    ]
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -99,19 +103,10 @@ function PluginManager(config) {
 
     // === Plugin Handlers ===
 
-    this.add_hook = function(hook_name) {
-        //
-        if (hook_exists(hook_name)) {
-            throw "PluginManagerError: hook with name \"" + hook_name + "\" already exists"
-        }
-        //
-        plugin_handlers[hook_name] = []
-    }
-
     this.register_plugin_handler = function(hook_name, plugin_handler) {
-        //
+        // introduce hook on-demand
         if (!hook_exists(hook_name)) {
-            throw "PluginManagerError: \"" + hook_name + "\" is an unsupported hook"
+            plugin_handlers[hook_name] = []
         }
         //
         register_plugin_handler(hook_name, plugin_handler)
@@ -128,15 +123,19 @@ function PluginManager(config) {
     this.trigger_plugin_handlers = function(hook_name) {
         var result = []
         //
-        var args = Array.prototype.slice.call(arguments)        // create real array from arguments object
-        args.shift()                                            // drop hook_name argument
-        //
-        for (var i = 0, plugin_handler; plugin_handler = plugin_handlers[hook_name][i]; i++) {
-            // trigger hook
-            var res = plugin_handler.apply(undefined, args)     // FIXME: pass plugin reference for "this"?
-            // store result
-            if (res !== undefined) {    // Note: undefined is not added to the result, but null is
-                result.push(res)
+        var handlers = plugin_handlers[hook_name]
+        if (handlers) {
+            // build arguments
+            var args = Array.prototype.slice.call(arguments)    // create real array from arguments object
+            args.shift()                                        // drop hook_name argument
+            //
+            for (var i = 0, handler; handler = handlers[i]; i++) {
+                // trigger hook
+                var res = handler.apply(undefined, args)        // FIXME: pass plugin reference for "this"?
+                // store result
+                if (res !== undefined) {    // Note: undefined is not added to the result, but null is
+                    result.push(res)
+                }
             }
         }
         //

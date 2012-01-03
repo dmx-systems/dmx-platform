@@ -23,10 +23,6 @@ function files_plugin() {
         return this.request("GET", "/files/" + file_topic_id)
     }
 
-    // === Hook Extension ===
-
-    dm4c.add_hook("process_files_drop")
-
     // === Webclient Handler ===
 
     dm4c.register_plugin_handler("process_drop", function(data_transfer) {

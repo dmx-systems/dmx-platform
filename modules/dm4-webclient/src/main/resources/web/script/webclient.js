@@ -624,10 +624,6 @@ var dm4c = new function() {
 
     // ---
 
-    this.add_hook = function(hook_name) {
-        pm.add_hook(hook_name)
-    }
-
     this.register_plugin_handler = function(hook_name, plugin_handler) {
         pm.register_plugin_handler(hook_name, plugin_handler)
     }

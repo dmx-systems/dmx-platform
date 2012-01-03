@@ -17,12 +17,6 @@ function topicmaps_plugin() {
 
 
 
-    // === Hook Extension ===
-
-    dm4c.add_hook("topicmap_renderer")
-
-
-
     // === Webclient Handler ===
 
     dm4c.register_plugin_handler("init", function() {
@@ -286,16 +280,12 @@ function topicmaps_plugin() {
 
     // === Access Control Handler ===
 
-    // Note: registration of non-Webclient handlers must be done at plugin initialization time.
-    dm4c.register_plugin_handler("init", function(type_menu) {
-        if (dm4c.get_plugin("accesscontrol_plugin")) {
-            dm4c.register_plugin_handler("user_logged_in", function(user) {
-                rebuild_topicmap_menu()
-            })
-            dm4c.register_plugin_handler("user_logged_out", function() {
-                rebuild_topicmap_menu()
-            })
-        }
+    dm4c.register_plugin_handler("user_logged_in", function(user) {
+        rebuild_topicmap_menu()
+    })
+
+    dm4c.register_plugin_handler("user_logged_out", function() {
+        rebuild_topicmap_menu()
     })
 
 
