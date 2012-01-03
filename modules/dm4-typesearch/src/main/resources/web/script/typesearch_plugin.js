@@ -5,19 +5,13 @@ function typesearch_plugin() {
 
     var type_menu
 
+    // === Webclient Handler ===
 
-
-    // ***********************************************************
-    // *** Webclient Hooks (triggered by deepamehta-webclient) ***
-    // ***********************************************************
-
-
-
-    this.init = function() {
+    dm4c.register_plugin_handler("init", function() {
         dm4c.toolbar.searchmode_menu.add_item({label: "By Type", value: "by-type"})
-    }
+    })
 
-    this.searchmode_widget = function(searchmode) {
+    dm4c.register_plugin_handler("searchmode_widget", function(searchmode) {
         if (searchmode == "by-type") {
             // enable search button
             dm4c.toolbar.search_button.button("enable")
@@ -27,40 +21,40 @@ function typesearch_plugin() {
             //
             return type_menu.dom
         }
-    }
+    })
 
-    this.search = function(searchmode) {
+    dm4c.register_plugin_handler("search", function(searchmode) {
         if (searchmode == "by-type") {
             return dm4c.restc.get_topics_and_create_bucket(get_type_uri(), dm4c.MAX_RESULT_SIZE)
         }
-    }
+    })
 
     /**
      * Once a "Topic Type" topic is created we refresh the type menu.
      */
-    this.post_create_topic = function(topic) {
+    dm4c.register_plugin_handler("post_create_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
             refresh_type_menu()
         }
-    }
+    })
 
     /**
      * Once a "Topic Type" topic is updated we refresh the type menu.
      */
-    this.post_update_topic = function(topic, old_topic) {
+    dm4c.register_plugin_handler("post_update_topic", function(topic, old_topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
             refresh_type_menu()
         }
-    }
+    })
 
     /**
      * Once a "Topic Type" topic is deleted we refresh the type menu.
      */
-    this.post_delete_topic = function(topic) {
+    dm4c.register_plugin_handler("post_delete_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
             refresh_type_menu()
         }
-    }
+    })
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 

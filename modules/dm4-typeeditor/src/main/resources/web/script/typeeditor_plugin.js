@@ -1,6 +1,6 @@
 function typeeditor_plugin() {
 
-    dm4c.register_page_renderer("/de.deepamehta.typeeditor/script/topictype_renderer.js")
+    dm4c.register_page_renderer("/de.deepamehta.typeeditor/script/page_renderers/topictype_renderer.js")
     dm4c.register_css_stylesheet("/de.deepamehta.typeeditor/style/typeeditor.css")
 
     // Note: no "uri" is set here. A new topic type gets its default URI at server-side.
@@ -18,15 +18,7 @@ function typeeditor_plugin() {
         ]
     }
 
-    // ------------------------------------------------------------------------------------------------------ Public API
-
-
-
-    // ***********************************************************
-    // *** Webclient Hooks (triggered by deepamehta-webclient) ***
-    // ***********************************************************
-
-
+    // === Webclient Handler ===
 
     /**
      * Once a topic type is created we must refresh the "Create" type menu.
@@ -34,22 +26,22 @@ function typeeditor_plugin() {
      * @param   topic   The topic just created.
      *                  Note: in case the just created topic is a type, the entire type definition is passed.
      */
-    this.post_create_topic = function(topic) {
+    dm4c.register_plugin_handler("post_create_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
             dm4c.refresh_create_menu()
         }
-    }
+    })
 
     /**
      * Once a topic type is updated we must refresh the "Create" type menu.
      */
-    this.post_update_topic = function(topic, old_topic) {
+    dm4c.register_plugin_handler("post_update_topic", function(topic, old_topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
             dm4c.refresh_create_menu()
         }
-    }
+    })
 
-    this.post_refresh_create_menu = function(type_menu) {
+    dm4c.register_plugin_handler("post_refresh_create_menu", function(type_menu) {
         type_menu.add_separator()
         type_menu.add_item({
             label: "New Topic Type",
@@ -59,5 +51,5 @@ function typeeditor_plugin() {
                 dm4c.do_create_topic_type(DEFAULT_TOPIC_TYPE)
             }
         })
-    }
+    })
 }

@@ -5,17 +5,11 @@ function workspaces_plugin() {
     // view
     var workspace_menu
 
-    // ------------------------------------------------------------------------------------------------------ Public API
 
 
+    // === Webclient Handler ===
 
-    // ***********************************************************
-    // *** Webclient Hooks (triggered by deepamehta-webclient) ***
-    // ***********************************************************
-
-
-
-    this.init = function() {
+    dm4c.register_plugin_handler("init", function() {
 
         var workspaces = get_all_workspaces()
         create_workspace_menu()
@@ -42,41 +36,41 @@ function workspaces_plugin() {
                     .append($("<input>").attr({id: "workspace_name", size: 30})))
             dm4c.ui.dialog("workspace-dialog", "New Workspace", workspace_dialog, "auto", "OK", do_create_workspace)
         }
-    }
+    })
 
     /**
      * @param   topic   a Topic object
      */
-    this.post_update_topic = function(topic, old_topic) {
+    dm4c.register_plugin_handler("post_update_topic", function(topic, old_topic) {
         if (topic.type_uri == "dm4.workspaces.workspace") {
             rebuild_workspace_menu()
         }
-    }
+    })
 
     /**
      * @param   topic   a Topic object
      */
-    this.post_delete_topic = function(topic) {
+    dm4c.register_plugin_handler("post_delete_topic", function(topic) {
         if (topic.type_uri == "dm4.workspaces.workspace") {
             rebuild_workspace_menu()
         }
-    }
+    })
 
 
 
-    // ********************************************************************
-    // *** Access Control Hooks (triggered by deepamehta-accesscontrol) ***
-    // ********************************************************************
+    // === Access Control Handler ===
 
-
-
-    this.user_logged_in = function(user) {
-        rebuild_workspace_menu()
-    }
-
-    this.user_logged_out = function() {
-        rebuild_workspace_menu()
-    }
+    // Note: registration of non-Webclient handlers must be done at plugin initialization time.
+    dm4c.register_plugin_handler("init", function(type_menu) {
+        if (dm4c.get_plugin("accesscontrol_plugin")) {
+            dm4c.register_plugin_handler("user_logged_in", function(user) {
+                rebuild_workspace_menu()
+            })
+            dm4c.register_plugin_handler("user_logged_out", function() {
+                rebuild_workspace_menu()
+            })
+        }
+    })
 
 
 

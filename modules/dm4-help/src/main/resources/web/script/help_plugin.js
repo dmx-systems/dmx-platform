@@ -2,18 +2,12 @@ function help_plugin() {
 
     dm4c.register_css_stylesheet("/de.deepamehta.help/style/help.css")
 
+    // === Webclient Handler ===
 
-
-    // ***********************************************************
-    // *** Webclient Hooks (triggered by deepamehta-webclient) ***
-    // ***********************************************************
-
-
-
-    this.init = function() {
+    dm4c.register_plugin_handler("init", function() {
         dm4c.toolbar.special_menu.add_item({label: "About DeepaMehta", handler: do_about})
         dm4c.ui.dialog("about-dialog", "About DeepaMehta", dialog_content(), "auto")
-    }
+    })
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
@@ -30,7 +24,9 @@ function help_plugin() {
                     '</td>' +
                     '<td>' +
                         '<div class="field-label">Version</div>' +
-                        '<div class="field-value">${project.version} / Nov 29, 2011</div>' +
+                        '<div class="field-value">${project.version}</div>' +
+                        '<div class="field-label">Release Date</div>' +
+                        '<div class="field-value">Jan 2, 2012</div>' +
                         '<div class="field-label">Copyright</div>' +
                         '<div class="field-value">2000-2011 Jörg Richter</div>' +
                         '<div class="field-label">License</div>' +

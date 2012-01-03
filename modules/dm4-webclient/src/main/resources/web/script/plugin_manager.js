@@ -99,14 +99,25 @@ function PluginManager(config) {
 
     // === Plugin Handlers ===
 
+    this.add_hook = function(hook_name) {
+        //
+        if (hook_exists(hook_name)) {
+            throw "PluginManagerError: hook with name \"" + hook_name + "\" already exists"
+        }
+        //
+        plugin_handlers[hook_name] = []
+    }
+
     this.register_plugin_handler = function(hook_name, plugin_handler) {
         //
-        if (!plugin_handlers[hook_name]) {
+        if (!hook_exists(hook_name)) {
             throw "PluginManagerError: \"" + hook_name + "\" is an unsupported hook"
         }
         //
-        plugin_handlers[hook_name].push(plugin_handler)
+        register_plugin_handler(hook_name, plugin_handler)
     }
+
+    // ---
 
     /**
      * Triggers the named hook of all installed plugins.
@@ -154,6 +165,16 @@ function PluginManager(config) {
 
     function register_plugin(source_path) {
         plugin_sources.push(source_path)
+    }
+
+    // ---
+
+    function register_plugin_handler(hook_name, plugin_handler) {
+        plugin_handlers[hook_name].push(plugin_handler)
+    }
+
+    function hook_exists(hook_name) {
+        return plugin_handlers[hook_name]
     }
 
     // ---

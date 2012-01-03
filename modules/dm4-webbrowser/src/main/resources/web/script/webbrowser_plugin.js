@@ -1,16 +1,10 @@
 function webbrowser_plugin() {
 
-    dm4c.register_page_renderer("/de.deepamehta.webbrowser/script/webpage_renderer.js")
+    dm4c.register_page_renderer("/de.deepamehta.webbrowser/script/page_renderers/webpage_renderer.js")
 
+    // === Webclient Handler ===
 
-
-    // ***********************************************************
-    // *** Webclient Hooks (triggered by deepamehta-webclient) ***
-    // ***********************************************************
-
-
-
-    this.topic_commands = function(topic) {
+    dm4c.register_plugin_handler("topic_commands", function(topic) {
 
         if (topic.type_uri == "dm4.webbrowser.url") {
             return [
@@ -46,7 +40,7 @@ function webbrowser_plugin() {
         function do_open_url_external() {
             window.open(js.absolute_http_url(topic.value), "_blank")
         }
-    }
+    })
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 

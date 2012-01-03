@@ -3,19 +3,33 @@ function files_plugin() {
     dm4c.register_field_renderer("/de.deepamehta.files/script/field_renderers/file_content_renderer.js")
     dm4c.register_field_renderer("/de.deepamehta.files/script/field_renderers/folder_content_renderer.js")
 
+    // === REST Client Extension ===
 
-
-    // ***********************************************************
-    // *** Webclient Hooks (triggered by deepamehta-webclient) ***
-    // ***********************************************************
-
-
-
-    this.init = function() {
-        extend_rest_client()
+    dm4c.restc.create_file_topic = function(path) {
+        return this.request("POST", "/files/file/" + encodeURIComponent(path))
+    }
+    dm4c.restc.create_folder_topic = function(path) {
+        return this.request("POST", "/files/folder/" + encodeURIComponent(path))
+    }
+    //
+    dm4c.restc.create_child_file_topic = function(folder_topic_id, path) {
+        return this.request("POST", "/files/" + folder_topic_id + "/file/" + encodeURIComponent(path))
+    }
+    dm4c.restc.create_child_folder_topic = function(folder_topic_id, path) {
+        return this.request("POST", "/files/" + folder_topic_id + "/folder/" + encodeURIComponent(path))
+    }
+    //
+    dm4c.restc.open_file = function(file_topic_id) {
+        return this.request("GET", "/files/" + file_topic_id)
     }
 
-    this.process_drop = function(data_transfer) {
+    // === Hook Extension ===
+
+    dm4c.add_hook("process_files_drop")
+
+    // === Webclient Handler ===
+
+    dm4c.register_plugin_handler("process_drop", function(data_transfer) {
         if (js.contains(data_transfer.types, "Files")) {
             if (typeof netscape != "undefined") {
                 var files = process_file_drop_firefox(data_transfer)
@@ -99,17 +113,19 @@ function files_plugin() {
                 return path.match(/.$/)[0] == "/"
             }
         }
-    }
+    })
 
     /**
      * @param   topic   a CanvasTopic object
      */
-    this.topic_doubleclicked = function(topic) {
+    dm4c.register_plugin_handler("topic_doubleclicked", function(topic) {
         if (topic.type_uri == "dm4.files.file" ||
             topic.type_uri == "dm4.files.folder") {
             dm4c.restc.open_file(topic.id)
         }
-    }
+    })
+
+
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -158,34 +174,7 @@ function files_plugin() {
         }
     }
 
-    // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function extend_rest_client() {
-
-        dm4c.restc.create_file_topic = function(path) {
-            return this.request("POST", "/files/file/" + encodeURIComponent(path))
-        }
-
-        dm4c.restc.create_folder_topic = function(path) {
-            return this.request("POST", "/files/folder/" + encodeURIComponent(path))
-        }
-
-        // ---
-
-        dm4c.restc.create_child_file_topic = function(folder_topic_id, path) {
-            return this.request("POST", "/files/" + folder_topic_id + "/file/" + encodeURIComponent(path))
-        }
-
-        dm4c.restc.create_child_folder_topic = function(folder_topic_id, path) {
-            return this.request("POST", "/files/" + folder_topic_id + "/folder/" + encodeURIComponent(path))
-        }
-
-        // ---
-
-        dm4c.restc.open_file = function(file_topic_id) {
-            return this.request("GET", "/files/" + file_topic_id)
-        }
-    }
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 

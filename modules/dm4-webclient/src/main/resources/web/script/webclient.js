@@ -622,9 +622,17 @@ var dm4c = new function() {
         pm.register_css_stylesheet(css_path)
     }
 
+    // ---
+
+    this.add_hook = function(hook_name) {
+        pm.add_hook(hook_name)
+    }
+
     this.register_plugin_handler = function(hook_name, plugin_handler) {
         pm.register_plugin_handler(hook_name, plugin_handler)
     }
+
+    // ---
 
     /**
      * Loads a Javascript file dynamically. Synchronous and asynchronous loading is supported.
@@ -827,7 +835,7 @@ var dm4c = new function() {
         }
     }
 
-    // === Persmissions ===
+    // === Permissions ===
 
     // ### TODO: handle associations as well
     this.has_write_permission = function(topic) {

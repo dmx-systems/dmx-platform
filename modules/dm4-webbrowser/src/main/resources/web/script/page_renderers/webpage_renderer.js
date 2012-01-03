@@ -50,7 +50,4 @@ function WebpageRenderer() {
     this.page_css = function() {
         return {overflow: "visible"}
     }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
 }

@@ -15,24 +15,17 @@ function topicmaps_plugin() {
     // View
     var topicmap_menu               // A GUIToolkit Menu object
 
-    // ------------------------------------------------------------------------------------------------------ Public API
 
-    /**
-     * @return  The selected topicmap
-     */
-    this.get_topicmap = function() {
-        return topicmap
-    }
+
+    // === Hook Extension ===
+
+    dm4c.add_hook("topicmap_renderer")
 
 
 
-    // ***********************************************************
-    // *** Webclient Hooks (triggered by deepamehta-webclient) ***
-    // ***********************************************************
+    // === Webclient Handler ===
 
-
-
-    this.init = function() {
+    dm4c.register_plugin_handler("init", function() {
         fetch_topicmap_topics()
         register_topicmap_renderers()
         extend_rest_client()
@@ -137,66 +130,66 @@ function topicmaps_plugin() {
                 dm4c.do_select_topic(topic_id)  // ### FIXME: rethink about history update
             }
         }
-    }
+    })
 
-    this.post_select_topic = function(topic) {
+    dm4c.register_plugin_handler("post_select_topic", function(topic) {
         topicmap.set_topic_selection(topic)
-    }
+    })
 
-    this.post_select_association = function(assoc) {
+    dm4c.register_plugin_handler("post_select_association", function(assoc) {
         topicmap.set_association_selection(assoc)
-    }
+    })
 
-    this.post_reset_selection = function() {
+    dm4c.register_plugin_handler("post_reset_selection", function() {
         topicmap.reset_selection()
-    }
+    })
 
     /**
      * @param   topic   a Topic object
      */
-    this.pre_show_topic = function(topic) {
+    dm4c.register_plugin_handler("pre_show_topic", function(topic) {
         topicmap.prepare_topic_for_display(topic)
-    }
+    })
 
     /**
      * @param   topic   a Topic object with additional "x" and "y" properties
      */
-    this.post_show_topic = function(topic) {
+    dm4c.register_plugin_handler("post_show_topic", function(topic) {
         topicmap.add_topic(topic.id, topic.type_uri, topic.value, topic.x, topic.y)
-    }
+    })
 
     /**
      * @param   assoc   a CanvasAssoc object
      */
-    this.post_show_association = function(assoc) {
+    dm4c.register_plugin_handler("post_show_association", function(assoc) {
         topicmap.add_association(assoc.id, assoc.type_uri, assoc.role_1.topic_id, assoc.role_2.topic_id)
-    }
+    })
 
     /**
      * @param   topic   a CanvasTopic object
      */
-    this.post_hide_topic = function(topic) {
+    dm4c.register_plugin_handler("post_hide_topic", function(topic) {
         topicmap.hide_topic(topic.id)
-    }
+    })
 
     /**
      * @param   assoc   a CanvasAssoc object
      */
-    this.post_hide_association = function(assoc) {
+    dm4c.register_plugin_handler("post_hide_association", function(assoc) {
         topicmap.hide_association(assoc.id)
-    }
+    })
 
     /**
      * @param   topic   a CanvasTopic object
      */
-    this.post_move_topic = function(topic) {
+    dm4c.register_plugin_handler("post_move_topic", function(topic) {
         topicmap.move_topic(topic.id, topic.x, topic.y)
-    }
+    })
 
     /**
      * @param   topic   a Topic object
      */
-    this.post_update_topic = function(topic, old_topic) {
+    dm4c.register_plugin_handler("post_update_topic", function(topic, old_topic) {
         // 1) Update all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Updating topic " + topic.id + " on all topicmaps")
         for (var id in topicmaps) {
@@ -206,23 +199,23 @@ function topicmaps_plugin() {
         if (topic.type_uri == "dm4.topicmaps.topicmap") {
             rebuild_topicmap_menu()
         }
-    }
+    })
 
     /**
      * @param   assoc       an Association object
      * @param   old_assoc   FIXME: not yet available
      */
-    this.post_update_association = function(assoc, old_assoc) {
+    dm4c.register_plugin_handler("post_update_association", function(assoc, old_assoc) {
         if (LOG_TOPICMAPS) dm4c.log("Updating association " + assoc.id + " on all topicmaps")
         for (var id in topicmaps) {
             topicmaps[id].update_association(assoc)
         }
-    }
+    })
 
     /**
      * @param   topic   a Topic object
      */
-    this.post_delete_topic = function(topic) {
+    dm4c.register_plugin_handler("post_delete_topic", function(topic) {
         // 1) Update all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Deleting topic " + topic.id + " from all topicmaps")
         for (var id in topicmaps) {
@@ -249,22 +242,22 @@ function topicmaps_plugin() {
                 rebuild_topicmap_menu()
             }
         }
-    }
+    })
 
-    this.post_delete_association = function(assoc) {
+    dm4c.register_plugin_handler("post_delete_association", function(assoc) {
         // Remove association from all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Deleting association " + assoc.id + " from all topicmaps")
         for (var id in topicmaps) {
             topicmaps[id].delete_association(assoc.id)
         }
-    }
+    })
 
-    this.pre_push_history = function(history_entry) {
+    dm4c.register_plugin_handler("pre_push_history", function(history_entry) {
         history_entry.state.topicmap_id = topicmap.get_id()
         history_entry.url = "/topicmap/" + topicmap.get_id() + history_entry.url
-    }
+    })
 
-    this.pre_pop_history = function(state) {
+    dm4c.register_plugin_handler("pre_pop_history", function(state) {
         if (dm4c.LOG_HISTORY) dm4c.log("..... topicmaps_plugin.pre_pop_history()")
         if (state.topicmap_id != topicmap.get_id()) {
             if (dm4c.LOG_HISTORY) dm4c.log(".......... switch from topicmap " + topicmap.get_id() +
@@ -277,32 +270,43 @@ function topicmaps_plugin() {
             dm4c.do_reset_selection(true)                       // no_history_update=true
             return false
         }
-    }
+    })
 
-    this.post_move_canvas = function(trans_x, trans_y) {
+    dm4c.register_plugin_handler("post_move_canvas", function(trans_x, trans_y) {
         topicmap.set_translation(trans_x, trans_y)
-    }
+    })
 
-    this.pre_draw_canvas = function(ctx) {
+    dm4c.register_plugin_handler("pre_draw_canvas", function(ctx) {
         // Note: topicmap is undefined if canvas draw() is performed
         // before the Topicmaps plugin is initialized.
         topicmap && topicmap.draw_background(ctx)
-    }
+    })
 
 
 
-    // ********************************************************************
-    // *** Access Control Hooks (triggered by deepamehta-accesscontrol) ***
-    // ********************************************************************
+    // === Access Control Handler ===
+
+    // Note: registration of non-Webclient handlers must be done at plugin initialization time.
+    dm4c.register_plugin_handler("init", function(type_menu) {
+        if (dm4c.get_plugin("accesscontrol_plugin")) {
+            dm4c.register_plugin_handler("user_logged_in", function(user) {
+                rebuild_topicmap_menu()
+            })
+            dm4c.register_plugin_handler("user_logged_out", function() {
+                rebuild_topicmap_menu()
+            })
+        }
+    })
 
 
 
-    this.user_logged_in = function(user) {
-        rebuild_topicmap_menu()
-    }
+    // ------------------------------------------------------------------------------------------------------ Public API
 
-    this.user_logged_out = function() {
-        rebuild_topicmap_menu()
+    /**
+     * @return  The selected topicmap
+     */
+    this.get_topicmap = function() {
+        return topicmap
     }
 
 
@@ -370,6 +374,8 @@ function topicmaps_plugin() {
         // update view
         display_topicmap()
     }
+
+    // ----------------------------------------------------------------------------------------------- Private Functions
 
 
 
