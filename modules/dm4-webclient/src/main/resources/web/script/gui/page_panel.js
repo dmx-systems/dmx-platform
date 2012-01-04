@@ -43,7 +43,7 @@ function PagePanel() {
         // update model
         displayed_object = null
         // update GUI
-        empty(true)
+        empty()
     }
 
     this.refresh = function() {
@@ -52,6 +52,10 @@ function PagePanel() {
             render_page()
             render_buttons("detail-panel-show")
         }
+    }
+
+    this.show_splash = function() {
+        show_splash()
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
@@ -95,15 +99,11 @@ function PagePanel() {
 
     // ---
 
-    function empty(do_show_splash) {
+    function empty() {
         $("#page-content").empty()
         $("#page-toolbar").empty()
         //
-        if (do_show_splash) {
-            show_splash()
-        } else {
-            hide_splash()
-        }
+        hide_splash()
     }
 
     function prepare_page() {

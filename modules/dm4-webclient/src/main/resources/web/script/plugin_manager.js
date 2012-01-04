@@ -22,17 +22,17 @@ function PluginManager(config) {
         "topic_commands",
         "association_commands",
         "canvas_commands",
-        // Storage
+        // Storage (DB updates)
         "post_create_topic",
         "post_update_topic",
         "post_update_association",
         "post_delete_topic",
         "post_delete_association",
-        // Selection
+        // Selection (client model updates)
         "post_select_topic",
         "post_select_association",
         "post_reset_selection",
-        // Show/Hide
+        // Show/Hide (view updates)
         "pre_show_topic",
         "post_show_topic",
         "post_show_association",
@@ -46,6 +46,7 @@ function PluginManager(config) {
         "pre_render_page",
         "pre_render_form",
         "post_submit_form",
+        "default_page_rendering",
         // Canvas
         "topic_doubleclicked",
         "post_move_topic",
