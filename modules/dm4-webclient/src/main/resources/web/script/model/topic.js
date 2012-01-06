@@ -21,11 +21,18 @@ Topic.prototype = {
     // === Public API ===
 
     /**
-     * Convenience method to lookup a simple value from this topic's direct composite.
+     * Convenience method to lookup a simple value or a composite value.
      */
     get: function(key) {
-        var topic = this.composite[key]
-        return topic && topic.value
+        var comp = this.composite[key]
+        if (comp) {
+            var topic = new Topic(comp)
+            if (topic.get_type().is_simple()) {
+                return topic.value
+            } else {
+                return topic
+            }
+        }
     },
 
     find_child_topic: function(type_uri) {
@@ -42,11 +49,11 @@ Topic.prototype = {
                 // ### FIXME: should be if (child_topic.type_uri == type_uri)
                 // ### but type_uri is not initialized in compact composite format
                 if (assoc_def_uri == type_uri) {
-                    return child_topic
+                    return new Topic(child_topic)
                 }
                 child_topic = find_child_topic(child_topic.composite)
                 if (child_topic) {
-                    return child_topic
+                    return new Topic(child_topic)
                 }
             }
         }

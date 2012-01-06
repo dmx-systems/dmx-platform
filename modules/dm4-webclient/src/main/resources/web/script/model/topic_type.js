@@ -11,6 +11,9 @@ function TopicType(topic_type) {
     this.assoc_defs         = deserialize(topic_type.assoc_defs)
     this.label_config       = topic_type.label_config
     this.view_config_topics = dm4c.hash_by_type(dm4c.build_topics(topic_type.view_config_topics))
+    //
+    this.icon = null    // The topic type's icon (JavaScript Image object).
+                        // Note: it must be loaded *after* loading the topic types (see Webclient's load_types()).
 
     // === "Page Displayable" implementation ===
 
@@ -28,11 +31,29 @@ function TopicType(topic_type) {
 
     // === Public API ===
 
+    this.is_simple = function() {
+        return !this.is_composite()
+    }
+
+    this.is_composite = function() {
+        return this.data_type_uri == "dm4.core.composite"
+    }
+
+    // ---
+
     this.get_label_config = function(assoc_def_uri) {
         return js.contains(this.label_config, assoc_def_uri)
     }
 
     // --- View Configuration ---
+
+    this.get_icon = function(type_uri) {
+        return this.icon
+    }
+
+    this.load_icon = function() {
+        this.icon = dm4c.create_image(this.get_icon_src())
+    }
 
     /**
      * Returns the icon source.

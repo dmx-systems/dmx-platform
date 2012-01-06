@@ -1,18 +1,36 @@
 function RenderHelper() {
 
     /**
-     * @param   topics      Topics to render (array of Topic objects).
+     * @param   topics          Topics to render (array of Topic objects).
+     * @param   click_handler   Optional: by using this argument the caller can customize the behavoir performed when
+     *                          the user clicks a topic. The argument is a function which takes a topic and returns
+     *                          the handler function to be called when the user clicks that topic.
+     *                          If not specified the default handler is used. The default handler reveals the clicked
+     *                          topic (by calling dm4c.do_reveal_related_topic())
+     *
+     * @return  The rendered topic list (a jQuery object)
      */
-    this.topic_list = function(topics, click_handler) {
+    this.topic_list = function(topics, click_handler, render_handler) {
         var table = $("<table>").addClass("topic-list")
         for (var i = 0, topic; topic = topics[i]; i++) {
-            var handler = click_handler && click_handler(topic) || reveal_handler(topic)
+            var handler = click_handler && click_handler(topic) || default_handler(topic)
+            if (render_handler) {
+                var supplement_text = render_handler(topic)
+                var supplement = $("<div>").addClass("supplement-text").append(supplement_text)
+            }
             table.append($("<tr>")
                 .append($("<td>").append(this.icon_link(topic, handler)))
-                .append($("<td>").append(this.topic_link(topic, handler)))
+                .append($("<td>").append(this.topic_link(topic, handler)).append(supplement))
             )
         }
         return table
+
+        function default_handler(topic) {
+            return function() {
+                dm4c.do_reveal_related_topic(topic.id)
+                return false
+            }
+        }
     }
 
     /**
@@ -25,13 +43,6 @@ function RenderHelper() {
 
     this.icon_link = function(topic, handler) {
         return this.type_icon(topic.type_uri).click(handler)
-    }
-
-    function reveal_handler(topic) {
-        return function() {
-            dm4c.do_reveal_related_topic(topic.id)
-            return false
-        }
     }
 
     /**

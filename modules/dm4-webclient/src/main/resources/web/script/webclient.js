@@ -2,6 +2,7 @@ var dm4c = new function() {
 
     // logger preferences
     var ENABLE_LOGGING = false
+    var LOG_TYPE_LOADING = false
     this.LOG_PLUGIN_LOADING = false
     var LOG_IMAGE_LOADING = false
     this.LOG_GUI = false
@@ -708,24 +709,38 @@ var dm4c = new function() {
         return dm4c.type_cache.get_topic_type(type_uri).value
     }
 
-    this.reload_types = function() {
-        dm4c.type_cache.clear()
-        load_types()
-    }
-
     /**
      * Convenience method that returns the topic type's icon source.
-     * If no icon is configured the generic topic icon is returned.
      *
      * @return  The icon source (string).
      */
     this.get_icon_src = function(type_uri) {
-        var topic_type = dm4c.type_cache.get_topic_type(type_uri)
-        // Note: topic_type is undefined if plugin is deactivated and content still exist.
-        if (topic_type) {
-            return topic_type.get_icon_src()
-        }
-        return this.DEFAULT_TOPIC_ICON
+        return dm4c.type_cache.get_topic_type(type_uri).get_icon_src()
+    }
+
+    /**
+     * Convenience method that returns the topic type's icon.
+     *
+     * @return  The icon (JavaScript Image object)
+     */
+    this.get_type_icon = function(topic_type_uri) {
+        return dm4c.type_cache.get_topic_type(topic_type_uri).get_icon()
+    }
+
+    /**
+     * Convenience method that returns the association type's color.
+     *
+     * @return  The color (CSS string)
+     */
+    this.get_type_color = function(assoc_type_uri) {
+        return dm4c.type_cache.get_association_type(assoc_type_uri).get_color()
+    }
+
+    // ---
+
+    this.reload_types = function() {
+        dm4c.type_cache.clear()
+        load_types()
     }
 
     // === View Configuration ===
@@ -951,29 +966,7 @@ var dm4c = new function() {
         }
     }
 
-    // === Misc ===
-
-    /**
-     * Returns the icon for a topic type.
-     * If no icon is configured for that type the default topic icon is returned.
-     *
-     * @return  The icon (JavaScript Image object)
-     */
-    this.get_type_icon = function(topic_type_uri) {
-        return dm4c.type_cache.get_icon(topic_type_uri) || default_topic_icon
-    }
-
-    /**
-     * Returns the color for an association type.
-     * If no color is configured for that type the default association color is returned.
-     *
-     * @return  The color (CSS string)
-     */
-    this.get_type_color = function(assoc_type_uri) {
-        return dm4c.type_cache.get_association_type(assoc_type_uri).get_color()
-    }
-
-    // ---
+    // === Logging ===
 
     this.log = function(text) {
         if (ENABLE_LOGGING) {
@@ -1091,21 +1084,30 @@ var dm4c = new function() {
     // --- Types ---
 
     function load_types() {
-        // topic types
+        // 1) load topic types
         var type_uris = dm4c.restc.get_topic_type_uris()
+        if (LOG_TYPE_LOADING) dm4c.log("Loading " + type_uris.length + " topic types")
         for (var i = 0; i < type_uris.length; i++) {
+            if (LOG_TYPE_LOADING) dm4c.log("..... " + type_uris[i])
             dm4c.type_cache.put_topic_type(fetch_topic_type(type_uris[i]))
         }
-        // association types
+        // 2) load association types
         var type_uris = dm4c.restc.get_association_type_uris()
+        if (LOG_TYPE_LOADING) dm4c.log("Loading " + type_uris.length + " association types")
         for (var i = 0; i < type_uris.length; i++) {
+            if (LOG_TYPE_LOADING) dm4c.log("..... " + type_uris[i])
             dm4c.type_cache.put_association_type(fetch_association_type(type_uris[i]))
         }
+        if (LOG_TYPE_LOADING) dm4c.log("Loading types complete")
+        // 3) load topic type icons
+        // Note: the icons must be loaded *after* loading the topic types.
+        // The topic type "dm4.webclient.icon" must be known.
+        dm4c.type_cache.iterate(function(topic_type) {
+            topic_type.load_icon()
+        })
     }
 
     // ------------------------------------------------------------------------------------------------ Constructor Code
-
-    var default_topic_icon = this.create_image(this.DEFAULT_TOPIC_ICON)
 
     $(function() {
         //

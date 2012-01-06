@@ -310,15 +310,15 @@ function CanvasRendererExtension() {
             // ---
 
             function init_translation() {
-                var trans = new Topic(info.composite["dm4.topicmaps.state"].composite["dm4.topicmaps.translation"])
+                var trans = info.get("dm4.topicmaps.state").get("dm4.topicmaps.translation")
                 trans_x = trans.get("dm4.topicmaps.translation_x")
                 trans_y = trans.get("dm4.topicmaps.translation_y")
             }
 
             function init_background_image() {
-                var file = info.composite["dm4.files.file"]
+                var file = info.get("dm4.files.file")
                 if (file) {
-                    var image_url = "/proxy/file:" + new Topic(file).get("dm4.files.path")  // ### new Topic bad API
+                    var image_url = "/proxy/file:" + file.get("dm4.files.path")
                     background_image = dm4c.create_image(image_url)
                 }
             }
