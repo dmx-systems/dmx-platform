@@ -137,6 +137,7 @@ function TopicRenderer() {
 
 
     // === Auto-Completion ===
+    // ### FIXME: this code is inactive
 
     /**
      * Auto-Completion main function. Triggered for every keystroke.
@@ -475,7 +476,7 @@ TopicRenderer.create_fields = function(topic_type, assoc_def, field_uri, value_t
         if (topic_type.data_type_uri == "dm4.core.composite") {
             var fields = {}
             for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                var child_topic_type = dm4c.type_cache.get_topic_type(assoc_def.part_topic_type_uri)
+                var child_topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
                 var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
                 var child_topic = value_topic && value_topic.composite[assoc_def.uri]
                 var child_fields = TopicRenderer.create_fields(child_topic_type, assoc_def, child_field_uri,

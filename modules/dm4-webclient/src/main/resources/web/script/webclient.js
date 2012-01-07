@@ -22,14 +22,6 @@ var dm4c = new function() {
         var log_window = window.open()
     }
 
-    var pm = new PluginManager({
-        embedded_plugins: [
-            "/script/embedded_plugins/default_plugin.js",
-            "/script/embedded_plugins/fulltext_plugin.js",
-            "/script/embedded_plugins/tinymce_plugin.js"
-        ]
-    })
-
     // utilities
     this.restc = new RESTClient(CORE_SERVICE_URI)
     this.ui = new GUIToolkit()
@@ -37,7 +29,6 @@ var dm4c = new function() {
 
     // client model
     this.selected_object = null     // a Topic or an Association object, or null if there is no selection
-    this.type_cache = new TypeCache()
 
     // view
     this.split_panel = null         // a SplitPanel object
@@ -45,6 +36,15 @@ var dm4c = new function() {
     this.canvas = null              // the canvas GUI component that displays the topicmap (a TopicmapRenderer object)
     this.page_panel = null          // the page panel GUI component on the right hand side (a PagePanel object)
     this.upload_dialog = null       // the upload dialog (an UploadDialog object)
+
+    var type_cache = new TypeCache()
+    var pm = new PluginManager({
+        embedded_plugins: [
+            "/script/embedded_plugins/default_plugin.js",
+            "/script/embedded_plugins/fulltext_plugin.js",
+            "/script/embedded_plugins/tinymce_plugin.js"
+        ]
+    })
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -135,6 +135,7 @@ var dm4c = new function() {
 
     /**
      * Reveals a topic that is related to the selected topic.
+     * Precondition: a topic is selected.
      * <p>
      * Triggers the "pre_show_topic" and "post_show_topic" hooks (indirectly).
      * Triggers the "post_show_association" hook (for each association).
@@ -155,7 +156,7 @@ var dm4c = new function() {
 
     /**
      * Hides a topic and its visible direct associations from the view (canvas and page panel).
-     * Triggers the "post_hide_topic" hook and the "post_hide_association" hook (several times).
+     * Triggers the "post_hide_topic" hook and the "post_hide_association" hook (for each association).
      */
     this.do_hide_topic = function(topic) {
         var assocs = dm4c.canvas.get_associations(topic.id)
@@ -266,9 +267,9 @@ var dm4c = new function() {
         var uri_changed = topic_type.uri != old_topic_type.uri
         if (uri_changed) {
             // alert("Type URI changed: " + old_topic_type.uri + " -> " + topic_type.uri)
-            dm4c.type_cache.remove(old_topic_type.uri)
+            type_cache.remove(old_topic_type.uri)
         }
-        dm4c.type_cache.put_topic_type(topic_type)
+        type_cache.put_topic_type(topic_type)
         //
         // 3) trigger hook
         dm4c.trigger_plugin_hook("post_update_topic", topic_type, old_topic_type)   // trigger hook
@@ -293,7 +294,7 @@ var dm4c = new function() {
 
     /**
      * Deletes a topic (including its associations) from the DB and the GUI.
-     * Triggers the "post_delete_topic" hook and the "post_delete_association" hook (several times).
+     * Triggers the "post_delete_topic" hook and the "post_delete_association" hook (for each association).
      */
     this.do_delete_topic = function(topic) {
         // update DB
@@ -483,7 +484,7 @@ var dm4c = new function() {
 
     function update_topic_type(topic_type) {
         // update client model
-        dm4c.type_cache.put_topic_type(topic_type)
+        type_cache.put_topic_type(topic_type)
         // update view
         dm4c.refresh_create_menu()
         dm4c.canvas.refresh()
@@ -599,7 +600,7 @@ var dm4c = new function() {
         // 2) update client model (type cache)
         // Note: the type cache must be updated *before* the "post_create_topic" hook is triggered.
         // Other plugins might rely on an up-to-date type cache (e.g. the Type Search plugin does).
-        dm4c.type_cache.put_topic_type(topic_type)
+        type_cache.put_topic_type(topic_type)
         // 3) trigger hook
         dm4c.trigger_plugin_hook("post_create_topic", topic_type)
         //
@@ -703,10 +704,26 @@ var dm4c = new function() {
     // === Types ===
 
     /**
+     * Looks up a topic type by its uri.
+     */
+    this.get_topic_type = function(type_uri) {
+        return type_cache.get_topic_type(type_uri)
+    }
+
+    /**
+     * Looks up an association type by its uri.
+     */
+    this.get_association_type = function(type_uri) {
+        return type_cache.get_association_type(type_uri)
+    }
+
+    // ---
+
+    /**
      * Convenience method that returns the topic type's label.
      */
     this.type_label = function(type_uri) {
-        return dm4c.type_cache.get_topic_type(type_uri).value
+        return dm4c.get_topic_type(type_uri).value
     }
 
     /**
@@ -715,7 +732,7 @@ var dm4c = new function() {
      * @return  The icon source (string).
      */
     this.get_icon_src = function(type_uri) {
-        return dm4c.type_cache.get_topic_type(type_uri).get_icon_src()
+        return dm4c.get_topic_type(type_uri).get_icon_src()
     }
 
     /**
@@ -724,7 +741,7 @@ var dm4c = new function() {
      * @return  The icon (JavaScript Image object)
      */
     this.get_type_icon = function(topic_type_uri) {
-        return dm4c.type_cache.get_topic_type(topic_type_uri).get_icon()
+        return dm4c.get_topic_type(topic_type_uri).get_icon()
     }
 
     /**
@@ -733,13 +750,13 @@ var dm4c = new function() {
      * @return  The color (CSS string)
      */
     this.get_type_color = function(assoc_type_uri) {
-        return dm4c.type_cache.get_association_type(assoc_type_uri).get_color()
+        return dm4c.get_association_type(assoc_type_uri).get_color()
     }
 
     // ---
 
     this.reload_types = function() {
-        dm4c.type_cache.clear()
+        type_cache.clear()
         load_types()
     }
 
@@ -859,7 +876,7 @@ var dm4c = new function() {
 
     // ### TODO: handle association types as well
     this.has_create_permission = function(type_uri) {
-        var result = dm4c.trigger_plugin_hook("has_create_permission", dm4c.type_cache.get_topic_type(type_uri))
+        var result = dm4c.trigger_plugin_hook("has_create_permission", dm4c.get_topic_type(type_uri))
         return !js.contains(result, false)
     }
 
@@ -888,7 +905,7 @@ var dm4c = new function() {
         // remove all items
         type_menu.empty()
         // add topic type items
-        dm4c.type_cache.iterate(function(topic_type) {
+        type_cache.iterate(function(topic_type) {
             if (!filter_func || filter_func(topic_type)) {
                 type_menu.add_item({
                     label: topic_type.value,
@@ -1089,22 +1106,24 @@ var dm4c = new function() {
         if (LOG_TYPE_LOADING) dm4c.log("Loading " + type_uris.length + " topic types")
         for (var i = 0; i < type_uris.length; i++) {
             if (LOG_TYPE_LOADING) dm4c.log("..... " + type_uris[i])
-            dm4c.type_cache.put_topic_type(fetch_topic_type(type_uris[i]))
+            type_cache.put_topic_type(fetch_topic_type(type_uris[i]))
         }
         // 2) load association types
         var type_uris = dm4c.restc.get_association_type_uris()
         if (LOG_TYPE_LOADING) dm4c.log("Loading " + type_uris.length + " association types")
         for (var i = 0; i < type_uris.length; i++) {
             if (LOG_TYPE_LOADING) dm4c.log("..... " + type_uris[i])
-            dm4c.type_cache.put_association_type(fetch_association_type(type_uris[i]))
+            type_cache.put_association_type(fetch_association_type(type_uris[i]))
         }
-        if (LOG_TYPE_LOADING) dm4c.log("Loading types complete")
         // 3) load topic type icons
         // Note: the icons must be loaded *after* loading the topic types.
         // The topic type "dm4.webclient.icon" must be known.
-        dm4c.type_cache.iterate(function(topic_type) {
+        if (LOG_TYPE_LOADING) dm4c.log("Loading topic type icons")
+        type_cache.iterate(function(topic_type) {
+            if (LOG_TYPE_LOADING) dm4c.log("..... " + topic_type.uri)
             topic_type.load_icon()
         })
+        if (LOG_TYPE_LOADING) dm4c.log("Loading types complete")
     }
 
     // ------------------------------------------------------------------------------------------------ Constructor Code

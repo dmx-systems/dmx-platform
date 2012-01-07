@@ -16,7 +16,7 @@ function TopictypeRenderer() {
 
 
     this.render_page = function(topic) {
-        var topic_type = dm4c.type_cache.get_topic_type(topic.uri)
+        var topic_type = dm4c.get_topic_type(topic.uri)
         //
         dm4c.render.field_label("Name")
         dm4c.render.field_value(topic_type.value)
@@ -32,7 +32,7 @@ function TopictypeRenderer() {
     }
 
     this.render_form = function(topic) {
-        var topic_type = dm4c.type_cache.get_topic_type(topic.uri)
+        var topic_type = dm4c.get_topic_type(topic.uri)
         //
         value_input = dm4c.render.input(topic_type.value)
         dm4c.render.field_label("Name")
@@ -137,7 +137,7 @@ function TopictypeRenderer() {
                 data_type_uri: data_type_menu.get_selection().value
             }
             //
-            var topic_type = dm4c.type_cache.get_topic_type(topic.uri)
+            var topic_type = dm4c.get_topic_type(topic.uri)
             if (topic_type.data_type_uri == "dm4.core.composite") {
                 var model = composite_model()
                 topic_type_model.assoc_defs   = model.assoc_defs

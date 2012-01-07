@@ -17,7 +17,7 @@ function AssociationRenderer() {
 
 
     this.render_page = function(assoc) {
-        var assoc_type = dm4c.type_cache.get_association_type(assoc.type_uri)
+        var assoc_type = dm4c.get_association_type(assoc.type_uri)
         dm4c.render.field_label("Association Type")
         dm4c.render.field_value(assoc_type.value)
         //

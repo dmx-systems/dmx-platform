@@ -10,7 +10,7 @@ Association.prototype = {
     // === "Page Displayable" implementation ===
 
     get_type: function() {
-        return dm4c.type_cache.get_association_type(this.type_uri)
+        return dm4c.get_association_type(this.type_uri)
     },
 
     get_commands: function(context) {

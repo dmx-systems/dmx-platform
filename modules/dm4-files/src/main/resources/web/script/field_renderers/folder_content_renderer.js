@@ -25,26 +25,22 @@ function FolderContentRenderer(topic, field) {
             }
             // Note: topic_list() takes arbitrary objects, provided
             // they contain "type_uri" and "value" properties.
-            return dm4c.render.topic_list(topics, reveal_handler)
+            return dm4c.render.topic_list(topics, click_handler)
         } catch (e) {
             field_value_div.addClass("ui-state-error")
             return "FolderContentRendererError: " + e
         }
     }
 
-    function reveal_handler(item) {
-        return function() {
-            if (item.kind == "file") {
-                var child_topic = dm4c.restc.create_child_file_topic(topic.id, item.path)
-            } else if (item.kind == "directory") {
-                var child_topic = dm4c.restc.create_child_folder_topic(topic.id, item.path)
-            } else {
-                throw "FileContentRendererError: item has unexpected kind (\"" + item.kind + "\")"
-            }
-            //
-            dm4c.do_reveal_related_topic(child_topic.id)
-            //
-            return false
+    function click_handler(item) {
+        if (item.kind == "file") {
+            var child_topic = dm4c.restc.create_child_file_topic(topic.id, item.path)
+        } else if (item.kind == "directory") {
+            var child_topic = dm4c.restc.create_child_folder_topic(topic.id, item.path)
+        } else {
+            throw "FileContentRendererError: item has unexpected kind (\"" + item.kind + "\")"
         }
+        //
+        dm4c.do_reveal_related_topic(child_topic.id)
     }
 }
