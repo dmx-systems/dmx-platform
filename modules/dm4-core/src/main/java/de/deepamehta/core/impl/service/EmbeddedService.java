@@ -131,7 +131,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving topic " + topicId + " failed", e);
+            throw new WebApplicationException(new RuntimeException("Retrieving topic " + topicId + " failed", e));
         } finally {
             tx.finish();
         }
@@ -151,7 +151,8 @@ public class EmbeddedService implements DeepaMehtaService {
             return attachedTopic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
+            throw new WebApplicationException(new RuntimeException("Retrieving topic failed (key=\"" + key +
+                "\", value=\"" + value + "\")", e));
         } finally {
             tx.finish();
         }
@@ -178,7 +179,8 @@ public class EmbeddedService implements DeepaMehtaService {
             return topics;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving topics by type failed (typeUri=\"" + typeUri + "\")", e);
+            throw new WebApplicationException(new RuntimeException("Retrieving topics by type failed (typeUri=\"" +
+                typeUri + "\")", e));
         } finally {
             tx.finish();
         }
@@ -198,8 +200,9 @@ public class EmbeddedService implements DeepaMehtaService {
             return topics;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Searching topics failed (searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
-                fieldUri + "\", wholeWord=" + wholeWord + ", clientState=" + clientState + ")", e);
+            throw new WebApplicationException(new RuntimeException("Searching topics failed (searchTerm=\"" +
+                searchTerm + "\", fieldUri=\"" + fieldUri + "\", wholeWord=" + wholeWord + ", clientState=" +
+                clientState + ")", e));
         } finally {
             tx.finish();
         }
@@ -291,7 +294,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return assoc;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving association " + assocId + " failed", e);
+            throw new WebApplicationException(new RuntimeException("Retrieving association " + assocId + " failed", e));
         } finally {
             tx.finish();
         }
@@ -319,8 +322,8 @@ public class EmbeddedService implements DeepaMehtaService {
             return assocs;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving associations between topics " + topic1Id +
-                " and " + topic2Id + " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
+            throw new WebApplicationException(new RuntimeException("Retrieving associations between topics " +
+                topic1Id + " and " + topic2Id + " failed (assocTypeUri=\"" + assocTypeUri + "\")", e));
         } finally {
             tx.finish();
         }
@@ -443,7 +446,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return topicType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving topic type \"" + uri + "\" failed", e);
+            throw new WebApplicationException(new RuntimeException("Retrieving topic type \"" + uri + "\" failed", e));
         } finally {
             tx.finish();
         }
@@ -537,7 +540,8 @@ public class EmbeddedService implements DeepaMehtaService {
             return assocType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving association type \"" + uri + "\" failed", e);
+            throw new WebApplicationException(new RuntimeException("Retrieving association type \"" +
+                uri + "\" failed", e));
         } finally {
             tx.finish();
         }
@@ -561,8 +565,8 @@ public class EmbeddedService implements DeepaMehtaService {
             return assocType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating association type \"" + assocTypeModel.getUri() +
-                "\" failed (" + assocTypeModel + ")", e);
+            throw new WebApplicationException(new RuntimeException("Creating association type \"" +
+                assocTypeModel.getUri() + "\" failed (" + assocTypeModel + ")", e));
         } finally {
             tx.finish();
         }
@@ -593,7 +597,8 @@ public class EmbeddedService implements DeepaMehtaService {
             return result;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Executing command \"" + command + "\" failed (params=" + params + ")", e);
+            throw new WebApplicationException(new RuntimeException("Executing command \"" + command +
+                "\" failed (params=" + params + ")", e));
         } finally {
             tx.finish();
         }
@@ -720,9 +725,10 @@ public class EmbeddedService implements DeepaMehtaService {
             return getTopic(topicId, false, clientState).getRelatedTopics(assocTypeUri, myRoleTypeUri,
                 othersRoleTypeUri, othersTopicTypeUri, false, false, maxResultSize, clientState);
         } catch (Exception e) {
-            throw new RuntimeException("Retrieving related topics of topic " + topicId + " failed (assocTypeUri=\"" +
-                assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", othersRoleTypeUri=\"" + othersRoleTypeUri +
-                "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\", maxResultSize=" + maxResultSize + ")", e);
+            throw new WebApplicationException(new RuntimeException("Retrieving related topics of topic " + topicId +
+                " failed (assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
+                "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri +
+                "\", maxResultSize=" + maxResultSize + ")", e));
         }
     }
 
