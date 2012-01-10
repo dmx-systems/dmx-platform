@@ -2,24 +2,22 @@
  * A topicmap model that is attached to the database. There are methods for:
  *  - loading a topicmap from DB
  *  - manipulating the topicmap by e.g. adding/removing topics and associations
- *  - putting the topicmap on the canvas.
  *
- * ### FIXME: introduce common base class for Topicmap and Geomap (see external deepamehta-geomaps module)
+ * ### TODO: introduce common base class for Topicmap and Geomap (see external deepamehta-geomaps module)
  */
 function Topicmap(topicmap_id) {
 
     var LOG_TOPICMAPS = false
+    var self = this
 
-    // Model
-    var info            // The underlying Topicmap topic (a Topic object)
-    var topics = {}     // topics of this topicmap (key: topic ID, value: TopicmapTopic object)
-    var assocs = {}     // associations of this topicmap (key: association ID, value: TopicmapAssociation object)
-    var trans_x, trans_y            // topicmap translation (in pixel)
-    var selected_object_id = -1     // ID of the selected topic or association, or -1 for no selection
-    var is_topic_selected           // true indicates topic selection, false indicates association selection
+    var info                // The underlying Topicmap topic (a Topic object)
+    var topics = {}         // topics of this topicmap (key: topic ID, value: TopicmapTopic object)
+    var assocs = {}         // associations of this topicmap (key: association ID, value: TopicmapAssociation object)
+    this.trans_x, this.trans_y      // topicmap translation (in pixel)
+    this.selected_object_id = -1    // ID of the selected topic or association, or -1 for no selection
+    this.is_topic_selected          // true indicates topic selection, false indicates association selection
                                     // only evaluated if there is a selection (selected_object_id != -1)
-    // View
-    var background_image
+    this.background_image   // JavaScript Image object
 
     load()
 
@@ -43,76 +41,6 @@ function Topicmap(topicmap_id) {
 
     this.iterate_associations = function(visitor_func) {
         iterate_associations(visitor_func)
-    }
-
-    /**
-     * @param   no_history_update   Optional: boolean.
-     */
-    this.put_on_canvas = function(no_history_update) {
-
-        track_images()
-
-        /**
-         * Defers "put_on_canvas" until all topicmap images are loaded.
-         */
-        function track_images() {
-            var image_tracker = dm4c.create_image_tracker(put_on_canvas)
-            // add type icons
-            iterate_topics(function(topic) {
-                if (topic.visibility) {
-                    image_tracker.add_image(dm4c.get_type_icon(topic.type_uri))
-                }
-            })
-            // add background image
-            if (background_image) {
-                image_tracker.add_image(background_image)
-            }
-            //
-            image_tracker.check()
-        }
-
-        function put_on_canvas() {
-
-            dm4c.canvas.clear()
-            dm4c.canvas.translate(trans_x, trans_y)
-            display_topics()
-            display_associations()
-            restore_selection()     // includes canvas refreshing
-
-            function display_topics() {
-                iterate_topics(function(topic) {
-                    if (topic.visibility) {
-                        // Note: canvas.add_topic() expects an topic object with "value" property (not "label")
-                        var t = {id: topic.id, type_uri: topic.type_uri, value: topic.label, x: topic.x, y: topic.y}
-                        dm4c.canvas.add_topic(t)
-                    }
-                })
-            }
-
-            function display_associations() {
-                iterate_associations(function(assoc) {
-                    var a = {
-                        id: assoc.id,
-                        type_uri: assoc.type_uri,
-                        role_1: {topic_id: assoc.topic_id_1},
-                        role_2: {topic_id: assoc.topic_id_2}
-                    }
-                    dm4c.canvas.add_association(a)
-                })
-            }
-
-            function restore_selection() {
-                if (selected_object_id != -1) {
-                    if (is_topic_selected) {
-                        dm4c.do_select_topic(selected_object_id, no_history_update)    // includes canvas refreshing
-                    } else {
-                        dm4c.do_select_association(selected_object_id, no_history_update) // includes canvas refr.
-                    }
-                } else {
-                    dm4c.do_reset_selection(no_history_update)                         // includes canvas refreshing
-                }
-            }
-        }
     }
 
     this.add_topic = function(id, type_uri, label, x, y) {
@@ -208,17 +136,17 @@ function Topicmap(topicmap_id) {
     }
 
     this.set_topic_selection = function(topic) {
-        selected_object_id = topic.id
-        is_topic_selected = true
+        this.selected_object_id = topic.id
+        this.is_topic_selected = true
     }
 
     this.set_association_selection = function(assoc) {
-        selected_object_id = assoc.id
-        is_topic_selected = false
+        this.selected_object_id = assoc.id
+        this.is_topic_selected = false
     }
 
     this.reset_selection = function() {
-        selected_object_id = -1
+        this.selected_object_id = -1
     }
 
     this.prepare_topic_for_display = function(topic) {
@@ -230,17 +158,17 @@ function Topicmap(topicmap_id) {
         }
     }
 
-    this.set_translation = function(t_x, t_y) {
+    this.set_translation = function(trans_x, trans_y) {
         // update memory
-        trans_x = t_x
-        trans_y = t_y
+        this.trans_x = trans_x
+        this.trans_y = trans_y
         // update DB
         dm4c.restc.set_topicmap_translation(topicmap_id, trans_x, trans_y)
     }
 
     this.draw_background = function(ctx) {
-        if (background_image) {
-            ctx.drawImage(background_image, 0, 0)
+        if (this.background_image) {
+            ctx.drawImage(this.background_image, 0, 0)
         }
     }
 
@@ -289,15 +217,15 @@ function Topicmap(topicmap_id) {
 
         function init_translation() {
             var trans = info.get("dm4.topicmaps.state").get("dm4.topicmaps.translation")
-            trans_x = trans.get("dm4.topicmaps.translation_x")
-            trans_y = trans.get("dm4.topicmaps.translation_y")
+            self.trans_x = trans.get("dm4.topicmaps.translation_x")
+            self.trans_y = trans.get("dm4.topicmaps.translation_y")
         }
 
         function init_background_image() {
             var file = info.get("dm4.files.file")
             if (file) {
                 var image_url = "/proxy/file:" + file.get("dm4.files.path")
-                background_image = dm4c.create_image(image_url)
+                self.background_image = dm4c.create_image(image_url)
             }
         }
     }
@@ -331,7 +259,7 @@ function Topicmap(topicmap_id) {
                                 // ### FIXME: the ref_id should be removed from the client-side model.
                                 // ### TODO: extend topicmaps REST API instead of exposing internals.
 
-        var self = this
+        var _self = this
 
         this.show = function() {
             set_visibility(true)
@@ -369,12 +297,12 @@ function Topicmap(topicmap_id) {
             // update DB ### TODO: extend topicmaps REST API instead of operating on the DB directly
             dm4c.restc.update_association({id: ref_id, composite: {"dm4.topicmaps.visibility": visibility}})
             // update memory
-            self.visibility = visibility
+            _self.visibility = visibility
         }
 
         function reset_selection() {
-            if (is_topic_selected && selected_object_id == id) {
-                selected_object_id = -1
+            if (self.is_topic_selected && self.selected_object_id == id) {
+                self.selected_object_id = -1
             }
         }
     }
@@ -413,8 +341,8 @@ function Topicmap(topicmap_id) {
         // ---
 
         function reset_selection() {
-            if (!is_topic_selected && selected_object_id == id) {
-                selected_object_id = -1
+            if (!self.is_topic_selected && self.selected_object_id == id) {
+                self.selected_object_id = -1
             }
         }
     }

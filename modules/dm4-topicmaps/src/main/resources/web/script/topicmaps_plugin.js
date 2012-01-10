@@ -1,12 +1,12 @@
 function topicmaps_plugin() {
 
+    var LOG_TOPICMAPS = false
+
     dm4c.register_css_stylesheet("/de.deepamehta.topicmaps/style/topicmaps.css")
     dm4c.javascript_source("/de.deepamehta.topicmaps/script/canvas_renderer_extension.js")
     dm4c.javascript_source("/de.deepamehta.topicmaps/script/model/topicmap.js")
 
     js.extend(dm4c.canvas, CanvasRendererExtension)
-
-    var LOG_TOPICMAPS = false
 
     // Model
     var topicmap_topics             // All topicmaps in the DB (object, key: topicmap ID, value: topicmap topic)
@@ -49,6 +49,20 @@ function topicmaps_plugin() {
         create_topicmap_menu()
         create_topicmap_dialog()
         display_initial_topicmap()
+
+        function register_topicmap_renderers() {
+            // default renderer
+            register(dm4c.canvas)
+            // custom renderers
+            var renderers = dm4c.trigger_plugin_hook("topicmap_renderer")
+            renderers.forEach(function(renderer) {
+                register(renderer)
+            })
+
+            function register(renderer) {
+                topicmap_renderers[renderer.get_info().uri] = renderer
+            }
+        }
 
         function create_default_topicmap() {
             if (!js.size(topicmap_topics)) {
@@ -467,20 +481,6 @@ function topicmaps_plugin() {
 
     // === Topicmap Renderers ===
 
-    function register_topicmap_renderers() {
-        // default renderer
-        register(dm4c.canvas)
-        // custom renderers
-        var renderers = dm4c.trigger_plugin_hook("topicmap_renderer")
-        renderers.forEach(function(renderer) {
-            register(renderer)
-        })
-
-        function register(renderer) {
-            topicmap_renderers[renderer.get_info().uri] = renderer
-        }
-    }
-
     function get_topicmap_renderer(renderer_uri) {
         var renderer = topicmap_renderers[renderer_uri]
         // error check
@@ -494,18 +494,6 @@ function topicmaps_plugin() {
     function iterate_topicmap_renderers(visitor_func) {
         for (var renderer_uri in topicmap_renderers) {
             visitor_func(topicmap_renderers[renderer_uri])
-        }
-    }
-
-    function switch_topicmap_renderer() {
-        var renderer_uri = dm4c.canvas.get_info().uri
-        var new_renderer_uri = topicmap.get_renderer_uri()
-        if (renderer_uri != new_renderer_uri) {
-            if (LOG_TOPICMAPS) dm4c.log("Switching topicmap renderer \"" +
-                renderer_uri + "\" => \"" + new_renderer_uri + "\"")
-            var renderer = get_topicmap_renderer(new_renderer_uri)
-            dm4c.canvas = renderer
-            dm4c.split_panel.set_left_panel(renderer)
         }
     }
 
@@ -526,7 +514,18 @@ function topicmaps_plugin() {
      */
     function display_topicmap(no_history_update) {
         switch_topicmap_renderer()
-        topicmap.put_on_canvas(no_history_update)
+        topicmap_renderer.display_topicmap(topicmap, no_history_update)
+    }
+
+    function switch_topicmap_renderer() {
+        var renderer_uri = dm4c.canvas.get_info().uri
+        var new_renderer_uri = topicmap_renderer.get_info().uri
+        if (renderer_uri != new_renderer_uri) {
+            if (LOG_TOPICMAPS) dm4c.log("Switching topicmap renderer \"" +
+                renderer_uri + "\" => \"" + new_renderer_uri + "\"")
+            dm4c.canvas = topicmap_renderer
+            dm4c.split_panel.set_left_panel(topicmap_renderer)
+        }
     }
 
     // === Topicmap Menu ===
