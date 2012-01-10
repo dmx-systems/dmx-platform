@@ -38,6 +38,7 @@ var dm4c = new function() {
     this.upload_dialog = null       // the upload dialog (an UploadDialog object)
 
     var type_cache = new TypeCache()
+
     var pm = new PluginManager({
         embedded_plugins: [
             "/script/embedded_plugins/default_plugin.js",
@@ -220,7 +221,7 @@ var dm4c = new function() {
      *                      post_update_topic hook to let plugins compare the old and new ones.
      * @param   new_topic   the new topic that is about to override the old topic.
      *
-     * @return  ### FIXME: The updated topic as stored in the DB (a Topic object).
+     * @return  ### FIXDOC: The updated topic as stored in the DB (a Topic object).
      *          Note: the new topic and the updated topic are not necessarily 100% identical. The new topic contains
      *          only the parts that are required for the update, e.g. a composite topic doesn't contain the "value"
      *          field. The updated topic on the other hand is the complete topic as returned by the server.
@@ -228,6 +229,7 @@ var dm4c = new function() {
     this.do_update_topic = function(old_topic, new_topic) {
         // update DB
         var directives = dm4c.restc.update_topic(new_topic)
+        // alert("do_update_topic(): directives=" + JSON.stringify(directives))
         // update client model and view
         process_directives(directives)
         //
@@ -352,18 +354,22 @@ var dm4c = new function() {
         dm4c.trigger_plugin_hook("pre_show_topic", topic)           // trigger hook
         // update view (canvas)
         var topics = dm4c.canvas.add_topic(topic, do_select)
-        if (do_center) {
-            dm4c.canvas.scroll_topic_to_center(topics.select.id)
+        if (topics.select) {
+            if (do_center) {
+                dm4c.canvas.scroll_topic_to_center(topics.select.id)
+            }
+            dm4c.canvas.refresh()
+            // update client model
+            if (do_select) {
+                set_selected_topic(topics.select)
+            }
+            //
+            dm4c.trigger_plugin_hook("post_show_topic", topics.select)  // trigger hook
+        } else {
+            // ### reset_selection()    // ### conditional by do_select?
         }
-        dm4c.canvas.refresh()
         // update view (page panel)
         update_page_panel()
-        // update client model
-        if (do_select) {
-            set_selected_topic(topics.select)
-        }
-        //
-        dm4c.trigger_plugin_hook("post_show_topic", topics.select)  // trigger hook
 
         function update_page_panel() {
             switch (action) {
@@ -421,10 +427,10 @@ var dm4c = new function() {
     // ---
 
     /**
-     * Processes an UPDATE_TOPIC directive.
-     * 
      * Updates a topic on the view (canvas and page panel).
      * Triggers the "post_update_topic" hook.
+     *
+     * Called to processes an UPDATE_TOPIC directive.
      *
      * @param   a Topic object
      */
@@ -437,10 +443,10 @@ var dm4c = new function() {
     }
 
     /**
-     * Processes an UPDATE_ASSOCIATION directive.
-     * 
      * Updates an association on the view (canvas and page panel).
      * Triggers the "post_update_association" hook.
+     *
+     * Called to processes an UPDATE_ASSOCIATION directive.
      *
      * @param   an Association object
      */

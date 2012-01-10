@@ -1,7 +1,10 @@
 function topicmaps_plugin() {
 
     dm4c.register_css_stylesheet("/de.deepamehta.topicmaps/style/topicmaps.css")
-    dm4c.javascript_source("/de.deepamehta.topicmaps/script/topicmap_renderers/canvas_renderer_extension.js")
+    dm4c.javascript_source("/de.deepamehta.topicmaps/script/canvas_renderer_extension.js")
+    dm4c.javascript_source("/de.deepamehta.topicmaps/script/model/topicmap.js")
+
+    js.extend(dm4c.canvas, CanvasRendererExtension)
 
     var LOG_TOPICMAPS = false
 
@@ -17,39 +20,35 @@ function topicmaps_plugin() {
 
 
 
+    // === REST Client Extension ===
+
+    dm4c.restc.get_topicmap = function(topicmap_id) {
+        return this.request("GET", "/topicmap/" + topicmap_id)
+    }
+    dm4c.restc.add_topic_to_topicmap = function(topicmap_id, topic_id, x, y) {
+        return this.request("PUT", "/topicmap/" + topicmap_id + "/topic/" + topic_id + "/" + x + "/" + y)
+    }
+    dm4c.restc.add_association_to_topicmap = function(topicmap_id, assoc_id) {
+        return this.request("PUT", "/topicmap/" + topicmap_id + "/association/" + assoc_id)
+    }
+    dm4c.restc.remove_association_from_topicmap = function(topicmap_id, assoc_id, ref_id) {
+        return this.request("DELETE", "/topicmap/" + topicmap_id + "/association/" + assoc_id + "/" + ref_id)
+    }
+    dm4c.restc.set_topicmap_translation = function(topicmap_id, trans_x, trans_y) {
+        return this.request("PUT", "/topicmap/" + topicmap_id + "/translation/" + trans_x + "/" + trans_y)
+    }
+
+
+
     // === Webclient Handler ===
 
     dm4c.register_plugin_handler("init", function() {
         fetch_topicmap_topics()
         register_topicmap_renderers()
-        extend_rest_client()
-        extend_canvas_renderer()
         create_default_topicmap()
         create_topicmap_menu()
         create_topicmap_dialog()
         display_initial_topicmap()
-
-        function extend_rest_client() {
-            dm4c.restc.get_topicmap = function(topicmap_id) {
-                return this.request("GET", "/topicmap/" + topicmap_id)
-            }
-            dm4c.restc.add_topic_to_topicmap = function(topicmap_id, topic_id, x, y) {
-                return this.request("PUT", "/topicmap/" + topicmap_id + "/topic/" + topic_id + "/" + x + "/" + y)
-            }
-            dm4c.restc.add_association_to_topicmap = function(topicmap_id, assoc_id) {
-                return this.request("PUT", "/topicmap/" + topicmap_id + "/association/" + assoc_id)
-            }
-            dm4c.restc.remove_association_from_topicmap = function(topicmap_id, assoc_id, ref_id) {
-                return this.request("DELETE", "/topicmap/" + topicmap_id + "/association/" + assoc_id + "/" + ref_id)
-            }
-            dm4c.restc.set_topicmap_translation = function(topicmap_id, trans_x, trans_y) {
-                return this.request("PUT", "/topicmap/" + topicmap_id + "/translation/" + trans_x + "/" + trans_y)
-            }
-        }
-
-        function extend_canvas_renderer() {
-            js.extend(dm4c.canvas, CanvasRendererExtension)
-        }
 
         function create_default_topicmap() {
             if (!js.size(topicmap_topics)) {
