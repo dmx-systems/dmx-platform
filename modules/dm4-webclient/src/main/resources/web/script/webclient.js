@@ -351,20 +351,20 @@ var dm4c = new function() {
         }
         var do_select = action != "none"
         // Note: the pre_show_topic() hook allows plugins to manipulate the topic, e.g. by setting coordinates
-        dm4c.trigger_plugin_hook("pre_show_topic", topic)           // trigger hook
+        dm4c.trigger_plugin_hook("pre_show_topic", topic)               // trigger hook
         // update view (canvas)
-        var topics = dm4c.canvas.add_topic(topic, do_select)
-        if (topics.select) {
+        var topic_shown = dm4c.canvas.add_topic(topic, do_select)
+        if (topic_shown) {
             if (do_center) {
-                dm4c.canvas.scroll_topic_to_center(topics.select.id)
+                dm4c.canvas.scroll_topic_to_center(topic_shown.id)
             }
             dm4c.canvas.refresh()
             // update client model
             if (do_select) {
-                set_selected_topic(topics.select)
+                set_selected_topic(topic_shown)
             }
             //
-            dm4c.trigger_plugin_hook("post_show_topic", topics.select)  // trigger hook
+            dm4c.trigger_plugin_hook("post_show_topic", topic_shown)    // trigger hook
         } else {
             // ### reset_selection()    // ### conditional by do_select?
         }
@@ -376,10 +376,10 @@ var dm4c = new function() {
             case "none":
                 break
             case "show":
-                dm4c.page_panel.display(topics.display)
+                dm4c.page_panel.display(topic)
                 break
             case "edit":
-                dm4c.begin_editing(topics.display)
+                dm4c.begin_editing(topic)
                 break
             default:
                 throw "WebclientError: \"" + action + "\" is an unexpected page panel action"

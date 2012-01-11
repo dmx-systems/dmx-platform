@@ -80,7 +80,7 @@ function Canvas() {
             set_highlight_topic(topic.id)
         }
         //
-        return {select: topic, display: topic}
+        return topic
 
         function init_position() {
             if (topic.x == undefined || topic.y == undefined) {
