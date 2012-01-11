@@ -23,13 +23,14 @@ function Canvas() {
     var canvas_assocs               // associations displayed on canvas (Object, key: assoc ID, value: CanvasAssoc)
     var width, height               // canvas size (in pixel)
     var trans_x, trans_y            // canvas translation (in pixel)
-    var highlight_object_id         // ID of the highlighted topic or association, or -1 for no highlighting
+    var highlight_mode = "none"     // "none", "topic", "assoc"
+    var highlight_id                // ID of the highlighted topic/association. Ignored if highlight mode is "none".
     var grid_positioning            // while grid positioning is in progress: a GridPositioning object, null otherwise
 
     // View (Canvas)
     var ctx                         // the canvas drawing context
 
-    // Short-term Interaction State (model)
+    // Short-term Interaction State
     var topic_move_in_progress      // true while topic move is in progress (boolean)
     var canvas_move_in_progress     // true while canvas translation is in progress (boolean)
     var association_in_progress     // true while new association is pulled (boolean)
@@ -76,21 +77,22 @@ function Canvas() {
         }
         //
         if (do_select) {
-            set_highlight_object(topic.id)
+            set_highlight_topic(topic.id)
         }
         //
         return {select: topic, display: topic}
 
         function init_position() {
-            if (topic.x == undefined && topic.y == undefined) {
+            if (topic.x == undefined || topic.y == undefined) {
                 if (grid_positioning) {
                     var pos = grid_positioning.next_position()
-                    topic.x = pos.x
-                    topic.y = pos.y
+                } else if (highlight()) {
+                    var pos = find_free_position(highlight_pos())
                 } else {
-                    topic.x = width  * Math.random() - trans_x
-                    topic.y = height * Math.random() - trans_y
+                    var pos = random_position()
                 }
+                topic.x = pos.x
+                topic.y = pos.y
             }
             topic.x = Math.floor(topic.x)
             topic.y = Math.floor(topic.y)
@@ -162,7 +164,7 @@ function Canvas() {
         if (!ct) {
             return
         }
-        reset_highlighting_conditionally(id)
+        reset_highlight_conditionally(id)
         // 2) refresh GUI
         if (refresh_canvas) {
             this.refresh()
@@ -181,7 +183,7 @@ function Canvas() {
         if (!ca) {
             return
         }
-        reset_highlighting_conditionally(id)
+        reset_highlight_conditionally(id)
         // 2) refresh GUI
         if (refresh_canvas) {
             this.refresh()
@@ -201,19 +203,19 @@ function Canvas() {
 
     this.select_topic = function(topic_id) {
         var topic = dm4c.fetch_topic(topic_id)
-        set_highlight_object(topic_id)
+        set_highlight_topic(topic_id)
         return {select: topic, display: topic}
     }
 
     this.select_association = function(assoc_id) {
         var assoc = dm4c.fetch_association(assoc_id)
-        set_highlight_object(assoc_id)
+        set_highlight_association(assoc_id)
         return assoc
     }
 
     this.reset_selection = function(refresh_canvas) {
         // update model
-        reset_highlighting()
+        reset_highlight()
         // refresh GUI
         if (refresh_canvas) {
             this.refresh()
@@ -245,7 +247,7 @@ function Canvas() {
     this.get_associations = function(topic_id) {
         var assocs = []
         iterate_associations(function(ca) {
-            if (ca.get_topic1_id() == topic_id || ca.get_topic2_id() == topic_id) {
+            if (ca.is_player_topic(topic_id)) {
                 assocs.push(ca)
             }
         })
@@ -310,36 +312,25 @@ function Canvas() {
         // set label style
         ctx.fillStyle = LABEL_COLOR
         //
-        iterate_topics(function(ct) {
-            // hightlight
-            var is_highlight = highlight_object_id == ct.id
-            set_highlight_style(is_highlight)
-            //
-            ct.draw()
-            //
-            reset_highlight_style(is_highlight)
+        iterate_topics(function(topic) {
+            draw_object(topic)
         })
     }
 
     function draw_associations() {
-        iterate_associations(function(ca) {
-            var ct1 = get_topic(ca.get_topic1_id())
-            var ct2 = get_topic(ca.get_topic2_id())
-            // error check
-            if (!ct1 || !ct2) {
-                // TODO: deleted associations must be removed from all topicmaps.
-                alert("ERROR in draw_associations: association " + ca.id + " is missing a topic")
-                // ### delete canvas_assocs[i]
-                return
-            }
-            // hightlight
-            var is_highlight = highlight_object_id == ca.id
-            set_highlight_style(is_highlight)
-            //
-            draw_line(ct1.x, ct1.y, ct2.x, ct2.y, ASSOC_WIDTH, ca.color)
-            //
-            reset_highlight_style(is_highlight)
+        iterate_associations(function(assoc) {
+            draw_object(assoc)
         })
+    }
+
+    function draw_object(topic_or_assoc) {
+        // highlight
+        var highlight = has_highlight(topic_or_assoc.id)
+        set_highlight_style(highlight)
+        //
+        topic_or_assoc.draw()
+        //
+        reset_highlight_style(highlight)
     }
 
     function draw_line(x1, y1, x2, y2, width, color) {
@@ -497,8 +488,8 @@ function Canvas() {
         var x = p.x
         var y = p.y
         return iterate_associations(function(ca) {
-            var ct1 = get_topic(ca.get_topic1_id())
-            var ct2 = get_topic(ca.get_topic2_id())
+            var ct1 = ca.get_topic_1()
+            var ct2 = ca.get_topic_2()
             // bounding rectangle
             var aw2 = ASSOC_WIDTH / 2   // buffer to make orthogonal associations selectable
             var bx1 = Math.min(ct1.x, ct2.x) - aw2
@@ -660,7 +651,7 @@ function Canvas() {
     function init_model() {
         canvas_topics = {}
         canvas_assocs = {}
-        reset_highlighting()
+        reset_highlight()
         trans_x = 0, trans_y = 0
     }
 
@@ -682,6 +673,10 @@ function Canvas() {
 
     function topic_exists(id) {
         return get_topic(id) != undefined
+    }
+
+    function get_highlight_topic() {
+        return get_topic(highlight_id)
     }
 
     function iterate_topics(func) {
@@ -713,6 +708,10 @@ function Canvas() {
         return get_association(id) != undefined
     }
 
+    function get_highlight_association() {
+        return get_association(highlight_id)
+    }
+
     function iterate_associations(func) {
         for (var id in canvas_assocs) {
             var ret = func(get_association(id))
@@ -724,18 +723,36 @@ function Canvas() {
 
     // === Highlighting ===
 
-    function set_highlight_object(object_id) {
-        highlight_object_id = object_id
+    function set_highlight_topic(topic_id) {
+        highlight_mode = "topic"
+        highlight_id = topic_id
     }
 
-    function reset_highlighting_conditionally(object_id) {
-        if (highlight_object_id == object_id) {
-            reset_highlighting()
+    function set_highlight_association(assoc_id) {
+        highlight_mode = "assoc"
+        highlight_id = assoc_id
+    }
+
+    // ---
+
+    function reset_highlight() {
+        highlight_mode = "none"
+    }
+
+    function reset_highlight_conditionally(id) {
+        if (has_highlight(id)) {
+            reset_highlight()
         }
     }
 
-    function reset_highlighting() {
-        highlight_object_id = -1
+    // ---
+
+    function highlight() {
+        return highlight_mode != "none"
+    }
+
+    function has_highlight(id) {
+        return highlight() && highlight_id == id
     }
 
 
@@ -796,6 +813,8 @@ function Canvas() {
         }
     }
 
+    // === Geometry ===
+
     /**
      * Interprets a mouse event according to a coordinate system.
      *
@@ -823,8 +842,62 @@ function Canvas() {
                 x: event.originalEvent.layerX - trans_x,
                 y: event.originalEvent.layerY - trans_y
             }
-        default:
-            throw "UnknownCoordinateSystem: " + coordinate_system
+        }
+    }
+
+    /**
+     * @return  an object with "x" and "y" properties.
+     */
+    function highlight_pos() {
+        switch (highlight_mode) {
+        case "topic":
+            var ct = get_highlight_topic()
+            return {x: ct.x, y: ct.y}
+        case "assoc":
+            var ca = get_highlight_association()
+            var ct1 = ca.get_topic_1()
+            var ct2 = ca.get_topic_2()
+            return {
+                x: (ct1.x + ct2.x) / 2,
+                y: (ct1.y + ct2.y) / 2
+            }
+        }
+    }
+
+    /**
+     * @return  an object with "x" and "y" properties.
+     */
+    function find_free_position(start_pos) {
+        var RADIUS_INCREMENT = 100
+        var round_count = 0
+        var radius = 0
+        while (true) {
+            round_count++
+            radius += RADIUS_INCREMENT
+            var max_tries = 10 * round_count
+            for (var t = 0; t < max_tries; t++) {
+                var pos = {
+                    x: start_pos.x + 2 * radius * Math.random() - radius,
+                    y: start_pos.y + 2 * radius * Math.random() - radius
+                }
+                if (is_position_free(pos)) {
+                    return pos
+                }
+            }
+        }
+    }
+
+    function is_position_free(pos) {
+        return true     // ### TODO
+    }
+
+    /**
+     * @return  an object with "x" and "y" properties.
+     */
+    function random_position(pos) {
+        return {
+            x: width  * Math.random() - trans_x,
+            y: height * Math.random() - trans_y
         }
     }
 
@@ -849,6 +922,8 @@ function Canvas() {
         this.y = topic.y
 
         init(topic);
+
+        // ---
 
         this.draw = function() {
             try {
@@ -905,7 +980,7 @@ function Canvas() {
      */
     function CanvasAssoc(assoc) {
 
-        var ca = this
+        var self = this
 
         this.id = assoc.id
         this.role_1 = assoc.role_1
@@ -913,23 +988,57 @@ function Canvas() {
 
         init(assoc)
 
-        this.get_topic1_id = function() {
-            return this.role_1.topic_id
+        // ---
+
+        this.get_topic_1 = function() {
+            return get_topic(id1())
         }
 
-        this.get_topic2_id = function() {
-            return this.role_2.topic_id
+        this.get_topic_2 = function() {
+            return get_topic(id2())
         }
 
         // ---
+
+        this.is_player_topic = function(topic_id) {
+            return id1() == topic_id || id2() == topic_id
+        }
+
+        // ---
+
+        this.draw = function() {
+            var ct1 = this.get_topic_1()
+            var ct2 = this.get_topic_2()
+            // error check
+            if (!ct1 || !ct2) {
+                // TODO: deleted associations must be removed from all topicmaps.
+                // ### alert("ERROR in draw_associations: association " + this.id + " is missing a topic")
+                // ### delete canvas_assocs[i]
+                return
+            }
+            //
+            draw_line(ct1.x, ct1.y, ct2.x, ct2.y, ASSOC_WIDTH, this.color)
+        }
 
         this.update = function(assoc) {
             init(assoc)
         }
 
+        // ---
+
+        function id1() {
+            return self.role_1.topic_id
+        }
+
+        function id2() {
+            return self.role_2.topic_id
+        }
+
+        // ---
+
         function init(assoc) {
-            ca.type_uri = assoc.type_uri
-            ca.color = dm4c.get_type_color(assoc.type_uri)
+            self.type_uri = assoc.type_uri
+            self.color = dm4c.get_type_color(assoc.type_uri)
         }
     }
 
