@@ -1,9 +1,9 @@
 /**
- * Extends the default topicmap renderer (as provided by the webclient module) by persistence.
+ * Extends the default canvas renderer (as provided by the webclient module) by persistence.
  */
 function CanvasRendererExtension() {
 
-    // === TopicmapRenderer Topicmaps Extension ===
+    // === CanvasRenderer Topicmaps Extension ===
 
     this.load_topicmap = function(topicmap_id) {
         return new Topicmap(topicmap_id)

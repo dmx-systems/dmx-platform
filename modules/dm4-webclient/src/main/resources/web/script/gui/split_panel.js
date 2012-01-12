@@ -58,7 +58,6 @@ function SplitPanel() {
         if (dm4c.LOG_GUI) dm4c.log("Page panel width=" + right_panel.width)
         //
         calculate_left_panel_width()
-        // alert("TopicmapRenderer(): width=" + this.canvas_width + " height=" + this.canvas_height)
         $("#canvas-panel").resizable({handles: "e", resize: do_resize, stop: do_stop_resize})
         //
         $(window).resize(do_window_resize)

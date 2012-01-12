@@ -11,7 +11,7 @@
  * Note: the concept of a (persistent) topicmap does not appear here.
  * It is only introduced by the Topicmaps module.
  */
-function TopicmapRenderer() {
+function CanvasRenderer() {
 
     this.get_info = function() {}
 

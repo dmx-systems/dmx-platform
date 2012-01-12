@@ -1,8 +1,8 @@
-function Canvas() {
+function TopicmapRenderer() {
 
     // ------------------------------------------------------------------------------------------------ Constructor Code
 
-    js.extend(this, TopicmapRenderer)
+    js.extend(this, CanvasRenderer)
     var self = this
 
     // Settings
@@ -27,7 +27,7 @@ function Canvas() {
     var highlight_id                // ID of the highlighted topic/association. Ignored if highlight mode is "none".
     var grid_positioning            // while grid positioning is in progress: a GridPositioning object, null otherwise
 
-    // View (Canvas)
+    // View (HTML5 Canvas)
     var ctx                         // the canvas drawing context
 
     // Short-term Interaction State
@@ -51,11 +51,11 @@ function Canvas() {
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
-    // === TopicmapRenderer Implementation ===
+    // === CanvasRenderer Implementation ===
 
     this.get_info = function() {
         return {
-            uri: "dm4.webclient.canvas_renderer",
+            uri: "dm4.webclient.topicmap_renderer",
             name: "Topicmap"
         }
     }
@@ -937,7 +937,7 @@ function Canvas() {
                 // Note: the context must be passed to every draw() call.
                 // The context changes when the canvas is resized.
             } catch (e) {
-                dm4c.log("### ERROR at Canvas.draw_topics:\nicon.src=" + icon.src + "\nicon.width=" + icon.width +
+                dm4c.log("### ERROR at CanvasTopic.draw:\nicon.src=" + icon.src + "\nicon.width=" + icon.width +
                     "\nicon.height=" + icon.height  + "\nicon.complete=" + icon.complete
                     /* + "\n" + JSON.stringify(e) */)
             }
