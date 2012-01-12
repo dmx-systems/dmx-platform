@@ -1,8 +1,8 @@
 function filemanager_plugin() {
 
-    // === Webclient Handler ===
+    // === Webclient Listeners ===
 
-    dm4c.register_plugin_handler("post_refresh_create_menu", function(type_menu) {
+    dm4c.register_listener("post_refresh_create_menu", function(type_menu) {
         type_menu.add_separator()
         type_menu.add_item({
             label: "New File Browser",
@@ -12,9 +12,9 @@ function filemanager_plugin() {
         })
     })
 
-    // === Files Handler ===
+    // === Files Listeners ===
 
-    dm4c.register_plugin_handler("process_files_drop", function(files) {
+    dm4c.register_listener("process_files_drop", function(files) {
         dm4c.canvas.start_grid_positioning()
         //
         var dir_count = files.get_directory_count()

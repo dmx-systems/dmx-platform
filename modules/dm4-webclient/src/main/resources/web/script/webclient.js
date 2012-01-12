@@ -635,8 +635,8 @@ var dm4c = new function() {
 
     // ---
 
-    this.register_plugin_handler = function(hook_name, plugin_handler) {
-        pm.register_plugin_handler(hook_name, plugin_handler)
+    this.register_listener = function(hook_name, listener) {
+        pm.register_listener(hook_name, listener)
     }
 
     // ---
@@ -660,13 +660,13 @@ var dm4c = new function() {
     // ---
 
     /**
-     * Triggers the named hook of all installed plugins.
+     * Triggers the registered listeners for the named hook.
      *
-     * @param   hook_name   Name of the plugin hook to trigger.
-     * @param   <varargs>   Variable number of arguments. Passed to the hook.
+     * @param   hook_name   Name of the hook.
+     * @param   <varargs>   Variable number of arguments. Passed to the listeners.
      */
     this.trigger_plugin_hook = function(hook_name) {
-        return pm.trigger_plugin_handlers.apply(undefined, arguments)
+        return pm.trigger_listeners.apply(undefined, arguments)
     }
 
     this.trigger_page_renderer_hook = function(topic_or_association, hook_name, args) {

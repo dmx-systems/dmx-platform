@@ -23,9 +23,9 @@ function files_plugin() {
         return this.request("GET", "/files/" + file_topic_id)
     }
 
-    // === Webclient Handler ===
+    // === Webclient Listeners ===
 
-    dm4c.register_plugin_handler("process_drop", function(data_transfer) {
+    dm4c.register_listener("process_drop", function(data_transfer) {
         if (js.contains(data_transfer.types, "Files")) {
             if (typeof netscape != "undefined") {
                 var files = process_file_drop_firefox(data_transfer)
@@ -114,7 +114,7 @@ function files_plugin() {
     /**
      * @param   topic   a CanvasTopic object
      */
-    dm4c.register_plugin_handler("topic_doubleclicked", function(topic) {
+    dm4c.register_listener("topic_doubleclicked", function(topic) {
         if (topic.type_uri == "dm4.files.file" ||
             topic.type_uri == "dm4.files.folder") {
             dm4c.restc.open_file(topic.id)

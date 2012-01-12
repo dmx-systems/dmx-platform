@@ -7,9 +7,9 @@ function workspaces_plugin() {
 
 
 
-    // === Webclient Handler ===
+    // === Webclient Listeners ===
 
-    dm4c.register_plugin_handler("init", function() {
+    dm4c.register_listener("init", function() {
 
         var workspaces = get_all_workspaces()
         create_workspace_menu()
@@ -41,7 +41,7 @@ function workspaces_plugin() {
     /**
      * @param   topic   a Topic object
      */
-    dm4c.register_plugin_handler("post_update_topic", function(topic, old_topic) {
+    dm4c.register_listener("post_update_topic", function(topic, old_topic) {
         if (topic.type_uri == "dm4.workspaces.workspace") {
             rebuild_workspace_menu()
         }
@@ -50,7 +50,7 @@ function workspaces_plugin() {
     /**
      * @param   topic   a Topic object
      */
-    dm4c.register_plugin_handler("post_delete_topic", function(topic) {
+    dm4c.register_listener("post_delete_topic", function(topic) {
         if (topic.type_uri == "dm4.workspaces.workspace") {
             rebuild_workspace_menu()
         }
@@ -58,13 +58,13 @@ function workspaces_plugin() {
 
 
 
-    // === Access Control Handler ===
+    // === Access Control Listeners ===
 
-    dm4c.register_plugin_handler("user_logged_in", function(user) {
+    dm4c.register_listener("user_logged_in", function(user) {
         rebuild_workspace_menu()
     })
 
-    dm4c.register_plugin_handler("user_logged_out", function() {
+    dm4c.register_listener("user_logged_out", function() {
         rebuild_workspace_menu()
     })
 

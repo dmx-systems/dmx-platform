@@ -2,9 +2,9 @@ function webbrowser_plugin() {
 
     dm4c.register_page_renderer("/de.deepamehta.webbrowser/script/page_renderers/webpage_renderer.js")
 
-    // === Webclient Handler ===
+    // === Webclient Listeners ===
 
-    dm4c.register_plugin_handler("topic_commands", function(topic) {
+    dm4c.register_listener("topic_commands", function(topic) {
 
         if (topic.type_uri == "dm4.webbrowser.url") {
             return [

@@ -40,9 +40,9 @@ function topicmaps_plugin() {
 
 
 
-    // === Webclient Handler ===
+    // === Webclient Listeners ===
 
-    dm4c.register_plugin_handler("init", function() {
+    dm4c.register_listener("init", function() {
         fetch_topicmap_topics()
         register_canvas_renderers()
         create_default_topicmap()
@@ -139,64 +139,64 @@ function topicmaps_plugin() {
         }
     })
 
-    dm4c.register_plugin_handler("post_select_topic", function(topic) {
+    dm4c.register_listener("post_select_topic", function(topic) {
         topicmap.set_topic_selection(topic)
     })
 
-    dm4c.register_plugin_handler("post_select_association", function(assoc) {
+    dm4c.register_listener("post_select_association", function(assoc) {
         topicmap.set_association_selection(assoc)
     })
 
-    dm4c.register_plugin_handler("post_reset_selection", function() {
+    dm4c.register_listener("post_reset_selection", function() {
         topicmap.reset_selection()
     })
 
     /**
      * @param   topic   a Topic object
      */
-    dm4c.register_plugin_handler("pre_show_topic", function(topic) {
+    dm4c.register_listener("pre_show_topic", function(topic) {
         topicmap.prepare_topic_for_display(topic)
     })
 
     /**
      * @param   topic   a Topic object with additional "x" and "y" properties
      */
-    dm4c.register_plugin_handler("post_show_topic", function(topic) {
+    dm4c.register_listener("post_show_topic", function(topic) {
         topicmap.add_topic(topic.id, topic.type_uri, topic.value, topic.x, topic.y)
     })
 
     /**
      * @param   assoc   a CanvasAssoc object
      */
-    dm4c.register_plugin_handler("post_show_association", function(assoc) {
+    dm4c.register_listener("post_show_association", function(assoc) {
         topicmap.add_association(assoc.id, assoc.type_uri, assoc.role_1.topic_id, assoc.role_2.topic_id)
     })
 
     /**
      * @param   topic   a CanvasTopic object
      */
-    dm4c.register_plugin_handler("post_hide_topic", function(topic) {
+    dm4c.register_listener("post_hide_topic", function(topic) {
         topicmap.hide_topic(topic.id)
     })
 
     /**
      * @param   assoc   a CanvasAssoc object
      */
-    dm4c.register_plugin_handler("post_hide_association", function(assoc) {
+    dm4c.register_listener("post_hide_association", function(assoc) {
         topicmap.hide_association(assoc.id)
     })
 
     /**
      * @param   topic   a CanvasTopic object
      */
-    dm4c.register_plugin_handler("post_move_topic", function(topic) {
+    dm4c.register_listener("post_move_topic", function(topic) {
         topicmap.move_topic(topic.id, topic.x, topic.y)
     })
 
     /**
      * @param   topic   a Topic object
      */
-    dm4c.register_plugin_handler("post_update_topic", function(topic, old_topic) {
+    dm4c.register_listener("post_update_topic", function(topic, old_topic) {
         // 1) Update all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Updating topic " + topic.id + " on all topicmaps")
         for (var id in topicmaps) {
@@ -212,7 +212,7 @@ function topicmaps_plugin() {
      * @param   assoc       an Association object
      * @param   old_assoc   FIXME: not yet available
      */
-    dm4c.register_plugin_handler("post_update_association", function(assoc, old_assoc) {
+    dm4c.register_listener("post_update_association", function(assoc, old_assoc) {
         if (LOG_TOPICMAPS) dm4c.log("Updating association " + assoc.id + " on all topicmaps")
         for (var id in topicmaps) {
             topicmaps[id].update_association(assoc)
@@ -222,7 +222,7 @@ function topicmaps_plugin() {
     /**
      * @param   topic   a Topic object
      */
-    dm4c.register_plugin_handler("post_delete_topic", function(topic) {
+    dm4c.register_listener("post_delete_topic", function(topic) {
         // 1) Update all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Deleting topic " + topic.id + " from all topicmaps")
         for (var id in topicmaps) {
@@ -251,7 +251,7 @@ function topicmaps_plugin() {
         }
     })
 
-    dm4c.register_plugin_handler("post_delete_association", function(assoc) {
+    dm4c.register_listener("post_delete_association", function(assoc) {
         // Remove association from all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Deleting association " + assoc.id + " from all topicmaps")
         for (var id in topicmaps) {
@@ -259,12 +259,12 @@ function topicmaps_plugin() {
         }
     })
 
-    dm4c.register_plugin_handler("pre_push_history", function(history_entry) {
+    dm4c.register_listener("pre_push_history", function(history_entry) {
         history_entry.state.topicmap_id = topicmap.get_id()
         history_entry.url = "/topicmap/" + topicmap.get_id() + history_entry.url
     })
 
-    dm4c.register_plugin_handler("pre_pop_history", function(state) {
+    dm4c.register_listener("pre_pop_history", function(state) {
         if (dm4c.LOG_HISTORY) dm4c.log("..... topicmaps_plugin.pre_pop_history()")
         if (state.topicmap_id != topicmap.get_id()) {
             if (dm4c.LOG_HISTORY) dm4c.log(".......... switch from topicmap " + topicmap.get_id() +
@@ -279,11 +279,11 @@ function topicmaps_plugin() {
         }
     })
 
-    dm4c.register_plugin_handler("post_move_canvas", function(trans_x, trans_y) {
+    dm4c.register_listener("post_move_canvas", function(trans_x, trans_y) {
         topicmap.set_translation(trans_x, trans_y)
     })
 
-    dm4c.register_plugin_handler("pre_draw_canvas", function(ctx) {
+    dm4c.register_listener("pre_draw_canvas", function(ctx) {
         // Note: topicmap is undefined if canvas draw() is performed
         // before the Topicmaps plugin is initialized.
         topicmap && topicmap.draw_background(ctx)
@@ -291,13 +291,13 @@ function topicmaps_plugin() {
 
 
 
-    // === Access Control Handler ===
+    // === Access Control Listeners ===
 
-    dm4c.register_plugin_handler("user_logged_in", function(user) {
+    dm4c.register_listener("user_logged_in", function(user) {
         rebuild_topicmap_menu()
     })
 
-    dm4c.register_plugin_handler("user_logged_out", function() {
+    dm4c.register_listener("user_logged_out", function() {
         rebuild_topicmap_menu()
     })
 

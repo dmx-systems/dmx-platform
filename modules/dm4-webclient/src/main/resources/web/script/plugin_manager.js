@@ -10,8 +10,8 @@ function PluginManager(config) {
 
     var css_stylesheets = []
 
-    // key: hook name (string), value: registered handlers (array of functions)
-    var plugin_handlers = {}
+    // key: hook name (string), value: registered listeners (array of functions)
+    var listener_registry = {}
 
     // ### FIXME: drop this. Not in use. Only here for documentation purposes.
     // ### TODO: move to wiki documentation.
@@ -102,37 +102,37 @@ function PluginManager(config) {
         css_stylesheets.push(css_path)
     }
 
-    // === Plugin Handlers ===
+    // === Listener Registry ===
 
-    this.register_plugin_handler = function(hook_name, plugin_handler) {
+    this.register_listener = function(hook_name, listener) {
         // introduce hook on-demand
         if (!hook_exists(hook_name)) {
-            plugin_handlers[hook_name] = []
+            listener_registry[hook_name] = []
         }
         //
-        register_plugin_handler(hook_name, plugin_handler)
+        register_listener(hook_name, listener)
     }
 
     // ---
 
     /**
-     * Triggers the named hook of all installed plugins.
+     * Triggers the registered listeners for the named hook.
      *
-     * @param   hook_name   Name of the plugin hook to trigger.
-     * @param   <varargs>   Variable number of arguments. Passed to the hook.
+     * @param   hook_name   Name of the hook.
+     * @param   <varargs>   Variable number of arguments. Passed to the listeners.
      */
-    this.trigger_plugin_handlers = function(hook_name) {
+    this.trigger_listeners = function(hook_name) {
         var result = []
         //
-        var handlers = plugin_handlers[hook_name]
-        if (handlers) {
+        var listeners = listener_registry[hook_name]
+        if (listeners) {
             // build arguments
             var args = Array.prototype.slice.call(arguments)    // create real array from arguments object
             args.shift()                                        // drop hook_name argument
             //
-            for (var i = 0, handler; handler = handlers[i]; i++) {
-                // trigger hook
-                var res = handler.apply(undefined, args)        // FIXME: pass plugin reference for "this"?
+            for (var i = 0, listener; listener = listeners[i]; i++) {
+                // trigger listener
+                var res = listener.apply(undefined, args)       // FIXME: pass plugin reference for "this"?
                 // store result
                 if (res !== undefined) {    // Note: undefined is not added to the result, but null is
                     result.push(res)
@@ -169,12 +169,12 @@ function PluginManager(config) {
 
     // ---
 
-    function register_plugin_handler(hook_name, plugin_handler) {
-        plugin_handlers[hook_name].push(plugin_handler)
+    function register_listener(hook_name, listener) {
+        listener_registry[hook_name].push(listener)
     }
 
     function hook_exists(hook_name) {
-        return plugin_handlers[hook_name]
+        return listener_registry[hook_name]
     }
 
     // ---
