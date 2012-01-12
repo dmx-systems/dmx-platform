@@ -366,6 +366,10 @@ var dm4c = new function() {
             //
             dm4c.trigger_plugin_hook("post_show_topic", topic_shown)    // trigger hook
         } else {
+            // update client model
+            if (do_select) {
+                set_selected_topic(topic)
+            }
             // ### reset_selection()    // ### conditional by do_select?
         }
         // update view (page panel)

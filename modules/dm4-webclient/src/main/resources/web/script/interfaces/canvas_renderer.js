@@ -58,6 +58,10 @@ function CanvasRenderer() {
     // === Selection ===
 
     /**
+     * Selects a topic, that is it is rendered as highlighted.
+     * If the topic is not present on the canvas nothing is performed. ### FIXDOC (explain): In this case
+     * there is still a value returned.
+     *
      * @return  an object with "select" and "display" properties (both values are Topic objects).
      */
     this.select_topic = function(topic_id) {}

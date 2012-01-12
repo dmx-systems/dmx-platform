@@ -202,14 +202,20 @@ function TopicmapRenderer() {
     // ---
 
     this.select_topic = function(topic_id) {
+        // fetch from DB
         var topic = dm4c.fetch_topic(topic_id)
+        // update model
         set_highlight_topic(topic_id)
+        //
         return {select: topic, display: topic}
     }
 
     this.select_association = function(assoc_id) {
+        // fetch from DB
         var assoc = dm4c.fetch_association(assoc_id)
+        // update model
         set_highlight_association(assoc_id)
+        //
         return assoc
     }
 
