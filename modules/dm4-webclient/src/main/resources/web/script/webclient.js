@@ -1075,7 +1075,7 @@ var dm4c = new function() {
 
     function fetch_topic_type(topic_type_uri) {
         // Note: fetch_topic_type() is the only spot where a TopicType object is created directly
-        // instead through build_topic_type().
+        // instead by calling build_topic_type().
         // fetch_topic_type() is part of the Webclient's bootstrapping sequence (see load_types() below).
         return new TopicType(dm4c.restc.get_topic_type(topic_type_uri))
     }
@@ -1105,6 +1105,7 @@ var dm4c = new function() {
     function build_topic_type(topic_type) {
         var tt = new TopicType(topic_type)
         // Note: every time a topic type is created its load_icon() method must be called.
+        // This can't be done in the TopicType constructor (see load_types() below).
         tt.load_icon()
         return tt
     }

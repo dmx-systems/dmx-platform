@@ -25,6 +25,10 @@
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
+            ],
+            label_config: [
+                dm4.topicmaps.translation_x,
+                dm4.topicmaps.translation_y
             ]
         },
         {
@@ -47,6 +51,10 @@
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
+            ],
+            label_config: [
+                dm4.topicmaps.zoom_level,
+                dm4.topicmaps.translation
             ],
             view_config_topics: [
                 {
