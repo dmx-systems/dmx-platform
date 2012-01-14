@@ -1,9 +1,8 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.CompositeValue;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.service.ChangeReport;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
@@ -52,7 +51,9 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // ---
 
-    ChangeReport update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives);
+    // ### FIXME: remove from interface. This is a low-level method.
+    void updateCompositeValue(AssociationDefinition assocDef, TopicModel valueTopic, ClientState clientState,
+                                                                                     Directives directives);
 
 
 
@@ -60,9 +61,11 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     /**
      * Returns a child topic's value or <code>null</code> if the child topic doesn't exist.
+     * ### FIXME: to be dropped?
      */
     SimpleValue getChildTopicValue(String assocDefUri);
 
+    // ### FIXME: to be dropped?
     void setChildTopicValue(String assocDefUri, SimpleValue value);
 
     // --- Topic Retrieval ---

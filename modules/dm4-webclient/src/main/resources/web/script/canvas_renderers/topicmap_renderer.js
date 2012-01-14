@@ -874,7 +874,7 @@ function TopicmapRenderer() {
      * @return  an object with "x" and "y" properties.
      */
     function find_free_position(start_pos) {
-        var RADIUS_INCREMENT = 100
+        var RADIUS_INCREMENT = 150
         var round_count = 0
         var radius = 0
         while (true) {

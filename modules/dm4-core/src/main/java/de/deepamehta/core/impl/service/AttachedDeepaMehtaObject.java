@@ -355,9 +355,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    // ### move up
-    @Override
-    public ChangeReport update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives) {
+    ChangeReport update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives) {
         ChangeReport report = new ChangeReport();
         updateUri(model.getUri());
         updateTypeUri(model.getTypeUri(), report);
@@ -413,77 +411,84 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // === Store ===
 
-    // TODO: factorize this method
     private void updateCompositeValue(CompositeValue newComp, ClientState clientState, Directives directives) {
         try {
-            CompositeValue comp = getCompositeValue();
             for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
-                String assocDefUri = assocDef.getUri();
-                TopicModel valueTopic = newComp.getTopic(assocDefUri, null);    // defaultValue=null
+                TopicModel valueTopic = newComp.getTopic(assocDef.getUri(), null);    // defaultValue=null
                 // skip if not contained in update request
                 if (valueTopic == null) {
                     continue;
                 }
-                //
-                String childTopicTypeUri = assocDef.getPartTopicTypeUri();
-                TopicType childTopicType = dms.getTopicType(childTopicTypeUri, null);
-                String assocTypeUri = assocDef.getTypeUri();
-                if (assocTypeUri.equals("dm4.core.composition_def")) {
-                    if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
-                        // Note: the child topic's composite must be fetched. It needs to be passed to the
-                        // POST_UPDATE_TOPIC hook as part of the "old model" (when the child topic is updated).
-                        Topic childTopic = fetchChildTopic(assocDef, true);             // fetchComposite=true
-                        CompositeValue childTopicComp = valueTopic.getCompositeValue();
-                        if (childTopic != null) {
-                            // update child topic
-                            TopicModel model = new TopicModel(childTopic.getId(), childTopicComp);
-                            childTopic.update(model, clientState, directives);
-                        } else {
-                            // create and associate child topic
-                            childTopic = dms.createTopic(new TopicModel(childTopicTypeUri, childTopicComp), null);
-                            associateChildTopic(assocDef, childTopic.getId());
-                            // Note: the child topic must be created right with its composite value.
-                            // Otherwise its label can't be calculated. ### still true?
-                        }
-                        // update memory
-                        comp.put(assocDefUri, childTopic.getCompositeValue());
-                    } else {
-                        setChildTopicValue(assocDefUri, valueTopic.getSimpleValue());
-                    }
-                } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
-                    if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
-                        throw new RuntimeException("Aggregation of composite topic types not yet supported");
-                    } else {
-                        // remove current assignment
-                        RelatedTopic childTopic = fetchChildTopic(assocDef, false);     // fetchComposite=false
-                        if (childTopic != null) {
-                            long assocId = childTopic.getAssociation().getId();
-                            dms.deleteAssociation(assocId, null);  // clientState=null
-                        }
-                        //
-                        String value = valueTopic.getSimpleValue().toString();
-                        boolean assignExistingTopic = value.startsWith(REF_PREFIX);
-                        if (assignExistingTopic) {
-                            // update DB
-                            long childTopicId = Long.parseLong(value.substring(REF_PREFIX.length()));
-                            associateChildTopic(assocDef, childTopicId);
-                            // update memory
-                            // Topic assignedTopic = dms.getTopic(childTopicId, false, null);  // fetchComposite=false
-                            // comp.put(assocDefUri, assignedTopic.getSimpleValue().value());
-                            SimpleValue childTopicValue = fetchChildTopicValue(assocDef);
-                            comp.put(assocDefUri, childTopicValue.value());
-                        } else {
-                            // create new child topic
-                            setChildTopicValue(assocDefUri, valueTopic.getSimpleValue());
-                        }
-                    }
-                } else {
-                    throw new RuntimeException("Association type \"" + assocTypeUri + "\" not supported");
-                }
+                updateCompositeValue(assocDef, valueTopic, clientState, directives);
             }
         } catch (Exception e) {
             throw new RuntimeException("Updating the composite value of " + className() + " " + getId() +
                 " failed (newComp=" + newComp + ")", e);
+        }
+    }
+
+    // ### FIXME: Remove from interface. Make it private.
+    @Override
+    public void updateCompositeValue(AssociationDefinition assocDef, TopicModel valueTopic, ClientState clientState,
+                                                                                            Directives directives) {
+        CompositeValue comp = getCompositeValue();
+        //
+        String assocDefUri       = assocDef.getUri();
+        String assocTypeUri      = assocDef.getTypeUri();
+        String childTopicTypeUri = assocDef.getPartTopicTypeUri();
+        TopicType childTopicType = dms.getTopicType(childTopicTypeUri, null);
+        // Note: the type URI of a simplified topic model (as constructed
+        // from update requests) is not initialzed.
+        valueTopic.setTypeUri(childTopicTypeUri);
+        //
+        if (assocTypeUri.equals("dm4.core.composition_def")) {
+            // Note: the child topic's composite must be fetched. It needs to be passed to the
+            // POST_UPDATE_TOPIC hook as part of the "old model" (when the child topic is updated).
+            Topic childTopic = fetchChildTopic(assocDef, true);             // fetchComposite=true
+            if (childTopic != null) {
+                // update existing child
+                childTopic.update(valueTopic, clientState, directives);
+            } else {
+                // create new child
+                childTopic = dms.createTopic(valueTopic, null);
+                associateChildTopic(assocDef, childTopic.getId());
+                // Note: the child topic must be created right with its composite value.
+                // Otherwise its label can't be calculated. ### still true?
+            }
+            // update memory
+            comp.put(assocDefUri, childTopic.getModel());
+        } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
+            if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
+                throw new RuntimeException("Aggregation of composite topic types not yet supported");
+            } else {
+                // remove current assignment
+                RelatedTopic childTopic = fetchChildTopic(assocDef, false);     // fetchComposite=false
+                if (childTopic != null) {
+                    long assocId = childTopic.getAssociation().getId();
+                    dms.deleteAssociation(assocId, null);  // clientState=null
+                }
+                //
+                String value = valueTopic.getSimpleValue().toString();
+                boolean assignExistingTopic = value.startsWith(REF_PREFIX);
+                if (assignExistingTopic) {
+                    // update DB
+                    long childTopicId = Long.parseLong(value.substring(REF_PREFIX.length()));
+                    associateChildTopic(assocDef, childTopicId);
+                    // update memory
+                    // Topic assignedTopic = dms.getTopic(childTopicId, false, null);  // fetchComposite=false
+                    // comp.put(assocDefUri, assignedTopic.getSimpleValue().value());
+                    SimpleValue childTopicValue = fetchChildTopicValue(assocDef);
+                    comp.put(assocDefUri, childTopicValue.value());
+                } else {
+                    // create new child
+                    Topic _childTopic = dms.createTopic(valueTopic, null);
+                    associateChildTopic(assocDef, _childTopic.getId());
+                    // update memory
+                    comp.put(assocDefUri, _childTopic.getModel());
+                }
+            }
+        } else {
+            throw new RuntimeException("Association type \"" + assocTypeUri + "\" not supported");
         }
     }
 
