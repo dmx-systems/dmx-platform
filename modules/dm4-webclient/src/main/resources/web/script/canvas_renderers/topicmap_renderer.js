@@ -808,14 +808,22 @@ function TopicmapRenderer() {
         if (x < 0 || x >= width || y < 0 || y >= height) {
             var dx = (width  / 2 - x) / ANIMATION_STEPS
             var dy = (height / 2 - y) / ANIMATION_STEPS
-            var animation_count = 0;
-            var animation = setInterval(function() {
-                translate(dx, dy)
-                draw()
-                if (++animation_count == ANIMATION_STEPS) {
-                    clearInterval(animation)
-                }
-            }, ANIMATION_DELAY)
+            var step_count = 0;
+            var animation = setInterval(animation_step, ANIMATION_DELAY)
+        }
+
+        function animation_step() {
+            translate(dx, dy)
+            draw()
+            if (++step_count == ANIMATION_STEPS) {
+                clearInterval(animation)
+                // Note: the Topicmaps module's setTopicmapTranslation()
+                // resource method expects integers (otherwise 404)
+                trans_x = Math.floor(trans_x)
+                trans_y = Math.floor(trans_y)
+                //
+                end_canvas_move()
+            }
         }
     }
 
