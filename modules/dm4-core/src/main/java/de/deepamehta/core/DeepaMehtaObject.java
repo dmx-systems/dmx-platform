@@ -1,8 +1,10 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
@@ -109,6 +111,12 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      Set<Association> getAssociations();
 
      Set<Association> getAssociations(String myRoleTypeUri);
+
+
+
+    // === Updating ===
+
+    ChangeReport update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives);
 
 
 

@@ -121,7 +121,24 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         return (TopicModel) super.getModel();
     }
 
+    // === Updating ===
 
+    @Override
+    public ChangeReport update(TopicModel model, ClientState clientState, Directives directives) {
+        logger.info("Updating topic " + getId() + " (new " + model + ")");
+        //
+        dms.triggerHook(Hook.PRE_UPDATE_TOPIC, this, model, directives);
+        //
+        TopicModel oldModel = (TopicModel) getModel().clone();
+        ChangeReport report = super.update(model, clientState, directives);
+        //
+        directives.add(Directive.UPDATE_TOPIC, this);
+        //
+        dms.triggerHook(Hook.POST_UPDATE_TOPIC, this, model, oldModel, clientState, directives);
+        dms.triggerHook(Hook.POST_FETCH_TOPIC, this, clientState, directives);
+        //
+        return report;
+    }
 
     // === Traversal ===
 
@@ -194,30 +211,14 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         super.store(clientState, directives);
     }
 
-    // ### move up
-    @Override
-    public ChangeReport update(TopicModel model, ClientState clientState, Directives directives) {
-        logger.info("Updating topic " + getId() + " (new " + model + ")");
-        //
-        dms.triggerHook(Hook.PRE_UPDATE_TOPIC, this, model, directives);
-        //
-        TopicModel oldModel = (TopicModel) getModel().clone();
-        ChangeReport report = super.update(model, clientState, directives);
-        //
-        directives.add(Directive.UPDATE_TOPIC, this);
-        //
-        dms.triggerHook(Hook.POST_UPDATE_TOPIC, this, model, oldModel, clientState, directives);
-        dms.triggerHook(Hook.POST_FETCH_TOPIC, this, clientState, directives);
-        //
-        return report;
-    }
-
     /**
      * Convenience method.
      */
     TopicType getTopicType() {
         return (TopicType) getType();
     }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

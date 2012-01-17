@@ -1,6 +1,9 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.service.ChangeReport;
+import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directives;
 
 import java.util.Set;
 
@@ -24,6 +27,8 @@ public interface Association extends DeepaMehtaObject {
     // ---
 
     AssociationModel getModel();
+
+    ChangeReport update(AssociationModel model, ClientState clientState, Directives directives);
 
     // === Traversal ===
 

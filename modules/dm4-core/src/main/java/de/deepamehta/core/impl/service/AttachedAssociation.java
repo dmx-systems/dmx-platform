@@ -163,7 +163,24 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         return (AssociationModel) super.getModel();
     }
 
+    // === Updating ===
 
+    /**
+     * @param   assocModel  The data to update.
+     *                      If the type URI is <code>null</code> it is not updated.
+     *                      If role 1 is <code>null</code> it is not updated.
+     *                      If role 2 is <code>null</code> it is not updated.
+     */
+    @Override
+    public ChangeReport update(AssociationModel model, ClientState clientState, Directives directives) {
+        logger.info("Updating association " + getId() + " (new " + model + ")");
+        //
+        ChangeReport report = super.update(model, clientState, directives);
+        updateRole(model.getRoleModel1(), 1);
+        updateRole(model.getRoleModel2(), 2);
+        //
+        return report;
+    }
 
     // === Traversal ===
 
@@ -236,23 +253,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         dms.storage.createAssociation(getModel());
         dms.associateWithAssociationType(getModel());
         super.store(clientState, directives);
-    }
-
-    /**
-     * @param   assocModel  The data to update.
-     *                      If the type URI is <code>null</code> it is not updated.
-     *                      If role 1 is <code>null</code> it is not updated.
-     *                      If role 2 is <code>null</code> it is not updated.
-     */
-    // ### @Override
-    ChangeReport update(AssociationModel model, ClientState clientState, Directives directives) {
-        logger.info("Updating association " + getId() + " (new " + model + ")");
-        //
-        ChangeReport report = super.update(model, clientState, directives);
-        updateRole(model.getRoleModel1(), 1);
-        updateRole(model.getRoleModel2(), 2);
-        //
-        return report;
     }
 
     /**

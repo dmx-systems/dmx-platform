@@ -229,6 +229,26 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
 
 
+    // === Updating ===
+
+    @Override
+    public ChangeReport update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives) {
+        ChangeReport report = new ChangeReport();
+        updateUri(model.getUri());
+        updateTypeUri(model.getTypeUri(), report);
+        // ### TODO: compare new model with current one and update only if changed.
+        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
+            updateCompositeValue(model.getCompositeValue(), clientState, directives);
+            refreshLabel();
+        } else {
+            updateValue(model.getSimpleValue());
+        }
+        //
+        return report;
+    }
+
+
+
     // === Deletion ===
 
     /**
@@ -355,21 +375,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    ChangeReport update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives) {
-        ChangeReport report = new ChangeReport();
-        updateUri(model.getUri());
-        updateTypeUri(model.getTypeUri(), report);
-        // ### TODO: compare new model with current one and update only if changed.
-        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            updateCompositeValue(model.getCompositeValue(), clientState, directives);
-            refreshLabel();
-        } else {
-            updateValue(model.getSimpleValue());
-        }
-        //
-        return report;
-    }
-
     /**
      * Called from {@link EmbeddedService#attach} (indirectly)
      */
@@ -464,8 +469,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 // remove current assignment
                 RelatedTopic childTopic = fetchChildTopic(assocDef, false);     // fetchComposite=false
                 if (childTopic != null) {
-                    long assocId = childTopic.getAssociation().getId();
-                    dms.deleteAssociation(assocId, null);  // clientState=null
+                    childTopic.getAssociation().delete(directives);
                 }
                 //
                 String value = valueTopic.getSimpleValue().toString();
