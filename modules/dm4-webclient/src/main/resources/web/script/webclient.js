@@ -624,26 +624,6 @@ var dm4c = new function() {
 
 
 
-    this.register_page_renderer = function(source_path) {
-        pm.register_page_renderer(source_path)
-    }
-
-    this.register_field_renderer = function(source_path) {
-        pm.register_field_renderer(source_path)
-    }
-
-    this.register_css_stylesheet = function(css_path) {
-        pm.register_css_stylesheet(css_path)
-    }
-
-    // ---
-
-    this.register_listener = function(hook_name, listener) {
-        pm.register_listener(hook_name, listener)
-    }
-
-    // ---
-
     /**
      * Loads a Javascript file dynamically. Synchronous and asynchronous loading is supported.
      *
@@ -651,13 +631,31 @@ var dm4c = new function() {
      * @param   callback        Optional: the function to invoke when asynchronous loading is complete.
      *                          If not given loading is performed synchronously.
      */
-    this.javascript_source = function(script_url, callback) {
+    this.load_script = function(script_url, callback) {
         $.ajax({
             url: script_url,
             dataType: "script",
             success: callback,
             async: callback != undefined
         })
+    }
+
+    this.load_stylesheet = function(css_path) {
+        pm.register_css_stylesheet(css_path)
+    }
+
+    this.load_page_renderer = function(source_path) {
+        pm.register_page_renderer(source_path)
+    }
+
+    this.load_field_renderer = function(source_path) {
+        pm.register_field_renderer(source_path)
+    }
+
+    // ---
+
+    this.register_listener = function(hook_name, listener) {
+        pm.register_listener(hook_name, listener)
     }
 
     // ---

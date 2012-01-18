@@ -1,6 +1,6 @@
 function help_plugin() {
 
-    dm4c.register_css_stylesheet("/de.deepamehta.help/style/help.css")
+    dm4c.load_stylesheet("/de.deepamehta.help/style/help.css")
 
     // === Webclient Listeners ===
 

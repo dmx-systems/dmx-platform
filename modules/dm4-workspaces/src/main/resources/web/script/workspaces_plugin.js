@@ -1,6 +1,6 @@
 function workspaces_plugin() {
 
-    dm4c.register_css_stylesheet("/de.deepamehta.workspaces/style/workspaces.css")
+    dm4c.load_stylesheet("/de.deepamehta.workspaces/style/workspaces.css")
 
     // view
     var workspace_menu

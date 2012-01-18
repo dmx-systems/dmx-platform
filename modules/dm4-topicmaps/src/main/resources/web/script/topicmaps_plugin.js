@@ -2,9 +2,9 @@ function topicmaps_plugin() {
 
     var LOG_TOPICMAPS = false
 
-    dm4c.register_css_stylesheet("/de.deepamehta.topicmaps/style/topicmaps.css")
-    dm4c.javascript_source("/de.deepamehta.topicmaps/script/canvas_renderer_extension.js")
-    dm4c.javascript_source("/de.deepamehta.topicmaps/script/model/topicmap.js")
+    dm4c.load_stylesheet("/de.deepamehta.topicmaps/style/topicmaps.css")
+    dm4c.load_script("/de.deepamehta.topicmaps/script/canvas_renderer_extension.js")
+    dm4c.load_script("/de.deepamehta.topicmaps/script/model/topicmap.js")
 
     js.extend(dm4c.canvas, CanvasRendererExtension)
 

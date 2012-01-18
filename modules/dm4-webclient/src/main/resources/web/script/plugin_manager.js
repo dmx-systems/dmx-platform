@@ -193,7 +193,7 @@ function PluginManager(config) {
         function load_plugin(plugin_source) {
             if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + plugin_source)
             // load plugin asynchronously
-            dm4c.javascript_source(plugin_source, function() {
+            dm4c.load_script(plugin_source, function() {
                 // instantiate
                 var plugin_class = js.basename(plugin_source)
                 if (dm4c.LOG_PLUGIN_LOADING) dm4c.log(".......... instantiating \"" + plugin_class + "\"")
@@ -226,7 +226,7 @@ function PluginManager(config) {
         function load_page_renderer(page_renderer_src) {
             if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + page_renderer_src)
             // load page renderer synchronously (Note: synchronous is required for displaying initial topic)
-            dm4c.javascript_source(page_renderer_src)
+            dm4c.load_script(page_renderer_src)
             // instantiate
             var page_renderer_class = js.to_camel_case(js.basename(page_renderer_src))
             if (dm4c.LOG_PLUGIN_LOADING) dm4c.log(".......... instantiating \"" + page_renderer_class + "\"")
@@ -239,7 +239,7 @@ function PluginManager(config) {
         for (var i = 0, field_renderer_source; field_renderer_source = field_renderer_sources[i]; i++) {
             if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + field_renderer_source)
             // load field renderer synchronously (Note: synchronous is required for displaying initial topic)
-            dm4c.javascript_source(field_renderer_source)
+            dm4c.load_script(field_renderer_source)
         }
     }
 

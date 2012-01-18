@@ -1,7 +1,7 @@
 function typeeditor_plugin() {
 
-    dm4c.register_page_renderer("/de.deepamehta.typeeditor/script/page_renderers/topictype_renderer.js")
-    dm4c.register_css_stylesheet("/de.deepamehta.typeeditor/style/typeeditor.css")
+    dm4c.load_page_renderer("/de.deepamehta.typeeditor/script/page_renderers/topictype_renderer.js")
+    dm4c.load_stylesheet("/de.deepamehta.typeeditor/style/typeeditor.css")
 
     // Note: no "uri" is set here. A new topic type gets its default URI at server-side.
     var DEFAULT_TOPIC_TYPE = {

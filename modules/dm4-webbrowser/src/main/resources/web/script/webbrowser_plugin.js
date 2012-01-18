@@ -1,6 +1,6 @@
 function webbrowser_plugin() {
 
-    dm4c.register_page_renderer("/de.deepamehta.webbrowser/script/page_renderers/webpage_renderer.js")
+    dm4c.load_page_renderer("/de.deepamehta.webbrowser/script/page_renderers/webpage_renderer.js")
 
     // === Webclient Listeners ===
 

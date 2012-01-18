@@ -1,7 +1,7 @@
 function files_plugin() {
 
-    dm4c.register_field_renderer("/de.deepamehta.files/script/field_renderers/file_content_renderer.js")
-    dm4c.register_field_renderer("/de.deepamehta.files/script/field_renderers/folder_content_renderer.js")
+    dm4c.load_field_renderer("/de.deepamehta.files/script/field_renderers/file_content_renderer.js")
+    dm4c.load_field_renderer("/de.deepamehta.files/script/field_renderers/folder_content_renderer.js")
 
     // === REST Client Extension ===
 

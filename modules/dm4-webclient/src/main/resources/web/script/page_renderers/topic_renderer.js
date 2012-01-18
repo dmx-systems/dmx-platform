@@ -466,10 +466,19 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
 }
 
 /**
+ * Creates a page model based on a topic type definition.
+ * A page model is made of fields (instances of TopicRenderer.Field).
+ * For a simple topic type the page model consists of just one field.
+ * For a composite topic type the page model consists of a nested structure of fields.
+ *
  * @param   topic_type      The type to create the fields for.
- * @param   assoc_def       The association definition that leads to the type.
+ * @param   assoc_def       The association definition that leads to that (child) type.
+ *                          For the top-level call pass <code>undefined</code>.
  * @param   field_uri       The (base) URI for the field(s) to create.
  * @param   value_topic     The topic that supplies the field values. May be undefined.
+ * @param   topic           The topic the page/form is rendered for. Usually that is the selected topic.
+ *                          Note: for the top-level call "topic" and "value_topic" are usually the same.
+ * @param   setting         "viewable" or "editable"
  */
 TopicRenderer.create_fields = function(topic_type, assoc_def, field_uri, value_topic, topic, setting) {
     if (get_view_config()) {
