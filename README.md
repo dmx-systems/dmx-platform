@@ -38,7 +38,7 @@ Requirements
 
 **Java 1.6** and a "modern" **webbrowser**.
 
-Works fine with Firefox 3.6 (or newer) and Safari 5. Works mostly fine with Chrome 5 (or newer).  
+Works fine with Firefox 3.6 (or newer) and Safari 5. Works mostly fine with Google Chrome.  
 Doesn't work with IE8. Potentially works with IE9.
 
 
@@ -48,13 +48,13 @@ Install
 Download the latest release and unzip it.  
 <https://github.com/jri/deepamehta/downloads/>
 
-A folder `deepamehta-4.0.6` is created.
+A folder `deepamehta-4.0.7` is created.
 
 
 Start
 -----
 
-Open the `deepamehta-4.0.6` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.0.7` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -90,7 +90,7 @@ Update
 ------
 
 Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is currently not supported.  
-Even updating from 4.0.x to 4.0.6 is currently not supported.  
+Even updating from 4.0.x to 4.0.7 is currently not supported.  
 Please see the note at the top.
 
 
@@ -104,7 +104,7 @@ To do so a) stop DeepaMehta, b) delete the `deepamehta-db` folder, and c) start 
 Uninstall
 ---------
 
-Stop DeepaMehta and delete the `deepamehta-4.0.6` folder.  
+Stop DeepaMehta and delete the `deepamehta-4.0.7` folder.  
 This removes DeepaMehta completely from your computer, including the database.
 
 
@@ -116,6 +116,21 @@ Build from Source
 
 Version History
 ---------------
+
+**4.0.7** -- Jan 19, 2012
+
+* Compatibility with 1 new and 2 updated plugins:
+    * DM4 Kiezatlas 2.0 (new): a geographical content management system.
+    * DM4 Geomaps 0.2 (updated): displays geo-related topics on a geographical map.
+    * DM4 Facets 0.2 (updated): introduces multi-typing to the DeepaMehta data model.
+* Improvements:
+    * Auto-positioned topics appear near selection.
+    * New "search result" icon.
+* Fixes:
+    * The topicmap state (translation) is persistent after auto scroll.
+    * Deleted associations resulting from combobox value changes are removed from the canvas.
+* See details in the release notes:
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.6** -- Nov 27, 2011
 
@@ -274,4 +289,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Nov 27, 2011
+Jan 19, 2012
