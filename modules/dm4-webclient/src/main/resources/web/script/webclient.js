@@ -43,7 +43,7 @@ var dm4c = new function() {
         embedded_plugins: [
             "/script/embedded_plugins/default_plugin.js",
             "/script/embedded_plugins/fulltext_plugin.js",
-            "/script/embedded_plugins/tinymce_plugin.js"
+            "/script/embedded_plugins/ckeditor_plugin.js"
         ]
     })
 

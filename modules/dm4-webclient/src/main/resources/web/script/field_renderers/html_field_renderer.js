@@ -1,5 +1,6 @@
 function HTMLFieldRenderer(topic, field, rel_topics) {
 
+    // ### drop this
     tinymce_options = {
         theme: "advanced",
         content_css: "/style/tinymce.css",
@@ -32,14 +33,10 @@ function HTMLFieldRenderer(topic, field, rel_topics) {
     }
 
     this.post_render_form_element = function() {
-        tinymce_options.window = window
-        tinymce_options.element_id = "field_" + field.uri
-        if (!tinyMCE.execCommand("mceAddFrameControl", false, tinymce_options)) {
-            alert("mceAddFrameControl not executed")
-        }
+        CKEDITOR.replace("field_" + field.uri)
     }
 
     this.read_form_value = function() {
-        return tinyMCE.get("field_" + field.uri).getContent()
+        return CKEDITOR.instances["field_" + field.uri].getData()
     }
 }
