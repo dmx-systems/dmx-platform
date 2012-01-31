@@ -45,7 +45,7 @@ function PluginManager(config) {
         // Page Panel
         "pre_render_page",
         "pre_render_form",
-        "post_submit_form",
+        "post_destroy_form",
         "default_page_rendering",
         // Canvas
         "topic_doubleclicked",

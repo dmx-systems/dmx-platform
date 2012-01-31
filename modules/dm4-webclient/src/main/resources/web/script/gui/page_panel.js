@@ -1,7 +1,14 @@
 function PagePanel() {
 
+    var PageState = {
+        PAGE: 1,
+        FORM: 2,
+        NONE: 3
+    }
+
     // Model
-    var displayed_object = null     // a topic or an association
+    var displayed_object = null         // a topic or an association, or null if nothing is displayed
+    var page_state = PageState.NONE     // Tracks page state. Used to fire "post_destroy_form" in case.
 
     // View
     var dom = $("<div>").attr("id", "page-panel")
@@ -37,13 +44,14 @@ function PagePanel() {
         // FIXME: "iframe" is TinyMCE specific. Another WYSIWYG editor plugin might be in use.
         // FIXME: multiline plain text fields (<textarea>) should be considered too. Omitted for the
         // moment because a TinyMCE's textarea is hidden ("display: none") and can't be focused.
+        // ### Update: TinyMCE is replaced by CKEditor meanwhile.
     }
 
     this.clear = function() {
         // update model
         displayed_object = null
         // update GUI
-        empty()
+        clear_page(PageState.NONE)
     }
 
     this.refresh = function() {
@@ -75,16 +83,16 @@ function PagePanel() {
         return false
     }
 
-    // === Helper ===
+    // ===
 
     function render_page() {
-        empty()
+        clear_page(PageState.PAGE)
         prepare_page()
         dm4c.trigger_page_renderer_hook(displayed_object, "render_page", displayed_object)
     }
 
     function render_form() {
-        empty()
+        clear_page(PageState.FORM)
         prepare_page()
         dm4c.trigger_page_renderer_hook(displayed_object, "render_form", displayed_object)
     }
@@ -99,11 +107,17 @@ function PagePanel() {
 
     // ---
 
-    function empty() {
+    function clear_page(new_page_state) {
         $("#page-content").empty()
         $("#page-toolbar").empty()
         //
         hide_splash()
+        // fire event
+        if (page_state == PageState.FORM) {
+            dm4c.trigger_plugin_hook("post_destroy_form")
+        }
+        // update model
+        page_state = new_page_state
     }
 
     function prepare_page() {

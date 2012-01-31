@@ -122,7 +122,6 @@ function TopictypeRenderer() {
     this.process_form = function(topic) {
         var topic_type_model = build_topic_type_model()
         dm4c.do_update_topic_type(topic, topic_type_model)
-        dm4c.trigger_plugin_hook("post_submit_form", topic)
 
         /**
          * Reads out values from GUI elements and builds a topic type model object from it.

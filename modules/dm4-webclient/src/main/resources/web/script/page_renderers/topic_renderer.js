@@ -41,9 +41,7 @@ function TopicRenderer() {
 
     this.process_form = function(topic) {
         var topic_model = build_topic_model()
-        // alert("update model " + JSON.stringify(topic_model))
         topic = dm4c.do_update_topic(topic, topic_model)
-        dm4c.trigger_plugin_hook("post_submit_form", topic)
 
         /**
          * Reads out values from GUI elements and builds a topic model object from it.

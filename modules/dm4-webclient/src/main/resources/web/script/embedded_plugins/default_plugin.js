@@ -101,7 +101,6 @@ function default_plugin () {
         }
 
         function do_cancel() {
-            dm4c.trigger_plugin_hook("post_submit_form", topic)
             dm4c.page_panel.refresh()
         }
     })
@@ -146,7 +145,6 @@ function default_plugin () {
         }
 
         function do_cancel() {
-            dm4c.trigger_plugin_hook("post_submit_form", assoc)
             dm4c.page_panel.refresh()
         }
     })

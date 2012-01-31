@@ -45,7 +45,6 @@ function AssociationRenderer() {
     this.process_form = function(assoc) {
         var assoc_model = build_association_model()
         assoc = dm4c.do_update_association(assoc, assoc_model)
-        dm4c.trigger_plugin_hook("post_submit_form", assoc)
 
         /**
          * Reads out values from GUI elements and builds an association model object from it.
