@@ -45,16 +45,28 @@ Doesn't work with IE8. Potentially works with IE9.
 Install
 -------
 
-Download the latest release and unzip it.  
-<https://github.com/jri/deepamehta/downloads/>
+1. Download the latest release from here:  
+   <https://github.com/jri/deepamehta/downloads/>
+2. Unzip the file.  
+   A folder `deepamehta-4.0.8` is created.
 
-A folder `deepamehta-4.0.7` is created.
+
+Update
+------
+
+You can update from DeepaMehta 4.0.7 to 4.0.8 while using your existing database:
+
+1. Stop DeepaMehta 4.0.7 if running.
+2. Copy your `deepamehta-db` folder from DeepaMehta 4.0.7 into the `deepamehta-4.0.8` folder.
+
+Updating from DeepaMehta versions prior to 4.0.7 is not supported.  
+Please see the note at the top.
 
 
 Start
 -----
 
-Open the `deepamehta-4.0.7` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.0.8` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -86,26 +98,23 @@ See the list of available plugins:
 <https://trac.deepamehta.de/wiki/Plugins>
 
 
-Update
-------
-
-Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is currently not supported.  
-Even updating from 4.0.x to 4.0.7 is currently not supported.  
-Please see the note at the top.
-
-
 Reset the database
 ------------------
 
-Sometimes you might required to restart DeepaMehta with a fresh database.  
-To do so a) stop DeepaMehta, b) delete the `deepamehta-db` folder, and c) start again.
+Sometimes you might want to restart DeepaMehta with a fresh database:
+
+1. Stop DeepaMehta.
+2. Delete the `deepamehta-db` folder.
+3. Start DeepaMehta.
 
 
 Uninstall
 ---------
 
-Stop DeepaMehta and delete the `deepamehta-4.0.7` folder.  
-This removes DeepaMehta completely from your computer, including the database.
+To remove DeepaMehta completely from your computer, including the database:
+
+1. Stop DeepaMehta.
+2. Delete the entire `deepamehta-4.0.8` folder.
 
 
 Build from Source
@@ -116,6 +125,10 @@ Build from Source
 
 Version History
 ---------------
+
+**4.0.8** -- Feb 2, 2012
+
+* CKEditor replaces TinyMCE
 
 **4.0.7** -- Jan 19, 2012
 

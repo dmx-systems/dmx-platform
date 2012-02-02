@@ -5,7 +5,7 @@ CKEditor Update Instructions
 DeepaMehta uses a CKEditor custom skin "kama_dm".
 This is based on the "kama" skin of CKEditor 3.6.2
 
-Perform these steps to when updating CKEditor:
+Perform these steps when updating CKEditor:
 
 1) Move the original "kama" skin folder to /src/main/resources/web/style/ckeditor_skin
    and rename it to "kama_dm"
@@ -17,7 +17,7 @@ Perform these steps to when updating CKEditor:
     editor.css
     templates.css
 
-3) In editor editor.css
+3) In editor.css:
 
     3a) Purpose: remove a) radius, b) border, c) padding
         Original (CKEditor 3.6.2) rule:
