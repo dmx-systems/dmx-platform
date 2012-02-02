@@ -1,6 +1,6 @@
 CKEDITOR.editorConfig = function(config) {
     //
-    config.skin          = "kama_dm,/script/config/ckeditor_skin/kama_dm/"
+    config.skin          = "kama_dm,/style/ckeditor_skin/kama_dm/"
     config.contentsCss   = "/style/ckeditor_contents.css"
     config.extraPlugins  = "autogrow"
     config.removePlugins = "elementspath,resize"
