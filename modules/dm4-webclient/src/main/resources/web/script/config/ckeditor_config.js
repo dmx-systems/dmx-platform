@@ -1,5 +1,6 @@
 CKEDITOR.editorConfig = function(config) {
     //
+    config.language      = "en"
     config.skin          = "kama_dm,/style/ckeditor_skin/kama_dm/"
     config.contentsCss   = "/style/ckeditor_contents.css"
     config.extraPlugins  = "autogrow"
@@ -10,8 +11,8 @@ CKEDITOR.editorConfig = function(config) {
     //
     config.toolbar = [
         ["Format"],
-        ["Bold", "Italic"],
         ["NumberedList", "BulletedList", "-", "Outdent", "Indent"],
+        ["Bold", "Italic"],
         ["Link", "Unlink", "-", "Image", "Table"],
         ["Undo", "Redo"],
         ["Source"]
