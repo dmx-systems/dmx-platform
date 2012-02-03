@@ -48,25 +48,25 @@ Install
 1. Download the latest release from here:  
    <https://github.com/jri/deepamehta/downloads/>
 2. Unzip the file.  
-   A folder `deepamehta-4.0.8` is created.
+   A folder `deepamehta-4.0.9` is created.
 
 
 Update
 ------
 
-You can update from DeepaMehta 4.0.7 to 4.0.8 while using your existing database:
+You can update from DeepaMehta 4.0.7 (or later) to 4.0.9 while using your existing database:
 
-1. Stop DeepaMehta 4.0.7 if running.
-2. Copy your `deepamehta-db` folder from DeepaMehta 4.0.7 into the `deepamehta-4.0.8` folder.
+1. Stop old DeepaMehta if running.
+2. Copy your `deepamehta-db` folder from old DeepaMehta into the `deepamehta-4.0.9` folder.
 
-Updating from DeepaMehta versions prior to 4.0.7 is not supported.  
+Note: Updating from DeepaMehta versions prior to 4.0.7 is not supported.  
 Please see the note at the top.
 
 
 Start
 -----
 
-Open the `deepamehta-4.0.8` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.0.9` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -114,7 +114,7 @@ Uninstall
 To remove DeepaMehta completely from your computer, including the database:
 
 1. Stop DeepaMehta.
-2. Delete the entire `deepamehta-4.0.8` folder.
+2. Delete the entire `deepamehta-4.0.9` folder.
 
 
 Build from Source
@@ -126,9 +126,19 @@ Build from Source
 Version History
 ---------------
 
+**4.0.9** -- Feb 3, 2012
+
+* Fix:
+    * CKEditor works in non-english environments.
+* See details in the release notes:
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
+
 **4.0.8** -- Feb 2, 2012
 
-* CKEditor replaces TinyMCE
+* Improvement:
+    * CKEditor as the new WYSIWYG editor. Compared to the formerly used TinyMCE it provides a much better look&feel.
+* See details in the release notes:
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.7** -- Jan 19, 2012
 
@@ -302,4 +312,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Jan 19, 2012
+Feb 3, 2012
