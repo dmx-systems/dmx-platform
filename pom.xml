@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Global</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-global</artifactId>
-    <version>4.0.9</version>
+    <version>4.0.10-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>

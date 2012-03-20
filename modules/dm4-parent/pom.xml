@@ -185,14 +185,14 @@
         </repository>
         <repository>
             <id>deepamehta-public-repository</id>
-            <url>http://www.deepamehta.de/maven2</url>
+            <url>http://deepamehta.newthinking.net/maven2</url>
         </repository>
     </repositories>
 
     <distributionManagement>
         <repository>
             <id>deepamehta-public-repository</id>
-            <url>scpexe://www.deepamehta.de/var/lib/tomcat-6/webapps/ROOT/maven2</url>
+            <url>scpexe://deepamehta.newthinking.net/var/lib/tomcat-6/webapps/ROOT/maven2</url>
         </repository>
     </distributionManagement>
 </project>

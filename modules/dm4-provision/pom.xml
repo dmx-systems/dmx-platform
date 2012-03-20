@@ -14,7 +14,7 @@
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-parent</artifactId>
         <version>2</version>
-        <relativePath>../deepamehta-parent/pom.xml</relativePath>
+        <relativePath>../dm4-parent/pom.xml</relativePath>
     </parent>
 
     <modules>
