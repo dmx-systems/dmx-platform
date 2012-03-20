@@ -1,6 +1,7 @@
 function topicmaps_plugin() {
 
     var LOG_TOPICMAPS = false
+    var self = this
 
     dm4c.load_stylesheet("/de.deepamehta.topicmaps/style/topicmaps.css")
     dm4c.load_script("/de.deepamehta.topicmaps/script/canvas_renderer_extension.js")
@@ -269,7 +270,7 @@ function topicmaps_plugin() {
         if (state.topicmap_id != topicmap.get_id()) {
             if (dm4c.LOG_HISTORY) dm4c.log(".......... switch from topicmap " + topicmap.get_id() +
                 " to " + state.topicmap_id)
-            this.do_select_topicmap(state.topicmap_id, true)    // no_history_update=true
+            self.do_select_topicmap(state.topicmap_id, true)    // no_history_update=true
             return false
         } else if (!state.topic_id) {
             if (dm4c.LOG_HISTORY) dm4c.log(".......... topicmap not changed and no topic in popstate " +
