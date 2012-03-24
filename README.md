@@ -6,7 +6,7 @@ DeepaMehta 4 is a platform for collaboration and knowledge management. The visio
 
 Technically DeepaMehta 4 is made of  
 Java, Neo4j, Apache Lucene, Apache Felix, Jetty, Jersey (server-side),  
-Javascript/AJAX, jQuery, jQuery-UI, HTML5 Canvas, and TinyMCE (client-side).
+Javascript/AJAX, jQuery, jQuery-UI, HTML5 Canvas, and CKEditor (client-side).
 
 DeepaMehta 4 is a rewrite of DeepaMehta 2.  
 (DeepaMehta 3 was a research & development effort.)
@@ -48,16 +48,16 @@ Install
 1. Download the latest release from here:  
    <https://github.com/jri/deepamehta/downloads/>
 2. Unzip the file.  
-   A folder `deepamehta-4.0.9` is created.
+   A folder `deepamehta-4.0.10` is created.
 
 
 Update
 ------
 
-You can update from DeepaMehta 4.0.7 (or later) to 4.0.9 while using your existing database:
+You can update from DeepaMehta 4.0.7 (or later) to 4.0.10 while using your existing database:
 
 1. Stop old DeepaMehta if running.
-2. Copy your `deepamehta-db` folder from old DeepaMehta into the `deepamehta-4.0.9` folder.
+2. Copy your `deepamehta-db` folder from old DeepaMehta into the `deepamehta-4.0.10` folder.
 
 Note: Updating from DeepaMehta versions prior to 4.0.7 is not supported.  
 Please see the note at the top.
@@ -66,7 +66,7 @@ Please see the note at the top.
 Start
 -----
 
-Open the `deepamehta-4.0.9` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.0.10` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -86,7 +86,7 @@ Go to the terminal window that opened while startup and press:
 
     Ctrl-C
 
-This puts the database in a consistent state and shuts down the webserver.  
+This shuts down the webserver and puts the database in a consistent state.  
 You can close the terminal window now.
 
 
@@ -114,7 +114,7 @@ Uninstall
 To remove DeepaMehta completely from your computer, including the database:
 
 1. Stop DeepaMehta.
-2. Delete the entire `deepamehta-4.0.9` folder.
+2. Delete the entire `deepamehta-4.0.10` folder.
 
 
 Build from Source
@@ -125,6 +125,14 @@ Build from Source
 
 Version History
 ---------------
+
+**4.0.10** -- Mar 24, 2012
+
+* Fixes:
+    * The Back button works cross-topicmap again (#231).
+    * A build from scratch with a pristine maven repo works again (#234).
+* See details in the release notes:
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.9** -- Feb 3, 2012
 
@@ -312,4 +320,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Feb 3, 2012
+Mar 24, 2012
