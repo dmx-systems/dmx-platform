@@ -6,7 +6,6 @@ import de.deepamehta.plugins.accesscontrol.model.Role;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
-import de.deepamehta.core.model.ClientContext;
 import de.deepamehta.core.model.DataField;
 import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
@@ -14,6 +13,7 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.model.Relation;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.util.JavaUtils;
