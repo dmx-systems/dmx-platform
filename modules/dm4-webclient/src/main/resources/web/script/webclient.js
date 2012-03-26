@@ -228,6 +228,7 @@ var dm4c = new function() {
      */
     this.do_update_topic = function(old_topic, new_topic) {
         // update DB
+        // alert("do_update_topic(): new_topic=" + JSON.stringify(new_topic))
         var directives = dm4c.restc.update_topic(new_topic)
         // alert("do_update_topic(): directives=" + JSON.stringify(directives))
         // update client model and view

@@ -4,10 +4,9 @@ import de.deepamehta.plugins.accesscontrol.model.Permission;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.plugins.accesscontrol.model.Role;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
+import de.deepamehta.plugins.facets.service.FacetsService;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
-import de.deepamehta.core.model.DataField;
-import de.deepamehta.core.model.Properties;
 import de.deepamehta.core.model.PropValue;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.model.Relation;
@@ -64,6 +63,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         DEFAULT_CREATOR_PERMISSIONS.add(Permission.CREATE, true);
     }
 
+    private FacetsService facetsService;
     private WorkspacesService wsService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -72,108 +72,9 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
 
 
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
-
-
-
-    @Override
-    public void postInstallPluginHook() {
-        Topic user = createUser(DEFAULT_USER, DEFAULT_PASSWORD);
-        logger.info("Creating \"admin\" user => ID=" + user.id);
-    }
-
-    @Override
-    public void serviceArrived(PluginService service) {
-        if (service instanceof WorkspacesService) {
-            wsService = (WorkspacesService) service;
-        }
-    }
-
-    @Override
-    public void serviceGone(PluginService service) {
-        if (service instanceof WorkspacesService) {
-            wsService = null;
-        }
-    }
-
-    // Note: we must use the postCreateHook to create the relation because at pre_create the document has no ID yet.
-    @Override
-    public void postCreateHook(Topic topic, ClientContext clientContext) {
-        /* check precondition 4
-        if (topic.id == user.id) {
-            logger.warning(topic + " can't be related to user \"" + username + "\" (the topic is the user itself!)");
-            return;
-        }*/
-        //
-        setCreator(topic, clientContext);
-        createACLEntry(topic.id, Role.CREATOR, DEFAULT_CREATOR_PERMISSIONS);
-    }
-
-    @Override
-    public void preUpdateHook(Topic topic, Properties newProperties) {
-        // encrypt password of new users
-        if (topic.typeUri.equals("de/deepamehta/core/topictype/user")) {
-            // we recognize a new user (or changed password) if password doesn't begin with ENCRYPTED_PASSWORD_PREFIX
-            String password = newProperties.get("de/deepamehta/core/property/password").toString();
-            if (!password.startsWith(ENCRYPTED_PASSWORD_PREFIX)) {
-                newProperties.put("de/deepamehta/core/property/password", encryptPassword(password));
-            }
-        }
-    }
-
-    @Override
-    public void modifyTopicTypeHook(TopicType topicType, ClientContext clientContext) {
-        addCreatorFieldToType(topicType);
-        addOwnerFieldToType(topicType);
-        //
-        setCreator(topicType, clientContext);
-        createACLEntry(topicType.id, Role.CREATOR, DEFAULT_CREATOR_PERMISSIONS);
-    }
-
-    // ---
-
-    @Override
-    public void providePropertiesHook(Topic topic) {
-        if (topic.typeUri.equals("de/deepamehta/core/topictype/role")) {
-            String roleName = dms.getTopicProperty(topic.id, "de/deepamehta/core/property/rolename").toString();
-            topic.setProperty("de/deepamehta/core/property/rolename", roleName);
-        }
-    }
-
-    @Override
-    public void providePropertiesHook(Relation relation) {
-        if (relation.typeId.equals(RelationType.ACCESS_CONTROL.name())) {
-            // transfer all relation properties
-            Properties properties = dms.getRelation(relation.id).getProperties();
-            relation.setProperties(properties);
-        }
-    }
-
-    // ---
-
-    @Override
-    public void enrichTopicHook(Topic topic, ClientContext clientContext) {
-        Map permissions = new HashMap();
-        permissions.put("write", hasPermission(topic, getUser(clientContext), Permission.WRITE));
-        topic.setEnrichment("permissions", permissions);
-    }
-
-    @Override
-    public void enrichTopicTypeHook(TopicType topicType, ClientContext clientContext) {
-        Topic user = getUser(clientContext);
-        Map permissions = new HashMap();
-        permissions.put("write",  hasPermission(topicType, user, Permission.WRITE));
-        permissions.put("create", hasPermission(topicType, user, Permission.CREATE));
-        topicType.setEnrichment("permissions", permissions);
-    }
-
-
-
-    // **********************
-    // *** Plugin Service ***
-    // **********************
+    // *******************************************
+    // *** AccessControlService Implementation ***
+    // *******************************************
 
 
 
@@ -240,6 +141,127 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
 
 
+    // **************************************************
+    // *** Core Hooks (called from DeepaMehta 4 Core) ***
+    // **************************************************
+
+
+
+    @Override
+    public void serviceArrived(PluginService service) {
+        logger.info("########## Service arrived: " + service);
+        if (service instanceof FacetsService) {
+            facetsService = (FacetsService) service;
+        }
+    }
+
+    @Override
+    public void serviceGone(PluginService service) {
+        logger.info("########## Service gone: " + service);
+        if (service == facetsService) {
+            facetsService = null;
+        }
+    }
+
+    // ---
+
+    @Override
+    public void postInstallPluginHook() {
+        Topic user = createUser(DEFAULT_USER, DEFAULT_PASSWORD);
+        logger.info("Creating \"admin\" user => ID=" + user.id);
+    }
+
+    @Override
+    public void serviceArrived(PluginService service) {
+        if (service instanceof WorkspacesService) {
+            wsService = (WorkspacesService) service;
+        }
+    }
+
+    @Override
+    public void serviceGone(PluginService service) {
+        if (service instanceof WorkspacesService) {
+            wsService = null;
+        }
+    }
+
+    // Note: we must use the postCreateHook to create the relation because at pre_create the document has no ID yet.
+    @Override
+    public void postCreateHook(Topic topic, ClientContext clientContext) {
+        /* check precondition 4
+        if (topic.id == user.id) {
+            logger.warning(topic + " can't be related to user \"" + username + "\" (the topic is the user itself!)");
+            return;
+        }*/
+        //
+        setCreator(topic, clientContext);
+        createACLEntry(topic.id, Role.CREATOR, DEFAULT_CREATOR_PERMISSIONS);
+    }
+
+    /* ### TODO: adapt to DM4
+    @Override
+    public void preUpdateHook(Topic topic, Properties newProperties) {
+        // encrypt password of new users
+        if (topic.typeUri.equals("de/deepamehta/core/topictype/user")) {
+            // we recognize a new user (or changed password) if password doesn't begin with ENCRYPTED_PASSWORD_PREFIX
+            String password = newProperties.get("de/deepamehta/core/property/password").toString();
+            if (!password.startsWith(ENCRYPTED_PASSWORD_PREFIX)) {
+                newProperties.put("de/deepamehta/core/property/password", encryptPassword(password));
+            }
+        }
+    } */
+
+    /* ### TODO: adapt to DM4
+    @Override
+    public void modifyTopicTypeHook(TopicType topicType, ClientContext clientContext) {
+        addCreatorFieldToType(topicType);
+        addOwnerFieldToType(topicType);
+        //
+        setCreator(topicType, clientContext);
+        createACLEntry(topicType.id, Role.CREATOR, DEFAULT_CREATOR_PERMISSIONS);
+    } */
+
+    // ---
+
+    /* ### TODO: adapt to DM4
+    @Override
+    public void providePropertiesHook(Topic topic) {
+        if (topic.typeUri.equals("de/deepamehta/core/topictype/role")) {
+            String roleName = dms.getTopicProperty(topic.id, "de/deepamehta/core/property/rolename").toString();
+            topic.setProperty("de/deepamehta/core/property/rolename", roleName);
+        }
+    } */
+
+    /* ### TODO: adapt to DM4
+    @Override
+    public void providePropertiesHook(Relation relation) {
+        if (relation.typeId.equals(RelationType.ACCESS_CONTROL.name())) {
+            // transfer all relation properties
+            Properties properties = dms.getRelation(relation.id).getProperties();
+            relation.setProperties(properties);
+        }
+    } */
+
+    // ---
+
+    @Override
+    public void enrichTopicHook(Topic topic, ClientContext clientContext) {
+        Map permissions = new HashMap();
+        permissions.put("write", hasPermission(topic, getUser(clientContext), Permission.WRITE));
+        topic.setEnrichment("permissions", permissions);
+    }
+
+    @Override
+    public void enrichTopicTypeHook(TopicType topicType, ClientContext clientContext) {
+        Topic user = getUser(clientContext);
+        Map permissions = new HashMap();
+        permissions.put("write",  hasPermission(topicType, user, Permission.WRITE));
+        permissions.put("create", hasPermission(topicType, user, Permission.CREATE));
+        topicType.setEnrichment("permissions", permissions);
+    }
+
+
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Topic createUser(String username, String password) {
@@ -274,6 +296,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     // ---
 
+    /* ### TODO: adapt to DM4
     private void addCreatorFieldToType(TopicType topicType) {
         DataField creatorField = new DataField("Creator", "reference");
         creatorField.setUri("de/deepamehta/core/property/creator");
@@ -282,8 +305,9 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         creatorField.setEditor("checkboxes");
         //
         topicType.addDataField(creatorField);
-    }
+    } */
 
+    /* ### TODO: adapt to DM4
     private void addOwnerFieldToType(TopicType topicType) {
         DataField ownerField = new DataField("Owner", "reference");
         ownerField.setUri("de/deepamehta/core/property/owner");
@@ -292,7 +316,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         ownerField.setEditor("checkboxes");
         //
         topicType.addDataField(ownerField);
-    }
+    } */
 
     // ---
 
