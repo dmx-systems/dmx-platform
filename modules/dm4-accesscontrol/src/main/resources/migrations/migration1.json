@@ -1,7 +1,7 @@
 {
     topic_types: [
 
-        ### Account ###
+        ### User Account ###
 
         {
             value: "Username",
@@ -15,14 +15,8 @@
             data_type_uri: "dm4.core.text"
         },
         {
-            value: "Notes",
-            uri: "dm4.accesscontrol.account_notes",
-            data_type_uri: "dm4.core.html",
-            index_mode_uris: ["dm4.core.fulltext"]
-        },
-        {
-            value: "Account",
-            uri: "dm4.accesscontrol.account",
+            value: "User Account",
+            uri: "dm4.accesscontrol.user_account",
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
@@ -32,11 +26,6 @@
                 },
                 {
                     part_topic_type_uri:  "dm4.accesscontrol.password",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
-                },
-                {
-                    part_topic_type_uri:  "dm4.accesscontrol.account_notes",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
@@ -51,36 +40,40 @@
             ]
         },
 
-        ### Role ###
+        ### Access Control List ###
 
         {
-            value: "Role Name",
-            uri: "dm4.accesscontrol.role_name",
-            data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.key"]
+            value: "Operation",
+            uri: "dm4.accesscontrol.operation",
+            data_type_uri: "dm4.core.text"
         },
         {
-            value: "Description",
-            uri: "dm4.accesscontrol.role_description",
-            data_type_uri: "dm4.core.html",
-            index_mode_uris: ["dm4.core.fulltext"]
+            value: "Grant",
+            uri: "dm4.accesscontrol.grant",
+            data_type_uri: "dm4.core.boolean"
+        },
+        {
+            value: "Permission",
+            uri: "dm4.accesscontrol.permission",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:   "dm4.accesscontrol.operation",
+                    part_cardinality_uri:  "dm4.core.one",
+                    whole_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.aggregation_def"
+                },
+                {
+                    part_topic_type_uri:   "dm4.accesscontrol.grant",
+                    part_cardinality_uri:  "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
+                }
+            ]
         },
         {
             value: "Role",
             uri: "dm4.accesscontrol.role",
-            data_type_uri: "dm4.core.composite",
-            assoc_defs: [
-                {
-                    part_topic_type_uri:  "dm4.accesscontrol.role_name",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
-                },
-                {
-                    part_topic_type_uri:  "dm4.accesscontrol.role_description",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
-                }
-            ],
+            data_type_uri: "dm4.core.text",
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
@@ -89,33 +82,145 @@
                     }
                 }
             ]
+        },
+        {
+            value: "ACL Entry",
+            uri: "dm4.accesscontrol.acl_entry",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:   "dm4.accesscontrol.role",
+                    part_cardinality_uri:  "dm4.core.one",
+                    whole_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.aggregation_def"
+                },
+                {
+                    part_topic_type_uri:   "dm4.accesscontrol.permission",
+                    part_cardinality_uri:  "dm4.core.many",
+                    assoc_type_uri:        "dm4.core.composition_def"
+                }
+            ]
+        },
+        {
+            value: "Access Control List",
+            uri: "dm4.accesscontrol.acl",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:   "dm4.accesscontrol.acl_entry",
+                    part_cardinality_uri:  "dm4.core.many",
+                    assoc_type_uri:        "dm4.core.composition_def"
+                }
+            ]
+        },
+        {
+            value: "Access Control List Facet",
+            uri: "dm4.accesscontrol.acl_facet",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:   "dm4.accesscontrol.acl",
+                    part_cardinality_uri:  "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
+                }
+            ]
+        },
+
+        ### Ownership ###
+
+        {
+            value: "Creator",
+            uri: "dm4.accesscontrol.creator",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:   "dm4.accesscontrol.user_account",
+                    part_cardinality_uri:  "dm4.core.one",
+                    whole_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.aggregation_def"
+                }
+            ]
+        },
+        {
+            value: "Owner",
+            uri: "dm4.accesscontrol.owner",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:   "dm4.accesscontrol.user_account",
+                    part_cardinality_uri:  "dm4.core.one",
+                    whole_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.aggregation_def"
+                }
+            ]
+        },
+        {
+            value: "Ownership",
+            uri: "dm4.accesscontrol.ownership",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:   "dm4.accesscontrol.creator",
+                    part_cardinality_uri:  "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:   "dm4.accesscontrol.owner",
+                    part_cardinality_uri:  "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
+                }
+            ]
+        },
+        {
+            value: "Ownership Facet",
+            uri: "dm4.accesscontrol.ownership_facet",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:   "dm4.accesscontrol.ownership",
+                    part_cardinality_uri:  "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
+                }
+            ]
         }
     ],
 
     topics: [
+
+        ### Operations ###
+
+        {
+            type_uri: "dm4.accesscontrol.operation",
+            uri:      "dm4.accesscontrol.operation_write",
+            value:    "Write"
+        },
+        {
+            type_uri: "dm4.accesscontrol.operation",
+            uri:      "dm4.accesscontrol.operation_create",
+            value:    "Create"
+        },
+
+        ### Roles ###
+
         {
             type_uri: "dm4.accesscontrol.role",
-            composite: {
-                "dm4.accesscontrol.role_name": "creator"
-            }
+            uri:      "dm4.accesscontrol.role_creator",
+            value:    "Creator"
         },
         {
             type_uri: "dm4.accesscontrol.role",
-            composite: {
-                "dm4.accesscontrol.role_name": "owner"
-            }
+            uri:      "dm4.accesscontrol.role_owner",
+            value:    "Owner"
         },
         {
             type_uri: "dm4.accesscontrol.role",
-            composite: {
-                "dm4.accesscontrol.role_name": "member"
-            }
+            uri:      "dm4.accesscontrol.role_member",
+            value:    "Member"
         },
         {
             type_uri: "dm4.accesscontrol.role",
-            composite: {
-                "dm4.accesscontrol.role_name": "everyone"
-            }
+            uri:      "dm4.accesscontrol.role_everyone",
+            value:    "Everyone"
         }
     ]
 }
