@@ -423,13 +423,19 @@ public class Plugin implements BundleActivator, EventHandler {
      * This method is called once both services become available.
      */
     private void initPlugin() {
-        logger.info("----- Initializing " + this + " -----");
-        installPlugin();                    // relies on DeepaMehtaService
-        registerPlugin();                   // relies on DeepaMehtaService (and committed migrations)
-        registerPluginService();
-        registerWebResources();             // relies on HttpService
-        registerRestResources();            // relies on HttpService and DeepaMehtaService (and registered plugin)
-        logger.info("----- Completing initialization of " + this + " -----");
+        try {
+            logger.info("----- Initializing " + this + " -----");
+            installPlugin();                    // relies on DeepaMehtaService
+            registerPlugin();                   // relies on DeepaMehtaService (and committed migrations)
+            registerPluginService();
+            registerWebResources();             // relies on HttpService
+            registerRestResources();            // relies on HttpService and DeepaMehtaService (and registered plugin)
+            logger.info("----- Completing initialization of " + this + " -----");
+            // ### FIXME: should we call registerPlugin() at last?
+            // Currently if e.g. registerPluginService() fails the plugin is still registered at the DeepaMehta core.
+        } catch (Exception e) {
+            throw new RuntimeException("Initialization of " + this + " failed", e);
+        }
     }
 
     /**
@@ -457,11 +463,22 @@ public class Plugin implements BundleActivator, EventHandler {
         }
     }
 
+    /**
+     * Registers the plugin's OSGi service at the OSGi framework.
+     * If the plugin doesn't provide a service nothing is performed.
+     */
     private void registerPluginService() {
         String serviceInterface = getConfigProperty("providedServiceInterface");
-        if (serviceInterface != null) {
+        if (serviceInterface == null) {
+            return;
+        }
+        //
+        try {
             logger.info("Registering service \"" + serviceInterface + "\" of " + this + " at OSGi framework");
             context.registerService(serviceInterface, this, null);
+        } catch (Exception e) {
+            throw new RuntimeException("Registering service of " + this + " at OSGi framework failed " +
+                "(serviceInterface=\"" + serviceInterface + "\")", e);
         }
     }
 
@@ -686,6 +703,7 @@ public class Plugin implements BundleActivator, EventHandler {
             logger.severe("Handling OSGi event for " + this + " failed (event=" + event + ")");
             e.printStackTrace();
             // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
+            // ### FIXME: should we re-throw to signalize that a plugin has a problem?
         }
     }
 
