@@ -16,6 +16,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.util.JavaUtils;
+import de.deepamehta.core.util.JSONHelper;
 import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
@@ -220,6 +221,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             fetchComposite, fetchRelatingComposite, maxResultSize, clientState);
     }
 
+    // Note: getRelatedTopics(List assocTypeUris, ...) is implemented in the subclasses. This is an abstract class.
+
     // --- Association Retrieval ---
 
     @Override
@@ -395,9 +398,17 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         try {
             CompositeValue comp = new CompositeValue();
             for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
-                AttachedTopic childTopic = fetchChildTopic(assocDef, true);     // fetchComposite=true
-                if (childTopic != null) {
-                    comp.put(assocDef.getUri(), childTopic.getModel());
+                String cardinalityUri = assocDef.getPartCardinalityUri();
+                if (cardinalityUri.equals("dm4.core.one")) {
+                    AttachedTopic childTopic = fetchChildTopic(assocDef, true);                 // fetchComposite=true
+                    if (childTopic != null) {
+                        comp.put(assocDef.getUri(), childTopic.getModel());
+                    }
+                } else if (cardinalityUri.equals("dm4.core.many")) {
+                    ResultSet<RelatedTopic> childTopics = fetchChildTopics(assocDef, true);     // fetchComposite=true
+                    comp.put(assocDef.getUri(), JSONHelper.toTopicModels(childTopics));
+                } else {
+                    throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
                 }
             }
             return comp;
@@ -667,6 +678,16 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         //
         return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
             fetchComposite, false, null);
+    }
+
+    private ResultSet<RelatedTopic> fetchChildTopics(AssociationDefinition assocDef, boolean fetchComposite) {
+        String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
+        String myRoleTypeUri      = assocDef.getWholeRoleTypeUri();
+        String othersRoleTypeUri  = assocDef.getPartRoleTypeUri();
+        String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
+        //
+        return getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+            fetchComposite, false, 0, null);
     }
 
     // ---

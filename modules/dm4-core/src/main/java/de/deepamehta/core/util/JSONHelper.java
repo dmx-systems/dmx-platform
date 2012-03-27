@@ -58,6 +58,14 @@ public class JSONHelper {
         return new ResultSet(relTopics.getTotalCount(), topics);
     }
 
+    public static Set<TopicModel> toTopicModels(ResultSet<RelatedTopic> relTopics) {
+        Set<TopicModel> topicModels = new LinkedHashSet();
+        for (Topic topic : relTopics) {
+            topicModels.add(topic.getModel());
+        }
+        return topicModels;
+    }
+
 
 
     // ************

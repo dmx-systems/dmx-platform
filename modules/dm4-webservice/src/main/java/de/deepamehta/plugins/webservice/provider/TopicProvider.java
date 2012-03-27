@@ -25,7 +25,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class TopicProvider implements MessageBodyReader<TopicModel>, MessageBodyWriter<Topic> {
+public class TopicProvider implements MessageBodyReader<TopicModel> /* ###, MessageBodyWriter<Topic> */ {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -67,6 +67,7 @@ public class TopicProvider implements MessageBodyReader<TopicModel>, MessageBody
 
 
 
+    /* ### TODO: drop this. Handled by JSONEnabledProvider
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
@@ -89,5 +90,5 @@ public class TopicProvider implements MessageBodyReader<TopicModel>, MessageBody
         } catch (Exception e) {
             throw new IOException("Writing message body failed (" + topic + ")", e);
         }
-    }
+    } */
 }

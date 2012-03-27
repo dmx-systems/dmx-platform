@@ -1,5 +1,7 @@
 package de.deepamehta.core.model;
 
+import de.deepamehta.core.util.JSONHelper;
+
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONException;
@@ -7,6 +9,7 @@ import org.codehaus.jettison.json.JSONException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 
 
@@ -21,10 +24,10 @@ public class CompositeValue {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     /**
-     * Internal representation. ### FIXDOC
-     * Key: String, value: non-null atomic (String, Integer, Long, Double, Boolean) or composite (JSONObject).
+     * Internal representation.
+     * Key: String, value: TopicModel or Set<TopicModel>
      */
-    private Map<String, TopicModel> values = new HashMap();
+    private Map<String, Object> values = new HashMap();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -59,7 +62,7 @@ public class CompositeValue {
     // ---
 
     public TopicModel getTopic(String key) {
-        TopicModel topic = values.get(key);
+        TopicModel topic = (TopicModel) values.get(key);
         // error check
         if (topic == null) {
             throw new RuntimeException("No entry \"" + key + "\" in composite value " + this);
@@ -69,13 +72,29 @@ public class CompositeValue {
     }
 
     public TopicModel getTopic(String key, TopicModel defaultValue) {
-        TopicModel topic = values.get(key);
+        TopicModel topic = (TopicModel) values.get(key);
         return topic != null ? topic : defaultValue;
     }
 
     // ---
 
     public CompositeValue put(String key, TopicModel value) {
+        try {
+            // check argument
+            if (value == null) {
+                throw new IllegalArgumentException("Tried to put a null value in a CompositeValue");
+            }
+            // put value
+            values.put(key, value);
+            //
+            return this;
+        } catch (Exception e) {
+            throw new RuntimeException("Putting a value in a CompositeValue failed (key=\"" + key +
+                "\", value=" + value + ", composite=" + this + ")", e);
+        }
+    }
+
+    public CompositeValue put(String key, Set<TopicModel> value) {
         try {
             // check argument
             if (value == null) {
@@ -188,11 +207,18 @@ public class CompositeValue {
         try {
             JSONObject json = new JSONObject();
             for (String key : keys()) {
-                json.put(key, getTopic(key).toJSON());
+                Object value = values.get(key);
+                if (value instanceof TopicModel) {
+                    json.put(key, ((TopicModel) value).toJSON());
+                } else if (value instanceof Set) {
+                    json.put(key, JSONHelper.objectsToJSON((Set<TopicModel>) value));
+                } else {
+                    throw new RuntimeException("Unexpected value in a CompositeValue: " + value);
+                }
             }
             return json;
-        } catch (JSONException e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Serialization of a CompositeValue failed (" + this + ")", e);
         }
     }
 
