@@ -114,14 +114,11 @@ var js = {
         }
     },
 
-    /**
-     * Copies all properties from source object to destination object.
-     * ### not in use
-    copy: function(src_obj, dst_obj) {
-        for (var key in src_obj) {
-            dst_obj[key] = src_obj[key]
-        }
-    },*/
+    is_array: function(obj) {
+        return Object.prototype.toString.call(obj) == "[object Array]"
+        // Note: since Javascript 1.8.5 (Firefox 4) there is Array.isArray(obj).
+        // The approach used here is compatible with older Javascript versions and is preferred by ECMA.
+    },
 
 
 

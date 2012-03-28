@@ -125,6 +125,9 @@ function TopicRenderer() {
     function render_page_model(page_model, render_func_name) {
         if (page_model instanceof TopicRenderer.Field) {
             page_model[render_func_name]()
+        } else if (js.is_array(page_model)) {
+            // Note: for cardinality "many" we render just the first field. TODO: render all fields.
+            render_page_model(page_model[0], render_func_name)
         } else {
             for (var assoc_def_uri in page_model) {
                 render_page_model(page_model[assoc_def_uri], render_func_name)
@@ -345,21 +348,25 @@ function TopicRenderer() {
  *                      For a non-composite topic the field URI is an empty string.
  *                      This URI is passed to the field renderer constructors (as a property of the "field" argument).
  *                      The particular field renderers are free to operate on it. Field renderers which do so:
- *                          - HTMLFieldRenderer (provided by the Webclient module)
- *                          - IconFieldRenderer (provided by the Icon Picker module)
+ *                          - HTMLFieldRenderer (Webclient module)
+ *                          - IconFieldRenderer (Icon Picker module)
  * @param   value       The value to be rendered.
  *                      May be null/undefined, in this case an empty string is rendered.
  * @param   topic       The topic the page/form is rendered for. Usually that is the selected topic.
  *                      (So, that is the same topic for all the Field objects making up one page/form.)
  *                      This topic is passed to the field renderer constructors.
  *                      The particular field renderers are free to operate on it. Field renderers which do so:
- *                          - SearchResultRenderer  (provided by the Webclient module)
- *                          - FileContentRenderer   (provided by the Files module)
- *                          - FolderContentRenderer (provided by the Files module)
+ *                          - SearchResultRenderer  (Webclient module)
+ *                          - FileContentRenderer   (Files module)
+ *                          - FolderContentRenderer (Files module)
  * @param   topic_type  The topic type underlying this field.
  *                      Note: in general the topic type is different for the Field objects making up one page/form.
  * @param   assoc_def   The direct association definition that leads to this field.
  *                      For a non-composite topic it is <code>undefined</code>.
+ *                      The association definition has 2 meanings:
+ *                          1) its view configuration has precedence over the topic type's view configuration
+ *                          2) The particular field renderers are free to operate on it. Field renderers which do so:
+ *                              - TextFieldRenderer  (Webclient module)
  */
 TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
 
@@ -464,12 +471,9 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
 }
 
 /**
- * Creates a page model based on a topic type definition.
- * A page model is made of fields (instances of TopicRenderer.Field).
- * For a simple topic type the page model consists of just one field.
- * For a composite topic type the page model consists of a nested structure of fields.
+ * Creates a page model for the given topic type.
  *
- * @param   topic_type      The type to create the fields for.
+ * @param   topic_type      The topic type to create the fields for.
  * @param   assoc_def       The association definition that leads to that (child) type.
  *                          For the top-level call pass <code>undefined</code>.
  * @param   field_uri       The (base) URI for the field(s) to create.
@@ -477,6 +481,10 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
  * @param   topic           The topic the page/form is rendered for. Usually that is the selected topic.
  *                          Note: for the top-level call "topic" and "value_topic" are usually the same.
  * @param   setting         "viewable" or "editable"
+ *
+ * @return  A page model. A page model is made of fields (instances of TopicRenderer.Field).
+ *          For a simple topic type the page model consists of just one field.
+ *          For a composite topic type the page model consists of a nested field structure.
  */
 TopicRenderer.create_fields = function(topic_type, assoc_def, field_uri, value_topic, topic, setting) {
     if (get_view_config()) {
@@ -486,8 +494,20 @@ TopicRenderer.create_fields = function(topic_type, assoc_def, field_uri, value_t
                 var child_topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
                 var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
                 var child_topic = value_topic && value_topic.composite[assoc_def.uri]
-                var child_fields = TopicRenderer.create_fields(child_topic_type, assoc_def, child_field_uri,
-                    child_topic, topic, setting)
+                var cardinality_uri = assoc_def.part_cardinality_uri
+                if (cardinality_uri == "dm4.core.one") {
+                    var child_fields = TopicRenderer.create_fields(child_topic_type, assoc_def, child_field_uri,
+                        child_topic, topic, setting)
+                } else if (cardinality_uri == "dm4.core.many") {
+                    var child_fields = []
+                    for (var j = 0, ct; ct = child_topic[j]; j++) {
+                        var child_field = TopicRenderer.create_fields(child_topic_type, assoc_def, child_field_uri,
+                            ct, topic, setting)
+                        child_fields.push(child_field)
+                    }
+                } else {
+                    throw "\"" + cardinality_uri + "\" is an unexpected cardinality URI"
+                }
                 if (child_fields) {
                     fields[assoc_def.uri] = child_fields
                 }
