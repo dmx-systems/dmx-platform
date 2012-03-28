@@ -8,6 +8,7 @@ import org.codehaus.jettison.json.JSONException;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -234,8 +235,19 @@ public class CompositeValue {
     public CompositeValue clone() {
         CompositeValue clone = new CompositeValue();
         for (String key : keys()) {
-            TopicModel model = (TopicModel) getTopic(key).clone();
-            clone.put(key, model);
+            Object value = values.get(key);
+            if (value instanceof TopicModel) {
+                TopicModel model = ((TopicModel) value).clone();
+                clone.put(key, model);
+            } else if (value instanceof Set) {
+                Set<TopicModel> models = new LinkedHashSet();
+                for (TopicModel model : (Set<TopicModel>) value) {
+                    models.add(model.clone());
+                }
+                clone.put(key, models);
+            } else {
+                throw new RuntimeException("Unexpected value in a CompositeValue: " + value);
+            }
         }
         return clone;
     }

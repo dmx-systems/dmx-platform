@@ -59,6 +59,15 @@ public class TopicModel extends DeepaMehtaObjectModel {
     // === Java API ===
 
     @Override
+    public TopicModel clone() {
+        try {
+            return (TopicModel) super.clone();
+        } catch (Exception e) {
+            throw new RuntimeException("Cloning a TopicModel failed", e);
+        }
+    }
+
+    @Override
     public String toString() {
         return "topic (" + super.toString() + ")";
     }
