@@ -31,6 +31,16 @@ import java.util.logging.Logger;
 
 
 
+/**
+ * DeepaMehtaObject implementation that takes a DeepaMehtaObjectModel and attaches it to the DB.
+ *
+ * Method name conventions and semantics:
+ *  - setXX(arg)        Updates memory (model) and DB. Elementary operation.
+ *  - updateXX(arg)     Compares arg with current (model) value and calls setXX() method(s) if required.
+ *                      Can be called with arg=null which indicates no update is requested.
+ *  - storeXX()         Stores current (model) value to DB.
+ *  - fetchXX()         Fetches value from DB.
+ */
 abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -389,32 +399,40 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    // === Fetch ===
+    // === Update ===
 
-    private CompositeValue fetchComposite() {
-        try {
-            CompositeValue comp = new CompositeValue();
-            for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
-                AttachedTopic childTopic = fetchChildTopic(assocDef, true);     // fetchComposite=true
-                if (childTopic != null) {
-                    comp.put(assocDef.getUri(), childTopic.getModel());
-                }
+    private void updateUri(String newUri) {
+        if (newUri != null) {
+            String uri = getUri();
+            if (!uri.equals(newUri)) {
+                logger.info("### Changing URI from \"" + uri + "\" -> \"" + newUri + "\"");
+                setUri(newUri);
             }
-            return comp;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching the " + className() + "'s composite failed (" + this + ")", e);
         }
     }
 
-    private SimpleValue fetchChildTopicValue(AssociationDefinition assocDef) {
-        Topic childTopic = fetchChildTopic(assocDef, false);                    // fetchComposite=false
-        if (childTopic != null) {
-            return childTopic.getSimpleValue();
+    private void updateTypeUri(String newTypeUri, ChangeReport report) {
+        if (newTypeUri != null) {
+            String typeUri = getTypeUri();
+            if (!typeUri.equals(newTypeUri)) {
+                logger.info("### Changing type URI from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
+                report.typeUriChanged(typeUri, newTypeUri);
+                setTypeUri(newTypeUri);
+            }
         }
-        return null;
     }
 
-    // === Store ===
+    private void updateValue(SimpleValue newValue) {
+        if (newValue != null) {
+            SimpleValue value = getSimpleValue();
+            if (!value.equals(newValue)) {
+                logger.info("### Changing simple value from \"" + value + "\" -> \"" + newValue + "\"");
+                setSimpleValue(newValue);
+            }
+        }
+    }
+
+    // ---
 
     private void updateCompositeValue(CompositeValue newComp, ClientState clientState, Directives directives) {
         try {
@@ -495,6 +513,33 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not supported");
         }
     }
+
+    // === Fetch ===
+
+    private CompositeValue fetchComposite() {
+        try {
+            CompositeValue comp = new CompositeValue();
+            for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
+                AttachedTopic childTopic = fetchChildTopic(assocDef, true);     // fetchComposite=true
+                if (childTopic != null) {
+                    comp.put(assocDef.getUri(), childTopic.getModel());
+                }
+            }
+            return comp;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching the " + className() + "'s composite failed (" + this + ")", e);
+        }
+    }
+
+    private SimpleValue fetchChildTopicValue(AssociationDefinition assocDef) {
+        Topic childTopic = fetchChildTopic(assocDef, false);                    // fetchComposite=false
+        if (childTopic != null) {
+            return childTopic.getSimpleValue();
+        }
+        return null;
+    }
+
+    // === Store ===
 
     /**
      * Stores a child's topic value in the database. If the child topic does not exist it is created.
@@ -611,39 +656,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             return "";
         } else {
             return getSimpleValue().toString();
-        }
-    }
-
-    // === Update ===
-
-    private void updateUri(String newUri) {
-        if (newUri != null) {
-            String uri = getUri();
-            if (!uri.equals(newUri)) {
-                logger.info("### Changing URI from \"" + uri + "\" -> \"" + newUri + "\"");
-                setUri(newUri);
-            }
-        }
-    }
-
-    private void updateTypeUri(String newTypeUri, ChangeReport report) {
-        if (newTypeUri != null) {
-            String typeUri = getTypeUri();
-            if (!typeUri.equals(newTypeUri)) {
-                logger.info("### Changing type URI from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
-                report.typeUriChanged(typeUri, newTypeUri);
-                setTypeUri(newTypeUri);
-            }
-        }
-    }
-
-    private void updateValue(SimpleValue newValue) {
-        if (newValue != null) {
-            SimpleValue value = getSimpleValue();
-            if (!value.equals(newValue)) {
-                logger.info("### Changing simple value from \"" + value + "\" -> \"" + newValue + "\"");
-                setSimpleValue(newValue);
-            }
         }
     }
 
