@@ -66,7 +66,8 @@ public class CompositeValue {
         TopicModel topic = (TopicModel) values.get(key);
         // error check
         if (topic == null) {
-            throw new RuntimeException("No entry \"" + key + "\" in composite value " + this);
+            throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\": " +
+                "no such entry in\n" + this);
         }
         //
         return topic;
@@ -75,6 +76,28 @@ public class CompositeValue {
     public TopicModel getTopic(String key, TopicModel defaultValue) {
         TopicModel topic = (TopicModel) values.get(key);
         return topic != null ? topic : defaultValue;
+    }
+
+    // ---
+
+    public Set<TopicModel> getTopics(String key) {
+        try {
+            Set<TopicModel> topics = (Set<TopicModel>) values.get(key);
+            // error check
+            if (topics == null) {
+                throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\": " +
+                    "no such entry in\n" + this);
+            }
+            //
+            return topics;
+        } catch (ClassCastException e) {
+            if (e.getMessage().equals("de.deepamehta.core.model.TopicModel cannot be cast to java.util.Set")) {
+                throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\": " +
+                    "the caller assumes it to be multiple-value but it is single-value in\n" + this, e);
+            } else {
+                throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\" in\n" + this, e);
+            }
+        }
     }
 
     // ---

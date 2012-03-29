@@ -254,7 +254,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             updateCompositeValue(model.getCompositeValue(), clientState, directives);
             refreshLabel();
         } else {
-            updateValue(model.getSimpleValue());
+            updateSimpleValue(model.getSimpleValue());
         }
         //
         return report;
@@ -425,7 +425,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    private void updateValue(SimpleValue newValue) {
+    private void updateSimpleValue(SimpleValue newValue) {
         if (newValue != null) {
             SimpleValue value = getSimpleValue();
             if (!value.equals(newValue)) {
@@ -440,12 +440,23 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     private void updateCompositeValue(CompositeValue newComp, ClientState clientState, Directives directives) {
         try {
             for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
-                TopicModel valueTopic = newComp.getTopic(assocDef.getUri(), null);    // defaultValue=null
-                // skip if not contained in update request
-                if (valueTopic == null) {
-                    continue;
+                String assocDefUri    = assocDef.getUri();
+                String cardinalityUri = assocDef.getPartCardinalityUri();
+                if (cardinalityUri.equals("dm4.core.one")) {
+                    TopicModel valueTopic = newComp.getTopic(assocDefUri, null);    // defaultValue=null
+                    // skip if not contained in update request
+                    if (valueTopic == null) {
+                        continue;
+                    }
+                    updateCompositeValue(assocDef, valueTopic, clientState, directives);
+                } else if (cardinalityUri.equals("dm4.core.many")) {
+                    Set<TopicModel> valueTopics = newComp.getTopics(assocDefUri);
+                    for (TopicModel valueTopic : valueTopics) {
+                        updateCompositeValue(assocDef, valueTopic, clientState, directives);
+                    }
+                } else {
+                    throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
                 }
-                updateCompositeValue(assocDef, valueTopic, clientState, directives);
             }
         } catch (Exception e) {
             throw new RuntimeException("Updating the composite value of " + className() + " " + getId() +
