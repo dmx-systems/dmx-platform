@@ -1,11 +1,13 @@
 /**
  * A page renderer that models a page as a set of fields.
+ *
+ * @see     PageRenderer interface (script/interfaces/page_renderer.js).
  */
 function TopicRenderer() {
 
-    var page_model  // either a Field object (non-composite) or an object (composite):
+    var page_model  // either a TopicRenderer.Field object (non-composite) or an object (composite):
                     //     key: assoc def URI
-                    //     value: either a Field object or again a page model object
+                    //     value: either a TopicRenderer.Field object or again a page model object
 
     // The autocomplete list
     $("#page-panel").append($("<div>").addClass("autocomplete-list"))
@@ -67,27 +69,39 @@ function TopicRenderer() {
             return topic_model
         }
 
-        function build_composite(fields) {
-            var composite = {}
-            for (var assoc_def_uri in fields) {
-                if (fields[assoc_def_uri] instanceof TopicRenderer.Field) {
-                    var form_value = fields[assoc_def_uri].read_form_value()
-                    // Note: undefined form value is an error (means: field renderer returned no value).
-                    // null is a valid form value (means: field renderer prevents the field from being updated).
-                    if (form_value != null) {
-                        if (typeof(form_value) == "object") {
-                            // store reference to existing topic
-                            composite[assoc_def_uri] = dm4c.REF_PREFIX + form_value.topic_id
-                        } else {
-                            // store value for new topic
-                            composite[assoc_def_uri] = form_value
+        function build_composite(page_model) {
+            if (page_model instanceof TopicRenderer.Field) {
+                var form_value = page_model.read_form_value()
+                // Note: undefined form value is an error (means: field renderer returned no value).
+                // null is a valid form value (means: field renderer prevents the field from being updated).
+                if (form_value != null) {
+                    if (typeof(form_value) == "object") {
+                        // store reference to existing topic
+                        return dm4c.REF_PREFIX + form_value.topic_id
+                    } else {
+                        // store value for new topic
+                        return form_value
+                    }
+                }
+            } else {
+                var composite = {}
+                for (var assoc_def_uri in page_model) {
+                    if (js.is_array(page_model[assoc_def_uri])) {
+                        // Note: for cardinality "many" we read out just the first instance.
+                        // TODO: read out all instances.
+                        var value = build_composite(page_model[assoc_def_uri][0])
+                        if (value !== undefined) {
+                            composite[assoc_def_uri] = [value]
+                        }
+                    } else {
+                        var value = build_composite(page_model[assoc_def_uri])
+                        if (value !== undefined) {
+                            composite[assoc_def_uri] = value
                         }
                     }
-                } else {
-                    composite[assoc_def_uri] = build_composite(fields[assoc_def_uri])
                 }
+                return composite
             }
-            return composite
         }
     }
 
@@ -126,7 +140,7 @@ function TopicRenderer() {
         if (page_model instanceof TopicRenderer.Field) {
             page_model[render_func_name]()
         } else if (js.is_array(page_model)) {
-            // Note: for cardinality "many" we render just the first field. TODO: render all fields.
+            // Note: for cardinality "many" we render just the first instance. TODO: render all instances.
             render_page_model(page_model[0], render_func_name)
         } else {
             for (var assoc_def_uri in page_model) {

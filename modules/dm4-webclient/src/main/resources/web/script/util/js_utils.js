@@ -69,6 +69,55 @@ var js = {
         return str
     },
 
+    stringify: function(object) {
+        var max_depth = 5
+        var str = ""
+        stringify(object, 0, "")
+        return str
+
+        function stringify(object, depth, indent) {
+            switch (typeof object) {
+            case "string":
+                str += "\"" + object + "\" (string)"
+                return
+            case "number":
+                str += object + " (number)"
+                return
+            case "boolean":
+                str += object + " (boolean)"
+                return
+            case "object":
+                str += (js.is_array(object) ? "[" : "{") + "\n"
+                if (depth < max_depth) {
+                    for (var key in object) {
+                        // skip functions
+                        if (typeof object[key] == "function") {
+                            continue
+                        }
+                        //
+                        str += indent + "\t" + key + ": "
+                        stringify(object[key], depth + 1, indent + "\t")
+                        str += "\n"
+                    }
+                } else {
+                    str += indent + "\t" + (js.is_array(object) ? "ARRAY" : "OBJECT") +
+                        " NOT SHOWN (max " + max_depth + " levels)\n"
+                }
+                str += indent + (js.is_array(object) ? "]" : "}")
+                return
+            case "function":
+                // skip
+                return
+            case "undefined":
+                str += "undefined"
+                return
+            default:
+                str += "UNKNOWN (" + typeof(object) + ")"
+                return
+            }
+        }
+    },
+
     /**
      * Returns true if the array contains the object, false otherwise.
      */

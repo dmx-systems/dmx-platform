@@ -41,13 +41,15 @@ public class CompositeValue {
             while (i.hasNext()) {
                 String key = i.next();
                 Object value = values.get(key);
-                TopicModel model;
-                if (value instanceof JSONObject) {
-                    model = new TopicModel(null, new CompositeValue((JSONObject) value));   // typeUri=null
+                if (value instanceof JSONArray) {
+                    Set<TopicModel> models = new LinkedHashSet();
+                    for (int j = 0; j < ((JSONArray) value).length(); j++) {
+                        models.add(model(((JSONArray) value).get(j)));
+                    }
+                    put(key, models);
                 } else {
-                    model = new TopicModel(null, new SimpleValue(value));                   // typeUri=null
+                    put(key, model(value));
                 }
-                put(key, model);
             }
         } catch (Exception e) {
             throw new RuntimeException("Parsing CompositeValue failed (JSONObject=" + values + ")", e);
@@ -278,5 +280,17 @@ public class CompositeValue {
     @Override
     public String toString() {
         return values.toString();
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private TopicModel model(Object value) {
+        if (value instanceof JSONObject) {
+            return new TopicModel(null, new CompositeValue((JSONObject) value));    // typeUri=null
+        } else {
+            return new TopicModel(null, new SimpleValue(value));                    // typeUri=null
+        }
     }
 }
