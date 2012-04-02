@@ -42,8 +42,7 @@ function TopicRenderer() {
     }
 
     this.process_form = function(topic) {
-        var topic_model = build_topic_model()
-        topic = dm4c.do_update_topic(topic, topic_model)
+        dm4c.do_update_topic(topic, build_topic_model())
 
         /**
          * Reads out values from GUI elements and builds a topic model object from it.
@@ -513,6 +512,12 @@ TopicRenderer.create_fields = function(topic_type, assoc_def, field_uri, value_t
                     var child_fields = TopicRenderer.create_fields(child_topic_type, assoc_def, child_field_uri,
                         child_topic, topic, setting)
                 } else if (cardinality_uri == "dm4.core.many") {
+                    //
+                    if (!js.is_array(child_topic)) {
+                        throw "TopicRendererError: field \"" + assoc_def.uri + "\" is multi-value by definition but " +
+                            "single-value in " + JSON.stringify(value_topic)
+                    }
+                    //
                     var child_fields = []
                     for (var j = 0, ct; ct = child_topic[j]; j++) {
                         var child_field = TopicRenderer.create_fields(child_topic_type, assoc_def, child_field_uri,

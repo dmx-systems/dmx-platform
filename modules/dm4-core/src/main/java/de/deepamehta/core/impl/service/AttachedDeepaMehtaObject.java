@@ -26,6 +26,7 @@ import org.codehaus.jettison.json.JSONObject;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -468,12 +469,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     @Override
     public void updateCompositeValue(AssociationDefinition assocDef, TopicModel valueTopic, ClientState clientState,
                                                                                             Directives directives) {
-        CompositeValue comp = getCompositeValue();
-        //
-        String assocDefUri       = assocDef.getUri();
         String assocTypeUri      = assocDef.getTypeUri();
         String childTopicTypeUri = assocDef.getPartTopicTypeUri();
-        TopicType childTopicType = dms.getTopicType(childTopicTypeUri, null);
         // Note: the type URI of a simplified topic model (as constructed
         // from update requests) is not initialzed.
         valueTopic.setTypeUri(childTopicTypeUri);
@@ -481,7 +478,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         if (assocTypeUri.equals("dm4.core.composition_def")) {
             // Note: the child topic's composite must be fetched. It needs to be passed to the
             // POST_UPDATE_TOPIC hook as part of the "old model" (when the child topic is updated).
-            Topic childTopic = fetchChildTopic(assocDef, true);             // fetchComposite=true
+            Topic childTopic = fetchChildTopic(assocDef, true);                 // fetchComposite=true
             if (childTopic != null) {
                 // update existing child
                 childTopic.update(valueTopic, clientState, directives);
@@ -493,8 +490,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 // Otherwise its label can't be calculated. ### still true?
             }
             // update memory
-            comp.put(assocDefUri, childTopic.getModel());
+            modelUpdate(assocDef, childTopic.getModel());
         } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
+            TopicType childTopicType = dms.getTopicType(childTopicTypeUri, null);
             if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
                 throw new RuntimeException("Aggregation of composite topic types not yet supported");
             } else {
@@ -511,16 +509,14 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                     long childTopicId = Long.parseLong(value.substring(REF_PREFIX.length()));
                     associateChildTopic(assocDef, childTopicId);
                     // update memory
-                    // Topic assignedTopic = dms.getTopic(childTopicId, false, null);  // fetchComposite=false
-                    // comp.put(assocDefUri, assignedTopic.getSimpleValue().value());
-                    SimpleValue childTopicValue = fetchChildTopicValue(assocDef);
-                    comp.put(assocDefUri, childTopicValue.value());
+                    childTopic = fetchChildTopic(assocDef, false);              // fetchComposite=false
+                    modelUpdate(assocDef, childTopic.getModel());
                 } else {
                     // create new child
                     Topic _childTopic = dms.createTopic(valueTopic, null);
                     associateChildTopic(assocDef, _childTopic.getId());
                     // update memory
-                    comp.put(assocDefUri, _childTopic.getModel());
+                    modelUpdate(assocDef, _childTopic.getModel());
                 }
             }
         } else {
@@ -725,5 +721,24 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     private AssociationDefinition getAssocDef(String assocDefUri) {
         return getType().getAssocDef(assocDefUri);
+    }
+
+    // ---
+
+    void modelUpdate(AssociationDefinition assocDef, TopicModel value) {
+        CompositeValue comp = getCompositeValue();
+        String assocDefUri = assocDef.getUri();
+        String cardinalityUri = assocDef.getPartCardinalityUri();
+        //
+        if (cardinalityUri.equals("dm4.core.one")) {
+            comp.put(assocDefUri, value);
+        } else if (cardinalityUri.equals("dm4.core.many")) {
+            // ### TODO: process multi-values
+            Set<TopicModel> values = new LinkedHashSet();
+            values.add(value);
+            comp.put(assocDefUri, values);
+        } else {
+            throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
+        }
     }
 }

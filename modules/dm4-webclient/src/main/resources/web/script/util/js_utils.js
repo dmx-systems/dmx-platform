@@ -70,7 +70,7 @@ var js = {
     },
 
     stringify: function(object) {
-        var max_depth = 5
+        var max_depth = 10
         var str = ""
         stringify(object, 0, "")
         return str
