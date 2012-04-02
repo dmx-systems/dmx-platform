@@ -512,20 +512,24 @@ TopicRenderer.create_fields = function(topic_type, assoc_def, field_uri, value_t
                     var child_fields = TopicRenderer.create_fields(child_topic_type, assoc_def, child_field_uri,
                         child_topic, topic, setting)
                 } else if (cardinality_uri == "dm4.core.many") {
-                    //
-                    if (!js.is_array(child_topic)) {
-                        throw "TopicRendererError: field \"" + assoc_def.uri + "\" is multi-value by definition but " +
-                            "single-value in " + JSON.stringify(value_topic)
-                    }
-                    //
                     var child_fields = []
-                    for (var j = 0, ct; ct = child_topic[j]; j++) {
+                    if (child_topic) {
+                        if (!js.is_array(child_topic)) {
+                            throw "TopicRendererError: field \"" + assoc_def.uri + "\" is defined as multi-value but " +
+                                "appears as single-value in " + JSON.stringify(value_topic)
+                        }
+                        for (var j = 0, ct; ct = child_topic[j]; j++) {
+                            var child_field = TopicRenderer.create_fields(child_topic_type, assoc_def, child_field_uri,
+                                ct, topic, setting)
+                            child_fields.push(child_field)
+                        }
+                    } else {
                         var child_field = TopicRenderer.create_fields(child_topic_type, assoc_def, child_field_uri,
-                            ct, topic, setting)
+                            undefined, topic, setting)
                         child_fields.push(child_field)
                     }
                 } else {
-                    throw "\"" + cardinality_uri + "\" is an unexpected cardinality URI"
+                    throw "TopicRendererError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
                 }
                 if (child_fields) {
                     fields[assoc_def.uri] = child_fields

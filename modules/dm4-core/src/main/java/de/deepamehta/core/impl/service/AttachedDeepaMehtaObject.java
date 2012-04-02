@@ -444,14 +444,20 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 String assocDefUri    = assocDef.getUri();
                 String cardinalityUri = assocDef.getPartCardinalityUri();
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    TopicModel valueTopic = newComp.getTopic(assocDefUri, null);    // defaultValue=null
+                    TopicModel valueTopic = newComp.getTopic(assocDefUri, null);            // defaultValue=null
                     // skip if not contained in update request
                     if (valueTopic == null) {
                         continue;
                     }
+                    //
                     updateCompositeValue(assocDef, valueTopic, clientState, directives);
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    Set<TopicModel> valueTopics = newComp.getTopics(assocDefUri);
+                    Set<TopicModel> valueTopics = newComp.getTopics(assocDefUri, null);     // defaultValue=null
+                    // skip if not contained in update request
+                    if (valueTopics == null) {
+                        continue;
+                    }
+                    //
                     for (TopicModel valueTopic : valueTopics) {
                         updateCompositeValue(assocDef, valueTopic, clientState, directives);
                     }
@@ -548,6 +554,40 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             throw new RuntimeException("Fetching the " + className() + "'s composite failed (" + this + ")", e);
         }
     }
+
+    // ---
+
+    /**
+     * Fetches and returns a child topic or <code>null</code> if no such topic extists.
+     */
+    private AttachedRelatedTopic fetchChildTopic(String assocDefUri, boolean fetchComposite) {
+        return fetchChildTopic(getAssocDef(assocDefUri), fetchComposite);
+    }
+
+    /**
+     * Fetches and returns a child topic or <code>null</code> if no such topic extists.
+     */
+    private AttachedRelatedTopic fetchChildTopic(AssociationDefinition assocDef, boolean fetchComposite) {
+        String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
+        String myRoleTypeUri      = assocDef.getWholeRoleTypeUri();
+        String othersRoleTypeUri  = assocDef.getPartRoleTypeUri();
+        String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
+        //
+        return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+            fetchComposite, false, null);
+    }
+
+    private ResultSet<RelatedTopic> fetchChildTopics(AssociationDefinition assocDef, boolean fetchComposite) {
+        String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
+        String myRoleTypeUri      = assocDef.getWholeRoleTypeUri();
+        String othersRoleTypeUri  = assocDef.getPartRoleTypeUri();
+        String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
+        //
+        return getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+            fetchComposite, false, 0, null);
+    }
+
+    // ---
 
     private SimpleValue fetchChildTopicValue(AssociationDefinition assocDef) {
         Topic childTopic = fetchChildTopic(assocDef, false);                    // fetchComposite=false
@@ -679,51 +719,15 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // === Helper ===
 
-    /**
-     * Fetches and returns a child topic or <code>null</code> if no such topic extists.
-     */
-    private AttachedRelatedTopic fetchChildTopic(String assocDefUri, boolean fetchComposite) {
-        return fetchChildTopic(getAssocDef(assocDefUri), fetchComposite);
-    }
-
-    /**
-     * Fetches and returns a child topic or <code>null</code> if no such topic extists.
-     */
-    private AttachedRelatedTopic fetchChildTopic(AssociationDefinition assocDef, boolean fetchComposite) {
-        String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri      = assocDef.getWholeRoleTypeUri();
-        String othersRoleTypeUri  = assocDef.getPartRoleTypeUri();
-        String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
-        //
-        return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-            fetchComposite, false, null);
-    }
-
-    private ResultSet<RelatedTopic> fetchChildTopics(AssociationDefinition assocDef, boolean fetchComposite) {
-        String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri      = assocDef.getWholeRoleTypeUri();
-        String othersRoleTypeUri  = assocDef.getPartRoleTypeUri();
-        String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
-        //
-        return getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-            fetchComposite, false, 0, null);
-    }
-
-    // ---
-
     private void associateChildTopic(AssociationDefinition assocDef, long childTopicId) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
             getRoleModel(assocDef.getWholeRoleTypeUri()),
             new TopicRoleModel(childTopicId, assocDef.getPartRoleTypeUri()));
     }
 
-    // ---
-
     private AssociationDefinition getAssocDef(String assocDefUri) {
         return getType().getAssocDef(assocDefUri);
     }
-
-    // ---
 
     void modelUpdate(AssociationDefinition assocDef, TopicModel value) {
         CompositeValue comp = getCompositeValue();

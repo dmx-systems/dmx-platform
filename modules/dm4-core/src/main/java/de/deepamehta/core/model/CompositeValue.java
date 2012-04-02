@@ -93,12 +93,18 @@ public class CompositeValue {
             //
             return topics;
         } catch (ClassCastException e) {
-            if (e.getMessage().equals("de.deepamehta.core.model.TopicModel cannot be cast to java.util.Set")) {
-                throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\": " +
-                    "the caller assumes it to be multiple-value but it is single-value in\n" + this, e);
-            } else {
-                throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\" in\n" + this, e);
-            }
+            throwInvalidAccess(key, e);
+            return null;    // never reached
+        }
+    }
+
+    public Set<TopicModel> getTopics(String key, Set<TopicModel> defaultValue) {
+        try {
+            Set<TopicModel> topics = (Set<TopicModel>) values.get(key);
+            return topics != null ? topics : defaultValue;
+        } catch (ClassCastException e) {
+            throwInvalidAccess(key, e);
+            return null;    // never reached
         }
     }
 
@@ -291,6 +297,15 @@ public class CompositeValue {
             return new TopicModel(null, new CompositeValue((JSONObject) value));    // typeUri=null
         } else {
             return new TopicModel(null, new SimpleValue(value));                    // typeUri=null
+        }
+    }
+
+    private void throwInvalidAccess(String key, ClassCastException e) {
+        if (e.getMessage().equals("de.deepamehta.core.model.TopicModel cannot be cast to java.util.Set")) {
+            throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\": " +
+                "the caller assumes it to be multiple-value but it is single-value in\n" + this, e);
+        } else {
+            throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\" in\n" + this, e);
         }
     }
 }
