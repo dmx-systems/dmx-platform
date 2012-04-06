@@ -64,7 +64,7 @@ function RenderHelper() {
     // ---
 
     /**
-     * @param   field   Optional: the initial value (a TopicRenderer.Field object or a non-object value).
+     * @param   field   Optional: the initial value (a TopicRenderer.FieldModel object or a non-object value).
      *                  If not specified the text field will be empty.
      *
      * @return  The <input> element (jQuery object).
@@ -81,7 +81,7 @@ function RenderHelper() {
     }
 
     /**
-     * @param   field   a TopicRenderer.Field object or a boolean.
+     * @param   field   a TopicRenderer.FieldModel object or a boolean.
      */
     this.checkbox = function(field) {
         var dom = $("<input type='checkbox'>")
@@ -128,7 +128,7 @@ function RenderHelper() {
     // ---
 
     /**
-     * @param   field   a TopicRenderer.Field object or a string.
+     * @param   field   a TopicRenderer.FieldModel object or a string.
      */
     this.field_label = function(field, result_set) {
         if (typeof(field) == "string") {

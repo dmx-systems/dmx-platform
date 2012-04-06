@@ -1,8 +1,16 @@
+/**
+ * @param   topic   a JavaScript object with these properties:
+ *                      id        - mandatory, may be -1
+ *                      uri       - mandatory, may be ""
+ *                      type_uri  - mandatory
+ *                      value     - mandatory, may be ""
+ *                      composite - mandatory, may be {}
+ */
 function Topic(topic) {
     this.id        = topic.id
     this.uri       = topic.uri
-    this.value     = topic.value
     this.type_uri  = topic.type_uri
+    this.value     = topic.value
     this.composite = topic.composite
 }
 

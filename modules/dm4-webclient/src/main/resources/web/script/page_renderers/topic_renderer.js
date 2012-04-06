@@ -5,9 +5,9 @@
  */
 function TopicRenderer() {
 
-    var page_model  // either a TopicRenderer.Field object (non-composite) or an object (composite):
+    var page_model  // either a TopicRenderer.FieldModel object (non-composite) or an object (composite):
                     //     key: assoc def URI
-                    //     value: either a TopicRenderer.Field object or again a page model object
+                    //     value: either a TopicRenderer.FieldModel object or again a page model object
 
     // The autocomplete list
     $("#page-panel").append($("<div>").addClass("autocomplete-list"))
@@ -55,7 +55,7 @@ function TopicRenderer() {
                 uri: topic.uri,
                 type_uri: topic.type_uri
             }
-            if (page_model instanceof TopicRenderer.Field) {
+            if (page_model instanceof TopicRenderer.FieldModel) {
                 var form_value = page_model.read_form_value()
                 // Note: undefined form value is an error (means: field renderer returned no value).
                 // null is a valid form value (means: field renderer prevents the field from being updated).
@@ -69,7 +69,7 @@ function TopicRenderer() {
         }
 
         function build_composite(page_model) {
-            if (page_model instanceof TopicRenderer.Field) {
+            if (page_model instanceof TopicRenderer.FieldModel) {
                 var form_value = page_model.read_form_value()
                 // Note: undefined form value is an error (means: field renderer returned no value).
                 // null is a valid form value (means: field renderer prevents the field from being updated).
@@ -120,23 +120,17 @@ function TopicRenderer() {
 
 
 
-    // **************
-    // *** Helper ***
-    // **************
-
-
-
     // === Page Model ===
 
     /**
      * @param   setting     "viewable" or "editable"
      */
     function create_page_model(topic, setting) {
-        return TopicRenderer.create_fields(topic.get_type(), undefined, "", topic, topic, setting)
+        return TopicRenderer.create_page_model(topic, undefined, "", topic, setting)
     }
 
     function render_page_model(page_model, render_func_name) {
-        if (page_model instanceof TopicRenderer.Field) {
+        if (page_model instanceof TopicRenderer.FieldModel) {
             page_model[render_func_name]()
         } else if (js.is_array(page_model)) {
             // Note: for cardinality "many" we render just the first instance. TODO: render all instances.
@@ -356,38 +350,39 @@ function TopicRenderer() {
 
 
 /**
- * @param   uri         The field URI. Unique within the page/form. The field URI is a path composed of association
- *                      definition URIs that leads to this field, e.g. "/dm4.contacts.address/dm4.contacts.street".
- *                      For a non-composite topic the field URI is an empty string.
- *                      This URI is passed to the field renderer constructors (as a property of the "field" argument).
- *                      The particular field renderers are free to operate on it. Field renderers which do so:
- *                          - HTMLFieldRenderer (Webclient module)
- *                          - IconFieldRenderer (Icon Picker module)
- * @param   value       The value to be rendered.
- *                      May be null/undefined, in this case an empty string is rendered.
- * @param   topic       The topic the page/form is rendered for. Usually that is the selected topic.
- *                      (So, that is the same topic for all the Field objects making up one page/form.)
- *                      This topic is passed to the field renderer constructors.
- *                      The particular field renderers are free to operate on it. Field renderers which do so:
- *                          - SearchResultRenderer  (Webclient module)
- *                          - FileContentRenderer   (Files module)
- *                          - FolderContentRenderer (Files module)
- * @param   topic_type  The topic type underlying this field.
- *                      Note: in general the topic type is different for the Field objects making up one page/form.
- * @param   assoc_def   The direct association definition that leads to this field.
- *                      For a non-composite topic it is <code>undefined</code>.
- *                      The association definition has 2 meanings:
- *                          1) its view configuration has precedence over the topic type's view configuration
- *                          2) The particular field renderers are free to operate on it. Field renderers which do so:
- *                              - TextFieldRenderer  (Webclient module)
+ * @param   field_uri       The field URI. Unique within the page/form. The field URI is a path composed of association
+ *                          definition URIs that leads to this field, e.g. "/dm4.contacts.address/dm4.contacts.street".
+ *                          For a non-composite topic the field URI is an empty string.
+ *                          This URI is passed to the field renderer constructors (as a property of the "field"
+ *                          argument). The particular field renderers are free to operate on it. Field renderers
+ *                          which do so:
+ *                              - HTMLFieldRenderer (Webclient module)
+ *                              - IconFieldRenderer (Icon Picker module)
+ * @param   topic           The topic underlying this field. Its "value" is rendered through this field model.
+ *                          A topic "id" -1 indicates a topic to be created.
+ * @param   toplevel_topic  The topic the page/form is rendered for. Usually that is the selected topic.
+ *                          (So, that is the same topic for all the FieldModel objects making up one page/form.)
+ *                          This topic is passed to the field renderer constructors.
+ *                          The particular field renderers are free to operate on it. Field renderers which do so:
+ *                              - SearchResultRenderer  (Webclient module)
+ *                              - FileContentRenderer   (Files module)
+ *                              - FolderContentRenderer (Files module)
+ * @param   assoc_def       The direct association definition that leads to this field.
+ *                          For a non-composite topic it is <code>undefined</code>.
+ *                          The association definition has 2 meanings:
+ *                              1) its view configuration has precedence over the topic type's view configuration
+ *                              2) The particular field renderers are free to operate on it.
+ *                                 Field renderers which do so:
+ *                                  - TextFieldRenderer (Webclient module)
  */
-TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
+TopicRenderer.FieldModel = function(field_uri, topic, toplevel_topic, assoc_def) {
 
-    this.uri = uri
-    this.value = value != null && value != undefined ? value : ""
-    this.topic_type = topic_type
+    var self = this
+    this.uri = field_uri
+    this.value = topic.value
+    this.topic_type = dm4c.get_topic_type(topic.type_uri)  // ### TODO: Topics in composite would allow topic.get_type()
     this.assoc_def = assoc_def
-    this.label = topic_type.value
+    this.label = this.topic_type.value
     this.rows                   = get_view_config("rows")
     var js_field_renderer_class = get_view_config("js_field_renderer_class")
     var renderer
@@ -395,12 +390,12 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
     this.render_field = function() {
         // error check
         if (!js_field_renderer_class) {
-            alert("WARNING (TopicRenderer.render_page):\n\nField \"" + uri +
+            alert("WARNING (TopicRenderer.render_page):\n\nField \"" + field_uri +
                 "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
             return
         }
         // create renderer
-        renderer = js.new_object(js_field_renderer_class, topic, this)
+        renderer = js.new_object(js_field_renderer_class, toplevel_topic, this)
         // render field
         var field_value_div = $("<div>").addClass("field-value")
         var html = trigger_renderer_hook("render_field", field_value_div)
@@ -408,20 +403,20 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
             $("#page-content").append(field_value_div.append(html))
             trigger_renderer_hook("post_render_field")
         } else {
-            alert("WARNING (TopicRenderer.render_page):\n\nRenderer for field \"" + uri + "\" " +
-                "returned no field.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
+            alert("WARNING (TopicRenderer.render_page):\n\nRenderer for field \"" + field_uri + "\" " +
+                "returned no field.\n\ntopic ID=" + toplevel_topic.id + "\nfield=" + JSON.stringify(this))
         }
     }
 
     this.render_form_element = function() {
         // error check
         if (!js_field_renderer_class) {
-            alert("WARNING (TopicRenderer.render_form):\n\nField \"" + uri +
+            alert("WARNING (TopicRenderer.render_form):\n\nField \"" + field_uri +
                 "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
             return
         }
         // create renderer
-        renderer = js.new_object(js_field_renderer_class, topic, this)
+        renderer = js.new_object(js_field_renderer_class, toplevel_topic, this)
         // render field label
         dm4c.render.field_label(this)
         // render form element
@@ -431,8 +426,8 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
             $("#page-content").append(field_value_div.append(html))
             trigger_renderer_hook("post_render_form_element")
         } else {
-            alert("WARNING (TopicRenderer.render_form):\n\nRenderer for field \"" + uri + "\" " +
-                "returned no form element.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
+            alert("WARNING (TopicRenderer.render_form):\n\nRenderer for field \"" + field_uri + "\" " +
+                "returned no form element.\n\ntopic ID=" + toplevel_topic.id + "\nfield=" + JSON.stringify(this))
         }
     }
 
@@ -443,8 +438,8 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
         if (form_value !== undefined) {
             return form_value
         } else {
-            alert("WARNING (TopicRenderer.process_form):\n\nRenderer for field \"" + uri + "\" " +
-                "returned no form value.\n\ntopic ID=" + topic.id + "\nfield=" + JSON.stringify(this))
+            alert("WARNING (TopicRenderer.process_form):\n\nRenderer for field \"" + field_uri + "\" " +
+                "returned no form value.\n\ntopic ID=" + toplevel_topic.id + "\nfield=" + JSON.stringify(this))
         }
     }
 
@@ -479,53 +474,51 @@ TopicRenderer.Field = function(uri, value, topic, topic_type, assoc_def) {
                 return value
             }
         }
-        return dm4c.get_view_config(topic_type, setting, true)
+        return dm4c.get_view_config(self.topic_type, setting, true)
     }
 }
 
 /**
- * Creates a page model for the given topic type.
+ * Creates a page model for a topic.
  *
- * @param   topic_type      The topic type to create the fields for.
+ * @param   topic           The topic the page model is created for.
  * @param   assoc_def       The association definition that leads to that (child) type.
  *                          For the top-level call pass <code>undefined</code>.
  * @param   field_uri       The (base) URI for the field(s) to create.
- * @param   value_topic     The topic that supplies the field values. May be undefined.
- * @param   topic           The topic the page/form is rendered for. Usually that is the selected topic.
- *                          Note: for the top-level call "topic" and "value_topic" are usually the same.
+ * @param   toplevel_topic  The topic the page/form is rendered for. Usually that is the selected topic.
+ *                          Note: for the top-level call "toplevel_topic" and "value_topic" are usually the same.
  * @param   setting         "viewable" or "editable"
  *
- * @return  A page model. A page model is made of fields (instances of TopicRenderer.Field).
+ * @return  A page model. A page model is made of fields (instances of TopicRenderer.FieldModel).
  *          For a simple topic type the page model consists of just one field.
  *          For a composite topic type the page model consists of a nested field structure.
  */
-TopicRenderer.create_fields = function(topic_type, assoc_def, field_uri, value_topic, topic, setting) {
+TopicRenderer.create_page_model = function(topic, assoc_def, field_uri, toplevel_topic, setting) {
+    var topic_type = dm4c.get_topic_type(topic.type_uri)   // ### TODO: Topics in composite would allow topic.get_type()
     if (get_view_config()) {
         if (topic_type.data_type_uri == "dm4.core.composite") {
             var fields = {}
             for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
                 var child_topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
                 var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
-                var child_topic = value_topic && value_topic.composite[assoc_def.uri]
                 var cardinality_uri = assoc_def.part_cardinality_uri
                 if (cardinality_uri == "dm4.core.one") {
-                    var child_fields = TopicRenderer.create_fields(child_topic_type, assoc_def, child_field_uri,
-                        child_topic, topic, setting)
+                    var child_topic = topic.composite[assoc_def.uri] || empty_topic(child_topic_type.uri)
+                    var child_fields = TopicRenderer.create_page_model(child_topic, assoc_def, child_field_uri,
+                        toplevel_topic, setting)
                 } else if (cardinality_uri == "dm4.core.many") {
+                    var child_topics = topic.composite[assoc_def.uri] || [] // ### TODO: server: don't send empty arrays
+                    if (!js.is_array(child_topics)) {
+                        throw "TopicRendererError: field \"" + assoc_def.uri + "\" is defined as multi-value but " +
+                            "appears as single-value in " + JSON.stringify(topic)
+                    }
+                    if (child_topics.length == 0) {
+                        child_topics.push(empty_topic(child_topic_type.uri))
+                    }
                     var child_fields = []
-                    if (child_topic) {
-                        if (!js.is_array(child_topic)) {
-                            throw "TopicRendererError: field \"" + assoc_def.uri + "\" is defined as multi-value but " +
-                                "appears as single-value in " + JSON.stringify(value_topic)
-                        }
-                        for (var j = 0, ct; ct = child_topic[j]; j++) {
-                            var child_field = TopicRenderer.create_fields(child_topic_type, assoc_def, child_field_uri,
-                                ct, topic, setting)
-                            child_fields.push(child_field)
-                        }
-                    } else {
-                        var child_field = TopicRenderer.create_fields(child_topic_type, assoc_def, child_field_uri,
-                            undefined, topic, setting)
+                    for (var j = 0, child_topic; child_topic = child_topics[j]; j++) {
+                        var child_field = TopicRenderer.create_page_model(child_topic, assoc_def,
+                            child_field_uri, toplevel_topic, setting)
                         child_fields.push(child_field)
                     }
                 } else {
@@ -537,12 +530,11 @@ TopicRenderer.create_fields = function(topic_type, assoc_def, field_uri, value_t
             }
             return fields;
         } else {
-            var value = value_topic && value_topic.value
-            return new TopicRenderer.Field(field_uri, value, topic, topic_type, assoc_def)
+            return new TopicRenderer.FieldModel(field_uri, topic, toplevel_topic, assoc_def)
         }
     }
 
-    // compare to get_view_config() in TopicRenderer.Field
+    // compare to get_view_config() in TopicRenderer.FieldModel
     function get_view_config() {
         // the assoc def's config has precedence
         if (assoc_def) {
@@ -552,5 +544,11 @@ TopicRenderer.create_fields = function(topic_type, assoc_def, field_uri, value_t
             }
         }
         return dm4c.get_view_config(topic_type, setting, true)
+    }
+
+    function empty_topic(topic_type_uri) {
+        return {
+            id: -1, uri: "", type_uri: topic_type_uri, value: "", composite: {}
+        }
     }
 }
