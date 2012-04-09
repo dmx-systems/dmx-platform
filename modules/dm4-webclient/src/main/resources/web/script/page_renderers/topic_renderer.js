@@ -62,8 +62,10 @@ function TopicRenderer() {
                 if (form_value != null) {
                     topic_model.value = form_value
                 }
-            } else {
+            } else if (page_model instanceof TopicRenderer.PageModel) {
                 topic_model.composite = build_composite(page_model)
+            } else {
+                throw "TopicRendererError: invalid page model " + JSON.stringify(page_model)
             }
             return topic_model
         }
@@ -82,24 +84,30 @@ function TopicRenderer() {
                         return form_value
                     }
                 }
-            } else {
+            } else if (page_model instanceof TopicRenderer.PageModel) {
                 var composite = {}
-                for (var assoc_def_uri in page_model) {
-                    if (js.is_array(page_model[assoc_def_uri])) {
-                        // Note: for cardinality "many" we read out just the first instance.
-                        // TODO: read out all instances.
-                        var value = build_composite(page_model[assoc_def_uri][0])
-                        if (value !== undefined) {
-                            composite[assoc_def_uri] = [value]
+                for (var assoc_def_uri in page_model.childs) {
+                    var child_model = page_model.childs[assoc_def_uri]
+                    if (js.is_array(child_model)) {
+                        // cardinality "many"
+                        composite[assoc_def_uri] = []
+                        for (var i = 0; i < child_model.length; i++) {
+                            var value = build_composite(child_model[i])
+                            if (value !== undefined) {
+                                composite[assoc_def_uri].push(value)
+                            }
                         }
                     } else {
-                        var value = build_composite(page_model[assoc_def_uri])
+                        // cardinality "one"
+                        var value = build_composite(child_model)
                         if (value !== undefined) {
                             composite[assoc_def_uri] = value
                         }
                     }
                 }
                 return composite
+            } else {
+                throw "TopicRendererError: invalid page model " + JSON.stringify(page_model)
             }
         }
     }
@@ -132,13 +140,21 @@ function TopicRenderer() {
     function render_page_model(page_model, render_func_name) {
         if (page_model instanceof TopicRenderer.FieldModel) {
             page_model[render_func_name]()
-        } else if (js.is_array(page_model)) {
-            // Note: for cardinality "many" we render just the first instance. TODO: render all instances.
-            render_page_model(page_model[0], render_func_name)
-        } else {
-            for (var assoc_def_uri in page_model) {
-                render_page_model(page_model[assoc_def_uri], render_func_name)
+        } else if (page_model instanceof TopicRenderer.PageModel) {
+            for (var assoc_def_uri in page_model.childs) {
+                var child_model = page_model.childs[assoc_def_uri]
+                if (js.is_array(child_model)) {
+                    // cardinality "many"
+                    for (var i = 0; i < child_model.length; i++) {
+                        render_page_model(child_model[i], render_func_name)
+                    }
+                } else {
+                    // cardinality "one"
+                    render_page_model(child_model, render_func_name)
+                }
             }
+        } else {
+            throw "TopicRendererError: invalid page model " + JSON.stringify(page_model)
         }
     }
 
@@ -349,7 +365,29 @@ function TopicRenderer() {
 
 
 
+TopicRenderer.PageModel = function(topic) {
+
+    this.topic = topic
+    this.childs = {}
+
+    /**
+     * @param   child_model     A FieldModel, or a PageModel, or an array of FieldModels or PageModels.
+     */
+    this.add_child = function(assoc_def_uri, child_model) {
+        this.childs[assoc_def_uri] = child_model
+    }
+}
+
 /**
+ * @param   topic           The topic underlying this field. Its "value" is rendered through this field model.
+ *                          A topic "id" -1 indicates a topic to be created.
+ * @param   assoc_def       The direct association definition that leads to this field.
+ *                          For a non-composite topic it is <code>undefined</code>.
+ *                          The association definition has 2 meanings:
+ *                              1) its view configuration has precedence over the topic type's view configuration
+ *                              2) The particular field renderers are free to operate on it.
+ *                                 Field renderers which do so:
+ *                                  - TextFieldRenderer (Webclient module)
  * @param   field_uri       The field URI. Unique within the page/form. The field URI is a path composed of association
  *                          definition URIs that leads to this field, e.g. "/dm4.contacts.address/dm4.contacts.street".
  *                          For a non-composite topic the field URI is an empty string.
@@ -358,8 +396,6 @@ function TopicRenderer() {
  *                          which do so:
  *                              - HTMLFieldRenderer (Webclient module)
  *                              - IconFieldRenderer (Icon Picker module)
- * @param   topic           The topic underlying this field. Its "value" is rendered through this field model.
- *                          A topic "id" -1 indicates a topic to be created.
  * @param   toplevel_topic  The topic the page/form is rendered for. Usually that is the selected topic.
  *                          (So, that is the same topic for all the FieldModel objects making up one page/form.)
  *                          This topic is passed to the field renderer constructors.
@@ -367,21 +403,15 @@ function TopicRenderer() {
  *                              - SearchResultRenderer  (Webclient module)
  *                              - FileContentRenderer   (Files module)
  *                              - FolderContentRenderer (Files module)
- * @param   assoc_def       The direct association definition that leads to this field.
- *                          For a non-composite topic it is <code>undefined</code>.
- *                          The association definition has 2 meanings:
- *                              1) its view configuration has precedence over the topic type's view configuration
- *                              2) The particular field renderers are free to operate on it.
- *                                 Field renderers which do so:
- *                                  - TextFieldRenderer (Webclient module)
  */
-TopicRenderer.FieldModel = function(field_uri, topic, toplevel_topic, assoc_def) {
+TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic) {
 
     var self = this
+    this.topic = topic
+    this.assoc_def = assoc_def
     this.uri = field_uri
     this.value = topic.value
     this.topic_type = dm4c.get_topic_type(topic.type_uri)  // ### TODO: Topics in composite would allow topic.get_type()
-    this.assoc_def = assoc_def
     this.label = this.topic_type.value
     this.rows                   = get_view_config("rows")
     var js_field_renderer_class = get_view_config("js_field_renderer_class")
@@ -489,49 +519,51 @@ TopicRenderer.FieldModel = function(field_uri, topic, toplevel_topic, assoc_def)
  *                          Note: for the top-level call "toplevel_topic" and "value_topic" are usually the same.
  * @param   setting         "viewable" or "editable"
  *
- * @return  A page model. A page model is made of fields (instances of TopicRenderer.FieldModel).
+ * @return  A page model (A FieldModel object, or a PageModel object), or undefined.
+ *          ### FIXDOC: A page model is made of fields (instances of TopicRenderer.FieldModel).
  *          For a simple topic type the page model consists of just one field.
  *          For a composite topic type the page model consists of a nested field structure.
  */
 TopicRenderer.create_page_model = function(topic, assoc_def, field_uri, toplevel_topic, setting) {
     var topic_type = dm4c.get_topic_type(topic.type_uri)   // ### TODO: Topics in composite would allow topic.get_type()
-    if (get_view_config()) {
-        if (topic_type.data_type_uri == "dm4.core.composite") {
-            var fields = {}
-            for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
-                var child_topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
-                var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
-                var cardinality_uri = assoc_def.part_cardinality_uri
-                if (cardinality_uri == "dm4.core.one") {
-                    var child_topic = topic.composite[assoc_def.uri] || empty_topic(child_topic_type.uri)
-                    var child_fields = TopicRenderer.create_page_model(child_topic, assoc_def, child_field_uri,
-                        toplevel_topic, setting)
-                } else if (cardinality_uri == "dm4.core.many") {
-                    var child_topics = topic.composite[assoc_def.uri] || [] // ### TODO: server: don't send empty arrays
-                    if (!js.is_array(child_topics)) {
-                        throw "TopicRendererError: field \"" + assoc_def.uri + "\" is defined as multi-value but " +
-                            "appears as single-value in " + JSON.stringify(topic)
-                    }
-                    if (child_topics.length == 0) {
-                        child_topics.push(empty_topic(child_topic_type.uri))
-                    }
-                    var child_fields = []
-                    for (var j = 0, child_topic; child_topic = child_topics[j]; j++) {
-                        var child_field = TopicRenderer.create_page_model(child_topic, assoc_def,
-                            child_field_uri, toplevel_topic, setting)
-                        child_fields.push(child_field)
-                    }
-                } else {
-                    throw "TopicRendererError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
+    if (!get_view_config()) {
+        return
+    }
+    if (topic_type.is_simple()) {
+        return new TopicRenderer.FieldModel(topic, assoc_def, field_uri, toplevel_topic)
+    } else {
+        var page_model = new TopicRenderer.PageModel(topic)
+        for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
+            var child_topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
+            var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
+            var cardinality_uri = assoc_def.part_cardinality_uri
+            if (cardinality_uri == "dm4.core.one") {
+                var child_topic = topic.composite[assoc_def.uri] || empty_topic(child_topic_type.uri)
+                var child_fields = TopicRenderer.create_page_model(child_topic, assoc_def, child_field_uri,
+                    toplevel_topic, setting)
+            } else if (cardinality_uri == "dm4.core.many") {
+                var child_topics = topic.composite[assoc_def.uri] || []     // ### TODO: server: don't send empty arrays
+                if (!js.is_array(child_topics)) {
+                    throw "TopicRendererError: field \"" + assoc_def.uri + "\" is defined as multi-value but " +
+                        "appears as single-value in " + JSON.stringify(topic)
                 }
-                if (child_fields) {
-                    fields[assoc_def.uri] = child_fields
+                if (child_topics.length == 0) {
+                    child_topics.push(empty_topic(child_topic_type.uri))
                 }
+                var child_fields = []
+                for (var j = 0, child_topic; child_topic = child_topics[j]; j++) {
+                    var child_field = TopicRenderer.create_page_model(child_topic, assoc_def,
+                        child_field_uri, toplevel_topic, setting)
+                    child_fields.push(child_field)
+                }
+            } else {
+                throw "TopicRendererError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
             }
-            return fields;
-        } else {
-            return new TopicRenderer.FieldModel(field_uri, topic, toplevel_topic, assoc_def)
+            if (child_fields) {
+                page_model.add_child(assoc_def.uri, child_fields)
+            }
         }
+        return page_model;
     }
 
     // compare to get_view_config() in TopicRenderer.FieldModel
