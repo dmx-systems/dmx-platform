@@ -39,11 +39,21 @@ function TextFieldRenderer(topic, field) {
 
     this.read_form_value = function() {
         if (gui_element instanceof jQuery) {
-            return $.trim(gui_element.val())
+            field.topic.value = $.trim(gui_element.val())
+            return field.topic
         } else {
             // gui_element is a Combobox
-            var selection = gui_element.get_selection() // either a menu item (object) or the text entered (string)
-            return typeof(selection) == "object" ? {topic_id: selection.value} : selection
+            var selection = gui_element.get_selection() // either a menu item (an object with the underlying topic
+                                                        // in its "value" property) or the text entered (string)
+            if (typeof(selection) == "object") {
+                // user selected existing topic 
+                return selection.value
+            } else {
+                // user entered new value. -1 causes the server to create a new topic
+                field.topic.id = -1
+                field.topic.value = selection
+                return field.topic
+            }
         }
     }
 
@@ -74,7 +84,7 @@ function TextFieldRenderer(topic, field) {
             var combobox = dm4c.ui.combobox()
             // add items
             for (var i in topics) {
-                combobox.add_item({label: topics[i].value, value: topics[i].id})
+                combobox.add_item({label: topics[i].value, value: topics[i]})
             }
             // select item
             combobox.select_by_label(field.value)

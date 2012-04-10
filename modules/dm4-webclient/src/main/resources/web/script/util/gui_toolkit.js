@@ -149,12 +149,18 @@ function GUIToolkit() {
              * @param   item    The menu item to add. An object with these properties:
              *                      "label" - The label to be displayed in the menu.
              *                      "value" - Optional: the value to be examined by the caller.
-             *                          Note: if this item is about to be selected programatically or re-labeled
-             *                          the value must be specified.
+             *                          Virtually the value can be any kind of object, but consider the note.
+             *                          Note: if this item is about to be selected programatically (by calling select())
+             *                          the value must be specified and it must be a simple value.
+             *                          ### TODO: selection of items which have an object as value could be supported
+             *                          e.g. by let the caller supply a indicator function. Currently the item to select
+             *                          is identified simply by equality (==) check on the values (see find_item()).
              *                      "icon" - Optional: the icon to decorate the item (relative or absolute URL).
              *                      "is_trigger" (boolean) - Optional: if true this item acts as stateless
              *                          action-trigger within an stateful select-like menu. Default is false.
              *                          Reasonable only for stateful select-like menus.
+             *                          ### FIXME: this property could possibly be dropped. Meanwhile we have optional
+             *                          per-item event handlers (see "handler" property).
              *                      "handler" - Optional: the individual handler.
              */
             this.add_item = function(item) {
@@ -190,20 +196,6 @@ function GUIToolkit() {
                 select_item(find_item(item_value))
             }
 
-            /**
-             * Sets the selected menu item by label.
-             * Note: no handler is triggered.
-             * <p>
-             * Only applicable for stateful select-like menus.
-             * (For stateless action-trigger menus nothing is performed.)
-             *
-             * @param   item_label      Label of the menu item to select.
-             *                          If there is not such menu item nothing is performed.
-             */
-            this.select_by_label = function(item_label) {
-                select_item(find_item_by_label(item_label))
-            }
-
             // ---
 
             /**
@@ -226,11 +218,7 @@ function GUIToolkit() {
              * If there is no such menu item undefined is returned.
              */
             this.find_item_by_label = function(label) {
-                for (var i = 0, item; item = items[i]; i++) {
-                    if (item.label == label) {
-                        return item
-                    }
-                }
+                return find_item_by_label(label)
             }
 
             /**
@@ -484,6 +472,18 @@ function GUIToolkit() {
                     }
                 }
             }
+
+            /**
+             * Finds a menu item by label.
+             * If there is no such menu item undefined is returned.
+             */
+            function find_item_by_label(label) {
+                for (var i = 0, item; item = items[i]; i++) {
+                    if (item.label == label) {
+                        return item
+                    }
+                }
+            }
         }
     }
 
@@ -521,7 +521,7 @@ function GUIToolkit() {
              * To examine which case occured the caller uses "typeof" on the returned value.
              */
             this.get_selection = function() {
-                var text = input.val()
+                var text = $.trim(input.val())
                 var item = menu.find_item_by_label(text)
                 return item || text
             }

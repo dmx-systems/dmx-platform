@@ -42,48 +42,18 @@ function TopicRenderer() {
     }
 
     this.process_form = function(topic) {
-        dm4c.do_update_topic(topic, build_topic_model())
+        dm4c.do_update_topic(topic, build_topic_model(page_model))
 
         /**
          * Reads out values from GUI elements and builds a topic model object from it.
          *
          * @return  a topic model object
          */
-        function build_topic_model() {
-            var topic_model = {
-                id: topic.id,
-                uri: topic.uri,
-                type_uri: topic.type_uri
-            }
+        function build_topic_model(page_model) {
             if (page_model instanceof TopicRenderer.FieldModel) {
-                var form_value = page_model.read_form_value()
                 // Note: undefined form value is an error (means: field renderer returned no value).
                 // null is a valid form value (means: field renderer prevents the field from being updated).
-                if (form_value != null) {
-                    topic_model.value = form_value
-                }
-            } else if (page_model instanceof TopicRenderer.PageModel) {
-                topic_model.composite = build_composite(page_model)
-            } else {
-                throw "TopicRendererError: invalid page model " + JSON.stringify(page_model)
-            }
-            return topic_model
-        }
-
-        function build_composite(page_model) {
-            if (page_model instanceof TopicRenderer.FieldModel) {
-                var form_value = page_model.read_form_value()
-                // Note: undefined form value is an error (means: field renderer returned no value).
-                // null is a valid form value (means: field renderer prevents the field from being updated).
-                if (form_value != null) {
-                    if (typeof(form_value) == "object") {
-                        // store reference to existing topic
-                        return dm4c.REF_PREFIX + form_value.topic_id
-                    } else {
-                        // store value for new topic
-                        return form_value
-                    }
-                }
+                return page_model.read_form_value()
             } else if (page_model instanceof TopicRenderer.PageModel) {
                 var composite = {}
                 for (var assoc_def_uri in page_model.childs) {
@@ -92,20 +62,21 @@ function TopicRenderer() {
                         // cardinality "many"
                         composite[assoc_def_uri] = []
                         for (var i = 0; i < child_model.length; i++) {
-                            var value = build_composite(child_model[i])
-                            if (value !== undefined) {
+                            var value = build_topic_model(child_model[i])
+                            if (value) {
                                 composite[assoc_def_uri].push(value)
                             }
                         }
                     } else {
                         // cardinality "one"
-                        var value = build_composite(child_model)
-                        if (value !== undefined) {
+                        var value = build_topic_model(child_model)
+                        if (value) {
                             composite[assoc_def_uri] = value
                         }
                     }
                 }
-                return composite
+                page_model.topic.composite = composite
+                return page_model.topic
             } else {
                 throw "TopicRendererError: invalid page model " + JSON.stringify(page_model)
             }
