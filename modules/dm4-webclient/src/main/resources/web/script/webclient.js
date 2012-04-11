@@ -15,7 +15,7 @@ var dm4c = new function() {
 
     var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
-    this.REF_PREFIX = "ref_id:"     // ### FIXME: drop this. Webbrowser plugin must be adapted
+    this.REF_PREFIX = "ref_id:"
 
     // log window
     if (ENABLE_LOGGING) {

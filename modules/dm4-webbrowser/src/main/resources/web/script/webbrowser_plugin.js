@@ -30,6 +30,7 @@ function webbrowser_plugin() {
         function do_open_url() {
             var webpage = get_webpage(topic)
             if (!webpage) {
+                // Note: a Webpage *aggregates* an URL (see migration2.json)
                 webpage = dm4c.create_topic("dm4.webbrowser.webpage", {
                     "dm4.webbrowser.url": dm4c.REF_PREFIX + topic.id
                 })

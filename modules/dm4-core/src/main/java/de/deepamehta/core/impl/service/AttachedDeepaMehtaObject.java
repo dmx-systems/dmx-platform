@@ -48,7 +48,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String LABEL_SEPARATOR = " ";
-    private static final String REF_PREFIX = "ref_id:";     // ### FIXME: drop this? Still required for compact format?
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -475,12 +474,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     @Override
     public void updateCompositeValue(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
                                                                                                Directives directives) {
-        String assocTypeUri      = assocDef.getTypeUri();
-        String childTopicTypeUri = assocDef.getPartTopicTypeUri();
-        // Note: the type URI of a simplified topic model (as constructed from update requests)
-        // is not initialzed. ### FIXME: should not be required anymore
-        // ### newChildTopic.setTypeUri(childTopicTypeUri);
-        //
+        String assocTypeUri = assocDef.getTypeUri();
         if (assocTypeUri.equals("dm4.core.composition_def")) {
             // Note: the child topic's composite must be fetched. It needs to be passed to the
             // POST_UPDATE_TOPIC hook as part of the "old model" (when the child topic is updated).
@@ -498,6 +492,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             // update memory
             modelUpdate(assocDef, childTopic.getModel());
         } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
+            String childTopicTypeUri = assocDef.getPartTopicTypeUri();
             TopicType childTopicType = dms.getTopicType(childTopicTypeUri, null);
             if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
                 throw new RuntimeException("Aggregation of composite topic types not yet supported");

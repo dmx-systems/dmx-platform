@@ -23,6 +23,10 @@ import java.util.logging.Logger;
  */
 public class CompositeValue {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String REF_PREFIX = "ref_id:";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     /**
@@ -47,11 +51,11 @@ public class CompositeValue {
                 if (value instanceof JSONArray) {
                     Set<TopicModel> models = new LinkedHashSet();
                     for (int j = 0; j < ((JSONArray) value).length(); j++) {
-                        models.add(model(key, ((JSONArray) value).get(j)));
+                        models.add(createTopicModel(key, ((JSONArray) value).get(j)));
                     }
                     put(key, models);
                 } else {
-                    put(key, model(key, value));
+                    put(key, createTopicModel(key, value));
                 }
             }
         } catch (Exception e) {
@@ -302,7 +306,7 @@ public class CompositeValue {
      * 1) canonic format -- contains entire topic models.
      * 2) compact format -- contains the topic value only (simple or composite).
      */
-    private TopicModel model(String key, Object value) {
+    private TopicModel createTopicModel(String key, Object value) {
         if (value instanceof JSONObject) {
             JSONObject val = (JSONObject) value;
             // we detect the canonic format by checking for a mandatory topic property
@@ -313,7 +317,15 @@ public class CompositeValue {
                 return new TopicModel(key, new CompositeValue(val));
             }
         } else {
-            // compact format (simple topic)
+            // compact format (simple topic or topic reference)
+            if (value instanceof String) {
+                String val = (String) value;
+                if (val.startsWith(REF_PREFIX)) {
+                    // value represents a topic reference
+                    long refTopicId = Long.parseLong(val.substring(REF_PREFIX.length()));
+                    return new TopicModel(refTopicId, null, key, null, null);
+                }
+            }
             return new TopicModel(key, new SimpleValue(value));
         }
     }
