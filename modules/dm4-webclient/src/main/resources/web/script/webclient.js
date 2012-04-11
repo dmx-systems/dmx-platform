@@ -15,7 +15,7 @@ var dm4c = new function() {
 
     var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
-    this.REF_PREFIX = "ref_id:"
+    this.REF_PREFIX = "ref_id:"     // ### FIXME: drop this. Webbrowser plugin must be adapted
 
     // log window
     if (ENABLE_LOGGING) {
@@ -228,7 +228,7 @@ var dm4c = new function() {
      */
     this.do_update_topic = function(old_topic, new_topic) {
         // update DB
-        alert("do_update_topic(): new_topic=" + js.stringify(new_topic))
+        // alert("do_update_topic(): new_topic=" + js.stringify(new_topic))
         var directives = dm4c.restc.update_topic(new_topic)
         // alert("do_update_topic(): directives=" + js.stringify(directives))
         // update client model and view

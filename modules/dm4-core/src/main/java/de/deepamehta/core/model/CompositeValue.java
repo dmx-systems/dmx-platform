@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 
 
@@ -30,6 +31,8 @@ public class CompositeValue {
      */
     private Map<String, Object> values = new HashMap();
 
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public CompositeValue() {
@@ -44,11 +47,11 @@ public class CompositeValue {
                 if (value instanceof JSONArray) {
                     Set<TopicModel> models = new LinkedHashSet();
                     for (int j = 0; j < ((JSONArray) value).length(); j++) {
-                        models.add(model(((JSONArray) value).get(j)));
+                        models.add(model(key, ((JSONArray) value).get(j)));
                     }
                     put(key, models);
                 } else {
-                    put(key, model(value));
+                    put(key, model(key, value));
                 }
             }
         } catch (Exception e) {
@@ -163,9 +166,9 @@ public class CompositeValue {
             // put value
             TopicModel model;
             if (value instanceof CompositeValue) {
-                model = new TopicModel(null, (CompositeValue) value);   // typeUri=null
+                model = new TopicModel(key, (CompositeValue) value);
             } else {
-                model = new TopicModel(null, new SimpleValue(value));   // typeUri=null
+                model = new TopicModel(key, new SimpleValue(value));
             }
             put(key, model);
             //
@@ -292,11 +295,26 @@ public class CompositeValue {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private TopicModel model(Object value) {
+    /**
+     * Creates a topic model from a JSON value.
+     *
+     * Both topic serialization formats are supported:
+     * 1) canonic format -- contains entire topic models.
+     * 2) compact format -- contains the topic value only (simple or composite).
+     */
+    private TopicModel model(String key, Object value) {
         if (value instanceof JSONObject) {
-            return new TopicModel(null, new CompositeValue((JSONObject) value));    // typeUri=null
+            JSONObject val = (JSONObject) value;
+            // we detect the canonic format by checking for a mandatory topic property
+            if (val.has("type_uri")) {
+                return new TopicModel(val);
+            } else {
+                // compact format (composite topic)
+                return new TopicModel(key, new CompositeValue(val));
+            }
         } else {
-            return new TopicModel(null, new SimpleValue(value));                    // typeUri=null
+            // compact format (simple topic)
+            return new TopicModel(key, new SimpleValue(value));
         }
     }
 

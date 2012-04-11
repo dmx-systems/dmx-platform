@@ -48,7 +48,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String LABEL_SEPARATOR = " ";
-    private static final String REF_PREFIX = "ref_id:";
+    private static final String REF_PREFIX = "ref_id:";     // ### FIXME: drop this? Still required for compact format?
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -444,22 +444,22 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 String assocDefUri    = assocDef.getUri();
                 String cardinalityUri = assocDef.getPartCardinalityUri();
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    TopicModel valueTopic = newComp.getTopic(assocDefUri, null);            // defaultValue=null
+                    TopicModel newChildTopic = newComp.getTopic(assocDefUri, null);            // defaultValue=null
                     // skip if not contained in update request
-                    if (valueTopic == null) {
+                    if (newChildTopic == null) {
                         continue;
                     }
                     //
-                    updateCompositeValue(assocDef, valueTopic, clientState, directives);
+                    updateCompositeValue(assocDef, newChildTopic, clientState, directives);
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    Set<TopicModel> valueTopics = newComp.getTopics(assocDefUri, null);     // defaultValue=null
+                    Set<TopicModel> newChildTopics = newComp.getTopics(assocDefUri, null);     // defaultValue=null
                     // skip if not contained in update request
-                    if (valueTopics == null) {
+                    if (newChildTopics == null) {
                         continue;
                     }
                     //
-                    for (TopicModel valueTopic : valueTopics) {
-                        updateCompositeValue(assocDef, valueTopic, clientState, directives);
+                    for (TopicModel newChildTopic : newChildTopics) {
+                        updateCompositeValue(assocDef, newChildTopic, clientState, directives);
                     }
                 } else {
                     throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
@@ -473,13 +473,13 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ### FIXME: Remove from interface. Make it private.
     @Override
-    public void updateCompositeValue(AssociationDefinition assocDef, TopicModel valueTopic, ClientState clientState,
-                                                                                            Directives directives) {
+    public void updateCompositeValue(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
+                                                                                               Directives directives) {
         String assocTypeUri      = assocDef.getTypeUri();
         String childTopicTypeUri = assocDef.getPartTopicTypeUri();
-        // Note: the type URI of a simplified topic model (as constructed
-        // from update requests) is not initialzed.
-        valueTopic.setTypeUri(childTopicTypeUri);
+        // Note: the type URI of a simplified topic model (as constructed from update requests)
+        // is not initialzed. ### FIXME: should not be required anymore
+        // ### newChildTopic.setTypeUri(childTopicTypeUri);
         //
         if (assocTypeUri.equals("dm4.core.composition_def")) {
             // Note: the child topic's composite must be fetched. It needs to be passed to the
@@ -487,10 +487,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             Topic childTopic = fetchChildTopic(assocDef, true);                 // fetchComposite=true
             if (childTopic != null) {
                 // update existing child
-                childTopic.update(valueTopic, clientState, directives);
+                childTopic.update(newChildTopic, clientState, directives);
             } else {
                 // create new child
-                childTopic = dms.createTopic(valueTopic, null);
+                childTopic = dms.createTopic(newChildTopic, null);
                 associateChildTopic(assocDef, childTopic.getId());
                 // Note: the child topic must be created right with its composite value.
                 // Otherwise its label can't be calculated. ### still true?
@@ -507,19 +507,18 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 if (childTopic != null) {
                     childTopic.getAssociation().delete(directives);
                 }
-                //
-                String value = valueTopic.getSimpleValue().toString();
-                boolean assignExistingTopic = value.startsWith(REF_PREFIX);
-                if (assignExistingTopic) {
+                // Note: an topic ID != -1 indicates an *existing* topic is to be assigned.
+                //       an topic ID == -1 indicates a *new* topic is to be created and assigned.
+                long childTopicId = newChildTopic.getId();
+                if (childTopicId != -1) {
                     // update DB
-                    long childTopicId = Long.parseLong(value.substring(REF_PREFIX.length()));
                     associateChildTopic(assocDef, childTopicId);
                     // update memory
                     childTopic = fetchChildTopic(assocDef, false);              // fetchComposite=false
                     modelUpdate(assocDef, childTopic.getModel());
                 } else {
                     // create new child
-                    Topic _childTopic = dms.createTopic(valueTopic, null);
+                    Topic _childTopic = dms.createTopic(newChildTopic, null);
                     associateChildTopic(assocDef, _childTopic.getId());
                     // update memory
                     modelUpdate(assocDef, _childTopic.getModel());

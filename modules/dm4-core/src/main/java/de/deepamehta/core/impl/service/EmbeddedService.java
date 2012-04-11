@@ -881,6 +881,11 @@ public class EmbeddedService implements DeepaMehtaService {
 
     void associateWithTopicType(TopicModel topic) {
         try {
+            // check argument
+            if (topic.getTypeUri() == null) {
+                throw new IllegalArgumentException("The type of topic " + topic.getId() + " is unknown (null)");
+            }
+            //
             AssociationModel model = new AssociationModel("dm4.core.instantiation");
             model.setRoleModel1(new TopicRoleModel(topic.getTypeUri(), "dm4.core.type"));
             model.setRoleModel2(new TopicRoleModel(topic.getId(), "dm4.core.instance"));

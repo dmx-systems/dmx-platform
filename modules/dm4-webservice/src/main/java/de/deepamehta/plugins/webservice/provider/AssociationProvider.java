@@ -55,7 +55,8 @@ public class AssociationProvider implements MessageBodyReader<AssociationModel>,
             String json = JavaUtils.readText(entityStream);
             return new AssociationModel(new JSONObject(json));
         } catch (Exception e) {
-            throw new IOException("Creating AssociationModel from message body failed", e);
+            throw new WebApplicationException(new RuntimeException(
+                "Creating AssociationModel from message body failed", e));
         }
     }
 
