@@ -42,16 +42,38 @@ function TopicRenderer() {
     }
 
     this.process_form = function(topic) {
-        dm4c.do_update_topic(topic, build_topic_model(page_model))
+        dm4c.do_update_topic(topic, build_topic_model())
 
         /**
-         * Reads out values from GUI elements and builds a topic model object from it.
+         * Reads out values from GUI elements and builds a topic model from it.
          *
          * @return  a topic model object, or null.
          *          Note: null is returned if a simple topic is being edited and the field renderer returns null
          *          (which is a valid return value to prevent the field from being updated).
          */
-        function build_topic_model(page_model) {
+        function build_topic_model() {
+            var values = read_form_values(page_model)
+            if (page_model instanceof TopicRenderer.FieldModel) {
+                if (values == null) {
+                    return null
+                }
+                page_model.topic.value = values
+                return page_model.topic
+            } else if (page_model instanceof TopicRenderer.PageModel) {
+                return values
+            } else {
+                throw "TopicRendererError: invalid page model " + JSON.stringify(page_model)
+            }
+        }
+
+        /**
+         * Reads out values from GUI elements.
+         *
+         * @return  a simple value topic value (or null), or a topic model.
+         *          Note: null is returned if a simple topic is being edited and the field renderer returns null
+         *          (which is a valid return value to prevent the field from being updated).
+         */
+        function read_form_values(page_model) {
             if (page_model instanceof TopicRenderer.FieldModel) {
                 // Note: undefined form value is an error (means: field renderer returned no value).
                 // null is a valid form value (means: field renderer prevents the field from being updated).
@@ -64,15 +86,15 @@ function TopicRenderer() {
                         // cardinality "many"
                         composite[assoc_def_uri] = []
                         for (var i = 0; i < child_model.length; i++) {
-                            var value = build_topic_model(child_model[i])
-                            if (value) {
+                            var value = read_form_values(child_model[i])
+                            if (value != null) {
                                 composite[assoc_def_uri].push(value)
                             }
                         }
                     } else {
                         // cardinality "one"
-                        var value = build_topic_model(child_model)
-                        if (value) {
+                        var value = read_form_values(child_model)
+                        if (value != null) {
                             composite[assoc_def_uri] = value
                         }
                     }
@@ -110,7 +132,15 @@ function TopicRenderer() {
         return TopicRenderer.create_page_model(topic, undefined, "", topic, setting)
     }
 
+    /**
+     * @param   page_model  the page model to render. If undefined nothing is rendered.
+     */
     function render_page_model(page_model, render_func_name) {
+        // Note: the page model is undefined if the topic is not viewable/editable.
+        if (!page_model) {
+            return
+        }
+        //
         if (page_model instanceof TopicRenderer.FieldModel) {
             page_model[render_func_name]()
         } else if (page_model instanceof TopicRenderer.PageModel) {
@@ -438,12 +468,12 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
         var form_value = trigger_renderer_hook("read_form_value")
         // Note: undefined value is an error (means: field renderer returned no value).
         // null is a valid result (means: field renderer prevents the field from being updated).
-        if (form_value !== undefined) {
-            return form_value
-        } else {
-            alert("WARNING (TopicRenderer.process_form):\n\nRenderer for field \"" + field_uri + "\" " +
-                "returned no form value.\n\ntopic ID=" + toplevel_topic.id)
+        if (form_value === undefined) {
+            throw "TopicRendererError: the \"" + this.label + "\" field renderer returned no value " +
+                "(js_field_renderer_class=\"" + js_field_renderer_class + "\")"
         }
+        //
+        return form_value
     }
 
     // ---
@@ -490,9 +520,10 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
  * @param   field_uri       The (base) URI for the field(s) to create.
  * @param   toplevel_topic  The topic the page/form is rendered for. Usually that is the selected topic.
  *                          Note: for the top-level call "toplevel_topic" and "value_topic" are usually the same.
- * @param   setting         "viewable" or "editable"
+ * @param   setting         "viewable" or "editable" (string).
  *
  * @return  A page model (A FieldModel object, or a PageModel object), or undefined.
+ *          Note: undefined is returned if the topic is not viewable/editable.
  *          ### FIXDOC: A page model is made of fields (instances of TopicRenderer.FieldModel).
  *          For a simple topic type the page model consists of just one field.
  *          For a composite topic type the page model consists of a nested field structure.

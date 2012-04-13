@@ -38,17 +38,18 @@ function IconFieldRenderer(topic, field) {
     }
 
     this.read_form_value = function() {
+        // prevent the field from being updated if no icon has been selected
+        if (picked_icon == null) {
+            return null
+        }
+        //
         if (field.uri) {
             // An instance of an Icon's parent type is edited.
-            return picked_icon
+            // Note: aggregation is assumed ### FIXME: support composition as well
+            return dm4c.REF_PREFIX + picked_icon.id
         } else {
             // An Icon instance itself is edited.
-            if (picked_icon) {
-                field.topic.value = picked_icon.value
-                return field.topic
-            } else {
-                return null
-            }
+            return picked_icon.value
         }
     }
 
