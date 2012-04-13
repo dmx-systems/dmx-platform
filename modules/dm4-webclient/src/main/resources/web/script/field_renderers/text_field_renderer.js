@@ -1,4 +1,4 @@
-function TextFieldRenderer(topic, field) {
+function TextFieldRenderer(field_model) {
 
     /**
      * Input field: a jQuery object
@@ -9,17 +9,17 @@ function TextFieldRenderer(topic, field) {
 
     this.render_field = function() {
         // field label
-        dm4c.render.field_label(field)
+        dm4c.render.field_label(field_model)
         // field value
-        return js.render_text(field.value)
+        return js.render_text(field_model.value)
     }
 
     this.render_form_element = function() {
-        if (!field.rows) {
-            alert("WARNING (TextFieldRenderer.render_form_element):\n\nField \"" + field.uri +
-                "\" has no \"rows\" setting.\n\nfield=" + JSON.stringify(field))
-        } else if (field.rows == 1) {
-            switch (field.assoc_def && field.assoc_def.assoc_type_uri) {
+        if (!field_model.rows) {
+            alert("WARNING (TextFieldRenderer.render_form_element):\n\nField \"" + field_model.uri +
+                "\" has no \"rows\" setting.\n\nfield=" + JSON.stringify(field_model))
+        } else if (field_model.rows == 1) {
+            switch (field_model.assoc_def && field_model.assoc_def.assoc_type_uri) {
             case undefined:
                 // Note: for non-composite topics the field's assoc_def is undefined.
                 // We treat this like a composition here.
@@ -30,7 +30,7 @@ function TextFieldRenderer(topic, field) {
                 return gui_element.dom
             default:
                 alert("TextFieldRenderer.render_form_element(): unexpected assoc type URI (\"" +
-                    field.assoc_def.assoc_type_uri + "\")")
+                    field_model.assoc_def.assoc_type_uri + "\")")
             }
         } else {
             return gui_element = render_textarea()
@@ -56,9 +56,9 @@ function TextFieldRenderer(topic, field) {
     // ---
 
     function render_input() {
-        var input = dm4c.render.input(field)
-        if (field.autocomplete_indexes) {
-            var page_renderer = dm4c.get_page_renderer(topic)
+        var input = dm4c.render.input(field_model)
+        if (field_model.autocomplete_indexes) {
+            var page_renderer = dm4c.get_page_renderer(field_model.toplevel_topic)
             input.keyup(page_renderer.autocomplete)
             input.blur(page_renderer.lost_focus)
             input.attr({autocomplete: "off"})
@@ -67,13 +67,13 @@ function TextFieldRenderer(topic, field) {
     }
 
     function render_textarea() {
-        return $("<textarea>").attr("rows", field.rows).text(field.value)
+        return $("<textarea>").attr("rows", field_model.rows).text(field_model.value)
     }
 
     function render_combobox() {
-
         // fetch all instances
-        var topics = dm4c.restc.get_topics(field.topic_type.uri, false, true).items  // fetch_composite=false, sort=true
+        var topics = dm4c.restc.get_topics(field_model.topic_type.uri, false, true).items   // fetch_composite=false,
+                                                                                            // sort=true
         return create_combobox();
 
         function create_combobox() {
@@ -83,7 +83,7 @@ function TextFieldRenderer(topic, field) {
                 combobox.add_item({label: topics[i].value, value: topics[i].id})
             }
             // select item
-            combobox.select_by_label(field.value)
+            combobox.select_by_label(field_model.value)
             //
             return combobox
         }

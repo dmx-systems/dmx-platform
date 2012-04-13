@@ -69,7 +69,7 @@ function TopicRenderer() {
         /**
          * Reads out values from GUI elements.
          *
-         * @return  a simple value topic value (or null), or a topic model.
+         * @return  a simple topic value (or null), or a topic model.
          *          Note: null is returned if a simple topic is being edited and the field renderer returns null
          *          (which is a valid return value to prevent the field from being updated).
          */
@@ -136,29 +136,7 @@ function TopicRenderer() {
      * @param   page_model  the page model to render. If undefined nothing is rendered.
      */
     function render_page_model(page_model, render_func_name) {
-        // Note: the page model is undefined if the topic is not viewable/editable.
-        if (!page_model) {
-            return
-        }
-        //
-        if (page_model instanceof TopicRenderer.FieldModel) {
-            page_model[render_func_name]()
-        } else if (page_model instanceof TopicRenderer.PageModel) {
-            for (var assoc_def_uri in page_model.childs) {
-                var child_model = page_model.childs[assoc_def_uri]
-                if (js.is_array(child_model)) {
-                    // cardinality "many"
-                    for (var i = 0; i < child_model.length; i++) {
-                        render_page_model(child_model[i], render_func_name)
-                    }
-                } else {
-                    // cardinality "one"
-                    render_page_model(child_model, render_func_name)
-                }
-            }
-        } else {
-            throw "TopicRendererError: invalid page model " + JSON.stringify(page_model)
-        }
+        TopicRenderer.render_page_model(page_model, render_func_name, $("#page-content"), 0)
     }
 
 
@@ -413,22 +391,14 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
     this.topic = topic
     this.assoc_def = assoc_def
     this.uri = field_uri
+    this.toplevel_topic = toplevel_topic
     this.value = topic.value
     this.topic_type = dm4c.get_topic_type(topic.type_uri)  // ### TODO: Topics in composite would allow topic.get_type()
     this.label = this.topic_type.value
-    this.rows                   = get_view_config("rows")
-    var js_field_renderer_class = get_view_config("js_field_renderer_class")
-    var renderer
+    this.rows = get_view_config("rows")
+    var field_renderer = create_field_renderer()
 
     this.render_field = function() {
-        // error check
-        if (!js_field_renderer_class) {
-            alert("WARNING (TopicRenderer.render_page):\n\nField \"" + field_uri +
-                "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
-            return
-        }
-        // create renderer
-        renderer = js.new_object(js_field_renderer_class, toplevel_topic, this)
         // render field
         var field_value_div = $("<div>").addClass("field-value")
         var html = trigger_renderer_hook("render_field", field_value_div)
@@ -442,14 +412,6 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
     }
 
     this.render_form_element = function() {
-        // error check
-        if (!js_field_renderer_class) {
-            alert("WARNING (TopicRenderer.render_form):\n\nField \"" + field_uri +
-                "\" has no field renderer.\n\nfield=" + JSON.stringify(this))
-            return
-        }
-        // create renderer
-        renderer = js.new_object(js_field_renderer_class, toplevel_topic, this)
         // render field label
         dm4c.render.field_label(this)
         // render form element
@@ -478,20 +440,31 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
 
     // ---
 
+    function create_field_renderer() {
+        var js_field_renderer_class = get_view_config("js_field_renderer_class")
+        // error check
+        if (!js_field_renderer_class) {
+            throw "TopicRendererError: unknown renderer class for field \"" + self.label +
+                "\" (field_uri=\"" + self.uri + "\")"
+        }
+        // create field renderer
+        return js.new_object(js_field_renderer_class, self)
+    }
+
     /**
-     * Triggers a renderer hook for this field.
+     * Triggers a field renderer hook.
      *
-     * @param   hook_name   Name of the renderer hook to trigger.
+     * @param   hook_name   Name of the field renderer hook to trigger.
      * @param   <varargs>   Variable number of arguments. Passed to the hook.
      */
     function trigger_renderer_hook(hook_name) {
-        // Trigger the hook only if it is defined (a renderer must not define all hooks).
-        if (renderer[hook_name]) {
+        // Trigger the hook only if it is defined (a field renderer must not define all hooks).
+        if (field_renderer[hook_name]) {
             // ### FIXME: use apply() instead of limiting arguments
             if (arguments.length == 1) {
-                return renderer[hook_name]()
+                return field_renderer[hook_name]()
             } else if (arguments.length == 2) {
-                return renderer[hook_name](arguments[1])
+                return field_renderer[hook_name](arguments[1])
             }
         }
     }
@@ -586,5 +559,38 @@ TopicRenderer.create_page_model = function(topic, assoc_def, field_uri, toplevel
         return {
             id: -1, uri: "", type_uri: topic_type_uri, value: "", composite: {}
         }
+    }
+}
+
+TopicRenderer.render_page_model = function(page_model, render_func_name, parent_element, level) {
+    // Note: the page model is undefined if the topic is not viewable/editable.
+    if (!page_model) {
+        return
+    }
+    //
+    if (page_model instanceof TopicRenderer.FieldModel) {
+        page_model[render_func_name]()
+    } else if (page_model instanceof TopicRenderer.PageModel) {
+        var box = render_box()  // ### TODO: not yet in use
+        for (var assoc_def_uri in page_model.childs) {
+            var child_model = page_model.childs[assoc_def_uri]
+            if (js.is_array(child_model)) {
+                // cardinality "many"
+                for (var i = 0; i < child_model.length; i++) {
+                    TopicRenderer.render_page_model(child_model[i], render_func_name, box, level + 1)
+                }
+            } else {
+                // cardinality "one"
+                TopicRenderer.render_page_model(child_model, render_func_name, box, level + 1)
+            }
+        }
+    } else {
+        throw "TopicRendererError: invalid page model " + JSON.stringify(page_model)
+    }
+
+    function render_box() {
+        var box = $("<div>").addClass("box").addClass("level" + level)
+        parent_element.append(box)
+        return box
     }
 }

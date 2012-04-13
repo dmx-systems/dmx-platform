@@ -1,16 +1,16 @@
-function IconFieldRenderer(topic, field) {
+function IconFieldRenderer(field_model) {
 
-    var picked_icon = null
+    var picked_icon = null  // a topic of type "dm4.webclient.icon"
 
     this.render_field = function() {
         // field label
-        dm4c.render.field_label(field)
+        dm4c.render.field_label(field_model)
         // field value
-        return render_icon(field.value)
+        return render_icon(field_model.value)
     }
 
     this.render_form_element = function() {
-        var image = render_icon(field.value)
+        var image = render_icon(field_model.value)
         return image.after(dm4c.ui.button(do_open_iconpicker, "Choose"))
 
         function do_open_iconpicker() {
@@ -43,7 +43,7 @@ function IconFieldRenderer(topic, field) {
             return null
         }
         //
-        if (field.uri) {
+        if (field_model.uri) {
             // An instance of an Icon's parent type is edited.
             // Note: aggregation is assumed ### FIXME: support composition as well
             return dm4c.REF_PREFIX + picked_icon.id

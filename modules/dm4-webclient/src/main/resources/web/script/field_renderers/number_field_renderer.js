@@ -1,16 +1,16 @@
-function NumberFieldRenderer(topic, field) {
+function NumberFieldRenderer(field_model) {
 
     var gui_element
 
     this.render_field = function() {
         // field label
-        dm4c.render.field_label(field)
+        dm4c.render.field_label(field_model)
         // field value
-        return field.value
+        return field_model.value
     }
 
     this.render_form_element = function() {
-        return gui_element = dm4c.render.input(field)
+        return gui_element = dm4c.render.input(field_model)
     }
 
     this.read_form_value = function() {
@@ -18,7 +18,7 @@ function NumberFieldRenderer(topic, field) {
         var content = Number(val)
         if (isNaN(content)) {
             alert("WARNING: \"" + val + "\" is not a number.\n" +
-                "(field \"" + field.label + "\", path \"" + field.uri + "\")\n\n" +
+                "(field \"" + field_model.label + "\", path \"" + field_model.uri + "\")\n\n" +
                 "The old value is restored.")
             return null     // prevent this field from being updated
         }

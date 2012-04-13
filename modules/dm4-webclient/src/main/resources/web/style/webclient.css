@@ -86,6 +86,32 @@ body {
     vertical-align: middle;
 }
 
+/*** Page Panel Boxes ***/
+
+#page-content .box.level0 {
+    background: #eee;
+}
+
+#page-content .box.level1 {
+    background: #ddd;
+}
+
+#page-content .box.level2 {
+    background: #ccc;
+}
+
+#page-content .box.level3 {
+    background: #bbb;
+}
+
+#page-content .box.level4 {
+    background: #aaa;
+}
+
+#page-content .box.level5 {
+    background: #999;
+}
+
 /*** Page Panel Style ***/
 
 .title {

@@ -1,8 +1,8 @@
-function FolderContentRenderer(topic, field) {
+function FolderContentRenderer(field_model) {
 
     this.render_field = function(field_value_div) {
         // field label
-        dm4c.render.field_label(field)
+        dm4c.render.field_label(field_model)
         // field value
         return render_content(field_value_div)
     }
@@ -11,7 +11,7 @@ function FolderContentRenderer(topic, field) {
 
     function render_content(field_value_div) {
         try {
-            var path = topic.get("dm4.files.path")
+            var path = field_model.toplevel_topic.get("dm4.files.path")
             var items = dm4c.restc.get_resource("file:" + path).items
             var topics = []
             for (var i = 0, item; item = items[i]; i++) {
@@ -34,9 +34,9 @@ function FolderContentRenderer(topic, field) {
 
     function click_handler(item) {
         if (item.kind == "file") {
-            var child_topic = dm4c.restc.create_child_file_topic(topic.id, item.path)
+            var child_topic = dm4c.restc.create_child_file_topic(field_model.toplevel_topic.id, item.path)
         } else if (item.kind == "directory") {
-            var child_topic = dm4c.restc.create_child_folder_topic(topic.id, item.path)
+            var child_topic = dm4c.restc.create_child_folder_topic(field_model.toplevel_topic.id, item.path)
         } else {
             throw "FileContentRendererError: item has unexpected kind (\"" + item.kind + "\")"
         }
