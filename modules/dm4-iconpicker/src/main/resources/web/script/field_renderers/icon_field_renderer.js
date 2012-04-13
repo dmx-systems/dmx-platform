@@ -40,11 +40,15 @@ function IconFieldRenderer(topic, field) {
     this.read_form_value = function() {
         if (field.uri) {
             // An instance of an Icon's parent type is edited.
-            // Note: aggregation is assumed ### FIXME: support composition as well
-            return picked_icon && {topic_id: picked_icon.id}
+            return picked_icon
         } else {
             // An Icon instance itself is edited.
-            return picked_icon && picked_icon.value
+            if (picked_icon) {
+                field.topic.value = picked_icon.value
+                return field.topic
+            } else {
+                return null
+            }
         }
     }
 

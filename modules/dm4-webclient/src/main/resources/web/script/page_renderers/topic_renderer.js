@@ -47,7 +47,9 @@ function TopicRenderer() {
         /**
          * Reads out values from GUI elements and builds a topic model object from it.
          *
-         * @return  a topic model object
+         * @return  a topic model object, or null.
+         *          Note: null is returned if a simple topic is being edited and the field renderer returns null
+         *          (which is a valid return value to prevent the field from being updated).
          */
         function build_topic_model(page_model) {
             if (page_model instanceof TopicRenderer.FieldModel) {
@@ -440,7 +442,7 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
             return form_value
         } else {
             alert("WARNING (TopicRenderer.process_form):\n\nRenderer for field \"" + field_uri + "\" " +
-                "returned no form value.\n\ntopic ID=" + toplevel_topic.id + "\nfield=" + JSON.stringify(this))
+                "returned no form value.\n\ntopic ID=" + toplevel_topic.id)
         }
     }
 
