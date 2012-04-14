@@ -121,11 +121,11 @@ body {
 /*** Page Panel Style ***/
 
 .title {
-    margin-top: 1em;
-    margin-bottom: 0.6em;
     font-size: 170%;
     font-weight: bold;
     line-height: 1.1em;
+    margin-top: 1em;
+    margin-bottom: 0.6em;
 }
 
 .field-label {
@@ -133,6 +133,10 @@ body {
     color: gray;
     line-height: 1.2em;
     margin-top: 0.6em;
+}
+
+.add-button {
+    text-align: right;
 }
 
 /* ### FIXME: revise field-value, not widely used anymore, drop it? */

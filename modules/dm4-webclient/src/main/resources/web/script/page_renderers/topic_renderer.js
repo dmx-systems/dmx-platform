@@ -349,6 +349,7 @@ function TopicRenderer() {
 TopicRenderer.PageModel = function(topic) {
 
     this.topic = topic
+    this.topic_type = dm4c.get_topic_type(topic.type_uri)  // ### TODO: Topics in composite would allow topic.get_type()
     this.childs = {}
 
     /**
@@ -473,7 +474,7 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
  *                          For the top-level call pass <code>undefined</code>.
  * @param   field_uri       The (base) URI for the field(s) to create.
  * @param   toplevel_topic  The topic the page/form is rendered for. Usually that is the selected topic.
- *                          Note: for the top-level call "toplevel_topic" and "value_topic" are usually the same.
+ *                          Note: for the top-level call "toplevel_topic" and "topic" are usually the same.
  * @param   setting         "viewable" or "editable" (string).
  *
  * @return  A page model (A FieldModel object, or a PageModel object), or undefined.
@@ -552,13 +553,17 @@ TopicRenderer.render_page_model = function(page_model, render_func_name, parent_
     if (page_model instanceof TopicRenderer.FieldModel) {
         page_model[render_func_name](parent_element)
     } else if (page_model instanceof TopicRenderer.PageModel) {
-        var box = render_box()  // ### TODO: not yet in use
+        var box = render_box()
         for (var assoc_def_uri in page_model.childs) {
             var child_model = page_model.childs[assoc_def_uri]
             if (js.is_array(child_model)) {
                 // cardinality "many"
                 for (var i = 0; i < child_model.length; i++) {
                     TopicRenderer.render_page_model(child_model[i], render_func_name, box, level + 1)
+                }
+                // ### FIXME: we should not rely on function name
+                if (render_func_name == "render_form_element") {
+                    render_add_button(box, child_model[0].topic_type)
                 }
             } else {
                 // cardinality "one"
@@ -573,5 +578,13 @@ TopicRenderer.render_page_model = function(page_model, render_func_name, parent_
         var box = $("<div>").addClass("box").addClass("level" + level)
         parent_element.append(box)
         return box
+    }
+
+    function render_add_button(parent_element, topic_type) {
+        var add_button = dm4c.ui.button(do_add, "Add " + topic_type.value)
+        parent_element.append($("<div>").addClass("add-button").append(add_button))
+
+        function do_add() {
+        }
     }
 }
