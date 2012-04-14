@@ -64,16 +64,16 @@ function RenderHelper() {
     // ---
 
     /**
-     * @param   field   Optional: the initial value (a TopicRenderer.FieldModel object or a non-object value).
-     *                  If not specified the text field will be empty.
+     * @param   field_model     Optional: the initial value (a TopicRenderer.FieldModel object or a non-object value).
+     *                          If not specified the text field will be empty.
      *
      * @return  The <input> element (jQuery object).
      */
-    this.input = function(field, size) {
-        if (typeof(field) == "object") {
-            var value = field.value
+    this.input = function(field_model, size) {
+        if (typeof(field_model) == "object") {
+            var value = field_model.value
         } else {
-            var value = field
+            var value = field_model
         }
         // Note: we use an object argument for attr().
         // attr("value", value) would be interpreted as 1-argument attr() call if value is undefined.
@@ -81,14 +81,14 @@ function RenderHelper() {
     }
 
     /**
-     * @param   field   a TopicRenderer.FieldModel object or a boolean.
+     * @param   field_model     a TopicRenderer.FieldModel object or a boolean.
      */
-    this.checkbox = function(field) {
+    this.checkbox = function(field_model) {
         var dom = $("<input type='checkbox'>")
-        if (typeof(field) == "boolean") {
-            var checked = field
+        if (typeof(field_model) == "boolean") {
+            var checked = field_model
         } else {
-            var checked = field.value
+            var checked = field_model.value
         }
         if (checked) {
             dom.attr("checked", "checked")
@@ -120,21 +120,25 @@ function RenderHelper() {
 
     this.associations = function(topic_id) {
         var result = dm4c.restc.get_related_topics(topic_id, undefined, true, dm4c.MAX_RESULT_SIZE)
-                                                             // traversal_filter=undefined, sort=true
-        this.field_label("Associations", result)
+                                                                // traversal_filter=undefined, sort=true
+        this.field_label("Associations", undefined, result)     // ### parent_element=undefined
         this.field_value(this.topic_list(result.items))
     }
 
     // ---
 
     /**
-     * @param   field   a TopicRenderer.FieldModel object or a string.
+     * @param   field_model     a TopicRenderer.FieldModel object or a string.
+     * @param   parent_element  Optional: the parent element the label is rendered to.
+     *                          If not specified the label is rendered directly to the page panel.
      */
-    this.field_label = function(field, result_set) {
-        if (typeof(field) == "string") {
-            var label = field
+    this.field_label = function(field_model, parent_element, result_set) {
+        parent_element = parent_element || $("#page-content")
+        //
+        if (typeof(field_model) == "string") {
+            var label = field_model
         } else {
-            var label = field.label
+            var label = field_model.label
         }
         //
         if (result_set) {
@@ -143,7 +147,7 @@ function RenderHelper() {
             label += " (" + c + (tc > c ? " of " + tc : "") + ")"
         }
         //
-        this.page($("<div>").addClass("field-label").text(label))
+        parent_element.append($("<div>").addClass("field-label").text(label))
     }
 
     this.field_value = function(value) {

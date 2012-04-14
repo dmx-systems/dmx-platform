@@ -88,28 +88,34 @@ body {
 
 /*** Page Panel Boxes ***/
 
+#page-content .box {
+    padding: 0.5em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
 #page-content .box.level0 {
-    background: #eee;
+    background: #f8f8f8;
 }
 
 #page-content .box.level1 {
-    background: #ddd;
+    background: #ececec;
 }
 
 #page-content .box.level2 {
-    background: #ccc;
+    background: #e0e0e0;
 }
 
 #page-content .box.level3 {
-    background: #bbb;
+    background: #d4d4d4;
 }
 
 #page-content .box.level4 {
-    background: #aaa;
+    background: #c8c8c8;
 }
 
 #page-content .box.level5 {
-    background: #999;
+    background: #bcbcbc;
 }
 
 /*** Page Panel Style ***/
@@ -124,9 +130,12 @@ body {
 
 .field-label {
     font-size: 75%;
-    font-weight: bold;
     color: gray;
+    line-height: 1.2em;
+    margin-top: 0.6em;
 }
+
+/* ### FIXME: revise field-value, not widely used anymore, drop it? */
 
 .field-value {
     margin-bottom: 1em;

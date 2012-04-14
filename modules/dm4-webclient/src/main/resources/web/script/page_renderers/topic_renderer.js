@@ -398,32 +398,13 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
     this.rows = get_view_config("rows")
     var field_renderer = create_field_renderer()
 
-    this.render_field = function() {
-        // render field
-        var field_value_div = $("<div>").addClass("field-value")
-        var html = trigger_renderer_hook("render_field", field_value_div)
-        if (html !== undefined) {
-            $("#page-content").append(field_value_div.append(html))
-            trigger_renderer_hook("post_render_field")
-        } else {
-            alert("WARNING (TopicRenderer.render_page):\n\nRenderer for field \"" + field_uri + "\" " +
-                "returned no field.\n\ntopic ID=" + toplevel_topic.id + "\nfield=" + JSON.stringify(this))
-        }
+    this.render_field = function(parent_element) {
+        trigger_renderer_hook("render_field", parent_element)
     }
 
-    this.render_form_element = function() {
-        // render field label
-        dm4c.render.field_label(this)
-        // render form element
-        var field_value_div = $("<div>").addClass("field-value")
-        var html = trigger_renderer_hook("render_form_element")
-        if (html !== undefined) {
-            $("#page-content").append(field_value_div.append(html))
-            trigger_renderer_hook("post_render_form_element")
-        } else {
-            alert("WARNING (TopicRenderer.render_form):\n\nRenderer for field \"" + field_uri + "\" " +
-                "returned no form element.\n\ntopic ID=" + toplevel_topic.id + "\nfield=" + JSON.stringify(this))
-        }
+    this.render_form_element = function(parent_element) {
+        dm4c.render.field_label(this, parent_element)
+        trigger_renderer_hook("render_form_element", parent_element)
     }
 
     this.read_form_value = function() {
@@ -447,7 +428,7 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
             throw "TopicRendererError: unknown renderer class for field \"" + self.label +
                 "\" (field_uri=\"" + self.uri + "\")"
         }
-        // create field renderer
+        //
         return js.new_object(js_field_renderer_class, self)
     }
 
@@ -569,7 +550,7 @@ TopicRenderer.render_page_model = function(page_model, render_func_name, parent_
     }
     //
     if (page_model instanceof TopicRenderer.FieldModel) {
-        page_model[render_func_name]()
+        page_model[render_func_name](parent_element)
     } else if (page_model instanceof TopicRenderer.PageModel) {
         var box = render_box()  // ### TODO: not yet in use
         for (var assoc_def_uri in page_model.childs) {

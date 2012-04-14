@@ -2,26 +2,25 @@ function NumberFieldRenderer(field_model) {
 
     var gui_element
 
-    this.render_field = function() {
-        // field label
-        dm4c.render.field_label(field_model)
-        // field value
-        return field_model.value
+    this.render_field = function(parent_element) {
+        dm4c.render.field_label(field_model, parent_element)
+        parent_element.append(field_model.value)
     }
 
-    this.render_form_element = function() {
-        return gui_element = dm4c.render.input(field_model)
+    this.render_form_element = function(parent_element) {
+        gui_element = dm4c.render.input(field_model)
+        parent_element.append(gui_element)
     }
 
     this.read_form_value = function() {
         var val = $.trim(gui_element.val())
-        var content = Number(val)
-        if (isNaN(content)) {
+        var value = Number(val)
+        if (isNaN(value)) {
             alert("WARNING: \"" + val + "\" is not a number.\n" +
-                "(field \"" + field_model.label + "\", path \"" + field_model.uri + "\")\n\n" +
+                "(field \"" + field_model.label + "\")\n\n" +
                 "The old value is restored.")
             return null     // prevent this field from being updated
         }
-        return content
+        return value
     }
 }

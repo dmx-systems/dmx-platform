@@ -1,15 +1,13 @@
 function FolderContentRenderer(field_model) {
 
-    this.render_field = function(field_value_div) {
-        // field label
-        dm4c.render.field_label(field_model)
-        // field value
-        return render_content(field_value_div)
+    this.render_field = function(parent_element) {
+        dm4c.render.field_label(field_model, parent_element)
+        render_content(parent_element)
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function render_content(field_value_div) {
+    function render_content(parent_element) {
         try {
             var path = field_model.toplevel_topic.get("dm4.files.path")
             var items = dm4c.restc.get_resource("file:" + path).items
@@ -25,10 +23,10 @@ function FolderContentRenderer(field_model) {
             }
             // Note: topic_list() takes arbitrary objects, provided
             // they contain "type_uri" and "value" properties.
-            return dm4c.render.topic_list(topics, click_handler)
+            parent_element.append(dm4c.render.topic_list(topics, click_handler))
         } catch (e) {
-            field_value_div.addClass("ui-state-error")
-            return "FolderContentRendererError: " + e
+            parent_element.addClass("ui-state-error")
+            parent_element.append("FolderContentRendererError: " + e)
         }
     }
 

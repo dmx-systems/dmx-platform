@@ -2,16 +2,14 @@ function IconFieldRenderer(field_model) {
 
     var picked_icon = null  // a topic of type "dm4.webclient.icon"
 
-    this.render_field = function() {
-        // field label
-        dm4c.render.field_label(field_model)
-        // field value
-        return render_icon(field_model.value)
+    this.render_field = function(parent_element) {
+        dm4c.render.field_label(field_model, parent_element)
+        parent_element.append(render_icon(field_model.value))
     }
 
-    this.render_form_element = function() {
+    this.render_form_element = function(parent_element) {
         var image = render_icon(field_model.value)
-        return image.after(dm4c.ui.button(do_open_iconpicker, "Choose"))
+        parent_element.append(image.after(dm4c.ui.button(do_open_iconpicker, "Choose")))
 
         function do_open_iconpicker() {
             // query icon topics

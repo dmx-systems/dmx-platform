@@ -7,33 +7,41 @@ function TextFieldRenderer(field_model) {
      */
     var gui_element
 
-    this.render_field = function() {
-        // field label
-        dm4c.render.field_label(field_model)
-        // field value
-        return js.render_text(field_model.value)
+    this.render_field = function(parent_element) {
+        dm4c.render.field_label(field_model, parent_element)
+        parent_element.append(js.render_text(field_model.value))
     }
 
-    this.render_form_element = function() {
+    this.render_form_element = function(parent_element) {
+        // error check
         if (!field_model.rows) {
-            alert("WARNING (TextFieldRenderer.render_form_element):\n\nField \"" + field_model.uri +
-                "\" has no \"rows\" setting.\n\nfield=" + JSON.stringify(field_model))
-        } else if (field_model.rows == 1) {
+            throw "TextFieldRendererError: field \"" + field_model.label + "\" has no \"rows\" setting"
+        }
+        //
+        if (field_model.rows == 1) {
             switch (field_model.assoc_def && field_model.assoc_def.assoc_type_uri) {
             case undefined:
                 // Note: for non-composite topics the field's assoc_def is undefined.
                 // We treat this like a composition here.
             case "dm4.core.composition_def":
-                return gui_element = render_input()
+                gui_element = render_input()
+                render(gui_element)
+                break
             case "dm4.core.aggregation_def":
                 gui_element = render_combobox()
-                return gui_element.dom
+                render(gui_element.dom)
+                break
             default:
-                alert("TextFieldRenderer.render_form_element(): unexpected assoc type URI (\"" +
-                    field_model.assoc_def.assoc_type_uri + "\")")
+                throw "TextFieldRendererError: \"" + field_model.assoc_def.assoc_type_uri +
+                    "\" is an unexpected assoc type URI"
             }
         } else {
-            return gui_element = render_textarea()
+            gui_element = render_textarea()
+            render(gui_element)
+        }
+
+        function render(form_element) {
+            parent_element.append(form_element)
         }
     }
 
