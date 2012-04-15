@@ -712,6 +712,17 @@ var dm4c = new function() {
         return hashed_topics
     }
 
+    // ---
+
+    /**
+     * Creates an empty topic.
+     */
+    this.empty_topic = function(topic_type_uri) {
+        return {
+            id: -1, uri: "", type_uri: topic_type_uri, value: "", composite: {}
+        }
+    }
+
     // === Types ===
 
     /**

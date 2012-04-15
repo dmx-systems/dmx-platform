@@ -136,7 +136,7 @@ function TopicRenderer() {
      * @param   page_model  the page model to render. If undefined nothing is rendered.
      */
     function render_page_model(page_model, render_func_name) {
-        TopicRenderer.render_page_model(page_model, render_func_name, $("#page-content"), 0)
+        TopicRenderer.render_page_model(page_model, render_func_name, 0, $("#page-content"))
     }
 
 
@@ -346,9 +346,12 @@ function TopicRenderer() {
 
 
 
-TopicRenderer.PageModel = function(topic) {
+TopicRenderer.PageModel = function(topic, assoc_def, field_uri, toplevel_topic) {
 
     this.topic = topic
+    this.assoc_def = assoc_def
+    this.uri = field_uri
+    this.toplevel_topic = toplevel_topic
     this.topic_type = dm4c.get_topic_type(topic.type_uri)  // ### TODO: Topics in composite would allow topic.get_type()
     this.childs = {}
 
@@ -470,18 +473,19 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
  * Creates a page model for a topic.
  *
  * @param   topic           The topic the page model is created for.
- * @param   assoc_def       The association definition that leads to that (child) type.
- *                          For the top-level call pass <code>undefined</code>.
- * @param   field_uri       The (base) URI for the field(s) to create.
+ * @param   assoc_def       The association definition that leads to that topic. Undefined for the top-level call.
+ *                          For a simple topic the association definition is used to create the corresponding
+ *                          field model. For a complex topic the association definition is (currently) not used.
+ * @param   field_uri       The (base) URI for the field model(s) to create.
  * @param   toplevel_topic  The topic the page/form is rendered for. Usually that is the selected topic.
+ *                          For a simple topic the top-level topic is used to create the corresponding field model.
+ *                          For a complex topic the top-level topic is just passed recursively.
  *                          Note: for the top-level call "toplevel_topic" and "topic" are usually the same.
  * @param   setting         "viewable" or "editable" (string).
  *
- * @return  A page model (A FieldModel object, or a PageModel object), or undefined.
- *          Note: undefined is returned if the topic is not viewable/editable.
- *          ### FIXDOC: A page model is made of fields (instances of TopicRenderer.FieldModel).
- *          For a simple topic type the page model consists of just one field.
- *          For a composite topic type the page model consists of a nested field structure.
+ * @return  The created page model, or undefined. Undefined is returned if the topic is not viewable/editable.
+ *          A page model is either a FieldModel object (for a simple topic) or a PageModel object (for a complex topic).
+ *          A PageModel object is a nested structure of FieldModels and (again) PageModels.
  */
 TopicRenderer.create_page_model = function(topic, assoc_def, field_uri, toplevel_topic, setting) {
     var topic_type = dm4c.get_topic_type(topic.type_uri)   // ### TODO: Topics in composite would allow topic.get_type()
@@ -491,13 +495,13 @@ TopicRenderer.create_page_model = function(topic, assoc_def, field_uri, toplevel
     if (topic_type.is_simple()) {
         return new TopicRenderer.FieldModel(topic, assoc_def, field_uri, toplevel_topic)
     } else {
-        var page_model = new TopicRenderer.PageModel(topic)
+        var page_model = new TopicRenderer.PageModel(topic, assoc_def, field_uri, toplevel_topic)
         for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
             var child_topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
             var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
             var cardinality_uri = assoc_def.part_cardinality_uri
             if (cardinality_uri == "dm4.core.one") {
-                var child_topic = topic.composite[assoc_def.uri] || empty_topic(child_topic_type.uri)
+                var child_topic = topic.composite[assoc_def.uri] || dm4c.empty_topic(child_topic_type.uri)
                 var child_fields = TopicRenderer.create_page_model(child_topic, assoc_def, child_field_uri,
                     toplevel_topic, setting)
             } else if (cardinality_uri == "dm4.core.many") {
@@ -507,7 +511,7 @@ TopicRenderer.create_page_model = function(topic, assoc_def, field_uri, toplevel
                         "appears as single-value in " + JSON.stringify(topic)
                 }
                 if (child_topics.length == 0) {
-                    child_topics.push(empty_topic(child_topic_type.uri))
+                    child_topics.push(dm4c.empty_topic(child_topic_type.uri))
                 }
                 var child_fields = []
                 for (var j = 0, child_topic; child_topic = child_topics[j]; j++) {
@@ -536,55 +540,72 @@ TopicRenderer.create_page_model = function(topic, assoc_def, field_uri, toplevel
         }
         return dm4c.get_view_config(topic_type, setting, true)
     }
-
-    function empty_topic(topic_type_uri) {
-        return {
-            id: -1, uri: "", type_uri: topic_type_uri, value: "", composite: {}
-        }
-    }
 }
 
-TopicRenderer.render_page_model = function(page_model, render_func_name, parent_element, level) {
-    // Note: the page model is undefined if the topic is not viewable/editable.
+/**
+ * @param   incremental     Boolean
+ */
+TopicRenderer.render_page_model = function(page_model, render_func_name, level, ref_element, incremental) {
+    // Note: if the topic is not viewable/editable the page model is undefined
     if (!page_model) {
         return
     }
     //
     if (page_model instanceof TopicRenderer.FieldModel) {
-        page_model[render_func_name](parent_element)
+        var box = render_box(true)      // is_simple=true
+        page_model[render_func_name](box)
     } else if (page_model instanceof TopicRenderer.PageModel) {
-        var box = render_box()
+        var box = render_box(false)     // is_simple=false
         for (var assoc_def_uri in page_model.childs) {
             var child_model = page_model.childs[assoc_def_uri]
             if (js.is_array(child_model)) {
                 // cardinality "many"
                 for (var i = 0; i < child_model.length; i++) {
-                    TopicRenderer.render_page_model(child_model[i], render_func_name, box, level + 1)
+                    TopicRenderer.render_page_model(child_model[i], render_func_name, level + 1, box)
                 }
                 // ### FIXME: we should not rely on function name
                 if (render_func_name == "render_form_element") {
-                    render_add_button(box, child_model[0].topic_type)
+                    render_add_button(child_model, level + 1, box)
                 }
             } else {
                 // cardinality "one"
-                TopicRenderer.render_page_model(child_model, render_func_name, box, level + 1)
+                TopicRenderer.render_page_model(child_model, render_func_name, level + 1, box)
             }
         }
     } else {
         throw "TopicRendererError: invalid page model " + JSON.stringify(page_model)
     }
 
-    function render_box() {
-        var box = $("<div>").addClass("box").addClass("level" + level)
-        parent_element.append(box)
+    function render_box(is_simple) {
+        var box = $("<div>")
+        if (!is_simple) {
+            box.addClass("box").addClass("level" + level)
+        }
+        if (incremental) {
+            ref_element.before(box)
+        } else {
+            ref_element.append(box)
+        }
         return box
     }
 
-    function render_add_button(parent_element, topic_type) {
+    function render_add_button(page_model, level, parent_element) {
+        var topic_type = page_model[0].topic_type
         var add_button = dm4c.ui.button(do_add, "Add " + topic_type.value)
-        parent_element.append($("<div>").addClass("add-button").append(add_button))
+        var add_button_div = $("<div>").addClass("add-button").append(add_button)
+        parent_element.append(add_button_div)
 
         function do_add() {
+            // extend page model
+            var topic = dm4c.empty_topic(topic_type.uri)
+            var assoc_def      = page_model[0].assoc_def
+            var field_uri      = page_model[0].uri
+            var toplevel_topic = page_model[0].toplevel_topic
+            var _page_model = TopicRenderer.create_page_model(topic, assoc_def, field_uri, toplevel_topic, "editable")
+            page_model.push(_page_model)
+            // render page model
+            TopicRenderer.render_page_model(_page_model, "render_form_element", level, add_button_div, true)
+                                                                                                   // incremental=true
         }
     }
 }
