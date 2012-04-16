@@ -227,9 +227,9 @@ var dm4c = new function() {
      *          field. The updated topic on the other hand is the complete topic as returned by the server.
      */
     this.do_update_topic = function(old_topic, new_topic) {
-        // update DB
-        // alert("do_update_topic(): new_topic=" + js.stringify(new_topic))
+        alert("do_update_topic(): new_topic=" + js.stringify(new_topic))
         if (new_topic) {
+            // update DB
             var directives = dm4c.restc.update_topic(new_topic)
             // alert("do_update_topic(): directives=" + js.stringify(directives))
             // update client model and view

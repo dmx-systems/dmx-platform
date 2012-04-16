@@ -29,7 +29,7 @@ public interface DeepaMehtaStorage {
     /**
      * Looks up a single topic by exact property value.
      * If no such topic exists <code>null</code> is returned.
-     * If more than one topic is found a runtime exception is thrown.
+     * If more than one topic were found a runtime exception is thrown.
      * <p>
      * IMPORTANT: Looking up a topic this way requires the property to be indexed with indexing mode <code>KEY</code>.
      * This is achieved by declaring the respective data field with <code>indexing_mode: "KEY"</code>
@@ -120,14 +120,15 @@ public interface DeepaMehtaStorage {
     AssociationModel getAssociation(long assocId);
 
     /**
-     * Returns the relation between two topics. If no such relation exists null is returned.
-     * If more than one relation exists, an exception is thrown.
+     * Returns the association between two topics, qualified by association type and both role types.
+     * If no such association exists <code>null</code> is returned.
+     * If more than one association were found, a runtime exception is thrown.
      *
-     * @param   typeId      Relation type filter. Pass <code>null</code> to switch filter off.
-     * @param   isDirected  Direction filter. Pass <code>true</code> if direction matters. In this case the relation
-     *                      is expected to be directed <i>from</i> source topic <i>to</i> destination topic.
+     * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
+     *                          ### FIXME: for methods with a singular return value all filters should be mandatory
      */
-    // Relation getRelation(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
+    AssociationModel getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                                                                       String roleTypeUri2);
 
     /**
      * Returns the associations between two topics. If no such association exists an empty set is returned.

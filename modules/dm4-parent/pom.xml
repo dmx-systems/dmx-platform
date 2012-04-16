@@ -44,7 +44,7 @@
             <dependency>
                 <groupId>de.deepamehta</groupId>
                 <artifactId>neo4j-mehtagraph</artifactId>
-                <version>0.8</version>
+                <version>0.9-SNAPSHOT</version>
             </dependency>
             <!-- OSGi -->
             <dependency>
