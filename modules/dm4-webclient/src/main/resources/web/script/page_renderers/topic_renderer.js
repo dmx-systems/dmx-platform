@@ -42,69 +42,7 @@ function TopicRenderer() {
     }
 
     this.process_form = function(topic) {
-        dm4c.do_update_topic(topic, build_topic_model())
-
-        /**
-         * Reads out values from GUI elements and builds a topic model from it.
-         *
-         * @return  a topic model object, or null.
-         *          Note: null is returned if a simple topic is being edited and the field renderer returns null
-         *          (which is a valid return value to prevent the field from being updated).
-         */
-        function build_topic_model() {
-            var values = read_form_values(page_model)
-            if (page_model instanceof TopicRenderer.FieldModel) {
-                if (values == null) {
-                    return null
-                }
-                page_model.topic.value = values
-                return page_model.topic
-            } else if (page_model instanceof TopicRenderer.PageModel) {
-                return values
-            } else {
-                throw "TopicRendererError: invalid page model " + JSON.stringify(page_model)
-            }
-        }
-
-        /**
-         * Reads out values from GUI elements.
-         *
-         * @return  a simple topic value (or null), or a topic model.
-         *          Note: null is returned if a simple topic is being edited and the field renderer returns null
-         *          (which is a valid return value to prevent the field from being updated).
-         */
-        function read_form_values(page_model) {
-            if (page_model instanceof TopicRenderer.FieldModel) {
-                // Note: undefined form value is an error (means: field renderer returned no value).
-                // null is a valid form value (means: field renderer prevents the field from being updated).
-                return page_model.read_form_value()
-            } else if (page_model instanceof TopicRenderer.PageModel) {
-                var composite = {}
-                for (var assoc_def_uri in page_model.childs) {
-                    var child_model = page_model.childs[assoc_def_uri]
-                    if (js.is_array(child_model)) {
-                        // cardinality "many"
-                        composite[assoc_def_uri] = []
-                        for (var i = 0; i < child_model.length; i++) {
-                            var value = read_form_values(child_model[i])
-                            if (value != null) {
-                                composite[assoc_def_uri].push(value)
-                            }
-                        }
-                    } else {
-                        // cardinality "one"
-                        var value = read_form_values(child_model)
-                        if (value != null) {
-                            composite[assoc_def_uri] = value
-                        }
-                    }
-                }
-                page_model.topic.composite = composite
-                return page_model.topic
-            } else {
-                throw "TopicRendererError: invalid page model " + JSON.stringify(page_model)
-            }
-        }
+        dm4c.do_update_topic(topic, build_topic_model(page_model))
     }
 
 
@@ -137,6 +75,65 @@ function TopicRenderer() {
      */
     function render_page_model(page_model, render_func_name) {
         TopicRenderer.render_page_model(page_model, render_func_name, 0, $("#page-content"))
+    }
+
+    /**
+     * Reads out values from a page model's GUI elements and builds a topic model from it.
+     *
+     * @return  a topic model (object), a topic reference (string), a simple topic value, or null.
+     *          Note 1: null is returned if a simple topic is being edited and the field renderer prevents the field
+     *          from being updated.
+     *          Note 2: despite on deeper recursion levels this method might return a topic reference (string), the
+     *          top-level call will always return a topic model (object), or null. This is because topic references
+     *          are only contained in composite topic models. A simple topic model on the other hand never represents
+     *          a topic reference.
+     */
+    function build_topic_model(page_model) {
+        if (page_model instanceof TopicRenderer.FieldModel) {
+            var value = page_model.read_form_value()
+            // Note: undefined form value is an error (means: field renderer returned no value).
+            // null is a valid form value (means: field renderer prevents the field from being updated).
+            if (value == null) {
+                return null
+            }
+            // ### TODO: explain. Compare to TextFieldRenderer.render_form_element()
+            switch (page_model.assoc_def && page_model.assoc_def.assoc_type_uri) {
+            case undefined:
+            case "dm4.core.composition_def":
+                page_model.topic.value = value
+                return page_model.topic
+            case "dm4.core.aggregation_def":
+                return value
+            default:
+                throw "TopicRendererError: \"" + page_model.assoc_def.assoc_type_uri +
+                    "\" is an unexpected assoc type URI"
+            }
+        } else if (page_model instanceof TopicRenderer.PageModel) {
+            var composite = {}
+            for (var assoc_def_uri in page_model.childs) {
+                var child_model = page_model.childs[assoc_def_uri]
+                if (js.is_array(child_model)) {
+                    // cardinality "many"
+                    composite[assoc_def_uri] = []
+                    for (var i = 0; i < child_model.length; i++) {
+                        var value = build_topic_model(child_model[i])
+                        if (value != null) {
+                            composite[assoc_def_uri].push(value)
+                        }
+                    }
+                } else {
+                    // cardinality "one"
+                    var value = build_topic_model(child_model)
+                    if (value != null) {
+                        composite[assoc_def_uri] = value
+                    }
+                }
+            }
+            page_model.topic.composite = composite
+            return page_model.topic
+        } else {
+            throw "TopicRendererError: invalid page model "
+        }
     }
 
 
@@ -573,7 +570,7 @@ TopicRenderer.render_page_model = function(page_model, render_func_name, level, 
             }
         }
     } else {
-        throw "TopicRendererError: invalid page model " + JSON.stringify(page_model)
+        throw "TopicRendererError: invalid page model"
     }
 
     function render_box(is_simple) {

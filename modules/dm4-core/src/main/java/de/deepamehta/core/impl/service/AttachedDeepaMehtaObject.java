@@ -8,6 +8,7 @@ import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
@@ -37,10 +38,11 @@ import java.util.logging.Logger;
  * DeepaMehtaObject implementation that takes a DeepaMehtaObjectModel and attaches it to the DB.
  *
  * Method name conventions and semantics:
+ *  - getXX()           Accesses the memory (model).
  *  - setXX(arg)        Updates memory (model) and DB. Elementary operation.
- *  - updateXX(arg)     Compares arg with current (model) value and calls setXX() method(s) if required.
+ *  - updateXX(arg)     Compares arg with current value (model) and calls setXX() method(s) if required.
  *                      Can be called with arg=null which indicates no update is requested.
- *  - storeXX()         Stores current (model) value to DB.
+ *  - storeXX()         Stores current value (model) to DB.
  *  - fetchXX()         Fetches value from DB.
  */
 abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
@@ -476,14 +478,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                                                                                                Directives directives) {
         String assocTypeUri = assocDef.getTypeUri();
         if (assocTypeUri.equals("dm4.core.composition_def")) {
-            long childTopicId = newChildTopic.getId();
-            if (childTopicId != -1) {
-                Topic childTopic = fetchChildTopic(assocDef, childTopicId, true);   // fetchComposite=true
-                // ### TODO
-            }
-            // Note: the child topic's composite must be fetched. It needs to be passed to the
-            // POST_UPDATE_TOPIC hook as part of the "old model" (when the child topic is updated).
-            Topic childTopic = fetchChildTopic(assocDef, true);                     // fetchComposite=true
+            Topic childTopic = fetchChildTopic(assocDef, newChildTopic);
             if (childTopic != null) {
                 // update existing child
                 childTopic.update(newChildTopic, clientState, directives);
@@ -491,11 +486,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 // create new child
                 childTopic = dms.createTopic(newChildTopic, null);
                 associateChildTopic(assocDef, childTopic.getId());
-                // Note: the child topic must be created right with its composite value.
-                // Otherwise its label can't be calculated. ### still true?
             }
             // update memory
-            modelUpdate(assocDef, childTopic.getModel());
+            updateCompositeModel(assocDef, childTopic.getModel());
         } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
             String childTopicTypeUri = assocDef.getPartTopicTypeUri();
             TopicType childTopicType = dms.getTopicType(childTopicTypeUri, null);
@@ -515,13 +508,13 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                     associateChildTopic(assocDef, childTopicId);
                     // update memory
                     childTopic = fetchChildTopic(assocDef, false);                  // fetchComposite=false
-                    modelUpdate(assocDef, childTopic.getModel());
+                    updateCompositeModel(assocDef, childTopic.getModel());
                 } else {
                     // create new child
                     Topic _childTopic = dms.createTopic(newChildTopic, null);
                     associateChildTopic(assocDef, _childTopic.getId());
                     // update memory
-                    modelUpdate(assocDef, _childTopic.getModel());
+                    updateCompositeModel(assocDef, _childTopic.getModel());
                 }
             }
         } else {
@@ -578,7 +571,40 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     private Topic fetchChildTopic(AssociationDefinition assocDef, long childTopicId, boolean fetchComposite) {
         Topic childTopic = dms.getTopic(childTopicId, fetchComposite, null);    // clientState=null
-        return null;    // ### TODO
+        // error check
+        String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
+        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();
+        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();
+        AssociationModel assoc = dms.storage.getAssociation(assocTypeUri, getId(), childTopicId, myRoleTypeUri,
+                                                                                                 othersRoleTypeUri);
+        if (assoc == null) {
+            throw new RuntimeException("Topic " + childTopicId + " is not a child of topic " + getId() +
+                " according to " + assocDef);
+        }
+        //
+        return childTopic;
+    }
+
+    /**
+     * Fetches and returns the child topic that matches an update topic model,
+     * or <code>null</code> if no such topic extists.
+     */
+    private Topic fetchChildTopic(AssociationDefinition assocDef, TopicModel newChildTopic) {
+        String cardinalityUri = assocDef.getPartCardinalityUri();
+        if (cardinalityUri.equals("dm4.core.one")) {
+            // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
+            // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
+            return fetchChildTopic(assocDef, true);                             // fetchComposite=true
+        } else {
+            long childTopicId = newChildTopic.getId();
+            if (childTopicId != -1) {
+                // Note: the child topic's composite must be fetched. It needs to be passed to the
+                // POST_UPDATE_TOPIC hook as part of the "old model" (when the child topic is updated).
+                return fetchChildTopic(assocDef, childTopicId, true);           // fetchComposite=true
+            } else {
+                return null;
+            }
+        }
     }
 
     // ---
@@ -735,18 +761,17 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         return getType().getAssocDef(assocDefUri);
     }
 
-    void modelUpdate(AssociationDefinition assocDef, TopicModel value) {
+    void updateCompositeModel(AssociationDefinition assocDef, TopicModel topic) {
         CompositeValue comp = getCompositeValue();
         String assocDefUri = assocDef.getUri();
         String cardinalityUri = assocDef.getPartCardinalityUri();
         //
         if (cardinalityUri.equals("dm4.core.one")) {
-            comp.put(assocDefUri, value);
+            comp.put(assocDefUri, topic);
         } else if (cardinalityUri.equals("dm4.core.many")) {
-            // ### TODO: process multi-values
-            Set<TopicModel> values = new LinkedHashSet();
-            values.add(value);
-            comp.put(assocDefUri, values);
+            Set<TopicModel> topics = comp.getTopics(assocDefUri);
+            topics.remove(topic);
+            topics.add(topic);
         } else {
             throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
         }

@@ -177,8 +177,8 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         }
         // error check
         if (edges.size() > 1) {
-            throw new RuntimeException("More than one \"" + assocTypeUri + "\" associations found (" +
-                "topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", " +
+            throw new RuntimeException("Ambiguity: there are " + edges.size() + " \"" + assocTypeUri +
+                "\" associations (topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", " +
                 "roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\")");
         }
         //
