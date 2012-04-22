@@ -47,8 +47,18 @@ public class AssociationRoleModel extends RoleModel {
         return assocId;
     }
 
-    // ---
+    // === Implementation of abstract RoleModel methods ===
 
+    @Override
+    public boolean refsSameObject(RoleModel model) {
+        if (model instanceof AssociationRoleModel) {
+            AssociationRoleModel assocRole = (AssociationRoleModel) model;
+            return assocRole.assocId == assocId;
+        }
+        return false;
+    }
+
+    @Override
     public JSONObject toJSON() {
         try {
             JSONObject o = new JSONObject();
@@ -60,9 +70,7 @@ public class AssociationRoleModel extends RoleModel {
         }
     }
 
-    // ---
-
-    // ### FIXME: define equals() and hashCode()
+    // === Java API ===
 
     @Override
     public String toString() {

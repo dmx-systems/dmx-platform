@@ -84,8 +84,24 @@ public class TopicRoleModel extends RoleModel {
         return topicIdentifiedByUri;
     }
 
-    // ---
+    // === Implementation of abstract RoleModel methods ===
 
+    @Override
+    public boolean refsSameObject(RoleModel model) {
+        if (model instanceof TopicRoleModel) {
+            TopicRoleModel topicRole = (TopicRoleModel) model;
+            if (topicRole.topicIdentifiedByUri == topicIdentifiedByUri) {
+                if (topicIdentifiedByUri) {
+                    return topicRole.topicUri.equals(topicUri);
+                } else {
+                    return topicRole.topicId == topicId;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
     public JSONObject toJSON() {
         try {
             JSONObject o = new JSONObject();
@@ -101,23 +117,7 @@ public class TopicRoleModel extends RoleModel {
         }
     }
 
-    // ---
-
-    @Override
-    public boolean equals(Object o) {
-        // ### FIXME: check class before
-        TopicRoleModel model = (TopicRoleModel) o;
-        if (model.roleTypeUri.equals(roleTypeUri) && model.topicIdentifiedByUri == topicIdentifiedByUri) {
-            if (topicIdentifiedByUri) {
-                return model.topicUri.equals(topicUri);
-            } else {
-                return model.topicId == topicId;
-            }
-        }
-        return false;
-    }
-
-    // ### FIXME: define hashCode()
+    // === Java API ===
 
     @Override
     public String toString() {

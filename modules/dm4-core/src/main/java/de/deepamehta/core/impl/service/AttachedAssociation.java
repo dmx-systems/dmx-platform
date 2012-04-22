@@ -135,9 +135,9 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     public Role getRole(RoleModel model) {
-        if (getRole1().getModel().equals(model)) {
+        if (getRole1().getModel().refsSameObject(model)) {
             return getRole1();
-        } else if (getRole2().getModel().equals(model)) {
+        } else if (getRole2().getModel().refsSameObject(model)) {
             return getRole2();
         }
         throw new RuntimeException("Role is not part of association (role=" + model + ", association=" + this);
