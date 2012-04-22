@@ -31,7 +31,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private AttachedViewConfiguration viewConfig;
+    private AttachedViewConfiguration viewConfig;   // attached object cache
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -43,8 +43,6 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-
 
     // === AssociationDefinition Implementation ===
 
@@ -91,20 +89,30 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     // ---
 
     @Override
-    public void setWholeCardinalityUri(String wholeCardinalityUri) {
+    public void setWholeCardinalityUri(String wholeCardinalityUri, ClientState clientState, Directives directives) {
+        // update memory
         getModel().setWholeCardinalityUri(wholeCardinalityUri);
+        // update DB
+        storeWholeCardinalityUri(directives);
     }
 
     @Override
-    public void setPartCardinalityUri(String partCardinalityUri) {
+    public void setPartCardinalityUri(String partCardinalityUri, ClientState clientState, Directives directives) {
+        // update memory
         getModel().setPartCardinalityUri(partCardinalityUri);
+        // update DB
+        storePartCardinalityUri(directives);
     }
 
     // === Updating ===
 
     @Override
-    public void update(AssociationDefinitionModel model, ClientState clientState, Directives directives) {
-        updateAssocTypeUri(model, clientState, directives);
+    public void update(AssociationDefinitionModel newModel, ClientState clientState, Directives directives) {
+        // assoc type
+        updateAssocTypeUri(newModel, clientState, directives);
+        // cardinality
+        updateWholeCardinality(newModel.getWholeCardinalityUri(), clientState, directives);
+        updatePartCardinality(newModel.getPartCardinalityUri(), clientState, directives);
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -117,19 +125,11 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
                 dms.createAssociation(getModel(), null);    // clientState=null
             }
             // role types
-            dms.createAssociation("dm4.core.aggregation",
-                new TopicRoleModel(getWholeRoleTypeUri(), "dm4.core.whole_role_type"),
-                new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
-            dms.createAssociation("dm4.core.aggregation",
-                new TopicRoleModel(getPartRoleTypeUri(), "dm4.core.part_role_type"),
-                new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
+            associateWholeRoleType();
+            associatePartRoleType();
             // cardinality
-            dms.createAssociation("dm4.core.aggregation",
-                new TopicRoleModel(getWholeCardinalityUri(), "dm4.core.whole_cardinality"),
-                new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
-            dms.createAssociation("dm4.core.aggregation",
-                new TopicRoleModel(getPartCardinalityUri(), "dm4.core.part_cardinality"),
-                new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
+            associateWholeCardinality();
+            associatePartCardinality();
             //
             storeViewConfig();
         } catch (Exception e) {
@@ -147,24 +147,94 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-
-
     // === Update ===
 
-    private void updateAssocTypeUri(AssociationDefinitionModel model, ClientState clientState, Directives directives) {
-        String newTypeUri = model.getTypeUri();
+    private void updateAssocTypeUri(AssociationDefinitionModel newModel, ClientState clientState,
+                                                                         Directives directives) {
+        String newTypeUri = newModel.getTypeUri();
         if (newTypeUri == null) {
             return;
         }
+        //
         String typeUri = getTypeUri();
         if (!typeUri.equals(newTypeUri)) {
-            super.update(model, clientState, directives);
+            super.update(newModel, clientState, directives);
         }
     }
 
+    // ---
 
+    private void updateWholeCardinality(String newWholeCardinalityUri, ClientState clientState, Directives directives) {
+        if (newWholeCardinalityUri == null) {
+            return;
+        }
+        //
+        String wholeCardinalityUri = getWholeCardinalityUri();
+        if (!wholeCardinalityUri.equals(newWholeCardinalityUri)) {
+            logger.info("### Changing whole cardinality URI from \"" + wholeCardinalityUri + "\" -> \"" +
+                newWholeCardinalityUri + "\"");
+            setWholeCardinalityUri(newWholeCardinalityUri, clientState, directives);
+        }
+    }
+
+    private void updatePartCardinality(String newPartCardinalityUri, ClientState clientState, Directives directives) {
+        if (newPartCardinalityUri == null) {
+            return;
+        }
+        //
+        String partCardinalityUri = getPartCardinalityUri();
+        if (!partCardinalityUri.equals(newPartCardinalityUri)) {
+            logger.info("### Changing part cardinality URI from \"" + partCardinalityUri + "\" -> \"" +
+                newPartCardinalityUri + "\"");
+            setPartCardinalityUri(newPartCardinalityUri, clientState, directives);
+        }
+    }
 
     // === Store ===
+
+    private void storeWholeCardinalityUri(Directives directives) {
+        // remove current assignment
+        dms.factory.fetchWholeCardinality(this).getAssociation().delete(directives);
+        // create new assignment
+        associateWholeCardinality();
+    }    
+
+    private void storePartCardinalityUri(Directives directives) {
+        // remove current assignment
+        dms.factory.fetchPartCardinality(this).getAssociation().delete(directives);
+        // create new assignment
+        associatePartCardinality();
+    }    
+
+    // ---
+
+    private void associateWholeCardinality() {
+        dms.createAssociation("dm4.core.aggregation",
+            new TopicRoleModel(getWholeCardinalityUri(), "dm4.core.whole_cardinality"),
+            new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
+    }
+
+    private void associatePartCardinality() {
+        dms.createAssociation("dm4.core.aggregation",
+            new TopicRoleModel(getPartCardinalityUri(), "dm4.core.part_cardinality"),
+            new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
+    }
+
+    // ---
+
+    private void associateWholeRoleType() {
+        dms.createAssociation("dm4.core.aggregation",
+            new TopicRoleModel(getWholeRoleTypeUri(), "dm4.core.whole_role_type"),
+            new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
+    }
+
+    private void associatePartRoleType() {
+        dms.createAssociation("dm4.core.aggregation",
+            new TopicRoleModel(getPartRoleTypeUri(), "dm4.core.part_role_type"),
+            new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
+    }
+
+    // ---
 
     private void storeViewConfig() {
         try {
@@ -179,8 +249,6 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
                 getUri() + "\" failed", e);
         }
     }
-
-
 
     // === Helper ===
 

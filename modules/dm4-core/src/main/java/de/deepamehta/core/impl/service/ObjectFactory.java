@@ -29,7 +29,6 @@ class ObjectFactory {
     AttachedAssociationDefinition fetchAssociationDefinition(Association assoc, String topicTypeUri) {
         try {
             TopicTypes topicTypes = fetchTopicTypes(assoc);
-            // ### RoleTypes roleTypes = fetchRoleTypes(assoc);
             Cardinality cardinality = fetchCardinality(assoc);
             // sanity check
             if (!topicTypes.wholeTopicTypeUri.equals(topicTypeUri)) {
@@ -48,31 +47,29 @@ class ObjectFactory {
         }
     }
 
+    // ---
+
+    RelatedTopic fetchWholeCardinality(Association assoc) {
+        return assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
+            "dm4.core.whole_cardinality", "dm4.core.cardinality", false, false, null);  // fetchComposite=false
+    }
+
+    RelatedTopic fetchPartCardinality(Association assoc) {
+        return assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
+            "dm4.core.part_cardinality", "dm4.core.cardinality", false, false, null);   // fetchComposite=false
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
     private TopicTypes fetchTopicTypes(Association assoc) {
         String wholeTopicTypeUri = getWholeTopicTypeUri(assoc);
         String partTopicTypeUri = getPartTopicTypeUri(assoc);
         return new TopicTypes(wholeTopicTypeUri, partTopicTypeUri);
     }
 
-    /* ### private RoleTypes fetchRoleTypes(Association assoc) {
-        Topic wholeRoleType = assoc.getTopic("dm4.core.whole_role_type");
-        Topic partRoleType = assoc.getTopic("dm4.core.part_role_type");
-        RoleTypes roleTypes = new RoleTypes();
-        // role types are optional
-        if (wholeRoleType != null) {
-            roleTypes.setWholeRoleTypeUri(wholeRoleType.getUri());
-        }
-        if (partRoleType != null) {
-            roleTypes.setPartRoleTypeUri(partRoleType.getUri());
-        }
-        return roleTypes;
-    } */
-
     private Cardinality fetchCardinality(Association assoc) {
-        Topic wholeCardinality = assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
-            "dm4.core.whole_cardinality", "dm4.core.cardinality", false, false, null);    // fetchComposite=false
-        Topic partCardinality = assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
-            "dm4.core.part_cardinality", "dm4.core.cardinality", false, false, null);     // fetchComposite=false
+        Topic wholeCardinality = fetchWholeCardinality(assoc);
+        Topic partCardinality = fetchPartCardinality(assoc);
         Cardinality cardinality = new Cardinality();
         if (wholeCardinality != null) {
             cardinality.setWholeCardinalityUri(wholeCardinality.getUri());
@@ -80,7 +77,7 @@ class ObjectFactory {
         if (partCardinality != null) {
             cardinality.setPartCardinalityUri(partCardinality.getUri());
         } else {
-            throw new RuntimeException("Missing cardinality of position 2");
+            throw new RuntimeException("Missing part cardinality");
         }
         return cardinality;
     }
@@ -118,20 +115,6 @@ class ObjectFactory {
             this.partTopicTypeUri = partTopicTypeUri;
         }
     }
-
-    /* ### private class RoleTypes {
-
-        private String wholeRoleTypeUri;
-        private String partRoleTypeUri;
-
-        private void setWholeRoleTypeUri(String wholeRoleTypeUri) {
-            this.wholeRoleTypeUri = wholeRoleTypeUri;
-        }
-
-        private void setPartRoleTypeUri(String partRoleTypeUri) {
-            this.partRoleTypeUri = partRoleTypeUri;
-        }
-    } */
 
     private class Cardinality {
 
