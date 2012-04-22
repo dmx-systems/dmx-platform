@@ -304,9 +304,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
             "dm4.core.part_type", "dm4.core.topic_type", false, false, 0, null);
         //
         for (RelatedTopic partTopicType : partTopicTypes) {
-            AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(dms);
-            // FIXME: pass more info of the reltopic to the fetch() method to avoid double-fetching
-            assocDef.fetch(partTopicType.getAssociation(), getUri());
+            Association assoc = partTopicType.getAssociation();
+            AttachedAssociationDefinition assocDef = dms.factory.fetchAssociationDefinition(assoc, getUri());
             // Note: the returned map is an intermediate, hashed by ID. The actual type model is
             // subsequently build from it by sorting the assoc def's according to the sequence IDs.
             assocDefs.put(assocDef.getId(), assocDef);

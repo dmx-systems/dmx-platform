@@ -14,6 +14,8 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directives;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -34,11 +36,6 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
-
-    AttachedAssociationDefinition(EmbeddedService dms) {
-        super(dms);     // The model and viewConfig remain uninitialized.
-                        // They are initialized later on through fetch().
-    }
 
     AttachedAssociationDefinition(AssociationDefinitionModel model, EmbeddedService dms) {
         super(model, dms);
@@ -103,34 +100,14 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         getModel().setPartCardinalityUri(partCardinalityUri);
     }
 
-    // ----------------------------------------------------------------------------------------- Package Private Methods
+    // === Updating ===
 
-
-
-    /**
-     * @param   topicTypeUri    only used for sanity check
-     */
-    void fetch(Association assoc, String topicTypeUri) {
-        try {
-            TopicTypes topicTypes = fetchTopicTypes(assoc);
-            // ### RoleTypes roleTypes = fetchRoleTypes(assoc);
-            Cardinality cardinality = fetchCardinality(assoc);
-            // sanity check
-            if (!topicTypes.wholeTopicTypeUri.equals(topicTypeUri)) {
-                throw new RuntimeException("jri doesn't understand Neo4j traversal");
-            }
-            //
-            setModel(new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
-                topicTypes.wholeTopicTypeUri, topicTypes.partTopicTypeUri,
-                cardinality.wholeCardinalityUri, cardinality.partCardinalityUri,
-                fetchViewConfig(assoc)));
-            //
-            initViewConfig();
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching association definition for topic type \"" + topicTypeUri +
-                "\" failed (" + assoc + ")", e);
-        }
+    @Override
+    public void update(AssociationDefinitionModel model, ClientState clientState, Directives directives) {
+        updateAssocTypeUri(model, clientState, directives);
     }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void store() {
         try {
@@ -172,93 +149,16 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
 
 
-    // === Fetch ===
+    // === Update ===
 
-    // Note: in the fetch methods the assoc def's model isn't available. It doesn't exist yet.
-    // The model is only created by these very fetch methods.
-
-    private TopicTypes fetchTopicTypes(Association assoc) {
-        String wholeTopicTypeUri = getWholeTopicTypeUri(assoc);
-        String partTopicTypeUri = getPartTopicTypeUri(assoc);
-        return new TopicTypes(wholeTopicTypeUri, partTopicTypeUri);
-    }
-
-    /* ### private RoleTypes fetchRoleTypes(Association assoc) {
-        Topic wholeRoleType = assoc.getTopic("dm4.core.whole_role_type");
-        Topic partRoleType = assoc.getTopic("dm4.core.part_role_type");
-        RoleTypes roleTypes = new RoleTypes();
-        // role types are optional
-        if (wholeRoleType != null) {
-            roleTypes.setWholeRoleTypeUri(wholeRoleType.getUri());
+    private void updateAssocTypeUri(AssociationDefinitionModel model, ClientState clientState, Directives directives) {
+        String newTypeUri = model.getTypeUri();
+        if (newTypeUri == null) {
+            return;
         }
-        if (partRoleType != null) {
-            roleTypes.setPartRoleTypeUri(partRoleType.getUri());
-        }
-        return roleTypes;
-    } */
-
-    private Cardinality fetchCardinality(Association assoc) {
-        Topic wholeCardinality = assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
-            "dm4.core.whole_cardinality", "dm4.core.cardinality", false, false, null);    // fetchComposite=false
-        Topic partCardinality = assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
-            "dm4.core.part_cardinality", "dm4.core.cardinality", false, false, null);     // fetchComposite=false
-        Cardinality cardinality = new Cardinality();
-        if (wholeCardinality != null) {
-            cardinality.setWholeCardinalityUri(wholeCardinality.getUri());
-        }
-        if (partCardinality != null) {
-            cardinality.setPartCardinalityUri(partCardinality.getUri());
-        } else {
-            throw new RuntimeException("Missing cardinality of position 2");
-        }
-        return cardinality;
-    }
-
-    private ViewConfigurationModel fetchViewConfig(Association assoc) {
-        ResultSet<RelatedTopic> topics = assoc.getRelatedTopics("dm4.core.aggregation", "dm4.core.assoc_def",
-            "dm4.core.view_config", null, true, false, 0, null);    // fetchComposite=true, fetchRelatingComposite=false
-        // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
-        return new ViewConfigurationModel(dms.getTopicModels(topics.getItems()));
-    }
-
-    // --- Inner Classes ---
-
-    private class TopicTypes {
-
-        private String wholeTopicTypeUri;
-        private String partTopicTypeUri;
-
-        private TopicTypes(String wholeTopicTypeUri, String partTopicTypeUri) {
-            this.wholeTopicTypeUri = wholeTopicTypeUri;
-            this.partTopicTypeUri = partTopicTypeUri;
-        }
-    }
-
-    /* ### private class RoleTypes {
-
-        private String wholeRoleTypeUri;
-        private String partRoleTypeUri;
-
-        private void setWholeRoleTypeUri(String wholeRoleTypeUri) {
-            this.wholeRoleTypeUri = wholeRoleTypeUri;
-        }
-
-        private void setPartRoleTypeUri(String partRoleTypeUri) {
-            this.partRoleTypeUri = partRoleTypeUri;
-        }
-    } */
-
-    private class Cardinality {
-
-        private String wholeCardinalityUri;
-        private String partCardinalityUri;
-
-        private void setWholeCardinalityUri(String wholeCardinalityUri) {
-            this.wholeCardinalityUri = wholeCardinalityUri;
-        }
-
-        private void setPartCardinalityUri(String partCardinalityUri) {
-            this.partCardinalityUri = partCardinalityUri;
+        String typeUri = getTypeUri();
+        if (!typeUri.equals(newTypeUri)) {
+            super.update(model, clientState, directives);
         }
     }
 
@@ -287,17 +187,5 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     private void initViewConfig() {
         RoleModel configurable = new AssociationRoleModel(getId(), "dm4.core.assoc_def");
         this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
-    }
-
-    // ---
-
-    // ### FIXME: copy in TypeEditorPlugin
-    private String getWholeTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm4.core.whole_type").getUri();
-    }
-
-    // ### FIXME: copy in TypeEditorPlugin
-    private String getPartTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm4.core.part_type").getUri();
     }
 }

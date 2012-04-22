@@ -38,12 +38,13 @@ import java.util.logging.Logger;
  * DeepaMehtaObject implementation that takes a DeepaMehtaObjectModel and attaches it to the DB.
  *
  * Method name conventions and semantics:
- *  - getXX()           Accesses the memory (model).
- *  - setXX(arg)        Updates memory (model) and DB. Elementary operation.
+ *  - getXX()           Reads from memory (model).
+ *  - setXX(arg)        Writes to memory (model) and DB. Elementary operation.
  *  - updateXX(arg)     Compares arg with current value (model) and calls setXX() method(s) if required.
  *                      Can be called with arg=null which indicates no update is requested.
- *  - storeXX()         Stores current value (model) to DB.
+ *                      Typically returns nothing.
  *  - fetchXX()         Fetches value from DB.
+ *  - storeXX()         Stores current value (model) to DB.
  */
 abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 

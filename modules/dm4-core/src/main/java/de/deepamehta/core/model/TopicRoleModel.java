@@ -104,6 +104,22 @@ public class TopicRoleModel extends RoleModel {
     // ---
 
     @Override
+    public boolean equals(Object o) {
+        // ### FIXME: check class before
+        TopicRoleModel model = (TopicRoleModel) o;
+        if (model.roleTypeUri.equals(roleTypeUri) && model.topicIdentifiedByUri == topicIdentifiedByUri) {
+            if (topicIdentifiedByUri) {
+                return model.topicUri.equals(topicUri);
+            } else {
+                return model.topicId == topicId;
+            }
+        }
+        return false;
+    }
+
+    // ### FIXME: define hashCode()
+
+    @Override
     public String toString() {
         return "\n        topic role (roleTypeUri=\"" + roleTypeUri + "\", topicId=" + topicId +
             ", topicUri=\"" + topicUri + "\", topicIdentifiedByUri=" + topicIdentifiedByUri + ")";

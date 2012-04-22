@@ -44,11 +44,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedAssociation(EmbeddedService dms) {
-        super(dms);     // ### The model and viewConfig remain uninitialized.
-                        // ### They are initialized later on through fetch().
-    }
-
     AttachedAssociation(AssociationModel model, EmbeddedService dms) {
         super(model, dms);
         this.role1 = createAttachedRole(model.getRoleModel1());
@@ -138,23 +133,14 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     // ---
 
-    // compare to Neo4jMehtaEdge.getMehtaObject()
     @Override
-    public Role getRole(long objectId) {
-        long id1 = getObjectId(((AttachedRole) getRole1()).getModel());
-        long id2 = getObjectId(((AttachedRole) getRole2()).getModel());
-        //
-        if (id1 == objectId && id2 == objectId) {
-            throw new RuntimeException("Self-connected mehta objects are not supported (" + this + ")");
-        }
-        //
-        if (id1 == objectId) {
+    public Role getRole(RoleModel model) {
+        if (getRole1().getModel().equals(model)) {
             return getRole1();
-        } else if (id2 == objectId) {
+        } else if (getRole2().getModel().equals(model)) {
             return getRole2();
-        } else {
-            throw new RuntimeException("Topic/Association " + objectId + " plays no role in " + this);
         }
+        throw new RuntimeException("Role is not part of association (role=" + model + ", association=" + this);
     }
 
     // ---
@@ -275,7 +261,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         if (newModel != null) {
             // Note: We must lookup the roles individually.
             // The role order (getRole1(), getRole2()) is undeterministic and not fix.
-            Role role = getRole(getObjectId(newModel));
+            Role role = getRole(newModel);
             String newRoleTypeUri = newModel.getRoleTypeUri();  // new value
             String roleTypeUri = role.getRoleTypeUri();         // current value
             if (!roleTypeUri.equals(newRoleTypeUri)) {          // has changed?
@@ -292,17 +278,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
             return new AttachedTopicRole((TopicRoleModel) model, this, dms);
         } else if (model instanceof AssociationRoleModel) {
             return new AttachedAssociationRole((AssociationRoleModel) model, this, dms);
-        } else {
-            throw new RuntimeException("Unexpected RoleModel object (" + model + ")");
-        }
-    }
-
-    // ### TODO: probably a generic getId() should be added to the Role interface.
-    private long getObjectId(RoleModel model) {
-        if (model instanceof TopicRoleModel) {
-            return ((TopicRoleModel) model).getTopicId();
-        } else if (model instanceof AssociationRoleModel) {
-            return ((AssociationRoleModel) model).getAssociationId();
         } else {
             throw new RuntimeException("Unexpected RoleModel object (" + model + ")");
         }

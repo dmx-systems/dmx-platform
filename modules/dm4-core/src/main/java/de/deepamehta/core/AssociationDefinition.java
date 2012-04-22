@@ -1,5 +1,9 @@
 package de.deepamehta.core;
 
+import de.deepamehta.core.model.AssociationDefinitionModel;
+import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directives;
+
 
 
 /**
@@ -31,4 +35,8 @@ public interface AssociationDefinition extends Association {
     void setWholeCardinalityUri(String wholeCardinalityUri);
 
     void setPartCardinalityUri(String partCardinalityUri);
+
+    // === Updating ===
+
+    void update(AssociationDefinitionModel model, ClientState clientState, Directives directives);
 }

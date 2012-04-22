@@ -95,8 +95,8 @@ class AttachedTopicType extends AttachedType implements TopicType {
             setDataTypeUri(dataTypeUri);
         }
         //
+        updateAssocDefs(model.getAssocDefs().values(), clientState, directives);
         updateSequence(model.getAssocDefs().values());
-        //
         updateLabelConfig(model.getLabelConfig());
         //
         if (!uriChanged && !valueChanged && !dataTypeChanged) {
@@ -107,6 +107,15 @@ class AttachedTopicType extends AttachedType implements TopicType {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // === Association Definitions ===
+
+    private void updateAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs, ClientState clientState,
+                                                                                      Directives directives) {
+        for (AssociationDefinitionModel assocDef : newAssocDefs) {
+            getAssocDef(assocDef.getUri()).update(assocDef, clientState, directives);
+        }
+    }
+
+    // === Sequence ===
 
     private void updateSequence(Collection<AssociationDefinitionModel> newAssocDefs) {
         if (hasSequenceChanged(newAssocDefs)) {

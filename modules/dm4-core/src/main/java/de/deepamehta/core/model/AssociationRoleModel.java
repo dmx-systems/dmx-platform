@@ -62,6 +62,8 @@ public class AssociationRoleModel extends RoleModel {
 
     // ---
 
+    // ### FIXME: define equals() and hashCode()
+
     @Override
     public String toString() {
         return "\n        association role (roleTypeUri=\"" + roleTypeUri + "\", assocId=" + assocId + ")";

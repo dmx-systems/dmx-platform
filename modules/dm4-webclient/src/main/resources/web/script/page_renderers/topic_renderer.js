@@ -83,10 +83,10 @@ function TopicRenderer() {
      * @return  a topic model (object), a topic reference (string), a simple topic value, or null.
      *          Note 1: null is returned if a simple topic is being edited and the field renderer prevents the field
      *          from being updated.
-     *          Note 2: despite on deeper recursion levels this method might return a topic reference (string), the
-     *          top-level call will always return a topic model (object), or null. This is because topic references
-     *          are only contained in composite topic models. A simple topic model on the other hand never represents
-     *          a topic reference.
+     *          Note 2: despite at deeper recursion levels this method might return a topic reference (string), or
+     *          a simple topic value, the top-level call will always return a topic model (object), or null.
+     *          This is because topic references are only contained in composite topic models. A simple topic model
+     *          on the other hand never represents a topic reference.
      */
     function build_topic_model(page_model) {
         if (page_model instanceof TopicRenderer.FieldModel) {

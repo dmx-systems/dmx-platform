@@ -134,8 +134,8 @@ function GUIToolkit() {
             var menu            = $("<div>").addClass("menu")
             var top_scroller    = $("<div>").addClass("scroll-area top")
             var bottom_scroller = $("<div>").addClass("scroll-area bottom")
-            // Note: clicking a scroller is meant to have no effect. However, the event must be consumed by the
-            // scroller in order to avoid it bubbling up to the body (where it would cause the menu to be closed).
+            // Note: clicking a scroller is meant to have no effect. However, the event must be consumed
+            // in order to avoid it bubbling up to the body (where it would cause the menu to be closed).
             top_scroller   .hover(create_scroll_handler(+SCROLL_DISTANCE), do_end_scroll).click(consume)
             bottom_scroller.hover(create_scroll_handler(-SCROLL_DISTANCE), do_end_scroll).click(consume)
             //

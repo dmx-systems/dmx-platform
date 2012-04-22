@@ -85,6 +85,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
             DeepaMehtaStorage storage;
             TypeCache typeCache;
+            ObjectFactory factory;
 
     private PluginCache pluginCache;
     private BundleContext bundleContext;
@@ -102,6 +103,7 @@ public class EmbeddedService implements DeepaMehtaService {
         this.bundleContext = bundleContext;
         this.pluginCache = new PluginCache();
         this.typeCache = new TypeCache(this);
+        this.factory = new ObjectFactory(this);
         bootstrapTypeCache();
     }
 

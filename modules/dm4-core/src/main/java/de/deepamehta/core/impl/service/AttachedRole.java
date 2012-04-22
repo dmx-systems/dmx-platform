@@ -51,15 +51,14 @@ class AttachedRole implements Role {
     // ---
 
     @Override
-    public JSONObject toJSON() {
-        return getModel().toJSON();
+    public RoleModel getModel() {
+        return model;
     }
 
+    // ---
 
-
-    // ----------------------------------------------------------------------------------------------- Protected Methods
-
-    protected RoleModel getModel() {
-        return model;
+    @Override
+    public JSONObject toJSON() {
+        return getModel().toJSON();
     }
 }
