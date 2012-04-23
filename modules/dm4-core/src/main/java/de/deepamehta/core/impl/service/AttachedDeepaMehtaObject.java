@@ -446,7 +446,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 String assocDefUri    = assocDef.getUri();
                 String cardinalityUri = assocDef.getPartCardinalityUri();
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    TopicModel newChildTopic = newComp.getTopic(assocDefUri, null);            // defaultValue=null
+                    TopicModel newChildTopic = newComp.getTopic(assocDefUri, null);             // defaultValue=null
                     // skip if not contained in update request
                     if (newChildTopic == null) {
                         continue;
@@ -454,7 +454,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                     //
                     updateCompositeValue(assocDef, newChildTopic, clientState, directives);
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    Set<TopicModel> newChildTopics = newComp.getTopics(assocDefUri, null);     // defaultValue=null
+                    List<TopicModel> newChildTopics = newComp.getTopics(assocDefUri, null);     // defaultValue=null
                     // skip if not contained in update request
                     if (newChildTopics == null) {
                         continue;
@@ -770,7 +770,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         if (cardinalityUri.equals("dm4.core.one")) {
             comp.put(assocDefUri, topic);
         } else if (cardinalityUri.equals("dm4.core.many")) {
-            Set<TopicModel> topics = comp.getTopics(assocDefUri);
+            List<TopicModel> topics = comp.getTopics(assocDefUri);
             topics.remove(topic);
             topics.add(topic);
         } else {

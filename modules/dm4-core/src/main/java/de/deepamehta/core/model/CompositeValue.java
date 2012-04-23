@@ -6,11 +6,11 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -31,9 +31,13 @@ public class CompositeValue {
 
     /**
      * Internal representation.
-     * Key: String, value: TopicModel or Set<TopicModel>
+     * Key: String, value: TopicModel or List<TopicModel>
      */
     private Map<String, Object> values = new HashMap();
+    // Note: it must be List<TopicModel>, not Set<TopicModel> (like before).
+    // There may be several TopicModels with the same ID. That occurrs if the webclient user adds several new topics
+    // at once (by the means of an "Add" button). In this case the ID is -1. TopicModel equality is defined solely as
+    // ID equality (see DeepaMehtaObjectModel.equals()).
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -49,7 +53,7 @@ public class CompositeValue {
                 String key = i.next();
                 Object value = values.get(key);
                 if (value instanceof JSONArray) {
-                    Set<TopicModel> models = new LinkedHashSet();
+                    List<TopicModel> models = new ArrayList();
                     for (int j = 0; j < ((JSONArray) value).length(); j++) {
                         models.add(createTopicModel(key, ((JSONArray) value).get(j)));
                     }
@@ -89,9 +93,9 @@ public class CompositeValue {
 
     // ---
 
-    public Set<TopicModel> getTopics(String key) {
+    public List<TopicModel> getTopics(String key) {
         try {
-            Set<TopicModel> topics = (Set<TopicModel>) values.get(key);
+            List<TopicModel> topics = (List<TopicModel>) values.get(key);
             // error check
             if (topics == null) {
                 throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\": " +
@@ -105,9 +109,9 @@ public class CompositeValue {
         }
     }
 
-    public Set<TopicModel> getTopics(String key, Set<TopicModel> defaultValue) {
+    public List<TopicModel> getTopics(String key, List<TopicModel> defaultValue) {
         try {
-            Set<TopicModel> topics = (Set<TopicModel>) values.get(key);
+            List<TopicModel> topics = (List<TopicModel>) values.get(key);
             return topics != null ? topics : defaultValue;
         } catch (ClassCastException e) {
             throwInvalidAccess(key, e);
@@ -121,7 +125,7 @@ public class CompositeValue {
         try {
             // check argument
             if (value == null) {
-                throw new IllegalArgumentException("Tried to put a null value in a CompositeValue");
+                throw new IllegalArgumentException("Tried to put null in a CompositeValue");
             }
             // put value
             values.put(key, value);
@@ -133,11 +137,11 @@ public class CompositeValue {
         }
     }
 
-    public CompositeValue put(String key, Set<TopicModel> value) {
+    public CompositeValue put(String key, List<TopicModel> value) {
         try {
             // check argument
             if (value == null) {
-                throw new IllegalArgumentException("Tried to put a null value in a CompositeValue");
+                throw new IllegalArgumentException("Tried to put null in a CompositeValue");
             }
             // put value
             values.put(key, value);
@@ -160,12 +164,12 @@ public class CompositeValue {
         try {
             // check argument
             if (value == null) {
-                throw new IllegalArgumentException("Tried to put a null value in a CompositeValue");
+                throw new IllegalArgumentException("Tried to put null in a CompositeValue");
             }
             if (!(value instanceof String || value instanceof Integer || value instanceof Long ||
                   value instanceof Double || value instanceof Boolean || value instanceof CompositeValue)) {
-                throw new IllegalArgumentException("Tried to put a " + value.getClass().getName() + " value in " +
-                    "a CompositeValue (expected are String, Integer, Long, Double, Boolean, or CompositeValue)");
+                throw new IllegalArgumentException("Tried to put a " + value.getClass().getName() + " in a " +
+                    "CompositeValue (expected are String, Integer, Long, Double, Boolean, or CompositeValue)");
             }
             // put value
             TopicModel model;
@@ -249,8 +253,8 @@ public class CompositeValue {
                 Object value = values.get(key);
                 if (value instanceof TopicModel) {
                     json.put(key, ((TopicModel) value).toJSON());
-                } else if (value instanceof Set) {
-                    json.put(key, JSONHelper.objectsToJSON((Set<TopicModel>) value));
+                } else if (value instanceof List) {
+                    json.put(key, JSONHelper.objectsToJSON((List<TopicModel>) value));
                 } else {
                     throw new RuntimeException("Unexpected value in a CompositeValue: " + value);
                 }
@@ -277,9 +281,9 @@ public class CompositeValue {
             if (value instanceof TopicModel) {
                 TopicModel model = ((TopicModel) value).clone();
                 clone.put(key, model);
-            } else if (value instanceof Set) {
-                Set<TopicModel> models = new LinkedHashSet();
-                for (TopicModel model : (Set<TopicModel>) value) {
+            } else if (value instanceof List) {
+                List<TopicModel> models = new ArrayList();
+                for (TopicModel model : (List<TopicModel>) value) {
                     models.add(model.clone());
                 }
                 clone.put(key, models);
@@ -331,7 +335,7 @@ public class CompositeValue {
     }
 
     private void throwInvalidAccess(String key, ClassCastException e) {
-        if (e.getMessage().equals("de.deepamehta.core.model.TopicModel cannot be cast to java.util.Set")) {
+        if (e.getMessage().equals("de.deepamehta.core.model.TopicModel cannot be cast to java.util.List")) {
             throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\": " +
                 "the caller assumes it to be multiple-value but it is single-value in\n" + this, e);
         } else {
