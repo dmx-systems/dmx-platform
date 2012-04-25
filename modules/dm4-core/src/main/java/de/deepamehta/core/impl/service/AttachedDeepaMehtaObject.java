@@ -24,6 +24,7 @@ import de.deepamehta.core.service.Directives;
 
 import org.codehaus.jettison.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -445,27 +446,28 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
                 String assocDefUri    = assocDef.getUri();
                 String cardinalityUri = assocDef.getPartCardinalityUri();
+                TopicModel newChildTopic        = null;     // only used for "one"
+                List<TopicModel> newChildTopics = null;     // only used for "many"
+                boolean one = false;
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    TopicModel newChildTopic = newComp.getTopic(assocDefUri, null);             // defaultValue=null
+                    newChildTopic = newComp.getTopic(assocDefUri, null);             // defaultValue=null
                     // skip if not contained in update request
                     if (newChildTopic == null) {
                         continue;
                     }
                     //
-                    updateCompositeValue(assocDef, newChildTopic, clientState, directives);
+                    one = true;
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    List<TopicModel> newChildTopics = newComp.getTopics(assocDefUri, null);     // defaultValue=null
+                    newChildTopics = newComp.getTopics(assocDefUri, null);     // defaultValue=null
                     // skip if not contained in update request
                     if (newChildTopics == null) {
                         continue;
                     }
-                    //
-                    for (TopicModel newChildTopic : newChildTopics) {
-                        updateCompositeValue(assocDef, newChildTopic, clientState, directives);
-                    }
                 } else {
                     throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
                 }
+                //
+                updateCompositeValue(assocDef, one, newChildTopic, newChildTopics, clientState, directives);
             }
         } catch (Exception e) {
             throw new RuntimeException("Updating the composite value of " + className() + " " + getId() +
@@ -477,50 +479,141 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     @Override
     public void updateCompositeValue(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
                                                                                                Directives directives) {
+    }
+
+    private void updateCompositeValue(AssociationDefinition assocDef, boolean one, TopicModel newChildTopic,
+                                      List<TopicModel> newChildTopics, ClientState clientState, Directives directives) {
         String assocTypeUri = assocDef.getTypeUri();
         if (assocTypeUri.equals("dm4.core.composition_def")) {
-            Topic childTopic = fetchChildTopic(assocDef, newChildTopic);
-            if (childTopic != null) {
-                // update existing child
-                childTopic.update(newChildTopic, clientState, directives);
+            if (one) {
+                updateCompositionOne(assocDef, newChildTopic, clientState, directives);
             } else {
-                // create new child
-                childTopic = dms.createTopic(newChildTopic, null);
-                associateChildTopic(assocDef, childTopic.getId());
+                updateCompositionMany(assocDef, newChildTopics, clientState, directives);
             }
-            // update memory
-            updateCompositeModel(assocDef, childTopic.getModel());
         } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
             String childTopicTypeUri = assocDef.getPartTopicTypeUri();
             TopicType childTopicType = dms.getTopicType(childTopicTypeUri, null);
             if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
                 throw new RuntimeException("Aggregation of composite topic types not yet supported");
+            }
+            if (one) {
+                updateAggregationOne(assocDef, newChildTopic, clientState, directives);
             } else {
-                // remove current assignment
-                RelatedTopic childTopic = fetchChildTopic(assocDef, false);         // fetchComposite=false
-                if (childTopic != null) {
-                    childTopic.getAssociation().delete(directives);
-                }
-                // Note: an topic ID != -1 indicates an *existing* topic is to be assigned.
-                //       an topic ID == -1 indicates a *new* topic is to be created and assigned.
-                long childTopicId = newChildTopic.getId();
-                if (childTopicId != -1) {
-                    // update DB
-                    associateChildTopic(assocDef, childTopicId);
-                    // update memory
-                    childTopic = fetchChildTopic(assocDef, false);                  // fetchComposite=false
-                    updateCompositeModel(assocDef, childTopic.getModel());
-                } else {
-                    // create new child
-                    Topic _childTopic = dms.createTopic(newChildTopic, null);
-                    associateChildTopic(assocDef, _childTopic.getId());
-                    // update memory
-                    updateCompositeModel(assocDef, _childTopic.getModel());
-                }
+                updateAggregationMany(assocDef, newChildTopics, clientState, directives);
             }
         } else {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not supported");
         }
+    }
+
+    // --- Composition ---
+
+    private void updateCompositionOne(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
+                                                                                                Directives directives) {
+        // 1) update DB
+        Topic childTopic = fetchChildTopic(assocDef, newChildTopic);
+        if (childTopic != null) {
+            // update existing child
+            childTopic.update(newChildTopic, clientState, directives);
+        } else {
+            // create new child
+            childTopic = dms.createTopic(newChildTopic, null);
+            associateChildTopic(assocDef, childTopic.getId());
+        }
+        // 2) update memory
+        updateCompositeModel(assocDef, childTopic.getModel());
+    }
+
+    private void updateCompositionMany(AssociationDefinition assocDef, List<TopicModel> newChildTopics,
+                                                                       ClientState clientState, Directives directives) {
+        for (TopicModel newChildTopic : newChildTopics) {
+            updateCompositionOne(assocDef, newChildTopic, clientState, directives);
+        }
+    }
+
+    /**
+     * Updates memory.
+     */
+    private void updateCompositeModel(AssociationDefinition assocDef, TopicModel topic) {
+        CompositeValue comp = getCompositeValue();
+        String assocDefUri = assocDef.getUri();
+        String cardinalityUri = assocDef.getPartCardinalityUri();
+        //
+        if (cardinalityUri.equals("dm4.core.one")) {
+            comp.put(assocDefUri, topic);
+        } else if (cardinalityUri.equals("dm4.core.many")) {
+            List<TopicModel> topics = comp.getTopics(assocDefUri);
+            topics.remove(topic);
+            topics.add(topic);
+        } else {
+            throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
+        }
+    }
+
+    // --- Aggregation ---
+
+    private void updateAggregationOne(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
+                                                                                                Directives directives) {
+        // 1) update DB
+        // remove current assignment
+        RelatedTopic childTopic = fetchChildTopic(assocDef, false);             // fetchComposite=false
+        if (childTopic != null) {
+            childTopic.getAssociation().delete(directives);
+        }
+        // create new assignment
+        Topic topic = createAssignment(assocDef, newChildTopic);
+        // 2) update memory
+        updateCompositeModelOne(assocDef, topic.getModel());
+    }
+
+    private void updateAggregationMany(AssociationDefinition assocDef, List<TopicModel> newChildTopics,
+                                                                       ClientState clientState, Directives directives) {
+        // 1) update DB
+        // remove current assignments
+        // ### FIXME: in case of "aggregation many" we expect the update request to contain *all* the childs.
+        // ### Childs not contained in the update request are removed.
+        for (RelatedTopic childTopic : fetchChildTopics(assocDef, false)) {     // fetchComposite=false
+            childTopic.getAssociation().delete(directives);
+        }
+        // create new assignments
+        List<TopicModel> topics = new ArrayList();
+        for (TopicModel newChildTopic : newChildTopics) {
+            Topic topic = createAssignment(assocDef, newChildTopic);
+            topics.add(topic.getModel());
+        }
+        // 2) update memory
+        updateCompositeModelMany(assocDef, topics);
+    }
+
+    /**
+     * Updates the DB.
+     */
+    Topic createAssignment(AssociationDefinition assocDef, TopicModel newChildTopic) {
+        long childTopicId = newChildTopic.getId();
+        if (childTopicId != -1) {
+            // assign existing child
+            associateChildTopic(assocDef, childTopicId);
+            return fetchChildTopic(assocDef, childTopicId, false);              // fetchComposite=false
+        } else {
+            // create new child
+            Topic childTopic = dms.createTopic(newChildTopic, null);
+            associateChildTopic(assocDef, childTopic.getId());
+            return childTopic;
+        }
+    }
+
+    /**
+     * Updates memory.
+     */
+    private void updateCompositeModelOne(AssociationDefinition assocDef, TopicModel topic) {
+        getCompositeValue().put(assocDef.getUri(), topic);
+    }
+
+    /**
+     * Updates memory.
+     */
+    private void updateCompositeModelMany(AssociationDefinition assocDef, List<TopicModel> topics) {
+        getCompositeValue().put(assocDef.getUri(), topics);
     }
 
     // === Fetch ===
@@ -760,21 +853,5 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     private AssociationDefinition getAssocDef(String assocDefUri) {
         return getType().getAssocDef(assocDefUri);
-    }
-
-    void updateCompositeModel(AssociationDefinition assocDef, TopicModel topic) {
-        CompositeValue comp = getCompositeValue();
-        String assocDefUri = assocDef.getUri();
-        String cardinalityUri = assocDef.getPartCardinalityUri();
-        //
-        if (cardinalityUri.equals("dm4.core.one")) {
-            comp.put(assocDefUri, topic);
-        } else if (cardinalityUri.equals("dm4.core.many")) {
-            List<TopicModel> topics = comp.getTopics(assocDefUri);
-            topics.remove(topic);
-            topics.add(topic);
-        } else {
-            throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
-        }
     }
 }
