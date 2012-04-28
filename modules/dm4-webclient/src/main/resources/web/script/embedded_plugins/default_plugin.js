@@ -65,9 +65,7 @@ function default_plugin () {
             commands.push({label: "Delete", handler: do_confirm, context: "context-menu", ui_icon: "trash"})
         }
         //
-        commands.push({label: "Save",   handler: do_save,   context: "detail-panel-edit", ui_icon: "circle-check",
-                                                                                          is_submit: true})
-        commands.push({label: "Cancel", handler: do_cancel, context: "detail-panel-edit"})
+        commands.push({label: "OK", handler: do_save, context: "detail-panel-edit", is_submit: true})
         //
         return commands
 
@@ -97,11 +95,7 @@ function default_plugin () {
         }
 
         function do_save() {
-            dm4c.trigger_page_renderer_hook(topic, "process_form", topic)
-        }
-
-        function do_cancel() {
-            dm4c.page_panel.refresh()
+            dm4c.page_panel.save()
         }
     })
 
@@ -118,9 +112,7 @@ function default_plugin () {
             commands.push({label: "Delete", handler: do_confirm, context: "context-menu", ui_icon: "trash"})
         }
         //
-        commands.push({label: "Save",   handler: do_save,   context: "detail-panel-edit", ui_icon: "circle-check",
-                                                                                          is_submit: true})
-        commands.push({label: "Cancel", handler: do_cancel, context: "detail-panel-edit"})
+        commands.push({label: "OK", handler: do_save, context: "detail-panel-edit", is_submit: true})
         //
         return commands
 
@@ -141,11 +133,7 @@ function default_plugin () {
         }
 
         function do_save() {
-            dm4c.trigger_page_renderer_hook(assoc, "process_form", assoc)
-        }
-
-        function do_cancel() {
-            dm4c.page_panel.refresh()
+            dm4c.page_panel.save()
         }
     })
 

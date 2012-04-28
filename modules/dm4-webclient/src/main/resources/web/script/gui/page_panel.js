@@ -7,8 +7,13 @@ function PagePanel() {
     }
 
     // Model
-    var displayed_object = null         // a topic or an association, or null if nothing is displayed
-    var page_state = PageState.NONE     // Tracks page state. Used to fire "post_destroy_form" in case.
+    var displayed_object = null         // The object displayed in the page panel, or null if nothing is displayed
+                                        // (a Topic object, or an Association object, or null).
+    var page_renderer                   // The displayed object's page renderer
+                                        // (only consulted if displayed_object is not null).
+    var page_state = PageState.NONE     // Tracks page state. Used to fire the "post_destroy_form" event in case.
+    var from_processing_func            // The form processing function: called to "submit" the form
+                                        // (only consulted if a form is displayed).
 
     // View
     var dom = $("<div>").attr("id", "page-panel")
@@ -22,9 +27,11 @@ function PagePanel() {
 
     this.display = function(topic_or_association) {
         // update model
-        displayed_object = topic_or_association
-        // update GUI
-        this.refresh()
+        set_displayed_object(topic_or_association)
+        // update view
+        clear_page(PageState.PAGE)
+        render_page()
+        render_buttons("detail-panel-show")
     }
 
     this.display_conditionally = function(topic_or_association) {
@@ -35,8 +42,9 @@ function PagePanel() {
 
     this.edit = function(topic_or_association) {
         // update model
-        displayed_object = topic_or_association
-        // update GUI
+        set_displayed_object(topic_or_association)
+        // update view
+        clear_page(PageState.FORM)
         render_form()
         render_buttons("detail-panel-edit")
         // set focus
@@ -49,14 +57,15 @@ function PagePanel() {
 
     this.clear = function() {
         // update model
-        displayed_object = null
-        // update GUI
+        set_displayed_object(null)
+        // update view
         clear_page(PageState.NONE)
     }
 
     this.refresh = function() {
-        // update GUI
+        // update view
         if (displayed_object) {  // if page has been cleared before we must not do anything (rendering would fail)
+            clear_page(PageState.PAGE)
             render_page()
             render_buttons("detail-panel-show")
         }
@@ -64,6 +73,12 @@ function PagePanel() {
 
     this.show_splash = function() {
         show_splash()
+    }
+
+    this.save = function() {
+        if (page_state == PageState.FORM) {
+            from_processing_func()
+        }
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
@@ -83,18 +98,29 @@ function PagePanel() {
         return false
     }
 
-    // ===
+    // === Model ===
+
+    /**
+     * @param   object      a topic or an association, or null if nothing is displayed.
+     */
+    function set_displayed_object(object) {
+        displayed_object = object
+        //
+        if (object) {
+            page_renderer = dm4c.get_page_renderer(object)
+        }
+    }
+
+    // === View ===
 
     function render_page() {
-        clear_page(PageState.PAGE)
         prepare_page()
-        dm4c.trigger_page_renderer_hook(displayed_object, "render_page", displayed_object)
+        page_renderer.render_page(displayed_object)
     }
 
     function render_form() {
-        clear_page(PageState.FORM)
         prepare_page()
-        dm4c.trigger_page_renderer_hook(displayed_object, "render_form", displayed_object)
+        from_processing_func = page_renderer.render_form(displayed_object)
     }
 
     function render_buttons(context) {
@@ -121,7 +147,7 @@ function PagePanel() {
     }
 
     function prepare_page() {
-        var css = dm4c.trigger_page_renderer_hook(displayed_object, "page_css")
+        var css = page_renderer.page_css()
         $("#page-content").css(css)
     }
 

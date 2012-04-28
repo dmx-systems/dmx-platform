@@ -5,10 +5,6 @@
  */
 function TopicRenderer() {
 
-    var page_model  // either a TopicRenderer.FieldModel object (non-composite) or an object (composite):
-                    //     key: assoc def URI
-                    //     value: either a TopicRenderer.FieldModel object or again a page model object
-
     // The autocomplete list
     $("#page-panel").append($("<div>").addClass("autocomplete-list"))
     autocomplete_item = -1
@@ -24,7 +20,7 @@ function TopicRenderer() {
 
 
     this.render_page = function(topic) {
-        page_model = create_page_model(topic, "viewable")
+        var page_model = create_page_model(topic, "viewable")
         // trigger hook
         dm4c.trigger_plugin_hook("pre_render_page", topic, page_model)
         //
@@ -34,27 +30,15 @@ function TopicRenderer() {
     }
 
     this.render_form = function(topic) {
-        page_model = create_page_model(topic, "editable")
+        var page_model = create_page_model(topic, "editable")
         // trigger hook
         dm4c.trigger_plugin_hook("pre_render_form", topic, page_model)
         //
         render_page_model(page_model, "render_form_element")
-    }
-
-    this.process_form = function(topic) {
-        dm4c.do_update_topic(topic, build_topic_model(page_model))
-    }
-
-
-
-    // ******************
-    // *** Public API ***
-    // ******************
-
-
-
-    this.get_page_model = function() {
-        return page_model
+        //
+        return function() {
+            dm4c.do_update_topic(topic, build_topic_model(page_model))
+        }
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions

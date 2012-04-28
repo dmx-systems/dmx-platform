@@ -19,9 +19,10 @@ function PageRenderer() {
 
     this.render_page = function(topic_or_association) {}
 
+    /**
+     * @return  the form processing function
+     */
     this.render_form = function(topic_or_association) {}
-
-    this.process_form = function(topic_or_association) {}
 
     // ---
 

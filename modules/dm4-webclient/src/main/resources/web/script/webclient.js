@@ -674,10 +674,6 @@ var dm4c = new function() {
         return pm.trigger_listeners.apply(undefined, arguments)
     }
 
-    this.trigger_page_renderer_hook = function(topic_or_association, hook_name, args) {
-        return dm4c.get_page_renderer(topic_or_association)[hook_name](args)
-    }
-
     this.get_plugin = function(plugin_class) {
         return pm.get_plugin(plugin_class)
     }

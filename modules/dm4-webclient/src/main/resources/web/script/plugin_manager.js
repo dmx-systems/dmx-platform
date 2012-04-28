@@ -82,7 +82,7 @@ function PluginManager(config) {
         var page_renderer = page_renderers[page_renderer_class]
         // error check
         if (!page_renderer) {
-            throw "UnknownPageRenderer: page renderer \"" + page_renderer_class + "\" is not registered"
+            throw "PluginManagerError: page renderer \"" + page_renderer_class + "\" is unknown"
         }
         //
         return page_renderer
