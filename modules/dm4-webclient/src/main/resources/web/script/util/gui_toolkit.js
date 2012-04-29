@@ -1,4 +1,4 @@
-function GUIToolkit() {
+function GUIToolkit(config) {
 
     var gui = this
 
@@ -120,7 +120,7 @@ function GUIToolkit() {
             // Note: the surrounding "handler" and "menu_title" are also part of the menu's model.
             var items = []
             var stateful = !menu_title
-            var selection   // selected item (object with "value" and "label" properties).
+            var selection   // selected menu item (object with "value" and "label" properties).
                             // Used only for stateful select-like menus.
 
             // short-term interaction state
@@ -237,6 +237,9 @@ function GUIToolkit() {
 
             // === Event Handler ===
 
+            /**
+             * Called when the menu-triggering button is clicked.
+             */
             function do_open_menu(event) {
                 // W3C DOM level 3 mouse events:
                 // (see http://www.w3.org/TR/2003/WD-DOM-Level-3-Events-20030331/ecma-script-binding.html)
@@ -349,6 +352,11 @@ function GUIToolkit() {
              * Calculates the position of the menu and opens it. Updates global state.
              */
             function open_menu(mouse_y) {
+                // fire event
+                if (config.pre_open_menu) {
+                    config.pre_open_menu(self)
+                }
+                //
                 var button_pos = button.offset()
                 var button_x = button_pos.left
                 var button_y = button_pos.top

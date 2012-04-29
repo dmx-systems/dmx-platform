@@ -63,12 +63,14 @@ function PagePanel() {
     }
 
     this.refresh = function() {
-        // update view
-        if (displayed_object) {  // if page has been cleared before we must not do anything (rendering would fail)
-            clear_page(PageState.PAGE)
-            render_page()
-            render_buttons("detail-panel-show")
+        // if page has been cleared before we perform nothing (rendering would fail)
+        if (!displayed_object) {
+            return
         }
+        // update view
+        clear_page(PageState.PAGE)
+        render_page()
+        render_buttons("detail-panel-show")
     }
 
     this.show_splash = function() {
@@ -77,7 +79,12 @@ function PagePanel() {
 
     this.save = function() {
         if (page_state == PageState.FORM) {
+            if (!from_processing_func) {
+                throw "PagePanelError: there is no form processing function"
+            }
+            //
             from_processing_func()
+            from_processing_func = null     // force a 2nd (unwanted) save call to fail
         }
     }
 

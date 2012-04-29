@@ -24,7 +24,7 @@ var dm4c = new function() {
 
     // utilities
     this.restc = new RESTClient(CORE_SERVICE_URI)
-    this.ui = new GUIToolkit()
+    this.ui = new GUIToolkit({pre_open_menu: pre_open_menu})
     this.render = new RenderHelper()
 
     // client model
@@ -76,6 +76,8 @@ var dm4c = new function() {
      * @param   no_history_update   Optional: boolean.
      */
     this.do_select_topic = function(topic_id, no_history_update) {
+        dm4c.page_panel.save()
+        //
         var topics = dm4c.canvas.select_topic(topic_id)
         // update client model
         set_selected_topic(topics.select, no_history_update)
@@ -93,6 +95,8 @@ var dm4c = new function() {
      * @param   no_history_update   Optional: boolean.
      */
     this.do_select_association = function(assoc_id, no_history_update) {
+        dm4c.page_panel.save()
+        //
         var assoc = dm4c.canvas.select_association(assoc_id)
         // update client model
         set_selected_association(assoc, no_history_update)
@@ -123,6 +127,8 @@ var dm4c = new function() {
     // ---
 
     this.do_search = function(searchmode) {
+        dm4c.page_panel.save()
+        //
         try {
             var search_topic = build_topic(dm4c.trigger_plugin_hook("search", searchmode)[0])
             // alert("search_topic=" + JSON.stringify(search_topic))
@@ -899,6 +905,27 @@ var dm4c = new function() {
     }
 
     // === GUI ===
+
+    /**
+     * Save the page panel before the user opens a menu.
+     *
+     * @param   menu    a GUIToolkit Menu object.
+     */
+    function pre_open_menu(menu) {
+        // react only on menus that are not part of the page content
+        if (menu.dom.parents("#page-content").length == 0) {
+            dm4c.page_panel.save()
+        }
+    }
+
+    /**
+     * Save the page panel before the user opens the canvas's context menu.
+     */
+    this.pre_open_context_menu = function() {
+        dm4c.page_panel.save()
+    }
+
+    // ---
 
     this.begin_editing = function(object) {
         // update view

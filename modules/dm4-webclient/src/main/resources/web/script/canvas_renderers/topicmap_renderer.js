@@ -571,7 +571,9 @@ function TopicmapRenderer() {
             var commands = dm4c.get_canvas_commands(p.x, p.y, "context-menu")
         }
         // 2) show menu
-        open_context_menu(commands, event)
+        if (commands.length) {
+            open_context_menu(commands, event)
+        }
         //
         return false
     }
@@ -579,13 +581,13 @@ function TopicmapRenderer() {
     /**
      * Builds a context menu from a set of commands and shows it.
      *
-     * @param   commands    Array of commands. May be empty. Must not be null/undefined.
+     * @param   commands    Array of commands. Must neither be empty nor null/undefined.
      * @param   event       The mouse event that triggered the context menu.
      */
     function open_context_menu(commands, event) {
-        if (!commands.length) {
-            return
-        }
+        // fire event (compare to GUITookit's open_menu())
+        dm4c.pre_open_context_menu()
+        //
         if (dm4c.LOG_GUI) dm4c.log("Opening context nenu: event.screenY=" + event.screenY +
             ", event.clientY=" + event.clientY + ", event.pageY=" + event.pageY +
             ", event.originalEvent.layerY=" + event.originalEvent.layerY)
