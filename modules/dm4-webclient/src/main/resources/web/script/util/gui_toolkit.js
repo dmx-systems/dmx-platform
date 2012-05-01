@@ -1,3 +1,8 @@
+/**
+ * A GUI toolkit to create buttons, menus, combo boxes, and dialog boxes.
+ *
+ * A toolkit instance is accessible as dm4c.ui
+ */
 function GUIToolkit(config) {
 
     var gui = this
@@ -10,6 +15,9 @@ function GUIToolkit(config) {
      * Creates and returns a jQuery UI button.
      *
      * @param   handler     The callback function. The generic JavaScript event arguments are passed to it.
+     * @param   label       Optional: the button label (string).
+     * @param   icon        Optional: the button icon (string).
+     * @param   is_submit   Optional: if true a submit button is created (boolean).
      *
      * @return              The button (a jQuery object).
      */
@@ -20,7 +28,7 @@ function GUIToolkit(config) {
         }
         //
         button = $('<button type="' + (is_submit ? "submit" : "button") + '">').click(handler)
-        //
+        // build options
         var options = {}
         if (label) {
             options.label = label
@@ -30,7 +38,7 @@ function GUIToolkit(config) {
         if (icon) {
             options.icons = {primary: "ui-icon-" + icon}
         }
-        //
+        // create button
         return button.button(options)
     }
 

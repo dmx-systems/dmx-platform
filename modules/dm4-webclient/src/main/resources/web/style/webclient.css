@@ -89,6 +89,10 @@ body {
 /*** Page Panel Boxes ***/
 
 #page-content .box {
+    position: relative;
+}
+
+#page-content .box.complex {
     padding: 0.5em;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
@@ -137,6 +141,12 @@ body {
 
 .add-button {
     text-align: right;
+}
+
+.remove-button {
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 /* ### FIXME: revise field-value, not widely used anymore, drop it? */
