@@ -16,6 +16,7 @@ var dm4c = new function() {
     var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
     this.REF_PREFIX = "ref_id:"
+    this.DEL_PREFIX = "del_id:"
 
     // log window
     if (ENABLE_LOGGING) {
@@ -233,7 +234,7 @@ var dm4c = new function() {
      *          field. The updated topic on the other hand is the complete topic as returned by the server.
      */
     this.do_update_topic = function(old_topic, new_topic) {
-        // alert("do_update_topic(): new_topic=" + js.stringify(new_topic))
+        alert("do_update_topic(): new_topic=" + js.stringify(new_topic))
         if (new_topic) {
             // update DB
             var directives = dm4c.restc.update_topic(new_topic)

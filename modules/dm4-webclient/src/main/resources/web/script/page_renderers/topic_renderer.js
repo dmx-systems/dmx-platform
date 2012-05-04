@@ -101,9 +101,24 @@ function TopicRenderer() {
                     // cardinality "many"
                     composite[assoc_def_uri] = []
                     for (var i = 0; i < child_model.length; i++) {
-                        var value = build_topic_model(child_model[i])
-                        if (value != null) {
-                            composite[assoc_def_uri].push(value)
+                        //
+                        if (child_model[i].topic.delete) {
+                            switch (child_model[i].assoc_def.assoc_type_uri) {
+                            case "dm4.core.composition_def":
+                                composite[assoc_def_uri].push(dm4c.DEL_PREFIX + child_model[i].topic.id)
+                                break
+                            case "dm4.core.aggregation_def":
+                                // do nothing
+                                break
+                            default:
+                                throw "TopicRendererError: \"" + child_model[i].assoc_def.assoc_type_uri +
+                                    "\" is an unexpected assoc type URI"
+                            }
+                        } else {
+                            var value = build_topic_model(child_model[i])
+                            if (value != null) {
+                                composite[assoc_def_uri].push(value)
+                            }
                         }
                     }
                 } else {
@@ -541,10 +556,10 @@ TopicRenderer.render_page_model = function(page_model, render_mode, level, ref_e
     }
     //
     if (page_model instanceof TopicRenderer.FieldModel) {
-        var box = render_box(is_many(), false)  // is_complex=false
+        var box = render_box(page_model, is_many(), false)  // is_complex=false
         page_model[render_func_name()](box)
     } else if (page_model instanceof TopicRenderer.PageModel) {
-        var box = render_box(is_many(), true)   // is_complex=true
+        var box = render_box(page_model, is_many(), true)   // is_complex=true
         for (var assoc_def_uri in page_model.childs) {
             var child_model = page_model.childs[assoc_def_uri]
             if (js.is_array(child_model)) {
@@ -580,7 +595,7 @@ TopicRenderer.render_page_model = function(page_model, render_mode, level, ref_e
         }
     }
 
-    function render_box(is_many, is_complex) {
+    function render_box(page_model, is_many, is_complex) {
         var box = $("<div>").addClass("box")
         if (is_complex) {
             box.addClass("complex").addClass("level" + level)
@@ -592,7 +607,7 @@ TopicRenderer.render_page_model = function(page_model, render_mode, level, ref_e
         }
         //
         if (render_mode == "form" && is_many) {
-            render_remove_button(box)
+            render_remove_button(page_model, box)
         }
         //
         return box
@@ -617,12 +632,16 @@ TopicRenderer.render_page_model = function(page_model, render_mode, level, ref_e
         }
     }
 
-    function render_remove_button(parent_element) {
+    function render_remove_button(page_model, parent_element) {
         var remove_button = dm4c.ui.button(do_remove, undefined, "circle-minus")
         var remove_button_div = $("<div>").addClass("remove-button").append(remove_button)
         parent_element.append(remove_button_div)
 
         function do_remove() {
+            // update model
+            page_model.topic.delete = true
+            // update view
+            parent_element.remove()
         }
     }
 }
