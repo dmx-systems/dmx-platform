@@ -384,6 +384,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     void store(ClientState clientState, Directives directives) {
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
             CompositeValue comp = getCompositeValue();
+            // Note: we build the composite value memory representation from scratch.
+            // Uninitialized IDs, URIs, and values in the TopicModels must be replaced with the real ones.
+            // In case of many-relationships the TopicModel arrays can not be updated incrementally because
+            // they can't be looked up by ID (because topics to be created have no ID yet.)
             model.setCompositeValue(new CompositeValue());
             updateCompositeValue(comp, clientState, directives);
             refreshLabel();
@@ -542,7 +546,12 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         if (cardinalityUri.equals("dm4.core.one")) {
             comp.put(assocDefUri, topic);
         } else if (cardinalityUri.equals("dm4.core.many")) {
-            List<TopicModel> topics = comp.getTopics(assocDefUri);
+            List<TopicModel> topics = comp.getTopics(assocDefUri, null);        // defaultValue=null
+            // Note: topics just created have no child topics yet
+            if (topics == null) {
+                topics = new ArrayList();
+                comp.put(assocDefUri, topics);
+            }
             topics.remove(topic);
             topics.add(topic);
         } else {

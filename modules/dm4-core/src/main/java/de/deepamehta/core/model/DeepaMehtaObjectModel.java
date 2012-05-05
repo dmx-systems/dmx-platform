@@ -5,7 +5,6 @@ import de.deepamehta.core.Identifiable;
 import de.deepamehta.core.JSONEnabled;
 
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.Collection;
@@ -206,7 +205,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
             o.put("type_uri", typeUri);
             o.put("composite", composite.toJSON());
             return o;
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
