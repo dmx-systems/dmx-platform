@@ -3,7 +3,6 @@ package de.deepamehta.plugins.topicmaps.model;
 import de.deepamehta.core.model.AssociationModel;
 
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 
@@ -32,7 +31,7 @@ public class TopicmapAssociation extends AssociationModel {
             JSONObject o = super.toJSON();
             o.put("ref_id", refId);
             return o;
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }

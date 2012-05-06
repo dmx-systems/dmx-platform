@@ -4,7 +4,6 @@ import de.deepamehta.core.util.JSONHelper;
 
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.HashMap;

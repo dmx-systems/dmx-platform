@@ -2,7 +2,6 @@ package de.deepamehta.core.service;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONException;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,7 +35,7 @@ public class PluginInfo {
             pluginInfo.put("plugin_id", pluginId);
             pluginInfo.put("plugin_file", pluginFile);
             return pluginInfo;
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }

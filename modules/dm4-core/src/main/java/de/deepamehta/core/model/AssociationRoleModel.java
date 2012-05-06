@@ -2,7 +2,6 @@ package de.deepamehta.core.model;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +64,7 @@ public class AssociationRoleModel extends RoleModel {
             o.put("assoc_id", assocId);
             o.put("role_type_uri", roleTypeUri);
             return o;
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }

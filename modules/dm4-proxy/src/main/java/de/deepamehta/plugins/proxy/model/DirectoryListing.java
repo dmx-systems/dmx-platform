@@ -4,7 +4,6 @@ import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ public class DirectoryListing {
             }
             dir.put("items", items);
             return dir;
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
@@ -109,7 +108,7 @@ public class DirectoryListing {
                     item.put("type", type);
                 }
                 return item;
-            } catch (JSONException e) {
+            } catch (Exception e) {
                 throw new RuntimeException("Serialization failed (" + this + ")", e);
             }
         }

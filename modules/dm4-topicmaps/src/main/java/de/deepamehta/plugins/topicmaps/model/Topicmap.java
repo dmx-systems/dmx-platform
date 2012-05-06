@@ -11,7 +11,6 @@ import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.util.JSONHelper;
 
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.awt.Point;
@@ -77,12 +76,16 @@ public class Topicmap {
 
     // ---
 
-    public JSONObject toJSON() throws JSONException {
-        JSONObject topicmap = new JSONObject();
-        topicmap.put("info", topicmapTopic.toJSON());
-        topicmap.put("topics", JSONHelper.objectsToJSON(topics.values()));
-        topicmap.put("assocs", JSONHelper.objectsToJSON(assocs.values()));
-        return topicmap;
+    public JSONObject toJSON() {
+        try {
+            JSONObject topicmap = new JSONObject();
+            topicmap.put("info", topicmapTopic.toJSON());
+            topicmap.put("topics", JSONHelper.objectsToJSON(topics.values()));
+            topicmap.put("assocs", JSONHelper.objectsToJSON(assocs.values()));
+            return topicmap;
+        } catch (Exception e) {
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
+        }
     }
 
     @Override

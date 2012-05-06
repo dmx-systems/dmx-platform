@@ -4,7 +4,6 @@ import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
 
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.Map;
@@ -41,7 +40,7 @@ public class TopicmapTopic extends TopicModel {
             o.put("visualization", visualizationProperties.toJSON());
             o.put("ref_id", refId);
             return o;
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }

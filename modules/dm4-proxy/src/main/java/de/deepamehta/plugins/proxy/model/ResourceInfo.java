@@ -1,7 +1,6 @@
 package de.deepamehta.plugins.proxy.model;
 
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONException;
 
 import java.io.File;
 import java.net.URL;
@@ -37,7 +36,7 @@ public class ResourceInfo {
             JSONObject info = new JSONObject();
             info.put("kind", kind);
             return info;
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
