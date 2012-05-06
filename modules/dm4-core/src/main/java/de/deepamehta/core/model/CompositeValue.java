@@ -26,6 +26,7 @@ public class CompositeValue {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String REF_PREFIX = "ref_id:";
+    private static final String DEL_PREFIX = "del_id:";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -315,6 +316,7 @@ public class CompositeValue {
             JSONObject val = (JSONObject) value;
             // we detect the canonic format by checking for a mandatory topic property
             if (val.has("type_uri")) {
+                // canonic format
                 return new TopicModel(val);
             } else {
                 // compact format (composite topic)
@@ -325,13 +327,22 @@ public class CompositeValue {
             if (value instanceof String) {
                 String val = (String) value;
                 if (val.startsWith(REF_PREFIX)) {
-                    // value represents a topic reference
-                    long refTopicId = Long.parseLong(val.substring(REF_PREFIX.length()));
-                    return new TopicModel(refTopicId, null, key, null, null);
+                    // topic reference
+                    long refTopicId = refTopicId(val, REF_PREFIX);
+                    return new TopicModel(refTopicId, key);
+                } else if (val.startsWith(DEL_PREFIX)) {
+                    // topic deletion reference
+                    long refTopicId = refTopicId(val, DEL_PREFIX);
+                    return new TopicDeletionModel(refTopicId);
                 }
             }
+            // compact format (simple topic)
             return new TopicModel(key, new SimpleValue(value));
         }
+    }
+
+    private long refTopicId(String val, String prefix) {
+        return Long.parseLong(val.substring(prefix.length()));
     }
 
     private void throwInvalidAccess(String key, ClassCastException e) {

@@ -14,6 +14,7 @@ import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.util.JavaUtils;
@@ -350,7 +351,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ----------------------------------------------------------------------------------------------- Protected Methods
 
-    // ### This is supposed to be protected, but doesn't compile!
+    // ### This is supposed to be protected, but doesn't compile! ### FIXME: re-check
     // ### It is called from the subclasses constructors, but on a differnt TopicBase instance.
     // ### See de.deepamehta.core.impl.storage.MGTopic and de.deepamehta.core.impl.service.AttachedTopic.
     public DeepaMehtaObjectModel getModel() {
@@ -384,6 +385,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     void store(ClientState clientState, Directives directives) {
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
             CompositeValue comp = getCompositeValue();
+            // Note: we build the composite value memory representation from scratch.
+            // Uninitialized IDs, URIs, and values in the TopicModels must be replaced with the real ones.
+            // In case of many-relationships the TopicModel arrays can not be updated incrementally because
+            // they can't be looked up by ID (because topics to be created have no ID yet.)
             model.setCompositeValue(new CompositeValue());
             updateCompositeValue(comp, clientState, directives);
             refreshLabel();
@@ -491,11 +496,13 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 updateCompositionMany(assocDef, newChildTopics, clientState, directives);
             }
         } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
+            // error check
             String childTopicTypeUri = assocDef.getPartTopicTypeUri();
             TopicType childTopicType = dms.getTopicType(childTopicTypeUri, null);
             if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
                 throw new RuntimeException("Aggregation of composite topic types not yet supported");
             }
+            //
             if (one) {
                 updateAggregationOne(assocDef, newChildTopic, clientState, directives);
             } else {
@@ -527,9 +534,23 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     private void updateCompositionMany(AssociationDefinition assocDef, List<TopicModel> newChildTopics,
                                                                        ClientState clientState, Directives directives) {
         for (TopicModel newChildTopic : newChildTopics) {
-            updateCompositionOne(assocDef, newChildTopic, clientState, directives);
+            if (newChildTopic instanceof TopicDeletionModel) {
+                deleteChildTopic(assocDef, newChildTopic, clientState, directives);
+            } else {
+                updateCompositionOne(assocDef, newChildTopic, clientState, directives);
+            }
         }
     }
+
+    private void deleteChildTopic(AssociationDefinition assocDef, TopicModel childTopic, ClientState clientState,
+                                                                                         Directives directives) {
+        // 1) update DB
+        dms.getTopic(childTopic.getId(), false, null).delete(directives);       // fetchComposite=false
+        // 2) update memory
+        updateCompositeModelDeletion(assocDef, childTopic);
+    }
+
+    // ---
 
     /**
      * Updates memory.
@@ -542,12 +563,28 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         if (cardinalityUri.equals("dm4.core.one")) {
             comp.put(assocDefUri, topic);
         } else if (cardinalityUri.equals("dm4.core.many")) {
-            List<TopicModel> topics = comp.getTopics(assocDefUri);
+            List<TopicModel> topics = comp.getTopics(assocDefUri, null);        // defaultValue=null
+            // Note: topics just created have no child topics yet
+            if (topics == null) {
+                topics = new ArrayList();
+                comp.put(assocDefUri, topics);
+            }
             topics.remove(topic);
             topics.add(topic);
         } else {
             throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
         }
+    }
+
+    /**
+     * Updates memory.
+     */
+    private void updateCompositeModelDeletion(AssociationDefinition assocDef, TopicModel topic) {
+        CompositeValue comp = getCompositeValue();
+        String assocDefUri = assocDef.getUri();
+        //
+        List<TopicModel> topics = comp.getTopics(assocDefUri, null);            // defaultValue=null
+        topics.remove(topic);
     }
 
     // --- Aggregation ---
@@ -601,6 +638,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             return childTopic;
         }
     }
+
+    // ---
 
     /**
      * Updates memory.

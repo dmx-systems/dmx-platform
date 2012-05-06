@@ -16,6 +16,7 @@ var dm4c = new function() {
     var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
     this.REF_PREFIX = "ref_id:"
+    this.DEL_PREFIX = "del_id:"
 
     // log window
     if (ENABLE_LOGGING) {

@@ -24,7 +24,7 @@ function TopicRenderer() {
         // trigger hook
         dm4c.trigger_plugin_hook("pre_render_page", topic, page_model)
         //
-        render_page_model(page_model, "render_field")
+        render_page_model(page_model, "page")
         //
         dm4c.render.associations(topic.id)
     }
@@ -34,7 +34,7 @@ function TopicRenderer() {
         // trigger hook
         dm4c.trigger_plugin_hook("pre_render_form", topic, page_model)
         //
-        render_page_model(page_model, "render_form_element")
+        render_page_model(page_model, "form")
         //
         return function() {
             dm4c.do_update_topic(topic, build_topic_model(page_model))
@@ -55,10 +55,11 @@ function TopicRenderer() {
     }
 
     /**
-     * @param   page_model  the page model to render. If undefined nothing is rendered.
+     * @param   page_model      the page model to render. If undefined nothing is rendered.
+     * @param   render_mode     "page" or "form" (string).
      */
-    function render_page_model(page_model, render_func_name) {
-        TopicRenderer.render_page_model(page_model, render_func_name, 0, $("#page-content"))
+    function render_page_model(page_model, render_mode) {
+        TopicRenderer.render_page_model(page_model, render_mode, 0, $("#page-content"))
     }
 
     /**
@@ -100,9 +101,24 @@ function TopicRenderer() {
                     // cardinality "many"
                     composite[assoc_def_uri] = []
                     for (var i = 0; i < child_model.length; i++) {
-                        var value = build_topic_model(child_model[i])
-                        if (value != null) {
-                            composite[assoc_def_uri].push(value)
+                        //
+                        if (child_model[i].topic.delete) {
+                            switch (child_model[i].assoc_def.assoc_type_uri) {
+                            case "dm4.core.composition_def":
+                                composite[assoc_def_uri].push(dm4c.DEL_PREFIX + child_model[i].topic.id)
+                                break
+                            case "dm4.core.aggregation_def":
+                                // do nothing
+                                break
+                            default:
+                                throw "TopicRendererError: \"" + child_model[i].assoc_def.assoc_type_uri +
+                                    "\" is an unexpected assoc type URI"
+                            }
+                        } else {
+                            var value = build_topic_model(child_model[i])
+                            if (value != null) {
+                                composite[assoc_def_uri].push(value)
+                            }
                         }
                     }
                 } else {
@@ -524,49 +540,76 @@ TopicRenderer.create_page_model = function(topic, assoc_def, field_uri, toplevel
 }
 
 /**
- * @param   incremental     Boolean
+ * Renders a page model. Called recursively.
+ *
+ * @param   page_model      The page model to render (a TopicRenderer.PageModel or a TopicRenderer.FieldModel).
+ * @param   render_mode     "page" or "form" (string).
+ * @param   level           The nesting level (integer). Starts at 0.
+ * @param   ref_element     The page element the rendering is attached to (a jQuery object).
+ *                          Precondition: this element is already part of the DOM.
+ * @param   incremental     (boolean).
  */
-TopicRenderer.render_page_model = function(page_model, render_func_name, level, ref_element, incremental) {
+TopicRenderer.render_page_model = function(page_model, render_mode, level, ref_element, incremental) {
     // Note: if the topic is not viewable/editable the page model is undefined
     if (!page_model) {
         return
     }
     //
     if (page_model instanceof TopicRenderer.FieldModel) {
-        var box = render_box(true)      // is_simple=true
-        page_model[render_func_name](box)
+        var box = render_box(page_model, is_many(), false)  // is_complex=false
+        page_model[render_func_name()](box)
     } else if (page_model instanceof TopicRenderer.PageModel) {
-        var box = render_box(false)     // is_simple=false
+        var box = render_box(page_model, is_many(), true)   // is_complex=true
         for (var assoc_def_uri in page_model.childs) {
             var child_model = page_model.childs[assoc_def_uri]
             if (js.is_array(child_model)) {
                 // cardinality "many"
                 for (var i = 0; i < child_model.length; i++) {
-                    TopicRenderer.render_page_model(child_model[i], render_func_name, level + 1, box)
+                    TopicRenderer.render_page_model(child_model[i], render_mode, level + 1, box)
                 }
-                // ### FIXME: we should not rely on function name
-                if (render_func_name == "render_form_element") {
+                if (render_mode == "form") {
                     render_add_button(child_model, level + 1, box)
                 }
             } else {
                 // cardinality "one"
-                TopicRenderer.render_page_model(child_model, render_func_name, level + 1, box)
+                TopicRenderer.render_page_model(child_model, render_mode, level + 1, box)
             }
         }
     } else {
         throw "TopicRendererError: invalid page model"
     }
 
-    function render_box(is_simple) {
-        var box = $("<div>")
-        if (!is_simple) {
-            box.addClass("box").addClass("level" + level)
+    function is_many() {
+        // Note: the top-level page model has no assoc_def
+        return page_model.assoc_def && page_model.assoc_def.part_cardinality_uri == "dm4.core.many"
+    }
+
+    function render_func_name() {
+        switch (render_mode) {
+        case "page":
+            return "render_field"
+        case "form":
+            return "render_form_element"
+        default:
+            throw "TopicRendererError: \"" + render_mode + "\" is an invalid render mode"
+        }
+    }
+
+    function render_box(page_model, is_many, is_complex) {
+        var box = $("<div>").addClass("box")
+        if (is_complex) {
+            box.addClass("complex").addClass("level" + level)
         }
         if (incremental) {
             ref_element.before(box)
         } else {
             ref_element.append(box)
         }
+        //
+        if (render_mode == "form" && is_many) {
+            render_remove_button(page_model, box)
+        }
+        //
         return box
     }
 
@@ -585,8 +628,20 @@ TopicRenderer.render_page_model = function(page_model, render_func_name, level, 
             var _page_model = TopicRenderer.create_page_model(topic, assoc_def, field_uri, toplevel_topic, "editable")
             page_model.push(_page_model)
             // render page model
-            TopicRenderer.render_page_model(_page_model, "render_form_element", level, add_button_div, true)
-                                                                                                   // incremental=true
+            TopicRenderer.render_page_model(_page_model, "form", level, add_button_div, true)   // incremental=true
+        }
+    }
+
+    function render_remove_button(page_model, parent_element) {
+        var remove_button = dm4c.ui.button(do_remove, undefined, "circle-minus")
+        var remove_button_div = $("<div>").addClass("remove-button").append(remove_button)
+        parent_element.append(remove_button_div)
+
+        function do_remove() {
+            // update model
+            page_model.topic.delete = true
+            // update view
+            parent_element.remove()
         }
     }
 }
