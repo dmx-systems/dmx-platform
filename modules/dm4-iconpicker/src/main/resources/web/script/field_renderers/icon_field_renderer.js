@@ -1,15 +1,30 @@
 function IconFieldRenderer(field_model) {
 
-    var picked_icon = null  // a topic of type "dm4.webclient.icon"
-
     this.render_field = function(parent_element) {
         dm4c.render.field_label(field_model, parent_element)
         parent_element.append(render_icon(field_model.value))
     }
 
     this.render_form_element = function(parent_element) {
+        var picked_icon = null  // a topic of type "dm4.webclient.icon"
         var image = render_icon(field_model.value)
         parent_element.append(image.after(dm4c.ui.button(do_open_iconpicker, "Choose")))
+        //
+        return function() {
+            // prevent the field from being updated if no icon has been selected
+            if (picked_icon == null) {
+                return null
+            }
+            //
+            if (field_model.uri) {
+                // An instance of an Icon's parent type is edited.
+                // Note: aggregation is assumed ### FIXME: support composition as well
+                return dm4c.REF_PREFIX + picked_icon.id
+            } else {
+                // An Icon instance itself is edited.
+                return picked_icon.value
+            }
+        }
 
         function do_open_iconpicker() {
             // query icon topics
@@ -32,22 +47,6 @@ function IconFieldRenderer(field_model) {
                     image.attr({src: icon_topic.value, title: icon_topic.value})
                 }
             }
-        }
-    }
-
-    this.read_form_value = function() {
-        // prevent the field from being updated if no icon has been selected
-        if (picked_icon == null) {
-            return null
-        }
-        //
-        if (field_model.uri) {
-            // An instance of an Icon's parent type is edited.
-            // Note: aggregation is assumed ### FIXME: support composition as well
-            return dm4c.REF_PREFIX + picked_icon.id
-        } else {
-            // An Icon instance itself is edited.
-            return picked_icon.value
         }
     }
 

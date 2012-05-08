@@ -398,18 +398,19 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
     this.label = this.topic_type.value
     this.rows = get_view_config("rows")
     var field_renderer = create_field_renderer()
+    var read_form_value_func
 
     this.render_field = function(parent_element) {
-        trigger_renderer_hook("render_field", parent_element)
+        field_renderer.render_field(parent_element)
     }
 
     this.render_form_element = function(parent_element) {
         dm4c.render.field_label(this, parent_element)
-        trigger_renderer_hook("render_form_element", parent_element)
+        read_form_value_func = field_renderer.render_form_element(parent_element)
     }
 
     this.read_form_value = function() {
-        var form_value = trigger_renderer_hook("read_form_value")
+        var form_value = read_form_value_func()
         // Note: undefined value is an error (means: field renderer returned no value).
         // null is a valid result (means: field renderer prevents the field from being updated).
         if (form_value === undefined) {
@@ -431,24 +432,6 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
         }
         //
         return js.new_object(js_field_renderer_class, self)
-    }
-
-    /**
-     * Triggers a field renderer hook.
-     *
-     * @param   hook_name   Name of the field renderer hook to trigger.
-     * @param   <varargs>   Variable number of arguments. Passed to the hook.
-     */
-    function trigger_renderer_hook(hook_name) {
-        // Trigger the hook only if it is defined (a field renderer must not define all hooks).
-        if (field_renderer[hook_name]) {
-            // ### FIXME: use apply() instead of limiting arguments
-            if (arguments.length == 1) {
-                return field_renderer[hook_name]()
-            } else if (arguments.length == 2) {
-                return field_renderer[hook_name](arguments[1])
-            }
-        }
     }
 
     function get_view_config(setting) {

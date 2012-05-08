@@ -1,18 +1,14 @@
 function TextFieldRenderer(field_model) {
 
-    /**
-     * Input field: a jQuery object
-     * Text area:   a jQuery object
-     * Combo box:   a GUIToolkit Combobox object
-     */
-    var gui_element
-
     this.render_field = function(parent_element) {
         dm4c.render.field_label(field_model, parent_element)
         parent_element.append(js.render_text(field_model.value))
     }
 
     this.render_form_element = function(parent_element) {
+        var gui_element     // Input field: a jQuery object
+                            // Text area:   a jQuery object
+                            // Combo box:   a GUIToolkit Combobox object
         // error check
         if (!field_model.rows) {
             throw "TextFieldRendererError: field \"" + field_model.label + "\" has no \"rows\" setting"
@@ -39,25 +35,25 @@ function TextFieldRenderer(field_model) {
             gui_element = render_textarea()
             render(gui_element)
         }
+        //
+        return function() {
+            if (gui_element instanceof jQuery) {
+                return $.trim(gui_element.val())
+            } else {
+                // gui_element is a Combobox
+                var selection = gui_element.get_selection()  // either a menu item (object) or the text entered (string)
+                if (typeof(selection) == "object") {
+                    // user selected existing topic
+                    return dm4c.REF_PREFIX + selection.value
+                } else {
+                    // user entered new value
+                    return selection
+                }
+            }
+        }
 
         function render(form_element) {
             parent_element.append(form_element)
-        }
-    }
-
-    this.read_form_value = function() {
-        if (gui_element instanceof jQuery) {
-            return $.trim(gui_element.val())
-        } else {
-            // gui_element is a Combobox
-            var selection = gui_element.get_selection()   // either a menu item (object) or the text entered (string)
-            if (typeof(selection) == "object") {
-                // user selected existing topic
-                return dm4c.REF_PREFIX + selection.value
-            } else {
-                // user entered new value
-                return selection
-            }
         }
     }
 

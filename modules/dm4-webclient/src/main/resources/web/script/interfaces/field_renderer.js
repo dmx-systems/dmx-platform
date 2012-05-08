@@ -17,10 +17,9 @@ function FieldRenderer() {
 
     this.render_field = function(parent_element) {
 
-    this.render_form_element = function(parent_element) {
-
     /**
-     * @return  a simple value or a topic reference (in REF_PREFIX notation)
+     * @return  A function that reads out the form element's value. This function is expected
+     *          to return a simple value or a topic reference (in REF_PREFIX notation).
      */
-    this.read_form_value = function() {
+    this.render_form_element = function(parent_element) {
 }

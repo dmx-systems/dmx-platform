@@ -13,9 +13,9 @@ function HTMLFieldRenderer(field_model) {
         CKEDITOR.replace("field_" + field_model.uri, {
             customConfig: "/script/config/ckeditor_config.js"
         })
-    }
-
-    this.read_form_value = function() {
-        return CKEDITOR.instances["field_" + field_model.uri].getData()
+        //
+        return function() {
+            return CKEDITOR.instances["field_" + field_model.uri].getData()
+        }
     }
 }

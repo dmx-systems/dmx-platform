@@ -1,3 +1,4 @@
+// ### TODO: adapt to new FieldRenderer API.
 function DateFieldRenderer(field) {
 
     this.render_field = function() {
