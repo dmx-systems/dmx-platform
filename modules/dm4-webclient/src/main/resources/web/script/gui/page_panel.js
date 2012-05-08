@@ -14,6 +14,8 @@ function PagePanel() {
     var page_state = PageState.NONE     // Tracks page state. Used to fire the "post_destroy_form" event in case.
     var from_processing_func            // The form processing function: called to "submit" the form
                                         // (only consulted if a form is displayed).
+    var from_processing_called          // Tracks the form processing function call (boolean).
+                                        // Used to ensure the form processing function is called only once.
 
     // View
     var dom = $("<div>").attr("id", "page-panel")
@@ -78,14 +80,16 @@ function PagePanel() {
     }
 
     this.save = function() {
-        if (page_state == PageState.FORM) {
-            if (!from_processing_func) {
-                throw "PagePanelError: there is no form processing function"
-            }
-            //
-            from_processing_func()
-            from_processing_func = null     // force a 2nd (unwanted) save call to fail
+        if (page_state != PageState.FORM) {
+            return
         }
+        //
+        if (from_processing_called) {
+            throw "PagePanelError: the form processing function has already been called"
+        }
+        //
+        from_processing_called = true
+        from_processing_func()
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
@@ -128,6 +132,7 @@ function PagePanel() {
     function render_form() {
         prepare_page()
         from_processing_func = page_renderer.render_form(displayed_object)
+        from_processing_called = false
     }
 
     function render_buttons(context) {

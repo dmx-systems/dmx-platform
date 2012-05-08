@@ -183,6 +183,20 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         refreshLabel();
     }
 
+    // ---
+
+    @Override
+    public void updateChildTopic(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
+                                                                                           Directives directives) {
+        updateChildTopics(assocDef, true, newChildTopic, null, clientState, directives);    // one=true
+    }
+
+    @Override
+    public void updateChildTopics(AssociationDefinition assocDef, List<TopicModel> newChildTopics,
+                                                                  ClientState clientState, Directives directives) {
+        updateChildTopics(assocDef, false, null, newChildTopics, clientState, directives);  // one=false
+    }
+
 
 
     // === Traversal ===
@@ -455,7 +469,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 List<TopicModel> newChildTopics = null;     // only used for "many"
                 boolean one = false;
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    newChildTopic = newComp.getTopic(assocDefUri, null);             // defaultValue=null
+                    newChildTopic = newComp.getTopic(assocDefUri, null);        // defaultValue=null
                     // skip if not contained in update request
                     if (newChildTopic == null) {
                         continue;
@@ -463,7 +477,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                     //
                     one = true;
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    newChildTopics = newComp.getTopics(assocDefUri, null);     // defaultValue=null
+                    newChildTopics = newComp.getTopics(assocDefUri, null);      // defaultValue=null
                     // skip if not contained in update request
                     if (newChildTopics == null) {
                         continue;
@@ -472,7 +486,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                     throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
                 }
                 //
-                updateCompositeValue(assocDef, one, newChildTopic, newChildTopics, clientState, directives);
+                updateChildTopics(assocDef, one, newChildTopic, newChildTopics, clientState, directives);
             }
         } catch (Exception e) {
             throw new RuntimeException("Updating the composite value of " + className() + " " + getId() +
@@ -480,14 +494,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    // ### FIXME: Remove from interface. Make it private.
-    @Override
-    public void updateCompositeValue(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
-                                                                                               Directives directives) {
-    }
-
-    private void updateCompositeValue(AssociationDefinition assocDef, boolean one, TopicModel newChildTopic,
-                                      List<TopicModel> newChildTopics, ClientState clientState, Directives directives) {
+    private void updateChildTopics(AssociationDefinition assocDef, boolean one, TopicModel newChildTopic,
+                                   List<TopicModel> newChildTopics, ClientState clientState, Directives directives) {
         String assocTypeUri = assocDef.getTypeUri();
         if (assocTypeUri.equals("dm4.core.composition_def")) {
             if (one) {

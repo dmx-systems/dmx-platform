@@ -53,9 +53,10 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // ---
 
-    // ### FIXME: remove from interface. This is a low-level method.
-    void updateCompositeValue(AssociationDefinition assocDef, TopicModel valueTopic, ClientState clientState,
-                                                                                     Directives directives);
+    void updateChildTopic(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
+                                                                                    Directives directives);
+    void updateChildTopics(AssociationDefinition assocDef, List<TopicModel> newChildTopics, ClientState clientState,
+                                                                                            Directives directives);
 
 
 
