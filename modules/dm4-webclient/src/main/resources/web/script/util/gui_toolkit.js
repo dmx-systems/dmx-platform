@@ -102,19 +102,19 @@ function GUIToolkit(config) {
      *          <div>           - the actual menu (hidden until triggered)
      *              <a>         - a menu item
      *
-     * The menu's DOM structure is accessible through the menu's "dom" attribute (a jQuery object).
+     * The menu's DOM structure is accessible through the menu's "dom" property (a jQuery object).
      *
      * @param   handler     Optional: The callback function. One argument is passed to it:
      *                      the selected menu item (an object with "value" and "label" properties).
      *                      If not specified your application can not react on the menu selection, which is
      *                      reasonable in case of stateful select-like menus.
      * @param   menu_title  Optional: The menu title (string).
-     *                      If specified a stateless action-trigger menu with a static menu title is created.
-     *                      If not specified a stateful select-like menu is created with the selected item as
-     *                      "menu title".
+     *                      If specified (even if empty string) a stateless action-trigger menu with a static menu title
+     *                      is created. If not specified a stateful select-like menu is created with the selected item
+     *                      as "menu title".
      *
      * @return              The created menu (a Menu object). The caller can add the menu to the page by accessing the
-     *                      menu's "dom" attribute (a jQuery object).
+     *                      menu's "dom" property (a jQuery object).
      */
     this.menu = function(handler, menu_title) {
 
@@ -127,7 +127,7 @@ function GUIToolkit(config) {
             // Model
             // Note: the surrounding "handler" and "menu_title" are also part of the menu's model.
             var items = []
-            var stateful = !menu_title
+            var stateful = menu_title == undefined
             var selection   // selected menu item (object with "value" and "label" properties).
                             // Used only for stateful select-like menus.
 
@@ -512,7 +512,7 @@ function GUIToolkit(config) {
         return new Combobox()
 
         function Combobox() {
-            var menu = gui.menu(item_selected, "Choose")
+            var menu = gui.menu(do_select_item, "")
             var input = $("<input>").attr("type", "text").addClass("combobox")
             menu.dom.append(input)
             this.dom = menu.dom
@@ -542,7 +542,7 @@ function GUIToolkit(config) {
                 return item || text
             }
 
-            function item_selected(item) {
+            function do_select_item(item) {
                 setInputText(item.label)
             }
 

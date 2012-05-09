@@ -37,32 +37,24 @@ TextFieldRenderer.prototype.render_form_element = function(parent_element) {
             throw "TextFieldRendererError: field \"" + field_model.label + "\" has no \"rows\" setting"
         }
         //
-        var form_element
         if (field_model.rows == 1) {
             switch (field_model.assoc_def && field_model.assoc_def.assoc_type_uri) {
             case undefined:
                 // Note: for non-composite topics the field's assoc_def is undefined.
                 // We treat this like a composition here.
             case "dm4.core.composition_def":
-                form_element = create_input()
-                render(form_element)
-                break
+                return render_input()
             case "dm4.core.aggregation_def":
-                form_element = create_combobox()
-                render(form_element.dom)
-                break
+                return render_combobox()
             default:
                 throw "TextFieldRendererError: \"" + field_model.assoc_def.assoc_type_uri +
                     "\" is an unexpected assoc type URI"
             }
         } else {
-            form_element = create_textarea()
-            render(form_element)
+            return render_textarea()
         }
-        //
-        return form_element
 
-        function create_input() {
+        function render_input() {
             var input = dm4c.render.input(field_model)
             if (field_model.autocomplete_indexes) {
                 var page_renderer = dm4c.get_page_renderer(field_model.toplevel_topic)
@@ -70,18 +62,26 @@ TextFieldRenderer.prototype.render_form_element = function(parent_element) {
                 input.blur(page_renderer.lost_focus)
                 input.attr({autocomplete: "off"})
             }
+            //
+            render(input)
             return input
         }
 
-        function create_textarea() {
-            return $("<textarea>").attr("rows", field_model.rows).text(field_model.value)
+        function render_textarea() {
+            var textarea = $("<textarea>").attr("rows", field_model.rows).text(field_model.value)
+            //
+            render(textarea)
+            return textarea
         }
 
-        function create_combobox() {
+        function render_combobox() {
             // fetch all instances
             var topics = dm4c.restc.get_topics(field_model.topic_type.uri, false, true).items  // fetch_composite=false,
-                                                                                               // sort=true
-            return create_combobox();
+            //                                                                                 // sort=true
+            var combobox = create_combobox()
+            //
+            render(combobox.dom)
+            return combobox
 
             function create_combobox() {
                 var combobox = dm4c.ui.combobox()
