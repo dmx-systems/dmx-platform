@@ -1,12 +1,13 @@
 function FileContentRenderer(field_model) {
+    this.field_model = field_model
+}
 
-    this.render_field = function(parent_element) {
-        render_content(parent_element)
-    }
+FileContentRenderer.prototype.render_field = function(parent_element) {
+    render_content(this.field_model)
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function render_content(parent_element) {
+    function render_content(field_model) {
         try {
             var path       = field_model.toplevel_topic.get("dm4.files.path")
             var size       = field_model.toplevel_topic.get("dm4.files.size")

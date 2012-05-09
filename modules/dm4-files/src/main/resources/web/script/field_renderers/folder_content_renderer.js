@@ -1,13 +1,14 @@
 function FolderContentRenderer(field_model) {
+    this.field_model = field_model
+}
 
-    this.render_field = function(parent_element) {
-        dm4c.render.field_label(field_model, parent_element)
-        render_content(parent_element)
-    }
+FolderContentRenderer.prototype.render_field = function(parent_element) {
+    dm4c.render.field_label(this.field_model, parent_element)
+    render_content(this.field_model)
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function render_content(parent_element) {
+    function render_content(field_model) {
         try {
             var path = field_model.toplevel_topic.get("dm4.files.path")
             var items = dm4c.restc.get_resource("file:" + path).items

@@ -58,6 +58,11 @@ function RenderHelper() {
     this.type_icon = function(type_uri) {
         var src   = dm4c.get_icon_src(type_uri)
         var title = dm4c.type_label(type_uri)
+        return this.icon(src, title)
+    }
+
+    this.icon = function(src, title) {
+        title = title || src
         return $("<img>").attr({src: src, title: title}).addClass("type-icon")
     }
 
