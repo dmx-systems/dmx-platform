@@ -110,8 +110,8 @@ function GUIToolkit(config) {
      *                      reasonable in case of stateful select-like menus.
      * @param   menu_title  Optional: The menu title (string).
      *                      If specified (even if empty string) a stateless action-trigger menu with a static menu title
-     *                      is created. If not specified a stateful select-like menu is created with the selected item
-     *                      as "menu title".
+     *                      is created. If not specified (undefined or null) a stateful select-like menu is created 
+     *                      with the selected item as "menu title".
      *
      * @return              The created menu (a Menu object). The caller can add the menu to the page by accessing the
      *                      menu's "dom" property (a jQuery object).
@@ -522,7 +522,7 @@ function GUIToolkit(config) {
             }
 
             this.select_by_label = function(item_label) {
-                setInputText(item_label)
+                set_input_text(item_label)
             }
 
             /**
@@ -543,10 +543,10 @@ function GUIToolkit(config) {
             }
 
             function do_select_item(item) {
-                setInputText(item.label)
+                set_input_text(item.label)
             }
 
-            function setInputText(text) {
+            function set_input_text(text) {
                 input.val(text)
             }
         }

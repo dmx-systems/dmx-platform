@@ -3,25 +3,16 @@ body {
     margin: 0;
 }
 
-/*** Main Layout ***/
+/*** Main Toolbar ***/
 
 #main-toolbar {
     background: #ddd;
     padding: 0.35em;
-    margin-bottom: 0.1em;
 }
 
 #main-toolbar input[type=text] {
     margin: 0;
     height: 1.3em;
-}
-
-#page-toolbar {
-    margin-top: 1.1em;
-}
-
-#page-toolbar button {
-    margin-right: 1em;
 }
 
 #search-widget {
@@ -32,13 +23,6 @@ body {
 #create-widget {
     float: left;
     margin-right: 3em;
-}
-
-.splash {
-    background-image: url("../images/deepamehta-logo.png");
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.5;
 }
 
 /*** Split Panel ***/
@@ -58,19 +42,92 @@ body {
     background: #f8f8f8;
 }
 
-/*** Page Panel Layout ***/
+/*** Page Panel ***/
 
 #page-panel {
     margin-left: 1.6em;
-    line-height: 1.6em;
 }
+
+#page-toolbar {
+    margin-top: 1.1em;
+}
+
+#page-toolbar button {
+    margin-right: 1em;
+}
+
+.splash {
+    background-image: url("../images/deepamehta-logo.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.5;
+}
+
+/*** Page Panel Content ***/
 
 #page-content {
     width: 30em;
 }
 
+#page-content p, ul, ol {
+    margin-top: 0;
+    margin-bottom: 0.7em;
+    line-height: 1.6em;
+}
+
+#page-content pre {
+    /* Relative or no font-size results in different sizes in Safari and Firefox */
+    font-size: 16px;
+    line-height: 1.3em;
+    white-space: pre-wrap;
+}
+
+.title {
+    font-size: 2em;
+    font-weight: bold;
+    line-height: 1.1em;
+    margin-top: 1em;
+    margin-bottom: 0.6em;
+}
+
+.field-label {
+    font-size: 75%;
+    color: gray;
+    margin-bottom: 0.2em;
+}
+
+/* the "Associations" label */
+.box + .field-label {
+    margin-top: 2em;
+    margin-bottom: 0.6em;
+}
+
+/*** Page Panel Boxes ***/
+
+#page-content .box {
+    position: relative;
+}
+
+#page-content .box + .box {
+    margin-top: 0.6em;
+}
+
+#page-content .box.complex {
+    padding: 0.6em;
+}
+
+#page-content .box.level0 {background: #f8f8f8;}
+#page-content .box.level1 {background: #ececec;}
+#page-content .box.level2 {background: #e0e0e0;}
+#page-content .box.level3 {background: #d4d4d4;}
+#page-content .box.level4 {background: #c8c8c8;}
+#page-content .box.level5 {background: #bcbcbc;}
+
+/*** Page Panel Form ***/
+
 #page-content input[type=text],
 #page-content textarea {
+    margin: 0;
     width: 97%;
     font-size: 1em;
 }
@@ -86,92 +143,15 @@ body {
     vertical-align: middle;
 }
 
-/*** Page Panel Boxes ***/
-
-#page-content .box {
-    position: relative;
-}
-
-#page-content .box.complex {
-    padding: 0.5em;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-}
-
-#page-content .box.level0 {
-    background: #f8f8f8;
-}
-
-#page-content .box.level1 {
-    background: #ececec;
-}
-
-#page-content .box.level2 {
-    background: #e0e0e0;
-}
-
-#page-content .box.level3 {
-    background: #d4d4d4;
-}
-
-#page-content .box.level4 {
-    background: #c8c8c8;
-}
-
-#page-content .box.level5 {
-    background: #bcbcbc;
-}
-
-/*** Page Panel Style ***/
-
-.title {
-    font-size: 170%;
-    font-weight: bold;
-    line-height: 1.1em;
-    margin-top: 1em;
+#page-content .add-button {
+    text-align: right;
     margin-bottom: 0.6em;
 }
 
-.field-label {
-    font-size: 75%;
-    color: gray;
-    line-height: 1.2em;
-    margin-top: 0.7em;
-}
-
-.add-button {
-    text-align: right;
-}
-
-.remove-button {
+#page-content .remove-button {
     position: absolute;
     top: 0;
     right: 0;
-}
-
-/* ### FIXME: revise field-value, not widely used anymore, drop it? */
-
-.field-value {
-    margin-bottom: 1em;
-}
-
-.field-value p {
-    margin-top: 0;
-}
-
-.field-value ul {
-    margin-top: 0;
-}
-
-.field-value pre {
-    /* Relative or no font-size results in different sizes in Safari and Firefox */
-    font-size: 16px;
-    line-height: 1.3em;
-    white-space: pre-wrap;
-}
-
-.field-value label {
-    display: block;
 }
 
 /*** Topic Lists ***/
