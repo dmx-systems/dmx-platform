@@ -1,6 +1,31 @@
 function RenderHelper() {
 
     /**
+     * @param   field_model     a TopicRenderer.FieldModel object or a string.
+     * @param   parent_element  Optional: the parent element the label is rendered to.
+     *                          If not specified the label is rendered directly to the page panel.
+     */
+    this.field_label = function(field_model, parent_element, result_set) {
+        parent_element = parent_element || $("#page-content")
+        //
+        if (typeof(field_model) == "string") {
+            var label = field_model
+        } else {
+            var label = field_model.label
+        }
+        //
+        if (result_set) {
+            var c = result_set.items.length
+            var tc = result_set.total_count
+            label += " (" + c + (tc > c ? " of " + tc : "") + ")"
+        }
+        //
+        parent_element.append($("<div>").addClass("field-label").text(label))
+    }
+
+    // ---
+
+    /**
      * @param   topics          Topics to render (array of Topic objects).
      *
      * @param   click_handler   Optional: by supplying a click handler the caller can customize the behavoir performed
@@ -126,40 +151,9 @@ function RenderHelper() {
     this.associations = function(topic_id) {
         var result = dm4c.restc.get_related_topics(topic_id, undefined, true, dm4c.MAX_RESULT_SIZE)
                                                                 // traversal_filter=undefined, sort=true
-        this.field_label("Associations", undefined, result)     // ### parent_element=undefined
-        this.field_value(this.topic_list(result.items))
+        this.field_label("Associations", undefined, result)     // parent_element=undefined
+        this.page(this.topic_list(result.items))
     }
-
-    // ---
-
-    /**
-     * @param   field_model     a TopicRenderer.FieldModel object or a string.
-     * @param   parent_element  Optional: the parent element the label is rendered to.
-     *                          If not specified the label is rendered directly to the page panel.
-     */
-    this.field_label = function(field_model, parent_element, result_set) {
-        parent_element = parent_element || $("#page-content")
-        //
-        if (typeof(field_model) == "string") {
-            var label = field_model
-        } else {
-            var label = field_model.label
-        }
-        //
-        if (result_set) {
-            var c = result_set.items.length
-            var tc = result_set.total_count
-            label += " (" + c + (tc > c ? " of " + tc : "") + ")"
-        }
-        //
-        parent_element.append($("<div>").addClass("field-label").text(label))
-    }
-
-    this.field_value = function(value) {
-        this.page($("<div>").addClass("field-value").append(value))
-    }
-
-    // ---
 
     this.page = function(html) {
         $("#page-content").append(html)

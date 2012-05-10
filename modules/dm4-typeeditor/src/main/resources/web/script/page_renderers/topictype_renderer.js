@@ -12,14 +12,14 @@ function TopictypeRenderer() {
         var topic_type = dm4c.get_topic_type(topic.uri)
         //
         dm4c.render.field_label("Name")
-        dm4c.render.field_value(topic_type.value)
+        dm4c.render.page(topic_type.value)
         //
         dm4c.render.field_label("URI")
-        dm4c.render.field_value(topic_type.uri)
+        dm4c.render.page(topic_type.uri)
         //
         var data_type = dm4c.restc.get_topic_by_value("uri", topic_type.data_type_uri)
         dm4c.render.field_label("Data Type")
-        dm4c.render.field_value(data_type.value)
+        dm4c.render.page(data_type.value)
         //
         dm4c.render.associations(topic.id)
     }
@@ -30,18 +30,18 @@ function TopictypeRenderer() {
         //
         var value_input = dm4c.render.input(topic_type.value)   // a jQuery <input> element
         dm4c.render.field_label("Name")
-        dm4c.render.field_value(value_input)
+        dm4c.render.page(value_input)
         //
         var uri_input = dm4c.render.input(topic_type.uri)       // a jQuery <input> element
         dm4c.render.field_label("URI")
-        dm4c.render.field_value(uri_input)
+        dm4c.render.page(uri_input)
         //
         var data_type_menu = dm4c.render.topic_menu("dm4.core.data_type", topic_type.data_type_uri) // a GUIToolkit
         dm4c.render.field_label("Data Type")                                                        // Menu object
-        dm4c.render.field_value(data_type_menu.dom)
+        dm4c.render.page(data_type_menu.dom)
         //
         if (topic_type.data_type_uri == "dm4.core.composite") {
-            dm4c.render.field_label("Composed Topic Types (" + topic_type.assoc_defs.length + ")")
+            dm4c.render.field_label("Child Topic Types (" + topic_type.assoc_defs.length + ")")
             render_assoc_def_editors()
         }
 
@@ -60,7 +60,8 @@ function TopictypeRenderer() {
          */
         function AssociationDefEditor(assoc_def, label_state) {
             var whole_type_label = $("<span>").addClass("label").text(topic_type.value)
-            var part_type_label = $("<span>").addClass("label").text(dm4c.type_label(assoc_def.part_topic_type_uri))
+            var part_type_label = $("<span>").addClass("label").addClass("part-type-label")
+                .text(dm4c.type_label(assoc_def.part_topic_type_uri))
             var whole_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.whole_cardinality_uri)
             var part_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.part_cardinality_uri)
             var assoc_type_label = $("<span>").addClass("label").addClass("field-label").text("Association Type")

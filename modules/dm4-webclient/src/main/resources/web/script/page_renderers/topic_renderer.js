@@ -582,6 +582,8 @@ TopicRenderer.render_page_model = function(page_model, render_mode, level, ref_e
         var box = $("<div>").addClass("box")
         if (is_complex) {
             box.addClass("complex").addClass("level" + level)
+        } else {
+            box.addClass("simple")
         }
         if (incremental) {
             ref_element.before(box)

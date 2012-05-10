@@ -5,8 +5,7 @@ function TitleRenderer(field_model) {
 TitleRenderer.prototype = new TextFieldRenderer()
 
 TitleRenderer.prototype.render_field = function(parent_element) {
-    parent_element.append($("<div>")
-        .addClass("title")
+    parent_element.append($("<h1>")
         .text(js.render_text(this.field_model.value))
     )
 }

@@ -82,24 +82,14 @@ body {
     white-space: pre-wrap;
 }
 
-.title {
-    font-size: 2em;
-    font-weight: bold;
-    line-height: 1.1em;
-    margin-top: 1em;
-    margin-bottom: 0.6em;
-}
-
 .field-label {
     font-size: 75%;
     color: gray;
     margin-bottom: 0.2em;
 }
 
-/* the "Associations" label */
-.box + .field-label {
-    margin-top: 2em;
-    margin-bottom: 0.6em;
+#page-content > .field-label {
+    margin-top: 16px;
 }
 
 /*** Page Panel Boxes ***/
@@ -114,6 +104,10 @@ body {
 
 #page-content .box.complex {
     padding: 0.6em;
+}
+
+#page-content > .box.simple {
+    margin-top: 1em;
 }
 
 #page-content .box.level0 {background: #f8f8f8;}
@@ -185,8 +179,11 @@ body {
 
 .assoc-role {
     padding: 0.4em 0.7em;
-    margin-top: 0.4em;
     margin-right: 0.4em;
+}
+
+.assoc-role + .assoc-role {
+    margin-top: 0.4em;
 }
 
 .assoc-role .field-label {
