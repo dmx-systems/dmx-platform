@@ -193,6 +193,12 @@ body {
     margin-top: 1em;
 }
 
+/*** Dialog Boxes ***/
+
+.ui-dialog-content .field-label {
+    margin-top: 1em;
+}
+
 /*** Icons ***/
 
 .type-icon {

@@ -94,7 +94,7 @@ function topicmaps_plugin() {
             var type_menu = create_maptype_menu()
             var topicmap_dialog = $("<form>").attr("action", "#").submit(do_create_topicmap)
                 .append($("<div>").addClass("field-label").text("Title"))
-                .append(title_input.addClass("field-value"))
+                .append(title_input)
             if (type_menu.get_item_count() > 1) {
                 topicmap_dialog
                 .append($("<div>").addClass("field-label").text("Type"))
