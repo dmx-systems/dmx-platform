@@ -41,7 +41,7 @@ function typesearch_plugin() {
     /**
      * Once a "Topic Type" topic is updated we refresh the type menu.
      */
-    dm4c.register_listener("post_update_topic", function(topic, old_topic) {
+    dm4c.register_listener("post_update_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
             refresh_type_menu()
         }

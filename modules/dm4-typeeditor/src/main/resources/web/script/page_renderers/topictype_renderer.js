@@ -114,12 +114,12 @@ function TopictypeRenderer() {
         }
 
         return function() {
-            dm4c.do_update_topic_type(topic, build_topic_type_model())
+            dm4c.do_update_topic_type(build_topic_type_model())
 
             /**
-             * Reads out values from GUI elements and builds a topic type model object from it.
+             * Reads out values from GUI elements and builds a topic type model from it.
              *
-             * @return  a topic type model object
+             * @return  a topic type model (object).
              */
             function build_topic_type_model() {
                 var topic_type_model = {

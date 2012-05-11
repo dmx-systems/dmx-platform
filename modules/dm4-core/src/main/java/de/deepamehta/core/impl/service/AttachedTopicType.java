@@ -7,6 +7,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.util.JSONHelper;
 import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 
 import java.util.Collection;
@@ -65,6 +66,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    // ### FIXME: add to interface?
     void update(TopicTypeModel model, ClientState clientState, Directives directives) {
         logger.info("Updating topic type \"" + getUri() + "\" (new " + model + ")");
         String uri = model.getUri();
@@ -102,6 +104,8 @@ class AttachedTopicType extends AttachedType implements TopicType {
         if (!uriChanged && !valueChanged && !dataTypeChanged) {
             logger.info("Updating topic type \"" + getUri() + "\" ABORTED -- no changes made by user");
         }
+        //
+        directives.add(Directive.UPDATE_TOPIC_TYPE, this);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

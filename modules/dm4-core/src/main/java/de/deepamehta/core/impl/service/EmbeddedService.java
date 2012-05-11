@@ -483,27 +483,21 @@ public class EmbeddedService implements DeepaMehtaService {
     @PUT
     @Path("/topictype")
     @Override
-    public TopicType updateTopicType(TopicTypeModel topicTypeModel, @HeaderParam("Cookie") ClientState clientState) {
+    public Directives updateTopicType(TopicTypeModel model, @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            String topicTypeUri = getTopic(topicTypeModel.getId(), false, clientState).getUri();  // fetchComp..=false
+            String topicTypeUri = getTopic(model.getId(), false, clientState).getUri();     // fetchComposite=false
             AttachedTopicType topicType = getTopicType(topicTypeUri, clientState);
-            Directives directives = new Directives();   // ### FIXME: directives are ignored
+            Directives directives = new Directives();
             //
-            // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
-            // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
-            //
-            topicType.update(topicTypeModel, clientState, directives);
-            //
-            // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
+            topicType.update(model, clientState, directives);
             //
             tx.success();
-            return topicType;
+            return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException(
-                "Updating topic type failed (" + topicTypeModel + ")", e));
+            throw new WebApplicationException(new RuntimeException("Updating topic type failed (" + model + ")", e));
         } finally {
             tx.finish();
         }

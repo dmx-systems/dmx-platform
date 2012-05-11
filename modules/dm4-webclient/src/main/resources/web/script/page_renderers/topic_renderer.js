@@ -37,7 +37,7 @@ function TopicRenderer() {
         render_page_model(page_model, "form")
         //
         return function() {
-            dm4c.do_update_topic(topic, build_topic_model(page_model))
+            dm4c.do_update_topic(build_topic_model(page_model))
         }
     }
 

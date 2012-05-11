@@ -66,9 +66,9 @@ public interface DeepaMehtaService {
      */
     public Set<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, ClientState clientState);
 
-    public Topic createTopic(TopicModel topicModel, ClientState clientState);
+    public Topic createTopic(TopicModel model, ClientState clientState);
 
-    public Directives updateTopic(TopicModel topicModel, ClientState clientState);
+    public Directives updateTopic(TopicModel model, ClientState clientState);
 
     public Directives deleteTopic(long topicId, ClientState clientState);
 
@@ -102,9 +102,9 @@ public interface DeepaMehtaService {
 
     // ---
 
-    public Association createAssociation(AssociationModel assocModel, ClientState clientState);
+    public Association createAssociation(AssociationModel model, ClientState clientState);
 
-    public Directives updateAssociation(AssociationModel assocModel, ClientState clientState);
+    public Directives updateAssociation(AssociationModel model, ClientState clientState);
 
     public Directives deleteAssociation(long assocId, ClientState clientState);
 
@@ -116,9 +116,9 @@ public interface DeepaMehtaService {
 
     public TopicType getTopicType(String topicTypeUri, ClientState clientState);
 
-    public TopicType createTopicType(TopicTypeModel topicTypeModel, ClientState clientState);
+    public TopicType createTopicType(TopicTypeModel model, ClientState clientState);
 
-    public TopicType updateTopicType(TopicTypeModel topicTypeModel, ClientState clientState);
+    public Directives updateTopicType(TopicTypeModel model, ClientState clientState);
 
 
 
@@ -128,7 +128,7 @@ public interface DeepaMehtaService {
 
     public AssociationType getAssociationType(String assocTypeUri, ClientState clientState);
 
-    public AssociationType createAssociationType(AssociationTypeModel assocTypeModel, ClientState clientState);
+    public AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState);
 
 
 

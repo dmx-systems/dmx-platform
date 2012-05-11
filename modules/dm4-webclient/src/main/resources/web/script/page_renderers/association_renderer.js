@@ -40,13 +40,12 @@ function AssociationRenderer() {
         render_assoc_role_editor(topic_2, role_type_menu_2)
         //
         return function() {
-            var assoc_model = build_association_model()
-            assoc = dm4c.do_update_association(assoc, assoc_model)
+            dm4c.do_update_association(build_association_model())
 
             /**
-             * Reads out values from GUI elements and builds an association model object from it.
+             * Reads out values from GUI elements and builds an association model from it.
              *
-             * @return  an association model object
+             * @return  an association model (object).
              */
             function build_association_model() {
                 return {
