@@ -249,6 +249,7 @@ var dm4c = new function() {
     this.do_update_association = function(assoc_model) {
         // update DB
         var directives = dm4c.restc.update_association(assoc_model)
+        // alert("do_update_association(): directives=" + js.stringify(directives))
         // update GUI (client model and view)
         process_directives(directives)
     }
@@ -262,7 +263,7 @@ var dm4c = new function() {
     this.do_update_topic_type = function(topic_type_model) {
         // update DB
         var directives = dm4c.restc.update_topic_type(topic_type_model)
-        alert("do_update_topic_type(): directives=" + js.stringify(directives))
+        // alert("do_update_topic_type(): directives=" + js.stringify(directives))
         // update GUI (client model and view)
         process_directives(directives)
     }

@@ -93,12 +93,12 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
         try {
             this.id = model.optLong("id", -1);
             this.uri = model.optString("uri", null);
+            this.typeUri = model.optString("type_uri", null);
             if (model.has("value")) {
                 this.value = new SimpleValue(model.get("value"));
             } else {
                 this.value = null;
             }
-            this.typeUri = model.optString("type_uri", null);
             if (model.has("composite")) {
                 this.composite = new CompositeValue(model.getJSONObject("composite"));
             } else {
@@ -116,8 +116,8 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
         try {
             this.id = typeModel.optLong("id", -1);
             this.uri = typeModel.optString("uri");
-            this.value = new SimpleValue(typeModel.get("value"));
             this.typeUri = typeUri;
+            this.value = new SimpleValue(typeModel.get("value"));
             this.composite = new CompositeValue();
         } catch (Exception e) {
             throw new RuntimeException("Parsing DeepaMehtaObjectModel failed (JSONObject=" + typeModel +
@@ -205,8 +205,8 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
             JSONObject o = new JSONObject();
             o.put("id", id);
             o.put("uri", uri);
-            o.put("value", value.value());
             o.put("type_uri", typeUri);
+            o.put("value", value.value());
             o.put("composite", composite.toJSON());
             return o;
         } catch (Exception e) {
@@ -241,7 +241,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
 
     @Override
     public String toString() {
-        return "id=" + id + ", uri=\"" + uri + "\", value=\"" + value + "\", typeUri=\"" + typeUri +
+        return "id=" + id + ", uri=\"" + uri + "\", typeUri=\"" + typeUri + "\", value=\"" + value +
             "\", composite=" + composite;
     }
 }

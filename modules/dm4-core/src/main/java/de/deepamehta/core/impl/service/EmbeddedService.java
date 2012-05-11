@@ -362,16 +362,7 @@ public class EmbeddedService implements DeepaMehtaService {
             AttachedAssociation assoc = getAssociation(model.getId());
             Directives directives = new Directives();
             //
-            // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
-            // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
-            //
-            ChangeReport report = assoc.update(model, clientState, directives);
-            //
-            directives.add(Directive.UPDATE_ASSOCIATION, assoc);
-            //
-            if (report.typeUriChanged) {
-                triggerHook(Hook.POST_RETYPE_ASSOCIATION, assoc, report.oldTypeUri, directives);
-            }
+            assoc.update(model, clientState, directives);
             //
             tx.success();
             return directives;

@@ -2,6 +2,7 @@ package de.deepamehta.core.service;
 
 
 
+// ### TODO: drop this class
 public class ChangeReport {
 
     public boolean typeUriChanged = false;
