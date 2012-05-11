@@ -82,6 +82,10 @@ body {
     white-space: pre-wrap;
 }
 
+#page-content .menu {
+    line-height: 1.8em;
+}
+
 .field-label {
     font-size: 75%;
     color: gray;
