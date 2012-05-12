@@ -452,20 +452,24 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
 /**
  * Creates a page model for a topic.
  *
+ * A page model comprises all the information required to render a topic in the page panel (a.k.a. detail panel).
+ *
+ * A page model is either a FieldModel object (for a simple topic) or a PageModel object (for a complex topic).
+ * A PageModel object is a nested structure of FieldModels and (again) PageModels.
+ *
  * @param   topic           The topic the page model is created for.
  * @param   assoc_def       The association definition that leads to that topic. Undefined for the top-level call.
  *                          For a simple topic the association definition is used to create the corresponding
  *                          field model. For a complex topic the association definition is (currently) not used.
- * @param   field_uri       The (base) URI for the field model(s) to create.
+ *                          ### FIXDOC
+ * @param   field_uri       The (base) URI for the field model(s) to create (string). Empty ("") for the top-level call.
  * @param   toplevel_topic  The topic the page/form is rendered for. Usually that is the selected topic.
  *                          For a simple topic the top-level topic is used to create the corresponding field model.
- *                          For a complex topic the top-level topic is just passed recursively.
+ *                          For a complex topic the top-level topic is just passed recursively. ### FIXDOC
  *                          Note: for the top-level call "toplevel_topic" and "topic" are usually the same.
  * @param   setting         "viewable" or "editable" (string).
  *
  * @return  The created page model, or undefined. Undefined is returned if the topic is not viewable/editable.
- *          A page model is either a FieldModel object (for a simple topic) or a PageModel object (for a complex topic).
- *          A PageModel object is a nested structure of FieldModels and (again) PageModels.
  */
 TopicRenderer.create_page_model = function(topic, assoc_def, field_uri, toplevel_topic, setting) {
     var topic_type = dm4c.get_topic_type(topic.type_uri)   // ### TODO: Topics in composite would allow topic.get_type()
@@ -482,7 +486,7 @@ TopicRenderer.create_page_model = function(topic, assoc_def, field_uri, toplevel
             var cardinality_uri = assoc_def.part_cardinality_uri
             if (cardinality_uri == "dm4.core.one") {
                 var child_topic = topic.composite[assoc_def.uri] || dm4c.empty_topic(child_topic_type.uri)
-                var child_fields = TopicRenderer.create_page_model(child_topic, assoc_def, child_field_uri,
+                var child_model = TopicRenderer.create_page_model(child_topic, assoc_def, child_field_uri,
                     toplevel_topic, setting)
             } else if (cardinality_uri == "dm4.core.many") {
                 var child_topics = topic.composite[assoc_def.uri] || []     // ### TODO: server: don't send empty arrays
@@ -493,17 +497,17 @@ TopicRenderer.create_page_model = function(topic, assoc_def, field_uri, toplevel
                 if (child_topics.length == 0) {
                     child_topics.push(dm4c.empty_topic(child_topic_type.uri))
                 }
-                var child_fields = []
+                var child_model = []
                 for (var j = 0, child_topic; child_topic = child_topics[j]; j++) {
                     var child_field = TopicRenderer.create_page_model(child_topic, assoc_def,
                         child_field_uri, toplevel_topic, setting)
-                    child_fields.push(child_field)
+                    child_model.push(child_field)
                 }
             } else {
                 throw "TopicRendererError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
             }
-            if (child_fields) {
-                page_model.add_child(assoc_def.uri, child_fields)
+            if (child_model) {
+                page_model.add_child(assoc_def.uri, child_model)
             }
         }
         return page_model;

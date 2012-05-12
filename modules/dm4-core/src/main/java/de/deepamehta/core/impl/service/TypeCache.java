@@ -70,7 +70,7 @@ class TypeCache {
     // ---
 
     void invalidate(String topicTypeUri) {
-        logger.info("Invalidating topic type \"" + topicTypeUri + "\"");
+        logger.info("### Invalidating topic type \"" + topicTypeUri + "\"");
         if (topicTypes.remove(topicTypeUri) == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found in type cache");
         }
