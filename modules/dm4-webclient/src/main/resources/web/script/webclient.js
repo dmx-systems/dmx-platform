@@ -406,8 +406,11 @@ var dm4c = new function() {
             case "UPDATE_TOPIC_TYPE":
                 update_topic_type(build_topic_type(directive.arg))
                 break
+            case "DELETE_TOPIC_TYPE":
+                remove_topic_type(directive.arg.uri)
+                break
             default:
-                throw "UnknownDirectiveError: directive \"" + directive.type + "\" not implemented"
+                throw "WebclientError: \"" + directive.type + "\" is an unknown directive"
             }
         }
     }
@@ -448,17 +451,9 @@ var dm4c = new function() {
 
     function update_topic_type(topic_type) {
         // update client model (type cache)
-        //
         // Note: the type cache must be updated *before* the "post_update_topic" hook is triggered.
         // Other plugins might rely on an up-to-date type cache (e.g. the Type Search plugin does).
-        /* ### TODO:
-        var uri_changed = topic_type.uri != old_topic_type.uri
-        if (uri_changed) {
-            // alert("Type URI changed: " + old_topic_type.uri + " -> " + topic_type.uri)
-            type_cache.remove(old_topic_type.uri)
-        } */
         type_cache.put_topic_type(topic_type)
-        //
         // update view
         dm4c.canvas.update_topic(topic_type, true)      // refresh_canvas=true
         dm4c.page_panel.display_conditionally(topic_type)
@@ -474,7 +469,7 @@ var dm4c = new function() {
      */
     function remove_topic(topic, hook_name) {
         // update view (canvas)
-        dm4c.canvas.remove_topic(topic.id, true)            // refresh_canvas=true
+        dm4c.canvas.remove_topic(topic.id, true)        // refresh_canvas=true
         // update client model and view
         reset_selection_conditionally(topic.id)
         // trigger hook
@@ -492,6 +487,10 @@ var dm4c = new function() {
         reset_selection_conditionally(assoc.id)
         // trigger hook
         dm4c.trigger_plugin_hook(hook_name, assoc)
+    }
+
+    function remove_topic_type(type_uri) {
+        type_cache.remove(type_uri)
     }
 
     // ---

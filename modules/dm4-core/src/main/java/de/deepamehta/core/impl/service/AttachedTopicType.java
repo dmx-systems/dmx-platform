@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.AssociationDefinition;
+import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.SimpleValue;
@@ -9,6 +10,8 @@ import de.deepamehta.core.util.JSONHelper;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
+
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -77,6 +80,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         boolean uriChanged = hasUriChanged(model.getUri());
         if (uriChanged) {
             dms.typeCache.invalidate(getUri());
+            directives.add(Directive.DELETE_TOPIC_TYPE, new JSONWrapper("uri", getUri()));
         }
         //
         super.update(model, clientState, directives);
@@ -167,6 +171,27 @@ class AttachedTopicType extends AttachedType implements TopicType {
             setLabelConfig(newLabelConfig);
         } else {
             logger.info("Updating label configuration ABORTED -- no changes made by user");
+        }
+    }
+
+    // --------------------------------------------------------------------------------------------- Private Inner Class
+
+    private class JSONWrapper implements JSONEnabled {
+
+        private JSONObject wrapped;
+
+        private JSONWrapper(String key, Object value) {
+            try {
+                wrapped = new JSONObject();
+                wrapped.put(key, value);
+            } catch (Exception e) {
+                throw new RuntimeException("Constructing a JSONWrapper failed", e);
+            }
+        }
+
+        @Override
+        public JSONObject toJSON() {
+            return wrapped;
         }
     }
 }
