@@ -35,7 +35,7 @@ function typeeditor_plugin() {
     /**
      * Once a topic type is updated we must refresh the "Create" type menu.
      */
-    dm4c.register_listener("post_update_topic", function(topic, old_topic) {
+    dm4c.register_listener("post_update_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
             dm4c.refresh_create_menu()
         }

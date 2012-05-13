@@ -44,7 +44,13 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    // === AssociationDefinition Implementation ===
+
+
+    // ********************************************
+    // *** AssociationDefinition Implementation ***
+    // ********************************************
+
+
 
     @Override
     public String getInstanceLevelAssocTypeUri() {
@@ -84,6 +90,13 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     @Override
     public ViewConfiguration getViewConfig() {
         return viewConfig;
+    }
+
+    // ---
+
+    @Override
+    public AssociationDefinitionModel getModel() {
+        return (AssociationDefinitionModel) super.getModel();
     }
 
     // ---
@@ -138,13 +151,6 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         }
     }
 
-    // ---
-
-    @Override
-    public AssociationDefinitionModel getModel() {
-        return (AssociationDefinitionModel) super.getModel();
-    }
-
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // === Update ===
@@ -194,14 +200,14 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     private void storeWholeCardinalityUri(Directives directives) {
         // remove current assignment
-        dms.factory.fetchWholeCardinality(this).getAssociation().delete(directives);
+        dms.getObjectFactory().fetchWholeCardinality(this).getAssociation().delete(directives);
         // create new assignment
         associateWholeCardinality();
     }    
 
     private void storePartCardinalityUri(Directives directives) {
         // remove current assignment
-        dms.factory.fetchPartCardinality(this).getAssociation().delete(directives);
+        dms.getObjectFactory().fetchPartCardinality(this).getAssociation().delete(directives);
         // create new assignment
         associatePartCardinality();
     }    

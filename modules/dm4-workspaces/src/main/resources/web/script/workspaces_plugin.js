@@ -48,7 +48,7 @@ function workspaces_plugin() {
     /**
      * @param   topic   a Topic object
      */
-    dm4c.register_listener("post_update_topic", function(topic, old_topic) {
+    dm4c.register_listener("post_update_topic", function(topic) {
         if (topic.type_uri == "dm4.workspaces.workspace") {
             rebuild_workspace_menu()
         }

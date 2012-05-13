@@ -21,6 +21,7 @@ import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.Hook;
 
 import java.util.HashSet;
 import java.util.List;
@@ -37,8 +38,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Role role1;
-    private Role role2;
+    private Role role1;     // Attached object cache
+    private Role role2;     // Attached object cache
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -97,7 +98,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     }
 
     @Override
-    protected RoleModel getRoleModel(String roleTypeUri) {
+    protected RoleModel createRoleModel(String roleTypeUri) {
         return new AssociationRoleModel(getId(), roleTypeUri);
     }
 
@@ -152,10 +153,10 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // === Updating ===
 
     /**
-     * @param   assocModel  The data to update.
-     *                      If the type URI is <code>null</code> it is not updated.
-     *                      If role 1 is <code>null</code> it is not updated.
-     *                      If role 2 is <code>null</code> it is not updated.
+     * @param   model   The data to update.
+     *                  If the type URI is <code>null</code> it is not updated.
+     *                  If role 1 is <code>null</code> it is not updated.
+     *                  If role 2 is <code>null</code> it is not updated.
      */
     @Override
     public ChangeReport update(AssociationModel model, ClientState clientState, Directives directives) {
@@ -164,6 +165,12 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         ChangeReport report = super.update(model, clientState, directives);
         updateRole(model.getRoleModel1(), 1);
         updateRole(model.getRoleModel2(), 2);
+        //
+        directives.add(Directive.UPDATE_ASSOCIATION, this);
+        //
+        if (report.typeUriChanged) {
+            dms.triggerHook(Hook.POST_RETYPE_ASSOCIATION, this, report.oldTypeUri, directives);
+        }
         //
         return report;
     }
@@ -265,7 +272,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
             String newRoleTypeUri = newModel.getRoleTypeUri();  // new value
             String roleTypeUri = role.getRoleTypeUri();         // current value
             if (!roleTypeUri.equals(newRoleTypeUri)) {          // has changed?
-                logger.info("Changing role type " + nr + " from \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri + "\"");
+                logger.info("### Changing role type " + nr + " from \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri +
+                    "\"");
                 role.setRoleTypeUri(newRoleTypeUri);
             }
         }

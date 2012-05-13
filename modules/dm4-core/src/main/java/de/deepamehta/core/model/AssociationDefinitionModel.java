@@ -155,10 +155,10 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     public JSONObject toJSON() {
         try {
-            JSONObject o = new JSONObject();
-            o.put("id", id);
-            o.put("uri", uri);
-            o.put("assoc_type_uri", typeUri);
+            JSONObject o = super.toJSON();
+            // o.put("id", id);                 // ### FIXME: drop this
+            // o.put("uri", uri);               // ### FIXME: drop this
+            o.put("assoc_type_uri", typeUri);   // ### FIXME: drop this
             o.put("whole_topic_type_uri", wholeTopicTypeUri);
             o.put("part_topic_type_uri", partTopicTypeUri);
             o.put("whole_role_type_uri", wholeRoleTypeUri);

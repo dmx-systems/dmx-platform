@@ -1,9 +1,9 @@
 package de.deepamehta.plugins.typeeditor;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
-import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
@@ -31,15 +31,21 @@ public class TypeEditorPlugin extends Plugin {
     @Override
     public void postRetypeAssociationHook(Association assoc, String oldTypeUri, Directives directives) {
         if (isAssocDef(assoc.getTypeUri())) {
-            AssociationDefinitionModel assocDef = buildAssocDefModel(assoc);
             // update/create assoc def
-            String topicTypeUri = assocDef.getWholeTopicTypeUri();
-            TopicType topicType = dms.getTopicType(topicTypeUri, null);
+            AssociationDefinitionModel assocDef;
+            String topicTypeUri;
+            TopicType topicType;
             if (isAssocDef(oldTypeUri)) {
+                assocDef = dms.getObjectFactory().fetchAssociationDefinition(assoc).getModel();
+                topicTypeUri = assocDef.getWholeTopicTypeUri();
+                topicType = dms.getTopicType(topicTypeUri, null);
                 logger.info("### Updating association definition \"" + assocDef.getUri() +
                     "\" of topic type \"" + topicTypeUri + "\" (" + assocDef + ")");
                 topicType.updateAssocDef(assocDef);
             } else {
+                assocDef = buildAssocDefModel(assoc);
+                topicTypeUri = assocDef.getWholeTopicTypeUri();
+                topicType = dms.getTopicType(topicTypeUri, null);
                 logger.info("### Adding association definition \"" + assocDef.getUri() +
                     "\" to topic type \"" + topicTypeUri + "\" (" + assocDef + ")");
                 topicType.addAssocDef(assocDef);
@@ -62,17 +68,17 @@ public class TypeEditorPlugin extends Plugin {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private AssociationDefinitionModel buildAssocDefModel(Association assoc) {
-        String wholeTopicTypeUri = getWholeTopicTypeUri(assoc);
-        String partTopicTypeUri = getPartTopicTypeUri(assoc);
+        String wholeTopicTypeUri = fetchWholeTopicType(assoc).getUri();
+        String partTopicTypeUri  = fetchPartTopicType(assoc).getUri();
         // Note: the assoc def's ID is already known. Setting it explicitely
         // prevents the core from creating the underlying association.
         return new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(), wholeTopicTypeUri, partTopicTypeUri,
-            "dm4.core.one", "dm4.core.one", null);  // viewConfigModel=null ### FIXME: handle cardinality
+            "dm4.core.one", "dm4.core.one", null);  // viewConfigModel=null
     }
 
     private TopicType removeAssocDef(Association assoc) {
-        String wholeTopicTypeUri = getWholeTopicTypeUri(assoc);
-        String partTopicTypeUri = getPartTopicTypeUri(assoc);
+        String wholeTopicTypeUri = fetchWholeTopicType(assoc).getUri();
+        String partTopicTypeUri  = fetchPartTopicType(assoc).getUri();
         TopicType topicType = dms.getTopicType(wholeTopicTypeUri, null);
         logger.info("### Removing association definition \"" + partTopicTypeUri +
             "\" from topic type \"" + wholeTopicTypeUri + "\"");
@@ -87,13 +93,11 @@ public class TypeEditorPlugin extends Plugin {
 
     // ---
 
-    // ### FIXME: copy in AttachedAssociationDefinition
-    private String getWholeTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm4.core.whole_type").getUri();
+    private Topic fetchWholeTopicType(Association assoc) {
+        return dms.getObjectFactory().fetchWholeTopicType(assoc);
     }
 
-    // ### FIXME: copy in AttachedAssociationDefinition
-    private String getPartTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm4.core.part_type").getUri();
+    private Topic fetchPartTopicType(Association assoc) {
+        return dms.getObjectFactory().fetchPartTopicType(assoc);
     }
 }

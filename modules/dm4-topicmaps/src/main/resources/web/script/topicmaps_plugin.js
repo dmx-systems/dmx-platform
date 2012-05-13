@@ -197,7 +197,7 @@ function topicmaps_plugin() {
     /**
      * @param   topic   a Topic object
      */
-    dm4c.register_listener("post_update_topic", function(topic, old_topic) {
+    dm4c.register_listener("post_update_topic", function(topic) {
         // 1) Update all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Updating topic " + topic.id + " on all topicmaps")
         for (var id in topicmaps) {
@@ -213,7 +213,7 @@ function topicmaps_plugin() {
      * @param   assoc       an Association object
      * @param   old_assoc   FIXME: not yet available
      */
-    dm4c.register_listener("post_update_association", function(assoc, old_assoc) {
+    dm4c.register_listener("post_update_association", function(assoc) {
         if (LOG_TOPICMAPS) dm4c.log("Updating association " + assoc.id + " on all topicmaps")
         for (var id in topicmaps) {
             topicmaps[id].update_association(assoc)
