@@ -1,15 +1,17 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.service.ObjectFactory;
 
 
 
-class ObjectFactory {
+class ObjectFactoryImpl implements ObjectFactory {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -17,24 +19,25 @@ class ObjectFactory {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ObjectFactory(EmbeddedService dms) {
+    ObjectFactoryImpl(EmbeddedService dms) {
         this.dms = dms;
     }
 
-    // ----------------------------------------------------------------------------------------- Package Private Methods
+    // -------------------------------------------------------------------------------------------------- Public Methods
 
-    /**
-     * @param   topicTypeUri    only used for sanity check
-     */
-    AttachedAssociationDefinition fetchAssociationDefinition(Association assoc, String topicTypeUri) {
+
+
+    // ************************************
+    // *** ObjectFactory Implementation ***
+    // ************************************
+
+
+
+    @Override
+    public AssociationDefinition fetchAssociationDefinition(Association assoc) {
         try {
             TopicTypes topicTypes = fetchTopicTypes(assoc);
             Cardinality cardinality = fetchCardinality(assoc);
-            // sanity check
-            if (!topicTypes.wholeTopicTypeUri.equals(topicTypeUri)) {
-                throw new RuntimeException("jri doesn't understand Neo4j traversal");
-            }
-            //
             AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
                 topicTypes.wholeTopicTypeUri, topicTypes.partTopicTypeUri,
                 cardinality.wholeCardinalityUri, cardinality.partCardinalityUri,
@@ -42,19 +45,20 @@ class ObjectFactory {
             //
             return new AttachedAssociationDefinition(model, dms);
         } catch (Exception e) {
-            throw new RuntimeException("Fetching association definition for topic type \"" + topicTypeUri +
-                "\" failed (" + assoc + ")", e);
+            throw new RuntimeException("Fetching association definition failed (" + assoc + ")", e);
         }
     }
 
     // ---
 
-    RelatedTopic fetchWholeCardinality(Association assoc) {
+    @Override
+    public RelatedTopic fetchWholeCardinality(Association assoc) {
         return assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
             "dm4.core.whole_cardinality", "dm4.core.cardinality", false, false, null);  // fetchComposite=false
     }
 
-    RelatedTopic fetchPartCardinality(Association assoc) {
+    @Override
+    public RelatedTopic fetchPartCardinality(Association assoc) {
         return assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
             "dm4.core.part_cardinality", "dm4.core.cardinality", false, false, null);   // fetchComposite=false
     }
@@ -103,7 +107,7 @@ class ObjectFactory {
 
 
 
-    // --- Inner Classes ---
+    // ------------------------------------------------------------------------------------------- Private Inner Classes
 
     private class TopicTypes {
 

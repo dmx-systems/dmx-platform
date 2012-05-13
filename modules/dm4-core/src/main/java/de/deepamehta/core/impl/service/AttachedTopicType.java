@@ -155,7 +155,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         return false;
     }
 
-    private Map<Long, AttachedAssociationDefinition> hashAssocDefsById() {
+    private Map<Long, AssociationDefinition> hashAssocDefsById() {
         Map assocDefs = new HashMap();
         for (AssociationDefinition assocDef : getAssocDefs().values()) {
             assocDefs.put(assocDef.getId(), assocDef);

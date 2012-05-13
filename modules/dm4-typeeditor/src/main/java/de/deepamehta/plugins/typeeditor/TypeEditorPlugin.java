@@ -1,9 +1,9 @@
 package de.deepamehta.plugins.typeeditor;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
-import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
@@ -87,13 +87,27 @@ public class TypeEditorPlugin extends Plugin {
 
     // ---
 
-    // ### FIXME: copy in AttachedAssociationDefinition
+    // ### FIXME: copy in ObjectFactory
     private String getWholeTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm4.core.whole_type").getUri();
+        Topic wholeTypeTopic = assoc.getTopic("dm4.core.whole_type");
+        // error check
+        if (wholeTypeTopic == null) {
+            throw new RuntimeException("Illegal association definition: topic role dm4.core.whole_type " +
+                "is missing in " + assoc);
+        }
+        //
+        return wholeTypeTopic.getUri();
     }
 
-    // ### FIXME: copy in AttachedAssociationDefinition
+    // ### FIXME: copy in ObjectFactory
     private String getPartTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm4.core.part_type").getUri();
+        Topic partTypeTopic = assoc.getTopic("dm4.core.part_type");
+        // error check
+        if (partTypeTopic == null) {
+            throw new RuntimeException("Illegal association definition: topic role dm4.core.part_type " +
+                "is missing in " + assoc);
+        }
+        //
+        return partTypeTopic.getUri();
     }
 }

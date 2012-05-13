@@ -32,6 +32,10 @@ public interface AssociationDefinition extends Association {
 
     // ---
 
+    AssociationDefinitionModel getModel();
+
+    // ---
+
     void setWholeCardinalityUri(String wholeCardinalityUri, ClientState clientState, Directives directives);
 
     void setPartCardinalityUri(String partCardinalityUri, ClientState clientState, Directives directives);

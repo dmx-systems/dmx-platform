@@ -37,7 +37,7 @@ public interface DeepaMehtaService {
 
     // === Topics ===
 
-    public Topic getTopic(long id, boolean fetchComposite, ClientState clientState);
+    Topic getTopic(long id, boolean fetchComposite, ClientState clientState);
 
     /**
      * Looks up a single topic by exact property value.
@@ -50,12 +50,11 @@ public interface DeepaMehtaService {
      * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
      * (for dynamically created data fields, typically in migration classes).
      */
-    public Topic getTopic(String key, SimpleValue value, boolean fetchComposite, ClientState clientState);
+    Topic getTopic(String key, SimpleValue value, boolean fetchComposite, ClientState clientState);
 
     // public Topic getTopic(String typeUri, String key, SimpleValue value);
 
-    public ResultSet<Topic> getTopics(String typeUri, boolean fetchComposite, int maxResultSize,
-                                                                              ClientState clientState);
+    ResultSet<Topic> getTopics(String typeUri, boolean fetchComposite, int maxResultSize, ClientState clientState);
 
     /**
      * Performs a fulltext search.
@@ -64,19 +63,19 @@ public interface DeepaMehtaService {
      * @param   wholeWord   If true the searchTerm is regarded as whole word.
      *                      If false the searchTerm is regarded as begin-of-word substring.
      */
-    public Set<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, ClientState clientState);
+    Set<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, ClientState clientState);
 
-    public Topic createTopic(TopicModel model, ClientState clientState);
+    Topic createTopic(TopicModel model, ClientState clientState);
 
-    public Directives updateTopic(TopicModel model, ClientState clientState);
+    Directives updateTopic(TopicModel model, ClientState clientState);
 
-    public Directives deleteTopic(long topicId, ClientState clientState);
+    Directives deleteTopic(long topicId, ClientState clientState);
 
 
 
     // === Associations ===
 
-    public Association getAssociation(long assocId);
+    Association getAssociation(long assocId);
 
     /**
      * Returns the relation between two topics. If no such relation exists null is returned.
@@ -91,70 +90,72 @@ public interface DeepaMehtaService {
     /**
      * Returns all associations between two topics. If no such association exists an empty set is returned.
      */
-    public Set<Association> getAssociations(long topic1Id, long topic2Id);
+    Set<Association> getAssociations(long topic1Id, long topic2Id);
 
     /**
      * Returns the associations between two topics. If no such association exists an empty set is returned.
      *
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      */
-    public Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
+    Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
 
     // ---
 
-    public Association createAssociation(AssociationModel model, ClientState clientState);
+    Association createAssociation(AssociationModel model, ClientState clientState);
 
-    public Directives updateAssociation(AssociationModel model, ClientState clientState);
+    Directives updateAssociation(AssociationModel model, ClientState clientState);
 
-    public Directives deleteAssociation(long assocId, ClientState clientState);
+    Directives deleteAssociation(long assocId, ClientState clientState);
 
 
 
     // === Topic Types ===
 
-    public Set<String> getTopicTypeUris();
+    Set<String> getTopicTypeUris();
 
-    public TopicType getTopicType(String topicTypeUri, ClientState clientState);
+    TopicType getTopicType(String topicTypeUri, ClientState clientState);
 
-    public TopicType createTopicType(TopicTypeModel model, ClientState clientState);
+    TopicType createTopicType(TopicTypeModel model, ClientState clientState);
 
-    public Directives updateTopicType(TopicTypeModel model, ClientState clientState);
+    Directives updateTopicType(TopicTypeModel model, ClientState clientState);
 
 
 
     // === Association Types ===
 
-    public Set<String> getAssociationTypeUris();
+    Set<String> getAssociationTypeUris();
 
-    public AssociationType getAssociationType(String assocTypeUri, ClientState clientState);
+    AssociationType getAssociationType(String assocTypeUri, ClientState clientState);
 
-    public AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState);
+    AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState);
 
 
 
     // === Commands ===
 
-    public CommandResult executeCommand(String command, CommandParams params, ClientState clientState);
+    CommandResult executeCommand(String command, CommandParams params, ClientState clientState);
 
 
 
     // === Plugins ===
 
-    public void registerPlugin(Plugin plugin);
+    void registerPlugin(Plugin plugin);
 
-    public void unregisterPlugin(String pluginId);
+    void unregisterPlugin(String pluginId);
 
-    public Plugin getPlugin(String pluginId);
+    Plugin getPlugin(String pluginId);
 
-    public Set<PluginInfo> getPluginInfo();
+    Set<PluginInfo> getPluginInfo();
 
-    public void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall);
+    void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall);
 
 
 
     // === Misc ===
 
-    public DeepaMehtaTransaction beginTx();
+    DeepaMehtaTransaction beginTx();
+
+    ObjectFactory getObjectFactory();
 
     /**
      * Checks if all DeepaMehta plugin bundles are registered at core.
@@ -163,7 +164,7 @@ public interface DeepaMehtaService {
      * Called from the Plugin class.
      * Not meant to be called by a plugin developer.
      */
-    public void checkAllPluginsReady();
+    void checkAllPluginsReady();
 
     /**
      * Setups the database to be compatible with this core service.
@@ -171,7 +172,7 @@ public interface DeepaMehtaService {
      * Called from the core activator.
      * Not meant to be called by a plugin developer.
      */
-    public void setupDB();
+    void setupDB();
 
     /**
      * Shuts down the database.
@@ -180,5 +181,5 @@ public interface DeepaMehtaService {
      * Called from the core activator.
      * Not meant to be called by a plugin developer.
      */
-    public void shutdown();
+    void shutdown();
 }

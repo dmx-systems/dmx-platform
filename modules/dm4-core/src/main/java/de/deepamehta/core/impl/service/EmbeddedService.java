@@ -27,6 +27,7 @@ import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Hook;
 import de.deepamehta.core.service.Migration;
+import de.deepamehta.core.service.ObjectFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
@@ -85,10 +86,10 @@ public class EmbeddedService implements DeepaMehtaService {
 
             DeepaMehtaStorage storage;
             TypeCache typeCache;
-            ObjectFactory factory;
 
     private PluginCache pluginCache;
     private BundleContext bundleContext;
+    private ObjectFactory objectFactory;
 
     private enum MigrationRunMode {
         CLEAN_INSTALL, UPDATE, ALWAYS
@@ -103,7 +104,7 @@ public class EmbeddedService implements DeepaMehtaService {
         this.bundleContext = bundleContext;
         this.pluginCache = new PluginCache();
         this.typeCache = new TypeCache(this);
-        this.factory = new ObjectFactory(this);
+        this.objectFactory = new ObjectFactoryImpl(this);
         bootstrapTypeCache();
     }
 
@@ -639,6 +640,12 @@ public class EmbeddedService implements DeepaMehtaService {
     public DeepaMehtaTransaction beginTx() {
         return storage.beginTx();
     }
+
+    @Override
+    public ObjectFactory getObjectFactory() {
+        return objectFactory;
+    }
+
 
     @Override
     public void checkAllPluginsReady() {
