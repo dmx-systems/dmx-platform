@@ -106,20 +106,24 @@ body {
     margin-top: 0.6em;
 }
 
-#page-content .box.complex {
+#page-content .box.complex.level1,
+#page-content .box.complex.level2,
+#page-content .box.complex.level3,
+#page-content .box.complex.level4,
+#page-content .box.complex.level5 {
     padding: 0.6em;
 }
 
-#page-content > .box.simple {
+#page-content > .box {
     margin-top: 1em;
 }
 
-#page-content .box.level0 {background: #f8f8f8;}
-#page-content .box.level1 {background: #ececec;}
-#page-content .box.level2 {background: #e0e0e0;}
-#page-content .box.level3 {background: #d4d4d4;}
-#page-content .box.level4 {background: #c8c8c8;}
-#page-content .box.level5 {background: #bcbcbc;}
+#page-content .box.level0 {background: #ffffff;}
+#page-content .box.level1 {background: #f4f4f4;}
+#page-content .box.level2 {background: #e8e8e8;}
+#page-content .box.level3 {background: #dcdcdc;}
+#page-content .box.level4 {background: #d0d0d0;}
+#page-content .box.level5 {background: #c4c4c4;}
 
 /*** Page Panel Form ***/
 
@@ -180,15 +184,6 @@ body {
 }
 
 /*** Association Page ***/
-
-.assoc-role {
-    padding: 0.4em 0.7em;
-    margin-right: 0.4em;
-}
-
-.assoc-role + .assoc-role {
-    margin-top: 0.4em;
-}
 
 .assoc-role .field-label {
     margin-top: 1em;
