@@ -580,8 +580,9 @@ TopicRenderer.render_page_model = function(page_model, render_mode, level, ref_e
 
     function render_box(page_model, is_many, is_complex) {
         var box = $("<div>").addClass("box")
+        // Note: a simple box doesn't get a "level" class to let it inherit the background color
         if (is_complex) {
-            box.addClass("complex").addClass("level" + level)
+            box.addClass("level" + level)
         }
         if (incremental) {
             ref_element.before(box)

@@ -106,11 +106,11 @@ body {
     margin-top: 0.6em;
 }
 
-#page-content .box.complex.level1,
-#page-content .box.complex.level2,
-#page-content .box.complex.level3,
-#page-content .box.complex.level4,
-#page-content .box.complex.level5 {
+#page-content .box.level1,
+#page-content .box.level2,
+#page-content .box.level3,
+#page-content .box.level4,
+#page-content .box.level5 {
     padding: 0.6em;
 }
 
