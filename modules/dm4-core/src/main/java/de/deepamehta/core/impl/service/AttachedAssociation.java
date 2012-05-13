@@ -38,8 +38,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Role role1;
-    private Role role2;
+    private Role role1;     // Attached object cache
+    private Role role2;     // Attached object cache
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -272,7 +272,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
             String newRoleTypeUri = newModel.getRoleTypeUri();  // new value
             String roleTypeUri = role.getRoleTypeUri();         // current value
             if (!roleTypeUri.equals(newRoleTypeUri)) {          // has changed?
-                logger.info("Changing role type " + nr + " from \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri + "\"");
+                logger.info("### Changing role type " + nr + " from \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri +
+                    "\"");
                 role.setRoleTypeUri(newRoleTypeUri);
             }
         }

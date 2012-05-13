@@ -31,15 +31,21 @@ public class TypeEditorPlugin extends Plugin {
     @Override
     public void postRetypeAssociationHook(Association assoc, String oldTypeUri, Directives directives) {
         if (isAssocDef(assoc.getTypeUri())) {
-            AssociationDefinitionModel assocDef = buildAssocDefModel(assoc);
             // update/create assoc def
-            String topicTypeUri = assocDef.getWholeTopicTypeUri();
-            TopicType topicType = dms.getTopicType(topicTypeUri, null);
+            AssociationDefinitionModel assocDef;
+            String topicTypeUri;
+            TopicType topicType;
             if (isAssocDef(oldTypeUri)) {
+                assocDef = dms.getObjectFactory().fetchAssociationDefinition(assoc).getModel();
+                topicTypeUri = assocDef.getWholeTopicTypeUri();
+                topicType = dms.getTopicType(topicTypeUri, null);
                 logger.info("### Updating association definition \"" + assocDef.getUri() +
                     "\" of topic type \"" + topicTypeUri + "\" (" + assocDef + ")");
                 topicType.updateAssocDef(assocDef);
             } else {
+                assocDef = buildAssocDefModel(assoc);
+                topicTypeUri = assocDef.getWholeTopicTypeUri();
+                topicType = dms.getTopicType(topicTypeUri, null);
                 logger.info("### Adding association definition \"" + assocDef.getUri() +
                     "\" to topic type \"" + topicTypeUri + "\" (" + assocDef + ")");
                 topicType.addAssocDef(assocDef);
@@ -72,7 +78,7 @@ public class TypeEditorPlugin extends Plugin {
 
     private TopicType removeAssocDef(Association assoc) {
         String wholeTopicTypeUri = getWholeTopicTypeUri(assoc);
-        String partTopicTypeUri = getPartTopicTypeUri(assoc);
+        String partTopicTypeUri  = getPartTopicTypeUri(assoc);
         TopicType topicType = dms.getTopicType(wholeTopicTypeUri, null);
         logger.info("### Removing association definition \"" + partTopicTypeUri +
             "\" from topic type \"" + wholeTopicTypeUri + "\"");
@@ -87,7 +93,7 @@ public class TypeEditorPlugin extends Plugin {
 
     // ---
 
-    // ### FIXME: copy in ObjectFactory
+    // ### FIXME: copy in ObjectFactoryImpl
     private String getWholeTopicTypeUri(Association assoc) {
         Topic wholeTypeTopic = assoc.getTopic("dm4.core.whole_type");
         // error check
@@ -99,7 +105,7 @@ public class TypeEditorPlugin extends Plugin {
         return wholeTypeTopic.getUri();
     }
 
-    // ### FIXME: copy in ObjectFactory
+    // ### FIXME: copy in ObjectFactoryImpl
     private String getPartTopicTypeUri(Association assoc) {
         Topic partTypeTopic = assoc.getTopic("dm4.core.part_type");
         // error check

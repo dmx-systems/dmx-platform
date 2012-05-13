@@ -124,8 +124,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
         getModel().updateAssocDef(model);                                       // update model
         _addAssocDef(model);                                                    // update attached object cache
         // update DB
-        // ### Note: nothing to do for the moment
-        // (in case of interactive assoc type change the association is already updated in DB)
+        // ### Note: the DB is not updated here! In case of interactive assoc type change the association is
+        // already updated in DB. => See interface comment.
     }
 
     @Override
@@ -492,6 +492,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
         }
     }
 
+    /**
+     * @param   model   the new association definition.
+     *                  Note: all fields must be initialized.
+     */
     private AttachedAssociationDefinition _addAssocDef(AssociationDefinitionModel model) {
         AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(model, dms);
         assocDefs.put(assocDef.getUri(), assocDef);
