@@ -98,7 +98,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     }
 
     @Override
-    protected RoleModel getRoleModel(String roleTypeUri) {
+    protected RoleModel createRoleModel(String roleTypeUri) {
         return new AssociationRoleModel(getId(), roleTypeUri);
     }
 

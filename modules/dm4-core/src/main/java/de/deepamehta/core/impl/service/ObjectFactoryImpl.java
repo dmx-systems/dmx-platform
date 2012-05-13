@@ -52,6 +52,32 @@ class ObjectFactoryImpl implements ObjectFactory {
     // ---
 
     @Override
+    public Topic fetchWholeTopicType(Association assoc) {
+        Topic wholeTypeTopic = assoc.getTopic("dm4.core.whole_type");
+        // error check
+        if (wholeTypeTopic == null) {
+            throw new RuntimeException("Illegal association definition: topic role dm4.core.whole_type " +
+                "is missing in " + assoc);
+        }
+        //
+        return wholeTypeTopic;
+    }
+
+    @Override
+    public Topic fetchPartTopicType(Association assoc) {
+        Topic partTypeTopic = assoc.getTopic("dm4.core.part_type");
+        // error check
+        if (partTypeTopic == null) {
+            throw new RuntimeException("Illegal association definition: topic role dm4.core.part_type " +
+                "is missing in " + assoc);
+        }
+        //
+        return partTypeTopic;
+    }
+
+    // ---
+
+    @Override
     public RelatedTopic fetchWholeCardinality(Association assoc) {
         return assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
             "dm4.core.whole_cardinality", "dm4.core.cardinality", false, false, null);  // fetchComposite=false
@@ -66,9 +92,9 @@ class ObjectFactoryImpl implements ObjectFactory {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private TopicTypes fetchTopicTypes(Association assoc) {
-        String wholeTopicTypeUri = getWholeTopicTypeUri(assoc);
-        String partTopicTypeUri = getPartTopicTypeUri(assoc);
-        return new TopicTypes(wholeTopicTypeUri, partTopicTypeUri);
+        Topic wholeTopicType = fetchWholeTopicType(assoc);
+        Topic partTopicType  = fetchPartTopicType(assoc);
+        return new TopicTypes(wholeTopicType.getUri(), partTopicType.getUri());
     }
 
     private Cardinality fetchCardinality(Association assoc) {
@@ -91,18 +117,6 @@ class ObjectFactoryImpl implements ObjectFactory {
             "dm4.core.view_config", null, true, false, 0, null);    // fetchComposite=true, fetchRelatingComposite=false
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
         return new ViewConfigurationModel(dms.getTopicModels(topics.getItems()));
-    }
-
-    // === Helper ===
-
-    // ### FIXME: copy in TypeEditorPlugin
-    private String getWholeTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm4.core.whole_type").getUri();
-    }
-
-    // ### FIXME: copy in TypeEditorPlugin
-    private String getPartTopicTypeUri(Association assoc) {
-        return assoc.getTopic("dm4.core.part_type").getUri();
     }
 
 

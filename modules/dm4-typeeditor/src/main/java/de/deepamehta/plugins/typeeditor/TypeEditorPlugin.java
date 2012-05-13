@@ -68,17 +68,17 @@ public class TypeEditorPlugin extends Plugin {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private AssociationDefinitionModel buildAssocDefModel(Association assoc) {
-        String wholeTopicTypeUri = getWholeTopicTypeUri(assoc);
-        String partTopicTypeUri = getPartTopicTypeUri(assoc);
+        String wholeTopicTypeUri = fetchWholeTopicType(assoc).getUri();
+        String partTopicTypeUri  = fetchPartTopicType(assoc).getUri();
         // Note: the assoc def's ID is already known. Setting it explicitely
         // prevents the core from creating the underlying association.
         return new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(), wholeTopicTypeUri, partTopicTypeUri,
-            "dm4.core.one", "dm4.core.one", null);  // viewConfigModel=null ### FIXME: handle cardinality
+            "dm4.core.one", "dm4.core.one", null);  // viewConfigModel=null
     }
 
     private TopicType removeAssocDef(Association assoc) {
-        String wholeTopicTypeUri = getWholeTopicTypeUri(assoc);
-        String partTopicTypeUri  = getPartTopicTypeUri(assoc);
+        String wholeTopicTypeUri = fetchWholeTopicType(assoc).getUri();
+        String partTopicTypeUri  = fetchPartTopicType(assoc).getUri();
         TopicType topicType = dms.getTopicType(wholeTopicTypeUri, null);
         logger.info("### Removing association definition \"" + partTopicTypeUri +
             "\" from topic type \"" + wholeTopicTypeUri + "\"");
@@ -93,27 +93,11 @@ public class TypeEditorPlugin extends Plugin {
 
     // ---
 
-    // ### FIXME: copy in ObjectFactoryImpl
-    private String getWholeTopicTypeUri(Association assoc) {
-        Topic wholeTypeTopic = assoc.getTopic("dm4.core.whole_type");
-        // error check
-        if (wholeTypeTopic == null) {
-            throw new RuntimeException("Illegal association definition: topic role dm4.core.whole_type " +
-                "is missing in " + assoc);
-        }
-        //
-        return wholeTypeTopic.getUri();
+    private Topic fetchWholeTopicType(Association assoc) {
+        return dms.getObjectFactory().fetchWholeTopicType(assoc);
     }
 
-    // ### FIXME: copy in ObjectFactoryImpl
-    private String getPartTopicTypeUri(Association assoc) {
-        Topic partTypeTopic = assoc.getTopic("dm4.core.part_type");
-        // error check
-        if (partTypeTopic == null) {
-            throw new RuntimeException("Illegal association definition: topic role dm4.core.part_type " +
-                "is missing in " + assoc);
-        }
-        //
-        return partTypeTopic.getUri();
+    private Topic fetchPartTopicType(Association assoc) {
+        return dms.getObjectFactory().fetchPartTopicType(assoc);
     }
 }

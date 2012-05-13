@@ -390,7 +390,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     protected abstract Type getType();
 
-    protected abstract RoleModel getRoleModel(String roleTypeUri);
+    protected abstract RoleModel createRoleModel(String roleTypeUri);
 
 
 
@@ -894,7 +894,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     private void associateChildTopic(AssociationDefinition assocDef, long childTopicId) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
-            getRoleModel(assocDef.getWholeRoleTypeUri()),
+            createRoleModel(assocDef.getWholeRoleTypeUri()),
             new TopicRoleModel(childTopicId, assocDef.getPartRoleTypeUri()));
     }
 

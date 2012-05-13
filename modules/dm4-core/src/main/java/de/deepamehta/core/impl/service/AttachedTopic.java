@@ -92,7 +92,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     }
 
     @Override
-    protected RoleModel getRoleModel(String roleTypeUri) {
+    protected RoleModel createRoleModel(String roleTypeUri) {
         return new TopicRoleModel(getId(), roleTypeUri);
     }
 
