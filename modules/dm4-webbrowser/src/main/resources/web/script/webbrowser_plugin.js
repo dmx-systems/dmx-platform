@@ -58,7 +58,7 @@ function webbrowser_plugin() {
         }).items
         //
         if (webpages.length > 1) {
-            alert("WARNING: data inconsistency\n\nThere are " + webpages.length + " webpages for URL \"" +
+            alert("WARNING: Data inconsistency\n\nThere are " + webpages.length + " webpages for URL \"" +
                 url_topic.value + "\" (expected is one)")
         }
         //

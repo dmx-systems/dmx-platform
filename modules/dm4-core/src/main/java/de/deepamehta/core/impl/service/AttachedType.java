@@ -288,8 +288,9 @@ abstract class AttachedType extends AttachedTopic implements Type {
         List<RelatedAssociation> sequence = fetchSequence();
         // sanity check
         if (assocDefs.size() != sequence.size()) {
-            throw new RuntimeException("Graph inconsistency: " + assocDefs.size() + " association " +
-                "definitions found but sequence length is " + sequence.size());
+            logger.warning("### Data inconsistency in " + className() + " \"" + getUri() + "\": there are " +
+                assocDefs.size() + " valid association definitions but expected are " + sequence.size());
+            // ### TODO: avoid that inconsistency to occur
         }
         //
         addAssocDefsSorted(assocDefs, JSONHelper.idList(sequence));
@@ -324,10 +325,12 @@ abstract class AttachedType extends AttachedTopic implements Type {
             AssociationDefinition assocDef = assocDefs.get(assocDefId);
             // sanity check
             if (assocDef == null) {
-                throw new RuntimeException("Graph inconsistency: ID " + assocDefId +
-                    " is in sequence but association definition is not found");
+                logger.warning("### Data inconsistency in " + className() + " \"" + getUri() +
+                    "\": association definition " + assocDefId + " is invalid");
+                continue;
+                // ### TODO: avoid that inconsistency to occur
             }
-            // Note: the model and the attached object cache is updated together
+            // Note: the model and the attached object cache are updated together
             getModel().addAssocDef(assocDef.getModel());        // update model
             this.assocDefs.put(assocDef.getUri(), assocDef);    // update attached object cache
         }

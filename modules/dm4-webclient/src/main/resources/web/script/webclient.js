@@ -297,6 +297,7 @@ var dm4c = new function() {
     this.do_delete_association = function(assoc) {
         // update DB
         var directives = dm4c.restc.delete_association(assoc.id)
+        // alert("do_delete_association(): directives=" + js.stringify(directives))
         // update client model and view
         process_directives(directives)
     }
@@ -421,7 +422,7 @@ var dm4c = new function() {
      * Updates a topic on the view (canvas and page panel).
      * Triggers the "post_update_topic" hook.
      *
-     * Called to processes an UPDATE_TOPIC directive.
+     * Processes an UPDATE_TOPIC directive.
      *
      * @param   a Topic object
      */
@@ -437,7 +438,7 @@ var dm4c = new function() {
      * Updates an association on the view (canvas and page panel).
      * Triggers the "post_update_association" hook.
      *
-     * Called to processes an UPDATE_ASSOCIATION directive.
+     * Processes an UPDATE_ASSOCIATION directive.
      *
      * @param   an Association object
      */
@@ -449,6 +450,9 @@ var dm4c = new function() {
         dm4c.trigger_plugin_hook("post_update_association", assoc)
     }
 
+    /**
+     * Processes an UPDATE_TOPIC_TYPE directive.
+     */
     function update_topic_type(topic_type) {
         // update client model (type cache)
         // Note: the type cache must be updated *before* the "post_update_topic" hook is triggered.
@@ -456,7 +460,7 @@ var dm4c = new function() {
         type_cache.put_topic_type(topic_type)
         // update view
         dm4c.canvas.update_topic(topic_type, true)      // refresh_canvas=true
-        dm4c.page_panel.display_conditionally(topic_type)
+        dm4c.page_panel.display_conditionally(topic_type)   // ### needed? already handled through UPDATE_TOPIC?
         // trigger hook
         dm4c.trigger_plugin_hook("post_update_topic", topic_type)
     }
@@ -466,6 +470,8 @@ var dm4c = new function() {
     /**
      * Removes an topic from the view (canvas and page panel).
      * Triggers the "post_hide_topic" or "post_delete_topic" hook.
+     *
+     * Processes a DELETE_TOPIC directive.
      */
     function remove_topic(topic, hook_name) {
         // update view (canvas)
@@ -479,6 +485,8 @@ var dm4c = new function() {
     /**
      * Removes an association from the view (canvas and page panel).
      * Triggers "post_hide_association" or "post_delete_association" the hook.
+     *
+     * Processes a DELETE_ASSOCIATION directive.
      */
     function remove_association(assoc, hook_name) {
         // update view (canvas)
@@ -489,6 +497,9 @@ var dm4c = new function() {
         dm4c.trigger_plugin_hook(hook_name, assoc)
     }
 
+    /**
+     * Processes a DELETE_TOPIC_TYPE directive.
+     */
     function remove_topic_type(type_uri) {
         type_cache.remove(type_uri)
     }
@@ -820,7 +831,7 @@ var dm4c = new function() {
         case "rows":
             return DEFAULT_FIELD_ROWS
         default:
-            alert("get_view_config_default: setting \"" + setting + "\" not implemented")
+            throw("WebclientError: \"" + setting + "\" is an unknown view configuration setting")
         }
 
         function default_field_renderer_class() {
@@ -834,8 +845,7 @@ var dm4c = new function() {
             case "dm4.core.boolean":
                 return "BooleanFieldRenderer"
             default:
-                alert("get_view_config_default: data type \"" + configurable.data_type_uri +
-                    "\" has no default field renderer class")
+                throw("WebclientError: \"" + configurable.data_type_uri + "\" is an unknown data type URI")
             }
         }
     }
