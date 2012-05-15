@@ -1,3 +1,6 @@
+/**
+ * DeepaMehta-specific rendering functions.
+ */
 function RenderHelper() {
 
     /**
@@ -70,11 +73,21 @@ function RenderHelper() {
      */
     this.topic_link = function(topic, handler) {
         var title = dm4c.type_label(topic.type_uri)
-        return $("<a>").attr({href: "#", title: title}).append(topic.value).click(handler)
+        var text = this.link_text(topic)
+        return $("<a>").attr({href: "#", title: title}).append(text).click(handler)
     }
 
     this.icon_link = function(topic, handler) {
         return this.type_icon(topic.type_uri).click(handler)
+    }
+
+    this.link_text = function(topic) {
+        if (dm4c.get_topic_type(topic.type_uri).data_type_uri == "dm4.core.html") {
+            var text = js.strip_html(topic.value)
+        } else {
+            var text = topic.value
+        }
+        return js.truncate(text, dm4c.MAX_LINK_TEXT_LENGTH)
     }
 
     /**

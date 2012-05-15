@@ -1,5 +1,5 @@
 /**
- * Generic JavaScript Utilities.
+ * Generic (DeepaMehta independent) JavaScript Utilities.
  */
 var js = {
 
@@ -231,6 +231,20 @@ var js = {
 
     render_text: function(text) {
         return text.replace ? text.replace(/\n/g, "<br>") : text
+    },
+
+    strip_html: function(text) {
+        // Compare to the Java-equivalent stripHTML() in JavaUtils.java
+        // *? is the reluctant version of the * quantifier (which is greedy).
+        return text.replace(/<.*?>/g, "")
+    },
+
+    truncate: function(text, max_length) {
+        if (text.length <= max_length) {
+            return text
+        }
+        var i = text.lastIndexOf(" ", max_length)
+        return text.substr(0, i >= 0 ? i : max_length) + " ..."
     },
 
     /**

@@ -1,7 +1,8 @@
 /**
- * A GUI toolkit to create buttons, menus, combo boxes, and dialog boxes.
+ * A generic (DeepaMehta independent) GUI toolkit to create buttons, menus, combo boxes, and dialog boxes.
+ * Based on jQuery UI.
  *
- * A toolkit instance is accessible as dm4c.ui
+ * The DeepaMehta Webclient's toolkit instance is accessible as dm4c.ui
  */
 function GUIToolkit(config) {
 

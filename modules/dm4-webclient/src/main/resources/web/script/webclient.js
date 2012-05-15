@@ -10,6 +10,7 @@ var dm4c = new function() {
 
     // preferences
     this.MAX_RESULT_SIZE = 100
+    this.MAX_LINK_TEXT_LENGTH = 50
     this.DEFAULT_TOPIC_ICON = "/images/ball-gray.png"
     var DEFAULT_FIELD_ROWS = 1
 
