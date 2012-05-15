@@ -185,6 +185,15 @@ body {
 
 /*** Association Page ***/
 
+.assoc-role {
+    background: #f4f4f4;
+    padding: 0.6em;
+}
+
+.assoc-role + .assoc-role {
+    margin-top: 0.6em;
+}
+
 .assoc-role .field-label {
     margin-top: 1em;
 }

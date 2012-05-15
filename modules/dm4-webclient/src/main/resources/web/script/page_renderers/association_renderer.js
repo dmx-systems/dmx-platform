@@ -79,7 +79,7 @@ function AssociationRenderer() {
         var role_type_div = $("<div>")
             .append($("<div>").addClass("field-label").text("Role Type"))
             .append($("<div>").append(role_type_element))
-        dm4c.render.page($("<div>").addClass("assoc-role").addClass("box").addClass("level1")
+        dm4c.render.page($("<div>").addClass("assoc-role")
             .append(topic_div).append(role_type_div))
     }
 }
