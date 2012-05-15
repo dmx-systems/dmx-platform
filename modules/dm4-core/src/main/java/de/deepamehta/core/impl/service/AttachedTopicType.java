@@ -133,8 +133,6 @@ class AttachedTopicType extends AttachedType implements TopicType {
             addAssocDefsSorted(hashAssocDefsById(), JSONHelper.idList(newAssocDefs));
             // update DB
             rebuildSequence();
-        } else {
-            logger.info("Updating assoc def sequence ABORTED -- no changes made by user");
         }
     }
 
@@ -169,8 +167,6 @@ class AttachedTopicType extends AttachedType implements TopicType {
         if (!getLabelConfig().equals(newLabelConfig)) {
             logger.info("### Changing label configuration");
             setLabelConfig(newLabelConfig);
-        } else {
-            logger.info("Updating label configuration ABORTED -- no changes made by user");
         }
     }
 

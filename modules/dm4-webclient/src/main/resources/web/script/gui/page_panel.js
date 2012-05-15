@@ -37,7 +37,7 @@ function PagePanel() {
     }
 
     this.display_conditionally = function(topic_or_association) {
-        if (displayed_object.id == topic_or_association.id) {
+        if (displayed_object && displayed_object.id == topic_or_association.id) {
             this.display(topic_or_association)
         }
     }

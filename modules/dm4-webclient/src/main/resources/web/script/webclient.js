@@ -459,8 +459,9 @@ var dm4c = new function() {
         // Other plugins might rely on an up-to-date type cache (e.g. the Type Search plugin does).
         type_cache.put_topic_type(topic_type)
         // update view
-        dm4c.canvas.update_topic(topic_type, true)      // refresh_canvas=true
-        dm4c.page_panel.display_conditionally(topic_type)   // ### needed? already handled through UPDATE_TOPIC?
+        // ### Note: the view is already updated through the accompanying UPDATE_TOPIC directive
+        // ### dm4c.canvas.update_topic(topic_type, true)       // refresh_canvas=true
+        // ### dm4c.page_panel.display_conditionally(topic_type)
         // trigger hook
         dm4c.trigger_plugin_hook("post_update_topic", topic_type)
     }
@@ -501,6 +502,7 @@ var dm4c = new function() {
      * Processes a DELETE_TOPIC_TYPE directive.
      */
     function remove_topic_type(type_uri) {
+        // update client model (type cache)
         type_cache.remove(type_uri)
     }
 
