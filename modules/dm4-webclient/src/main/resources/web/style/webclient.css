@@ -162,6 +162,10 @@ body {
     border-spacing: 0;
 }
 
+.topic-list:first-child {
+    margin-top: 1em;
+}
+
 .topic-list > tbody > tr > td {
     padding: 0.3em 0;
     vertical-align: top;

@@ -230,7 +230,7 @@ var js = {
     },
 
     render_text: function(text) {
-        return text.replace ? text.replace(/\n/g, "<br>") : text
+        return text.replace(/\n/g, "<br>")
     },
 
     strip_html: function(text) {
