@@ -3,12 +3,13 @@ function FolderContentRenderer(field_model) {
 }
 
 FolderContentRenderer.prototype.render_field = function(parent_element) {
-    dm4c.render.field_label(this.field_model, parent_element)
-    render_content(this.field_model)
+    var field_model = this.field_model      // needed in click_handler
+    dm4c.render.field_label(field_model, parent_element)
+    render_content()
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function render_content(field_model) {
+    function render_content() {
         try {
             var path = field_model.toplevel_topic.get("dm4.files.path")
             var items = dm4c.restc.get_resource("file:" + path).items
@@ -16,7 +17,7 @@ FolderContentRenderer.prototype.render_field = function(parent_element) {
             for (var i = 0, item; item = items[i]; i++) {
                 // error check
                 if (item.kind != "file" && item.kind != "directory") {
-                    throw "FileContentRendererError: item has unexpected kind (\"" + item.kind + "\")"
+                    throw "FolderContentRendererError: item has unexpected kind (\"" + item.kind + "\")"
                 }
                 //
                 var type_uri = item.kind == "file" ? "dm4.files.file" : "dm4.files.folder"
@@ -37,7 +38,7 @@ FolderContentRenderer.prototype.render_field = function(parent_element) {
         } else if (item.kind == "directory") {
             var child_topic = dm4c.restc.create_child_folder_topic(field_model.toplevel_topic.id, item.path)
         } else {
-            throw "FileContentRendererError: item has unexpected kind (\"" + item.kind + "\")"
+            throw "FolderContentRendererError: item has unexpected kind (\"" + item.kind + "\")"
         }
         //
         dm4c.do_reveal_related_topic(child_topic.id)
