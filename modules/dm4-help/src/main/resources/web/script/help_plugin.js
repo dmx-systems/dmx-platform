@@ -24,8 +24,8 @@ function help_plugin() {
                 '<td>' +
                     '<div class="field-label">Version</div>' +
                     '<div>${project.version}</div>' +
-                    '<div class="field-label">Build Date</div>' +
-                    '<div>May 10, 2012</div>' +
+                    '<div class="field-label">Release Date</div>' +
+                    '<div>May 19, 2012</div>' +
                     '<div class="field-label">Copyright</div>' +
                     '<div>2000-2012 Jörg Richter</div>' +
                     '<div class="field-label">License</div>' +

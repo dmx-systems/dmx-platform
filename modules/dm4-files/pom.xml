@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Files</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-files</artifactId>
-    <version>4.0.11-SNAPSHOT</version>
+    <version>4.0.11</version>
     <packaging>bundle</packaging>
 
     <parent>
@@ -21,12 +21,12 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webservice</artifactId>
-            <version>4.0.11-SNAPSHOT</version>
+            <version>4.0.11</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-proxy</artifactId>
-            <version>4.0.11-SNAPSHOT</version>
+            <version>4.0.11</version>
         </dependency>
     </dependencies>
 
