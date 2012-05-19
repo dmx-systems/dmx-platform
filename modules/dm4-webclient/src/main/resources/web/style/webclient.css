@@ -103,7 +103,7 @@ body {
 }
 
 #page-content .box + .box {
-    margin-top: 0.6em;
+    margin-top: 1em;
 }
 
 #page-content .box.level1,
