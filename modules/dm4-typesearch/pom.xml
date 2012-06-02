@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Type Search</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-typesearch</artifactId>
-    <version>4.0.11</version>
+    <version>4.0.12-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>

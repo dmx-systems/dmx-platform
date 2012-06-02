@@ -7,14 +7,14 @@
     <name>DeepaMehta 4 Distribution</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-distribution</artifactId>
-    <version>4.0.11</version>
+    <version>4.0.12-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <!-- Inherit properties -->
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-global</artifactId>
-        <version>4.0.11</version>
+        <version>4.0.12-SNAPSHOT</version>
     </parent>
 
     <!-- These 2 properties are overridden. We must use relative paths for the distribution. -->
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-bundles</artifactId>
-            <version>4.0.11</version>
+            <version>4.0.12-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
     </dependencies>
