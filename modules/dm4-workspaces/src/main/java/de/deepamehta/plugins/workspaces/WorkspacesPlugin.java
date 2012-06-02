@@ -89,7 +89,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
             workspaceId = Long.parseLong(wsId);
             assignTopic(workspaceId, topic.getId());
         } catch (Exception e) {
-            logger.warning("Assigning " + topic + " to workspace " + workspaceId + " failed (" + e + "). " +
+            logger.warning("Assigning " + topic + " to workspace " + workspaceId + " failed (" + e + ").\n" +
                 "This can happen after a DB reset if there is a stale \"dm4_workspace_id\" browser cookie.");
         }
     }

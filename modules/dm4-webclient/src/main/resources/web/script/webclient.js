@@ -10,12 +10,14 @@ var dm4c = new function() {
 
     // preferences
     this.MAX_RESULT_SIZE = 100
+    this.MAX_LINK_TEXT_LENGTH = 50
     this.DEFAULT_TOPIC_ICON = "/images/ball-gray.png"
     var DEFAULT_FIELD_ROWS = 1
 
     var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
     this.REF_PREFIX = "ref_id:"
+    this.DEL_PREFIX = "del_id:"
 
     // log window
     if (ENABLE_LOGGING) {
@@ -24,7 +26,7 @@ var dm4c = new function() {
 
     // utilities
     this.restc = new RESTClient(CORE_SERVICE_URI)
-    this.ui = new GUIToolkit()
+    this.ui = new GUIToolkit({pre_open_menu: pre_open_menu})
     this.render = new RenderHelper()
 
     // client model
@@ -76,6 +78,8 @@ var dm4c = new function() {
      * @param   no_history_update   Optional: boolean.
      */
     this.do_select_topic = function(topic_id, no_history_update) {
+        dm4c.page_panel.save()
+        //
         var topics = dm4c.canvas.select_topic(topic_id)
         // update client model
         set_selected_topic(topics.select, no_history_update)
@@ -93,6 +97,8 @@ var dm4c = new function() {
      * @param   no_history_update   Optional: boolean.
      */
     this.do_select_association = function(assoc_id, no_history_update) {
+        dm4c.page_panel.save()
+        //
         var assoc = dm4c.canvas.select_association(assoc_id)
         // update client model
         set_selected_association(assoc, no_history_update)
@@ -123,6 +129,8 @@ var dm4c = new function() {
     // ---
 
     this.do_search = function(searchmode) {
+        dm4c.page_panel.save()
+        //
         try {
             var search_topic = build_topic(dm4c.trigger_plugin_hook("search", searchmode)[0])
             // alert("search_topic=" + JSON.stringify(search_topic))
@@ -217,71 +225,48 @@ var dm4c = new function() {
      * Updates a topic in the DB and on the GUI.
      * Triggers the "post_update_topic" hook (indirectly).
      *
-     * @param   old_topic   the topic that is about to be updated. ### FIXME: This "old" version is passed to the
-     *                      post_update_topic hook to let plugins compare the old and new ones.
-     * @param   new_topic   the new topic that is about to override the old topic.
-     *
-     * @return  ### FIXDOC: The updated topic as stored in the DB (a Topic object).
-     *          Note: the new topic and the updated topic are not necessarily 100% identical. The new topic contains
-     *          only the parts that are required for the update, e.g. a composite topic doesn't contain the "value"
-     *          field. The updated topic on the other hand is the complete topic as returned by the server.
+     * @param   topic_model     Optional: a topic model containing the data to be udpated.
+     *                          If not specified no DB update is performed but the page panel is still refreshed.
      */
-    this.do_update_topic = function(old_topic, new_topic) {
-        // update DB
-        // alert("do_update_topic(): new_topic=" + JSON.stringify(new_topic))
-        var directives = dm4c.restc.update_topic(new_topic)
-        // alert("do_update_topic(): directives=" + JSON.stringify(directives))
-        // update client model and view
-        process_directives(directives)
-        //
-        // ### return updated_topic
+    this.do_update_topic = function(topic_model) {
+        // alert("do_update_topic(): topic_model=" + js.stringify(topic_model))
+        if (topic_model) {
+            // update DB
+            var directives = dm4c.restc.update_topic(topic_model)
+            // alert("do_update_topic(): directives=" + js.stringify(directives))
+            // update GUI (client model and view)
+            process_directives(directives)
+        } else {
+            dm4c.page_panel.refresh()
+        }
     }
 
     /**
      * Updates an association in the DB and on the GUI.
      * Triggers the "post_update_association" hook (indirectly).
      *
-     * @param   old_assoc   the association that is about to be updated. ### FIXME: This "old" version is passed to the
-     *                      post_update_association hook to let plugins compare the old and new ones.
-     * @param   new_assoc   the new association that is about to override the old association.
-     *
-     * @return  ### FIXME: The updated association as stored in the DB.
+     * @param   assoc_model     an association model containing the data to be udpated.
      */
-    this.do_update_association = function(old_assoc, new_assoc) {
+    this.do_update_association = function(assoc_model) {
         // update DB
-        var directives = dm4c.restc.update_association(new_assoc)
-        // update client model and view
+        var directives = dm4c.restc.update_association(assoc_model)
+        // alert("do_update_association(): directives=" + js.stringify(directives))
+        // update GUI (client model and view)
         process_directives(directives)
-        //
-        // ### return updated_assoc
     }
 
     /**
      * Updates a topic type in the DB and on the GUI.
-     * Triggers the "post_update_topic" hook.
+     * Triggers the "post_update_topic" hook (indirectly).
+     *
+     * @param   topic_type_model    a topic type model containing the data to be udpated.
      */
-    this.do_update_topic_type = function(old_topic_type, new_topic_type) {
-        // 1) update DB
-        var topic_type = build_topic_type(dm4c.restc.update_topic_type(new_topic_type))
-        //
-        // 2) update client model (type cache)
-        // Note: the type cache must be updated *before* the "post_update_topic" hook is triggered.
-        // Other plugins might rely on an up-to-date type cache (e.g. the Type Search plugin does).
-        var uri_changed = topic_type.uri != old_topic_type.uri
-        if (uri_changed) {
-            // alert("Type URI changed: " + old_topic_type.uri + " -> " + topic_type.uri)
-            type_cache.remove(old_topic_type.uri)
-        }
-        type_cache.put_topic_type(topic_type)
-        //
-        // 3) trigger hook
-        dm4c.trigger_plugin_hook("post_update_topic", topic_type, old_topic_type)   // trigger hook
-        //
-        // 4) update view
-        dm4c.canvas.update_topic(topic_type, true)
-        dm4c.page_panel.display(topic_type)
-        //
-        return topic_type
+    this.do_update_topic_type = function(topic_type_model) {
+        // update DB
+        var directives = dm4c.restc.update_topic_type(topic_type_model)
+        // alert("do_update_topic_type(): directives=" + js.stringify(directives))
+        // update GUI (client model and view)
+        process_directives(directives)
     }
 
     // ---
@@ -313,6 +298,7 @@ var dm4c = new function() {
     this.do_delete_association = function(assoc) {
         // update DB
         var directives = dm4c.restc.delete_association(assoc.id)
+        // alert("do_delete_association(): directives=" + js.stringify(directives))
         // update client model and view
         process_directives(directives)
     }
@@ -422,8 +408,11 @@ var dm4c = new function() {
             case "UPDATE_TOPIC_TYPE":
                 update_topic_type(build_topic_type(directive.arg))
                 break
+            case "DELETE_TOPIC_TYPE":
+                remove_topic_type(directive.arg.uri)
+                break
             default:
-                throw "UnknownDirectiveError: directive \"" + directive.type + "\" not implemented"
+                throw "WebclientError: \"" + directive.type + "\" is an unknown directive"
             }
         }
     }
@@ -434,7 +423,7 @@ var dm4c = new function() {
      * Updates a topic on the view (canvas and page panel).
      * Triggers the "post_update_topic" hook.
      *
-     * Called to processes an UPDATE_TOPIC directive.
+     * Processes an UPDATE_TOPIC directive.
      *
      * @param   a Topic object
      */
@@ -443,14 +432,14 @@ var dm4c = new function() {
         dm4c.canvas.update_topic(topic, true)           // refresh_canvas=true
         dm4c.page_panel.display_conditionally(topic)
         // trigger hook
-        dm4c.trigger_plugin_hook("post_update_topic", topic, undefined)         // FIXME: old_topic=undefined
+        dm4c.trigger_plugin_hook("post_update_topic", topic)
     }
 
     /**
      * Updates an association on the view (canvas and page panel).
      * Triggers the "post_update_association" hook.
      *
-     * Called to processes an UPDATE_ASSOCIATION directive.
+     * Processes an UPDATE_ASSOCIATION directive.
      *
      * @param   an Association object
      */
@@ -459,7 +448,23 @@ var dm4c = new function() {
         dm4c.canvas.update_association(assoc, true)     // refresh_canvas=true
         dm4c.page_panel.display_conditionally(assoc)
         // trigger hook
-        dm4c.trigger_plugin_hook("post_update_association", assoc, undefined)   // FIXME: old_assoc=undefined
+        dm4c.trigger_plugin_hook("post_update_association", assoc)
+    }
+
+    /**
+     * Processes an UPDATE_TOPIC_TYPE directive.
+     */
+    function update_topic_type(topic_type) {
+        // update client model (type cache)
+        // Note: the type cache must be updated *before* the "post_update_topic" hook is triggered.
+        // Other plugins might rely on an up-to-date type cache (e.g. the Type Search plugin does).
+        type_cache.put_topic_type(topic_type)
+        // update view
+        // ### Note: the view is already updated through the accompanying UPDATE_TOPIC directive
+        // ### dm4c.canvas.update_topic(topic_type, true)       // refresh_canvas=true
+        // ### dm4c.page_panel.display_conditionally(topic_type)
+        // trigger hook
+        dm4c.trigger_plugin_hook("post_update_topic", topic_type)
     }
 
     // ---
@@ -467,10 +472,12 @@ var dm4c = new function() {
     /**
      * Removes an topic from the view (canvas and page panel).
      * Triggers the "post_hide_topic" or "post_delete_topic" hook.
+     *
+     * Processes a DELETE_TOPIC directive.
      */
     function remove_topic(topic, hook_name) {
         // update view (canvas)
-        dm4c.canvas.remove_topic(topic.id, true)            // refresh_canvas=true
+        dm4c.canvas.remove_topic(topic.id, true)        // refresh_canvas=true
         // update client model and view
         reset_selection_conditionally(topic.id)
         // trigger hook
@@ -480,6 +487,8 @@ var dm4c = new function() {
     /**
      * Removes an association from the view (canvas and page panel).
      * Triggers "post_hide_association" or "post_delete_association" the hook.
+     *
+     * Processes a DELETE_ASSOCIATION directive.
      */
     function remove_association(assoc, hook_name) {
         // update view (canvas)
@@ -490,14 +499,12 @@ var dm4c = new function() {
         dm4c.trigger_plugin_hook(hook_name, assoc)
     }
 
-    // ---
-
-    function update_topic_type(topic_type) {
-        // update client model
-        type_cache.put_topic_type(topic_type)
-        // update view
-        dm4c.refresh_create_menu()
-        dm4c.canvas.refresh()
+    /**
+     * Processes a DELETE_TOPIC_TYPE directive.
+     */
+    function remove_topic_type(type_uri) {
+        // update client model (type cache)
+        type_cache.remove(type_uri)
     }
 
     // ---
@@ -671,10 +678,6 @@ var dm4c = new function() {
         return pm.trigger_listeners.apply(undefined, arguments)
     }
 
-    this.trigger_page_renderer_hook = function(topic_or_association, hook_name, args) {
-        return dm4c.get_page_renderer(topic_or_association)[hook_name](args)
-    }
-
     this.get_plugin = function(plugin_class) {
         return pm.get_plugin(plugin_class)
     }
@@ -707,6 +710,17 @@ var dm4c = new function() {
             hashed_topics[topic.type_uri] = topic
         }
         return hashed_topics
+    }
+
+    // ---
+
+    /**
+     * Creates an empty topic.
+     */
+    this.empty_topic = function(topic_type_uri) {
+        return {
+            id: -1, uri: "", type_uri: topic_type_uri, value: "", composite: {}
+        }
     }
 
     // === Types ===
@@ -820,7 +834,7 @@ var dm4c = new function() {
         case "rows":
             return DEFAULT_FIELD_ROWS
         default:
-            alert("get_view_config_default: setting \"" + setting + "\" not implemented")
+            throw("WebclientError: \"" + setting + "\" is an unknown view configuration setting")
         }
 
         function default_field_renderer_class() {
@@ -834,8 +848,7 @@ var dm4c = new function() {
             case "dm4.core.boolean":
                 return "BooleanFieldRenderer"
             default:
-                alert("get_view_config_default: data type \"" + configurable.data_type_uri +
-                    "\" has no default field renderer class")
+                throw("WebclientError: \"" + configurable.data_type_uri + "\" is an unknown data type URI")
             }
         }
     }
@@ -889,6 +902,27 @@ var dm4c = new function() {
     }
 
     // === GUI ===
+
+    /**
+     * Save the page panel before the user opens a menu.
+     *
+     * @param   menu    a GUIToolkit Menu object.
+     */
+    function pre_open_menu(menu) {
+        // react only on menus that are not part of the page content
+        if (menu.dom.parents("#page-content").length == 0) {
+            dm4c.page_panel.save()
+        }
+    }
+
+    /**
+     * Save the page panel before the user opens the canvas's context menu.
+     */
+    this.pre_open_context_menu = function() {
+        dm4c.page_panel.save()
+    }
+
+    // ---
 
     this.begin_editing = function(object) {
         // update view

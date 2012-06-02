@@ -1,22 +1,17 @@
-function BooleanFieldRenderer(topic, field) {
+function BooleanFieldRenderer(field_model) {
+    this.field_model = field_model
+}
 
-    /**
-     * Checkbox: a jQuery object
-     */
-    var gui_element
+BooleanFieldRenderer.prototype.render_field = function(parent_element) {
+    dm4c.render.field_label(this.field_model, parent_element)
+    parent_element.append(this.field_model.value.toString())
+}
 
-    this.render_field = function() {
-        // field label
-        dm4c.render.field_label(field)
-        // field value
-        return field.value.toString()
-    }
-
-    this.render_form_element = function() {
-        return gui_element = dm4c.render.checkbox(field)
-    }
-
-    this.read_form_value = function() {
-        return gui_element.get(0).checked
+BooleanFieldRenderer.prototype.render_form_element = function(parent_element) {
+    var form_element = dm4c.render.checkbox(this.field_model)    // a jQuery object
+    parent_element.append(form_element)
+    //
+    return function() {
+        return form_element.get(0).checked
     }
 }

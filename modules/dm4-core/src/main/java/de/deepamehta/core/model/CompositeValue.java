@@ -1,12 +1,16 @@
 package de.deepamehta.core.model;
 
+import de.deepamehta.core.util.JSONHelper;
+
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 
@@ -18,13 +22,24 @@ import java.util.Map;
  */
 public class CompositeValue {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String REF_PREFIX = "ref_id:";
+    private static final String DEL_PREFIX = "del_id:";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     /**
-     * Internal representation. ### FIXDOC
-     * Key: String, value: non-null atomic (String, Integer, Long, Double, Boolean) or composite (JSONObject).
+     * Internal representation.
+     * Key: String, value: TopicModel or List<TopicModel>
      */
-    private Map<String, TopicModel> values = new HashMap();
+    private Map<String, Object> values = new HashMap();
+    // Note: it must be List<TopicModel>, not Set<TopicModel> (like before).
+    // There may be several TopicModels with the same ID. That occurrs if the webclient user adds several new topics
+    // at once (by the means of an "Add" button). In this case the ID is -1. TopicModel equality is defined solely as
+    // ID equality (see DeepaMehtaObjectModel.equals()).
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -37,13 +52,15 @@ public class CompositeValue {
             while (i.hasNext()) {
                 String key = i.next();
                 Object value = values.get(key);
-                TopicModel model;
-                if (value instanceof JSONObject) {
-                    model = new TopicModel(null, new CompositeValue((JSONObject) value));   // typeUri=null
+                if (value instanceof JSONArray) {
+                    List<TopicModel> models = new ArrayList();
+                    for (int j = 0; j < ((JSONArray) value).length(); j++) {
+                        models.add(createTopicModel(key, ((JSONArray) value).get(j)));
+                    }
+                    put(key, models);
                 } else {
-                    model = new TopicModel(null, new SimpleValue(value));                   // typeUri=null
+                    put(key, createTopicModel(key, value));
                 }
-                put(key, model);
             }
         } catch (Exception e) {
             throw new RuntimeException("Parsing CompositeValue failed (JSONObject=" + values + ")", e);
@@ -59,18 +76,47 @@ public class CompositeValue {
     // ---
 
     public TopicModel getTopic(String key) {
-        TopicModel topic = values.get(key);
+        TopicModel topic = (TopicModel) values.get(key);
         // error check
         if (topic == null) {
-            throw new RuntimeException("No entry \"" + key + "\" in composite value " + this);
+            throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\": " +
+                "no such entry in\n" + this);
         }
         //
         return topic;
     }
 
     public TopicModel getTopic(String key, TopicModel defaultValue) {
-        TopicModel topic = values.get(key);
+        TopicModel topic = (TopicModel) values.get(key);
         return topic != null ? topic : defaultValue;
+    }
+
+    // ---
+
+    public List<TopicModel> getTopics(String key) {
+        try {
+            List<TopicModel> topics = (List<TopicModel>) values.get(key);
+            // error check
+            if (topics == null) {
+                throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\": " +
+                    "no such entry in\n" + this);
+            }
+            //
+            return topics;
+        } catch (ClassCastException e) {
+            throwInvalidAccess(key, e);
+            return null;    // never reached
+        }
+    }
+
+    public List<TopicModel> getTopics(String key, List<TopicModel> defaultValue) {
+        try {
+            List<TopicModel> topics = (List<TopicModel>) values.get(key);
+            return topics != null ? topics : defaultValue;
+        } catch (ClassCastException e) {
+            throwInvalidAccess(key, e);
+            return null;    // never reached
+        }
     }
 
     // ---
@@ -79,7 +125,23 @@ public class CompositeValue {
         try {
             // check argument
             if (value == null) {
-                throw new IllegalArgumentException("Tried to put a null value in a CompositeValue");
+                throw new IllegalArgumentException("Tried to put null in a CompositeValue");
+            }
+            // put value
+            values.put(key, value);
+            //
+            return this;
+        } catch (Exception e) {
+            throw new RuntimeException("Putting a value in a CompositeValue failed (key=\"" + key +
+                "\", value=" + value + ", composite=" + this + ")", e);
+        }
+    }
+
+    public CompositeValue put(String key, List<TopicModel> value) {
+        try {
+            // check argument
+            if (value == null) {
+                throw new IllegalArgumentException("Tried to put null in a CompositeValue");
             }
             // put value
             values.put(key, value);
@@ -102,19 +164,19 @@ public class CompositeValue {
         try {
             // check argument
             if (value == null) {
-                throw new IllegalArgumentException("Tried to put a null value in a CompositeValue");
+                throw new IllegalArgumentException("Tried to put null in a CompositeValue");
             }
             if (!(value instanceof String || value instanceof Integer || value instanceof Long ||
                   value instanceof Double || value instanceof Boolean || value instanceof CompositeValue)) {
-                throw new IllegalArgumentException("Tried to put a " + value.getClass().getName() + " value in " +
-                    "a CompositeValue (expected are String, Integer, Long, Double, Boolean, or CompositeValue)");
+                throw new IllegalArgumentException("Tried to put a " + value.getClass().getName() + " in a " +
+                    "CompositeValue (expected are String, Integer, Long, Double, Boolean, or CompositeValue)");
             }
             // put value
             TopicModel model;
             if (value instanceof CompositeValue) {
-                model = new TopicModel(null, (CompositeValue) value);   // typeUri=null
+                model = new TopicModel(key, (CompositeValue) value);
             } else {
-                model = new TopicModel(null, new SimpleValue(value));   // typeUri=null
+                model = new TopicModel(key, new SimpleValue(value));
             }
             put(key, model);
             //
@@ -188,11 +250,18 @@ public class CompositeValue {
         try {
             JSONObject json = new JSONObject();
             for (String key : keys()) {
-                json.put(key, getTopic(key).toJSON());
+                Object value = values.get(key);
+                if (value instanceof TopicModel) {
+                    json.put(key, ((TopicModel) value).toJSON());
+                } else if (value instanceof List) {
+                    json.put(key, JSONHelper.objectsToJSON((List<TopicModel>) value));
+                } else {
+                    throw new RuntimeException("Unexpected value in a CompositeValue: " + value);
+                }
             }
             return json;
-        } catch (JSONException e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Serialization of a CompositeValue failed (" + this + ")", e);
         }
     }
 
@@ -208,8 +277,19 @@ public class CompositeValue {
     public CompositeValue clone() {
         CompositeValue clone = new CompositeValue();
         for (String key : keys()) {
-            TopicModel model = (TopicModel) getTopic(key).clone();
-            clone.put(key, model);
+            Object value = values.get(key);
+            if (value instanceof TopicModel) {
+                TopicModel model = ((TopicModel) value).clone();
+                clone.put(key, model);
+            } else if (value instanceof List) {
+                List<TopicModel> models = new ArrayList();
+                for (TopicModel model : (List<TopicModel>) value) {
+                    models.add(model.clone());
+                }
+                clone.put(key, models);
+            } else {
+                throw new RuntimeException("Unexpected value in a CompositeValue: " + value);
+            }
         }
         return clone;
     }
@@ -217,5 +297,59 @@ public class CompositeValue {
     @Override
     public String toString() {
         return values.toString();
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    /**
+     * Creates a topic model from a JSON value.
+     *
+     * Both topic serialization formats are supported:
+     * 1) canonic format -- contains entire topic models.
+     * 2) compact format -- contains the topic value only (simple or composite).
+     */
+    private TopicModel createTopicModel(String key, Object value) {
+        if (value instanceof JSONObject) {
+            JSONObject val = (JSONObject) value;
+            // we detect the canonic format by checking for a mandatory topic property
+            if (val.has("type_uri")) {
+                // canonic format
+                return new TopicModel(val);
+            } else {
+                // compact format (composite topic)
+                return new TopicModel(key, new CompositeValue(val));
+            }
+        } else {
+            // compact format (simple topic or topic reference)
+            if (value instanceof String) {
+                String val = (String) value;
+                if (val.startsWith(REF_PREFIX)) {
+                    // topic reference
+                    long refTopicId = refTopicId(val, REF_PREFIX);
+                    return new TopicModel(refTopicId, key);
+                } else if (val.startsWith(DEL_PREFIX)) {
+                    // topic deletion reference
+                    long refTopicId = refTopicId(val, DEL_PREFIX);
+                    return new TopicDeletionModel(refTopicId);
+                }
+            }
+            // compact format (simple topic)
+            return new TopicModel(key, new SimpleValue(value));
+        }
+    }
+
+    private long refTopicId(String val, String prefix) {
+        return Long.parseLong(val.substring(prefix.length()));
+    }
+
+    private void throwInvalidAccess(String key, ClassCastException e) {
+        if (e.getMessage().equals("de.deepamehta.core.model.TopicModel cannot be cast to java.util.List")) {
+            throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\": " +
+                "the caller assumes it to be multiple-value but it is single-value in\n" + this, e);
+        } else {
+            throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\" in\n" + this, e);
+        }
     }
 }

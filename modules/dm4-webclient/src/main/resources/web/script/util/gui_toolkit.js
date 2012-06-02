@@ -1,4 +1,10 @@
-function GUIToolkit() {
+/**
+ * A generic (DeepaMehta independent) GUI toolkit to create buttons, menus, combo boxes, and dialog boxes.
+ * Based on jQuery UI.
+ *
+ * The DeepaMehta Webclient's toolkit instance is accessible as dm4c.ui
+ */
+function GUIToolkit(config) {
 
     var gui = this
 
@@ -10,6 +16,9 @@ function GUIToolkit() {
      * Creates and returns a jQuery UI button.
      *
      * @param   handler     The callback function. The generic JavaScript event arguments are passed to it.
+     * @param   label       Optional: the button label (string).
+     * @param   icon        Optional: the button icon (string).
+     * @param   is_submit   Optional: if true a submit button is created (boolean).
      *
      * @return              The button (a jQuery object).
      */
@@ -20,7 +29,7 @@ function GUIToolkit() {
         }
         //
         button = $('<button type="' + (is_submit ? "submit" : "button") + '">').click(handler)
-        //
+        // build options
         var options = {}
         if (label) {
             options.label = label
@@ -30,7 +39,7 @@ function GUIToolkit() {
         if (icon) {
             options.icons = {primary: "ui-icon-" + icon}
         }
-        //
+        // create button
         return button.button(options)
     }
 
@@ -94,19 +103,19 @@ function GUIToolkit() {
      *          <div>           - the actual menu (hidden until triggered)
      *              <a>         - a menu item
      *
-     * The menu's DOM structure is accessible through the menu's "dom" attribute (a jQuery object).
+     * The menu's DOM structure is accessible through the menu's "dom" property (a jQuery object).
      *
      * @param   handler     Optional: The callback function. One argument is passed to it:
      *                      the selected menu item (an object with "value" and "label" properties).
      *                      If not specified your application can not react on the menu selection, which is
      *                      reasonable in case of stateful select-like menus.
      * @param   menu_title  Optional: The menu title (string).
-     *                      If specified a stateless action-trigger menu with a static menu title is created.
-     *                      If not specified a stateful select-like menu is created with the selected item as
-     *                      "menu title".
+     *                      If specified (even if empty string) a stateless action-trigger menu with a static menu title
+     *                      is created. If not specified (undefined or null) a stateful select-like menu is created 
+     *                      with the selected item as "menu title".
      *
      * @return              The created menu (a Menu object). The caller can add the menu to the page by accessing the
-     *                      menu's "dom" attribute (a jQuery object).
+     *                      menu's "dom" property (a jQuery object).
      */
     this.menu = function(handler, menu_title) {
 
@@ -119,8 +128,8 @@ function GUIToolkit() {
             // Model
             // Note: the surrounding "handler" and "menu_title" are also part of the menu's model.
             var items = []
-            var stateful = !menu_title
-            var selection   // selected item (object with "value" and "label" properties).
+            var stateful = menu_title == undefined
+            var selection   // selected menu item (object with "value" and "label" properties).
                             // Used only for stateful select-like menus.
 
             // short-term interaction state
@@ -134,8 +143,8 @@ function GUIToolkit() {
             var menu            = $("<div>").addClass("menu")
             var top_scroller    = $("<div>").addClass("scroll-area top")
             var bottom_scroller = $("<div>").addClass("scroll-area bottom")
-            // Note: clicking a scroller is meant to have no effect. However, the event must be consumed by the
-            // scroller in order to avoid it bubbling up to the body (where it would cause the menu to be closed).
+            // Note: clicking a scroller is meant to have no effect. However, the event must be consumed
+            // in order to avoid it bubbling up to the body (where it would cause the menu to be closed).
             top_scroller   .hover(create_scroll_handler(+SCROLL_DISTANCE), do_end_scroll).click(consume)
             bottom_scroller.hover(create_scroll_handler(-SCROLL_DISTANCE), do_end_scroll).click(consume)
             //
@@ -149,12 +158,18 @@ function GUIToolkit() {
              * @param   item    The menu item to add. An object with these properties:
              *                      "label" - The label to be displayed in the menu.
              *                      "value" - Optional: the value to be examined by the caller.
-             *                          Note: if this item is about to be selected programatically or re-labeled
-             *                          the value must be specified.
+             *                          Virtually the value can be any kind of object, but consider the note.
+             *                          Note: if this item is about to be selected programatically (by calling select())
+             *                          the value must be specified and it must be a simple value.
+             *                          ### TODO: selection of items which have an object as value could be supported
+             *                          e.g. by let the caller supply a indicator function. Currently the item to select
+             *                          is identified simply by equality (==) check on the values (see find_item()).
              *                      "icon" - Optional: the icon to decorate the item (relative or absolute URL).
              *                      "is_trigger" (boolean) - Optional: if true this item acts as stateless
              *                          action-trigger within an stateful select-like menu. Default is false.
              *                          Reasonable only for stateful select-like menus.
+             *                          ### FIXME: this property could possibly be dropped. Meanwhile we have optional
+             *                          per-item event handlers (see "handler" property).
              *                      "handler" - Optional: the individual handler.
              */
             this.add_item = function(item) {
@@ -190,20 +205,6 @@ function GUIToolkit() {
                 select_item(find_item(item_value))
             }
 
-            /**
-             * Sets the selected menu item by label.
-             * Note: no handler is triggered.
-             * <p>
-             * Only applicable for stateful select-like menus.
-             * (For stateless action-trigger menus nothing is performed.)
-             *
-             * @param   item_label      Label of the menu item to select.
-             *                          If there is not such menu item nothing is performed.
-             */
-            this.select_by_label = function(item_label) {
-                select_item(find_item_by_label(item_label))
-            }
-
             // ---
 
             /**
@@ -226,11 +227,7 @@ function GUIToolkit() {
              * If there is no such menu item undefined is returned.
              */
             this.find_item_by_label = function(label) {
-                for (var i = 0, item; item = items[i]; i++) {
-                    if (item.label == label) {
-                        return item
-                    }
-                }
+                return find_item_by_label(label)
             }
 
             /**
@@ -249,6 +246,9 @@ function GUIToolkit() {
 
             // === Event Handler ===
 
+            /**
+             * Called when the menu-triggering button is clicked.
+             */
             function do_open_menu(event) {
                 // W3C DOM level 3 mouse events:
                 // (see http://www.w3.org/TR/2003/WD-DOM-Level-3-Events-20030331/ecma-script-binding.html)
@@ -361,6 +361,11 @@ function GUIToolkit() {
              * Calculates the position of the menu and opens it. Updates global state.
              */
             function open_menu(mouse_y) {
+                // fire event
+                if (config.pre_open_menu) {
+                    config.pre_open_menu(self)
+                }
+                //
                 var button_pos = button.offset()
                 var button_x = button_pos.left
                 var button_y = button_pos.top
@@ -484,6 +489,18 @@ function GUIToolkit() {
                     }
                 }
             }
+
+            /**
+             * Finds a menu item by label.
+             * If there is no such menu item undefined is returned.
+             */
+            function find_item_by_label(label) {
+                for (var i = 0, item; item = items[i]; i++) {
+                    if (item.label == label) {
+                        return item
+                    }
+                }
+            }
         }
     }
 
@@ -496,7 +513,7 @@ function GUIToolkit() {
         return new Combobox()
 
         function Combobox() {
-            var menu = gui.menu(item_selected, "Choose")
+            var menu = gui.menu(do_select_item, "")
             var input = $("<input>").attr("type", "text").addClass("combobox")
             menu.dom.append(input)
             this.dom = menu.dom
@@ -506,7 +523,7 @@ function GUIToolkit() {
             }
 
             this.select_by_label = function(item_label) {
-                setInputText(item_label)
+                set_input_text(item_label)
             }
 
             /**
@@ -521,16 +538,16 @@ function GUIToolkit() {
              * To examine which case occured the caller uses "typeof" on the returned value.
              */
             this.get_selection = function() {
-                var text = input.val()
+                var text = $.trim(input.val())
                 var item = menu.find_item_by_label(text)
                 return item || text
             }
 
-            function item_selected(item) {
-                setInputText(item.label)
+            function do_select_item(item) {
+                set_input_text(item.label)
             }
 
-            function setInputText(text) {
+            function set_input_text(text) {
                 input.val(text)
             }
         }

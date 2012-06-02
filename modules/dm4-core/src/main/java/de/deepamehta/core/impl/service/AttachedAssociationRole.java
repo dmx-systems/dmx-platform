@@ -30,14 +30,10 @@ class AttachedAssociationRole extends AttachedRole implements AssociationRole {
         return getModel().getAssociationId();
     }
 
-    // ----------------------------------------------------------------------------------------------- Protected Methods
-
-
-
     // === AttachedRole Overrides ===
 
     @Override
-    protected AssociationRoleModel getModel() {
+    public AssociationRoleModel getModel() {
         return (AssociationRoleModel) super.getModel();
     }
 }

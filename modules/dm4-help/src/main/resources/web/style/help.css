@@ -1,7 +1,5 @@
 #about-dialog {
-    font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
     font-size: 0.9em;
-    line-height: 1.6em;
 }
 
 #about-dialog table {
@@ -20,4 +18,12 @@
 #about-dialog a:link,
 #about-dialog a:visited {
     color: blue;
+}
+
+#about-dialog .contributors {
+    line-height: 1.6em;
+}
+
+#about-dialog .field-label ~ .field-label {
+    margin-top: 1.3em;
 }

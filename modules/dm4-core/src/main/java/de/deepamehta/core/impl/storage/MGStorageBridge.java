@@ -168,11 +168,35 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     }
 
     @Override
-    public Set<AssociationModel> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
-        Set<MehtaEdge> edges = mg.getMehtaEdges(topic1Id, topic2Id);
+    public AssociationModel getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                                                                              String roleTypeUri2) {
+        Set<MehtaEdge> edges = mg.getMehtaEdges(topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
+        // apply type filter
         if (assocTypeUri != null) {
             filterEdgesByAssociationType(edges, assocTypeUri);
         }
+        // error check
+        if (edges.size() > 1) {
+            throw new RuntimeException("Ambiguity: there are " + edges.size() + " \"" + assocTypeUri +
+                "\" associations (topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", " +
+                "roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\")");
+        }
+        //
+        if (edges.size() == 0) {
+            return null;
+        } else {
+            return buildAssociation(edges.iterator().next());
+        }
+    }
+
+    @Override
+    public Set<AssociationModel> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
+        Set<MehtaEdge> edges = mg.getMehtaEdges(topic1Id, topic2Id);
+        // apply type filter
+        if (assocTypeUri != null) {
+            filterEdgesByAssociationType(edges, assocTypeUri);
+        }
+        //
         return buildAssociations(edges);
     }
 
@@ -298,22 +322,19 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
 
 
-    // === Build Topics from MehtaNodes ===
+    // === Build Topic models from MehtaNodes ===
 
     private TopicModel buildTopic(MehtaNode node) {
         if (node == null) {
             throw new IllegalArgumentException("Tried to build a TopicModel from a null MehtaNode");
         }
         //
-        return buildTopic(node.getId(), node.getString("uri"), getTopicTypeUri(node),
-            new SimpleValue(node.getObject("value")));
-    }
-
-    private TopicModel buildTopic(long id, String uri, String typeUri, SimpleValue value) {
+        long id = node.getId();
+        String uri = node.getString("uri");
+        String typeUri = getTopicTypeUri(node);
+        SimpleValue value = new SimpleValue(node.getObject("value"));
         return new TopicModel(id, uri, typeUri, value, null);   // composite=null
     }
-
-    // ---
 
     private Set<TopicModel> buildTopics(List<MehtaNode> nodes) {
         Set<TopicModel> topics = new LinkedHashSet();
@@ -322,8 +343,6 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         }
         return topics;
     }
-
-    // ---
 
     private RelatedTopicModel buildRelatedTopic(ConnectedMehtaNode node) {
         RelatedTopicModel relTopic = new RelatedTopicModel(
@@ -346,22 +365,18 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
 
 
-    // === Build Associations from MehtaEdges ===
+    // === Build Association models from MehtaEdges ===
 
     private AssociationModel buildAssociation(MehtaEdge edge) {
         if (edge == null) {
             throw new IllegalArgumentException("Tried to build an AssociationModel from a null MehtaEdge");
         }
         //
+        long id = edge.getId();
+        String typeUri = getAssociationTypeUri(edge);
         List<RoleModel> roleModels = getRoleModels(edge);
-        return buildAssociation(edge.getId(), getAssociationTypeUri(edge), roleModels.get(0), roleModels.get(1));
+        return new AssociationModel(id, typeUri, roleModels.get(0), roleModels.get(1));
     }
-
-    private AssociationModel buildAssociation(long id, String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
-        return new AssociationModel(id, typeUri, roleModel1, roleModel2);
-    }
-
-    // ---
 
     private Set<AssociationModel> buildAssociations(Iterable<MehtaEdge> edges) {
         Set<AssociationModel> assocs = new LinkedHashSet();
@@ -370,8 +385,6 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         }
         return assocs;
     }
-
-    // ---
 
     private RelatedAssociationModel buildRelatedAssociation(ConnectedMehtaEdge edge) {
         RelatedAssociationModel relAssoc = new RelatedAssociationModel(

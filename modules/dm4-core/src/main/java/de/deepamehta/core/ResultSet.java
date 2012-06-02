@@ -2,7 +2,6 @@ package de.deepamehta.core;
 
 import de.deepamehta.core.util.JSONHelper;
 
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.Iterator;
@@ -35,7 +34,7 @@ public class ResultSet<T extends JSONEnabled> implements JSONEnabled, Iterable<T
             o.put("total_count", totalCount);
             o.put("items", JSONHelper.objectsToJSON(items));
             return o;
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }

@@ -27,6 +27,7 @@ import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Hook;
 import de.deepamehta.core.service.Migration;
+import de.deepamehta.core.service.ObjectFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
@@ -88,6 +89,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     private PluginCache pluginCache;
     private BundleContext bundleContext;
+    private ObjectFactory objectFactory;
 
     private enum MigrationRunMode {
         CLEAN_INSTALL, UPDATE, ALWAYS
@@ -102,6 +104,7 @@ public class EmbeddedService implements DeepaMehtaService {
         this.bundleContext = bundleContext;
         this.pluginCache = new PluginCache();
         this.typeCache = new TypeCache(this);
+        this.objectFactory = new ObjectFactoryImpl(this);
         bootstrapTypeCache();
     }
 
@@ -360,16 +363,7 @@ public class EmbeddedService implements DeepaMehtaService {
             AttachedAssociation assoc = getAssociation(model.getId());
             Directives directives = new Directives();
             //
-            // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
-            // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
-            //
-            ChangeReport report = assoc.update(model, clientState, directives);
-            //
-            directives.add(Directive.UPDATE_ASSOCIATION, assoc);
-            //
-            if (report.typeUriChanged) {
-                triggerHook(Hook.POST_RETYPE_ASSOCIATION, assoc, report.oldTypeUri, directives);
-            }
+            assoc.update(model, clientState, directives);
             //
             tx.success();
             return directives;
@@ -481,27 +475,21 @@ public class EmbeddedService implements DeepaMehtaService {
     @PUT
     @Path("/topictype")
     @Override
-    public TopicType updateTopicType(TopicTypeModel topicTypeModel, @HeaderParam("Cookie") ClientState clientState) {
+    public Directives updateTopicType(TopicTypeModel model, @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            String topicTypeUri = getTopic(topicTypeModel.getId(), false, clientState).getUri();  // fetchComp..=false
+            String topicTypeUri = getTopic(model.getId(), false, clientState).getUri();     // fetchComposite=false
             AttachedTopicType topicType = getTopicType(topicTypeUri, clientState);
-            Directives directives = new Directives();   // ### FIXME: directives are ignored
+            Directives directives = new Directives();
             //
-            // Properties oldProperties = new Properties(topic.getProperties());   // copy old properties for comparison
-            // ### triggerHook(Hook.PRE_UPDATE_TOPIC, topic, properties);
-            //
-            topicType.update(topicTypeModel, clientState, directives);
-            //
-            // ### triggerHook(Hook.POST_UPDATE_TOPIC, topic, oldProperties);
+            topicType.update(model, clientState, directives);
             //
             tx.success();
-            return topicType;
+            return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException(
-                "Updating topic type failed (" + topicTypeModel + ")", e));
+            throw new WebApplicationException(new RuntimeException("Updating topic type failed (" + model + ")", e));
         } finally {
             tx.finish();
         }
@@ -652,6 +640,12 @@ public class EmbeddedService implements DeepaMehtaService {
     public DeepaMehtaTransaction beginTx() {
         return storage.beginTx();
     }
+
+    @Override
+    public ObjectFactory getObjectFactory() {
+        return objectFactory;
+    }
+
 
     @Override
     public void checkAllPluginsReady() {
@@ -881,6 +875,11 @@ public class EmbeddedService implements DeepaMehtaService {
 
     void associateWithTopicType(TopicModel topic) {
         try {
+            // check argument
+            if (topic.getTypeUri() == null) {
+                throw new IllegalArgumentException("The type of topic " + topic.getId() + " is unknown (null)");
+            }
+            //
             AssociationModel model = new AssociationModel("dm4.core.instantiation");
             model.setRoleModel1(new TopicRoleModel(topic.getTypeUri(), "dm4.core.type"));
             model.setRoleModel2(new TopicRoleModel(topic.getId(), "dm4.core.instance"));

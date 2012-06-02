@@ -25,7 +25,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class TopicProvider implements MessageBodyReader<TopicModel>, MessageBodyWriter<Topic> {
+public class TopicProvider implements MessageBodyReader<TopicModel> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -55,39 +55,7 @@ public class TopicProvider implements MessageBodyReader<TopicModel>, MessageBody
             String json = JavaUtils.readText(entityStream);
             return new TopicModel(new JSONObject(json));
         } catch (Exception e) {
-            throw new IOException("Creating TopicModel from message body failed", e);
-        }
-    }
-
-
-
-    // ****************************************
-    // *** MessageBodyWriter Implementation ***
-    // ****************************************
-
-
-
-    @Override
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
-        return Topic.class.isAssignableFrom(type) && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
-    }
-
-    @Override
-    public long getSize(Topic topic, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return -1;
-    }
-
-    @Override
-    public void writeTo(Topic topic, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
-                        MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
-                        throws IOException, WebApplicationException {
-        try {
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            topic.toJSON().write(writer);
-            writer.flush();
-        } catch (Exception e) {
-            throw new IOException("Writing message body failed (" + topic + ")", e);
+            throw new WebApplicationException(new RuntimeException("Creating TopicModel from message body failed", e));
         }
     }
 }

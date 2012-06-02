@@ -4,7 +4,6 @@ import de.deepamehta.core.util.JSONHelper;
 
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -111,7 +110,7 @@ public abstract class TypeModel extends TopicModel {
 
     public void addAssocDef(AssociationDefinitionModel assocDef) {
         String assocDefUri = assocDef.getUri();
-        // sanity check ### FIXME: drop this check or provide proper feedback to the type editor user
+        // error check ### FIXME: drop this check or provide proper feedback to the type editor user
         if (!getDataTypeUri().equals("dm4.core.composite")) {
             throw new RuntimeException("Association definitions can only be added to composite topic types. " +
                 "Topic type \"" + getUri() + "\" is of data type \"" + getDataTypeUri() + "\". (" + assocDef + ")");

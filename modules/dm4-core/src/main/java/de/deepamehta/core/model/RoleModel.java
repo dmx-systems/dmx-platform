@@ -35,5 +35,7 @@ public abstract class RoleModel {
 
     // ---
 
+    public abstract boolean refsSameObject(RoleModel model);
+
     public abstract JSONObject toJSON();
 }

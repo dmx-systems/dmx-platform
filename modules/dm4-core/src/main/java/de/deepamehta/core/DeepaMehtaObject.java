@@ -53,9 +53,10 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // ---
 
-    // ### FIXME: remove from interface. This is a low-level method.
-    void updateCompositeValue(AssociationDefinition assocDef, TopicModel valueTopic, ClientState clientState,
-                                                                                     Directives directives);
+    void updateChildTopic(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
+                                                                                    Directives directives);
+    void updateChildTopics(AssociationDefinition assocDef, List<TopicModel> newChildTopics, ClientState clientState,
+                                                                                            Directives directives);
 
 
 
@@ -91,6 +92,9 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
+     * @param   fetchComposite
+     * @param   fetchRelatingComposite
+     * @param   maxResultSize       Result size limit. Pass 0 for no limit.
      */
     ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,

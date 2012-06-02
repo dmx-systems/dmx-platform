@@ -1,10 +1,9 @@
-function BodyTextRenderer(topic, field, rel_topics) {
+function BodyTextRenderer(field_model) {
+    this.field_model = field_model
+}
 
-    this.superclass = HTMLFieldRenderer
-    this.superclass(topic, field, rel_topics)
+BodyTextRenderer.prototype = new HTMLFieldRenderer()
 
-    this.render_field = function(field_value_div) {
-        // render field value
-        return field.value
-    }
+BodyTextRenderer.prototype.render_field = function(parent_element) {
+    parent_element.append(this.field_model.value)
 }

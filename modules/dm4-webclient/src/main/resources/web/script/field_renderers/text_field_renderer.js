@@ -1,85 +1,103 @@
-function TextFieldRenderer(topic, field) {
+function TextFieldRenderer(field_model) {
+    this.field_model = field_model
+}
 
-    /**
-     * Input field: a jQuery object
-     * Text area:   a jQuery object
-     * Combo box:   a GUIToolkit Combobox object
-     */
-    var gui_element
+TextFieldRenderer.prototype.render_field = function(parent_element) {
+    dm4c.render.field_label(this.field_model, parent_element)
+    parent_element.append(js.render_text(this.field_model.value))
+}
 
-    this.render_field = function() {
-        // field label
-        dm4c.render.field_label(field)
-        // field value
-        return js.render_text(field.value)
+TextFieldRenderer.prototype.render_form_element = function(parent_element) {
+    // Input field: a jQuery object
+    // Text area:   a jQuery object
+    // Combo box:   a GUIToolkit Combobox object
+    var form_element = render_form_element(this.field_model)
+    //
+    return function() {
+        if (form_element instanceof jQuery) {
+            return $.trim(form_element.val())
+        } else {
+            // form_element is a Combobox
+            var selection = form_element.get_selection() // either a menu item (object) or the text entered (string)
+            if (typeof(selection) == "object") {
+                // user selected existing topic
+                return dm4c.REF_PREFIX + selection.value
+            } else {
+                // user entered new value
+                return selection
+            }
+        }
     }
 
-    this.render_form_element = function() {
-        if (!field.rows) {
-            alert("WARNING (TextFieldRenderer.render_form_element):\n\nField \"" + field.uri +
-                "\" has no \"rows\" setting.\n\nfield=" + JSON.stringify(field))
-        } else if (field.rows == 1) {
-            switch (field.assoc_def && field.assoc_def.assoc_type_uri) {
+    // ----------------------------------------------------------------------------------------------- Private Functions
+
+    function render_form_element(field_model) {
+        // error check
+        if (!field_model.rows) {
+            throw "TextFieldRendererError: field \"" + field_model.label + "\" has no \"rows\" setting"
+        }
+        //
+        if (field_model.rows == 1) {
+            switch (field_model.assoc_def && field_model.assoc_def.assoc_type_uri) {
             case undefined:
                 // Note: for non-composite topics the field's assoc_def is undefined.
                 // We treat this like a composition here.
             case "dm4.core.composition_def":
-                return gui_element = render_input()
+                return render_input()
             case "dm4.core.aggregation_def":
-                gui_element = render_combobox()
-                return gui_element.dom
+                return render_combobox()
             default:
-                alert("TextFieldRenderer.render_form_element(): unexpected assoc type URI (\"" +
-                    field.assoc_def.assoc_type_uri + "\")")
+                throw "TextFieldRendererError: \"" + field_model.assoc_def.assoc_type_uri +
+                    "\" is an unexpected assoc type URI"
             }
         } else {
-            return gui_element = render_textarea()
+            return render_textarea()
         }
-    }
 
-    this.read_form_value = function() {
-        if (gui_element instanceof jQuery) {
-            return $.trim(gui_element.val())
-        } else {
-            // gui_element is a Combobox
-            var selection = gui_element.get_selection() // either a menu item (object) or the text entered (string)
-            return typeof(selection) == "object" ? {topic_id: selection.value} : selection
-        }
-    }
-
-    // ---
-
-    function render_input() {
-        var input = dm4c.render.input(field)
-        if (field.autocomplete_indexes) {
-            var page_renderer = dm4c.get_page_renderer(topic)
-            input.keyup(page_renderer.autocomplete)
-            input.blur(page_renderer.lost_focus)
-            input.attr({autocomplete: "off"})
-        }
-        return input
-    }
-
-    function render_textarea() {
-        return $("<textarea>").attr("rows", field.rows).text(field.value)
-    }
-
-    function render_combobox() {
-
-        // fetch all instances
-        var topics = dm4c.restc.get_topics(field.topic_type.uri, false, true).items  // fetch_composite=false, sort=true
-        return create_combobox();
-
-        function create_combobox() {
-            var combobox = dm4c.ui.combobox()
-            // add items
-            for (var i in topics) {
-                combobox.add_item({label: topics[i].value, value: topics[i].id})
+        function render_input() {
+            var input = dm4c.render.input(field_model)
+            if (field_model.autocomplete_indexes) {
+                var page_renderer = dm4c.get_page_renderer(field_model.toplevel_topic)
+                input.keyup(page_renderer.autocomplete)
+                input.blur(page_renderer.lost_focus)
+                input.attr({autocomplete: "off"})
             }
-            // select item
-            combobox.select_by_label(field.value)
             //
+            render(input)
+            return input
+        }
+
+        function render_textarea() {
+            var textarea = $("<textarea>").attr("rows", field_model.rows).text(field_model.value)
+            //
+            render(textarea)
+            return textarea
+        }
+
+        function render_combobox() {
+            // fetch all instances
+            var topics = dm4c.restc.get_topics(field_model.topic_type.uri, false, true).items  // fetch_composite=false,
+            //                                                                                 // sort=true
+            var combobox = create_combobox()
+            //
+            render(combobox.dom)
             return combobox
+
+            function create_combobox() {
+                var combobox = dm4c.ui.combobox()
+                // add items
+                for (var i in topics) {
+                    combobox.add_item({label: topics[i].value, value: topics[i].id})
+                }
+                // select item
+                combobox.select_by_label(field_model.value)
+                //
+                return combobox
+            }
+        }
+
+        function render(form_element) {
+            parent_element.append(form_element)
         }
     }
 }

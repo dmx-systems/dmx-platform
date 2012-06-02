@@ -28,6 +28,14 @@ public class TopicModel extends DeepaMehtaObjectModel {
         super(uri, typeUri, composite);
     }
 
+    public TopicModel(long id) {
+        super(id);
+    }
+
+    public TopicModel(long id, String typeUri) {
+        super(id, typeUri);
+    }
+
     public TopicModel(long id, CompositeValue composite) {
         super(id, composite);
     }
@@ -57,6 +65,15 @@ public class TopicModel extends DeepaMehtaObjectModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     // === Java API ===
+
+    @Override
+    public TopicModel clone() {
+        try {
+            return (TopicModel) super.clone();
+        } catch (Exception e) {
+            throw new RuntimeException("Cloning a TopicModel failed", e);
+        }
+    }
 
     @Override
     public String toString() {

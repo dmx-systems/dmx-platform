@@ -15,71 +15,6 @@ function TopicType(topic_type) {
     this.icon = null    // The topic type's icon (JavaScript Image object).
                         // Note: it must be loaded *after* loading the topic types (see Webclient's load_types()).
 
-    // === "Page Displayable" implementation ===
-
-    this.get_type = function() {
-        return dm4c.get_topic_type(this.type_uri)
-    }
-
-    this.get_commands = function(context) {
-        return dm4c.get_topic_commands(this, context)
-    }
-
-    this.get_page_renderer_class = function() {
-        return dm4c.get_view_config(this, "js_page_renderer_class") || "TopicRenderer"
-    }
-
-    // === Public API ===
-
-    this.is_simple = function() {
-        return !this.is_composite()
-    }
-
-    this.is_composite = function() {
-        return this.data_type_uri == "dm4.core.composite"
-    }
-
-    // ---
-
-    this.get_label_config = function(assoc_def_uri) {
-        return js.contains(this.label_config, assoc_def_uri)
-    }
-
-    // --- View Configuration ---
-
-    this.get_icon = function(type_uri) {
-        return this.icon
-    }
-
-    this.load_icon = function() {
-        this.icon = dm4c.create_image(this.get_icon_src())
-    }
-
-    /**
-     * Returns the icon source.
-     * If no icon is configured the source of the generic topic icon is returned.
-     *
-     * @return  The icon source (string).
-     */
-    this.get_icon_src = function() {
-        return dm4c.get_view_config(this, "icon") || dm4c.DEFAULT_TOPIC_ICON
-    }
-
-    this.get_menu_config = function(menu_id) {
-        switch (menu_id) {
-        case "create-type-menu":
-            return dm4c.get_view_config(this, "add_to_create_menu", true)
-        case "search-type-menu":
-            return true
-        default:
-            alert("TopicType.get_menu_config: menu \"" + menu_id + "\" not implemented")
-        }
-    }
-
-    this.is_editable = function() {
-        return dm4c.get_view_config(this, "editable", true)
-    }
-
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function deserialize(assoc_defs) {
@@ -88,4 +23,69 @@ function TopicType(topic_type) {
         }
         return assoc_defs
     }
+}
+
+// === "Page Displayable" implementation ===
+
+TopicType.prototype.get_type = function() {
+    return dm4c.get_topic_type(this.type_uri)
+}
+
+TopicType.prototype.get_commands = function(context) {
+    return dm4c.get_topic_commands(this, context)
+}
+
+TopicType.prototype.get_page_renderer_class = function() {
+    return dm4c.get_view_config(this, "js_page_renderer_class") || "TopicRenderer"
+}
+
+// === Public API ===
+
+TopicType.prototype.is_simple = function() {
+    return !this.is_composite()
+}
+
+TopicType.prototype.is_composite = function() {
+    return this.data_type_uri == "dm4.core.composite"
+}
+
+// ---
+
+TopicType.prototype.get_label_config = function(assoc_def_uri) {
+    return js.contains(this.label_config, assoc_def_uri)
+}
+
+// --- View Configuration ---
+
+TopicType.prototype.get_icon = function(type_uri) {
+    return this.icon
+}
+
+TopicType.prototype.load_icon = function() {
+    this.icon = dm4c.create_image(this.get_icon_src())
+}
+
+/**
+ * Returns the icon source.
+ * If no icon is configured the source of the generic topic icon is returned.
+ *
+ * @return  The icon source (string).
+ */
+TopicType.prototype.get_icon_src = function() {
+    return dm4c.get_view_config(this, "icon") || dm4c.DEFAULT_TOPIC_ICON
+}
+
+TopicType.prototype.get_menu_config = function(menu_id) {
+    switch (menu_id) {
+    case "create-type-menu":
+        return dm4c.get_view_config(this, "add_to_create_menu", true)
+    case "search-type-menu":
+        return true
+    default:
+        alert("TopicType.get_menu_config: menu \"" + menu_id + "\" not implemented")
+    }
+}
+
+TopicType.prototype.is_editable = function() {
+    return dm4c.get_view_config(this, "editable", true)
 }

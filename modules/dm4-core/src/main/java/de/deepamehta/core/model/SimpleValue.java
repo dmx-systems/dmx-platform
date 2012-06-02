@@ -46,9 +46,16 @@ public class SimpleValue {
     }
 
     public SimpleValue(Object value) {
+        // check argument
         if (value == null) {
             throw new IllegalArgumentException("Tried to build a SimpleValue from a null Object");
         }
+        if (!(value instanceof String || value instanceof Integer || value instanceof Long ||
+              value instanceof Double || value instanceof Boolean)) {
+            throw new IllegalArgumentException("Tried to build a SimpleValue from a " + value.getClass().getName() +
+                " (expected are String, Integer, Long, Double, or Boolean)");
+        }
+        //
         this.value = value;
     }
 

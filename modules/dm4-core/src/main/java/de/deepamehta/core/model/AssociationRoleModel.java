@@ -2,7 +2,6 @@ package de.deepamehta.core.model;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,20 +46,30 @@ public class AssociationRoleModel extends RoleModel {
         return assocId;
     }
 
-    // ---
+    // === Implementation of abstract RoleModel methods ===
 
+    @Override
+    public boolean refsSameObject(RoleModel model) {
+        if (model instanceof AssociationRoleModel) {
+            AssociationRoleModel assocRole = (AssociationRoleModel) model;
+            return assocRole.assocId == assocId;
+        }
+        return false;
+    }
+
+    @Override
     public JSONObject toJSON() {
         try {
             JSONObject o = new JSONObject();
             o.put("assoc_id", assocId);
             o.put("role_type_uri", roleTypeUri);
             return o;
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
 
-    // ---
+    // === Java API ===
 
     @Override
     public String toString() {

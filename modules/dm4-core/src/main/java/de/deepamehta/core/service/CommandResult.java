@@ -2,7 +2,6 @@ package de.deepamehta.core.service;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONException;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,7 +39,7 @@ public class CommandResult {
     public void put(String key, Object value) {
         try {
             result.put(key, value);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Putting entry in " + this + " failed", e);
         }
     }

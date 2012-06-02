@@ -1,4 +1,32 @@
+/**
+ * DeepaMehta-specific rendering functions.
+ */
 function RenderHelper() {
+
+    /**
+     * @param   field_model     a TopicRenderer.FieldModel object or a string.
+     * @param   parent_element  Optional: the parent element the label is rendered to.
+     *                          If not specified the label is rendered directly to the page panel.
+     */
+    this.field_label = function(field_model, parent_element, result_set) {
+        parent_element = parent_element || $("#page-content")
+        //
+        if (typeof(field_model) == "string") {
+            var label = field_model
+        } else {
+            var label = field_model.label
+        }
+        //
+        if (result_set) {
+            var c = result_set.items.length
+            var tc = result_set.total_count
+            label += " (" + c + (tc > c ? " of " + tc : "") + ")"
+        }
+        //
+        parent_element.append($("<div>").addClass("field-label").text(label))
+    }
+
+    // ---
 
     /**
      * @param   topics          Topics to render (array of Topic objects).
@@ -45,11 +73,21 @@ function RenderHelper() {
      */
     this.topic_link = function(topic, handler) {
         var title = dm4c.type_label(topic.type_uri)
-        return $("<a>").attr({href: "#", title: title}).append(topic.value).click(handler)
+        var text = this.link_text(topic)
+        return $("<a>").attr({href: "#", title: title}).append(text).click(handler)
     }
 
     this.icon_link = function(topic, handler) {
         return this.type_icon(topic.type_uri).click(handler)
+    }
+
+    this.link_text = function(topic) {
+        if (dm4c.get_topic_type(topic.type_uri).data_type_uri == "dm4.core.html") {
+            var text = js.strip_html(topic.value)
+        } else {
+            var text = topic.value.toString()   // value can be a number or a boolean as well (truncate would fail)
+        }
+        return js.truncate(text, dm4c.MAX_LINK_TEXT_LENGTH)
     }
 
     /**
@@ -58,22 +96,27 @@ function RenderHelper() {
     this.type_icon = function(type_uri) {
         var src   = dm4c.get_icon_src(type_uri)
         var title = dm4c.type_label(type_uri)
+        return this.icon(src, title)
+    }
+
+    this.icon = function(src, title) {
+        title = title || src
         return $("<img>").attr({src: src, title: title}).addClass("type-icon")
     }
 
     // ---
 
     /**
-     * @param   field   Optional: the initial value (a TopicRenderer.Field object or a non-object value).
-     *                  If not specified the text field will be empty.
+     * @param   field_model     Optional: the initial value (a TopicRenderer.FieldModel object or a non-object value).
+     *                          If not specified the text field will be empty.
      *
      * @return  The <input> element (jQuery object).
      */
-    this.input = function(field, size) {
-        if (typeof(field) == "object") {
-            var value = field.value
+    this.input = function(field_model, size) {
+        if (typeof(field_model) == "object") {
+            var value = field_model.value
         } else {
-            var value = field
+            var value = field_model
         }
         // Note: we use an object argument for attr().
         // attr("value", value) would be interpreted as 1-argument attr() call if value is undefined.
@@ -81,14 +124,14 @@ function RenderHelper() {
     }
 
     /**
-     * @param   field   a TopicRenderer.Field object or a boolean.
+     * @param   field_model     a TopicRenderer.FieldModel object or a boolean.
      */
-    this.checkbox = function(field) {
+    this.checkbox = function(field_model) {
         var dom = $("<input type='checkbox'>")
-        if (typeof(field) == "boolean") {
-            var checked = field
+        if (typeof(field_model) == "boolean") {
+            var checked = field_model
         } else {
-            var checked = field.value
+            var checked = field_model.value
         }
         if (checked) {
             dom.attr("checked", "checked")
@@ -120,37 +163,10 @@ function RenderHelper() {
 
     this.associations = function(topic_id) {
         var result = dm4c.restc.get_related_topics(topic_id, undefined, true, dm4c.MAX_RESULT_SIZE)
-                                                             // traversal_filter=undefined, sort=true
-        this.field_label("Associations", result)
-        this.field_value(this.topic_list(result.items))
+                                                                // traversal_filter=undefined, sort=true
+        this.field_label("Associations", undefined, result)     // parent_element=undefined
+        this.page(this.topic_list(result.items))
     }
-
-    // ---
-
-    /**
-     * @param   field   a TopicRenderer.Field object or a string.
-     */
-    this.field_label = function(field, result_set) {
-        if (typeof(field) == "string") {
-            var label = field
-        } else {
-            var label = field.label
-        }
-        //
-        if (result_set) {
-            var c = result_set.items.length
-            var tc = result_set.total_count
-            label += " (" + c + (tc > c ? " of " + tc : "") + ")"
-        }
-        //
-        this.page($("<div>").addClass("field-label").text(label))
-    }
-
-    this.field_value = function(value) {
-        this.page($("<div>").addClass("field-value").append(value))
-    }
-
-    // ---
 
     this.page = function(html) {
         $("#page-content").append(html)

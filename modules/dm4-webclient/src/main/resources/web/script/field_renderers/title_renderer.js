@@ -1,11 +1,11 @@
-function TitleRenderer(topic, field, rel_topics) {
+function TitleRenderer(field_model) {
+    this.field_model = field_model
+}
 
-    this.superclass = TextFieldRenderer
-    this.superclass(topic, field, rel_topics)
+TitleRenderer.prototype = new TextFieldRenderer()
 
-    this.render_field = function(field_value_div) {
-        // render field value
-        field_value_div.removeClass("field-value").addClass("title")
-        return js.render_text(field.value)
-    }
+TitleRenderer.prototype.render_field = function(parent_element) {
+    parent_element.append($("<h1>")
+        .text(js.render_text(this.field_model.value))
+    )
 }

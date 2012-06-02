@@ -4,7 +4,6 @@ import de.deepamehta.core.Association;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,7 +103,7 @@ public class AssociationModel extends DeepaMehtaObjectModel {
             o.put("role_1", roleModel1.toJSON());
             o.put("role_2", roleModel2.toJSON());
             return o;
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }

@@ -1,16 +1,17 @@
-function FileContentRenderer(topic, field) {
+function FileContentRenderer(field_model) {
+    this.field_model = field_model
+}
 
-    this.render_field = function(field_value_div) {
-        return render_content(field_value_div)
-    }
+FileContentRenderer.prototype.render_field = function(parent_element) {
+    render_content(this.field_model)
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function render_content(field_value_div) {
+    function render_content(field_model) {
         try {
-            var path       = topic.get("dm4.files.path")
-            var size       = topic.get("dm4.files.size")
-            var media_type = topic.get("dm4.files.media_type")
+            var path       = field_model.toplevel_topic.get("dm4.files.path")
+            var size       = field_model.toplevel_topic.get("dm4.files.size")
+            var media_type = field_model.toplevel_topic.get("dm4.files.media_type")
             var src = local_resource_URI()
             // Note: for unknown file types media_type is null
             /*if (!media_type) {
@@ -19,17 +20,21 @@ function FileContentRenderer(topic, field) {
             if (media_type) {
                 // TODO: let plugins render the file content
                 if (media_type == "text/plain") {
-                    return $("<pre>").text(dm4c.restc.get_resource("file:" + path, media_type, size))
+                    render($("<pre>").text(dm4c.restc.get_resource("file:" + path, media_type, size)))
+                    return
                 } else if (js.begins_with(media_type, "image/")) {
-                    return $("<img>").attr("src", src)
+                    render($("<img>").attr("src", src))
+                    return
                 } else if (media_type == "application/pdf") {
-                    return $("<embed>").attr({src: src, type: media_type,
-                        width: "100%", height: dm4c.page_panel.height})
+                    render($("<embed>").attr({src: src, type: media_type,
+                        width: "100%", height: dm4c.page_panel.height}))
+                    return
                     // return $("<iframe>").attr({src: src, width: "100%",
                     //     height: dm4c.canvas.canvas_height, frameborder: 0})
                 } else if (js.begins_with(media_type, "audio/")) {
-                    return $("<embed>").attr({src: src, width: "95%", height: 64, bgcolor: "#ffffff"})
-                        .css("margin-top", "2em")
+                    render($("<embed>").attr({src: src, width: "95%", height: 64, bgcolor: "#ffffff"})
+                        .css("margin-top", "2em"))
+                    return
                     // var content = "<audio controls=\"\" src=\"" + src + "\"></audio>"
                 } else if (js.begins_with(media_type, "video/")) {
                     // Note: default embed element is used
@@ -39,13 +44,13 @@ function FileContentRenderer(topic, field) {
                     // throw "media type \"" + media_type + "\" is not supported"
                 }
             }
-            return $("<embed>").attr({src: src, type: media_type, width: "100%",
-                height: 0.75 * dm4c.page_panel.width, bgcolor: "#ffffff"})
+            render($("<embed>").attr({src: src, type: media_type, width: "100%",
+                height: 0.75 * dm4c.page_panel.width, bgcolor: "#ffffff"}))
             // Note: "bgcolor" is a quicktime plugin attribute.
             // We want a white background also in Chrome (in Chrome default background is black).
         } catch (e) {
-            field_value_div.addClass("ui-state-error")
-            return "FileContentRendererError: " + e
+            parent_element.addClass("ui-state-error")
+            render("FileContentRendererError: " + e)
         }
 
         function local_resource_URI() {
@@ -54,6 +59,10 @@ function FileContentRenderer(topic, field) {
                 uri += "&type=" + encodeURIComponent(media_type)  // media_type might contain + char ("image/svg+xml")
             }
             return uri
+        }
+
+        function render(content_element) {
+            parent_element.append(content_element)
         }
     }
 }

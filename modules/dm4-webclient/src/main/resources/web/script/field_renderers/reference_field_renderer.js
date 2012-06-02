@@ -1,3 +1,4 @@
+// ### FIXME: not in use
 function ReferenceFieldRenderer(topic, field, rel_topics) {
 
     this.render_field = function() {

@@ -1,23 +1,23 @@
-function FolderContentRenderer(topic, field) {
+function FolderContentRenderer(field_model) {
+    this.field_model = field_model
+}
 
-    this.render_field = function(field_value_div) {
-        // field label
-        dm4c.render.field_label(field)
-        // field value
-        return render_content(field_value_div)
-    }
+FolderContentRenderer.prototype.render_field = function(parent_element) {
+    var field_model = this.field_model      // needed in click_handler
+    dm4c.render.field_label(field_model, parent_element)
+    render_content()
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function render_content(field_value_div) {
+    function render_content() {
         try {
-            var path = topic.get("dm4.files.path")
+            var path = field_model.toplevel_topic.get("dm4.files.path")
             var items = dm4c.restc.get_resource("file:" + path).items
             var topics = []
             for (var i = 0, item; item = items[i]; i++) {
                 // error check
                 if (item.kind != "file" && item.kind != "directory") {
-                    throw "FileContentRendererError: item has unexpected kind (\"" + item.kind + "\")"
+                    throw "FolderContentRendererError: item has unexpected kind (\"" + item.kind + "\")"
                 }
                 //
                 var type_uri = item.kind == "file" ? "dm4.files.file" : "dm4.files.folder"
@@ -25,20 +25,20 @@ function FolderContentRenderer(topic, field) {
             }
             // Note: topic_list() takes arbitrary objects, provided
             // they contain "type_uri" and "value" properties.
-            return dm4c.render.topic_list(topics, click_handler)
+            parent_element.append(dm4c.render.topic_list(topics, click_handler))
         } catch (e) {
-            field_value_div.addClass("ui-state-error")
-            return "FolderContentRendererError: " + e
+            parent_element.addClass("ui-state-error")
+            parent_element.append("FolderContentRendererError: " + e)
         }
     }
 
     function click_handler(item) {
         if (item.kind == "file") {
-            var child_topic = dm4c.restc.create_child_file_topic(topic.id, item.path)
+            var child_topic = dm4c.restc.create_child_file_topic(field_model.toplevel_topic.id, item.path)
         } else if (item.kind == "directory") {
-            var child_topic = dm4c.restc.create_child_folder_topic(topic.id, item.path)
+            var child_topic = dm4c.restc.create_child_folder_topic(field_model.toplevel_topic.id, item.path)
         } else {
-            throw "FileContentRendererError: item has unexpected kind (\"" + item.kind + "\")"
+            throw "FolderContentRendererError: item has unexpected kind (\"" + item.kind + "\")"
         }
         //
         dm4c.do_reveal_related_topic(child_topic.id)

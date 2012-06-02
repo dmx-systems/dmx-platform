@@ -1,5 +1,5 @@
-.field-value > .type-icon {
-    padding-right:  1em;
+.type-icon + .ui-button {
+    margin-left: 1em !important;
 }
 
 #iconpicker-dialog .type-icon {

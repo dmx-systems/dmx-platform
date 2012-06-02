@@ -56,14 +56,10 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
         storeRoleTypeUri(roleTypeUri);
     }
 
-    // ----------------------------------------------------------------------------------------------- Protected Methods
-
-
-
     // === AttachedRole Overrides ===
 
     @Override
-    protected TopicRoleModel getModel() {
+    public TopicRoleModel getModel() {
         return (TopicRoleModel) super.getModel();
     }
 

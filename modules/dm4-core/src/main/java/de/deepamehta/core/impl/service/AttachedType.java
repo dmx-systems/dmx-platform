@@ -124,8 +124,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
         getModel().updateAssocDef(model);                                       // update model
         _addAssocDef(model);                                                    // update attached object cache
         // update DB
-        // ### Note: nothing to do for the moment
-        // (in case of interactive assoc type change the association is already updated in DB)
+        // ### Note: the DB is not updated here! In case of interactive assoc type change the association is
+        // already updated in DB. => See interface comment.
     }
 
     @Override
@@ -284,19 +284,20 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // ---
 
     private void initAssociationDefinitions() {
-        Map<Long, AttachedAssociationDefinition> assocDefs = fetchAssociationDefinitions();
+        Map<Long, AssociationDefinition> assocDefs = fetchAssociationDefinitions();
         List<RelatedAssociation> sequence = fetchSequence();
         // sanity check
         if (assocDefs.size() != sequence.size()) {
-            throw new RuntimeException("Graph inconsistency: " + assocDefs.size() + " association " +
-                "definitions found but sequence length is " + sequence.size());
+            // ### TODO: avoid that inconsistency to occur
+            logger.warning("### Data inconsistency in " + className() + " \"" + getUri() + "\": there are " +
+                assocDefs.size() + " valid association definitions but expected are " + sequence.size());
         }
         //
         addAssocDefsSorted(assocDefs, JSONHelper.idList(sequence));
     }
 
-    private Map<Long, AttachedAssociationDefinition> fetchAssociationDefinitions() {
-        Map<Long, AttachedAssociationDefinition> assocDefs = new HashMap();
+    private Map<Long, AssociationDefinition> fetchAssociationDefinitions() {
+        Map<Long, AssociationDefinition> assocDefs = new HashMap();
         //
         // fetch part topic types
         List assocTypeFilter = Arrays.asList("dm4.core.aggregation_def", "dm4.core.composition_def");
@@ -304,9 +305,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
             "dm4.core.part_type", "dm4.core.topic_type", false, false, 0, null);
         //
         for (RelatedTopic partTopicType : partTopicTypes) {
-            AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(dms);
-            // FIXME: pass more info of the reltopic to the fetch() method to avoid double-fetching
-            assocDef.fetch(partTopicType.getAssociation(), getUri());
+            Association assoc = partTopicType.getAssociation();
+            AssociationDefinition assocDef = dms.getObjectFactory().fetchAssociationDefinition(assoc);
             // Note: the returned map is an intermediate, hashed by ID. The actual type model is
             // subsequently build from it by sorting the assoc def's according to the sequence IDs.
             assocDefs.put(assocDef.getId(), assocDef);
@@ -318,17 +318,19 @@ abstract class AttachedType extends AttachedTopic implements Type {
      * Updates model and attached object cache.
      * ### FIXME: should be private
      */
-    protected void addAssocDefsSorted(Map<Long, AttachedAssociationDefinition> assocDefs, List<Long> sequence) {
+    protected void addAssocDefsSorted(Map<Long, AssociationDefinition> assocDefs, List<Long> sequence) {
         getModel().setAssocDefs(new LinkedHashMap());           // init model
         this.assocDefs = new LinkedHashMap();                   // init attached object cache
         for (long assocDefId : sequence) {
-            AttachedAssociationDefinition assocDef = assocDefs.get(assocDefId);
+            AssociationDefinition assocDef = assocDefs.get(assocDefId);
             // sanity check
             if (assocDef == null) {
-                throw new RuntimeException("Graph inconsistency: ID " + assocDefId +
-                    " is in sequence but association definition is not found");
+                // ### TODO: avoid that inconsistency to occur
+                logger.warning("### Data inconsistency in " + className() + " \"" + getUri() +
+                    "\": association definition " + assocDefId + " is invalid");
+                continue;
             }
-            // Note: the model and the attached object cache is updated together
+            // Note: the model and the attached object cache are updated together
             getModel().addAssocDef(assocDef.getModel());        // update model
             this.assocDefs.put(assocDef.getUri(), assocDef);    // update attached object cache
         }
@@ -493,6 +495,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
         }
     }
 
+    /**
+     * @param   model   the new association definition.
+     *                  Note: all fields must be initialized.
+     */
     private AttachedAssociationDefinition _addAssocDef(AssociationDefinitionModel model) {
         AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(model, dms);
         assocDefs.put(assocDef.getUri(), assocDef);

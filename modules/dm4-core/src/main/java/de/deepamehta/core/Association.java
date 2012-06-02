@@ -1,6 +1,7 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
@@ -10,7 +11,7 @@ import java.util.Set;
 
 
 /**
- * Specification of an association -- A n-ary connection between topics and other associations.
+ * ### FIXDOC: Specification of an association -- A n-ary connection between topics and other associations.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
@@ -22,11 +23,13 @@ public interface Association extends DeepaMehtaObject {
 
     // ---
 
-    Role getRole(long objectId);
+    Role getRole(RoleModel model);
 
     // ---
 
     AssociationModel getModel();
+
+    // === Updating ===
 
     ChangeReport update(AssociationModel model, ClientState clientState, Directives directives);
 

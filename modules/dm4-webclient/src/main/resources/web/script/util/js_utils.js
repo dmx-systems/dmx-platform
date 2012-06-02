@@ -1,5 +1,5 @@
 /**
- * Generic JavaScript Utilities.
+ * Generic (DeepaMehta independent) JavaScript Utilities.
  */
 var js = {
 
@@ -69,6 +69,55 @@ var js = {
         return str
     },
 
+    stringify: function(object) {
+        var max_depth = 10
+        var str = ""
+        stringify(object, 0, "")
+        return str
+
+        function stringify(object, depth, indent) {
+            switch (typeof object) {
+            case "string":
+                str += "\"" + object + "\" (string)"
+                return
+            case "number":
+                str += object + " (number)"
+                return
+            case "boolean":
+                str += object + " (boolean)"
+                return
+            case "object":
+                str += (js.is_array(object) ? "[" : "{") + "\n"
+                if (depth < max_depth) {
+                    for (var key in object) {
+                        // skip functions
+                        if (typeof object[key] == "function") {
+                            continue
+                        }
+                        //
+                        str += indent + "\t" + key + ": "
+                        stringify(object[key], depth + 1, indent + "\t")
+                        str += "\n"
+                    }
+                } else {
+                    str += indent + "\t" + (js.is_array(object) ? "ARRAY" : "OBJECT") +
+                        " NOT SHOWN (max " + max_depth + " levels)\n"
+                }
+                str += indent + (js.is_array(object) ? "]" : "}")
+                return
+            case "function":
+                // skip
+                return
+            case "undefined":
+                str += "undefined"
+                return
+            default:
+                str += "UNKNOWN (" + typeof(object) + ")"
+                return
+            }
+        }
+    },
+
     /**
      * Returns true if the array contains the object, false otherwise.
      */
@@ -114,14 +163,11 @@ var js = {
         }
     },
 
-    /**
-     * Copies all properties from source object to destination object.
-     * ### not in use
-    copy: function(src_obj, dst_obj) {
-        for (var key in src_obj) {
-            dst_obj[key] = src_obj[key]
-        }
-    },*/
+    is_array: function(obj) {
+        return Object.prototype.toString.call(obj) == "[object Array]"
+        // Note: since Javascript 1.8.5 (Firefox 4) there is Array.isArray(obj).
+        // The approach used here is compatible with older Javascript versions and is preferred by ECMA.
+    },
 
 
 
@@ -184,7 +230,21 @@ var js = {
     },
 
     render_text: function(text) {
-        return text.replace ? text.replace(/\n/g, "<br>") : text
+        return text.replace(/\n/g, "<br>")
+    },
+
+    strip_html: function(text) {
+        // Compare to the Java-equivalent stripHTML() in JavaUtils.java
+        // *? is the reluctant version of the * quantifier (which is greedy).
+        return text.replace(/<.*?>/g, "")
+    },
+
+    truncate: function(text, max_length) {
+        if (text.length <= max_length) {
+            return text
+        }
+        var i = text.lastIndexOf(" ", max_length)
+        return text.substr(0, i >= 0 ? i : max_length) + " ..."
     },
 
     /**
