@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.accesscontrol;
 
 import de.deepamehta.plugins.accesscontrol.provider.PermissionsProvider;
-import de.deepamehta.plugins.server.provider.TopicProvider;
+import de.deepamehta.plugins.webservice.provider.TopicProvider;
 
 import de.deepamehta.core.osgi.Activator;
 

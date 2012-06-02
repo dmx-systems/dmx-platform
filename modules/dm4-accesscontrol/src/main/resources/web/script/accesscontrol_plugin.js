@@ -72,10 +72,10 @@ function accesscontrol_plugin() {
         }
 
         function extend_rest_client() {
-            dm4c.restc.get_user = function() {
+            dm4c.restc.get_user_account = function() {
                 return this.request("GET", "/accesscontrol/user")
             }
-            dm4c.restc.get_topic_by_owner = function(user_id, type_uri) {
+            dm4c.restc.get_owned_topic = function(user_id, type_uri) {
                 return this.request("GET", "/accesscontrol/owner/" + user_id + "/" + encodeURIComponent(type_uri))
             }
             dm4c.restc.set_owner = function(topic_id, user_id) {
@@ -144,12 +144,12 @@ function accesscontrol_plugin() {
 
     // ---
 
-    this.get_user = function() {
-        return dm4c.restc.get_user()
+    this.get_user_account = function() {
+        return dm4c.restc.get_user_account()
     }
 
-    this.get_topic_by_owner = function(user_id, type_uri) {
-        return dm4c.restc.get_topic_by_owner(user_id, type_uri)
+    this.get_owned_topic = function(user_id, type_uri) {
+        return dm4c.restc.get_owned_topic(user_id, type_uri)
     }
 
     this.set_owner = function(topic_id, user_id) {
