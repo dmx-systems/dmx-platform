@@ -288,11 +288,11 @@ public class EmbeddedService implements DeepaMehtaService {
     @GET
     @Path("/association/{id}")
     @Override
-    public AttachedAssociation getAssociation(@PathParam("id") long assocId) {
+    public Association getAssociation(@PathParam("id") long assocId) {
         logger.info("assocId=" + assocId);
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedAssociation assoc = attach(storage.getAssociation(assocId));
+            Association assoc = attach(storage.getAssociation(assocId));
             tx.success();
             return assoc;
         } catch (Exception e) {
@@ -302,6 +302,31 @@ public class EmbeddedService implements DeepaMehtaService {
             tx.finish();
         }
     }
+
+    @GET
+    @Path("/association/{assoc_type_uri}/{topic1_id}/{topic2_id}/{role_type1_uri}/{role_type2_uri}")
+    @Override
+    public Association getAssociation(@PathParam("assoc_type_uri") String assocTypeUri,
+                   @PathParam("topic1_id") long topic1Id, @PathParam("topic2_id") long topic2Id,
+                   @PathParam("role_type1_uri") String roleTypeUri1, @PathParam("role_type2_uri") String roleTypeUri2) {
+        String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
+            ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
+        logger.info(info);
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            Association assoc = attach(storage.getAssociation(assocTypeUri, topic1Id, topic2Id,
+                roleTypeUri1, roleTypeUri2));
+            tx.success();
+            return assoc;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new WebApplicationException(new RuntimeException("Retrieving association failed (" + info + ")", e));
+        } finally {
+            tx.finish();
+        }
+    }
+
+    // ---
 
     @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}")
@@ -360,7 +385,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public Directives updateAssociation(AssociationModel model, @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedAssociation assoc = getAssociation(model.getId());
+            Association assoc = getAssociation(model.getId());
             Directives directives = new Directives();
             //
             assoc.update(model, clientState, directives);
@@ -763,6 +788,7 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * Attaches this core service to a topic model fetched from storage layer.
      * Optionally fetches the topic's composite value from storage layer.
+     * Triggers postFetchTopicHook.
      */
     AttachedTopic attach(TopicModel model, boolean fetchComposite, ClientState clientState) {
         AttachedTopic topic = new AttachedTopic(model, this);

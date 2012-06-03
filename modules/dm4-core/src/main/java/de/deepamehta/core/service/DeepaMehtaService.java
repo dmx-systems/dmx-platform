@@ -52,8 +52,6 @@ public interface DeepaMehtaService {
      */
     Topic getTopic(String key, SimpleValue value, boolean fetchComposite, ClientState clientState);
 
-    // public Topic getTopic(String typeUri, String key, SimpleValue value);
-
     ResultSet<Topic> getTopics(String typeUri, boolean fetchComposite, int maxResultSize, ClientState clientState);
 
     /**
@@ -78,14 +76,16 @@ public interface DeepaMehtaService {
     Association getAssociation(long assocId);
 
     /**
-     * Returns the relation between two topics. If no such relation exists null is returned.
-     * If more than one relation exists, an exception is thrown.
+     * Returns the association between two topics, qualified by association type and both role types.
+     * If no such association exists <code>null</code> is returned.
+     * If more than one association exist, a runtime exception is thrown.
      *
-     * @param   typeId      Relation type filter. Pass <code>null</code> to switch filter off.
-     * @param   isDirected  Direction filter. Pass <code>true</code> if direction matters. In this case the relation
-     *                      is expected to be directed <i>from</i> source topic <i>to</i> destination topic.
+     * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      */
-    // public Relation getRelation(long srcTopicId, long dstTopicId, String typeId, boolean isDirected);
+    Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,  String roleTypeUri1,
+                                                                                   String roleTypeUri2);
+
+    // ---
 
     /**
      * Returns all associations between two topics. If no such association exists an empty set is returned.

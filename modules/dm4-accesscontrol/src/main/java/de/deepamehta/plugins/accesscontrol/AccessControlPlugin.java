@@ -454,7 +454,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     // ---
 
     private Set<RelatedTopic> getACLEntries(Topic topic) {
-        return facetsService.getFacets(topic, "dm4.accesscontrol.acl_facet").getItems();
+        return facetsService.getFacets(topic, "dm4.accesscontrol.acl_facet");
     }
 
     private boolean getAllowed(Topic aclEntry, String operationUri) {

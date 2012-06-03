@@ -122,7 +122,7 @@ public interface DeepaMehtaStorage {
     /**
      * Returns the association between two topics, qualified by association type and both role types.
      * If no such association exists <code>null</code> is returned.
-     * If more than one association were found, a runtime exception is thrown.
+     * If more than one association exist, a runtime exception is thrown.
      *
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      *                          ### FIXME: for methods with a singular return value all filters should be mandatory

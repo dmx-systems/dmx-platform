@@ -4,9 +4,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Access Control</name>
+    <name>DeepaMehta 4 Facets</name>
     <groupId>de.deepamehta</groupId>
-    <artifactId>deepamehta-accesscontrol</artifactId>
+    <artifactId>deepamehta-facets</artifactId>
     <version>4.0.12-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
@@ -20,17 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-webservice</artifactId>
-            <version>4.0.12-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-workspaces</artifactId>
-            <version>4.0.12-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-facets</artifactId>
+            <artifactId>deepamehta-core</artifactId>
             <version>4.0.12-SNAPSHOT</version>
         </dependency>
     </dependencies>
@@ -43,7 +33,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.plugins.accesscontrol.AccessControlPlugin
+                            de.deepamehta.plugins.facets.FacetsPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>
