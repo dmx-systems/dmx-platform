@@ -4,8 +4,8 @@ function accesscontrol_plugin() {
     var DEFAULT_PASSWORD = ""
     var ENCRYPTED_PASSWORD_PREFIX = "-SHA256-"  // don't change this
 
-    dm4c.css_stylesheet("/de.deepamehta.accesscontrol/style/dm4-accesscontrol.css")
-    dm4c.javascript_source("/de.deepamehta.accesscontrol/script/vendor/sha256.js")
+    dm4c.load_stylesheet("/de.deepamehta.accesscontrol/style/accesscontrol.css")
+    dm4c.load_script("/de.deepamehta.accesscontrol/script/vendor/sha256.js")
 
     var self = this
 

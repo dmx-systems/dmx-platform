@@ -274,7 +274,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     private Topic createUserAccount(String username, String password) {
         return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new CompositeValue()
-            .put("dm4.accesscontrol.user_name", username)
+            .put("dm4.accesscontrol.username", username)
             .put("dm4.accesscontrol.password", encryptPassword(password))), null);  // clientState=null
     }
 
@@ -286,7 +286,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
      * @return  a Topic of type <code>dm4.accesscontrol.user_account</code>.
      */
     private Topic getUserAccount(String username) {
-        Topic userName = dms.getTopic("dm4.accesscontrol.user_name", new SimpleValue(username), false, null);
+        Topic userName = dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username), false, null);
         if (userName == null) {
             return null;
         }
