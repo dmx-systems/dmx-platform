@@ -27,7 +27,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
     private static final String DEFAULT_WORKSPACE_NAME = "Default";
 
-    // association type semantics ### FIXME: to be dropped. Model-driven manipulators required.
+    // association type semantics ### TODO: to be dropped. Model-driven manipulators required.
     private static final String WORKSPACE_TOPIC     = "dm4.workspaces.workspace_context";
     private static final String WORKSPACE_TYPE      = "dm4.workspaces.workspace_context";
     private static final String ROLE_TYPE_TOPIC     = "dm4.workspaces.workspace_topic";

@@ -8,11 +8,14 @@ import de.deepamehta.plugins.facets.service.FacetsService;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
 import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
@@ -37,6 +40,7 @@ import static java.util.Arrays.asList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -49,6 +53,11 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
     private static final String ENCRYPTED_PASSWORD_PREFIX = "-SHA256-";  // don't change this
+
+    // association type semantics ### TODO: to be dropped. Model-driven manipulators required.
+    private static final String WORKSPACE_MEMBERSHIP = "dm4.accesscontrol.membership";
+    private static final String ROLE_TYPE_USER       = "dm4.core.default";
+    private static final String ROLE_TYPE_WORKSPACE  = "dm4.core.default";
 
     private static enum RelationType {
         TOPIC_CREATOR,      // Creator of a topic.    Direction is from topic to user.
@@ -143,8 +152,9 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     @Path("/user/{userId}/{workspaceId}")
     @Override
     public void joinWorkspace(@PathParam("workspaceId") long workspaceId, @PathParam("userId") long userId) {
-        /* ### TODO: adapt to DM4
-        dms.createRelation(RelationType.WORKSPACE_MEMBER.name(), workspaceId, userId, null); */    // properties=null
+        dms.createAssociation(new AssociationModel(WORKSPACE_MEMBERSHIP,
+            new TopicRoleModel(userId, ROLE_TYPE_USER),
+            new TopicRoleModel(workspaceId, ROLE_TYPE_WORKSPACE)), null);
     }
 
 
@@ -158,7 +168,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     @Override
     public void postInstallPluginHook() {
         Topic user = createUserAccount(DEFAULT_USERNAME, DEFAULT_PASSWORD);
-        logger.info("Creating \"admin\" user => ID=" + user.getId());
+        logger.info("Creating \"admin\" user account => ID=" + user.getId());
     }
 
     @Override
@@ -241,19 +251,21 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     // ---
 
     @Override
-    public void enrichTopicHook(Topic topic, ClientState clientState) {
-        Map permissions = new HashMap();
-        permissions.put("write", hasPermission(topic, getUserAccount(clientState), Permission.WRITE));
-        topic.setEnrichment("permissions", permissions);
-    }
-
-    @Override
-    public void enrichTopicTypeHook(TopicType topicType, ClientState clientState) {
+    public void postFetchTopicHook(Topic topic, ClientState clientState, Directives directives) {
         Topic user = getUserAccount(clientState);
-        Map permissions = new HashMap();
-        permissions.put("write",  hasPermission(topicType, user, Permission.WRITE));
-        permissions.put("create", hasPermission(topicType, user, Permission.CREATE));
-        topicType.setEnrichment("permissions", permissions);
+        CompositeValue permissions = new CompositeValue();
+        permissions.put("write", hasPermission(topic, user, "dm4.accesscontrol.operation_write"));
+        // ### TODO: namespace key/value
+        if (topic.getTypeUri().equals("dm4.core.topic_type")) {
+            logger.info("### Enriching topic type \"" + topic.getUri() + "\" with its permission");
+            permissions.put("create", hasPermission(topic, user, "dm4.accesscontrol.operation_create"));
+            // ### TODO: namespace key/value
+            // ### FIXME: is postFetchTopicHook() triggered for types?
+        } else {
+            logger.info("### Enriching topic " + topic.getId() + " with its permission");
+        }
+        topic.getCompositeValue().put("permissions", permissions);
+        // ### TODO: namespace key/value
     }
 
 
@@ -352,33 +364,27 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     // ---
 
     /**
-     * Returns true if the user has a permission for a topic.
+     * Returns true if the user is allowed to perform an operation on a topic.
      */
-    private boolean hasPermission(Topic topic, Topic user, Permission permission) {
-        String roleName = null;
-        try {
-            logger.fine("Determining permission of user " + user + " to " + permission + " " + topic);
-            for (RelatedTopic relTopic : getACLEntries(topic.getId())) {
-                roleName = relTopic.getTopic().getProperty("de/deepamehta/core/property/rolename").toString();
-                Role role = Role.valueOf(roleName.toUpperCase());   // throws IllegalArgumentException
-                logger.fine("There is an ACL entry for role " + role);
-                boolean allowedForRole = relTopic.getRelation().getProperty(permission.s()).booleanValue();
-                logger.fine("value=" + allowedForRole);
-                if (allowedForRole && userOccupiesRole(topic, user, role)) {
-                    logger.fine("=> ALLOWED");
-                    return true;
-                }
+    private boolean hasPermission(Topic topic, Topic user, String operationUri) {
+        logger.fine("Determining permission of user " + user + " to \"" + operationUri + "\" " + topic);
+        for (RelatedTopic aclEntry : getACLEntries(topic)) {
+            String roleUri = aclEntry.getCompositeValue().getTopic("dm4.accesscontrol.role").getUri();
+            logger.fine("There is an ACL entry for role \"" + roleUri + "\"");
+            boolean allowedForRole = getAllowed(aclEntry, operationUri);
+            logger.fine("value=" + allowedForRole);
+            if (allowedForRole && userOccupiesRole(topic, user, roleUri)) {
+                logger.fine("=> ALLOWED");
+                return true;
             }
-            logger.fine("=> DENIED");
-            return false;
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Unexpected role \"" + roleName + "\" in ACL entry for " + topic, e);
         }
+        logger.fine("=> DENIED");
+        return false;
     }
 
-    private boolean userOccupiesRole(Topic topic, Topic user, Role role) {
+    private boolean userOccupiesRole(Topic topic, Topic user, String roleUri) {
         //
-        if (role.equals(Role.EVERYONE)) {
+        if (roleUri.equals("dm4.accesscontrol.role_everyone")) {
             return true;
         }
         //
@@ -386,20 +392,20 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
             return false;
         }
         //
-        if (role.equals(Role.MEMBER)) {
+        if (roleUri.equals("dm4.accesscontrol.role_member")) {
             if (userIsMember(user, topic)) {
                 return true;
             }
-        } else if (role.equals(Role.OWNER)) {
+        } else if (roleUri.equals("dm4.accesscontrol.role_owner")) {
             if (userIsOwner(user, topic)) {
                 return true;
             }
-        } else if (role.equals(Role.CREATOR)) {
+        } else if (roleUri.equals("dm4.accesscontrol.role_creator")) {
             if (userIsCreator(user, topic)) {
                 return true;
             }
         } else {
-            throw new RuntimeException("Role \"" + role + "\" not yet handled");
+            throw new RuntimeException("\"" + roleUri + "\" is an unexpected role URI");
         }
         return false;
     }
@@ -414,18 +420,14 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
      * @param   topic   actually a topic type.
      */
     private boolean userIsMember(Topic user, Topic topic) {
-        String typeUri = topic.getProperty("de/deepamehta/core/property/TypeURI").toString();
-        // String typeUri = topic.typeUri;
-        //
-        Set<RelatedTopic> relTopics = wsService.getWorkspaces(topic.getId());
-        logger.fine("Topic type " + typeUri + " is assigned to " + relTopics.size() + " workspaces");
-        for (RelatedTopic relTopic : relTopics) {
-            long workspaceId = relTopic.getTopic().getId();
-            if (isMemberOfWorkspace(user.getId(), workspaceId)) {
-                logger.fine("User " + user + " IS member of workspace " + relTopic.getTopic());
+        Set<RelatedTopic> workspaces = wsService.getWorkspaces(topic.getId());
+        logger.fine("Topic type \"" + topic.getUri() + "\" is assigned to " + workspaces.size() + " workspaces");
+        for (RelatedTopic workspace : workspaces) {
+            if (isMemberOfWorkspace(user.getId(), workspace.getId())) {
+                logger.fine("User " + user + " IS member of workspace " + workspace);
                 return true;
             } else {
-                logger.fine("User " + user + " is NOT member of workspace " + relTopic.getTopic());
+                logger.fine("User " + user + " is NOT member of workspace " + workspace);
             }
         }
         return false;
@@ -435,7 +437,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
      * Returns true if the user is the owner of the topic.
      */
     private boolean userIsOwner(Topic user, Topic topic) {
-        Topic owner = getOwner(topic.getId());
+        Topic owner = getOwner(topic);
         logger.fine("The owner is " + owner);
         return owner != null && user.getId() == owner.getId();
     }
@@ -444,54 +446,60 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
      * Returns true if the user is the creator of the topic.
      */
     private boolean userIsCreator(Topic user, Topic topic) {
-        Topic creator = getCreator(topic.getId());
+        Topic creator = getCreator(topic);
         logger.fine("The creator is " + creator);
         return creator != null && user.getId() == creator.getId();
     }
 
     // ---
 
-    private List<RelatedTopic> getACLEntries(long topicId) {
-        return dms.getRelatedTopics(topicId,
-            asList("de/deepamehta/core/topictype/role"),
-            asList(RelationType.ACCESS_CONTROL.name() + ";INCOMING"), null);
+    private Set<RelatedTopic> getACLEntries(Topic topic) {
+        return facetsService.getFacets(topic, "dm4.accesscontrol.acl_facet").getItems();
+    }
+
+    private boolean getAllowed(Topic aclEntry, String operationUri) {
+        for (TopicModel permission : aclEntry.getCompositeValue().getTopics("dm4.accesscontrol.permission")) {
+            if (permission.getCompositeValue().getTopic("dm4.accesscontrol.operation").getUri().equals(operationUri)) {
+                return permission.getCompositeValue().getBoolean("dm4.accesscontrol.allowed");
+            }
+        }
+        return false;
     }
 
     // ---
 
     /**
-     * Returns the topic's creator (a user topic), or <code>null</code> if no creator is set.
+     * Returns the creator of a topic, or <code>null</code> if no creator is set.
+     *
+     * @return  a Topic of type <code>dm4.accesscontrol.user_account</code>.
      */
-    private Topic getCreator(long topicId) {
-        List<RelatedTopic> users = dms.getRelatedTopics(topicId, asList("de/deepamehta/core/topictype/user"),
-            asList(RelationType.TOPIC_CREATOR.name() + ";INCOMING"), null);
-        //
-        if (users.size() == 0) {
+    private Topic getCreator(Topic topic) {
+        Topic creator = facetsService.getFacet(topic, "dm4.accesscontrol.creator_facet");
+        if (creator == null) {
             return null;
-        } else if (users.size() > 1) {
-            throw new RuntimeException("Ambiguity: topic " + topicId + " has " + users.size() + " creators");
         }
-        //
-        return users.get(0).getTopic();
+        return creator.getRelatedTopic("dm4.core.aggregation", "dm4.core.whole", "dm4.core.part",
+            "dm4.accesscontrol.user_account", true, false, null);  // fetchComposite=true, fetchRelatingComposite=false
     }
 
     /**
-     * Returns the topic's owner (a user topic), or <code>null</code> if no owner is set.
+     * Returns the owner of a topic, or <code>null</code> if no owner is set.
+     *
+     * @return  a Topic of type <code>dm4.accesscontrol.user_account</code>.
      */
-    private Topic getOwner(long topicId) {
-        List<RelatedTopic> users = dms.getRelatedTopics(topicId, asList("de/deepamehta/core/topictype/user"),
-            asList(RelationType.TOPIC_OWNER.name() + ";INCOMING"), null);
-        //
-        if (users.size() == 0) {
+    private Topic getOwner(Topic topic) {
+        Topic owner = facetsService.getFacet(topic, "dm4.accesscontrol.owner_facet");
+        if (owner == null) {
             return null;
-        } else if (users.size() > 1) {
-            throw new RuntimeException("Ambiguity: topic " + topicId + " has " + users.size() + " owners");
         }
-        //
-        return users.get(0).getTopic();
+        return owner.getRelatedTopic("dm4.core.aggregation", "dm4.core.whole", "dm4.core.part",
+            "dm4.accesscontrol.user_account", true, false, null);  // fetchComposite=true, fetchRelatingComposite=false
     }
 
+    // ---
+
     private boolean isMemberOfWorkspace(long userId, long workspaceId) {
-        return dms.getRelation(workspaceId, userId, RelationType.WORKSPACE_MEMBER.name(), true) != null;
+        return dms.getAssociation(WORKSPACE_MEMBERSHIP, userId, workspaceId,
+            ROLE_TYPE_USER, ROLE_TYPE_WORKSPACE) != null;
     }
 }

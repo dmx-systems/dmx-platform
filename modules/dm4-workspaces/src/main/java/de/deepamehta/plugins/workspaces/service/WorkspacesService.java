@@ -22,7 +22,7 @@ public interface WorkspacesService extends PluginService {
      * Note: takes a type ID instead of a type URI to avoid endless recursion through dms.getTopicType().
      * Consider the Access Control plugin: determining the permissions for a type with MEMBER role would involve
      * retrieving the type itself. This in turn would involve determining its permissions ...
-     * See AccessControlPlugin.userIsMember() ### still true?
+     * See AccessControlPlugin.userIsMember() ### TODO: still true?
      */
     public Set<RelatedTopic> getWorkspaces(long typeId);
 }
