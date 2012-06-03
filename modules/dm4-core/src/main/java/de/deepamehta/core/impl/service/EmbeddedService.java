@@ -434,20 +434,24 @@ public class EmbeddedService implements DeepaMehtaService {
     @Path("/topictype")
     @Override
     public Set<String> getTopicTypeUris() {
-        Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm4.core.topic_type")), false, null);
-        ResultSet<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-            "dm4.core.instance", "dm4.core.topic_type", false, false, 0, null);
-        Set<String> topicTypeUris = new HashSet();
-        // add meta types
-        topicTypeUris.add("dm4.core.topic_type");
-        topicTypeUris.add("dm4.core.assoc_type");
-        topicTypeUris.add("dm4.core.meta_type");
-        topicTypeUris.add("dm4.core.meta_meta_type");
-        // add regular types
-        for (Topic topicType : topicTypes) {
-            topicTypeUris.add(topicType.getUri());
+        try {
+            Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm4.core.topic_type")), false, null);
+            ResultSet<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
+                "dm4.core.instance", "dm4.core.topic_type", false, false, 0, null);
+            Set<String> topicTypeUris = new HashSet();
+            // add meta types
+            topicTypeUris.add("dm4.core.topic_type");
+            topicTypeUris.add("dm4.core.assoc_type");
+            topicTypeUris.add("dm4.core.meta_type");
+            topicTypeUris.add("dm4.core.meta_meta_type");
+            // add regular types
+            for (Topic topicType : topicTypes) {
+                topicTypeUris.add(topicType.getUri());
+            }
+            return topicTypeUris;
+        } catch (Exception e) {
+            throw new WebApplicationException(new RuntimeException("Retrieving list of topic type URIs failed", e));
         }
-        return topicTypeUris;
     }
 
     @GET
@@ -528,14 +532,19 @@ public class EmbeddedService implements DeepaMehtaService {
     @Path("/assoctype")
     @Override
     public Set<String> getAssociationTypeUris() {
-        Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm4.core.assoc_type")), false, null);
-        ResultSet<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-            "dm4.core.instance", "dm4.core.assoc_type", false, false, 0, null);
-        Set<String> assocTypeUris = new HashSet();
-        for (Topic assocType : assocTypes) {
-            assocTypeUris.add(assocType.getUri());
+        try {
+            Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm4.core.assoc_type")), false, null);
+            ResultSet<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
+                "dm4.core.instance", "dm4.core.assoc_type", false, false, 0, null);
+            Set<String> assocTypeUris = new HashSet();
+            for (Topic assocType : assocTypes) {
+                assocTypeUris.add(assocType.getUri());
+            }
+            return assocTypeUris;
+        } catch (Exception e) {
+            throw new WebApplicationException(new RuntimeException("Retrieving list of association type URIs failed",
+                e));
         }
-        return assocTypeUris;
     }
 
     @GET
