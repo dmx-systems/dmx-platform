@@ -54,7 +54,8 @@
                         ${project.basedir}/modules/dm4-files/target,
                         ${project.basedir}/modules/dm4-filemanager/target,
                         ${project.basedir}/modules/dm4-proxy/target,
-                        ${project.basedir}/modules/dm4-help/target
+                        ${project.basedir}/modules/dm4-help/target,
+                        ${project.basedir}/modules/dm4-facets/target
                     ]]>
                     <!-- not yet adapted to DeepaMehta 4.0 resp. obsolete -->
                     <!--
@@ -120,6 +121,7 @@
                 <module>modules/dm4-filemanager</module>
                 <module>modules/dm4-proxy</module>
                 <module>modules/dm4-help</module>
+                <module>modules/dm4-facets</module>
                 <!-- POM projects -->
                 <!-- Note: modules/dm4-distribution is not listed here.                -->
                 <!-- We don't want to build the distribution with every reactor build. -->
