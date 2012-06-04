@@ -9,17 +9,11 @@ function accesscontrol_plugin() {
 
     var self = this
 
-    // -------------------------------------------------------------------------------------------------- Public Methods
 
 
+    // === Webclient Listeners ===
 
-    // ***********************************************************
-    // *** Webclient Hooks (triggered by deepamehta-webclient) ***
-    // ***********************************************************
-
-
-
-    this.init = function() {
+    dm4c.register_listener("init", function() {
 
         dm4c.add_to_special_menu({value: "loginout-item", label: menu_item_label()})
         create_login_dialog()
@@ -88,51 +82,43 @@ function accesscontrol_plugin() {
                 return this.request("POST", "/accesscontrol/user/" + user_id + "/" + workspace_id)
             }
         }
-    }
+    })
 
-    this.handle_special_command = function(label) {
+    dm4c.register_listener("handle_special_command", function(label) {
         if (label == "Login...") {
             $("#login-dialog").dialog("open")
         } else if (label == "Logout \"" + get_username() + "\"") {
-            this.logout()
+            this.logout()   // ### "this" doesn't work in listeners
         }
-    }
+    })
 
     // ---
 
-    this.has_write_permission = function(topic) {
-        return topic.permissions.write
-    }
+    dm4c.register_listener("has_write_permission", function(topic) {
+        return topic.permissions.write          // ### adapt to DM4
+    })
 
-    this.has_create_permission = function(topic_type) {
-        return topic_type.permissions.create
-    }
-
-
-
-    // ********************************************************************
-    // *** Access Control Hooks (triggered by deepamehta-accesscontrol) ***
-    // ********************************************************************
+    dm4c.register_listener("has_create_permission", function(topic_type) {
+        return topic_type.permissions.create    // ### adapt to DM4
+    })
 
 
 
-    this.user_logged_in = function(user) {
+    // === Access Control Listeners ===
+
+    dm4c.register_listener("user_logged_in", function(user) {
         refresh_menu_item()
         dm4c.render_topic()
-    }
+    })
 
-    this.user_logged_out = function() {
+    dm4c.register_listener("user_logged_out", function() {
         refresh_menu_item()
         dm4c.render_topic()
-    }
+    })
 
 
 
-    // ******************
-    // *** Public API ***
-    // ******************
-
-
+    // ------------------------------------------------------------------------------------------------------ Public API
 
     this.create_user = function(username, password) {
         var properties = {
