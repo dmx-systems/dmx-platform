@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl.service;
 
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicTypeModel;
@@ -29,7 +30,7 @@ class TypeCache {
 
     private EmbeddedService dms;
 
-    // private int callCount = 0;  // endless recursion protection ### FIXME: not in use
+    private int callCount = 0;  // endless recursion protection ### FIXME: not in use
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -43,7 +44,7 @@ class TypeCache {
     AttachedTopicType getTopicType(String topicTypeUri) {
         AttachedTopicType topicType = topicTypes.get(topicTypeUri);
         if (topicType == null) {
-            // endlessRecursionProtection(topicTypeUri);    // ### FIXME: not in use
+            endlessRecursionProtection(topicTypeUri);    // ### FIXME: not in use
             topicType = loadTopicType(topicTypeUri);
         }
         return topicType;
@@ -80,42 +81,45 @@ class TypeCache {
 
     private AttachedTopicType loadTopicType(String topicTypeUri) {
         logger.info("Loading topic type \"" + topicTypeUri + "\"");
-        AttachedTopic typeTopic = dms.getTopic("uri", new SimpleValue(topicTypeUri), false, null);
+        // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
+        // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
+        // loading its ACL which in turn would rely on this very topic type.
+        TopicModel model = dms.storage.getTopic("uri", new SimpleValue(topicTypeUri));
         // error check
-        if (typeTopic == null) {
+        if (model == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
         }
         //
         AttachedTopicType topicType = new AttachedTopicType(dms);
-        topicType.fetch(new TopicTypeModel(typeTopic.getModel()));
+        topicType.fetch(new TopicTypeModel(model));
         //
         return topicType;
     }
 
     private AttachedAssociationType loadAssociationType(String assocTypeUri) {
         logger.info("Loading association type \"" + assocTypeUri + "\"");
-        AttachedTopic typeTopic = dms.getTopic("uri", new SimpleValue(assocTypeUri), false, null);
+        TopicModel model = dms.storage.getTopic("uri", new SimpleValue(assocTypeUri));
         // error check
-        if (typeTopic == null) {
+        if (model == null) {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found");
         }
         //
         AttachedAssociationType assocType = new AttachedAssociationType(dms);
-        assocType.fetch(new AssociationTypeModel(typeTopic.getModel()));
+        assocType.fetch(new AssociationTypeModel(model));
         //
         return assocType;
     }
 
     // ---
 
-    /* ### FIXME: not in use
+    // ### FIXME: not in use
     private void endlessRecursionProtection(String topicTypeUri) {
-        if (topicTypeUri.equals("dm4.webclient.icon")) {
+        if (topicTypeUri.equals("dm4.accesscontrol.acl_facet")) {
             callCount++;
-            logger.info("########## Loading topic type \"dm4.webclient.icon\" => count=" + callCount);
+            logger.info("########## Loading topic type \"dm4.accesscontrol.acl_facet\" => count=" + callCount);
             if (callCount >= 2) {
                 throw new RuntimeException("Endless Recursion!");
             }
         }
-    } */
+    }
 }
