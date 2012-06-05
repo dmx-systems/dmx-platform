@@ -102,6 +102,16 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         return new AssociationRoleModel(getId(), roleTypeUri);
     }
 
+    // like the interface method but with a triggerPostFetch parameter
+    @Override
+    ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+                                    boolean triggerPostFetch, int maxResultSize, ClientState clientState) {
+        ResultSet<RelatedTopicModel> topics = dms.storage.getAssociationRelatedTopics(getId(), assocTypeUris,
+            myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
+        return dms.attach(topics, fetchComposite, fetchRelatingComposite, triggerPostFetch, clientState);
+    }
+
     // === Deletion ===
 
     @Override
@@ -218,17 +228,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
 
     // === Traversal ===
-
-    // --- Topic Retrieval ---
-
-    @Override
-    public ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
-                                    int maxResultSize, ClientState clientState) {
-        ResultSet<RelatedTopicModel> topics = dms.storage.getAssociationRelatedTopics(getId(), assocTypeUris,
-            myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
-        return dms.attach(topics, fetchComposite, fetchRelatingComposite, clientState);
-    }
 
     // --- Association Retrieval ---
 

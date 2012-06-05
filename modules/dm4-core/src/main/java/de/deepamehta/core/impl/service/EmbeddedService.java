@@ -819,20 +819,32 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     AttachedRelatedTopic attach(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite,
-                                                                                 ClientState clientState) {
+                                                                                   ClientState clientState) {
+        return attach(model, fetchComposite, fetchRelatingComposite, true, clientState);    // triggerPostFetch=true
+    }
+
+    AttachedRelatedTopic attach(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite,
+                                                         boolean triggerPostFetch, ClientState clientState) {
         AttachedRelatedTopic relTopic = new AttachedRelatedTopic(model, this);
         fetchComposite(fetchComposite, fetchRelatingComposite, relTopic);
         //
-        triggerHook(Hook.POST_FETCH_TOPIC, relTopic, clientState, null);    // directives=null
+        if (triggerPostFetch) {
+            triggerHook(Hook.POST_FETCH_TOPIC, relTopic, clientState, null);    // directives=null
+        }
         //
         return relTopic;
     }
 
     ResultSet<RelatedTopic> attach(ResultSet<RelatedTopicModel> models, boolean fetchComposite,
                                    boolean fetchRelatingComposite, ClientState clientState) {
+        return attach(models, fetchComposite, fetchRelatingComposite, true, clientState);   // triggerPostFetch=true
+    }
+
+    ResultSet<RelatedTopic> attach(ResultSet<RelatedTopicModel> models, boolean fetchComposite,
+                                   boolean fetchRelatingComposite, boolean triggerPostFetch, ClientState clientState) {
         Set<RelatedTopic> relTopics = new LinkedHashSet();
         for (RelatedTopicModel model : models) {
-            relTopics.add(attach(model, fetchComposite, fetchRelatingComposite, clientState));
+            relTopics.add(attach(model, fetchComposite, fetchRelatingComposite, triggerPostFetch, clientState));
         }
         return new ResultSet<RelatedTopic>(models.getTotalCount(), relTopics);
     }

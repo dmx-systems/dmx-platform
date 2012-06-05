@@ -227,30 +227,28 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                 String othersTopicTypeUri, boolean fetchComposite,
                                                 boolean fetchRelatingComposite, ClientState clientState) {
-        ResultSet<RelatedTopic> topics = getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri, fetchComposite, fetchRelatingComposite, 0, clientState);
-        switch (topics.getSize()) {
-        case 0:
-            return null;
-        case 1:
-            return (AttachedRelatedTopic) topics.getIterator().next();
-        default:
-            throw new RuntimeException("Ambiguity: there are " + topics.getSize() + " related topics (object ID=" +
-                getId() + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
-                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
-        }
+        // delegate to the package pivate method
+        return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+            fetchComposite, fetchRelatingComposite, true, clientState);                 // triggerPostFetch=true
     }
 
     @Override
     public ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
-                                    int maxResultSize, ClientState clientState) {
-        List assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
-        return getRelatedTopics(assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-            fetchComposite, fetchRelatingComposite, maxResultSize, clientState);
+                                      String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+                                      int maxResultSize, ClientState clientState) {
+        // delegate to the package pivate method
+        return getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+            fetchComposite, fetchRelatingComposite, true, maxResultSize, clientState);  // triggerPostFetch=true
     }
 
-    // Note: getRelatedTopics(List assocTypeUris, ...) is implemented in the subclasses. This is an abstract class.
+    @Override
+    public ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+                                     int maxResultSize, ClientState clientState) {
+        // delegate to the *abstract* package pivate method
+        return getRelatedTopics(assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+            fetchComposite, fetchRelatingComposite, true, maxResultSize, clientState);  // triggerPostFetch=true
+    }
 
     // --- Association Retrieval ---
 
@@ -420,6 +418,41 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         // update memory
         model.setCompositeValue(comp);
     }
+
+    // ---
+
+    // like the interface method but with a triggerPostFetch parameter
+    AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                      String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+                                      boolean triggerPostFetch, ClientState clientState) {
+        ResultSet<RelatedTopic> topics = getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri, fetchComposite, fetchRelatingComposite, triggerPostFetch, 0, clientState);
+        switch (topics.getSize()) {
+        case 0:
+            return null;
+        case 1:
+            return (AttachedRelatedTopic) topics.getIterator().next();
+        default:
+            throw new RuntimeException("Ambiguity: there are " + topics.getSize() + " related topics (object ID=" +
+                getId() + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
+                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
+        }
+    }
+
+    // like the interface method but with a triggerPostFetch parameter
+    ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                      String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+                                      boolean triggerPostFetch, int maxResultSize, ClientState clientState) {
+        List assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
+        return getRelatedTopics(assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+            fetchComposite, fetchRelatingComposite, triggerPostFetch, maxResultSize, clientState);
+    }
+
+    // like the interface method but with a triggerPostFetch parameter
+    // declared abstract; implemented in the subclasses
+    abstract ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
+            String othersRoleTypeUri, String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+            boolean triggerPostFetch, int maxResultSize, ClientState clientState);
 
 
 

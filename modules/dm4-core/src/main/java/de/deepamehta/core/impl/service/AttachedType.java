@@ -263,7 +263,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     private RelatedTopic fetchDataTypeTopic() {
         try {
             RelatedTopic dataType = getRelatedTopic("dm4.core.aggregation", "dm4.core.type", null,
-                "dm4.core.data_type", false, false, null);      // fetchComposite=false
+                "dm4.core.data_type", false, false, false, null);      // fetchComposite=false, triggerPostFetch=false
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to " + className() + " \"" +
                     getUri() + "\"");
@@ -302,7 +302,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // fetch part topic types
         List assocTypeFilter = Arrays.asList("dm4.core.aggregation_def", "dm4.core.composition_def");
         ResultSet<RelatedTopic> partTopicTypes = getRelatedTopics(assocTypeFilter, "dm4.core.whole_type",
-            "dm4.core.part_type", "dm4.core.topic_type", false, false, 0, null);
+            "dm4.core.part_type", "dm4.core.topic_type", false, false, false, 0, null);     // triggerPostFetch=false
         //
         for (RelatedTopic partTopicType : partTopicTypes) {
             Association assoc = partTopicType.getAssociation();
