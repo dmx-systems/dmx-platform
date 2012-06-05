@@ -73,6 +73,32 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
+    public RelatedTopicModel getTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                              String othersRoleTypeUri, String othersTopicTypeUri) {
+        ResultSet<RelatedTopicModel> topics = getTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri, 0);
+        switch (topics.getSize()) {
+        case 0:
+            return null;
+        case 1:
+            return topics.getIterator().next();
+        default:
+            throw new RuntimeException("Ambiguity: there are " + topics.getSize() + " related topics (topicId=" +
+                topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
+                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
+        }
+    }
+
+    @Override
+    public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                              String othersRoleTypeUri, String othersTopicTypeUri,
+                                                              int maxResultSize) {
+        List assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
+        return getTopicRelatedTopics(topicId, assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+            maxResultSize);
+    }
+
+    @Override
     public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, List assocTypeUris, String myRoleTypeUri,
                                                               String othersRoleTypeUri, String othersTopicTypeUri,
                                                               int maxResultSize) {
@@ -203,8 +229,30 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public Set<AssociationModel> getAssociationAssociations(long assocId, String myRoleTypeUri) {
-        return buildAssociations(mg.getMehtaEdge(assocId).getMehtaEdges(myRoleTypeUri));
+    public RelatedTopicModel getAssociationRelatedTopic(long assocId, String assocTypeUri,
+                                                                    String myRoleTypeUri, String othersRoleTypeUri,
+                                                                    String othersTopicTypeUri) {
+        ResultSet<RelatedTopicModel> topics = getAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri, 0);
+        switch (topics.getSize()) {
+        case 0:
+            return null;
+        case 1:
+            return topics.getIterator().next();
+        default:
+            throw new RuntimeException("Ambiguity: there are " + topics.getSize() + " related topics (assocId=" +
+                assocId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
+                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
+        }
+    }
+
+    @Override
+    public ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri,
+                                                                    String myRoleTypeUri, String othersRoleTypeUri,
+                                                                    String othersTopicTypeUri, int maxResultSize) {
+        List assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
+        return getAssociationRelatedTopics(assocId, assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+            maxResultSize);
     }
 
     @Override
@@ -223,6 +271,11 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     }
 
     // ---
+
+    @Override
+    public Set<AssociationModel> getAssociationAssociations(long assocId, String myRoleTypeUri) {
+        return buildAssociations(mg.getMehtaEdge(assocId).getMehtaEdges(myRoleTypeUri));
+    }
 
     @Override
     public RelatedAssociationModel getAssociationRelatedAssociation(long assocId, String assocTypeUri,

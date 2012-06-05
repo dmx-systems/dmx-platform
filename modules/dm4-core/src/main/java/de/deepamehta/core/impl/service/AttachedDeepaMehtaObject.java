@@ -223,34 +223,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         return getRelatedTopics(assocTypeUri, null, null, null, false, false, maxResultSize, clientState);
     }
 
-    @Override
-    public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                String othersTopicTypeUri, boolean fetchComposite,
-                                                boolean fetchRelatingComposite, ClientState clientState) {
-        ResultSet<RelatedTopic> topics = getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri, fetchComposite, fetchRelatingComposite, 0, clientState);
-        switch (topics.getSize()) {
-        case 0:
-            return null;
-        case 1:
-            return (AttachedRelatedTopic) topics.getIterator().next();
-        default:
-            throw new RuntimeException("Ambiguity: there are " + topics.getSize() + " related topics (object ID=" +
-                getId() + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
-                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
-        }
-    }
-
-    @Override
-    public ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
-                                    int maxResultSize, ClientState clientState) {
-        List assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
-        return getRelatedTopics(assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-            fetchComposite, fetchRelatingComposite, maxResultSize, clientState);
-    }
-
-    // Note: getRelatedTopics(List assocTypeUris, ...) is implemented in the subclasses. This is an abstract class.
+    // Note: these methods are implemented in the subclasses (this is an abstract class):
+    //     getRelatedTopic(String assocTypeUri, ...)
+    //     getRelatedTopics(String assocTypeUri, ...)
+    //     getRelatedTopics(List assocTypeUris, ...)
 
     // --- Association Retrieval ---
 
@@ -671,12 +647,12 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
                 String cardinalityUri = assocDef.getPartCardinalityUri();
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    AttachedTopic childTopic = fetchChildTopic(assocDef, true);                 // fetchComposite=true
+                    Topic childTopic = fetchChildTopic(assocDef, true);                     // fetchComposite=true
                     if (childTopic != null) {
                         comp.put(assocDef.getUri(), childTopic.getModel());
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    ResultSet<RelatedTopic> childTopics = fetchChildTopics(assocDef, true);     // fetchComposite=true
+                    ResultSet<RelatedTopic> childTopics = fetchChildTopics(assocDef, true); // fetchComposite=true
                     comp.put(assocDef.getUri(), JSONHelper.toTopicModels(childTopics));
                 } else {
                     throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
@@ -693,21 +669,21 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     /**
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
-    private AttachedRelatedTopic fetchChildTopic(String assocDefUri, boolean fetchComposite) {
+    private RelatedTopic fetchChildTopic(String assocDefUri, boolean fetchComposite) {
         return fetchChildTopic(getAssocDef(assocDefUri), fetchComposite);
     }
 
     /**
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
-    private AttachedRelatedTopic fetchChildTopic(AssociationDefinition assocDef, boolean fetchComposite) {
+    private RelatedTopic fetchChildTopic(AssociationDefinition assocDef, boolean fetchComposite) {
         String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
         String myRoleTypeUri      = assocDef.getWholeRoleTypeUri();
         String othersRoleTypeUri  = assocDef.getPartRoleTypeUri();
         String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
         //
-        return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-            fetchComposite, false, null);
+        return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, fetchComposite,
+            false, null);
     }
 
     private Topic fetchChildTopic(AssociationDefinition assocDef, long childTopicId, boolean fetchComposite) {
@@ -853,10 +829,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         if (type.getDataTypeUri().equals("dm4.core.composite")) {
             StringBuilder label = new StringBuilder();
             for (String assocDefUri : type.getLabelConfig()) {
-                AttachedDeepaMehtaObject childTopic = fetchChildTopic(assocDefUri, false);  // fetchComposite=false
+                Topic childTopic = fetchChildTopic(assocDefUri, false);     // fetchComposite=false
                 // Note: topics just created have no child topics yet
                 if (childTopic != null) {
-                    String l = childTopic.buildLabel();
+                    String l = ((AttachedDeepaMehtaObject) childTopic).buildLabel();
                     // add separator
                     if (label.length() > 0 && l.length() > 0) {
                         label.append(LABEL_SEPARATOR);
@@ -878,10 +854,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             // Note: types just created might have no child types yet
             if (i.hasNext()) {
                 AssociationDefinition assocDef = i.next();
-                AttachedDeepaMehtaObject childTopic = fetchChildTopic(assocDef, false);     // fetchComposite=false
+                Topic childTopic = fetchChildTopic(assocDef, false);        // fetchComposite=false
                 // Note: topics just created have no child topics yet
                 if (childTopic != null) {
-                    return childTopic.buildDefaultLabel();
+                    return ((AttachedDeepaMehtaObject) childTopic).buildDefaultLabel();
                 }
             }
             return "";

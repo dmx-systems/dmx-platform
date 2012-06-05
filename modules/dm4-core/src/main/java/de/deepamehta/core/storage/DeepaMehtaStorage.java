@@ -41,6 +41,13 @@ public interface DeepaMehtaStorage {
 
     // ---
 
+    RelatedTopicModel getTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                       String othersRoleTypeUri, String othersTopicTypeUri);
+
+    ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                       String othersRoleTypeUri, String othersTopicTypeUri,
+                                                       int maxResultSize);
+
     /**
      * @param   assocTypeUris       may be null
      * @param   myRoleTypeUri       may be null
@@ -139,10 +146,12 @@ public interface DeepaMehtaStorage {
 
     // ---
 
-    /**
-     * @param   myRoleTypeUri       may be null
-     */
-    Set<AssociationModel> getAssociationAssociations(long assocId, String myRoleTypeUri);
+    RelatedTopicModel getAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                             String othersRoleTypeUri, String othersTopicTypeUri);
+
+    ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                             String othersRoleTypeUri, String othersTopicTypeUri,
+                                                             int maxResultSize);
 
     /**
      * @param   assocTypeUris       may be null
@@ -155,6 +164,11 @@ public interface DeepaMehtaStorage {
                                                              int maxResultSize);
 
     // ---
+
+    /**
+     * @param   myRoleTypeUri       may be null
+     */
+    Set<AssociationModel> getAssociationAssociations(long assocId, String myRoleTypeUri);
 
     RelatedAssociationModel getAssociationRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                              String othersRoleTypeUri);

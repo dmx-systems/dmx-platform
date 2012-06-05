@@ -185,11 +185,29 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // --- Topic Retrieval ---
 
     @Override
+    public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                String othersTopicTypeUri, boolean fetchComposite,
+                                                boolean fetchRelatingComposite, ClientState clientState) {
+        RelatedTopicModel topic = dms.storage.getTopicRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
+        return topic != null ? dms.attach(topic, fetchComposite, fetchRelatingComposite, clientState) : null;
+    }
+
+    @Override
+    public ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+                                    int maxResultSize, ClientState clientState) {
+        ResultSet<RelatedTopicModel> topics = dms.storage.getTopicRelatedTopics(getId(), assocTypeUri,
+            myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
+        return dms.attach(topics, fetchComposite, fetchRelatingComposite, clientState);
+    }
+
+    @Override
     public ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
                                     int maxResultSize, ClientState clientState) {
-        ResultSet<RelatedTopicModel> topics = dms.storage.getTopicRelatedTopics(getId(), assocTypeUris, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
+        ResultSet<RelatedTopicModel> topics = dms.storage.getTopicRelatedTopics(getId(), assocTypeUris,
+            myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
         return dms.attach(topics, fetchComposite, fetchRelatingComposite, clientState);
     }
 
