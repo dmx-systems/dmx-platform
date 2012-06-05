@@ -57,6 +57,8 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         return getModel().getInstanceLevelAssocTypeUri();
     }
 
+    // ### FIXME: wording should be "getWholeTypeUri".
+    // Also association types have association definitions
     @Override
     public String getWholeTopicTypeUri() {
         return getModel().getWholeTopicTypeUri();
@@ -146,8 +148,9 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
             //
             storeViewConfig();
         } catch (Exception e) {
+            // ### FIXME wording: "type" should be "topic type" or "association type"
             throw new RuntimeException("Storing association definition \"" + getUri() +
-                "\" of topic type \"" + getWholeTopicTypeUri() + "\" failed", e);
+                "\" of type \"" + getWholeTopicTypeUri() + "\" failed", e);
         }
     }
 

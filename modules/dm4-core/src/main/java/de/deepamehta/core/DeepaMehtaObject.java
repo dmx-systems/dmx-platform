@@ -73,8 +73,6 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // --- Topic Retrieval ---
 
-    ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize, ClientState clientState);
-
     /**
      * Fetches and returns a related topic or <code>null</code> if no such topic extists.
      *
@@ -86,6 +84,8 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
     RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                  String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
                                  ClientState clientState);
+
+    ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize, ClientState clientState);
 
     /**
      * @param   assocTypeUri        may be null
