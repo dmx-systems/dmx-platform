@@ -10,6 +10,7 @@ import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
@@ -260,10 +261,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // === Fetch ===
 
-    private RelatedTopic fetchDataTypeTopic() {
+    private RelatedTopicModel fetchDataTypeTopic() {
         try {
-            RelatedTopic dataType = getRelatedTopic("dm4.core.aggregation", "dm4.core.type", null,
-                "dm4.core.data_type", false, false, null);      // fetchComposite=false
+            RelatedTopicModel dataType = dms.storage.getTopicRelatedTopic(getId(), "dm4.core.aggregation",
+                "dm4.core.type", null, "dm4.core.data_type");
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to " + className() + " \"" +
                     getUri() + "\"");
@@ -368,7 +369,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private void storeDataTypeUri() {
         // remove current assignment
-        long assocId = fetchDataTypeTopic().getAssociation().getId();
+        long assocId = fetchDataTypeTopic().getAssociationModel().getId();
         dms.deleteAssociation(assocId, null);  // clientState=null
         // create new assignment
         dms.associateDataType(getUri(), getDataTypeUri());
