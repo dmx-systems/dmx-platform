@@ -85,11 +85,11 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
             DeepaMehtaStorage storage;
+            ObjectFactoryImpl objectFactory;
             TypeCache typeCache;
 
     private PluginCache pluginCache;
     private BundleContext bundleContext;
-    private ObjectFactory objectFactory;
 
     private enum MigrationRunMode {
         CLEAN_INSTALL, UPDATE, ALWAYS

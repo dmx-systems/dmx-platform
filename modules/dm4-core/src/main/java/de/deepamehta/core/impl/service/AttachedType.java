@@ -263,6 +263,9 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private RelatedTopicModel fetchDataTypeTopic() {
         try {
+            // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
+            // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
+            // loading its ACL which in turn would rely on this very topic type.
             RelatedTopicModel dataType = dms.storage.getTopicRelatedTopic(getId(), "dm4.core.aggregation",
                 "dm4.core.type", null, "dm4.core.data_type");
             if (dataType == null) {
@@ -298,18 +301,22 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     private Map<Long, AssociationDefinition> fetchAssociationDefinitions() {
-        Map<Long, AssociationDefinition> assocDefs = new HashMap();
-        //
-        // fetch part topic types
+        // 1) fetch part topic types
+        // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
+        // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
+        // loading its ACL which in turn would rely on this very topic type.
         List assocTypeFilter = Arrays.asList("dm4.core.aggregation_def", "dm4.core.composition_def");
-        ResultSet<RelatedTopic> partTopicTypes = getRelatedTopics(assocTypeFilter, "dm4.core.whole_type",
-            "dm4.core.part_type", "dm4.core.topic_type", false, false, 0, null);
+        ResultSet<RelatedTopicModel> partTopicTypes = dms.storage.getTopicRelatedTopics(getId(), assocTypeFilter,
+            "dm4.core.whole_type", "dm4.core.part_type", "dm4.core.topic_type", 0);
         //
-        for (RelatedTopic partTopicType : partTopicTypes) {
-            Association assoc = partTopicType.getAssociation();
-            AssociationDefinition assocDef = dms.getObjectFactory().fetchAssociationDefinition(assoc);
-            // Note: the returned map is an intermediate, hashed by ID. The actual type model is
-            // subsequently build from it by sorting the assoc def's according to the sequence IDs.
+        // 2) create association definitions
+        // Note: the returned map is an intermediate, hashed by ID. The actual type model is
+        // subsequently build from it by sorting the assoc def's according to the sequence IDs.
+        Map<Long, AssociationDefinition> assocDefs = new HashMap();
+        for (RelatedTopicModel partTopicType : partTopicTypes) {
+            Association assoc = new AttachedAssociation(partTopicType.getAssociationModel(), dms);
+            AssociationDefinition assocDef = dms.objectFactory.fetchAssociationDefinition(assoc, getUri(),
+                partTopicType.getId());
             assocDefs.put(assocDef.getId(), assocDef);
         }
         return assocDefs;

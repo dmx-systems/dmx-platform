@@ -6,6 +6,7 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationDefinitionModel;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.ObjectFactory;
 
@@ -49,6 +50,31 @@ class ObjectFactoryImpl implements ObjectFactory {
         }
     }
 
+    /**
+     * Not part of public interface. Used internally by type loader (see AttachedType.fetchAssociationDefinitions()).
+     * Type loading must perform low-level, that is by accessing the storage layer directly (bypassing the application
+     * service).
+     */
+    AssociationDefinition fetchAssociationDefinition(Association assoc, String wholeTopicTypeUri,
+                                                                        long partTopicTypeId) {
+        try {
+            // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
+            // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
+            // loading its ACL which in turn would rely on this very topic type.
+            String partTopicTypeUri = dms.storage.getTopic(partTopicTypeId).getUri();
+            Cardinality cardinality = fetchCardinality(assoc);
+            AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
+                wholeTopicTypeUri, partTopicTypeUri,
+                cardinality.wholeCardinalityUri, cardinality.partCardinalityUri,
+                fetchViewConfig(assoc));
+            //
+            return new AttachedAssociationDefinition(model, dms);
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching association definition failed (wholeTopicTypeUri=\"" +
+                wholeTopicTypeUri + "\", partTopicTypeId=" + partTopicTypeId + ", " + assoc + ")", e);
+        }
+    }
+
     // ---
 
     @Override
@@ -79,14 +105,32 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public RelatedTopic fetchWholeCardinality(Association assoc) {
-        return assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
-            "dm4.core.whole_cardinality", "dm4.core.cardinality", false, false, null);  // fetchComposite=false
+        // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
+        // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
+        // loading its ACL which in turn would rely on this very topic type.
+        RelatedTopicModel model = dms.storage.getAssociationRelatedTopic(assoc.getId(), "dm4.core.aggregation",
+            "dm4.core.assoc_def", "dm4.core.whole_cardinality", "dm4.core.cardinality");    // fetchComposite=false
+        // error check
+        if (model == null) {
+            throw new RuntimeException("Illegal association definition: whole cardinality is missing (" + assoc + ")");
+        }
+        //
+        return new AttachedRelatedTopic(model, dms);
     }
 
     @Override
     public RelatedTopic fetchPartCardinality(Association assoc) {
-        return assoc.getRelatedTopic("dm4.core.aggregation", "dm4.core.assoc_def",
-            "dm4.core.part_cardinality", "dm4.core.cardinality", false, false, null);   // fetchComposite=false
+        // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
+        // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
+        // loading its ACL which in turn would rely on this very topic type.
+        RelatedTopicModel model = dms.storage.getAssociationRelatedTopic(assoc.getId(), "dm4.core.aggregation",
+            "dm4.core.assoc_def", "dm4.core.part_cardinality", "dm4.core.cardinality");     // fetchComposite=false
+        // error check
+        if (model == null) {
+            throw new RuntimeException("Illegal association definition: part cardinality is missing (" + assoc + ")");
+        }
+        //
+        return new AttachedRelatedTopic(model, dms);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -99,20 +143,14 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     private Cardinality fetchCardinality(Association assoc) {
         Topic wholeCardinality = fetchWholeCardinality(assoc);
-        Topic partCardinality = fetchPartCardinality(assoc);
-        Cardinality cardinality = new Cardinality();
-        if (wholeCardinality != null) {
-            cardinality.setWholeCardinalityUri(wholeCardinality.getUri());
-        }
-        if (partCardinality != null) {
-            cardinality.setPartCardinalityUri(partCardinality.getUri());
-        } else {
-            throw new RuntimeException("Missing part cardinality");
-        }
-        return cardinality;
+        Topic partCardinality  = fetchPartCardinality(assoc);
+        return new Cardinality(wholeCardinality.getUri(), partCardinality.getUri());
     }
 
+    // ---
+
     private ViewConfigurationModel fetchViewConfig(Association assoc) {
+        // ### FIXME: use low-level storage call
         ResultSet<RelatedTopic> topics = assoc.getRelatedTopics("dm4.core.aggregation", "dm4.core.assoc_def",
             "dm4.core.view_config", null, true, false, 0, null);    // fetchComposite=true, fetchRelatingComposite=false
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
@@ -139,11 +177,8 @@ class ObjectFactoryImpl implements ObjectFactory {
         private String wholeCardinalityUri;
         private String partCardinalityUri;
 
-        private void setWholeCardinalityUri(String wholeCardinalityUri) {
+        private Cardinality(String wholeCardinalityUri, String partCardinalityUri) {
             this.wholeCardinalityUri = wholeCardinalityUri;
-        }
-
-        private void setPartCardinalityUri(String partCardinalityUri) {
             this.partCardinalityUri = partCardinalityUri;
         }
     }
