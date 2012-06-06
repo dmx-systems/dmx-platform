@@ -238,6 +238,9 @@ public class Plugin implements BundleActivator, EventHandler {
     public void postFetchTopicHook(Topic topic, ClientState clientState, Directives directives) {
     }
 
+    public void postFetchTopicTypeHook(TopicType topicType, ClientState clientState, Directives directives) {
+    }
+
     // ---
 
     public void preCreateHook(TopicModel model, ClientState clientState) {

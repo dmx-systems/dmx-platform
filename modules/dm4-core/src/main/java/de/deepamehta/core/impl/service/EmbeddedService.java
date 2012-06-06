@@ -465,6 +465,7 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedTopicType topicType = typeCache.getTopicType(uri);
+            triggerHook(Hook.POST_FETCH_TOPIC_TYPE, topicType, clientState, null);    // directives=null
             tx.success();
             return topicType;
         } catch (Exception e) {

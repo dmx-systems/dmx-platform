@@ -150,7 +150,8 @@ class ObjectFactoryImpl implements ObjectFactory {
     // ---
 
     private ViewConfigurationModel fetchViewConfig(Association assoc) {
-        // ### FIXME: use low-level storage call
+        // ### FIXME: use low-level storage call.
+        // ### Note: also the composite must be low-level fetched.
         ResultSet<RelatedTopic> topics = assoc.getRelatedTopics("dm4.core.aggregation", "dm4.core.assoc_def",
             "dm4.core.view_config", null, true, false, 0, null);    // fetchComposite=true, fetchRelatingComposite=false
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null

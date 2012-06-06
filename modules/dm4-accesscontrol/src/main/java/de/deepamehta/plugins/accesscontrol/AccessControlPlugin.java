@@ -54,6 +54,9 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     private static final String DEFAULT_PASSWORD = "";
     private static final String ENCRYPTED_PASSWORD_PREFIX = "-SHA256-";  // don't change this
 
+    private static final String OPERATION_WRITE_URI = "dm4.accesscontrol.operation_write";
+    private static final String OPERATION_CREATE_URI = "dm4.accesscontrol.operation_create";
+
     // association type semantics ### TODO: to be dropped. Model-driven manipulators required.
     private static final String WORKSPACE_MEMBERSHIP = "dm4.accesscontrol.membership";
     private static final String ROLE_TYPE_USER       = "dm4.core.default";
@@ -252,20 +255,25 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     @Override
     public void postFetchTopicHook(Topic topic, ClientState clientState, Directives directives) {
+        logger.info("### Enriching topic " + topic.getId() + " with its permission");
         Topic user = getUserAccount(clientState);
         CompositeValue permissions = new CompositeValue();
-        permissions.put("write", hasPermission(topic, user, "dm4.accesscontrol.operation_write"));
-        // ### TODO: namespace key/value
-        if (topic.getTypeUri().equals("dm4.core.topic_type")) {
-            logger.info("### Enriching topic type \"" + topic.getUri() + "\" with its permission");
-            permissions.put("create", hasPermission(topic, user, "dm4.accesscontrol.operation_create"));
-            // ### TODO: namespace key/value
-            // ### FIXME: is postFetchTopicHook() triggered for types?
-        } else {
-            logger.info("### Enriching topic " + topic.getId() + " with its permission");
-        }
-        topic.getCompositeValue().put("permissions", permissions);
-        // ### TODO: namespace key/value
+        permissions.put(OPERATION_WRITE_URI, hasPermission(user, OPERATION_WRITE_URI, topic));
+        // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
+        // Permissions are transient data, not stored in DB, recalculated for each request.
+        topic.getCompositeValue().put("dm4.accesscontrol.permissions", permissions);
+    }
+
+    @Override
+    public void postFetchTopicTypeHook(TopicType topicType, ClientState clientState, Directives directives) {
+        logger.info("### Enriching topic type \"" + topicType.getUri() + "\" with its permission");
+        Topic user = getUserAccount(clientState);
+        CompositeValue permissions = new CompositeValue();
+        permissions.put(OPERATION_WRITE_URI, hasPermission(user, OPERATION_WRITE_URI, topicType));
+        permissions.put(OPERATION_CREATE_URI, hasPermission(user, OPERATION_CREATE_URI, topicType));
+        // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
+        // Permissions are transient data, not stored in DB, recalculated for each request.
+        topicType.getCompositeValue().put("dm4.accesscontrol.permissions", permissions);
     }
 
 
@@ -366,7 +374,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     /**
      * Returns true if the user is allowed to perform an operation on a topic.
      */
-    private boolean hasPermission(Topic topic, Topic user, String operationUri) {
+    private boolean hasPermission(Topic user, String operationUri, Topic topic) {
         logger.fine("Determining permission of user " + user + " to \"" + operationUri + "\" " + topic);
         for (RelatedTopic aclEntry : getACLEntries(topic)) {
             String roleUri = aclEntry.getCompositeValue().getTopic("dm4.accesscontrol.role").getUri();
