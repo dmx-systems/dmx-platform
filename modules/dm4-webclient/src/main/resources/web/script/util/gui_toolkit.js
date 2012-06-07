@@ -164,13 +164,15 @@ function GUIToolkit(config) {
              *                          ### TODO: selection of items which have an object as value could be supported
              *                          e.g. by let the caller supply a indicator function. Currently the item to select
              *                          is identified simply by equality (==) check on the values (see find_item()).
+             *                          ### Think about: is the caller allowed to change the value afterwards?
              *                      "icon" - Optional: the icon to decorate the item (relative or absolute URL).
              *                      "is_trigger" (boolean) - Optional: if true this item acts as stateless
              *                          action-trigger within an stateful select-like menu. Default is false.
              *                          Reasonable only for stateful select-like menus.
              *                          ### FIXME: this property could possibly be dropped. Meanwhile we have optional
              *                          per-item event handlers (see "handler" property).
-             *                      "handler" - Optional: the individual handler.
+             *                      "handler" - Optional: the individual handler. One argument is passed to it:
+             *                          the selected menu item (an object with "value" and "label" properties).
              */
             this.add_item = function(item) {
                 add_item(item)

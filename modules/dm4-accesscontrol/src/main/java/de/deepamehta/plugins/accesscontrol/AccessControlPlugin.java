@@ -255,25 +255,28 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     @Override
     public void postFetchTopicHook(Topic topic, ClientState clientState, Directives directives) {
-        logger.info("### Enriching topic " + topic.getId() + " with its permission");
+        logger.info("### Enriching topic " + topic.getId() + " with its permissions");
         Topic user = getUserAccount(clientState);
-        CompositeValue permissions = new CompositeValue();
-        permissions.put(OPERATION_WRITE_URI, hasPermission(user, OPERATION_WRITE_URI, topic));
-        // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
-        // Permissions are transient data, not stored in DB, recalculated for each request.
-        topic.getCompositeValue().put("dm4.accesscontrol.permissions", permissions);
+        enrichWithPermissions(topic,
+            hasPermission(user, OPERATION_WRITE_URI, topic));
     }
 
     @Override
     public void postFetchTopicTypeHook(TopicType topicType, ClientState clientState, Directives directives) {
-        logger.info("### Enriching topic type \"" + topicType.getUri() + "\" with its permission");
+        String typeUri = topicType.getUri();
+        // Note: there are 2 types whose permissions must be set manually as they can't be calculated the usual way:
+        // - "Access Control List Facet": endless recursion would occur.
+        // - "Meta Meta Type": doesn't exist in DB. Retrieving its ACL would fail.
+        if (typeUri.equals("dm4.accesscontrol.acl_facet") || typeUri.equals("dm4.core.meta_meta_type")) {
+            enrichWithPermissions(topicType, false, false);     // write=false, create=false
+            return;
+        }
+        //
+        logger.info("### Enriching topic type \"" + typeUri + "\" with its permissions");
         Topic user = getUserAccount(clientState);
-        CompositeValue permissions = new CompositeValue();
-        permissions.put(OPERATION_WRITE_URI, hasPermission(user, OPERATION_WRITE_URI, topicType));
-        permissions.put(OPERATION_CREATE_URI, hasPermission(user, OPERATION_CREATE_URI, topicType));
-        // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
-        // Permissions are transient data, not stored in DB, recalculated for each request.
-        topicType.getCompositeValue().put("dm4.accesscontrol.permissions", permissions);
+        enrichWithPermissions(topicType,
+            hasPermission(user, OPERATION_WRITE_URI, topicType),
+            hasPermission(user, OPERATION_CREATE_URI, topicType));
     }
 
 
@@ -509,5 +512,34 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     private boolean isMemberOfWorkspace(long userId, long workspaceId) {
         return dms.getAssociation(WORKSPACE_MEMBERSHIP, userId, workspaceId,
             ROLE_TYPE_USER, ROLE_TYPE_WORKSPACE) != null;
+    }
+
+    // ---
+
+    private void enrichWithPermissions(Topic topic, boolean write) {
+        // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
+        // Permissions are transient data, not stored in DB, recalculated for each request.
+        topic.getCompositeValue().put("dm4.accesscontrol.permissions", permissions(write));
+    }
+
+    private void enrichWithPermissions(TopicType topicType, boolean write, boolean create) {
+        // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
+        // Permissions are transient data, not stored in DB, recalculated for each request.
+        topicType.getCompositeValue().put("dm4.accesscontrol.permissions", permissions(write, create));
+    }
+
+    // ---
+
+    private CompositeValue permissions(boolean write) {
+        CompositeValue permissions = new CompositeValue();
+        permissions.put(OPERATION_WRITE_URI, write);
+        return permissions;
+    }
+
+    private CompositeValue permissions(boolean write, boolean create) {
+        CompositeValue permissions = new CompositeValue();
+        permissions.put(OPERATION_WRITE_URI, write);
+        permissions.put(OPERATION_CREATE_URI, create);
+        return permissions;
     }
 }

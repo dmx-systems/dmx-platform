@@ -15,7 +15,7 @@ function accesscontrol_plugin() {
 
     dm4c.register_listener("init", function() {
 
-        dm4c.add_to_special_menu({value: "loginout-item", label: menu_item_label()})
+        dm4c.toolbar.special_menu.add_item({label: menu_item_label(), value: "loginout-item", handler: do_handle_menu})
         create_login_dialog()
         extend_rest_client()
 
@@ -35,6 +35,16 @@ function accesscontrol_plugin() {
                 title: "Login", buttons: {"OK": do_login},
                 modal: true, autoOpen: false, closeOnEscape: true, draggable: false, resizable: false
             })
+        }
+
+        function do_handle_menu(item) {
+            if (item.label == "Login...") {
+                $("#login-dialog").dialog("open")
+            } else if (item.label == "Logout \"" + get_username() + "\"") {
+                this.logout()   // ### "this" doesn't work here
+            } else {
+                alert("Unexpected menu item: " + js.stringify(item))
+            }
         }
 
         function do_login() {
@@ -84,22 +94,16 @@ function accesscontrol_plugin() {
         }
     })
 
-    dm4c.register_listener("handle_special_command", function(label) {
-        if (label == "Login...") {
-            $("#login-dialog").dialog("open")
-        } else if (label == "Logout \"" + get_username() + "\"") {
-            this.logout()   // ### "this" doesn't work in listeners
-        }
-    })
-
     // ---
 
     dm4c.register_listener("has_write_permission", function(topic) {
-        return topic.permissions.write          // ### adapt to DM4
+        return topic.composite["dm4.accesscontrol.permissions"]
+                    .composite["dm4.accesscontrol.operation_write"].value
     })
 
     dm4c.register_listener("has_create_permission", function(topic_type) {
-        return topic_type.permissions.create    // ### adapt to DM4
+        return topic_type.composite["dm4.accesscontrol.permissions"]
+                         .composite["dm4.accesscontrol.operation_create"].value
     })
 
 

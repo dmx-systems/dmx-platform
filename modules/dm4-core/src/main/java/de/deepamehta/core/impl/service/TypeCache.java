@@ -30,7 +30,8 @@ class TypeCache {
 
     private EmbeddedService dms;
 
-    private int callCount = 0;  // endless recursion protection ### FIXME: not in use
+    // ### private EndlessRecursionProtection endlessRecursionProtection = new EndlessRecursionProtection();
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -44,7 +45,7 @@ class TypeCache {
     AttachedTopicType getTopicType(String topicTypeUri) {
         AttachedTopicType topicType = topicTypes.get(topicTypeUri);
         if (topicType == null) {
-            endlessRecursionProtection(topicTypeUri);    // ### FIXME: not in use
+            // ### endlessRecursionProtection.check(topicTypeUri);
             topicType = loadTopicType(topicTypeUri);
         }
         return topicType;
@@ -53,6 +54,7 @@ class TypeCache {
     AttachedAssociationType getAssociationType(String assocTypeUri) {
         AttachedAssociationType assocType = assocTypes.get(assocTypeUri);
         if (assocType == null) {
+            // ### endlessRecursionProtection.check(assocTypeUri);
             assocType = loadAssociationType(assocTypeUri);
         }
         return assocType;
@@ -112,13 +114,19 @@ class TypeCache {
 
     // ---
 
-    // ### FIXME: not in use
-    private void endlessRecursionProtection(String topicTypeUri) {
-        if (topicTypeUri.equals("dm4.accesscontrol.acl_facet")) {
-            callCount++;
-            logger.info("########## Loading topic type \"dm4.accesscontrol.acl_facet\" => count=" + callCount);
-            if (callCount >= 2) {
-                throw new RuntimeException("Endless Recursion!");
+    private class EndlessRecursionProtection {
+
+        private Map<String, Integer> callCount = new HashMap();
+
+        private void check(String typeUri) {
+            Integer count = callCount.get(typeUri);
+            if (count == null) {
+                count = 0;
+            }
+            count++;
+            callCount.put(typeUri, count);
+            if (count >= 2) {
+                throw new RuntimeException("Endless recursion while loading type \"" + typeUri + "\"");
             }
         }
     }
