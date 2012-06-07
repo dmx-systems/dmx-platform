@@ -7,13 +7,13 @@
             value: "First Name",
             uri: "dm4.contacts.first_name",
             data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext"]
+            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"]
         },
         {
             value: "Last Name",
             uri: "dm4.contacts.last_name",
             data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext"]
+            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"]
         },
         {
             value: "Person Name",
@@ -43,7 +43,7 @@
             value: "Institution Name",
             uri: "dm4.contacts.institution_name",
             data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext"]
+            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"]
         },
 
         ### Phone ###
@@ -57,7 +57,7 @@
             value: "Phone",
             uri: "dm4.contacts.phone_number",
             data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext"]
+            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"]
         },
         {
             value: "Phone Entry",
@@ -84,7 +84,7 @@
             value: "Email",
             uri: "dm4.contacts.email_address",
             data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext"]
+            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"]
         },
 
         ### Address ###
@@ -93,25 +93,25 @@
             value: "Street",
             uri: "dm4.contacts.street",
             data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext"]
+            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"]
         },
         {
             value: "Postal Code",
             uri: "dm4.contacts.postal_code",
             data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext"]
+            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"]
         },
         {
             value: "City",
             uri: "dm4.contacts.city",
             data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext"]
+            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"]
         },
         {
             value: "Country",
             uri: "dm4.contacts.country",
             data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext"]
+            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"]
         },
         {
             value: "Address",
