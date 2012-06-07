@@ -1,0 +1,22 @@
+
+DeepaMehta uses a jQuery UI custom build.
+
+Basic Theme: "Smoothness"
+
+Font Settings: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif
+
+Components (9):
+    Core
+    Widget
+    Mouse
+    Position
+
+    Resizable
+    Sortable
+
+    Autocomplete
+    Button
+    Dialog
+
+IMPORTANT: the generated CSS file must be adapted manually:
+    \\\"Lucida Grande\\\" -> "Lucida Grande" (2 occurrences)
