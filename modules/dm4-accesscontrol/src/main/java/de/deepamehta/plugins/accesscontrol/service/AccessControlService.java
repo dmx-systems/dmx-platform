@@ -10,17 +10,21 @@ import de.deepamehta.core.service.PluginService;
 
 public interface AccessControlService extends PluginService {
 
-    public Topic getUserAccount(ClientState clientState);
+    Topic lookupUserAccount(String username);
 
-    public Topic getOwnedTopic(long userId, String typeUri);
-
-    // ---
-
-    public void setOwner(long topicId, long userId);
-
-    public void createACLEntry(long topicId, Role role, Permissions permissions);
+    Topic getUserAccount(ClientState clientState);
 
     // ---
 
-    public void joinWorkspace(long workspaceId, long userId);
+    Topic getOwnedTopic(long userId, String typeUri);
+
+    void setOwner(long topicId, long userId);
+
+    // ---
+
+    void createACLEntry(long topicId, Role role, Permissions permissions);
+
+    // ---
+
+    void joinWorkspace(long workspaceId, long userId);
 }

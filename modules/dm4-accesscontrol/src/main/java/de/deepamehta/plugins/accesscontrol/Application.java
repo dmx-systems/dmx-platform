@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.accesscontrol;
 
 import de.deepamehta.plugins.accesscontrol.provider.PermissionsProvider;
-import de.deepamehta.plugins.webservice.provider.TopicProvider;
+import de.deepamehta.plugins.webservice.provider.JSONEnabledProvider;
 
 import de.deepamehta.core.osgi.Activator;
 
@@ -16,7 +16,7 @@ public class Application extends javax.ws.rs.core.Application {
     public Set<Class<?>> getClasses() {
         Set classes = new HashSet();
         classes.add(PermissionsProvider.class);
-        classes.add(TopicProvider.class);
+        classes.add(JSONEnabledProvider.class);
         return classes;
     }
 

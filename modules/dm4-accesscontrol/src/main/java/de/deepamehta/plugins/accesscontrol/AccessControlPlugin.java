@@ -92,6 +92,14 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
 
 
+    @GET
+    @Path("/user/{username}")
+    @Override
+    public Topic lookupUserAccount(@PathParam("username") String username) {
+        logger.info("username=\"" + username + "\"");
+        return getUserAccount(username);
+    }
+
     /**
      * Returns the user that is represented by the client state, or <code>null</code> if no user is logged in.
      */
@@ -108,6 +116,8 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         }
         return getUserAccount(username);
     }
+
+    // ---
 
     @GET
     @Path("/owner/{userId}/{typeUri}")
@@ -128,8 +138,6 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         return null;
     }
 
-    // ---
-
     @POST
     @Path("/topic/{topicId}/owner/{userId}")
     @Override
@@ -138,6 +146,8 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
             new CompositeValue().put("dm4.accesscontrol.user_account", "ref_id:" + userId)), null, null);
         // ### FIXME: "ref_id:" not expanded by put(). TODO: Add a put_ref method().
     }
+
+    // ---
 
     @POST
     @Path("/topic/{topicId}/role/{role}")
