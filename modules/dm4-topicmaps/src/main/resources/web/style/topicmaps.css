@@ -1,6 +1,6 @@
 #topicmap-widget {
-    float: left;
-    margin-right: 3em;
+    display: inline;
+    margin-left: 1.2em;
 }
 
 #topicmap-label {

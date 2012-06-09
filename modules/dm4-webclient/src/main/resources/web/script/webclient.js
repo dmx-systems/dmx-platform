@@ -969,7 +969,10 @@ var dm4c = new function() {
         dm4c.refresh_type_menu(dm4c.toolbar.create_menu, function(topic_type) {
             return dm4c.has_create_permission(topic_type.uri) && topic_type.get_menu_config("create-type-menu")
         })
+        //
         dm4c.trigger_plugin_hook("post_refresh_create_menu", dm4c.toolbar.create_menu)
+        //
+        return dm4c.toolbar.create_menu
     }
 
     // === Images ===

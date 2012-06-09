@@ -1,3 +1,9 @@
+#login-widget {
+    float: right;
+    font-size: 60%;
+    margin-right: 1em;
+}
+
 #login-message {
     font-weight: bold;
     margin-top: 1em;

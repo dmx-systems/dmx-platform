@@ -7,6 +7,7 @@ function accesscontrol_plugin() {
     dm4c.load_stylesheet("/de.deepamehta.accesscontrol/style/accesscontrol.css")
     dm4c.load_script("/de.deepamehta.accesscontrol/script/vendor/sha256.js")
 
+    var login_widget
     var self = this
 
 
@@ -41,8 +42,49 @@ function accesscontrol_plugin() {
 
     dm4c.register_listener("init", function() {
 
-        dm4c.toolbar.special_menu.add_item({label: menu_item_label(), value: "loginout-item", handler: do_handle_menu})
+        create_login_widget()
         create_login_dialog()
+
+        function create_login_widget() {
+            login_widget = new LoginWidget()
+            dm4c.toolbar.dom.prepend(login_widget.dom)
+
+            function LoginWidget() {
+                var dom = $("<div>").attr({id: "login-widget"})    // attr("id", ...) doesn't create the div!
+                var username = get_username()
+                if (username) {
+                    show_user(username)
+                } else {
+                    show_login()
+                }
+                this.dom = dom
+
+                this.show_user = function(username) {
+                    dom.empty()
+                    show_user(username)
+                }
+
+                this.show_login = function() {
+                    dom.empty()
+                    show_login()
+                }
+
+                function show_user(username) {
+                    dom.append("Logged in as \"" + username + "\"<br>")
+                    dom.append($("<a>").attr("href", "#").text("Logout").click(function() {
+                        self.do_logout()
+                        return false
+                    }))
+                }
+
+                function show_login() {
+                    dom.append($("<a>").attr("href", "#").text("Login").click(function() {
+                        $("#login-dialog").dialog("open")
+                        return false
+                    }))
+                }
+            }
+        }
 
         function create_login_dialog() {
             var username_input = $("<input>")
@@ -53,15 +95,15 @@ function accesscontrol_plugin() {
                 .after($("<div>").addClass("field-label").text("Password"))
                 .after(password_input)
                 .after(message_div)
-            dm4c.ui.dialog("login-dialog", "Login", dialog_content, "auto", "OK", do_login)
+            dm4c.ui.dialog("login-dialog", "Login", dialog_content, "auto", "OK", do_try_login)
 
-            function do_login() {
+            function do_try_login() {
                 var username = username_input.val()
                 var password = password_input.val()
                 var user = try_login(username, password)
                 if (user) {
                     show_message("Login OK", "login-ok", close_login_dialog)
-                    self.login(user)
+                    self.do_login(user)
                 } else {
                     show_message("Login failed", "login-failed")
                 }
@@ -83,16 +125,6 @@ function accesscontrol_plugin() {
                 })
             }
         }
-
-        function do_handle_menu(item) {
-            if (item.label == "Login...") {
-                $("#login-dialog").dialog("open")
-            } else if (item.label == "Logout \"" + get_username() + "\"") {
-                self.logout()
-            } else {
-                alert("Unexpected menu item: " + js.stringify(item))
-            }
-        }
     })
 
     // ---
@@ -111,19 +143,42 @@ function accesscontrol_plugin() {
 
     // === Access Control Listeners ===
 
-    dm4c.register_listener("user_logged_in", function(user) {
-        refresh_menu_item()
+    /* dm4c.register_listener("user_logged_in", function(user) {
+        refresh_menu_item() // ###
         dm4c.render_topic()
     })
 
     dm4c.register_listener("user_logged_out", function() {
-        refresh_menu_item()
+        refresh_menu_item() // ###
         dm4c.render_topic()
-    })
+    }) */
 
 
 
     // ------------------------------------------------------------------------------------------------------ Public API
+
+    this.do_login = function(user) {
+        var username = user.get("dm4.accesscontrol.username")
+        js.set_cookie("dm4_username", username)
+        //
+        adjust_create_widget()
+        login_widget.show_user(username)
+        dm4c.page_panel.refresh()
+        //
+        dm4c.trigger_plugin_hook("user_logged_in", user)
+    }
+
+    this.do_logout = function() {
+        js.remove_cookie("dm4_username")
+        //
+        adjust_create_widget()
+        login_widget.show_login()
+        dm4c.page_panel.refresh()
+        //
+        dm4c.trigger_plugin_hook("user_logged_out")
+    }
+
+    // ---
 
     this.create_user = function(username, password) {
         return dm4c.create_topic("dm4.accesscontrol.user_account", {
@@ -154,25 +209,6 @@ function accesscontrol_plugin() {
         dm4c.restc.join_workspace(workspace_id, user_id)
     }
 
-    // ---
-
-    this.login = function(user) {
-        var username = user.get("dm4.accesscontrol.username")
-        js.set_cookie("dm4_username", username)
-        //
-        adjust_create_widget()
-        //
-        dm4c.trigger_hook("user_logged_in", user)
-    }
-
-    this.logout = function() {
-        js.remove_cookie("dm4_username")
-        //
-        adjust_create_widget()
-        //
-        dm4c.trigger_hook("user_logged_out")
-    }
-
 
 
     // ----------------------------------------------------------------------------------------------- Private Functions
@@ -188,7 +224,7 @@ function accesscontrol_plugin() {
     }
 
     /**
-     * Returns the username of the logged in user, or null/undefined if no user is logged in.
+     * Returns the username of the logged in user, or undefined if no user is logged in.
      */
     function get_username() {
         return js.get_cookie("dm4_username")
@@ -200,19 +236,9 @@ function accesscontrol_plugin() {
 
     // ---
 
-    function refresh_menu_item() {
-        dm4c.ui.set_menu_item_label("special-menu", "loginout-item", menu_item_label())
-    }
-
-    function menu_item_label() {
-        return get_username() ? "Logout \"" + get_username() + "\"" : "Login..."
-    }
-
-    // ---
-
     function adjust_create_widget() {
         dm4c.reload_types()
-        var menu = dm4c.recreate_type_menu("create-type-menu")
+        var menu = dm4c.refresh_create_menu()
         if (menu.get_item_count()) {
             $("#create-widget").show()
         } else {

@@ -1,6 +1,5 @@
 #workspace-widget {
-    float: left;
-    margin-right: 1.2em;
+    display: inline;
 }
 
 #workspace-label {

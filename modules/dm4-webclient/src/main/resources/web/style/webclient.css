@@ -16,13 +16,17 @@ body {
 }
 
 #search-widget {
-    float: left;
-    margin-right: 3em;
+    display: inline;
+    margin-left: 3em;
 }
 
 #create-widget {
-    float: left;
-    margin-right: 3em;
+    display: inline;
+    margin-left: 3em;
+}
+
+#help-menu {
+    margin-left: 3em;
 }
 
 /*** Split Panel ***/
