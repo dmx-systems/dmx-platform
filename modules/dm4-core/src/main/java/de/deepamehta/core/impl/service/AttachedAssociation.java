@@ -252,7 +252,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     public Set<Association> getAssociations(String myRoleTypeUri) {
-        return dms.attach(dms.storage.getAssociationAssociations(getId(), myRoleTypeUri));
+        return dms.attach(dms.storage.getAssociationAssociations(getId(), myRoleTypeUri), false);
+        // fetchComposite=false
     }
 
 

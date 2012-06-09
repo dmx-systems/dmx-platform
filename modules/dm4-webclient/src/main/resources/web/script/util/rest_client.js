@@ -93,25 +93,26 @@ function RESTClient(core_service_uri) {
 
     // === Associations ===
 
-    this.get_association = function(assoc_id) {
-        return request("GET", "/association/" + assoc_id)
+    this.get_association_by_id = function(assoc_id, fetch_composite) {
+        var params = new RequestParameter({fetch_composite: fetch_composite})
+        return request("GET", "/association/" + assoc_id + "?" + params.to_query_string())
     }
 
     /**
-     * Returns the relation between two topics.
-     * If no such relation exists null is returned. FIXME: check this.
-     * If more than one relation exists, an exception is thrown. FIXME: check this.
+     * Returns the association between two topics, qualified by association type and both role types.
+     * If no such association exists <code>null</code> is returned.
+     * If more than one association exist, an exception is thrown.
      *
-     * @param   type_id     Relation type filter (optional). Pass <code>null</code> to switch filter off.
-     * @param   isDirected  Direction filter (optional). Pass <code>true</code> if direction matters. In this case the
-     *                      relation is expected to be directed <i>from</i> source topic <i>to</i> destination topic.
+     * @param   assoc_type_uri  Association type filter.
      *
-     * @return  The relation (a Relation object). FIXME: check this.
-     * FIXME: not in use
-    this.get_relation = function(src_topic_id, dst_topic_id, type_id, is_directed) {
-        var params = new RequestParameter({src: src_topic_id, dst: dst_topic_id, type: type_id, directed: is_directed})
-        return request("GET", "/relation?" + params.to_query_string())
-    } */
+     * @return  The association (a JavaScript object).
+     */
+    this.get_association = function(assoc_type_uri, topic1_id, topic2_id, role_type1_uri, role_type2_uri,
+                                                                                          fetch_composite) {
+        var params = new RequestParameter({fetch_composite: fetch_composite})
+        return request("GET", "/association/" + assoc_type_uri + "/" +  topic1_id + "/" + topic2_id + "/" +
+            role_type1_uri + "/" + role_type2_uri + "?" + params.to_query_string())
+    }
 
     /**
      * Returns the associations between two topics. If no such association exists an empty array is returned.
@@ -261,13 +262,15 @@ function RESTClient(core_service_uri) {
         if (status == "success") {
             return responseData
         } else {
-            throw "AJAX " + method + " request failed, server response: " + responseCode +
+            throw "RESTClientError: " + method + " request failed, server response: " + responseCode +
                 " (" + responseMessage + "), exception: " + exception
         }
     }
 
     /**
      * @params      Optional: initial set of parameters
+     *
+     * ### TODO: rename to QueryParameter (to fit JAX-RS wording)
      */
     function RequestParameter(params) {
 

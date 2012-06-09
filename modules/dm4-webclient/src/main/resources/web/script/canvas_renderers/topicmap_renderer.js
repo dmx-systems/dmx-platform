@@ -202,18 +202,20 @@ function TopicmapRenderer() {
     // ---
 
     this.select_topic = function(topic_id) {
-        // fetch from DB
+        // 1) fetch from DB
         var topic = dm4c.fetch_topic(topic_id)
-        // update model
+        // 2) update model
         set_highlight_topic(topic_id)
         //
         return {select: topic, display: topic}
     }
 
     this.select_association = function(assoc_id) {
-        // fetch from DB
-        var assoc = dm4c.fetch_association(assoc_id)
-        // update model
+        // 1) fetch from DB
+        // Note: the association's composite doesn't need to be fetched
+        // as is not used by the default association renderer
+        var assoc = dm4c.fetch_association(assoc_id, false)     // fetch_composite=false
+        // 2) update model
         set_highlight_association(assoc_id)
         //
         return assoc

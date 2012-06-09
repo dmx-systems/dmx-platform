@@ -1105,8 +1105,8 @@ var dm4c = new function() {
         return build_topic(dm4c.restc.get_topic_by_id(topic_id, fetch_composite))
     }
 
-    this.fetch_association = function(assoc_id) {
-        return build_association(dm4c.restc.get_association(assoc_id))
+    this.fetch_association = function(assoc_id, fetch_composite) {
+        return build_association(dm4c.restc.get_association_by_id(assoc_id, fetch_composite))
     }
 
     function fetch_topic_type(topic_type_uri) {

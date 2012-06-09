@@ -73,7 +73,7 @@ public interface DeepaMehtaService {
 
     // === Associations ===
 
-    Association getAssociation(long assocId);
+    Association getAssociation(long assocId, boolean fetchComposite, ClientState clientState);
 
     /**
      * Returns the association between two topics, qualified by association type and both role types.
@@ -82,8 +82,9 @@ public interface DeepaMehtaService {
      *
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      */
-    Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,  String roleTypeUri1,
-                                                                                   String roleTypeUri2);
+    Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
+                                                    String roleTypeUri1, String roleTypeUri2,
+                                                    boolean fetchComposite, ClientState clientState);
 
     // ---
 

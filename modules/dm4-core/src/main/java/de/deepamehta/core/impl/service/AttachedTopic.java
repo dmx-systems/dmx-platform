@@ -215,7 +215,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     public Set<Association> getAssociations(String myRoleTypeUri) {
-        return dms.attach(dms.storage.getTopicAssociations(getId(), myRoleTypeUri));
+        return dms.attach(dms.storage.getTopicAssociations(getId(), myRoleTypeUri), false);     // fetchComposite=false
     }
 
 
