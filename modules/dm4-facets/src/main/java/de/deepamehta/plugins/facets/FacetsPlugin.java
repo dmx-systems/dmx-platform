@@ -14,6 +14,7 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
 
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -56,12 +57,20 @@ public class FacetsPlugin extends Plugin implements FacetsService {
             new TopicRoleModel(facetTypeUri, "dm4.facets.facet")), null);   // clientState=null
     }
 
+    // ---
+
     @Override
     public void updateFacet(Topic topic, String facetTypeUri, TopicModel facet, ClientState clientState,
                                                                                 Directives directives) {
-        // ### TODO: incorporate the Facets module into the DeepaMehta core.
-        // ### TODO: many cardinality
+        // ### TODO: incorporate the Facets module into the DeepaMehta core?
         topic.updateChildTopic(getAssocDef(facetTypeUri), facet, clientState, directives);
+    }
+
+    @Override
+    public void updateFacets(Topic topic, String facetTypeUri, List<TopicModel> facets, ClientState clientState,
+                                                                                        Directives directives) {
+        // ### TODO: incorporate the Facets module into the DeepaMehta core?
+        topic.updateChildTopics(getAssocDef(facetTypeUri), facets, clientState, directives);
     }
 
 
