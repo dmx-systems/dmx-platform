@@ -18,6 +18,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -102,7 +103,7 @@ public class FilesPlugin extends Plugin implements FilesService {
             //
             return dms.createTopic(new TopicModel("dm4.files.file", comp), null);       // FIXME: clientState=null
         } catch (Throwable e) {
-            throw new RuntimeException(text + " failed", e);
+            throw new WebApplicationException(new RuntimeException(text + " failed", e));
         }
     }
 
@@ -130,7 +131,7 @@ public class FilesPlugin extends Plugin implements FilesService {
             //
             return dms.createTopic(new TopicModel("dm4.files.folder", comp), null);     // FIXME: clientState=null
         } catch (Throwable e) {
-            throw new RuntimeException(text + " failed", e);
+            throw new WebApplicationException(new RuntimeException(text + " failed", e));
         }
     }
 
@@ -169,7 +170,7 @@ public class FilesPlugin extends Plugin implements FilesService {
             logger.info("### Opening file \"" + file + "\"");
             Desktop.getDesktop().open(file);
         } catch (Throwable e) {
-            throw new RuntimeException("Opening file \"" + file + "\" failed", e);
+            throw new WebApplicationException(new RuntimeException("Opening file \"" + file + "\" failed", e));
         }
     }
 
