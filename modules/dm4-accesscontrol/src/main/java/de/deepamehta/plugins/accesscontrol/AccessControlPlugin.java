@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.accesscontrol;
 
-import de.deepamehta.plugins.accesscontrol.model.Permission;
+import de.deepamehta.plugins.accesscontrol.model.Operation;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.plugins.accesscontrol.model.Role;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
@@ -54,27 +54,19 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     private static final String DEFAULT_PASSWORD = "";
     private static final String ENCRYPTED_PASSWORD_PREFIX = "-SHA256-";  // don't change this
 
-    private static final String OPERATION_WRITE_URI = "dm4.accesscontrol.operation_write";
-    private static final String OPERATION_CREATE_URI = "dm4.accesscontrol.operation_create";
-
     // association type semantics ### TODO: to be dropped. Model-driven manipulators required.
     private static final String WORKSPACE_MEMBERSHIP = "dm4.accesscontrol.membership";
     private static final String ROLE_TYPE_USER       = "dm4.core.default";
     private static final String ROLE_TYPE_WORKSPACE  = "dm4.core.default";
 
-    private static enum RelationType {
-        TOPIC_CREATOR,      // Creator of a topic.    Direction is from topic to user.
-        TOPIC_OWNER,        // Owner of a topic.      Direction is from topic to user.
-        ACCESS_CONTROL,     // ACL of a topic.        Direction is from topic to role.
-        WORKSPACE_MEMBER    // Member of a workspace. Direction is from workspace to user.
-    }
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private static final Permissions DEFAULT_CREATOR_PERMISSIONS = new Permissions();
+    private static final Permissions DEFAULT_TOPIC_PERMISSIONS = new Permissions();
+    private static final Permissions DEFAULT_TYPE_PERMISSIONS  = new Permissions();
     static {
-        DEFAULT_CREATOR_PERMISSIONS.add(Permission.WRITE, true);
-        DEFAULT_CREATOR_PERMISSIONS.add(Permission.CREATE, true);
+        DEFAULT_TOPIC_PERMISSIONS.add(Operation.WRITE, true);
+        DEFAULT_TYPE_PERMISSIONS.add(Operation.WRITE, true);
+        DEFAULT_TYPE_PERMISSIONS.add(Operation.CREATE, true);
     }
 
     private FacetsService facetsService;
@@ -120,9 +112,9 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     // ---
 
     @GET
-    @Path("/owner/{userId}/{typeUri}")
+    @Path("/owner/{userId}/{type_uri}")
     @Override
-    public Topic getOwnedTopic(@PathParam("userId") long userId, @PathParam("typeUri") String typeUri) {
+    public Topic getOwnedTopic(@PathParam("userId") long userId, @PathParam("type_uri") String typeUri) {
         /* ### TODO: adapt to DM4
         List<RelatedTopic> topics = dms.getRelatedTopics(userId, asList(typeUri),
             asList(RelationType.TOPIC_OWNER.name() + ";OUTGOING"), null);
@@ -139,32 +131,36 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     }
 
     @POST
-    @Path("/topic/{topicId}/owner/{userId}")
+    @Path("/topic/{topic_id}/owner/{user_id}")
     @Override
-    public void setOwner(@PathParam("topicId") long topicId, @PathParam("userId") long userId) {
+    public void setOwner(@PathParam("topic_id") long topicId, @PathParam("user_id") long userId) {
         dms.getTopic(topicId, false, null).setCompositeValue(new CompositeValue().put("dm4.accesscontrol.owner",
             new CompositeValue().put("dm4.accesscontrol.user_account", "ref_id:" + userId)), null, null);
-        // ### FIXME: "ref_id:" not expanded by put(). TODO: Add a put_ref method().
+        // ### FIXME: "ref_id:" not expanded by put(). TODO: Add a put_ref() method to CompositeValue.
     }
 
     // ---
 
     @POST
-    @Path("/topic/{topicId}/role/{role}")
+    @Path("/topic/{topic_id}/role/{role_uri}")
     @Override
-    public void createACLEntry(@PathParam("topicId") long topicId, @PathParam("role") Role role,
-                                                                                      Permissions permissions) {
-        /* ### TODO: adapt to DM4
-        dms.createRelation(RelationType.ACCESS_CONTROL.name(), topicId, getRoleTopic(role).id,
-                           new Properties(permissions)); */
+    public void createACLEntry(@PathParam("topic_id") long topicId, @PathParam("role_uri") Role role,
+                                                                                           Permissions permissions) {
+        createACLEntry(dms.getTopic(topicId, false, null), role, permissions);
+    }
+
+    @Override
+    public void createACLEntry(Topic topic, Role role, Permissions permissions) {
+        TopicModel aclEntry = aclEntry(role, permissions);
+        facetsService.updateFacets(topic, "dm4.accesscontrol.acl_facet", asList(aclEntry), null, null);
     }
 
     // ---
 
     @POST
-    @Path("/user/{userId}/{workspaceId}")
+    @Path("/user/{user_id}/{workspace_id}")
     @Override
-    public void joinWorkspace(@PathParam("workspaceId") long workspaceId, @PathParam("userId") long userId) {
+    public void joinWorkspace(@PathParam("workspace_id") long workspaceId, @PathParam("user_id") long userId) {
         dms.createAssociation(new AssociationModel(WORKSPACE_MEMBERSHIP,
             new TopicRoleModel(userId, ROLE_TYPE_USER),
             new TopicRoleModel(workspaceId, ROLE_TYPE_WORKSPACE)), null);
@@ -204,17 +200,19 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         }
     }
 
-    // Note: we must use the postCreateHook to create the relation because at pre_create the topic has no ID yet.
     @Override
     public void postCreateHook(Topic topic, ClientState clientState, Directives directives) {
-        /* check precondition 4
-        if (topic.id == user.id) {
-            logger.warning(topic + " can't be related to user \"" + username + "\" (the topic is the user itself!)");
+        // ### TODO: explain
+        if (topic.getTypeUri().equals("dm4.accesscontrol.acl_entry")  ||
+            topic.getTypeUri().equals("dm4.accesscontrol.role")       ||    // ### needed?
+            topic.getTypeUri().equals("dm4.accesscontrol.permission") ||
+            topic.getTypeUri().equals("dm4.accesscontrol.operation")  ||    // ### needed?
+            topic.getTypeUri().equals("dm4.accesscontrol.allowed")) {
             return;
-        }*/
+        }
         //
         setCreator(topic, clientState);
-        createACLEntry(topic.getId(), Role.CREATOR, DEFAULT_CREATOR_PERMISSIONS);
+        createACLEntry(topic, Role.CREATOR, DEFAULT_TOPIC_PERMISSIONS);
     }
 
     /* ### TODO: adapt to DM4
@@ -268,16 +266,20 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         logger.info("### Enriching topic " + topic.getId() + " with its permissions");
         Topic user = getUserAccount(clientState);
         enrichWithPermissions(topic,
-            hasPermission(user, OPERATION_WRITE_URI, topic));
+            hasPermission(user, Operation.WRITE, topic));
     }
 
     @Override
     public void postFetchTopicTypeHook(TopicType topicType, ClientState clientState, Directives directives) {
         String typeUri = topicType.getUri();
         // Note: there are 2 types whose permissions must be set manually as they can't be calculated the usual way:
-        // - "Access Control List Facet": endless recursion would occur.
+        // - "Access Control List Facet": endless recursion would occur. ### FIXDOC
         // - "Meta Meta Type": doesn't exist in DB. Retrieving its ACL would fail.
-        if (typeUri.equals("dm4.accesscontrol.acl_facet") || typeUri.equals("dm4.core.meta_meta_type")) {
+        if (typeUri.equals("dm4.accesscontrol.acl_facet")    ||
+            typeUri.equals("dm4.accesscontrol.acl_entry")    ||
+            typeUri.equals("dm4.accesscontrol.user_account") ||
+            typeUri.equals("dm4.accesscontrol.username")     ||
+            typeUri.equals("dm4.accesscontrol.password")     || typeUri.equals("dm4.core.meta_meta_type")) {
             enrichWithPermissions(topicType, false, false);     // write=false, create=false
             return;
         }
@@ -285,8 +287,8 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         logger.info("### Enriching topic type \"" + typeUri + "\" with its permissions");
         Topic user = getUserAccount(clientState);
         enrichWithPermissions(topicType,
-            hasPermission(user, OPERATION_WRITE_URI, topicType),
-            hasPermission(user, OPERATION_CREATE_URI, topicType));
+            hasPermission(user, Operation.WRITE, topicType),
+            hasPermission(user, Operation.CREATE, topicType));
     }
 
 
@@ -387,12 +389,12 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     /**
      * Returns true if the user is allowed to perform an operation on a topic.
      */
-    private boolean hasPermission(Topic user, String operationUri, Topic topic) {
-        logger.fine("Determining permission of user " + user + " to \"" + operationUri + "\" " + topic);
+    private boolean hasPermission(Topic user, Operation operation, Topic topic) {
+        logger.fine("Determining permission of user " + user + " to " + operation + " " + topic);
         for (RelatedTopic aclEntry : getACLEntries(topic)) {
             String roleUri = aclEntry.getCompositeValue().getTopic("dm4.accesscontrol.role").getUri();
             logger.fine("There is an ACL entry for role \"" + roleUri + "\"");
-            boolean allowedForRole = getAllowed(aclEntry, operationUri);
+            boolean allowedForRole = getAllowed(aclEntry, operation);
             logger.fine("value=" + allowedForRole);
             if (allowedForRole && userOccupiesRole(topic, user, roleUri)) {
                 logger.fine("=> ALLOWED");
@@ -478,9 +480,9 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         return facetsService.getFacets(topic, "dm4.accesscontrol.acl_facet");
     }
 
-    private boolean getAllowed(Topic aclEntry, String operationUri) {
+    private boolean getAllowed(Topic aclEntry, Operation operation) {
         for (TopicModel permission : aclEntry.getCompositeValue().getTopics("dm4.accesscontrol.permission")) {
-            if (permission.getCompositeValue().getTopic("dm4.accesscontrol.operation").getUri().equals(operationUri)) {
+            if (permission.getCompositeValue().getTopic("dm4.accesscontrol.operation").getUri().equals(operation.uri)) {
                 return permission.getCompositeValue().getBoolean("dm4.accesscontrol.allowed");
             }
         }
@@ -521,7 +523,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     private boolean isMemberOfWorkspace(long userId, long workspaceId) {
         return dms.getAssociation(WORKSPACE_MEMBERSHIP, userId, workspaceId,
-            ROLE_TYPE_USER, ROLE_TYPE_WORKSPACE) != null;
+            ROLE_TYPE_USER, ROLE_TYPE_WORKSPACE, false, null) != null;  // fetchComposite=false
     }
 
     // ---
@@ -540,16 +542,23 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     // ---
 
+    private TopicModel aclEntry(Role role, Permissions permissions) {
+        return new TopicModel("dm4.accesscontrol.acl_entry", new CompositeValue()
+            .put("dm4.accesscontrol.role", role.uri)
+            .put("dm4.accesscontrol.permission", permissions.asTopics()));
+    }
+
+    // ---
+
     private CompositeValue permissions(boolean write) {
         CompositeValue permissions = new CompositeValue();
-        permissions.put(OPERATION_WRITE_URI, write);
+        permissions.put(Operation.WRITE.uri, write);
         return permissions;
     }
 
     private CompositeValue permissions(boolean write, boolean create) {
-        CompositeValue permissions = new CompositeValue();
-        permissions.put(OPERATION_WRITE_URI, write);
-        permissions.put(OPERATION_CREATE_URI, create);
+        CompositeValue permissions = permissions(write);
+        permissions.put(Operation.CREATE.uri, create);
         return permissions;
     }
 }

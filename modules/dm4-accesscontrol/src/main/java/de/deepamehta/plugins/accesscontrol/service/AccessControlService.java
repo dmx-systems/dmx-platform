@@ -23,6 +23,7 @@ public interface AccessControlService extends PluginService {
     // ---
 
     void createACLEntry(long topicId, Role role, Permissions permissions);
+    void createACLEntry(Topic topic,  Role role, Permissions permissions);
 
     // ---
 
