@@ -7,6 +7,7 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -37,6 +38,8 @@ public interface FacetsService extends PluginService {
 
     void addFacetTypeToTopic(long topicId, String facetTypeUri);
 
+    // ---
+
     /**
      * Updates a topic facet.
      *
@@ -46,4 +49,14 @@ public interface FacetsService extends PluginService {
      */
     void updateFacet(Topic topic, String facetTypeUri, TopicModel facet, ClientState clientState,
                                                                          Directives directives);
+
+    /**
+     * Updates a topic multi-facet.
+     *
+     * @param   topic           The facetted topic.
+     * @param   facetTypeUri    URI of the facet type.
+     * @param   facets          The new facet values.
+     */
+    void updateFacets(Topic topic, String facetTypeUri, List<TopicModel> facets, ClientState clientState,
+                                                                                 Directives directives);
 }
