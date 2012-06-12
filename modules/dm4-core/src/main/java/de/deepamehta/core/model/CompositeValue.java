@@ -24,7 +24,8 @@ public class CompositeValue {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String REF_PREFIX = "ref_id:";
+    private static final String REF_ID_PREFIX = "ref_id:";
+    private static final String REF_URI_PREFIX = "ref_uri:";
     private static final String DEL_PREFIX = "del_id:";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -189,6 +190,18 @@ public class CompositeValue {
 
     // ---
 
+    public CompositeValue put_ref(String key, long refTopicId) {
+        put(key, new TopicModel(refTopicId, key));
+        return this;
+    }
+
+    public CompositeValue put_ref(String key, String refTopicUri) {
+        put(key, new TopicModel(refTopicUri, key));
+        return this;
+    }
+
+    // ---
+
     public boolean has(String key) {
         return values.containsKey(key);
     }
@@ -325,14 +338,12 @@ public class CompositeValue {
             // compact format (simple topic or topic reference)
             if (value instanceof String) {
                 String val = (String) value;
-                if (val.startsWith(REF_PREFIX)) {
-                    // topic reference
-                    long refTopicId = refTopicId(val, REF_PREFIX);
-                    return new TopicModel(refTopicId, key);
+                if (val.startsWith(REF_ID_PREFIX)) {
+                    return new TopicModel(refTopicId(val), key);    // topic reference by-ID
+                } else if (val.startsWith(REF_URI_PREFIX)) {
+                    return new TopicModel(refTopicUri(val), key);   // topic reference by-URI
                 } else if (val.startsWith(DEL_PREFIX)) {
-                    // topic deletion reference
-                    long refTopicId = refTopicId(val, DEL_PREFIX);
-                    return new TopicDeletionModel(refTopicId);
+                    return new TopicDeletionModel(delTopicId(val)); // topic deletion reference
                 }
             }
             // compact format (simple topic)
@@ -340,9 +351,21 @@ public class CompositeValue {
         }
     }
 
-    private long refTopicId(String val, String prefix) {
-        return Long.parseLong(val.substring(prefix.length()));
+    // ---
+
+    private long refTopicId(String val) {
+        return Long.parseLong(val.substring(REF_ID_PREFIX.length()));
     }
+
+    private String refTopicUri(String val) {
+        return val.substring(REF_URI_PREFIX.length());
+    }
+
+    private long delTopicId(String val) {
+        return Long.parseLong(val.substring(DEL_PREFIX.length()));
+    }
+
+    // ---
 
     private void throwInvalidAccess(String key, ClassCastException e) {
         if (e.getMessage().equals("de.deepamehta.core.model.TopicModel cannot be cast to java.util.List")) {

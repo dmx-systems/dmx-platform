@@ -44,6 +44,10 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
         this(null, typeUri, composite);
     }
 
+    public DeepaMehtaObjectModel(String uri, String typeUri) {
+        this(-1, uri, typeUri, null, null);
+    }
+
     public DeepaMehtaObjectModel(String uri, String typeUri, SimpleValue value) {
         this(-1, uri, typeUri, value, null);
     }

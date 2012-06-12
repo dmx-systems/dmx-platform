@@ -20,6 +20,10 @@ public class TopicModel extends DeepaMehtaObjectModel {
         super(typeUri, composite);
     }
 
+    public TopicModel(String uri, String typeUri) {
+        super(uri, typeUri);
+    }
+
     public TopicModel(String uri, String typeUri, SimpleValue value) {
         super(uri, typeUri, value);
     }
