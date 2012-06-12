@@ -35,7 +35,7 @@ public class Permissions extends HashMap<String, Boolean> {
         List<TopicModel> permissions = new ArrayList();
         for (String operationUri : keySet()) {
             TopicModel permission = new TopicModel("dm4.accesscontrol.permission", new CompositeValue()
-                .put("dm4.accesscontrol.operation", operationUri)   // ### FIXME: put_ref
+                .put_ref("dm4.accesscontrol.operation", operationUri)
                 .put("dm4.accesscontrol.allowed", get(operationUri))
             );
             permissions.add(permission);

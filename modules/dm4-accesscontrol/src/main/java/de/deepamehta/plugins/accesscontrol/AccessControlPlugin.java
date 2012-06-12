@@ -134,9 +134,8 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     @Path("/topic/{topic_id}/owner/{user_id}")
     @Override
     public void setOwner(@PathParam("topic_id") long topicId, @PathParam("user_id") long userId) {
-        dms.getTopic(topicId, false, null).setCompositeValue(new CompositeValue().put("dm4.accesscontrol.owner",
-            new CompositeValue().put("dm4.accesscontrol.user_account", "ref_id:" + userId)), null, null);
-        // ### FIXME: "ref_id:" not expanded by put(). TODO: Add a put_ref() method to CompositeValue.
+        Topic topic = dms.getTopic(topicId, false, null);
+        facetsService.updateFacet(topic, "dm4.accesscontrol.owner_facet", owner(userId), null, null);
     }
 
     // ---
@@ -263,7 +262,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     @Override
     public void postFetchTopicHook(Topic topic, ClientState clientState, Directives directives) {
-        logger.info("### Enriching topic " + topic.getId() + " with its permissions");
+        logger.info("### Enriching " + info(topic) + " with its permissions (clientState=" + clientState + ")");
         Topic user = getUserAccount(clientState);
         enrichWithPermissions(topic,
             hasPermission(user, Operation.WRITE, topic));
@@ -368,9 +367,8 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     }
 
     private void setCreator(long topicId, long userId) {
-        dms.getTopic(topicId, false, null).setCompositeValue(new CompositeValue().put("dm4.accesscontrol.creator",
-            new CompositeValue().put("dm4.accesscontrol.user_account", "ref_id:" + userId)), null, null);
-        // ### FIXME: "ref_id:" not expanded by put(). TODO: Add a put_ref method().
+        Topic topic = dms.getTopic(topicId, false, null);
+        facetsService.updateFacet(topic, "dm4.accesscontrol.creator_facet", creator(userId), null, null);
     }
 
     // === ACL Entries ===
@@ -390,7 +388,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
      * Returns true if the user is allowed to perform an operation on a topic.
      */
     private boolean hasPermission(Topic user, Operation operation, Topic topic) {
-        logger.fine("Determining permission of user " + user + " to " + operation + " " + topic);
+        logger.fine("Determining permission of " + user(user) + " to " + operation + " " + info(topic));
         for (RelatedTopic aclEntry : getACLEntries(topic)) {
             String roleUri = aclEntry.getCompositeValue().getTopic("dm4.accesscontrol.role").getUri();
             logger.fine("There is an ACL entry for role \"" + roleUri + "\"");
@@ -542,10 +540,23 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     // ---
 
+    private TopicModel creator(long userId) {
+        return new TopicModel("dm4.accesscontrol.creator", new CompositeValue()
+            .put_ref("dm4.accesscontrol.user_account", userId)
+        );
+    }
+
+    private TopicModel owner(long userId) {
+        return new TopicModel("dm4.accesscontrol.owner", new CompositeValue()
+            .put_ref("dm4.accesscontrol.user_account", userId)
+        );
+    }
+
     private TopicModel aclEntry(Role role, Permissions permissions) {
         return new TopicModel("dm4.accesscontrol.acl_entry", new CompositeValue()
-            .put("dm4.accesscontrol.role", role.uri)
-            .put("dm4.accesscontrol.permission", permissions.asTopics()));
+            .put_ref("dm4.accesscontrol.role", role.uri)
+            .put("dm4.accesscontrol.permission", permissions.asTopics())
+        );
     }
 
     // ---
@@ -560,5 +571,22 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         CompositeValue permissions = permissions(write);
         permissions.put(Operation.CREATE.uri, create);
         return permissions;
+    }
+
+    // === Logging ===
+
+    private String user(Topic topic) {
+        if (topic == null) {
+            return "user <anonymous>";
+        }
+        return "user \"" + topic.getSimpleValue() + "\" (id=" + topic.getId() + ", typeUri=\"" + topic.getTypeUri() +
+            "\")";
+    }
+
+    private String info(Topic topic) {
+        if (topic == null) {
+            return "topic <null>";
+        }
+        return "topic " + topic.getId() + " (typeUri=\"" + topic.getTypeUri() + "\", uri=\"" + topic.getUri() + "\")";
     }
 }
