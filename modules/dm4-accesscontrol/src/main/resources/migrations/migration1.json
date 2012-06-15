@@ -122,7 +122,7 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:   "dm4.accesscontrol.user_account",
+                    part_topic_type_uri:   "dm4.accesscontrol.username",
                     part_cardinality_uri:  "dm4.core.one",
                     whole_cardinality_uri: "dm4.core.many",
                     assoc_type_uri:        "dm4.core.aggregation_def"
@@ -135,7 +135,7 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:   "dm4.accesscontrol.user_account",
+                    part_topic_type_uri:   "dm4.accesscontrol.username",
                     part_cardinality_uri:  "dm4.core.one",
                     whole_cardinality_uri: "dm4.core.many",
                     assoc_type_uri:        "dm4.core.aggregation_def"

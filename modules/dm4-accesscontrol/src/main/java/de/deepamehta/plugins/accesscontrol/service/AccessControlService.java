@@ -12,7 +12,12 @@ public interface AccessControlService extends PluginService {
 
     Topic lookupUserAccount(String username);
 
-    Topic getUserAccount(ClientState clientState);
+    /**
+     * Returns the username that is represented by the client state, or <code>null</code> if no user is logged in.
+     *
+     * @return  a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
+     */
+    Topic getUsername(ClientState clientState);
 
     // ---
 

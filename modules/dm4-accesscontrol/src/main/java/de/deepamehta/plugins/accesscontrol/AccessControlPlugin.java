@@ -92,13 +92,10 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         return getUserAccount(username);
     }
 
-    /**
-     * Returns the user that is represented by the client state, or <code>null</code> if no user is logged in.
-     */
     @GET
     @Path("/user")
     @Override
-    public Topic getUserAccount(@HeaderParam("Cookie") ClientState clientState) {
+    public Topic getUsername(@HeaderParam("Cookie") ClientState clientState) {
         if (clientState == null) {      // some callers to dms.getTopic() doesn't pass a client state
             return null;
         }
@@ -106,7 +103,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         if (username == null) {
             return null;
         }
-        return getUserAccount(username);
+        return getUsername(username);
     }
 
     // ---
@@ -130,6 +127,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         return null;
     }
 
+    // ### FIXME: ref username instead of user account
     @POST
     @Path("/topic/{topic_id}/owner/{user_id}")
     @Override
@@ -175,8 +173,8 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     @Override
     public void postInstallPluginHook() {
-        Topic user = createUserAccount(DEFAULT_USERNAME, DEFAULT_PASSWORD);
-        logger.info("Creating \"admin\" user account => ID=" + user.getId());
+        Topic userAccount = createUserAccount(DEFAULT_USERNAME, DEFAULT_PASSWORD);
+        logger.info("Creating \"admin\" user account => ID=" + userAccount.getId());
     }
 
     @Override
@@ -202,11 +200,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     @Override
     public void postCreateHook(Topic topic, ClientState clientState, Directives directives) {
         // ### TODO: explain
-        if (topic.getTypeUri().equals("dm4.accesscontrol.acl_entry")  ||
-            topic.getTypeUri().equals("dm4.accesscontrol.role")       ||    // ### needed?
-            topic.getTypeUri().equals("dm4.accesscontrol.permission") ||
-            topic.getTypeUri().equals("dm4.accesscontrol.operation")  ||    // ### needed?
-            topic.getTypeUri().equals("dm4.accesscontrol.allowed")) {
+        if (isPluginTopic(topic)) {
             return;
         }
         //
@@ -262,32 +256,33 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     @Override
     public void postFetchTopicHook(Topic topic, ClientState clientState, Directives directives) {
+        // ### TODO: explain
+        if (isPluginTopic(topic)) {
+            enrichWithPermissions(topic, false);    // write=false
+            return;
+        }
+        //
         logger.info("### Enriching " + info(topic) + " with its permissions (clientState=" + clientState + ")");
-        Topic user = getUserAccount(clientState);
+        Topic username = getUsername(clientState);
         enrichWithPermissions(topic,
-            hasPermission(user, Operation.WRITE, topic));
+            hasPermission(username, Operation.WRITE, topic));
     }
 
     @Override
     public void postFetchTopicTypeHook(TopicType topicType, ClientState clientState, Directives directives) {
-        String typeUri = topicType.getUri();
         // Note: there are 2 types whose permissions must be set manually as they can't be calculated the usual way:
         // - "Access Control List Facet": endless recursion would occur. ### FIXDOC
         // - "Meta Meta Type": doesn't exist in DB. Retrieving its ACL would fail.
-        if (typeUri.equals("dm4.accesscontrol.acl_facet")    ||
-            typeUri.equals("dm4.accesscontrol.acl_entry")    ||
-            typeUri.equals("dm4.accesscontrol.user_account") ||
-            typeUri.equals("dm4.accesscontrol.username")     ||
-            typeUri.equals("dm4.accesscontrol.password")     || typeUri.equals("dm4.core.meta_meta_type")) {
+        if (isPluginType(topicType) || topicType.getUri().equals("dm4.core.meta_meta_type")) {
             enrichWithPermissions(topicType, false, false);     // write=false, create=false
             return;
         }
         //
-        logger.info("### Enriching topic type \"" + typeUri + "\" with its permissions");
-        Topic user = getUserAccount(clientState);
+        logger.info("### Enriching topic type \"" + topicType.getUri() + "\" with its permissions");
+        Topic username = getUsername(clientState);
         enrichWithPermissions(topicType,
-            hasPermission(user, Operation.WRITE, topicType),
-            hasPermission(user, Operation.CREATE, topicType));
+            hasPermission(username, Operation.WRITE, topicType),
+            hasPermission(username, Operation.CREATE, topicType));
     }
 
 
@@ -305,10 +300,10 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     /**
      * Returns a user account by username, or <code>null</code> if no such user account exists.
      *
-     * @return  a Topic of type <code>dm4.accesscontrol.user_account</code>.
+     * @return  a Topic of type "User Account" (<code>dm4.accesscontrol.user_account</code>).
      */
     private Topic getUserAccount(String username) {
-        Topic userName = dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username), false, null);
+        Topic userName = getUsername(username);
         if (userName == null) {
             return null;
         }
@@ -316,12 +311,27 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
             "dm4.accesscontrol.user_account", true, false, null);  // fetchComposite=true, fetchRelatingComposite=false
     }
 
+    /**
+     * Returns the "Username" topic that corresponds to a username, or <code>null</code> if no such username exists.
+     *
+     * @return  a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
+     */
+    private Topic getUsername(String username) {
+        return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username), false, null);
+    }
+
+    /**
+     * Returns the "Username" topic that corresponds to the "admin" user.
+     * If the "admin" user doesn't exist an exception is thrown.
+     *
+     * @return  a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
+     */
     private Topic getAdminUser() {
-        Topic user = getUserAccount(DEFAULT_USERNAME);
-        if (user == null) {
+        Topic username = getUsername(DEFAULT_USERNAME);
+        if (username == null) {
             throw new RuntimeException("The \"" + DEFAULT_USERNAME + "\" user doesn't exist");
         }
-        return user;
+        return username;
     }
 
     // ---
@@ -357,18 +367,18 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     // ---
 
     private void setCreator(Topic topic, ClientState clientState) {
-        Topic user = getUserAccount(clientState);
-        if (user == null) {
+        Topic username = getUsername(clientState);
+        if (username == null) {
             logger.warning("Assigning a creator to " + topic + " failed (no user is logged in). " +
                 "Assigning user \"admin\" instead.");
-            user = getAdminUser();
+            username = getAdminUser();
         }
-        setCreator(topic.getId(), user.getId());
+        setCreator(topic.getId(), username.getId());
     }
 
-    private void setCreator(long topicId, long userId) {
+    private void setCreator(long topicId, long usernameId) {
         Topic topic = dms.getTopic(topicId, false, null);
-        facetsService.updateFacet(topic, "dm4.accesscontrol.creator_facet", creator(userId), null, null);
+        facetsService.updateFacet(topic, "dm4.accesscontrol.creator_facet", creator(usernameId), null, null);
     }
 
     // === ACL Entries ===
@@ -387,14 +397,14 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     /**
      * Returns true if the user is allowed to perform an operation on a topic.
      */
-    private boolean hasPermission(Topic user, Operation operation, Topic topic) {
-        logger.fine("Determining permission of " + user(user) + " to " + operation + " " + info(topic));
+    private boolean hasPermission(Topic username, Operation operation, Topic topic) {
+        logger.fine("Determining permission for " + userInfo(username) + " to " + operation + " " + info(topic));
         for (RelatedTopic aclEntry : getACLEntries(topic)) {
             String roleUri = aclEntry.getCompositeValue().getTopic("dm4.accesscontrol.role").getUri();
             logger.fine("There is an ACL entry for role \"" + roleUri + "\"");
             boolean allowedForRole = getAllowed(aclEntry, operation);
             logger.fine("value=" + allowedForRole);
-            if (allowedForRole && userOccupiesRole(topic, user, roleUri)) {
+            if (allowedForRole && userOccupiesRole(topic, username, roleUri)) {
                 logger.fine("=> ALLOWED");
                 return true;
             }
@@ -403,26 +413,26 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         return false;
     }
 
-    private boolean userOccupiesRole(Topic topic, Topic user, String roleUri) {
+    private boolean userOccupiesRole(Topic topic, Topic username, String roleUri) {
         //
         if (roleUri.equals("dm4.accesscontrol.role_everyone")) {
             return true;
         }
         //
-        if (user == null) {
+        if (username == null) {
             return false;
         }
         //
         if (roleUri.equals("dm4.accesscontrol.role_member")) {
-            if (userIsMember(user, topic)) {
+            if (userIsMember(username, topic)) {
                 return true;
             }
         } else if (roleUri.equals("dm4.accesscontrol.role_owner")) {
-            if (userIsOwner(user, topic)) {
+            if (userIsOwner(username, topic)) {
                 return true;
             }
         } else if (roleUri.equals("dm4.accesscontrol.role_creator")) {
-            if (userIsCreator(user, topic)) {
+            if (userIsCreator(username, topic)) {
                 return true;
             }
         } else {
@@ -440,15 +450,15 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
      *
      * @param   topic   actually a topic type.
      */
-    private boolean userIsMember(Topic user, Topic topic) {
+    private boolean userIsMember(Topic username, Topic topic) {
         Set<RelatedTopic> workspaces = wsService.getWorkspaces(topic.getId());
         logger.fine("Topic type \"" + topic.getUri() + "\" is assigned to " + workspaces.size() + " workspaces");
         for (RelatedTopic workspace : workspaces) {
-            if (isMemberOfWorkspace(user.getId(), workspace.getId())) {
-                logger.fine("User " + user + " IS member of workspace " + workspace);
+            if (isMemberOfWorkspace(username.getId(), workspace.getId())) {
+                logger.fine("User " + username + " IS member of workspace " + workspace);
                 return true;
             } else {
-                logger.fine("User " + user + " is NOT member of workspace " + workspace);
+                logger.fine("User " + username + " is NOT member of workspace " + workspace);
             }
         }
         return false;
@@ -457,19 +467,19 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     /**
      * Returns true if the user is the owner of the topic.
      */
-    private boolean userIsOwner(Topic user, Topic topic) {
+    private boolean userIsOwner(Topic username, Topic topic) {
         Topic owner = getOwner(topic);
         logger.fine("The owner is " + owner);
-        return owner != null && user.getId() == owner.getId();
+        return owner != null && username.getId() == owner.getId();
     }
 
     /**
      * Returns true if the user is the creator of the topic.
      */
-    private boolean userIsCreator(Topic user, Topic topic) {
+    private boolean userIsCreator(Topic username, Topic topic) {
         Topic creator = getCreator(topic);
         logger.fine("The creator is " + creator);
-        return creator != null && user.getId() == creator.getId();
+        return creator != null && username.getId() == creator.getId();
     }
 
     // ---
@@ -492,7 +502,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     /**
      * Returns the creator of a topic, or <code>null</code> if no creator is set.
      *
-     * @return  a Topic of type <code>dm4.accesscontrol.user_account</code>.
+     * @return  a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
      */
     private Topic getCreator(Topic topic) {
         Topic creator = facetsService.getFacet(topic, "dm4.accesscontrol.creator_facet");
@@ -500,13 +510,13 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
             return null;
         }
         return creator.getRelatedTopic("dm4.core.aggregation", "dm4.core.whole", "dm4.core.part",
-            "dm4.accesscontrol.user_account", true, false, null);  // fetchComposite=true, fetchRelatingComposite=false
+            "dm4.accesscontrol.username", false, false, null);  // fetchComposite=false, fetchRelatingComposite=false
     }
 
     /**
      * Returns the owner of a topic, or <code>null</code> if no owner is set.
      *
-     * @return  a Topic of type <code>dm4.accesscontrol.user_account</code>.
+     * @return  a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
      */
     private Topic getOwner(Topic topic) {
         Topic owner = facetsService.getFacet(topic, "dm4.accesscontrol.owner_facet");
@@ -514,7 +524,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
             return null;
         }
         return owner.getRelatedTopic("dm4.core.aggregation", "dm4.core.whole", "dm4.core.part",
-            "dm4.accesscontrol.user_account", true, false, null);  // fetchComposite=true, fetchRelatingComposite=false
+            "dm4.accesscontrol.username", false, false, null);  // fetchComposite=false, fetchRelatingComposite=false
     }
 
     // ---
@@ -540,12 +550,13 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     // ---
 
-    private TopicModel creator(long userId) {
+    private TopicModel creator(long usernameId) {
         return new TopicModel("dm4.accesscontrol.creator", new CompositeValue()
-            .put_ref("dm4.accesscontrol.user_account", userId)
+            .put_ref("dm4.accesscontrol.username", usernameId)
         );
     }
 
+    // ### FIXME: ref username instead of user account
     private TopicModel owner(long userId) {
         return new TopicModel("dm4.accesscontrol.owner", new CompositeValue()
             .put_ref("dm4.accesscontrol.user_account", userId)
@@ -573,9 +584,19 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         return permissions;
     }
 
+    // ---
+
+    private boolean isPluginTopic(Topic topic) {
+        return topic.getTypeUri().startsWith("dm4.accesscontrol.");
+    }
+
+    private boolean isPluginType(TopicType type) {
+        return type.getUri().startsWith("dm4.accesscontrol.");
+    }
+
     // === Logging ===
 
-    private String user(Topic topic) {
+    private String userInfo(Topic topic) {
         if (topic == null) {
             return "user <anonymous>";
         }
