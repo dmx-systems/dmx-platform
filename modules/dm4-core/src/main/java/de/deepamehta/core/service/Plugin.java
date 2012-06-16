@@ -433,7 +433,7 @@ public class Plugin implements BundleActivator, EventHandler {
             registerPluginService();
             registerWebResources();             // relies on HttpService
             registerRestResources();            // relies on HttpService and DeepaMehtaService (and registered plugin)
-            logger.info("----- Completing initialization of " + this + " -----");
+            logger.info("----- Initialization of " + this + " complete -----");
             // ### FIXME: should we call registerPlugin() at last?
             // Currently if e.g. registerPluginService() fails the plugin is still registered at the DeepaMehta core.
         } catch (Exception e) {
@@ -760,13 +760,13 @@ public class Plugin implements BundleActivator, EventHandler {
     }
 
     private void introduceTypesToPlugin() {
-        try {
-            for (String topicTypeUri : dms.getTopicTypeUris()) {
+        for (String topicTypeUri : dms.getTopicTypeUris()) {
+            try {
                 // trigger hook
                 modifyTopicTypeHook(dms.getTopicType(topicTypeUri, null), null);   // clientState=null (2x)
+            } catch (Exception e) {
+                throw new RuntimeException("Introducing topic type \"" + topicTypeUri + "\" to " + this + " failed", e);
             }
-        } catch (Exception e) {
-            throw new RuntimeException("Introducing topic types to " + this + " failed", e);
         }
     }
 }

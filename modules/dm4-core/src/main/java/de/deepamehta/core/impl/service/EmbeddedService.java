@@ -694,18 +694,18 @@ public class EmbeddedService implements DeepaMehtaService {
     public void checkAllPluginsReady() {
         Bundle[] bundles = bundleContext.getBundles();
         int plugins = 0;
-        int registered = 0;
+        int ready = 0;
         for (Bundle bundle : bundles) {
             if (isDeepaMehtaPlugin(bundle)) {
                 plugins++;
                 if (isPluginRegistered(bundle.getSymbolicName())) {
-                    registered++;
+                    ready++;
                 }
             }
         }
-        logger.info("### bundles total: " + bundles.length +
-            ", DM plugins: " + plugins + ", registered: " + registered);
-        if (plugins == registered) {
+        logger.info("### Bundles total: " + bundles.length +
+            ", DM plugins: " + plugins + ", ready: " + ready);
+        if (plugins == ready) {
             logger.info("########## All plugins ready ##########");
             triggerHook(Hook.ALL_PLUGINS_READY);
         }
