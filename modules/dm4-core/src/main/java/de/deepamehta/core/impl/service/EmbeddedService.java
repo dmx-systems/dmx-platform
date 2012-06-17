@@ -37,21 +37,6 @@ import de.deepamehta.core.util.JSONHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-
 import java.io.InputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -72,9 +57,6 @@ import java.util.logging.Logger;
 /**
  * Implementation of the DeepaMehta core service. Embeddable into Java applications.
  */
-@Path("/")
-@Consumes("application/json")
-@Produces("application/json")
 public class EmbeddedService implements DeepaMehtaService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -120,12 +102,8 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // === Topics ===
 
-    @GET
-    @Path("/topic/{id}")
     @Override
-    public AttachedTopic getTopic(@PathParam("id") long topicId,
-                                  @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite,
-                                  @HeaderParam("Cookie") ClientState clientState) {
+    public AttachedTopic getTopic(long topicId, boolean fetchComposite, ClientState clientState) {
         // logger.info("topicId=" + topicId + ", fetchComposite=" + fetchComposite);
         DeepaMehtaTransaction tx = beginTx();
         try {
@@ -134,18 +112,14 @@ public class EmbeddedService implements DeepaMehtaService {
             return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Retrieving topic " + topicId + " failed", e));
+            throw new RuntimeException("Retrieving topic " + topicId + " failed", e);
         } finally {
             tx.finish();
         }
     }
 
-    @GET
-    @Path("/topic/by_value/{key}/{value}")
     @Override
-    public AttachedTopic getTopic(@PathParam("key") String key, @PathParam("value") SimpleValue value,
-                                  @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite,
-                                  @HeaderParam("Cookie") ClientState clientState) {
+    public AttachedTopic getTopic(String key, SimpleValue value, boolean fetchComposite, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             TopicModel model = storage.getTopic(key, value);
@@ -154,20 +128,15 @@ public class EmbeddedService implements DeepaMehtaService {
             return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Retrieving topic failed (key=\"" + key +
-                "\", value=\"" + value + "\")", e));
+            throw new RuntimeException("Retrieving topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         } finally {
             tx.finish();
         }
     }
 
-    @GET
-    @Path("/topic/by_type/{type_uri}")
     @Override
-    public ResultSet<Topic> getTopics(@PathParam("type_uri") String typeUri,
-                                      @QueryParam("fetch_composite") @DefaultValue("false") boolean fetchComposite,
-                                      @QueryParam("max_result_size") int maxResultSize,
-                                      @HeaderParam("Cookie") ClientState clientState) {
+    public ResultSet<Topic> getTopics(String typeUri, boolean fetchComposite, int maxResultSize,
+                                                                              ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             ResultSet<Topic> topics = JSONHelper.toTopicSet(getTopicType(typeUri, clientState).getRelatedTopics(
@@ -182,20 +151,14 @@ public class EmbeddedService implements DeepaMehtaService {
             return topics;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Retrieving topics by type failed (typeUri=\"" +
-                typeUri + "\")", e));
+            throw new RuntimeException("Retrieving topics by type failed (typeUri=\"" + typeUri + "\")", e);
         } finally {
             tx.finish();
         }
     }
 
-    @GET
-    @Path("/topic")
     @Override
-    public Set<Topic> searchTopics(@QueryParam("search")    String searchTerm,
-                                   @QueryParam("field")     String fieldUri,
-                                   @QueryParam("wholeword") boolean wholeWord,
-                                   @HeaderParam("Cookie")   ClientState clientState) {
+    public Set<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             // ### FIXME: fetchComposite=false, parameterize it
@@ -204,18 +167,15 @@ public class EmbeddedService implements DeepaMehtaService {
             return topics;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Searching topics failed (searchTerm=\"" +
-                searchTerm + "\", fieldUri=\"" + fieldUri + "\", wholeWord=" + wholeWord + ", clientState=" +
-                clientState + ")", e));
+            throw new RuntimeException("Searching topics failed (searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
+                fieldUri + "\", wholeWord=" + wholeWord + ", clientState=" + clientState + ")", e);
         } finally {
             tx.finish();
         }
     }
 
-    @POST
-    @Path("/topic")
     @Override
-    public AttachedTopic createTopic(TopicModel model, @HeaderParam("Cookie") ClientState clientState) {
+    public AttachedTopic createTopic(TopicModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             triggerHook(Hook.PRE_CREATE_TOPIC, model, clientState);
@@ -231,16 +191,14 @@ public class EmbeddedService implements DeepaMehtaService {
             return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Creating topic failed (" + model + ")", e));
+            throw new RuntimeException("Creating topic failed (" + model + ")", e);
         } finally {
             tx.finish();
         }
     }
 
-    @PUT
-    @Path("/topic")
     @Override
-    public Directives updateTopic(TopicModel model, @HeaderParam("Cookie") ClientState clientState) {
+    public Directives updateTopic(TopicModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedTopic topic = getTopic(model.getId(), true, clientState);     // fetchComposite=true
@@ -252,16 +210,14 @@ public class EmbeddedService implements DeepaMehtaService {
             return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Updating topic failed (" + model + ")", e));
+            throw new RuntimeException("Updating topic failed (" + model + ")", e);
         } finally {
             tx.finish();
         }
     }
 
-    @DELETE
-    @Path("/topic/{id}")
     @Override
-    public Directives deleteTopic(@PathParam("id") long topicId, @HeaderParam("Cookie") ClientState clientState) {
+    public Directives deleteTopic(long topicId, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         Topic topic = null;
         try {
@@ -275,8 +231,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Deleting topic " + topicId + " failed (" +
-                topic + ")", e));
+            throw new RuntimeException("Deleting topic " + topicId + " failed (" + topic + ")", e);
         } finally {
             tx.finish();
         }
@@ -286,12 +241,8 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // === Associations ===
 
-    @GET
-    @Path("/association/{id}")
     @Override
-    public Association getAssociation(@PathParam("id") long assocId,
-                                      @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite,
-                                      @HeaderParam("Cookie") ClientState clientState) {
+    public Association getAssociation(long assocId, boolean fetchComposite, ClientState clientState) {
         logger.info("assocId=" + assocId + ", fetchComposite=" + fetchComposite + ", clientState=" + clientState);
         DeepaMehtaTransaction tx = beginTx();
         try {
@@ -300,20 +251,15 @@ public class EmbeddedService implements DeepaMehtaService {
             return assoc;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Retrieving association " + assocId + " failed", e));
+            throw new RuntimeException("Retrieving association " + assocId + " failed", e);
         } finally {
             tx.finish();
         }
     }
 
-    @GET
-    @Path("/association/{assoc_type_uri}/{topic1_id}/{topic2_id}/{role_type1_uri}/{role_type2_uri}")
     @Override
-    public Association getAssociation(@PathParam("assoc_type_uri") String assocTypeUri,
-                   @PathParam("topic1_id") long topic1Id, @PathParam("topic2_id") long topic2Id,
-                   @PathParam("role_type1_uri") String roleTypeUri1, @PathParam("role_type2_uri") String roleTypeUri2,
-                   @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite,
-                   @HeaderParam("Cookie") ClientState clientState) {
+    public Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                      String roleTypeUri2, boolean fetchComposite, ClientState clientState) {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\", fetchComposite=" +
             fetchComposite + ", clientState=" + clientState;
@@ -327,7 +273,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return assoc;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Retrieving association failed (" + info + ")", e));
+            throw new RuntimeException("Retrieving association failed (" + info + ")", e);
         } finally {
             tx.finish();
         }
@@ -335,20 +281,13 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ---
 
-    @GET
-    @Path("/association/multiple/{topic1_id}/{topic2_id}")
     @Override
-    public Set<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
-                                            @PathParam("topic2_id") long topic2Id) {
+    public Set<Association> getAssociations(long topic1Id, long topic2Id) {
         return getAssociations(topic1Id, topic2Id, null);
     }
 
-    @GET
-    @Path("/association/multiple/{topic1_id}/{topic2_id}/{assoc_type_uri}")
     @Override
-    public Set<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
-                                            @PathParam("topic2_id") long topic2Id,
-                                            @PathParam("assoc_type_uri") String assocTypeUri) {
+    public Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
         logger.info("topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", assocTypeUri=\"" + assocTypeUri + "\"");
         DeepaMehtaTransaction tx = beginTx();
         try {
@@ -358,8 +297,8 @@ public class EmbeddedService implements DeepaMehtaService {
             return assocs;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Retrieving associations between topics " +
-                topic1Id + " and " + topic2Id + " failed (assocTypeUri=\"" + assocTypeUri + "\")", e));
+            throw new RuntimeException("Retrieving associations between topics " + topic1Id + " and " + topic2Id +
+                " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
         } finally {
             tx.finish();
         }
@@ -367,10 +306,8 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ---
 
-    @POST
-    @Path("/association")
     @Override
-    public Association createAssociation(AssociationModel model, @HeaderParam("Cookie") ClientState clientState) {
+    public Association createAssociation(AssociationModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedAssociation assoc = new AttachedAssociation(model, this);
@@ -381,16 +318,14 @@ public class EmbeddedService implements DeepaMehtaService {
             return assoc;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Creating association failed (" + model + ")", e));
+            throw new RuntimeException("Creating association failed (" + model + ")", e);
         } finally {
             tx.finish();
         }
     }
 
-    @PUT
-    @Path("/association")
     @Override
-    public Directives updateAssociation(AssociationModel model, @HeaderParam("Cookie") ClientState clientState) {
+    public Directives updateAssociation(AssociationModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             Association assoc = getAssociation(model.getId(), false, null);     // fetchComposite=false
@@ -402,16 +337,14 @@ public class EmbeddedService implements DeepaMehtaService {
             return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Updating association failed (" + model + ")", e));
+            throw new RuntimeException("Updating association failed (" + model + ")", e);
         } finally {
             tx.finish();
         }
     }
 
-    @DELETE
-    @Path("/association/{id}")
     @Override
-    public Directives deleteAssociation(@PathParam("id") long assocId, @HeaderParam("Cookie") ClientState clientState) {
+    public Directives deleteAssociation(long assocId, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         Association assoc = null;
         try {
@@ -427,8 +360,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Deleting association " + assocId + " failed ("
-                + assoc + ")", e));
+            throw new RuntimeException("Deleting association " + assocId + " failed (" + assoc + ")", e);
         } finally {
             tx.finish();
         }
@@ -438,8 +370,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // === Topic Types ===
 
-    @GET
-    @Path("/topictype")
     @Override
     public Set<String> getTopicTypeUris() {
         try {
@@ -458,15 +388,12 @@ public class EmbeddedService implements DeepaMehtaService {
             }
             return topicTypeUris;
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Retrieving list of topic type URIs failed", e));
+            throw new RuntimeException("Retrieving list of topic type URIs failed", e);
         }
     }
 
-    @GET
-    @Path("/topictype/{uri}")
     @Override
-    public AttachedTopicType getTopicType(@PathParam("uri") String uri,
-                                          @HeaderParam("Cookie") ClientState clientState) {
+    public AttachedTopicType getTopicType(String uri, ClientState clientState) {
         if (uri == null) {
             throw new IllegalArgumentException("Tried to get a topic type with null URI");
         }
@@ -478,16 +405,14 @@ public class EmbeddedService implements DeepaMehtaService {
             return topicType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Retrieving topic type \"" + uri + "\" failed", e));
+            throw new RuntimeException("Retrieving topic type \"" + uri + "\" failed", e);
         } finally {
             tx.finish();
         }
     }
 
-    @POST
-    @Path("/topictype")
     @Override
-    public TopicType createTopicType(TopicTypeModel topicTypeModel, @HeaderParam("Cookie") ClientState clientState) {
+    public TopicType createTopicType(TopicTypeModel topicTypeModel, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedTopicType topicType = new AttachedTopicType(topicTypeModel, this);
@@ -503,17 +428,15 @@ public class EmbeddedService implements DeepaMehtaService {
             return topicType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Creating topic type \"" + topicTypeModel.getUri() +
-                "\" failed (" + topicTypeModel + ")", e));
+            throw new RuntimeException("Creating topic type \"" + topicTypeModel.getUri() + "\" failed (" +
+                topicTypeModel + ")", e);
         } finally {
             tx.finish();
         }
     }
 
-    @PUT
-    @Path("/topictype")
     @Override
-    public Directives updateTopicType(TopicTypeModel model, @HeaderParam("Cookie") ClientState clientState) {
+    public Directives updateTopicType(TopicTypeModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
@@ -527,7 +450,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Updating topic type failed (" + model + ")", e));
+            throw new RuntimeException("Updating topic type failed (" + model + ")", e);
         } finally {
             tx.finish();
         }
@@ -537,8 +460,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // === Association Types ===
 
-    @GET
-    @Path("/assoctype")
     @Override
     public Set<String> getAssociationTypeUris() {
         try {
@@ -551,16 +472,12 @@ public class EmbeddedService implements DeepaMehtaService {
             }
             return assocTypeUris;
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Retrieving list of association type URIs failed",
-                e));
+            throw new RuntimeException("Retrieving list of association type URIs failed", e);
         }
     }
 
-    @GET
-    @Path("/assoctype/{uri}")
     @Override
-    public AttachedAssociationType getAssociationType(@PathParam("uri") String uri,
-                                                      @HeaderParam("Cookie") ClientState clientState) {
+    public AttachedAssociationType getAssociationType(String uri, ClientState clientState) {
         if (uri == null) {
             throw new IllegalArgumentException("Tried to get an association type with null URI");
         }
@@ -571,18 +488,14 @@ public class EmbeddedService implements DeepaMehtaService {
             return assocType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Retrieving association type \"" +
-                uri + "\" failed", e));
+            throw new RuntimeException("Retrieving association type \"" + uri + "\" failed", e);
         } finally {
             tx.finish();
         }
     }
 
-    @POST
-    @Path("/assoctype")
     @Override
-    public AssociationType createAssociationType(AssociationTypeModel assocTypeModel,
-                                                 @HeaderParam("Cookie") ClientState clientState) {
+    public AssociationType createAssociationType(AssociationTypeModel assocTypeModel, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedAssociationType assocType = new AttachedAssociationType(assocTypeModel, this);
@@ -596,8 +509,8 @@ public class EmbeddedService implements DeepaMehtaService {
             return assocType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Creating association type \"" +
-                assocTypeModel.getUri() + "\" failed (" + assocTypeModel + ")", e));
+            throw new RuntimeException("Creating association type \"" + assocTypeModel.getUri() + "\" failed (" +
+                assocTypeModel + ")", e);
         } finally {
             tx.finish();
         }
@@ -607,12 +520,8 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // === Commands ===
 
-    @POST
-    @Path("/command/{command}")
-    @Consumes("application/json, multipart/form-data")
     @Override
-    public CommandResult executeCommand(@PathParam("command") String command, CommandParams params,
-                                        @HeaderParam("Cookie") ClientState clientState) {
+    public CommandResult executeCommand(String command, CommandParams params, ClientState clientState) {
         logger.info("command=\"" + command + "\", params=" + params);
         DeepaMehtaTransaction tx = beginTx();
         try {
@@ -628,8 +537,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return result;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Executing command \"" + command +
-                "\" failed (params=" + params + ")", e));
+            throw new RuntimeException("Executing command \"" + command + "\" failed (params=" + params + ")", e);
         } finally {
             tx.finish();
         }
@@ -654,8 +562,6 @@ public class EmbeddedService implements DeepaMehtaService {
         return pluginCache.get(pluginId);
     }
 
-    @GET
-    @Path("/plugin")
     @Override
     public Set<PluginInfo> getPluginInfo() {
         final Set info = new HashSet();
@@ -737,45 +643,6 @@ public class EmbeddedService implements DeepaMehtaService {
     public void shutdown() {
         closeDB();
     }
-
-
-
-    // **********************
-    // *** Topic REST API ***
-    // **********************
-
-
-
-    @GET
-    @Path("/topic/{id}/related_topics")
-    public ResultSet<RelatedTopic> getRelatedTopics(@PathParam("id")                     long topicId,
-                                                    @QueryParam("assoc_type_uri")        String assocTypeUri,
-                                                    @QueryParam("my_role_type_uri")      String myRoleTypeUri,
-                                                    @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
-                                                    @QueryParam("others_topic_type_uri") String othersTopicTypeUri,
-                                                    @QueryParam("max_result_size")       int maxResultSize,
-                                                    @HeaderParam("Cookie")               ClientState clientState) {
-        logger.info("topicId=" + topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
-            "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri +
-            "\", maxResultSize=" + maxResultSize);
-        try {
-            return getTopic(topicId, false, clientState).getRelatedTopics(assocTypeUri, myRoleTypeUri,
-                othersRoleTypeUri, othersTopicTypeUri, false, false, maxResultSize, clientState);
-        } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Retrieving related topics of topic " + topicId +
-                " failed (assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
-                "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri +
-                "\", maxResultSize=" + maxResultSize + ")", e));
-        }
-    }
-
-
-
-    // ****************************
-    // *** Association REST API ***
-    // ****************************
-
-    // ### TODO
 
 
 
