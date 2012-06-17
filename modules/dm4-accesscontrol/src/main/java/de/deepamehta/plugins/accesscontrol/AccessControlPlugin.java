@@ -256,7 +256,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     // ---
 
     @Override
-    public void postFetchTopicHook(Topic topic, ClientState clientState, Directives directives) {
+    public void preSendTopicHook(Topic topic, ClientState clientState) {
         // ### TODO: explain
         if (isPluginTopic(topic)) {
             enrichWithPermissions(topic, false);    // write=false
@@ -270,7 +270,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     }
 
     @Override
-    public void postFetchTopicTypeHook(TopicType topicType, ClientState clientState, Directives directives) {
+    public void preSendTopicTypeHook(TopicType topicType, ClientState clientState) {
         // Note: there are 2 types whose permissions must be set manually as they can't be calculated the usual way:
         // - "Access Control List Facet": endless recursion would occur. ### FIXDOC
         // - "Meta Meta Type": doesn't exist in DB. Retrieving its ACL would fail.

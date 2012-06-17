@@ -235,14 +235,6 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // ---
 
-    public void postFetchTopicHook(Topic topic, ClientState clientState, Directives directives) {
-    }
-
-    public void postFetchTopicTypeHook(TopicType topicType, ClientState clientState, Directives directives) {
-    }
-
-    // ---
-
     public void preCreateHook(TopicModel model, ClientState clientState) {
     }
 
@@ -269,6 +261,14 @@ public class Plugin implements BundleActivator, EventHandler {
     }
 
     public void postDeleteAssociationHook(Association assoc, Directives directives) {
+    }
+
+    // ---
+
+    public void preSendTopicHook(Topic topic, ClientState clientState) {
+    }
+
+    public void preSendTopicTypeHook(TopicType topicType, ClientState clientState) {
     }
 
     // ---

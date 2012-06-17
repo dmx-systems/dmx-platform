@@ -130,13 +130,23 @@ function accesscontrol_plugin() {
     // ---
 
     dm4c.register_listener("has_write_permission", function(topic) {
-        return topic.composite["dm4.accesscontrol.permissions"]
-                    .composite["dm4.accesscontrol.operation_write"].value
+        var permissions = topic.composite["dm4.accesscontrol.permissions"]
+        // error check
+        if (!permissions) {
+            throw "AccessControlError: topic " + topic.id + " has no permissions info"
+        }
+        //
+        return permissions.composite["dm4.accesscontrol.operation_write"].value
     })
 
     dm4c.register_listener("has_create_permission", function(topic_type) {
-        return topic_type.composite["dm4.accesscontrol.permissions"]
-                         .composite["dm4.accesscontrol.operation_create"].value
+        var permissions = topic_type.composite["dm4.accesscontrol.permissions"]
+        // error check
+        if (!permissions) {
+            throw "AccessControlError: topic " + topic.id + " has no permissions info"
+        }
+        //
+        return permissions.composite["dm4.accesscontrol.operation_create"].value
     })
 
 

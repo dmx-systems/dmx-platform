@@ -185,7 +185,6 @@ public class EmbeddedService implements DeepaMehtaService {
             topic.store(clientState, directives);
             //
             triggerHook(Hook.POST_CREATE_TOPIC, topic, clientState, directives);
-            triggerHook(Hook.POST_FETCH_TOPIC, topic, clientState, directives);
             //
             tx.success();
             return topic;
@@ -400,7 +399,6 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedTopicType topicType = typeCache.getTopicType(uri);
-            triggerHook(Hook.POST_FETCH_TOPIC_TYPE, topicType, clientState, null);    // directives=null
             tx.success();
             return topicType;
         } catch (Exception e) {
@@ -673,14 +671,10 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * Attaches this core service to a topic model fetched from storage layer.
      * Optionally fetches the topic's composite value from storage layer.
-     * Triggers postFetchTopicHook.
      */
     AttachedTopic attach(TopicModel model, boolean fetchComposite, ClientState clientState) {
         AttachedTopic topic = new AttachedTopic(model, this);
         fetchComposite(topic, fetchComposite);
-        //
-        triggerHook(Hook.POST_FETCH_TOPIC, topic, clientState, null);       // directives=null
-        //
         return topic;
     }
 
@@ -698,9 +692,6 @@ public class EmbeddedService implements DeepaMehtaService {
                                                                                  ClientState clientState) {
         AttachedRelatedTopic relTopic = new AttachedRelatedTopic(model, this);
         fetchComposite(relTopic, fetchComposite, fetchRelatingComposite);
-        //
-        triggerHook(Hook.POST_FETCH_TOPIC, relTopic, clientState, null);    // directives=null
-        //
         return relTopic;
     }
 
@@ -722,9 +713,6 @@ public class EmbeddedService implements DeepaMehtaService {
     private AttachedAssociation attach(AssociationModel model, boolean fetchComposite) {
         AttachedAssociation assoc = new AttachedAssociation(model, this);
         fetchComposite(assoc, fetchComposite);
-        //
-        // ### TODO: introduce POST_FETCH_ASSOCIATION hook
-        //
         return assoc;
     }
 
@@ -847,7 +835,8 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * Triggers a hook for all installed plugins.
      */
-    Map<String, Object> triggerHook(final Hook hook, final Object... params) {
+    @Override
+    public Map<String, Object> triggerHook(final Hook hook, final Object... params) {
         final Map resultMap = new HashMap();
         new PluginCache.Iterator() {
             @Override

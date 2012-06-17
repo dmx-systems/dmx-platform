@@ -25,9 +25,6 @@ public enum Hook {
     // It is declared here for documentation purpose only.
     SERVICE_GONE("serviceGone", PluginService.class),
 
-    POST_FETCH_TOPIC("postFetchTopicHook", Topic.class, ClientState.class, Directives.class),
-    POST_FETCH_TOPIC_TYPE("postFetchTopicTypeHook", TopicType.class, ClientState.class, Directives.class),
-
      PRE_CREATE_TOPIC("preCreateHook",  TopicModel.class, ClientState.class),
     POST_CREATE_TOPIC("postCreateHook", Topic.class,      ClientState.class, Directives.class),
 
@@ -37,6 +34,9 @@ public enum Hook {
 
      PRE_DELETE_ASSOCIATION("preDeleteAssociationHook",  Association.class, Directives.class),
     POST_DELETE_ASSOCIATION("postDeleteAssociationHook", Association.class, Directives.class),
+
+    PRE_SEND_TOPIC("preSendTopicHook", Topic.class, ClientState.class),
+    PRE_SEND_TOPIC_TYPE("preSendTopicTypeHook", TopicType.class, ClientState.class),
 
     // ### TODO: remove this hook. Retype is special case of update.
     POST_RETYPE_ASSOCIATION("postRetypeAssociationHook", Association.class, String.class, Directives.class),
@@ -49,7 +49,6 @@ public enum Hook {
     // Note: besides regular triggering (see {@link #createTopicType})
     // this hook is triggered by the plugin itself
     // (see {@link de.deepamehta.core.service.Plugin#introduceTypesToPlugin}).
-    // ### TODO: remove this hook. Use the facets service instead.
     MODIFY_TOPIC_TYPE("modifyTopicTypeHook", TopicType.class, ClientState.class),
 
     // ### TODO: remove this hook. Let the plugin provide a REST API instead.

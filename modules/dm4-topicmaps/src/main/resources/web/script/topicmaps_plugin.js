@@ -423,7 +423,7 @@ function topicmaps_plugin() {
         if (LOG_TOPICMAPS) dm4c.log("Selecting topicmap " + topicmap_id)
         // 1) update cookie
         // Note: the cookie must be set *before* the topicmap is loaded.
-        // Server-side topic loading might depend on the topicmap type (postFetchTopicHook()).
+        // Server-side topic loading might depend on the topicmap type.
         js.set_cookie("dm4_topicmap_id", topicmap_id)
         // 2) update "canvas_renderer"
         var renderer_uri = topicmap_topics[topicmap_id].get("dm4.topicmaps.canvas_renderer_uri")

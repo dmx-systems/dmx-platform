@@ -150,6 +150,8 @@ public interface DeepaMehtaService {
 
     void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall);
 
+    Map<String, Object> triggerHook(Hook hook, Object... params);
+
 
 
     // === Misc ===

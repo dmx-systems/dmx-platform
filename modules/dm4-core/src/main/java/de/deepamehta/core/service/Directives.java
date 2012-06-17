@@ -6,28 +6,29 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
 
-public class Directives {
+public class Directives implements Iterable<Directives.Entry> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private List<Dir> directives = new ArrayList();
+    private List<Entry> directives = new ArrayList();
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public void add(Directive type, JSONEnabled arg) {
-        directives.add(new Dir(type, arg));
+    public void add(Directive dir, JSONEnabled arg) {
+        directives.add(new Entry(dir, arg));
     }
 
     public JSONArray toJSON() {
         try {
             JSONArray array = new JSONArray();
-            for (Dir directive : directives) {
+            for (Entry directive : directives) {
                 JSONObject dir = new JSONObject();
-                dir.put("type", directive.type);
+                dir.put("type", directive.dir);
                 dir.put("arg",  directive.arg.toJSON());
                 array.put(dir);
             }
@@ -37,21 +38,26 @@ public class Directives {
         }
     }
 
+    @Override
+    public Iterator<Entry> iterator() {
+        return directives.iterator();
+    }
+
     // --------------------------------------------------------------------------------------------------- Inner Classes
 
-    private class Dir {
+    public class Entry {
 
-        private Directive type;
-        private JSONEnabled arg;
+        public Directive dir;
+        public JSONEnabled arg;
 
-        private Dir(Directive type, JSONEnabled arg) {
-            this.type = type;
+        private Entry(Directive dir, JSONEnabled arg) {
+            this.dir = dir;
             this.arg = arg;
         }
 
         @Override
         public String toString() {
-            return type + ": " + arg;
+            return dir + ": " + arg;
         }
     }
 }
