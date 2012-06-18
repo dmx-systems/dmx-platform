@@ -158,7 +158,7 @@ var dm4c = new function() {
         for (var i = 0, assoc; assoc = assocs[i]; i++) {
             dm4c.show_association(assoc)
         }
-        dm4c.show_topic(dm4c.fetch_topic(topic_id), "show", undefined, true)
+        dm4c.show_topic(dm4c.fetch_topic(topic_id), "show", undefined, true)    // coordinates=undefined, do_center=true
     }
 
     // ---

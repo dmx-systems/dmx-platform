@@ -12,6 +12,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.Hook;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.util.JSONHelper;
 
@@ -48,6 +49,77 @@ public class WebclientPlugin extends Plugin {
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+
+
+    // *************************
+    // *** Webclient Service ***
+    // *************************
+
+    // Note: the client service is provided as REST service only (OSGi service not required for the moment).
+
+
+
+    /**
+     * Performs a fulltext search and creates a search result topic (a bucket).
+     */
+    @GET
+    @Path("/search")
+    public Topic searchTopics(@QueryParam("search") String searchTerm,
+                              @QueryParam("field")  String fieldUri,
+                              @QueryParam("wholeword") boolean wholeWord,
+                              @HeaderParam("Cookie") ClientState clientState) {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\", wholeWord=" + wholeWord +
+                ", clientState=" + clientState);
+            Set<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri, wholeWord, clientState);
+            Set<Topic> searchableUnits = findSearchableUnits(singleTopics, clientState);
+            logger.info(singleTopics.size() + " single topics found, " + searchableUnits.size() + " searchable units");
+            Topic searchTopic = createSearchTopic("\"" + searchTerm + "\"", searchableUnits, clientState);
+            tx.success();
+            // ### TODO: triggering PRE_SEND should not be up to the plugin developer.
+            // ### Possibly a JAX-RS 2.0 entity interceptor could be used instead.
+            dms.triggerHook(Hook.PRE_SEND_TOPIC, searchTopic, clientState);
+            return searchTopic;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new WebApplicationException(new RuntimeException("Searching topics failed", e));
+        } finally {
+            tx.finish();
+        }
+    }
+
+    /**
+     * Performs a by-type search and creates a search result topic (a bucket).
+     * <p>
+     * Note: this resource method is actually part of the Type Search plugin.
+     * TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
+     * another namespace again) or make the Type Search plugin an integral part of the Webclient plugin.
+     */
+    @GET
+    @Path("/search/by_type/{type_uri}")
+    public Topic getTopics(@PathParam("type_uri") String typeUri,
+                           @QueryParam("max_result_size") int maxResultSize,
+                           @HeaderParam("Cookie") ClientState clientState) {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            logger.info("typeUri=\"" + typeUri + "\", maxResultSize=" + maxResultSize);
+            String searchTerm = dms.getTopicType(typeUri, clientState).getSimpleValue() + "(s)";
+            ResultSet<Topic> result = dms.getTopics(typeUri, false, maxResultSize, clientState); // fetchComposite=false
+            Topic searchTopic = createSearchTopic(searchTerm, result.getItems(), clientState);
+            tx.success();
+            // ### TODO: triggering PRE_SEND should not be up to the plugin developer.
+            // ### Possibly a JAX-RS 2.0 entity interceptor could be used instead.
+            dms.triggerHook(Hook.PRE_SEND_TOPIC, searchTopic, clientState);
+            return searchTopic;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new WebApplicationException(new RuntimeException("Searching topics failed", e));
+        } finally {
+            tx.finish();
+        }
+    }
 
 
 
@@ -92,71 +164,6 @@ public class WebclientPlugin extends Plugin {
             logger.info("### Updating view configuration for topic type \"" + type.getUri() + "\" (" + topic + ")");
             type.getViewConfig().getModel().updateConfigTopic(topic.getModel());
             directives.add(Directive.UPDATE_TOPIC_TYPE, type);
-        }
-    }
-
-
-
-    // **********************
-    // *** Plugin Service ***
-    // **********************
-
-    // Note: the client service is provided as REST service only (OSGi service not required for the moment).
-
-
-
-    /**
-     * Performs a fulltext search and creates a search result topic (a bucket).
-     */
-    @GET
-    @Path("/search")
-    public Topic searchTopics(@QueryParam("search") String searchTerm,
-                              @QueryParam("field")  String fieldUri,
-                              @QueryParam("wholeword") boolean wholeWord,
-                              @HeaderParam("Cookie") ClientState clientState) {
-        DeepaMehtaTransaction tx = dms.beginTx();
-        try {
-            logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\", wholeWord=" + wholeWord +
-                ", clientState=" + clientState);
-            Set<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri, wholeWord, clientState);
-            Set<Topic> searchableUnits = findSearchableUnits(singleTopics, clientState);
-            logger.info(singleTopics.size() + " single topics found, " + searchableUnits.size() + " searchable units");
-            Topic searchTopic = createSearchTopic("\"" + searchTerm + "\"", searchableUnits, clientState);
-            tx.success();
-            return searchTopic;
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Searching topics failed", e));
-        } finally {
-            tx.finish();
-        }
-    }
-
-    /**
-     * Performs a by-type search and creates a search result topic (a bucket).
-     * <p>
-     * Note: this resource method is actually part of the Type Search plugin.
-     * TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
-     * another namespace again) or make the Type Search plugin an integral part of the Webclient plugin.
-     */
-    @GET
-    @Path("/search/by_type/{type_uri}")
-    public Topic getTopics(@PathParam("type_uri") String typeUri,
-                           @QueryParam("max_result_size") int maxResultSize,
-                           @HeaderParam("Cookie") ClientState clientState) {
-        DeepaMehtaTransaction tx = dms.beginTx();
-        try {
-            logger.info("typeUri=\"" + typeUri + "\", maxResultSize=" + maxResultSize);
-            String searchTerm = dms.getTopicType(typeUri, clientState).getSimpleValue() + "(s)";
-            ResultSet<Topic> result = dms.getTopics(typeUri, false, maxResultSize, clientState); // fetchComposite=false
-            Topic searchTopic = createSearchTopic(searchTerm, result.getItems(), clientState);
-            tx.success();
-            return searchTopic;
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Searching topics failed", e));
-        } finally {
-            tx.finish();
         }
     }
 
