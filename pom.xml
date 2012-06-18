@@ -55,6 +55,7 @@
                         ${project.basedir}/modules/dm4-filemanager/target,
                         ${project.basedir}/modules/dm4-proxy/target,
                         ${project.basedir}/modules/dm4-help/target,
+                        ${project.basedir}/modules/dm4-accesscontrol/target,
                         ${project.basedir}/modules/dm4-facets/target
                     ]]>
                     <!-- not yet adapted to DeepaMehta 4.0 resp. obsolete -->
@@ -62,7 +63,6 @@
                         ${project.basedir}/modules/dm4-coretypes/target,
                         ${project.basedir}/modules/dm4-time/target,
                         ${project.basedir}/modules/dm4-projects/target,
-                        ${project.basedir}/modules/dm4-accesscontrol/target
                     -->
                 </felix.fileinstall.dir>
                 <!-- Watching only for jar files suppresses deployment of exploded bundles (which often fails).    -->
@@ -121,6 +121,7 @@
                 <module>modules/dm4-filemanager</module>
                 <module>modules/dm4-proxy</module>
                 <module>modules/dm4-help</module>
+                <module>modules/dm4-accesscontrol</module>
                 <module>modules/dm4-facets</module>
                 <!-- POM projects -->
                 <!-- Note: modules/dm4-distribution is not listed here.                -->
@@ -131,8 +132,7 @@
                 <!-- not yet adapted to DeepaMehta 4.0 resp. obsolete -->
                 <!-- <module>modules/dm4-coretypes</module>
                 <module>modules/dm4-time</module>
-                <module>modules/dm4-projects</module>
-                <module>modules/dm4-accesscontrol</module> -->
+                <module>modules/dm4-projects</module> -->
             </modules>
         </profile>
 
