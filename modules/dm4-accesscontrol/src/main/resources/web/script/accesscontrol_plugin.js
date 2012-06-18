@@ -47,7 +47,7 @@ function accesscontrol_plugin() {
 
         function create_login_widget() {
             login_widget = new LoginWidget()
-            dm4c.toolbar.dom.prepend(login_widget.dom)
+            dm4c.toolbar.dom.append(login_widget.dom)
 
             function LoginWidget() {
                 var dom = $("<div>").attr({id: "login-widget"})    // attr("id", ...) doesn't create the div!
