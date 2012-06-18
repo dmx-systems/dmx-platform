@@ -37,10 +37,18 @@ public class FacetsPlugin extends Plugin implements FacetsService {
 
 
     @Override
+    public Topic getFacet(long topicId, String facetTypeUri) {
+        Topic topic = dms.getTopic(topicId, false, null);                   // fetchComposite=false
+        return getFacet(topic, facetTypeUri);
+    }
+
+    @Override
     public Topic getFacet(Topic topic, String facetTypeUri) {
         // ### TODO: integrity check: is the topic an instance of that facet type?
         return fetchChildTopic(topic, getAssocDef(facetTypeUri), true);     // fetchComposite=true
     }
+
+    // ---
 
     @Override
     public Set<RelatedTopic> getFacets(Topic topic, String facetTypeUri) {
