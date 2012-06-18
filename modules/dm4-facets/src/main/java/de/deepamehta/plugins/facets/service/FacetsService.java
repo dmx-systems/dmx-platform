@@ -14,6 +14,8 @@ import java.util.Set;
 
 public interface FacetsService extends PluginService {
 
+    Topic getFacet(long topicId, String facetTypeUri);
+
     /**
      * Retrieves a topic facet from the DB.
      *
@@ -23,6 +25,8 @@ public interface FacetsService extends PluginService {
      * @return  The retrieved facet.
      */
     Topic getFacet(Topic topic, String facetTypeUri);
+
+    // ---
 
     /**
      * Retrieves a topic multi-facet from the DB.
