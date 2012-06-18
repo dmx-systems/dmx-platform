@@ -486,7 +486,7 @@ function topicmaps_plugin() {
         var renderer = canvas_renderers[renderer_uri]
         // error check
         if (!renderer) {
-            throw "UnknownCanvasRendererError: canvas renderer \"" + renderer_uri + "\" is not registered"
+            throw "TopicmapsError: \"" + renderer_uri + "\" is an unknown canvas renderer"
         }
         //
         return renderer
