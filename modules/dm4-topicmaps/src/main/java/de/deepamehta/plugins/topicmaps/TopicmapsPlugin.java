@@ -101,7 +101,9 @@ public class TopicmapsPlugin extends Plugin implements TopicmapsService {
         CompositeValue topicmapState = new CompositeValue().put("dm4.topicmaps.state", new CompositeValue()
             .put("dm4.topicmaps.translation", new CompositeValue()
                 .put("dm4.topicmaps.translation_x", trans_x)
-                .put("dm4.topicmaps.translation_y", trans_y)));
+                .put("dm4.topicmaps.translation_y", trans_y)
+            )
+        );
         dms.updateTopic(new TopicModel(topicmapId, topicmapState), null);
     }
 

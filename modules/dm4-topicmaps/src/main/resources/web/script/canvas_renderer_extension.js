@@ -5,8 +5,8 @@ function CanvasRendererExtension() {
 
     // === CanvasRenderer Topicmaps Extension ===
 
-    this.load_topicmap = function(topicmap_id) {
-        return new Topicmap(topicmap_id)
+    this.load_topicmap = function(topicmap_id, config) {
+        return new Topicmap(topicmap_id, config)
     }
 
     /**

@@ -5,7 +5,7 @@
  *
  * ### TODO: introduce common base class for Topicmap and Geomap (see external deepamehta-geomaps module)
  */
-function Topicmap(topicmap_id) {
+function Topicmap(topicmap_id, config) {
 
     var LOG_TOPICMAPS = false
     var self = this
@@ -21,7 +21,9 @@ function Topicmap(topicmap_id) {
 
     load()
 
-    // --- Public API ---
+
+
+    // ------------------------------------------------------------------------------------------------------ Public API
 
     this.get_id = function() {
         return topicmap_id
@@ -163,7 +165,9 @@ function Topicmap(topicmap_id) {
         this.trans_x = trans_x
         this.trans_y = trans_y
         // update DB
-        dm4c.restc.set_topicmap_translation(topicmap_id, trans_x, trans_y)
+        if (is_writable()) {
+            dm4c.restc.set_topicmap_translation(topicmap_id, trans_x, trans_y)
+        }
     }
 
     this.draw_background = function(ctx) {
@@ -172,7 +176,9 @@ function Topicmap(topicmap_id) {
         }
     }
 
-    // --- Private Functions ---
+
+
+    // ----------------------------------------------------------------------------------------------- Private Functions
 
     function load() {
 
@@ -244,7 +250,15 @@ function Topicmap(topicmap_id) {
         }
     }
 
-    // --- Private Classes ---
+    // ---
+
+    function is_writable() {
+        return config.is_writable()
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Classes
 
     function TopicmapTopic(id, type_uri, label, x, y, visibility, ref_id) {
 

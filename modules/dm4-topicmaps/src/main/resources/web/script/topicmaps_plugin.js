@@ -211,7 +211,6 @@ function topicmaps_plugin() {
 
     /**
      * @param   assoc       an Association object
-     * @param   old_assoc   FIXME: not yet available
      */
     dm4c.register_listener("post_update_association", function(assoc) {
         if (LOG_TOPICMAPS) dm4c.log("Updating association " + assoc.id + " on all topicmaps")
@@ -315,9 +314,9 @@ function topicmaps_plugin() {
 
 
 
-    /******************/
-    /*** Controller ***/
-    /******************/
+    // ******************
+    // *** Controller ***
+    // ******************
 
 
 
@@ -383,9 +382,9 @@ function topicmaps_plugin() {
 
 
 
-    /*************************/
-    /*** Controller Helper ***/
-    /*************************/
+    // *************************
+    // *** Controller Helper ***
+    // *************************
 
 
 
@@ -410,9 +409,9 @@ function topicmaps_plugin() {
 
 
 
-    /*************/
-    /*** Model ***/
-    /*************/
+    // *************
+    // *** Model ***
+    // *************
 
 
 
@@ -446,10 +445,17 @@ function topicmaps_plugin() {
      */
     function load_topicmap(topicmap_id) {
         if (!topicmaps[topicmap_id]) {
-            topicmaps[topicmap_id] = canvas_renderer.load_topicmap(topicmap_id)
+            var config = {is_writable: is_writable}
+            topicmaps[topicmap_id] = canvas_renderer.load_topicmap(topicmap_id, config)
         }
         //
         return topicmaps[topicmap_id]
+
+        function is_writable() {
+            return topicmap_topics[topicmap_id]
+                .composite["dm4.accesscontrol.permissions"]
+                .composite["dm4.accesscontrol.operation_write"].value
+        }
     }
 
     /**
@@ -500,9 +506,9 @@ function topicmaps_plugin() {
 
 
 
-    /************/
-    /*** View ***/
-    /************/
+    // ************
+    // *** View ***
+    // ************
 
 
 
