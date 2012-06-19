@@ -21,6 +21,10 @@ public interface AccessControlService extends PluginService {
 
     // ---
 
+    Permissions getTopicPermissions(long topicId, ClientState clientState);
+
+    // ---
+
     Topic getOwnedTopic(long userId, String typeUri);
 
     void setOwner(long topicId, long userId);

@@ -20,8 +20,11 @@ function accesscontrol_plugin() {
     dm4c.restc.lookup_user_account = function(username) {
         return this.request("GET", "/accesscontrol/user/" + username)
     }
-    dm4c.restc.get_user_account = function() {
+    dm4c.restc.get_username = function() {
         return this.request("GET", "/accesscontrol/user")
+    }
+    dm4c.restc.get_topic_permissions = function(topic_id) {
+        return this.request("GET", "/accesscontrol/topic/" + topic_id)
     }
     dm4c.restc.get_owned_topic = function(user_id, type_uri) {
         return this.request("GET", "/accesscontrol/owner/" + user_id + "/" + type_uri)
@@ -190,7 +193,7 @@ function accesscontrol_plugin() {
 
     // ---
 
-    this.create_user = function(username, password) {
+    this.create_user_account = function(username, password) {
         return dm4c.create_topic("dm4.accesscontrol.user_account", {
             "dm4.accesscontrol.username": username,
             "dm4.accesscontrol.password": encrypt_password(password)
@@ -199,8 +202,12 @@ function accesscontrol_plugin() {
 
     // ---
 
-    this.get_user_account = function() {
-        return dm4c.restc.get_user_account()
+    this.get_username = function() {
+        return dm4c.restc.get_username()
+    }
+
+    this.get_topic_permissions = function(topic_id) {
+        return dm4c.restc.get_topic_permissions(topic_id)
     }
 
     this.get_owned_topic = function(user_id, type_uri) {

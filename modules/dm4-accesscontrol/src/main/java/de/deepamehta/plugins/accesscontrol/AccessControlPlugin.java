@@ -109,9 +109,20 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     // ---
 
     @GET
-    @Path("/owner/{userId}/{type_uri}")
+    @Path("/topic/{topic_id}")
     @Override
-    public Topic getOwnedTopic(@PathParam("userId") long userId, @PathParam("type_uri") String typeUri) {
+    public Permissions getTopicPermissions(@PathParam("topic_id") long topicId,
+                                           @HeaderParam("Cookie") ClientState clientState) {
+        Topic username = getUsername(clientState);
+        return permissions(hasPermission(username, Operation.WRITE, topicId));
+    }
+
+    // ---
+
+    @GET
+    @Path("/owner/{user_id}/{type_uri}")
+    @Override
+    public Topic getOwnedTopic(@PathParam("user_id") long userId, @PathParam("type_uri") String typeUri) {
         /* ### TODO: adapt to DM4
         List<RelatedTopic> topics = dms.getRelatedTopics(userId, asList(typeUri),
             asList(RelationType.TOPIC_OWNER.name() + ";OUTGOING"), null);
@@ -359,6 +370,11 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     // === ACL Entries ===
 
+    private boolean hasPermission(Topic username, Operation operation, long topicId) {
+        Topic topic = dms.getTopic(topicId, false, null);
+        return hasPermission(username, operation, topic);
+    }
+
     /**
      * Returns true if the user is allowed to perform an operation on a topic.
      *
@@ -379,6 +395,8 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         logger.fine("=> DENIED");
         return false;
     }
+
+    // ---
 
     /**
      * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
@@ -514,13 +532,13 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     private void enrichWithPermissions(Topic topic, boolean write) {
         // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
         // Permissions are transient data, not stored in DB, recalculated for each request.
-        topic.getCompositeValue().put("dm4.accesscontrol.permissions", permissions(write));
+        topic.getCompositeValue().put("dm4.accesscontrol.permissions", permissionsValue(write));
     }
 
     private void enrichWithPermissions(TopicType topicType, boolean write, boolean create) {
         // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
         // Permissions are transient data, not stored in DB, recalculated for each request.
-        topicType.getCompositeValue().put("dm4.accesscontrol.permissions", permissions(write, create));
+        topicType.getCompositeValue().put("dm4.accesscontrol.permissions", permissionsValue(write, create));
     }
 
     // ---
@@ -547,14 +565,28 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     // ---
 
-    private CompositeValue permissions(boolean write) {
+    private Permissions permissions(boolean write) {
+        Permissions permissions = new Permissions();
+        permissions.add(Operation.WRITE, write);
+        return permissions;
+    }
+
+    private Permissions permissions(boolean write, boolean create) {
+        Permissions permissions = permissions(write);
+        permissions.add(Operation.CREATE, create);
+        return permissions;
+    }
+
+    // ---
+
+    private CompositeValue permissionsValue(boolean write) {
         CompositeValue permissions = new CompositeValue();
         permissions.put(Operation.WRITE.uri, write);
         return permissions;
     }
 
-    private CompositeValue permissions(boolean write, boolean create) {
-        CompositeValue permissions = permissions(write);
+    private CompositeValue permissionsValue(boolean write, boolean create) {
+        CompositeValue permissions = permissionsValue(write);
         permissions.put(Operation.CREATE.uri, create);
         return permissions;
     }

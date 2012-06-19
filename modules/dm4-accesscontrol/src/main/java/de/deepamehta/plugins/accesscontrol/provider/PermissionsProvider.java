@@ -50,7 +50,7 @@ public class PermissionsProvider implements MessageBodyReader<Permissions> {
             String json = JavaUtils.readText(entityStream);
             return new Permissions(new JSONObject(json));
         } catch (Exception e) {
-            throw new IOException("Creating Permissions from message body failed", e);
+            throw new WebApplicationException(new RuntimeException("Creating Permissions from message body failed", e));
         }
     }
 }
