@@ -89,7 +89,11 @@ public class WebservicePlugin extends Plugin {
                                       @QueryParam("max_result_size") int maxResultSize,
                                       @HeaderParam("Cookie") ClientState clientState) {
         try {
-            return dms.getTopics(typeUri, fetchComposite, maxResultSize, clientState);
+            ResultSet<Topic> topics = dms.getTopics(typeUri, fetchComposite, maxResultSize, clientState);
+            //
+            triggerPreSend(topics, clientState);
+            //
+            return topics;
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
@@ -397,6 +401,12 @@ public class WebservicePlugin extends Plugin {
 
     private void triggerPreSend(TopicType topicType, ClientState clientState) {
         dms.triggerHook(Hook.PRE_SEND_TOPIC_TYPE, topicType, clientState);
+    }
+
+    private void triggerPreSend(ResultSet<Topic> topics, ClientState clientState) {
+        for (Topic topic : topics) {
+            triggerPreSend(topic, clientState);
+        }
     }
 
     private void triggerPreSend(Directives directives, ClientState clientState) {

@@ -16,9 +16,9 @@ import java.util.List;
 /**
  * A mapping from operations to booleans.
  * <p>
- * Permissions objects are used for both situations:
- * - as part of static ACL entries
- * - to represent calculated permissions for the current user
+ * Permissions objects are used to represent both:
+ * - a part of a static ACL entry
+ * - calculated permissions for the current user
  */
 public class Permissions extends HashMap<String, Boolean> implements JSONEnabled {
 
