@@ -385,6 +385,16 @@ var dm4c = new function() {
 
     // ---
 
+    this.restore_selection = function() {
+        if (dm4c.selected_object instanceof Topic) {
+            dm4c.do_select_topic(dm4c.selected_object.id)
+        } else if (dm4c.selected_object instanceof Association) {
+            dm4c.do_select_association(dm4c.selected_object.id)
+        }
+    }
+
+    // ---
+
     /**
      * Updates the client model and view according to a set of directives received from server.
      * Precondition: the DB is already up-to-date.

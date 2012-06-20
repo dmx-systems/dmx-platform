@@ -177,7 +177,7 @@ function accesscontrol_plugin() {
         //
         adjust_create_widget()
         login_widget.show_user(username)
-        dm4c.page_panel.refresh()
+        dm4c.restore_selection()
         //
         dm4c.trigger_plugin_hook("user_logged_in", user)
     }
@@ -187,7 +187,7 @@ function accesscontrol_plugin() {
         //
         adjust_create_widget()
         login_widget.show_login()
-        dm4c.page_panel.refresh()
+        dm4c.restore_selection()
         //
         dm4c.trigger_plugin_hook("user_logged_out")
     }
