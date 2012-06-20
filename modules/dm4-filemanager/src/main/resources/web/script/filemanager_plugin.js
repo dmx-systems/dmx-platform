@@ -3,6 +3,10 @@ function filemanager_plugin() {
     // === Webclient Listeners ===
 
     dm4c.register_listener("post_refresh_create_menu", function(type_menu) {
+        if (!dm4c.has_create_permission("dm4.files.folder")) {
+            return
+        }
+        //
         type_menu.add_separator()
         type_menu.add_item({
             label: "New File Browser",

@@ -42,6 +42,10 @@ function typeeditor_plugin() {
     })
 
     dm4c.register_listener("post_refresh_create_menu", function(type_menu) {
+        if (!dm4c.has_create_permission("dm4.core.topic_type")) {
+            return
+        }
+        //
         type_menu.add_separator()
         type_menu.add_item({
             label: "New Topic Type",
