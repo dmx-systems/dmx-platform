@@ -70,12 +70,6 @@ public class CompositeValue {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public Iterable<String> keys() {
-        return values.keySet();
-    }
-
-    // ---
-
     public TopicModel getTopic(String key) {
         TopicModel topic = (TopicModel) values.get(key);
         // error check
@@ -202,6 +196,10 @@ public class CompositeValue {
 
     // ---
 
+    public Iterable<String> keys() {
+        return values.keySet();
+    }
+
     public boolean has(String key) {
         return values.containsKey(key);
     }
@@ -209,53 +207,57 @@ public class CompositeValue {
     // ---
 
     /**
-     * Convenience method.
+     * Convenience method for accessing the *simple* value of a single-valued child.
      */
     public String getString(String key) {
         return getTopic(key).getSimpleValue().toString();
     }
 
     /**
-     * Convenience method.
+     * Convenience method for accessing the *simple* value of a single-valued child.
      */
     public int getInt(String key) {
         return getTopic(key).getSimpleValue().intValue();
     }
 
     /**
-     * Convenience method.
+     * Convenience method for accessing the *simple* value of a single-valued child.
      */
     public long getLong(String key) {
         return getTopic(key).getSimpleValue().longValue();
     }
 
     /**
-     * Convenience method.
+     * Convenience method for accessing the *simple* value of a single-valued child.
      */
     public double getDouble(String key) {
         return getTopic(key).getSimpleValue().doubleValue();
     }
 
     /**
-     * Convenience method.
+     * Convenience method for accessing the *simple* value of a single-valued child.
      */
     public boolean getBoolean(String key) {
         return getTopic(key).getSimpleValue().booleanValue();
     }
 
     /**
-     * Convenience method.
+     * Convenience method for accessing the *simple* value of a single-valued child.
      */
     public Object get(String key) {
         return getTopic(key).getSimpleValue().value();
     }
 
+    // ---
+
     /**
-     * Convenience method.
+     * Convenience method for accessing the *composite* value of a single-valued child.
      */
     public CompositeValue getComposite(String key) {
         return getTopic(key).getCompositeValue();
     }
+
+    // Note: there are no convenience accessors for a multiple-valued child.
 
     // ---
 

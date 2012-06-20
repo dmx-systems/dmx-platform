@@ -136,7 +136,8 @@ function accesscontrol_plugin() {
         var permissions = topic.composite["dm4.accesscontrol.permissions"]
         // error check
         if (!permissions) {
-            throw "AccessControlError: topic " + topic.id + " has no permissions info"
+            throw "AccessControlError: topic " + topic.id + " (type_uri=\"" + topic.type_uri +
+                "\") has no permissions info"
         }
         //
         return permissions.composite["dm4.accesscontrol.operation_write"].value
@@ -146,7 +147,7 @@ function accesscontrol_plugin() {
         var permissions = topic_type.composite["dm4.accesscontrol.permissions"]
         // error check
         if (!permissions) {
-            throw "AccessControlError: topic " + topic.id + " has no permissions info"
+            throw "AccessControlError: topic type \"" + topic_type.uri + "\" has no permissions info"
         }
         //
         return permissions.composite["dm4.accesscontrol.operation_create"].value

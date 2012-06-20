@@ -530,15 +530,34 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     // ---
 
     private void enrichWithPermissions(Topic topic, boolean write) {
-        // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
-        // Permissions are transient data, not stored in DB, recalculated for each request.
-        topic.getCompositeValue().put("dm4.accesscontrol.permissions", permissionsValue(write));
+        // Note: we must extend/override possibly existing permissions.
+        // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
+        CompositeValue permissions = getPermissions(topic);
+        permissions.put(Operation.WRITE.uri, write);
     }
 
     private void enrichWithPermissions(TopicType topicType, boolean write, boolean create) {
+        // Note: we must extend/override possibly existing permissions.
+        // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
+        CompositeValue permissions = getPermissions(topicType);
+        permissions.put(Operation.WRITE.uri, write);
+        permissions.put(Operation.CREATE.uri, create);
+    }
+
+    // ---
+
+    private CompositeValue getPermissions(Topic topic) {
         // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
         // Permissions are transient data, not stored in DB, recalculated for each request.
-        topicType.getCompositeValue().put("dm4.accesscontrol.permissions", permissionsValue(write, create));
+        TopicModel permissionsTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.permissions", null);
+        CompositeValue permissions;
+        if (permissionsTopic != null) {
+            permissions = permissionsTopic.getCompositeValue();
+        } else {
+            permissions = new CompositeValue();
+            topic.getCompositeValue().put("dm4.accesscontrol.permissions", permissions);
+        }
+        return permissions;
     }
 
     // ---
@@ -574,20 +593,6 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     private Permissions permissions(boolean write, boolean create) {
         Permissions permissions = permissions(write);
         permissions.add(Operation.CREATE, create);
-        return permissions;
-    }
-
-    // ---
-
-    private CompositeValue permissionsValue(boolean write) {
-        CompositeValue permissions = new CompositeValue();
-        permissions.put(Operation.WRITE.uri, write);
-        return permissions;
-    }
-
-    private CompositeValue permissionsValue(boolean write, boolean create) {
-        CompositeValue permissions = permissionsValue(write);
-        permissions.put(Operation.CREATE.uri, create);
         return permissions;
     }
 

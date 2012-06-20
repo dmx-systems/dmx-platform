@@ -270,7 +270,11 @@ public class WebservicePlugin extends Plugin {
     @Path("/topictype")
     public TopicType createTopicType(TopicTypeModel topicTypeModel, @HeaderParam("Cookie") ClientState clientState) {
         try {
-            return dms.createTopicType(topicTypeModel, clientState);
+            TopicType topicType = dms.createTopicType(topicTypeModel, clientState);
+            //
+            triggerPreSend(topicType, clientState);
+            //
+            return topicType;
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
@@ -280,7 +284,11 @@ public class WebservicePlugin extends Plugin {
     @Path("/topictype")
     public Directives updateTopicType(TopicTypeModel model, @HeaderParam("Cookie") ClientState clientState) {
         try {
-            return dms.updateTopicType(model, clientState);
+            Directives directives = dms.updateTopicType(model, clientState);
+            //
+            triggerPreSend(directives, clientState);
+            //
+            return directives;
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
