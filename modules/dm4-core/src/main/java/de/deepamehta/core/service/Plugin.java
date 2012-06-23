@@ -273,6 +273,11 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // ---
 
+    public void preSendAssociationHook(Association assoc, ClientState clientState) {
+    }
+
+    // ---
+
     public void providePropertiesHook(Topic topic) {
     }
 

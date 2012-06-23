@@ -38,6 +38,8 @@ public enum Hook {
     PRE_SEND_TOPIC("preSendTopicHook", Topic.class, ClientState.class),
     PRE_SEND_TOPIC_TYPE("preSendTopicTypeHook", TopicType.class, ClientState.class),
 
+    PRE_SEND_ASSOCIATION("preSendAssociationHook", Association.class, ClientState.class),
+
     // ### TODO: remove this hook. Retype is special case of update.
     POST_RETYPE_ASSOCIATION("postRetypeAssociationHook", Association.class, String.class, Directives.class),
 

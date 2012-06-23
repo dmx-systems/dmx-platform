@@ -106,11 +106,11 @@ function default_plugin () {
         // commands.push({is_separator: true,                         context: "context-menu"})
         // commands.push({label: "Associate",  handler: do_associate, context: "context-menu"})     // TODO: implement
         //
-        if (dm4c.has_write_permission(assoc)) {
+        // if (dm4c.has_write_permission(assoc)) {      ### TODO
             commands.push({label: "Edit",   handler: do_edit,    context: "detail-panel-show", ui_icon: "pencil"})
             commands.push({is_separator: true,                   context: "context-menu"})
             commands.push({label: "Delete", handler: do_confirm, context: "context-menu", ui_icon: "trash"})
-        }
+        // }
         //
         commands.push({label: "OK", handler: do_save, context: "detail-panel-edit", is_submit: true})
         //

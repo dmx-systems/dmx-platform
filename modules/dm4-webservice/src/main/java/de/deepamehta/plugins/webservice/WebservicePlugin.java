@@ -160,7 +160,11 @@ public class WebservicePlugin extends Plugin {
                                       @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite,
                                       @HeaderParam("Cookie") ClientState clientState) {
         try {
-            return dms.getAssociation(assocId, fetchComposite, clientState);
+            Association assoc = dms.getAssociation(assocId, fetchComposite, clientState);
+            //
+            // triggerPreSend(assoc, clientState);  ### TODO
+            //
+            return assoc;
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
