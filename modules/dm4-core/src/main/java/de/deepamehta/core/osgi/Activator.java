@@ -52,6 +52,8 @@ public class Activator implements BundleActivator {
             //
             logger.info("Registering DeepaMehta 4 core service at OSGi framework");
             context.registerService(DeepaMehtaService.class.getName(), dms, null);
+            //
+            new HttpServiceTracker(context);
         } catch (Exception e) {
             logger.severe("Activation of DeepaMehta 4 Core failed:");
             e.printStackTrace();

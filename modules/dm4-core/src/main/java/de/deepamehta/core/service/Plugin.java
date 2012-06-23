@@ -7,6 +7,7 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.osgi.WebPublishingService;    // ### TODO: packaging?
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.JSONHelper;
 
@@ -84,6 +85,7 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // Consumed services
     protected DeepaMehtaService dms;
+    private WebPublishingService webPublishingService;
     private HttpService httpService;
     private EventAdmin eventService;
 
@@ -195,6 +197,7 @@ public class Plugin implements BundleActivator, EventHandler {
             }
             //
             createServiceTracker(DeepaMehtaService.class.getName());
+            createServiceTracker(WebPublishingService.class.getName());
             createServiceTracker(HttpService.class.getName());
             createServiceTracker(EventAdmin.class.getName());
             createServiceTrackers();
@@ -349,6 +352,10 @@ public class Plugin implements BundleActivator, EventHandler {
                     logger.info("Adding DeepaMehta 4 core service to plugin \"" + pluginName + "\"");
                     dms = (DeepaMehtaService) service;
                     checkServiceAvailability();
+                } else if (service instanceof WebPublishingService) {
+                    logger.info("Adding Web Publishing service to plugin \"" + pluginName + "\"");
+                    webPublishingService = (WebPublishingService) service;
+                    checkServiceAvailability();
                 } else if (service instanceof HttpService) {
                     logger.info("Adding HTTP service to plugin \"" + pluginName + "\"");
                     httpService = (HttpService) service;
@@ -372,6 +379,10 @@ public class Plugin implements BundleActivator, EventHandler {
                     logger.info("Removing DeepaMehta 4 core service from plugin \"" + pluginName + "\"");
                     unregisterPlugin();
                     dms = null;
+                } else if (service == webPublishingService) {
+                    logger.info("Removing Web Publishing service from plugin \"" + pluginName + "\"");
+                    // unregister...();  ### TODO
+                    webPublishingService = null;
                 } else if (service == httpService) {
                     logger.info("Removing HTTP service from plugin \"" + pluginName + "\"");
                     unregisterWebResources();
@@ -400,7 +411,8 @@ public class Plugin implements BundleActivator, EventHandler {
      * and if so, initializes the plugin. ### FIXDOC
      */
     private void checkServiceAvailability() {
-        if (dms != null && httpService != null && eventService != null && dependenciesAvailable()) {
+        if (dms != null && webPublishingService != null && httpService != null && eventService != null
+                                                                               && dependenciesAvailable()) {
             initPlugin();
             pluginReady();
             postPluginReadyEvent();
@@ -546,7 +558,8 @@ public class Plugin implements BundleActivator, EventHandler {
     // ---
 
     private String getWebResourcesNamespace() {
-        return getConfigProperty("webResourcesNamespace", "/" + pluginId);
+        return "/" + pluginId;
+        // return getConfigProperty("webResourcesNamespace", "/" + pluginId);   // ### TODO
     }
 
     // ---
@@ -603,7 +616,7 @@ public class Plugin implements BundleActivator, EventHandler {
                 logger.info("Registering REST resources of " + this + " at namespace " + namespace);
                 // Generic plugins (plugin bundles not containing a Plugin subclass) which provide resource classes
                 // must set the "pluginPackage" config property. Otherwise the resource classes can't be located.
-                if (pluginPackage.equals("de.deepamehta.core.service")) {
+                /* ### if (pluginPackage.equals("de.deepamehta.core.service")) {
                     throw new RuntimeException("Resource classes can't be located (plugin package is unknown). " +
                         "You must implement a Plugin subclass OR configure \"pluginPackage\" in plugin.properties");
                 }
@@ -615,7 +628,8 @@ public class Plugin implements BundleActivator, EventHandler {
                     initParams.put("com.sun.jersey.config.property.packages", packagesToScan());
                 }
                 //
-                httpService.registerServlet(namespace, new ServletContainer(), initParams, null);
+                httpService.registerServlet(namespace, new ServletContainer(), initParams, null); */
+                webPublishingService.addResource(this);
             }
         } catch (Exception e) {
             unregisterWebResources();
