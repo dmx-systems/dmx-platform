@@ -295,10 +295,12 @@ function topicmaps_plugin() {
 
     dm4c.register_listener("user_logged_in", function(user) {
         rebuild_topicmap_menu()
+        // Note: the topicmap permissions are refreshed in the course of refetching the topicmap topics.
     })
 
     dm4c.register_listener("user_logged_out", function() {
         rebuild_topicmap_menu()
+        // Note: the topicmap permissions are refreshed in the course of refetching the topicmap topics.
     })
 
 

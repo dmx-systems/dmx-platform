@@ -86,8 +86,7 @@ function Topicmap(topicmap_id, config) {
 
     this.hide_topic = function(id) {
         var topic = topics[id]
-        if (LOG_TOPICMAPS) dm4c.log("Hiding topic " + id + " (\"" + topic.label + "\") from topicmap " +
-            topicmap_id)
+        if (LOG_TOPICMAPS) dm4c.log("Hiding topic " + id + " (\"" + topic.label + "\") from topicmap " + topicmap_id)
         topic.hide()
     }
 
@@ -286,7 +285,9 @@ function Topicmap(topicmap_id, config) {
 
         this.move_to = function(x, y) {
             // update DB ### TODO: extend topicmaps REST API instead of operating on the DB directly
-            dm4c.restc.update_association({id: ref_id, composite: {"dm4.topicmaps.x": x, "dm4.topicmaps.y": y}})
+            if (is_writable()) {
+                dm4c.restc.update_association({id: ref_id, composite: {"dm4.topicmaps.x": x, "dm4.topicmaps.y": y}})
+            }
             // update memory
             this.x = x
             this.y = y
@@ -309,7 +310,9 @@ function Topicmap(topicmap_id, config) {
 
         function set_visibility(visibility) {
             // update DB ### TODO: extend topicmaps REST API instead of operating on the DB directly
-            dm4c.restc.update_association({id: ref_id, composite: {"dm4.topicmaps.visibility": visibility}})
+            if (is_writable()) {
+                dm4c.restc.update_association({id: ref_id, composite: {"dm4.topicmaps.visibility": visibility}})
+            }
             // update memory
             _self.visibility = visibility
         }
@@ -334,7 +337,9 @@ function Topicmap(topicmap_id, config) {
 
         this.hide = function() {
             // update DB
-            dm4c.restc.remove_association_from_topicmap(topicmap_id, id, ref_id)
+            if (is_writable()) {
+                dm4c.restc.remove_association_from_topicmap(topicmap_id, id, ref_id)
+            }
             // update memory
             delete assocs[id]
             reset_selection()
