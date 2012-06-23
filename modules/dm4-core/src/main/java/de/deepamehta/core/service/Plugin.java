@@ -16,6 +16,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
@@ -85,6 +86,9 @@ public class Plugin implements BundleActivator, EventHandler {
     protected DeepaMehtaService dms;
     private HttpService httpService;
     private EventAdmin eventService;
+
+    // Provided Service
+    ServiceRegistration registration;
 
     private List<ServiceTracker> serviceTrackers = new ArrayList();
 
@@ -209,6 +213,8 @@ public class Plugin implements BundleActivator, EventHandler {
         for (ServiceTracker serviceTracker : serviceTrackers) {
             serviceTracker.close();
         }
+        //
+        unregisterPluginService();
     }
 
 
@@ -466,6 +472,8 @@ public class Plugin implements BundleActivator, EventHandler {
         }
     }
 
+    // ---
+
     /**
      * Registers the plugin's OSGi service at the OSGi framework.
      * If the plugin doesn't provide a service nothing is performed.
@@ -478,9 +486,24 @@ public class Plugin implements BundleActivator, EventHandler {
         //
         try {
             logger.info("Registering service \"" + serviceInterface + "\" of " + this + " at OSGi framework");
-            context.registerService(serviceInterface, this, null);
+            registration = context.registerService(serviceInterface, this, null);
         } catch (Exception e) {
             throw new RuntimeException("Registering service of " + this + " at OSGi framework failed " +
+                "(serviceInterface=\"" + serviceInterface + "\")", e);
+        }
+    }
+
+    private void unregisterPluginService() {
+        String serviceInterface = getConfigProperty("providedServiceInterface");
+        if (serviceInterface == null) {
+            return;
+        }
+        //
+        try {
+            logger.info("Unregistering service \"" + serviceInterface + "\" of " + this + " at OSGi framework");
+            registration.unregister();
+        } catch (Exception e) {
+            throw new RuntimeException("Unregistering service of " + this + " at OSGi framework failed " +
                 "(serviceInterface=\"" + serviceInterface + "\")", e);
         }
     }
