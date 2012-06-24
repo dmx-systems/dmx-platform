@@ -14,7 +14,7 @@ HTMLFieldRenderer.prototype.render_form_element = function(parent_element) {
         .text(field_model.value)
     )
     CKEDITOR.replace("field_" + field_model.uri, {
-        customConfig: "/script/config/ckeditor_config.js"
+        customConfig: "/de.deepamehta.webclient/script/config/ckeditor_config.js"
     })
     //
     return function() {

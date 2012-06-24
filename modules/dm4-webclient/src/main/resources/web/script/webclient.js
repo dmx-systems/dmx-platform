@@ -11,7 +11,7 @@ var dm4c = new function() {
     // preferences
     this.MAX_RESULT_SIZE = 100
     this.MAX_LINK_TEXT_LENGTH = 50
-    this.DEFAULT_TOPIC_ICON = "/images/ball-gray.png"
+    this.DEFAULT_TOPIC_ICON = "/de.deepamehta.webclient/images/ball-gray.png"
     var DEFAULT_FIELD_ROWS = 1
 
     var CORE_SERVICE_URI = "/core"
@@ -43,9 +43,9 @@ var dm4c = new function() {
 
     var pm = new PluginManager({
         embedded_plugins: [
-            "/script/embedded_plugins/default_plugin.js",
-            "/script/embedded_plugins/fulltext_plugin.js",
-            "/script/embedded_plugins/ckeditor_plugin.js"
+            "/de.deepamehta.webclient/script/embedded_plugins/default_plugin.js",
+            "/de.deepamehta.webclient/script/embedded_plugins/fulltext_plugin.js",
+            "/de.deepamehta.webclient/script/embedded_plugins/ckeditor_plugin.js"
         ]
     })
 

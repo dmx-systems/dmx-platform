@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -629,7 +630,9 @@ public class Plugin implements BundleActivator, EventHandler {
                 }
                 //
                 httpService.registerServlet(namespace, new ServletContainer(), initParams, null); */
-                webPublishingService.addResource(this);
+                webPublishingService.addResource(this, getProviderClasses());
+                // ### webPublishingService.addProviderClasses(getProviderClasses());
+                // ### webPublishingService.refresh();
             }
         } catch (Exception e) {
             unregisterWebResources();
@@ -646,7 +649,30 @@ public class Plugin implements BundleActivator, EventHandler {
         }
     }
 
+    public Set<Class<?>> getProviderClasses() throws IOException {
+        Set<Class<?>> providerClasses = new HashSet();
+        String providerPackage = ("/" + pluginPackage + ".provider").replace('.', '/');
+        Enumeration<String> e = pluginBundle.getEntryPaths(providerPackage);
+        logger.info("#################### Scanning package " + providerPackage + " -> " + e);
+        if (e != null) {
+            while (e.hasMoreElements()) {
+                String entryPath = e.nextElement();
+                entryPath = entryPath.substring(0, entryPath.length() - 6);     // cut ".class"
+                String className = entryPath.replace('/', '.');
+                logger.info("                 ### " + className + " ###");
+                Class providerClass = loadClass(className);
+                if (providerClass == null) {
+                    throw new RuntimeException("Loading provider class \"" + className + "\" failed");
+                }
+                providerClasses.add(providerClass);
+            }
+        }
+        return providerClasses;
+    }
+
     /**
+     * ### TODO: drop method
+     *
      * Returns the packages Jersey have to scan (for root resource and provider classes) for this plugin.
      * These comprise:
      * 1) The plugin's "resources" package.

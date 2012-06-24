@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/")
+@Path("/files")
 @Produces("application/json")
 public class FilesPlugin extends Plugin implements FilesService {
 

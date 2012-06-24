@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/")
+@Path("/webclient")
 @Consumes("application/json")
 @Produces("application/json")
 public class WebclientPlugin extends Plugin {
@@ -244,8 +244,7 @@ public class WebclientPlugin extends Plugin {
     // === Client Start ===
 
     private String getWebclientUrl() {
-        String host = "localhost";
         String port = System.getProperty("org.osgi.service.http.port");
-        return "http://" + host + ":" + port + "/";
+        return "http://localhost:" + port + "/de.deepamehta.webclient/";
     }
 }

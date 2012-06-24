@@ -26,7 +26,7 @@ public class WebPublishingService {
     // Root resource and provider instances
     private Set<Object> singletons = new HashSet<Object>();
 
-    private ServletContainer servlet;
+    private ServletContainer jerseyServlet;
 
     private HttpService httpService;
     private ServiceRegistration registration;
@@ -48,33 +48,60 @@ public class WebPublishingService {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    // Note: synchronizing this method prevents creation of multiple Jersey servlet instances due to parallel plugin
-    // initialization.
-    public synchronized void addResource(Object resource) {
+    // ### Note: the root resource and provider classes must be added in the same method along with reloading the
+    // ### Jersey servlet. Otherwise the provider classes will not work. Furthermore this works only with synchronous
+    // ### bundle starts (felix.fileinstall.noInitialDelay=true in global pom). This all is really strange.
+    public synchronized void addResource(Object resource, Set<Class<?>> providerClasses) {
         singletons.add(resource);
-        // Note: we must register the Jersey servlet lazily, that is not before any resource is added. Registering
-        // a Jersey servlet with an "empty" application would fail (com.sun.jersey.api.container.ContainerException:
+        classes.addAll(providerClasses);
+        // ### registerServlet();
+        if (jerseyServlet == null) {
+            try {
+                logger.info("########## Registering Jersey servlet at HTTP service");
+                jerseyServlet = new ServletContainer(new RootApplication());
+                httpService.registerServlet(APPLICATION_ROOT, jerseyServlet, null, null);
+            } catch (Exception e) {
+                // unregister...();     // ### TODO?
+                throw new RuntimeException("Registering Jersey servlet at HTTP service failed", e);
+            }
+        } else {
+            jerseyServlet.reload();
+        }
+    }
+
+    /* public synchronized void addProviderClasses(Set<Class<?>> providerClasses) {
+        classes.addAll(providerClasses);
+        registerServlet();
+        //
+        jerseyServlet.reload();
+    } */
+
+    /* public synchronized void refresh() {
+        // Note: we must register the Jersey servlet lazily, that is not before any resources or providers are added.
+        // A Jersey servlet with an "empty" application would fail (com.sun.jersey.api.container.ContainerException:
         // The ResourceConfig instance does not contain any root resource classes).
         registerServlet();
         //
-        servlet.reload();
-    }
+        jerseyServlet.reload();
+    } */
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void registerServlet() {
-        if (servlet != null) {
+    // Note: synchronizing this method prevents creation of multiple Jersey servlet instances due to parallel plugin
+    // initialization.
+    /* private synchronized void registerServlet() {
+        if (jerseyServlet != null) {
             return;
         }
         try {
             logger.info("########## Registering Jersey servlet at HTTP service");
-            servlet = new ServletContainer(new RootApplication());
-            httpService.registerServlet(APPLICATION_ROOT, servlet, null, null);
+            jerseyServlet = new ServletContainer(new RootApplication());
+            httpService.registerServlet(APPLICATION_ROOT, jerseyServlet, null, null);
         } catch (Exception e) {
             // unregister...();     // ### TODO?
             throw new RuntimeException("Registering Jersey servlet at HTTP service failed", e);
-        }            
-    }
+        }
+    } */
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 

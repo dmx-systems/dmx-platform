@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/")
+@Path("/accesscontrol")
 @Consumes("application/json")
 @Produces("application/json")
 public class AccessControlPlugin extends Plugin implements AccessControlService {

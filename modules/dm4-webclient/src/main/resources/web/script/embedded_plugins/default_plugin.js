@@ -5,18 +5,18 @@ function default_plugin () {
 
     var type_menu
 
-    dm4c.load_page_renderer("/script/page_renderers/topic_renderer.js")
-    dm4c.load_page_renderer("/script/page_renderers/association_renderer.js")
+    dm4c.load_page_renderer("/de.deepamehta.webclient/script/page_renderers/topic_renderer.js")
+    dm4c.load_page_renderer("/de.deepamehta.webclient/script/page_renderers/association_renderer.js")
 
-    dm4c.load_field_renderer("/script/field_renderers/text_field_renderer.js")
-    dm4c.load_field_renderer("/script/field_renderers/number_field_renderer.js")
-    dm4c.load_field_renderer("/script/field_renderers/boolean_field_renderer.js")
-    dm4c.load_field_renderer("/script/field_renderers/html_field_renderer.js")
+    dm4c.load_field_renderer("/de.deepamehta.webclient/script/field_renderers/text_field_renderer.js")
+    dm4c.load_field_renderer("/de.deepamehta.webclient/script/field_renderers/number_field_renderer.js")
+    dm4c.load_field_renderer("/de.deepamehta.webclient/script/field_renderers/boolean_field_renderer.js")
+    dm4c.load_field_renderer("/de.deepamehta.webclient/script/field_renderers/html_field_renderer.js")
     // ### dm4c.load_field_renderer("/script/field_renderers/date_field_renderer.js")
     // ### dm4c.load_field_renderer("/script/field_renderers/reference_field_renderer.js")
-    dm4c.load_field_renderer("/script/field_renderers/title_renderer.js")
-    dm4c.load_field_renderer("/script/field_renderers/body_text_renderer.js")
-    dm4c.load_field_renderer("/script/field_renderers/search_result_renderer.js")
+    dm4c.load_field_renderer("/de.deepamehta.webclient/script/field_renderers/title_renderer.js")
+    dm4c.load_field_renderer("/de.deepamehta.webclient/script/field_renderers/body_text_renderer.js")
+    dm4c.load_field_renderer("/de.deepamehta.webclient/script/field_renderers/search_result_renderer.js")
 
     // === Webclient Listeners ===
 

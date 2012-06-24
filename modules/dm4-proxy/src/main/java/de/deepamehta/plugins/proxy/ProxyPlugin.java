@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/")
+@Path("/proxy")
 public class ProxyPlugin extends Plugin implements ProxyService {
 
     // ------------------------------------------------------------------------------------------------------- Constants

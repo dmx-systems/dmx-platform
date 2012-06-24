@@ -39,7 +39,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/")
+@Path("/core")
 @Consumes("application/json")
 @Produces("application/json")
 public class WebservicePlugin extends Plugin {

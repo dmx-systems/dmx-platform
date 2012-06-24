@@ -19,13 +19,13 @@ function help_plugin() {
         '<table>' +
             '<tr>' +
                 '<td>' +
-                    '<img src="/images/deepamehta-logo.png">' +
+                    '<img src="/de.deepamehta.webclient/images/deepamehta-logo.png">' +
                 '</td>' +
                 '<td>' +
                     '<div class="field-label">Version</div>' +
                     '<div>${project.version}</div>' +
                     '<div class="field-label">Build Date</div>' +
-                    '<div>Jun 2, 2012</div>' +
+                    '<div>Jun 23, 2012</div>' +
                     '<div class="field-label">Copyright</div>' +
                     '<div>2000-2012 Jörg Richter</div>' +
                     '<div class="field-label">License</div>' +
