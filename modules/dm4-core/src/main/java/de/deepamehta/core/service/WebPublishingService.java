@@ -1,4 +1,4 @@
-package de.deepamehta.core.osgi;
+package de.deepamehta.core.service;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 
 
+// ### TODO: should not be a public class.
 public class WebPublishingService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -35,7 +36,7 @@ public class WebPublishingService {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    WebPublishingService(BundleContext context, HttpService httpService) {
+    public WebPublishingService(BundleContext context, HttpService httpService) {
         try {
             logger.info("Registering Web Publishing service at OSGi framework");
             this.httpService = httpService;
@@ -50,7 +51,7 @@ public class WebPublishingService {
 
     // Note: synchronizing this method prevents creation of multiple Jersey servlet instances due to parallel plugin
     // initialization.
-    public synchronized void addResource(Object resource, Set<Class<?>> providerClasses) {
+    synchronized RestResource addResource(Object resource, Set<Class<?>> providerClasses) {
         singletons.add(resource);
         classes.addAll(providerClasses);
         // Note: we must create the Jersey servlet lazily, that is not before any resources or providers are added.
@@ -59,9 +60,17 @@ public class WebPublishingService {
         if (jerseyServlet == null) {
             createJerseyServlet();
         } else {
-            logger.info("##### Reloading Jersey servlet");
-            jerseyServlet.reload();
+            reloadJerseyServlet();
         }
+        //
+        return new RestResource(resource, providerClasses);
+    }
+
+    synchronized void removeResource(RestResource restResource) {
+        singletons.remove(restResource.resource);
+        classes.removeAll(restResource.providerClasses);
+        //
+        reloadJerseyServlet();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -75,6 +84,11 @@ public class WebPublishingService {
             // unregister...();     // ### TODO?
             throw new RuntimeException("Creating Jersey servlet and registering at HTTP service failed", e);
         }
+    }
+
+    private void reloadJerseyServlet() {
+        logger.info("##### Reloading Jersey servlet");
+        jerseyServlet.reload();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Classes

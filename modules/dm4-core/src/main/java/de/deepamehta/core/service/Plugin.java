@@ -7,7 +7,6 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.osgi.WebPublishingService;    // ### TODO: packaging?
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.JSONHelper;
 
@@ -88,8 +87,11 @@ public class Plugin implements BundleActivator, EventHandler {
     private HttpService httpService;
     private EventAdmin eventService;
 
-    // Provided Service
+    // Provided OSGi service
     ServiceRegistration registration;
+
+    // Provided REST service
+    RestResource restResource;
 
     private List<ServiceTracker> serviceTrackers = new ArrayList();
 
@@ -380,12 +382,11 @@ public class Plugin implements BundleActivator, EventHandler {
                     dms = null;
                 } else if (service == webPublishingService) {
                     logger.info("Removing Web Publishing service from plugin \"" + pluginName + "\"");
-                    // unregister...();  ### TODO
+                    unregisterRestResources();
                     webPublishingService = null;
                 } else if (service == httpService) {
                     logger.info("Removing HTTP service from plugin \"" + pluginName + "\"");
                     unregisterWebResources();
-                    unregisterRestResources();
                     httpService = null;
                 } else if (service == eventService) {
                     logger.info("Removing Event Admin service from plugin \"" + pluginName + "\"");
@@ -613,7 +614,7 @@ public class Plugin implements BundleActivator, EventHandler {
         try {
             if (namespace != null) {
                 logger.info("Registering REST resources of " + this + " at namespace " + namespace);
-                webPublishingService.addResource(this, getProviderClasses());
+                restResource = webPublishingService.addResource(this, getProviderClasses());
             }
         } catch (Exception e) {
             unregisterWebResources();
@@ -623,12 +624,13 @@ public class Plugin implements BundleActivator, EventHandler {
     }
 
     private void unregisterRestResources() {
-        String namespace = getConfigProperty("restResourcesNamespace");     // ### TODO: drop this config property
-        if (namespace != null) {
+        if (restResource != null) {
             logger.info("Unregistering REST resources of " + this);
-            httpService.unregister(namespace);
+            webPublishingService.removeResource(restResource);
         }
     }
+
+    // ---
 
     public Set<Class<?>> getProviderClasses() throws IOException {
         Set<Class<?>> providerClasses = new HashSet();

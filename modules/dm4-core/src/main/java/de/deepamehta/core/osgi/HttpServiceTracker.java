@@ -5,6 +5,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 
+import de.deepamehta.core.service.WebPublishingService;
+
 import java.util.logging.Logger;
 
 
