@@ -1,6 +1,6 @@
 package de.deepamehta.core.osgi;
 
-import javax.ws.rs.core.Application;
+import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 import org.osgi.framework.BundleContext;
@@ -48,64 +48,38 @@ public class WebPublishingService {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    // ### Note: the root resource and provider classes must be added in the same method along with reloading the
-    // ### Jersey servlet. Otherwise the provider classes will not work. Furthermore this works only with synchronous
-    // ### bundle starts (felix.fileinstall.noInitialDelay=true in global pom). This all is really strange.
+    // Note: synchronizing this method prevents creation of multiple Jersey servlet instances due to parallel plugin
+    // initialization.
     public synchronized void addResource(Object resource, Set<Class<?>> providerClasses) {
         singletons.add(resource);
         classes.addAll(providerClasses);
-        // ### registerServlet();
+        // Note: we must create the Jersey servlet lazily, that is not before any resources or providers are added.
+        // A Jersey servlet with an "empty" application would fail (com.sun.jersey.api.container.ContainerException:
+        // The ResourceConfig instance does not contain any root resource classes).
         if (jerseyServlet == null) {
-            try {
-                logger.info("########## Registering Jersey servlet at HTTP service");
-                jerseyServlet = new ServletContainer(new RootApplication());
-                httpService.registerServlet(APPLICATION_ROOT, jerseyServlet, null, null);
-            } catch (Exception e) {
-                // unregister...();     // ### TODO?
-                throw new RuntimeException("Registering Jersey servlet at HTTP service failed", e);
-            }
+            createJerseyServlet();
         } else {
+            logger.info("##### Reloading Jersey servlet");
             jerseyServlet.reload();
         }
     }
 
-    /* public synchronized void addProviderClasses(Set<Class<?>> providerClasses) {
-        classes.addAll(providerClasses);
-        registerServlet();
-        //
-        jerseyServlet.reload();
-    } */
-
-    /* public synchronized void refresh() {
-        // Note: we must register the Jersey servlet lazily, that is not before any resources or providers are added.
-        // A Jersey servlet with an "empty" application would fail (com.sun.jersey.api.container.ContainerException:
-        // The ResourceConfig instance does not contain any root resource classes).
-        registerServlet();
-        //
-        jerseyServlet.reload();
-    } */
-
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    // Note: synchronizing this method prevents creation of multiple Jersey servlet instances due to parallel plugin
-    // initialization.
-    /* private synchronized void registerServlet() {
-        if (jerseyServlet != null) {
-            return;
-        }
+    private void createJerseyServlet() {
         try {
-            logger.info("########## Registering Jersey servlet at HTTP service");
+            logger.info("########## Creating Jersey servlet and registering at HTTP service");
             jerseyServlet = new ServletContainer(new RootApplication());
             httpService.registerServlet(APPLICATION_ROOT, jerseyServlet, null, null);
         } catch (Exception e) {
             // unregister...();     // ### TODO?
-            throw new RuntimeException("Registering Jersey servlet at HTTP service failed", e);
+            throw new RuntimeException("Creating Jersey servlet and registering at HTTP service failed", e);
         }
-    } */
+    }
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
-    private class RootApplication extends Application {
+    private class RootApplication extends DefaultResourceConfig {
 
         @Override
         public Set<Class<?>> getClasses() {
@@ -114,6 +88,7 @@ public class WebPublishingService {
 
         @Override
         public Set<Object> getSingletons() {
+            // logger.info("##### " + singletons.size() + " resources: " + singletons);
             return singletons;
         }
     }

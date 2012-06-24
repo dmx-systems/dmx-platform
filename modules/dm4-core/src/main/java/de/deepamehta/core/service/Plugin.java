@@ -59,8 +59,6 @@ public class Plugin implements BundleActivator, EventHandler {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
-    private static final String STANDARD_PROVIDER_PACKAGE = "de.deepamehta.plugins.webservice.provider";
-
     private static final String PLUGIN_READY = "dm4/core/plugin_ready";
 
     // ------------------------------------------------------------------------------------------------- Class Variables
@@ -560,7 +558,7 @@ public class Plugin implements BundleActivator, EventHandler {
 
     private String getWebResourcesNamespace() {
         return "/" + pluginId;
-        // return getConfigProperty("webResourcesNamespace", "/" + pluginId);   // ### TODO
+        // return getConfigProperty("webResourcesNamespace", "/" + pluginId);   // ### TODO: drop this config property
     }
 
     // ---
@@ -611,28 +609,11 @@ public class Plugin implements BundleActivator, EventHandler {
     // === REST Resources ===
 
     private void registerRestResources() {
-        String namespace = getConfigProperty("restResourcesNamespace");
+        String namespace = getConfigProperty("restResourcesNamespace");     // ### TODO: drop this config property
         try {
             if (namespace != null) {
                 logger.info("Registering REST resources of " + this + " at namespace " + namespace);
-                // Generic plugins (plugin bundles not containing a Plugin subclass) which provide resource classes
-                // must set the "pluginPackage" config property. Otherwise the resource classes can't be located.
-                /* ### if (pluginPackage.equals("de.deepamehta.core.service")) {
-                    throw new RuntimeException("Resource classes can't be located (plugin package is unknown). " +
-                        "You must implement a Plugin subclass OR configure \"pluginPackage\" in plugin.properties");
-                }
-                //
-                Dictionary initParams = new Hashtable();
-                if (loadClass(pluginPackage + ".Application") != null) {
-                    initParams.put("javax.ws.rs.Application", pluginPackage + ".Application");
-                } else {
-                    initParams.put("com.sun.jersey.config.property.packages", packagesToScan());
-                }
-                //
-                httpService.registerServlet(namespace, new ServletContainer(), initParams, null); */
                 webPublishingService.addResource(this, getProviderClasses());
-                // ### webPublishingService.addProviderClasses(getProviderClasses());
-                // ### webPublishingService.refresh();
             }
         } catch (Exception e) {
             unregisterWebResources();
@@ -642,7 +623,7 @@ public class Plugin implements BundleActivator, EventHandler {
     }
 
     private void unregisterRestResources() {
-        String namespace = getConfigProperty("restResourcesNamespace");
+        String namespace = getConfigProperty("restResourcesNamespace");     // ### TODO: drop this config property
         if (namespace != null) {
             logger.info("Unregistering REST resources of " + this);
             httpService.unregister(namespace);
@@ -653,13 +634,13 @@ public class Plugin implements BundleActivator, EventHandler {
         Set<Class<?>> providerClasses = new HashSet();
         String providerPackage = ("/" + pluginPackage + ".provider").replace('.', '/');
         Enumeration<String> e = pluginBundle.getEntryPaths(providerPackage);
-        logger.info("#################### Scanning package " + providerPackage + " -> " + e);
+        logger.info("### Scanning package " + pluginPackage + ".provider");
         if (e != null) {
             while (e.hasMoreElements()) {
                 String entryPath = e.nextElement();
                 entryPath = entryPath.substring(0, entryPath.length() - 6);     // cut ".class"
                 String className = entryPath.replace('/', '.');
-                logger.info("                 ### " + className + " ###");
+                logger.info("  # Found provider class: " + className);
                 Class providerClass = loadClass(className);
                 if (providerClass == null) {
                     throw new RuntimeException("Loading provider class \"" + className + "\" failed");
@@ -668,29 +649,6 @@ public class Plugin implements BundleActivator, EventHandler {
             }
         }
         return providerClasses;
-    }
-
-    /**
-     * ### TODO: drop method
-     *
-     * Returns the packages Jersey have to scan (for root resource and provider classes) for this plugin.
-     * These comprise:
-     * 1) The plugin's "resources" package.
-     * 2) The plugin's "provider" package.
-     * 3) The deepamehta-webservice's "provider" package.
-     *    This contains providers for DeepaMehta's core model classes, e.g. "Topic".
-     */
-    private String packagesToScan() {
-        StringBuilder packages = new StringBuilder(pluginPackage + ".resources;");
-        //
-        String pluginProviderPackage = pluginPackage + ".provider";
-        if (!pluginProviderPackage.equals(STANDARD_PROVIDER_PACKAGE)) {
-            packages.append(pluginProviderPackage + ";");
-        }
-        // The standard provider classes of the deepamehta-webservice module are available to every plugin
-        packages.append(STANDARD_PROVIDER_PACKAGE);
-        //
-        return packages.toString();
     }
 
     // === Config Properties ===
