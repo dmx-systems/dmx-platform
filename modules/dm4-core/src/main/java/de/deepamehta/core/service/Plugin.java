@@ -636,13 +636,13 @@ public class Plugin implements BundleActivator, EventHandler {
         Set<Class<?>> providerClasses = new HashSet();
         String providerPackage = ("/" + pluginPackage + ".provider").replace('.', '/');
         Enumeration<String> e = pluginBundle.getEntryPaths(providerPackage);
-        logger.info("### Scanning package " + pluginPackage + ".provider");
+        logger.fine("### Scanning package " + pluginPackage + ".provider");
         if (e != null) {
             while (e.hasMoreElements()) {
                 String entryPath = e.nextElement();
                 entryPath = entryPath.substring(0, entryPath.length() - 6);     // cut ".class"
                 String className = entryPath.replace('/', '.');
-                logger.info("  # Found provider class: " + className);
+                logger.fine("  # Found provider class: " + className);
                 Class providerClass = loadClass(className);
                 if (providerClass == null) {
                     throw new RuntimeException("Loading provider class \"" + className + "\" failed");

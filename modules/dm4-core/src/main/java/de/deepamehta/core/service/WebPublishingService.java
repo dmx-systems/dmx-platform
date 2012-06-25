@@ -22,12 +22,14 @@ public class WebPublishingService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    // Root resource and provider classes
-    private Set<Class<?>> classes = new HashSet<Class<?>>();
-    // Root resource and provider instances
-    private Set<Object> singletons = new HashSet<Object>();
+    private DefaultResourceConfig rootApplication = new DefaultResourceConfig();
+    private int classCount = 0;         // counts DM root resource and provider classes
+    private int singletonCount = 0;     // counts DM root resource and provider instances
+    // Note: we count DM resources separately as Jersey adds its own ones to the application.
+    // Once the total DM resource count reaches 0 the Jersey servlet is unregistered.
 
-    private ServletContainer jerseyServlet;
+    private ServletContainer jerseyServlet = new ServletContainer(rootApplication);
+    private boolean isJerseyServletRegistered = false;
 
     private HttpService httpService;
     private ServiceRegistration registration;
@@ -47,18 +49,20 @@ public class WebPublishingService {
         }
     }
 
-    // -------------------------------------------------------------------------------------------------- Public Methods
+    // ----------------------------------------------------------------------------------------- Package Private Methods
 
     // Note: synchronizing this method prevents creation of multiple Jersey servlet instances due to parallel plugin
     // initialization.
     synchronized RestResource addResource(Object resource, Set<Class<?>> providerClasses) {
-        singletons.add(resource);
-        classes.addAll(providerClasses);
-        // Note: we must create the Jersey servlet lazily, that is not before any resources or providers are added.
-        // A Jersey servlet with an "empty" application would fail (com.sun.jersey.api.container.ContainerException:
+        addSingleton(resource);
+        addClasses(providerClasses);
+        logResourceInfo();
+        //
+        // Note: we must register the Jersey servlet lazily, that is not before any resources or providers
+        // are added. An "empty" application would fail (com.sun.jersey.api.container.ContainerException:
         // The ResourceConfig instance does not contain any root resource classes).
-        if (jerseyServlet == null) {
-            createJerseyServlet();
+        if (!isJerseyServletRegistered) {
+            registerJerseyServlet();
         } else {
             reloadJerseyServlet();
         }
@@ -67,43 +71,90 @@ public class WebPublishingService {
     }
 
     synchronized void removeResource(RestResource restResource) {
-        singletons.remove(restResource.resource);
-        classes.removeAll(restResource.providerClasses);
+        removeSingleton(restResource.resource);
+        removeClasses(restResource.providerClasses);
+        logResourceInfo();
         //
-        reloadJerseyServlet();
+        // Note: once all resources and providers are removed we must unregister the Jersey servlet.
+        // Reloading it with an "empty" application would fail (com.sun.jersey.api.container.ContainerException:
+        // The ResourceConfig instance does not contain any root resource classes).
+        if (!hasResources()) {
+            unregisterJerseyServlet();
+        } else {
+            reloadJerseyServlet();
+        }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void createJerseyServlet() {
+    private Set<Class<?>> getClasses() {
+        return rootApplication.getClasses();
+    }
+
+    private Set<Object> getSingletons() {
+        return rootApplication.getSingletons();
+    }
+
+    // ---
+
+    private void addClasses(Set<Class<?>> classes) {
+        getClasses().addAll(classes);
+        classCount += classes.size();
+    }
+
+    private void addSingleton(Object singleton) {
+        getSingletons().add(singleton);
+        singletonCount++;
+    }
+
+    // ---
+
+    private void removeClasses(Set<Class<?>> classes) {
+        getClasses().removeAll(classes);
+        classCount -= classes.size();
+    }
+
+    private void removeSingleton(Object singleton) {
+        getSingletons().remove(singleton);
+        singletonCount--;
+    }
+
+    // ---
+
+    private boolean hasResources() {
+        return classCount + singletonCount > 0;
+    }
+
+    private void logResourceInfo() {
+        logger.fine("##### DM Classes: " + classCount + ", All: " + getClasses().size() + " " + getClasses());
+        logger.fine("##### DM Singletons: " + singletonCount + ", All: " + getSingletons().size() + " " +
+            getSingletons());
+    }
+
+    // ---
+
+    private void registerJerseyServlet() {
         try {
-            logger.info("########## Creating Jersey servlet and registering at HTTP service");
-            jerseyServlet = new ServletContainer(new RootApplication());
-            httpService.registerServlet(APPLICATION_ROOT, jerseyServlet, null, null);
+            logger.fine("########## Registering Jersey servlet at HTTP service (namespace=\"" + APPLICATION_ROOT +
+                "\")");
+            httpService.registerServlet(APPLICATION_ROOT, jerseyServlet, null, null);  // javax.servlet.ServletException
+            isJerseyServletRegistered = true;
         } catch (Exception e) {
             // unregister...();     // ### TODO?
-            throw new RuntimeException("Creating Jersey servlet and registering at HTTP service failed", e);
+            throw new RuntimeException("Registering Jersey servlet at HTTP service failed", e);
         }
     }
+
+    private void unregisterJerseyServlet() {
+        logger.fine("########## Unregistering Jersey servlet at HTTP service (namespace=\"" + APPLICATION_ROOT + "\")");
+        httpService.unregister(APPLICATION_ROOT);
+        isJerseyServletRegistered = false;
+    }
+
+    // ---
 
     private void reloadJerseyServlet() {
-        logger.info("##### Reloading Jersey servlet");
+        logger.fine("##### Reloading Jersey servlet");
         jerseyServlet.reload();
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Classes
-
-    private class RootApplication extends DefaultResourceConfig {
-
-        @Override
-        public Set<Class<?>> getClasses() {
-            return classes;
-        }
-
-        @Override
-        public Set<Object> getSingletons() {
-            // logger.info("##### " + singletons.size() + " resources: " + singletons);
-            return singletons;
-        }
     }
 }
