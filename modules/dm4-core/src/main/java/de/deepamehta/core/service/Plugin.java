@@ -46,7 +46,7 @@ public class Plugin implements BundleActivator, EventHandler {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
-    private static final String PLUGIN_READY = "dm4/core/plugin_ready";
+    private static final String PLUGIN_READY = "de/deepamehta/core/plugin_ready";   // topic of the OSGi event
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 
@@ -84,6 +84,8 @@ public class Plugin implements BundleActivator, EventHandler {
     private List<ServiceTracker> serviceTrackers = new ArrayList();
 
     private Logger logger = Logger.getLogger(getClass().getName());
+
+
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -206,6 +208,8 @@ public class Plugin implements BundleActivator, EventHandler {
         }
         //
         unregisterPluginService();
+        //
+        removeFromReadyPlugins();
     }
 
 
@@ -320,6 +324,31 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    // === Config Properties ===
+
+    private Properties readConfigFile() {
+        try {
+            Properties properties = new Properties();
+            InputStream in = getResourceAsStream(PLUGIN_CONFIG_FILE);
+            if (in != null) {
+                logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this);
+                properties.load(in);
+            } else {
+                logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this +
+                    " ABORTED -- file does not exist");
+            }
+            return properties;
+        } catch (Exception e) {
+            throw new RuntimeException("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this + " failed", e);
+        }
+    }
+
+    private String getConfigProperty(String key, String defaultValue) {
+        return configProperties.getProperty(key, defaultValue);
+    }
+
+    // === Service Tracking ===
+
     private void createServiceTrackers() {
         String consumedServiceInterfaces = getConfigProperty("consumedServiceInterfaces");
         if (consumedServiceInterfaces != null) {
@@ -387,24 +416,60 @@ public class Plugin implements BundleActivator, EventHandler {
     // ---
 
     /**
-     * Checks if both required OSGi services (DeepaMehtaService and HttpService) are available,
-     * and if so, initializes the plugin. ### FIXDOC
+     * Checks if the requirements are met, and if so, initializes this plugin.
+     *
+     * The requirements:
+     *   - the 3 basic OSGi services are available (DeepaMehtaService, WebPublishingService, EventAdmin).
+     *   - the plugins this plugin depends on (according to this plugin's "importModels" property) are ready.
+     *
+     * After initialization:
+     *   - adds this plugin to the set of "ready" plugins.
+     *   - posts the PLUGIN_READY event.
+     *   - checks if all plugins are ready, and if so, triggers the ALL_PLUGINS_READY hook.
      */
     private void checkServiceAvailability() {
-        if (dms != null && webPublishingService != null && eventService != null && dependenciesAvailable()) {
-            initPlugin();
-            pluginReady();
-            postPluginReadyEvent();
-            dms.checkAllPluginsReady();
+        if (dms == null || webPublishingService == null || eventService == null || !dependenciesAvailable()) {
+            return;
         }
+        // Note: we must not initialize a plugin twice.
+        // This would happen e.g. if a dependent plugin is redeployed.
+        if (isPluginReady()) {
+            logger.info("Initialization of " + this + " ABORTED -- already initialized");
+            return;
+        }
+        //
+        initializePlugin();
+        //
+        addToReadyPlugins();    // Once a plugin has been intialized it is "ready"
+        postPluginReadyEvent();
+        dms.checkAllPluginsReady();
     }
 
     // ---
 
-    private void pluginReady() {
+    /**
+     * Adds this plugin to the set of ready plugins.
+     */
+    private void addToReadyPlugins() {
         readyPlugins.add(pluginId);
     }
 
+    private void removeFromReadyPlugins() {
+        readyPlugins.remove(pluginId);
+    }
+
+    // ---
+
+    /**
+     * Returns the "ready" state of this plugin (true=ready).
+     */
+    private boolean isPluginReady() {
+        return isPluginReady(pluginId);
+    }
+
+    /**
+     * Returns the "ready" state of a plugin (true=ready).
+     */
     private boolean isPluginReady(String pluginId) {
         return readyPlugins.contains(pluginId);
     }
@@ -419,17 +484,17 @@ public class Plugin implements BundleActivator, EventHandler {
      * - register the plugin's static web resources at the OSGi HTTP service
      * - register the plugin's REST resources at the OSGi HTTP service
      *
-     * These are the tasks which rely on both, the DeepaMehtaService and the HttpService.
+     * These are the tasks which rely on both, the DeepaMehtaService and the WebPublishingService.
      * This method is called once both services become available. ### FIXDOC
      */
-    private void initPlugin() {
+    private void initializePlugin() {
         try {
             logger.info("----- Initializing " + this + " -----");
-            installPlugin();                    // relies on DeepaMehtaService
-            registerPlugin();                   // relies on DeepaMehtaService (and committed migrations)
+            installPluginInDB();        // relies on DeepaMehtaService
+            registerPlugin();           // relies on DeepaMehtaService (and committed migrations)
             registerPluginService();
-            registerWebResources();             // relies on HttpService
-            registerRestResources();            // relies on HttpService and DeepaMehtaService (and registered plugin)
+            registerWebResources();     // relies on WebPublishingService
+            registerRestResources();    // relies on WebPublishingService and DeepaMehtaService (and registered plugin)
             logger.info("----- Initialization of " + this + " complete -----");
             // ### FIXME: should we call registerPlugin() at last?
             // Currently if e.g. registerPluginService() fails the plugin is still registered at the DeepaMehta core.
@@ -438,6 +503,8 @@ public class Plugin implements BundleActivator, EventHandler {
         }
     }
 
+    // === Installation ===
+
     /**
      * Installs the plugin in the database. This comprises:
      * - create topic of type "Plugin"
@@ -445,25 +512,103 @@ public class Plugin implements BundleActivator, EventHandler {
      * - trigger POST_INSTALL_PLUGIN hook
      * - trigger MODIFY_TOPIC_TYPE hook (multiple times)
      */
-    private void installPlugin() {
+    private void installPluginInDB() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            boolean isCleanInstall = initPluginTopic();
+            boolean isCleanInstall;
+            // 1) create "Plugin" topic
+            pluginTopic = fetchPluginTopic();
+            if (pluginTopic != null) {
+                logger.info("Installing " + this + " in the database ABORTED -- already installed");
+                isCleanInstall = false;
+            } else {
+                logger.info("Installing " + this + " in the database");
+                createPluginTopic();
+                isCleanInstall = true;
+            }
+            // 2) run migrations
             runPluginMigrations(isCleanInstall);
+            // 3) post install
             if (isCleanInstall) {
                 postInstallPluginHook();  // trigger hook
                 introduceTypesToPlugin();
             }
+            //
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK! (" + this + ")");
-            throw new RuntimeException("Installation of " + this + " failed", e);
+            throw new RuntimeException("Installing " + this + " in the database failed", e);
         } finally {
             tx.finish();
         }
     }
 
-    // ---
+    /**
+     * Creates a Plugin topic in the DB.
+     * <p>
+     * A Plugin topic represents an installed plugin and is used to track its version.
+     */
+    private void createPluginTopic() {
+        pluginTopic = dms.createTopic(new TopicModel(pluginId, "dm4.core.plugin", new CompositeValue()
+            .put("dm4.core.plugin_name", pluginName)
+            .put("dm4.core.plugin_symbolic_name", pluginId)
+            .put("dm4.core.plugin_migration_nr", 0)
+        ), null);   // FIXME: clientState=null
+    }
+
+    private Topic fetchPluginTopic() {
+        return dms.getTopic("uri", new SimpleValue(pluginId), false, null);     // fetchComposite=false
+    }
+
+    /**
+     * Determines the migrations to be run for this plugin and run them.
+     */
+    private void runPluginMigrations(boolean isCleanInstall) {
+        int migrationNr = pluginTopic.getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
+        int requiredMigrationNr = Integer.parseInt(getConfigProperty("requiredPluginMigrationNr", "0"));
+        int migrationsToRun = requiredMigrationNr - migrationNr;
+        //
+        if (migrationsToRun == 0) {
+            logger.info("Running migrations for " + this + " ABORTED -- everything up-to-date (migrationNr=" +
+                migrationNr + ")");
+            return;
+        }
+        //
+        logger.info("Running " + migrationsToRun + " migrations for " + this + " (migrationNr=" + migrationNr +
+            ", requiredMigrationNr=" + requiredMigrationNr + ")");
+        for (int i = migrationNr + 1; i <= requiredMigrationNr; i++) {
+            dms.runPluginMigration(this, i, isCleanInstall);
+        }
+    }
+
+    private void introduceTypesToPlugin() {
+        for (String topicTypeUri : dms.getTopicTypeUris()) {
+            try {
+                // trigger hook
+                modifyTopicTypeHook(dms.getTopicType(topicTypeUri, null), null);   // clientState=null (2x)
+            } catch (Exception e) {
+                throw new RuntimeException("Introducing topic type \"" + topicTypeUri + "\" to " + this + " failed", e);
+            }
+        }
+    }
+
+    // === Core Registration ===
+
+    /**
+     * Registers the plugin at the DeepaMehta core service. From that moment the plugin takes part of the
+     * core service control flow, that is the plugin's hooks are triggered.
+     */
+    private void registerPlugin() {
+        logger.info("Registering " + this + " at DeepaMehta 4 core service");
+        dms.registerPlugin(this);
+    }
+
+    private void unregisterPlugin() {
+        logger.info("Unregistering " + this + " at DeepaMehta 4 core service");
+        dms.unregisterPlugin(pluginId);
+    }
+
+    // === Plugin Service ===
 
     /**
      * Registers the plugin's OSGi service at the OSGi framework.
@@ -497,22 +642,6 @@ public class Plugin implements BundleActivator, EventHandler {
             throw new RuntimeException("Unregistering service of " + this + " at OSGi framework failed " +
                 "(serviceInterface=\"" + serviceInterface + "\")", e);
         }
-    }
-
-    // ---
-
-    /**
-     * Registers the plugin at the DeepaMehta core service. From that moment the plugin takes part of the
-     * core service control flow, that is the plugin's hooks are triggered.
-     */
-    private void registerPlugin() {
-        logger.info("Registering " + this + " at DeepaMehta 4 core service");
-        dms.registerPlugin(this);
-    }
-
-    private void unregisterPlugin() {
-        logger.info("Unregistering " + this + " at DeepaMehta 4 core service");
-        dms.unregisterPlugin(pluginId);
     }
 
     // === Web Resources ===
@@ -595,29 +724,6 @@ public class Plugin implements BundleActivator, EventHandler {
         return providerClasses;
     }
 
-    // === Config Properties ===
-
-    private Properties readConfigFile() {
-        try {
-            Properties properties = new Properties();
-            InputStream in = getResourceAsStream(PLUGIN_CONFIG_FILE);
-            if (in != null) {
-                logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this);
-                properties.load(in);
-            } else {
-                logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this +
-                    " ABORTED -- file does not exist");
-            }
-            return properties;
-        } catch (Exception e) {
-            throw new RuntimeException("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this + " failed", e);
-        }
-    }
-
-    private String getConfigProperty(String key, String defaultValue) {
-        return configProperties.getProperty(key, defaultValue);
-    }
-
     // === Model Dependencies ===
 
     private Map<String, Boolean> initDependencies() {
@@ -679,59 +785,5 @@ public class Plugin implements BundleActivator, EventHandler {
         Properties properties = new Properties();
         properties.put(EventConstants.BUNDLE_SYMBOLICNAME, pluginId);
         eventService.postEvent(new Event(PLUGIN_READY, properties));
-    }
-
-    // ---
-
-    /**
-     * Creates a Plugin topic in the DB, if not already exists.
-     * <p>
-     * A Plugin topic represents an installed plugin and is used to track its version.
-     *
-     * @return  <code>true</code> if a Plugin topic has been created (means: this is a plugin clean install),
-     *          <code>false</code> otherwise.
-     */
-    private boolean initPluginTopic() {
-        pluginTopic = findPluginTopic();
-        if (pluginTopic != null) {
-            logger.info("Installing " + this + " ABORTED -- already installed");
-            return false;
-        } else {
-            logger.info("Installing " + this);
-            pluginTopic = dms.createTopic(new TopicModel(pluginId, "dm4.core.plugin",
-                new CompositeValue().put("dm4.core.plugin_name", pluginName)
-                                    .put("dm4.core.plugin_symbolic_name", pluginId)
-                                    .put("dm4.core.plugin_migration_nr", 0)), null);    // FIXME: clientState=null
-            return true;
-        }
-    }
-
-    private Topic findPluginTopic() {
-        return dms.getTopic("uri", new SimpleValue(pluginId), false, null);     // fetchComposite=false
-    }
-
-    /**
-     * Determines the migrations to be run for this plugin and run them.
-     */
-    private void runPluginMigrations(boolean isCleanInstall) {
-        int migrationNr = pluginTopic.getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
-        int requiredMigrationNr = Integer.parseInt(getConfigProperty("requiredPluginMigrationNr", "0"));
-        int migrationsToRun = requiredMigrationNr - migrationNr;
-        logger.info("Running " + migrationsToRun + " plugin migrations (migrationNr=" + migrationNr +
-            ", requiredMigrationNr=" + requiredMigrationNr + ")");
-        for (int i = migrationNr + 1; i <= requiredMigrationNr; i++) {
-            dms.runPluginMigration(this, i, isCleanInstall);
-        }
-    }
-
-    private void introduceTypesToPlugin() {
-        for (String topicTypeUri : dms.getTopicTypeUris()) {
-            try {
-                // trigger hook
-                modifyTopicTypeHook(dms.getTopicType(topicTypeUri, null), null);   // clientState=null (2x)
-            } catch (Exception e) {
-                throw new RuntimeException("Introducing topic type \"" + topicTypeUri + "\" to " + this + " failed", e);
-            }
-        }
     }
 }

@@ -608,7 +608,7 @@ public class EmbeddedService implements DeepaMehtaService {
             }
         }
         logger.info("### Bundles total: " + bundles.length +
-            ", DM plugins: " + plugins + ", ready: " + ready);
+            ", DeepaMehta plugins: " + plugins + ", Ready: " + ready);
         if (plugins == ready) {
             logger.info("########## All plugins ready ##########");
             triggerHook(Hook.ALL_PLUGINS_READY);
@@ -1122,17 +1122,16 @@ public class EmbeddedService implements DeepaMehtaService {
                     logger.info("Reading migration config file \"" + configFile + "\"");
                     migrationConfig.load(in);
                 } else {
-                    logger.info("Using default migration configuration (no migration config file found, " +
-                        "tried \"" + configFile + "\")");
+                    logger.info("Reading migration config file \"" + configFile + "\" ABORTED -- file does not exist");
                 }
                 //
                 runMode = migrationConfig.getProperty("migrationRunMode", MigrationRunMode.ALWAYS.name());
                 MigrationRunMode.valueOf(runMode);  // check if value is valid
             } catch (IllegalArgumentException e) {
-                throw new RuntimeException("Error in config file \"" + configFile + "\": \"" + runMode +
+                throw new RuntimeException("Reading migration config file \"" + configFile + "\" failed: \"" + runMode +
                     "\" is an invalid value for \"migrationRunMode\"", e);
             } catch (IOException e) {
-                throw new RuntimeException("Config file \"" + configFile + "\" can't be read", e);
+                throw new RuntimeException("Reading migration config file \"" + configFile + "\" failed", e);
             }
         }
 

@@ -44,7 +44,7 @@ public class WebclientPlugin extends Plugin {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private boolean webclientLaunched = false;
+    private boolean hasWebclientLaunched = false;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -131,16 +131,20 @@ public class WebclientPlugin extends Plugin {
 
     @Override
     public void allPluginsReadyHook() {
-        if (webclientLaunched == false) {
-            String webclientUrl = getWebclientUrl();
-            try {
-                logger.info("### Launching webclient (url=\"" + webclientUrl + "\")");
-                Desktop.getDesktop().browse(new URI(webclientUrl));
-                webclientLaunched = true;
-            } catch (Exception e) {
-                logger.warning("### Launching webclient failed (" + e + ")");
-                logger.warning("### Use this URL to launch the webclient manually: " + webclientUrl);
-            }
+        String webclientUrl = getWebclientUrl();
+        //
+        if (hasWebclientLaunched == true) {
+            logger.info("### Launching webclient (url=\"" + webclientUrl + "\") ABORTED -- already launched");
+            return;
+        }
+        //
+        try {
+            logger.info("### Launching webclient (url=\"" + webclientUrl + "\")");
+            Desktop.getDesktop().browse(new URI(webclientUrl));
+            hasWebclientLaunched = true;
+        } catch (Exception e) {
+            logger.warning("### Launching webclient failed (" + e + ")");
+            logger.warning("### To launch it manually: " + webclientUrl);
         }
     }
 
@@ -241,7 +245,7 @@ public class WebclientPlugin extends Plugin {
         return dms.getTopicType(typeTopic.getUri(), null);  // ### FIXME: handle assoc types
     }
 
-    // === Client Start ===
+    // === Webclient Start ===
 
     private String getWebclientUrl() {
         String port = System.getProperty("org.osgi.service.http.port");

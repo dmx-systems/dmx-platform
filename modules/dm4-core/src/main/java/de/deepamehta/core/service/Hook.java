@@ -10,7 +10,7 @@ import de.deepamehta.core.model.TopicModel;
 public enum Hook {
 
     // Note: this hook is triggered only by the plugin itself
-    // (see {@link de.deepamehta.core.service.Plugin#initPlugin}).
+    // (see {@link de.deepamehta.core.service.Plugin#initializePlugin}).
     // It is declared here for documentation purpose only.
     // ### TODO: remove this hook. Use migration 1 instead.
     POST_INSTALL_PLUGIN("postInstallPluginHook"),
