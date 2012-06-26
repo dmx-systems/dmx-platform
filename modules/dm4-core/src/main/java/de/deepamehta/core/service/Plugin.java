@@ -17,13 +17,12 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
-import org.osgi.service.http.HttpContext;
-import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import java.io.InputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -36,10 +35,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
-import java.io.InputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 
 
@@ -77,13 +72,13 @@ public class Plugin implements BundleActivator, EventHandler {
     // Consumed services
     protected DeepaMehtaService dms;
     private WebPublishingService webPublishingService;
-    private HttpService httpService;
     private EventAdmin eventService;
 
     // Provided OSGi service
     private ServiceRegistration registration;
 
-    // Provided REST service
+    // Provided resources
+    private WebResources webResources;
     private RestResource restResource;
 
     private List<ServiceTracker> serviceTrackers = new ArrayList();
@@ -192,7 +187,6 @@ public class Plugin implements BundleActivator, EventHandler {
             //
             createServiceTracker(DeepaMehtaService.class.getName());
             createServiceTracker(WebPublishingService.class.getName());
-            createServiceTracker(HttpService.class.getName());
             createServiceTracker(EventAdmin.class.getName());
             createServiceTrackers();
         } catch (Exception e) {
@@ -350,10 +344,6 @@ public class Plugin implements BundleActivator, EventHandler {
                     logger.info("Adding Web Publishing service to plugin \"" + pluginName + "\"");
                     webPublishingService = (WebPublishingService) service;
                     checkServiceAvailability();
-                } else if (service instanceof HttpService) {
-                    logger.info("Adding HTTP service to plugin \"" + pluginName + "\"");
-                    httpService = (HttpService) service;
-                    checkServiceAvailability();
                 } else if (service instanceof EventAdmin) {
                     logger.info("Adding Event Admin service to plugin \"" + pluginName + "\"");
                     eventService = (EventAdmin) service;
@@ -376,11 +366,8 @@ public class Plugin implements BundleActivator, EventHandler {
                 } else if (service == webPublishingService) {
                     logger.info("Removing Web Publishing service from plugin \"" + pluginName + "\"");
                     unregisterRestResources();
-                    webPublishingService = null;
-                } else if (service == httpService) {
-                    logger.info("Removing HTTP service from plugin \"" + pluginName + "\"");
                     unregisterWebResources();
-                    httpService = null;
+                    webPublishingService = null;
                 } else if (service == eventService) {
                     logger.info("Removing Event Admin service from plugin \"" + pluginName + "\"");
                     eventService = null;
@@ -404,8 +391,7 @@ public class Plugin implements BundleActivator, EventHandler {
      * and if so, initializes the plugin. ### FIXDOC
      */
     private void checkServiceAvailability() {
-        if (dms != null && webPublishingService != null && httpService != null && eventService != null
-                                                                               && dependenciesAvailable()) {
+        if (dms != null && webPublishingService != null && eventService != null && dependenciesAvailable()) {
             initPlugin();
             pluginReady();
             postPluginReadyEvent();
@@ -434,7 +420,7 @@ public class Plugin implements BundleActivator, EventHandler {
      * - register the plugin's REST resources at the OSGi HTTP service
      *
      * These are the tasks which rely on both, the DeepaMehtaService and the HttpService.
-     * This method is called once both services become available.
+     * This method is called once both services become available. ### FIXDOC
      */
     private void initPlugin() {
         try {
@@ -532,26 +518,25 @@ public class Plugin implements BundleActivator, EventHandler {
     // === Web Resources ===
 
     private void registerWebResources() {
-        String namespace = null;
+        String uriNamespace = null;
         try {
-            namespace = getWebResourcesNamespace();
-            if (namespace != null) {
-                logger.info("Registering Web resources of " + this + " at namespace \"" + namespace + "\"");
-                httpService.registerResources(namespace, "/web", new PluginHTTPContext());
+            uriNamespace = getWebResourcesNamespace();
+            if (uriNamespace != null) {
+                logger.info("Registering Web resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
+                webResources = webPublishingService.addWebResources(pluginBundle, uriNamespace);
             } else {
                 logger.info("Registering Web resources of " + this + " ABORTED -- no Web resources provided");
             }
         } catch (Exception e) {
             throw new RuntimeException("Registering Web resources of " + this + " failed " +
-                "(namespace=\"" + namespace + "\")", e);
+                "(uriNamespace=\"" + uriNamespace + "\")", e);
         }
     }
 
     private void unregisterWebResources() {
-        String namespace = getWebResourcesNamespace();
-        if (namespace != null) {
+        if (webResources != null) {
             logger.info("Unregistering Web resources of " + this);
-            httpService.unregister(namespace);
+            webPublishingService.removeWebResources(webResources);
         }
     }
 
@@ -561,74 +546,29 @@ public class Plugin implements BundleActivator, EventHandler {
         return pluginBundle.getEntry("/web") != null ? "/" + pluginId : null;
     }
 
-    // ---
-
-    /**
-     * Custom HttpContext to map resource name "/" to URL "/index.html"
-     */
-    private class PluginHTTPContext implements HttpContext {
-
-        private HttpContext httpContext;
-
-        private PluginHTTPContext() {
-            httpContext = httpService.createDefaultHttpContext();
-        }
-
-        // ---
-
-        @Override
-        public URL getResource(String name) {
-            try {
-                URL url;
-                if (name.equals("web/")) {
-                    url = new URL("bundle://" + pluginBundle.getBundleId() + ".0:1/web/index.html");
-                } else {
-                    url = httpContext.getResource(name);
-                }
-                // logger.info("### Mapping resource name \"" + name + "\" for plugin \"" +
-                //     pluginName + "\"\n          => URL \"" + url + "\"");
-                return url;
-            } catch (MalformedURLException e) {
-                throw new RuntimeException("Mapping resource name \"" + name + "\" for plugin \"" +
-                    pluginName + "\" to an URL failed");
-            }
-        }
-
-        @Override
-        public String getMimeType(String name) {
-            return httpContext.getMimeType(name);
-        }
-
-        @Override
-        public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response)
-                                                                            throws java.io.IOException {
-            return httpContext.handleSecurity(request, response);
-        }
-    }
-
     // === REST Resources ===
 
     private void registerRestResources() {
-        String uriPath = null;
+        String uriNamespace = null;
         try {
-            uriPath = webPublishingService.getUriPath(this);
-            if (uriPath != null) {
-                logger.info("Registering REST resources of " + this + " at namespace \"" + uriPath + "\"");
-                restResource = webPublishingService.addResource(this, getProviderClasses());
+            uriNamespace = webPublishingService.getUriNamespace(this);
+            if (uriNamespace != null) {
+                logger.info("Registering REST resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
+                restResource = webPublishingService.addRestResource(this, getProviderClasses());
             } else {
                 logger.info("Registering REST resources of " + this + " ABORTED -- no REST resources provided");
             }
         } catch (Exception e) {
             unregisterWebResources();
             throw new RuntimeException("Registering REST resources of " + this + " failed " +
-                "(namespace=\"" + uriPath + "\")", e);
+                "(uriNamespace=\"" + uriNamespace + "\")", e);
         }
     }
 
     private void unregisterRestResources() {
         if (restResource != null) {
             logger.info("Unregistering REST resources of " + this);
-            webPublishingService.removeResource(restResource);
+            webPublishingService.removeRestResource(restResource);
         }
     }
 

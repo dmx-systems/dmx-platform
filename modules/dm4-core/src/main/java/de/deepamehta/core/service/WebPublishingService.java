@@ -3,12 +3,18 @@ package de.deepamehta.core.service;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import javax.ws.rs.Path;
 
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -20,7 +26,7 @@ public class WebPublishingService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String APPLICATION_ROOT = "/";
+    private static final String ROOT_APPLICATION_PATH = "/";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -53,9 +59,27 @@ public class WebPublishingService {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    // === Web Resources ===
+
+    WebResources addWebResources(Bundle bundle, String uriNamespace) {
+        try {
+            // Note: registerResources() throws org.osgi.service.http.NamespaceException
+            httpService.registerResources(uriNamespace, "/web", new BundleHTTPContext(bundle));
+            return new WebResources(uriNamespace);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    void removeWebResources(WebResources webResources) {
+        httpService.unregister(webResources.uriNamespace);
+    }
+
+    // === REST Resources ===
+
     // Note: synchronizing this method prevents creation of multiple Jersey servlet instances due to parallel plugin
     // initialization.
-    synchronized RestResource addResource(Object resource, Set<Class<?>> providerClasses) {
+    synchronized RestResource addRestResource(Object resource, Set<Class<?>> providerClasses) {
         addSingleton(resource);
         addClasses(providerClasses);
         logResourceInfo();
@@ -72,7 +96,7 @@ public class WebPublishingService {
         return new RestResource(resource, providerClasses);
     }
 
-    synchronized void removeResource(RestResource restResource) {
+    synchronized void removeRestResource(RestResource restResource) {
         removeSingleton(restResource.resource);
         removeClasses(restResource.providerClasses);
         logResourceInfo();
@@ -89,11 +113,11 @@ public class WebPublishingService {
 
     // ---
 
-    boolean isResource(Object object) {
-        return object.getClass().isAnnotationPresent(Path.class);
+    boolean isRestResource(Object object) {
+        return getUriNamespace(object) != null;
     }
 
-    String getUriPath(Object object) {
+    String getUriNamespace(Object object) {
         Path path = object.getClass().getAnnotation(Path.class);
         return path != null ? path.value() : null;
     }
@@ -148,9 +172,10 @@ public class WebPublishingService {
 
     private void registerJerseyServlet() {
         try {
-            logger.fine("########## Registering Jersey servlet at HTTP service (namespace=\"" + APPLICATION_ROOT +
-                "\")");
-            httpService.registerServlet(APPLICATION_ROOT, jerseyServlet, null, null);  // javax.servlet.ServletException
+            logger.fine("########## Registering Jersey servlet at HTTP service (URI namespace=\"" +
+                ROOT_APPLICATION_PATH + "\")");
+            // Note: registerServlet() throws javax.servlet.ServletException
+            httpService.registerServlet(ROOT_APPLICATION_PATH, jerseyServlet, null, null);
             isJerseyServletRegistered = true;
         } catch (Exception e) {
             // unregister...();     // ### TODO?
@@ -159,8 +184,9 @@ public class WebPublishingService {
     }
 
     private void unregisterJerseyServlet() {
-        logger.fine("########## Unregistering Jersey servlet at HTTP service (namespace=\"" + APPLICATION_ROOT + "\")");
-        httpService.unregister(APPLICATION_ROOT);
+        logger.fine("########## Unregistering Jersey servlet at HTTP service (URI namespace=\"" +
+            ROOT_APPLICATION_PATH + "\")");
+        httpService.unregister(ROOT_APPLICATION_PATH);
         isJerseyServletRegistered = false;
     }
 
@@ -169,5 +195,47 @@ public class WebPublishingService {
     private void reloadJerseyServlet() {
         logger.fine("##### Reloading Jersey servlet");
         jerseyServlet.reload();
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Classes
+
+    /**
+     * Custom HttpContext to map resource name "/" to URL "/index.html"
+     */
+    private class BundleHTTPContext implements HttpContext {
+
+        private Bundle bundle;
+        private HttpContext httpContext;
+
+        private BundleHTTPContext(Bundle bundle) {
+            this.bundle = bundle;
+            this.httpContext = httpService.createDefaultHttpContext();
+        }
+
+        // ---
+
+        @Override
+        public URL getResource(String name) {
+            URL url;
+            if (name.equals("web/")) {
+                url = bundle.getResource("/web/index.html");
+            } else {
+                url = bundle.getResource(name);
+            }
+            // logger.info("### Mapping resource name \"" + name + "\" for plugin \"" +
+            //     pluginName + "\"\n          => URL \"" + url + "\"");
+            return url;
+        }
+
+        @Override
+        public String getMimeType(String name) {
+            return httpContext.getMimeType(name);
+        }
+
+        @Override
+        public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response)
+                                                                            throws java.io.IOException {
+            return httpContext.handleSecurity(request, response);
+        }
     }
 }
