@@ -7,6 +7,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.http.HttpService;
 
+import javax.ws.rs.Path;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -83,6 +85,17 @@ public class WebPublishingService {
         } else {
             reloadJerseyServlet();
         }
+    }
+
+    // ---
+
+    boolean isResource(Object object) {
+        return object.getClass().isAnnotationPresent(Path.class);
+    }
+
+    String getUriPath(Object object) {
+        Path path = object.getClass().getAnnotation(Path.class);
+        return path != null ? path.value() : null;
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

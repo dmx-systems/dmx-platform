@@ -7,10 +7,6 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.util.JavaUtils;
-import de.deepamehta.core.util.JSONHelper;
-
-import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
@@ -23,10 +19,7 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
-import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
-
-import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -88,10 +81,10 @@ public class Plugin implements BundleActivator, EventHandler {
     private EventAdmin eventService;
 
     // Provided OSGi service
-    ServiceRegistration registration;
+    private ServiceRegistration registration;
 
     // Provided REST service
-    RestResource restResource;
+    private RestResource restResource;
 
     private List<ServiceTracker> serviceTrackers = new ArrayList();
 
@@ -539,27 +532,33 @@ public class Plugin implements BundleActivator, EventHandler {
     // === Web Resources ===
 
     private void registerWebResources() {
-        String namespace = getWebResourcesNamespace();
+        String namespace = null;
         try {
-            logger.info("Registering web resources of " + this + " at namespace " + namespace);
-            httpService.registerResources(namespace, "/web", new PluginHTTPContext());
-        } catch (NamespaceException e) {
-            throw new RuntimeException("Registering web resources of " + this + " failed " +
-                "(namespace=" + namespace + ")", e);
+            namespace = getWebResourcesNamespace();
+            if (namespace != null) {
+                logger.info("Registering Web resources of " + this + " at namespace \"" + namespace + "\"");
+                httpService.registerResources(namespace, "/web", new PluginHTTPContext());
+            } else {
+                logger.info("Registering Web resources of " + this + " ABORTED -- no Web resources provided");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Registering Web resources of " + this + " failed " +
+                "(namespace=\"" + namespace + "\")", e);
         }
     }
 
     private void unregisterWebResources() {
         String namespace = getWebResourcesNamespace();
-        logger.info("Unregistering web resources of " + this);
-        httpService.unregister(namespace);
+        if (namespace != null) {
+            logger.info("Unregistering Web resources of " + this);
+            httpService.unregister(namespace);
+        }
     }
 
     // ---
 
     private String getWebResourcesNamespace() {
-        return "/" + pluginId;
-        // return getConfigProperty("webResourcesNamespace", "/" + pluginId);   // ### TODO: drop this config property
+        return pluginBundle.getEntry("/web") != null ? "/" + pluginId : null;
     }
 
     // ---
@@ -610,16 +609,19 @@ public class Plugin implements BundleActivator, EventHandler {
     // === REST Resources ===
 
     private void registerRestResources() {
-        String namespace = getConfigProperty("restResourcesNamespace");     // ### TODO: drop this config property
+        String uriPath = null;
         try {
-            if (namespace != null) {
-                logger.info("Registering REST resources of " + this + " at namespace " + namespace);
+            uriPath = webPublishingService.getUriPath(this);
+            if (uriPath != null) {
+                logger.info("Registering REST resources of " + this + " at namespace \"" + uriPath + "\"");
                 restResource = webPublishingService.addResource(this, getProviderClasses());
+            } else {
+                logger.info("Registering REST resources of " + this + " ABORTED -- no REST resources provided");
             }
         } catch (Exception e) {
             unregisterWebResources();
             throw new RuntimeException("Registering REST resources of " + this + " failed " +
-                "(namespace=" + namespace + ")", e);
+                "(namespace=\"" + uriPath + "\")", e);
         }
     }
 
@@ -663,12 +665,12 @@ public class Plugin implements BundleActivator, EventHandler {
                 logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this);
                 properties.load(in);
             } else {
-                logger.info("Using default configuration for " + this + " (no config file found, " +
-                    "tried \"" + PLUGIN_CONFIG_FILE + "\")");
+                logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this +
+                    " ABORTED -- file does not exist");
             }
             return properties;
         } catch (Exception e) {
-            throw new RuntimeException("Reading config file for " + this + " failed", e);
+            throw new RuntimeException("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this + " failed", e);
         }
     }
 
