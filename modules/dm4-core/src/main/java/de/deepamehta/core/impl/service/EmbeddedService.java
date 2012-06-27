@@ -551,13 +551,13 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public void unregisterPlugin(String pluginId) {
-        pluginCache.remove(pluginId);
+    public void unregisterPlugin(String pluginUri) {
+        pluginCache.remove(pluginUri);
     }
 
     @Override
-    public Plugin getPlugin(String pluginId) {
-        return pluginCache.get(pluginId);
+    public Plugin getPlugin(String pluginUri) {
+        return pluginCache.get(pluginUri);
     }
 
     @Override
@@ -566,8 +566,7 @@ public class EmbeddedService implements DeepaMehtaService {
         new PluginCache.Iterator() {
             @Override
             void body(Plugin plugin) {
-                String pluginFile = plugin.getConfigProperty("clientSidePluginFile");
-                info.add(new PluginInfo(plugin.getId(), pluginFile));
+                info.add(plugin.getInfo());
             }
         };
         return info;
@@ -844,7 +843,7 @@ public class EmbeddedService implements DeepaMehtaService {
                 try {
                     Object result = triggerHook(plugin, hook, params);
                     if (result != null) {
-                        resultMap.put(plugin.getId(), result);
+                        resultMap.put(plugin.getUri(), result);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException("Triggering hook " + hook + " of " + plugin + " failed", e);
@@ -873,8 +872,8 @@ public class EmbeddedService implements DeepaMehtaService {
             !bundle.getSymbolicName().equals("de.deepamehta.core");
     }
 
-    private boolean isPluginRegistered(String pluginId) {
-        return pluginCache.contains(pluginId);
+    private boolean isPluginRegistered(String pluginUri) {
+        return pluginCache.contains(pluginUri);
     }
 
 

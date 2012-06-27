@@ -15,16 +15,16 @@ public class PluginInfo {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    String pluginId;
-    String pluginFile;
+    String pluginUri;
+    boolean hasClientComponent;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public PluginInfo(String pluginId, String pluginFile) {
-        this.pluginId = pluginId;
-        this.pluginFile = pluginFile;
+    public PluginInfo(String pluginUri, boolean hasClientComponent) {
+        this.pluginUri = pluginUri;
+        this.hasClientComponent = hasClientComponent;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -32,8 +32,8 @@ public class PluginInfo {
     public JSONObject toJSON() {
         try {
             JSONObject pluginInfo = new JSONObject();
-            pluginInfo.put("plugin_id", pluginId);
-            pluginInfo.put("plugin_file", pluginFile);
+            pluginInfo.put("plugin_uri", pluginUri);
+            pluginInfo.put("has_client_component", hasClientComponent);
             return pluginInfo;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);

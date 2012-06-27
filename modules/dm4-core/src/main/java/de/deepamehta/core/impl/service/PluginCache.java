@@ -24,33 +24,33 @@ class PluginCache {
      */
     static private Map<String, Plugin> plugins = new HashMap();
 
-    Plugin get(String pluginId) {
-        Plugin plugin = plugins.get(pluginId);
+    Plugin get(String pluginUri) {
+        Plugin plugin = plugins.get(pluginUri);
         if (plugin == null) {
-            throw new RuntimeException("Plugin \"" + pluginId + "\" not found");
+            throw new RuntimeException("Plugin \"" + pluginUri + "\" not found");
         }
         return plugin;
     }
 
     void put(Plugin plugin) {
         synchronized(plugins) {
-            plugins.put(plugin.getId(), plugin);
+            plugins.put(plugin.getUri(), plugin);
         }
     }
 
-    void remove(String pluginId) {
+    void remove(String pluginUri) {
         synchronized(plugins) {
-            plugins.remove(pluginId);
+            plugins.remove(pluginUri);
         }
     }
 
-    boolean contains(String pluginId) {
+    boolean contains(String pluginUri) {
         synchronized(plugins) {
-            return plugins.get(pluginId) != null;
+            return plugins.get(pluginUri) != null;
         }
     }
 
-    static class Iterator {
+    static abstract class Iterator {
 
         Iterator() {
             synchronized(plugins) {
@@ -60,7 +60,6 @@ class PluginCache {
             }
         }
 
-        void body(Plugin plugin) {
-        }
+        abstract void body(Plugin plugin);
     }
 }

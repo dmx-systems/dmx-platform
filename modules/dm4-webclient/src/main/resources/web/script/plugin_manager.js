@@ -176,19 +176,20 @@ function PluginManager(config) {
     }
 
     /**
-     * Registers server-side plugins to the list of plugins to load at client-side.
+     * Retrieves the list of installed plugins and registers those which have a client component.
      */
     function register_plugins() {
+        // retrieve list
         var plugins = dm4c.restc.get_plugins()
         if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Plugins installed at server-side: " + plugins.length)
+        // register
         for (var i = 0, plugin; plugin = plugins[i]; i++) {
-            if (plugin.plugin_file) {
-                if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_id +
-                    "\" contains client-side parts -- to be loaded")
-                register_plugin("/" + plugin.plugin_id + "/script/" + plugin.plugin_file)
+            if (plugin.has_client_component) {
+                if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_uri +
+                    "\" -- has client component")
+                register_plugin("/" + plugin.plugin_uri + "/script/plugin.js")
             } else {
-                if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_id +
-                    "\" contains no client-side parts -- nothing to load")
+                if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_uri + "\"")
             }
         }
     }

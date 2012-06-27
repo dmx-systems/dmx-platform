@@ -142,9 +142,9 @@ public interface DeepaMehtaService {
 
     void registerPlugin(Plugin plugin);
 
-    void unregisterPlugin(String pluginId);
+    void unregisterPlugin(String pluginUri);
 
-    Plugin getPlugin(String pluginId);
+    Plugin getPlugin(String pluginUri);
 
     Set<PluginInfo> getPluginInfo();
 

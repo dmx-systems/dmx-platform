@@ -56,12 +56,13 @@ public class Plugin implements BundleActivator, EventHandler {
 
     private BundleContext context;
 
-    private String pluginId;                // This bundle's symbolic name, e.g. "de.deepamehta.webclient".
-    private String pluginName;              // This bundle's name = POM project name.
-    private String pluginClass;
-    private String pluginPackage;
-    private Bundle pluginBundle;
-    private Topic  pluginTopic;             // Represents this plugin in DB. Holds plugin migration number.
+    private String     pluginUri;           // This bundle's symbolic name, e.g. "de.deepamehta.webclient".
+    private String     pluginName;          // This bundle's name = POM project name.
+    private String     pluginClass;
+    private String     pluginPackage;
+    private Bundle     pluginBundle;
+    private PluginInfo pluginInfo;
+    private Topic      pluginTopic;         // Represents this plugin in DB. Holds plugin migration number.
 
     private Properties configProperties;    // Read from file "plugin.properties"
 
@@ -89,12 +90,16 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public String getId() {
-        return pluginId;
+    public String getUri() {
+        return pluginUri;
     }
 
     public String getName() {
         return pluginName;
+    }
+
+    public PluginInfo getInfo() {
+        return pluginInfo;
     }
 
     /**
@@ -173,7 +178,7 @@ public class Plugin implements BundleActivator, EventHandler {
         try {
             this.context = context;
             this.pluginBundle = context.getBundle();
-            this.pluginId = pluginBundle.getSymbolicName();
+            this.pluginUri = pluginBundle.getSymbolicName();
             this.pluginName = (String) pluginBundle.getHeaders().get("Bundle-Name");
             this.pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
             //
@@ -181,6 +186,7 @@ public class Plugin implements BundleActivator, EventHandler {
             //
             this.configProperties = readConfigFile();
             this.pluginPackage = getConfigProperty("pluginPackage", getClass().getPackage().getName());
+            this.pluginInfo = createPluginInfo();
             this.dependencyState = initDependencies();
             //
             if (dependencyState.size() > 0) {
@@ -324,6 +330,11 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private PluginInfo createPluginInfo() {
+        boolean hasClientComponent = pluginBundle.getEntry("/web/script/plugin.js") != null;
+        return new PluginInfo(pluginUri, hasClientComponent);
+    }
+
     // === Config Properties ===
 
     private Properties readConfigFile() {
@@ -451,11 +462,11 @@ public class Plugin implements BundleActivator, EventHandler {
      * Adds this plugin to the set of ready plugins.
      */
     private void addToReadyPlugins() {
-        readyPlugins.add(pluginId);
+        readyPlugins.add(pluginUri);
     }
 
     private void removeFromReadyPlugins() {
-        readyPlugins.remove(pluginId);
+        readyPlugins.remove(pluginUri);
     }
 
     // ---
@@ -464,14 +475,14 @@ public class Plugin implements BundleActivator, EventHandler {
      * Returns the "ready" state of this plugin (true=ready).
      */
     private boolean isPluginReady() {
-        return isPluginReady(pluginId);
+        return isPluginReady(pluginUri);
     }
 
     /**
      * Returns the "ready" state of a plugin (true=ready).
      */
-    private boolean isPluginReady(String pluginId) {
-        return readyPlugins.contains(pluginId);
+    private boolean isPluginReady(String pluginUri) {
+        return readyPlugins.contains(pluginUri);
     }
 
     // ---
@@ -549,15 +560,15 @@ public class Plugin implements BundleActivator, EventHandler {
      * A Plugin topic represents an installed plugin and is used to track its version.
      */
     private void createPluginTopic() {
-        pluginTopic = dms.createTopic(new TopicModel(pluginId, "dm4.core.plugin", new CompositeValue()
+        pluginTopic = dms.createTopic(new TopicModel(pluginUri, "dm4.core.plugin", new CompositeValue()
             .put("dm4.core.plugin_name", pluginName)
-            .put("dm4.core.plugin_symbolic_name", pluginId)
+            .put("dm4.core.plugin_symbolic_name", pluginUri)
             .put("dm4.core.plugin_migration_nr", 0)
         ), null);   // FIXME: clientState=null
     }
 
     private Topic fetchPluginTopic() {
-        return dms.getTopic("uri", new SimpleValue(pluginId), false, null);     // fetchComposite=false
+        return dms.getTopic("uri", new SimpleValue(pluginUri), false, null);        // fetchComposite=false
     }
 
     /**
@@ -585,7 +596,7 @@ public class Plugin implements BundleActivator, EventHandler {
         for (String topicTypeUri : dms.getTopicTypeUris()) {
             try {
                 // trigger hook
-                modifyTopicTypeHook(dms.getTopicType(topicTypeUri, null), null);   // clientState=null (2x)
+                modifyTopicTypeHook(dms.getTopicType(topicTypeUri, null), null);    // clientState=null (2x)
             } catch (Exception e) {
                 throw new RuntimeException("Introducing topic type \"" + topicTypeUri + "\" to " + this + " failed", e);
             }
@@ -605,7 +616,7 @@ public class Plugin implements BundleActivator, EventHandler {
 
     private void unregisterPlugin() {
         logger.info("Unregistering " + this + " at DeepaMehta 4 core service");
-        dms.unregisterPlugin(pluginId);
+        dms.unregisterPlugin(pluginUri);
     }
 
     // === Plugin Service ===
@@ -672,7 +683,7 @@ public class Plugin implements BundleActivator, EventHandler {
     // ---
 
     private String getWebResourcesNamespace() {
-        return pluginBundle.getEntry("/web") != null ? "/" + pluginId : null;
+        return pluginBundle.getEntry("/web") != null ? "/" + pluginUri : null;
     }
 
     // === REST Resources ===
@@ -740,8 +751,8 @@ public class Plugin implements BundleActivator, EventHandler {
         return dependencyState;
     }
 
-    private boolean hasDependency(String pluginId) {
-        return dependencyState.get(pluginId) != null;
+    private boolean hasDependency(String pluginUri) {
+        return dependencyState.get(pluginUri) != null;
     }
 
     private boolean dependenciesAvailable() {
@@ -764,10 +775,10 @@ public class Plugin implements BundleActivator, EventHandler {
     public void handleEvent(Event event) {
         try {
             if (event.getTopic().equals(PLUGIN_READY)) {
-                String pluginId = (String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME);
-                if (hasDependency(pluginId)) {
-                    logger.info("### Receiving PLUGIN_READY event from \"" + pluginId + "\" for " + this);
-                    dependencyState.put(pluginId, true);
+                String pluginUri = (String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME);
+                if (hasDependency(pluginUri)) {
+                    logger.info("### Receiving PLUGIN_READY event from \"" + pluginUri + "\" for " + this);
+                    dependencyState.put(pluginUri, true);
                     checkServiceAvailability();
                 }
             } else {
@@ -783,7 +794,7 @@ public class Plugin implements BundleActivator, EventHandler {
 
     private void postPluginReadyEvent() {
         Properties properties = new Properties();
-        properties.put(EventConstants.BUNDLE_SYMBOLICNAME, pluginId);
+        properties.put(EventConstants.BUNDLE_SYMBOLICNAME, pluginUri);
         eventService.postEvent(new Event(PLUGIN_READY, properties));
     }
 }
