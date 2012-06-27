@@ -1,7 +1,7 @@
 /**
  * Provides the standard commands ("Create", "Edit", "Delete", "Hide", "Associate").
  */
-dm4c.add_plugin("function default_plugin", function() {
+dm4c.add_plugin("default_plugin", function() {
 
     var type_menu
 
