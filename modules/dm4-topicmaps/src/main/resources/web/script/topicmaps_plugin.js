@@ -1,4 +1,4 @@
-function topicmaps_plugin() {
+dm4c.add_plugin("topicmaps_plugin", function() {
 
     var LOG_TOPICMAPS = false
     var self = this
@@ -582,4 +582,4 @@ function topicmaps_plugin() {
     function open_topicmap_dialog() {
         $("#topicmap-dialog").dialog("open")
     }
-}
+})

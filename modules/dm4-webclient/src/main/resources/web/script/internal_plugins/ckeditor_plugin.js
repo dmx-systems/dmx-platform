@@ -1,4 +1,4 @@
-function ckeditor_plugin() {
+dm4c.add_plugin("ckeditor_plugin", function() {
 
     // === Webclient Listeners ===
 
@@ -8,4 +8,4 @@ function ckeditor_plugin() {
             CKEDITOR.instances[editor_name].destroy(true)   // noUpdate=true (textarea DOM element is already removed)
         }
     })
-}
+})

@@ -1,7 +1,8 @@
 function PluginManager(config) {
 
-    var plugin_sources = config.embedded_plugins
-    var plugins = {}            // key: plugin class name, base name of source file (string), value: plugin instance
+    var plugin_sources = []
+    var plugins = {}            // key: plugin URI, value: plugin instance
+    var plugins_complete = 0
 
     var page_renderer_sources = []
     var page_renderers = {}     // key: page renderer class name, camel case (string), value: renderer instance
@@ -63,13 +64,36 @@ function PluginManager(config) {
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
-    this.load_plugins = function(callback) {
+    this.load_plugins = function() {
+        register_internal_plugins(config.internal_plugins)
         register_plugins()
-        load_plugins(callback)
+        load_plugins()
     }
 
-    this.get_plugin = function(plugin_class) {
-        return plugins[plugin_class]
+    this.add_plugin = function(plugin_uri, plugin_func) {
+        // instantiate
+        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log(".......... instantiating \"" + plugin_uri + "\"")
+        var plugin = {}
+        plugin_func.call(plugin)
+        plugins[plugin_uri] = plugin
+        // all plugins complete?
+        plugins_complete++
+        if (plugins_complete == plugin_sources.length) {
+            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("PLUGINS COMPLETE!")
+            all_plugins_loaded()
+        }
+
+        function all_plugins_loaded() {
+            load_page_renderers()
+            load_field_renderers()
+            load_stylesheets()
+            //
+            config.post_load_plugins()
+        }
+    }
+
+    this.get_plugin = function(plugin_uri) {
+        return plugins[plugin_uri]
     }
 
     this.get_page_renderer = function(topic_or_association_or_classname) {
@@ -145,6 +169,12 @@ function PluginManager(config) {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
+    function register_internal_plugins(plugins) {
+        for (var i = 0, plugin; plugin = plugins[i]; i++) {
+            register_plugin("/de.deepamehta.webclient/script/internal_plugins/" + plugin)
+        }
+    }
+
     /**
      * Registers server-side plugins to the list of plugins to load at client-side.
      */
@@ -180,39 +210,13 @@ function PluginManager(config) {
     // ---
 
     /**
-     * Loads and instantiates all registered plugins.
+     * Loads all registered plugins.
      */
-    function load_plugins(callback) {
-
+    function load_plugins() {
         if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Loading " + plugin_sources.length + " plugins:")
-        var plugins_complete = 0
         for (var i = 0, plugin_source; plugin_source = plugin_sources[i]; i++) {
-            load_plugin(plugin_source)
-        }
-
-        function load_plugin(plugin_source) {
             if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + plugin_source)
-            // load plugin asynchronously
-            dm4c.load_script(plugin_source, function() {
-                // instantiate
-                var plugin_class = js.basename(plugin_source)
-                if (dm4c.LOG_PLUGIN_LOADING) dm4c.log(".......... instantiating \"" + plugin_class + "\"")
-                plugins[plugin_class] = js.new_object(plugin_class)
-                // all plugins complete?
-                plugins_complete++
-                if (plugins_complete == plugin_sources.length) {
-                    if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("PLUGINS COMPLETE!")
-                    all_plugins_loaded()
-                }
-            })
-        }
-
-        function all_plugins_loaded() {
-            load_page_renderers()
-            load_field_renderers()
-            load_stylesheets()
-            //
-            callback()
+            dm4c.load_script(plugin_source, function() {})      // load plugin asynchronously
         }
     }
 

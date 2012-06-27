@@ -1,7 +1,7 @@
 /**
  * Provides the standard commands ("Create", "Edit", "Delete", "Hide", "Associate").
  */
-function default_plugin () {
+dm4c.add_plugin("function default_plugin", function() {
 
     var type_menu
 
@@ -153,4 +153,4 @@ function default_plugin () {
             dm4c.do_create_topic(type_uri, cx, cy)
         }
     })
-}
+})

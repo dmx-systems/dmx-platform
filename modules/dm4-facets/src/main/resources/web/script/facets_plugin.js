@@ -1,4 +1,4 @@
-function facets_plugin() {
+dm4c.add_plugin("facets_plugin", function() {
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -25,4 +25,4 @@ function facets_plugin() {
             page_model.add_child(assoc_def.uri, child_model)
         }
     }
-}
+})

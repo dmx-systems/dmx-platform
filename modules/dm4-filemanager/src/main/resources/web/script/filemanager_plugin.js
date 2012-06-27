@@ -1,4 +1,4 @@
-function filemanager_plugin() {
+dm4c.add_plugin("filemanager_plugin", function() {
 
     // === Webclient Listeners ===
 
@@ -27,4 +27,4 @@ function filemanager_plugin() {
         //
         dm4c.canvas.stop_grid_positioning()
     })
-}
+})

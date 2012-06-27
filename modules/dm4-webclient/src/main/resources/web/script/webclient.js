@@ -1,4 +1,6 @@
-var dm4c = new function() {
+(function() {
+
+function Webclient() {
 
     // logger preferences
     var ENABLE_LOGGING = false
@@ -42,12 +44,11 @@ var dm4c = new function() {
     var type_cache = new TypeCache()
 
     var pm = new PluginManager({
-        embedded_plugins: [
-            "/de.deepamehta.webclient/script/embedded_plugins/default_plugin.js",
-            "/de.deepamehta.webclient/script/embedded_plugins/fulltext_plugin.js",
-            "/de.deepamehta.webclient/script/embedded_plugins/ckeditor_plugin.js"
-        ]
+        internal_plugins: ["default_plugin.js", "fulltext_plugin.js", "ckeditor_plugin.js"],
+        post_load_plugins: setup_gui
     })
+
+    extend_rest_client()
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -632,6 +633,20 @@ var dm4c = new function() {
 
 
 
+    this.add_plugin = function(plugin_uri, plugin_func) {
+        pm.add_plugin(plugin_uri, plugin_func)
+    }
+
+    this.get_plugin = function(plugin_class) {
+        return pm.get_plugin(plugin_class)
+    }
+
+    this.get_page_renderer = function(topic_or_association_or_classname) {
+        return pm.get_page_renderer(topic_or_association_or_classname)
+    }
+
+    // ---
+
     /**
      * Loads a Javascript file dynamically. Synchronous and asynchronous loading is supported.
      *
@@ -676,14 +691,6 @@ var dm4c = new function() {
      */
     this.trigger_plugin_hook = function(hook_name) {
         return pm.trigger_listeners.apply(undefined, arguments)
-    }
-
-    this.get_plugin = function(plugin_class) {
-        return pm.get_plugin(plugin_class)
-    }
-
-    this.get_page_renderer = function(topic_or_association_or_classname) {
-        return pm.get_page_renderer(topic_or_association_or_classname)
     }
 
 
@@ -902,6 +909,24 @@ var dm4c = new function() {
     }
 
     // === GUI ===
+
+    /**
+     * Called once all plugins are loaded.
+     */
+    function setup_gui() {
+        dm4c.log("Setting up GUI")
+        // setup create widget
+        dm4c.refresh_create_menu()
+        if (!dm4c.toolbar.create_menu.get_item_count()) {
+            dm4c.toolbar.create_widget.hide()
+        }
+        // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta-topicmaps plugin
+        // does!) the "init" hook is triggered *after* creating the canvas.
+        // Note: for displaying an initial topic (the deepamehta-topicmaps plugin does!) the "init" hook must
+        // be triggered *after* the GUI setup is complete.
+        dm4c.log("Initializing plugins")
+        dm4c.trigger_plugin_hook("init")
+    }
 
     /**
      * Save the page panel before the user opens a menu.
@@ -1150,7 +1175,7 @@ var dm4c = new function() {
         return new AssociationType(assoc_type)
     }
 
-    // --- Types ---
+    // === Types ===
 
     function load_types() {
         // 1) load topic types
@@ -1178,11 +1203,27 @@ var dm4c = new function() {
         if (LOG_TYPE_LOADING) dm4c.log("Loading types complete")
     }
 
+    // === REST client ===
+
+    function extend_rest_client() {
+        dm4c.restc.search_topics_and_create_bucket = function(text, field_uri, whole_word) {
+            var params = this.createRequestParameter({search: text, field: field_uri, wholeword: whole_word})
+            return this.request("GET", "/webclient/search?" + params.to_query_string())
+        }
+        // Note: this method is actually part of the Type Search plugin.
+        // TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
+        // another namespace again) or make the Type Search plugin an integral part of the Client plugin.
+        dm4c.restc.get_topics_and_create_bucket = function(type_uri, max_result_size) {
+            var params = this.createRequestParameter({max_result_size: max_result_size})
+            return this.request("GET", "/webclient/search/by_type/" + type_uri + "?" + params.to_query_string())
+        }
+    }
+
     // ------------------------------------------------------------------------------------------------ Constructor Code
 
     $(function() {
         //
-        // --- 1) Prepare GUI ---
+        // --- 1) Build GUI ---
         // create toolbar
         dm4c.toolbar = new ToolbarPanel()
         $("body").append(dm4c.toolbar.dom)
@@ -1198,45 +1239,15 @@ var dm4c = new function() {
         // create upload dialog
         dm4c.upload_dialog = new UploadDialog()
         //
-        // --- 2) Load Plugins ---
-        // Note: in order to let a plugin DOM manipulate the GUI the plugins are loaded *after* the GUI is prepared.
-        extend_rest_client()
+        // --- 2) Load Types ---
         load_types()
         //
-        pm.load_plugins(setup_gui)
-
-        /**
-         * Called once all plugins are loaded.
-         */
-        function setup_gui() {
-            dm4c.log("Setting up GUI")
-            // setup create widget
-            dm4c.refresh_create_menu()
-            if (!dm4c.toolbar.create_menu.get_item_count()) {
-                dm4c.toolbar.create_widget.hide()
-            }
-            // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta-topicmaps plugin
-            // does!) the "init" hook is triggered *after* creating the canvas.
-            // Note: for displaying an initial topic (the deepamehta-topicmaps plugin does!) the "init" hook must
-            // be triggered *after* the GUI setup is complete.
-            dm4c.log("Initializing plugins")
-            dm4c.trigger_plugin_hook("init")
-        }
-
-        function extend_rest_client() {
-
-            dm4c.restc.search_topics_and_create_bucket = function(text, field_uri, whole_word) {
-                var params = this.createRequestParameter({search: text, field: field_uri, wholeword: whole_word})
-                return this.request("GET", "/webclient/search?" + params.to_query_string())
-            }
-
-            // Note: this method is actually part of the Type Search plugin.
-            // TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
-            // another namespace again) or make the Type Search plugin an integral part of the Client plugin.
-            dm4c.restc.get_topics_and_create_bucket = function(type_uri, max_result_size) {
-                var params = this.createRequestParameter({max_result_size: max_result_size})
-                return this.request("GET", "/webclient/search/by_type/" + type_uri + "?" + params.to_query_string())
-            }
-        }
+        // --- 3) Load Plugins ---
+        // Note: in order to let a plugin DOM manipulate the GUI the plugins are loaded *after* the GUI is build.
+        pm.load_plugins()
     })
 }
+
+dm4c = {}   // create global object
+Webclient.call(dm4c)
+})()

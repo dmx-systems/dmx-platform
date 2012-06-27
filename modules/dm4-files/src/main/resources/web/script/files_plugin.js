@@ -1,4 +1,4 @@
-function files_plugin() {
+dm4c.add_plugin("files_plugin", function() {
 
     dm4c.load_field_renderer("/de.deepamehta.files/script/field_renderers/file_content_renderer.js")
     dm4c.load_field_renderer("/de.deepamehta.files/script/field_renderers/folder_content_renderer.js")
@@ -224,4 +224,4 @@ function files_plugin() {
         this.path = path
         this.items = items  // array of File and Directory objects
     }
-}
+})

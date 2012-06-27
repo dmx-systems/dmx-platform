@@ -1,4 +1,4 @@
-function workspaces_plugin() {
+dm4c.add_plugin("workspaces_plugin", function() {
 
     dm4c.load_stylesheet("/de.deepamehta.workspaces/style/workspaces.css")
 
@@ -173,4 +173,4 @@ function workspaces_plugin() {
     function update_cookie() {
         js.set_cookie("dm4_workspace_id", get_workspace_id_from_menu())
     }
-}
+})

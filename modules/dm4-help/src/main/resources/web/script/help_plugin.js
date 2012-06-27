@@ -1,4 +1,4 @@
-function help_plugin() {
+dm4c.add_plugin("help_plugin", function() {
 
     dm4c.load_stylesheet("/de.deepamehta.help/style/help.css")
 
@@ -25,7 +25,7 @@ function help_plugin() {
                     '<div class="field-label">Version</div>' +
                     '<div>${project.version}</div>' +
                     '<div class="field-label">Build Date</div>' +
-                    '<div>Jun 23, 2012</div>' +
+                    '<div>Jun 27, 2012</div>' +
                     '<div class="field-label">Copyright</div>' +
                     '<div>2000-2012 Jörg Richter</div>' +
                     '<div class="field-label">License</div>' +
@@ -68,4 +68,4 @@ function help_plugin() {
                 '</td>' +
             '</tr>' +
         '</table>'
-}
+})

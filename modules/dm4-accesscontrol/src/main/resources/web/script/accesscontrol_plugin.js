@@ -1,4 +1,4 @@
-function accesscontrol_plugin() {
+dm4c.add_plugin("accesscontrol_plugin", function() {
 
     var DEFAULT_USER = "admin"
     var DEFAULT_PASSWORD = ""
@@ -255,4 +255,4 @@ function accesscontrol_plugin() {
             $("#create-widget").hide()
         }
     }
-}
+})

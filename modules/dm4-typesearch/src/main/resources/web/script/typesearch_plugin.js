@@ -1,7 +1,7 @@
 /**
  * Provides the "By Type" search mode.
  */
-function typesearch_plugin() {
+dm4c.add_plugin("typesearch_plugin", function() {
 
     var type_menu
 
@@ -80,4 +80,4 @@ function typesearch_plugin() {
     function get_type_uri() {
         return type_menu.get_selection().value
     }
-}
+})

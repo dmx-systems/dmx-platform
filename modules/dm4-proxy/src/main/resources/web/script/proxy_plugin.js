@@ -1,4 +1,4 @@
-function proxy_plugin() {
+dm4c.add_plugin("proxy_plugin", function() {
 
     // === REST Client Extension ===
 
@@ -16,4 +16,4 @@ function proxy_plugin() {
     dm4c.restc.get_resource_info = function(uri) {
         return this.request("GET", "/proxy/" + encodeURIComponent(uri) + "/info")
     }
-}
+})

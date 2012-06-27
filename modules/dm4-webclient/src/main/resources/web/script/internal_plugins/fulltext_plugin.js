@@ -1,7 +1,7 @@
 /**
  * Provides the "By Text" search mode.
  */
-function fulltext_plugin() {
+dm4c.add_plugin("fulltext_plugin", function() {
 
     var SEARCH_FIELD_WIDTH = 20    // in chars
     var search_field
@@ -50,4 +50,4 @@ function fulltext_plugin() {
     function get_searchterm() {
         return $.trim(search_field.val())
     }
-}
+})
