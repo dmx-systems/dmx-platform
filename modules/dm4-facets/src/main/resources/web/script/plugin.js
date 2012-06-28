@@ -1,4 +1,4 @@
-dm4c.add_plugin("facets_plugin", function() {
+dm4c.add_plugin("de.deepamehta.facets", function() {
 
     // ------------------------------------------------------------------------------------------------------ Public API
 

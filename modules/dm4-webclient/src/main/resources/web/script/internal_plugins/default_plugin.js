@@ -1,7 +1,7 @@
 /**
  * Provides the standard commands ("Create", "Edit", "Delete", "Hide", "Associate").
  */
-dm4c.add_plugin("default_plugin", function() {
+dm4c.add_plugin("de.deepamehta.webclient.default", function() {
 
     var type_menu
 

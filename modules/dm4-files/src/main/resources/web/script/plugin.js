@@ -1,4 +1,4 @@
-dm4c.add_plugin("files_plugin", function() {
+dm4c.add_plugin("de.deepamehta.files", function() {
 
     dm4c.load_field_renderer("/de.deepamehta.files/script/field_renderers/file_content_renderer.js")
     dm4c.load_field_renderer("/de.deepamehta.files/script/field_renderers/folder_content_renderer.js")

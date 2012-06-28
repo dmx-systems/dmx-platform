@@ -1,7 +1,7 @@
 /**
  * Provides the "By Text" search mode.
  */
-dm4c.add_plugin("fulltext_plugin", function() {
+dm4c.add_plugin("de.deepamehta.webclient.fulltext", function() {
 
     var SEARCH_FIELD_WIDTH = 20    // in chars
     var search_field

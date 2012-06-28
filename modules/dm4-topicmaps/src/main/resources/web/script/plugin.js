@@ -1,4 +1,4 @@
-dm4c.add_plugin("topicmaps_plugin", function() {
+dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     var LOG_TOPICMAPS = false
     var self = this

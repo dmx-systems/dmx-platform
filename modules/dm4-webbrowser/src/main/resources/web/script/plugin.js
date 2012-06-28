@@ -1,4 +1,4 @@
-dm4c.add_plugin("webbrowser_plugin", function() {
+dm4c.add_plugin("de.deepamehta.webbrowser", function() {
 
     dm4c.load_page_renderer("/de.deepamehta.webbrowser/script/page_renderers/webpage_renderer.js")
 

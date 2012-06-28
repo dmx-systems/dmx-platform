@@ -1,4 +1,4 @@
-dm4c.add_plugin("typeeditor_plugin", function() {
+dm4c.add_plugin("de.deepamehta.typeeditor", function() {
 
     dm4c.load_page_renderer("/de.deepamehta.typeeditor/script/page_renderers/topictype_renderer.js")
     dm4c.load_stylesheet("/de.deepamehta.typeeditor/style/typeeditor.css")

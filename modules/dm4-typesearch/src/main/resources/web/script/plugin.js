@@ -1,7 +1,7 @@
 /**
  * Provides the "By Type" search mode.
  */
-dm4c.add_plugin("typesearch_plugin", function() {
+dm4c.add_plugin("de.deepamehta.typesearch", function() {
 
     var type_menu
 

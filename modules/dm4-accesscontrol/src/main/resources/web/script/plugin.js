@@ -1,4 +1,4 @@
-dm4c.add_plugin("accesscontrol_plugin", function() {
+dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     var DEFAULT_USER = "admin"
     var DEFAULT_PASSWORD = ""

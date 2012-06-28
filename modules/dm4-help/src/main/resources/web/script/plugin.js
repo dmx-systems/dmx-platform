@@ -1,4 +1,4 @@
-dm4c.add_plugin("help_plugin", function() {
+dm4c.add_plugin("de.deepamehta.help", function() {
 
     dm4c.load_stylesheet("/de.deepamehta.help/style/help.css")
 

@@ -1,4 +1,4 @@
-dm4c.add_plugin("ckeditor_plugin", function() {
+dm4c.add_plugin("de.deepamehta.webclient.ckeditor", function() {
 
     // === Webclient Listeners ===
 

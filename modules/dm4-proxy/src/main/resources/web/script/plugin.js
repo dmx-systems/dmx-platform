@@ -1,4 +1,4 @@
-dm4c.add_plugin("proxy_plugin", function() {
+dm4c.add_plugin("de.deepamehta.proxy", function() {
 
     // === REST Client Extension ===
 
