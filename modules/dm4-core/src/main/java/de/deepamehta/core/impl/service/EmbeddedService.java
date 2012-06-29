@@ -22,10 +22,12 @@ import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.CommandParams;
 import de.deepamehta.core.service.CommandResult;
+import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Hook;
+import de.deepamehta.core.service.Hook;     // ### TODO: drop this
+import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.ObjectFactory;
 import de.deepamehta.core.service.Plugin;
@@ -71,6 +73,7 @@ public class EmbeddedService implements DeepaMehtaService {
             TypeCache typeCache;
 
     private PluginCache pluginCache;
+    private ListenerRegistry listenerRegistry;
     private BundleContext bundleContext;
 
     private enum MigrationRunMode {
@@ -85,6 +88,7 @@ public class EmbeddedService implements DeepaMehtaService {
         this.storage = storage;
         this.bundleContext = bundleContext;
         this.pluginCache = new PluginCache();
+        this.listenerRegistry = new ListenerRegistry();
         this.typeCache = new TypeCache(this);
         this.objectFactory = new ObjectFactoryImpl(this);
         bootstrapTypeCache();
@@ -184,7 +188,8 @@ public class EmbeddedService implements DeepaMehtaService {
             Directives directives = new Directives();   // ### FIXME: directives are ignored
             topic.store(clientState, directives);
             //
-            triggerHook(Hook.POST_CREATE_TOPIC, topic, clientState, directives);
+            // ### triggerHook(Hook.POST_CREATE_TOPIC, topic, clientState, directives);
+            fireEvent(CoreEvent.POST_CREATE_TOPIC, topic, clientState, directives);
             //
             tx.success();
             return topic;
@@ -578,6 +583,44 @@ public class EmbeddedService implements DeepaMehtaService {
         plugin.setMigrationNr(migrationNr);
     }
 
+    /**
+     * Triggers a hook for all installed plugins.
+     *
+     * ### TODO: drop this method.
+     */
+    @Override
+    public Map<String, Object> triggerHook(final Hook hook, final Object... params) {
+        final Map resultMap = new HashMap();
+        new PluginCache.Iterator() {
+            @Override
+            void body(Plugin plugin) {
+                try {
+                    Object result = triggerHook(plugin, hook, params);
+                    if (result != null) {
+                        resultMap.put(plugin.getUri(), result);
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException("Triggering hook " + hook + " of " + plugin + " failed", e);
+                }
+            }
+        };
+        return resultMap;
+    }
+
+
+
+    // === Listeners ===
+
+    @Override
+    public List<Object> fireEvent(CoreEvent event, Object... params) {
+        return listenerRegistry.fireEvent(event, params);
+    }
+
+    @Override
+    public void addListener(CoreEvent event, Listener listener) {
+        listenerRegistry.addListener(event, listener);
+    }
+
 
 
     // === Misc ===
@@ -832,28 +875,8 @@ public class EmbeddedService implements DeepaMehtaService {
     // === Plugins ===
 
     /**
-     * Triggers a hook for all installed plugins.
-     */
-    @Override
-    public Map<String, Object> triggerHook(final Hook hook, final Object... params) {
-        final Map resultMap = new HashMap();
-        new PluginCache.Iterator() {
-            @Override
-            void body(Plugin plugin) {
-                try {
-                    Object result = triggerHook(plugin, hook, params);
-                    if (result != null) {
-                        resultMap.put(plugin.getUri(), result);
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException("Triggering hook " + hook + " of " + plugin + " failed", e);
-                }
-            }
-        };
-        return resultMap;
-    }
-
-    /**
+     * ### TODO: drop this method
+     *
      * @throws  NoSuchMethodException
      * @throws  IllegalAccessException
      * @throws  InvocationTargetException
@@ -862,8 +885,6 @@ public class EmbeddedService implements DeepaMehtaService {
         Method hookMethod = plugin.getClass().getMethod(hook.getMethodName(), hook.getParamClasses());
         return hookMethod.invoke(plugin, params);
     }
-
-    // ---
 
     private boolean isDeepaMehtaPlugin(Bundle bundle) {
         String packages = (String) bundle.getHeaders().get("Import-Package");

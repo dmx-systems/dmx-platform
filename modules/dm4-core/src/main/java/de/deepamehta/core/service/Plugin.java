@@ -503,6 +503,7 @@ public class Plugin implements BundleActivator, EventHandler {
             logger.info("----- Initializing " + this + " -----");
             installPluginInDB();        // relies on DeepaMehtaService
             registerPlugin();           // relies on DeepaMehtaService (and committed migrations)
+            registerPluginListeners();
             registerPluginService();
             registerWebResources();     // relies on WebPublishingService
             registerRestResources();    // relies on WebPublishingService and DeepaMehtaService (and registered plugin)
@@ -617,6 +618,23 @@ public class Plugin implements BundleActivator, EventHandler {
     private void unregisterPlugin() {
         logger.info("Unregistering " + this + " at DeepaMehta 4 core service");
         dms.unregisterPlugin(pluginUri);
+    }
+
+    // === Plugin Listeners ===
+
+    private void registerPluginListeners() {
+        logger.info("Registering listeners of " + this + " at DeepaMehta 4 core service");
+        for (Class interfaze : getClass().getInterfaces()) {
+            if (isListener(interfaze)) {
+                CoreEvent event = CoreEvent.fromListenerInterface(interfaze);
+                logger.info("######################## Listener Interface: " + interfaze + " -> " + event);
+                dms.addListener(event, (Listener) this);
+            }
+        }
+    }
+
+    private boolean isListener(Class clazz) {
+        return Listener.class.isAssignableFrom(clazz);
     }
 
     // === Plugin Service ===

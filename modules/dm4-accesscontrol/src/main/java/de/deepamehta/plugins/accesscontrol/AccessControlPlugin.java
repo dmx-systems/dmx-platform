@@ -20,6 +20,7 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.listeners.PostCreateTopicListener;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.DefaultValue;
@@ -48,7 +49,7 @@ import java.util.logging.Logger;
 @Path("/accesscontrol")
 @Consumes("application/json")
 @Produces("application/json")
-public class AccessControlPlugin extends Plugin implements AccessControlService {
+public class AccessControlPlugin extends Plugin implements AccessControlService, PostCreateTopicListener {
 
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
@@ -165,9 +166,9 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
 
 
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
 
 
 
@@ -198,7 +199,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     }
 
     @Override
-    public void postCreateHook(Topic topic, ClientState clientState, Directives directives) {
+    public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
         // ### TODO: explain
         if (isPluginTopic(topic)) {
             return;

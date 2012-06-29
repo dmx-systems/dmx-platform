@@ -13,6 +13,7 @@ import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.listeners.PostCreateTopicListener;
 
 import static java.util.Arrays.asList;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
 
 
 
-public class WorkspacesPlugin extends Plugin implements WorkspacesService {
+public class WorkspacesPlugin extends Plugin implements WorkspacesService, PostCreateTopicListener {
 
     private static final String DEFAULT_WORKSPACE_NAME = "Default";
 
@@ -42,9 +43,51 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
 
 
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
+    // ****************************************
+    // *** WorkspacesService Implementation ***
+    // ****************************************
+
+
+
+    @Override
+    public Topic createWorkspace(String name) {
+        logger.info("Creating workspace \"" + name + "\"");
+        CompositeValue comp = new CompositeValue().put("dm4.workspaces.name", name);
+        return dms.createTopic(new TopicModel("dm4.workspaces.workspace", comp), null); // FIXME: clientState=null
+    }
+
+    @Override
+    public void assignTopic(long workspaceId, long topicId) {
+        checkWorkspaceId(workspaceId);
+        //
+        AssociationModel assocModel = new AssociationModel(WORKSPACE_TOPIC);
+        assocModel.setRoleModel1(new TopicRoleModel(workspaceId, ROLE_TYPE_WORKSPACE));
+        assocModel.setRoleModel2(new TopicRoleModel(topicId, ROLE_TYPE_TOPIC));
+        dms.createAssociation(assocModel, null);         // clientState=null
+    }
+
+    @Override
+    public void assignType(long workspaceId, long typeId) {
+        checkWorkspaceId(workspaceId);
+        //
+        AssociationModel assocModel = new AssociationModel(WORKSPACE_TYPE);
+        assocModel.setRoleModel1(new TopicRoleModel(workspaceId, ROLE_TYPE_WORKSPACE));
+        assocModel.setRoleModel2(new TopicRoleModel(typeId, ROLE_TYPE_TYPE));
+        dms.createAssociation(assocModel, null);         // clientState=null
+    }
+
+    @Override
+    public Set<RelatedTopic> getWorkspaces(long typeId) {
+        Topic typeTopic = dms.getTopic(typeId, false, null);                // fetchComposite=false, clientState=null
+        return typeTopic.getRelatedTopics(WORKSPACE_TYPE, ROLE_TYPE_TYPE, null,
+            "dm4.workspaces.workspace", false, false, 0, null).getItems();  // fetchComposite=false
+    }
+
+
+
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
 
 
 
@@ -60,7 +103,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
      * Assigns a newly created topic to the current workspace.
      */
     @Override
-    public void postCreateHook(Topic topic, ClientState clientState, Directives directives) {
+    public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
         long workspaceId = -1;
         try {
             // check precondition 1
@@ -123,48 +166,6 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
         //
         topicType.addAssocDef(assocDef);
     } */
-
-
-
-    // **********************
-    // *** Plugin Service ***
-    // **********************
-
-
-
-    @Override
-    public Topic createWorkspace(String name) {
-        logger.info("Creating workspace \"" + name + "\"");
-        CompositeValue comp = new CompositeValue().put("dm4.workspaces.name", name);
-        return dms.createTopic(new TopicModel("dm4.workspaces.workspace", comp), null); // FIXME: clientState=null
-    }
-
-    @Override
-    public void assignTopic(long workspaceId, long topicId) {
-        checkWorkspaceId(workspaceId);
-        //
-        AssociationModel assocModel = new AssociationModel(WORKSPACE_TOPIC);
-        assocModel.setRoleModel1(new TopicRoleModel(workspaceId, ROLE_TYPE_WORKSPACE));
-        assocModel.setRoleModel2(new TopicRoleModel(topicId, ROLE_TYPE_TOPIC));
-        dms.createAssociation(assocModel, null);         // clientState=null
-    }
-
-    @Override
-    public void assignType(long workspaceId, long typeId) {
-        checkWorkspaceId(workspaceId);
-        //
-        AssociationModel assocModel = new AssociationModel(WORKSPACE_TYPE);
-        assocModel.setRoleModel1(new TopicRoleModel(workspaceId, ROLE_TYPE_WORKSPACE));
-        assocModel.setRoleModel2(new TopicRoleModel(typeId, ROLE_TYPE_TYPE));
-        dms.createAssociation(assocModel, null);         // clientState=null
-    }
-
-    @Override
-    public Set<RelatedTopic> getWorkspaces(long typeId) {
-        Topic typeTopic = dms.getTopic(typeId, false, null);            // fetchComposite=false, clientState=null
-        return typeTopic.getRelatedTopics(WORKSPACE_TYPE, ROLE_TYPE_TYPE, null,
-            "dm4.workspaces.workspace", false, false, 0, null).getItems();    // fetchComposite=false
-    }
 
 
 
