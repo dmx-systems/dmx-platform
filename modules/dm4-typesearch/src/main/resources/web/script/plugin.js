@@ -7,11 +7,11 @@ dm4c.add_plugin("de.deepamehta.typesearch", function() {
 
     // === Webclient Listeners ===
 
-    dm4c.register_listener("init", function() {
+    dm4c.add_listener("init", function() {
         dm4c.toolbar.searchmode_menu.add_item({label: "By Type", value: "by-type"})
     })
 
-    dm4c.register_listener("searchmode_widget", function(searchmode) {
+    dm4c.add_listener("searchmode_widget", function(searchmode) {
         if (searchmode == "by-type") {
             // enable search button
             dm4c.toolbar.search_button.button("enable")
@@ -23,7 +23,7 @@ dm4c.add_plugin("de.deepamehta.typesearch", function() {
         }
     })
 
-    dm4c.register_listener("search", function(searchmode) {
+    dm4c.add_listener("search", function(searchmode) {
         if (searchmode == "by-type") {
             return dm4c.restc.get_topics_and_create_bucket(get_type_uri(), dm4c.MAX_RESULT_SIZE)
         }
@@ -32,7 +32,7 @@ dm4c.add_plugin("de.deepamehta.typesearch", function() {
     /**
      * Once a "Topic Type" topic is created we refresh the type menu.
      */
-    dm4c.register_listener("post_create_topic", function(topic) {
+    dm4c.add_listener("post_create_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
             refresh_type_menu()
         }
@@ -41,7 +41,7 @@ dm4c.add_plugin("de.deepamehta.typesearch", function() {
     /**
      * Once a "Topic Type" topic is updated we refresh the type menu.
      */
-    dm4c.register_listener("post_update_topic", function(topic) {
+    dm4c.add_listener("post_update_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
             refresh_type_menu()
         }
@@ -50,7 +50,7 @@ dm4c.add_plugin("de.deepamehta.typesearch", function() {
     /**
      * Once a "Topic Type" topic is deleted we refresh the type menu.
      */
-    dm4c.register_listener("post_delete_topic", function(topic) {
+    dm4c.add_listener("post_delete_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
             refresh_type_menu()
         }

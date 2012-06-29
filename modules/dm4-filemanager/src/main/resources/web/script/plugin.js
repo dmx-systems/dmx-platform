@@ -2,7 +2,7 @@ dm4c.add_plugin("de.deepamehta.filemanager", function() {
 
     // === Webclient Listeners ===
 
-    dm4c.register_listener("post_refresh_create_menu", function(type_menu) {
+    dm4c.add_listener("post_refresh_create_menu", function(type_menu) {
         type_menu.add_separator()
         type_menu.add_item({
             label: "New File Browser",
@@ -14,7 +14,7 @@ dm4c.add_plugin("de.deepamehta.filemanager", function() {
 
     // === Files Listeners ===
 
-    dm4c.register_listener("process_files_drop", function(files) {
+    dm4c.add_listener("process_files_drop", function(files) {
         dm4c.canvas.start_grid_positioning()
         //
         var dir_count = files.get_directory_count()

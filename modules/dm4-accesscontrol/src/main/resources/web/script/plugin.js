@@ -40,7 +40,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     // === Webclient Listeners ===
 
-    dm4c.register_listener("init", function() {
+    dm4c.add_listener("init", function() {
 
         create_login_widget()
         create_login_dialog()
@@ -129,7 +129,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     // ---
 
-    dm4c.register_listener("has_write_permission", function(topic) {
+    dm4c.add_listener("has_write_permission", function(topic) {
         var permissions = topic.composite["dm4.accesscontrol.permissions"]
         // error check
         if (!permissions) {
@@ -139,7 +139,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         return permissions.composite["dm4.accesscontrol.operation_write"].value
     })
 
-    dm4c.register_listener("has_create_permission", function(topic_type) {
+    dm4c.add_listener("has_create_permission", function(topic_type) {
         var permissions = topic_type.composite["dm4.accesscontrol.permissions"]
         // error check
         if (!permissions) {

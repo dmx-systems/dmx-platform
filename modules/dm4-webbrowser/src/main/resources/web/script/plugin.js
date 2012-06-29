@@ -4,7 +4,7 @@ dm4c.add_plugin("de.deepamehta.webbrowser", function() {
 
     // === Webclient Listeners ===
 
-    dm4c.register_listener("topic_commands", function(topic) {
+    dm4c.add_listener("topic_commands", function(topic) {
 
         if (topic.type_uri == "dm4.webbrowser.url") {
             return [

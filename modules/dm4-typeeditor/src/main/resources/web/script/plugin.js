@@ -26,7 +26,7 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
      * @param   topic   The topic just created.
      *                  Note: in case the just created topic is a type, the entire type definition is passed.
      */
-    dm4c.register_listener("post_create_topic", function(topic) {
+    dm4c.add_listener("post_create_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
             dm4c.refresh_create_menu()
         }
@@ -35,13 +35,13 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
     /**
      * Once a topic type is updated we must refresh the "Create" type menu.
      */
-    dm4c.register_listener("post_update_topic", function(topic) {
+    dm4c.add_listener("post_update_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
             dm4c.refresh_create_menu()
         }
     })
 
-    dm4c.register_listener("post_refresh_create_menu", function(type_menu) {
+    dm4c.add_listener("post_refresh_create_menu", function(type_menu) {
         type_menu.add_separator()
         type_menu.add_item({
             label: "New Topic Type",

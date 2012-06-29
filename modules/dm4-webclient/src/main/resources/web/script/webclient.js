@@ -680,8 +680,8 @@ function Webclient() {
 
     // ---
 
-    this.register_listener = function(hook_name, listener) {
-        pm.register_listener(hook_name, listener)
+    this.add_listener = function(hook_name, listener) {
+        pm.add_listener(hook_name, listener)
     }
 
     // ---

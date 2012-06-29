@@ -20,7 +20,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
 
     // === Webclient Listeners ===
 
-    dm4c.register_listener("init", function() {
+    dm4c.add_listener("init", function() {
 
         dm4c.ui.dialog("delete-topic-dialog",       "Delete Topic?",       undefined, undefined,
             "Delete", do_delete_topic)
@@ -48,7 +48,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         }
     })
 
-    dm4c.register_listener("topic_commands", function(topic) {
+    dm4c.add_listener("topic_commands", function(topic) {
         var commands = []
         //
         commands.push({label: "Hide",       handler: do_hide,      context: "context-menu"})
@@ -99,7 +99,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         }
     })
 
-    dm4c.register_listener("association_commands", function(assoc) {
+    dm4c.add_listener("association_commands", function(assoc) {
         var commands = []
         //
         commands.push({label: "Hide",       handler: do_hide,    context: "context-menu"})
@@ -137,7 +137,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         }
     })
 
-    dm4c.register_listener("canvas_commands", function(cx, cy) {
+    dm4c.add_listener("canvas_commands", function(cx, cy) {
         var commands = []
         // Note: type_uri is undefined if the user has no create permission or has nothing created yet
         var type_uri = dm4c.toolbar.get_recent_type_uri()

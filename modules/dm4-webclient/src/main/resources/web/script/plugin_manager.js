@@ -143,13 +143,13 @@ function PluginManager(config) {
 
     // === Listener Registry ===
 
-    this.register_listener = function(hook_name, listener) {
+    this.add_listener = function(hook_name, listener) {
         // introduce hook on-demand
         if (!hook_exists(hook_name)) {
             listener_registry[hook_name] = []
         }
         //
-        register_listener(hook_name, listener)
+        add_listener(hook_name, listener)
     }
 
     // ---
@@ -215,7 +215,7 @@ function PluginManager(config) {
 
     // ---
 
-    function register_listener(hook_name, listener) {
+    function add_listener(hook_name, listener) {
         listener_registry[hook_name].push(listener)
     }
 

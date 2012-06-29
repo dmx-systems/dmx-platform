@@ -4,7 +4,7 @@ dm4c.add_plugin("de.deepamehta.help", function() {
 
     // === Webclient Listeners ===
 
-    dm4c.register_listener("init", function() {
+    dm4c.add_listener("init", function() {
         dm4c.toolbar.special_menu.add_item({label: "About DeepaMehta", handler: do_about})
         dm4c.ui.dialog("about-dialog", "About DeepaMehta", DIALOG_CONTENT, "auto")
     })
@@ -25,7 +25,7 @@ dm4c.add_plugin("de.deepamehta.help", function() {
                     '<div class="field-label">Version</div>' +
                     '<div>${project.version}</div>' +
                     '<div class="field-label">Build Date</div>' +
-                    '<div>Jun 27, 2012</div>' +
+                    '<div>Jun 29, 2012</div>' +
                     '<div class="field-label">Copyright</div>' +
                     '<div>2000-2012 Jörg Richter</div>' +
                     '<div class="field-label">License</div>' +
