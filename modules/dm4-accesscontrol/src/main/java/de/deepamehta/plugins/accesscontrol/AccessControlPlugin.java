@@ -20,9 +20,10 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.listeners.PostCreateTopicListener;
-import de.deepamehta.core.service.listeners.PreSendTopicListener;
-import de.deepamehta.core.service.listeners.PreSendTopicTypeListener;
+import de.deepamehta.core.service.listener.PostCreateTopicListener;
+import de.deepamehta.core.service.listener.PreSendTopicListener;
+import de.deepamehta.core.service.listener.PreSendTopicTypeListener;
+import de.deepamehta.core.service.listener.PostInstallPluginListener;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.DefaultValue;
@@ -53,7 +54,8 @@ import java.util.logging.Logger;
 @Produces("application/json")
 public class AccessControlPlugin extends Plugin implements AccessControlService, PostCreateTopicListener,
                                                                                  PreSendTopicListener,
-                                                                                 PreSendTopicTypeListener {
+                                                                                 PreSendTopicTypeListener,
+                                                                                 PostInstallPluginListener {
 
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
@@ -177,32 +179,6 @@ public class AccessControlPlugin extends Plugin implements AccessControlService,
 
 
     @Override
-    public void postInstallPluginHook() {
-        Topic userAccount = createUserAccount(DEFAULT_USERNAME, DEFAULT_PASSWORD);
-        logger.info("Creating \"admin\" user account => ID=" + userAccount.getId());
-    }
-
-    @Override
-    public void serviceArrived(PluginService service) {
-        logger.info("########## Service arrived: " + service);
-        if (service instanceof FacetsService) {
-            facetsService = (FacetsService) service;
-        } else if (service instanceof WorkspacesService) {
-            wsService = (WorkspacesService) service;
-        }
-    }
-
-    @Override
-    public void serviceGone(PluginService service) {
-        logger.info("########## Service gone: " + service);
-        if (service == facetsService) {
-            facetsService = null;
-        } else if (service == wsService) {
-            wsService = null;
-        }
-    }
-
-    @Override
     public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
         // ### TODO: explain
         if (isPluginTopic(topic)) {
@@ -268,6 +244,32 @@ public class AccessControlPlugin extends Plugin implements AccessControlService,
         enrichWithPermissions(topicType,
             hasPermission(username, Operation.WRITE, topicType),
             hasPermission(username, Operation.CREATE, topicType));
+    }
+
+    @Override
+    public void postInstallPlugin() {
+        Topic userAccount = createUserAccount(DEFAULT_USERNAME, DEFAULT_PASSWORD);
+        logger.info("Creating \"admin\" user account => ID=" + userAccount.getId());
+    }
+
+    @Override
+    public void serviceArrived(PluginService service) {
+        logger.info("########## Service arrived: " + service);
+        if (service instanceof FacetsService) {
+            facetsService = (FacetsService) service;
+        } else if (service instanceof WorkspacesService) {
+            wsService = (WorkspacesService) service;
+        }
+    }
+
+    @Override
+    public void serviceGone(PluginService service) {
+        logger.info("########## Service gone: " + service);
+        if (service == facetsService) {
+            facetsService = null;
+        } else if (service == wsService) {
+            wsService = null;
+        }
     }
 
 

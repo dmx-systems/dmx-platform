@@ -15,8 +15,8 @@ import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Hook;
 import de.deepamehta.core.service.Plugin;
-import de.deepamehta.core.service.listeners.PreUpdateTopicListener;
-import de.deepamehta.core.service.listeners.PostUpdateTopicListener;
+import de.deepamehta.core.service.listener.PreUpdateTopicListener;
+import de.deepamehta.core.service.listener.PostUpdateTopicListener;
 import de.deepamehta.core.util.JSONHelper;
 
 import javax.ws.rs.Consumes;

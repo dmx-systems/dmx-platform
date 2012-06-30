@@ -32,38 +32,31 @@ class ListenerRegistry {
         listeners.add(listener);
     }
 
-    public List<Object> fireEvent(CoreEvent event, Object... params) {
+    List<Object> fireEvent(CoreEvent event, Object... params) {
         List results = new ArrayList();
         List<Listener> listeners = get(event);
         if (listeners == null) {
             return results;
         }
         for (Listener listener : listeners) {
-            try {
-                Object result = fireEvent(listener, event, params);
-                if (result != null) {
-                    results.add(result);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("Firing event " + event + " for " + listener + " failed", e);
+            Object result = handleEvent(listener, event, params);
+            if (result != null) {
+                results.add(result);
             }
         }
         return results;
     }
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    /**
-     * @throws  NoSuchMethodException
-     * @throws  IllegalAccessException
-     * @throws  InvocationTargetException
-     */
-    private Object fireEvent(Listener listener, CoreEvent event, Object... params) throws Exception {
-        Method listenerMethod = listener.getClass().getMethod(event.getListenerMethodName(), event.getParamClasses());
-        return listenerMethod.invoke(listener, params);
+    Object handleEvent(Listener listener, CoreEvent event, Object... params) {
+        try {
+            Method listenerMethod = listener.getClass().getMethod(event.handlerMethodName, event.paramClasses);
+            return listenerMethod.invoke(listener, params);
+        } catch (Exception e) {     // NoSuchMethodException, IllegalAccessException, InvocationTargetException
+            throw new RuntimeException("Handling event " + event + " by " + listener + " failed", e);
+        }
     }
 
-    // ---
+    // ------------------------------------------------------------------------------------------------- Private Methods
 
     private List<Listener> get(CoreEvent event) {
         return listenerRegistry.get(event.name());

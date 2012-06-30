@@ -156,9 +156,13 @@ public interface DeepaMehtaService {
 
     // === Listeners ===
 
+    void addListener(CoreEvent event, Listener listener);
+
+    // ---
+
     List<Object> fireEvent(CoreEvent event, Object... params);
 
-    void addListener(CoreEvent event, Listener listener);
+    Object handleEvent(Listener listener, CoreEvent event, Object... params);
 
 
 

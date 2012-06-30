@@ -226,8 +226,8 @@ public class Plugin implements BundleActivator, EventHandler {
 
 
 
-    public void postInstallPluginHook() {
-    }
+    /* ### public void postInstallPluginHook() {
+    } */
 
     public void allPluginsReadyHook() {
     }
@@ -442,10 +442,6 @@ public class Plugin implements BundleActivator, EventHandler {
         }
         //
         initializePlugin();
-        //
-        addToReadyPlugins();    // Once a plugin has been intialized it is "ready"
-        postPluginReadyEvent();
-        dms.checkAllPluginsReady();
     }
 
     // ---
@@ -502,8 +498,14 @@ public class Plugin implements BundleActivator, EventHandler {
             logger.info("----- Initialization of " + this + " complete -----");
             // ### FIXME: should we call registerPlugin() at last?
             // Currently if e.g. registerPluginService() fails the plugin is still registered at the DeepaMehta core.
+            //
+            addToReadyPlugins();    // Once a plugin has been intialized it is "ready"
+            postPluginReadyEvent();
+            dms.checkAllPluginsReady();
         } catch (Exception e) {
-            throw new RuntimeException("Initialization of " + this + " failed", e);
+            logger.severe("Initialization of " + this + " failed:");
+            e.printStackTrace();
+            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
         }
     }
 
@@ -534,7 +536,7 @@ public class Plugin implements BundleActivator, EventHandler {
             runPluginMigrations(isCleanInstall);
             // 3) post install
             if (isCleanInstall) {
-                postInstallPluginHook();  // trigger hook
+                handleEvent(CoreEvent.POST_INSTALL_PLUGIN);
                 introduceTypesToPlugin();
             }
             //
@@ -617,16 +619,31 @@ public class Plugin implements BundleActivator, EventHandler {
     private void registerPluginListeners() {
         logger.info("Registering listeners of " + this + " at DeepaMehta 4 core service");
         for (Class interfaze : getClass().getInterfaces()) {
-            if (isListener(interfaze)) {
+            if (isListenerInterface(interfaze)) {
                 CoreEvent event = CoreEvent.fromListenerInterface(interfaze);
-                logger.info("######################## Listener Interface: " + interfaze + " -> " + event);
+                logger.info("################## Listener Interface: " + interfaze + " -> " + event);
                 dms.addListener(event, (Listener) this);
             }
         }
     }
 
-    private boolean isListener(Class clazz) {
-        return Listener.class.isAssignableFrom(clazz);
+    private boolean isListenerInterface(Class interfaze) {
+        return Listener.class.isAssignableFrom(interfaze);
+    }
+
+    /**
+     * Returns true if this plugin is a listener for the specified event.
+     */
+    private boolean isListener(CoreEvent event) {
+        return event.listenerInterface.isAssignableFrom(getClass());
+    }
+
+    private Object handleEvent(CoreEvent event, Object... params) {
+        if (isListener(event)) {
+            logger.info("########################################################### " + event + " handled by " + this);
+            return dms.handleEvent((Listener) this, event, params);
+        }
+        return null;
     }
 
     // === Plugin Service ===
@@ -783,22 +800,15 @@ public class Plugin implements BundleActivator, EventHandler {
 
     @Override
     public void handleEvent(Event event) {
-        try {
-            if (event.getTopic().equals(PLUGIN_READY)) {
-                String pluginUri = (String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME);
-                if (hasDependency(pluginUri)) {
-                    logger.info("### Receiving PLUGIN_READY event from \"" + pluginUri + "\" for " + this);
-                    dependencyState.put(pluginUri, true);
-                    checkServiceAvailability();
-                }
-            } else {
-                throw new RuntimeException("Unexpected event: " + event);
+        if (event.getTopic().equals(PLUGIN_READY)) {
+            String pluginUri = (String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME);
+            if (hasDependency(pluginUri)) {
+                logger.info("### Receiving PLUGIN_READY event from \"" + pluginUri + "\" for " + this);
+                dependencyState.put(pluginUri, true);
+                checkServiceAvailability();
             }
-        } catch (Exception e) {
-            logger.severe("Handling OSGi event for " + this + " failed (event=" + event + ")");
-            e.printStackTrace();
-            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
-            // ### FIXME: should we re-throw to signalize that a plugin has a problem?
+        } else {
+            throw new RuntimeException("Unexpected event: " + event);
         }
     }
 

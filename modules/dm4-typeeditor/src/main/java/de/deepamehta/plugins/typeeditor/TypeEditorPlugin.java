@@ -7,7 +7,7 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
-import de.deepamehta.core.service.listeners.PostDeleteAssociationListener;
+import de.deepamehta.core.service.listener.PostDeleteAssociationListener;
 
 import java.util.logging.Logger;
 

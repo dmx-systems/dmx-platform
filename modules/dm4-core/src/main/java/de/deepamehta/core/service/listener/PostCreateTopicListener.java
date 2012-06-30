@@ -1,4 +1,4 @@
-package de.deepamehta.core.service.listeners;
+package de.deepamehta.core.service.listener;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.ClientState;

@@ -13,7 +13,8 @@ import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
-import de.deepamehta.core.service.listeners.PostCreateTopicListener;
+import de.deepamehta.core.service.listener.PostCreateTopicListener;
+import de.deepamehta.core.service.listener.PostInstallPluginListener;
 
 import static java.util.Arrays.asList;
 import java.util.HashMap;
@@ -24,7 +25,8 @@ import java.util.logging.Logger;
 
 
 
-public class WorkspacesPlugin extends Plugin implements WorkspacesService, PostCreateTopicListener {
+public class WorkspacesPlugin extends Plugin implements WorkspacesService, PostCreateTopicListener,
+                                                                           PostInstallPluginListener {
 
     private static final String DEFAULT_WORKSPACE_NAME = "Default";
 
@@ -90,14 +92,6 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService, PostC
     // ********************************
 
 
-
-    /**
-     * Creates the "Default" workspace.
-     */
-    @Override
-    public void postInstallPluginHook() {
-        createWorkspace(DEFAULT_WORKSPACE_NAME);
-    }
 
     /**
      * Assigns a newly created topic to the current workspace.
@@ -166,6 +160,14 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService, PostC
         //
         topicType.addAssocDef(assocDef);
     } */
+
+    /**
+     * Creates the "Default" workspace.
+     */
+    @Override
+    public void postInstallPlugin() {
+        createWorkspace(DEFAULT_WORKSPACE_NAME);
+    }
 
 
 

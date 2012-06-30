@@ -611,13 +611,20 @@ public class EmbeddedService implements DeepaMehtaService {
     // === Listeners ===
 
     @Override
+    public void addListener(CoreEvent event, Listener listener) {
+        listenerRegistry.addListener(event, listener);
+    }
+
+    // ---
+
+    @Override
     public List<Object> fireEvent(CoreEvent event, Object... params) {
         return listenerRegistry.fireEvent(event, params);
     }
 
     @Override
-    public void addListener(CoreEvent event, Listener listener) {
-        listenerRegistry.addListener(event, listener);
+    public Object handleEvent(Listener listener, CoreEvent event, Object... params) {
+        return listenerRegistry.handleEvent(listener, event, params);
     }
 
 
@@ -668,7 +675,7 @@ public class EmbeddedService implements DeepaMehtaService {
             runCoreMigrations(isCleanInstall);
             tx.success();
             tx.finish();
-            logger.info("----- Completing initialization of DeepaMehta 4 Core -----");
+            logger.info("----- Initialization of DeepaMehta 4 Core complete -----");
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             tx.finish();
