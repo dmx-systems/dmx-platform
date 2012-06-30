@@ -10,10 +10,13 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Hook;
 import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.listeners.PreUpdateTopicListener;
+import de.deepamehta.core.service.listeners.PostUpdateTopicListener;
 import de.deepamehta.core.util.JSONHelper;
 
 import javax.ws.rs.Consumes;
@@ -40,7 +43,7 @@ import java.util.logging.Logger;
 @Path("/webclient")
 @Consumes("application/json")
 @Produces("application/json")
-public class WebclientPlugin extends Plugin {
+public class WebclientPlugin extends Plugin implements PreUpdateTopicListener, PostUpdateTopicListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -78,9 +81,9 @@ public class WebclientPlugin extends Plugin {
             logger.info(singleTopics.size() + " single topics found, " + searchableUnits.size() + " searchable units");
             Topic searchTopic = createSearchTopic("\"" + searchTerm + "\"", searchableUnits, clientState);
             tx.success();
-            // ### TODO: triggering PRE_SEND should not be up to the plugin developer.
+            // ### TODO: firing PRE_SEND should not be up to the plugin developer.
             // ### Possibly a JAX-RS 2.0 entity interceptor could be used instead.
-            dms.triggerHook(Hook.PRE_SEND_TOPIC, searchTopic, clientState);
+            dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, searchTopic, clientState);
             return searchTopic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -109,9 +112,9 @@ public class WebclientPlugin extends Plugin {
             ResultSet<Topic> result = dms.getTopics(typeUri, false, maxResultSize, clientState); // fetchComposite=false
             Topic searchTopic = createSearchTopic(searchTerm, result.getItems(), clientState);
             tx.success();
-            // ### TODO: triggering PRE_SEND should not be up to the plugin developer.
+            // ### TODO: firing PRE_SEND should not be up to the plugin developer.
             // ### Possibly a JAX-RS 2.0 entity interceptor could be used instead.
-            dms.triggerHook(Hook.PRE_SEND_TOPIC, searchTopic, clientState);
+            dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, searchTopic, clientState);
             return searchTopic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -123,9 +126,9 @@ public class WebclientPlugin extends Plugin {
 
 
 
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
 
 
 
@@ -149,7 +152,7 @@ public class WebclientPlugin extends Plugin {
     }
 
     @Override
-    public void preUpdateHook(Topic topic, TopicModel newModel, Directives directives) {
+    public void preUpdateTopic(Topic topic, TopicModel newModel, Directives directives) {
         if (topic.getTypeUri().equals("dm4.files.file") && newModel.getTypeUri().equals("dm4.webclient.icon")) {
             String iconUrl = "/proxy/file:" + topic.getCompositeValue().getString("dm4.files.path");
             logger.info("### Retyping a file to an icon (iconUrl=" + iconUrl + ")");
@@ -161,8 +164,8 @@ public class WebclientPlugin extends Plugin {
      * Once a view configuration is updated in the DB we must update the cached view configuration model.
      */
     @Override
-    public void postUpdateHook(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
-                                                                                      Directives directives) {
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
+                                                                                       Directives directives) {
         if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
             Type type = getType(topic);
             logger.info("### Updating view configuration for topic type \"" + type.getUri() + "\" (" + topic + ")");

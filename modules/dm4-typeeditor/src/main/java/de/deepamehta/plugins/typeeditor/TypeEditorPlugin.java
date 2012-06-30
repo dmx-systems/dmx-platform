@@ -7,12 +7,13 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.listeners.PostDeleteAssociationListener;
 
 import java.util.logging.Logger;
 
 
 
-public class TypeEditorPlugin extends Plugin {
+public class TypeEditorPlugin extends Plugin implements PostDeleteAssociationListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -22,9 +23,9 @@ public class TypeEditorPlugin extends Plugin {
 
 
 
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
 
 
 
@@ -58,12 +59,14 @@ public class TypeEditorPlugin extends Plugin {
     }
 
     @Override
-    public void postDeleteAssociationHook(Association assoc, Directives directives) {
+    public void postDeleteAssociation(Association assoc, Directives directives) {
         if (isAssocDef(assoc.getTypeUri())) {
             TopicType topicType = removeAssocDef(assoc);
             directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
         }
     }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

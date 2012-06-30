@@ -14,6 +14,7 @@ import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.CommandParams;
 import de.deepamehta.core.service.CommandResult;
+import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Hook;
 import de.deepamehta.core.service.Plugin;
@@ -62,7 +63,7 @@ public class WebservicePlugin extends Plugin {
         try {
             Topic topic = dms.getTopic(topicId, fetchComposite, clientState);
             //
-            triggerPreSend(topic, clientState);
+            firePreSend(topic, clientState);
             //
             return topic;
         } catch (Exception e) {
@@ -114,7 +115,7 @@ public class WebservicePlugin extends Plugin {
         try {
             Topic topic = dms.createTopic(model, clientState);
             //
-            triggerPreSend(topic, clientState);
+            firePreSend(topic, clientState);
             //
             return topic;
         } catch (Exception e) {
@@ -128,7 +129,7 @@ public class WebservicePlugin extends Plugin {
         try {
             Directives directives = dms.updateTopic(model, clientState);
             //
-            triggerPreSend(directives, clientState);
+            firePreSend(directives, clientState);
             //
             return directives;
         } catch (Exception e) {
@@ -254,7 +255,7 @@ public class WebservicePlugin extends Plugin {
         try {
             TopicType topicType = dms.getTopicType(uri, clientState);
             //
-            triggerPreSend(topicType, clientState);
+            firePreSend(topicType, clientState);
             //
             return topicType;
         } catch (Exception e) {
@@ -391,22 +392,22 @@ public class WebservicePlugin extends Plugin {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void triggerPreSend(Topic topic, ClientState clientState) {
-        dms.triggerHook(Hook.PRE_SEND_TOPIC, topic, clientState);
+    private void firePreSend(Topic topic, ClientState clientState) {
+        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, topic, clientState);
     }
 
-    private void triggerPreSend(TopicType topicType, ClientState clientState) {
-        dms.triggerHook(Hook.PRE_SEND_TOPIC_TYPE, topicType, clientState);
+    private void firePreSend(TopicType topicType, ClientState clientState) {
+        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC_TYPE, topicType, clientState);
     }
 
-    private void triggerPreSend(Directives directives, ClientState clientState) {
+    private void firePreSend(Directives directives, ClientState clientState) {
         for (Directives.Entry entry : directives) {
             switch (entry.dir) {
             case UPDATE_TOPIC:
-                triggerPreSend((Topic) entry.arg, clientState);
+                firePreSend((Topic) entry.arg, clientState);
                 break;
             case UPDATE_TOPIC_TYPE:
-                triggerPreSend((TopicType) entry.arg, clientState);
+                firePreSend((TopicType) entry.arg, clientState);
                 break;
             }
         }

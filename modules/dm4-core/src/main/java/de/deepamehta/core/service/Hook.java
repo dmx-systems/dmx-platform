@@ -25,26 +25,21 @@ public enum Hook {
     // It is declared here for documentation purpose only.
     SERVICE_GONE("serviceGone", PluginService.class),
 
-     PRE_CREATE_TOPIC("preCreateHook",  TopicModel.class, ClientState.class),
-    POST_CREATE_TOPIC("postCreateHook", Topic.class,      ClientState.class, Directives.class),
+    // ### PRE_CREATE_TOPIC("preCreateHook",  TopicModel.class, ClientState.class),
+    // ### POST_CREATE_TOPIC("postCreateHook", Topic.class,      ClientState.class, Directives.class),
 
-     PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, TopicModel.class, Directives.class),
-    POST_UPDATE_TOPIC("postUpdateHook", Topic.class, TopicModel.class, TopicModel.class,
-                                        ClientState.class, Directives.class),
+    // ### PRE_UPDATE_TOPIC("preUpdateHook",  Topic.class, TopicModel.class, Directives.class),
+    // ### POST_UPDATE_TOPIC("postUpdateHook", Topic.class, TopicModel.class, TopicModel.class,
+    // ###                                    ClientState.class, Directives.class),
 
-     PRE_DELETE_ASSOCIATION("preDeleteAssociationHook",  Association.class, Directives.class),
-    POST_DELETE_ASSOCIATION("postDeleteAssociationHook", Association.class, Directives.class),
+    // ### PRE_DELETE_ASSOCIATION("preDeleteAssociationHook",  Association.class, Directives.class),
+    // ### POST_DELETE_ASSOCIATION("postDeleteAssociationHook", Association.class, Directives.class),
 
-    PRE_SEND_TOPIC("preSendTopicHook", Topic.class, ClientState.class),
-    PRE_SEND_TOPIC_TYPE("preSendTopicTypeHook", TopicType.class, ClientState.class),
+    // ### PRE_SEND_TOPIC("preSendTopicHook", Topic.class, ClientState.class),
+    // ### PRE_SEND_TOPIC_TYPE("preSendTopicTypeHook", TopicType.class, ClientState.class),
 
     // ### TODO: remove this hook. Retype is special case of update.
     POST_RETYPE_ASSOCIATION("postRetypeAssociationHook", Association.class, String.class, Directives.class),
-
-    // ### TODO: remove this hook. Use the "fetchComposite" flag instead.
-    PROVIDE_TOPIC_PROPERTIES("providePropertiesHook", Topic.class),
-    // ### TODO: remove this hook. Use the "fetchComposite" flag instead.
-    PROVIDE_RELATION_PROPERTIES("providePropertiesHook", Association.class),
 
     // Note: besides regular triggering (see {@link #createTopicType})
     // this hook is triggered by the plugin itself

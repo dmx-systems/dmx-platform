@@ -21,6 +21,8 @@ import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.listeners.PostCreateTopicListener;
+import de.deepamehta.core.service.listeners.PreSendTopicListener;
+import de.deepamehta.core.service.listeners.PreSendTopicTypeListener;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.DefaultValue;
@@ -49,7 +51,9 @@ import java.util.logging.Logger;
 @Path("/accesscontrol")
 @Consumes("application/json")
 @Produces("application/json")
-public class AccessControlPlugin extends Plugin implements AccessControlService, PostCreateTopicListener {
+public class AccessControlPlugin extends Plugin implements AccessControlService, PostCreateTopicListener,
+                                                                                 PreSendTopicListener,
+                                                                                 PreSendTopicTypeListener {
 
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
@@ -235,29 +239,8 @@ public class AccessControlPlugin extends Plugin implements AccessControlService,
 
     // ---
 
-    /* ### TODO: adapt to DM4
     @Override
-    public void providePropertiesHook(Topic topic) {
-        if (topic.typeUri.equals("de/deepamehta/core/topictype/role")) {
-            String roleName = dms.getTopicProperty(topic.id, "de/deepamehta/core/property/rolename").toString();
-            topic.setProperty("de/deepamehta/core/property/rolename", roleName);
-        }
-    } */
-
-    /* ### TODO: adapt to DM4
-    @Override
-    public void providePropertiesHook(Relation relation) {
-        if (relation.typeId.equals(RelationType.ACCESS_CONTROL.name())) {
-            // transfer all relation properties
-            Properties properties = dms.getRelation(relation.id).getProperties();
-            relation.setProperties(properties);
-        }
-    } */
-
-    // ---
-
-    @Override
-    public void preSendTopicHook(Topic topic, ClientState clientState) {
+    public void preSendTopic(Topic topic, ClientState clientState) {
         // ### TODO: explain
         if (isPluginTopic(topic)) {
             enrichWithPermissions(topic, false);    // write=false
@@ -271,7 +254,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService,
     }
 
     @Override
-    public void preSendTopicTypeHook(TopicType topicType, ClientState clientState) {
+    public void preSendTopicType(TopicType topicType, ClientState clientState) {
         // Note: there are 2 types whose permissions must be set manually as they can't be calculated the usual way:
         // - "Access Control List Facet": endless recursion would occur. ### FIXDOC
         // - "Meta Meta Type": doesn't exist in DB. Retrieving its ACL would fail.

@@ -12,7 +12,18 @@ import java.util.Map;
 
 public enum CoreEvent {
 
-    POST_CREATE_TOPIC("postCreateTopic", Topic.class, ClientState.class, Directives.class);
+    PRE_CREATE_TOPIC("preCreateTopic", TopicModel.class, ClientState.class),
+    POST_CREATE_TOPIC("postCreateTopic", Topic.class, ClientState.class, Directives.class),
+
+    PRE_UPDATE_TOPIC("preUpdateTopic", Topic.class, TopicModel.class, Directives.class),
+    POST_UPDATE_TOPIC("postUpdateTopic", Topic.class, TopicModel.class, TopicModel.class, ClientState.class,
+                                                                                          Directives.class),
+    PRE_DELETE_ASSOCIATION("preDeleteAssociation",  Association.class, Directives.class),
+    POST_DELETE_ASSOCIATION("postDeleteAssociation", Association.class, Directives.class),
+
+    PRE_SEND_TOPIC("preSendTopic", Topic.class, ClientState.class),
+    PRE_SEND_TOPIC_TYPE("preSendTopicType", TopicType.class, ClientState.class);
+
     // ### TODO: transform the other hooks into events
 
     private final String listenerMethodName;
@@ -41,6 +52,8 @@ public enum CoreEvent {
     public Class[] getParamClasses() {
         return paramClasses;
     }
+
+    // ---
 
     public static CoreEvent fromListenerInterface(Class listenerInterface) {
         String name = listenerInterface.getSimpleName();

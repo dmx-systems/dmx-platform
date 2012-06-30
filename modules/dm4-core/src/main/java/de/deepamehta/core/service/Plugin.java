@@ -242,20 +242,20 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // ---
 
-    public void preCreateHook(TopicModel model, ClientState clientState) {
+    /* ### public void preCreateHook(TopicModel model, ClientState clientState) {
     }
 
     public void postCreateHook(Topic topic, ClientState clientState, Directives directives) {
-    }
+    } */
 
     // ---
 
-    public void preUpdateHook(Topic topic, TopicModel newModel, Directives directives) {
-    }
+    /* ### public void preUpdateHook(Topic topic, TopicModel newModel, Directives directives) {
+    } */
 
-    public void postUpdateHook(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
+    /* ### public void postUpdateHook(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
                                                                                       Directives directives) {
-    }
+    } */
 
     // ---
 
@@ -264,27 +264,19 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // ---
 
-    public void preDeleteAssociationHook(Association assoc, Directives directives) {
-    }
+    /* ### public void preDeleteAssociationHook(Association assoc, Directives directives) {
+    } */
 
-    public void postDeleteAssociationHook(Association assoc, Directives directives) {
-    }
-
-    // ---
-
-    public void preSendTopicHook(Topic topic, ClientState clientState) {
-    }
-
-    public void preSendTopicTypeHook(TopicType topicType, ClientState clientState) {
-    }
+    /* ### public void postDeleteAssociationHook(Association assoc, Directives directives) {
+    } */
 
     // ---
 
-    public void providePropertiesHook(Topic topic) {
-    }
+    /* ### public void preSendTopicHook(Topic topic, ClientState clientState) {
+    } */
 
-    public void providePropertiesHook(Association assoc) {
-    }
+    /* ### public void preSendTopicTypeHook(TopicType topicType, ClientState clientState) {
+    } */
 
     // ---
 

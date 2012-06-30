@@ -182,13 +182,12 @@ public class EmbeddedService implements DeepaMehtaService {
     public AttachedTopic createTopic(TopicModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            triggerHook(Hook.PRE_CREATE_TOPIC, model, clientState);
+            fireEvent(CoreEvent.PRE_CREATE_TOPIC, model, clientState);
             //
             AttachedTopic topic = new AttachedTopic(model, this);
             Directives directives = new Directives();   // ### FIXME: directives are ignored
             topic.store(clientState, directives);
             //
-            // ### triggerHook(Hook.POST_CREATE_TOPIC, topic, clientState, directives);
             fireEvent(CoreEvent.POST_CREATE_TOPIC, topic, clientState, directives);
             //
             tx.success();
@@ -356,9 +355,9 @@ public class EmbeddedService implements DeepaMehtaService {
             //
             Directives directives = new Directives();
             //
-            triggerHook(Hook.PRE_DELETE_ASSOCIATION, assoc, directives);
+            fireEvent(CoreEvent.PRE_DELETE_ASSOCIATION, assoc, directives);
             assoc.delete(directives);
-            triggerHook(Hook.POST_DELETE_ASSOCIATION, assoc, directives);
+            fireEvent(CoreEvent.POST_DELETE_ASSOCIATION, assoc, directives);
             //
             tx.success();
             return directives;
