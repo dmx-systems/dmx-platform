@@ -20,10 +20,13 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.listener.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.listener.PostCreateTopicListener;
 import de.deepamehta.core.service.listener.PreSendTopicListener;
 import de.deepamehta.core.service.listener.PreSendTopicTypeListener;
 import de.deepamehta.core.service.listener.PostInstallPluginListener;
+import de.deepamehta.core.service.listener.ServiceArrivedListener;
+import de.deepamehta.core.service.listener.ServiceGoneListener;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.DefaultValue;
@@ -55,7 +58,10 @@ import java.util.logging.Logger;
 public class AccessControlPlugin extends Plugin implements AccessControlService, PostCreateTopicListener,
                                                                                  PreSendTopicListener,
                                                                                  PreSendTopicTypeListener,
-                                                                                 PostInstallPluginListener {
+                                                                                 PostInstallPluginListener,
+                                                                                 IntroduceTopicTypeListener,
+                                                                                 ServiceArrivedListener,
+                                                                                 ServiceGoneListener {
 
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
@@ -203,7 +209,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService,
     } */
 
     @Override
-    public void modifyTopicTypeHook(TopicType topicType, ClientState clientState) {
+    public void introduceTopicTypeHook(TopicType topicType, ClientState clientState) {
         // ### TODO: explain
         if (topicType.getUri().equals("dm4.core.meta_meta_type")) {
             return;

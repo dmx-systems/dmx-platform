@@ -132,12 +132,6 @@ public interface DeepaMehtaService {
 
 
 
-    // === Commands ===
-
-    CommandResult executeCommand(String command, CommandParams params, ClientState clientState);
-
-
-
     // === Plugins ===
 
     void registerPlugin(Plugin plugin);

@@ -422,9 +422,9 @@ public class EmbeddedService implements DeepaMehtaService {
             typeCache.put(topicType);
             topicType.store();
             //
-            // Note: the modification must be applied *before* the enrichment.
+            // Note: the modification must be applied *before* the enrichment. ### FIXDOC
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
-            triggerHook(Hook.MODIFY_TOPIC_TYPE, topicType, clientState);
+            fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, clientState);
             //
             tx.success();
             return topicType;
@@ -513,33 +513,6 @@ public class EmbeddedService implements DeepaMehtaService {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Creating association type \"" + assocTypeModel.getUri() + "\" failed (" +
                 assocTypeModel + ")", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
-
-
-    // === Commands ===
-
-    @Override
-    public CommandResult executeCommand(String command, CommandParams params, ClientState clientState) {
-        logger.info("command=\"" + command + "\", params=" + params);
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            Iterator i = triggerHook(Hook.EXECUTE_COMMAND, command, params, clientState).values().iterator();
-            if (!i.hasNext()) {
-                throw new RuntimeException("Command is not handled by any plugin");
-            }
-            CommandResult result = (CommandResult) i.next();
-            if (i.hasNext()) {
-                throw new RuntimeException("Ambiguity: more than one plugin returned a result");
-            }
-            tx.success();
-            return result;
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Executing command \"" + command + "\" failed (params=" + params + ")", e);
         } finally {
             tx.finish();
         }
@@ -659,7 +632,7 @@ public class EmbeddedService implements DeepaMehtaService {
             ", DeepaMehta plugins: " + plugins + ", Ready: " + ready);
         if (plugins == ready) {
             logger.info("########## All plugins ready ##########");
-            triggerHook(Hook.ALL_PLUGINS_READY);
+            fireEvent(CoreEvent.ALL_PLUGINS_READY);
         }
     }
 

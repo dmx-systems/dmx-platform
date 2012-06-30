@@ -9,21 +9,23 @@ import de.deepamehta.core.model.TopicModel;
 
 public enum Hook {
 
+    DUMMY("dummy");
+
     // Note: this hook is triggered only by the plugin itself
     // (see {@link de.deepamehta.core.service.Plugin#initializePlugin}).
     // It is declared here for documentation purpose only.
     // ### TODO: remove this hook. Use migration 1 instead.
     // ### POST_INSTALL_PLUGIN("postInstallPluginHook"),
-    ALL_PLUGINS_READY("allPluginsReadyHook"),
+    // ### ALL_PLUGINS_READY("allPluginsReadyHook"),
 
     // Note: this hook is triggered only by the plugin itself
     // (see {@link de.deepamehta.core.service.Plugin#createServiceTracker}).
     // It is declared here for documentation purpose only.
-    SERVICE_ARRIVED("serviceArrived", PluginService.class),
+    // ### SERVICE_ARRIVED("serviceArrived", PluginService.class),
     // Note: this hook is triggered only by the plugin itself
     // (see {@link de.deepamehta.core.service.Plugin#createServiceTracker}).
     // It is declared here for documentation purpose only.
-    SERVICE_GONE("serviceGone", PluginService.class),
+    // ### SERVICE_GONE("serviceGone", PluginService.class),
 
     // ### PRE_CREATE_TOPIC("preCreateHook",  TopicModel.class, ClientState.class),
     // ### POST_CREATE_TOPIC("postCreateHook", Topic.class,      ClientState.class, Directives.class),
@@ -39,15 +41,15 @@ public enum Hook {
     // ### PRE_SEND_TOPIC_TYPE("preSendTopicTypeHook", TopicType.class, ClientState.class),
 
     // ### TODO: remove this hook. Retype is special case of update.
-    POST_RETYPE_ASSOCIATION("postRetypeAssociationHook", Association.class, String.class, Directives.class),
+    // ### POST_RETYPE_ASSOCIATION("postRetypeAssociationHook", Association.class, String.class, Directives.class),
 
     // Note: besides regular triggering (see {@link #createTopicType})
     // this hook is triggered by the plugin itself
     // (see {@link de.deepamehta.core.service.Plugin#introduceTypesToPlugin}).
-    MODIFY_TOPIC_TYPE("modifyTopicTypeHook", TopicType.class, ClientState.class),
+    // ### MODIFY_TOPIC_TYPE("modifyTopicTypeHook", TopicType.class, ClientState.class),
 
     // ### TODO: remove this hook. Let the plugin provide a REST API instead.
-    EXECUTE_COMMAND("executeCommandHook", String.class, CommandParams.class, ClientState.class);
+    // ### EXECUTE_COMMAND("executeCommandHook", String.class, CommandParams.class, ClientState.class);
 
     private final String methodName;
     private final Class[] paramClasses;

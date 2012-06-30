@@ -15,6 +15,7 @@ import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Hook;
 import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.listener.AllPluginsReadyListener;
 import de.deepamehta.core.service.listener.PreUpdateTopicListener;
 import de.deepamehta.core.service.listener.PostUpdateTopicListener;
 import de.deepamehta.core.util.JSONHelper;
@@ -43,7 +44,9 @@ import java.util.logging.Logger;
 @Path("/webclient")
 @Consumes("application/json")
 @Produces("application/json")
-public class WebclientPlugin extends Plugin implements PreUpdateTopicListener, PostUpdateTopicListener {
+public class WebclientPlugin extends Plugin implements PreUpdateTopicListener,
+                                                       PostUpdateTopicListener,
+                                                       AllPluginsReadyListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -133,7 +136,7 @@ public class WebclientPlugin extends Plugin implements PreUpdateTopicListener, P
 
 
     @Override
-    public void allPluginsReadyHook() {
+    public void allPluginsReady() {
         String webclientUrl = getWebclientUrl();
         //
         if (hasWebclientLaunched == true) {

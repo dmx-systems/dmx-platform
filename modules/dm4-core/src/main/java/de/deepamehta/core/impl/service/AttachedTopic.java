@@ -19,7 +19,6 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Hook;
 
 import java.util.List;
 import java.util.Set;

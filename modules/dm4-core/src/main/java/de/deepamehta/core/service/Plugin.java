@@ -229,16 +229,16 @@ public class Plugin implements BundleActivator, EventHandler {
     /* ### public void postInstallPluginHook() {
     } */
 
-    public void allPluginsReadyHook() {
-    }
+    /* ### public void allPluginsReadyHook() {
+    } */
 
     // ---
 
-    public void serviceArrived(PluginService service) {
+    /* ### public void serviceArrived(PluginService service) {
     }
 
     public void serviceGone(PluginService service) {
-    }
+    } */
 
     // ---
 
@@ -259,8 +259,8 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // ---
 
-    public void postRetypeAssociationHook(Association assoc, String oldTypeUri, Directives directives) {
-    }
+    /* ### public void postRetypeAssociationHook(Association assoc, String oldTypeUri, Directives directives) {
+    } */
 
     // ---
 
@@ -309,8 +309,8 @@ public class Plugin implements BundleActivator, EventHandler {
      *                      particular the underlying type topic has an ID already. That is, the type is ready for
      *                      e.g. being related to other topics.
      */
-    public void modifyTopicTypeHook(TopicType topicType, ClientState clientState) {
-    }
+    /* ### public void modifyTopicTypeHook(TopicType topicType, ClientState clientState) {
+    } */
 
     // ---
 
@@ -382,8 +382,7 @@ public class Plugin implements BundleActivator, EventHandler {
                     checkServiceAvailability();
                 } else if (service instanceof PluginService) {
                     logger.info("Adding plugin service \"" + serviceInterface + "\" to plugin \"" + pluginName + "\"");
-                    // trigger hook
-                    serviceArrived((PluginService) service);
+                    handleEvent(CoreEvent.SERVICE_ARRIVED, (PluginService) service);
                 }
                 //
                 return service;
@@ -406,8 +405,7 @@ public class Plugin implements BundleActivator, EventHandler {
                 } else if (service instanceof PluginService) {
                     logger.info("Removing plugin service \"" + serviceInterface + "\" from plugin \"" +
                         pluginName + "\"");
-                    // trigger hook
-                    serviceGone((PluginService) service);
+                    handleEvent(CoreEvent.SERVICE_GONE, (PluginService) service);
                 }
                 super.removedService(ref, service);
             }
@@ -424,11 +422,6 @@ public class Plugin implements BundleActivator, EventHandler {
      * The requirements:
      *   - the 3 basic OSGi services are available (DeepaMehtaService, WebPublishingService, EventAdmin).
      *   - the plugins this plugin depends on (according to this plugin's "importModels" property) are ready.
-     *
-     * After initialization:
-     *   - adds this plugin to the set of "ready" plugins.
-     *   - posts the PLUGIN_READY event.
-     *   - checks if all plugins are ready, and if so, triggers the ALL_PLUGINS_READY hook.
      */
     private void checkServiceAvailability() {
         if (dms == null || webPublishingService == null || eventService == null || !dependenciesAvailable()) {
@@ -478,13 +471,18 @@ public class Plugin implements BundleActivator, EventHandler {
     /**
      * Initializes the plugin. This comprises:
      * - install the plugin in the database
-     * - register the plugin at the DeepaMehta core service
+     * - register the plugin at the DeepaMehta core service ### FIXDOC (listeners)
      * - register the plugin's OSGi service at the OSGi framework
      * - register the plugin's static web resources at the OSGi HTTP service
      * - register the plugin's REST resources at the OSGi HTTP service
      *
      * These are the tasks which rely on both, the DeepaMehtaService and the WebPublishingService.
      * This method is called once both services become available. ### FIXDOC
+     *
+     * After initialization:
+     *   - adds this plugin to the set of "ready" plugins.
+     *   - posts the PLUGIN_READY event.
+     *   - checks if all plugins are ready, and if so, triggers the ALL_PLUGINS_READY hook.
      */
     private void initializePlugin() {
         try {
@@ -499,7 +497,7 @@ public class Plugin implements BundleActivator, EventHandler {
             // ### FIXME: should we call registerPlugin() at last?
             // Currently if e.g. registerPluginService() fails the plugin is still registered at the DeepaMehta core.
             //
-            addToReadyPlugins();    // Once a plugin has been intialized it is "ready"
+            addToReadyPlugins();        // Once a plugin has been intialized it is "ready"
             postPluginReadyEvent();
             dms.checkAllPluginsReady();
         } catch (Exception e) {
@@ -516,7 +514,7 @@ public class Plugin implements BundleActivator, EventHandler {
      * - create topic of type "Plugin"
      * - run migrations
      * - trigger POST_INSTALL_PLUGIN hook
-     * - trigger MODIFY_TOPIC_TYPE hook (multiple times)
+     * - trigger INTRODUCE_TOPIC_TYPE hook (multiple times)
      */
     private void installPluginInDB() {
         DeepaMehtaTransaction tx = dms.beginTx();
@@ -590,8 +588,8 @@ public class Plugin implements BundleActivator, EventHandler {
     private void introduceTypesToPlugin() {
         for (String topicTypeUri : dms.getTopicTypeUris()) {
             try {
-                // trigger hook
-                modifyTopicTypeHook(dms.getTopicType(topicTypeUri, null), null);    // clientState=null (2x)
+                TopicType topicType = dms.getTopicType(topicTypeUri, null);     // clientState=null
+                handleEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);   // clientState=null
             } catch (Exception e) {
                 throw new RuntimeException("Introducing topic type \"" + topicTypeUri + "\" to " + this + " failed", e);
             }
@@ -627,6 +625,19 @@ public class Plugin implements BundleActivator, EventHandler {
         }
     }
 
+    private Object handleEvent(CoreEvent event, Object... params) {
+        if (isListener(event)) {
+            logger.info("########################################################### " + event + " handled by " + this);
+            return dms.handleEvent((Listener) this, event, params);
+        }
+        return null;
+    }
+
+    // ---
+
+    /**
+     * Returns true if the specified interface extends the Listener interface.
+     */
     private boolean isListenerInterface(Class interfaze) {
         return Listener.class.isAssignableFrom(interfaze);
     }
@@ -636,14 +647,6 @@ public class Plugin implements BundleActivator, EventHandler {
      */
     private boolean isListener(CoreEvent event) {
         return event.listenerInterface.isAssignableFrom(getClass());
-    }
-
-    private Object handleEvent(CoreEvent event, Object... params) {
-        if (isListener(event)) {
-            logger.info("########################################################### " + event + " handled by " + this);
-            return dms.handleEvent((Listener) this, event, params);
-        }
-        return null;
     }
 
     // === Plugin Service ===

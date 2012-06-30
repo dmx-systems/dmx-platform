@@ -323,13 +323,15 @@ public class WebservicePlugin extends Plugin {
 
     // === Commands ===
 
+    // ### TODO: drop this method. For the moment it stays here to illustrate file uploading.
+    // ### See de.deepamehta.plugins.webservice.provider.CommandParamsProvider
     @POST
     @Path("/command/{command}")
     @Consumes("application/json, multipart/form-data")
     public CommandResult executeCommand(@PathParam("command") String command, CommandParams params,
                                         @HeaderParam("Cookie") ClientState clientState) {
         try {
-            return dms.executeCommand(command, params, clientState);
+            return null;    // ### dms.executeCommand(command, params, clientState);
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }

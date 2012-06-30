@@ -11,6 +11,8 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.listener.ServiceArrivedListener;
+import de.deepamehta.core.service.listener.ServiceGoneListener;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.GET;
@@ -28,7 +30,8 @@ import java.util.logging.Logger;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends Plugin implements FilesService {
+public class FilesPlugin extends Plugin implements FilesService, ServiceArrivedListener,
+                                                                 ServiceGoneListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -40,33 +43,9 @@ public class FilesPlugin extends Plugin implements FilesService {
 
 
 
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
-
-
-
-    @Override
-    public void serviceArrived(PluginService service) {
-        logger.info("########## Service arrived: " + service);
-        if (service instanceof ProxyService) {
-            proxyService = (ProxyService) service;
-        }
-    }
-
-    @Override
-    public void serviceGone(PluginService service) {
-        logger.info("########## Service gone: " + service);
-        if (service == proxyService) {
-            proxyService = null;
-        }
-    }
-
-
-
-    // **********************
-    // *** Plugin Service ***
-    // **********************
+    // ***********************************
+    // *** FilesService Implementation ***
+    // ***********************************
 
 
 
@@ -171,6 +150,30 @@ public class FilesPlugin extends Plugin implements FilesService {
             Desktop.getDesktop().open(file);
         } catch (Throwable e) {
             throw new WebApplicationException(new RuntimeException("Opening file \"" + file + "\" failed", e));
+        }
+    }
+
+
+
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
+
+
+
+    @Override
+    public void serviceArrived(PluginService service) {
+        logger.info("########## Service arrived: " + service);
+        if (service instanceof ProxyService) {
+            proxyService = (ProxyService) service;
+        }
+    }
+
+    @Override
+    public void serviceGone(PluginService service) {
+        logger.info("########## Service gone: " + service);
+        if (service == proxyService) {
+            proxyService = null;
         }
     }
 

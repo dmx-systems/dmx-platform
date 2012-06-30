@@ -8,12 +8,14 @@ import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.listener.PostDeleteAssociationListener;
+import de.deepamehta.core.service.listener.PostRetypeAssociationListener;
 
 import java.util.logging.Logger;
 
 
 
-public class TypeEditorPlugin extends Plugin implements PostDeleteAssociationListener {
+public class TypeEditorPlugin extends Plugin implements PostRetypeAssociationListener,
+                                                        PostDeleteAssociationListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -30,7 +32,7 @@ public class TypeEditorPlugin extends Plugin implements PostDeleteAssociationLis
 
 
     @Override
-    public void postRetypeAssociationHook(Association assoc, String oldTypeUri, Directives directives) {
+    public void postRetypeAssociation(Association assoc, String oldTypeUri, Directives directives) {
         if (isAssocDef(assoc.getTypeUri())) {
             // update/create assoc def
             AssociationDefinitionModel assocDef;

@@ -28,16 +28,38 @@ public enum CoreEvent {
     POST_DELETE_ASSOCIATION(PostDeleteAssociationListener.class,
         "postDeleteAssociation", Association.class, Directives.class),
 
+    POST_RETYPE_ASSOCIATION(PostRetypeAssociationListener.class,
+        "postRetypeAssociation", Association.class, String.class, Directives.class),
+    // ### TODO: remove this hook. Retype is special case of update.
+
     PRE_SEND_TOPIC(PreSendTopicListener.class,
         "preSendTopic", Topic.class, ClientState.class),
     PRE_SEND_TOPIC_TYPE(PreSendTopicTypeListener.class,
         "preSendTopicType", TopicType.class, ClientState.class),
 
     POST_INSTALL_PLUGIN(PostInstallPluginListener.class,
-        "postInstallPlugin");
+        "postInstallPlugin"),
     // Note: this is an internal plugin event. It is fired for a specific plugin only.
     // (see {@link de.deepamehta.core.service.Plugin#initializePlugin}).
     // ### TODO: remove this event. Use migration 1 instead.
+
+    ALL_PLUGINS_READY(AllPluginsReadyListener.class,
+        "allPluginsReady"),
+
+    INTRODUCE_TOPIC_TYPE(IntroduceTopicTypeListener.class,
+        "introduceTopicType", TopicType.class, ClientState.class),
+    // Note: besides regular triggering (see {@link #createTopicType})
+    // this hook is triggered by the plugin itself
+    // (see {@link de.deepamehta.core.service.Plugin#introduceTypesToPlugin}).
+
+    SERVICE_ARRIVED(ServiceArrivedListener.class,
+        "serviceArrived", PluginService.class),
+    // Note: this hook is triggered only by the plugin itself
+    // (see {@link de.deepamehta.core.service.Plugin#createServiceTracker}).
+    SERVICE_GONE(ServiceGoneListener.class,
+        "serviceGone", PluginService.class);
+    // Note: this hook is triggered only by the plugin itself
+    // (see {@link de.deepamehta.core.service.Plugin#createServiceTracker}).
 
     // ### TODO: transform the other hooks into events
 
@@ -53,11 +75,9 @@ public enum CoreEvent {
         this.listenerInterface = listenerInterface;
         this.handlerMethodName = handlerMethodName;
         this.paramClasses = paramClasses;
-        // events.put(this);
-        // ### Doesn't compile: "illegal reference to static field from initializer".
-        // ### Enum constants are initialzed before other static fields.
-        // ### Lazy initialization outside the constructor solves it.
-        put(this);
+        // events.put(..);      // ### Doesn't compile: "illegal reference to static field from initializer".
+                                // ### Enum constants are initialzed before other static fields.
+        put(this);              // ### Lazy initialization outside the constructor solves it.
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
