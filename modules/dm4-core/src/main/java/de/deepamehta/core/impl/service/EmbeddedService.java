@@ -588,6 +588,11 @@ public class EmbeddedService implements DeepaMehtaService {
         listenerRegistry.addListener(event, listener);
     }
 
+    @Override
+    public void removeListener(CoreEvent event, Listener listener) {
+        listenerRegistry.removeListener(event, listener);
+    }
+
     // ---
 
     @Override
@@ -596,8 +601,8 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Object handleEvent(Listener listener, CoreEvent event, Object... params) {
-        return listenerRegistry.handleEvent(listener, event, params);
+    public Object deliverEvent(Listener listener, CoreEvent event, Object... params) {
+        return listenerRegistry.deliverEvent(listener, event, params);
     }
 
 

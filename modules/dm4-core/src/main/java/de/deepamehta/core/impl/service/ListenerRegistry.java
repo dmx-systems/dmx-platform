@@ -24,22 +24,32 @@ class ListenerRegistry {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void addListener(CoreEvent event, Listener listener) {
-        List<Listener> listeners = get(event);
+        List<Listener> listeners = getListeners(event);
         if (listeners == null) {
             listeners = new ArrayList();
-            put(event, listeners);
+            putListeners(event, listeners);
         }
         listeners.add(listener);
     }
 
+    void removeListener(CoreEvent event, Listener listener) {
+        List<Listener> listeners = getListeners(event);
+        if (!listeners.remove(listener)) {
+            throw new RuntimeException("Removing " + listener + " from " +
+                event + " listeners failed: not found in " + listeners);
+        }
+    }
+
+    // ---
+
     List<Object> fireEvent(CoreEvent event, Object... params) {
         List results = new ArrayList();
-        List<Listener> listeners = get(event);
+        List<Listener> listeners = getListeners(event);
         if (listeners == null) {
             return results;
         }
         for (Listener listener : listeners) {
-            Object result = handleEvent(listener, event, params);
+            Object result = deliverEvent(listener, event, params);
             if (result != null) {
                 results.add(result);
             }
@@ -47,22 +57,22 @@ class ListenerRegistry {
         return results;
     }
 
-    Object handleEvent(Listener listener, CoreEvent event, Object... params) {
+    Object deliverEvent(Listener listener, CoreEvent event, Object... params) {
         try {
             Method listenerMethod = listener.getClass().getMethod(event.handlerMethodName, event.paramClasses);
             return listenerMethod.invoke(listener, params);
         } catch (Exception e) {     // NoSuchMethodException, IllegalAccessException, InvocationTargetException
-            throw new RuntimeException("Handling event " + event + " by " + listener + " failed", e);
+            throw new RuntimeException("Delivering event " + event + " to " + listener + " failed", e);
         }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private List<Listener> get(CoreEvent event) {
+    private List<Listener> getListeners(CoreEvent event) {
         return listenerRegistry.get(event.name());
     }
 
-    private void put(CoreEvent event, List<Listener> listeners) {
+    private void putListeners(CoreEvent event, List<Listener> listeners) {
         listenerRegistry.put(event.name(), listeners);
     }
 }

@@ -61,8 +61,6 @@ public enum CoreEvent {
     // Note: this hook is triggered only by the plugin itself
     // (see {@link de.deepamehta.core.service.Plugin#createServiceTracker}).
 
-    // ### TODO: transform the other hooks into events
-
     public final Class listenerInterface;
     public final String handlerMethodName;
     public final Class[] paramClasses;

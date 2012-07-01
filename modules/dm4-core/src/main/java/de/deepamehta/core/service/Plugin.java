@@ -197,7 +197,7 @@ public class Plugin implements BundleActivator, EventHandler {
             createServiceTracker(DeepaMehtaService.class.getName());
             createServiceTracker(WebPublishingService.class.getName());
             createServiceTracker(EventAdmin.class.getName());
-            createServiceTrackers();
+            createPluginServiceTrackers();
         } catch (Exception e) {
             logger.severe("Starting " + this + " failed:");
             e.printStackTrace();
@@ -209,16 +209,15 @@ public class Plugin implements BundleActivator, EventHandler {
     @Override
     public void stop(BundleContext context) {
         logger.info("========== Stopping " + this + " ==========");
+        //
+        shutdown();
+        //
         // Note: we close the service trackers in reverse creation order. Consider this case: when a consumed
         // plugin service goes away the core service is still needed to deliver the SERVICE_GONE event.
         ListIterator<ServiceTracker> i = serviceTrackers.listIterator(serviceTrackers.size());
         while (i.hasPrevious()) {
             i.previous().close();
         }
-        //
-        unregisterPluginService();
-        //
-        removeFromReadyPlugins();
     }
 
 
@@ -355,7 +354,7 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // === Service Tracking ===
 
-    private void createServiceTrackers() {
+    private void createPluginServiceTrackers() {
         String consumedServiceInterfaces = getConfigProperty("consumedServiceInterfaces");
         if (consumedServiceInterfaces != null) {
             String[] serviceInterfaces = consumedServiceInterfaces.split(", *");
@@ -385,7 +384,7 @@ public class Plugin implements BundleActivator, EventHandler {
                     checkServiceAvailability();
                 } else if (service instanceof PluginService) {
                     logger.info("Adding plugin service \"" + serviceInterface + "\" to plugin \"" + pluginName + "\"");
-                    handleEvent(CoreEvent.SERVICE_ARRIVED, (PluginService) service);
+                    deliverEvent(CoreEvent.SERVICE_ARRIVED, (PluginService) service);
                 }
                 //
                 return service;
@@ -408,7 +407,7 @@ public class Plugin implements BundleActivator, EventHandler {
                 } else if (service instanceof PluginService) {
                     logger.info("Removing plugin service \"" + serviceInterface + "\" from plugin \"" +
                         pluginName + "\"");
-                    handleEvent(CoreEvent.SERVICE_GONE, (PluginService) service);
+                    deliverEvent(CoreEvent.SERVICE_GONE, (PluginService) service);
                 }
                 super.removedService(ref, service);
             }
@@ -510,6 +509,12 @@ public class Plugin implements BundleActivator, EventHandler {
         }
     }
 
+    private void shutdown() {
+        removeFromReadyPlugins();
+        unregisterPluginService();
+        unregisterListeners();
+    }
+
     // === Installation ===
 
     /**
@@ -537,7 +542,7 @@ public class Plugin implements BundleActivator, EventHandler {
             runPluginMigrations(isCleanInstall);
             // 3) post install
             if (isCleanInstall) {
-                handleEvent(CoreEvent.POST_INSTALL_PLUGIN);
+                deliverEvent(CoreEvent.POST_INSTALL_PLUGIN);
                 introduceTypesToPlugin();
             }
             //
@@ -592,7 +597,7 @@ public class Plugin implements BundleActivator, EventHandler {
         for (String topicTypeUri : dms.getTopicTypeUris()) {
             try {
                 TopicType topicType = dms.getTopicType(topicTypeUri, null);     // clientState=null
-                handleEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);   // clientState=null
+                deliverEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);   // clientState=null
             } catch (Exception e) {
                 throw new RuntimeException("Introducing topic type \"" + topicTypeUri + "\" to " + this + " failed", e);
             }
@@ -618,28 +623,75 @@ public class Plugin implements BundleActivator, EventHandler {
     // === Plugin Listeners ===
 
     private void registerPluginListeners() {
-        logger.info("Registering listeners of " + this + " at DeepaMehta 4 core service");
-        for (Class interfaze : getClass().getInterfaces()) {
-            if (isListenerInterface(interfaze)) {
-                CoreEvent event = CoreEvent.fromListenerInterface(interfaze);
-                logger.info("################## Listener Interface: " + interfaze + " -> " + event);
-                dms.addListener(event, (Listener) this);
-            }
+        List<CoreEvent> events = getEvents();
+        //
+        if (events.size() == 0) {
+            logger.info("Registering listeners of " + this + " at DeepaMehta 4 core service ABORTED " +
+                "-- no listeners implemented");
+            return;
+        }
+        //
+        logger.info("Registering " + events.size() + " listeners of " + this + " at DeepaMehta 4 core service");
+        for (CoreEvent event : events) {
+            dms.addListener(event, (Listener) this);
         }
     }
 
-    private Object handleEvent(CoreEvent event, Object... params) {
-        if (isListener(event)) {
-            logger.info("########################################################### " + event + " handled by " + this);
-            return dms.handleEvent((Listener) this, event, params);
+    private void unregisterListeners() {
+        List<CoreEvent> events = getEvents();
+        if (events.size() == 0) {
+            return;
         }
-        return null;
+        //
+        logger.info("Unregistering listeners of " + this + " at DeepaMehta 4 core service");
+        for (CoreEvent event : events) {
+            dms.removeListener(event, (Listener) this);
+        }
     }
 
     // ---
 
     /**
-     * Returns true if the specified interface extends the Listener interface.
+     * Returns the events this plugin is listening to.
+     */
+    private List<CoreEvent> getEvents() {
+        List<CoreEvent> events = new ArrayList();
+        for (Class interfaze : getClass().getInterfaces()) {
+            if (isListenerInterface(interfaze)) {
+                CoreEvent event = CoreEvent.fromListenerInterface(interfaze);
+                logger.fine("### Listener Interface: " + interfaze + ", event=" + event);
+                events.add(event);
+            }
+        }
+        return events;
+    }
+
+    /**
+     * Delivers an event to this plugin, provided this plugin is a listener for that event.
+     * <p>
+     * By this method this plugin delivers the "internal" events to itself. An internal event is bound
+     * to a particular plugin, in contrast to being fired and delivered to all registered plugins.
+     * <p>
+     * There are 4 internal events:
+     *   - POST_INSTALL_PLUGIN
+     *   - INTRODUCE_TOPIC_TYPE
+     *   - SERVICE_ARRIVED
+     *   - SERVICE_GONE
+     */
+    private Object deliverEvent(CoreEvent event, Object... params) {
+        if (!isListener(event)) {
+            return null;
+        }
+        //
+        logger.info("### Delivering internal " + event + " event to " + this);
+        return dms.deliverEvent((Listener) this, event, params);
+    }
+
+    // ---
+
+    /**
+     * Returns true if the specified interface is a listener interface.
+     * A listener interface is a sub-interface of {@link Listener}.
      */
     private boolean isListenerInterface(Class interfaze) {
         return Listener.class.isAssignableFrom(interfaze);
@@ -809,7 +861,7 @@ public class Plugin implements BundleActivator, EventHandler {
         if (event.getTopic().equals(PLUGIN_READY)) {
             String pluginUri = (String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME);
             if (hasDependency(pluginUri)) {
-                logger.info("### Receiving PLUGIN_READY event from \"" + pluginUri + "\" for " + this);
+                logger.info("Receiving PLUGIN_READY event from \"" + pluginUri + "\" for " + this);
                 dependencyState.put(pluginUri, true);
                 checkServiceAvailability();
             }
