@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -208,9 +209,11 @@ public class Plugin implements BundleActivator, EventHandler {
     @Override
     public void stop(BundleContext context) {
         logger.info("========== Stopping " + this + " ==========");
-        //
-        for (ServiceTracker serviceTracker : serviceTrackers) {
-            serviceTracker.close();
+        // Note: we close the service trackers in reverse creation order. Consider this case: when a consumed
+        // plugin service goes away the core service is still needed to deliver the SERVICE_GONE event.
+        ListIterator<ServiceTracker> i = serviceTrackers.listIterator(serviceTrackers.size());
+        while (i.hasPrevious()) {
+            i.previous().close();
         }
         //
         unregisterPluginService();
@@ -314,9 +317,9 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // ---
 
-    public CommandResult executeCommandHook(String command, CommandParams params, ClientState clientState) {
+    /* ### public CommandResult executeCommandHook(String command, CommandParams params, ClientState clientState) {
         return null;
-    }
+    } */
 
 
 

@@ -46,7 +46,7 @@ public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext context) {
         try {
-            logger.info("========== Starting bundle \"DeepaMehta 4 Core\" ==========");
+            logger.info("========== Starting \"DeepaMehta 4 Core\" ==========");
             dms = new EmbeddedService(new MGStorageBridge(openDB()), context);
             dms.setupDB();
             //
@@ -64,7 +64,7 @@ public class Activator implements BundleActivator {
 
     @Override
     public void stop(BundleContext context) {
-        logger.info("========== Stopping DeepaMehta 4 Core ==========");
+        logger.info("========== Stopping \"DeepaMehta 4 Core\" ==========");
         if (dms != null) {
             dms.shutdown();
         }
