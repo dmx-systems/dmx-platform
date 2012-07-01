@@ -222,103 +222,25 @@ public class Plugin implements BundleActivator, EventHandler {
 
 
 
-    // *************
-    // *** Hooks ***
-    // *************
+    // ************************************
+    // *** Event Handler Implementation ***
+    // ************************************
 
 
 
-    /* ### public void postInstallPluginHook() {
-    } */
-
-    /* ### public void allPluginsReadyHook() {
-    } */
-
-    // ---
-
-    /* ### public void serviceArrived(PluginService service) {
+    @Override
+    public void handleEvent(Event event) {
+        if (event.getTopic().equals(PLUGIN_READY)) {
+            String pluginUri = (String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME);
+            if (hasDependency(pluginUri)) {
+                logger.info("Receiving PLUGIN_READY event from \"" + pluginUri + "\" for " + this);
+                dependencyState.put(pluginUri, true);
+                checkServiceAvailability();
+            }
+        } else {
+            throw new RuntimeException("Unexpected event: " + event);
+        }
     }
-
-    public void serviceGone(PluginService service) {
-    } */
-
-    // ---
-
-    /* ### public void preCreateHook(TopicModel model, ClientState clientState) {
-    }
-
-    public void postCreateHook(Topic topic, ClientState clientState, Directives directives) {
-    } */
-
-    // ---
-
-    /* ### public void preUpdateHook(Topic topic, TopicModel newModel, Directives directives) {
-    } */
-
-    /* ### public void postUpdateHook(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
-                                                                                      Directives directives) {
-    } */
-
-    // ---
-
-    /* ### public void postRetypeAssociationHook(Association assoc, String oldTypeUri, Directives directives) {
-    } */
-
-    // ---
-
-    /* ### public void preDeleteAssociationHook(Association assoc, Directives directives) {
-    } */
-
-    /* ### public void postDeleteAssociationHook(Association assoc, Directives directives) {
-    } */
-
-    // ---
-
-    /* ### public void preSendTopicHook(Topic topic, ClientState clientState) {
-    } */
-
-    /* ### public void preSendTopicTypeHook(TopicType topicType, ClientState clientState) {
-    } */
-
-    // ---
-
-    /**
-     * Allows a plugin to modify type definitions -- exisisting ones <i>and</i> future ones.
-     * Plugins get a opportunity to visit (and modify) each type definition extacly once.
-     * <p>
-     * This hook is triggered in 2 situations:
-     * <ul>
-     *  <li>for each type that <i>exists</i> already while a plugin clean install.
-     *  <li>for types created (interactively by the user, or programmatically by a migration) <i>after</i>
-     *      the plugin has been installed.
-     * </ul>
-     * This hook is typically used by plugins which provide cross-cutting concerns by affecting <i>all</i>
-     * type definitions of a DeepaMehta installation. Typically such a plugin adds new data fields to types
-     * or relates types with specific topics.
-     * <p>
-     * Examples of plugins which use this hook:
-     * <ul>
-     *  <li>The "DeepaMehta 4 Workspaces" plugin adds a "Workspaces" field to all types.
-     *  <li>The "DeepaMehta 4 Time" plugin adds timestamp fields to all types.
-     *  <li>The "DeepaMehta 4 Access Control" plugin adds a "Creator" field to all types and relates them to a user.
-     * </ul>
-     *
-     * @param   topicType   the type to be modified. The passed object is actually an instance of a {@link TopicType}
-     *                      subclass that is backed by the database. That is, modifications by e.g.
-     *                      {@link TopicType#addDataField} are persistent.
-     *                      <p>
-     *                      Note: at the time the hook is triggered the type exists already in the database, in
-     *                      particular the underlying type topic has an ID already. That is, the type is ready for
-     *                      e.g. being related to other topics.
-     */
-    /* ### public void modifyTopicTypeHook(TopicType topicType, ClientState clientState) {
-    } */
-
-    // ---
-
-    /* ### public CommandResult executeCommandHook(String command, CommandParams params, ClientState clientState) {
-        return null;
-    } */
 
 
 
@@ -483,8 +405,8 @@ public class Plugin implements BundleActivator, EventHandler {
      *
      * After initialization:
      *   - adds this plugin to the set of "ready" plugins.
-     *   - posts the PLUGIN_READY event.
-     *   - checks if all plugins are ready, and if so, triggers the ALL_PLUGINS_READY hook.
+     *   - posts the PLUGIN_READY OSGi event.
+     *   - checks if all plugins are ready, and if so, fires the {@link CoreEvent.ALL_PLUGINS_READY} event.
      */
     private void initializePlugin() {
         try {
@@ -521,8 +443,8 @@ public class Plugin implements BundleActivator, EventHandler {
      * Installs the plugin in the database. This comprises:
      * - create topic of type "Plugin"
      * - run migrations
-     * - trigger POST_INSTALL_PLUGIN hook
-     * - trigger INTRODUCE_TOPIC_TYPE hook (multiple times)
+     * - fires the {@link CoreEvent.POST_INSTALL_PLUGIN} event
+     * - fires the {@link CoreEvent.INTRODUCE_TOPIC_TYPE} event (multiple times)
      */
     private void installPluginInDB() {
         DeepaMehtaTransaction tx = dms.beginTx();
@@ -597,7 +519,7 @@ public class Plugin implements BundleActivator, EventHandler {
         for (String topicTypeUri : dms.getTopicTypeUris()) {
             try {
                 TopicType topicType = dms.getTopicType(topicTypeUri, null);     // clientState=null
-                deliverEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);   // clientState=null
+                deliverEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);  // clientState=null
             } catch (Exception e) {
                 throw new RuntimeException("Introducing topic type \"" + topicTypeUri + "\" to " + this + " failed", e);
             }
@@ -608,7 +530,7 @@ public class Plugin implements BundleActivator, EventHandler {
 
     /**
      * Registers the plugin at the DeepaMehta core service. From that moment the plugin takes part of the
-     * core service control flow, that is the plugin's hooks are triggered.
+     * core service control flow, that is the plugin's hooks are triggered. ### FIXDOC
      */
     private void registerPlugin() {
         logger.info("Registering " + this + " at DeepaMehta 4 core service");
@@ -669,7 +591,7 @@ public class Plugin implements BundleActivator, EventHandler {
     /**
      * Delivers an event to this plugin, provided this plugin is a listener for that event.
      * <p>
-     * By this method this plugin delivers the "internal" events to itself. An internal event is bound
+     * By this method this plugin delivers an "internal" event to itself. An internal event is bound
      * to a particular plugin, in contrast to being fired and delivered to all registered plugins.
      * <p>
      * There are 4 internal events:
@@ -799,7 +721,7 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // ---
 
-    public Set<Class<?>> getProviderClasses() throws IOException {
+    private Set<Class<?>> getProviderClasses() throws IOException {
         Set<Class<?>> providerClasses = new HashSet();
         String providerPackage = ("/" + pluginPackage + ".provider").replace('.', '/');
         Enumeration<String> e = pluginBundle.getEntryPaths(providerPackage);
@@ -854,20 +776,6 @@ public class Plugin implements BundleActivator, EventHandler {
         Hashtable properties = new Hashtable();
         properties.put(EventConstants.EVENT_TOPIC, topics);
         context.registerService(EventHandler.class.getName(), this, properties);
-    }
-
-    @Override
-    public void handleEvent(Event event) {
-        if (event.getTopic().equals(PLUGIN_READY)) {
-            String pluginUri = (String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME);
-            if (hasDependency(pluginUri)) {
-                logger.info("Receiving PLUGIN_READY event from \"" + pluginUri + "\" for " + this);
-                dependencyState.put(pluginUri, true);
-                checkServiceAvailability();
-            }
-        } else {
-            throw new RuntimeException("Unexpected event: " + event);
-        }
     }
 
     private void postPluginReadyEvent() {

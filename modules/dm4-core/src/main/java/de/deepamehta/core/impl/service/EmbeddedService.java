@@ -26,7 +26,6 @@ import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Hook;     // ### TODO: drop this
 import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.ObjectFactory;
@@ -146,11 +145,6 @@ public class EmbeddedService implements DeepaMehtaService {
             ResultSet<Topic> topics = JSONHelper.toTopicSet(getTopicType(typeUri, clientState).getRelatedTopics(
                 "dm4.core.instantiation", "dm4.core.type", "dm4.core.instance", null, fetchComposite, false,
                 maxResultSize, clientState));   // othersTopicTypeUri=null
-            /*
-            for (Topic topic : topics) {
-                triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, topic);
-            }
-            */
             tx.success();
             return topics;
         } catch (Exception e) {
@@ -555,30 +549,6 @@ public class EmbeddedService implements DeepaMehtaService {
         plugin.setMigrationNr(migrationNr);
     }
 
-    /**
-     * Triggers a hook for all installed plugins.
-     *
-     * ### TODO: drop this method.
-     */
-    @Override
-    public Map<String, Object> triggerHook(final Hook hook, final Object... params) {
-        final Map resultMap = new HashMap();
-        new PluginCache.Iterator() {
-            @Override
-            void body(Plugin plugin) {
-                try {
-                    Object result = triggerHook(plugin, hook, params);
-                    if (result != null) {
-                        resultMap.put(plugin.getUri(), result);
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException("Triggering hook " + hook + " of " + plugin + " failed", e);
-                }
-            }
-        };
-        return resultMap;
-    }
-
 
 
     // === Listeners ===
@@ -857,18 +827,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
     // === Plugins ===
-
-    /**
-     * ### TODO: drop this method
-     *
-     * @throws  NoSuchMethodException
-     * @throws  IllegalAccessException
-     * @throws  InvocationTargetException
-     */
-    private Object triggerHook(Plugin plugin, Hook hook, Object... params) throws Exception {
-        Method hookMethod = plugin.getClass().getMethod(hook.getMethodName(), hook.getParamClasses());
-        return hookMethod.invoke(plugin, params);
-    }
 
     private boolean isDeepaMehtaPlugin(Bundle bundle) {
         String packages = (String) bundle.getHeaders().get("Import-Package");

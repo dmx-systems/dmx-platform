@@ -209,7 +209,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService,
     } */
 
     @Override
-    public void introduceTopicTypeHook(TopicType topicType, ClientState clientState) {
+    public void introduceTopicType(TopicType topicType, ClientState clientState) {
         // ### TODO: explain
         if (topicType.getUri().equals("dm4.core.meta_meta_type")) {
             return;

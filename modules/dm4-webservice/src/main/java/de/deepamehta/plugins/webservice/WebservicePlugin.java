@@ -16,7 +16,6 @@ import de.deepamehta.core.service.CommandParams;
 import de.deepamehta.core.service.CommandResult;
 import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Hook;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 

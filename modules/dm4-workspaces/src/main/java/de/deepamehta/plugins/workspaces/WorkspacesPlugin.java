@@ -133,7 +133,7 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService, PostC
 
     /**
      * Adds a "Workspace" association to all topic types.
-     * FIXME: not ready for the prime time
+     * FIXME: not ready for the prime time ### Realize as a facet?
     @Override
     public void modifyTopicTypeHook(TopicType topicType, ClientState clientState) {
         String topicTypeUri = topicType.getUri();

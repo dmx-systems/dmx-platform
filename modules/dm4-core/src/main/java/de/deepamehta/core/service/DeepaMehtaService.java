@@ -24,7 +24,7 @@ import java.util.Set;
  * <p>
  * The responsibility of the DeepaMehta core service is to orchestrate the control flow and allow plugins to hook in.
  * The main duties of the DeepaMehta core service are to provide access to the storage layer and to trigger hooks of
- * the registered plugins.
+ * the registered plugins. ### FIXDOC
  * <p>
  * The DeepaMehta core service is a realization of the <i>Inversion of Control</i> pattern.
  * <p>
@@ -144,8 +144,6 @@ public interface DeepaMehtaService {
 
     void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall);
 
-    Map<String, Object> triggerHook(Hook hook, Object... params);
-
 
 
     // === Listeners ===
@@ -170,7 +168,7 @@ public interface DeepaMehtaService {
 
     /**
      * Checks if all DeepaMehta plugin bundles are registered at core.
-     * Triggers the ALL_PLUGINS_READY hook if so.
+     * Fires the {@link CoreEvent.ALL_PLUGINS_READY} event if so.
      * <p>
      * Called from the Plugin class.
      * Not meant to be called by a plugin developer.
