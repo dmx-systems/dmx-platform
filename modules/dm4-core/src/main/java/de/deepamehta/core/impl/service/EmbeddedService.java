@@ -527,20 +527,18 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
+    public boolean isPluginRegistered(String pluginUri) {
+        return pluginCache.contains(pluginUri);
+    }
+
+    @Override
     public Plugin getPlugin(String pluginUri) {
         return pluginCache.get(pluginUri);
     }
 
     @Override
     public Set<PluginInfo> getPluginInfo() {
-        final Set info = new HashSet();
-        new PluginCache.Iterator() {
-            @Override
-            void body(Plugin plugin) {
-                info.add(plugin.getInfo());
-            }
-        };
-        return info;
+        return pluginCache.getPluginInfo();
     }
 
     @Override
@@ -615,7 +613,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public void setupDB() {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            logger.info("----- Initializing DeepaMehta 4 Core -----");
+            logger.info("----- Activating DeepaMehta 4 Core -----");
             boolean isCleanInstall = initDB();
             if (isCleanInstall) {
                 setupBootstrapContent();
@@ -623,7 +621,7 @@ public class EmbeddedService implements DeepaMehtaService {
             runCoreMigrations(isCleanInstall);
             tx.success();
             tx.finish();
-            logger.info("----- Initialization of DeepaMehta 4 Core complete -----");
+            logger.info("----- Activation of DeepaMehta 4 Core complete -----");
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             tx.finish();
@@ -833,10 +831,6 @@ public class EmbeddedService implements DeepaMehtaService {
         // Note: packages might be null. Not all bundles import packges.
         return packages != null && packages.contains("de.deepamehta.core.service") &&
             !bundle.getSymbolicName().equals("de.deepamehta.core");
-    }
-
-    private boolean isPluginRegistered(String pluginUri) {
-        return pluginCache.contains(pluginUri);
     }
 
 

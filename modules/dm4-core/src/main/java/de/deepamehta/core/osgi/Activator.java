@@ -55,18 +55,24 @@ public class Activator implements BundleActivator {
             //
             new HttpServiceTracker(context);
         } catch (Exception e) {
-            logger.severe("Activation of DeepaMehta 4 Core failed:");
+            logger.severe("Starting \"DeepaMehta 4 Core\" failed:");
             e.printStackTrace();
-            // Note: an exception thrown from here is swallowed by the container without reporting
-            // and let File Install retry to start the bundle endlessly.
+            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
+            // File Install would retry to start the bundle endlessly.
         }
     }
 
     @Override
     public void stop(BundleContext context) {
-        logger.info("========== Stopping \"DeepaMehta 4 Core\" ==========");
-        if (dms != null) {
-            dms.shutdown();
+        try {
+            logger.info("========== Stopping \"DeepaMehta 4 Core\" ==========");
+            if (dms != null) {
+                dms.shutdown();
+            }
+        } catch (Exception e) {
+            logger.severe("Stopping \"DeepaMehta 4 Core\" failed:");
+            e.printStackTrace();
+            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
         }
     }
 

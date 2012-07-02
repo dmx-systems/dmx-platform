@@ -49,32 +49,24 @@ public class Plugin implements BundleActivator, EventHandler {
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
     private static final String PLUGIN_READY = "de/deepamehta/core/plugin_ready";   // topic of the OSGi event
 
-    // ------------------------------------------------------------------------------------------------- Class Variables
-
-    private static final Set<String> readyPlugins = new HashSet();
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private BundleContext context;
 
-    private String     pluginUri;           // This bundle's symbolic name, e.g. "de.deepamehta.webclient".
-    private String     pluginName;          // This bundle's name = POM project name.
-    private String     pluginClass;
-    private String     pluginPackage;
-    private Bundle     pluginBundle;
-    private PluginInfo pluginInfo;
-    private Topic      pluginTopic;         // Represents this plugin in DB. Holds plugin migration number.
-
-    private Properties configProperties;    // Read from file "plugin.properties"
-
-    // For tracking the state of dependent plugins.
-    // Key: plugin ID, value: availability (true=available)
-    private Map<String, Boolean> dependencyState;
+    private String      pluginUri;          // This bundle's symbolic name, e.g. "de.deepamehta.webclient"
+    private String      pluginName;         // This bundle's name = POM project name
+    private String      pluginClass;
+    private String      pluginPackage;
+    private Bundle      pluginBundle;
+    private PluginInfo  pluginInfo;
+    private Topic       pluginTopic;        // Represents this plugin in DB. Holds plugin migration number.
+    private Properties  pluginProperties;   // Read from file "plugin.properties"
+    private Set<String> pluginDependencies; // plugin URIs as read from "importModels" property
 
     // Consumed services
     protected DeepaMehtaService dms;
     private WebPublishingService webPublishingService;
-    private EventAdmin eventService;
+    private EventAdmin eventService;        // needed to post the PLUGIN_READY OSGi event
 
     // Provided OSGi service
     private ServiceRegistration registration;
@@ -83,7 +75,8 @@ public class Plugin implements BundleActivator, EventHandler {
     private WebResources webResources;
     private RestResource restResource;
 
-    private List<ServiceTracker> serviceTrackers = new ArrayList();
+    private List<ServiceTracker> coreServiceTrackers = new ArrayList();
+    private List<ServiceTracker> pluginServiceTrackers = new ArrayList();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -185,38 +178,39 @@ public class Plugin implements BundleActivator, EventHandler {
             //
             logger.info("========== Starting " + this + " ==========");
             //
-            this.configProperties = readConfigFile();
+            this.pluginProperties = readConfigFile();
             this.pluginPackage = getConfigProperty("pluginPackage", getClass().getPackage().getName());
             this.pluginInfo = createPluginInfo();
-            this.dependencyState = initDependencies();
+            this.pluginDependencies = getPluginDependencies();
             //
-            if (dependencyState.size() > 0) {
+            if (pluginDependencies.size() > 0) {
                 registerEventListener();
             }
             //
-            createServiceTracker(DeepaMehtaService.class.getName());
-            createServiceTracker(WebPublishingService.class.getName());
-            createServiceTracker(EventAdmin.class.getName());
+            registerPluginService();
+            //
+            createCoreServiceTrackers();
             createPluginServiceTrackers();
+            //
+            openCoreServiceTrackers();
         } catch (Exception e) {
             logger.severe("Starting " + this + " failed:");
             e.printStackTrace();
-            // Note: an exception thrown from here is swallowed by the container without reporting
-            // and let File Install retry to start the bundle endlessly.
+            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
+            // File Install would retry to start the bundle endlessly.
         }
     }
 
     @Override
     public void stop(BundleContext context) {
-        logger.info("========== Stopping " + this + " ==========");
-        //
-        shutdown();
-        //
-        // Note: we close the service trackers in reverse creation order. Consider this case: when a consumed
-        // plugin service goes away the core service is still needed to deliver the SERVICE_GONE event.
-        ListIterator<ServiceTracker> i = serviceTrackers.listIterator(serviceTrackers.size());
-        while (i.hasPrevious()) {
-            i.previous().close();
+        try {
+            logger.info("========== Stopping " + this + " ==========");
+            //
+            closeCoreServiceTrackers();
+        } catch (Exception e) {
+            logger.severe("Stopping " + this + " failed:");
+            e.printStackTrace();
+            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
         }
     }
 
@@ -230,15 +224,23 @@ public class Plugin implements BundleActivator, EventHandler {
 
     @Override
     public void handleEvent(Event event) {
-        if (event.getTopic().equals(PLUGIN_READY)) {
-            String pluginUri = (String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME);
-            if (hasDependency(pluginUri)) {
-                logger.info("Receiving PLUGIN_READY event from \"" + pluginUri + "\" for " + this);
-                dependencyState.put(pluginUri, true);
-                checkServiceAvailability();
+        String pluginUri = null;
+        try {
+            if (!event.getTopic().equals(PLUGIN_READY)) {
+                throw new RuntimeException("Unexpected event: " + event);
             }
-        } else {
-            throw new RuntimeException("Unexpected event: " + event);
+            //
+            pluginUri = (String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME);
+            if (!hasDependency(pluginUri)) {
+                return;
+            }
+            //
+            logger.info("Handling PLUGIN_READY event from \"" + pluginUri + "\" for " + this);
+            checkServiceAvailability();
+        } catch (Exception e) {
+            logger.severe("Handling PLUGIN_READY event from \"" + pluginUri + "\" for " + this + " failed:");
+            e.printStackTrace();
+            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
         }
     }
 
@@ -271,170 +273,203 @@ public class Plugin implements BundleActivator, EventHandler {
     }
 
     private String getConfigProperty(String key, String defaultValue) {
-        return configProperties.getProperty(key, defaultValue);
+        return pluginProperties.getProperty(key, defaultValue);
     }
 
     // === Service Tracking ===
 
+    private void createCoreServiceTrackers() {
+        coreServiceTrackers.add(createServiceTracker(DeepaMehtaService.class));
+        coreServiceTrackers.add(createServiceTracker(WebPublishingService.class));
+        coreServiceTrackers.add(createServiceTracker(EventAdmin.class));
+    }
+
     private void createPluginServiceTrackers() {
         String consumedServiceInterfaces = getConfigProperty("consumedServiceInterfaces");
-        if (consumedServiceInterfaces != null) {
-            String[] serviceInterfaces = consumedServiceInterfaces.split(", *");
-            for (int i = 0; i < serviceInterfaces.length; i++) {
-                createServiceTracker(serviceInterfaces[i]);
-            }
+        if (consumedServiceInterfaces == null) {
+            return;
+        }
+        //
+        String[] serviceInterfaces = consumedServiceInterfaces.split(", *");
+        for (int i = 0; i < serviceInterfaces.length; i++) {
+            pluginServiceTrackers.add(createServiceTracker(serviceInterfaces[i]));
         }
     }
 
-    private void createServiceTracker(final String serviceInterface) {
-        ServiceTracker serviceTracker = new ServiceTracker(context, serviceInterface, null) {
+    // ---
+
+    private ServiceTracker createServiceTracker(Class serviceInterface) {
+        return createServiceTracker(serviceInterface.getName());
+    }
+
+    private ServiceTracker createServiceTracker(final String serviceInterface) {
+        return new ServiceTracker(context, serviceInterface, null) {
 
             @Override
             public Object addingService(ServiceReference serviceRef) {
-                Object service = super.addingService(serviceRef);
-                if (service instanceof DeepaMehtaService) {
-                    logger.info("Adding DeepaMehta 4 core service to plugin \"" + pluginName + "\"");
-                    dms = (DeepaMehtaService) service;
-                    checkServiceAvailability();
-                } else if (service instanceof WebPublishingService) {
-                    logger.info("Adding Web Publishing service to plugin \"" + pluginName + "\"");
-                    webPublishingService = (WebPublishingService) service;
-                    checkServiceAvailability();
-                } else if (service instanceof EventAdmin) {
-                    logger.info("Adding Event Admin service to plugin \"" + pluginName + "\"");
-                    eventService = (EventAdmin) service;
-                    checkServiceAvailability();
-                } else if (service instanceof PluginService) {
-                    logger.info("Adding plugin service \"" + serviceInterface + "\" to plugin \"" + pluginName + "\"");
-                    deliverEvent(CoreEvent.SERVICE_ARRIVED, (PluginService) service);
+                Object service = null;
+                try {
+                    service = super.addingService(serviceRef);
+                    addService(service, serviceInterface);
+                } catch (Exception e) {
+                    logger.severe("Adding service " + service + " to plugin \"" + pluginName + "\" failed:");
+                    e.printStackTrace();
+                    // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
                 }
-                //
                 return service;
             }
 
             @Override
             public void removedService(ServiceReference ref, Object service) {
-                if (service == dms) {
-                    logger.info("Removing DeepaMehta 4 core service from plugin \"" + pluginName + "\"");
-                    unregisterPlugin();
-                    dms = null;
-                } else if (service == webPublishingService) {
-                    logger.info("Removing Web Publishing service from plugin \"" + pluginName + "\"");
-                    unregisterRestResources();
-                    unregisterWebResources();
-                    webPublishingService = null;
-                } else if (service == eventService) {
-                    logger.info("Removing Event Admin service from plugin \"" + pluginName + "\"");
-                    eventService = null;
-                } else if (service instanceof PluginService) {
-                    logger.info("Removing plugin service \"" + serviceInterface + "\" from plugin \"" +
-                        pluginName + "\"");
-                    deliverEvent(CoreEvent.SERVICE_GONE, (PluginService) service);
+                try {
+                    removeService(service, serviceInterface);
+                    super.removedService(ref, service);
+                } catch (Exception e) {
+                    logger.severe("Removing service " + service + " from plugin \"" + pluginName + "\" failed:");
+                    e.printStackTrace();
+                    // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
                 }
-                super.removedService(ref, service);
             }
         };
-        serviceTrackers.add(serviceTracker);
-        serviceTracker.open();
+    }
+
+    // ---
+
+    private void openCoreServiceTrackers() {
+        openServiceTrackers(coreServiceTrackers);
+    }
+
+    private void closeCoreServiceTrackers() {
+        closeServiceTrackers(coreServiceTrackers);
+    }
+
+    private void openPluginServiceTrackers() {
+        openServiceTrackers(pluginServiceTrackers);
+    }
+
+    private void closePluginServiceTrackers() {
+        closeServiceTrackers(pluginServiceTrackers);
+    }
+
+    // ---
+
+    private void openServiceTrackers(List<ServiceTracker> serviceTrackers) {
+        for (ServiceTracker serviceTracker : serviceTrackers) {
+            serviceTracker.open();
+        }
+    }
+
+    private void closeServiceTrackers(List<ServiceTracker> serviceTrackers) {
+        // Note: we close the service trackers in reverse creation order. Consider this case: when a consumed plugin
+        // service goes away the core service is still needed to deliver the SERVICE_GONE event. ### STILL TRUE?
+        ListIterator<ServiceTracker> i = serviceTrackers.listIterator(serviceTrackers.size());
+        while (i.hasPrevious()) {
+            i.previous().close();
+        }
+    }
+
+    // ---
+
+    private void addService(Object service, String serviceInterface) {
+        if (service instanceof DeepaMehtaService) {
+            logger.info("Adding DeepaMehta 4 core service to " + this);
+            dms = (DeepaMehtaService) service;
+            openPluginServiceTrackers();
+            registerListeners();
+            checkServiceAvailability();
+        } else if (service instanceof WebPublishingService) {
+            logger.info("Adding Web Publishing service to " + this);
+            webPublishingService = (WebPublishingService) service;
+            registerWebResources();
+            registerRestResources();
+            checkServiceAvailability();
+        } else if (service instanceof EventAdmin) {
+            logger.info("Adding Event Admin service to " + this);
+            eventService = (EventAdmin) service;
+            checkServiceAvailability();
+        } else if (service instanceof PluginService) {
+            logger.info("Adding \"" + serviceInterface + "\" to " + this);
+            deliverEvent(CoreEvent.SERVICE_ARRIVED, (PluginService) service);
+        }
+    }
+
+    private void removeService(Object service, String serviceInterface) {
+        if (service == dms) {
+            logger.info("Removing DeepaMehta 4 core service from " + this);
+            closePluginServiceTrackers();   // core service is needed to deliver the SERVICE_GONE event
+            unregisterListeners();
+            unregisterPlugin();
+            dms = null;
+        } else if (service == webPublishingService) {
+            logger.info("Removing Web Publishing service from " + this);
+            unregisterRestResources();
+            unregisterWebResources();
+            webPublishingService = null;
+        } else if (service == eventService) {
+            logger.info("Removing Event Admin service from " + this);
+            eventService = null;
+        } else if (service instanceof PluginService) {
+            logger.info("Removing plugin service \"" + serviceInterface + "\" from " + this);
+            deliverEvent(CoreEvent.SERVICE_GONE, (PluginService) service);
+        }
     }
 
     // ---
 
     /**
-     * Checks if the requirements are met, and if so, initializes this plugin.
+     * Checks if the requirements are met, and if so, activates this plugin.
      *
      * The requirements:
-     *   - the 3 basic OSGi services are available (DeepaMehtaService, WebPublishingService, EventAdmin).
-     *   - the plugins this plugin depends on (according to this plugin's "importModels" property) are ready.
+     *   - the 3 core services are available (DeepaMehtaService, WebPublishingService, EventAdmin).
+     *   - the plugins this plugin depends on (according to this plugin's "importModels" property) are active.
+     *
+     * After activation:
+     *   - posts the PLUGIN_READY OSGi event.
+     *   - checks if all plugins are active, and if so, fires the {@link CoreEvent.ALL_PLUGINS_READY} event.
      */
     private void checkServiceAvailability() {
+        // Note: The Web Publishing service is not strictly required for activation, but we must ensure
+        // ALL_PLUGINS_READY is not fired before the Web Publishing service becomes available.
         if (dms == null || webPublishingService == null || eventService == null || !dependenciesAvailable()) {
             return;
         }
-        // Note: we must not initialize a plugin twice.
-        // This would happen e.g. if a dependent plugin is redeployed.
-        if (isPluginReady()) {
-            logger.info("Initialization of " + this + " ABORTED -- already initialized");
-            return;
-        }
         //
-        initializePlugin();
-    }
-
-    // ---
-
-    /**
-     * Adds this plugin to the set of ready plugins.
-     */
-    private void addToReadyPlugins() {
-        readyPlugins.add(pluginUri);
-    }
-
-    private void removeFromReadyPlugins() {
-        readyPlugins.remove(pluginUri);
-    }
-
-    // ---
-
-    /**
-     * Returns the "ready" state of this plugin (true=ready).
-     */
-    private boolean isPluginReady() {
-        return isPluginReady(pluginUri);
-    }
-
-    /**
-     * Returns the "ready" state of a plugin (true=ready).
-     */
-    private boolean isPluginReady(String pluginUri) {
-        return readyPlugins.contains(pluginUri);
-    }
-
-    // ---
-
-    /**
-     * Initializes the plugin. This comprises:
-     * - install the plugin in the database
-     * - register the plugin at the DeepaMehta core service ### FIXDOC (listeners)
-     * - register the plugin's OSGi service at the OSGi framework
-     * - register the plugin's static web resources at the OSGi HTTP service
-     * - register the plugin's REST resources at the OSGi HTTP service
-     *
-     * These are the tasks which rely on both, the DeepaMehtaService and the WebPublishingService.
-     * This method is called once both services become available. ### FIXDOC
-     *
-     * After initialization:
-     *   - adds this plugin to the set of "ready" plugins.
-     *   - posts the PLUGIN_READY OSGi event.
-     *   - checks if all plugins are ready, and if so, fires the {@link CoreEvent.ALL_PLUGINS_READY} event.
-     */
-    private void initializePlugin() {
-        try {
-            logger.info("----- Initializing " + this + " -----");
-            installPluginInDB();        // relies on DeepaMehtaService
-            registerPlugin();           // relies on DeepaMehtaService (and committed migrations)
-            registerPluginListeners();
-            registerPluginService();
-            registerWebResources();     // relies on WebPublishingService
-            registerRestResources();    // relies on WebPublishingService and DeepaMehtaService (and registered plugin)
-            logger.info("----- Initialization of " + this + " complete -----");
-            // ### FIXME: should we call registerPlugin() at last?
-            // Currently if e.g. registerPluginService() fails the plugin is still registered at the DeepaMehta core.
-            //
-            addToReadyPlugins();        // Once a plugin has been intialized it is "ready"
+        if (activate()) {
             postPluginReadyEvent();
             dms.checkAllPluginsReady();
-        } catch (Exception e) {
-            logger.severe("Initialization of " + this + " failed:");
-            e.printStackTrace();
-            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
         }
     }
 
-    private void shutdown() {
-        removeFromReadyPlugins();
-        unregisterPluginService();
-        unregisterListeners();
+    // ---
+
+    /**
+     * Activates this plugin. This comprises:
+     * - install the plugin in the database
+     * - register the plugin at the DeepaMehta core service
+     *
+     * If this plugin is already activated, nothing is performed and false is returned.
+     * Otherwise true is returned.
+     *
+     * Acivation relies on both, the DeepaMehtaService and the EventAdmin service.
+     * This method is called once both services become available. ### FIXDOC
+     */
+    private synchronized boolean activate() {
+        try {
+            // Note: we must not activate a plugin twice.
+            // This would happen e.g. if a dependency plugin is redeployed.
+            if (isRegistered()) {
+                logger.info("Activation of " + this + " ABORTED -- already activated");
+                return false;
+            }
+            //
+            logger.info("----- Activating " + this + " -----");
+            installPluginInDB();        // relies on DeepaMehtaService
+            registerPlugin();           // relies on DeepaMehtaService (and committed migrations)
+            logger.info("----- Activation of " + this + " complete -----");
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Activation of " + this + " failed", e);
+        }
     }
 
     // === Installation ===
@@ -529,8 +564,7 @@ public class Plugin implements BundleActivator, EventHandler {
     // === Core Registration ===
 
     /**
-     * Registers the plugin at the DeepaMehta core service. From that moment the plugin takes part of the
-     * core service control flow, that is the plugin's hooks are triggered. ### FIXDOC
+     * Registers this plugin at the DeepaMehta core service.
      */
     private void registerPlugin() {
         logger.info("Registering " + this + " at DeepaMehta 4 core service");
@@ -542,9 +576,22 @@ public class Plugin implements BundleActivator, EventHandler {
         dms.unregisterPlugin(pluginUri);
     }
 
+    // ---
+
+    /**
+     * Returns true if this plugin is registered at the DeepaMehta core service.
+     */
+    private boolean isRegistered() {
+        return isRegistered(pluginUri);
+    }
+
+    private boolean isRegistered(String pluginUri) {
+        return dms.isPluginRegistered(pluginUri);
+    }
+
     // === Plugin Listeners ===
 
-    private void registerPluginListeners() {
+    private void registerListeners() {
         List<CoreEvent> events = getEvents();
         //
         if (events.size() == 0) {
@@ -605,7 +652,7 @@ public class Plugin implements BundleActivator, EventHandler {
             return null;
         }
         //
-        logger.info("### Delivering internal " + event + " event to " + this);
+        logger.info("### Delivering internal plugin event " + event + " from/to " + this);
         return dms.deliverEvent((Listener) this, event, params);
     }
 
@@ -629,17 +676,19 @@ public class Plugin implements BundleActivator, EventHandler {
     // === Plugin Service ===
 
     /**
-     * Registers the plugin's OSGi service at the OSGi framework.
-     * If the plugin doesn't provide a service nothing is performed.
+     * Registers this plugin's OSGi service at the OSGi framework.
+     * If the plugin doesn't provide an OSGi service nothing is performed.
      */
     private void registerPluginService() {
-        String serviceInterface = getConfigProperty("providedServiceInterface");
-        if (serviceInterface == null) {
-            return;
-        }
-        //
+        String serviceInterface = null;
         try {
-            logger.info("Registering service \"" + serviceInterface + "\" of " + this + " at OSGi framework");
+            serviceInterface = getConfigProperty("providedServiceInterface");
+            if (serviceInterface == null) {
+                logger.info("Registering OSGi service of " + this + " ABORTED -- no OSGi service provided");
+                return;
+            }
+            //
+            logger.info("Registering service \"" + serviceInterface + "\" at OSGi framework");
             registration = context.registerService(serviceInterface, this, null);
         } catch (Exception e) {
             throw new RuntimeException("Registering service of " + this + " at OSGi framework failed " +
@@ -647,33 +696,40 @@ public class Plugin implements BundleActivator, EventHandler {
         }
     }
 
+    /* ### FIXME: needed?
     private void unregisterPluginService() {
-        String serviceInterface = getConfigProperty("providedServiceInterface");
-        if (serviceInterface == null) {
-            return;
-        }
-        //
+        String serviceInterface = null;
         try {
-            logger.info("Unregistering service \"" + serviceInterface + "\" of " + this + " at OSGi framework");
+            serviceInterface = getConfigProperty("providedServiceInterface");
+            if (serviceInterface == null) {
+                return;
+            }
+            //
+            logger.info("Unregistering service \"" + serviceInterface + "\" at OSGi framework");
             registration.unregister();
         } catch (Exception e) {
             throw new RuntimeException("Unregistering service of " + this + " at OSGi framework failed " +
                 "(serviceInterface=\"" + serviceInterface + "\")", e);
         }
-    }
+    } */
 
     // === Web Resources ===
 
+    /**
+     * Registers this plugin's web resources at the Web Publishing service.
+     * If the plugin doesn't provide web resources nothing is performed.
+     */
     private void registerWebResources() {
         String uriNamespace = null;
         try {
             uriNamespace = getWebResourcesNamespace();
-            if (uriNamespace != null) {
-                logger.info("Registering Web resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
-                webResources = webPublishingService.addWebResources(pluginBundle, uriNamespace);
-            } else {
+            if (uriNamespace == null) {
                 logger.info("Registering Web resources of " + this + " ABORTED -- no Web resources provided");
+                return;
             }
+            //
+            logger.info("Registering Web resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
+            webResources = webPublishingService.addWebResources(pluginBundle, uriNamespace);
         } catch (Exception e) {
             throw new RuntimeException("Registering Web resources of " + this + " failed " +
                 "(uriNamespace=\"" + uriNamespace + "\")", e);
@@ -695,16 +751,21 @@ public class Plugin implements BundleActivator, EventHandler {
 
     // === REST Resources ===
 
+    /**
+     * Registers this plugin's REST resources at the Web Publishing service.
+     * If the plugin doesn't provide REST resources nothing is performed.
+     */
     private void registerRestResources() {
         String uriNamespace = null;
         try {
             uriNamespace = webPublishingService.getUriNamespace(this);
-            if (uriNamespace != null) {
-                logger.info("Registering REST resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
-                restResource = webPublishingService.addRestResource(this, getProviderClasses());
-            } else {
+            if (uriNamespace == null) {
                 logger.info("Registering REST resources of " + this + " ABORTED -- no REST resources provided");
+                return;
             }
+            //
+            logger.info("Registering REST resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
+            restResource = webPublishingService.addRestResource(this, getProviderClasses());
         } catch (Exception e) {
             unregisterWebResources();
             throw new RuntimeException("Registering REST resources of " + this + " failed " +
@@ -742,29 +803,27 @@ public class Plugin implements BundleActivator, EventHandler {
         return providerClasses;
     }
 
-    // === Model Dependencies ===
+    // === Plugin Dependencies ===
 
-    private Map<String, Boolean> initDependencies() {
-        Map<String, Boolean> dependencyState = new HashMap();
+    private Set<String> getPluginDependencies() {
+        Set<String> pluginDependencies = new HashSet();
         String importModels = getConfigProperty("importModels");
         if (importModels != null) {
-            String[] pluginIDs = importModels.split(", *");
-            for (int i = 0; i < pluginIDs.length; i++) {
-                if (!isPluginReady(pluginIDs[i])) {
-                    dependencyState.put(pluginIDs[i], false);
-                }
+            String[] pluginUris = importModels.split(", *");
+            for (int i = 0; i < pluginUris.length; i++) {
+                pluginDependencies.add(pluginUris[i]);
             }
         }
-        return dependencyState;
+        return pluginDependencies;
     }
 
     private boolean hasDependency(String pluginUri) {
-        return dependencyState.get(pluginUri) != null;
+        return pluginDependencies.contains(pluginUri);
     }
 
     private boolean dependenciesAvailable() {
-        for (boolean available : dependencyState.values()) {
-            if (!available) {
+        for (String pluginUri : pluginDependencies) {
+            if (!isRegistered(pluginUri)) {
                 return false;
             }
         }

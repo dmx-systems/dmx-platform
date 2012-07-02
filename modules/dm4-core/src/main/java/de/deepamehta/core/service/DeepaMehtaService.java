@@ -138,6 +138,8 @@ public interface DeepaMehtaService {
 
     void unregisterPlugin(String pluginUri);
 
+    boolean isPluginRegistered(String pluginUri);
+
     Plugin getPlugin(String pluginUri);
 
     Set<PluginInfo> getPluginInfo();

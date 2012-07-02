@@ -1,9 +1,12 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.PluginInfo;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 
@@ -33,33 +36,22 @@ class PluginCache {
     }
 
     void put(Plugin plugin) {
-        synchronized(plugins) {
-            plugins.put(plugin.getUri(), plugin);
-        }
+        plugins.put(plugin.getUri(), plugin);
     }
 
     void remove(String pluginUri) {
-        synchronized(plugins) {
-            plugins.remove(pluginUri);
-        }
+        plugins.remove(pluginUri);
     }
 
     boolean contains(String pluginUri) {
-        synchronized(plugins) {
-            return plugins.get(pluginUri) != null;
-        }
+        return plugins.get(pluginUri) != null;
     }
 
-    static abstract class Iterator {
-
-        Iterator() {
-            synchronized(plugins) {
-                for (Plugin plugin : plugins.values()) {
-                    body(plugin);
-                }
-            }
+    public Set<PluginInfo> getPluginInfo() {
+        Set info = new HashSet();
+        for (Plugin plugin : plugins.values()) {
+            info.add(plugin.getInfo());
         }
-
-        abstract void body(Plugin plugin);
+        return info;
     }
 }
