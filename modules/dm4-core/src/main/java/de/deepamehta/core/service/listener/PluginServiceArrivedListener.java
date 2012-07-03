@@ -5,7 +5,7 @@ import de.deepamehta.core.service.PluginService;
 
 
 
-public interface ServiceGoneListener extends Listener {
+public interface PluginServiceArrivedListener extends Listener {
 
-    void serviceGone(PluginService service);
+    void pluginServiceArrived(PluginService service);
 }

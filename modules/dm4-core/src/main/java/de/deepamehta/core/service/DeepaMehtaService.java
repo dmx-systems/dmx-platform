@@ -170,12 +170,12 @@ public interface DeepaMehtaService {
 
     /**
      * Checks if all DeepaMehta plugin bundles are registered at core.
-     * Fires the {@link CoreEvent.ALL_PLUGINS_READY} event if so.
+     * Fires the {@link CoreEvent.ALL_PLUGINS_ACTIVE} event if so.
      * <p>
      * Called from the Plugin class.
      * Not meant to be called by a plugin developer.
      */
-    void checkAllPluginsReady();
+    void checkAllPluginsActive();
 
     /**
      * Setups the database to be compatible with this core service.

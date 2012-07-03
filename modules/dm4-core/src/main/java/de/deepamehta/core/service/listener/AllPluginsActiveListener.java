@@ -4,7 +4,7 @@ import de.deepamehta.core.service.Listener;
 
 
 
-public interface AllPluginsReadyListener extends Listener {
+public interface AllPluginsActiveListener extends Listener {
 
-    void allPluginsReady();
+    void allPluginsActive();
 }

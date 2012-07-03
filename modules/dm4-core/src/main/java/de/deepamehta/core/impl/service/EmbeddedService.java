@@ -589,23 +589,23 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
     @Override
-    public void checkAllPluginsReady() {
+    public void checkAllPluginsActive() {
         Bundle[] bundles = bundleContext.getBundles();
         int plugins = 0;
-        int ready = 0;
+        int active = 0;
         for (Bundle bundle : bundles) {
             if (isDeepaMehtaPlugin(bundle)) {
                 plugins++;
                 if (isPluginRegistered(bundle.getSymbolicName())) {
-                    ready++;
+                    active++;
                 }
             }
         }
         logger.info("### Bundles total: " + bundles.length +
-            ", DeepaMehta plugins: " + plugins + ", Ready: " + ready);
-        if (plugins == ready) {
-            logger.info("########## All plugins ready ##########");
-            fireEvent(CoreEvent.ALL_PLUGINS_READY);
+            ", DeepaMehta plugins: " + plugins + ", Active: " + active);
+        if (plugins == active) {
+            logger.info("########## All Plugins Active ##########");
+            fireEvent(CoreEvent.ALL_PLUGINS_ACTIVE);
         }
     }
 

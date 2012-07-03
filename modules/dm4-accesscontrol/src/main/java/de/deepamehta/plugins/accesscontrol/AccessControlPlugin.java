@@ -25,8 +25,8 @@ import de.deepamehta.core.service.listener.PostCreateTopicListener;
 import de.deepamehta.core.service.listener.PreSendTopicListener;
 import de.deepamehta.core.service.listener.PreSendTopicTypeListener;
 import de.deepamehta.core.service.listener.PostInstallPluginListener;
-import de.deepamehta.core.service.listener.ServiceArrivedListener;
-import de.deepamehta.core.service.listener.ServiceGoneListener;
+import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
+import de.deepamehta.core.service.listener.PluginServiceGoneListener;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.DefaultValue;
@@ -60,8 +60,8 @@ public class AccessControlPlugin extends Plugin implements AccessControlService,
                                                                                  PreSendTopicTypeListener,
                                                                                  PostInstallPluginListener,
                                                                                  IntroduceTopicTypeListener,
-                                                                                 ServiceArrivedListener,
-                                                                                 ServiceGoneListener {
+                                                                                 PluginServiceArrivedListener,
+                                                                                 PluginServiceGoneListener {
 
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
@@ -259,7 +259,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService,
     }
 
     @Override
-    public void serviceArrived(PluginService service) {
+    public void pluginServiceArrived(PluginService service) {
         logger.info("########## Service arrived: " + service);
         if (service instanceof FacetsService) {
             facetsService = (FacetsService) service;
@@ -269,7 +269,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService,
     }
 
     @Override
-    public void serviceGone(PluginService service) {
+    public void pluginServiceGone(PluginService service) {
         logger.info("########## Service gone: " + service);
         if (service == facetsService) {
             facetsService = null;

@@ -11,8 +11,8 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.listener.ServiceArrivedListener;
-import de.deepamehta.core.service.listener.ServiceGoneListener;
+import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
+import de.deepamehta.core.service.listener.PluginServiceGoneListener;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.GET;
@@ -30,8 +30,8 @@ import java.util.logging.Logger;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends Plugin implements FilesService, ServiceArrivedListener,
-                                                                 ServiceGoneListener {
+public class FilesPlugin extends Plugin implements FilesService, PluginServiceArrivedListener,
+                                                                 PluginServiceGoneListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -162,7 +162,7 @@ public class FilesPlugin extends Plugin implements FilesService, ServiceArrivedL
 
 
     @Override
-    public void serviceArrived(PluginService service) {
+    public void pluginServiceArrived(PluginService service) {
         logger.info("########## Service arrived: " + service);
         if (service instanceof ProxyService) {
             proxyService = (ProxyService) service;
@@ -170,7 +170,7 @@ public class FilesPlugin extends Plugin implements FilesService, ServiceArrivedL
     }
 
     @Override
-    public void serviceGone(PluginService service) {
+    public void pluginServiceGone(PluginService service) {
         logger.info("########## Service gone: " + service);
         if (service == proxyService) {
             proxyService = null;

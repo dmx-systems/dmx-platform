@@ -47,7 +47,7 @@ public class Plugin implements BundleActivator, EventHandler {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
-    private static final String PLUGIN_READY = "de/deepamehta/core/plugin_ready";   // topic of the OSGi event
+    private static final String PLUGIN_ACTIVATED = "de/deepamehta/core/plugin_activated";   // topic of the OSGi event
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -66,7 +66,7 @@ public class Plugin implements BundleActivator, EventHandler {
     // Consumed services
     protected DeepaMehtaService dms;
     private WebPublishingService webPublishingService;
-    private EventAdmin eventService;        // needed to post the PLUGIN_READY OSGi event
+    private EventAdmin eventService;        // needed to post the PLUGIN_ACTIVATED OSGi event
 
     // Provided OSGi service
     private ServiceRegistration registration;
@@ -226,7 +226,7 @@ public class Plugin implements BundleActivator, EventHandler {
     public void handleEvent(Event event) {
         String pluginUri = null;
         try {
-            if (!event.getTopic().equals(PLUGIN_READY)) {
+            if (!event.getTopic().equals(PLUGIN_ACTIVATED)) {
                 throw new RuntimeException("Unexpected event: " + event);
             }
             //
@@ -235,10 +235,10 @@ public class Plugin implements BundleActivator, EventHandler {
                 return;
             }
             //
-            logger.info("Handling PLUGIN_READY event from \"" + pluginUri + "\" for " + this);
+            logger.info("Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this);
             checkServiceAvailability();
         } catch (Exception e) {
-            logger.severe("Handling PLUGIN_READY event from \"" + pluginUri + "\" for " + this + " failed:");
+            logger.severe("Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this + " failed:");
             e.printStackTrace();
             // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
         }
@@ -361,10 +361,13 @@ public class Plugin implements BundleActivator, EventHandler {
 
     private void closeServiceTrackers(List<ServiceTracker> serviceTrackers) {
         // Note: we close the service trackers in reverse creation order. Consider this case: when a consumed plugin
-        // service goes away the core service is still needed to deliver the SERVICE_GONE event. ### STILL TRUE?
-        ListIterator<ServiceTracker> i = serviceTrackers.listIterator(serviceTrackers.size());
+        // service goes away the core service is still needed to deliver the PLUGIN_SERVICE_GONE event. ### STILL TRUE?
+        /* ListIterator<ServiceTracker> i = serviceTrackers.listIterator(serviceTrackers.size());
         while (i.hasPrevious()) {
             i.previous().close();
+        } */
+        for (ServiceTracker serviceTracker : serviceTrackers) {
+            serviceTracker.close();
         }
     }
 
@@ -389,14 +392,14 @@ public class Plugin implements BundleActivator, EventHandler {
             checkServiceAvailability();
         } else if (service instanceof PluginService) {
             logger.info("Adding \"" + serviceInterface + "\" to " + this);
-            deliverEvent(CoreEvent.SERVICE_ARRIVED, (PluginService) service);
+            deliverEvent(CoreEvent.PLUGIN_SERVICE_ARRIVED, (PluginService) service);
         }
     }
 
     private void removeService(Object service, String serviceInterface) {
         if (service == dms) {
             logger.info("Removing DeepaMehta 4 core service from " + this);
-            closePluginServiceTrackers();   // core service is needed to deliver the SERVICE_GONE event
+            closePluginServiceTrackers();   // core service is needed to deliver the PLUGIN_SERVICE_GONE events
             unregisterListeners();
             unregisterPlugin();
             dms = null;
@@ -410,7 +413,7 @@ public class Plugin implements BundleActivator, EventHandler {
             eventService = null;
         } else if (service instanceof PluginService) {
             logger.info("Removing plugin service \"" + serviceInterface + "\" from " + this);
-            deliverEvent(CoreEvent.SERVICE_GONE, (PluginService) service);
+            deliverEvent(CoreEvent.PLUGIN_SERVICE_GONE, (PluginService) service);
         }
     }
 
@@ -421,22 +424,22 @@ public class Plugin implements BundleActivator, EventHandler {
      *
      * The requirements:
      *   - the 3 core services are available (DeepaMehtaService, WebPublishingService, EventAdmin).
-     *   - the plugins this plugin depends on (according to this plugin's "importModels" property) are active.
+     *   - the plugin dependencies (according to this plugin's "importModels" property) are active.
      *
      * After activation:
-     *   - posts the PLUGIN_READY OSGi event.
-     *   - checks if all plugins are active, and if so, fires the {@link CoreEvent.ALL_PLUGINS_READY} event.
+     *   - posts the PLUGIN_ACTIVATED OSGi event.
+     *   - checks if all plugins are active, and if so, fires the {@link CoreEvent.ALL_PLUGINS_ACTIVE} event.
      */
     private void checkServiceAvailability() {
         // Note: The Web Publishing service is not strictly required for activation, but we must ensure
-        // ALL_PLUGINS_READY is not fired before the Web Publishing service becomes available.
+        // ALL_PLUGINS_ACTIVE is not fired before the Web Publishing service becomes available.
         if (dms == null || webPublishingService == null || eventService == null || !dependenciesAvailable()) {
             return;
         }
         //
         if (activate()) {
-            postPluginReadyEvent();
-            dms.checkAllPluginsReady();
+            postPluginActivatedEvent();
+            dms.checkAllPluginsActive();
         }
     }
 
@@ -644,8 +647,8 @@ public class Plugin implements BundleActivator, EventHandler {
      * There are 4 internal events:
      *   - POST_INSTALL_PLUGIN
      *   - INTRODUCE_TOPIC_TYPE
-     *   - SERVICE_ARRIVED
-     *   - SERVICE_GONE
+     *   - PLUGIN_SERVICE_ARRIVED
+     *   - PLUGIN_SERVICE_GONE
      */
     private Object deliverEvent(CoreEvent event, Object... params) {
         if (!isListener(event)) {
@@ -831,15 +834,15 @@ public class Plugin implements BundleActivator, EventHandler {
     }
 
     private void registerEventListener() {
-        String[] topics = new String[] {PLUGIN_READY};
+        String[] topics = new String[] {PLUGIN_ACTIVATED};
         Hashtable properties = new Hashtable();
         properties.put(EventConstants.EVENT_TOPIC, topics);
         context.registerService(EventHandler.class.getName(), this, properties);
     }
 
-    private void postPluginReadyEvent() {
+    private void postPluginActivatedEvent() {
         Properties properties = new Properties();
         properties.put(EventConstants.BUNDLE_SYMBOLICNAME, pluginUri);
-        eventService.postEvent(new Event(PLUGIN_READY, properties));
+        eventService.postEvent(new Event(PLUGIN_ACTIVATED, properties));
     }
 }

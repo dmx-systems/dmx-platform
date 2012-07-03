@@ -20,8 +20,8 @@ import java.util.Map;
  *   - internal plugin events: are fired by a plugin and then delivered only to itself. There are 4 internal events:
  *     - POST_INSTALL_PLUGIN
  *     - INTRODUCE_TOPIC_TYPE (has a double nature)
- *     - SERVICE_ARRIVED
- *     - SERVICE_GONE
+ *     - PLUGIN_SERVICE_ARRIVED
+ *     - PLUGIN_SERVICE_GONE
  *
  * @see de.deepamehta.core.service.listener
  */
@@ -54,19 +54,19 @@ public enum CoreEvent {
         "postInstallPlugin"),
     // Note: this is an internal plugin event (see {@link Plugin#installPluginInDB}).
 
-    ALL_PLUGINS_READY(AllPluginsReadyListener.class,
-        "allPluginsReady"),
+    ALL_PLUGINS_ACTIVE(AllPluginsActiveListener.class,
+        "allPluginsActive"),
 
     INTRODUCE_TOPIC_TYPE(IntroduceTopicTypeListener.class,
         "introduceTopicType", TopicType.class, ClientState.class),
     // Note: besides regular firing           (see {@link EmbeddedService#createTopicType})
     // this is an internal plugin event       (see {@link Plugin#introduceTypesToPlugin}).
 
-    SERVICE_ARRIVED(ServiceArrivedListener.class,
-        "serviceArrived", PluginService.class),
+    PLUGIN_SERVICE_ARRIVED(PluginServiceArrivedListener.class,
+        "pluginServiceArrived", PluginService.class),
     // Note: this is an internal plugin event (see {@link Plugin#createServiceTracker}).
-    SERVICE_GONE(ServiceGoneListener.class,
-        "serviceGone", PluginService.class)
+    PLUGIN_SERVICE_GONE(PluginServiceGoneListener.class,
+        "pluginServiceGone", PluginService.class)
     // Note: this is an internal plugin event (see {@link Plugin#createServiceTracker}).
     ;
 
