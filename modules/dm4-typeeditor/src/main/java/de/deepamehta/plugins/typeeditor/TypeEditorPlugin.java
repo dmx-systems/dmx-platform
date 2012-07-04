@@ -4,9 +4,9 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.listener.PostDeleteAssociationListener;
 import de.deepamehta.core.service.listener.PostRetypeAssociationListener;
 
@@ -14,8 +14,8 @@ import java.util.logging.Logger;
 
 
 
-public class TypeEditorPlugin extends Plugin implements PostRetypeAssociationListener,
-                                                        PostDeleteAssociationListener {
+public class TypeEditorPlugin extends PluginActivator implements PostRetypeAssociationListener,
+                                                                 PostDeleteAssociationListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

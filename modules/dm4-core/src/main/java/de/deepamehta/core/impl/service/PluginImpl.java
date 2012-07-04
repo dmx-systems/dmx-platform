@@ -7,6 +7,7 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.osgi.PluginContext;
 import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Listener;
@@ -48,12 +49,14 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
+    private static final String PLUGIN_DEFAULT_PACKAGE = "de.deepamehta.core.osgi";
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
     private static final String PLUGIN_ACTIVATED = "de/deepamehta/core/plugin_activated";   // topic of the OSGi event
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private BundleContext context;
+    private PluginContext pluginContext;
+    private BundleContext bundleContext;
 
     private String      pluginUri;          // This bundle's symbolic name, e.g. "de.deepamehta.webclient"
     private String      pluginName;         // This bundle's name = POM project name
@@ -66,7 +69,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private Set<String> pluginDependencies; // plugin URIs as read from "importModels" property
 
     // Consumed services
-    protected EmbeddedService dms;
+    private EmbeddedService dms;
     private WebPublishingService webPublishingService;
     private EventAdmin eventService;        // needed to post the PLUGIN_ACTIVATED OSGi event
 
@@ -86,64 +89,13 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public PluginImpl(BundleContext context) {
-        start(context);
+    public PluginImpl(PluginContext pluginContext) {
+        this.pluginContext = pluginContext;
+        this.bundleContext = pluginContext.getBundleContext();
+        start();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-    public String getUri() {
-        return pluginUri;
-    }
-
-    public String getName() {
-        return pluginName;
-    }
-
-    public PluginInfo getInfo() {
-        return pluginInfo;
-    }
-
-    /**
-     * Returns a plugin configuration property (as read from file "plugin.properties")
-     * or <code>null</code> if no such property exists.
-     */
-    public String getConfigProperty(String key) {
-        return getConfigProperty(key, null);
-    }
-
-    /**
-     * Uses the plugin bundle's class loader to load a class by name.
-     *
-     * @return  the class, or <code>null</code> if the class is not found.
-     */
-    public Class loadClass(String className) {
-        try {
-            return pluginBundle.loadClass(className);
-        } catch (ClassNotFoundException e) {
-            return null;
-        }
-    }
-
-    /**
-     * Returns the migration class name for the given migration number.
-     *
-     * @return  the fully qualified migration class name, or <code>null</code> if the migration package is unknown.
-     *          This is the case if the plugin bundle contains no Plugin subclass and the "pluginPackage" config
-     *          property is not set.
-     */
-    public String getMigrationClassName(int migrationNr) {
-        if (pluginPackage.equals("de.deepamehta.core.service")) {
-            return null;    // migration package is unknown
-        }
-        //
-        return pluginPackage + ".migrations.Migration" + migrationNr;
-    }
-
-    // FIXME: should be private
-    public void setMigrationNr(int migrationNr) {
-        pluginTopic.setChildTopicValue("dm4.core.plugin_migration_nr", new SimpleValue(migrationNr));
-    }
 
     /**
      * Uses the plugin bundle's class loader to find a resource.
@@ -199,12 +151,77 @@ public class PluginImpl implements Plugin, EventHandler {
 
 
 
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    String getUri() {
+        return pluginUri;
+    }
+
+    public PluginInfo getInfo() {
+        return pluginInfo;
+    }
+
+    Topic getPluginTopic() {
+        return pluginTopic;
+    }
+
+    // ---
+
+    /**
+     * Returns a plugin configuration property (as read from file "plugin.properties")
+     * or <code>null</code> if no such property exists.
+     */
+    String getConfigProperty(String key) {
+        return getConfigProperty(key, null);
+    }
+
+    String getConfigProperty(String key, String defaultValue) {
+        return pluginProperties.getProperty(key, defaultValue);
+    }
+
+    // ---
+
+    /**
+     * Returns the migration class name for the given migration number.
+     *
+     * @return  the fully qualified migration class name, or <code>null</code> if the migration package is unknown.
+     *          This is the case if the plugin bundle contains no Plugin subclass and the "pluginPackage" config
+     *          property is not set.
+     */
+    String getMigrationClassName(int migrationNr) {
+        if (pluginPackage.equals(PLUGIN_DEFAULT_PACKAGE)) {
+            return null;    // migration package is unknown
+        }
+        //
+        return pluginPackage + ".migrations.Migration" + migrationNr;
+    }
+
+    void setMigrationNr(int migrationNr) {
+        pluginTopic.setChildTopicValue("dm4.core.plugin_migration_nr", new SimpleValue(migrationNr));
+    }
+
+    // ---
+
+    /**
+     * Uses the plugin bundle's class loader to load a class by name.
+     *
+     * @return  the class, or <code>null</code> if the class is not found.
+     */
+    Class loadClass(String className) {
+        try {
+            return pluginBundle.loadClass(className);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void start(BundleContext context) {
+    private void start() {
         try {
-            this.context = context;
-            this.pluginBundle = context.getBundle();
+            this.pluginBundle = bundleContext.getBundle();
             this.pluginUri = pluginBundle.getSymbolicName();
             this.pluginName = (String) pluginBundle.getHeaders().get("Bundle-Name");
             this.pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
@@ -212,7 +229,7 @@ public class PluginImpl implements Plugin, EventHandler {
             logger.info("========== Starting " + this + " ==========");
             //
             this.pluginProperties = readConfigFile();
-            this.pluginPackage = getConfigProperty("pluginPackage", getClass().getPackage().getName());
+            this.pluginPackage = getConfigProperty("pluginPackage", pluginContext.getClass().getPackage().getName());
             this.pluginInfo = createPluginInfo();
             this.pluginDependencies = getPluginDependencies();
             //
@@ -272,10 +289,6 @@ public class PluginImpl implements Plugin, EventHandler {
         }
     }
 
-    private String getConfigProperty(String key, String defaultValue) {
-        return pluginProperties.getProperty(key, defaultValue);
-    }
-
     // === Service Tracking ===
 
     private void createCoreServiceTrackers() {
@@ -303,7 +316,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private ServiceTracker createServiceTracker(final String serviceInterface) {
-        return new ServiceTracker(context, serviceInterface, null) {
+        return new ServiceTracker(bundleContext, serviceInterface, null) {
 
             @Override
             public Object addingService(ServiceReference serviceRef) {
@@ -376,7 +389,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private void addService(Object service, String serviceInterface) {
         if (service instanceof DeepaMehtaService) {
             logger.info("Adding DeepaMehta 4 core service to " + this);
-            dms = (EmbeddedService) service;
+            setCoreService((EmbeddedService) service);
             openPluginServiceTrackers();
             registerListeners();
             checkServiceAvailability();
@@ -402,7 +415,7 @@ public class PluginImpl implements Plugin, EventHandler {
             closePluginServiceTrackers();   // core service is needed to deliver the PLUGIN_SERVICE_GONE events
             unregisterListeners();
             unregisterPlugin();
-            dms = null;
+            setCoreService(null);
         } else if (service == webPublishingService) {
             logger.info("Removing Web Publishing service from " + this);
             unregisterRestResources();
@@ -415,6 +428,13 @@ public class PluginImpl implements Plugin, EventHandler {
             logger.info("Removing plugin service \"" + serviceInterface + "\" from " + this);
             deliverEvent(CoreEvent.PLUGIN_SERVICE_GONE, (PluginService) service);
         }
+    }
+
+    // ---
+
+    private void setCoreService(EmbeddedService dms) {
+        this.dms = dms;
+        pluginContext.setCoreService(dms);
     }
 
     // ---
@@ -502,7 +522,7 @@ public class PluginImpl implements Plugin, EventHandler {
                 isCleanInstall = true;
             }
             // 2) run migrations
-            runPluginMigrations(isCleanInstall);
+            dms.migrationManager.runPluginMigrations(this, isCleanInstall);
             // 3) post install
             if (isCleanInstall) {
                 deliverEvent(CoreEvent.POST_INSTALL_PLUGIN);
@@ -533,27 +553,6 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private Topic fetchPluginTopic() {
         return dms.getTopic("uri", new SimpleValue(pluginUri), false, null);        // fetchComposite=false
-    }
-
-    /**
-     * Determines the migrations to be run for this plugin and run them.
-     */
-    private void runPluginMigrations(boolean isCleanInstall) {
-        int migrationNr = pluginTopic.getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
-        int requiredMigrationNr = Integer.parseInt(getConfigProperty("requiredPluginMigrationNr", "0"));
-        int migrationsToRun = requiredMigrationNr - migrationNr;
-        //
-        if (migrationsToRun == 0) {
-            logger.info("Running migrations for " + this + " ABORTED -- everything up-to-date (migrationNr=" +
-                migrationNr + ")");
-            return;
-        }
-        //
-        logger.info("Running " + migrationsToRun + " migrations for " + this + " (migrationNr=" + migrationNr +
-            ", requiredMigrationNr=" + requiredMigrationNr + ")");
-        for (int i = migrationNr + 1; i <= requiredMigrationNr; i++) {
-            dms.migrationManager.runPluginMigration(this, i, isCleanInstall);
-        }
     }
 
     private void introduceTypesToPlugin() {
@@ -608,7 +607,7 @@ public class PluginImpl implements Plugin, EventHandler {
         //
         logger.info("Registering " + events.size() + " listeners of " + this + " at DeepaMehta 4 core service");
         for (CoreEvent event : events) {
-            dms.addListener(event, (Listener) this);
+            dms.addListener(event, (Listener) pluginContext);
         }
     }
 
@@ -620,7 +619,7 @@ public class PluginImpl implements Plugin, EventHandler {
         //
         logger.info("Unregistering listeners of " + this + " at DeepaMehta 4 core service");
         for (CoreEvent event : events) {
-            dms.removeListener(event, (Listener) this);
+            dms.removeListener(event, (Listener) pluginContext);
         }
     }
 
@@ -631,7 +630,7 @@ public class PluginImpl implements Plugin, EventHandler {
      */
     private List<CoreEvent> getEvents() {
         List<CoreEvent> events = new ArrayList();
-        for (Class interfaze : getClass().getInterfaces()) {
+        for (Class interfaze : pluginContext.getClass().getInterfaces()) {
             if (isListenerInterface(interfaze)) {
                 CoreEvent event = CoreEvent.fromListenerInterface(interfaze);
                 logger.fine("### Listener Interface: " + interfaze + ", event=" + event);
@@ -659,7 +658,7 @@ public class PluginImpl implements Plugin, EventHandler {
         }
         //
         logger.info("### Delivering internal plugin event " + event + " from/to " + this);
-        return dms.deliverEvent((Listener) this, event, params);
+        return dms.deliverEvent((Listener) pluginContext, event, params);
     }
 
     // ---
@@ -676,7 +675,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * Returns true if this plugin is a listener for the specified event.
      */
     private boolean isListener(CoreEvent event) {
-        return event.listenerInterface.isAssignableFrom(getClass());
+        return event.listenerInterface.isAssignableFrom(pluginContext.getClass());
     }
 
     // === Plugin Service ===
@@ -695,7 +694,7 @@ public class PluginImpl implements Plugin, EventHandler {
             }
             //
             logger.info("Registering service \"" + serviceInterface + "\" at OSGi framework");
-            registration = context.registerService(serviceInterface, this, null);
+            registration = bundleContext.registerService(serviceInterface, pluginContext, null);
         } catch (Exception e) {
             throw new RuntimeException("Registering service of " + this + " at OSGi framework failed " +
                 "(serviceInterface=\"" + serviceInterface + "\")", e);
@@ -764,14 +763,14 @@ public class PluginImpl implements Plugin, EventHandler {
     private void registerRestResources() {
         String uriNamespace = null;
         try {
-            uriNamespace = webPublishingService.getUriNamespace(this);
+            uriNamespace = webPublishingService.getUriNamespace(pluginContext);
             if (uriNamespace == null) {
                 logger.info("Registering REST resources of " + this + " ABORTED -- no REST resources provided");
                 return;
             }
             //
             logger.info("Registering REST resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
-            restResource = webPublishingService.addRestResource(this, getProviderClasses());
+            restResource = webPublishingService.addRestResource(pluginContext, getProviderClasses());
         } catch (Exception e) {
             unregisterWebResources();
             throw new RuntimeException("Registering REST resources of " + this + " failed " +
@@ -840,7 +839,7 @@ public class PluginImpl implements Plugin, EventHandler {
         String[] topics = new String[] {PLUGIN_ACTIVATED};
         Hashtable properties = new Hashtable();
         properties.put(EventConstants.EVENT_TOPIC, topics);
-        context.registerService(EventHandler.class.getName(), this, properties);
+        bundleContext.registerService(EventHandler.class.getName(), this, properties);
     }
 
     private void postPluginActivatedEvent() {

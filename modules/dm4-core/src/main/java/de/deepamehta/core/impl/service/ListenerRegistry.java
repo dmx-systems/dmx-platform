@@ -2,7 +2,6 @@ package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.Listener;
-import de.deepamehta.core.service.Plugin;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

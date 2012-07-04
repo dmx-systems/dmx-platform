@@ -9,7 +9,7 @@ import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
 import de.deepamehta.core.service.listener.PluginServiceGoneListener;
@@ -30,8 +30,8 @@ import java.util.logging.Logger;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends Plugin implements FilesService, PluginServiceArrivedListener,
-                                                                 PluginServiceGoneListener {
+public class FilesPlugin extends PluginActivator implements FilesService, PluginServiceArrivedListener,
+                                                                          PluginServiceGoneListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

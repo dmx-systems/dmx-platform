@@ -16,9 +16,9 @@ import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.listener.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.listener.PostCreateTopicListener;
@@ -55,13 +55,13 @@ import java.util.logging.Logger;
 @Path("/accesscontrol")
 @Consumes("application/json")
 @Produces("application/json")
-public class AccessControlPlugin extends Plugin implements AccessControlService, PostCreateTopicListener,
-                                                                                 PreSendTopicListener,
-                                                                                 PreSendTopicTypeListener,
-                                                                                 PostInstallPluginListener,
-                                                                                 IntroduceTopicTypeListener,
-                                                                                 PluginServiceArrivedListener,
-                                                                                 PluginServiceGoneListener {
+public class AccessControlPlugin extends PluginActivator implements AccessControlService, PostCreateTopicListener,
+                                                                                          PreSendTopicListener,
+                                                                                          PreSendTopicTypeListener,
+                                                                                          PostInstallPluginListener,
+                                                                                          IntroduceTopicTypeListener,
+                                                                                          PluginServiceArrivedListener,
+                                                                                          PluginServiceGoneListener {
 
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";

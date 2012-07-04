@@ -1,6 +1,7 @@
 package de.deepamehta.core.osgi;
 
 import de.deepamehta.core.impl.service.EmbeddedService;
+import de.deepamehta.core.impl.service.WebPublishingService;
 import de.deepamehta.core.impl.storage.MGStorageBridge;
 import de.deepamehta.core.service.DeepaMehtaService;
 
@@ -9,9 +10,8 @@ import de.deepamehta.mehtagraph.MehtaGraphFactory;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import java.util.Map;
@@ -102,6 +102,44 @@ public class CoreActivator implements BundleActivator {
             return MehtaGraphFactory.createInstance(DATABASE_PATH);
         } catch (Exception e) {
             throw new RuntimeException("Opening database failed (path=" + DATABASE_PATH + ")", e);
+        }
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Classes
+
+    private class HttpServiceTracker extends ServiceTracker {
+
+        private HttpService httpService;
+
+        private Logger logger = Logger.getLogger(getClass().getName());
+
+        private HttpServiceTracker(BundleContext context) {
+            super(context, HttpService.class.getName(), null);
+            open();
+        }
+
+        @Override
+        public Object addingService(ServiceReference serviceRef) {
+            Object service = super.addingService(serviceRef);
+            if (service instanceof HttpService) {
+                logger.info("Adding HTTP service to DeepaMehta 4 Core");
+                httpService = (HttpService) service;
+                new WebPublishingService(context, httpService);
+            }
+            //
+            return service;
+        }
+
+        @Override
+        public void removedService(ServiceReference ref, Object service) {
+            if (service == httpService) {
+                logger.info("Removing HTTP service from DeepaMehta 4 Core");
+                // ### TODO: unregister WebPublishingService
+                httpService = null;
+            }
+            super.removedService(ref, service);
         }
     }
 }

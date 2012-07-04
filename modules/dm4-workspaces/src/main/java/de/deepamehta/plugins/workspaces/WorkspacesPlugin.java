@@ -10,9 +10,9 @@ import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.listener.PostCreateTopicListener;
 import de.deepamehta.core.service.listener.PostInstallPluginListener;
 
@@ -25,8 +25,8 @@ import java.util.logging.Logger;
 
 
 
-public class WorkspacesPlugin extends Plugin implements WorkspacesService, PostCreateTopicListener,
-                                                                           PostInstallPluginListener {
+public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, PostCreateTopicListener,
+                                                                                    PostInstallPluginListener {
 
     private static final String DEFAULT_WORKSPACE_NAME = "Default";
 

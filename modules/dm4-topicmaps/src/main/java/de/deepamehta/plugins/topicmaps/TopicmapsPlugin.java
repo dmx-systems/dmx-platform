@@ -9,8 +9,8 @@ import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
-import de.deepamehta.core.service.Plugin;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 @Path("/topicmap")
 @Consumes("application/json")
 @Produces("application/json")
-public class TopicmapsPlugin extends Plugin implements TopicmapsService {
+public class TopicmapsPlugin extends PluginActivator implements TopicmapsService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

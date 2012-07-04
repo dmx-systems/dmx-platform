@@ -15,7 +15,7 @@ public abstract class Migration {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public void setService(DeepaMehtaService dms) {
+    public void setCoreService(DeepaMehtaService dms) {
         this.dms = dms;
     }
 

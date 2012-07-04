@@ -5,7 +5,7 @@ import de.deepamehta.plugins.proxy.model.Resource;
 import de.deepamehta.plugins.proxy.model.ResourceInfo;
 import de.deepamehta.plugins.proxy.service.ProxyService;
 
-import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.GET;
@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 
 
 @Path("/proxy")
-public class ProxyPlugin extends Plugin implements ProxyService {
+public class ProxyPlugin extends PluginActivator implements ProxyService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 

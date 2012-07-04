@@ -9,11 +9,11 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.listener.AllPluginsActiveListener;
 import de.deepamehta.core.service.listener.PreUpdateTopicListener;
 import de.deepamehta.core.service.listener.PostUpdateTopicListener;
@@ -43,9 +43,9 @@ import java.util.logging.Logger;
 @Path("/webclient")
 @Consumes("application/json")
 @Produces("application/json")
-public class WebclientPlugin extends Plugin implements PreUpdateTopicListener,
-                                                       PostUpdateTopicListener,
-                                                       AllPluginsActiveListener {
+public class WebclientPlugin extends PluginActivator implements PreUpdateTopicListener,
+                                                                PostUpdateTopicListener,
+                                                                AllPluginsActiveListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

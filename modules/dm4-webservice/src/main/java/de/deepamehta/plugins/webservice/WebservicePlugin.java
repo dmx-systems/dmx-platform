@@ -11,12 +11,12 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.CommandParams;
 import de.deepamehta.core.service.CommandResult;
 import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 
 import javax.ws.rs.GET;
@@ -42,7 +42,7 @@ import java.util.logging.Logger;
 @Path("/core")
 @Consumes("application/json")
 @Produces("application/json")
-public class WebservicePlugin extends Plugin {
+public class WebservicePlugin extends PluginActivator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

@@ -35,9 +35,25 @@ class MigrationManager {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void runPluginMigration(PluginImpl plugin, int migrationNr, boolean isCleanInstall) {
-        runMigration(migrationNr, plugin, isCleanInstall);
-        plugin.setMigrationNr(migrationNr);
+    /**
+     * Determines the migrations to be run for the specified plugin and run them.
+     */
+    void runPluginMigrations(PluginImpl plugin, boolean isCleanInstall) {
+        int migrationNr = plugin.getPluginTopic().getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
+        int requiredMigrationNr = Integer.parseInt(plugin.getConfigProperty("requiredPluginMigrationNr", "0"));
+        int migrationsToRun = requiredMigrationNr - migrationNr;
+        //
+        if (migrationsToRun == 0) {
+            logger.info("Running migrations for " + plugin + " ABORTED -- everything up-to-date (migrationNr=" +
+                migrationNr + ")");
+            return;
+        }
+        //
+        logger.info("Running " + migrationsToRun + " migrations for " + plugin + " (migrationNr=" + migrationNr +
+            ", requiredMigrationNr=" + requiredMigrationNr + ")");
+        for (int i = migrationNr + 1; i <= requiredMigrationNr; i++) {
+            runPluginMigration(plugin, i, isCleanInstall);
+        }
     }
 
     /**
@@ -47,6 +63,12 @@ class MigrationManager {
         int migrationNr = dms.storage.getMigrationNr();
         int requiredMigrationNr = REQUIRED_CORE_MIGRATION;
         int migrationsToRun = requiredMigrationNr - migrationNr;
+        //
+        if (migrationsToRun == 0) {
+            logger.info("Running core migrations ABORTED -- everything up-to-date (migrationNr=" + migrationNr + ")");
+            return;
+        }
+        //
         logger.info("Running " + migrationsToRun + " core migrations (migrationNr=" + migrationNr +
             ", requiredMigrationNr=" + requiredMigrationNr + ")");
         for (int i = migrationNr + 1; i <= requiredMigrationNr; i++) {
@@ -54,12 +76,19 @@ class MigrationManager {
         }
     }
 
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
     private void runCoreMigration(int migrationNr, boolean isCleanInstall) {
         runMigration(migrationNr, null, isCleanInstall);
         dms.storage.setMigrationNr(migrationNr);
     }
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
+    private void runPluginMigration(PluginImpl plugin, int migrationNr, boolean isCleanInstall) {
+        runMigration(migrationNr, plugin, isCleanInstall);
+        plugin.setMigrationNr(migrationNr);
+    }
+
+    // ---
 
     /**
      * Runs a core migration or a plugin migration.
@@ -101,7 +130,7 @@ class MigrationManager {
                 } else {
                     Migration migration = (Migration) mi.migrationClass.newInstance();
                     logger.info("Running " + mi.migrationType + " migration class " + mi.migrationClassName);
-                    migration.setService(dms);
+                    migration.setCoreService(dms);
                     migration.run();
                 }
                 logger.info("Completing " + mi.migrationInfo);
@@ -152,7 +181,7 @@ class MigrationManager {
                     migrationClassName = coreMigrationClassName(migrationNr);
                     migrationClass = loadClass(migrationClassName);
                 } else {
-                    migrationInfo = "migration " + migrationNr + " of plugin \"" + plugin.getName() + "\"";
+                    migrationInfo = "migration " + migrationNr + " of " + plugin;
                     logger.info("Preparing " + migrationInfo + " ...");
                     configIn     = plugin.getResourceAsStream(configFile);
                     migrationIn  = plugin.getResourceAsStream(migrationFile);
