@@ -27,7 +27,6 @@ import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Listener;
-import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.ObjectFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
@@ -38,8 +37,6 @@ import de.deepamehta.core.util.JSONHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import java.io.InputStream;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -49,7 +46,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -60,24 +56,15 @@ import java.util.logging.Logger;
  */
 public class EmbeddedService implements DeepaMehtaService {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static final String CORE_MIGRATIONS_PACKAGE = "de.deepamehta.core.migrations";
-    private static final int REQUIRED_CORE_MIGRATION = 3;
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+            PluginManager pluginManager;
+            MigrationManager migrationManager;
             DeepaMehtaStorage storage;
             ObjectFactoryImpl objectFactory;
             TypeCache typeCache;
 
-    private PluginCache pluginCache;
     private ListenerRegistry listenerRegistry;
-    private BundleContext bundleContext;
-
-    private enum MigrationRunMode {
-        CLEAN_INSTALL, UPDATE, ALWAYS
-    }
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -85,8 +72,8 @@ public class EmbeddedService implements DeepaMehtaService {
 
     public EmbeddedService(DeepaMehtaStorage storage, BundleContext bundleContext) {
         this.storage = storage;
-        this.bundleContext = bundleContext;
-        this.pluginCache = new PluginCache();
+        this.migrationManager = new MigrationManager(this);
+        this.pluginManager = new PluginManager(bundleContext);
         this.listenerRegistry = new ListenerRegistry();
         this.typeCache = new TypeCache(this);
         this.objectFactory = new ObjectFactoryImpl(this);
@@ -517,34 +504,13 @@ public class EmbeddedService implements DeepaMehtaService {
     // === Plugins ===
 
     @Override
-    public void registerPlugin(Plugin plugin) {
-        pluginCache.put(plugin);
-    }
-
-    @Override
-    public void unregisterPlugin(String pluginUri) {
-        pluginCache.remove(pluginUri);
-    }
-
-    @Override
-    public boolean isPluginRegistered(String pluginUri) {
-        return pluginCache.contains(pluginUri);
-    }
-
-    @Override
     public Plugin getPlugin(String pluginUri) {
-        return pluginCache.get(pluginUri);
+        return pluginManager.getPlugin(pluginUri);
     }
 
     @Override
     public Set<PluginInfo> getPluginInfo() {
-        return pluginCache.getPluginInfo();
-    }
-
-    @Override
-    public void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall) {
-        runMigration(migrationNr, plugin, isCleanInstall);
-        plugin.setMigrationNr(migrationNr);
+        return pluginManager.getPluginInfo();
     }
 
 
@@ -587,28 +553,6 @@ public class EmbeddedService implements DeepaMehtaService {
         return objectFactory;
     }
 
-
-    @Override
-    public void checkAllPluginsActive() {
-        Bundle[] bundles = bundleContext.getBundles();
-        int plugins = 0;
-        int active = 0;
-        for (Bundle bundle : bundles) {
-            if (isDeepaMehtaPlugin(bundle)) {
-                plugins++;
-                if (isPluginRegistered(bundle.getSymbolicName())) {
-                    active++;
-                }
-            }
-        }
-        logger.info("### Bundles total: " + bundles.length +
-            ", DeepaMehta plugins: " + plugins + ", Active: " + active);
-        if (plugins == active) {
-            logger.info("########## All Plugins Active ##########");
-            fireEvent(CoreEvent.ALL_PLUGINS_ACTIVE);
-        }
-    }
-
     @Override
     public void setupDB() {
         DeepaMehtaTransaction tx = beginTx();
@@ -618,7 +562,7 @@ public class EmbeddedService implements DeepaMehtaService {
             if (isCleanInstall) {
                 setupBootstrapContent();
             }
-            runCoreMigrations(isCleanInstall);
+            migrationManager.runCoreMigrations(isCleanInstall);
             tx.success();
             tx.finish();
             logger.info("----- Activation of DeepaMehta 4 Core complete -----");
@@ -824,17 +768,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
-    // === Plugins ===
-
-    private boolean isDeepaMehtaPlugin(Bundle bundle) {
-        String packages = (String) bundle.getHeaders().get("Import-Package");
-        // Note: packages might be null. Not all bundles import packges.
-        return packages != null && packages.contains("de.deepamehta.core.service") &&
-            !bundle.getSymbolicName().equals("de.deepamehta.core");
-    }
-
-
-
     // === DB ===
 
     /**
@@ -930,194 +863,5 @@ public class EmbeddedService implements DeepaMehtaService {
     private void bootstrapTypeCache() {
         typeCache.put(new AttachedTopicType(new TopicTypeModel("dm4.core.meta_meta_type",
             "dm4.core.meta_meta_meta_type", "Meta Meta Type", "dm4.core.text"), this));
-    }
-
-
-
-    // === Migrations ===
-
-    /**
-     * Determines the core migrations to be run and run them.
-     */
-    private void runCoreMigrations(boolean isCleanInstall) {
-        int migrationNr = storage.getMigrationNr();
-        int requiredMigrationNr = REQUIRED_CORE_MIGRATION;
-        int migrationsToRun = requiredMigrationNr - migrationNr;
-        logger.info("Running " + migrationsToRun + " core migrations (migrationNr=" + migrationNr +
-            ", requiredMigrationNr=" + requiredMigrationNr + ")");
-        for (int i = migrationNr + 1; i <= requiredMigrationNr; i++) {
-            runCoreMigration(i, isCleanInstall);
-        }
-    }
-
-    private void runCoreMigration(int migrationNr, boolean isCleanInstall) {
-        runMigration(migrationNr, null, isCleanInstall);
-        storage.setMigrationNr(migrationNr);
-    }
-
-    // ---
-
-    /**
-     * Runs a core migration or a plugin migration.
-     *
-     * @param   migrationNr     Number of the migration to run.
-     * @param   plugin          The plugin that provides the migration to run.
-     *                          <code>null</code> for a core migration.
-     * @param   isCleanInstall  <code>true</code> if the migration is run as part of a clean install,
-     *                          <code>false</code> if the migration is run as part of an update.
-     */
-    private void runMigration(int migrationNr, Plugin plugin, boolean isCleanInstall) {
-        MigrationInfo mi = null;
-        try {
-            mi = new MigrationInfo(migrationNr, plugin);
-            if (!mi.success) {
-                throw mi.exception;
-            }
-            // error checks
-            if (!mi.isDeclarative && !mi.isImperative) {
-                String message = "Neither a migration file (" + mi.migrationFile + ") nor a migration class ";
-                if (mi.migrationClassName != null) {
-                    throw new RuntimeException(message + "(" + mi.migrationClassName + ") is found");
-                } else {
-                    throw new RuntimeException(message + "is found. Note: a possible migration class can't be located" +
-                        " (plugin package is unknown). Consider setting \"pluginPackage\" in plugin.properties");
-                }
-            }
-            if (mi.isDeclarative && mi.isImperative) {
-                throw new RuntimeException("Ambiguity: a migration file (" + mi.migrationFile + ") AND a migration " +
-                    "class (" + mi.migrationClassName + ") are found. Consider using two different migration numbers.");
-            }
-            // run migration
-            String runInfo = " (runMode=" + mi.runMode + ", isCleanInstall=" + isCleanInstall + ")";
-            if (mi.runMode.equals(MigrationRunMode.CLEAN_INSTALL.name()) == isCleanInstall ||
-                mi.runMode.equals(MigrationRunMode.ALWAYS.name())) {
-                logger.info("Running " + mi.migrationInfo + runInfo);
-                if (mi.isDeclarative) {
-                    JSONHelper.readMigrationFile(mi.migrationIn, mi.migrationFile, this);
-                } else {
-                    Migration migration = (Migration) mi.migrationClass.newInstance();
-                    logger.info("Running " + mi.migrationType + " migration class " + mi.migrationClassName);
-                    migration.setService(this);
-                    migration.run();
-                }
-                logger.info("Completing " + mi.migrationInfo);
-            } else {
-                logger.info("Running " + mi.migrationInfo + " ABORTED" + runInfo);
-            }
-            logger.info("Updating migration number (" + migrationNr + ")");
-        } catch (Exception e) {
-            throw new RuntimeException("Running " + mi.migrationInfo + " failed", e);
-        }
-    }
-
-    // ---
-
-    /**
-     * Collects the info required to run a migration.
-     */
-    private class MigrationInfo {
-
-        String migrationType;       // "core", "plugin"
-        String migrationInfo;       // for logging
-        String runMode;             // "CLEAN_INSTALL", "UPDATE", "ALWAYS"
-        //
-        boolean isDeclarative;
-        boolean isImperative;
-        //
-        String migrationFile;       // for declarative migration
-        InputStream migrationIn;    // for declarative migration
-        //
-        String migrationClassName;  // for imperative migration
-        Class migrationClass;       // for imperative migration
-        //
-        boolean success;            // error occurred?
-        Exception exception;        // the error
-
-        MigrationInfo(int migrationNr, Plugin plugin) {
-            try {
-                String configFile = migrationConfigFile(migrationNr);
-                InputStream configIn;
-                migrationFile = migrationFile(migrationNr);
-                migrationType = plugin != null ? "plugin" : "core";
-                //
-                if (migrationType.equals("core")) {
-                    migrationInfo = "core migration " + migrationNr;
-                    logger.info("Preparing " + migrationInfo + " ...");
-                    configIn     = getClass().getResourceAsStream(configFile);
-                    migrationIn  = getClass().getResourceAsStream(migrationFile);
-                    migrationClassName = coreMigrationClassName(migrationNr);
-                    migrationClass = loadClass(migrationClassName);
-                } else {
-                    migrationInfo = "migration " + migrationNr + " of plugin \"" + plugin.getName() + "\"";
-                    logger.info("Preparing " + migrationInfo + " ...");
-                    configIn     = plugin.getResourceAsStream(configFile);
-                    migrationIn  = plugin.getResourceAsStream(migrationFile);
-                    migrationClassName = plugin.getMigrationClassName(migrationNr);
-                    if (migrationClassName != null) {
-                        migrationClass = plugin.loadClass(migrationClassName);
-                    }
-                }
-                //
-                isDeclarative = migrationIn != null;
-                isImperative = migrationClass != null;
-                //
-                readMigrationConfigFile(configIn, configFile);
-                //
-                success = true;
-            } catch (Exception e) {
-                exception = e;
-            }
-        }
-
-        // ---
-
-        private void readMigrationConfigFile(InputStream in, String configFile) {
-            try {
-                Properties migrationConfig = new Properties();
-                if (in != null) {
-                    logger.info("Reading migration config file \"" + configFile + "\"");
-                    migrationConfig.load(in);
-                } else {
-                    logger.info("Reading migration config file \"" + configFile + "\" ABORTED -- file does not exist");
-                }
-                //
-                runMode = migrationConfig.getProperty("migrationRunMode", MigrationRunMode.ALWAYS.name());
-                MigrationRunMode.valueOf(runMode);  // check if value is valid
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException("Reading migration config file \"" + configFile + "\" failed: \"" + runMode +
-                    "\" is an invalid value for \"migrationRunMode\"", e);
-            } catch (IOException e) {
-                throw new RuntimeException("Reading migration config file \"" + configFile + "\" failed", e);
-            }
-        }
-
-        // ---
-
-        private String migrationFile(int migrationNr) {
-            return "/migrations/migration" + migrationNr + ".json";
-        }
-
-        private String migrationConfigFile(int migrationNr) {
-            return "/migrations/migration" + migrationNr + ".properties";
-        }
-
-        private String coreMigrationClassName(int migrationNr) {
-            return CORE_MIGRATIONS_PACKAGE + ".Migration" + migrationNr;
-        }
-
-        // --- Generic Utilities ---
-
-        /**
-         * Uses the core bundle's class loader to load a class by name.
-         *
-         * @return  the class, or <code>null</code> if the class is not found.
-         */
-        private Class loadClass(String className) {
-            try {
-                return Class.forName(className);
-            } catch (ClassNotFoundException e) {
-                return null;
-            }
-        }
     }
 }

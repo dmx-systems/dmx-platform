@@ -170,7 +170,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         }
     }
 
-    // --------------------------------------------------------------------------------------------- Private Inner Class
+    // ------------------------------------------------------------------------------------------------- Private Classes
 
     private class JSONWrapper implements JSONEnabled {
 

@@ -1,18 +1,20 @@
-package de.deepamehta.core.service;
+package de.deepamehta.core.impl.service;
 
 import java.util.Set;
 
 
 
-class WebResources {
+class RestResource {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    String uriNamespace;
+    Object resource;
+    Set<Class<?>> providerClasses;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    WebResources(String uriNamespace) {
-        this.uriNamespace = uriNamespace;
+    RestResource(Object resource, Set<Class<?>> providerClasses) {
+        this.resource = resource;
+        this.providerClasses = providerClasses;
     }
 }

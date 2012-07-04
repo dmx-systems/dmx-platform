@@ -134,17 +134,9 @@ public interface DeepaMehtaService {
 
     // === Plugins ===
 
-    void registerPlugin(Plugin plugin);
-
-    void unregisterPlugin(String pluginUri);
-
-    boolean isPluginRegistered(String pluginUri);
-
     Plugin getPlugin(String pluginUri);
 
     Set<PluginInfo> getPluginInfo();
-
-    void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall);
 
 
 
@@ -167,15 +159,6 @@ public interface DeepaMehtaService {
     DeepaMehtaTransaction beginTx();
 
     ObjectFactory getObjectFactory();
-
-    /**
-     * Checks if all DeepaMehta plugin bundles are registered at core.
-     * Fires the {@link CoreEvent.ALL_PLUGINS_ACTIVE} event if so.
-     * <p>
-     * Called from the Plugin class.
-     * Not meant to be called by a plugin developer.
-     */
-    void checkAllPluginsActive();
 
     /**
      * Setups the database to be compatible with this core service.

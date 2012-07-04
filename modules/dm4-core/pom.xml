@@ -70,7 +70,7 @@
                             org.osgi.service.log        <!-- required when running without Gogo Shell -->
                         </Export-Package>
                         <Bundle-Activator>
-                            de.deepamehta.core.osgi.Activator
+                            de.deepamehta.core.osgi.CoreActivator
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

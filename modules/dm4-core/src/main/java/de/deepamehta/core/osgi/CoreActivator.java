@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 
 
-public class Activator implements BundleActivator {
+public class CoreActivator implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 

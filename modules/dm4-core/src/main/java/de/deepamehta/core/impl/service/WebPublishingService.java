@@ -1,4 +1,4 @@
-package de.deepamehta.core.service;
+package de.deepamehta.core.impl.service;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 
 
 
-// ### TODO: should not be a public class.
 public class WebPublishingService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
