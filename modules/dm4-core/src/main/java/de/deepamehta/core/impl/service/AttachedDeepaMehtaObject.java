@@ -824,7 +824,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Label ===
 
     /**
-     * Prerequsite: this is a composite object.
+     * Prerequisite: this is a composite object.
      */
     private void refreshLabel() {
         try {
