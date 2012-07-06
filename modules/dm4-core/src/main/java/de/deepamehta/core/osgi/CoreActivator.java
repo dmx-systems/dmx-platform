@@ -27,7 +27,7 @@ public class CoreActivator implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 
-    private static DeepaMehtaService dms;
+    private static EmbeddedService dms;
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

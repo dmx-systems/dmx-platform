@@ -6,6 +6,8 @@ import de.deepamehta.core.impl.service.PluginImpl;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+import java.util.logging.Logger;
+
 
 
 /**
@@ -18,8 +20,10 @@ public class PluginActivator implements BundleActivator, PluginContext {
     private BundleContext bundleContext;
     private PluginImpl plugin;
 
-    // Consumed services
+    // Consumed service
     protected DeepaMehtaService dms;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -35,11 +39,28 @@ public class PluginActivator implements BundleActivator, PluginContext {
     public void start(BundleContext context) {
         this.bundleContext = context;
         this.plugin = new PluginImpl(this);
+        //
+        try {
+            logger.info("========== Starting " + this + " ==========");
+            plugin.start();
+        } catch (Exception e) {
+            logger.severe("Starting " + this + " failed:");
+            e.printStackTrace();
+            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
+            // File Install would retry to start the bundle endlessly.
+        }
     }
 
     @Override
     public void stop(BundleContext context) {
-        plugin.stop();
+        try {
+            logger.info("========== Stopping " + this + " ==========");
+            plugin.stop();
+        } catch (Exception e) {
+            logger.severe("Stopping " + this + " failed:");
+            e.printStackTrace();
+            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
+        }
     }
 
 
@@ -58,5 +79,13 @@ public class PluginActivator implements BundleActivator, PluginContext {
     @Override
     public void setCoreService(DeepaMehtaService dms) {
         this.dms = dms;
+    }
+
+
+
+    // ===
+
+    public String toString() {
+        return plugin.toString();
     }
 }

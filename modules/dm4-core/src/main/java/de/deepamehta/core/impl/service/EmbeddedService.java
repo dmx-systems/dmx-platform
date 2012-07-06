@@ -58,13 +58,12 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-            PluginManager pluginManager;
-            MigrationManager migrationManager;
-            DeepaMehtaStorage storage;
-            ObjectFactoryImpl objectFactory;
-            TypeCache typeCache;
-
-    private ListenerRegistry listenerRegistry;
+    PluginManager pluginManager;
+    ListenerRegistry listenerRegistry;
+    DeepaMehtaStorage storage;
+    MigrationManager migrationManager;
+    ObjectFactoryImpl objectFactory;
+    TypeCache typeCache;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -518,25 +517,8 @@ public class EmbeddedService implements DeepaMehtaService {
     // === Listeners ===
 
     @Override
-    public void addListener(CoreEvent event, Listener listener) {
-        listenerRegistry.addListener(event, listener);
-    }
-
-    @Override
-    public void removeListener(CoreEvent event, Listener listener) {
-        listenerRegistry.removeListener(event, listener);
-    }
-
-    // ---
-
-    @Override
     public List<Object> fireEvent(CoreEvent event, Object... params) {
         return listenerRegistry.fireEvent(event, params);
-    }
-
-    @Override
-    public Object deliverEvent(Listener listener, CoreEvent event, Object... params) {
-        return listenerRegistry.deliverEvent(listener, event, params);
     }
 
 
@@ -553,12 +535,25 @@ public class EmbeddedService implements DeepaMehtaService {
         return objectFactory;
     }
 
-    @Override
+
+
+    // *** End of DeepaMehtaService Implementation ***
+
+
+
+    /**
+     * Setups the database:
+     *   1) initializes the database.
+     *   2) in case of a clean install: sets up the bootstrap content.
+     *   3) runs the core migrations.
+     * <p>
+     * Called from {@link CoreActivator#start}.
+     */
     public void setupDB() {
         DeepaMehtaTransaction tx = beginTx();
         try {
             logger.info("----- Activating DeepaMehta 4 Core -----");
-            boolean isCleanInstall = initDB();
+            boolean isCleanInstall = storage.init();
             if (isCleanInstall) {
                 setupBootstrapContent();
             }
@@ -572,12 +567,17 @@ public class EmbeddedService implements DeepaMehtaService {
             shutdown();
             throw new RuntimeException("Setting up the database failed", e);
         }
-        // Note: we use no finally clause here because in case of error the core service has to be shut down.
+        // Note: we don't put finish() in a finally clause here because
+        // in case of error the core service has to be shut down.
     }
 
-    @Override
+    /**
+     * Shuts down the database.
+     * <p>
+     * Called from {@link CoreActivator#stop}.
+     */
     public void shutdown() {
-        closeDB();
+        storage.shutdown();
     }
 
 
@@ -764,21 +764,6 @@ public class EmbeddedService implements DeepaMehtaService {
             throw new RuntimeException("Associating type \"" + typeUri + "\" with data type \"" +
                 dataTypeUri + "\" failed", e);
         }
-    }
-
-
-
-    // === DB ===
-
-    /**
-     * @return  <code>true</code> if this is a clean install, <code>false</code> otherwise.
-     */
-    private boolean initDB() {
-        return storage.init();
-    }
-
-    private void closeDB() {
-        storage.shutdown();
     }
 
 

@@ -142,15 +142,7 @@ public interface DeepaMehtaService {
 
     // === Listeners ===
 
-    void addListener(CoreEvent event, Listener listener);
-
-    void removeListener(CoreEvent event, Listener listener);
-
-    // ---
-
     List<Object> fireEvent(CoreEvent event, Object... params);
-
-    Object deliverEvent(Listener listener, CoreEvent event, Object... params);
 
 
 
@@ -159,21 +151,4 @@ public interface DeepaMehtaService {
     DeepaMehtaTransaction beginTx();
 
     ObjectFactory getObjectFactory();
-
-    /**
-     * Setups the database to be compatible with this core service.
-     * <p>
-     * Called from the core activator.
-     * Not meant to be called by a plugin developer.
-     */
-    void setupDB();
-
-    /**
-     * Shuts down the database.
-     * Called when the core service stops.
-     * <p>
-     * Called from the core activator.
-     * Not meant to be called by a plugin developer.
-     */
-    void shutdown();
 }

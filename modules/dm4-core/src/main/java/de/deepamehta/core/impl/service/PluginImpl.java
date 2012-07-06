@@ -51,6 +51,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private static final String PLUGIN_DEFAULT_PACKAGE = "de.deepamehta.core.osgi";
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
+    private static final String PLUGIN_JAVASCRIPT_FILE = "/web/script/plugin.js";
     private static final String PLUGIN_ACTIVATED = "de/deepamehta/core/plugin_activated";   // topic of the OSGi event
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -58,15 +59,16 @@ public class PluginImpl implements Plugin, EventHandler {
     private PluginContext pluginContext;
     private BundleContext bundleContext;
 
-    private String      pluginUri;          // This bundle's symbolic name, e.g. "de.deepamehta.webclient"
-    private String      pluginName;         // This bundle's name = POM project name
-    private String      pluginClass;
-    private String      pluginPackage;
     private Bundle      pluginBundle;
-    private PluginInfo  pluginInfo;
-    private Topic       pluginTopic;        // Represents this plugin in DB. Holds plugin migration number.
+    private String      pluginUri;          // This bundle's symbolic name, e.g. "de.deepamehta.webclient"
+    private String      pluginName;         // This bundle's name = POM project name, e.g. "DeepaMehta 4 Webclient"
+    private String      pluginClass;
+
     private Properties  pluginProperties;   // Read from file "plugin.properties"
+    private String      pluginPackage;
+    private PluginInfo  pluginInfo;
     private Set<String> pluginDependencies; // plugin URIs as read from "importModels" property
+    private Topic       pluginTopic;        // Represents this plugin in DB. Holds plugin migration number.
 
     // Consumed services
     private EmbeddedService dms;
@@ -92,10 +94,42 @@ public class PluginImpl implements Plugin, EventHandler {
     public PluginImpl(PluginContext pluginContext) {
         this.pluginContext = pluginContext;
         this.bundleContext = pluginContext.getBundleContext();
-        start();
+        //
+        this.pluginBundle = bundleContext.getBundle();
+        this.pluginUri = pluginBundle.getSymbolicName();
+        this.pluginName = (String) pluginBundle.getHeaders().get("Bundle-Name");
+        this.pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
+        //
+        this.pluginProperties = readConfigFile();
+        this.pluginPackage = getConfigProperty("pluginPackage", pluginContext.getClass().getPackage().getName());
+        this.pluginInfo = createPluginInfo();
+        this.pluginDependencies = getPluginDependencies();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    public void start() {
+        if (pluginDependencies.size() > 0) {
+            registerEventListener();
+        }
+        //
+        registerPluginService();
+        //
+        createCoreServiceTrackers();    // ### FIXME: move to constructor?
+        createPluginServiceTrackers();  // ### FIXME: move to constructor?
+        //
+        openCoreServiceTrackers();
+    }
+
+    public void stop() {
+        closeCoreServiceTrackers();
+    }
+
+    // ---
+
+    public PluginInfo getInfo() {
+        return pluginInfo;
+    }
 
     /**
      * Uses the plugin bundle's class loader to find a resource.
@@ -113,6 +147,8 @@ public class PluginImpl implements Plugin, EventHandler {
             return null;
         }
     }
+
+    // ---
 
     @Override
     public String toString() {
@@ -155,10 +191,6 @@ public class PluginImpl implements Plugin, EventHandler {
 
     String getUri() {
         return pluginUri;
-    }
-
-    public PluginInfo getInfo() {
-        return pluginInfo;
     }
 
     Topic getPluginTopic() {
@@ -219,54 +251,8 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void start() {
-        try {
-            this.pluginBundle = bundleContext.getBundle();
-            this.pluginUri = pluginBundle.getSymbolicName();
-            this.pluginName = (String) pluginBundle.getHeaders().get("Bundle-Name");
-            this.pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
-            //
-            logger.info("========== Starting " + this + " ==========");
-            //
-            this.pluginProperties = readConfigFile();
-            this.pluginPackage = getConfigProperty("pluginPackage", pluginContext.getClass().getPackage().getName());
-            this.pluginInfo = createPluginInfo();
-            this.pluginDependencies = getPluginDependencies();
-            //
-            if (pluginDependencies.size() > 0) {
-                registerEventListener();
-            }
-            //
-            registerPluginService();
-            //
-            createCoreServiceTrackers();
-            createPluginServiceTrackers();
-            //
-            openCoreServiceTrackers();
-        } catch (Exception e) {
-            logger.severe("Starting " + this + " failed:");
-            e.printStackTrace();
-            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
-            // File Install would retry to start the bundle endlessly.
-        }
-    }
-
-    public void stop() {
-        try {
-            logger.info("========== Stopping " + this + " ==========");
-            //
-            closeCoreServiceTrackers();
-        } catch (Exception e) {
-            logger.severe("Stopping " + this + " failed:");
-            e.printStackTrace();
-            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
-        }
-    }
-
-    // ---
-
     private PluginInfo createPluginInfo() {
-        boolean hasClientComponent = pluginBundle.getEntry("/web/script/plugin.js") != null;
+        boolean hasClientComponent = pluginBundle.getEntry(PLUGIN_JAVASCRIPT_FILE) != null;
         return new PluginInfo(pluginUri, hasClientComponent);
     }
 
@@ -607,7 +593,7 @@ public class PluginImpl implements Plugin, EventHandler {
         //
         logger.info("Registering " + events.size() + " listeners of " + this + " at DeepaMehta 4 core service");
         for (CoreEvent event : events) {
-            dms.addListener(event, (Listener) pluginContext);
+            dms.listenerRegistry.addListener(event, (Listener) pluginContext);
         }
     }
 
@@ -619,7 +605,7 @@ public class PluginImpl implements Plugin, EventHandler {
         //
         logger.info("Unregistering listeners of " + this + " at DeepaMehta 4 core service");
         for (CoreEvent event : events) {
-            dms.removeListener(event, (Listener) pluginContext);
+            dms.listenerRegistry.removeListener(event, (Listener) pluginContext);
         }
     }
 
@@ -658,7 +644,7 @@ public class PluginImpl implements Plugin, EventHandler {
         }
         //
         logger.info("### Delivering internal plugin event " + event + " from/to " + this);
-        return dms.deliverEvent((Listener) pluginContext, event, params);
+        return dms.listenerRegistry.deliverEvent((Listener) pluginContext, event, params);
     }
 
     // ---
