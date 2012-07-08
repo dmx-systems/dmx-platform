@@ -8,6 +8,6 @@ public class Migration1 extends Migration {
 
     @Override
     public void run() {
-        addTopicTypeSetting("dm4.webclient.icon", "js_field_renderer_class", "IconFieldRenderer");
+        addTopicTypeSetting("dm4.webclient.icon", "field_renderer_uri", "dm4.iconpicker.icon_field_renderer");
     }
 }

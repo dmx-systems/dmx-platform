@@ -1,9 +1,8 @@
-function BodyTextRenderer(field_model) {
-    this.field_model = field_model
-}
+dm4c.add_field_renderer("dm4.webclient.body_text_renderer", {
 
-BodyTextRenderer.prototype = new HTMLFieldRenderer()
+    render_field: function(field_model, parent_element) {
+        parent_element.append(field_model.value)
+    },
 
-BodyTextRenderer.prototype.render_field = function(parent_element) {
-    parent_element.append(this.field_model.value)
-}
+    render_form_element: dm4c.get_field_renderer("dm4.webclient.html_renderer").render_form_element
+})

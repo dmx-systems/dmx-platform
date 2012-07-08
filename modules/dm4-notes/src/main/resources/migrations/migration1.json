@@ -25,7 +25,7 @@
                         {
                             type_uri: "dm4.webclient.view_config",
                             composite: {
-                                dm4.webclient.js_field_renderer_class: "TitleRenderer"
+                                dm4.webclient.field_renderer_uri: "dm4.webclient.title_renderer"
                             }
                         }
                     ]
@@ -38,7 +38,7 @@
                         {
                             type_uri: "dm4.webclient.view_config",
                             composite: {
-                                dm4.webclient.js_field_renderer_class: "BodyTextRenderer",
+                                dm4.webclient.field_renderer_uri: "dm4.webclient.body_text_renderer",
                                 dm4.webclient.rows: 15
                             }
                         }

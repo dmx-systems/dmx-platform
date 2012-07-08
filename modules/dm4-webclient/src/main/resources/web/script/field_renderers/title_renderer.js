@@ -1,11 +1,10 @@
-function TitleRenderer(field_model) {
-    this.field_model = field_model
-}
+dm4c.add_field_renderer("dm4.webclient.title_renderer", {
 
-TitleRenderer.prototype = new TextFieldRenderer()
+    render_field: function(field_model, parent_element) {
+        parent_element.append($("<h1>")
+            .text(js.render_text(field_model.value))
+        )
+    },
 
-TitleRenderer.prototype.render_field = function(parent_element) {
-    parent_element.append($("<h1>")
-        .text(js.render_text(this.field_model.value))
-    )
-}
+    render_form_element: dm4c.get_field_renderer("dm4.webclient.text_renderer").render_form_element
+})

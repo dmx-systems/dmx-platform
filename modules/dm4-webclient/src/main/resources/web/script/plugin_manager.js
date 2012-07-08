@@ -8,6 +8,7 @@ function PluginManager(config) {
     var page_renderers = {}     // key: page renderer class name, camel case (string), value: renderer instance
 
     var field_renderer_sources = []
+    var field_renderers = {}    // key: field renderer URI, value: object with "render_field" and "render_form_element"
 
     var css_stylesheets = []
 
@@ -110,6 +111,29 @@ function PluginManager(config) {
         //
         return plugin
     }
+
+    // ---
+
+    this.add_field_renderer = function(renderer_uri, renderer) {
+        // error check
+        if (field_renderers[renderer_uri]) {
+            throw "PluginManagerError: field renderer URI clash with \"" + renderer_uri + "\""
+        }
+        //
+        field_renderers[renderer_uri] = renderer
+    }
+
+    this.get_field_renderer = function(renderer_uri) {
+        var renderer = field_renderers[renderer_uri]
+        // error check
+        if (!renderer) {
+            throw "PluginManagerError: field renderer \"" + renderer_uri + "\" not found"
+        }
+        //
+        return renderer
+    }
+
+    // ---
 
     this.get_page_renderer = function(topic_or_association_or_classname) {
         if (typeof(topic_or_association_or_classname) == "string") {

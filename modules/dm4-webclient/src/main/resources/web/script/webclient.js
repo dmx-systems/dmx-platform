@@ -641,6 +641,18 @@ function Webclient() {
         return pm.get_plugin(plugin_class)
     }
 
+    // ---
+
+    this.add_field_renderer = function(renderer_uri, renderer) {
+        pm.add_field_renderer(renderer_uri, renderer)
+    }
+
+    this.get_field_renderer = function(renderer_uri) {
+        return pm.get_field_renderer(renderer_uri)
+    }
+
+    // ---
+
     this.get_page_renderer = function(topic_or_association_or_classname) {
         return pm.get_page_renderer(topic_or_association_or_classname)
     }
@@ -839,24 +851,24 @@ function Webclient() {
             return true
         case "viewable":
             return true
-        case "js_field_renderer_class":
-            return default_field_renderer_class()
+        case "field_renderer_uri":
+            return default_field_renderer_uri()
         case "rows":
             return DEFAULT_FIELD_ROWS
         default:
             throw("WebclientError: \"" + setting + "\" is an unknown view configuration setting")
         }
 
-        function default_field_renderer_class() {
+        function default_field_renderer_uri() {
             switch (configurable.data_type_uri) {
             case "dm4.core.text":
-                return "TextFieldRenderer"
+                return "dm4.webclient.text_renderer"
             case "dm4.core.html":
-                return "HTMLFieldRenderer"
+                return "dm4.webclient.html_renderer"
             case "dm4.core.number":
-                return "NumberFieldRenderer"
+                return "dm4.webclient.number_renderer"
             case "dm4.core.boolean":
-                return "BooleanFieldRenderer"
+                return "dm4.webclient.boolean_renderer"
             default:
                 throw("WebclientError: \"" + configurable.data_type_uri + "\" is an unknown data type URI")
             }

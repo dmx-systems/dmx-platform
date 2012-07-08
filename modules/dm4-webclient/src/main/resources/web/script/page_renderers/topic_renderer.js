@@ -397,16 +397,16 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
     this.topic_type = dm4c.get_topic_type(topic.type_uri)  // ### TODO: Topics in composite would allow topic.get_type()
     this.label = this.topic_type.value
     this.rows = get_view_config("rows")
-    var field_renderer = create_field_renderer()
+    var field_renderer = get_field_renderer()
     var read_form_value_func
 
     this.render_field = function(parent_element) {
-        field_renderer.render_field(parent_element)
+        field_renderer.render_field(this, parent_element)
     }
 
     this.render_form_element = function(parent_element) {
         dm4c.render.field_label(this, parent_element)
-        read_form_value_func = field_renderer.render_form_element(parent_element)
+        read_form_value_func = field_renderer.render_form_element(this, parent_element)
     }
 
     this.read_form_value = function() {
@@ -415,7 +415,7 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
         // null is a valid result (means: field renderer prevents the field from being updated).
         if (form_value === undefined) {
             throw "TopicRendererError: the \"" + this.label + "\" field renderer returned no value " +
-                "(js_field_renderer_class=\"" + js_field_renderer_class + "\")"
+                "(field_renderer_uri=\"" + field_renderer_uri + "\")"   // ### FIXME: field_renderer_uri undefined
         }
         //
         return form_value
@@ -423,15 +423,15 @@ TopicRenderer.FieldModel = function(topic, assoc_def, field_uri, toplevel_topic)
 
     // ---
 
-    function create_field_renderer() {
-        var js_field_renderer_class = get_view_config("js_field_renderer_class")
+    function get_field_renderer() {
+        var field_renderer_uri = get_view_config("field_renderer_uri")
         // error check
-        if (!js_field_renderer_class) {
-            throw "TopicRendererError: unknown renderer class for field \"" + self.label +
+        if (!field_renderer_uri) {
+            throw "TopicRendererError: unknown renderer for field \"" + self.label +
                 "\" (field_uri=\"" + self.uri + "\")"
         }
         //
-        return js.new_object(js_field_renderer_class, self)
+        return dm4c.get_field_renderer(field_renderer_uri)
     }
 
     function get_view_config(setting) {

@@ -39,8 +39,8 @@
             data_type_uri: "dm4.core.text"
         },
         {
-            value: "JavaScript Field Renderer Class",
-            uri: "dm4.webclient.js_field_renderer_class",
+            value: "Field Renderer URI",
+            uri: "dm4.webclient.field_renderer_uri",
             data_type_uri: "dm4.core.text"
         },
         {
@@ -90,7 +90,7 @@
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webclient.js_field_renderer_class",
+                    part_topic_type_uri:  "dm4.webclient.field_renderer_uri",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
@@ -120,7 +120,7 @@
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm4.webclient.js_field_renderer_class: "SearchResultRenderer"
+                        dm4.webclient.field_renderer_uri: "dm4.webclient.search_result_renderer"
                     }
                 }
             ]
