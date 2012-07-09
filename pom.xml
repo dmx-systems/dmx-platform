@@ -150,11 +150,11 @@
                                 <link>http://www.osgi.org/javadoc/r4v401/</link>
                             </links>
                             <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
-                                <docletArtifact>
-                                    <groupId>org.umlgraph</groupId>
-                                    <artifactId>umlgraph</artifactId>
-                                    <version>5.6</version>
-                                </docletArtifact>
+                            <docletArtifact>
+                                <groupId>org.umlgraph</groupId>
+                                <artifactId>umlgraph</artifactId>
+                                <version>5.6</version>
+                            </docletArtifact>
                             <additionalparam>-collapsible -hide java.* -hide org.* -inferdepvis public -inferrel</additionalparam>
                             <useStandardDocletOptions>true</useStandardDocletOptions>
                         </configuration>
