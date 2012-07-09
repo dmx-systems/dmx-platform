@@ -20,6 +20,7 @@ dm4c.add_plugin("de.deepamehta.facets", function() {
             var child_field_uri = dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
             // ### TODO: cardinality many
             var child_topic = topic.composite[assoc_def.uri] || dm4c.empty_topic(child_topic_type.uri)
+            // ### TODO: adapt to new page renderer format
             var child_model = TopicRenderer.create_page_model(child_topic, assoc_def, child_field_uri, topic, setting)
             // ### FIXME: child_model may be undefined
             page_model.add_child(assoc_def.uri, child_model)

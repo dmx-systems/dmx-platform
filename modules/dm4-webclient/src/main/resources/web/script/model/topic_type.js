@@ -36,7 +36,7 @@ TopicType.prototype.get_commands = function(context) {
 }
 
 TopicType.prototype.get_page_renderer_class = function() {
-    return dm4c.get_view_config(this, "js_page_renderer_class") || "TopicRenderer"
+    return dm4c.get_view_config(this, "page_renderer_uri") || "dm4.webclient.topic_renderer"
 }
 
 // === Public API ===

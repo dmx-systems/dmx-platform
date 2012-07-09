@@ -106,7 +106,7 @@ function PluginManager(config) {
         var plugin = plugins[plugin_uri]
         // error check
         if (!plugin) {
-            throw "PluginManagerError: plugin \"" + plugin_uri + "\" not found"
+            throw "PluginManagerError: plugin \"" + plugin_uri + "\" is unknown"
         }
         //
         return plugin
@@ -127,7 +127,7 @@ function PluginManager(config) {
         var renderer = field_renderers[renderer_uri]
         // error check
         if (!renderer) {
-            throw "PluginManagerError: field renderer \"" + renderer_uri + "\" not found"
+            throw "PluginManagerError: field renderer \"" + renderer_uri + "\" is unknown"
         }
         //
         return renderer
@@ -135,20 +135,29 @@ function PluginManager(config) {
 
     // ---
 
-    this.get_page_renderer = function(topic_or_association_or_classname) {
-        if (typeof(topic_or_association_or_classname) == "string") {
-            var page_renderer_class = topic_or_association_or_classname
-        } else {
-            var type = topic_or_association_or_classname.get_type()
-            var page_renderer_class = type.get_page_renderer_class()
-        }
-        var page_renderer = page_renderers[page_renderer_class]
+    this.add_page_renderer = function(renderer_uri, renderer) {
         // error check
-        if (!page_renderer) {
-            throw "PluginManagerError: page renderer \"" + page_renderer_class + "\" is unknown"
+        if (page_renderers[renderer_uri]) {
+            throw "PluginManagerError: page renderer URI clash with \"" + renderer_uri + "\""
         }
         //
-        return page_renderer
+        page_renderers[renderer_uri] = renderer
+    }
+
+    this.get_page_renderer = function(topic_or_association_or_renderer_uri) {
+        if (typeof(topic_or_association_or_renderer_uri) == "string") {
+            var renderer_uri = topic_or_association_or_renderer_uri
+        } else {
+            var type = topic_or_association_or_renderer_uri.get_type()
+            var renderer_uri = type.get_page_renderer_class()
+        }
+        var renderer = page_renderers[renderer_uri]
+        // error check
+        if (!renderer) {
+            throw "PluginManagerError: page renderer \"" + renderer_uri + "\" is unknown"
+        }
+        //
+        return renderer
     }
 
     // ---
@@ -264,17 +273,9 @@ function PluginManager(config) {
 
         if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Loading " + page_renderer_sources.length + " page renderers:")
         for (var i = 0, page_renderer_src; page_renderer_src = page_renderer_sources[i]; i++) {
-            load_page_renderer(page_renderer_src)
-        }
-
-        function load_page_renderer(page_renderer_src) {
             if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + page_renderer_src)
             // load page renderer synchronously (Note: synchronous is required for displaying initial topic)
             dm4c.load_script(page_renderer_src)
-            // instantiate
-            var page_renderer_class = js.to_camel_case(js.basename(page_renderer_src))
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log(".......... instantiating \"" + page_renderer_class + "\"")
-            page_renderers[page_renderer_class] = js.instantiate(PageRenderer, page_renderer_class)
         }
     }
 

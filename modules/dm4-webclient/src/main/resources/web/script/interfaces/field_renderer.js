@@ -1,4 +1,7 @@
 /**
+ * ### FIXDOC
+ * Note: this is inactive code. It is here only for documentation purpose.
+ *
  * The DeepaMehta standard distribution provides the following field renderers:
  *     - TextFieldRenderer      (Webclient module)
  *     - NumberFieldRenderer    (Webclient module)

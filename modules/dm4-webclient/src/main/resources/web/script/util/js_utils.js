@@ -178,43 +178,13 @@ var js = {
 
 
     /**
-     * Constructs a new object dynamically.
-     *
-     * @param   class_name  Name of class.
-     * @param   <varargs>   Variable number of arguments. Passed to the constructor.
-     */
-    new_object: function(class_name) {
-        var args = []
-        var argvals = []
-        for (var i = 1; i < arguments.length; i++) {
-            args.push("arg" + i)
-            argvals.push(arguments[i])
-        }
-        var argstr = args.join()
-        //
-        return new Function(argstr, "return new " + class_name + "(" + argstr + ")").apply(undefined, argvals)
-    },
-
-    /**
-     * ### FIXME: drop this method? eval() is evil.
-     *
-     * @param   superclass      the baseclass constructor (a function)
-     * @param   subclass_name   (a string)
-     */
-    instantiate: function(superclass, subclass_name) {
-        var obj = new superclass()
-        eval(subclass_name).apply(obj)
-        return obj
-    },
-
-    /**
      * Extends an object with all the methods defined in a superclass.
      *
      * @param   obj         The object to be extended
      * @param   superclass  The superclass (a function)
      */
     extend: function(obj, superclass) {
-        superclass.apply(obj)
+        superclass.call(obj)
     },
 
 
@@ -247,14 +217,6 @@ var js = {
         return text.substr(0, i >= 0 ? i : max_length) + " ..."
     },
 
-    /**
-     * "vendor/dm4-time/script/dm4-time.js" -> "dm4-time"
-     */
-    basename: function(path) {
-        path.match(/.*\/(.*)\..*/)
-        return RegExp.$1
-    },
-
     filename: function(path) {
         path.match(/.*\/(.*)/)
         return RegExp.$1
@@ -262,16 +224,6 @@ var js = {
 
     filename_ext: function(path) {
         return path.substr(path.lastIndexOf(".") + 1)
-    },
-
-    to_camel_case: function(str) {
-        var res = ""
-        var words = str.split("_")
-        for (var i = 0, word; word = words[i]; i++) {
-            res += word[0].toUpperCase()
-            res += word.substr(1)
-        }
-        return res
     },
 
     /**

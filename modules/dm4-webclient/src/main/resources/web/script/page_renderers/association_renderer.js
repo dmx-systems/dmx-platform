@@ -1,70 +1,64 @@
-function AssociationRenderer() {
+(function() {
+    dm4c.add_page_renderer("dm4.webclient.association_renderer", {
 
-    var topic_1, topic_2
+        // === Page Renderer Implementation ===
 
-    // -------------------------------------------------------------------------------------------------- Public Methods
+        render_page: function(assoc) {
+            topic_1 = assoc.get_topic_1()
+            topic_2 = assoc.get_topic_2()
+            var role_type_1 = assoc.get_role_type_1()
+            var role_type_2 = assoc.get_role_type_2()
+            //
+            var assoc_type = dm4c.get_association_type(assoc.type_uri)
+            dm4c.render.field_label("Association Type")
+            dm4c.render.page(assoc_type.value)
+            //
+            dm4c.render.field_label("Associated Topics")
+            render_assoc_role(topic_1, role_type_1)
+            render_assoc_role(topic_2, role_type_2)
+        },
 
+        render_form: function(assoc) {
+            var role_type_menu_1 = dm4c.render.topic_menu("dm4.core.role_type", assoc.role_1.role_type_uri)
+            var role_type_menu_2 = dm4c.render.topic_menu("dm4.core.role_type", assoc.role_2.role_type_uri)
+            //
+            var assoc_type_menu = dm4c.render.topic_menu("dm4.core.assoc_type", assoc.type_uri) // a GUIToolkit Menu obj
+            dm4c.render.field_label("Association Type")
+            dm4c.render.page(assoc_type_menu.dom)
+            //
+            dm4c.render.field_label("Associated Topics")
+            render_assoc_role_editor(topic_1, role_type_menu_1)
+            render_assoc_role_editor(topic_2, role_type_menu_2)
+            //
+            return function() {
+                dm4c.do_update_association(build_association_model())
 
-
-    // ************************************
-    // *** Page Renderer Implementation ***
-    // ************************************
-
-
-
-    this.render_page = function(assoc) {
-        topic_1 = assoc.get_topic_1()
-        topic_2 = assoc.get_topic_2()
-        var role_type_1 = assoc.get_role_type_1()
-        var role_type_2 = assoc.get_role_type_2()
-        //
-        var assoc_type = dm4c.get_association_type(assoc.type_uri)
-        dm4c.render.field_label("Association Type")
-        dm4c.render.page(assoc_type.value)
-        //
-        dm4c.render.field_label("Associated Topics")
-        render_assoc_role(topic_1, role_type_1)
-        render_assoc_role(topic_2, role_type_2)
-    }
-
-    this.render_form = function(assoc) {
-        var role_type_menu_1 = dm4c.render.topic_menu("dm4.core.role_type", assoc.role_1.role_type_uri)
-        var role_type_menu_2 = dm4c.render.topic_menu("dm4.core.role_type", assoc.role_2.role_type_uri)
-        //
-        var assoc_type_menu = dm4c.render.topic_menu("dm4.core.assoc_type", assoc.type_uri)  // a GUIToolkit Menu object
-        dm4c.render.field_label("Association Type")
-        dm4c.render.page(assoc_type_menu.dom)
-        //
-        dm4c.render.field_label("Associated Topics")
-        render_assoc_role_editor(topic_1, role_type_menu_1)
-        render_assoc_role_editor(topic_2, role_type_menu_2)
-        //
-        return function() {
-            dm4c.do_update_association(build_association_model())
-
-            /**
-             * Reads out values from GUI elements and builds an association model from it.
-             *
-             * @return  an association model (object).
-             */
-            function build_association_model() {
-                return {
-                    id: assoc.id,
-                    type_uri: assoc_type_menu.get_selection().value,
-                    role_1: {
-                        topic_id: assoc.role_1.topic_id,
-                        role_type_uri: role_type_menu_1.get_selection().value
-                    },
-                    role_2: {
-                        topic_id: assoc.role_2.topic_id,
-                        role_type_uri: role_type_menu_2.get_selection().value
+                /**
+                 * Reads out values from GUI elements and builds an association model from it.
+                 *
+                 * @return  an association model (object).
+                 */
+                function build_association_model() {
+                    return {
+                        id: assoc.id,
+                        type_uri: assoc_type_menu.get_selection().value,
+                        role_1: {
+                            topic_id: assoc.role_1.topic_id,
+                            role_type_uri: role_type_menu_1.get_selection().value
+                        },
+                        role_2: {
+                            topic_id: assoc.role_2.topic_id,
+                            role_type_uri: role_type_menu_2.get_selection().value
+                        }
                     }
                 }
             }
         }
-    }
+    })
 
     // ----------------------------------------------------------------------------------------------- Private Functions
+
+    var topic_1, topic_2
 
     function render_assoc_role(topic, role_type) {
         _render_assoc_role(topic, role_type.value)
@@ -82,4 +76,4 @@ function AssociationRenderer() {
         dm4c.render.page($("<div>").addClass("assoc-role")
             .append(topic_div).append(role_type_div))
     }
-}
+})()

@@ -159,7 +159,7 @@ function PagePanel() {
     }
 
     function prepare_page() {
-        var css = page_renderer.page_css()
+        var css = page_renderer.page_css || {overflow: "auto"}
         $("#page-content").css(css)
     }
 

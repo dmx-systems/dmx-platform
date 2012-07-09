@@ -20,7 +20,7 @@ AssociationType.prototype.get_commands = function(context) {
 }
 
 AssociationType.prototype.get_page_renderer_class = function() {
-    return dm4c.get_view_config(this, "js_page_renderer_class") || "AssociationRenderer"
+    return dm4c.get_view_config(this, "page_renderer_uri") || "dm4.webclient.association_renderer"
 }
 
 // === Public API ===

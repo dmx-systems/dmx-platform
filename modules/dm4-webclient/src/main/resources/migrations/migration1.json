@@ -34,8 +34,8 @@
             data_type_uri: "dm4.core.boolean"
         },
         {
-            value: "JavaScript Page Renderer Class",
-            uri: "dm4.webclient.js_page_renderer_class",
+            value: "Page Renderer URI",
+            uri: "dm4.webclient.page_renderer_uri",
             data_type_uri: "dm4.core.text"
         },
         {
@@ -85,7 +85,7 @@
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webclient.js_page_renderer_class",
+                    part_topic_type_uri:  "dm4.webclient.page_renderer_uri",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },

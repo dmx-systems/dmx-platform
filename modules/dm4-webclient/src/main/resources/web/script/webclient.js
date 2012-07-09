@@ -653,8 +653,12 @@ function Webclient() {
 
     // ---
 
-    this.get_page_renderer = function(topic_or_association_or_classname) {
-        return pm.get_page_renderer(topic_or_association_or_classname)
+    this.add_page_renderer = function(renderer_uri, renderer) {
+        pm.add_page_renderer(renderer_uri, renderer)
+    }
+
+    this.get_page_renderer = function(topic_or_association_or_renderer_uri) {
+        return pm.get_page_renderer(topic_or_association_or_renderer_uri)
     }
 
     // ---
@@ -840,7 +844,7 @@ function Webclient() {
     // Note: for these settings the default is provided by the configurable itself:
     //     "icon"
     //     "color"
-    //     "js_page_renderer_class"
+    //     "page_renderer_uri"
     this.get_view_config_default = function(configurable, setting) {
         switch (setting) {
         case "add_to_create_menu":

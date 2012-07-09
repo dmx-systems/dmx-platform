@@ -16,7 +16,7 @@
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm4.webclient.js_page_renderer_class: "WebpageRenderer"
+                        dm4.webclient.page_renderer_uri: "dm4.webbrowser.webpage_renderer"
                     }
                 }
             ]

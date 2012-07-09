@@ -1,14 +1,8 @@
-function TopictypeRenderer() {
+dm4c.add_page_renderer("dm4.typeeditor.topictype_renderer", {
 
+    // === Page Renderer Implementation ===
 
-
-    // ************************************
-    // *** Page Renderer Implementation ***
-    // ************************************
-
-
-
-    this.render_page = function(topic) {
+    render_page: function(topic) {
         var topic_type = dm4c.get_topic_type(topic.uri)
         //
         dm4c.render.field_label("Name")
@@ -22,9 +16,9 @@ function TopictypeRenderer() {
         dm4c.render.page(data_type.value)
         //
         dm4c.render.associations(topic.id)
-    }
+    },
 
-    this.render_form = function(topic) {
+    render_form: function(topic) {
         var topic_type = dm4c.get_topic_type(topic.uri)
         var editors_list                                        // a jQuery <ul> element
         //
@@ -157,4 +151,4 @@ function TopictypeRenderer() {
             }
         }
     }
-}
+})
