@@ -811,70 +811,99 @@ function Webclient() {
     // === View Configuration ===
 
     /**
-     * Read out a view configuration setting.
+     * Reads out a view configuration setting.
      * <p>
      * Compare to server-side counterparts: WebclientPlugin.getViewConfig() and ViewConfiguration.getSetting()
      *
-     * @param   configurable    A topic type, an association type, or an association definition.
-     *                          Must not be null/undefined.
+     * @param   configurable    A topic type or an association type.
      * @param   setting         Last component of the setting URI, e.g. "icon".
-     * @paran   lookup_default  Optional: if evaluates to true a default value is looked up in case no setting was made.
-     *                          If evaluates to false and no setting was made undefined is returned.
+     * @param   assoc_def       Optional: if given its setting has precedence.
      *
-     * @return  The set value, or <code>undefined</code> if no setting was made and lookup_default evaluates to false.
+     * @return  The configuration setting.
      */
-    this.get_view_config = function(configurable, setting, lookup_default) {
-        // error check
-        if (!configurable.view_config_topics) {
-            throw "InvalidConfigurable: no \"view_config_topics\" property found in " + JSON.stringify(configurable)
+    this.get_view_config = function(configurable, setting, assoc_def) {
+        // assoc def setting (has precedence)
+        if (assoc_def) {
+            var value = get_view_config(assoc_def)
+            if (is_set(value)) {
+                return value
+            }
         }
-        // every configurable has an view_config_topics object, however it might be empty
-        var view_config = configurable.view_config_topics["dm4.webclient.view_config"]
-        if (view_config) {
-            var value = view_config.get("dm4.webclient." + setting)
+        // type setting
+        value = get_view_config(configurable)
+        if (is_set(value)) {
+            return value
         }
-        // lookup default
-        if ((value === undefined || value === "") && lookup_default) {
-            return dm4c.get_view_config_default(configurable, setting)
-        }
-        //
-        return value
-    }
+        // default setting
+        return get_view_config_default(configurable, setting)
 
-    // Note: for these settings the default is provided by the configurable itself:
-    //     "icon"
-    //     "color"
-    //     "page_renderer_uri"
-    this.get_view_config_default = function(configurable, setting) {
-        switch (setting) {
-        case "add_to_create_menu":
-            return false;
-        case "is_searchable_unit":
-            return false;
-        case "editable":
-            return true
-        case "viewable":
-            return true
-        case "field_renderer_uri":
-            return default_field_renderer_uri()
-        case "rows":
-            return DEFAULT_FIELD_ROWS
-        default:
-            throw("WebclientError: \"" + setting + "\" is an unknown view configuration setting")
+        function is_set(value) {
+            // Note 1: we explicitely compare to undefined to let assoc defs override with falsish (0 or false) values.
+            //         != is sufficient as these are false: 0 == undefined, false == undefined
+            // Note 2: we must regard an empty string as "not set" to get the default renderer URIs.
+            //         !== is required as these are true: 0 == "", false == ""
+            return value != undefined && value !== ""
         }
 
-        function default_field_renderer_uri() {
-            switch (configurable.data_type_uri) {
-            case "dm4.core.text":
-                return "dm4.webclient.text_renderer"
-            case "dm4.core.html":
-                return "dm4.webclient.html_renderer"
-            case "dm4.core.number":
-                return "dm4.webclient.number_renderer"
-            case "dm4.core.boolean":
-                return "dm4.webclient.boolean_renderer"
+        function get_view_config(configurable) {
+            // error check
+            if (!configurable.view_config_topics) {
+                throw "InvalidConfigurableError: no \"view_config_topics\" property found in " +
+                    JSON.stringify(configurable)
+            }
+            // every configurable has an view_config_topics object, however it might be empty
+            var view_config = configurable.view_config_topics["dm4.webclient.view_config"]
+            if (view_config) {
+                return view_config.get("dm4.webclient." + setting)
+            }
+        }
+
+        function get_view_config_default() {
+            switch (setting) {
+            case "icon":
+                return dm4c.DEFAULT_TOPIC_ICON
+            case "color":
+                return dm4c.canvas.DEFAULT_ASSOC_COLOR
+            case "add_to_create_menu":
+                return false;
+            case "is_searchable_unit":
+                return false;
+            case "editable":
+                return true
+            case "viewable":
+                return true
+            case "page_renderer_uri":
+                return default_page_renderer_uri()
+            case "field_renderer_uri":
+                return default_field_renderer_uri()
+            case "rows":
+                return DEFAULT_FIELD_ROWS
             default:
-                throw("WebclientError: \"" + configurable.data_type_uri + "\" is an unknown data type URI")
+                throw("WebclientError: \"" + setting + "\" is an unknown view configuration setting")
+            }
+
+            function default_page_renderer_uri() {
+                if (configurable instanceof TopicType) {
+                    return "dm4.webclient.topic_renderer"
+                } else if (configurable instanceof AssociationType) {
+                    return "dm4.webclient.association_renderer"
+                }
+                throw "InvalidConfigurableError: " + JSON.stringify(configurable)
+            }
+
+            function default_field_renderer_uri() {
+                switch (configurable.data_type_uri) {
+                case "dm4.core.text":
+                    return "dm4.webclient.text_renderer"
+                case "dm4.core.html":
+                    return "dm4.webclient.html_renderer"
+                case "dm4.core.number":
+                    return "dm4.webclient.number_renderer"
+                case "dm4.core.boolean":
+                    return "dm4.webclient.boolean_renderer"
+                default:
+                    throw("WebclientError: \"" + configurable.data_type_uri + "\" is an unknown data type URI")
+                }
             }
         }
     }

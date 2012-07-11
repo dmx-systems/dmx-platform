@@ -149,7 +149,7 @@ function PluginManager(config) {
             var renderer_uri = topic_or_association_or_renderer_uri
         } else {
             var type = topic_or_association_or_renderer_uri.get_type()
-            var renderer_uri = type.get_page_renderer_class()
+            var renderer_uri = type.get_page_renderer_uri()
         }
         var renderer = page_renderers[renderer_uri]
         // error check

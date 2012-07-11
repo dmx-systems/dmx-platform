@@ -35,8 +35,8 @@ TopicType.prototype.get_commands = function(context) {
     return dm4c.get_topic_commands(this, context)
 }
 
-TopicType.prototype.get_page_renderer_class = function() {
-    return dm4c.get_view_config(this, "page_renderer_uri") || "dm4.webclient.topic_renderer"
+TopicType.prototype.get_page_renderer_uri = function() {
+    return dm4c.get_view_config(this, "page_renderer_uri")
 }
 
 // === Public API ===
@@ -72,13 +72,13 @@ TopicType.prototype.load_icon = function() {
  * @return  The icon source (string).
  */
 TopicType.prototype.get_icon_src = function() {
-    return dm4c.get_view_config(this, "icon") || dm4c.DEFAULT_TOPIC_ICON
+    return dm4c.get_view_config(this, "icon")
 }
 
 TopicType.prototype.get_menu_config = function(menu_id) {
     switch (menu_id) {
     case "create-type-menu":
-        return dm4c.get_view_config(this, "add_to_create_menu", true)
+        return dm4c.get_view_config(this, "add_to_create_menu")
     case "search-type-menu":
         return true
     default:
@@ -87,5 +87,5 @@ TopicType.prototype.get_menu_config = function(menu_id) {
 }
 
 TopicType.prototype.is_editable = function() {
-    return dm4c.get_view_config(this, "editable", true)
+    return dm4c.get_view_config(this, "editable")
 }

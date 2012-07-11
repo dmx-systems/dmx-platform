@@ -60,7 +60,7 @@
          */
         create_page_model: function(topic, assoc_def, field_uri, toplevel_topic, setting) {
             var topic_type = dm4c.get_topic_type(topic.type_uri)   // ### TODO: real Topics would allow topic.get_type()
-            if (!get_view_config()) {
+            if (!dm4c.get_view_config(topic_type, setting, assoc_def)) {
                 return
             }
             if (topic_type.is_simple()) {
@@ -99,18 +99,6 @@
                     }
                 }
                 return page_model;
-            }
-
-            // compare to get_view_config() in FieldModel
-            function get_view_config() {
-                // the assoc def's config has precedence
-                if (assoc_def) {
-                    var value = dm4c.get_view_config(assoc_def, setting)
-                    if (value != undefined) {
-                        return value
-                    }
-                }
-                return dm4c.get_view_config(topic_type, setting, true)
             }
         },
 
@@ -379,7 +367,7 @@
         this.value = topic.value
         this.topic_type = dm4c.get_topic_type(topic.type_uri)   // ### TODO: real Topics would allow topic.get_type()
         this.label = this.topic_type.value
-        this.rows = get_view_config("rows")
+        this.rows = dm4c.get_view_config(self.topic_type, "rows", assoc_def)
         var field_renderer = get_field_renderer()
         var read_form_value_func
 
@@ -407,28 +395,8 @@
         // ---
 
         function get_field_renderer() {
-            var field_renderer_uri = get_view_config("field_renderer_uri")
-            // error check
-            if (!field_renderer_uri) {
-                throw "TopicRendererError: unknown renderer for field \"" + self.label +
-                    "\" (field_uri=\"" + self.uri + "\")"
-            }
-            //
-            return dm4c.get_field_renderer(field_renderer_uri)
-        }
-
-        function get_view_config(setting) {
-            // the assoc def's config has precedence
-            if (assoc_def) {
-                var value = dm4c.get_view_config(assoc_def, setting)
-                // Note 1: we explicitely compare to undefined to let assoc defs override with falsish values.
-                // Note 2: we must regard an empty string as "not set" to not loose the default rendering classes.
-                if (value !== undefined && value !== "") {      // compare to get_view_config() in webclient.js
-                    // regard the assoc def's value as set
-                    return value
-                }
-            }
-            return dm4c.get_view_config(self.topic_type, setting, true)
+            var renderer_uri = dm4c.get_view_config(self.topic_type, "field_renderer_uri", assoc_def)
+            return dm4c.get_field_renderer(renderer_uri)
         }
     }
 })()
