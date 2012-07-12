@@ -127,12 +127,8 @@
                     var child_model = page_model.childs[assoc_def_uri]
                     if (js.is_array(child_model)) {
                         // cardinality "many"
-                        for (var i = 0; i < child_model.length; i++) {
-                            this.render_page_model(child_model[i], render_mode, level + 1, box)
-                        }
-                        if (render_mode == "form") {
-                            render_add_button(child_model, level + 1, box)
-                        }
+                        var renderer = get_multi_renderer(child_model[0].topic_type, child_model[0].assoc_def)
+                        renderer[render_func_name_many()](child_model, level + 1, box)
                     } else {
                         // cardinality "one"
                         this.render_page_model(child_model, render_mode, level + 1, box)
@@ -158,6 +154,17 @@
                 }
             }
 
+            function render_func_name_many() {
+                switch (render_mode) {
+                case "page":
+                    return "render_fields"
+                case "form":
+                    return "render_form_elements"
+                default:
+                    throw "TopicRendererError: \"" + render_mode + "\" is an invalid render mode"
+                }
+            }
+
             function render_box(page_model, is_many, is_complex) {
                 var box = $("<div>").addClass("box")
                 // Note: a simple box doesn't get a "level" class to let it inherit the background color
@@ -177,26 +184,6 @@
                 return box
             }
 
-            function render_add_button(page_model, level, parent_element) {
-                var topic_type = page_model[0].topic_type
-                var add_button = dm4c.ui.button(do_add, "Add " + topic_type.value)
-                var add_button_div = $("<div>").addClass("add-button").append(add_button)
-                parent_element.append(add_button_div)
-
-                function do_add() {
-                    // extend page model
-                    var topic = dm4c.empty_topic(topic_type.uri)
-                    var assoc_def      = page_model[0].assoc_def
-                    var field_uri      = page_model[0].uri
-                    var toplevel_topic = page_model[0].toplevel_topic
-                    var _page_model = topic_renderer.create_page_model(topic, assoc_def, field_uri, toplevel_topic,
-                        "editable")
-                    page_model.push(_page_model)
-                    // render page model
-                    topic_renderer.render_page_model(_page_model, "form", level, add_button_div, true) // incremntl=true
-                }
-            }
-
             function render_remove_button(page_model, parent_element) {
                 var remove_button = dm4c.ui.button(do_remove, undefined, "circle-minus")
                 var remove_button_div = $("<div>").addClass("remove-button").append(remove_button)
@@ -208,6 +195,13 @@
                     // update view
                     parent_element.remove()
                 }
+            }
+
+            // ---
+
+            function get_multi_renderer(topic_type, assoc_def) {
+                var renderer_uri = dm4c.get_view_config(topic_type, "multi_renderer_uri", assoc_def)
+                return dm4c.get_multi_renderer(renderer_uri)
             }
         }
     }
@@ -364,8 +358,8 @@
         this.assoc_def = assoc_def
         this.uri = field_uri
         this.toplevel_topic = toplevel_topic
-        this.value = topic.value
         this.topic_type = dm4c.get_topic_type(topic.type_uri)   // ### TODO: real Topics would allow topic.get_type()
+        this.value = topic.value
         this.label = this.topic_type.value
         this.rows = dm4c.get_view_config(self.topic_type, "rows", assoc_def)
         var field_renderer = get_field_renderer()
