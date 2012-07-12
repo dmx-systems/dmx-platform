@@ -56,19 +56,27 @@
          *                          Note: for the top-level call "toplevel_topic" and "topic" are usually the same.
          * @param   setting         "viewable" or "editable" (string).
          *
-         * @return  The created page model, or undefined. Undefined is returned if the topic is not viewable/editable.
+         * @return  The created page model, or undefined. Undefined is returned if the topic is a simple one and is not
+         *          viewable/editable.
          */
         create_page_model: function(topic, assoc_def, field_uri, toplevel_topic, setting) {
             var topic_type = dm4c.get_topic_type(topic.type_uri)   // ### TODO: real Topics would allow topic.get_type()
-            if (!dm4c.get_view_config(topic_type, setting, assoc_def)) {
-                return
-            }
             if (topic_type.is_simple()) {
+                //
+                if (!dm4c.get_view_config(topic_type, setting, assoc_def)) {
+                    return
+                }
+                //
                 return new FieldModel(topic, assoc_def, field_uri, toplevel_topic)
             } else {
                 var page_model = new PageModel(topic, assoc_def, field_uri, toplevel_topic)
                 for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
                     var child_topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
+                    //
+                    if (!dm4c.get_view_config(child_topic_type, setting, assoc_def)) {
+                        continue
+                    }
+                    //
                     var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
                     var cardinality_uri = assoc_def.part_cardinality_uri
                     if (cardinality_uri == "dm4.core.one") {
@@ -94,9 +102,8 @@
                     } else {
                         throw "TopicRendererError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
                     }
-                    if (child_model) {
-                        page_model.add_child(assoc_def.uri, child_model)
-                    }
+                    //
+                    page_model.add_child(assoc_def.uri, child_model)
                 }
                 return page_model;
             }
