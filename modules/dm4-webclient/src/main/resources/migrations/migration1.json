@@ -44,6 +44,11 @@
             data_type_uri: "dm4.core.text"
         },
         {
+            value: "Multi Renderer URI",
+            uri: "dm4.webclient.multi_renderer_uri",
+            data_type_uri: "dm4.core.text"
+        },
+        {
             value: "Rows",
             uri: "dm4.webclient.rows",
             data_type_uri: "dm4.core.number"
@@ -91,6 +96,11 @@
                 },
                 {
                     part_topic_type_uri:  "dm4.webclient.field_renderer_uri",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.webclient.multi_renderer_uri",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },

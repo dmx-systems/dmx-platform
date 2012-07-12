@@ -5,10 +5,13 @@ function PluginManager(config) {
     var plugins_complete = 0
 
     var page_renderer_sources = []
-    var page_renderers = {}     // key: page renderer class name, camel case (string), value: renderer instance
+    var page_renderers = {}     // key: page renderer URI, value: object with "render_page", "render_form", "page_css"
 
     var field_renderer_sources = []
-    var field_renderers = {}    // key: field renderer URI, value: object with "render_field" and "render_form_element"
+    var field_renderers = {}    // key: field renderer URI, value: object with "render_field", "render_form_element"
+
+    var multi_renderer_sources = []
+    var multi_renderers = {}    // key: multi renderer URI, value: object with "render_fields", "render_form_elements"
 
     var css_stylesheets = []
 
@@ -96,6 +99,7 @@ function PluginManager(config) {
         function all_plugins_loaded() {
             load_page_renderers()
             load_field_renderers()
+            load_multi_renderers()
             load_stylesheets()
             //
             config.post_load_plugins()
@@ -128,6 +132,27 @@ function PluginManager(config) {
         // error check
         if (!renderer) {
             throw "PluginManagerError: field renderer \"" + renderer_uri + "\" is unknown"
+        }
+        //
+        return renderer
+    }
+
+    // ---
+
+    this.add_multi_renderer = function(renderer_uri, renderer) {
+        // error check
+        if (multi_renderers[renderer_uri]) {
+            throw "PluginManagerError: multi renderer URI clash with \"" + renderer_uri + "\""
+        }
+        //
+        multi_renderers[renderer_uri] = renderer
+    }
+
+    this.get_multi_renderer = function(renderer_uri) {
+        var renderer = multi_renderers[renderer_uri]
+        // error check
+        if (!renderer) {
+            throw "PluginManagerError: multi renderer \"" + renderer_uri + "\" is unknown"
         }
         //
         return renderer
@@ -169,6 +194,12 @@ function PluginManager(config) {
     this.register_field_renderer = function(source_path) {
         field_renderer_sources.push(source_path)
     }
+
+    this.register_multi_renderer = function(source_path) {
+        multi_renderer_sources.push(source_path)
+    }
+
+    // ---
 
     this.register_css_stylesheet = function(css_path) {
         css_stylesheets.push(css_path)
@@ -280,11 +311,20 @@ function PluginManager(config) {
     }
 
     function load_field_renderers() {
-        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Loading " + field_renderer_sources.length + " data field renderers:")
+        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Loading " + field_renderer_sources.length + " field renderers:")
         for (var i = 0, field_renderer_source; field_renderer_source = field_renderer_sources[i]; i++) {
             if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + field_renderer_source)
             // load field renderer synchronously (Note: synchronous is required for displaying initial topic)
             dm4c.load_script(field_renderer_source)
+        }
+    }
+
+    function load_multi_renderers() {
+        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Loading " + multi_renderer_sources.length + " multi renderers:")
+        for (var i = 0, multi_renderer_source; multi_renderer_source = multi_renderer_sources[i]; i++) {
+            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + multi_renderer_source)
+            // load multi renderer synchronously (Note: synchronous is required for displaying initial topic)
+            dm4c.load_script(multi_renderer_source)
         }
     }
 

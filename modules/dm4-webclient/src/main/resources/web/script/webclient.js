@@ -653,6 +653,16 @@ function Webclient() {
 
     // ---
 
+    this.add_multi_renderer = function(renderer_uri, renderer) {
+        pm.add_multi_renderer(renderer_uri, renderer)
+    }
+
+    this.get_multi_renderer = function(renderer_uri) {
+        return pm.get_multi_renderer(renderer_uri)
+    }
+
+    // ---
+
     this.add_page_renderer = function(renderer_uri, renderer) {
         pm.add_page_renderer(renderer_uri, renderer)
     }
@@ -692,6 +702,10 @@ function Webclient() {
 
     this.load_field_renderer = function(source_path) {
         pm.register_field_renderer(source_path)
+    }
+
+    this.load_multi_renderer = function(source_path) {
+        pm.register_multi_renderer(source_path)
     }
 
     // ---
@@ -876,6 +890,8 @@ function Webclient() {
                 return default_page_renderer_uri()
             case "field_renderer_uri":
                 return default_field_renderer_uri()
+            case "multi_renderer_uri":
+                return "dm4.webclient.default_multi_renderer"
             case "rows":
                 return DEFAULT_FIELD_ROWS
             default:

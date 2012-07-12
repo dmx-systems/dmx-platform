@@ -18,6 +18,8 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
     dm4c.load_field_renderer("/de.deepamehta.webclient/script/field_renderers/body_text_renderer.js")
     dm4c.load_field_renderer("/de.deepamehta.webclient/script/field_renderers/search_result_renderer.js")
 
+    dm4c.load_multi_renderer("/de.deepamehta.webclient/script/multi_renderers/default_multi_renderer.js")
+
     // === Webclient Listeners ===
 
     dm4c.add_listener("init", function() {
