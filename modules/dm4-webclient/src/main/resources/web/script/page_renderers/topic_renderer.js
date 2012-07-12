@@ -321,6 +321,8 @@
         this.uri = field_uri
         this.toplevel_topic = toplevel_topic
         this.topic_type = dm4c.get_topic_type(topic.type_uri)   // ### TODO: real Topics would allow topic.get_type()
+        // ### FIXME: also needs a value, for checkbox_renderer, if checkbox_renderer used for complex topics
+        // ### FIXME: also needs a label, for checkbox_renderer, if checkbox_renderer used for complex topics
         this.childs = {}
 
         /**
