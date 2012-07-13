@@ -67,9 +67,9 @@
                     return
                 }
                 //
-                return new FieldModel(topic, assoc_def, field_uri, toplevel_topic)
+                return new PageModel(PageModel.SIMPLE, topic, assoc_def, field_uri, toplevel_topic)
             } else {
-                var page_model = new PageModel(topic, assoc_def, field_uri, toplevel_topic)
+                var page_model = new PageModel(PageModel.COMPOSITE, topic, assoc_def, field_uri, toplevel_topic)
                 for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
                     var child_topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
                     //
@@ -83,6 +83,7 @@
                         var child_topic = topic.composite[assoc_def.uri] || dm4c.empty_topic(child_topic_type.uri)
                         var child_model = this.create_page_model(child_topic, assoc_def, child_field_uri,
                             toplevel_topic, setting)
+                        page_model.childs[assoc_def.uri] = child_model
                     } else if (cardinality_uri == "dm4.core.many") {
                         // ### TODO: server: don't send empty arrays
                         var child_topics = topic.composite[assoc_def.uri] || []
@@ -93,17 +94,17 @@
                         if (child_topics.length == 0) {
                             child_topics.push(dm4c.empty_topic(child_topic_type.uri))
                         }
-                        var child_model = []
+                        var child_model = new PageModel(PageModel.MULTI, child_topics[0], assoc_def, field_uri,
+                            toplevel_topic)
                         for (var j = 0, child_topic; child_topic = child_topics[j]; j++) {
                             var child_field = this.create_page_model(child_topic, assoc_def, child_field_uri,
                                 toplevel_topic, setting)
-                            child_model.push(child_field)
+                            child_model.values.push(child_field)
                         }
+                        page_model.childs[assoc_def.uri] = child_model
                     } else {
                         throw "TopicRendererError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
                     }
-                    //
-                    page_model.add_child(assoc_def.uri, child_model)
                 }
                 return page_model;
             }
@@ -125,17 +126,16 @@
                 return
             }
             //
-            if (page_model instanceof FieldModel) {
+            if (page_model.type == PageModel.SIMPLE) {
                 var box = render_box(page_model, is_many(), false)  // is_complex=false
                 page_model[render_func_name()](box)
-            } else if (page_model instanceof PageModel) {
+            } else if (page_model.type == PageModel.COMPOSITE) {
                 var box = render_box(page_model, is_many(), true)   // is_complex=true
                 for (var assoc_def_uri in page_model.childs) {
                     var child_model = page_model.childs[assoc_def_uri]
-                    if (js.is_array(child_model)) {
+                    if (child_model.type == PageModel.MULTI) {
                         // cardinality "many"
-                        var renderer = get_multi_renderer(child_model[0].topic_type, child_model[0].assoc_def)
-                        renderer[render_func_name_many()](child_model, level + 1, box)
+                        child_model[render_func_name_many()](level + 1, box)
                     } else {
                         // cardinality "one"
                         this.render_page_model(child_model, render_mode, level + 1, box)
@@ -203,13 +203,6 @@
                     parent_element.remove()
                 }
             }
-
-            // ---
-
-            function get_multi_renderer(topic_type, assoc_def) {
-                var renderer_uri = dm4c.get_view_config(topic_type, "multi_renderer_uri", assoc_def)
-                return dm4c.get_multi_renderer(renderer_uri)
-            }
         }
     }
 
@@ -248,7 +241,7 @@
      *          on the other hand never represents a topic reference.
      */
     function build_topic_model(page_model) {
-        if (page_model instanceof FieldModel) {
+        if (page_model.type == PageModel.SIMPLE) {
             var value = page_model.read_form_value()
             // Note: undefined form value is an error (means: field renderer returned no value).
             // null is a valid form value (means: field renderer prevents the field from being updated).
@@ -267,29 +260,29 @@
                 throw "TopicRendererError: \"" + page_model.assoc_def.assoc_type_uri +
                     "\" is an unexpected assoc type URI"
             }
-        } else if (page_model instanceof PageModel) {
+        } else if (page_model.type == PageModel.COMPOSITE) {
             var composite = {}
             for (var assoc_def_uri in page_model.childs) {
                 var child_model = page_model.childs[assoc_def_uri]
-                if (js.is_array(child_model)) {
+                if (child_model.type == PageModel.MULTI) {
                     // cardinality "many"
                     composite[assoc_def_uri] = []
-                    for (var i = 0; i < child_model.length; i++) {
+                    for (var i = 0; i < child_model.values.length; i++) {
                         //
-                        if (child_model[i].topic.delete) {
-                            switch (child_model[i].assoc_def.assoc_type_uri) {
+                        if (child_model.values[i].topic.delete) {
+                            switch (child_model.values[i].assoc_def.assoc_type_uri) {
                             case "dm4.core.composition_def":
-                                composite[assoc_def_uri].push(dm4c.DEL_PREFIX + child_model[i].topic.id)
+                                composite[assoc_def_uri].push(dm4c.DEL_PREFIX + child_model.values[i].topic.id)
                                 break
                             case "dm4.core.aggregation_def":
                                 // do nothing
                                 break
                             default:
-                                throw "TopicRendererError: \"" + child_model[i].assoc_def.assoc_type_uri +
+                                throw "TopicRendererError: \"" + child_model.values[i].assoc_def.assoc_type_uri +
                                     "\" is an unexpected assoc type URI"
                             }
                         } else {
-                            var value = build_topic_model(child_model[i])
+                            var value = build_topic_model(child_model.values[i])
                             if (value != null) {
                                 composite[assoc_def_uri].push(value)
                             }
@@ -313,25 +306,6 @@
 
 
     // ------------------------------------------------------------------------------------------------- Private Classes
-
-    function PageModel(topic, assoc_def, field_uri, toplevel_topic) {
-
-        this.topic = topic
-        this.assoc_def = assoc_def
-        this.uri = field_uri
-        this.toplevel_topic = toplevel_topic
-        this.topic_type = dm4c.get_topic_type(topic.type_uri)   // ### TODO: real Topics would allow topic.get_type()
-        // ### FIXME: also needs a value, for checkbox_renderer, if checkbox_renderer used for complex topics
-        // ### FIXME: also needs a label, for checkbox_renderer, if checkbox_renderer used for complex topics
-        this.childs = {}
-
-        /**
-         * @param   child_model     A FieldModel, or a PageModel, or an array of FieldModels or PageModels.
-         */
-        this.add_child = function(assoc_def_uri, child_model) {
-            this.childs[assoc_def_uri] = child_model
-        }
-    }
 
     /**
      * @param   topic           The topic underlying this field. Its "value" is rendered through this field model.
@@ -360,10 +334,13 @@
      *                              - FileContentRenderer   (Files module)
      *                              - FolderContentRenderer (Files module)
      */
-    function FieldModel(topic, assoc_def, field_uri, toplevel_topic) {
+    function PageModel(type, topic, assoc_def, field_uri, toplevel_topic) {
 
         var self = this
-        this.topic = topic
+        this.type = type        // page model type (SIMPLE, COMPOSITE, MULTI)
+        this.topic = topic      // the SIMPLE topic, the COMPOSITE topic, or the 1st MULTI topic
+        this.childs = {}        // used for COMPOSITE
+        this.values = []        // used for MULTI
         this.assoc_def = assoc_def
         this.uri = field_uri
         this.toplevel_topic = toplevel_topic
@@ -371,16 +348,18 @@
         this.value = topic.value
         this.label = this.topic_type.value
         this.rows = dm4c.get_view_config(self.topic_type, "rows", assoc_def)
-        var field_renderer = get_field_renderer()
+        var renderer = lookup_renderer()
         var read_form_value_func
 
+        // === Simple Renderer ===
+
         this.render_field = function(parent_element) {
-            field_renderer.render_field(this, parent_element)
+            renderer.render_field(this, parent_element)
         }
 
         this.render_form_element = function(parent_element) {
             dm4c.render.field_label(this, parent_element)
-            read_form_value_func = field_renderer.render_form_element(this, parent_element)
+            read_form_value_func = renderer.render_form_element(this, parent_element)
         }
 
         this.read_form_value = function() {
@@ -389,17 +368,42 @@
             // null is a valid result (means: field renderer prevents the field from being updated).
             if (form_value === undefined) {
                 throw "TopicRendererError: the \"" + this.label + "\" field renderer returned no value " +
-                    "(field_renderer_uri=\"" + field_renderer_uri + "\")"   // ### FIXME: field_renderer_uri undefined
+                    "(renderer_uri=\"" + renderer_uri + "\")"   // ### FIXME: renderer_uri undefined
             }
             //
             return form_value
         }
 
-        // ---
+        // === Multi Renderer ===
 
-        function get_field_renderer() {
-            var renderer_uri = dm4c.get_view_config(self.topic_type, "field_renderer_uri", assoc_def)
-            return dm4c.get_field_renderer(renderer_uri)
+        this.render_fields = function(level, parent_element) {
+            renderer.render_fields(this.values, level, parent_element)
+        }
+
+        this.render_form_elements = function(level, parent_element) {
+            read_form_value_func = renderer.render_form_elements(this.values, level, parent_element)
+        }
+
+        // ===
+
+        function lookup_renderer() {
+            switch (type) {
+            case PageModel.SIMPLE:
+                var renderer_uri = dm4c.get_view_config(self.topic_type, "field_renderer_uri", assoc_def)
+                return dm4c.get_field_renderer(renderer_uri)
+            case PageModel.COMPOSITE:
+                // ### TODO
+                return null
+            case PageModel.MULTI:
+                var renderer_uri = dm4c.get_view_config(self.topic_type, "multi_renderer_uri", assoc_def)
+                return dm4c.get_multi_renderer(renderer_uri)
+            default:
+                throw "TopicRendererError: \"" + type + "\" is an unknown page model type"
+            }
         }
     }
+
+    PageModel.SIMPLE = 1
+    PageModel.COMPOSITE = 2
+    PageModel.MULTI = 3
 })()
