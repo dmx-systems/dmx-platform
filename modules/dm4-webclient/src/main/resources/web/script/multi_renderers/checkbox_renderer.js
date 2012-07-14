@@ -20,6 +20,9 @@ dm4c.add_multi_renderer("dm4.webclient.checkbox_renderer", {
             parent_element.append(topics[i].value)
             parent_element.append("<br>")
         }
+        //
+        return function() {
+        }
 
         function checked(topic) {
             return js.includes(page_models, function(page_model) {

@@ -8,8 +8,8 @@
  *     - BooleanFieldRenderer   (Webclient module)
  *     - HTMLFieldRenderer      (Webclient module)
  *     - SearchResultRenderer   (Webclient module)
- *     - TitleRenderer          (Webclient module) ### FIXME: drop this?
- *     - BodyTextRenderer       (Webclient module) ### FIXME: drop this?
+ *     - TitleRenderer          (Webclient module)
+ *     - BodyTextRenderer       (Webclient module)
  *     - DateFieldRenderer      (Webclient module) ### FIXME: not in use
  *     - ReferenceFieldRenderer (Webclient module) ### FIXME: not in use
  *     - FileContentRenderer    (Files module)
@@ -21,8 +21,8 @@ function FieldRenderer() {
     this.render_field = function(parent_element) {
 
     /**
-     * @return  A function that reads out the form element's value. This function is expected
-     *          to return a simple value or a topic reference (in REF_PREFIX notation).
+     * @return  The form reading function: called to read out the form element's value.
+     *          This function is expected to return a simple value or a topic reference (in REF_PREFIX notation).
      */
     this.render_form_element = function(parent_element) {
 }

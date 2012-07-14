@@ -23,7 +23,7 @@ function PageRenderer() {
     this.render_page = function(topic_or_association) {}
 
     /**
-     * @return  the form processing function
+     * @return  The form processing function: called to "submit" the form.
      */
     this.render_form = function(topic_or_association) {}
 
