@@ -10,7 +10,7 @@
         // === Page Renderer Implementation ===
 
         render_page: function(topic) {
-            var page_model = create_page_model(topic, "viewable")
+            var page_model = create_page_model(topic, "page")
             // trigger hook
             dm4c.trigger_plugin_hook("pre_render_page", topic, page_model)
             //
@@ -20,7 +20,7 @@
         },
 
         render_form: function(topic) {
-            var page_model = create_page_model(topic, "editable")
+            var page_model = create_page_model(topic, "form")
             // trigger hook
             dm4c.trigger_plugin_hook("pre_render_form", topic, page_model)
             //
@@ -54,16 +54,16 @@
          *                          model. For a complex topic the top-level topic is just passed recursively.
          *                          ### FIXDOC
          *                          Note: for the top-level call "toplevel_topic" and "topic" are usually the same.
-         * @param   setting         "viewable" or "editable" (string).
+         * @param   render_mode     "page" or "form" (string).
          *
          * @return  The created page model, or undefined. Undefined is returned if the topic is a simple one and is not
          *          viewable/editable.
          */
-        create_page_model: function(topic, assoc_def, field_uri, toplevel_topic, setting) {
+        create_page_model: function(topic, assoc_def, field_uri, toplevel_topic, render_mode) {
             var topic_type = dm4c.get_topic_type(topic.type_uri)   // ### TODO: real Topics would allow topic.get_type()
             if (topic_type.is_simple()) {
                 //
-                if (!dm4c.get_view_config(topic_type, setting, assoc_def)) {
+                if (!dm4c.get_view_config(topic_type, render_setting(), assoc_def)) {
                     return
                 }
                 //
@@ -73,7 +73,7 @@
                 for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
                     var child_topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
                     //
-                    if (!dm4c.get_view_config(child_topic_type, setting, assoc_def)) {
+                    if (!dm4c.get_view_config(child_topic_type, render_setting(), assoc_def)) {
                         continue
                     }
                     //
@@ -82,7 +82,7 @@
                     if (cardinality_uri == "dm4.core.one") {
                         var child_topic = topic.composite[assoc_def.uri] || dm4c.empty_topic(child_topic_type.uri)
                         var child_model = this.create_page_model(child_topic, assoc_def, child_field_uri,
-                            toplevel_topic, setting)
+                            toplevel_topic, render_mode)
                         page_model.childs[assoc_def.uri] = child_model
                     } else if (cardinality_uri == "dm4.core.many") {
                         // ### TODO: server: don't send empty arrays
@@ -98,7 +98,7 @@
                             toplevel_topic)
                         for (var j = 0, child_topic; child_topic = child_topics[j]; j++) {
                             var child_field = this.create_page_model(child_topic, assoc_def, child_field_uri,
-                                toplevel_topic, setting)
+                                toplevel_topic, render_mode)
                             child_model.values.push(child_field)
                         }
                         page_model.childs[assoc_def.uri] = child_model
@@ -107,6 +107,17 @@
                     }
                 }
                 return page_model;
+            }
+
+            function render_setting() {
+                switch (render_mode) {
+                case "page":
+                    return "viewable"
+                case "form":
+                    return "editable"
+                default:
+                    throw "TopicRendererError: \"" + render_mode + "\" is an invalid render mode"
+                }
             }
         },
 
@@ -135,7 +146,7 @@
                     var child_model = page_model.childs[assoc_def_uri]
                     if (child_model.type == PageModel.MULTI) {
                         // cardinality "many"
-                        child_model[render_func_name_many()](level + 1, box)
+                        child_model[render_func_name_many()](box, level + 1)
                     } else {
                         // cardinality "one"
                         this.render_page_model(child_model, render_mode, level + 1, box)
@@ -269,10 +280,10 @@
     // === Page Model ===
 
     /**
-     * @param   setting     "viewable" or "editable"
+     * @param   render_mode     "page" or "form" (string).
      */
-    function create_page_model(topic, setting) {
-        return topic_renderer.create_page_model(topic, undefined, "", topic, setting)
+    function create_page_model(topic, render_mode) {
+        return topic_renderer.create_page_model(topic, undefined, "", topic, render_mode)
     }
 
     /**
@@ -362,12 +373,12 @@
 
         // === Multi Renderer ===
 
-        this.render_fields = function(level, parent_element) {
-            renderer.render_fields(this.values, level, parent_element)
+        this.render_fields = function(parent_element, level) {
+            renderer.render_fields(this.values, parent_element, level)
         }
 
-        this.render_form_elements = function(level, parent_element) {
-            form_reading_function = renderer.render_form_elements(this.values, level, parent_element)
+        this.render_form_elements = function(parent_element, level) {
+            form_reading_function = renderer.render_form_elements(this.values, parent_element, level)
         }
 
         this.read_form_values = function() {
