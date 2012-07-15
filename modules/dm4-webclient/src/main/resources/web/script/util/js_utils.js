@@ -142,6 +142,7 @@ var js = {
                 return true
             }
         }
+        return false
     },
 
     /**

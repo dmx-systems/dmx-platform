@@ -124,19 +124,19 @@ function RenderHelper() {
     }
 
     /**
-     * @param   field_model     a TopicRenderer.FieldModel object or a boolean.
+     * @param   field_model     a boolean value or a TopicRenderer.FieldModel of a boolean topic.
      */
     this.checkbox = function(field_model) {
-        var dom = $("<input type='checkbox'>")
+        var checkbox = $("<input type='checkbox'>")
         if (typeof(field_model) == "boolean") {
             var checked = field_model
         } else {
             var checked = field_model.value
         }
         if (checked) {
-            dom.attr("checked", "checked")
+            checkbox.attr("checked", "checked")
         }
-        return dom
+        return checkbox
     }
 
     // ---
