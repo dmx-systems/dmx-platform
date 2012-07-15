@@ -138,15 +138,16 @@
             }
             //
             if (page_model.type == PageModel.SIMPLE) {
-                var box = render_box(page_model, is_many(), false)  // is_complex=false
+                var box = render_box(false, ref_element, incremental, remove_button_page_model())   // accentuated=false
                 page_model[render_func_name()](box)
             } else if (page_model.type == PageModel.COMPOSITE) {
-                var box = render_box(page_model, is_many(), true)   // is_complex=true
+                var box = render_box(true, ref_element, incremental, remove_button_page_model())    // accentuated=true
                 for (var assoc_def_uri in page_model.childs) {
                     var child_model = page_model.childs[assoc_def_uri]
                     if (child_model.type == PageModel.MULTI) {
                         // cardinality "many"
-                        child_model[render_func_name_many()](box, level + 1)
+                        var many_box = render_box(false, box, false)                                // accentuated=false
+                        child_model[render_func_name_many()](many_box, level + 1)
                     } else {
                         // cardinality "one"
                         this.render_page_model(child_model, render_mode, level + 1, box)
@@ -156,9 +157,11 @@
                 throw "TopicRendererError: invalid page model"
             }
 
-            function is_many() {
-                // Note: the top-level page model has no assoc_def
-                return page_model.assoc_def && page_model.assoc_def.part_cardinality_uri == "dm4.core.many"
+            function remove_button_page_model() {
+                return render_mode == "form" &&
+                       page_model.assoc_def &&  // Note: the top-level page model has no assoc_def
+                       page_model.assoc_def.part_cardinality_uri == "dm4.core.many" &&
+                       page_model
             }
 
             function render_func_name() {
@@ -183,10 +186,10 @@
                 }
             }
 
-            function render_box(page_model, is_many, is_complex) {
+            function render_box(accentuated, ref_element, incremental, remove_button_page_model) {
                 var box = $("<div>").addClass("box")
                 // Note: a simple box doesn't get a "level" class to let it inherit the background color
-                if (is_complex) {
+                if (accentuated) {
                     box.addClass("level" + level)
                 }
                 if (incremental) {
@@ -195,14 +198,19 @@
                     ref_element.append(box)
                 }
                 //
-                if (render_mode == "form" && is_many) {
-                    render_remove_button(page_model, box)
+                if (remove_button_page_model) {
+                    render_remove_button(box, remove_button_page_model)
                 }
                 //
                 return box
             }
 
-            function render_remove_button(page_model, parent_element) {
+            /**
+             * @param   parent_element  The element the remove button is appended to.
+             *                          This element is removed from the page when the remove button is pressed.
+             * @param   page_model      The page model of the topic to be removed when the remove button is pressed.
+             */
+            function render_remove_button(parent_element, page_model) {
                 var remove_button = dm4c.ui.button(do_remove, undefined, "circle-minus")
                 var remove_button_div = $("<div>").addClass("remove-button").append(remove_button)
                 parent_element.append(remove_button_div)
