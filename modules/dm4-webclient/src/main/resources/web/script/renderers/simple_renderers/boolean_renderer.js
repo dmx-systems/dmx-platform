@@ -1,4 +1,4 @@
-dm4c.add_field_renderer("dm4.webclient.boolean_renderer", {
+dm4c.add_simple_renderer("dm4.webclient.boolean_renderer", {
 
     render_field: function(field_model, parent_element) {
         dm4c.render.field_label(field_model, parent_element)

@@ -2,11 +2,11 @@
  * ### FIXDOC
  * Note: this is inactive code. It is here only for documentation purpose.
  *
- * The DeepaMehta standard distribution provides the following field renderers:
- *     - TextFieldRenderer      (Webclient module)
- *     - NumberFieldRenderer    (Webclient module)
- *     - BooleanFieldRenderer   (Webclient module)
- *     - HTMLFieldRenderer      (Webclient module)
+ * The DeepaMehta standard distribution provides the following simple renderers:
+ *     - TextRenderer           (Webclient module)
+ *     - NumberRenderer         (Webclient module)
+ *     - BooleanRenderer        (Webclient module)
+ *     - HTMLRenderer           (Webclient module)
  *     - SearchResultRenderer   (Webclient module)
  *     - TitleRenderer          (Webclient module)
  *     - BodyTextRenderer       (Webclient module)
@@ -14,9 +14,9 @@
  *     - ReferenceFieldRenderer (Webclient module) ### FIXME: not in use
  *     - FileContentRenderer    (Files module)
  *     - FolderContentRenderer  (Files module)
- *     - IconFieldRenderer      (Icon Picker module)
+ *     - IconRenderer           (Icon Picker module)
  */
-function FieldRenderer() {
+function SimpleRenderer() {
 
     this.render_field = function(parent_element) {
 

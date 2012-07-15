@@ -1,4 +1,4 @@
-dm4c.add_field_renderer("dm4.webclient.text_renderer", {
+dm4c.add_simple_renderer("dm4.webclient.text_renderer", {
 
     render_field: function(field_model, parent_element) {
         dm4c.render.field_label(field_model, parent_element)
@@ -32,7 +32,7 @@ dm4c.add_field_renderer("dm4.webclient.text_renderer", {
         function render_form_element() {
             // error check
             if (!field_model.rows) {
-                throw "TextFieldRendererError: field \"" + field_model.label + "\" has no \"rows\" setting"
+                throw "TextRendererError: field \"" + field_model.label + "\" has no \"rows\" setting"
             }
             //
             if (field_model.rows == 1) {
@@ -45,7 +45,7 @@ dm4c.add_field_renderer("dm4.webclient.text_renderer", {
                 case "dm4.core.aggregation_def":
                     return render_combobox()
                 default:
-                    throw "TextFieldRendererError: \"" + field_model.assoc_def.assoc_type_uri +
+                    throw "TextRendererError: \"" + field_model.assoc_def.assoc_type_uri +
                         "\" is an unexpected assoc type URI"
                 }
             } else {
@@ -54,20 +54,12 @@ dm4c.add_field_renderer("dm4.webclient.text_renderer", {
 
             function render_input() {
                 var input = dm4c.render.input(field_model)
-                if (field_model.autocomplete_indexes) {
-                    var page_renderer = dm4c.get_page_renderer(field_model.toplevel_topic)
-                    input.keyup(page_renderer.autocomplete)
-                    input.blur(page_renderer.lost_focus)
-                    input.attr({autocomplete: "off"})
-                }
-                //
                 render(input)
                 return input
             }
 
             function render_textarea() {
                 var textarea = $("<textarea>").attr("rows", field_model.rows).text(field_model.value)
-                //
                 render(textarea)
                 return textarea
             }

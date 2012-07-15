@@ -1,4 +1,4 @@
-dm4c.add_field_renderer("dm4.files.file_content_renderer", {
+dm4c.add_simple_renderer("dm4.files.file_content_renderer", {
 
     render_field: function(field_model, parent_element) {
         render_content()

@@ -157,12 +157,26 @@
                 throw "TopicRendererError: invalid page model"
             }
 
-            function remove_button_page_model() {
-                return render_mode == "form" &&
-                       page_model.assoc_def &&  // Note: the top-level page model has no assoc_def
-                       page_model.assoc_def.part_cardinality_uri == "dm4.core.many" &&
-                       page_model
+            function render_box(accentuated, ref_element, incremental, remove_button_page_model) {
+                var box = $("<div>").addClass("box")
+                // Note: a simple box doesn't get a "level" class to let it inherit the background color
+                if (accentuated) {
+                    box.addClass("level" + level)
+                }
+                if (incremental) {
+                    ref_element.before(box)
+                } else {
+                    ref_element.append(box)
+                }
+                //
+                if (remove_button_page_model) {
+                    render_remove_button(box, remove_button_page_model)
+                }
+                //
+                return box
             }
+
+            // ---
 
             function render_func_name() {
                 switch (render_mode) {
@@ -186,23 +200,17 @@
                 }
             }
 
-            function render_box(accentuated, ref_element, incremental, remove_button_page_model) {
-                var box = $("<div>").addClass("box")
-                // Note: a simple box doesn't get a "level" class to let it inherit the background color
-                if (accentuated) {
-                    box.addClass("level" + level)
-                }
-                if (incremental) {
-                    ref_element.before(box)
-                } else {
-                    ref_element.append(box)
-                }
-                //
-                if (remove_button_page_model) {
-                    render_remove_button(box, remove_button_page_model)
-                }
-                //
-                return box
+            // === "Remove" Button ===
+
+            // Note: subject of removal is always a SIMPLE or a COMPOSITE, never a MULTI. So, the remove button
+            // aspect is handled here at framework level. In contrast, the "Add" button is always bound to a MULTI.
+            // So, the add button aspect is handled by the respective multi renderers.
+
+            function remove_button_page_model() {
+                return render_mode == "form" &&
+                    page_model.assoc_def &&  // Note: the top-level page model has no assoc_def
+                    page_model.assoc_def.part_cardinality_uri == "dm4.core.many" &&
+                    page_model
             }
 
             /**
@@ -228,8 +236,8 @@
          * Reads out values from a page model's GUI elements and builds a topic model from it.
          *
          * @return  a topic model (object), a topic reference (string), a simple topic value, or null.
-         *          Note 1: null is returned if a simple topic is being edited and the field renderer prevents the field
-         *          from being updated.
+         *          Note 1: null is returned if a simple topic is being edited and the simple renderer prevents the
+         *          field from being updated.
          *          Note 2: despite at deeper recursion levels this method might return a topic reference (string), or
          *          a simple topic value, the top-level call will always return a topic model (object), or null.
          *          This is because topic references are only contained in composite topic models. A simple topic model
@@ -238,12 +246,12 @@
         build_topic_model: function(page_model) {
             if (page_model.type == PageModel.SIMPLE) {
                 var value = page_model.read_form_value()
-                // Note: undefined form value is an error (means: field renderer returned no value).
-                // null is a valid form value (means: field renderer prevents the field from being updated).
+                // Note: undefined form value is an error (means: simple renderer returned no value).
+                // null is a valid form value (means: simple renderer prevents the field from being updated).
                 if (value == null) {
                     return null
                 }
-                // ### TODO: explain. Compare to TextFieldRenderer.render_form_element()
+                // ### TODO: explain. Compare to TextRenderer.render_form_element()
                 switch (page_model.assoc_def && page_model.assoc_def.assoc_type_uri) {
                 case undefined:
                 case "dm4.core.composition_def":
@@ -313,22 +321,22 @@
      *                          For a non-composite topic it is <code>undefined</code>.
      *                          The association definition has 2 meanings:
      *                              1) its view configuration has precedence over the topic type's view configuration
-     *                              2) The particular field renderers are free to operate on it.
-     *                                 Field renderers which do so:
-     *                                  - TextFieldRenderer (Webclient module)
+     *                              2) The particular simple renderers are free to operate on it.
+     *                                 Simple renderers which do so:
+     *                                  - TextRenderer (Webclient module)
      * @param   field_uri       The field URI. Unique within the page/form. The field URI is a path composed of
      *                          association definition URIs that leads to this field, e.g.
      *                          "/dm4.contacts.address/dm4.contacts.street".
      *                          For a non-composite topic the field URI is an empty string.
-     *                          This URI is passed to the field renderer constructors (as a property of the "field"
-     *                          argument). The particular field renderers are free to operate on it. Field renderers
+     *                          This URI is passed to the simple renderer constructors (as a property of the "field"
+     *                          argument). The particular simple renderers are free to operate on it. Simple renderers
      *                          which do so:
-     *                              - HTMLFieldRenderer (Webclient module)
-     *                              - IconFieldRenderer (Icon Picker module)
+     *                              - HTMLRenderer (Webclient module)
+     *                              - IconRenderer (Icon Picker module)
      * @param   toplevel_topic  The topic the page/form is rendered for. Usually that is the selected topic.
      *                          (So, that is the same topic for all the FieldModel objects making up one page/form.)
-     *                          This topic is passed to the field renderer constructors.
-     *                          The particular field renderers are free to operate on it. Field renderers which do so:
+     *                          This topic is passed to the simple renderer constructors.
+     *                          The particular simple renderers are free to operate on it. Simple renderers which do so:
      *                              - SearchResultRenderer  (Webclient module)
      *                              - FileContentRenderer   (Files module)
      *                              - FolderContentRenderer (Files module)
@@ -369,8 +377,8 @@
             }
             //
             var form_value = form_reading_function()
-            // Note: undefined value is an error (means: field renderer returned no value).
-            // null is a valid result (means: field renderer prevents the field from being updated).
+            // Note: undefined value is an error (means: simple renderer returned no value).
+            // null is a valid result (means: simple renderer prevents the field from being updated).
             if (form_value === undefined) {
                 throw "TopicRendererError: the form reading function for \"" + this.label +
                     "\" returned no value (renderer_uri=\"" + renderer_uri + "\")"
@@ -396,8 +404,8 @@
             }
             //
             var form_values = form_reading_function()
-            // Note: undefined value is an error (means: field renderer returned no value).
-            // null is a valid result (means: field renderer prevents the field from being updated).
+            // Note: undefined value is an error (means: simple renderer returned no value).
+            // null is a valid result (means: simple renderer prevents the field from being updated).
             if (form_values === undefined) {
                 throw "TopicRendererError: the form reading function for \"" + this.label +
                     "\" returned no value (renderer_uri=\"" + renderer_uri + "\")"
@@ -411,8 +419,8 @@
         function lookup_renderer() {
             switch (type) {
             case PageModel.SIMPLE:
-                renderer_uri = dm4c.get_view_config(self.topic_type, "field_renderer_uri", assoc_def)
-                return dm4c.get_field_renderer(renderer_uri)
+                renderer_uri = dm4c.get_view_config(self.topic_type, "simple_renderer_uri", assoc_def)
+                return dm4c.get_simple_renderer(renderer_uri)
             case PageModel.COMPOSITE:
                 // ### TODO
                 return null

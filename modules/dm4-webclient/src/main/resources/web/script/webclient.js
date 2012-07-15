@@ -643,12 +643,12 @@ function Webclient() {
 
     // ---
 
-    this.add_field_renderer = function(renderer_uri, renderer) {
-        pm.add_field_renderer(renderer_uri, renderer)
+    this.add_simple_renderer = function(renderer_uri, renderer) {
+        pm.add_simple_renderer(renderer_uri, renderer)
     }
 
-    this.get_field_renderer = function(renderer_uri) {
-        return pm.get_field_renderer(renderer_uri)
+    this.get_simple_renderer = function(renderer_uri) {
+        return pm.get_simple_renderer(renderer_uri)
     }
 
     // ---
@@ -700,8 +700,8 @@ function Webclient() {
         pm.register_page_renderer(source_path)
     }
 
-    this.load_field_renderer = function(source_path) {
-        pm.register_field_renderer(source_path)
+    this.load_simple_renderer = function(source_path) {
+        pm.register_simple_renderer(source_path)
     }
 
     this.load_multi_renderer = function(source_path) {
@@ -888,8 +888,8 @@ function Webclient() {
                 return true
             case "page_renderer_uri":
                 return default_page_renderer_uri()
-            case "field_renderer_uri":
-                return default_field_renderer_uri()
+            case "simple_renderer_uri":
+                return default_simple_renderer_uri()
             case "multi_renderer_uri":
                 return "dm4.webclient.default_multi_renderer"
             case "rows":
@@ -907,7 +907,7 @@ function Webclient() {
                 throw "InvalidConfigurableError: " + JSON.stringify(configurable)
             }
 
-            function default_field_renderer_uri() {
+            function default_simple_renderer_uri() {
                 switch (configurable.data_type_uri) {
                 case "dm4.core.text":
                     return "dm4.webclient.text_renderer"

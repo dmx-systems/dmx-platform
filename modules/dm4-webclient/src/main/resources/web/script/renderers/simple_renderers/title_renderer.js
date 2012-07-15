@@ -1,4 +1,4 @@
-dm4c.add_field_renderer("dm4.webclient.title_renderer", {
+dm4c.add_simple_renderer("dm4.webclient.title_renderer", {
 
     render_field: function(field_model, parent_element) {
         parent_element.append($("<h1>")
@@ -6,5 +6,5 @@ dm4c.add_field_renderer("dm4.webclient.title_renderer", {
         )
     },
 
-    render_form_element: dm4c.get_field_renderer("dm4.webclient.text_renderer").render_form_element
+    render_form_element: dm4c.get_simple_renderer("dm4.webclient.text_renderer").render_form_element
 })

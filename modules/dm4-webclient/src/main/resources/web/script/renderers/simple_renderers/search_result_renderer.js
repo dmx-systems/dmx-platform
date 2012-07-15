@@ -1,4 +1,4 @@
-dm4c.add_field_renderer("dm4.webclient.search_result_renderer", {
+dm4c.add_simple_renderer("dm4.webclient.search_result_renderer", {
 
     render_field: function(field_model, parent_element) {
         // fetch search result
