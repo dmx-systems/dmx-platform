@@ -1,21 +1,21 @@
 dm4c.add_simple_renderer("dm4.webclient.html_renderer", {
 
-    render_field: function(field_model, parent_element) {
-        dm4c.render.field_label(field_model, parent_element)
-        parent_element.append(field_model.value)
+    render_info: function(page_model, parent_element) {
+        dm4c.render.field_label(page_model, parent_element)
+        parent_element.append(page_model.value)
     },
 
-    render_form_element: function(field_model, parent_element) {
+    render_form: function(page_model, parent_element) {
         parent_element.append($("<textarea>")
-            .attr({id: "field_" + field_model.uri, rows: field_model.rows})
-            .text(field_model.value)
+            .attr({id: "field_" + page_model.uri, rows: page_model.rows})
+            .text(page_model.value)
         )
-        CKEDITOR.replace("field_" + field_model.uri, {
+        CKEDITOR.replace("field_" + page_model.uri, {
             customConfig: "/de.deepamehta.webclient/script/config/ckeditor_config.js"
         })
         //
         return function() {
-            return CKEDITOR.instances["field_" + field_model.uri].getData()
+            return CKEDITOR.instances["field_" + page_model.uri].getData()
         }
     }
 })

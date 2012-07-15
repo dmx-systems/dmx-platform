@@ -1,15 +1,15 @@
 dm4c.add_simple_renderer("dm4.files.file_content_renderer", {
 
-    render_field: function(field_model, parent_element) {
+    render_info: function(page_model, parent_element) {
         render_content()
 
         // ------------------------------------------------------------------------------------------- Private Functions
 
         function render_content() {
             try {
-                var path       = field_model.toplevel_topic.get("dm4.files.path")
-                var size       = field_model.toplevel_topic.get("dm4.files.size")
-                var media_type = field_model.toplevel_topic.get("dm4.files.media_type")
+                var path       = page_model.toplevel_topic.get("dm4.files.path")
+                var size       = page_model.toplevel_topic.get("dm4.files.size")
+                var media_type = page_model.toplevel_topic.get("dm4.files.media_type")
                 var src = local_resource_URI()
                 // Note: for unknown file types media_type is null
                 /*if (!media_type) {

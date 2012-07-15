@@ -1,13 +1,13 @@
 dm4c.add_simple_renderer("dm4.iconpicker.icon_renderer", {
 
-    render_field: function(field_model, parent_element) {
-        dm4c.render.field_label(field_model, parent_element)
-        parent_element.append(dm4c.render.icon(field_model.value))
+    render_info: function(page_model, parent_element) {
+        dm4c.render.field_label(page_model, parent_element)
+        parent_element.append(dm4c.render.icon(page_model.value))
     },
 
-    render_form_element: function(field_model, parent_element) {
+    render_form: function(page_model, parent_element) {
         var picked_icon = null                  // a topic of type "dm4.webclient.icon"
-        var image = dm4c.render.icon(field_model.value)
+        var image = dm4c.render.icon(page_model.value)
         parent_element.append(image.after(dm4c.ui.button(do_open_iconpicker, "Choose")))
         //
         return function() {
@@ -16,7 +16,7 @@ dm4c.add_simple_renderer("dm4.iconpicker.icon_renderer", {
                 return null
             }
             //
-            if (field_model.uri) {
+            if (page_model.uri) {
                 // An instance of an Icon's parent type is edited.
                 // Note: aggregation is assumed ### FIXME: support composition as well
                 return dm4c.REF_PREFIX + picked_icon.id

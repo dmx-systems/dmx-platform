@@ -8,10 +8,10 @@ function PluginManager(config) {
     var page_renderers = {}     // key: page renderer URI, value: object with "render_page", "render_form", "page_css"
 
     var simple_renderer_sources = []
-    var simple_renderers = {}   // key: simple renderer URI, value: object with "render_field", "render_form_element"
+    var simple_renderers = {}   // key: simple renderer URI, value: object with "render_info", "render_form"
 
     var multi_renderer_sources = []
-    var multi_renderers = {}    // key: multi renderer URI, value: object with "render_fields", "render_form_elements"
+    var multi_renderers = {}    // key: multi renderer URI, value: object with "render_info", "render_form"
 
     var css_stylesheets = []
 

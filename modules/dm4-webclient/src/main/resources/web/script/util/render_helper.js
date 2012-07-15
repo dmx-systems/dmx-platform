@@ -4,17 +4,17 @@
 function RenderHelper() {
 
     /**
-     * @param   field_model     a TopicRenderer.FieldModel object or a string.
+     * @param   page_model      a TopicRenderer.PageModel object or a string.
      * @param   parent_element  Optional: the parent element the label is rendered to.
      *                          If not specified the label is rendered directly to the page panel.
      */
-    this.field_label = function(field_model, parent_element, result_set) {
+    this.field_label = function(page_model, parent_element, result_set) {
         parent_element = parent_element || $("#page-content")
         //
-        if (typeof(field_model) == "string") {
-            var label = field_model
+        if (typeof(page_model) == "string") {
+            var label = page_model
         } else {
-            var label = field_model.label
+            var label = page_model.label
         }
         //
         if (result_set) {
@@ -107,16 +107,16 @@ function RenderHelper() {
     // ---
 
     /**
-     * @param   field_model     Optional: the initial value (a TopicRenderer.FieldModel object or a non-object value).
+     * @param   page_model      Optional: the initial value (a TopicRenderer.PageModel object or a non-object value).
      *                          If not specified the text field will be empty.
      *
      * @return  The <input> element (jQuery object).
      */
-    this.input = function(field_model, size) {
-        if (typeof(field_model) == "object") {
-            var value = field_model.value
+    this.input = function(page_model, size) {
+        if (typeof(page_model) == "object") {
+            var value = page_model.value
         } else {
-            var value = field_model
+            var value = page_model
         }
         // Note: we use an object argument for attr().
         // attr("value", value) would be interpreted as 1-argument attr() call if value is undefined.
@@ -124,14 +124,14 @@ function RenderHelper() {
     }
 
     /**
-     * @param   field_model     a boolean value or a TopicRenderer.FieldModel of a boolean topic.
+     * @param   page_model      a boolean value or a TopicRenderer.PageModel of a boolean topic.
      */
-    this.checkbox = function(field_model) {
+    this.checkbox = function(page_model) {
         var checkbox = $("<input type='checkbox'>")
-        if (typeof(field_model) == "boolean") {
-            var checked = field_model
+        if (typeof(page_model) == "boolean") {
+            var checked = page_model
         } else {
-            var checked = field_model.value
+            var checked = page_model.value
         }
         if (checked) {
             checkbox.attr("checked", "checked")

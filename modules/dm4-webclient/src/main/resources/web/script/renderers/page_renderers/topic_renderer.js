@@ -10,28 +10,41 @@
         // === Page Renderer Implementation ===
 
         render_page: function(topic) {
-            var page_model = create_page_model(topic, "page")
+            var page_model = create_page_model(topic, this.mode.INFO)
             // trigger hook
             dm4c.trigger_plugin_hook("pre_render_page", topic, page_model)
             //
-            render_page_model(page_model, "page")
+            render_page_model(page_model, this.mode.INFO)
             //
             dm4c.render.associations(topic.id)
         },
 
         render_form: function(topic) {
-            var page_model = create_page_model(topic, "form")
+            var page_model = create_page_model(topic, this.mode.FORM)
             // trigger hook
             dm4c.trigger_plugin_hook("pre_render_form", topic, page_model)
             //
-            render_page_model(page_model, "form")
+            render_page_model(page_model, this.mode.FORM)
             //
             return function() {
                 dm4c.do_update_topic(topic_renderer.build_topic_model(page_model))
             }
         },
 
-        // === Proprietary methods ===
+        // === Proprietary objects and methods ===
+
+        mode: {
+            INFO: {
+                render_setting: "viewable",
+                render_func_name_simple: "render_info_simple",
+                render_func_name_multi:  "render_info_multi"
+            },
+            FORM: {
+                render_setting: "editable",
+                render_func_name_simple: "render_form_simple",
+                render_func_name_multi:  "render_form_multi"
+            }
+        },
 
         /**
          * Creates a page model for a topic.
@@ -39,22 +52,21 @@
          * A page model comprises all the information required to render a topic in the page panel (a.k.a. detail
          * panel).
          *
-         * A page model is either a FieldModel object (for a simple topic) or a PageModel object (for a complex topic).
-         * A PageModel object is a nested structure of FieldModels and (again) PageModels.
+         * A page model is represented by a hierarchical structure of PageModel objects.
          *
          * @param   topic           The topic the page model is created for.
          * @param   assoc_def       The association definition that leads to that topic. Undefined for the top-level
-         *                          call. For a simple topic the association definition is used to create the
-         *                          corresponding field model. For a complex topic the association definition is
-         *                          (currently) not used. ### FIXDOC
-         * @param   field_uri       The (base) URI for the field model(s) to create (string). Empty ("") for the
-         *                          top-level call.
+         *                          call. The association definition is used to create the PageModel object.
+         *                          See there for further documentation.
+         * @param   field_uri       The (base) URI for the (child) model(s) to create (string). Empty ("") for the
+         *                          top-level call. The field URI is used to create the child PageModel objects.
+         *                          See there for further documentation.
          * @param   toplevel_topic  The topic the page/form is rendered for. Usually that is the selected topic.
          *                          For a simple topic the top-level topic is used to create the corresponding field
          *                          model. For a complex topic the top-level topic is just passed recursively.
          *                          ### FIXDOC
          *                          Note: for the top-level call "toplevel_topic" and "topic" are usually the same.
-         * @param   render_mode     "page" or "form" (string).
+         * @param   render_mode     this.mode.INFO or this.mode.FORM (object).
          *
          * @return  The created page model, or undefined. Undefined is returned if the topic is a simple one and is not
          *          viewable/editable.
@@ -63,7 +75,7 @@
             var topic_type = dm4c.get_topic_type(topic.type_uri)   // ### TODO: real Topics would allow topic.get_type()
             if (topic_type.is_simple()) {
                 //
-                if (!dm4c.get_view_config(topic_type, render_setting(), assoc_def)) {
+                if (!dm4c.get_view_config(topic_type, render_mode.render_setting, assoc_def)) {
                     return
                 }
                 //
@@ -73,7 +85,7 @@
                 for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
                     var child_topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
                     //
-                    if (!dm4c.get_view_config(child_topic_type, render_setting(), assoc_def)) {
+                    if (!dm4c.get_view_config(child_topic_type, render_mode.render_setting, assoc_def)) {
                         continue
                     }
                     //
@@ -108,24 +120,13 @@
                 }
                 return page_model;
             }
-
-            function render_setting() {
-                switch (render_mode) {
-                case "page":
-                    return "viewable"
-                case "form":
-                    return "editable"
-                default:
-                    throw "TopicRendererError: \"" + render_mode + "\" is an invalid render mode"
-                }
-            }
         },
 
         /**
          * Renders a page model. Called recursively.
          *
-         * @param   page_model      The page model to render (a PageModel or a FieldModel).
-         * @param   render_mode     "page" or "form" (string).
+         * @param   page_model      The page model to render (a PageModel object).
+         * @param   render_mode     this.mode.INFO or this.mode.FORM (object).
          * @param   level           The nesting level (integer). Starts at 0.
          * @param   ref_element     The page element the rendering is attached to (a jQuery object).
          *                          Precondition: this element is already part of the DOM.
@@ -139,15 +140,15 @@
             //
             if (page_model.type == PageModel.SIMPLE) {
                 var box = render_box(false, ref_element, incremental, remove_button_page_model())   // accentuated=false
-                page_model[render_func_name()](box)
+                page_model[render_mode.render_func_name_simple](box)
             } else if (page_model.type == PageModel.COMPOSITE) {
                 var box = render_box(true, ref_element, incremental, remove_button_page_model())    // accentuated=true
                 for (var assoc_def_uri in page_model.childs) {
                     var child_model = page_model.childs[assoc_def_uri]
                     if (child_model.type == PageModel.MULTI) {
                         // cardinality "many"
-                        var many_box = render_box(false, box, false)                                // accentuated=false
-                        child_model[render_func_name_many()](many_box, level + 1)
+                        var multi_box = render_box(false, box, false)                               // accentuated=false
+                        child_model[render_mode.render_func_name_multi](multi_box, level + 1)
                     } else {
                         // cardinality "one"
                         this.render_page_model(child_model, render_mode, level + 1, box)
@@ -176,30 +177,6 @@
                 return box
             }
 
-            // ---
-
-            function render_func_name() {
-                switch (render_mode) {
-                case "page":
-                    return "render_field"
-                case "form":
-                    return "render_form_element"
-                default:
-                    throw "TopicRendererError: \"" + render_mode + "\" is an invalid render mode"
-                }
-            }
-
-            function render_func_name_many() {
-                switch (render_mode) {
-                case "page":
-                    return "render_fields"
-                case "form":
-                    return "render_form_elements"
-                default:
-                    throw "TopicRendererError: \"" + render_mode + "\" is an invalid render mode"
-                }
-            }
-
             // === "Remove" Button ===
 
             // Note: subject of removal is always a SIMPLE or a COMPOSITE, never a MULTI. So, the remove button
@@ -207,7 +184,7 @@
             // So, the add button aspect is handled by the respective multi renderers.
 
             function remove_button_page_model() {
-                return render_mode == "form" &&
+                return render_mode == topic_renderer.mode.FORM &&
                     page_model.assoc_def &&  // Note: the top-level page model has no assoc_def
                     page_model.assoc_def.part_cardinality_uri == "dm4.core.many" &&
                     page_model
@@ -251,7 +228,7 @@
                 if (value == null) {
                     return null
                 }
-                // ### TODO: explain. Compare to TextRenderer.render_form_element()
+                // ### TODO: explain. Compare to TextRenderer.render_form()
                 switch (page_model.assoc_def && page_model.assoc_def.assoc_type_uri) {
                 case undefined:
                 case "dm4.core.composition_def":
@@ -296,7 +273,7 @@
     // === Page Model ===
 
     /**
-     * @param   render_mode     "page" or "form" (string).
+     * @param   render_mode     this.mode.INFO or this.mode.FORM (object).
      */
     function create_page_model(topic, render_mode) {
         return topic_renderer.create_page_model(topic, undefined, "", topic, render_mode)
@@ -304,7 +281,7 @@
 
     /**
      * @param   page_model      the page model to render. If undefined nothing is rendered.
-     * @param   render_mode     "page" or "form" (string).
+     * @param   render_mode     this.mode.INFO or this.mode.FORM (object).
      */
     function render_page_model(page_model, render_mode) {
         topic_renderer.render_page_model(page_model, render_mode, 0, $("#page-content"))
@@ -315,7 +292,7 @@
     // ------------------------------------------------------------------------------------------------- Private Classes
 
     /**
-     * @param   topic           The topic underlying this field. Its "value" is rendered through this field model.
+     * @param   topic           The topic underlying this field. Its "value" is rendered through this page model.
      *                          A topic "id" -1 indicates a topic to be created.
      * @param   assoc_def       The direct association definition that leads to this field.
      *                          For a non-composite topic it is <code>undefined</code>.
@@ -334,7 +311,7 @@
      *                              - HTMLRenderer (Webclient module)
      *                              - IconRenderer (Icon Picker module)
      * @param   toplevel_topic  The topic the page/form is rendered for. Usually that is the selected topic.
-     *                          (So, that is the same topic for all the FieldModel objects making up one page/form.)
+     *                          (So, that is the same topic for all the PageModel objects making up one page/form.)
      *                          This topic is passed to the simple renderer constructors.
      *                          The particular simple renderers are free to operate on it. Simple renderers which do so:
      *                              - SearchResultRenderer  (Webclient module)
@@ -361,13 +338,13 @@
 
         // === Simple Renderer ===
 
-        this.render_field = function(parent_element) {
-            renderer.render_field(this, parent_element)
+        this.render_info_simple = function(parent_element) {
+            renderer.render_info(this, parent_element)
         }
 
-        this.render_form_element = function(parent_element) {
+        this.render_form_simple = function(parent_element) {
             dm4c.render.field_label(this, parent_element)
-            form_reading_function = renderer.render_form_element(this, parent_element)
+            form_reading_function = renderer.render_form(this, parent_element)
         }
 
         this.read_form_value = function() {
@@ -389,12 +366,12 @@
 
         // === Multi Renderer ===
 
-        this.render_fields = function(parent_element, level) {
-            renderer.render_fields(this.values, parent_element, level)
+        this.render_info_multi = function(parent_element, level) {
+            renderer.render_info(this.values, parent_element, level)
         }
 
-        this.render_form_elements = function(parent_element, level) {
-            form_reading_function = renderer.render_form_elements(this.values, parent_element, level)
+        this.render_form_multi = function(parent_element, level) {
+            form_reading_function = renderer.render_form(this.values, parent_element, level)
         }
 
         this.read_form_values = function() {

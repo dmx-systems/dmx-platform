@@ -1,6 +1,6 @@
 dm4c.add_multi_renderer("dm4.webclient.checkbox_renderer", {
 
-    render_fields: function(page_models, parent_element, level) {
+    render_info: function(page_models, parent_element, level) {
         var list = $("<ul>")
         for (var i = 0; i < page_models.length; i++) {
             list.append($("<li>").text(page_models[i].value))
@@ -9,7 +9,7 @@ dm4c.add_multi_renderer("dm4.webclient.checkbox_renderer", {
         parent_element.append(list)
     },
 
-    render_form_elements: function(page_models, parent_element, level) {
+    render_form: function(page_models, parent_element, level) {
         // fetch all instances                         // fetch_composite=false, sort=true
         var topics = dm4c.restc.get_topics(page_models[0].topic_type.uri, false, true).items
         var checkboxes = {}
