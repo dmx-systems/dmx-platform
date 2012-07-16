@@ -51,7 +51,6 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private static final String PLUGIN_DEFAULT_PACKAGE = "de.deepamehta.core.osgi";
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
-    private static final String PLUGIN_JAVASCRIPT_FILE = "/web/script/plugin.js";
     private static final String PLUGIN_ACTIVATED = "de/deepamehta/core/plugin_activated";   // topic of the OSGi event
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -102,7 +101,7 @@ public class PluginImpl implements Plugin, EventHandler {
         //
         this.pluginProperties = readConfigFile();
         this.pluginPackage = getConfigProperty("pluginPackage", pluginContext.getClass().getPackage().getName());
-        this.pluginInfo = createPluginInfo();
+        this.pluginInfo = new PluginInfoImpl(pluginUri, pluginBundle);
         this.pluginDependencies = getPluginDependencies();
     }
 
@@ -126,10 +125,6 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     // ---
-
-    public PluginInfo getInfo() {
-        return pluginInfo;
-    }
 
     /**
      * Uses the plugin bundle's class loader to find a resource.
@@ -193,6 +188,10 @@ public class PluginImpl implements Plugin, EventHandler {
         return pluginUri;
     }
 
+    PluginInfo getInfo() {
+        return pluginInfo;
+    }
+
     Topic getPluginTopic() {
         return pluginTopic;
     }
@@ -250,11 +249,6 @@ public class PluginImpl implements Plugin, EventHandler {
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private PluginInfo createPluginInfo() {
-        boolean hasClientComponent = pluginBundle.getEntry(PLUGIN_JAVASCRIPT_FILE) != null;
-        return new PluginInfo(pluginUri, hasClientComponent);
-    }
 
     // === Config Properties ===
 
