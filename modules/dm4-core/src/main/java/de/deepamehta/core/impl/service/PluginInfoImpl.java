@@ -37,7 +37,7 @@ class PluginInfoImpl implements PluginInfo {
             renderers.put("page_renderers",   getRenderers("page_renderers"));
             renderers.put("simple_renderers", getRenderers("simple_renderers"));
             renderers.put("multi_renderers",  getRenderers("multi_renderers"));
-            renderers.put("canvas_renderers", getRenderers("canvas_renderers"));
+            // ### renderers.put("canvas_renderers", getRenderers("canvas_renderers"));
             pluginInfo.put("renderers", renderers);
             //
         } catch (Exception e) {

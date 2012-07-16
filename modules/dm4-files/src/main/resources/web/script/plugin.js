@@ -1,8 +1,5 @@
 dm4c.add_plugin("de.deepamehta.files", function() {
 
-    dm4c.load_simple_renderer("/de.deepamehta.files/script/renderers/simple_renderers/file_content_renderer.js")
-    dm4c.load_simple_renderer("/de.deepamehta.files/script/renderers/simple_renderers/folder_content_renderer.js")
-
     // === REST Client Extension ===
 
     dm4c.restc.create_file_topic = function(path) {

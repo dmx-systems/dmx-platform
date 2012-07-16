@@ -5,22 +5,6 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
 
     var type_menu
 
-    dm4c.load_page_renderer("/de.deepamehta.webclient/script/renderers/page_renderers/topic_renderer.js")
-    dm4c.load_page_renderer("/de.deepamehta.webclient/script/renderers/page_renderers/association_renderer.js")
-
-    dm4c.load_simple_renderer("/de.deepamehta.webclient/script/renderers/simple_renderers/text_renderer.js")
-    dm4c.load_simple_renderer("/de.deepamehta.webclient/script/renderers/simple_renderers/number_renderer.js")
-    dm4c.load_simple_renderer("/de.deepamehta.webclient/script/renderers/simple_renderers/boolean_renderer.js")
-    dm4c.load_simple_renderer("/de.deepamehta.webclient/script/renderers/simple_renderers/html_renderer.js")
-    // ### dm4c.load_field_renderer("/script/field_renderers/date_field_renderer.js")
-    // ### dm4c.load_field_renderer("/script/field_renderers/reference_field_renderer.js")
-    dm4c.load_simple_renderer("/de.deepamehta.webclient/script/renderers/simple_renderers/title_renderer.js")
-    dm4c.load_simple_renderer("/de.deepamehta.webclient/script/renderers/simple_renderers/body_text_renderer.js")
-    dm4c.load_simple_renderer("/de.deepamehta.webclient/script/renderers/simple_renderers/search_result_renderer.js")
-
-    dm4c.load_multi_renderer("/de.deepamehta.webclient/script/renderers/multi_renderers/default_multi_renderer.js")
-    dm4c.load_multi_renderer("/de.deepamehta.webclient/script/renderers/multi_renderers/checkbox_renderer.js")
-
     // === Webclient Listeners ===
 
     dm4c.add_listener("init", function() {

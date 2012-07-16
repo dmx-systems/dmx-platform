@@ -696,18 +696,6 @@ function Webclient() {
         pm.register_css_stylesheet(css_path)
     }
 
-    this.load_page_renderer = function(source_path) {
-        pm.register_page_renderer(source_path)
-    }
-
-    this.load_simple_renderer = function(source_path) {
-        pm.register_simple_renderer(source_path)
-    }
-
-    this.load_multi_renderer = function(source_path) {
-        pm.register_multi_renderer(source_path)
-    }
-
     // ---
 
     this.add_listener = function(hook_name, listener) {
