@@ -73,12 +73,14 @@ body {
     width: 30em;
 }
 
+/* Note: these styles must match with /script/vendor/ckeditor/css/ckeditor_contents.css */
 #page-content p, ul, ol {
     margin-top: 0;
     margin-bottom: 0.7em;
     line-height: 1.6em;
 }
 
+/* Note: these styles must match with /script/vendor/ckeditor/css/ckeditor_contents.css */
 #page-content pre {
     /* Relative or no font-size results in different sizes in Safari and Firefox */
     font-size: 16px;

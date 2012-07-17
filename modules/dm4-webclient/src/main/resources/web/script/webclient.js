@@ -4,6 +4,7 @@ function Webclient() {
 
     // logger preferences
     var ENABLE_LOGGING = false
+    //
     var LOG_TYPE_LOADING = false
     this.LOG_PLUGIN_LOADING = false
     var LOG_IMAGE_LOADING = false

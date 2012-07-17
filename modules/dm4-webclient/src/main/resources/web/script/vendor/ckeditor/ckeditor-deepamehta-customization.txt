@@ -1,13 +1,28 @@
 
+CKEditor DeepaMehta Customization
+=================================
+
+Within the Webclient bundle CKEditor is located at /src/main/resources/web/script/vendor/ckeditor/
+
+The following files are customized by DeepaMehta and must be preserved when updating CKEditor:
+
+    ckeditor-deepamehta-customization.txt       # this file
+    ckeditor_config.js                          # referenced from DM's html_renderer
+    css/
+        ckeditor_contents.css                   # these styles must match with webclient.css
+    skins/
+        kama_dm/                                # see following update instructions
+
+
 CKEditor Update Instructions
-============================
+----------------------------
 
 DeepaMehta uses a CKEditor custom skin "kama_dm".
 This is based on the "kama" skin of CKEditor 3.6.2
 
 Perform these steps when updating CKEditor:
 
-1) Move the original "kama" skin folder to /src/main/resources/web/style/ckeditor_skin
+1) Move the original "kama" skin folder to /src/main/resources/web/script/vendor/ckeditor/skins/
    and rename it to "kama_dm"
 
 2) In 4 files globally replace "kama" by "kama_dm":

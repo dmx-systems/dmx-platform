@@ -11,7 +11,7 @@ dm4c.add_simple_renderer("dm4.webclient.html_renderer", {
             .text(page_model.value)
         )
         CKEDITOR.replace("field_" + page_model.uri, {
-            customConfig: "/de.deepamehta.webclient/script/config/ckeditor_config.js"
+            customConfig: "/de.deepamehta.webclient/script/vendor/ckeditor/ckeditor_config.js"
         })
         //
         return function() {
