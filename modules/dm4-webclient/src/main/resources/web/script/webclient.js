@@ -693,8 +693,8 @@ function Webclient() {
         })
     }
 
-    this.load_stylesheet = function(css_path) {
-        pm.register_css_stylesheet(css_path)
+    this.load_stylesheet = function(stylesheet) {
+        pm.load_stylesheet(stylesheet)
     }
 
     // ---

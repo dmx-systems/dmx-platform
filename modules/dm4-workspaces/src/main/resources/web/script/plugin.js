@@ -1,7 +1,5 @@
 dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
-    dm4c.load_stylesheet("/de.deepamehta.workspaces/style/workspaces.css")
-
     // view
     var workspace_menu
 

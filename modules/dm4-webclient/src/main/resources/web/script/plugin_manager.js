@@ -5,8 +5,6 @@ function PluginManager(config) {
     var simple_renderers = {}   // key: simple renderer URI, value: object with "render_info", "render_form"
     var multi_renderers = {}    // key: multi renderer URI, value: object with "render_info", "render_form"
 
-    var css_stylesheets = []
-
     var items_to_load
     var items_complete = 0
 
@@ -132,8 +130,8 @@ function PluginManager(config) {
 
     // ---
 
-    this.register_css_stylesheet = function(css_path) {
-        css_stylesheets.push(css_path)
+    this.load_stylesheet = function(stylesheet) {
+        load_stylesheet(stylesheet)
     }
 
     // === Listener Registry ===
@@ -183,7 +181,7 @@ function PluginManager(config) {
         var count = 0
         for (var i = 0, plugin; plugin = plugins[i]; i++) {
             // count plugin file
-            if (plugin.has_client_component) {
+            if (plugin.has_plugin_file) {
                 count++
             }
             // count renderers
@@ -200,7 +198,6 @@ function PluginManager(config) {
             items_complete + "/" + items_to_load + ")")
         if (items_complete == items_to_load) {
             if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("PLUGINS COMPLETE!")
-            load_stylesheets()
             config.post_load_plugins()
         }
     }
@@ -225,14 +222,15 @@ function PluginManager(config) {
 
     function load_plugin(plugin) {
         // 1) load plugin file
-        if (plugin.has_client_component) {
+        if (plugin.has_plugin_file) {
             if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_uri +
-                "\" -- has client component")
+                "\" -- has plugin file")
             var plugin_file = "/" + plugin.plugin_uri + "/script/plugin.js"
             if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + plugin_file)
             load_plugin_file(plugin_file)
         } else {
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_uri + "\"")
+            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_uri +
+                "\" -- no plugin file to be loaded")
         }
         //
         // 2) load renderers
@@ -240,12 +238,14 @@ function PluginManager(config) {
         load_renderers(plugin.plugin_uri, "simple_renderers", plugin.renderers.simple_renderers)
         load_renderers(plugin.plugin_uri, "multi_renderers",  plugin.renderers.multi_renderers)
         // ### load_renderers(plugin.plugin_uri, "canvas_renderers", plugin.renderers.canvas_renderers)
+        //
+        // 3) load stylesheets
+        load_stylesheets(plugin.plugin_uri, plugin.stylesheets)
     }
 
     function load_renderers(plugin_uri, renderer_type, renderer_files) {
-        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Loading " + renderer_files.length + " " + renderer_type + ":")
         for (var i = 0, renderer_file; renderer_file = renderer_files[i]; i++) {
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + renderer_file)
+            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... Loading " + renderer_type + " " + renderer_file)
             // load renderer synchronously (Note: synchronous is required for displaying initial topic) ### FIXME
             dm4c.load_script("/" + plugin_uri + "/script/renderers/" + renderer_type + "/" + renderer_file)
         }
@@ -257,11 +257,14 @@ function PluginManager(config) {
 
     // ---
 
-    function load_stylesheets() {
-        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Loading " + css_stylesheets.length + " CSS stylesheets:")
-        for (var i = 0, css_stylesheet; css_stylesheet = css_stylesheets[i]; i++) {
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + css_stylesheet)
-            $("head").append($("<link>").attr({rel: "stylesheet", href: css_stylesheet, type: "text/css"}))
+    function load_stylesheets(plugin_uri, stylesheets) {
+        for (var i = 0, stylesheet; stylesheet = stylesheets[i]; i++) {
+            load_stylesheet("/" + plugin_uri + "/style/" + stylesheet)
         }
+    }
+
+    function load_stylesheet(stylesheet) {
+        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... Loading CSS " + stylesheet)
+        $("head").append($("<link>").attr({rel: "stylesheet", href: stylesheet, type: "text/css"}))
     }
 }

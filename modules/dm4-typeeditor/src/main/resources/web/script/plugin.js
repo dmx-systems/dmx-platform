@@ -1,7 +1,5 @@
 dm4c.add_plugin("de.deepamehta.typeeditor", function() {
 
-    dm4c.load_stylesheet("/de.deepamehta.typeeditor/style/typeeditor.css")
-
     // Note: no "uri" is set here. A new topic type gets its default URI at server-side.
     var DEFAULT_TOPIC_TYPE = {
         value: "Topic Type Name",

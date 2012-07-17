@@ -3,7 +3,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     var LOG_TOPICMAPS = false
     var self = this
 
-    dm4c.load_stylesheet("/de.deepamehta.topicmaps/style/topicmaps.css")
     dm4c.load_script("/de.deepamehta.topicmaps/script/canvas_renderer_extension.js")
     dm4c.load_script("/de.deepamehta.topicmaps/script/model/topicmap.js")
 

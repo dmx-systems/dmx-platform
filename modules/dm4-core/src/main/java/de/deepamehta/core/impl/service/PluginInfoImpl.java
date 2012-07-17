@@ -1,7 +1,11 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.service.PluginInfo;
+import de.deepamehta.core.util.JavaUtils;
+
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONException;
+
 import org.osgi.framework.Bundle;
 
 import java.util.ArrayList;
@@ -15,8 +19,9 @@ class PluginInfoImpl implements PluginInfo {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String PLUGIN_JAVASCRIPT_FILE = "/web/script/plugin.js";
+    private static final String PLUGIN_FILE            = "/web/script/plugin.js";
     private static final String PLUGIN_RENDERERS_PATH  = "/web/script/renderers/";
+    private static final String PLUGIN_STYLE_PATH      = "/web/style/";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -31,15 +36,9 @@ class PluginInfoImpl implements PluginInfo {
         this.pluginBundle = pluginBundle;
         try {
             pluginInfo.put("plugin_uri", pluginUri);
-            pluginInfo.put("has_client_component", pluginBundle.getEntry(PLUGIN_JAVASCRIPT_FILE) != null);
-            //
-            JSONObject renderers = new JSONObject();
-            renderers.put("page_renderers",   getRenderers("page_renderers"));
-            renderers.put("simple_renderers", getRenderers("simple_renderers"));
-            renderers.put("multi_renderers",  getRenderers("multi_renderers"));
-            // ### renderers.put("canvas_renderers", getRenderers("canvas_renderers"));
-            pluginInfo.put("renderers", renderers);
-            //
+            pluginInfo.put("has_plugin_file", hasPluginFile());
+            pluginInfo.put("stylesheets", getStylesheets());
+            pluginInfo.put("renderers", getRenderers());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -54,16 +53,38 @@ class PluginInfoImpl implements PluginInfo {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private boolean hasPluginFile() {
+        return pluginBundle.getEntry(PLUGIN_FILE) != null;
+    }
+
+    private List<String> getStylesheets() {
+        return getFilenames(PLUGIN_STYLE_PATH);
+    }
+
     private List<String> getRenderers(String renderersDir) {
-        List<String> renderers = new ArrayList();
-        Enumeration<String> e = pluginBundle.getEntryPaths(PLUGIN_RENDERERS_PATH + renderersDir);
+        return getFilenames(PLUGIN_RENDERERS_PATH + renderersDir);
+    }
+
+    private JSONObject getRenderers() throws JSONException {
+        JSONObject renderers = new JSONObject();
+        renderers.put("page_renderers",   getRenderers("page_renderers"));
+        renderers.put("simple_renderers", getRenderers("simple_renderers"));
+        renderers.put("multi_renderers",  getRenderers("multi_renderers"));
+        // ### renderers.put("canvas_renderers", getRenderers("canvas_renderers"));
+        return renderers;
+    }
+
+    // ---
+
+    private List<String> getFilenames(String path) {
+        List<String> filenames = new ArrayList();
+        Enumeration<String> e = pluginBundle.getEntryPaths(path);
         if (e != null) {
             while (e.hasMoreElements()) {
                 String entryPath = e.nextElement();
-                String renderer = entryPath.substring(entryPath.lastIndexOf('/') + 1);
-                renderers.add(renderer);
+                filenames.add(JavaUtils.getFilename(entryPath));
             }
         }
-        return renderers;
+        return filenames;
     }
 }

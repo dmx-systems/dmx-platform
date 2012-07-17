@@ -80,6 +80,10 @@ public class JavaUtils {
         return null;
     }
 
+    public static String getFilename(String path) {
+        return path.substring(path.lastIndexOf('/') + 1);
+    }
+
     public static String getExtension(String fileName) {
         return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
     }
