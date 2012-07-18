@@ -677,16 +677,16 @@ function Webclient() {
     /**
      * Loads a Javascript file dynamically. Synchronous and asynchronous loading is supported.
      *
-     * @param   script_url      The URL (absolute or relative) of the Javascript file to load.
-     * @param   callback        Optional: the function to invoke when asynchronous loading is complete.
-     *                          If not given loading is performed synchronously.
+     * @param   url     The URL (absolute or relative) of the Javascript file to load.
+     * @param   async   Optional (boolean):
+     *                      If true loading is asynchronous.
+     *                      If false or not given loading is synchronous.
      */
-    this.load_script = function(script_url, callback) {
+    this.load_script = function(url, async) {
         $.ajax({
-            url: script_url,
+            url: url,
             dataType: "script",
-            async: callback != undefined,
-            success: callback,
+            async: async || false,
             error: function(jq_xhr, text_status, error_thrown) {
                 throw text_status + ": " + error_thrown
             }
@@ -965,14 +965,19 @@ function Webclient() {
 
     /**
      * Called once all plugins are loaded.
+     * Note: the types are already loaded as well.
      */
     function setup_gui() {
         dm4c.log("Setting up GUI")
-        // setup create widget
+        // 1) Setting up the create widget
+        // Note: the create menu must be popularized *after* the plugins are loaded.
+        // Two hooks are involved: post_refresh_create_menu() and has_create_permission().
         dm4c.refresh_create_menu()
+        //
         if (!dm4c.toolbar.create_menu.get_item_count()) {
             dm4c.toolbar.create_widget.hide()
         }
+        // 2) Initialize plugins
         // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta-topicmaps plugin
         // does!) the "init" hook is triggered *after* creating the canvas.
         // Note: for displaying an initial topic (the deepamehta-topicmaps plugin does!) the "init" hook must
