@@ -394,6 +394,25 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
+    public Set<TopicType> getAllTopicTypes(ClientState clientState) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            Set<TopicType> topicTypes = new HashSet();
+            for (String uri : getTopicTypeUris()) {
+                TopicType topicType = getTopicType(uri, clientState);
+                topicTypes.add(topicType);
+            }
+            tx.success();
+            return topicTypes;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Retrieving all topic types failed", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Override
     public TopicType createTopicType(TopicTypeModel topicTypeModel, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
@@ -471,6 +490,25 @@ public class EmbeddedService implements DeepaMehtaService {
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Retrieving association type \"" + uri + "\" failed", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Override
+    public Set<AssociationType> getAllAssociationTypes(ClientState clientState) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            Set<AssociationType> assocTypes = new HashSet();
+            for (String uri : getAssociationTypeUris()) {
+                AssociationType assocType = getAssociationType(uri, clientState);
+                assocTypes.add(assocType);
+            }
+            tx.success();
+            return assocTypes;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Retrieving all association types failed", e);
         } finally {
             tx.finish();
         }

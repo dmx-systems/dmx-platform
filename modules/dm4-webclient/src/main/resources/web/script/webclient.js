@@ -1192,17 +1192,6 @@ function Webclient() {
         return build_association(dm4c.restc.get_association_by_id(assoc_id, fetch_composite))
     }
 
-    function fetch_topic_type(topic_type_uri) {
-        // Note: fetch_topic_type() is the only spot where a TopicType object is created directly
-        // instead by calling build_topic_type().
-        // fetch_topic_type() is part of the Webclient's bootstrapping sequence (see load_types() below).
-        return new TopicType(dm4c.restc.get_topic_type(topic_type_uri))
-    }
-
-    function fetch_association_type(assoc_type_uri) {
-        return build_association_type(dm4c.restc.get_association_type(assoc_type_uri))
-    }
-
     // ---
 
     function build_topic(topic) {
@@ -1229,6 +1218,7 @@ function Webclient() {
         return tt
     }
 
+    // ### FIXME: not yet used
     function build_association_type(assoc_type) {
         return new AssociationType(assoc_type)
     }
@@ -1237,18 +1227,18 @@ function Webclient() {
 
     function load_types() {
         // 1) load topic types
-        var type_uris = dm4c.restc.get_topic_type_uris()
-        if (LOG_TYPE_LOADING) dm4c.log("Loading " + type_uris.length + " topic types")
-        for (var i = 0; i < type_uris.length; i++) {
-            if (LOG_TYPE_LOADING) dm4c.log("..... " + type_uris[i])
-            type_cache.put_topic_type(fetch_topic_type(type_uris[i]))
+        var topic_types = dm4c.restc.get_all_topic_types()
+        if (LOG_TYPE_LOADING) dm4c.log("Loading " + topic_types.length + " topic types")
+        for (var i = 0, topic_type; topic_type = topic_types[i]; i++) {
+            if (LOG_TYPE_LOADING) dm4c.log("..... " + topic_type.uri)
+            type_cache.put_topic_type(new TopicType(topic_type))
         }
         // 2) load association types
-        var type_uris = dm4c.restc.get_association_type_uris()
-        if (LOG_TYPE_LOADING) dm4c.log("Loading " + type_uris.length + " association types")
-        for (var i = 0; i < type_uris.length; i++) {
-            if (LOG_TYPE_LOADING) dm4c.log("..... " + type_uris[i])
-            type_cache.put_association_type(fetch_association_type(type_uris[i]))
+        var assoc_types = dm4c.restc.get_all_association_types()
+        if (LOG_TYPE_LOADING) dm4c.log("Loading " + assoc_types.length + " association types")
+        for (var i = 0, assoc_type; assoc_type = assoc_types[i]; i++) {
+            if (LOG_TYPE_LOADING) dm4c.log("..... " + assoc_type.uri)
+            type_cache.put_association_type(new AssociationType(assoc_type))
         }
         // 3) load topic type icons
         // Note: the icons must be loaded *after* loading the topic types.

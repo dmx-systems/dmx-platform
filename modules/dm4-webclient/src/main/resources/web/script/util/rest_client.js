@@ -150,6 +150,10 @@ function RESTClient(core_service_uri) {
         return request("GET", "/topictype/" + type_uri)
     }
 
+    this.get_all_topic_types = function() {
+        return request("GET", "/topictype/all")
+    }
+
     this.create_topic_type = function(topic_type_model) {
         return request("POST", "/topictype", topic_type_model)
     }
@@ -168,6 +172,10 @@ function RESTClient(core_service_uri) {
 
     this.get_association_type = function(type_uri) {
         return request("GET", "/assoctype/" + type_uri)
+    }
+
+    this.get_all_association_types = function() {
+        return request("GET", "/assoctype/all")
     }
 
 
