@@ -116,6 +116,8 @@ public interface DeepaMehtaService {
 
     TopicType getTopicType(String topicTypeUri, ClientState clientState);
 
+    Set<TopicType> getAllTopicTypes(ClientState clientState);
+
     TopicType createTopicType(TopicTypeModel model, ClientState clientState);
 
     Directives updateTopicType(TopicTypeModel model, ClientState clientState);
@@ -127,6 +129,8 @@ public interface DeepaMehtaService {
     Set<String> getAssociationTypeUris();
 
     AssociationType getAssociationType(String assocTypeUri, ClientState clientState);
+
+    Set<AssociationType> getAllAssociationTypes(ClientState clientState);
 
     AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState);
 

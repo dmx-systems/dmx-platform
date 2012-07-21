@@ -262,6 +262,16 @@ public class WebservicePlugin extends PluginActivator {
         }
     }
 
+    @GET
+    @Path("/topictype/all")
+    public Set<TopicType> getAllTopicTypes(@HeaderParam("Cookie") ClientState clientState) {
+        try {
+            return dms.getAllTopicTypes(clientState);
+        } catch (Exception e) {
+            throw new WebApplicationException(e);
+        }
+    }
+
     @POST
     @Path("/topictype")
     public TopicType createTopicType(TopicTypeModel topicTypeModel, @HeaderParam("Cookie") ClientState clientState) {
@@ -302,6 +312,16 @@ public class WebservicePlugin extends PluginActivator {
                                               @HeaderParam("Cookie") ClientState clientState) {
         try {
             return dms.getAssociationType(uri, clientState);
+        } catch (Exception e) {
+            throw new WebApplicationException(e);
+        }
+    }
+
+    @GET
+    @Path("/assoctype/all")
+    public Set<AssociationType> getAssociationAllTypes(@HeaderParam("Cookie") ClientState clientState) {
+        try {
+            return dms.getAllAssociationTypes(clientState);
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
