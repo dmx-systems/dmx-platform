@@ -5,27 +5,33 @@ function PluginManager(config) {
     var simple_renderers = {}   // key: simple renderer URI, value: object with "render_info", "render_form"
     var multi_renderers = {}    // key: multi renderer URI, value: object with "render_info", "render_form"
 
-    var items_to_load
-    var items_complete = 0
+    var plugin_list
+    var load_tracker
 
     // key: hook name (string), value: registered listeners (array of functions)
     var listener_registry = {}
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
-    this.load_plugins = function() {
+    this.retrieve_plugin_list = function() {
         // retrieve list of installed plugins from server
-        var plugins = dm4c.restc.get_plugins()
+        plugin_list = dm4c.restc.get_plugins()
         //
-        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Plugins installed at server-side: " + plugins.length)
+        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Plugins installed at server-side: " + plugin_list.length)
         //
-        items_to_load = count_items_to_load(plugins) + config.internal_plugins.length
+        var items_to_load = count_items_to_load(plugin_list) + config.internal_plugins.length
         //
         if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Total items to load: " + items_to_load)
         //
+        return items_to_load
+    }
+
+    this.load_plugins = function(tracker) {
+        load_tracker = tracker
+        //
         load_internal_plugins(config.internal_plugins)
         //
-        for (var i = 0, plugin; plugin = plugins[i]; i++) {
+        for (var i = 0, plugin; plugin = plugin_list[i]; i++) {
             load_plugin(plugin)
         }
     }
@@ -177,9 +183,9 @@ function PluginManager(config) {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function count_items_to_load(plugins) {
+    function count_items_to_load(plugin_list) {
         var count = 0
-        for (var i = 0, plugin; plugin = plugins[i]; i++) {
+        for (var i = 0, plugin; plugin = plugin_list[i]; i++) {
             // count plugin file
             if (plugin.has_plugin_file) {
                 count++
@@ -193,13 +199,8 @@ function PluginManager(config) {
     }
 
     function track_load_state(item) {
-        items_complete++
-        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + item + " complete (" +
-            items_complete + "/" + items_to_load + ")")
-        if (items_complete == items_to_load) {
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("PLUGINS COMPLETE!")
-            config.post_load_plugins()
-        }
+        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + item + " complete")
+        load_tracker.track()
     }
 
     // ---

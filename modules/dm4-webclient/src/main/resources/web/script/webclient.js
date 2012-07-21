@@ -5,7 +5,7 @@ function Webclient() {
     // logger preferences
     var ENABLE_LOGGING = false
     //
-    var LOG_TYPE_LOADING = false
+    this.LOG_TYPE_LOADING = false
     this.LOG_PLUGIN_LOADING = false
     var LOG_IMAGE_LOADING = false
     this.LOG_GUI = false
@@ -45,8 +45,7 @@ function Webclient() {
     var type_cache = new TypeCache()
 
     var pm = new PluginManager({
-        internal_plugins: ["default_plugin.js", "fulltext_plugin.js", "ckeditor_plugin.js"],
-        post_load_plugins: setup_gui
+        internal_plugins: ["default_plugin.js", "fulltext_plugin.js", "ckeditor_plugin.js"]
     })
 
     extend_rest_client()
@@ -1074,7 +1073,8 @@ function Webclient() {
         return img
     }
 
-    this.create_image_tracker = function(callback_func) {
+    // ### TODO: replace image tracker by load tracker?
+    this.create_image_tracker = function(callback) {
 
         return image_tracker = new ImageTracker()
 
@@ -1092,7 +1092,7 @@ function Webclient() {
             // If so, the callback is triggered and this tracker is removed.
             this.check = function() {
                 if (is_all_complete()) {
-                    callback_func()
+                    callback()
                     image_tracker = null
                 }
             }
@@ -1107,6 +1107,19 @@ function Webclient() {
                 return js.includes(images, function(img) {
                     return img.src == image.src
                 })
+            }
+        }
+    }
+
+    // === Load Tracker ===
+
+    function LoadTracker(number_of_loads, callback) {
+        var loads_tracked = 0
+        //
+        this.track = function() {
+            loads_tracked++
+            if (loads_tracked == number_of_loads) {
+                callback()
             }
         }
     }
@@ -1223,34 +1236,6 @@ function Webclient() {
         return new AssociationType(assoc_type)
     }
 
-    // === Types ===
-
-    function load_types() {
-        // 1) load topic types
-        var topic_types = dm4c.restc.get_all_topic_types()
-        if (LOG_TYPE_LOADING) dm4c.log("Loading " + topic_types.length + " topic types")
-        for (var i = 0, topic_type; topic_type = topic_types[i]; i++) {
-            if (LOG_TYPE_LOADING) dm4c.log("..... " + topic_type.uri)
-            type_cache.put_topic_type(new TopicType(topic_type))
-        }
-        // 2) load association types
-        var assoc_types = dm4c.restc.get_all_association_types()
-        if (LOG_TYPE_LOADING) dm4c.log("Loading " + assoc_types.length + " association types")
-        for (var i = 0, assoc_type; assoc_type = assoc_types[i]; i++) {
-            if (LOG_TYPE_LOADING) dm4c.log("..... " + assoc_type.uri)
-            type_cache.put_association_type(new AssociationType(assoc_type))
-        }
-        // 3) load topic type icons
-        // Note: the icons must be loaded *after* loading the topic types.
-        // The topic type "dm4.webclient.icon" must be known.
-        if (LOG_TYPE_LOADING) dm4c.log("Loading topic type icons")
-        type_cache.iterate(function(topic_type) {
-            if (LOG_TYPE_LOADING) dm4c.log("..... " + topic_type.uri)
-            topic_type.load_icon()
-        })
-        if (LOG_TYPE_LOADING) dm4c.log("Loading types complete")
-    }
-
     // === REST client ===
 
     function extend_rest_client() {
@@ -1270,29 +1255,31 @@ function Webclient() {
     // ------------------------------------------------------------------------------------------------ Constructor Code
 
     $(function() {
-        //
-        // --- 1) Build GUI ---
-        // create toolbar
+        // 1) Build GUI
         dm4c.toolbar = new ToolbarPanel()
         $("body").append(dm4c.toolbar.dom)
-        // create split panel
+        //
         dm4c.split_panel = new SplitPanel()
         $("body").append(dm4c.split_panel.dom)
-        // create page panel
+        //
         dm4c.page_panel = new PagePanel()
         dm4c.split_panel.set_right_panel(dm4c.page_panel)
-        // create canvas
+        //
         dm4c.canvas = new TopicmapRenderer()
         dm4c.split_panel.set_left_panel(dm4c.canvas)
-        // create upload dialog
+        //
         dm4c.upload_dialog = new UploadDialog()
         //
-        // --- 2) Load Types ---
-        load_types()
+        // 2) Setup Load Tracker
+        var items_to_load = pm.retrieve_plugin_list()
+        var number_of_loads = items_to_load + 2    // +2 loads: topic types and association types
+        var tracker = new LoadTracker(number_of_loads, setup_gui)
         //
-        // --- 3) Load Plugins ---
-        // Note: in order to let a plugin DOM manipulate the GUI the plugins are loaded *after* the GUI is build.
-        pm.load_plugins()
+        // 3) Load Plugins
+        pm.load_plugins(tracker)
+        //
+        // 4) Load Types
+        type_cache.load_types(tracker)
     })
 }
 
