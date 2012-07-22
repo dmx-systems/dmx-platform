@@ -12,7 +12,7 @@ function PagePanel() {
     var page_renderer                   // The displayed object's page renderer
                                         // (only consulted if displayed_object is not null).
     var page_state = PageState.NONE     // Tracks page state. Used to fire the "post_destroy_form" event in case.
-    var from_processing_func            // The form processing function: called to "submit" the form
+    var from_processing_function        // The form processing function: called to "submit" the form
                                         // (only consulted if a form is displayed).
     var from_processing_called          // Tracks the form processing function call (boolean).
                                         // Used to ensure the form processing function is called only once.
@@ -89,7 +89,7 @@ function PagePanel() {
         }
         //
         from_processing_called = true
-        from_processing_func()
+        from_processing_function()
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
@@ -101,9 +101,10 @@ function PagePanel() {
      */
     function do_process_key(event) {
         // dm4c.log("Key up " + event.which)
-        if (event.which == 13) {
+        if (event.which == 13 && event.target.nodeName == "INPUT" && event.target.type == "text") {
             var submit_button = $("#page-toolbar button[type=submit]")
-            // alert("do_process_key: submit button=\"" + submit_button.text() + "\"")
+            // alert("do_process_key:\nsubmit button=\"" + submit_button.text() +
+            //    "\"\ntarget.type=" + js.inspect(event.target.type))
             submit_button.click()
         }
         return false
@@ -131,7 +132,7 @@ function PagePanel() {
 
     function render_form() {
         prepare_page()
-        from_processing_func = page_renderer.render_form(displayed_object)
+        from_processing_function = page_renderer.render_form(displayed_object)
         from_processing_called = false
     }
 
@@ -159,7 +160,7 @@ function PagePanel() {
     }
 
     function prepare_page() {
-        var css = page_renderer.page_css()
+        var css = page_renderer.page_css || {overflow: "auto"}
         $("#page-content").css(css)
     }
 

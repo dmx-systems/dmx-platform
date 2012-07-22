@@ -19,6 +19,7 @@
             value: "Person Name",
             uri: "dm4.contacts.person_name",
             data_type_uri: "dm4.core.composite",
+            index_mode_uris: ["dm4.core.fulltext_key"],
             assoc_defs: [
                 {
                     part_topic_type_uri:  "dm4.contacts.first_name",
@@ -117,6 +118,7 @@
             value: "Address",
             uri: "dm4.contacts.address",
             data_type_uri: "dm4.core.composite",
+            index_mode_uris: ["dm4.core.fulltext_key"],
             assoc_defs: [
                 {
                     part_topic_type_uri:   "dm4.contacts.street",

@@ -9,8 +9,10 @@ import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
+import de.deepamehta.core.service.listener.PluginServiceGoneListener;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.GET;
@@ -26,9 +28,10 @@ import java.util.logging.Logger;
 
 
 
-@Path("/")
+@Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends Plugin implements FilesService {
+public class FilesPlugin extends PluginActivator implements FilesService, PluginServiceArrivedListener,
+                                                                          PluginServiceGoneListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -40,33 +43,9 @@ public class FilesPlugin extends Plugin implements FilesService {
 
 
 
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
-
-
-
-    @Override
-    public void serviceArrived(PluginService service) {
-        logger.info("########## Service arrived: " + service);
-        if (service instanceof ProxyService) {
-            proxyService = (ProxyService) service;
-        }
-    }
-
-    @Override
-    public void serviceGone(PluginService service) {
-        logger.info("########## Service gone: " + service);
-        if (service == proxyService) {
-            proxyService = null;
-        }
-    }
-
-
-
-    // **********************
-    // *** Plugin Service ***
-    // **********************
+    // ***********************************
+    // *** FilesService Implementation ***
+    // ***********************************
 
 
 
@@ -157,8 +136,7 @@ public class FilesPlugin extends Plugin implements FilesService {
 
     // ---
 
-    // ### FIXME: Jersey WARNING: A HTTP GET method MUST return a non-void type
-    @GET
+    @POST
     @Path("/{id}")
     @Override
     public void openFile(@PathParam("id") long fileTopicId) {
@@ -171,6 +149,30 @@ public class FilesPlugin extends Plugin implements FilesService {
             Desktop.getDesktop().open(file);
         } catch (Throwable e) {
             throw new WebApplicationException(new RuntimeException("Opening file \"" + file + "\" failed", e));
+        }
+    }
+
+
+
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
+
+
+
+    @Override
+    public void pluginServiceArrived(PluginService service) {
+        logger.info("########## Service arrived: " + service);
+        if (service instanceof ProxyService) {
+            proxyService = (ProxyService) service;
+        }
+    }
+
+    @Override
+    public void pluginServiceGone(PluginService service) {
+        logger.info("########## Service gone: " + service);
+        if (service == proxyService) {
+            proxyService = null;
         }
     }
 

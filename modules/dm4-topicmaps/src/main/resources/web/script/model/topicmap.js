@@ -30,7 +30,7 @@ function Topicmap(topicmap_id, config) {
     }
 
     this.get_renderer_uri = function() {
-        return info.get("dm4.topicmaps.canvas_renderer_uri")
+        return info.get("dm4.topicmaps.topicmap_renderer_uri")
     }
 
     this.get_topic = function(id) {

@@ -22,11 +22,11 @@ import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.CommandParams;
 import de.deepamehta.core.service.CommandResult;
+import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Hook;
-import de.deepamehta.core.service.Migration;
+import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.ObjectFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
@@ -37,8 +37,6 @@ import de.deepamehta.core.util.JSONHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import java.io.InputStream;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -48,7 +46,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -59,23 +56,14 @@ import java.util.logging.Logger;
  */
 public class EmbeddedService implements DeepaMehtaService {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static final String CORE_MIGRATIONS_PACKAGE = "de.deepamehta.core.migrations";
-    private static final int REQUIRED_CORE_MIGRATION = 3;
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-            DeepaMehtaStorage storage;
-            ObjectFactoryImpl objectFactory;
-            TypeCache typeCache;
-
-    private PluginCache pluginCache;
-    private BundleContext bundleContext;
-
-    private enum MigrationRunMode {
-        CLEAN_INSTALL, UPDATE, ALWAYS
-    }
+    PluginManager pluginManager;
+    ListenerRegistry listenerRegistry;
+    DeepaMehtaStorage storage;
+    MigrationManager migrationManager;
+    ObjectFactoryImpl objectFactory;
+    TypeCache typeCache;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -83,8 +71,9 @@ public class EmbeddedService implements DeepaMehtaService {
 
     public EmbeddedService(DeepaMehtaStorage storage, BundleContext bundleContext) {
         this.storage = storage;
-        this.bundleContext = bundleContext;
-        this.pluginCache = new PluginCache();
+        this.migrationManager = new MigrationManager(this);
+        this.pluginManager = new PluginManager(bundleContext);
+        this.listenerRegistry = new ListenerRegistry();
         this.typeCache = new TypeCache(this);
         this.objectFactory = new ObjectFactoryImpl(this);
         bootstrapTypeCache();
@@ -142,11 +131,6 @@ public class EmbeddedService implements DeepaMehtaService {
             ResultSet<Topic> topics = JSONHelper.toTopicSet(getTopicType(typeUri, clientState).getRelatedTopics(
                 "dm4.core.instantiation", "dm4.core.type", "dm4.core.instance", null, fetchComposite, false,
                 maxResultSize, clientState));   // othersTopicTypeUri=null
-            /*
-            for (Topic topic : topics) {
-                triggerHook(Hook.PROVIDE_TOPIC_PROPERTIES, topic);
-            }
-            */
             tx.success();
             return topics;
         } catch (Exception e) {
@@ -178,13 +162,13 @@ public class EmbeddedService implements DeepaMehtaService {
     public AttachedTopic createTopic(TopicModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            triggerHook(Hook.PRE_CREATE_TOPIC, model, clientState);
+            fireEvent(CoreEvent.PRE_CREATE_TOPIC, model, clientState);
             //
             AttachedTopic topic = new AttachedTopic(model, this);
             Directives directives = new Directives();   // ### FIXME: directives are ignored
             topic.store(clientState, directives);
             //
-            triggerHook(Hook.POST_CREATE_TOPIC, topic, clientState, directives);
+            fireEvent(CoreEvent.POST_CREATE_TOPIC, topic, clientState, directives);
             //
             tx.success();
             return topic;
@@ -351,9 +335,9 @@ public class EmbeddedService implements DeepaMehtaService {
             //
             Directives directives = new Directives();
             //
-            triggerHook(Hook.PRE_DELETE_ASSOCIATION, assoc, directives);
+            fireEvent(CoreEvent.PRE_DELETE_ASSOCIATION, assoc, directives);
             assoc.delete(directives);
-            triggerHook(Hook.POST_DELETE_ASSOCIATION, assoc, directives);
+            fireEvent(CoreEvent.POST_DELETE_ASSOCIATION, assoc, directives);
             //
             tx.success();
             return directives;
@@ -410,6 +394,25 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
+    public Set<TopicType> getAllTopicTypes(ClientState clientState) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            Set<TopicType> topicTypes = new HashSet();
+            for (String uri : getTopicTypeUris()) {
+                TopicType topicType = getTopicType(uri, clientState);
+                topicTypes.add(topicType);
+            }
+            tx.success();
+            return topicTypes;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Retrieving all topic types failed", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Override
     public TopicType createTopicType(TopicTypeModel topicTypeModel, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
@@ -418,9 +421,9 @@ public class EmbeddedService implements DeepaMehtaService {
             typeCache.put(topicType);
             topicType.store();
             //
-            // Note: the modification must be applied *before* the enrichment.
+            // Note: the modification must be applied *before* the enrichment. ### FIXDOC
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
-            triggerHook(Hook.MODIFY_TOPIC_TYPE, topicType, clientState);
+            fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, clientState);
             //
             tx.success();
             return topicType;
@@ -493,6 +496,25 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
+    public Set<AssociationType> getAllAssociationTypes(ClientState clientState) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            Set<AssociationType> assocTypes = new HashSet();
+            for (String uri : getAssociationTypeUris()) {
+                AssociationType assocType = getAssociationType(uri, clientState);
+                assocTypes.add(assocType);
+            }
+            tx.success();
+            return assocTypes;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Retrieving all association types failed", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Override
     public AssociationType createAssociationType(AssociationTypeModel assocTypeModel, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
@@ -516,67 +538,25 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
-    // === Commands ===
-
-    @Override
-    public CommandResult executeCommand(String command, CommandParams params, ClientState clientState) {
-        logger.info("command=\"" + command + "\", params=" + params);
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            Iterator i = triggerHook(Hook.EXECUTE_COMMAND, command, params, clientState).values().iterator();
-            if (!i.hasNext()) {
-                throw new RuntimeException("Command is not handled by any plugin");
-            }
-            CommandResult result = (CommandResult) i.next();
-            if (i.hasNext()) {
-                throw new RuntimeException("Ambiguity: more than one plugin returned a result");
-            }
-            tx.success();
-            return result;
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Executing command \"" + command + "\" failed (params=" + params + ")", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
-
-
     // === Plugins ===
 
     @Override
-    public void registerPlugin(Plugin plugin) {
-        pluginCache.put(plugin);
-    }
-
-    @Override
-    public void unregisterPlugin(String pluginId) {
-        pluginCache.remove(pluginId);
-    }
-
-    @Override
-    public Plugin getPlugin(String pluginId) {
-        return pluginCache.get(pluginId);
+    public Plugin getPlugin(String pluginUri) {
+        return pluginManager.getPlugin(pluginUri);
     }
 
     @Override
     public Set<PluginInfo> getPluginInfo() {
-        final Set info = new HashSet();
-        new PluginCache.Iterator() {
-            @Override
-            void body(Plugin plugin) {
-                String pluginFile = plugin.getConfigProperty("clientSidePluginFile");
-                info.add(new PluginInfo(plugin.getId(), pluginFile));
-            }
-        };
-        return info;
+        return pluginManager.getPluginInfo();
     }
 
+
+
+    // === Listeners ===
+
     @Override
-    public void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall) {
-        runMigration(migrationNr, plugin, isCleanInstall);
-        plugin.setMigrationNr(migrationNr);
+    public List<Object> fireEvent(CoreEvent event, Object... params) {
+        return listenerRegistry.fireEvent(event, params);
     }
 
 
@@ -594,52 +574,48 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
 
-    @Override
-    public void checkAllPluginsReady() {
-        Bundle[] bundles = bundleContext.getBundles();
-        int plugins = 0;
-        int ready = 0;
-        for (Bundle bundle : bundles) {
-            if (isDeepaMehtaPlugin(bundle)) {
-                plugins++;
-                if (isPluginRegistered(bundle.getSymbolicName())) {
-                    ready++;
-                }
-            }
-        }
-        logger.info("### Bundles total: " + bundles.length +
-            ", DM plugins: " + plugins + ", ready: " + ready);
-        if (plugins == ready) {
-            logger.info("########## All plugins ready ##########");
-            triggerHook(Hook.ALL_PLUGINS_READY);
-        }
-    }
 
-    @Override
+    // *** End of DeepaMehtaService Implementation ***
+
+
+
+    /**
+     * Setups the database:
+     *   1) initializes the database.
+     *   2) in case of a clean install: sets up the bootstrap content.
+     *   3) runs the core migrations.
+     * <p>
+     * Called from {@link CoreActivator#start}.
+     */
     public void setupDB() {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            logger.info("----- Initializing DeepaMehta 4 Core -----");
-            boolean isCleanInstall = initDB();
+            logger.info("----- Activating DeepaMehta 4 Core -----");
+            boolean isCleanInstall = storage.init();
             if (isCleanInstall) {
                 setupBootstrapContent();
             }
-            runCoreMigrations(isCleanInstall);
+            migrationManager.runCoreMigrations(isCleanInstall);
             tx.success();
             tx.finish();
-            logger.info("----- Completing initialization of DeepaMehta 4 Core -----");
+            logger.info("----- Activation of DeepaMehta 4 Core complete -----");
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             tx.finish();
             shutdown();
             throw new RuntimeException("Setting up the database failed", e);
         }
-        // Note: we use no finally clause here because in case of error the core service has to be shut down.
+        // Note: we don't put finish() in a finally clause here because
+        // in case of error the core service has to be shut down.
     }
 
-    @Override
+    /**
+     * Shuts down the database.
+     * <p>
+     * Called from {@link CoreActivator#stop}.
+     */
     public void shutdown() {
-        closeDB();
+        storage.shutdown();
     }
 
 
@@ -830,70 +806,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
-    // === Plugins ===
-
-    /**
-     * Triggers a hook for all installed plugins.
-     */
-    @Override
-    public Map<String, Object> triggerHook(final Hook hook, final Object... params) {
-        final Map resultMap = new HashMap();
-        new PluginCache.Iterator() {
-            @Override
-            void body(Plugin plugin) {
-                try {
-                    Object result = triggerHook(plugin, hook, params);
-                    if (result != null) {
-                        resultMap.put(plugin.getId(), result);
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException("Triggering hook " + hook + " of " + plugin + " failed", e);
-                }
-            }
-        };
-        return resultMap;
-    }
-
-    /**
-     * @throws  NoSuchMethodException
-     * @throws  IllegalAccessException
-     * @throws  InvocationTargetException
-     */
-    private Object triggerHook(Plugin plugin, Hook hook, Object... params) throws Exception {
-        Method hookMethod = plugin.getClass().getMethod(hook.getMethodName(), hook.getParamClasses());
-        return hookMethod.invoke(plugin, params);
-    }
-
-    // ---
-
-    private boolean isDeepaMehtaPlugin(Bundle bundle) {
-        String packages = (String) bundle.getHeaders().get("Import-Package");
-        // Note: packages might be null. Not all bundles import packges.
-        return packages != null && packages.contains("de.deepamehta.core.service") &&
-            !bundle.getSymbolicName().equals("de.deepamehta.core");
-    }
-
-    private boolean isPluginRegistered(String pluginId) {
-        return pluginCache.contains(pluginId);
-    }
-
-
-
-    // === DB ===
-
-    /**
-     * @return  <code>true</code> if this is a clean install, <code>false</code> otherwise.
-     */
-    private boolean initDB() {
-        return storage.init();
-    }
-
-    private void closeDB() {
-        storage.shutdown();
-    }
-
-
-
     // === Bootstrap ===
 
     private void setupBootstrapContent() {
@@ -974,195 +886,5 @@ public class EmbeddedService implements DeepaMehtaService {
     private void bootstrapTypeCache() {
         typeCache.put(new AttachedTopicType(new TopicTypeModel("dm4.core.meta_meta_type",
             "dm4.core.meta_meta_meta_type", "Meta Meta Type", "dm4.core.text"), this));
-    }
-
-
-
-    // === Migrations ===
-
-    /**
-     * Determines the core migrations to be run and run them.
-     */
-    private void runCoreMigrations(boolean isCleanInstall) {
-        int migrationNr = storage.getMigrationNr();
-        int requiredMigrationNr = REQUIRED_CORE_MIGRATION;
-        int migrationsToRun = requiredMigrationNr - migrationNr;
-        logger.info("Running " + migrationsToRun + " core migrations (migrationNr=" + migrationNr +
-            ", requiredMigrationNr=" + requiredMigrationNr + ")");
-        for (int i = migrationNr + 1; i <= requiredMigrationNr; i++) {
-            runCoreMigration(i, isCleanInstall);
-        }
-    }
-
-    private void runCoreMigration(int migrationNr, boolean isCleanInstall) {
-        runMigration(migrationNr, null, isCleanInstall);
-        storage.setMigrationNr(migrationNr);
-    }
-
-    // ---
-
-    /**
-     * Runs a core migration or a plugin migration.
-     *
-     * @param   migrationNr     Number of the migration to run.
-     * @param   plugin          The plugin that provides the migration to run.
-     *                          <code>null</code> for a core migration.
-     * @param   isCleanInstall  <code>true</code> if the migration is run as part of a clean install,
-     *                          <code>false</code> if the migration is run as part of an update.
-     */
-    private void runMigration(int migrationNr, Plugin plugin, boolean isCleanInstall) {
-        MigrationInfo mi = null;
-        try {
-            mi = new MigrationInfo(migrationNr, plugin);
-            if (!mi.success) {
-                throw mi.exception;
-            }
-            // error checks
-            if (!mi.isDeclarative && !mi.isImperative) {
-                String message = "Neither a migration file (" + mi.migrationFile + ") nor a migration class ";
-                if (mi.migrationClassName != null) {
-                    throw new RuntimeException(message + "(" + mi.migrationClassName + ") is found");
-                } else {
-                    throw new RuntimeException(message + "is found. Note: a possible migration class can't be located" +
-                        " (plugin package is unknown). Consider setting \"pluginPackage\" in plugin.properties");
-                }
-            }
-            if (mi.isDeclarative && mi.isImperative) {
-                throw new RuntimeException("Ambiguity: a migration file (" + mi.migrationFile + ") AND a migration " +
-                    "class (" + mi.migrationClassName + ") are found. Consider using two different migration numbers.");
-            }
-            // run migration
-            String runInfo = " (runMode=" + mi.runMode + ", isCleanInstall=" + isCleanInstall + ")";
-            if (mi.runMode.equals(MigrationRunMode.CLEAN_INSTALL.name()) == isCleanInstall ||
-                mi.runMode.equals(MigrationRunMode.ALWAYS.name())) {
-                logger.info("Running " + mi.migrationInfo + runInfo);
-                if (mi.isDeclarative) {
-                    JSONHelper.readMigrationFile(mi.migrationIn, mi.migrationFile, this);
-                } else {
-                    Migration migration = (Migration) mi.migrationClass.newInstance();
-                    logger.info("Running " + mi.migrationType + " migration class " + mi.migrationClassName);
-                    migration.setService(this);
-                    migration.run();
-                }
-                logger.info("Completing " + mi.migrationInfo);
-            } else {
-                logger.info("Running " + mi.migrationInfo + " ABORTED" + runInfo);
-            }
-            logger.info("Updating migration number (" + migrationNr + ")");
-        } catch (Exception e) {
-            throw new RuntimeException("Running " + mi.migrationInfo + " failed", e);
-        }
-    }
-
-    // ---
-
-    /**
-     * Collects the info required to run a migration.
-     */
-    private class MigrationInfo {
-
-        String migrationType;       // "core", "plugin"
-        String migrationInfo;       // for logging
-        String runMode;             // "CLEAN_INSTALL", "UPDATE", "ALWAYS"
-        //
-        boolean isDeclarative;
-        boolean isImperative;
-        //
-        String migrationFile;       // for declarative migration
-        InputStream migrationIn;    // for declarative migration
-        //
-        String migrationClassName;  // for imperative migration
-        Class migrationClass;       // for imperative migration
-        //
-        boolean success;            // error occurred?
-        Exception exception;        // the error
-
-        MigrationInfo(int migrationNr, Plugin plugin) {
-            try {
-                String configFile = migrationConfigFile(migrationNr);
-                InputStream configIn;
-                migrationFile = migrationFile(migrationNr);
-                migrationType = plugin != null ? "plugin" : "core";
-                //
-                if (migrationType.equals("core")) {
-                    migrationInfo = "core migration " + migrationNr;
-                    logger.info("Preparing " + migrationInfo + " ...");
-                    configIn     = getClass().getResourceAsStream(configFile);
-                    migrationIn  = getClass().getResourceAsStream(migrationFile);
-                    migrationClassName = coreMigrationClassName(migrationNr);
-                    migrationClass = loadClass(migrationClassName);
-                } else {
-                    migrationInfo = "migration " + migrationNr + " of plugin \"" + plugin.getName() + "\"";
-                    logger.info("Preparing " + migrationInfo + " ...");
-                    configIn     = plugin.getResourceAsStream(configFile);
-                    migrationIn  = plugin.getResourceAsStream(migrationFile);
-                    migrationClassName = plugin.getMigrationClassName(migrationNr);
-                    if (migrationClassName != null) {
-                        migrationClass = plugin.loadClass(migrationClassName);
-                    }
-                }
-                //
-                isDeclarative = migrationIn != null;
-                isImperative = migrationClass != null;
-                //
-                readMigrationConfigFile(configIn, configFile);
-                //
-                success = true;
-            } catch (Exception e) {
-                exception = e;
-            }
-        }
-
-        // ---
-
-        private void readMigrationConfigFile(InputStream in, String configFile) {
-            try {
-                Properties migrationConfig = new Properties();
-                if (in != null) {
-                    logger.info("Reading migration config file \"" + configFile + "\"");
-                    migrationConfig.load(in);
-                } else {
-                    logger.info("Using default migration configuration (no migration config file found, " +
-                        "tried \"" + configFile + "\")");
-                }
-                //
-                runMode = migrationConfig.getProperty("migrationRunMode", MigrationRunMode.ALWAYS.name());
-                MigrationRunMode.valueOf(runMode);  // check if value is valid
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException("Error in config file \"" + configFile + "\": \"" + runMode +
-                    "\" is an invalid value for \"migrationRunMode\"", e);
-            } catch (IOException e) {
-                throw new RuntimeException("Config file \"" + configFile + "\" can't be read", e);
-            }
-        }
-
-        // ---
-
-        private String migrationFile(int migrationNr) {
-            return "/migrations/migration" + migrationNr + ".json";
-        }
-
-        private String migrationConfigFile(int migrationNr) {
-            return "/migrations/migration" + migrationNr + ".properties";
-        }
-
-        private String coreMigrationClassName(int migrationNr) {
-            return CORE_MIGRATIONS_PACKAGE + ".Migration" + migrationNr;
-        }
-
-        // --- Generic Utilities ---
-
-        /**
-         * Uses the core bundle's class loader to load a class by name.
-         *
-         * @return  the class, or <code>null</code> if the class is not found.
-         */
-        private Class loadClass(String className) {
-            try {
-                return Class.forName(className);
-            } catch (ClassNotFoundException e) {
-                return null;
-            }
-        }
     }
 }

@@ -9,11 +9,14 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Hook;
-import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.listener.AllPluginsActiveListener;
+import de.deepamehta.core.service.listener.PreUpdateTopicListener;
+import de.deepamehta.core.service.listener.PostUpdateTopicListener;
 import de.deepamehta.core.util.JSONHelper;
 
 import javax.ws.rs.Consumes;
@@ -37,14 +40,16 @@ import java.util.logging.Logger;
 
 
 
-@Path("/")
+@Path("/webclient")
 @Consumes("application/json")
 @Produces("application/json")
-public class WebclientPlugin extends Plugin {
+public class WebclientPlugin extends PluginActivator implements PreUpdateTopicListener,
+                                                                PostUpdateTopicListener,
+                                                                AllPluginsActiveListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private boolean webclientLaunched = false;
+    private boolean hasWebclientLaunched = false;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -78,9 +83,9 @@ public class WebclientPlugin extends Plugin {
             logger.info(singleTopics.size() + " single topics found, " + searchableUnits.size() + " searchable units");
             Topic searchTopic = createSearchTopic("\"" + searchTerm + "\"", searchableUnits, clientState);
             tx.success();
-            // ### TODO: triggering PRE_SEND should not be up to the plugin developer.
+            // ### TODO: firing PRE_SEND should not be up to the plugin developer.
             // ### Possibly a JAX-RS 2.0 entity interceptor could be used instead.
-            dms.triggerHook(Hook.PRE_SEND_TOPIC, searchTopic, clientState);
+            dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, searchTopic, clientState);
             return searchTopic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -109,9 +114,9 @@ public class WebclientPlugin extends Plugin {
             ResultSet<Topic> result = dms.getTopics(typeUri, false, maxResultSize, clientState); // fetchComposite=false
             Topic searchTopic = createSearchTopic(searchTerm, result.getItems(), clientState);
             tx.success();
-            // ### TODO: triggering PRE_SEND should not be up to the plugin developer.
+            // ### TODO: firing PRE_SEND should not be up to the plugin developer.
             // ### Possibly a JAX-RS 2.0 entity interceptor could be used instead.
-            dms.triggerHook(Hook.PRE_SEND_TOPIC, searchTopic, clientState);
+            dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, searchTopic, clientState);
             return searchTopic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -123,29 +128,33 @@ public class WebclientPlugin extends Plugin {
 
 
 
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
 
 
 
     @Override
-    public void allPluginsReadyHook() {
-        if (webclientLaunched == false) {
-            String webclientUrl = getWebclientUrl();
-            try {
-                logger.info("### Launching webclient (url=\"" + webclientUrl + "\")");
-                Desktop.getDesktop().browse(new URI(webclientUrl));
-                webclientLaunched = true;
-            } catch (Exception e) {
-                logger.warning("### Launching webclient failed (" + e + ")");
-                logger.warning("### Use this URL to launch the webclient manually: " + webclientUrl);
-            }
+    public void allPluginsActive() {
+        String webclientUrl = getWebclientUrl();
+        //
+        if (hasWebclientLaunched == true) {
+            logger.info("### Launching webclient (url=\"" + webclientUrl + "\") ABORTED -- already launched");
+            return;
+        }
+        //
+        try {
+            logger.info("### Launching webclient (url=\"" + webclientUrl + "\")");
+            Desktop.getDesktop().browse(new URI(webclientUrl));
+            hasWebclientLaunched = true;
+        } catch (Exception e) {
+            logger.warning("### Launching webclient failed (" + e + ")");
+            logger.warning("### To launch it manually: " + webclientUrl);
         }
     }
 
     @Override
-    public void preUpdateHook(Topic topic, TopicModel newModel, Directives directives) {
+    public void preUpdateTopic(Topic topic, TopicModel newModel, Directives directives) {
         if (topic.getTypeUri().equals("dm4.files.file") && newModel.getTypeUri().equals("dm4.webclient.icon")) {
             String iconUrl = "/proxy/file:" + topic.getCompositeValue().getString("dm4.files.path");
             logger.info("### Retyping a file to an icon (iconUrl=" + iconUrl + ")");
@@ -157,8 +166,8 @@ public class WebclientPlugin extends Plugin {
      * Once a view configuration is updated in the DB we must update the cached view configuration model.
      */
     @Override
-    public void postUpdateHook(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
-                                                                                      Directives directives) {
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
+                                                                                       Directives directives) {
         if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
             Type type = getType(topic);
             logger.info("### Updating view configuration for topic type \"" + type.getUri() + "\" (" + topic + ")");
@@ -241,11 +250,10 @@ public class WebclientPlugin extends Plugin {
         return dms.getTopicType(typeTopic.getUri(), null);  // ### FIXME: handle assoc types
     }
 
-    // === Client Start ===
+    // === Webclient Start ===
 
     private String getWebclientUrl() {
-        String host = "localhost";
         String port = System.getProperty("org.osgi.service.http.port");
-        return "http://" + host + ":" + port + "/";
+        return "http://localhost:" + port + "/de.deepamehta.webclient/";
     }
 }

@@ -141,9 +141,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <!-- Use generic plugin as default activator -->
                         <Bundle-Activator>
-                            de.deepamehta.core.service.Plugin
+                            de.deepamehta.core.osgi.PluginActivator
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

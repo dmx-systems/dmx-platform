@@ -212,9 +212,10 @@ public interface DeepaMehtaStorage {
     DeepaMehtaTransaction beginTx();
 
     /**
-     * Performs storage layer initialization. Runs in a transaction.
+     * Initializes the database.
+     * Prerequisite: there is an open transaction.
      *
-     * @return  <code>true</code> if this is a clean install, <code>false</code> otherwise.
+     * @return  <code>true</code> if a clean install is detected, <code>false</code> otherwise.
      */
     boolean init();
 

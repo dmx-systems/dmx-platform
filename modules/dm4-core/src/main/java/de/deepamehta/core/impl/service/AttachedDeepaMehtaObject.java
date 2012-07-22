@@ -737,7 +737,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             long childTopicId = newChildTopic.getId();
             if (childTopicId != -1) {
                 // Note: the child topic's composite must be fetched. It needs to be passed to the
-                // POST_UPDATE_TOPIC hook as part of the "old model" (when the child topic is updated).
+                // POST_UPDATE_TOPIC hook as part of the "old model" (when the child topic is updated). ### FIXDOC
                 return fetchChildTopic(assocDef, childTopicId, true);           // fetchComposite=true
             } else {
                 return null;
@@ -824,7 +824,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Label ===
 
     /**
-     * Prerequsite: this is a composite object.
+     * Prerequisite: this is a composite object.
      */
     private void refreshLabel() {
         try {

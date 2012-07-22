@@ -10,9 +10,9 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Plugin;
 
 import java.util.List;
 import java.util.Set;
@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 
 
-public class FacetsPlugin extends Plugin implements FacetsService {
+public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

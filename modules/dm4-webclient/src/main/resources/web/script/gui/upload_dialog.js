@@ -16,7 +16,7 @@ function UploadDialog() {
      * @param   command     the command (a string) send to the server along with the selected file.
      * @param   callback    the function that is invoked once the file has been uploaded and processed at server-side.
      *                      One argument is passed to that function: the object (deserialzed JSON) returned by the
-     *                      (server-side) executeCommandHook.
+     *                      (server-side) executeCommandHook. ### FIXDOC
      */
     this.show = function(command, callback) {
         $("#upload-dialog form").attr("action", "/core/command/" + command)

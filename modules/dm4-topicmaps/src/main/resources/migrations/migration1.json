@@ -13,8 +13,8 @@
             index_mode_uris:  ["dm4.core.fulltext"]
         },
         {
-            value:            "Canvas Renderer URI",
-            uri:              "dm4.topicmaps.canvas_renderer_uri",
+            value:            "Topicmap Renderer URI",
+            uri:              "dm4.topicmaps.topicmap_renderer_uri",
             data_type_uri:    "dm4.core.text",
             view_config_topics: [
                 {
@@ -42,7 +42,7 @@
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.topicmaps.canvas_renderer_uri",
+                    part_topic_type_uri:  "dm4.topicmaps.topicmap_renderer_uri",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },

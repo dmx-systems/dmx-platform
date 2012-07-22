@@ -19,9 +19,9 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Hook;
 
 import java.util.HashSet;
 import java.util.List;
@@ -169,7 +169,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         directives.add(Directive.UPDATE_ASSOCIATION, this);
         //
         if (report.typeUriChanged) {
-            dms.triggerHook(Hook.POST_RETYPE_ASSOCIATION, this, report.oldTypeUri, directives);
+            dms.fireEvent(CoreEvent.POST_RETYPE_ASSOCIATION, this, report.oldTypeUri, directives);
         }
         //
         return report;

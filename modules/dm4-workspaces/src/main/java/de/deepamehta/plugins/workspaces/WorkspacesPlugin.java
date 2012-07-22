@@ -10,9 +10,11 @@ import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.listener.PostCreateTopicListener;
+import de.deepamehta.core.service.listener.PostInstallPluginListener;
 
 import static java.util.Arrays.asList;
 import java.util.HashMap;
@@ -23,7 +25,8 @@ import java.util.logging.Logger;
 
 
 
-public class WorkspacesPlugin extends Plugin implements WorkspacesService {
+public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, PostCreateTopicListener,
+                                                                                    PostInstallPluginListener {
 
     private static final String DEFAULT_WORKSPACE_NAME = "Default";
 
@@ -42,93 +45,9 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
 
 
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
-
-
-
-    /**
-     * Creates the "Default" workspace.
-     */
-    @Override
-    public void postInstallPluginHook() {
-        createWorkspace(DEFAULT_WORKSPACE_NAME);
-    }
-
-    /**
-     * Assigns a newly created topic to the current workspace.
-     */
-    @Override
-    public void postCreateHook(Topic topic, ClientState clientState, Directives directives) {
-        long workspaceId = -1;
-        try {
-            // check precondition 1
-            if (topic.getTypeUri().equals("dm4.webclient.search") ||
-                topic.getTypeUri().equals("dm4.workspaces.workspace")) {
-                // Note 1: we do not relate search topics to a workspace.
-                // Note 2: we do not relate workspaces to a workspace.
-                logger.info("Assigning topic to a workspace ABORTED: searches and workspaces are not assigned (" +
-                    topic + ")");
-                return;
-            }
-            // check precondition 2
-            if (clientState == null) {
-                // ### logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +
-                // ###     "(client context is not initialzed))");
-                return;
-            }
-            // check precondition 3
-            String wsId = clientState.get("dm4_workspace_id");
-            if (wsId == null) {
-                logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +
-                    "(no setting found in client context))");
-                return;
-            }
-            // assign topic to workspace
-            workspaceId = Long.parseLong(wsId);
-            assignTopic(workspaceId, topic.getId());
-        } catch (Exception e) {
-            logger.warning("Assigning " + topic + " to workspace " + workspaceId + " failed (" + e + ").\n" +
-                "This can happen after a DB reset if there is a stale \"dm4_workspace_id\" browser cookie.");
-        }
-    }
-
-    /**
-     * Adds a "Workspace" association to all topic types.
-     * FIXME: not ready for the prime time
-    @Override
-    public void modifyTopicTypeHook(TopicType topicType, ClientState clientState) {
-        String topicTypeUri = topicType.getUri();
-        // skip our own types
-        if (topicTypeUri.startsWith("dm4.workspaces.")) {
-            return;
-        }
-        //
-        if (!topicType.getDataTypeUri().equals("dm4.core.composite")) {
-            return;
-        }
-        //
-        if (!isSearchableUnit(topicType)) {
-            return;
-        }
-        //
-        logger.info("########## Associate type \"" + topicTypeUri + "\" with type \"dm4.workspaces.workspace\"");
-        AssociationDefinition assocDef = new AssociationDefinition(topicTypeUri, "dm4.workspaces.workspace");
-        assocDef.setAssocTypeUri("dm4.core.aggregation_def");
-        assocDef.setWholeCardinalityUri("dm4.core.many");
-        assocDef.setPartCardinalityUri("dm4.core.many");
-        assocDef.setViewConfigModel(new ViewConfigurationModel());  // FIXME: serialization fails if plugin developer
-                                                                    // forget to set
-        //
-        topicType.addAssocDef(assocDef);
-    } */
-
-
-
-    // **********************
-    // *** Plugin Service ***
-    // **********************
+    // ****************************************
+    // *** WorkspacesService Implementation ***
+    // ****************************************
 
 
 
@@ -161,9 +80,93 @@ public class WorkspacesPlugin extends Plugin implements WorkspacesService {
 
     @Override
     public Set<RelatedTopic> getWorkspaces(long typeId) {
-        Topic typeTopic = dms.getTopic(typeId, false, null);            // fetchComposite=false, clientState=null
+        Topic typeTopic = dms.getTopic(typeId, false, null);                // fetchComposite=false, clientState=null
         return typeTopic.getRelatedTopics(WORKSPACE_TYPE, ROLE_TYPE_TYPE, null,
-            "dm4.workspaces.workspace", false, false, 0, null).getItems();    // fetchComposite=false
+            "dm4.workspaces.workspace", false, false, 0, null).getItems();  // fetchComposite=false
+    }
+
+
+
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
+
+
+
+    /**
+     * Assigns a newly created topic to the current workspace.
+     */
+    @Override
+    public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
+        long workspaceId = -1;
+        try {
+            // check precondition 1
+            if (topic.getTypeUri().equals("dm4.webclient.search") ||
+                topic.getTypeUri().equals("dm4.workspaces.workspace")) {
+                // Note 1: we do not relate search topics to a workspace.
+                // Note 2: we do not relate workspaces to a workspace.
+                logger.info("Assigning topic to a workspace ABORTED: searches and workspaces are not assigned (" +
+                    topic + ")");
+                return;
+            }
+            // check precondition 2
+            if (clientState == null) {
+                // ### logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +
+                // ###     "(client context is not initialzed))");
+                return;
+            }
+            // check precondition 3
+            String wsId = clientState.get("dm4_workspace_id");
+            if (wsId == null) {
+                logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +
+                    "(no setting found in client context))");
+                return;
+            }
+            // assign topic to workspace
+            workspaceId = Long.parseLong(wsId);
+            assignTopic(workspaceId, topic.getId());
+        } catch (Exception e) {
+            logger.warning("Assigning topic " + topic.getId() + " to workspace " + workspaceId + " failed (" + e +
+                ").\nThis can happen after a DB reset if there is a stale \"dm4_workspace_id\" browser cookie.");
+        }
+    }
+
+    /**
+     * Adds a "Workspace" association to all topic types.
+     * FIXME: not ready for the prime time ### Realize as a facet?
+    @Override
+    public void modifyTopicTypeHook(TopicType topicType, ClientState clientState) {
+        String topicTypeUri = topicType.getUri();
+        // skip our own types
+        if (topicTypeUri.startsWith("dm4.workspaces.")) {
+            return;
+        }
+        //
+        if (!topicType.getDataTypeUri().equals("dm4.core.composite")) {
+            return;
+        }
+        //
+        if (!isSearchableUnit(topicType)) {
+            return;
+        }
+        //
+        logger.info("########## Associate type \"" + topicTypeUri + "\" with type \"dm4.workspaces.workspace\"");
+        AssociationDefinition assocDef = new AssociationDefinition(topicTypeUri, "dm4.workspaces.workspace");
+        assocDef.setAssocTypeUri("dm4.core.aggregation_def");
+        assocDef.setWholeCardinalityUri("dm4.core.many");
+        assocDef.setPartCardinalityUri("dm4.core.many");
+        assocDef.setViewConfigModel(new ViewConfigurationModel());  // FIXME: serialization fails if plugin developer
+                                                                    // forget to set
+        //
+        topicType.addAssocDef(assocDef);
+    } */
+
+    /**
+     * Creates the "Default" workspace.
+     */
+    @Override
+    public void postInstallPlugin() {
+        createWorkspace(DEFAULT_WORKSPACE_NAME);
     }
 
 

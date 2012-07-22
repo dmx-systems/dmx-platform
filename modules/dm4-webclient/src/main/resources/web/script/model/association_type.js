@@ -19,12 +19,12 @@ AssociationType.prototype.get_commands = function(context) {
     return dm4c.get_topic_commands(this, context)
 }
 
-AssociationType.prototype.get_page_renderer_class = function() {
-    return dm4c.get_view_config(this, "js_page_renderer_class") || "AssociationRenderer"
+AssociationType.prototype.get_page_renderer_uri = function() {
+    return dm4c.get_view_config(this, "page_renderer_uri")
 }
 
 // === Public API ===
 
 AssociationType.prototype.get_color = function() {
-    return dm4c.get_view_config(this, "color") || dm4c.canvas.DEFAULT_ASSOC_COLOR
+    return dm4c.get_view_config(this, "color")
 }

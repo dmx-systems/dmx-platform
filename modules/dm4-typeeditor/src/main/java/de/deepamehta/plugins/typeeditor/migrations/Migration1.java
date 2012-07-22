@@ -10,6 +10,6 @@ public class Migration1 extends Migration {
 
     @Override
     public void run() {
-        addTopicTypeSetting("dm4.core.topic_type", "js_page_renderer_class", "TopictypeRenderer");
+        addTopicTypeSetting("dm4.core.topic_type", "page_renderer_uri", "dm4.typeeditor.topictype_renderer");
     }
 }

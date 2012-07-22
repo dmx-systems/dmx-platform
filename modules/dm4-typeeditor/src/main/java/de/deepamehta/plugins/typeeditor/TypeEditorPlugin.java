@@ -4,15 +4,18 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.listener.PostDeleteAssociationListener;
+import de.deepamehta.core.service.listener.PostRetypeAssociationListener;
 
 import java.util.logging.Logger;
 
 
 
-public class TypeEditorPlugin extends Plugin {
+public class TypeEditorPlugin extends PluginActivator implements PostRetypeAssociationListener,
+                                                                 PostDeleteAssociationListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -22,14 +25,14 @@ public class TypeEditorPlugin extends Plugin {
 
 
 
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
 
 
 
     @Override
-    public void postRetypeAssociationHook(Association assoc, String oldTypeUri, Directives directives) {
+    public void postRetypeAssociation(Association assoc, String oldTypeUri, Directives directives) {
         if (isAssocDef(assoc.getTypeUri())) {
             // update/create assoc def
             AssociationDefinitionModel assocDef;
@@ -58,12 +61,14 @@ public class TypeEditorPlugin extends Plugin {
     }
 
     @Override
-    public void postDeleteAssociationHook(Association assoc, Directives directives) {
+    public void postDeleteAssociation(Association assoc, Directives directives) {
         if (isAssocDef(assoc.getTypeUri())) {
             TopicType topicType = removeAssocDef(assoc);
             directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
         }
     }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

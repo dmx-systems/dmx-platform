@@ -20,7 +20,7 @@ public enum Role {
         this.uri = uri;
         // roles.put(uri, this);    // ### Doesn't compile: "illegal reference to static field from initializer".
                                     // ### Enum constants are initialzed before other static fields.
-        put(uri, this);             // ### Lazy initialization outside the constructor solves it.
+        put(this);                  // ### Lazy initialization outside the constructor solves it.
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -36,12 +36,12 @@ public enum Role {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void put(String uri, Role role) {
+    private void put(Role role) {
         // ### must initialize lazily, see above
         if (roles == null) {
             roles = new HashMap();
         }
         //
-        roles.put(uri, role);
+        roles.put(role.uri, role);
     }
 }

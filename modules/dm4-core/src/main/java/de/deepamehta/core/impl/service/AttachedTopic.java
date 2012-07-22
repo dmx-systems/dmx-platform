@@ -16,9 +16,9 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Hook;
 
 import java.util.List;
 import java.util.Set;
@@ -127,14 +127,14 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     public ChangeReport update(TopicModel model, ClientState clientState, Directives directives) {
         logger.info("Updating topic " + getId() + " (new " + model + ")");
         //
-        dms.triggerHook(Hook.PRE_UPDATE_TOPIC, this, model, directives);
+        dms.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model, directives);
         //
         TopicModel oldModel = (TopicModel) getModel().clone();
         ChangeReport report = super.update(model, clientState, directives);
         //
         directives.add(Directive.UPDATE_TOPIC, this);
         //
-        dms.triggerHook(Hook.POST_UPDATE_TOPIC, this, model, oldModel, clientState, directives);
+        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel, clientState, directives);
         //
         return report;
     }

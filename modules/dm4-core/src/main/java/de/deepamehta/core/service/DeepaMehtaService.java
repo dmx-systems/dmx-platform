@@ -24,7 +24,7 @@ import java.util.Set;
  * <p>
  * The responsibility of the DeepaMehta core service is to orchestrate the control flow and allow plugins to hook in.
  * The main duties of the DeepaMehta core service are to provide access to the storage layer and to trigger hooks of
- * the registered plugins.
+ * the registered plugins. ### FIXDOC
  * <p>
  * The DeepaMehta core service is a realization of the <i>Inversion of Control</i> pattern.
  * <p>
@@ -116,6 +116,8 @@ public interface DeepaMehtaService {
 
     TopicType getTopicType(String topicTypeUri, ClientState clientState);
 
+    Set<TopicType> getAllTopicTypes(ClientState clientState);
+
     TopicType createTopicType(TopicTypeModel model, ClientState clientState);
 
     Directives updateTopicType(TopicTypeModel model, ClientState clientState);
@@ -128,29 +130,23 @@ public interface DeepaMehtaService {
 
     AssociationType getAssociationType(String assocTypeUri, ClientState clientState);
 
+    Set<AssociationType> getAllAssociationTypes(ClientState clientState);
+
     AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState);
-
-
-
-    // === Commands ===
-
-    CommandResult executeCommand(String command, CommandParams params, ClientState clientState);
 
 
 
     // === Plugins ===
 
-    void registerPlugin(Plugin plugin);
-
-    void unregisterPlugin(String pluginId);
-
-    Plugin getPlugin(String pluginId);
+    Plugin getPlugin(String pluginUri);
 
     Set<PluginInfo> getPluginInfo();
 
-    void runPluginMigration(Plugin plugin, int migrationNr, boolean isCleanInstall);
 
-    Map<String, Object> triggerHook(Hook hook, Object... params);
+
+    // === Listeners ===
+
+    List<Object> fireEvent(CoreEvent event, Object... params);
 
 
 
@@ -159,30 +155,4 @@ public interface DeepaMehtaService {
     DeepaMehtaTransaction beginTx();
 
     ObjectFactory getObjectFactory();
-
-    /**
-     * Checks if all DeepaMehta plugin bundles are registered at core.
-     * Triggers the ALL_PLUGINS_READY hook if so.
-     * <p>
-     * Called from the Plugin class.
-     * Not meant to be called by a plugin developer.
-     */
-    void checkAllPluginsReady();
-
-    /**
-     * Setups the database to be compatible with this core service.
-     * <p>
-     * Called from the core activator.
-     * Not meant to be called by a plugin developer.
-     */
-    void setupDB();
-
-    /**
-     * Shuts down the database.
-     * Called when the core service stops.
-     * <p>
-     * Called from the core activator.
-     * Not meant to be called by a plugin developer.
-     */
-    void shutdown();
 }

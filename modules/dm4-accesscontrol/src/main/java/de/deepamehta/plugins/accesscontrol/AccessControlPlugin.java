@@ -16,10 +16,17 @@ import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.listener.IntroduceTopicTypeListener;
+import de.deepamehta.core.service.listener.PostCreateTopicListener;
+import de.deepamehta.core.service.listener.PreSendTopicListener;
+import de.deepamehta.core.service.listener.PreSendTopicTypeListener;
+import de.deepamehta.core.service.listener.PostInstallPluginListener;
+import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
+import de.deepamehta.core.service.listener.PluginServiceGoneListener;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.DefaultValue;
@@ -45,10 +52,16 @@ import java.util.logging.Logger;
 
 
 
-@Path("/")
+@Path("/accesscontrol")
 @Consumes("application/json")
 @Produces("application/json")
-public class AccessControlPlugin extends Plugin implements AccessControlService {
+public class AccessControlPlugin extends PluginActivator implements AccessControlService, PostCreateTopicListener,
+                                                                                          PreSendTopicListener,
+                                                                                          PreSendTopicTypeListener,
+                                                                                          PostInstallPluginListener,
+                                                                                          IntroduceTopicTypeListener,
+                                                                                          PluginServiceArrivedListener,
+                                                                                          PluginServiceGoneListener {
 
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
@@ -176,40 +189,14 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
 
 
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
 
 
 
     @Override
-    public void postInstallPluginHook() {
-        Topic userAccount = createUserAccount(DEFAULT_USERNAME, DEFAULT_PASSWORD);
-        logger.info("Creating \"admin\" user account => ID=" + userAccount.getId());
-    }
-
-    @Override
-    public void serviceArrived(PluginService service) {
-        logger.info("########## Service arrived: " + service);
-        if (service instanceof FacetsService) {
-            facetsService = (FacetsService) service;
-        } else if (service instanceof WorkspacesService) {
-            wsService = (WorkspacesService) service;
-        }
-    }
-
-    @Override
-    public void serviceGone(PluginService service) {
-        logger.info("########## Service gone: " + service);
-        if (service == facetsService) {
-            facetsService = null;
-        } else if (service == wsService) {
-            wsService = null;
-        }
-    }
-
-    @Override
-    public void postCreateHook(Topic topic, ClientState clientState, Directives directives) {
+    public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
         // ### TODO: explain
         if (isPluginTopic(topic)) {
             return;
@@ -233,7 +220,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     } */
 
     @Override
-    public void modifyTopicTypeHook(TopicType topicType, ClientState clientState) {
+    public void introduceTopicType(TopicType topicType, ClientState clientState) {
         // ### TODO: explain
         if (topicType.getUri().equals("dm4.core.meta_meta_type")) {
             return;
@@ -245,29 +232,8 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
 
     // ---
 
-    /* ### TODO: adapt to DM4
     @Override
-    public void providePropertiesHook(Topic topic) {
-        if (topic.typeUri.equals("de/deepamehta/core/topictype/role")) {
-            String roleName = dms.getTopicProperty(topic.id, "de/deepamehta/core/property/rolename").toString();
-            topic.setProperty("de/deepamehta/core/property/rolename", roleName);
-        }
-    } */
-
-    /* ### TODO: adapt to DM4
-    @Override
-    public void providePropertiesHook(Relation relation) {
-        if (relation.typeId.equals(RelationType.ACCESS_CONTROL.name())) {
-            // transfer all relation properties
-            Properties properties = dms.getRelation(relation.id).getProperties();
-            relation.setProperties(properties);
-        }
-    } */
-
-    // ---
-
-    @Override
-    public void preSendTopicHook(Topic topic, ClientState clientState) {
+    public void preSendTopic(Topic topic, ClientState clientState) {
         // ### TODO: explain
         if (isPluginTopic(topic)) {
             enrichWithPermissions(topic, false);    // write=false
@@ -281,7 +247,7 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
     }
 
     @Override
-    public void preSendTopicTypeHook(TopicType topicType, ClientState clientState) {
+    public void preSendTopicType(TopicType topicType, ClientState clientState) {
         // Note: there are 2 types whose permissions must be set manually as they can't be calculated the usual way:
         // - "Access Control List Facet": endless recursion would occur. ### FIXDOC
         // - "Meta Meta Type": doesn't exist in DB. Retrieving its ACL would fail.
@@ -295,6 +261,32 @@ public class AccessControlPlugin extends Plugin implements AccessControlService 
         enrichWithPermissions(topicType,
             hasPermission(username, Operation.WRITE, topicType),
             hasPermission(username, Operation.CREATE, topicType));
+    }
+
+    @Override
+    public void postInstallPlugin() {
+        Topic userAccount = createUserAccount(DEFAULT_USERNAME, DEFAULT_PASSWORD);
+        logger.info("Creating \"admin\" user account => ID=" + userAccount.getId());
+    }
+
+    @Override
+    public void pluginServiceArrived(PluginService service) {
+        logger.info("########## Service arrived: " + service);
+        if (service instanceof FacetsService) {
+            facetsService = (FacetsService) service;
+        } else if (service instanceof WorkspacesService) {
+            wsService = (WorkspacesService) service;
+        }
+    }
+
+    @Override
+    public void pluginServiceGone(PluginService service) {
+        logger.info("########## Service gone: " + service);
+        if (service == facetsService) {
+            facetsService = null;
+        } else if (service == wsService) {
+            wsService = null;
+        }
     }
 
 

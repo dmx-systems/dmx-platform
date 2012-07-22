@@ -160,7 +160,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
 
 
-    // ------------------------------------------------------------------------------------------- Private Inner Classes
+    // ------------------------------------------------------------------------------------------------- Private Classes
 
     private class TopicTypes {
 

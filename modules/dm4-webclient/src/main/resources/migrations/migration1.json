@@ -34,13 +34,18 @@
             data_type_uri: "dm4.core.boolean"
         },
         {
-            value: "JavaScript Page Renderer Class",
-            uri: "dm4.webclient.js_page_renderer_class",
+            value: "Page Renderer URI",
+            uri: "dm4.webclient.page_renderer_uri",
             data_type_uri: "dm4.core.text"
         },
         {
-            value: "JavaScript Field Renderer Class",
-            uri: "dm4.webclient.js_field_renderer_class",
+            value: "Simple Renderer URI",
+            uri: "dm4.webclient.simple_renderer_uri",
+            data_type_uri: "dm4.core.text"
+        },
+        {
+            value: "Multi Renderer URI",
+            uri: "dm4.webclient.multi_renderer_uri",
             data_type_uri: "dm4.core.text"
         },
         {
@@ -85,12 +90,17 @@
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webclient.js_page_renderer_class",
+                    part_topic_type_uri:  "dm4.webclient.page_renderer_uri",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webclient.js_field_renderer_class",
+                    part_topic_type_uri:  "dm4.webclient.simple_renderer_uri",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.webclient.multi_renderer_uri",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
@@ -120,7 +130,7 @@
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm4.webclient.js_field_renderer_class: "SearchResultRenderer"
+                        dm4.webclient.simple_renderer_uri: "dm4.webclient.search_result_renderer"
                     }
                 }
             ]
@@ -145,7 +155,7 @@
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm4.webclient.icon: "/images/balls.png"
+                        dm4.webclient.icon: "/de.deepamehta.webclient/images/balls.png"
                     }
                 }
             ]
@@ -165,37 +175,37 @@
         ### Icons ###
 
         {
-            value:    "/images/ball-blue.png",
+            value:    "/de.deepamehta.webclient/images/ball-blue.png",
             uri:      "dm4.webclient.icons.ball_blue",
             type_uri: "dm4.webclient.icon"
         },
         {
-            value:    "/images/ball-gray.png",
+            value:    "/de.deepamehta.webclient/images/ball-gray.png",
             uri:      "dm4.webclient.icons.ball_gray",
             type_uri: "dm4.webclient.icon"
         },
         {
-            value:    "/images/ball-green.png",
+            value:    "/de.deepamehta.webclient/images/ball-green.png",
             uri:      "dm4.webclient.icons.ball_green",
             type_uri: "dm4.webclient.icon"
         },
         {
-            value:    "/images/ball-orange.png",
+            value:    "/de.deepamehta.webclient/images/ball-orange.png",
             uri:      "dm4.webclient.icons.ball_orange",
             type_uri: "dm4.webclient.icon"
         },
         {
-            value:    "/images/ball-purple.png",
+            value:    "/de.deepamehta.webclient/images/ball-purple.png",
             uri:      "dm4.webclient.icons.ball_purple",
             type_uri: "dm4.webclient.icon"
         },
         {
-            value:    "/images/ball-red.png",
+            value:    "/de.deepamehta.webclient/images/ball-red.png",
             uri:      "dm4.webclient.icons.ball_red",
             type_uri: "dm4.webclient.icon"
         },
         {
-            value:    "/images/ball-yellow.png",
+            value:    "/de.deepamehta.webclient/images/ball-yellow.png",
             uri:      "dm4.webclient.icons.ball_yellow",
             type_uri: "dm4.webclient.icon"
         }

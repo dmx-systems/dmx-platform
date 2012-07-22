@@ -1,8 +1,11 @@
-var dm4c = new function() {
+(function() {
+
+function Webclient() {
 
     // logger preferences
     var ENABLE_LOGGING = false
-    var LOG_TYPE_LOADING = false
+    //
+    this.LOG_TYPE_LOADING = false
     this.LOG_PLUGIN_LOADING = false
     var LOG_IMAGE_LOADING = false
     this.LOG_GUI = false
@@ -11,7 +14,7 @@ var dm4c = new function() {
     // preferences
     this.MAX_RESULT_SIZE = 100
     this.MAX_LINK_TEXT_LENGTH = 50
-    this.DEFAULT_TOPIC_ICON = "/images/ball-gray.png"
+    this.DEFAULT_TOPIC_ICON = "/de.deepamehta.webclient/images/ball-gray.png"
     var DEFAULT_FIELD_ROWS = 1
 
     var CORE_SERVICE_URI = "/core"
@@ -35,19 +38,17 @@ var dm4c = new function() {
     // view
     this.split_panel = null         // a SplitPanel object
     this.toolbar = null             // the upper toolbar GUI component (a ToolbarPanel object)
-    this.canvas = null              // the canvas GUI component that displays the topicmap (a CanvasRenderer object)
+    this.canvas = null              // the canvas GUI component that displays the topicmap (a TopicmapRenderer object)
     this.page_panel = null          // the page panel GUI component on the right hand side (a PagePanel object)
     this.upload_dialog = null       // the upload dialog (an UploadDialog object)
 
     var type_cache = new TypeCache()
 
     var pm = new PluginManager({
-        embedded_plugins: [
-            "/script/embedded_plugins/default_plugin.js",
-            "/script/embedded_plugins/fulltext_plugin.js",
-            "/script/embedded_plugins/ckeditor_plugin.js"
-        ]
+        internal_plugins: ["default_plugin.js", "fulltext_plugin.js", "ckeditor_plugin.js"]
     })
+
+    extend_rest_client()
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -642,38 +643,73 @@ var dm4c = new function() {
 
 
 
-    /**
-     * Loads a Javascript file dynamically. Synchronous and asynchronous loading is supported.
-     *
-     * @param   script_url      The URL (absolute or relative) of the Javascript file to load.
-     * @param   callback        Optional: the function to invoke when asynchronous loading is complete.
-     *                          If not given loading is performed synchronously.
-     */
-    this.load_script = function(script_url, callback) {
-        $.ajax({
-            url: script_url,
-            dataType: "script",
-            success: callback,
-            async: callback != undefined
-        })
+    this.add_plugin = function(plugin_uri, plugin_func) {
+        pm.add_plugin(plugin_uri, plugin_func)
     }
 
-    this.load_stylesheet = function(css_path) {
-        pm.register_css_stylesheet(css_path)
-    }
-
-    this.load_page_renderer = function(source_path) {
-        pm.register_page_renderer(source_path)
-    }
-
-    this.load_field_renderer = function(source_path) {
-        pm.register_field_renderer(source_path)
+    this.get_plugin = function(plugin_class) {
+        return pm.get_plugin(plugin_class)
     }
 
     // ---
 
-    this.register_listener = function(hook_name, listener) {
-        pm.register_listener(hook_name, listener)
+    this.add_simple_renderer = function(renderer_uri, renderer) {
+        pm.add_simple_renderer(renderer_uri, renderer)
+    }
+
+    this.get_simple_renderer = function(renderer_uri) {
+        return pm.get_simple_renderer(renderer_uri)
+    }
+
+    // ---
+
+    this.add_multi_renderer = function(renderer_uri, renderer) {
+        pm.add_multi_renderer(renderer_uri, renderer)
+    }
+
+    this.get_multi_renderer = function(renderer_uri) {
+        return pm.get_multi_renderer(renderer_uri)
+    }
+
+    // ---
+
+    this.add_page_renderer = function(renderer_uri, renderer) {
+        pm.add_page_renderer(renderer_uri, renderer)
+    }
+
+    this.get_page_renderer = function(topic_or_association_or_renderer_uri) {
+        return pm.get_page_renderer(topic_or_association_or_renderer_uri)
+    }
+
+    // ---
+
+    /**
+     * Loads a Javascript file dynamically. Synchronous and asynchronous loading is supported.
+     *
+     * @param   url     The URL (absolute or relative) of the Javascript file to load.
+     * @param   async   Optional (boolean):
+     *                      If true loading is asynchronous.
+     *                      If false or not given loading is synchronous.
+     */
+    this.load_script = function(url, async) {
+        $.ajax({
+            url: url,
+            dataType: "script",
+            async: async || false,
+            error: function(jq_xhr, text_status, error_thrown) {
+                throw "WebclientError: loading script failed (" + text_status + ": " + error_thrown + ")"
+            }
+        })
+    }
+
+    this.load_stylesheet = function(stylesheet) {
+        pm.load_stylesheet(stylesheet)
+    }
+
+    // ---
+
+    this.add_listener = function(hook_name, listener) {
+        pm.add_listener(hook_name, listener)
     }
 
     // ---
@@ -686,14 +722,6 @@ var dm4c = new function() {
      */
     this.trigger_plugin_hook = function(hook_name) {
         return pm.trigger_listeners.apply(undefined, arguments)
-    }
-
-    this.get_plugin = function(plugin_class) {
-        return pm.get_plugin(plugin_class)
-    }
-
-    this.get_page_renderer = function(topic_or_association_or_classname) {
-        return pm.get_page_renderer(topic_or_association_or_classname)
     }
 
 
@@ -795,70 +823,101 @@ var dm4c = new function() {
     // === View Configuration ===
 
     /**
-     * Read out a view configuration setting.
+     * Reads out a view configuration setting.
      * <p>
      * Compare to server-side counterparts: WebclientPlugin.getViewConfig() and ViewConfiguration.getSetting()
      *
-     * @param   configurable    A topic type, an association type, or an association definition.
-     *                          Must not be null/undefined.
+     * @param   configurable    A topic type or an association type.
      * @param   setting         Last component of the setting URI, e.g. "icon".
-     * @paran   lookup_default  Optional: if evaluates to true a default value is looked up in case no setting was made.
-     *                          If evaluates to false and no setting was made undefined is returned.
+     * @param   assoc_def       Optional: if given its setting has precedence.
      *
-     * @return  The set value, or <code>undefined</code> if no setting was made and lookup_default evaluates to false.
+     * @return  The configuration setting.
      */
-    this.get_view_config = function(configurable, setting, lookup_default) {
-        // error check
-        if (!configurable.view_config_topics) {
-            throw "InvalidConfigurable: no \"view_config_topics\" property found in " + JSON.stringify(configurable)
+    this.get_view_config = function(configurable, setting, assoc_def) {
+        // assoc def setting (has precedence)
+        if (assoc_def) {
+            var value = get_view_config(assoc_def)
+            if (is_set(value)) {
+                return value
+            }
         }
-        // every configurable has an view_config_topics object, however it might be empty
-        var view_config = configurable.view_config_topics["dm4.webclient.view_config"]
-        if (view_config) {
-            var value = view_config.get("dm4.webclient." + setting)
+        // type setting
+        value = get_view_config(configurable)
+        if (is_set(value)) {
+            return value
         }
-        // lookup default
-        if ((value === undefined || value === "") && lookup_default) {
-            return dm4c.get_view_config_default(configurable, setting)
-        }
-        //
-        return value
-    }
+        // default setting
+        return get_view_config_default(configurable, setting)
 
-    // Note: for these settings the default is provided by the configurable itself:
-    //     "icon"
-    //     "color"
-    //     "js_page_renderer_class"
-    this.get_view_config_default = function(configurable, setting) {
-        switch (setting) {
-        case "add_to_create_menu":
-            return false;
-        case "is_searchable_unit":
-            return false;
-        case "editable":
-            return true
-        case "viewable":
-            return true
-        case "js_field_renderer_class":
-            return default_field_renderer_class()
-        case "rows":
-            return DEFAULT_FIELD_ROWS
-        default:
-            throw("WebclientError: \"" + setting + "\" is an unknown view configuration setting")
+        function is_set(value) {
+            // Note 1: we explicitely compare to undefined to let assoc defs override with falsish (0 or false) values.
+            //         != is sufficient as these are false: 0 == undefined, false == undefined
+            // Note 2: we must regard an empty string as "not set" to get the default renderer URIs.
+            //         !== is required as these are true: 0 == "", false == ""
+            return value != undefined && value !== ""
         }
 
-        function default_field_renderer_class() {
-            switch (configurable.data_type_uri) {
-            case "dm4.core.text":
-                return "TextFieldRenderer"
-            case "dm4.core.html":
-                return "HTMLFieldRenderer"
-            case "dm4.core.number":
-                return "NumberFieldRenderer"
-            case "dm4.core.boolean":
-                return "BooleanFieldRenderer"
+        function get_view_config(configurable) {
+            // error check
+            if (!configurable.view_config_topics) {
+                throw "InvalidConfigurableError: no \"view_config_topics\" property found in " +
+                    JSON.stringify(configurable)
+            }
+            // every configurable has an view_config_topics object, however it might be empty
+            var view_config = configurable.view_config_topics["dm4.webclient.view_config"]
+            if (view_config) {
+                return view_config.get("dm4.webclient." + setting)
+            }
+        }
+
+        function get_view_config_default() {
+            switch (setting) {
+            case "icon":
+                return dm4c.DEFAULT_TOPIC_ICON
+            case "color":
+                return dm4c.canvas.DEFAULT_ASSOC_COLOR
+            case "add_to_create_menu":
+                return false;
+            case "is_searchable_unit":
+                return false;
+            case "editable":
+                return true
+            case "viewable":
+                return true
+            case "page_renderer_uri":
+                return default_page_renderer_uri()
+            case "simple_renderer_uri":
+                return default_simple_renderer_uri()
+            case "multi_renderer_uri":
+                return "dm4.webclient.default_multi_renderer"
+            case "rows":
+                return DEFAULT_FIELD_ROWS
             default:
-                throw("WebclientError: \"" + configurable.data_type_uri + "\" is an unknown data type URI")
+                throw("WebclientError: \"" + setting + "\" is an unknown view configuration setting")
+            }
+
+            function default_page_renderer_uri() {
+                if (configurable instanceof TopicType) {
+                    return "dm4.webclient.topic_renderer"
+                } else if (configurable instanceof AssociationType) {
+                    return "dm4.webclient.association_renderer"
+                }
+                throw "InvalidConfigurableError: " + JSON.stringify(configurable)
+            }
+
+            function default_simple_renderer_uri() {
+                switch (configurable.data_type_uri) {
+                case "dm4.core.text":
+                    return "dm4.webclient.text_renderer"
+                case "dm4.core.html":
+                    return "dm4.webclient.html_renderer"
+                case "dm4.core.number":
+                    return "dm4.webclient.number_renderer"
+                case "dm4.core.boolean":
+                    return "dm4.webclient.boolean_renderer"
+                default:
+                    throw("WebclientError: \"" + configurable.data_type_uri + "\" is an unknown data type URI")
+                }
             }
         }
     }
@@ -912,6 +971,29 @@ var dm4c = new function() {
     }
 
     // === GUI ===
+
+    /**
+     * Called once all plugins are loaded.
+     * Note: the types are already loaded as well.
+     */
+    function setup_gui() {
+        dm4c.log("Setting up GUI")
+        // 1) Setting up the create widget
+        // Note: the create menu must be popularized *after* the plugins are loaded.
+        // Two hooks are involved: post_refresh_create_menu() and has_create_permission().
+        dm4c.refresh_create_menu()
+        //
+        if (!dm4c.toolbar.create_menu.get_item_count()) {
+            dm4c.toolbar.create_widget.hide()
+        }
+        // 2) Initialize plugins
+        // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta-topicmaps plugin
+        // does!) the "init" hook is triggered *after* creating the canvas.
+        // Note: for displaying an initial topic (the deepamehta-topicmaps plugin does!) the "init" hook must
+        // be triggered *after* the GUI setup is complete.
+        dm4c.log("Initializing plugins")
+        dm4c.trigger_plugin_hook("init")
+    }
 
     /**
      * Save the page panel before the user opens a menu.
@@ -1001,7 +1083,8 @@ var dm4c = new function() {
         return img
     }
 
-    this.create_image_tracker = function(callback_func) {
+    // ### TODO: replace image tracker by load tracker?
+    this.create_image_tracker = function(callback) {
 
         return image_tracker = new ImageTracker()
 
@@ -1019,7 +1102,7 @@ var dm4c = new function() {
             // If so, the callback is triggered and this tracker is removed.
             this.check = function() {
                 if (is_all_complete()) {
-                    callback_func()
+                    callback()
                     image_tracker = null
                 }
             }
@@ -1034,6 +1117,19 @@ var dm4c = new function() {
                 return js.includes(images, function(img) {
                     return img.src == image.src
                 })
+            }
+        }
+    }
+
+    // === Load Tracker ===
+
+    function LoadTracker(number_of_loads, callback) {
+        var loads_tracked = 0
+        //
+        this.track = function() {
+            loads_tracked++
+            if (loads_tracked == number_of_loads) {
+                callback()
             }
         }
     }
@@ -1119,17 +1215,6 @@ var dm4c = new function() {
         return build_association(dm4c.restc.get_association_by_id(assoc_id, fetch_composite))
     }
 
-    function fetch_topic_type(topic_type_uri) {
-        // Note: fetch_topic_type() is the only spot where a TopicType object is created directly
-        // instead by calling build_topic_type().
-        // fetch_topic_type() is part of the Webclient's bootstrapping sequence (see load_types() below).
-        return new TopicType(dm4c.restc.get_topic_type(topic_type_uri))
-    }
-
-    function fetch_association_type(assoc_type_uri) {
-        return build_association_type(dm4c.restc.get_association_type(assoc_type_uri))
-    }
-
     // ---
 
     function build_topic(topic) {
@@ -1156,97 +1241,58 @@ var dm4c = new function() {
         return tt
     }
 
+    // ### FIXME: not yet used
     function build_association_type(assoc_type) {
         return new AssociationType(assoc_type)
     }
 
-    // --- Types ---
+    // === REST client ===
 
-    function load_types() {
-        // 1) load topic types
-        var type_uris = dm4c.restc.get_topic_type_uris()
-        if (LOG_TYPE_LOADING) dm4c.log("Loading " + type_uris.length + " topic types")
-        for (var i = 0; i < type_uris.length; i++) {
-            if (LOG_TYPE_LOADING) dm4c.log("..... " + type_uris[i])
-            type_cache.put_topic_type(fetch_topic_type(type_uris[i]))
+    function extend_rest_client() {
+        dm4c.restc.search_topics_and_create_bucket = function(text, field_uri, whole_word) {
+            var params = this.createRequestParameter({search: text, field: field_uri, wholeword: whole_word})
+            return this.request("GET", "/webclient/search?" + params.to_query_string())
         }
-        // 2) load association types
-        var type_uris = dm4c.restc.get_association_type_uris()
-        if (LOG_TYPE_LOADING) dm4c.log("Loading " + type_uris.length + " association types")
-        for (var i = 0; i < type_uris.length; i++) {
-            if (LOG_TYPE_LOADING) dm4c.log("..... " + type_uris[i])
-            type_cache.put_association_type(fetch_association_type(type_uris[i]))
+        // Note: this method is actually part of the Type Search plugin.
+        // TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
+        // another namespace again) or make the Type Search plugin an integral part of the Client plugin.
+        dm4c.restc.get_topics_and_create_bucket = function(type_uri, max_result_size) {
+            var params = this.createRequestParameter({max_result_size: max_result_size})
+            return this.request("GET", "/webclient/search/by_type/" + type_uri + "?" + params.to_query_string())
         }
-        // 3) load topic type icons
-        // Note: the icons must be loaded *after* loading the topic types.
-        // The topic type "dm4.webclient.icon" must be known.
-        if (LOG_TYPE_LOADING) dm4c.log("Loading topic type icons")
-        type_cache.iterate(function(topic_type) {
-            if (LOG_TYPE_LOADING) dm4c.log("..... " + topic_type.uri)
-            topic_type.load_icon()
-        })
-        if (LOG_TYPE_LOADING) dm4c.log("Loading types complete")
     }
 
     // ------------------------------------------------------------------------------------------------ Constructor Code
 
     $(function() {
-        //
-        // --- 1) Prepare GUI ---
-        // create toolbar
+        // 1) Build GUI
         dm4c.toolbar = new ToolbarPanel()
         $("body").append(dm4c.toolbar.dom)
-        // create split panel
+        //
         dm4c.split_panel = new SplitPanel()
         $("body").append(dm4c.split_panel.dom)
-        // create page panel
+        //
         dm4c.page_panel = new PagePanel()
         dm4c.split_panel.set_right_panel(dm4c.page_panel)
-        // create canvas
-        dm4c.canvas = new TopicmapRenderer()
+        //
+        dm4c.canvas = new DefaultTopicmapRenderer()
         dm4c.split_panel.set_left_panel(dm4c.canvas)
-        // create upload dialog
+        //
         dm4c.upload_dialog = new UploadDialog()
         //
-        // --- 2) Load Plugins ---
-        // Note: in order to let a plugin DOM manipulate the GUI the plugins are loaded *after* the GUI is prepared.
-        extend_rest_client()
-        load_types()
+        // 2) Setup Load Tracker
+        var items_to_load = pm.retrieve_plugin_list()
+        var number_of_loads = items_to_load + 2    // +2 loads: topic types and association types
+        var tracker = new LoadTracker(number_of_loads, setup_gui)
         //
-        pm.load_plugins(setup_gui)
-
-        /**
-         * Called once all plugins are loaded.
-         */
-        function setup_gui() {
-            dm4c.log("Setting up GUI")
-            // setup create widget
-            dm4c.refresh_create_menu()
-            if (!dm4c.toolbar.create_menu.get_item_count()) {
-                dm4c.toolbar.create_widget.hide()
-            }
-            // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta-topicmaps plugin
-            // does!) the "init" hook is triggered *after* creating the canvas.
-            // Note: for displaying an initial topic (the deepamehta-topicmaps plugin does!) the "init" hook must
-            // be triggered *after* the GUI setup is complete.
-            dm4c.log("Initializing plugins")
-            dm4c.trigger_plugin_hook("init")
-        }
-
-        function extend_rest_client() {
-
-            dm4c.restc.search_topics_and_create_bucket = function(text, field_uri, whole_word) {
-                var params = this.createRequestParameter({search: text, field: field_uri, wholeword: whole_word})
-                return this.request("GET", "/webclient/search?" + params.to_query_string())
-            }
-
-            // Note: this method is actually part of the Type Search plugin.
-            // TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
-            // another namespace again) or make the Type Search plugin an integral part of the Client plugin.
-            dm4c.restc.get_topics_and_create_bucket = function(type_uri, max_result_size) {
-                var params = this.createRequestParameter({max_result_size: max_result_size})
-                return this.request("GET", "/webclient/search/by_type/" + type_uri + "?" + params.to_query_string())
-            }
-        }
+        // 3) Load Plugins
+        pm.load_plugins(tracker)
+        //
+        // 4) Load Types
+        type_cache.load_types(tracker)
     })
 }
+
+dm4c = {}   // create global object
+Webclient.call(dm4c)
+})()

@@ -1,7 +1,6 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.impl.storage.MGStorageBridge;
-import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.util.JavaUtils;
 
 import de.deepamehta.mehtagraph.MehtaGraph;
@@ -17,7 +16,7 @@ import java.util.logging.Logger;
 
 public class CoreServiceTestEnvironment {
 
-    protected DeepaMehtaService dms;
+    protected EmbeddedService dms;
     protected Logger logger = Logger.getLogger(getClass().getName());
 
     private File dbPath;

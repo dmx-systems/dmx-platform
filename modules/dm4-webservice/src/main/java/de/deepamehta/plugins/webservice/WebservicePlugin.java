@@ -11,12 +11,12 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.CommandParams;
 import de.deepamehta.core.service.CommandResult;
+import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Hook;
-import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 
 import javax.ws.rs.GET;
@@ -39,10 +39,10 @@ import java.util.logging.Logger;
 
 
 
-@Path("/")
+@Path("/core")
 @Consumes("application/json")
 @Produces("application/json")
-public class WebservicePlugin extends Plugin {
+public class WebservicePlugin extends PluginActivator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -62,7 +62,7 @@ public class WebservicePlugin extends Plugin {
         try {
             Topic topic = dms.getTopic(topicId, fetchComposite, clientState);
             //
-            triggerPreSend(topic, clientState);
+            firePreSend(topic, clientState);
             //
             return topic;
         } catch (Exception e) {
@@ -91,7 +91,7 @@ public class WebservicePlugin extends Plugin {
         try {
             ResultSet<Topic> topics = dms.getTopics(typeUri, fetchComposite, maxResultSize, clientState);
             //
-            triggerPreSend(topics, clientState);
+            firePreSend(topics, clientState);
             //
             return topics;
         } catch (Exception e) {
@@ -118,7 +118,7 @@ public class WebservicePlugin extends Plugin {
         try {
             Topic topic = dms.createTopic(model, clientState);
             //
-            triggerPreSend(topic, clientState);
+            firePreSend(topic, clientState);
             //
             return topic;
         } catch (Exception e) {
@@ -132,7 +132,7 @@ public class WebservicePlugin extends Plugin {
         try {
             Directives directives = dms.updateTopic(model, clientState);
             //
-            triggerPreSend(directives, clientState);
+            firePreSend(directives, clientState);
             //
             return directives;
         } catch (Exception e) {
@@ -162,7 +162,7 @@ public class WebservicePlugin extends Plugin {
         try {
             Association assoc = dms.getAssociation(assocId, fetchComposite, clientState);
             //
-            // triggerPreSend(assoc, clientState);  ### TODO
+            // firePreSend(assoc, clientState);  ### TODO
             //
             return assoc;
         } catch (Exception e) {
@@ -262,9 +262,19 @@ public class WebservicePlugin extends Plugin {
         try {
             TopicType topicType = dms.getTopicType(uri, clientState);
             //
-            triggerPreSend(topicType, clientState);
+            firePreSend(topicType, clientState);
             //
             return topicType;
+        } catch (Exception e) {
+            throw new WebApplicationException(e);
+        }
+    }
+
+    @GET
+    @Path("/topictype/all")
+    public Set<TopicType> getAllTopicTypes(@HeaderParam("Cookie") ClientState clientState) {
+        try {
+            return dms.getAllTopicTypes(clientState);
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
@@ -276,7 +286,7 @@ public class WebservicePlugin extends Plugin {
         try {
             TopicType topicType = dms.createTopicType(topicTypeModel, clientState);
             //
-            triggerPreSend(topicType, clientState);
+            firePreSend(topicType, clientState);
             //
             return topicType;
         } catch (Exception e) {
@@ -290,7 +300,7 @@ public class WebservicePlugin extends Plugin {
         try {
             Directives directives = dms.updateTopicType(model, clientState);
             //
-            triggerPreSend(directives, clientState);
+            firePreSend(directives, clientState);
             //
             return directives;
         } catch (Exception e) {
@@ -323,6 +333,16 @@ public class WebservicePlugin extends Plugin {
         }
     }
 
+    @GET
+    @Path("/assoctype/all")
+    public Set<AssociationType> getAssociationAllTypes(@HeaderParam("Cookie") ClientState clientState) {
+        try {
+            return dms.getAllAssociationTypes(clientState);
+        } catch (Exception e) {
+            throw new WebApplicationException(e);
+        }
+    }
+
     @POST
     @Path("/assoctype")
     public AssociationType createAssociationType(AssociationTypeModel assocTypeModel,
@@ -338,13 +358,15 @@ public class WebservicePlugin extends Plugin {
 
     // === Commands ===
 
+    // ### TODO: drop this method. For the moment it stays here to illustrate file uploading.
+    // ### See de.deepamehta.plugins.webservice.provider.CommandParamsProvider
     @POST
     @Path("/command/{command}")
     @Consumes("application/json, multipart/form-data")
     public CommandResult executeCommand(@PathParam("command") String command, CommandParams params,
                                         @HeaderParam("Cookie") ClientState clientState) {
         try {
-            return dms.executeCommand(command, params, clientState);
+            return null;    // ### dms.executeCommand(command, params, clientState);
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
@@ -407,28 +429,28 @@ public class WebservicePlugin extends Plugin {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void triggerPreSend(Topic topic, ClientState clientState) {
-        dms.triggerHook(Hook.PRE_SEND_TOPIC, topic, clientState);
+    private void firePreSend(Topic topic, ClientState clientState) {
+        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, topic, clientState);
     }
 
-    private void triggerPreSend(TopicType topicType, ClientState clientState) {
-        dms.triggerHook(Hook.PRE_SEND_TOPIC_TYPE, topicType, clientState);
+    private void firePreSend(TopicType topicType, ClientState clientState) {
+        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC_TYPE, topicType, clientState);
     }
 
-    private void triggerPreSend(ResultSet<Topic> topics, ClientState clientState) {
+    private void firePreSend(ResultSet<Topic> topics, ClientState clientState) {
         for (Topic topic : topics) {
-            triggerPreSend(topic, clientState);
+            firePreSend(topic, clientState);
         }
     }
 
-    private void triggerPreSend(Directives directives, ClientState clientState) {
+    private void firePreSend(Directives directives, ClientState clientState) {
         for (Directives.Entry entry : directives) {
             switch (entry.dir) {
             case UPDATE_TOPIC:
-                triggerPreSend((Topic) entry.arg, clientState);
+                firePreSend((Topic) entry.arg, clientState);
                 break;
             case UPDATE_TOPIC_TYPE:
-                triggerPreSend((TopicType) entry.arg, clientState);
+                firePreSend((TopicType) entry.arg, clientState);
                 break;
             }
         }

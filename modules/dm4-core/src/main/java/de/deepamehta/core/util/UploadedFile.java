@@ -5,6 +5,7 @@ import java.io.InputStream;
 
 
 /**
+ * ### FIXDOC
  * An uploaded file.
  * <p>
  * Files are uploaded via the REST API by POSTing <code>multipart/form-data</code> to the <code>/command</code>

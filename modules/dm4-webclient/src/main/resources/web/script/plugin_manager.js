@@ -1,116 +1,154 @@
 function PluginManager(config) {
 
-    var plugin_sources = config.embedded_plugins
-    var plugins = {}            // key: plugin class name, base name of source file (string), value: plugin instance
+    var plugins = {}            // key: plugin URI, value: plugin instance
+    var page_renderers = {}     // key: page renderer URI, value: object with "render_page", "render_form", "page_css"
+    var simple_renderers = {}   // key: simple renderer URI, value: object with "render_info", "render_form"
+    var multi_renderers = {}    // key: multi renderer URI, value: object with "render_info", "render_form"
 
-    var page_renderer_sources = []
-    var page_renderers = {}     // key: page renderer class name, camel case (string), value: renderer instance
-
-    var field_renderer_sources = []
-
-    var css_stylesheets = []
+    var plugin_list
+    var load_tracker
 
     // key: hook name (string), value: registered listeners (array of functions)
     var listener_registry = {}
 
-    // ### FIXME: drop this. Not in use. Only here for documentation purposes.
-    // ### TODO: move to wiki documentation.
-    var hook_names = [
-        // Plugin
-        "init",
-        // Commands
-        "topic_commands",
-        "association_commands",
-        "canvas_commands",
-        // Storage (DB updates)
-        "post_create_topic",
-        "post_update_topic",
-        "post_update_association",
-        "post_delete_topic",
-        "post_delete_association",
-        // Selection (client model updates)
-        "post_select_topic",
-        "post_select_association",
-        "post_reset_selection",
-        // Show/Hide (view updates)
-        "pre_show_topic",
-        "post_show_topic",
-        "post_show_association",
-        "post_hide_topic",
-        "post_hide_association",
-        // Toolbar
-        "searchmode_widget",
-        "search",
-        "post_refresh_create_menu",
-        // Page Panel
-        "pre_render_page",
-        "pre_render_form",
-        "post_destroy_form",
-        "default_page_rendering",
-        // Canvas
-        "topic_doubleclicked",
-        "post_move_topic",
-        "post_move_canvas",
-        "pre_draw_canvas",
-        "process_drop",
-        // History
-        "pre_push_history",
-        "pre_pop_history",
-        // Permissions
-        "has_write_permission",
-        "has_create_permission"
-    ]
-
     // ------------------------------------------------------------------------------------------------------ Public API
 
-    this.load_plugins = function(callback) {
-        register_plugins()
-        load_plugins(callback)
+    this.retrieve_plugin_list = function() {
+        // retrieve list of installed plugins from server
+        plugin_list = dm4c.restc.get_plugins()
+        //
+        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Plugins installed at server-side: " + plugin_list.length)
+        //
+        var items_to_load = count_items_to_load(plugin_list) + config.internal_plugins.length
+        //
+        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Total items to load: " + items_to_load)
+        //
+        return items_to_load
     }
 
-    this.get_plugin = function(plugin_class) {
-        return plugins[plugin_class]
-    }
-
-    this.get_page_renderer = function(topic_or_association_or_classname) {
-        if (typeof(topic_or_association_or_classname) == "string") {
-            var page_renderer_class = topic_or_association_or_classname
-        } else {
-            var type = topic_or_association_or_classname.get_type()
-            var page_renderer_class = type.get_page_renderer_class()
+    this.load_plugins = function(tracker) {
+        load_tracker = tracker
+        //
+        load_internal_plugins(config.internal_plugins)
+        //
+        for (var i = 0, plugin; plugin = plugin_list[i]; i++) {
+            load_plugin(plugin)
         }
-        var page_renderer = page_renderers[page_renderer_class]
+    }
+
+    this.add_plugin = function(plugin_uri, plugin_func) {
         // error check
-        if (!page_renderer) {
-            throw "PluginManagerError: page renderer \"" + page_renderer_class + "\" is unknown"
+        if (plugins[plugin_uri]) {
+            throw "PluginManagerError: plugin URI clash with \"" + plugin_uri + "\""
         }
         //
-        return page_renderer
+        var plugin = {}
+        plugin_func.call(plugin)
+        plugins[plugin_uri] = plugin
+        //
+        track_load_state("plugin \"" + plugin_uri + "\"");
+    }
+
+    this.get_plugin = function(plugin_uri) {
+        var plugin = plugins[plugin_uri]
+        // error check
+        if (!plugin) {
+            throw "PluginManagerError: plugin \"" + plugin_uri + "\" is unknown"
+        }
+        //
+        return plugin
     }
 
     // ---
 
-    this.register_page_renderer = function(source_path) {
-        page_renderer_sources.push(source_path)
+    this.add_page_renderer = function(renderer_uri, renderer) {
+        // error check
+        if (page_renderers[renderer_uri]) {
+            throw "PluginManagerError: page renderer URI clash with \"" + renderer_uri + "\""
+        }
+        //
+        page_renderers[renderer_uri] = renderer
+        //
+        track_load_state("page renderer \"" + renderer_uri + "\"");
     }
 
-    this.register_field_renderer = function(source_path) {
-        field_renderer_sources.push(source_path)
+    this.get_page_renderer = function(topic_or_association_or_renderer_uri) {
+        if (typeof(topic_or_association_or_renderer_uri) == "string") {
+            var renderer_uri = topic_or_association_or_renderer_uri
+        } else {
+            var type = topic_or_association_or_renderer_uri.get_type()
+            var renderer_uri = type.get_page_renderer_uri()
+        }
+        var renderer = page_renderers[renderer_uri]
+        // error check
+        if (!renderer) {
+            throw "PluginManagerError: page renderer \"" + renderer_uri + "\" is unknown"
+        }
+        //
+        return renderer
     }
 
-    this.register_css_stylesheet = function(css_path) {
-        css_stylesheets.push(css_path)
+    // ---
+
+    this.add_simple_renderer = function(renderer_uri, renderer) {
+        // error check
+        if (simple_renderers[renderer_uri]) {
+            throw "PluginManagerError: simple renderer URI clash with \"" + renderer_uri + "\""
+        }
+        //
+        simple_renderers[renderer_uri] = renderer
+        //
+        track_load_state("simple renderer \"" + renderer_uri + "\"");
+    }
+
+    this.get_simple_renderer = function(renderer_uri) {
+        var renderer = simple_renderers[renderer_uri]
+        // error check
+        if (!renderer) {
+            throw "PluginManagerError: simple renderer \"" + renderer_uri + "\" is unknown"
+        }
+        //
+        return renderer
+    }
+
+    // ---
+
+    this.add_multi_renderer = function(renderer_uri, renderer) {
+        // error check
+        if (multi_renderers[renderer_uri]) {
+            throw "PluginManagerError: multi renderer URI clash with \"" + renderer_uri + "\""
+        }
+        //
+        multi_renderers[renderer_uri] = renderer
+        //
+        track_load_state("multi renderer \"" + renderer_uri + "\"");
+    }
+
+    this.get_multi_renderer = function(renderer_uri) {
+        var renderer = multi_renderers[renderer_uri]
+        // error check
+        if (!renderer) {
+            throw "PluginManagerError: multi renderer \"" + renderer_uri + "\" is unknown"
+        }
+        //
+        return renderer
+    }
+
+    // ---
+
+    this.load_stylesheet = function(stylesheet) {
+        load_stylesheet(stylesheet)
     }
 
     // === Listener Registry ===
 
-    this.register_listener = function(hook_name, listener) {
+    this.add_listener = function(hook_name, listener) {
         // introduce hook on-demand
         if (!hook_exists(hook_name)) {
             listener_registry[hook_name] = []
         }
         //
-        register_listener(hook_name, listener)
+        add_listener(hook_name, listener)
     }
 
     // ---
@@ -145,31 +183,29 @@ function PluginManager(config) {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    /**
-     * Registers server-side plugins to the list of plugins to load at client-side.
-     */
-    function register_plugins() {
-        var plugins = dm4c.restc.get_plugins()
-        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Plugins installed at server-side: " + plugins.length)
-        for (var i = 0, plugin; plugin = plugins[i]; i++) {
-            if (plugin.plugin_file) {
-                if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_id +
-                    "\" contains client-side parts -- to be loaded")
-                register_plugin("/" + plugin.plugin_id + "/script/" + plugin.plugin_file)
-            } else {
-                if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_id +
-                    "\" contains no client-side parts -- nothing to load")
+    function count_items_to_load(plugin_list) {
+        var count = 0
+        for (var i = 0, plugin; plugin = plugin_list[i]; i++) {
+            // count plugin file
+            if (plugin.has_plugin_file) {
+                count++
+            }
+            // count renderers
+            for (var renderer_type in plugin.renderers) {
+                count += plugin.renderers[renderer_type].length
             }
         }
+        return count
     }
 
-    function register_plugin(source_path) {
-        plugin_sources.push(source_path)
+    function track_load_state(item) {
+        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + item + " complete")
+        load_tracker.track()
     }
 
     // ---
 
-    function register_listener(hook_name, listener) {
+    function add_listener(hook_name, listener) {
         listener_registry[hook_name].push(listener)
     }
 
@@ -179,75 +215,57 @@ function PluginManager(config) {
 
     // ---
 
-    /**
-     * Loads and instantiates all registered plugins.
-     */
-    function load_plugins(callback) {
-
-        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Loading " + plugin_sources.length + " plugins:")
-        var plugins_complete = 0
-        for (var i = 0, plugin_source; plugin_source = plugin_sources[i]; i++) {
-            load_plugin(plugin_source)
-        }
-
-        function load_plugin(plugin_source) {
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + plugin_source)
-            // load plugin asynchronously
-            dm4c.load_script(plugin_source, function() {
-                // instantiate
-                var plugin_class = js.basename(plugin_source)
-                if (dm4c.LOG_PLUGIN_LOADING) dm4c.log(".......... instantiating \"" + plugin_class + "\"")
-                plugins[plugin_class] = js.new_object(plugin_class)
-                // all plugins complete?
-                plugins_complete++
-                if (plugins_complete == plugin_sources.length) {
-                    if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("PLUGINS COMPLETE!")
-                    all_plugins_loaded()
-                }
-            })
-        }
-
-        function all_plugins_loaded() {
-            load_page_renderers()
-            load_field_renderers()
-            load_stylesheets()
-            //
-            callback()
+    function load_internal_plugins(plugins) {
+        for (var i = 0, plugin; plugin = plugins[i]; i++) {
+            load_plugin_file("/de.deepamehta.webclient/script/internal_plugins/" + plugin)
         }
     }
 
-    function load_page_renderers() {
-
-        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Loading " + page_renderer_sources.length + " page renderers:")
-        for (var i = 0, page_renderer_src; page_renderer_src = page_renderer_sources[i]; i++) {
-            load_page_renderer(page_renderer_src)
+    function load_plugin(plugin) {
+        // 1) load plugin file
+        if (plugin.has_plugin_file) {
+            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_uri +
+                "\" -- has plugin file")
+            var plugin_file = "/" + plugin.plugin_uri + "/script/plugin.js"
+            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + plugin_file)
+            load_plugin_file(plugin_file)
+        } else {
+            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_uri +
+                "\" -- no plugin file to be loaded")
         }
+        //
+        // 2) load renderers
+        load_renderers(plugin.plugin_uri, "page_renderers",   plugin.renderers.page_renderers)
+        load_renderers(plugin.plugin_uri, "simple_renderers", plugin.renderers.simple_renderers)
+        load_renderers(plugin.plugin_uri, "multi_renderers",  plugin.renderers.multi_renderers)
+        // ### load_renderers(plugin.plugin_uri, "topicmap_renderers", plugin.renderers.topicmap_renderers)
+        //
+        // 3) load stylesheets
+        load_stylesheets(plugin.plugin_uri, plugin.stylesheets)
+    }
 
-        function load_page_renderer(page_renderer_src) {
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + page_renderer_src)
-            // load page renderer synchronously (Note: synchronous is required for displaying initial topic)
-            dm4c.load_script(page_renderer_src)
-            // instantiate
-            var page_renderer_class = js.to_camel_case(js.basename(page_renderer_src))
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log(".......... instantiating \"" + page_renderer_class + "\"")
-            page_renderers[page_renderer_class] = js.instantiate(PageRenderer, page_renderer_class)
+    function load_renderers(plugin_uri, renderer_type, renderer_files) {
+        for (var i = 0, renderer_file; renderer_file = renderer_files[i]; i++) {
+            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... Loading " + renderer_type + " " + renderer_file)
+            renderer_file = "/" + plugin_uri + "/script/renderers/" + renderer_type + "/" + renderer_file
+            dm4c.load_script(renderer_file, true)   // async=true
         }
     }
 
-    function load_field_renderers() {
-        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Loading " + field_renderer_sources.length + " data field renderers:")
-        for (var i = 0, field_renderer_source; field_renderer_source = field_renderer_sources[i]; i++) {
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + field_renderer_source)
-            // load field renderer synchronously (Note: synchronous is required for displaying initial topic)
-            dm4c.load_script(field_renderer_source)
+    function load_plugin_file(plugin_file) {
+        dm4c.load_script(plugin_file, true)         // async=true
+    }
+
+    // ---
+
+    function load_stylesheets(plugin_uri, stylesheets) {
+        for (var i = 0, stylesheet; stylesheet = stylesheets[i]; i++) {
+            load_stylesheet("/" + plugin_uri + "/style/" + stylesheet)
         }
     }
 
-    function load_stylesheets() {
-        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Loading " + css_stylesheets.length + " CSS stylesheets:")
-        for (var i = 0, css_stylesheet; css_stylesheet = css_stylesheets[i]; i++) {
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + css_stylesheet)
-            $("head").append($("<link>").attr({rel: "stylesheet", href: css_stylesheet, type: "text/css"}))
-        }
+    function load_stylesheet(stylesheet) {
+        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... Loading CSS " + stylesheet)
+        $("head").append($("<link>").attr({rel: "stylesheet", href: stylesheet, type: "text/css"}))
     }
 }

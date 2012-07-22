@@ -1,4 +1,7 @@
 /**
+ * ### FIXDOC
+ * Note: this is inactive code. It is here only for documentation purpose.
+ *
  * An abstraction of the view component that occupies the right part of the DeepaMehta window (the "page panel").
  * The abstraction comprises:
  *     - a strategy to render a topic/association info page
@@ -10,23 +13,24 @@
  * PageRenderer instances are singletons. They are created and cached by the Webclient main class.
  *
  * The DeepaMehta standard distribution provides the following page renderers:
- *     - TopicRenderer: the default renderer for topics (Webclient module)
- *     - AssociationRenderer: the default renderer for associations (Webclient module)
- *     - TopictypeRenderer (Type Editor module)
- *     - WebpageRenderer (Webbrowser module)
+ *     - dm4.webclient.topic_renderer:       the default renderer for topics       (Webclient module)
+ *     - dm4.webclient.association_renderer: the default renderer for associations (Webclient module)
+ *     - dm4.typeeditor.topictype_renderer   (Type Editor module)
+ *     - dm4.webbrowser.webpage_renderer     (Webbrowser module)
  */
 function PageRenderer() {
 
     this.render_page = function(topic_or_association) {}
 
     /**
-     * @return  the form processing function
+     * @return  The form processing function: called to "submit" the form.
      */
     this.render_form = function(topic_or_association) {}
 
     // ---
 
-    this.page_css = function() {
-        return {overflow: "auto"}
-    }
+    /**
+     * Optional: the page CSS (JavaScript object). If not specified {overflow: "auto"} is used.
+     */
+    this.page_css = {overflow: "auto"}
 }

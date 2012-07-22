@@ -150,6 +150,10 @@ function RESTClient(core_service_uri) {
         return request("GET", "/topictype/" + type_uri)
     }
 
+    this.get_all_topic_types = function(callback) {
+        request("GET", "/topictype/all", undefined, callback)
+    }
+
     this.create_topic_type = function(topic_type_model) {
         return request("POST", "/topictype", topic_type_model)
     }
@@ -168,6 +172,10 @@ function RESTClient(core_service_uri) {
 
     this.get_association_type = function(type_uri) {
         return request("GET", "/assoctype/" + type_uri)
+    }
+
+    this.get_all_association_types = function(callback) {
+        request("GET", "/assoctype/all", undefined, callback)
     }
 
 
@@ -198,7 +206,7 @@ function RESTClient(core_service_uri) {
      * For example, see the DeepaMehta 4 Topicmaps plugin.
      */
     this.request = function(method, uri, data, content_type) {
-        return request(method, uri, data, content_type, true)
+        return request(method, uri, data, undefined, content_type, true)    // callback=undefined
     }
 
     /**
@@ -222,12 +230,10 @@ function RESTClient(core_service_uri) {
      * @param   is_absolute_uri     If true, the URI is interpreted as relative to the DeepaMehta core service URI.
      *                              If false, the URI is interpreted as an absolute URI.
      */
-    function request(method, uri, data, content_type, is_absolute_uri) {
-        var status                  // "success" if request was successful
-        var responseCode            // HTTP response code, e.g. 304
-        var responseMessage         // HTTP response message, e.g. "Not Modified"
-        var responseData            // in case of successful request: the response data (response body)
-        var exception               // in case of unsuccessful request: possibly an exception
+    function request(method, uri, data, callback, content_type, is_absolute_uri) {
+        var async = callback != undefined
+        var status          // used only for synchronous request: "success" if request was successful
+        var response_data   // used only for synchronous successful request: the response data (response body)
         //
         if (LOG_AJAX_REQUESTS) dm4c.log(method + " " + uri + "\n..... " + JSON.stringify(data))
         //
@@ -242,28 +248,26 @@ function RESTClient(core_service_uri) {
             contentType: content_type,
             data: data,
             processData: false,
-            async: false,
-            success: function(data, textStatus, xhr) {
-                if (LOG_AJAX_REQUESTS) dm4c.log("..... " + xhr.status + " " + xhr.statusText +
+            async: async,
+            success: function(data, text_status, jq_xhr) {
+                if (LOG_AJAX_REQUESTS) dm4c.log("..... " + jq_xhr.status + " " + jq_xhr.statusText +
                     "\n..... " + JSON.stringify(data))
-                responseData = data
+                if (callback) {
+                    callback(data)
+                }
+                response_data = data
             },
-            error: function(xhr, textStatus, ex) {
-                if (LOG_AJAX_REQUESTS) dm4c.log("..... " + xhr.status + " " + xhr.statusText +
-                    "\n..... exception: " + JSON.stringify(ex))
-                exception = ex
+            error: function(jq_xhr, text_status, error_thrown) {
+                if (LOG_AJAX_REQUESTS) dm4c.log("..... " + jq_xhr.status + " " + jq_xhr.statusText +
+                    "\n..... exception: " + JSON.stringify(error_thrown))
+                throw "RESTClientError: " + method + " request failed (" + text_status + ": " + error_thrown + ")"
             },
-            complete: function(xhr, textStatus) {
-                status = textStatus
-                responseCode = xhr.status
-                responseMessage = xhr.statusText
+            complete: function(jq_xhr, text_status) {
+                status = text_status
             }
         })
-        if (status == "success") {
-            return responseData
-        } else {
-            throw "RESTClientError: " + method + " request failed, server response: " + responseCode +
-                " (" + responseMessage + "), exception: " + exception
+        if (!async && status == "success") {
+            return response_data
         }
     }
 
