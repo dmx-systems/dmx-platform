@@ -136,8 +136,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Plugin
 
     // ---
 
-    // ### FIXME: Jersey WARNING: A HTTP GET method MUST return a non-void type
-    @GET
+    @POST
     @Path("/{id}")
     @Override
     public void openFile(@PathParam("id") long fileTopicId) {
