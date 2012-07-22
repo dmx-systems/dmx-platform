@@ -1,8 +1,8 @@
-function TopicmapRenderer() {
+function DefaultTopicmapRenderer() {
 
     // ------------------------------------------------------------------------------------------------ Constructor Code
 
-    js.extend(this, CanvasRenderer)
+    js.extend(this, TopicmapRenderer)
     var self = this
 
     // Settings
@@ -51,11 +51,11 @@ function TopicmapRenderer() {
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
-    // === CanvasRenderer Implementation ===
+    // === TopicmapRenderer Implementation ===
 
     this.get_info = function() {
         return {
-            uri: "dm4.webclient.topicmap_renderer",
+            uri: "dm4.webclient.default_topicmap_renderer",
             name: "Topicmap"
         }
     }

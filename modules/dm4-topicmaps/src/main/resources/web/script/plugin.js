@@ -3,17 +3,17 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     var LOG_TOPICMAPS = false
     var self = this
 
-    dm4c.load_script("/de.deepamehta.topicmaps/script/canvas_renderer_extension.js")
+    dm4c.load_script("/de.deepamehta.topicmaps/script/topicmap_renderer_extension.js")
     dm4c.load_script("/de.deepamehta.topicmaps/script/model/topicmap.js")
 
-    js.extend(dm4c.canvas, CanvasRendererExtension)
+    js.extend(dm4c.canvas, TopicmapRendererExtension)
 
     // Model
     var topicmap_topics             // All topicmaps in the DB (object, key: topicmap ID, value: topicmap topic)
     var topicmaps = {}              // Loaded topicmaps (key: topicmap ID, value: Topicmap object)
     var topicmap                    // Selected topicmap (Topicmap object)
-    var canvas_renderer             // The canvas renderer of the selected topicmap
-    var canvas_renderers = {}       // Registered canvas renderers (key: renderer URI, value: CanvasRenderer object)
+    var topicmap_renderer           // The topicmap renderer of the selected topicmap
+    var topicmap_renderers = {}     // Registered topicmap renderers (key: renderer URI, value: TopicmapRenderer object)
 
     // View
     var topicmap_menu               // A GUIToolkit Menu object
@@ -44,23 +44,23 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     dm4c.add_listener("init", function() {
         fetch_topicmap_topics()
-        register_canvas_renderers()
+        register_topicmap_renderers()
         create_default_topicmap()
         create_topicmap_menu()
         create_topicmap_dialog()
         display_initial_topicmap()
 
-        function register_canvas_renderers() {
+        function register_topicmap_renderers() {
             // default renderer
             register(dm4c.canvas)
             // custom renderers
-            var renderers = dm4c.trigger_plugin_hook("canvas_renderer")
+            var renderers = dm4c.trigger_plugin_hook("topicmap_renderer")
             renderers.forEach(function(renderer) {
                 register(renderer)
             })
 
             function register(renderer) {
-                canvas_renderers[renderer.get_info().uri] = renderer
+                topicmap_renderers[renderer.get_info().uri] = renderer
             }
         }
 
@@ -103,7 +103,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
             function create_maptype_menu() {
                 var menu = dm4c.ui.menu()
-                iterate_canvas_renderers(function(renderer) {
+                iterate_topicmap_renderers(function(renderer) {
                     var info = renderer.get_info()
                     menu.add_item({label: info.name, value: info.uri})
                 })
@@ -113,8 +113,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             function do_create_topicmap() {
                 $("#topicmap-dialog").dialog("close")
                 var name = title_input.val()
-                var canvas_renderer_uri = type_menu.get_selection().value
-                create_topicmap(name, canvas_renderer_uri)
+                var topicmap_renderer_uri = type_menu.get_selection().value
+                create_topicmap(name, topicmap_renderer_uri)
                 return false
             }
         }
@@ -354,13 +354,13 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     /**
      * Creates a topicmap with the given name, puts it in the topicmap menu, and displays the topicmap.
      *
-     * @param   canvas_renderer_uri     Optional: the canvas renderer to attach to the topicmap.
-     *                                  Default is "dm4.webclient.topicmap_renderer".
+     * @param   topicmap_renderer_uri   Optional: the topicmap renderer to attach to the topicmap.
+     *                                  Default is "dm4.webclient.default_topicmap_renderer".
      *
      * @return  the topicmap topic.
      */
-    this.do_create_topicmap = function(name, canvas_renderer_uri) {
-        return create_topicmap(name, canvas_renderer_uri)
+    this.do_create_topicmap = function(name, topicmap_renderer_uri) {
+        return create_topicmap(name, topicmap_renderer_uri)
     }
 
     // ---
@@ -391,13 +391,13 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     /**
      * Creates a topicmap with the given name, puts it in the topicmap menu, and displays the topicmap.
      *
-     * @param   canvas_renderer_uri     Optional: the canvas renderer to attach to the topicmap.
-     *                                  Default is "dm4.webclient.topicmap_renderer".
+     * @param   topicmap_renderer_uri   Optional: the topicmap renderer to attach to the topicmap.
+     *                                  Default is "dm4.webclient.default_topicmap_renderer".
      *
      * @return  the topicmap topic.
      */
-    function create_topicmap(name, canvas_renderer_uri) {
-        var topicmap_topic = create_topicmap_topic(name, canvas_renderer_uri)
+    function create_topicmap(name, topicmap_renderer_uri) {
+        var topicmap_topic = create_topicmap_topic(name, topicmap_renderer_uri)
         rebuild_topicmap_menu(topicmap_topic.id)
         // update model
         set_selected_topicmap(topicmap_topic.id)
@@ -424,9 +424,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         // Note: the cookie must be set *before* the topicmap is loaded.
         // Server-side topic loading might depend on the topicmap type.
         js.set_cookie("dm4_topicmap_id", topicmap_id)
-        // 2) update "canvas_renderer"
-        var renderer_uri = topicmap_topics[topicmap_id].get("dm4.topicmaps.canvas_renderer_uri")
-        canvas_renderer = get_canvas_renderer(renderer_uri)
+        // 2) update "topicmap_renderer"
+        var renderer_uri = topicmap_topics[topicmap_id].get("dm4.topicmaps.topicmap_renderer_uri")
+        topicmap_renderer = get_topicmap_renderer(renderer_uri)
         // 3) update "topicmap"
         topicmap = load_topicmap(topicmap_id)
     }
@@ -445,7 +445,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     function load_topicmap(topicmap_id) {
         if (!topicmaps[topicmap_id]) {
-            topicmaps[topicmap_id] = canvas_renderer.load_topicmap(topicmap_id)
+            topicmaps[topicmap_id] = topicmap_renderer.load_topicmap(topicmap_id)
         }
         //
         return topicmaps[topicmap_id]
@@ -454,21 +454,21 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     /**
      * Creates a Topicmap topic in the DB.
      *
-     * @param   canvas_renderer_uri     Optional: the canvas renderer to attach to the topicmap.
-     *                                  Default is "dm4.webclient.topicmap_renderer".
+     * @param   topicmap_renderer_uri   Optional: the topicmap renderer to attach to the topicmap.
+     *                                  Default is "dm4.webclient.default_topicmap_renderer".
      *
      * @return  The created topic.
      */
-    function create_topicmap_topic(name, canvas_renderer_uri) {
-        canvas_renderer_uri = canvas_renderer_uri || "dm4.webclient.topicmap_renderer"
+    function create_topicmap_topic(name, topicmap_renderer_uri) {
+        topicmap_renderer_uri = topicmap_renderer_uri || "dm4.webclient.default_topicmap_renderer"
         //
-        if (LOG_TOPICMAPS) dm4c.log("Creating topicmap \"" + name + "\" (canvas_renderer_uri=\"" +
-            canvas_renderer_uri + "\")")
+        if (LOG_TOPICMAPS) dm4c.log("Creating topicmap \"" + name + "\" (topicmap_renderer_uri=\"" +
+            topicmap_renderer_uri + "\")")
         //
-        var topicmap_state = get_canvas_renderer(canvas_renderer_uri).initial_topicmap_state()
+        var topicmap_state = get_topicmap_renderer(topicmap_renderer_uri).initial_topicmap_state()
         var topicmap = dm4c.create_topic("dm4.topicmaps.topicmap", {
             "dm4.topicmaps.name": name,
-            "dm4.topicmaps.canvas_renderer_uri": canvas_renderer_uri,
+            "dm4.topicmaps.topicmap_renderer_uri": topicmap_renderer_uri,
             "dm4.topicmaps.state": topicmap_state
         })
         //
@@ -479,21 +479,21 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
 
 
-    // === Canvas Renderers ===
+    // === Topicmap Renderers ===
 
-    function get_canvas_renderer(renderer_uri) {
-        var renderer = canvas_renderers[renderer_uri]
+    function get_topicmap_renderer(renderer_uri) {
+        var renderer = topicmap_renderers[renderer_uri]
         // error check
         if (!renderer) {
-            throw "TopicmapsError: \"" + renderer_uri + "\" is an unknown canvas renderer"
+            throw "TopicmapsError: \"" + renderer_uri + "\" is an unknown topicmap renderer"
         }
         //
         return renderer
     }
 
-    function iterate_canvas_renderers(visitor_func) {
-        for (var renderer_uri in canvas_renderers) {
-            visitor_func(canvas_renderers[renderer_uri])
+    function iterate_topicmap_renderers(visitor_func) {
+        for (var renderer_uri in topicmap_renderers) {
+            visitor_func(topicmap_renderers[renderer_uri])
         }
     }
 
@@ -513,18 +513,18 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * @param   no_history_update   Optional: boolean.
      */
     function display_topicmap(no_history_update) {
-        switch_canvas_renderer()
-        canvas_renderer.display_topicmap(topicmap, no_history_update)
+        switch_topicmap_renderer()
+        topicmap_renderer.display_topicmap(topicmap, no_history_update)
     }
 
-    function switch_canvas_renderer() {
+    function switch_topicmap_renderer() {
         var renderer_uri = dm4c.canvas.get_info().uri
-        var new_renderer_uri = canvas_renderer.get_info().uri
+        var new_renderer_uri = topicmap_renderer.get_info().uri
         if (renderer_uri != new_renderer_uri) {
-            if (LOG_TOPICMAPS) dm4c.log("Switching canvas renderer \"" +
+            if (LOG_TOPICMAPS) dm4c.log("Switching topicmap renderer \"" +
                 renderer_uri + "\" => \"" + new_renderer_uri + "\"")
-            dm4c.canvas = canvas_renderer
-            dm4c.split_panel.set_left_panel(canvas_renderer)
+            dm4c.canvas = topicmap_renderer
+            dm4c.split_panel.set_left_panel(topicmap_renderer)
         }
     }
 

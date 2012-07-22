@@ -38,7 +38,7 @@ function Webclient() {
     // view
     this.split_panel = null         // a SplitPanel object
     this.toolbar = null             // the upper toolbar GUI component (a ToolbarPanel object)
-    this.canvas = null              // the canvas GUI component that displays the topicmap (a CanvasRenderer object)
+    this.canvas = null              // the canvas GUI component that displays the topicmap (a TopicmapRenderer object)
     this.page_panel = null          // the page panel GUI component on the right hand side (a PagePanel object)
     this.upload_dialog = null       // the upload dialog (an UploadDialog object)
 
@@ -1265,7 +1265,7 @@ function Webclient() {
         dm4c.page_panel = new PagePanel()
         dm4c.split_panel.set_right_panel(dm4c.page_panel)
         //
-        dm4c.canvas = new TopicmapRenderer()
+        dm4c.canvas = new DefaultTopicmapRenderer()
         dm4c.split_panel.set_left_panel(dm4c.canvas)
         //
         dm4c.upload_dialog = new UploadDialog()

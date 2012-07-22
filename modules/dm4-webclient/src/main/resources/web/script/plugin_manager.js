@@ -238,7 +238,7 @@ function PluginManager(config) {
         load_renderers(plugin.plugin_uri, "page_renderers",   plugin.renderers.page_renderers)
         load_renderers(plugin.plugin_uri, "simple_renderers", plugin.renderers.simple_renderers)
         load_renderers(plugin.plugin_uri, "multi_renderers",  plugin.renderers.multi_renderers)
-        // ### load_renderers(plugin.plugin_uri, "canvas_renderers", plugin.renderers.canvas_renderers)
+        // ### load_renderers(plugin.plugin_uri, "topicmap_renderers", plugin.renderers.topicmap_renderers)
         //
         // 3) load stylesheets
         load_stylesheets(plugin.plugin_uri, plugin.stylesheets)
