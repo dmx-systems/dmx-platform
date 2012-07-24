@@ -697,7 +697,7 @@ function Webclient() {
             dataType: "script",
             async: async || false,
             error: function(jq_xhr, text_status, error_thrown) {
-                throw "WebclientError: loading script failed (" + text_status + ": " + error_thrown + ")"
+                throw "WebclientError: loading script " + url + " failed (" + text_status + ": " + error_thrown + ")"
             }
         })
     }
@@ -815,9 +815,15 @@ function Webclient() {
 
     // ---
 
-    this.reload_types = function() {
+    this.reload_types = function(callback) {
+        // setup tracker
+        var tracker = new LoadTracker(2, function() {   // 2 loads: topic types and association types
+            adjust_create_widget()
+            callback()
+        })
+        // reload types
         type_cache.clear()
-        load_types()
+        type_cache.load_types(tracker)
     }
 
     // === View Configuration ===
@@ -978,14 +984,12 @@ function Webclient() {
      */
     function setup_gui() {
         dm4c.log("Setting up GUI")
+        //
         // 1) Setting up the create widget
         // Note: the create menu must be popularized *after* the plugins are loaded.
         // Two hooks are involved: post_refresh_create_menu() and has_create_permission().
-        dm4c.refresh_create_menu()
+        adjust_create_widget()
         //
-        if (!dm4c.toolbar.create_menu.get_item_count()) {
-            dm4c.toolbar.create_widget.hide()
-        }
         // 2) Initialize plugins
         // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta-topicmaps plugin
         // does!) the "init" hook is triggered *after* creating the canvas.
@@ -993,6 +997,16 @@ function Webclient() {
         // be triggered *after* the GUI setup is complete.
         dm4c.log("Initializing plugins")
         dm4c.trigger_plugin_hook("init")
+    }
+
+    function adjust_create_widget() {
+        dm4c.refresh_create_menu()
+        //
+        if (dm4c.toolbar.create_menu.get_item_count()) {
+            dm4c.toolbar.create_widget.show()
+        } else {
+            dm4c.toolbar.create_widget.hide()
+        }
     }
 
     /**
@@ -1024,7 +1038,7 @@ function Webclient() {
     // ---
 
     /**
-     * Refreshes a menu so it reflects the current set of known topic types.
+     * Refreshes a type menu to reflect the updated type cache (after adding/removing/renaming a type).
      * <p>
      * Utility method for plugin developers.
      *
@@ -1055,6 +1069,8 @@ function Webclient() {
     }
 
     /**
+     * Refreshes the create menu to reflect the updated type cache (after adding/removing/renaming a type).
+     * <p>
      * Utility method for plugin developers.
      */
     this.refresh_create_menu = function() {
@@ -1063,8 +1079,6 @@ function Webclient() {
         })
         //
         dm4c.trigger_plugin_hook("post_refresh_create_menu", dm4c.toolbar.create_menu)
-        //
-        return dm4c.toolbar.create_menu
     }
 
     // === Images ===
@@ -1282,8 +1296,7 @@ function Webclient() {
         //
         // 2) Setup Load Tracker
         var items_to_load = pm.retrieve_plugin_list()
-        var number_of_loads = items_to_load + 2    // +2 loads: topic types and association types
-        var tracker = new LoadTracker(number_of_loads, setup_gui)
+        var tracker = new LoadTracker(items_to_load + 2, setup_gui)     // +2 loads: topic types and association types
         //
         // 3) Load Plugins
         pm.load_plugins(tracker)

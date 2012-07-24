@@ -274,7 +274,11 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/topictype/all")
     public Set<TopicType> getAllTopicTypes(@HeaderParam("Cookie") ClientState clientState) {
         try {
-            return dms.getAllTopicTypes(clientState);
+            Set<TopicType> topicTypes = dms.getAllTopicTypes(clientState);
+            //
+            firePreSend(topicTypes, clientState);
+            //
+            return topicTypes;
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
@@ -440,6 +444,12 @@ public class WebservicePlugin extends PluginActivator {
     private void firePreSend(ResultSet<Topic> topics, ClientState clientState) {
         for (Topic topic : topics) {
             firePreSend(topic, clientState);
+        }
+    }
+
+    private void firePreSend(Set<TopicType> topicTypes, ClientState clientState) {
+        for (TopicType topicType : topicTypes) {
+            firePreSend(topicType, clientState);
         }
     }
 

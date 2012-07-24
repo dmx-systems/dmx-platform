@@ -371,7 +371,9 @@ public class PluginImpl implements Plugin, EventHandler {
             logger.info("Adding DeepaMehta 4 core service to " + this);
             setCoreService((EmbeddedService) service);
             openPluginServiceTrackers();
-            registerListeners();
+            // Note: registering the listeners is deferred until the plugin is installed and the
+            // CoreEvent.POST_INSTALL_PLUGIN is delivered. See activate() below.
+            // Consider the Access Control plugin: it can't set a topic's creator before the "admin" user is created.
             checkServiceAvailability();
         } else if (service instanceof WebPublishingService) {
             logger.info("Adding Web Publishing service to " + this);
@@ -470,6 +472,7 @@ public class PluginImpl implements Plugin, EventHandler {
             //
             logger.info("----- Activating " + this + " -----");
             installPluginInDB();        // relies on DeepaMehtaService
+            registerListeners();        // relies on DeepaMehtaService
             registerPlugin();           // relies on DeepaMehtaService (and committed migrations)
             logger.info("----- Activation of " + this + " complete -----");
             return true;

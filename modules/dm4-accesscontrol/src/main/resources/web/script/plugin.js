@@ -174,21 +174,21 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         var username = user.get("dm4.accesscontrol.username")
         js.set_cookie("dm4_username", username)
         //
-        adjust_create_widget()
-        login_widget.show_user(username)
-        dm4c.restore_selection()
-        //
-        dm4c.trigger_plugin_hook("user_logged_in", user)
+        dm4c.reload_types(function() {
+            login_widget.show_user(username)
+            dm4c.restore_selection()
+            dm4c.trigger_plugin_hook("user_logged_in", user)
+        })
     }
 
     this.do_logout = function() {
         js.remove_cookie("dm4_username")
         //
-        adjust_create_widget()
-        login_widget.show_login()
-        dm4c.restore_selection()
-        //
-        dm4c.trigger_plugin_hook("user_logged_out")
+        dm4c.reload_types(function() {
+            login_widget.show_login()
+            dm4c.restore_selection()
+            dm4c.trigger_plugin_hook("user_logged_out")
+        })
     }
 
     // ---
@@ -249,17 +249,5 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     function encrypt_password(password) {
         return ENCRYPTED_PASSWORD_PREFIX + SHA256(password)
-    }
-
-    // ---
-
-    function adjust_create_widget() {
-        dm4c.reload_types()
-        var menu = dm4c.refresh_create_menu()
-        if (menu.get_item_count()) {
-            $("#create-widget").show()
-        } else {
-            $("#create-widget").hide()
-        }
     }
 })

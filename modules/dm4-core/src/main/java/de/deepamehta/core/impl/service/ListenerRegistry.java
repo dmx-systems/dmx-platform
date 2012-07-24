@@ -47,6 +47,7 @@ class ListenerRegistry {
         if (listeners == null) {
             return results;
         }
+        // ### FIXME: ConcurrentModificationException might occur
         for (Listener listener : listeners) {
             Object result = deliverEvent(listener, event, params);
             if (result != null) {
