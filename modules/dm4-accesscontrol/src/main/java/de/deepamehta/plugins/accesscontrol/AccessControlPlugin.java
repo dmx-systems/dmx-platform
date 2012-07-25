@@ -63,6 +63,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                                                                                           PluginServiceArrivedListener,
                                                                                           PluginServiceGoneListener {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
     private static final String ENCRYPTED_PASSWORD_PREFIX = "-SHA256-";  // don't change this

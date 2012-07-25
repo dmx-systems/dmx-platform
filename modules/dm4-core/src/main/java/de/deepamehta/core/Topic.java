@@ -26,9 +26,21 @@ public interface Topic extends DeepaMehtaObject {
 
     // ### TODO: move this methods to DeepaMehtaObject.
 
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersAssocTypeUri  may be null
+     */
     RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                      String othersAssocTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
 
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersAssocTypeUri  may be null
+     */
     Set<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                      String othersAssocTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
 }

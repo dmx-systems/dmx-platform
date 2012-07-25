@@ -13,22 +13,18 @@ import java.util.Map;
 /**
  * A topic as contained in a topicmap.
  * That is a generic topic enriched by visualization properties ("x", "y", "visibility").
- * <p>
- * Note: the topic's own properties are not initialized.
  */
 public class TopicmapTopic extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private CompositeValue visualizationProperties;
-    private long refId;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicmapTopic(TopicModel topic, CompositeValue visualizationProperties, long refId) {
+    TopicmapTopic(TopicModel topic, CompositeValue visualizationProperties) {
         super(topic);
         this.visualizationProperties = visualizationProperties;
-        this.refId = refId;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -38,7 +34,6 @@ public class TopicmapTopic extends TopicModel {
         try {
             JSONObject o = super.toJSON();
             o.put("visualization", visualizationProperties.toJSON());
-            o.put("ref_id", refId);
             return o;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
@@ -49,14 +44,14 @@ public class TopicmapTopic extends TopicModel {
 
     public int getX() {
         // Note: coordinates can have both formats: double (through JavaScript) and integer (programmatically placed).
-        // TODO: store coordinates always as integers
+        // ### TODO: store coordinates always as integers
         Object x = visualizationProperties.get("x");
         return x instanceof Double ? ((Double) x).intValue() : (Integer) x;
     }
 
     public int getY() {
         // Note: coordinates can have both formats: double (through JavaScript) and integer (programmatically placed).
-        // TODO: store coordinates always as integers
+        // ### TODO: store coordinates always as integers
         Object y = visualizationProperties.get("y");
         return y instanceof Double ? ((Double) y).intValue() : (Integer) y;
     }

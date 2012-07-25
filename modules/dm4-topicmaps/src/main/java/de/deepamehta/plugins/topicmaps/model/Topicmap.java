@@ -1,24 +1,21 @@
 package de.deepamehta.plugins.topicmaps.model;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.util.JSONHelper;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.awt.Point;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -32,7 +29,7 @@ import java.util.logging.Logger;
  * - load from DB (by constructor).
  * - Serialization to JSON.
  */
-public class Topicmap {
+public class Topicmap implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -76,6 +73,7 @@ public class Topicmap {
 
     // ---
 
+    @Override
     public JSONObject toJSON() {
         try {
             JSONObject topicmap = new JSONObject();
@@ -162,8 +160,8 @@ public class Topicmap {
             "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, false, true, 0, clientState);
             // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=true, maxResultSize=0
         for (RelatedTopic mapTopic : mapTopics) {
-            Association refAssoc = mapTopic.getAssociation();
-            addTopic(new TopicmapTopic(mapTopic.getModel(), refAssoc.getCompositeValue(), refAssoc.getId()));
+            CompositeValue visualizationProperties = mapTopic.getAssociation().getCompositeValue();
+            addTopic(new TopicmapTopic(mapTopic.getModel(), visualizationProperties));
         }
     }
 
@@ -171,8 +169,7 @@ public class Topicmap {
         Set<RelatedAssociation> mapAssocs = topicmapTopic.getRelatedAssociations("dm4.topicmaps.association_mapcontext",
             "dm4.core.default", "dm4.topicmaps.topicmap_association", null, false, false);
         for (RelatedAssociation mapAssoc : mapAssocs) {
-            Association refAssoc = mapAssoc.getRelatingAssociation();
-            addAssociation(new TopicmapAssociation(mapAssoc.getModel(), refAssoc.getId()));
+            addAssociation(new TopicmapAssociation(mapAssoc.getModel()));
         }
     }
 

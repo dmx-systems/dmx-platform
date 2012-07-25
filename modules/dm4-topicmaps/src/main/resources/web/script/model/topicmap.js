@@ -50,10 +50,11 @@ function Topicmap(topicmap_id, config) {
         if (!topic) {
             if (LOG_TOPICMAPS) dm4c.log("Adding topic " + id + " (\"" + label + "\") to topicmap " + topicmap_id)
             // update DB
-            var response = dm4c.restc.add_topic_to_topicmap(topicmap_id, id, x, y)
-            if (LOG_TOPICMAPS) dm4c.log("..... => ref ID " + response.ref_id)
+            if (is_writable()) {
+                dm4c.restc.add_topic_to_topicmap(topicmap_id, id, x, y)
+            }
             // update memory
-            topics[id] = new TopicmapTopic(id, type_uri, label, x, y, true, response.ref_id)
+            topics[id] = new TopicmapTopic(id, type_uri, label, x, y, true)     // visibility=true
         } else if (!topic.visibility) {
             if (LOG_TOPICMAPS)
                 dm4c.log("Showing topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id)
@@ -68,10 +69,11 @@ function Topicmap(topicmap_id, config) {
         if (!assocs[id]) {
             if (LOG_TOPICMAPS) dm4c.log("Adding association " + id + " to topicmap " + topicmap_id)
             // update DB
-            var response = dm4c.restc.add_association_to_topicmap(topicmap_id, id)
-            if (LOG_TOPICMAPS) dm4c.log("..... => ref ID " + response.ref_id)
+            if (is_writable()) {
+                dm4c.restc.add_association_to_topicmap(topicmap_id, id)
+            }
             // update memory
-            assocs[id] = new TopicmapAssociation(id, type_uri, topic_id_1, topic_id_2, response.ref_id)
+            assocs[id] = new TopicmapAssociation(id, type_uri, topic_id_1, topic_id_2)
         } else {
             if (LOG_TOPICMAPS) dm4c.log("Association " + id + " already in topicmap " + topicmap_id)
         }
@@ -201,20 +203,17 @@ function Topicmap(topicmap_id, config) {
                 var y = topic.visualization["dm4.topicmaps.y"].value
                 var visibility = topic.visualization["dm4.topicmaps.visibility"].value
                 if (LOG_TOPICMAPS) dm4c.log(".......... ID " + topic.id + ": type_uri=\"" + topic.type_uri +
-                    "\", label=\"" + topic.value + "\", x=" + x + ", y=" + y + ", visibility=" + visibility +
-                    ", ref_id=" + topic.ref_id)
-                topics[topic.id] = new TopicmapTopic(topic.id, topic.type_uri, topic.value, x, y, visibility,
-                    topic.ref_id)
+                    "\", label=\"" + topic.value + "\", x=" + x + ", y=" + y + ", visibility=" + visibility)
+                topics[topic.id] = new TopicmapTopic(topic.id, topic.type_uri, topic.value, x, y, visibility)
             }
         }
 
         function init_associations() {
             for (var i = 0, assoc; assoc = topicmap.assocs[i]; i++) {
                 if (LOG_TOPICMAPS) dm4c.log(".......... ID " + assoc.id + ": type_uri=\"" + assoc.type_uri +
-                    "\", topic_id_1=" + assoc.role_1.topic_id + ", topic_id_2=" + assoc.role_2.topic_id +
-                    ", ref_id=" + assoc.ref_id)
+                    "\", topic_id_1=" + assoc.role_1.topic_id + ", topic_id_2=" + assoc.role_2.topic_id)
                 assocs[assoc.id] = new TopicmapAssociation(assoc.id, assoc.type_uri,
-                    assoc.role_1.topic_id, assoc.role_2.topic_id, assoc.ref_id)
+                    assoc.role_1.topic_id, assoc.role_2.topic_id)
             }
         }
 
@@ -259,7 +258,7 @@ function Topicmap(topicmap_id, config) {
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
-    function TopicmapTopic(id, type_uri, label, x, y, visibility, ref_id) {
+    function TopicmapTopic(id, type_uri, label, x, y, visibility) {
 
         this.id = id
         this.type_uri = type_uri
@@ -267,12 +266,8 @@ function Topicmap(topicmap_id, config) {
         this.x = x
         this.y = y
         this.visibility = visibility
-        this.ref_id = ref_id    // ID of the "dm4.topicmaps.topic_mapcontext" association
-                                // that is used by the topicmap to reference this topic.
-                                // ### FIXME: the ref_id should be removed from the client-side model.
-                                // ### TODO: extend topicmaps REST API instead of exposing internals.
 
-        var _self = this
+        var _self = this        // Note: "self" is already defined in context
 
         this.show = function() {
             set_visibility(true)
@@ -284,9 +279,9 @@ function Topicmap(topicmap_id, config) {
         }
 
         this.move_to = function(x, y) {
-            // update DB ### TODO: extend topicmaps REST API instead of operating on the DB directly
+            // update DB
             if (is_writable()) {
-                dm4c.restc.update_association({id: ref_id, composite: {"dm4.topicmaps.x": x, "dm4.topicmaps.y": y}})
+                dm4c.restc.move_topic(topicmap_id, id, x, y)
             }
             // update memory
             this.x = x
@@ -309,9 +304,9 @@ function Topicmap(topicmap_id, config) {
         // ---
 
         function set_visibility(visibility) {
-            // update DB ### TODO: extend topicmaps REST API instead of operating on the DB directly
+            // update DB
             if (is_writable()) {
-                dm4c.restc.update_association({id: ref_id, composite: {"dm4.topicmaps.visibility": visibility}})
+                dm4c.restc.set_topic_visibility(topicmap_id, id, visibility)
             }
             // update memory
             _self.visibility = visibility
@@ -324,21 +319,17 @@ function Topicmap(topicmap_id, config) {
         }
     }
 
-    function TopicmapAssociation(id, type_uri, topic_id_1, topic_id_2, ref_id) {
+    function TopicmapAssociation(id, type_uri, topic_id_1, topic_id_2) {
 
         this.id = id
         this.type_uri = type_uri
         this.topic_id_1 = topic_id_1
         this.topic_id_2 = topic_id_2
-        this.ref_id = ref_id    // ID of the "dm4.topicmaps.association_mapcontext" association
-                                // that is used by the topicmap to reference this association.
-                                // ### FIXME: the ref_id should be removed from the client-side model.
-                                // ### TODO: extend topicmaps REST API instead of exposing internals.
 
         this.hide = function() {
             // update DB
             if (is_writable()) {
-                dm4c.restc.remove_association_from_topicmap(topicmap_id, id, ref_id)
+                dm4c.restc.remove_association_from_topicmap(topicmap_id, id)
             }
             // update memory
             delete assocs[id]

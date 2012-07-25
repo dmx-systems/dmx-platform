@@ -28,6 +28,8 @@ import java.util.logging.Logger;
 public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, PostCreateTopicListener,
                                                                                     PostInstallPluginListener {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
     private static final String DEFAULT_WORKSPACE_NAME = "Default";
 
     // association type semantics ### TODO: to be dropped. Model-driven manipulators required.

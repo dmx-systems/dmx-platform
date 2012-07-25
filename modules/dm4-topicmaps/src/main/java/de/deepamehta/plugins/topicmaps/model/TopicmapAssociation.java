@@ -12,27 +12,9 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class TopicmapAssociation extends AssociationModel {
 
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private long refId;
-
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicmapAssociation(AssociationModel assoc, long refId) {
+    TopicmapAssociation(AssociationModel assoc) {
         super(assoc);
-        this.refId = refId;
-    }
-
-    // -------------------------------------------------------------------------------------------------- Public Methods
-
-    @Override
-    public JSONObject toJSON() {
-        try {
-            JSONObject o = super.toJSON();
-            o.put("ref_id", refId);
-            return o;
-        } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
-        }
     }
 }

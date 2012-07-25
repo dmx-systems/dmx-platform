@@ -3,6 +3,7 @@ package de.deepamehta.core.impl.service;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
@@ -179,8 +180,17 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public void setCompositeValue(CompositeValue comp, ClientState clientState, Directives directives) {
-        updateCompositeValue(comp, clientState, directives);
-        refreshLabel();
+        DeepaMehtaTransaction tx = dms.beginTx();   // ### FIXME: all other writing API methods need transaction
+        try {
+            updateCompositeValue(comp, clientState, directives);
+            refreshLabel();
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Setting composite value failed (" + comp + ")", e);
+        } finally {
+            tx.finish();
+        }
     }
 
     // ---

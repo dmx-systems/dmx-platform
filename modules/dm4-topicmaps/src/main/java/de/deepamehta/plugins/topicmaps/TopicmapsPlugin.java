@@ -11,6 +11,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directives;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -36,6 +37,15 @@ import java.util.logging.Logger;
 @Produces("application/json")
 public class TopicmapsPlugin extends PluginActivator implements TopicmapsService {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    // association type semantics ### TODO: to be dropped. Model-driven manipulators required.
+    private static final String TOPIC_MAPCONTEXT       = "dm4.topicmaps.topic_mapcontext";
+    private static final String ASSOCIATION_MAPCONTEXT = "dm4.topicmaps.association_mapcontext";
+    private static final String ROLE_TYPE_TOPICMAP     = "dm4.core.default";
+    private static final String ROLE_TYPE_TOPIC        = "dm4.topicmaps.topicmap_topic";
+    private static final String ROLE_TYPE_ASSOCIATION  = "dm4.topicmaps.topicmap_association";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -57,41 +67,63 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         return new Topicmap(topicmapId, dms, clientState);
     }
 
-    @PUT
+    // ---
+
+    @POST
     @Path("/{id}/topic/{topic_id}/{x}/{y}")
     @Override
-    public long addTopicToTopicmap(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
+    public void addTopicToTopicmap(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                    @PathParam("x") int x, @PathParam("y") int y) {
-        AssociationModel model = new AssociationModel("dm4.topicmaps.topic_mapcontext",
-            new TopicRoleModel(topicmapId, "dm4.core.default"),
-            new TopicRoleModel(topicId,    "dm4.topicmaps.topicmap_topic"),
+        dms.createAssociation(new AssociationModel(TOPIC_MAPCONTEXT,
+            new TopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
+            new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC),
             new CompositeValue().put("dm4.topicmaps.x", x)
                                 .put("dm4.topicmaps.y", y)
                                 .put("dm4.topicmaps.visibility", true)
-        );
-        Association refAssoc = dms.createAssociation(model, null);     // FIXME: clientState=null
-        return refAssoc.getId();
+        ), null);   // FIXME: clientState=null
+    }
+
+    @POST
+    @Path("/{id}/association/{assoc_id}")
+    @Override
+    public void addAssociationToTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
+        dms.createAssociation(new AssociationModel(ASSOCIATION_MAPCONTEXT,
+            new TopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
+            new AssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
+        ), null);   // FIXME: clientState=null
+    }
+
+    // ---
+
+    @PUT
+    @Path("/{id}/topic/{topic_id}/{x}/{y}")
+    @Override
+    public void moveTopic(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId, @PathParam("x") int x,
+                                                                                                @PathParam("y") int y) {
+        getTopicRefAssociation(topicmapId, topicId).setCompositeValue(new CompositeValue()
+            .put("dm4.topicmaps.x", x)
+            .put("dm4.topicmaps.y", y), null, new Directives());    // clientState=null
     }
 
     @PUT
-    @Path("/{id}/association/{assoc_id}")
+    @Path("/{id}/topic/{topic_id}/{visibility}")
     @Override
-    public long addAssociationToTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
-        AssociationModel model = new AssociationModel("dm4.topicmaps.association_mapcontext",
-            new TopicRoleModel(topicmapId,    "dm4.core.default"),
-            new AssociationRoleModel(assocId, "dm4.topicmaps.topicmap_association"));
-        Association refAssoc = dms.createAssociation(model, null);     // FIXME: clientState=null
-        return refAssoc.getId();
+    public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
+                                                                     @PathParam("visibility") boolean visibility) {
+        getTopicRefAssociation(topicmapId, topicId).setCompositeValue(new CompositeValue()
+            .put("dm4.topicmaps.visibility", visibility), null, new Directives());  // clientState=null
     }
 
+    // ---
+
     @DELETE
-    @Path("/{id}/association/{assoc_id}/{ref_id}")
+    @Path("/{id}/association/{assoc_id}")
     @Override
-    public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId,
-                                              @PathParam("assoc_id") long assocId,
-                                              @PathParam("ref_id") long refId) {
-        removeAssociationFromTopicmap(refId);
+    public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
+        getAssociationRefAssociation(topicmapId, assocId).delete(null);     // directives=null
     }
+
+    // ---
 
     @PUT
     @Path("/{id}/translation/{x}/{y}")
@@ -131,11 +163,15 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    /**
-     * @param   refId   ID of the "Association Mapcontext" association that relates to the association to remove.
-     */
-    private void removeAssociationFromTopicmap(long refId) {
-        dms.deleteAssociation(refId, null);     // clientState=null
+    private Association getTopicRefAssociation(long topicmapId, long topicId) {
+        return dms.getAssociation(TOPIC_MAPCONTEXT, topicmapId, topicId,
+            ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC, false, null);          // fetchComposite=false, clientState=null
+    }
+
+    private Association getAssociationRefAssociation(long topicmapId, long assocId) {
+        // ### FIXME: doesn't work! getAssociation() expects 2 topicIDs!
+        return dms.getAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
+            ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION, false, null);    // fetchComposite=false, clientState=null
     }
 
     // ---
