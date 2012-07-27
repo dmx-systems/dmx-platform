@@ -86,6 +86,10 @@ public interface DeepaMehtaService {
                                                     String roleTypeUri1, String roleTypeUri2,
                                                     boolean fetchComposite, ClientState clientState);
 
+    Association getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
+                                                    String topicRoleTypeUri, String assocRoleTypeUri,
+                                                    boolean fetchComposite, ClientState clientState);
+
     // ---
 
     /**

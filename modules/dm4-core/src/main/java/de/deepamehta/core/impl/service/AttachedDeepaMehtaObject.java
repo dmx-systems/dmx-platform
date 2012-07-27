@@ -180,7 +180,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public void setCompositeValue(CompositeValue comp, ClientState clientState, Directives directives) {
-        DeepaMehtaTransaction tx = dms.beginTx();   // ### FIXME: all other writing API methods need transaction
+        DeepaMehtaTransaction tx = dms.beginTx();   // ### FIXME: all other writing API methods need transaction as well
         try {
             updateCompositeValue(comp, clientState, directives);
             refreshLabel();

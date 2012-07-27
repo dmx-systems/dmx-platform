@@ -120,7 +120,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Path("/{id}/association/{assoc_id}")
     @Override
     public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
-        getAssociationRefAssociation(topicmapId, assocId).delete(null);     // directives=null
+        getAssociationRefAssociation(topicmapId, assocId).delete(new Directives());
     }
 
     // ---
@@ -169,8 +169,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private Association getAssociationRefAssociation(long topicmapId, long assocId) {
-        // ### FIXME: doesn't work! getAssociation() expects 2 topicIDs!
-        return dms.getAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
+        return dms.getAssociationBetweenTopicAndAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
             ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION, false, null);    // fetchComposite=false, clientState=null
     }
 

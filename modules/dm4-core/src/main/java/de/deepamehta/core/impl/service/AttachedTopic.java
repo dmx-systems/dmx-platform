@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
@@ -100,12 +101,22 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     public void delete(Directives directives) {
-        // delete sub-topics and associations
-        super.delete(directives);
-        // delete topic itself
-        logger.info("Deleting " + this);
-        dms.storage.deleteTopic(getId());
-        directives.add(Directive.DELETE_TOPIC, this);
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            // delete sub-topics and associations
+            super.delete(directives);
+            // delete topic itself
+            logger.info("Deleting " + this);
+            dms.storage.deleteTopic(getId());
+            directives.add(Directive.DELETE_TOPIC, this);
+            //
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Deleting topic failed (" + this + ")", e);
+        } finally {
+            tx.finish();
+        }
     }
 
 

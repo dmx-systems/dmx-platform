@@ -2,6 +2,7 @@ package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
+import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
@@ -106,12 +107,22 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     public void delete(Directives directives) {
-        // delete sub-topics and associations
-        super.delete(directives);
-        // delete association itself
-        logger.info("Deleting " + this);
-        dms.storage.deleteAssociation(getId());
-        directives.add(Directive.DELETE_ASSOCIATION, this);
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            // delete sub-topics and associations
+            super.delete(directives);
+            // delete association itself
+            logger.info("Deleting " + this);
+            dms.storage.deleteAssociation(getId());
+            directives.add(Directive.DELETE_ASSOCIATION, this);
+            //
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Deleting association failed (" + this + ")", e);
+        } finally {
+            tx.finish();
+        }
     }
 
 

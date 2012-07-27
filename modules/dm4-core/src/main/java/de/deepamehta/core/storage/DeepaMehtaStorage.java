@@ -137,6 +137,9 @@ public interface DeepaMehtaStorage {
     AssociationModel getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
                                                                                        String roleTypeUri2);
 
+    AssociationModel getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
+                                                              String topicRoleTypeUri, String assocRoleTypeUri);
+
     /**
      * Returns the associations between two topics. If no such association exists an empty set is returned.
      *

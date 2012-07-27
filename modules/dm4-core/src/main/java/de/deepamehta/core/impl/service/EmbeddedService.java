@@ -262,6 +262,29 @@ public class EmbeddedService implements DeepaMehtaService {
         }
     }
 
+    @Override
+    public Association getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
+                                                                String topicRoleTypeUri, String assocRoleTypeUri,
+                                                                boolean fetchComposite, ClientState clientState) {
+        String info = "assocTypeUri=\"" + assocTypeUri + "\", topicId=" + topicId + ", assocId=" + assocId +
+            ", topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri +
+            "\", fetchComposite=" + fetchComposite + ", clientState=" + clientState;
+        logger.info(info);
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            AssociationModel model = storage.getAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
+                topicRoleTypeUri, assocRoleTypeUri);
+            Association assoc = model != null ? attach(model, fetchComposite) : null;
+            tx.success();
+            return assoc;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Retrieving association failed (" + info + ")", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
     // ---
 
     @Override
