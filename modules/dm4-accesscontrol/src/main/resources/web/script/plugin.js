@@ -154,40 +154,36 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
 
 
-    // === Access Control Listeners ===
-
-    /* dm4c.register_listener("user_logged_in", function(user) {
-        refresh_menu_item() // ###
-        dm4c.render_topic()
-    })
-
-    dm4c.register_listener("user_logged_out", function() {
-        refresh_menu_item() // ###
-        dm4c.render_topic()
-    }) */
-
-
-
     // ------------------------------------------------------------------------------------------------------ Public API
 
     this.do_login = function(user) {
+        // update model
         var username = user.get("dm4.accesscontrol.username")
         js.set_cookie("dm4_username", username)
         //
+        // Note: the types must be reloaded *before* the logged_in event is fired.
+        // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
         dm4c.reload_types(function() {
+            // update view
             login_widget.show_user(username)
             dm4c.restore_selection()
-            dm4c.trigger_plugin_hook("user_logged_in", user)
+            // fire event
+            dm4c.trigger_plugin_hook("logged_in", user)
         })
     }
 
     this.do_logout = function() {
+        // update model
         js.remove_cookie("dm4_username")
         //
+        // Note: the types must be reloaded *before* the logged_out event is fired.
+        // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
         dm4c.reload_types(function() {
+            // update view
             login_widget.show_login()
             dm4c.restore_selection()
-            dm4c.trigger_plugin_hook("user_logged_out")
+            // fire event
+            dm4c.trigger_plugin_hook("logged_out")
         })
     }
 

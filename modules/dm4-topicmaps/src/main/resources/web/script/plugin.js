@@ -9,11 +9,11 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     js.extend(dm4c.canvas, TopicmapRendererExtension)
 
     // Model
-    var topicmap_topics             // All topicmaps in the DB (object, key: topicmap ID, value: topicmap topic)
-    var topicmaps = {}              // Loaded topicmaps (key: topicmap ID, value: Topicmap object)
-    var topicmap                    // Selected topicmap (Topicmap object)
-    var topicmap_renderer           // The topicmap renderer of the selected topicmap
+    var topicmap                    // Selected topicmap (Topicmap object)              \ updated together by
+    var topicmap_renderer           // The topicmap renderer of the selected topicmap   / set_selected_topicmap()
     var topicmap_renderers = {}     // Registered topicmap renderers (key: renderer URI, value: TopicmapRenderer object)
+    var topicmap_topics             // All topicmaps in the DB (object, key: topicmap ID, value: topicmap topic)
+    var topicmap_cache = {}         // Loaded topicmaps (key: topicmap ID, value: Topicmap object)
 
     // View
     var topicmap_menu               // A GUIToolkit Menu object
@@ -91,7 +91,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
                 dm4c.toolbar.dom.prepend(topicmap_widget)
             }
             //
-            rebuild_topicmap_menu(undefined, true)  // no_refetch=true
+            refresh_topicmap_menu(undefined, true)  // no_refetch=true
         }
 
         function create_topicmap_dialog() {
@@ -205,12 +205,12 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     dm4c.add_listener("post_update_topic", function(topic) {
         // 1) Update all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Updating topic " + topic.id + " on all topicmaps")
-        for (var id in topicmaps) {
-            topicmaps[id].update_topic(topic)
-        }
+        all_topicmaps(function(topicmap) {
+            topicmap.update_topic(topic)
+        })
         // 2) Update the topicmap menu
         if (topic.type_uri == "dm4.topicmaps.topicmap") {
-            rebuild_topicmap_menu()
+            refresh_topicmap_menu()
         }
     })
 
@@ -219,9 +219,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     dm4c.add_listener("post_update_association", function(assoc) {
         if (LOG_TOPICMAPS) dm4c.log("Updating association " + assoc.id + " on all topicmaps")
-        for (var id in topicmaps) {
-            topicmaps[id].update_association(assoc)
-        }
+        all_topicmaps(function(topicmap) {
+            topicmap.update_association(assoc)
+        })
     })
 
     /**
@@ -230,28 +230,28 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     dm4c.add_listener("post_delete_topic", function(topic) {
         // 1) Update all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Deleting topic " + topic.id + " from all topicmaps")
-        for (var id in topicmaps) {
-            topicmaps[id].delete_topic(topic.id)
-        }
+        all_topicmaps(function(topicmap) {
+            topicmap.delete_topic(topic.id)
+        })
         // 2) Update the topicmap menu
         if (topic.type_uri == "dm4.topicmaps.topicmap") {
             // remove topicmap model
-            delete topicmaps[topic.id]
+            delete topicmap_cache[topic.id]
             //
             var topicmap_id = get_topicmap_id_from_menu()
             if (topicmap_id == topic.id) {
                 if (LOG_TOPICMAPS) dm4c.log("..... updating the topicmap menu and selecting the first item " +
                     "(the deleted topic was the CURRENT topicmap)")
-                if (!js.size(topicmaps)) {
+                if (!js.size(topicmap_cache)) {
                     create_topicmap_topic("untitled")
                 }
-                rebuild_topicmap_menu()
+                refresh_topicmap_menu()
                 set_selected_topicmap(get_topicmap_id_from_menu())
                 display_topicmap()
             } else {
                 if (LOG_TOPICMAPS) dm4c.log("..... updating the topicmap menu and restoring the selection " +
                     "(the deleted topic was ANOTHER topicmap)")
-                rebuild_topicmap_menu()
+                refresh_topicmap_menu()
             }
         }
     })
@@ -259,9 +259,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     dm4c.add_listener("post_delete_association", function(assoc) {
         // Remove association from all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Deleting association " + assoc.id + " from all topicmaps")
-        for (var id in topicmaps) {
-            topicmaps[id].delete_association(assoc.id)
-        }
+        all_topicmaps(function(topicmap) {
+            topicmap.delete_association(assoc.id)
+        })
     })
 
     dm4c.add_listener("pre_push_history", function(history_entry) {
@@ -298,13 +298,16 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     // === Access Control Listeners ===
 
-    dm4c.add_listener("user_logged_in", function(user) {
-        rebuild_topicmap_menu()
+    dm4c.add_listener("logged_in", function(user) {
+        refresh_topicmap_menu()
         // Note: the topicmap permissions are refreshed in the course of refetching the topicmap topics.
+        //
+        clear_topicmap_cache()
+        reload_topicmap()
     })
 
-    dm4c.add_listener("user_logged_out", function() {
-        rebuild_topicmap_menu()
+    dm4c.add_listener("logged_out", function() {
+        refresh_topicmap_menu()
         // Note: the topicmap permissions are refreshed in the course of refetching the topicmap topics.
     })
 
@@ -370,21 +373,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         return create_topicmap(name, topicmap_renderer_uri)
     }
 
-    // ---
-
-    /**
-     * Reloads a topicmap from DB and displays it on the canvas.
-     *
-     * Prerequisite: the topicmap is already selected in the topicmap menu.
-     */
-    this.do_refresh_topicmap = function(topicmap_id) {
-        // update model
-        delete topicmaps[topicmap_id]
-        set_selected_topicmap(topicmap_id)
-        // update view
-        display_topicmap()
-    }
-
     // ----------------------------------------------------------------------------------------------- Private Functions
 
 
@@ -405,13 +393,25 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     function create_topicmap(name, topicmap_renderer_uri) {
         var topicmap_topic = create_topicmap_topic(name, topicmap_renderer_uri)
-        rebuild_topicmap_menu(topicmap_topic.id)
+        refresh_topicmap_menu(topicmap_topic.id)
         // update model
         set_selected_topicmap(topicmap_topic.id)
         // update view
         display_topicmap()
         //
         return topicmap_topic
+    }
+
+    /**
+     * Reloads the current topicmap from DB and displays it.
+     */
+    function reload_topicmap() {
+        // 1) update model
+        // Note: set_selected_topicmap() is not called here as the topicmap cache must be ignored.
+        // (Furthermore the cookie and the renderer are already up-to-date).
+        topicmap = load_topicmap(topicmap.get_id())
+        // 2) update view
+        display_topicmap()
     }
 
 
@@ -423,19 +423,37 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
 
     /**
+     * Returns a topicmap from the cache.
+     * If not in cache, the topicmap is loaded and cached before.
+     */
+    function get_topicmap(topicmap_id) {
+        // load if not in cache
+        if (!topicmap_cache[topicmap_id]) {
+            topicmap_cache[topicmap_id] = load_topicmap(topicmap_id)
+        }
+        //
+        return topicmap_cache[topicmap_id]
+    }
+
+    /**
      * Updates the model to reflect the given topicmap is now selected.
      */
     function set_selected_topicmap(topicmap_id) {
         if (LOG_TOPICMAPS) dm4c.log("Selecting topicmap " + topicmap_id)
+        //
         // 1) update cookie
         // Note: the cookie must be set *before* the topicmap is loaded.
         // Server-side topic loading might depend on the topicmap type.
         js.set_cookie("dm4_topicmap_id", topicmap_id)
+        //
         // 2) update "topicmap_renderer"
+        // Note: the renderer must be set *before* the topicmap is loaded.
+        // The renderer is responsible for loading.
         var renderer_uri = topicmap_topics[topicmap_id].get("dm4.topicmaps.topicmap_renderer_uri")
         topicmap_renderer = get_topicmap_renderer(renderer_uri)
+        //
         // 3) update "topicmap"
-        topicmap = load_topicmap(topicmap_id)
+        topicmap = get_topicmap(topicmap_id)
     }
 
     function fetch_topicmap_topics() {
@@ -445,24 +463,23 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     }
 
     /**
-     * Loads a topicmap from DB and caches it.
-     * If already in cache, the cached topicmap is returned.
+     * Loads a topicmap from DB.
+     *
+     * Prerequisite: the topicmap renderer responsible for loading is already set.
      *
      * @return  a Topicmap object
      */
     function load_topicmap(topicmap_id) {
-        if (!topicmaps[topicmap_id]) {
-            var config = {is_writable: is_writable}
-            topicmaps[topicmap_id] = topicmap_renderer.load_topicmap(topicmap_id, config)
+        // prepare config
+        var config = {
+            is_writable: function() {
+                return topicmap_topics[topicmap_id]
+                    .composite["dm4.accesscontrol.permissions"]
+                    .composite["dm4.accesscontrol.operation_write"].value
+            }
         }
-        //
-        return topicmaps[topicmap_id]
-
-        function is_writable() {
-            return topicmap_topics[topicmap_id]
-                .composite["dm4.accesscontrol.permissions"]
-                .composite["dm4.accesscontrol.operation_write"].value
-        }
+        // load topicmap
+        return topicmap_renderer.load_topicmap(topicmap_id, config)
     }
 
     /**
@@ -513,6 +530,20 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
 
 
+    // === Topicmap Cache ===
+
+    function all_topicmaps(visitor_func) {
+        for (var topicmap_id in topicmap_cache) {
+            visitor_func(topicmap_cache[topicmap_id])
+        }
+    }
+
+    function clear_topicmap_cache() {
+        topicmap_cache = {}
+    }
+
+
+
     // ************
     // *** View ***
     // ************
@@ -548,7 +579,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * @param   topicmap_id     Optional: ID of the topicmap to select.
      *                          If not given, the current selection is preserved.
      */
-    function rebuild_topicmap_menu(topicmap_id, no_refetch) {
+    function refresh_topicmap_menu(topicmap_id, no_refetch) {
         if (!topicmap_id) {
             topicmap_id = get_topicmap_id_from_menu()
         }

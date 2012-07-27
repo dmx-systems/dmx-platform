@@ -23,7 +23,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
             // put in toolbar
             dm4c.toolbar.dom.prepend(workspace_form)
             //
-            rebuild_workspace_menu(undefined, workspaces)
+            refresh_workspace_menu(undefined, workspaces)
             update_cookie()
         }
 
@@ -48,7 +48,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      */
     dm4c.add_listener("post_update_topic", function(topic) {
         if (topic.type_uri == "dm4.workspaces.workspace") {
-            rebuild_workspace_menu()
+            refresh_workspace_menu()
         }
     })
 
@@ -57,7 +57,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      */
     dm4c.add_listener("post_delete_topic", function(topic) {
         if (topic.type_uri == "dm4.workspaces.workspace") {
-            rebuild_workspace_menu()
+            refresh_workspace_menu()
         }
     })
 
@@ -65,12 +65,12 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     // === Access Control Listeners ===
 
-    dm4c.add_listener("user_logged_in", function(user) {
-        rebuild_workspace_menu()
+    dm4c.add_listener("logged_in", function(user) {
+        refresh_workspace_menu()
     })
 
-    dm4c.add_listener("user_logged_out", function() {
-        rebuild_workspace_menu()
+    dm4c.add_listener("logged_out", function() {
+        refresh_workspace_menu()
     })
 
 
@@ -118,7 +118,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      */
     function create_workspace(name) {
         var workspace = create_workspace_topic(name)
-        rebuild_workspace_menu(workspace.id)
+        refresh_workspace_menu(workspace.id)
     }
 
     /**
@@ -134,7 +134,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      * @param   workspace_id    Optional: ID of the workspace to select.
      *                          If not given, the current selection is preserved.
      */
-    function rebuild_workspace_menu(workspace_id, workspaces) {
+    function refresh_workspace_menu(workspace_id, workspaces) {
         if (!workspace_id) {
             workspace_id = get_workspace_id_from_menu()
         }
