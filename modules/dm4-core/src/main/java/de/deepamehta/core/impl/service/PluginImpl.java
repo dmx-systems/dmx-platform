@@ -785,6 +785,13 @@ public class PluginImpl implements Plugin, EventHandler {
                 providerClasses.add(providerClass);
             }
         }
+        //
+        if (providerClasses.size() == 0) {
+            logger.info("Registering provider classes of " + this + " ABORTED -- no provider classes provided");
+        } else {
+            logger.info("Registering " + providerClasses.size() + " provider classes of " + this);
+        }
+        //
         return providerClasses;
     }
 

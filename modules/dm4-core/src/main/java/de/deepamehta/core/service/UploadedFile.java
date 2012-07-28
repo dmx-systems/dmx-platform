@@ -1,4 +1,4 @@
-package de.deepamehta.core.util;
+package de.deepamehta.core.service;
 
 import java.io.InputStream;
 

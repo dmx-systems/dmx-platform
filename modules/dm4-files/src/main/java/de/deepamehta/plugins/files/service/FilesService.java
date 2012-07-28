@@ -1,7 +1,9 @@
 package de.deepamehta.plugins.files.service;
 
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.UploadedFile;
 
 import java.net.URL;
 
@@ -26,6 +28,10 @@ public interface FilesService extends PluginService {
     Topic createChildFileTopic(long folderTopicId, String path);
 
     Topic createChildFolderTopic(long folderTopicId, String path);
+
+    // ---
+
+    void uploadFile(UploadedFile file, String command, ClientState clientState);
 
     // ---
 

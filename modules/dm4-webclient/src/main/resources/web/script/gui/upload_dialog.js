@@ -19,7 +19,7 @@ function UploadDialog() {
      *                      (server-side) executeCommandHook. ### FIXDOC
      */
     this.show = function(command, callback) {
-        $("#upload-dialog form").attr("action", "/core/command/" + command)
+        $("#upload-dialog form").attr("action", "/files/" + command)
         $("#upload-dialog").dialog("open")
         // bind callback function, using artifact ID as event namespace
         $("#upload-target").unbind("load.deepamehta-webclient")
@@ -33,7 +33,7 @@ function UploadDialog() {
                 try {
                     callback(JSON.parse(result))
                 } catch (e) {
-                    alert("No valid server response: \"" + result + "\"\n\nException=" + JSON.stringify(e))
+                    alert("Invalid server response: \"" + result + "\"\n\nException=" + JSON.stringify(e))
                 }
             }
         }

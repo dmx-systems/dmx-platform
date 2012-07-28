@@ -13,8 +13,6 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
-import de.deepamehta.core.service.CommandParams;
-import de.deepamehta.core.service.CommandResult;
 import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginInfo;
@@ -333,24 +331,6 @@ public class WebservicePlugin extends PluginActivator {
                                                  @HeaderParam("Cookie") ClientState clientState) {
         try {
             return dms.createAssociationType(assocTypeModel, clientState);
-        } catch (Exception e) {
-            throw new WebApplicationException(e);
-        }
-    }
-
-
-
-    // === Commands ===
-
-    // ### TODO: drop this method. For the moment it stays here to illustrate file uploading.
-    // ### See de.deepamehta.plugins.webservice.provider.CommandParamsProvider
-    @POST
-    @Path("/command/{command}")
-    @Consumes("application/json, multipart/form-data")
-    public CommandResult executeCommand(@PathParam("command") String command, CommandParams params,
-                                        @HeaderParam("Cookie") ClientState clientState) {
-        try {
-            return null;    // ### dms.executeCommand(command, params, clientState);
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }

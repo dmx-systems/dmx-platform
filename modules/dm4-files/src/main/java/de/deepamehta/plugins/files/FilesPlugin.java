@@ -10,12 +10,15 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.UploadedFile;
 import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
 import de.deepamehta.core.service.listener.PluginServiceGoneListener;
 import de.deepamehta.core.util.JavaUtils;
 
-import javax.ws.rs.GET;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.POST;
@@ -81,7 +84,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Plugin
             comp.put("dm4.files.size", fileSize);
             //
             return dms.createTopic(new TopicModel("dm4.files.file", comp), null);       // FIXME: clientState=null
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException(text + " failed", e));
         }
     }
@@ -109,7 +112,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Plugin
             comp.put("dm4.files.path", path);
             //
             return dms.createTopic(new TopicModel("dm4.files.folder", comp), null);     // FIXME: clientState=null
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException(text + " failed", e));
         }
     }
@@ -137,6 +140,16 @@ public class FilesPlugin extends PluginActivator implements FilesService, Plugin
     // ---
 
     @POST
+    @Path("/{command}")
+    @Consumes("multipart/form-data")
+    @Override
+    public void uploadFile(UploadedFile file, @PathParam("command") String command,
+                                              @HeaderParam("Cookie") ClientState clientState) {
+    }
+
+    // ---
+
+    @POST
     @Path("/{id}")
     @Override
     public void openFile(@PathParam("id") long fileTopicId) {
@@ -147,7 +160,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Plugin
             file = proxyService.locateFile(path);
             logger.info("### Opening file \"" + file + "\"");
             Desktop.getDesktop().open(file);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException("Opening file \"" + file + "\" failed", e));
         }
     }

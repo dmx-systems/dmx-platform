@@ -20,8 +20,6 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
-import de.deepamehta.core.service.CommandParams;
-import de.deepamehta.core.service.CommandResult;
 import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directive;
