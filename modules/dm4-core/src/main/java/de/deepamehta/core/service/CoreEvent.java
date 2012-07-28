@@ -17,9 +17,10 @@ import java.util.Map;
  *
  * There are 2 types of events:
  *   - regular events: are fired (usually) by the core and then delivered to all registered listeners (plugins).
- *   - internal plugin events: are fired by a plugin and then delivered only to itself. There are 4 internal events:
+ *   - internal plugin events: are fired by a plugin and then delivered only to itself. There are 5 internal events:
  *     - POST_INSTALL_PLUGIN
  *     - INTRODUCE_TOPIC_TYPE (has a double nature)
+ *     - INITIALIZE_PLUGIN
  *     - PLUGIN_SERVICE_ARRIVED
  *     - PLUGIN_SERVICE_GONE
  *
@@ -42,33 +43,34 @@ public enum CoreEvent {
     POST_DELETE_ASSOCIATION(PostDeleteAssociationListener.class,
         "postDeleteAssociation", Association.class, Directives.class),
 
-    POST_RETYPE_ASSOCIATION(PostRetypeAssociationListener.class,    // ### TODO: remove this event. Retype is special 
-        "postRetypeAssociation", Association.class, String.class, Directives.class),             // case of update.
+    // ### TODO: remove this event. Retype is special case of update
+    POST_RETYPE_ASSOCIATION(PostRetypeAssociationListener.class,
+        "postRetypeAssociation", Association.class, String.class, Directives.class),
 
     PRE_SEND_TOPIC(PreSendTopicListener.class,
         "preSendTopic", Topic.class, ClientState.class),
     PRE_SEND_TOPIC_TYPE(PreSendTopicTypeListener.class,
         "preSendTopicType", TopicType.class, ClientState.class),
 
-    POST_INSTALL_PLUGIN(PostInstallPluginListener.class,    // ### TODO: remove this event. Use migration 1 instead.
-        "postInstallPlugin"),
-    // Note: this is an internal plugin event (see {@link Plugin#installPluginInDB}).
-
     ALL_PLUGINS_ACTIVE(AllPluginsActiveListener.class,
         "allPluginsActive"),
 
+    // === Internal plugin events ===
+
+    // ### TODO: remove this event. Use migration 1 instead.
+    POST_INSTALL_PLUGIN(PostInstallPluginListener.class,
+        "postInstallPlugin"),
+
     INTRODUCE_TOPIC_TYPE(IntroduceTopicTypeListener.class,
         "introduceTopicType", TopicType.class, ClientState.class),
-    // Note: besides regular firing           (see {@link EmbeddedService#createTopicType})
-    // this is an internal plugin event       (see {@link Plugin#introduceTypesToPlugin}).
+
+    INITIALIZE_PLUGIN(InitializePluginListener.class,
+        "initializePlugin"),
 
     PLUGIN_SERVICE_ARRIVED(PluginServiceArrivedListener.class,
         "pluginServiceArrived", PluginService.class),
-    // Note: this is an internal plugin event (see {@link Plugin#createServiceTracker}).
     PLUGIN_SERVICE_GONE(PluginServiceGoneListener.class,
-        "pluginServiceGone", PluginService.class)
-    // Note: this is an internal plugin event (see {@link Plugin#createServiceTracker}).
-    ;
+        "pluginServiceGone", PluginService.class);
 
     public final Class listenerInterface;
     public final String handlerMethodName;
