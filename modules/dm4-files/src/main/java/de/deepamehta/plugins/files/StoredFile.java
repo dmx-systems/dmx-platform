@@ -6,17 +6,18 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 
-public class UploadResult implements JSONEnabled {
+public class StoredFile implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private JSONObject uploadResult = new JSONObject();
+    private JSONObject storedFile = new JSONObject();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    UploadResult(String fileName) {
+    StoredFile(String fileName, long fileTopicId) {
         try {
-            uploadResult.put("file_name", fileName);
+            storedFile.put("file_name", fileName);
+            storedFile.put("topic_id", fileTopicId);
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -26,6 +27,6 @@ public class UploadResult implements JSONEnabled {
 
     @Override
     public JSONObject toJSON() {
-        return uploadResult;
+        return storedFile;
     }
 }

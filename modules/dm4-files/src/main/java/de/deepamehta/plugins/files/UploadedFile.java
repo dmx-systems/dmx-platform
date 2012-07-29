@@ -46,7 +46,11 @@ public class UploadedFile {
         return fileItem.getName();
     }
 
-    public String getContentType() {
+    public long getSize() {
+        return fileItem.getSize();
+    }
+
+    public String getMediaType() {
         return fileItem.getContentType();
     }
 
@@ -54,7 +58,7 @@ public class UploadedFile {
 
     @Override
     public String toString() {
-        return "file \"" + getName() + "\" (" + getContentType() + ")";
+        return "file \"" + getName() + "\" (" + getMediaType() + "), " + getSize() + " bytes";
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

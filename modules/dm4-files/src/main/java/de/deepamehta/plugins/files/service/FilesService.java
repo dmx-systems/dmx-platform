@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.files.service;
 
+import de.deepamehta.plugins.files.StoredFile;
 import de.deepamehta.plugins.files.UploadedFile;
-import de.deepamehta.plugins.files.UploadResult;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.ClientState;
@@ -33,7 +33,7 @@ public interface FilesService extends PluginService {
 
     // ---
 
-    UploadResult uploadFile(UploadedFile file);
+    StoredFile storeFile(UploadedFile file);
 
     // ---
 

@@ -33,13 +33,13 @@ import java.util.logging.Logger;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends PluginActivator implements FilesService, InitializePluginListener,
-                                                                          PluginServiceArrivedListener,
-                                                                          PluginServiceGoneListener {
+public class FilesPlugin extends PluginActivator implements FilesService,          InitializePluginListener,
+                                                            FileRepositoryContext, PluginServiceArrivedListener,
+                                                                                   PluginServiceGoneListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private FileRepository fileRepository = new FileRepository();
+    private FileRepository fileRepository = new FileRepository(this);
     private ProxyService proxyService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -58,36 +58,30 @@ public class FilesPlugin extends PluginActivator implements FilesService, Initia
     @Path("/file/{path:.+}")       // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public Topic createFileTopic(@PathParam("path") String path) {
-        String text = "Creating file topic for path \"" + path + "\"";
+        String info = "Creating file topic for path \"" + path + "\"";
         try {
             // ### FIXME: drag'n'drop files from arbitrary locations (in particular different Windows drives)
             // collides with the concept of a single-rooted file repository (as realized by the proxy module).
-            // For the moment we just strip a possible drive letter to be compatible with the proxy moudle.
+            // For the moment we just strip a possible drive letter to be compatible with the proxy module.
             path = JavaUtils.stripDriveLetter(path);
             //
+            // 1) check if already exists
             Topic fileTopic = getFileTopic(path);
             if (fileTopic != null) {
-                logger.info(text + " ABORTED -- already exists");
+                logger.info(info + " ABORTED -- already exists");
                 return fileTopic;
             }
-            logger.info(text);
+            // 2) create topic
+            logger.info(info);
             //
             File file = proxyService.locateFile(path);
             String fileName = file.getName();
-            String fileType = JavaUtils.getFileType(fileName);
-            long fileSize = file.length();
+            String mediaType = JavaUtils.getFileType(fileName);
+            long size = file.length();
             //
-            CompositeValue comp = new CompositeValue();
-            comp.put("dm4.files.file_name", fileName);
-            comp.put("dm4.files.path", path);
-            if (fileType != null) {
-                comp.put("dm4.files.media_type", fileType);
-            }
-            comp.put("dm4.files.size", fileSize);
-            //
-            return dms.createTopic(new TopicModel("dm4.files.file", comp), null);       // FIXME: clientState=null
+            return createFileTopic(fileName, path, mediaType, size);
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(text + " failed", e));
+            throw new WebApplicationException(new RuntimeException(info + " failed", e));
         }
     }
 
@@ -95,27 +89,26 @@ public class FilesPlugin extends PluginActivator implements FilesService, Initia
     @Path("/folder/{path:.+}")     // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public Topic createFolderTopic(@PathParam("path") String path) {
-        String text = "Creating folder topic for path \"" + path + "\"";
+        String info = "Creating folder topic for path \"" + path + "\"";
         try {
             // ### FIXME: drag'n'drop folders from arbitrary locations (in particular different Windows drives)
             // collides with the concept of a single-rooted file repository (as realized by the proxy module).
-            // For the moment we just strip a possible drive letter to be compatible with the proxy moudle.
+            // For the moment we just strip a possible drive letter to be compatible with the proxy module.
             path = JavaUtils.stripDriveLetter(path);
             //
+            // 1) check if already exists
             Topic folderTopic = getFolderTopic(path);
             if (folderTopic != null) {
-                logger.info(text + " ABORTED -- already exists");
+                logger.info(info + " ABORTED -- already exists");
                 return folderTopic;
             }
-            logger.info(text);
+            // 2) create topic
+            logger.info(info);
             //
-            CompositeValue comp = new CompositeValue();
-            comp.put("dm4.files.folder_name", new File(path).getName());
-            comp.put("dm4.files.path", path);
-            //
-            return dms.createTopic(new TopicModel("dm4.files.folder", comp), null);     // FIXME: clientState=null
+            String folderName = new File(path).getName();
+            return createFolderTopic(folderName, path);
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(text + " failed", e));
+            throw new WebApplicationException(new RuntimeException(info + " failed", e));
         }
     }
 
@@ -144,10 +137,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Initia
     @POST
     @Consumes("multipart/form-data")
     @Override
-    public UploadResult uploadFile(UploadedFile file) {
+    public StoredFile storeFile(UploadedFile file) {
         try {
-            fileRepository.storeFile(file);
-            return new UploadResult(file.getName());
+            return fileRepository.storeFile(file);
         } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException("Uploading " + file + " failed", e));
         }
@@ -222,6 +214,29 @@ public class FilesPlugin extends PluginActivator implements FilesService, Initia
                 true, false, null);
         }
         return null;
+    }
+
+    // ---
+
+    @Override
+    public Topic createFileTopic(String fileName, String path, String mediaType, long size) {
+        CompositeValue comp = new CompositeValue();
+        comp.put("dm4.files.file_name", fileName);
+        comp.put("dm4.files.path", path);
+        if (mediaType != null) {
+            comp.put("dm4.files.media_type", mediaType);
+        }
+        comp.put("dm4.files.size", size);
+        //
+        return dms.createTopic(new TopicModel("dm4.files.file", comp), null);       // FIXME: clientState=null
+    }
+
+    private Topic createFolderTopic(String folderName, String path) {
+        CompositeValue comp = new CompositeValue();
+        comp.put("dm4.files.folder_name", folderName);
+        comp.put("dm4.files.path", path);
+        //
+        return dms.createTopic(new TopicModel("dm4.files.folder", comp), null);     // FIXME: clientState=null
     }
 
     // ---
