@@ -12,10 +12,10 @@ dm4c.add_plugin("de.deepamehta.filemanager", function() {
         }
 
         function do_open_upload_dialog() {
-            dm4c.upload_dialog.show("dummy-command", show_result)
+            dm4c.upload_dialog.show(show_result)
 
             function show_result(result) {
-                alert("import result=" + JSON.stringify(result))
+                alert("Upload result=" + JSON.stringify(result))
             }
         }
     })

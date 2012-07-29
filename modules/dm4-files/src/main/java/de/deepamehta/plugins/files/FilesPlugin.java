@@ -12,7 +12,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.UploadedFile;
+import de.deepamehta.core.service.listener.InitializePluginListener;
 import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
 import de.deepamehta.core.service.listener.PluginServiceGoneListener;
 import de.deepamehta.core.util.JavaUtils;
@@ -33,11 +33,13 @@ import java.util.logging.Logger;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends PluginActivator implements FilesService, PluginServiceArrivedListener,
+public class FilesPlugin extends PluginActivator implements FilesService, InitializePluginListener,
+                                                                          PluginServiceArrivedListener,
                                                                           PluginServiceGoneListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private FileRepository fileRepository = new FileRepository();
     private ProxyService proxyService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -140,11 +142,15 @@ public class FilesPlugin extends PluginActivator implements FilesService, Plugin
     // ---
 
     @POST
-    @Path("/{command}")
     @Consumes("multipart/form-data")
     @Override
-    public void uploadFile(UploadedFile file, @PathParam("command") String command,
-                                              @HeaderParam("Cookie") ClientState clientState) {
+    public UploadResult uploadFile(UploadedFile file) {
+        try {
+            fileRepository.storeFile(file);
+            return new UploadResult(file.getName());
+        } catch (Exception e) {
+            throw new WebApplicationException(new RuntimeException("Uploading " + file + " failed", e));
+        }
     }
 
     // ---
@@ -172,6 +178,13 @@ public class FilesPlugin extends PluginActivator implements FilesService, Plugin
     // ********************************
 
 
+
+    @Override
+    public void initializePlugin() {
+        fileRepository.initialize();
+    }
+
+    // ---
 
     @Override
     public void pluginServiceArrived(PluginService service) {

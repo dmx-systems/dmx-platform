@@ -1,9 +1,11 @@
 package de.deepamehta.plugins.files.service;
 
+import de.deepamehta.plugins.files.UploadedFile;
+import de.deepamehta.plugins.files.UploadResult;
+
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.UploadedFile;
 
 import java.net.URL;
 
@@ -31,7 +33,7 @@ public interface FilesService extends PluginService {
 
     // ---
 
-    void uploadFile(UploadedFile file, String command, ClientState clientState);
+    UploadResult uploadFile(UploadedFile file);
 
     // ---
 

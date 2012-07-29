@@ -1,21 +1,22 @@
-package de.deepamehta.core.service;
+package de.deepamehta.plugins.files;
 
-import java.io.InputStream;
+import org.apache.commons.fileupload.FileItem;
+
+import java.io.File;
 
 
 
 /**
- * ### FIXDOC
  * An uploaded file.
  * <p>
- * Files are uploaded via the REST API by POSTing <code>multipart/form-data</code> to the <code>/command</code>
+ * Files are uploaded via the REST API by POSTing <code>multipart/form-data</code> to the <code>/files</code>
  * resource.
  * <p>
  * Client-side support: the <code>deepamehta-webclient</code> plugin provides an utility method
  * <code>dm4c.upload_dialog.show()</code> that allows the user to choose and upload a file.</p>
  * <p>
  * At server-side a plugin accesses the upload file via the
- * {@link de.deepamehta.core.service.Plugin#executeCommandHook}.</p>
+ * {@link de.deepamehta.core.service.Plugin#executeCommandHook}. ### FIXDOC</p>
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
@@ -23,39 +24,42 @@ public class UploadedFile {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private InputStream inputStream;
-    private String fileName;
-    private String mimeType;
+    private FileItem fileItem;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public UploadedFile(InputStream inputStream, String fileName, String mimeType) {
-        this.inputStream = inputStream;
-        this.fileName = fileName;
-        this.mimeType = mimeType;
+    public UploadedFile(FileItem fileItem) {
+        this.fileItem = fileItem;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    /* ### FIXME: not in use
     public InputStream getInputStream() {
-        return inputStream;
-    }
+        return fileItem.getInputStream();   // throws IOException
+    } */
 
     /**
      * Returns the original (client-side) file name.
      */
-    public String getFileName() {
-        return fileName;
+    public String getName() {
+        return fileItem.getName();
     }
 
-    public String getMimeType() {
-        return mimeType;
+    public String getContentType() {
+        return fileItem.getContentType();
     }
 
     // ---
 
     @Override
     public String toString() {
-        return "file \"" + fileName + "\" (" + mimeType + ")";
+        return "file \"" + getName() + "\" (" + getContentType() + ")";
+    }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    void write(File file) throws Exception {
+        fileItem.write(file);   // throws Exception
     }
 }

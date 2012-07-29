@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.files.provider;
 
-import de.deepamehta.core.service.UploadedFile;
+import de.deepamehta.plugins.files.UploadedFile;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -56,15 +56,10 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile> {
             MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
                                                                 throws IOException, WebApplicationException {
         try {
-            if (mediaType.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
-                return parseMultiPart();
-            } else {
-                // ### never happens
-                throw new RuntimeException("Unexpected media type: " + mediaType);
-            }
+            return parseMultiPart();
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Creating UploadedFile from message body failed",
-                e));
+            throw new WebApplicationException(new RuntimeException(
+                "Creating UploadedFile from message body failed", e));
         }
     }
 
@@ -86,16 +81,19 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile> {
                 String fieldName = item.getFieldName();
                 if (item.isFormField()) {
                     String value = item.getString();
-                    logger.info("### \"" + fieldName + "\" => \"" + value + "\"");
-                    throw new RuntimeException("\"" + fieldName + "\" is an unexpected file item (value=\"" +
-                        value + "\")");
+                    logger.info("### field \"" + fieldName + "\" => \"" + value + "\"");
+                    throw new RuntimeException("\"" + fieldName + "\" is an unexpected field (value=\"" + value +
+                        "\")");
                 } else {
                     if (file != null) {
                         throw new RuntimeException("Only single file uploads are supported");
                     }
-                    file = new UploadedFile(item.getInputStream(), item.getName(), item.getContentType());
-                    logger.info("### \"" + fieldName + "\" => " + file);
+                    file = new UploadedFile(item);
+                    logger.info("### field \"" + fieldName + "\" => " + file);
                 }
+            }
+            if (file == null) {
+                throw new RuntimeException("Request does not contain a file part");
             }
             return file;
         } catch (Exception e) {

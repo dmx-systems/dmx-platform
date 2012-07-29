@@ -21,6 +21,7 @@
     <!-- The other dm4.* properties are required by 'run' only. They are placed here for clarity.     -->
     <properties>
         <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
+        <dm4.files.path>${project.basedir}/deepamehta-files</dm4.files.path>
         <dm4.proxy.files.path></dm4.proxy.files.path>
         <dm4.proxy.net.filter>127.0.0.1/32</dm4.proxy.net.filter>
     </properties>
