@@ -13,7 +13,7 @@ import java.io.File;
  * resource.
  * <p>
  * Client-side support: the <code>deepamehta-webclient</code> plugin provides an utility method
- * <code>dm4c.upload_dialog.show()</code> that allows the user to choose and upload a file.</p>
+ * <code>dm4c.upload_dialog.open()</code> that allows the user to choose and upload a file.</p>
  * <p>
  * At server-side a plugin accesses the upload file via the
  * {@link de.deepamehta.core.service.Plugin#executeCommandHook}. ### FIXDOC</p>
@@ -50,6 +50,9 @@ public class UploadedFile {
         return fileItem.getSize();
     }
 
+    /**
+     * Returns the content type passed by the browser or null if not defined.
+     */
     public String getMediaType() {
         return fileItem.getContentType();
     }

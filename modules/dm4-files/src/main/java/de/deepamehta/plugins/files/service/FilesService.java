@@ -33,7 +33,7 @@ public interface FilesService extends PluginService {
 
     // ---
 
-    StoredFile storeFile(UploadedFile file);
+    StoredFile storeFile(UploadedFile file, String storagePath);
 
     // ---
 

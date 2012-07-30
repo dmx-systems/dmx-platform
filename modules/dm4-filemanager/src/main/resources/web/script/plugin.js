@@ -5,18 +5,9 @@ dm4c.add_plugin("de.deepamehta.filemanager", function() {
     dm4c.add_listener("post_refresh_create_menu", function(type_menu) {
         type_menu.add_separator()
         type_menu.add_item({label: "New File Browser", handler: do_new_file_browser})
-        type_menu.add_item({label: "Upload File",      handler: do_open_upload_dialog})
 
         function do_new_file_browser() {
             dm4c.get_plugin("de.deepamehta.files").create_folder_topic({path: "/"}, true, true)
-        }
-
-        function do_open_upload_dialog() {
-            dm4c.upload_dialog.show(show_result)
-
-            function show_result(result) {
-                alert("Upload result=" + JSON.stringify(result))
-            }
         }
     })
 

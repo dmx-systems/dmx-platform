@@ -3,7 +3,6 @@ function UploadDialog() {
     var UPLOAD_DIALOG_WIDTH = "50em"
 
     var upload_form = $("<form>", {
-        action:  "/files",
         method:  "post",
         enctype: "multipart/form-data",
         target:  "upload-target"
@@ -19,26 +18,26 @@ function UploadDialog() {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     /**
-     * @param   command     the command (a string) send to the server along with the selected file. ### FIXME
-     * @param   callback    the function that is invoked once the file has been uploaded and processed at server-side.
-     *                      One argument is passed to that function: the object (deserialzed JSON) returned by the
-     *                      (server-side) executeCommandHook. ### FIXDOC
+     * @param   storage_path    the file repository path (a string) to upload the selected file to. Must begin with "/".
+     * @param   callback        the function that is invoked once the file has been uploaded and processed at
+     *                          server-side. One argument is passed to that function: the object (deserialzed JSON)
+     *                          returned by the (server-side) executeCommandHook. ### FIXDOC
      */
-    this.show = function(callback) {
-        // $("#upload-dialog form").attr("action", "/files/" + command)     // ### FIXME
+    this.open = function(storage_path, callback) {
+        upload_form.attr("action", "/files/" + storage_path)
         $("#upload-dialog").dialog("open")
-        // bind handler. Note: the previous handler must be removed
-        upload_target.unbind("load")
+        // bind handler
+        upload_target.unbind("load")    // Note: the previous handler must be removed
         upload_target.load(upload_complete)
 
         function upload_complete() {
             $("#upload-dialog").dialog("close")
             // Note: iframes must be accessed via window.frames
-            var result = $("pre", window.frames["upload-target"].document).text()
+            var response = $("pre", window.frames["upload-target"].document).text()
             try {
-                callback(JSON.parse(result))
+                callback(JSON.parse(response))
             } catch (e) {
-                alert("Invalid server response: \"" + result + "\"\n\nException=" + JSON.stringify(e))
+                alert("Upload failed: \"" + response + "\"\n\nException=" + JSON.stringify(e))
             }
         }
     }

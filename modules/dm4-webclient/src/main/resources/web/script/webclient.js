@@ -687,7 +687,7 @@ function Webclient() {
             dataType: "script",
             async: async || false,
             error: function(jq_xhr, text_status, error_thrown) {
-                throw "WebclientError: loading script failed (" + text_status + ": " + error_thrown + ")"
+                throw "WebclientError: loading script " + url + " failed (" + text_status + ": " + error_thrown + ")"
             }
         })
     }

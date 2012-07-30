@@ -118,6 +118,20 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         }
     })
 
+    dm4c.add_listener("topic_commands", function(topic) {
+        if (topic.type_uri == "dm4.files.folder") {
+            return [{label: "Upload File", handler: do_open_upload_dialog, context: "detail-panel-show"}]
+        }
+
+        function do_open_upload_dialog() {
+            var storage_path = topic.get("dm4.files.path")
+            dm4c.upload_dialog.open(storage_path, show_response)
+
+            function show_response(response) {
+                alert("Upload response=" + JSON.stringify(response))
+            }
+        }
+    })
 
 
     // ------------------------------------------------------------------------------------------------------ Public API

@@ -33,13 +33,13 @@ import java.util.logging.Logger;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends PluginActivator implements FilesService,          InitializePluginListener,
-                                                            FileRepositoryContext, PluginServiceArrivedListener,
-                                                                                   PluginServiceGoneListener {
+public class FilesPlugin extends PluginActivator implements FilesService, InitializePluginListener,
+                                                                          PluginServiceArrivedListener,
+                                                                          PluginServiceGoneListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private FileRepository fileRepository = new FileRepository(this);
+    private FileRepository fileRepository;
     private ProxyService proxyService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -135,11 +135,13 @@ public class FilesPlugin extends PluginActivator implements FilesService,       
     // ---
 
     @POST
+    @Path("/{storage_path:.+}")
     @Consumes("multipart/form-data")
     @Override
-    public StoredFile storeFile(UploadedFile file) {
+    public StoredFile storeFile(UploadedFile file, @PathParam("storage_path") String storagePath) {
         try {
-            return fileRepository.storeFile(file);
+            logger.info(file + ", storagePath=\"" + storagePath + "\"");
+            return fileRepository.storeFile(file, storagePath);
         } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException("Uploading " + file + " failed", e));
         }
@@ -173,7 +175,7 @@ public class FilesPlugin extends PluginActivator implements FilesService,       
 
     @Override
     public void initializePlugin() {
-        fileRepository.initialize();
+        fileRepository = new FileRepository(dms);
     }
 
     // ---
@@ -218,8 +220,7 @@ public class FilesPlugin extends PluginActivator implements FilesService,       
 
     // ---
 
-    @Override
-    public Topic createFileTopic(String fileName, String path, String mediaType, long size) {
+    private Topic createFileTopic(String fileName, String path, String mediaType, long size) {
         CompositeValue comp = new CompositeValue();
         comp.put("dm4.files.file_name", fileName);
         comp.put("dm4.files.path", path);
