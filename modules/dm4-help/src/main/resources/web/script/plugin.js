@@ -1,18 +1,5 @@
 dm4c.add_plugin("de.deepamehta.help", function() {
 
-    // === Webclient Listeners ===
-
-    dm4c.add_listener("init", function() {
-        dm4c.toolbar.special_menu.add_item({label: "About DeepaMehta", handler: do_about})
-        dm4c.ui.dialog("about-dialog", "About DeepaMehta", DIALOG_CONTENT, "auto")
-    })
-
-    // ----------------------------------------------------------------------------------------------- Private Functions
-
-    function do_about() {
-        \$("#about-dialog").dialog("open")  // Note: $ is escaped from Maven resource filtering
-    }
-
     var DIALOG_CONTENT =
         '<table>' +
             '<tr>' +
@@ -23,7 +10,7 @@ dm4c.add_plugin("de.deepamehta.help", function() {
                     '<div class="field-label">Version</div>' +
                     '<div>${project.version}</div>' +
                     '<div class="field-label">Build Date</div>' +
-                    '<div>July 22, 2012</div>' +
+                    '<div>July 31, 2012</div>' +
                     '<div class="field-label">Copyright</div>' +
                     '<div>2000-2012 Jörg Richter</div>' +
                     '<div class="field-label">License</div>' +
@@ -66,4 +53,12 @@ dm4c.add_plugin("de.deepamehta.help", function() {
                 '</td>' +
             '</tr>' +
         '</table>'
+
+    var about_dialog = dm4c.ui.dialog({
+        id: "about-dialog", title: "About DeepaMehta", content: DIALOG_CONTENT
+    })
+
+    dm4c.toolbar.special_menu.add_item({label: "About DeepaMehta", handler: function() {
+        about_dialog.open()
+    }})
 })

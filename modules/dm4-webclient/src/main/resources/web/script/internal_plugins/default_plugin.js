@@ -3,37 +3,50 @@
  */
 dm4c.add_plugin("de.deepamehta.webclient.default", function() {
 
-    var type_menu
+    // === Dialogs ===
 
-    // === Webclient Listeners ===
-
-    dm4c.add_listener("init", function() {
-
-        dm4c.ui.dialog("delete-topic-dialog",       "Delete Topic?",       undefined, undefined,
-            "Delete", do_delete_topic)
-        dm4c.ui.dialog("delete-association-dialog", "Delete Association?", undefined, undefined,
-            "Delete", do_delete_association)
-        //
-        type_menu = dm4c.ui.menu()
-        dm4c.ui.dialog("retype-topic-dialog",       "Retype Topic",        type_menu.dom, undefined,
-            "Retype", do_retype_topic)
-
-        function do_delete_topic() {
-            $("#delete-topic-dialog").dialog("close")
+    var delete_topic_dialog = dm4c.ui.dialog({
+        title: "Delete Topic?",
+        width: "300px",
+        button_label: "Delete",
+        button_handler: function() {
+            delete_topic_dialog.close()
             dm4c.do_delete_topic(dm4c.selected_object)
-        }
-
-        function do_delete_association() {
-            $("#delete-association-dialog").dialog("close")
-            dm4c.do_delete_association(dm4c.selected_object)
-        }
-
-        function do_retype_topic() {
-            var type_uri = type_menu.get_selection().value
-            $("#retype-topic-dialog").dialog("close")
-            dm4c.do_retype_topic(dm4c.selected_object, type_uri)
+            // ### FIXME: we should not operate on dm4c.selected_object. Theoretically it may have
+            // changed since opening the dialog (practically it can't because the dialog is modal).
+            // Instead we should set the button handler only when opening the dialog.
         }
     })
+    var delete_association_dialog = dm4c.ui.dialog({
+        title: "Delete Association?",
+        width: "300px",
+        button_label: "Delete",
+        button_handler: function() {
+            delete_association_dialog.close()
+            dm4c.do_delete_association(dm4c.selected_object)
+            // ### FIXME: we should not operate on dm4c.selected_object. Theoretically it may have
+            // changed since opening the dialog (practically it can't because the dialog is modal).
+            // Instead we should set the button handler only when opening the dialog.
+        }
+    })
+
+    var type_menu = dm4c.ui.menu()
+    var retype_topic_dialog = dm4c.ui.dialog({
+        title: "Retype Topic",
+        content: type_menu.dom,
+        width: "400px",
+        button_label: "Retype",
+        button_handler: function() {
+            var type_uri = type_menu.get_selection().value
+            retype_topic_dialog.close()
+            dm4c.do_retype_topic(dm4c.selected_object, type_uri)
+            // ### FIXME: we should not operate on dm4c.selected_object. Theoretically it may have
+            // changed since opening the dialog (practically it can't because the dialog is modal).
+            // Instead we should set the button handler only when opening the dialog.
+        }
+    })
+
+    // === Webclient Listeners ===
 
     dm4c.add_listener("topic_commands", function(topic) {
         var commands = []
@@ -74,11 +87,11 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         function do_retype() {
             dm4c.refresh_type_menu(type_menu)   // no filter_func specified
             type_menu.select(topic.type_uri)
-            $("#retype-topic-dialog").dialog("open")
+            retype_topic_dialog.open()
         }
 
         function do_confirm() {
-            $("#delete-topic-dialog").dialog("open")
+            delete_topic_dialog.open()
         }
 
         function do_save() {
@@ -116,7 +129,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         }
 
         function do_confirm() {
-            $("#delete-association-dialog").dialog("open")
+            delete_association_dialog.open()
         }
 
         function do_save() {

@@ -33,6 +33,8 @@ public interface FilesService extends PluginService {
 
     // ---
 
+    void createFolder(String name, String storagePath);
+
     StoredFile storeFile(UploadedFile file, String storagePath);
 
     // ---

@@ -1,11 +1,11 @@
 #workspace-widget {
     display: inline;
+    margin-left: 0.6em;
 }
 
 #workspace-label {
     color: #555;
     font-size: 75%;
     font-weight: normal;
-    margin-left: 0.8em;
     margin-right: 0.4em;
 }

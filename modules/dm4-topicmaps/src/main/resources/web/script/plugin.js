@@ -43,6 +43,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // === Webclient Listeners ===
 
     dm4c.add_listener("init", function() {
+
+        var topicmap_dialog
+
         fetch_topicmap_topics()
         register_topicmap_renderers()
         create_default_topicmap()
@@ -86,20 +89,37 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             }
             //
             rebuild_topicmap_menu(undefined, true)  // no_refetch=true
+
+            function do_select_topicmap(menu_item) {
+                var topicmap_id = menu_item.value
+                if (topicmap_id == "_new") {
+                    topicmap_dialog.open()
+                } else {
+                    // update model
+                    set_selected_topicmap(topicmap_id)
+                    // update view
+                    display_topicmap()
+                }
+            }
         }
 
         function create_topicmap_dialog() {
             var title_input = dm4c.render.input(undefined, 30)
             var type_menu = create_maptype_menu()
-            var topicmap_dialog = $("<form>").attr("action", "#").submit(do_create_topicmap)
+            var dialog_content = $("<form>").attr("action", "#").submit(do_create_topicmap)
                 .append($("<div>").addClass("field-label").text("Title"))
                 .append(title_input)
             if (type_menu.get_item_count() > 1) {
-                topicmap_dialog
-                .append($("<div>").addClass("field-label").text("Type"))
-                .append(type_menu.dom)
+                dialog_content
+                    .append($("<div>").addClass("field-label").text("Type"))
+                    .append(type_menu.dom)
             }
-            dm4c.ui.dialog("topicmap-dialog", "New Topicmap", topicmap_dialog, "auto", "Create", do_create_topicmap)
+            topicmap_dialog = dm4c.ui.dialog({
+                title: "New Topicmap",
+                content: dialog_content,
+                button_label: "Create",
+                button_handler: do_create_topicmap
+            })
 
             function create_maptype_menu() {
                 var menu = dm4c.ui.menu()
@@ -111,7 +131,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             }
 
             function do_create_topicmap() {
-                $("#topicmap-dialog").dialog("close")
+                topicmap_dialog.close()
                 var name = title_input.val()
                 var topicmap_renderer_uri = type_menu.get_selection().value
                 create_topicmap(name, topicmap_renderer_uri)
@@ -332,21 +352,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         // update view
         select_menu_item(topicmap_id)
         display_topicmap(no_history_update)
-    }
-
-    /**
-     * Invoked when the user made a selection from the topicmap menu.
-     */
-    function do_select_topicmap(menu_item) {
-        var topicmap_id = menu_item.value
-        if (topicmap_id == "_new") {
-            open_topicmap_dialog()
-        } else {
-            // update model
-            set_selected_topicmap(topicmap_id)
-            // update view
-            display_topicmap()
-        }
     }
 
     // ---
@@ -574,11 +579,5 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         if (item) {
             return item.value
         }
-    }
-
-    // ---
-
-    function open_topicmap_dialog() {
-        $("#topicmap-dialog").dialog("open")
     }
 })

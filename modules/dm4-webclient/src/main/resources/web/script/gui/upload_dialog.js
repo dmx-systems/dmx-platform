@@ -1,7 +1,5 @@
 function UploadDialog() {
 
-    var UPLOAD_DIALOG_WIDTH = "50em"
-
     var upload_form = $("<form>", {
         method:  "post",
         enctype: "multipart/form-data",
@@ -10,7 +8,7 @@ function UploadDialog() {
         .append($('<input type="file">').attr({name: "file", size: 60}))    // Note: attr() must be used here.
         .append($('<input type="submit">').attr({value: "Upload"}))         // An attr object as 2nd param doesn't work!
 
-    dm4c.ui.dialog("upload-dialog", "Upload File", upload_form, UPLOAD_DIALOG_WIDTH)
+    var upload_dialog = dm4c.ui.dialog({title: "Upload File", content: upload_form})
 
     var upload_target = $("<iframe>", {name: "upload-target"}).hide()
     $("body").append(upload_target)
@@ -25,13 +23,13 @@ function UploadDialog() {
      */
     this.open = function(storage_path, callback) {
         upload_form.attr("action", "/files/" + storage_path)
-        $("#upload-dialog").dialog("open")
+        upload_dialog.open()
         // bind handler
         upload_target.unbind("load")    // Note: the previous handler must be removed
         upload_target.load(upload_complete)
 
         function upload_complete() {
-            $("#upload-dialog").dialog("close")
+            upload_dialog.close()
             // Note: iframes must be accessed via window.frames
             var response = $("pre", window.frames["upload-target"].document).text()
             try {

@@ -134,6 +134,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Initia
 
     // ---
 
+    @Override
+    public void createFolder(String name, String storagePath) {
+    }
+
     @POST
     @Path("/{storage_path:.+}")
     @Consumes("multipart/form-data")

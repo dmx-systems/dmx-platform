@@ -120,7 +120,13 @@ dm4c.add_plugin("de.deepamehta.files", function() {
 
     dm4c.add_listener("topic_commands", function(topic) {
         if (topic.type_uri == "dm4.files.folder") {
-            return [{label: "Upload File", handler: do_open_upload_dialog, context: "detail-panel-show"}]
+            return [
+                {label: "Create Folder", handler: do_create_folder,      context: "detail-panel-show"},
+                {label: "Upload File",   handler: do_open_upload_dialog, context: "detail-panel-show"}
+            ]
+        }
+
+        function do_create_folder() {
         }
 
         function do_open_upload_dialog() {
