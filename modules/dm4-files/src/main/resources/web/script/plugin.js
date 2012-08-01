@@ -127,6 +127,8 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         }
 
         function do_create_folder() {
+            dm4c.ui.prompt("Create Folder", "Folder Name", "Create", function(folder_name) {
+            })
         }
 
         function do_open_upload_dialog() {

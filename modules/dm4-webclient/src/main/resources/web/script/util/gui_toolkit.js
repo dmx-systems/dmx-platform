@@ -106,6 +106,12 @@ function GUIToolkit(config) {
             this.append = function(element) {
                 dialog.append(element)
             }
+
+            this.destroy = function() {
+                // Note: "destroy" leaves the sole dialog content element in the DOM and returns it.
+                // We remove it afterwards. We want the dialog to be completely removed from the DOM.
+                dialog.dialog("destroy").remove()
+            }
         }
     }
 
@@ -113,7 +119,25 @@ function GUIToolkit(config) {
 
     // === Prompt ===
 
-    this.prompt = function() {
+    this.prompt = function(title, input_label, button_label, callback) {
+        var input = dm4c.render.input(undefined, 30).keyup(function(event) {
+            if (event.which == 13) {
+                do_submit()
+            }
+        })
+        var content = $("<div>").addClass("field-label").text(input_label).after(input)
+        var dialog = this.dialog({
+            title: title,
+            content: content,
+            button_label: button_label,
+            button_handler: do_submit
+        })
+        dialog.open()
+
+        function do_submit() {
+            dialog.destroy()
+            callback(input.val())   // Note: obviously the value can still be the read after destroying the dialog
+        }
     }
 
 
