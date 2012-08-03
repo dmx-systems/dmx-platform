@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.proxy.model;
+package de.deepamehta.plugins.files;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -11,16 +11,9 @@ public class ResourceInfo {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String kind;    // "file", "directory", "remote"
+    private String kind;    // "file", "directory"
 
     // ---------------------------------------------------------------------------------------------------- Constructors
-
-    /**
-     * Precondition: the URL is a remote URL.
-     */
-    public ResourceInfo(URL uri) {
-        kind = "remote";
-    }
 
     /**
      * Precondition: the file exists.

@@ -1,5 +1,6 @@
-package de.deepamehta.plugins.proxy.model;
+package de.deepamehta.plugins.files;
 
+import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -11,11 +12,11 @@ import java.util.List;
 
 
 
-public class DirectoryListing {
+public class DirectoryListing implements JSONEnabled {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.proxy.files.path");
+    private static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path");
     private static final int FILE_REPOSITORY_PATH_LENGTH = FILE_REPOSITORY_PATH.length();
 
     // ---------------------------------------------------------------------------------------------- Instance Variables

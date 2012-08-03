@@ -21,8 +21,8 @@
     <!-- The other dm4.* properties are required by 'run' only. They are placed here for clarity.     -->
     <properties>
         <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
-        <dm4.proxy.files.path></dm4.proxy.files.path>
-        <dm4.proxy.net.filter>127.0.0.1/32</dm4.proxy.net.filter>
+        <dm4.filerepo.path></dm4.filerepo.path>
+        <dm4.filerepo.netfilter>127.0.0.1/32</dm4.filerepo.netfilter>
     </properties>
 
     <profiles>
@@ -53,7 +53,6 @@
                         ${project.basedir}/modules/dm4-topicmaps/target,
                         ${project.basedir}/modules/dm4-files/target,
                         ${project.basedir}/modules/dm4-filemanager/target,
-                        ${project.basedir}/modules/dm4-proxy/target,
                         ${project.basedir}/modules/dm4-help/target,
                         ${project.basedir}/modules/dm4-facets/target
                     ]]>
@@ -116,7 +115,6 @@
                 <module>modules/dm4-topicmaps</module>
                 <module>modules/dm4-files</module>
                 <module>modules/dm4-filemanager</module>
-                <module>modules/dm4-proxy</module>
                 <module>modules/dm4-help</module>
                 <module>modules/dm4-facets</module>
                 <!-- POM projects -->

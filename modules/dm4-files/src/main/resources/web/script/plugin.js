@@ -16,6 +16,16 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         return this.request("POST", "/files/" + folder_topic_id + "/folder/" + encodeURIComponent(path))
     }
     //
+    dm4c.restc.get_file = function(path) {
+        return this.request("GET", "/filerepo/" + encodeURI(path))
+    }
+    dm4c.restc.get_folder_content = function(path) {
+        return this.request("GET", "/files/" + encodeURI(path))
+    }
+    dm4c.restc.get_resource_info = function(path) {
+        return this.request("GET", "/files/" + encodeURI(path) + "/info")
+    }
+    //
     dm4c.restc.open_file = function(file_topic_id) {
         return this.request("POST", "/files/" + file_topic_id)
     }
@@ -53,7 +63,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
                     netscape.security.PrivilegeManager.enablePrivilege("UniversalFileRead")
                     var path = file.mozFullPath
                     if (is_directory(file)) {
-                        var dropped_dir = dm4c.restc.get_resource("file:" + path)
+                        var dropped_dir = dm4c.restc.get_folder_content(path)
                         files.add_directory(dropped_dir)
                         continue
                     }
@@ -72,7 +82,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
                     return false
                 }
                 // Otherwise we involve the server to get information about the item
-                var info = dm4c.restc.get_resource_info("file:" + file.mozFullPath)
+                var info = dm4c.restc.get_resource_info(file.mozFullPath)
                 return info.kind == "directory"
             }
         }
@@ -84,7 +94,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
             for (var i = 0, file; file = data_transfer.files[i]; i++) {
                 var path = uri_to_path(uri_list[i])
                 if (is_directory(path)) {
-                    var dropped_dir = dm4c.restc.get_resource("file:" + path)
+                    var dropped_dir = dm4c.restc.get_folder_content(path)
                     files.add_directory(dropped_dir)
                     continue
                 }

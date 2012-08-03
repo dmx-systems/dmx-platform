@@ -8,9 +8,8 @@ dm4c.add_simple_renderer("dm4.files.file_content_renderer", {
         function render_content() {
             try {
                 var path       = page_model.toplevel_topic.get("dm4.files.path")
-                var size       = page_model.toplevel_topic.get("dm4.files.size")
                 var media_type = page_model.toplevel_topic.get("dm4.files.media_type")
-                var src = local_resource_URI()
+                var src = filerepo_URI()
                 // Note: for unknown file types media_type is null
                 /*if (!media_type) {
                     throw "the file's media type can't be detected";
@@ -18,7 +17,7 @@ dm4c.add_simple_renderer("dm4.files.file_content_renderer", {
                 if (media_type) {
                     // TODO: let plugins render the file content
                     if (media_type == "text/plain") {
-                        render($("<pre>").text(dm4c.restc.get_resource("file:" + path, media_type, size)))
+                        render($("<pre>").text(dm4c.restc.get_file(path)))
                         return
                     } else if (js.begins_with(media_type, "image/")) {
                         render($("<img>").attr("src", src))
@@ -51,13 +50,10 @@ dm4c.add_simple_renderer("dm4.files.file_content_renderer", {
                 render("FileContentRendererError: " + e)
             }
 
-            function local_resource_URI() {
-                var uri = "/proxy/file:" + encodeURIComponent(path) + "?size=" + size
-                if (media_type) {
-                    uri += "&type=" + encodeURIComponent(media_type)
-                    // media_type might contain + char ("image/svg+xml")
-                }
-                return uri
+            function filerepo_URI() {
+                // Note: we use encodeURI() instead of encodeURIComponent().
+                // We want the slashes not to be encoded.
+                return "/filerepo" + encodeURI(path)
             }
 
             function render(content_element) {

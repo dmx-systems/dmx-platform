@@ -68,6 +68,7 @@
             <artifactId>org.apache.servicemix.bundles.asm</artifactId>
             <version>3.1_1</version>
         </dependency>
+        <!-- Commons IO for Commons FileUpload -->
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.commons-io</artifactId>

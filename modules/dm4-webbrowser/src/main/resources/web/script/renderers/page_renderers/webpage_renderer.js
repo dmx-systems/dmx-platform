@@ -1,7 +1,7 @@
 (function() {
 
     var TRAILBLAZER_FEATURE = false                 // trailblazer is switched off
-    var PROXY_URL = "http://localhost:8080/proxy/"  // used by trailblazer
+    var PROXY_URL = "http://localhost:8080/proxy/"  // used by trailblazer ### FIXME
 
     dm4c.add_page_renderer("dm4.webbrowser.webpage_renderer", {
 

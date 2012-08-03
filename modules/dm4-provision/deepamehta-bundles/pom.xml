@@ -84,11 +84,6 @@
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-proxy</artifactId>
-            <version>4.0.12-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-help</artifactId>
             <version>4.0.12-SNAPSHOT</version>
         </dependency>

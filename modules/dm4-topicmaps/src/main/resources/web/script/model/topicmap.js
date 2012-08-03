@@ -224,7 +224,7 @@ function Topicmap(topicmap_id) {
         function init_background_image() {
             var file = info.get("dm4.files.file")
             if (file) {
-                var image_url = "/proxy/file:" + file.get("dm4.files.path")
+                var image_url = "/proxy/file:" + file.get("dm4.files.path")     // ### FIXME
                 self.background_image = dm4c.create_image(image_url)
             }
         }

@@ -1,8 +1,8 @@
 package de.deepamehta.plugins.files;
 
 import de.deepamehta.plugins.files.service.FilesService;
-import de.deepamehta.plugins.proxy.service.ProxyService;
 
+import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
@@ -18,29 +18,39 @@ import de.deepamehta.core.service.listener.PluginServiceGoneListener;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response.Status;
+
+import javax.servlet.http.HttpServletRequest;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends PluginActivator implements FilesService,          InitializePluginListener,
-                                                            FileRepositoryContext, PluginServiceArrivedListener,
-                                                                                   PluginServiceGoneListener {
+public class FilesPlugin extends PluginActivator implements FilesService, InitializePluginListener {
+
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path");
+    private static final String REMOTE_ACCESS_FILTER = System.getProperty("dm4.filerepo.netfilter");
+    private static final String FILE_REPOSITORY_URI = "/filerepo";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private FileRepository fileRepository;
-    private ProxyService proxyService;
+    @Context
+    private HttpServletRequest request;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -74,7 +84,7 @@ public class FilesPlugin extends PluginActivator implements FilesService,       
             // 2) create topic
             logger.info(info);
             //
-            File file = proxyService.locateFile(path);
+            File file = locateFile(path);
             String fileName = file.getName();
             String mediaType = JavaUtils.getFileType(fileName);
             long size = file.length();
@@ -132,13 +142,15 @@ public class FilesPlugin extends PluginActivator implements FilesService,       
         return childTopic;
     }
 
-    // ---
+
+
+    // === File Repository ===
 
     @Override
     public void createFolder(String folderName, String storagePath) {
         try {
             logger.info("folderName=\"" + folderName + "\", storagePath=\"" + storagePath + "\"");
-            fileRepository.createFolder(folderName, storagePath);
+            // ### TODO
         } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException("Creating folder \"" + folderName +
                 "\" failed (storagePath=\"" + storagePath + "\")", e));
@@ -150,15 +162,56 @@ public class FilesPlugin extends PluginActivator implements FilesService,       
     @Consumes("multipart/form-data")
     @Override
     public StoredFile storeFile(UploadedFile file, @PathParam("storage_path") String storagePath) {
+        File repoFile = null;
         try {
             logger.info(file + ", storagePath=\"" + storagePath + "\"");
-            return fileRepository.storeFile(file, storagePath);
+            Topic fileTopic = createFileTopic(file, storagePath);
+            repoFile = repoFile(fileTopic);
+            logger.info("Storing file \"" + repoFile + "\" in file repository");
+            file.write(repoFile);
+            return new StoredFile(fileName(fileTopic), fileTopic.getId());
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Uploading " + file + " failed", e));
+            throw new WebApplicationException(new RuntimeException("Storing file \"" + repoFile +
+                "\" in file repository failed", e));
         }
     }
 
+    // ===
+
+    @GET
+    @Path("/{path:.+}")      // Note: we also match slashes as they are already decoded by an apache reverse proxy
+    @Override
+    public DirectoryListing getFolderContent(@PathParam("path") String path) {
+        logger.info("path=\"" + path + "\")");
+        //
+        checkRemoteAccess(request);
+        //
+        File file = locateFile(path);
+        if (file.isDirectory()) {
+            return new DirectoryListing(file);
+        }
+        return null;    // ### FIXME
+    }
+
+    @GET
+    @Path("/{path:.+}/info") // Note: we also match slashes as they are already decoded by an apache reverse proxy
+    @Override
+    public ResourceInfo getResourceInfo(@PathParam("path") String path) {
+        logger.info("path=\"" + path + "\")");
+        //
+        checkRemoteAccess(request);
+        //
+        return new ResourceInfo(locateFile(path));
+    }
+
     // ---
+
+    @Override
+    public File locateFile(String relativePath) {
+        return checkFileAccess(new File(FILE_REPOSITORY_PATH, relativePath));
+    }
+
+    // ===
 
     @POST
     @Path("/{id}")
@@ -168,7 +221,7 @@ public class FilesPlugin extends PluginActivator implements FilesService,       
         try {
             Topic fileTopic = dms.getTopic(fileTopicId, true, null);    // fetchComposite=true, clientState=null
             String path = fileTopic.getCompositeValue().getString("dm4.files.path");
-            file = proxyService.locateFile(path);
+            file = locateFile(path);
             logger.info("### Opening file \"" + file + "\"");
             Desktop.getDesktop().open(file);
         } catch (Exception e) {
@@ -186,37 +239,7 @@ public class FilesPlugin extends PluginActivator implements FilesService,       
 
     @Override
     public void initializePlugin() {
-        fileRepository = new FileRepository(this, dms);
-    }
-
-    // ---
-
-    @Override
-    public void pluginServiceArrived(PluginService service) {
-        logger.info("########## Service arrived: " + service);
-        if (service instanceof ProxyService) {
-            proxyService = (ProxyService) service;
-        }
-    }
-
-    @Override
-    public void pluginServiceGone(PluginService service) {
-        logger.info("########## Service gone: " + service);
-        if (service == proxyService) {
-            proxyService = null;
-        }
-    }
-
-
-
-    // ********************************************
-    // *** FileRepositoryContext Implementation ***
-    // ********************************************
-
-
-
-    public void publishDirectory(String directoryPath, String uriNamespace) {
-        super.publishDirectory(directoryPath, uriNamespace);
+        publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI);
     }
 
 
@@ -275,5 +298,109 @@ public class FilesPlugin extends PluginActivator implements FilesService,       
 
     private boolean childAssociationExists(long folderTopicId, long childTopicId) {
         return dms.getAssociations(folderTopicId, childTopicId, "dm4.core.aggregation").size() > 0;
+    }
+
+
+
+    // === File Repository ===
+
+    /**
+     * @param   storagePath     Begins with "/". Has no "/" at end.
+     */
+    private Topic createFileTopic(UploadedFile file, String storagePath) {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic fileTopic = dms.createTopic(new TopicModel("dm4.files.file"), null);       // FIXME: clientState=null
+            //
+            String fileName = fileTopic.getId() + "-" + file.getName();
+            String path = storagePath + "/" + fileName;
+            String mediaType = file.getMediaType();
+            long size = file.getSize();
+            //
+            CompositeValue comp = new CompositeValue();
+            comp.put("dm4.files.file_name", fileName);
+            comp.put("dm4.files.path", path);
+            if (mediaType != null) {
+                comp.put("dm4.files.media_type", mediaType);
+            }
+            comp.put("dm4.files.size", size);
+            //
+            fileTopic.setCompositeValue(comp, null, null);
+            //
+            tx.success();
+            return fileTopic;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Creating file topic for uploaded file failed (" +
+                file + ", storagePath=\"" + storagePath + "\")", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    /**
+     * Calculates the storage location for the file represented by the specified file topic.
+     */
+    private File repoFile(Topic fileTopic) {
+        return new File(FILE_REPOSITORY_PATH, path(fileTopic));
+    }
+
+    // ---
+
+    private String fileName(Topic fileTopic) {
+        return fileTopic.getCompositeValue().getString("dm4.files.file_name");
+    }
+
+    private String path(Topic fileTopic) {
+        return fileTopic.getCompositeValue().getString("dm4.files.path");
+    }
+
+    // ---
+
+    private void checkRemoteAccess(HttpServletRequest request) {
+        String remoteAddr = request.getRemoteAddr();
+        boolean isInRange = JavaUtils.isInRange(remoteAddr, REMOTE_ACCESS_FILTER);
+        //
+        logger.info("Checking remote access to \"" + request.getRequestURL() + "\"\n      dm4.filerepo.netfilter=\"" +
+            REMOTE_ACCESS_FILTER + "\", remote address=\"" + remoteAddr + "\" => " +
+            (isInRange ? "ALLOWED" : "FORBIDDEN"));
+        //
+        if (!isInRange) {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
+    }
+
+    /**
+     * @return  The canonical file.
+     */
+    private File checkFileAccess(File file) {
+        try {
+            // 1) Check path
+            //
+            // Note 1: we use getCanonicalPath() to fight directory traversal attacks (../../).
+            // Note 2: A directory path returned by getCanonicalPath() never contains a "/" at the end.
+            // Thats why "dm4.filerepo.path" is expected to have no "/" at the end as well.
+            String path = file.getCanonicalPath();
+            boolean pointsToRepository = path.startsWith(FILE_REPOSITORY_PATH);
+            //
+            logger.info("Checking file repository access to \"" + file.getPath() + "\"\n      dm4.filerepo.path=" +
+                "\"" + FILE_REPOSITORY_PATH + "\", canonical request path=\"" + path + "\" => " +
+                (pointsToRepository ? "ALLOWED" : "FORBIDDEN"));
+            //
+            if (!pointsToRepository) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
+            //
+            // 2) Check existence
+            //
+            if (!file.exists()) {
+                logger.info("Requested file/directory \"" + file.getPath() + "\" does not exist => NOT FOUND");
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
+            //
+            return new File(path);
+        } catch (IOException e) {
+            throw new RuntimeException("Checking file repository access failed (file=\"" + file + "\")", e);
+        }
     }
 }

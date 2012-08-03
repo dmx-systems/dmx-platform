@@ -156,7 +156,7 @@ public class WebclientPlugin extends PluginActivator implements PreUpdateTopicLi
     @Override
     public void preUpdateTopic(Topic topic, TopicModel newModel, Directives directives) {
         if (topic.getTypeUri().equals("dm4.files.file") && newModel.getTypeUri().equals("dm4.webclient.icon")) {
-            String iconUrl = "/proxy/file:" + topic.getCompositeValue().getString("dm4.files.path");
+            String iconUrl = "/proxy/file:" + topic.getCompositeValue().getString("dm4.files.path");    // ### FIXME
             logger.info("### Retyping a file to an icon (iconUrl=" + iconUrl + ")");
             newModel.setSimpleValue(iconUrl);
         }
