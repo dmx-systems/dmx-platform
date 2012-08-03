@@ -144,7 +144,7 @@ public interface DeepaMehtaService {
 
 
 
-    // === Listeners ===
+    // === Events ===
 
     List<Object> fireEvent(CoreEvent event, Object... params);
 

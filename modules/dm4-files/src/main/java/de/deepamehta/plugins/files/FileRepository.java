@@ -16,33 +16,26 @@ class FileRepository {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.proxy.files.path");
+    private static final String FILE_REPOSITORY_URI = "/filerepo";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private File fileRepositoryPath;
     private DeepaMehtaService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    FileRepository(DeepaMehtaService dms) {
-        this.fileRepositoryPath = new File(FILE_REPOSITORY_PATH);
+    FileRepository(FileRepositoryContext context, DeepaMehtaService dms) {
         this.dms = dms;
+        context.publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI);
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    /* ### FIXME: not used
-    void initialize() {
-        if (filesDir.exists()) {
-            logger.info("Creating file repository ABORTED -- already exists (\"" + filesDir + "\")");
-            return;
-        }
-        //
-        logger.info("Creating file repository at \"" + filesDir + "\"");
-        filesDir.mkdir();
-    } */
+    void createFolder(String folder_name, String storagePath) {
+        // ### TODO
+    }
 
     StoredFile storeFile(UploadedFile file, String storagePath) {
         File repoFile = null;
@@ -97,7 +90,7 @@ class FileRepository {
      * Calculates the storage location for the file represented by the specified file topic.
      */
     private File repoFile(Topic fileTopic) {
-        return new File(fileRepositoryPath, path(fileTopic));
+        return new File(FILE_REPOSITORY_PATH, path(fileTopic));
     }
 
     // ---

@@ -33,9 +33,9 @@ import java.util.logging.Logger;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends PluginActivator implements FilesService, InitializePluginListener,
-                                                                          PluginServiceArrivedListener,
-                                                                          PluginServiceGoneListener {
+public class FilesPlugin extends PluginActivator implements FilesService,          InitializePluginListener,
+                                                            FileRepositoryContext, PluginServiceArrivedListener,
+                                                                                   PluginServiceGoneListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -135,7 +135,14 @@ public class FilesPlugin extends PluginActivator implements FilesService, Initia
     // ---
 
     @Override
-    public void createFolder(String name, String storagePath) {
+    public void createFolder(String folderName, String storagePath) {
+        try {
+            logger.info("folderName=\"" + folderName + "\", storagePath=\"" + storagePath + "\"");
+            fileRepository.createFolder(folderName, storagePath);
+        } catch (Exception e) {
+            throw new WebApplicationException(new RuntimeException("Creating folder \"" + folderName +
+                "\" failed (storagePath=\"" + storagePath + "\")", e));
+        }
     }
 
     @POST
@@ -179,7 +186,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Initia
 
     @Override
     public void initializePlugin() {
-        fileRepository = new FileRepository(dms);
+        fileRepository = new FileRepository(this, dms);
     }
 
     // ---
@@ -198,6 +205,18 @@ public class FilesPlugin extends PluginActivator implements FilesService, Initia
         if (service == proxyService) {
             proxyService = null;
         }
+    }
+
+
+
+    // ********************************************
+    // *** FileRepositoryContext Implementation ***
+    // ********************************************
+
+
+
+    public void publishDirectory(String directoryPath, String uriNamespace) {
+        super.publishDirectory(directoryPath, uriNamespace);
     }
 
 

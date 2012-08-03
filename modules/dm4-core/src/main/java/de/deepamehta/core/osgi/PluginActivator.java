@@ -88,4 +88,12 @@ public class PluginActivator implements BundleActivator, PluginContext {
     public String toString() {
         return plugin.toString();
     }
+
+
+
+    // ----------------------------------------------------------------------------------------------- Protected Methods
+
+    protected void publishDirectory(String directoryPath, String uriNamespace) {
+        plugin.publishDirectory(directoryPath, uriNamespace);
+    }
 }

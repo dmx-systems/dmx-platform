@@ -60,6 +60,9 @@ public class WebPublishingService {
 
     // === Web Resources ===
 
+    /**
+     * Publishes the /web resources directory of the given bundle to the web.
+     */
     WebResources addWebResources(Bundle bundle, String uriNamespace) {
         try {
             // Note: registerResources() throws org.osgi.service.http.NamespaceException
@@ -72,6 +75,21 @@ public class WebPublishingService {
 
     void removeWebResources(WebResources webResources) {
         httpService.unregister(webResources.uriNamespace);
+    }
+
+    // ---
+
+    /**
+     * Publishes a directory of the server's file system to the web.
+     */
+    WebResources addWebResources(String directoryPath, String uriNamespace) {
+        try {
+            // Note: registerResources() throws org.osgi.service.http.NamespaceException
+            httpService.registerResources(uriNamespace, "/", new DirectoryHTTPContext(directoryPath));
+            return new WebResources(uriNamespace);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // === REST Resources ===
@@ -224,6 +242,41 @@ public class WebPublishingService {
             // logger.info("### Mapping resource name \"" + name + "\" for plugin \"" +
             //     pluginName + "\"\n          => URL \"" + url + "\"");
             return url;
+        }
+
+        @Override
+        public String getMimeType(String name) {
+            return httpContext.getMimeType(name);
+        }
+
+        @Override
+        public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response)
+                                                                            throws java.io.IOException {
+            return httpContext.handleSecurity(request, response);
+        }
+    }
+
+    private class DirectoryHTTPContext implements HttpContext {
+
+        private String directoryPath;
+        private HttpContext httpContext;
+
+        private DirectoryHTTPContext(String directoryPath) {
+            this.directoryPath = directoryPath;
+            this.httpContext = httpService.createDefaultHttpContext();
+        }
+
+        // ---
+
+        @Override
+        public URL getResource(String name) {
+            try {
+                URL url = new URL("file:" + directoryPath + "/" + name);    // throws java.net.MalformedURLException
+                logger.info("### Mapping resource name \"" + name + "\" to URL \"" + url + "\"");
+                return url;
+            } catch (Exception e) {
+                throw new RuntimeException("Mapping resource name \"" + name + "\" to URL failed", e);
+            }
         }
 
         @Override

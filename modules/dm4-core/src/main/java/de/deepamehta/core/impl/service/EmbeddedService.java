@@ -550,7 +550,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
-    // === Listeners ===
+    // === Events ===
 
     @Override
     public List<Object> fireEvent(CoreEvent event, Object... params) {
