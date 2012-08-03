@@ -71,8 +71,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Initia
         String info = "Creating file topic for path \"" + path + "\"";
         try {
             // ### FIXME: drag'n'drop files from arbitrary locations (in particular different Windows drives)
-            // collides with the concept of a single-rooted file repository (as realized by the proxy module).
-            // For the moment we just strip a possible drive letter to be compatible with the proxy module.
+            // collides with the concept of a single-rooted file repository (as realized by the Files module).
+            // For the moment we just strip a possible drive letter to be compatible with the Files module.
             path = JavaUtils.stripDriveLetter(path);
             //
             // 1) check if already exists
@@ -102,8 +102,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Initia
         String info = "Creating folder topic for path \"" + path + "\"";
         try {
             // ### FIXME: drag'n'drop folders from arbitrary locations (in particular different Windows drives)
-            // collides with the concept of a single-rooted file repository (as realized by the proxy module).
-            // For the moment we just strip a possible drive letter to be compatible with the proxy module.
+            // collides with the concept of a single-rooted file repository (as realized by the Files module).
+            // For the moment we just strip a possible drive letter to be compatible with the Files module.
             path = JavaUtils.stripDriveLetter(path);
             //
             // 1) check if already exists
