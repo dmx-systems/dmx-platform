@@ -14,6 +14,7 @@ import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.SecurityHandler;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -127,7 +128,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
-    public void publishDirectory(String directoryPath, String uriNamespace) {
+    public void publishDirectory(String directoryPath, String uriNamespace, SecurityHandler securityHandler) {
         try {
             logger.info("### Publishing directory \"" + directoryPath + "\" at URI namespace \"" + uriNamespace + "\"");
             //
@@ -136,7 +137,7 @@ public class PluginImpl implements Plugin, EventHandler {
                     "only one per plugin is supported");
             }
             //
-            directoryResource = webPublishingService.addWebResources(directoryPath, uriNamespace);
+            directoryResource = webPublishingService.addWebResources(directoryPath, uriNamespace, securityHandler);
         } catch (Exception e) {
             throw new RuntimeException("Publishing directory \"" + directoryPath + "\" at URI namespace \"" +
                 uriNamespace + "\" failed", e);

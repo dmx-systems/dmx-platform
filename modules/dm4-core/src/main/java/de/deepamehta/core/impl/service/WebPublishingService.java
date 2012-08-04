@@ -1,5 +1,7 @@
 package de.deepamehta.core.impl.service;
 
+import de.deepamehta.core.service.SecurityHandler;
+
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
@@ -82,10 +84,10 @@ public class WebPublishingService {
     /**
      * Publishes a directory of the server's file system to the web.
      */
-    WebResources addWebResources(String directoryPath, String uriNamespace) {
+    WebResources addWebResources(String directoryPath, String uriNamespace, SecurityHandler securityHandler) {
         try {
             // Note: registerResources() throws org.osgi.service.http.NamespaceException
-            httpService.registerResources(uriNamespace, "/", new DirectoryHTTPContext(directoryPath));
+            httpService.registerResources(uriNamespace, "/", new DirectoryHTTPContext(directoryPath, securityHandler));
             return new WebResources(uriNamespace);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -259,10 +261,12 @@ public class WebPublishingService {
     private class DirectoryHTTPContext implements HttpContext {
 
         private String directoryPath;
+        private SecurityHandler securityHandler;
         private HttpContext httpContext;
 
-        private DirectoryHTTPContext(String directoryPath) {
+        private DirectoryHTTPContext(String directoryPath, SecurityHandler securityHandler) {
             this.directoryPath = directoryPath;
+            this.securityHandler = securityHandler;
             this.httpContext = httpService.createDefaultHttpContext();
         }
 
@@ -287,7 +291,11 @@ public class WebPublishingService {
         @Override
         public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response)
                                                                             throws java.io.IOException {
-            return httpContext.handleSecurity(request, response);
+            if (securityHandler != null) {
+                return securityHandler.handleSecurity(request, response);
+            } else {
+                return httpContext.handleSecurity(request, response);
+            }
         }
     }
 }

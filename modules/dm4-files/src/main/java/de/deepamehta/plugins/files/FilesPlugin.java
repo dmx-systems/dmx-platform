@@ -12,9 +12,8 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.SecurityHandler;
 import de.deepamehta.core.service.listener.InitializePluginListener;
-import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
-import de.deepamehta.core.service.listener.PluginServiceGoneListener;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.Consumes;
@@ -29,6 +28,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -39,7 +39,7 @@ import java.util.logging.Logger;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends PluginActivator implements FilesService, InitializePluginListener {
+public class FilesPlugin extends PluginActivator implements FilesService, SecurityHandler, InitializePluginListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -231,6 +231,19 @@ public class FilesPlugin extends PluginActivator implements FilesService, Initia
 
 
 
+    // **************************************
+    // *** SecurityHandler Implementation ***
+    // **************************************
+
+
+
+    @Override
+    public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) {
+        return checkRemoteAccess(request, response);
+    }
+
+
+
     // ********************************
     // *** Listener Implementations ***
     // ********************************
@@ -239,7 +252,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Initia
 
     @Override
     public void initializePlugin() {
-        publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI);
+        publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI, this);      // securityHandler=this
     }
 
 
@@ -355,9 +368,31 @@ public class FilesPlugin extends PluginActivator implements FilesService, Initia
         return fileTopic.getCompositeValue().getString("dm4.files.path");
     }
 
-    // ---
 
+
+    // === Security ===
+
+    /**
+     * Provides security for JAX-RS resource methods.
+     */
     private void checkRemoteAccess(HttpServletRequest request) {
+        if (!_checkRemoteAccess(request)) {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
+    }
+
+    /**
+     * Provides security for OSGi web resources.
+     */
+    private boolean checkRemoteAccess(HttpServletRequest request, HttpServletResponse response) {
+        if (!_checkRemoteAccess(request)) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean _checkRemoteAccess(HttpServletRequest request) {
         String remoteAddr = request.getRemoteAddr();
         boolean isInRange = JavaUtils.isInRange(remoteAddr, REMOTE_ACCESS_FILTER);
         //
@@ -365,10 +400,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Initia
             REMOTE_ACCESS_FILTER + "\", remote address=\"" + remoteAddr + "\" => " +
             (isInRange ? "ALLOWED" : "FORBIDDEN"));
         //
-        if (!isInRange) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
+        return isInRange;
     }
+
+    // ---
 
     /**
      * @return  The canonical file.
