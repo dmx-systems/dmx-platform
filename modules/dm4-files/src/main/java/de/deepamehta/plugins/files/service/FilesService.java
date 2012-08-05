@@ -15,6 +15,10 @@ import java.io.File;
 
 public interface FilesService extends PluginService {
 
+
+
+    // === File System Representation ===
+
     /**
      * Creates a File topic for a given path.
      * If a File topic for that path exists already that topic is returned.
@@ -33,24 +37,24 @@ public interface FilesService extends PluginService {
 
     Topic createChildFolderTopic(long folderTopicId, String path);
 
+
+
     // === File Repository ===
 
-    void createFolder(String folderName, String storagePath);
+    /**
+     * @param   path    The directory where to store the file. Relative to the file repository root path.
+     *                  Must begin with slash ('/'), no slash at the end.
+     *                  The directory must exist.
+     */
+    StoredFile storeFile(UploadedFile file, String path);
 
-    StoredFile storeFile(UploadedFile file, String storagePath);
+    void createFolder(String folderName, String path);
 
     // ---
 
-    DirectoryListing getFolderContent(String path);
+    DirectoryListing getDirectoryListing(String path);
 
     ResourceInfo getResourceInfo(String path);
-
-    // ---
-
-    /**
-     * Locates a file in the file repository.
-     */
-    public File locateFile(String relativePath);
 
     // ---
 

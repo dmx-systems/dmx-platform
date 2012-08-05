@@ -16,13 +16,13 @@ function UploadDialog() {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     /**
-     * @param   storage_path    the file repository path (a string) to upload the selected file to. Must begin with "/".
-     * @param   callback        the function that is invoked once the file has been uploaded and processed at
-     *                          server-side. One argument is passed to that function: the object (deserialzed JSON)
-     *                          returned by the (server-side) executeCommandHook. ### FIXDOC
+     * @param   path        the file repository path (a string) to upload the selected file to. Must begin with "/".
+     * @param   callback    the function that is invoked once the file has been uploaded and processed at server-side.
+     *                      One argument is passed to that function: the object (deserialzed JSON)
+     *                      returned by the (server-side) executeCommandHook. ### FIXDOC
      */
-    this.open = function(storage_path, callback) {
-        upload_form.attr("action", "/files/" + storage_path)
+    this.open = function(path, callback) {
+        upload_form.attr("action", "/files/" + path)
         upload_dialog.open()
         // bind handler
         upload_target.unbind("load")    // Note: the previous handler must be removed

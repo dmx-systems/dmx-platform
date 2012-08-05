@@ -17,13 +17,14 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     }
     //
     dm4c.restc.get_file = function(path) {
-        return this.request("GET", "/filerepo/" + encodeURI(path))
+        // ### FIXME: principle copy in File Content Renderers's filerepo_URI()
+        return this.request("GET", "/filerepo/" + encodeURIComponent(path))
     }
-    dm4c.restc.get_folder_content = function(path) {
-        return this.request("GET", "/files/" + encodeURI(path))
+    dm4c.restc.get_directory_listing = function(path) {
+        return this.request("GET", "/files/" + encodeURIComponent(path))
     }
     dm4c.restc.get_resource_info = function(path) {
-        return this.request("GET", "/files/" + encodeURI(path) + "/info")
+        return this.request("GET", "/files/" + encodeURIComponent(path) + "/info")
     }
     //
     dm4c.restc.open_file = function(file_topic_id) {
@@ -63,7 +64,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
                     netscape.security.PrivilegeManager.enablePrivilege("UniversalFileRead")
                     var path = file.mozFullPath
                     if (is_directory(file)) {
-                        var dropped_dir = dm4c.restc.get_folder_content(path)
+                        var dropped_dir = dm4c.restc.get_directory_listing(path)
                         files.add_directory(dropped_dir)
                         continue
                     }
@@ -94,7 +95,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
             for (var i = 0, file; file = data_transfer.files[i]; i++) {
                 var path = uri_to_path(uri_list[i])
                 if (is_directory(path)) {
-                    var dropped_dir = dm4c.restc.get_folder_content(path)
+                    var dropped_dir = dm4c.restc.get_directory_listing(path)
                     files.add_directory(dropped_dir)
                     continue
                 }
@@ -142,8 +143,8 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         }
 
         function do_open_upload_dialog() {
-            var storage_path = topic.get("dm4.files.path")
-            dm4c.upload_dialog.open(storage_path, show_response)
+            var path = topic.get("dm4.files.path")
+            dm4c.upload_dialog.open(path, show_response)
 
             function show_response(response) {
                 alert("Upload response=" + JSON.stringify(response))

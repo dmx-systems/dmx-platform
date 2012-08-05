@@ -33,6 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.util.logging.Logger;
 
 
@@ -64,34 +66,36 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
 
 
+    // === File System Representation ===
+
     @POST
     @Path("/file/{path:.+}")       // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public Topic createFileTopic(@PathParam("path") String path) {
-        String info = "Creating file topic for path \"" + path + "\"";
+        String operation = "Creating file topic for request path \"" + path + "\"";
         try {
+            logger.info(operation);
             // ### FIXME: drag'n'drop files from arbitrary locations (in particular different Windows drives)
             // collides with the concept of a single-rooted file repository (as realized by the Files module).
             // For the moment we just strip a possible drive letter to be compatible with the Files module.
             path = JavaUtils.stripDriveLetter(path);
             //
-            // 1) check if already exists
-            Topic fileTopic = getFileTopic(path);
+            // 1) enforce security
+            File file = enforeSecurity(request, path);
+            //
+            // 2) check if topic already exists
+            Topic fileTopic = fetchFileTopic(file);
             if (fileTopic != null) {
-                logger.info(info + " ABORTED -- already exists");
+                logger.info(operation + " ABORTED -- already exists");
                 return fileTopic;
             }
-            // 2) create topic
-            logger.info(info);
+            // 3) create topic
+            return createFileTopic(file);
             //
-            File file = locateFile(path);
-            String fileName = file.getName();
-            String mediaType = JavaUtils.getFileType(fileName);
-            long size = file.length();
-            //
-            return createFileTopic(fileName, path, mediaType, size);
+        } catch (FileRepositoryException e) {
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(info + " failed", e));
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
         }
     }
 
@@ -99,26 +103,30 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     @Path("/folder/{path:.+}")     // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public Topic createFolderTopic(@PathParam("path") String path) {
-        String info = "Creating folder topic for path \"" + path + "\"";
+        String operation = "Creating folder topic for request path \"" + path + "\"";
         try {
+            logger.info(operation);
             // ### FIXME: drag'n'drop folders from arbitrary locations (in particular different Windows drives)
             // collides with the concept of a single-rooted file repository (as realized by the Files module).
             // For the moment we just strip a possible drive letter to be compatible with the Files module.
             path = JavaUtils.stripDriveLetter(path);
             //
-            // 1) check if already exists
-            Topic folderTopic = getFolderTopic(path);
+            // 1) enforce security
+            File file = enforeSecurity(request, path);
+            //
+            // 2) check if topic already exists
+            Topic folderTopic = fetchFolderTopic(file);
             if (folderTopic != null) {
-                logger.info(info + " ABORTED -- already exists");
+                logger.info(operation + " ABORTED -- already exists");
                 return folderTopic;
             }
-            // 2) create topic
-            logger.info(info);
+            // 3) create topic
+            return createFolderTopic(file);
             //
-            String folderName = new File(path).getName();
-            return createFolderTopic(folderName, path);
+        } catch (FileRepositoryException e) {
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(info + " failed", e));
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
         }
     }
 
@@ -146,86 +154,104 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     // === File Repository ===
 
+    @POST
+    @Path("/{path:.+}")
+    @Consumes("multipart/form-data")
     @Override
-    public void createFolder(String folderName, String storagePath) {
+    public StoredFile storeFile(UploadedFile file, @PathParam("path") String path) {
+        String operation = "Storing " + file + " at request path \"" + path + "\"";
         try {
-            logger.info("folderName=\"" + folderName + "\", storagePath=\"" + storagePath + "\"");
+            logger.info(operation);
+            // 1) enforce security
+            File directory = enforeSecurity(request, path);
+            //
+            // 2) store file
+            File repoFile = repoFile(directory, file);
+            file.write(repoFile);
+            //
+            // 3) create topic
+            Topic fileTopic = createFileTopic(repoFile);
+            return new StoredFile(repoFile.getName(), fileTopic.getId());
+            //
+        } catch (FileRepositoryException e) {
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
+        } catch (Exception e) {
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
+        }
+    }
+
+    @Override
+    public void createFolder(String folderName, String path) {
+        try {
+            logger.info("folderName=\"" + folderName + "\", path=\"" + path + "\"");
             // ### TODO
         } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException("Creating folder \"" + folderName +
-                "\" failed (storagePath=\"" + storagePath + "\")", e));
+                "\" failed (path=\"" + path + "\")", e));
         }
     }
 
-    @POST
-    @Path("/{storage_path:.+}")
-    @Consumes("multipart/form-data")
-    @Override
-    public StoredFile storeFile(UploadedFile file, @PathParam("storage_path") String storagePath) {
-        File repoFile = null;
-        try {
-            logger.info(file + ", storagePath=\"" + storagePath + "\"");
-            Topic fileTopic = createFileTopic(file, storagePath);
-            repoFile = repoFile(fileTopic);
-            logger.info("Storing file \"" + repoFile + "\" in file repository");
-            file.write(repoFile);
-            return new StoredFile(fileName(fileTopic), fileTopic.getId());
-        } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Storing file \"" + repoFile +
-                "\" in file repository failed", e));
-        }
-    }
-
-    // ===
+    // ---
 
     @GET
     @Path("/{path:.+}")      // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
-    public DirectoryListing getFolderContent(@PathParam("path") String path) {
-        logger.info("path=\"" + path + "\")");
-        //
-        checkRemoteAccess(request);
-        //
-        File file = locateFile(path);
-        if (file.isDirectory()) {
-            return new DirectoryListing(file);
+    public DirectoryListing getDirectoryListing(@PathParam("path") String path) {
+        String operation = "Getting directory listing for request path \"" + path + "\"";
+        try {
+            logger.info(operation);
+            //
+            File folder = enforeSecurity(request, path);
+            //
+            // ### TODO: if folder is no directory send NOT FOUND
+            return new DirectoryListing(folder);
+            //
+        } catch (FileRepositoryException e) {
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
+        } catch (Exception e) {
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
         }
-        return null;    // ### FIXME
     }
 
     @GET
     @Path("/{path:.+}/info") // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public ResourceInfo getResourceInfo(@PathParam("path") String path) {
-        logger.info("path=\"" + path + "\")");
-        //
-        checkRemoteAccess(request);
-        //
-        return new ResourceInfo(locateFile(path));
+        String operation = "Getting resource info for request path \"" + path + "\"";
+        try {
+            logger.info(operation);
+            //
+            File file = enforeSecurity(request, path);
+            //
+            return new ResourceInfo(file);
+            //
+        } catch (FileRepositoryException e) {
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
+        } catch (Exception e) {
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
+        }
     }
 
     // ---
-
-    @Override
-    public File locateFile(String relativePath) {
-        return checkFileAccess(new File(FILE_REPOSITORY_PATH, relativePath));
-    }
-
-    // ===
 
     @POST
     @Path("/{id}")
     @Override
     public void openFile(@PathParam("id") long fileTopicId) {
-        File file = null;
+        String operation = "Opening file of topic " + fileTopicId;
         try {
             Topic fileTopic = dms.getTopic(fileTopicId, true, null);    // fetchComposite=true, clientState=null
             String path = fileTopic.getCompositeValue().getString("dm4.files.path");
-            file = locateFile(path);
+            //
+            File file = enforeSecurity(request, path);
+            //
             logger.info("### Opening file \"" + file + "\"");
             Desktop.getDesktop().open(file);
+            //
+        } catch (FileRepositoryException e) {
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Opening file \"" + file + "\" failed", e));
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
         }
     }
 
@@ -239,7 +265,19 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     @Override
     public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) {
-        return checkRemoteAccess(request, response);
+        try {
+            String path = request.getRequestURI().substring(FILE_REPOSITORY_URI.length());
+            path = JavaUtils.decodeURIComponent(path);
+            logger.info("### request path=\"" + path + "\"");
+            File file = enforeSecurity(request, path);
+            return true;
+        } catch (FileRepositoryException e) {
+            response.setStatus(e.getStatusCode());
+            return false;
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return false;
+        }
     }
 
 
@@ -255,11 +293,14 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI, this);      // securityHandler=this
     }
 
-
-
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private Topic getFileTopic(String path) {
+
+
+    // === File System Representation ===
+
+    private Topic fetchFileTopic(File file) {
+        String path = truncate(file.getPath());
         Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false, null);   // fetchComposite=false
         if (topic != null) {
             return topic.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole", "dm4.files.file",
@@ -268,7 +309,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         return null;
     }
 
-    private Topic getFolderTopic(String path) {
+    private Topic fetchFolderTopic(File file) {
+        String path = truncate(file.getPath());
         Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false, null);   // fetchComposite=false
         if (topic != null) {
             return topic.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole", "dm4.files.folder",
@@ -279,22 +321,32 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     // ---
 
-    private Topic createFileTopic(String fileName, String path, String mediaType, long size) {
+    private Topic createFileTopic(File file) {
+        String mediaType = JavaUtils.getFileType(file.getName());
+        //
         CompositeValue comp = new CompositeValue();
-        comp.put("dm4.files.file_name", fileName);
-        comp.put("dm4.files.path", path);
+        comp.put("dm4.files.file_name", file.getName());
+        comp.put("dm4.files.path",      truncate(file.getPath()));
         if (mediaType != null) {
             comp.put("dm4.files.media_type", mediaType);
         }
-        comp.put("dm4.files.size", size);
+        comp.put("dm4.files.size",      file.length());
         //
         return dms.createTopic(new TopicModel("dm4.files.file", comp), null);       // FIXME: clientState=null
     }
 
-    private Topic createFolderTopic(String folderName, String path) {
+    private Topic createFolderTopic(File file) {
+        String folderName = file.getName();
+        String path = truncate(file.getPath());
+        //
+        // root folder needs special treatment
+        if (path.equals("/")) {
+            folderName = "";
+        }
+        //
         CompositeValue comp = new CompositeValue();
         comp.put("dm4.files.folder_name", folderName);
-        comp.put("dm4.files.path", path);
+        comp.put("dm4.files.path",        path);
         //
         return dms.createTopic(new TopicModel("dm4.files.folder", comp), null);     // FIXME: clientState=null
     }
@@ -317,82 +369,57 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     // === File Repository ===
 
-    /**
-     * @param   storagePath     Begins with "/". Has no "/" at end.
-     */
-    private Topic createFileTopic(UploadedFile file, String storagePath) {
-        DeepaMehtaTransaction tx = dms.beginTx();
+    private File mapRequestPathToRepository(String path) {
         try {
-            Topic fileTopic = dms.createTopic(new TopicModel("dm4.files.file"), null);       // FIXME: clientState=null
-            //
-            String fileName = fileTopic.getId() + "-" + file.getName();
-            String path = storagePath + "/" + fileName;
-            String mediaType = file.getMediaType();
-            long size = file.getSize();
-            //
-            CompositeValue comp = new CompositeValue();
-            comp.put("dm4.files.file_name", fileName);
-            comp.put("dm4.files.path", path);
-            if (mediaType != null) {
-                comp.put("dm4.files.media_type", mediaType);
-            }
-            comp.put("dm4.files.size", size);
-            //
-            fileTopic.setCompositeValue(comp, null, null);
-            //
-            tx.success();
-            return fileTopic;
+            File file = new File(FILE_REPOSITORY_PATH, path);
+            // Note 1: we use getCanonicalPath() to fight directory traversal attacks (../../).
+            // Note 2: A directory path returned by getCanonicalPath() never contains a "/" at the end.
+            // Thats why "dm4.filerepo.path" is expected to have no "/" at the end as well.
+            return file.getCanonicalFile();     // throws IOException
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating file topic for uploaded file failed (" +
-                file + ", storagePath=\"" + storagePath + "\")", e);
-        } finally {
-            tx.finish();
+            throw new RuntimeException("Mapping request path \"" + path + "\" to file repository failed", e);
         }
     }
 
     /**
-     * Calculates the storage location for the file represented by the specified file topic.
+     * Calculates the storage location for the uploaded file.
      */
-    private File repoFile(Topic fileTopic) {
-        return new File(FILE_REPOSITORY_PATH, path(fileTopic));
+    private File repoFile(File directory, UploadedFile file) {
+        return JavaUtils.findUnusedFile(new File(directory, file.getName()));
     }
 
-    // ---
-
-    private String fileName(Topic fileTopic) {
-        return fileTopic.getCompositeValue().getString("dm4.files.file_name");
-    }
-
-    private String path(Topic fileTopic) {
-        return fileTopic.getCompositeValue().getString("dm4.files.path");
+    /**
+     * Truncates an absolute path to a request path.
+     */
+    private String truncate(String path) {
+        path = path.substring(FILE_REPOSITORY_PATH.length());
+        // root folder needs special treatment
+        if (path.equals("")) {
+            path = "/";
+        }
+        //
+        return path;
+        // ### TODO: there is a principle copy in DirectoryListing
+        // ### FIXME: Windows drive letter? See DirectoryListing
     }
 
 
 
     // === Security ===
 
-    /**
-     * Provides security for JAX-RS resource methods.
-     */
-    private void checkRemoteAccess(HttpServletRequest request) {
-        if (!_checkRemoteAccess(request)) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
+    private File enforeSecurity(HttpServletRequest request, String path) throws FileRepositoryException {
+        checkRemoteAccess(request);
+        //
+        File file = mapRequestPathToRepository(path);
+        checkFilePath(file);
+        checkFileExistence(file);
+        //
+        return file;
     }
 
-    /**
-     * Provides security for OSGi web resources.
-     */
-    private boolean checkRemoteAccess(HttpServletRequest request, HttpServletResponse response) {
-        if (!_checkRemoteAccess(request)) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return false;
-        }
-        return true;
-    }
+    // --- Remote Access ---
 
-    private boolean _checkRemoteAccess(HttpServletRequest request) {
+    private void checkRemoteAccess(HttpServletRequest request) throws FileRepositoryException {
         String remoteAddr = request.getRemoteAddr();
         boolean isInRange = JavaUtils.isInRange(remoteAddr, REMOTE_ACCESS_FILTER);
         //
@@ -400,42 +427,32 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             REMOTE_ACCESS_FILTER + "\", remote address=\"" + remoteAddr + "\" => " +
             (isInRange ? "ALLOWED" : "FORBIDDEN"));
         //
-        return isInRange;
+        if (!isInRange) {
+            throw new FileRepositoryException("Request from \"" + remoteAddr + "\" is not allowed " +
+                "(dm4.filerepo.netfilter=\"" + REMOTE_ACCESS_FILTER + "\")", Status.FORBIDDEN);
+        }
     }
 
-    // ---
+    // --- File Access ---
 
     /**
-     * @return  The canonical file.
+     * Prerequisite: the file's path is canonical.
      */
-    private File checkFileAccess(File file) {
-        try {
-            // 1) Check path
-            //
-            // Note 1: we use getCanonicalPath() to fight directory traversal attacks (../../).
-            // Note 2: A directory path returned by getCanonicalPath() never contains a "/" at the end.
-            // Thats why "dm4.filerepo.path" is expected to have no "/" at the end as well.
-            String path = file.getCanonicalPath();
-            boolean pointsToRepository = path.startsWith(FILE_REPOSITORY_PATH);
-            //
-            logger.info("Checking file repository access to \"" + file.getPath() + "\"\n      dm4.filerepo.path=" +
-                "\"" + FILE_REPOSITORY_PATH + "\", canonical request path=\"" + path + "\" => " +
-                (pointsToRepository ? "ALLOWED" : "FORBIDDEN"));
-            //
-            if (!pointsToRepository) {
-                throw new WebApplicationException(Status.FORBIDDEN);
-            }
-            //
-            // 2) Check existence
-            //
-            if (!file.exists()) {
-                logger.info("Requested file/directory \"" + file.getPath() + "\" does not exist => NOT FOUND");
-                throw new WebApplicationException(Status.NOT_FOUND);
-            }
-            //
-            return new File(path);
-        } catch (IOException e) {
-            throw new RuntimeException("Checking file repository access failed (file=\"" + file + "\")", e);
+    private void checkFilePath(File file) throws FileRepositoryException {
+        boolean pointsToRepository = file.getPath().startsWith(FILE_REPOSITORY_PATH);
+        //
+        logger.info("Checking file repository access to \"" + file + "\"\n      dm4.filerepo.path=" +
+            "\"" + FILE_REPOSITORY_PATH + "\" => " + (pointsToRepository ? "ALLOWED" : "FORBIDDEN"));
+        //
+        if (!pointsToRepository) {
+            throw new FileRepositoryException("\"" + file + "\" is not a file repository path", Status.FORBIDDEN);
+        }
+    }
+
+    private void checkFileExistence(File file) throws FileRepositoryException {
+        if (!file.exists()) {
+            logger.info("File/directory \"" + file + "\" does not exist => NOT FOUND");
+            throw new FileRepositoryException("\"" + file + "\" does not exist in file repository", Status.NOT_FOUND);
         }
     }
 }

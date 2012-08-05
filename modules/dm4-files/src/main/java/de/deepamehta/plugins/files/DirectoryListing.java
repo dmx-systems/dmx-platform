@@ -17,7 +17,6 @@ public class DirectoryListing implements JSONEnabled {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path");
-    private static final int FILE_REPOSITORY_PATH_LENGTH = FILE_REPOSITORY_PATH.length();
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -94,7 +93,7 @@ public class DirectoryListing implements JSONEnabled {
                 throw new RuntimeException("Path \"" + path + "\" is not a file repository path");
             }
             //
-            return JavaUtils.stripDriveLetter(path.substring(FILE_REPOSITORY_PATH_LENGTH));
+            return JavaUtils.stripDriveLetter(path.substring(FILE_REPOSITORY_PATH.length()));
         }
 
         // ---

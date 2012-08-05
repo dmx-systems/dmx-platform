@@ -9,7 +9,7 @@ dm4c.add_simple_renderer("dm4.files.folder_content_renderer", {
         function render_content() {
             try {
                 var path = page_model.toplevel_topic.get("dm4.files.path")
-                var items = dm4c.restc.get_folder_content(path).items
+                var items = dm4c.restc.get_directory_listing(path).items
                 var topics = []
                 for (var i = 0, item; item = items[i]; i++) {
                     // error check
