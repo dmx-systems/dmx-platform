@@ -28,7 +28,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     }
     //
     dm4c.restc.open_file = function(file_topic_id) {
-        return this.request("POST", "/files/" + file_topic_id)
+        return this.request("POST", "/files/open/" + file_topic_id)
     }
 
     // === Webclient Listeners ===

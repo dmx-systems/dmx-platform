@@ -52,9 +52,9 @@ public interface FilesService extends PluginService {
 
     // ---
 
-    DirectoryListing getDirectoryListing(String path);
-
     ResourceInfo getResourceInfo(String path);
+
+    DirectoryListing getDirectoryListing(String path);
 
     // ---
 

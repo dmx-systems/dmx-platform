@@ -33,8 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
 import java.util.logging.Logger;
 
 
@@ -194,6 +192,25 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     // ---
 
     @GET
+    @Path("/{path:.+}/info") // Note: we also match slashes as they are already decoded by an apache reverse proxy
+    @Override
+    public ResourceInfo getResourceInfo(@PathParam("path") String path) {
+        String operation = "Getting resource info for request path \"" + path + "\"";
+        try {
+            logger.info(operation);
+            //
+            File file = enforeSecurity(request, path);
+            //
+            return new ResourceInfo(file);
+            //
+        } catch (FileRepositoryException e) {
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
+        } catch (Exception e) {
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
+        }
+    }
+
+    @GET
     @Path("/{path:.+}")      // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public DirectoryListing getDirectoryListing(@PathParam("path") String path) {
@@ -213,33 +230,15 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         }
     }
 
-    @GET
-    @Path("/{path:.+}/info") // Note: we also match slashes as they are already decoded by an apache reverse proxy
-    @Override
-    public ResourceInfo getResourceInfo(@PathParam("path") String path) {
-        String operation = "Getting resource info for request path \"" + path + "\"";
-        try {
-            logger.info(operation);
-            //
-            File file = enforeSecurity(request, path);
-            //
-            return new ResourceInfo(file);
-            //
-        } catch (FileRepositoryException e) {
-            throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
-        } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
-        }
-    }
-
     // ---
 
     @POST
-    @Path("/{id}")
+    @Path("/open/{id}")
     @Override
     public void openFile(@PathParam("id") long fileTopicId) {
         String operation = "Opening file of topic " + fileTopicId;
         try {
+            logger.info(operation);
             Topic fileTopic = dms.getTopic(fileTopicId, true, null);    // fetchComposite=true, clientState=null
             String path = fileTopic.getCompositeValue().getString("dm4.files.path");
             //
