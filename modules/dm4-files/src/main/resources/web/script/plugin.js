@@ -1,5 +1,7 @@
 dm4c.add_plugin("de.deepamehta.files", function() {
 
+    var self = this
+
     // === REST Client Extension ===
 
     dm4c.restc.create_file_topic = function(path) {
@@ -10,14 +12,29 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     }
     //
     dm4c.restc.create_child_file_topic = function(folder_topic_id, path) {
-        return this.request("POST", "/files/" + folder_topic_id + "/file/" + encodeURIComponent(path))
+        return this.request("POST", "/files/parent/" + folder_topic_id + "/file/" + encodeURIComponent(path))
     }
     dm4c.restc.create_child_folder_topic = function(folder_topic_id, path) {
-        return this.request("POST", "/files/" + folder_topic_id + "/folder/" + encodeURIComponent(path))
+        return this.request("POST", "/files/parent/" + folder_topic_id + "/folder/" + encodeURIComponent(path))
+    }
+    //
+    dm4c.restc.get_file = function(path) {
+        // ### FIXME: principle copy in File Content Renderers's filerepo_URI()
+        return this.request("GET", "/filerepo/" + encodeURIComponent(path))
+    }
+    dm4c.restc.create_folder = function(folder_name, path) {
+        return this.request("POST", "/files/" + encodeURIComponent(path) + "/folder/" + encodeURIComponent(folder_name))
+    }
+    //
+    dm4c.restc.get_resource_info = function(path) {
+        return this.request("GET", "/files/" + encodeURIComponent(path) + "/info")
+    }
+    dm4c.restc.get_directory_listing = function(path) {
+        return this.request("GET", "/files/" + encodeURIComponent(path))
     }
     //
     dm4c.restc.open_file = function(file_topic_id) {
-        return this.request("POST", "/files/" + file_topic_id)
+        return this.request("POST", "/files/open/" + file_topic_id)
     }
 
     // === Webclient Listeners ===
@@ -53,7 +70,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
                     netscape.security.PrivilegeManager.enablePrivilege("UniversalFileRead")
                     var path = file.mozFullPath
                     if (is_directory(file)) {
-                        var dropped_dir = dm4c.restc.get_resource("file:" + path)
+                        var dropped_dir = dm4c.restc.get_directory_listing(path)
                         files.add_directory(dropped_dir)
                         continue
                     }
@@ -72,7 +89,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
                     return false
                 }
                 // Otherwise we involve the server to get information about the item
-                var info = dm4c.restc.get_resource_info("file:" + file.mozFullPath)
+                var info = dm4c.restc.get_resource_info(file.mozFullPath)
                 return info.kind == "directory"
             }
         }
@@ -84,7 +101,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
             for (var i = 0, file; file = data_transfer.files[i]; i++) {
                 var path = uri_to_path(uri_list[i])
                 if (is_directory(path)) {
-                    var dropped_dir = dm4c.restc.get_resource("file:" + path)
+                    var dropped_dir = dm4c.restc.get_directory_listing(path)
                     files.add_directory(dropped_dir)
                     continue
                 }
@@ -115,6 +132,31 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         if (topic.type_uri == "dm4.files.file" ||
             topic.type_uri == "dm4.files.folder") {
             dm4c.restc.open_file(topic.id)
+        }
+    })
+
+    dm4c.add_listener("topic_commands", function(topic) {
+        if (topic.type_uri == "dm4.files.folder") {
+            return [
+                {label: "Create Folder", handler: do_create_folder,      context: "detail-panel-show"},
+                {label: "Upload File",   handler: do_open_upload_dialog, context: "detail-panel-show"}
+            ]
+        }
+
+        function do_create_folder() {
+            dm4c.ui.prompt("Create Folder", "Folder Name", "Create", function(folder_name) {
+                var path = topic.get("dm4.files.path")
+                dm4c.restc.create_folder(folder_name, path)
+            })
+        }
+
+        function do_open_upload_dialog() {
+            var path = topic.get("dm4.files.path")
+            self.open_upload_dialog(path, show_response)
+
+            function show_response(response) {
+                alert("Upload response=" + JSON.stringify(response))
+            }
         }
     })
 
@@ -167,6 +209,51 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         }
     }
 
+    // ---
+
+    /**
+     * @param   path        the file repository path (a string) to upload the selected file to. Must begin with "/".
+     * @param   callback    the function that is invoked once the file has been uploaded and processed at server-side.
+     *                      One argument is passed to that function: the object (deserialzed JSON)
+     *                      returned by the (server-side) executeCommandHook. ### FIXDOC
+     */
+    this.open_upload_dialog = (function() {
+
+        // 1) install upload target
+        var upload_target = $("<iframe>", {name: "upload-target"}).hide()
+        $("body").append(upload_target)
+
+        // 2) create upload dialog
+        var upload_form = $("<form>", {
+            method:  "post",
+            enctype: "multipart/form-data",
+            target:  "upload-target"
+        })
+        .append($('<input type="file">').attr({name: "file", size: 60}))    // Note: attr() must be used here.
+        .append($('<input type="submit">').attr({value: "Upload"}))         // An attr object as 2nd param doesn't work!
+        //
+        var upload_dialog = dm4c.ui.dialog({title: "Upload File", content: upload_form})
+
+        // 3) create dialog handler
+        return function(path, callback) {
+            upload_form.attr("action", "/files/" + path)
+            upload_dialog.open()
+            // bind handler
+            upload_target.unbind("load")    // Note: the previous handler must be removed
+            upload_target.load(upload_complete)
+
+            function upload_complete() {
+                upload_dialog.close()
+                // Note: iframes must be accessed via window.frames
+                var response = $("pre", window.frames["upload-target"].document).text()
+                try {
+                    callback(JSON.parse(response))
+                } catch (e) {
+                    alert("Upload failed: \"" + response + "\"\n\nException=" + JSON.stringify(e))
+                }
+            }
+        }
+    })()
 
 
     // ------------------------------------------------------------------------------------------------- Private Classes

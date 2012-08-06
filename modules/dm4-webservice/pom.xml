@@ -23,16 +23,6 @@
             <artifactId>deepamehta-core</artifactId>
             <version>4.0.12-SNAPSHOT</version>
         </dependency>
-        <!-- Commons FileUpload -->
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-        </dependency>
-        <!-- Servlet API -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

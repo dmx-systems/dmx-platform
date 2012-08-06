@@ -15,6 +15,7 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 import java.security.MessageDigest;
@@ -84,12 +85,35 @@ public class JavaUtils {
         return path.substring(path.lastIndexOf('/') + 1);
     }
 
+    public static String getBasename(String fileName) {
+        int i = fileName.lastIndexOf(".");
+        if (i == -1) {
+            return fileName;
+        }
+        return fileName.substring(0, i);
+    }
+
     public static String getExtension(String fileName) {
         return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
     }
 
     public static String stripDriveLetter(String path) {
         return path.replaceFirst("^[A-Z]:", "");
+    }
+
+    // ---
+
+    public static File findUnusedFile(File file) {
+        String parent = file.getParent();
+        String fileName = file.getName();
+        String basename = getBasename(fileName);
+        String extension = getExtension(fileName);
+        int nr = 1;
+        while (file.exists()) {
+            nr++;
+            file = new File(parent, basename + "-" + nr + "." + extension);
+        }
+        return file;
     }
 
     // ---
@@ -139,11 +163,21 @@ public class JavaUtils {
         }
     }
 
+    // ---
+
     public static String encodeURIComponent(String uriComp) {
         try {
             return URLEncoder.encode(uriComp, "UTF-8").replaceAll("\\+", "%20");
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("Encoding URI component \"" + uriComp + "\" failed", e);
+        }
+    }
+
+    public static String decodeURIComponent(String uriComp) {
+        try {
+            return URLDecoder.decode(uriComp, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Decoding URI component \"" + uriComp + "\" failed", e);
         }
     }
 

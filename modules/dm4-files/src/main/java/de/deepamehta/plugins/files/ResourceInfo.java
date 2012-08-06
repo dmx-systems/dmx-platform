@@ -1,26 +1,20 @@
-package de.deepamehta.plugins.proxy.model;
+package de.deepamehta.plugins.files;
+
+import de.deepamehta.core.JSONEnabled;
 
 import org.codehaus.jettison.json.JSONObject;
 
 import java.io.File;
-import java.net.URL;
 
 
 
-public class ResourceInfo {
+public class ResourceInfo implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String kind;    // "file", "directory", "remote"
+    private String kind;    // "file", "directory"
 
     // ---------------------------------------------------------------------------------------------------- Constructors
-
-    /**
-     * Precondition: the URL is a remote URL.
-     */
-    public ResourceInfo(URL uri) {
-        kind = "remote";
-    }
 
     /**
      * Precondition: the file exists.
@@ -31,6 +25,7 @@ public class ResourceInfo {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    @Override
     public JSONObject toJSON() {
         try {
             JSONObject info = new JSONObject();

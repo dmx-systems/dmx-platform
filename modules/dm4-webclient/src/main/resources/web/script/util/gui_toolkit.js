@@ -1,5 +1,5 @@
 /**
- * A generic (DeepaMehta independent) GUI toolkit to create buttons, menus, combo boxes, and dialog boxes.
+ * A generic (DeepaMehta independent) GUI toolkit to create buttons, menus, combo boxes, dialog boxes, and prompts.
  * Based on jQuery UI.
  *
  * The DeepaMehta Webclient's toolkit instance is accessible as dm4c.ui
@@ -47,27 +47,97 @@ function GUIToolkit(config) {
 
     // === Dialog Box ===
 
-    // Settings
-    var DEFAULT_DIALOG_WIDTH = 350   // in pixel
+    /**
+     * @param   config  an object with these properties:
+     *                      id             - Optional: the dialog content div will get this ID. Useful to style the
+     *                                       dialog with CSS. If not specified no "id" attribute is set.
+     *                      title          - Optional: the dialog title. If not specified an empty string is used.
+     *                      content        - Optional: the dialog content (HTML or jQuery objects). If not specified
+     *                                       the dialog will be empty. It still can have a title and/or a button.
+     *                      width          - Optional: the dialog width (CSS value). If not specified "auto" is used.
+     *                      button_label   - Optional: the button label. If not specified no button appears.
+     *                                       Note: the button label and button handler must be set together.
+     *                      button_handler - Optional: the button handler function. If not specified no button appears.
+     *                                       Note: the button label and button handler must be set together.
+     */
+    this.dialog = function(config) {
 
-    this.dialog = function(id, title, content, width, button_label, button_handler) {
-        var dialog = $("<div>", {id: id}).append(content)
-        width = width || DEFAULT_DIALOG_WIDTH
-        //
-        var buttons = {}
-        if (button_label && button_handler) {
-            buttons[button_label] = button_handler
+        return new Dialog()
+
+        function Dialog() {
+            var id = config.id
+            var title = config.title
+            var content = config.content
+            var width = config.width || "auto"
+            var button_label = config.button_label
+            var button_handler = config.button_handler
+            //
+            var dialog = $("<div>", {id: id}).append(content)
+            //
+            var buttons = {}
+            if (button_label && button_handler) {
+                buttons[button_label] = button_handler
+            }
+            //
+            var options = {
+                modal: true, autoOpen: false, draggable: false, resizable: false, width: width,
+                title: title, buttons: buttons
+            }
+            // Firefox workaround, see http://bugs.jqueryui.com/ticket/3623
+            options.open = function() {
+                $("body").css("overflow", "hidden")
+            }
+            //
+            $("body").append(dialog)
+            dialog.dialog(options)
+
+            this.open = function() {
+                dialog.dialog("open")
+            }
+
+            this.close = function() {
+                dialog.dialog("close")
+            }
+
+            this.empty = function() {
+                dialog.empty()
+            }
+
+            this.append = function(element) {
+                dialog.append(element)
+            }
+
+            this.destroy = function() {
+                // Note: "destroy" leaves the sole dialog content element in the DOM and returns it.
+                // We remove it afterwards. We want the dialog to be completely removed from the DOM.
+                dialog.dialog("destroy").remove()
+            }
         }
-        //
-        var options = {
-            modal: true, autoOpen: false, draggable: false, resizable: false, width: width,
-            title: title, buttons: buttons
+    }
+
+
+
+    // === Prompt ===
+
+    this.prompt = function(title, input_label, button_label, callback) {
+        var input = dm4c.render.input(undefined, 30).keyup(function(event) {
+            if (event.which == 13) {
+                do_submit()
+            }
+        })
+        var content = $("<div>").addClass("field-label").text(input_label).after(input)
+        var dialog = this.dialog({
+            title: title,
+            content: content,
+            button_label: button_label,
+            button_handler: do_submit
+        })
+        dialog.open()
+
+        function do_submit() {
+            dialog.destroy()
+            callback(input.val())   // Note: obviously the value can still be the read after destroying the dialog
         }
-        // Firefox workaround, see http://bugs.jqueryui.com/ticket/3623
-        options.open = function() {$("body").css("overflow", "hidden")}
-        //
-        $("body").append(dialog)
-        dialog.dialog(options)
     }
 
 

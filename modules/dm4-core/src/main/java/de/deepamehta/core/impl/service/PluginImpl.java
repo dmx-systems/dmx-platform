@@ -14,6 +14,7 @@ import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.SecurityHandler;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -79,6 +80,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // Provided resources
     private WebResources webResources;
+    private WebResources directoryResource;
     private RestResource restResource;
 
     private List<ServiceTracker> coreServiceTrackers = new ArrayList();
@@ -122,6 +124,24 @@ public class PluginImpl implements Plugin, EventHandler {
 
     public void stop() {
         closeCoreServiceTrackers();
+    }
+
+    // ---
+
+    public void publishDirectory(String directoryPath, String uriNamespace, SecurityHandler securityHandler) {
+        try {
+            logger.info("### Publishing directory \"" + directoryPath + "\" at URI namespace \"" + uriNamespace + "\"");
+            //
+            if (directoryResource != null) {
+                throw new RuntimeException(this + " has already published a directory; " +
+                    "only one per plugin is supported");
+            }
+            //
+            directoryResource = webPublishingService.addWebResources(directoryPath, uriNamespace, securityHandler);
+        } catch (Exception e) {
+            throw new RuntimeException("Publishing directory \"" + directoryPath + "\" at URI namespace \"" +
+                uriNamespace + "\" failed", e);
+        }
     }
 
     // ---
@@ -246,9 +266,9 @@ public class PluginImpl implements Plugin, EventHandler {
         }
     }
 
-
-
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
 
     // === Config Properties ===
 
@@ -268,6 +288,8 @@ public class PluginImpl implements Plugin, EventHandler {
             throw new RuntimeException("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this + " failed", e);
         }
     }
+
+
 
     // === Service Tracking ===
 
@@ -402,6 +424,7 @@ public class PluginImpl implements Plugin, EventHandler {
             logger.info("Removing Web Publishing service from " + this);
             unregisterRestResources();
             unregisterWebResources();
+            unregisterDirectoryResource();
             webPublishingService = null;
         } else if (service == eventService) {
             logger.info("Removing Event Admin service from " + this);
@@ -448,6 +471,8 @@ public class PluginImpl implements Plugin, EventHandler {
         }
     }
 
+
+
     // === Activation ===
 
     /**
@@ -481,6 +506,8 @@ public class PluginImpl implements Plugin, EventHandler {
             throw new RuntimeException("Activation of " + this + " failed", e);
         }
     }
+
+
 
     // === Installation ===
 
@@ -550,11 +577,15 @@ public class PluginImpl implements Plugin, EventHandler {
         }
     }
 
+
+
     // === Initialization ===
 
     private void initializePlugin() {
         deliverEvent(CoreEvent.INITIALIZE_PLUGIN);
     }
+
+
 
     // === Core Registration ===
 
@@ -584,7 +615,9 @@ public class PluginImpl implements Plugin, EventHandler {
         return dms.pluginManager.isPluginRegistered(pluginUri);
     }
 
-    // === Plugin Listeners ===
+
+
+    // === Events ===
 
     private void registerListeners() {
         List<CoreEvent> events = getEvents();
@@ -669,6 +702,8 @@ public class PluginImpl implements Plugin, EventHandler {
         return event.listenerInterface.isAssignableFrom(pluginContext.getClass());
     }
 
+
+
     // === Plugin Service ===
 
     /**
@@ -709,6 +744,8 @@ public class PluginImpl implements Plugin, EventHandler {
         }
     } */
 
+
+
     // === Web Resources ===
 
     /**
@@ -744,6 +781,21 @@ public class PluginImpl implements Plugin, EventHandler {
     private String getWebResourcesNamespace() {
         return pluginBundle.getEntry("/web") != null ? "/" + pluginUri : null;
     }
+
+
+
+    // === Directory Resources ===
+
+    // Note: registration is performed by public method publishDirectory()
+
+    private void unregisterDirectoryResource() {
+        if (directoryResource != null) {
+            logger.info("Unregistering Directory resource of " + this);
+            webPublishingService.removeWebResources(directoryResource);
+        }
+    }
+
+
 
     // === REST Resources ===
 
@@ -796,8 +848,17 @@ public class PluginImpl implements Plugin, EventHandler {
                 providerClasses.add(providerClass);
             }
         }
+        //
+        if (providerClasses.size() == 0) {
+            logger.info("Registering provider classes of " + this + " ABORTED -- no provider classes provided");
+        } else {
+            logger.info("Registering " + providerClasses.size() + " provider classes of " + this);
+        }
+        //
         return providerClasses;
     }
+
+
 
     // === Plugin Dependencies ===
 
