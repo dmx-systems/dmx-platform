@@ -448,7 +448,7 @@ public class PluginImpl implements Plugin, EventHandler {
         }
     }
 
-    // ---
+    // === Activation ===
 
     /**
      * Activates this plugin. This comprises:
@@ -472,6 +472,7 @@ public class PluginImpl implements Plugin, EventHandler {
             //
             logger.info("----- Activating " + this + " -----");
             installPluginInDB();        // relies on DeepaMehtaService
+            initializePlugin();         // relies on DeepaMehtaService
             registerListeners();        // relies on DeepaMehtaService
             registerPlugin();           // relies on DeepaMehtaService (and committed migrations)
             logger.info("----- Activation of " + this + " complete -----");
@@ -547,6 +548,12 @@ public class PluginImpl implements Plugin, EventHandler {
                 throw new RuntimeException("Introducing topic type \"" + topicTypeUri + "\" to " + this + " failed", e);
             }
         }
+    }
+
+    // === Initialization ===
+
+    private void initializePlugin() {
+        deliverEvent(CoreEvent.INITIALIZE_PLUGIN);
     }
 
     // === Core Registration ===
@@ -629,9 +636,10 @@ public class PluginImpl implements Plugin, EventHandler {
      * By this method this plugin delivers an "internal" event to itself. An internal event is bound
      * to a particular plugin, in contrast to being fired and delivered to all registered plugins.
      * <p>
-     * There are 4 internal events:
+     * There are 5 internal events:
      *   - POST_INSTALL_PLUGIN
-     *   - INTRODUCE_TOPIC_TYPE
+     *   - INTRODUCE_TOPIC_TYPE (has a double nature)
+     *   - INITIALIZE_PLUGIN
      *   - PLUGIN_SERVICE_ARRIVED
      *   - PLUGIN_SERVICE_GONE
      */
