@@ -12,8 +12,9 @@ import java.io.File;
  * Files are uploaded via the REST API by POSTing <code>multipart/form-data</code> to the <code>/files</code>
  * resource.
  * <p>
- * Client-side support: the <code>deepamehta-webclient</code> plugin provides an utility method
- * <code>dm4c.upload_dialog.open()</code> that allows the user to choose and upload a file.</p>
+ * Client-side support: the public API of the <code>deepamehta-files</code> plugin provides a method
+ * <code>dm4c.get_plugin("de.deepamehta.files").open_upload_dialog()</code> that allows the user to
+ * choose and upload a file.</p>
  * <p>
  * At server-side a plugin accesses the upload file via the
  * {@link de.deepamehta.core.service.Plugin#executeCommandHook}. ### FIXDOC</p>
@@ -33,11 +34,6 @@ public class UploadedFile {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-    /* ### FIXME: not in use
-    public InputStream getInputStream() {
-        return fileItem.getInputStream();   // throws IOException
-    } */
 
     /**
      * Returns the original (client-side) file name.

@@ -1,5 +1,7 @@
 dm4c.add_plugin("de.deepamehta.files", function() {
 
+    var self = this
+
     // === REST Client Extension ===
 
     dm4c.restc.create_file_topic = function(path) {
@@ -150,13 +152,14 @@ dm4c.add_plugin("de.deepamehta.files", function() {
 
         function do_open_upload_dialog() {
             var path = topic.get("dm4.files.path")
-            dm4c.upload_dialog.open(path, show_response)
+            self.open_upload_dialog(path, show_response)
 
             function show_response(response) {
                 alert("Upload response=" + JSON.stringify(response))
             }
         }
     })
+
 
 
     // ------------------------------------------------------------------------------------------------------ Public API
@@ -206,6 +209,51 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         }
     }
 
+    // ---
+
+    /**
+     * @param   path        the file repository path (a string) to upload the selected file to. Must begin with "/".
+     * @param   callback    the function that is invoked once the file has been uploaded and processed at server-side.
+     *                      One argument is passed to that function: the object (deserialzed JSON)
+     *                      returned by the (server-side) executeCommandHook. ### FIXDOC
+     */
+    this.open_upload_dialog = (function() {
+
+        // 1) install upload target
+        var upload_target = $("<iframe>", {name: "upload-target"}).hide()
+        $("body").append(upload_target)
+
+        // 2) create upload dialog
+        var upload_form = $("<form>", {
+            method:  "post",
+            enctype: "multipart/form-data",
+            target:  "upload-target"
+        })
+        .append($('<input type="file">').attr({name: "file", size: 60}))    // Note: attr() must be used here.
+        .append($('<input type="submit">').attr({value: "Upload"}))         // An attr object as 2nd param doesn't work!
+        //
+        var upload_dialog = dm4c.ui.dialog({title: "Upload File", content: upload_form})
+
+        // 3) create dialog handler
+        return function(path, callback) {
+            upload_form.attr("action", "/files/" + path)
+            upload_dialog.open()
+            // bind handler
+            upload_target.unbind("load")    // Note: the previous handler must be removed
+            upload_target.load(upload_complete)
+
+            function upload_complete() {
+                upload_dialog.close()
+                // Note: iframes must be accessed via window.frames
+                var response = $("pre", window.frames["upload-target"].document).text()
+                try {
+                    callback(JSON.parse(response))
+                } catch (e) {
+                    alert("Upload failed: \"" + response + "\"\n\nException=" + JSON.stringify(e))
+                }
+            }
+        }
+    })()
 
 
     // ------------------------------------------------------------------------------------------------- Private Classes
