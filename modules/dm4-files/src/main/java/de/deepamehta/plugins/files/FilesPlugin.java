@@ -70,7 +70,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     @Path("/file/{path:.+}")       // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public Topic createFileTopic(@PathParam("path") String path) {
-        String operation = "Creating file topic for request path \"" + path + "\"";
+        String operation = "Creating file topic for repository path \"" + path + "\"";
         try {
             logger.info(operation);
             // ### FIXME: drag'n'drop files from arbitrary locations (in particular different Windows drives)
@@ -101,7 +101,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     @Path("/folder/{path:.+}")     // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public Topic createFolderTopic(@PathParam("path") String path) {
-        String operation = "Creating folder topic for request path \"" + path + "\"";
+        String operation = "Creating folder topic for repository path \"" + path + "\"";
         try {
             logger.info(operation);
             // ### FIXME: drag'n'drop folders from arbitrary locations (in particular different Windows drives)
@@ -131,7 +131,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     // ---
 
     @POST
-    @Path("/{id}/file/{path:.+}")  // Note: we also match slashes as they are already decoded by an apache reverse proxy
+    @Path("/parent/{id}/file/{path:.+}")    // Note: we also match slashes as they are already decoded by an apache ...
     @Override
     public Topic createChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
         Topic childTopic = createFileTopic(path);
@@ -140,7 +140,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     }
 
     @POST
-    @Path("/{id}/folder/{path:.+}")// Note: we also match slashes as they are already decoded by an apache reverse proxy
+    @Path("/parent/{id}/folder/{path:.+}")  // Note: we also match slashes as they are already decoded by an apache ...
     @Override
     public Topic createChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
         Topic childTopic = createFolderTopic(path);
@@ -153,11 +153,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     // === File Repository ===
 
     @POST
-    @Path("/{path:.+}")
+    @Path("/{path:.+}")     // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Consumes("multipart/form-data")
     @Override
     public StoredFile storeFile(UploadedFile file, @PathParam("path") String path) {
-        String operation = "Storing " + file + " at request path \"" + path + "\"";
+        String operation = "Storing " + file + " at repository path \"" + path + "\"";
         try {
             logger.info(operation);
             // 1) enforce security
@@ -178,24 +178,42 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         }
     }
 
+    @POST
+    @Path("/{path:.+}/folder/{folder_name}") // Note: we also match slashes as they are already decoded by an apache ...
     @Override
-    public void createFolder(String folderName, String path) {
+    public void createFolder(@PathParam("folder_name") String folderName, @PathParam("path") String path) {
+        String operation = "Creating folder \"" + folderName + "\" at repository path \"" + path + "\"";
         try {
-            logger.info("folderName=\"" + folderName + "\", path=\"" + path + "\"");
-            // ### TODO
+            logger.info(operation);
+            // 1) enforce security
+            File directory = enforeSecurity(request, path);
+            //
+            // 2) create directory
+            File repoFile = repoFile(directory, folderName);
+            if (repoFile.exists()) {
+                throw new RuntimeException("File or directory \"" + repoFile + "\" already exists");
+            }
+            //
+            boolean success = repoFile.mkdir();
+            //
+            if (!success) {
+                throw new RuntimeException("The File.mkdir() call had no success (file=\"" + repoFile + "\")");
+            }
+            //
+        } catch (FileRepositoryException e) {
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Creating folder \"" + folderName +
-                "\" failed (path=\"" + path + "\")", e));
+            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
         }
     }
 
     // ---
 
     @GET
-    @Path("/{path:.+}/info") // Note: we also match slashes as they are already decoded by an apache reverse proxy
+    @Path("/{path:.+}/info")    // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public ResourceInfo getResourceInfo(@PathParam("path") String path) {
-        String operation = "Getting resource info for request path \"" + path + "\"";
+        String operation = "Getting resource info for repository path \"" + path + "\"";
         try {
             logger.info(operation);
             //
@@ -211,17 +229,16 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     }
 
     @GET
-    @Path("/{path:.+}")      // Note: we also match slashes as they are already decoded by an apache reverse proxy
+    @Path("/{path:.+}")         // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
     public DirectoryListing getDirectoryListing(@PathParam("path") String path) {
-        String operation = "Getting directory listing for request path \"" + path + "\"";
+        String operation = "Getting directory listing for repository path \"" + path + "\"";
         try {
             logger.info(operation);
             //
             File folder = enforeSecurity(request, path);
             //
-            // ### TODO: if folder is no directory send NOT FOUND
-            return new DirectoryListing(folder);
+            return new DirectoryListing(folder);    // ### TODO: if folder is no directory send NOT FOUND
             //
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
@@ -267,7 +284,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         try {
             String path = request.getRequestURI().substring(FILE_REPOSITORY_URI.length());
             path = JavaUtils.decodeURIComponent(path);
-            logger.info("### request path=\"" + path + "\"");
+            logger.info("### repository path=\"" + path + "\"");
             File file = enforeSecurity(request, path);
             return true;
         } catch (FileRepositoryException e) {
@@ -299,7 +316,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     // === File System Representation ===
 
     private Topic fetchFileTopic(File file) {
-        String path = truncate(file.getPath());
+        String path = repoPath(file);
         Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false, null);   // fetchComposite=false
         if (topic != null) {
             return topic.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole", "dm4.files.file",
@@ -309,7 +326,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     }
 
     private Topic fetchFolderTopic(File file) {
-        String path = truncate(file.getPath());
+        String path = repoPath(file);
         Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false, null);   // fetchComposite=false
         if (topic != null) {
             return topic.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole", "dm4.files.folder",
@@ -325,7 +342,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         //
         CompositeValue comp = new CompositeValue();
         comp.put("dm4.files.file_name", file.getName());
-        comp.put("dm4.files.path",      truncate(file.getPath()));
+        comp.put("dm4.files.path",      repoPath(file));
         if (mediaType != null) {
             comp.put("dm4.files.media_type", mediaType);
         }
@@ -336,7 +353,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     private Topic createFolderTopic(File file) {
         String folderName = file.getName();
-        String path = truncate(file.getPath());
+        String path = repoPath(file);
         //
         // root folder needs special treatment
         if (path.equals("/")) {
@@ -368,7 +385,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     // === File Repository ===
 
-    private File mapRequestPathToRepository(String path) {
+    /**
+     * Maps a repository path to a repository file.
+     */
+    private File repoFile(String path) {
         try {
             File file = new File(FILE_REPOSITORY_PATH, path);
             // Note 1: we use getCanonicalPath() to fight directory traversal attacks (../../).
@@ -376,7 +396,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             // Thats why "dm4.filerepo.path" is expected to have no "/" at the end as well.
             return file.getCanonicalFile();     // throws IOException
         } catch (Exception e) {
-            throw new RuntimeException("Mapping request path \"" + path + "\" to file repository failed", e);
+            throw new RuntimeException("Mapping repository path \"" + path + "\" to repository file failed", e);
         }
     }
 
@@ -384,14 +404,20 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
      * Calculates the storage location for the uploaded file.
      */
     private File repoFile(File directory, UploadedFile file) {
-        return JavaUtils.findUnusedFile(new File(directory, file.getName()));
+        return JavaUtils.findUnusedFile(repoFile(directory, file.getName()));
     }
 
+    private File repoFile(File directory, String fileName) {
+        return new File(directory, fileName);
+    }
+
+    // ---
+
     /**
-     * Truncates an absolute path to a request path.
+     * Maps a repository file to a repository path.
      */
-    private String truncate(String path) {
-        path = path.substring(FILE_REPOSITORY_PATH.length());
+    private String repoPath(File file) {
+        String path = file.getPath().substring(FILE_REPOSITORY_PATH.length());
         // root folder needs special treatment
         if (path.equals("")) {
             path = "/";
@@ -409,7 +435,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     private File enforeSecurity(HttpServletRequest request, String path) throws FileRepositoryException {
         checkRemoteAccess(request);
         //
-        File file = mapRequestPathToRepository(path);
+        File file = repoFile(path);
         checkFilePath(file);
         checkFileExistence(file);
         //
@@ -450,7 +476,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     private void checkFileExistence(File file) throws FileRepositoryException {
         if (!file.exists()) {
-            logger.info("File/directory \"" + file + "\" does not exist => NOT FOUND");
+            logger.info("File or directory \"" + file + "\" does not exist => NOT FOUND");
             throw new FileRepositoryException("\"" + file + "\" does not exist in file repository", Status.NOT_FOUND);
         }
     }

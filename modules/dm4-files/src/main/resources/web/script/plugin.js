@@ -10,21 +10,25 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     }
     //
     dm4c.restc.create_child_file_topic = function(folder_topic_id, path) {
-        return this.request("POST", "/files/" + folder_topic_id + "/file/" + encodeURIComponent(path))
+        return this.request("POST", "/files/parent/" + folder_topic_id + "/file/" + encodeURIComponent(path))
     }
     dm4c.restc.create_child_folder_topic = function(folder_topic_id, path) {
-        return this.request("POST", "/files/" + folder_topic_id + "/folder/" + encodeURIComponent(path))
+        return this.request("POST", "/files/parent/" + folder_topic_id + "/folder/" + encodeURIComponent(path))
     }
     //
     dm4c.restc.get_file = function(path) {
         // ### FIXME: principle copy in File Content Renderers's filerepo_URI()
         return this.request("GET", "/filerepo/" + encodeURIComponent(path))
     }
-    dm4c.restc.get_directory_listing = function(path) {
-        return this.request("GET", "/files/" + encodeURIComponent(path))
+    dm4c.restc.create_folder = function(folder_name, path) {
+        return this.request("POST", "/files/" + encodeURIComponent(path) + "/folder/" + encodeURIComponent(folder_name))
     }
+    //
     dm4c.restc.get_resource_info = function(path) {
         return this.request("GET", "/files/" + encodeURIComponent(path) + "/info")
+    }
+    dm4c.restc.get_directory_listing = function(path) {
+        return this.request("GET", "/files/" + encodeURIComponent(path))
     }
     //
     dm4c.restc.open_file = function(file_topic_id) {
@@ -139,6 +143,8 @@ dm4c.add_plugin("de.deepamehta.files", function() {
 
         function do_create_folder() {
             dm4c.ui.prompt("Create Folder", "Folder Name", "Create", function(folder_name) {
+                var path = topic.get("dm4.files.path")
+                dm4c.restc.create_folder(folder_name, path)
             })
         }
 
