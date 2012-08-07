@@ -10,10 +10,10 @@
     margin-top: 1em;
 }
 
-.login-ok {
+#login-message.ok {
     color: green;
 }
 
-.login-failed {
+#login-message.failed {
     color: red;
 }

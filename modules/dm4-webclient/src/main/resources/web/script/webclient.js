@@ -1080,6 +1080,17 @@ function Webclient() {
         dm4c.trigger_plugin_hook("post_refresh_create_menu", dm4c.toolbar.create_menu)
     }
 
+    // ---
+
+    // ### TODO: formulate this as an jQuery extension
+    this.on_return_key = function(element, callback) {
+        element.keyup(function(event) {
+            if (event.which == 13) {
+                callback();
+            }
+        })
+    }
+
     // === Images ===
 
     var image_tracker   // ### FIXME: the image tracker is global. There can only be one at a time.

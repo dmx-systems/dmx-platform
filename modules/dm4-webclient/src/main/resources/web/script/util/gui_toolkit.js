@@ -95,8 +95,17 @@ function GUIToolkit(config) {
                 dialog.dialog("open")
             }
 
-            this.close = function() {
-                dialog.dialog("close")
+            /**
+             * @paran   duration    Optional: determines how long the fade out animation will run (in milliseconds).
+             *                      If not specified (or 0) no animation is run (the dialog disappears immediately).
+             * @paran   callback    Optional: function to be called once the animation is complete.
+             */
+            this.close = function(duration, callback) {
+                duration = duration || 0
+                dialog.parent().fadeOut(duration, function() {
+                    dialog.dialog("close")
+                    callback && callback()
+                })
             }
 
             this.empty = function() {

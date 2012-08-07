@@ -44,6 +44,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     dm4c.add_listener("init", function() {
 
+        var login_dialog
+
         create_login_widget()
         create_login_dialog()
 
@@ -81,7 +83,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
                 function show_login() {
                     dom.append($("<a>").attr("href", "#").text("Login").click(function() {
-                        $("#login-dialog").dialog("open")
+                        login_dialog.open()
                         return false
                     }))
                 }
@@ -97,17 +99,29 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 .after($("<div>").addClass("field-label").text("Password"))
                 .after(password_input)
                 .after(message_div)
-            dm4c.ui.dialog("login-dialog", "Login", dialog_content, "auto", "OK", do_try_login)
+            login_dialog = dm4c.ui.dialog({
+                title: "Login",
+                content: dialog_content,
+                button_label: "OK",
+                button_handler: do_try_login
+            })
+            //
+            dm4c.on_return_key(username_input, function() {
+                password_input.focus();
+            })
+            dm4c.on_return_key(password_input, function() {
+                do_try_login();
+            })
 
             function do_try_login() {
                 var username = username_input.val()
                 var password = password_input.val()
                 var user = try_login(username, password)
                 if (user) {
-                    show_message("Login OK", "login-ok", close_login_dialog)
+                    show_message("Login OK", "ok", close_login_dialog)
                     self.do_login(user)
                 } else {
-                    show_message("Login failed", "login-failed")
+                    show_message("Login failed", "failed")
                 }
             }
 
@@ -118,9 +132,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             }
 
             function close_login_dialog() {
-                $("#login-dialog").parent().fadeOut(400, function() {
-                    $("#login-dialog").dialog("close")
-                    // clear fields for possible re-open
+                login_dialog.close(400, function() {
+                    // clear fields for next re-open
                     username_input.val("")
                     password_input.val("")
                     message_div.text("")
