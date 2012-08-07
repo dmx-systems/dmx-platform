@@ -214,6 +214,10 @@ body {
     margin-top: 1em;
 }
 
+.no-close-button .ui-dialog-titlebar-close {
+    display: none;
+}
+
 /*** Icons ***/
 
 .type-icon {

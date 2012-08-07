@@ -21,7 +21,3 @@
 #login-message.failed {
     color: red;
 }
-
-.no-close-button .ui-dialog-titlebar-close {
-    display: none;
-}
