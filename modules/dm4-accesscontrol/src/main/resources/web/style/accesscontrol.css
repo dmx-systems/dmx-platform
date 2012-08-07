@@ -1,9 +1,13 @@
+/* Login Widget */
+
 #login-widget {
     position: absolute;
     top: 0.4em;
     right: 1.2em;
     font-size: 60%;
 }
+
+/* Login Dialog */
 
 #login-message {
     font-weight: bold;
@@ -16,4 +20,8 @@
 
 #login-message.failed {
     color: red;
+}
+
+.no-close-button .ui-dialog-titlebar-close {
+    display: none;
 }

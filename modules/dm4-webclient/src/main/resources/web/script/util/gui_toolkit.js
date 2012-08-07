@@ -91,7 +91,10 @@ function GUIToolkit(config) {
             $("body").append(dialog)
             dialog.dialog(options)
 
-            this.open = function() {
+            this.open = function(no_close_button) {
+                dialog.dialog("option", "dialogClass",    no_close_button ? "no-close-button" : "")
+                dialog.dialog("option", "closeOnEscape", !no_close_button)
+                //
                 dialog.dialog("open")
             }
 
