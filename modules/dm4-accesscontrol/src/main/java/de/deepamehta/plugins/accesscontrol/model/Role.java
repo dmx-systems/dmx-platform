@@ -10,11 +10,18 @@ public enum Role {
     CREATOR("dm4.accesscontrol.role_creator"),
     OWNER("dm4.accesscontrol.role_owner"),
     MEMBER("dm4.accesscontrol.role_member"),
+    USER("dm4.accesscontrol.role_user"),
     EVERYONE("dm4.accesscontrol.role_everyone");
+
+    // ------------------------------------------------------------------------------------------------- Class Variables
+
+    private static Map<String, Role> roles;
+
+    // ---------------------------------------------------------------------------------------------- Instance Variables
 
     public final String uri;
 
-    private static Map<String, Role> roles;
+    // ---------------------------------------------------------------------------------------------------- Constructors
 
     private Role(String uri) {
         this.uri = uri;

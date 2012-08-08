@@ -209,6 +209,11 @@
             type_uri: "dm4.accesscontrol.role"
         },
         {
+            value:    "User",
+            uri:      "dm4.accesscontrol.role_user",
+            type_uri: "dm4.accesscontrol.role"
+        },
+        {
             value:    "Everyone",
             uri:      "dm4.accesscontrol.role_everyone",
             type_uri: "dm4.accesscontrol.role"

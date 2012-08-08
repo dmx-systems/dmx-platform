@@ -364,15 +364,24 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === ACL Entries ===
 
+    /**
+     * Checks if a user is allowed to perform an operation on a topic.
+     * In this case <code>true</code> is returned.
+     *
+     * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
+     *                      or <code>null</code> if no user is logged in.
+     */
     private boolean hasPermission(Topic username, Operation operation, long topicId) {
         Topic topic = dms.getTopic(topicId, false, null);
         return hasPermission(username, operation, topic);
     }
 
     /**
-     * Returns true if the user is allowed to perform an operation on a topic.
+     * Checks if a user is allowed to perform an operation on a topic.
+     * In this case <code>true</code> is returned.
      *
-     * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
+     * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
+     *                      or <code>null</code> if no user is logged in.
      */
     private boolean hasPermission(Topic username, Operation operation, Topic topic) {
         logger.fine("Determining permission for " + userInfo(username) + " to " + operation + " " + info(topic));
@@ -393,7 +402,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     /**
-     * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
+     * Checks if a user occupies a role with regard to the specified topic.
+     * In this case <code>true</code> is returned.
+     *
+     * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
+     *                      or <code>null</code> if no user is logged in.
      */
     private boolean userOccupiesRole(Topic topic, Topic username, String roleUri) {
         //
@@ -405,7 +418,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return false;
         }
         //
-        if (roleUri.equals("dm4.accesscontrol.role_member")) {
+        if (roleUri.equals("dm4.accesscontrol.role_user")) {
+            return true;
+        } else if (roleUri.equals("dm4.accesscontrol.role_member")) {
             if (userIsMember(username, topic)) {
                 return true;
             }
@@ -426,7 +441,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     /**
-     * Returns true if the user is a member of a workspace the topic type is assigned to.
+     * Checks if a user is a member of a workspace the topic type is assigned to.
+     * In this case <code>true</code> is returned.
+     *
+     * Prerequisite: a user is logged in (<code>username</code> is not <code>null</code>).
      *
      * FIXME: for the moment only implemented for types, not for regular topics.
      *
@@ -448,7 +466,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     /**
-     * Returns true if the user is the owner of the topic.
+     * Checks if a user is the owner of the topic.
+     * In this case <code>true</code> is returned.
+     *
+     * Prerequisite: a user is logged in (<code>username</code> is not <code>null</code>).
      *
      * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
      */
@@ -459,7 +480,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     /**
-     * Returns true if the user is the creator of the topic.
+     * Checks if a user is the creator of the topic.
+     * In this case <code>true</code> is returned.
+     *
+     * Prerequisite: a user is logged in (<code>username</code> is not <code>null</code>).
      *
      * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
      */
