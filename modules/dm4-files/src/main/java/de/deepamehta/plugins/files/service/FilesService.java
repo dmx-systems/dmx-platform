@@ -58,5 +58,7 @@ public interface FilesService extends PluginService {
 
     // ---
 
+    File getFile(long fileTopicId);
+
     void openFile(long fileTopicId);
 }

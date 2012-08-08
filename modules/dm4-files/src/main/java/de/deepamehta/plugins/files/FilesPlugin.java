@@ -249,15 +249,32 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     // ---
 
+    // Note: this is not a resource method.
+    // To access a file remotely use the /filerepo resource.
+    @Override
+    public File getFile(long fileTopicId) {
+        String operation = "Getting the file represented by file topic " + fileTopicId;
+        try {
+            logger.info(operation);
+            String path = repoPath(fileTopicId);
+            //
+            File file = enforeSecurity(request, path);
+            //
+            return file;
+            //
+        } catch (Exception e) {
+            throw new RuntimeException(operation + " failed", e);
+        }
+    }
+
     @POST
     @Path("/open/{id}")
     @Override
     public void openFile(@PathParam("id") long fileTopicId) {
-        String operation = "Opening file of topic " + fileTopicId;
+        String operation = "Opening the file represented by file topic " + fileTopicId;
         try {
             logger.info(operation);
-            Topic fileTopic = dms.getTopic(fileTopicId, true, null);    // fetchComposite=true, clientState=null
-            String path = fileTopic.getCompositeValue().getString("dm4.files.path");
+            String path = repoPath(fileTopicId);
             //
             File file = enforeSecurity(request, path);
             //
@@ -426,6 +443,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         return path;
         // ### TODO: there is a principle copy in DirectoryListing
         // ### FIXME: Windows drive letter? See DirectoryListing
+    }
+
+    private String repoPath(long fileTopicId) {
+        Topic fileTopic = dms.getTopic(fileTopicId, true, null);    // fetchComposite=true, clientState=null
+        return fileTopic.getCompositeValue().getString("dm4.files.path");
     }
 
 
