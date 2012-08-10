@@ -3,6 +3,7 @@ package de.deepamehta.core.impl.service;
 import de.deepamehta.core.service.SecurityHandler;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 import org.osgi.framework.Bundle;
@@ -31,13 +32,13 @@ public class WebPublishingService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DefaultResourceConfig rootApplication = new DefaultResourceConfig();
+    private DefaultResourceConfig rootApplication;
     private int classCount = 0;         // counts DM root resource and provider classes
     private int singletonCount = 0;     // counts DM root resource and provider instances
     // Note: we count DM resources separately as Jersey adds its own ones to the application.
     // Once the total DM resource count reaches 0 the Jersey servlet is unregistered.
 
-    private ServletContainer jerseyServlet = new ServletContainer(rootApplication);
+    private ServletContainer jerseyServlet;
     private boolean isJerseyServletRegistered = false;
 
     private HttpService httpService;
@@ -49,8 +50,19 @@ public class WebPublishingService {
 
     public WebPublishingService(BundleContext context, HttpService httpService) {
         try {
-            logger.info("Registering Web Publishing service at OSGi framework");
             this.httpService = httpService;
+            //
+            // create web application
+            this.rootApplication = new DefaultResourceConfig();
+            //
+            // setup request filter ### FIXME: experimental
+            rootApplication.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                new JerseyRequestFilter());
+            //
+            // deploy it in container
+            this.jerseyServlet = new ServletContainer(rootApplication);
+            //
+            logger.info("Registering Web Publishing service at OSGi framework");
             this.registration = context.registerService(getClass().getName(), this, null);
         } catch (Exception e) {
             // unregister...();     // ### TODO?
