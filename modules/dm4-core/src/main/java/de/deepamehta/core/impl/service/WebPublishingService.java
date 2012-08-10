@@ -6,8 +6,11 @@ import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
+import org.apache.felix.http.api.ExtHttpService;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
@@ -51,6 +54,16 @@ public class WebPublishingService {
     public WebPublishingService(BundleContext context, HttpService httpService) {
         try {
             this.httpService = httpService;
+            //
+            // setup filter
+            ServiceReference sRef = context.getServiceReference(ExtHttpService.class.getName());
+            if (sRef != null) {
+                ExtHttpService service = (ExtHttpService) context.getService(sRef);
+                // Dictionary initParams = null, int ranking = 0, HttpContext context = null
+                service.registerFilter(new RequestFilter(), "/.*", null, 0, null);
+            } else {
+                throw new RuntimeException("ExtHttpService not available");
+            }
             //
             // create web application
             this.rootApplication = new DefaultResourceConfig();

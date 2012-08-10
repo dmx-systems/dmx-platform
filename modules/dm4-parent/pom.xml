@@ -96,6 +96,14 @@
                 <scope>provided</scope>
                 <optional>true</optional>
             </dependency>
+            <!-- Felix HTTP API -->
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.http.api</artifactId>
+                <version>2.2.0</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
             <!-- Testing -->
             <dependency>
                 <groupId>junit</groupId>
