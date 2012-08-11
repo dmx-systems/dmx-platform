@@ -20,6 +20,7 @@
     <!-- Note: the dm4.database.path property is required by both, the 'run' and the 'neo4j' profile. -->
     <!-- The other dm4.* properties are required by 'run' only. They are placed here for clarity.     -->
     <properties>
+        <dm4.installation.type>PRIVATE</dm4.installation.type><!-- SINGLE_USER, PRIVATE, PUBLIC, SANDBOX -->
         <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
         <dm4.filerepo.path></dm4.filerepo.path>
         <dm4.filerepo.netfilter>127.0.0.1/32</dm4.filerepo.netfilter>

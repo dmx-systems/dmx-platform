@@ -122,13 +122,16 @@ public class CoreActivator implements BundleActivator {
 
         @Override
         public Object addingService(ServiceReference serviceRef) {
+            // ### TODO: should we catch exceptions here?
+            // ### If HttpService is available on open() the exception is catched in start() -> OK.
+            // ### If HttpService is not available on open() the exception is thrown through the OSGi container
+            // ### and the stacktrace is not logged.
             Object service = super.addingService(serviceRef);
             if (service instanceof HttpService) {
                 logger.info("Adding HTTP service to DeepaMehta 4 Core");
                 httpService = (HttpService) service;
                 new WebPublishingService(context, httpService);
             }
-            //
             return service;
         }
 

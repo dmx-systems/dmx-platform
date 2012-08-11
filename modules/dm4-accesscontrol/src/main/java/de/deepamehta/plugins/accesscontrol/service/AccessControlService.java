@@ -10,6 +10,12 @@ import de.deepamehta.core.service.PluginService;
 
 public interface AccessControlService extends PluginService {
 
+    /**
+     * Looks up a user account by username.
+     *
+     * @return  a Topic of type "User Account" (<code>dm4.accesscontrol.user_account</code>),
+     *          or <code>null</code> if no such user account exists.
+     */
     Topic lookupUserAccount(String username);
 
     /**

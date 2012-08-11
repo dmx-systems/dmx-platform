@@ -53,17 +53,10 @@ public class WebPublishingService {
 
     public WebPublishingService(BundleContext context, HttpService httpService) {
         try {
-            this.httpService = httpService;
+            logger.info("Setting up the Web Publishing service");
             //
-            // setup filter
-            ServiceReference sRef = context.getServiceReference(ExtHttpService.class.getName());
-            if (sRef != null) {
-                ExtHttpService service = (ExtHttpService) context.getService(sRef);
-                // Dictionary initParams = null, int ranking = 0, HttpContext context = null
-                service.registerFilter(new RequestFilter(), "/.*", null, 0, null);
-            } else {
-                throw new RuntimeException("ExtHttpService not available");
-            }
+            // setup security filter
+            setupSecurityFilter(context);
             //
             // create web application
             this.rootApplication = new DefaultResourceConfig();
@@ -72,14 +65,15 @@ public class WebPublishingService {
             rootApplication.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
                 new JerseyRequestFilter());
             //
-            // deploy it in container
+            // deploy web application in container
             this.jerseyServlet = new ServletContainer(rootApplication);
+            this.httpService = httpService;
             //
             logger.info("Registering Web Publishing service at OSGi framework");
             this.registration = context.registerService(getClass().getName(), this, null);
         } catch (Exception e) {
             // unregister...();     // ### TODO?
-            throw new RuntimeException("Registering Web Publishing service at OSGi framework failed", e);
+            throw new RuntimeException("Setting up the Web Publishing service failed", e);
         }
     }
 
@@ -239,6 +233,23 @@ public class WebPublishingService {
     private void reloadJerseyServlet() {
         logger.fine("##### Reloading Jersey servlet");
         jerseyServlet.reload();
+    }
+
+    // ---
+
+    private void setupSecurityFilter(BundleContext context) {
+        try {
+            ServiceReference sRef = context.getServiceReference(ExtHttpService.class.getName());
+            if (sRef != null) {
+                ExtHttpService service = (ExtHttpService) context.getService(sRef);
+                // Dictionary initParams = null, int ranking = 0, HttpContext context = null
+                service.registerFilter(new SecurityFilter(), "/.*", null, 0, null);
+            } else {
+                throw new RuntimeException("ExtHttpService not available");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Setting up the security filter failed", e);
+        }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Classes
