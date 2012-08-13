@@ -99,6 +99,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
+    @Override
+    public Topic login(String username, String password) {
+        Topic userName = getUsername(username);
+        if (userName == null) {
+            return null;
+        }
+        if (!matches(userName, password)) {
+            return null;
+        }
+        return userName;
+    }
+
     @GET
     @Path("/user/{username}")
     @Override
@@ -304,33 +316,49 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     /**
-     * Returns a user account by username, or <code>null</code> if no such user account exists.
+     * Retrieves the User Account for the specified username.
      *
-     * @return  a Topic of type "User Account" (<code>dm4.accesscontrol.user_account</code>).
+     * @return  the retrieved User Account (a Topic of type "User Account" /
+     *          <code>dm4.accesscontrol.user_account</code>), or <code>null</code> if no such User Account exists.
      */
     private Topic getUserAccount(String username) {
         Topic userName = getUsername(username);
         if (userName == null) {
             return null;
         }
-        return userName.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole",
-            "dm4.accesscontrol.user_account", true, false, null);  // fetchComposite=true, fetchRelatingComposite=false
+        return getUserAccount(userName);
     }
 
     /**
-     * Returns the "Username" topic that corresponds to a username, or <code>null</code> if no such username exists.
+     * Prerequisite: username is not <code>null</code>.
+     */
+    private Topic getUserAccount(Topic username) {
+        Topic userAccount = username.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole",
+            "dm4.accesscontrol.user_account", true, false, null);  // fetchComposite=true, fetchRelatingComposite=false
+        if (userAccount == null) {
+            throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
+                username.getSimpleValue() + "\" (username=" + username + ")");
+        }
+        return userAccount;
+    }
+
+    // ---
+
+    /**
+     * Retrieves the "Username" topic for the specified username.
      *
-     * @return  a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
+     * @return  The retrieved Username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
+     *          or <code>null</code> if no such Username topic exists.
      */
     private Topic getUsername(String username) {
         return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username), false, null);
     }
 
     /**
-     * Returns the "Username" topic that corresponds to the "admin" user.
+     * Retrieves the "Username" topic for the "admin" user.
      * If the "admin" user doesn't exist an exception is thrown.
      *
-     * @return  a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
+     * @return  The retrieved Username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>).
      */
     private Topic getAdminUser() {
         Topic username = getUsername(DEFAULT_USERNAME);
@@ -342,8 +370,25 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
+    /**
+     * @return  The encryted password of the specified User Account.
+     */
+    private String getPassword(Topic userAccount) {
+        return userAccount.getCompositeValue().getString("dm4.accesscontrol.password");
+    }
+
     private String encryptPassword(String password) {
         return ENCRYPTED_PASSWORD_PREFIX + JavaUtils.encodeSHA256(password);
+    }
+
+    /**
+     * Prerequisite: username is not <code>null</code>.
+     *
+     * @param   password    The plain text password.
+     */
+    private boolean matches(Topic username, String password) {
+        String encryptedPassword = getPassword(getUserAccount(username));
+        return encryptedPassword.equals(encryptPassword(password));
     }
 
     // ---

@@ -11,6 +11,20 @@ import de.deepamehta.core.service.PluginService;
 public interface AccessControlService extends PluginService {
 
     /**
+     * Checks weather the username and the plain text password match an existing User Account.
+     *
+     * Note: this is not a resource method (can't be invoked via HTTP) as plain text passwords are not supposed to be
+     * send over the wire. This method is used by server-side plugins who process the credentials obtained through
+     * Basic authorization (which sends the plain text password over the wire).
+     *
+     * @param   password    The plain text password.
+     *
+     * @return  The username of the matched User Account (a Topic of type "Username" /
+     *          <code>dm4.accesscontrol.username</code>), or <code>null</code> if there is no matching User Account.
+     */
+    Topic login(String username, String password);
+
+    /**
      * Looks up a user account by username.
      *
      * @return  a Topic of type "User Account" (<code>dm4.accesscontrol.user_account</code>),

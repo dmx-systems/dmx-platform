@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl.service;
 
-import com.sun.jersey.core.util.Base64;
+import de.deepamehta.core.Topic;
+import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -13,8 +14,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import java.io.IOException;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
+import com.sun.jersey.core.util.Base64;
+
+import java.io.IOException;
 import java.util.logging.Logger;
 
 
@@ -27,15 +32,17 @@ class SecurityFilter implements Filter {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    BundleContext context;
     private InstallationType installationType;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    SecurityFilter() {
+    SecurityFilter(BundleContext context) {
         try {
-            installationType = InstallationType.valueOf(INSTALLATION_TYPE);
+            this.context = context;
+            this.installationType = InstallationType.valueOf(INSTALLATION_TYPE);
             logger.info("########## Installation type is \"" + installationType + "\"");
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("\"" + INSTALLATION_TYPE + "\" is an unexpected installation type");
@@ -53,8 +60,11 @@ class SecurityFilter implements Filter {
                                                                                                      ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
+        String authHeader = req.getHeader("Authorization");
         HttpSession session = req.getSession(false);
-        logger.info("#####      " + req.getRequestURL() + "\n      #####      " + session);
+        logger.info("#####      " + req.getRequestURL() +
+            "\n      #####      \"Authorization\"=" + authHeader +
+            "\n      #####      session=" + session);
         //
         boolean isReadRequest = req.getMethod().equals("GET");
         boolean loginRequired = !installationType.lookup(isReadRequest);
@@ -63,12 +73,15 @@ class SecurityFilter implements Filter {
             if (session != null) {
                 allowed = true;
             } else {
-                String authHeader = req.getHeader("Authorization");
                 if (authHeader != null) {
                     Credentials cred = new Credentials(authHeader);
-                    logger.info("#####      \"Authorization\" header: \"" + authHeader + "\" => " + cred);
-                } else {
-                    logger.info("#####      \"Authorization\" header: " + authHeader);
+                    Topic username = getAccessControlService().login(cred.username, cred.password);
+                    if (username != null) {
+                        logger.info("#####      Logging in with " + cred + " SUCCESSFUL!");
+                        allowed = true;
+                    } else {
+                        logger.info("#####      Logging in with " + cred + " FAILED!");
+                    }
                 }
             }
         } else {
@@ -78,10 +91,7 @@ class SecurityFilter implements Filter {
         if (allowed) {
             chain.doFilter(request, response);
         } else {
-            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            resp.setHeader("WWW-Authenticate", "Basic realm=\"DeepaMehta\"");
-            resp.setHeader("Content-Type", "text/html");    // for text/plain (default) Safari provides no Web Console
-            resp.getWriter().println("Not authorized. Sorry.");
+            unauthorized(resp);
         }
     }
 
@@ -92,6 +102,26 @@ class SecurityFilter implements Filter {
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private AccessControlService getAccessControlService() {
+        // ### TODO: should we use a service tracker instead?
+        ServiceReference sRef = context.getServiceReference(AccessControlService.class.getName());
+        if (sRef != null) {
+            // ### TODO: should we unget the service after each use?
+            return (AccessControlService) context.getService(sRef);
+        } else {
+            throw new RuntimeException("AccessControlService not available");
+        }
+    }
+
+    private void unauthorized(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setHeader("WWW-Authenticate", "Basic realm=\"DeepaMehta\"");
+        response.setHeader("Content-Type", "text/html");    // for text/plain (default) Safari provides no Web Console
+        response.getWriter().println("Not authorized. Sorry.");     // throws IOException
+    }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 

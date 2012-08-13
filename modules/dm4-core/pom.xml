@@ -18,6 +18,12 @@
     </parent>
 
     <dependencies>
+        <!-- Access Control plugin -->
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-accesscontrol</artifactId>
+            <version>4.0.12-SNAPSHOT</version>
+        </dependency>
         <!-- Neo4j Metagraph -->
         <dependency>
             <groupId>de.deepamehta</groupId>

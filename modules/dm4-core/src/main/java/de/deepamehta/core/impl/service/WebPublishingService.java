@@ -243,7 +243,7 @@ public class WebPublishingService {
             if (sRef != null) {
                 ExtHttpService service = (ExtHttpService) context.getService(sRef);
                 // Dictionary initParams = null, int ranking = 0, HttpContext context = null
-                service.registerFilter(new SecurityFilter(), "/.*", null, 0, null);
+                service.registerFilter(new SecurityFilter(context), "/.*", null, 0, null);
             } else {
                 throw new RuntimeException("ExtHttpService not available");
             }
