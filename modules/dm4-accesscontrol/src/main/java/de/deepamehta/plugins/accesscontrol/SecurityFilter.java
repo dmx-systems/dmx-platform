@@ -113,12 +113,11 @@ class SecurityFilter implements Filter {
     
     // ### FIXME: there is a principal copy in AccessControlPlugin
     private String getUsername(HttpSession session) {
-        Object username = session.getAttribute("username");
-        logger.info("#####      Username in session: " + username);
+        Topic username = (Topic) session.getAttribute("username");
         if (username == null) {
             throw new RuntimeException("Session data inconsistency: \"username\" attribute is missing");
         }
-        return ((Topic) username).getSimpleValue().toString();
+        return username.getSimpleValue().toString();
     }
 
     // ---
