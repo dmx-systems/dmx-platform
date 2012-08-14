@@ -1,4 +1,4 @@
-package de.deepamehta.core.impl.service;
+package de.deepamehta.plugins.accesscontrol;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
@@ -32,16 +32,16 @@ class SecurityFilter implements Filter {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    BundleContext context;
+    AccessControlService acService;
     private InstallationType installationType;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    SecurityFilter(BundleContext context) {
+    SecurityFilter(AccessControlService acService) {
         try {
-            this.context = context;
+            this.acService = acService;
             this.installationType = InstallationType.valueOf(INSTALLATION_TYPE);
             logger.info("########## Installation type is \"" + installationType + "\"");
         } catch (IllegalArgumentException e) {
@@ -61,10 +61,10 @@ class SecurityFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
         String authHeader = req.getHeader("Authorization");
-        HttpSession session = req.getSession(false);
+        HttpSession session = req.getSession(false);    // create=false
         logger.info("#####      " + req.getRequestURL() +
-            "\n      #####      \"Authorization\"=" + authHeader +
-            "\n      #####      session=" + session);
+            "\n      #####      \"Authorization\"=\"" + authHeader + "\"" + 
+            "\n      #####      " + info(session));
         //
         boolean isReadRequest = req.getMethod().equals("GET");
         boolean loginRequired = !installationType.lookup(isReadRequest);
@@ -75,12 +75,15 @@ class SecurityFilter implements Filter {
             } else {
                 if (authHeader != null) {
                     Credentials cred = new Credentials(authHeader);
-                    Topic username = getAccessControlService().login(cred.username, cred.password);
+                    Topic username = acService.checkCredentials(cred.username, cred.password);
                     if (username != null) {
-                        logger.info("#####      Logging in with " + cred + " SUCCESSFUL!");
+                        session = req.getSession();
+                        session.setAttribute("username", username);
+                        logger.info("#####      Logging in with " + cred + " => SUCCESSFUL!" +
+                            "\n      #####      Creating new " + info(session));
                         allowed = true;
                     } else {
-                        logger.info("#####      Logging in with " + cred + " FAILED!");
+                        logger.info("#####      Logging in with " + cred + " => FAILED!");
                     }
                 }
             }
@@ -103,16 +106,22 @@ class SecurityFilter implements Filter {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private AccessControlService getAccessControlService() {
-        // ### TODO: should we use a service tracker instead?
-        ServiceReference sRef = context.getServiceReference(AccessControlService.class.getName());
-        if (sRef != null) {
-            // ### TODO: should we unget the service after each use?
-            return (AccessControlService) context.getService(sRef);
-        } else {
-            throw new RuntimeException("AccessControlService not available");
-        }
+    private String info(HttpSession session) {
+        return "session" + (session != null ? " " + session.getId() +
+            " (username=\"" + getUsername(session) + "\")" : ": null");
     }
+    
+    // ### FIXME: there is a principal copy in AccessControlPlugin
+    private String getUsername(HttpSession session) {
+        Object username = session.getAttribute("username");
+        logger.info("#####      Username in session: " + username);
+        if (username == null) {
+            throw new RuntimeException("Session data inconsistency: \"username\" attribute is missing");
+        }
+        return ((Topic) username).getSimpleValue().toString();
+    }
+
+    // ---
 
     private void unauthorized(HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

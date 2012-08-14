@@ -6,6 +6,11 @@ import de.deepamehta.core.impl.service.PluginImpl;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+
+import org.apache.felix.http.api.ExtHttpService;
+
+import javax.servlet.Filter;
 
 import java.util.logging.Logger;
 
@@ -99,5 +104,20 @@ public class PluginActivator implements BundleActivator, PluginContext {
      */
     protected void publishDirectory(String directoryPath, String uriNamespace, SecurityHandler securityHandler) {
         plugin.publishDirectory(directoryPath, uriNamespace, securityHandler);
+    }
+
+    protected void registerFilter(Filter filter) {
+        try {
+            ServiceReference sRef = bundleContext.getServiceReference(ExtHttpService.class.getName());
+            if (sRef != null) {
+                ExtHttpService service = (ExtHttpService) bundleContext.getService(sRef);
+                // Dictionary initParams = null, int ranking = 0, HttpContext context = null
+                service.registerFilter(filter, "/.*", null, 0, null);
+            } else {
+                throw new RuntimeException("ExtHttpService not available");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Registering filter " + filter + " failed", e);
+        }
     }
 }

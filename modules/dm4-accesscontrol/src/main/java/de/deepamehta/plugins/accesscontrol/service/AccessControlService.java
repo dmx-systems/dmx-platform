@@ -22,26 +22,27 @@ public interface AccessControlService extends PluginService {
      * @return  The username of the matched User Account (a Topic of type "Username" /
      *          <code>dm4.accesscontrol.username</code>), or <code>null</code> if there is no matching User Account.
      */
-    Topic login(String username, String password);
+    Topic checkCredentials(String username, String password);
 
     /**
      * Looks up a user account by username.
      *
-     * @return  a Topic of type "User Account" (<code>dm4.accesscontrol.user_account</code>),
+     * @return  the user account (a Topic of type "User Account" / <code>dm4.accesscontrol.user_account</code>),
      *          or <code>null</code> if no such user account exists.
      */
     Topic lookupUserAccount(String username);
 
     /**
-     * Returns the username that is represented by the client state, or <code>null</code> if no user is logged in.
+     * Returns the username of the logged in user.
      *
-     * @return  a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
+     * @return  the username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
+     *          or <code>null</code> if no user is logged in.
      */
-    Topic getUsername(ClientState clientState);
+    Topic getUsername();
 
     // ---
 
-    Permissions getTopicPermissions(long topicId, ClientState clientState);
+    Permissions getTopicPermissions(long topicId);
 
     // ---
 

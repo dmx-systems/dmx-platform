@@ -6,11 +6,8 @@ import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
-import org.apache.felix.http.api.ExtHttpService;
-
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
@@ -54,9 +51,6 @@ public class WebPublishingService {
     public WebPublishingService(BundleContext context, HttpService httpService) {
         try {
             logger.info("Setting up the Web Publishing service");
-            //
-            // setup security filter
-            setupSecurityFilter(context);
             //
             // create web application
             this.rootApplication = new DefaultResourceConfig();
@@ -233,23 +227,6 @@ public class WebPublishingService {
     private void reloadJerseyServlet() {
         logger.fine("##### Reloading Jersey servlet");
         jerseyServlet.reload();
-    }
-
-    // ---
-
-    private void setupSecurityFilter(BundleContext context) {
-        try {
-            ServiceReference sRef = context.getServiceReference(ExtHttpService.class.getName());
-            if (sRef != null) {
-                ExtHttpService service = (ExtHttpService) context.getService(sRef);
-                // Dictionary initParams = null, int ranking = 0, HttpContext context = null
-                service.registerFilter(new SecurityFilter(context), "/.*", null, 0, null);
-            } else {
-                throw new RuntimeException("ExtHttpService not available");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Setting up the security filter failed", e);
-        }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Classes

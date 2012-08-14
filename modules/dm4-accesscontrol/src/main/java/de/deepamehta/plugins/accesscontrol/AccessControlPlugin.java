@@ -20,6 +20,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.listener.InitializePluginListener;
 import de.deepamehta.core.service.listener.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.listener.PostCreateTopicListener;
 import de.deepamehta.core.service.listener.PreSendTopicListener;
@@ -28,6 +29,9 @@ import de.deepamehta.core.service.listener.PostInstallPluginListener;
 import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
 import de.deepamehta.core.service.listener.PluginServiceGoneListener;
 import de.deepamehta.core.util.JavaUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -41,7 +45,7 @@ import javax.ws.rs.CookieParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.Context;
 
 import static java.util.Arrays.asList;
 import java.util.HashMap;
@@ -55,7 +59,8 @@ import java.util.logging.Logger;
 @Path("/accesscontrol")
 @Consumes("application/json")
 @Produces("application/json")
-public class AccessControlPlugin extends PluginActivator implements AccessControlService, PostCreateTopicListener,
+public class AccessControlPlugin extends PluginActivator implements AccessControlService, InitializePluginListener,
+                                                                                          PostCreateTopicListener,
                                                                                           PreSendTopicListener,
                                                                                           PreSendTopicTypeListener,
                                                                                           PostInstallPluginListener,
@@ -87,6 +92,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private FacetsService facetsService;
     private WorkspacesService wsService;
 
+    @Context
+    private HttpServletRequest request;
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -100,7 +108,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     @Override
-    public Topic login(String username, String password) {
+    public Topic checkCredentials(String username, String password) {
         Topic userName = getUsername(username);
         if (userName == null) {
             return null;
@@ -122,15 +130,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @GET
     @Path("/user")
     @Override
-    public Topic getUsername(@HeaderParam("Cookie") ClientState clientState) {
-        if (clientState == null) {      // some callers to dms.getTopic() doesn't pass a client state
+    public Topic getUsername() {
+        HttpSession session = request.getSession(false);    // create=false
+        if (session == null) {
             return null;
         }
-        String username = clientState.get("dm4_username");
-        if (username == null) {
-            return null;
-        }
-        return getUsername(username);
+        return getUsername(session);
     }
 
     // ---
@@ -138,10 +143,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @GET
     @Path("/topic/{topic_id}")
     @Override
-    public Permissions getTopicPermissions(@PathParam("topic_id") long topicId,
-                                           @HeaderParam("Cookie") ClientState clientState) {
-        Topic username = getUsername(clientState);
-        return permissions(hasPermission(username, Operation.WRITE, topicId));
+    public Permissions getTopicPermissions(@PathParam("topic_id") long topicId) {
+        return permissions(hasPermission(getUsername(), Operation.WRITE, topicId));
     }
 
     // ---
@@ -210,13 +213,22 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     @Override
+    public void initializePlugin() {
+        try {
+            registerFilter(new SecurityFilter(this));
+        } catch (Exception e) {
+            throw new RuntimeException("Registering the security filter failed", e);
+        }
+    }
+
+    @Override
     public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
         // ### TODO: explain
         if (isPluginTopic(topic)) {
             return;
         }
         //
-        setCreator(topic, clientState);
+        setCreator(topic);
         createACLEntry(topic, Role.CREATOR, DEFAULT_TOPIC_PERMISSIONS);
     }
 
@@ -240,7 +252,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return;
         }
         //
-        setCreator(topicType, clientState);
+        setCreator(topicType);
         createACLEntry(topicType, Role.CREATOR, DEFAULT_TYPE_PERMISSIONS);
     }
 
@@ -255,9 +267,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
         //
         logger.info("### Enriching " + info(topic) + " with its permissions (clientState=" + clientState + ")");
-        Topic username = getUsername(clientState);
-        enrichWithPermissions(topic,
-            hasPermission(username, Operation.WRITE, topic));
+        enrichWithPermissions(topic, hasPermission(getUsername(), Operation.WRITE, topic));
     }
 
     @Override
@@ -271,7 +281,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
         //
         logger.info("### Enriching topic type \"" + topicType.getUri() + "\" with its permissions");
-        Topic username = getUsername(clientState);
+        Topic username = getUsername();
         enrichWithPermissions(topicType,
             hasPermission(username, Operation.WRITE, topicType),
             hasPermission(username, Operation.CREATE, topicType));
@@ -354,6 +364,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username), false, null);
     }
 
+    // ### FIXME: there is a principal copy in SecurityFilter
+    private Topic getUsername(HttpSession session) {
+        Topic username = (Topic) session.getAttribute("username");
+        if (username == null) {
+            throw new RuntimeException("Session data inconsistency: \"username\" attribute is missing");
+        }
+        return username;
+    }
+
+    // ---
+
     /**
      * Retrieves the "Username" topic for the "admin" user.
      * If the "admin" user doesn't exist an exception is thrown.
@@ -393,8 +414,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    private void setCreator(Topic topic, ClientState clientState) {
-        Topic username = getUsername(clientState);
+    private void setCreator(Topic topic) {
+        Topic username = getUsername();
         if (username == null) {
             logger.warning("Assigning a creator to " + info(topic) + " failed (no user is logged in). " +
                 "Assigning user \"admin\" instead.");
