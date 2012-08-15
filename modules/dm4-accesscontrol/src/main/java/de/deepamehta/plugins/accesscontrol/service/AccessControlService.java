@@ -18,15 +18,9 @@ public interface AccessControlService extends PluginService {
      */
     Topic login(String username, String password);
 
-    // ---
+    void logout();
 
-    /**
-     * Looks up a user account by username. ### TODO: drop this method
-     *
-     * @return  the user account (a Topic of type "User Account" / <code>dm4.accesscontrol.user_account</code>),
-     *          or <code>null</code> if no such user account exists.
-     */
-    Topic lookupUserAccount(String username);
+    // ---
 
     /**
      * Returns the username of the logged in user.

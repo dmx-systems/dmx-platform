@@ -106,20 +106,21 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    @GET
+    @GET    // ### FIXME: should be POST (requires exception for request filter rules)
     @Path("/login/{username}/{password}")
     @Override
     public Topic login(@PathParam("username") String username, @PathParam("password") String password) {
         return login(username, password, request);
     }
 
-    @GET
-    @Path("/user/{username}")
+    @POST
+    @Path("/logout")
     @Override
-    public Topic lookupUserAccount(@PathParam("username") String username) {
-        logger.info("username=\"" + username + "\"");
-        return getUserAccount(username);
+    public void logout() {
+        request.getSession(false).invalidate();             // create=false
     }
+
+    // ---
 
     @GET
     @Path("/user")
@@ -349,20 +350,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     /**
-     * Retrieves the User Account for the specified username.
-     *
-     * @return  the retrieved User Account (a Topic of type "User Account" /
-     *          <code>dm4.accesscontrol.user_account</code>), or <code>null</code> if no such User Account exists.
-     */
-    private Topic getUserAccount(String username) {
-        Topic userName = getUsername(username);
-        if (userName == null) {
-            return null;
-        }
-        return getUserAccount(userName);
-    }
-
-    /**
      * Prerequisite: username is not <code>null</code>.
      */
     private Topic getUserAccount(Topic username) {
@@ -428,7 +415,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         facetsService.updateFacet(topic, "dm4.accesscontrol.creator_facet", creatorModel(usernameId), null, null);
     }
 
-    // === Login ===
+    // ---
 
     private Topic checkCredentials(String username, String password) {
         Topic userName = getUsername(username);

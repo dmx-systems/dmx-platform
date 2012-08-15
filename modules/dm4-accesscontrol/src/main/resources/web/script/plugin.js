@@ -12,11 +12,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     dm4c.restc.login = function(username, password) {
         return this.request("GET", "/accesscontrol/login/" + username + "/" + password)
     }
-    /**
-     * @return  a User Account topic, or null if there is no such user ### To be dropped
-     */
-    dm4c.restc.lookup_user_account = function(username) {
-        return this.request("GET", "/accesscontrol/user/" + username)
+    dm4c.restc.logout = function() {
+        this.request("POST", "/accesscontrol/logout")
     }
     dm4c.restc.get_username = function() {
         return this.request("GET", "/accesscontrol/user")   // Note: 204 No Content yields to null result
@@ -28,13 +25,13 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         return this.request("GET", "/accesscontrol/owner/" + user_id + "/" + type_uri)
     }
     dm4c.restc.set_owner = function(topic_id, user_id) {
-        return this.request("POST", "/accesscontrol/topic/" + topic_id + "/owner/" + user_id)
+        this.request("POST", "/accesscontrol/topic/" + topic_id + "/owner/" + user_id)
     }
     dm4c.restc.create_acl_entry = function(topic_id, role, permissions) {
-        return this.request("POST", "/accesscontrol/topic/" + topic_id + "/role/" + role, permissions)
+        this.request("POST", "/accesscontrol/topic/" + topic_id + "/role/" + role, permissions)
     }
     dm4c.restc.join_workspace = function(workspace_id, user_id) {
-        return this.request("POST", "/accesscontrol/user/" + user_id + "/" + workspace_id)
+        this.request("POST", "/accesscontrol/user/" + user_id + "/" + workspace_id)
     }
 
 
@@ -76,6 +73,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 function show_user(username) {
                     dom.append("Logged in as \"" + username + "\"<br>")
                     dom.append($("<a>").attr("href", "#").text("Logout").click(function() {
+                        dm4c.restc.logout()
                         logout()
                         return false
                     }))
@@ -143,6 +141,9 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
         // ---
 
+        /**
+         * Updates the GUI once logged in.
+         */
         function login(username_topic) {
             // Note: the types must be reloaded *before* the logged_in event is fired.
             // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
@@ -156,6 +157,9 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             })
         }
 
+        /**
+         * Updates the GUI once logged out.
+         */
         function logout() {
             // Note: the types must be reloaded *before* the logged_out event is fired.
             // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
