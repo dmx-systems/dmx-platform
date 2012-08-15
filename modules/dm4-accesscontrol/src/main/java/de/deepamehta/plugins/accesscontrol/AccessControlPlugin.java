@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.accesscontrol;
 
+import de.deepamehta.plugins.accesscontrol.model.Credentials;
 import de.deepamehta.plugins.accesscontrol.model.Operation;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.plugins.accesscontrol.model.Role;
@@ -28,7 +29,6 @@ import de.deepamehta.core.service.listener.PreSendTopicTypeListener;
 import de.deepamehta.core.service.listener.PostInstallPluginListener;
 import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
 import de.deepamehta.core.service.listener.PluginServiceGoneListener;
-import de.deepamehta.core.util.JavaUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -60,7 +60,7 @@ import java.util.logging.Logger;
 @Consumes("application/json")
 @Produces("application/json")
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, InitializePluginListener,
-                                                                                          PostCreateTopicListener,
+                                                                    SecurityContext,      PostCreateTopicListener,
                                                                                           PreSendTopicListener,
                                                                                           PreSendTopicTypeListener,
                                                                                           PostInstallPluginListener,
@@ -72,7 +72,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
-    private static final String ENCRYPTED_PASSWORD_PREFIX = "-SHA256-";  // don't change this
 
     // association type semantics ### TODO: to be dropped. Model-driven manipulators required.
     private static final String WORKSPACE_MEMBERSHIP = "dm4.accesscontrol.membership";
@@ -107,16 +106,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
+    @GET
+    @Path("/login/{username}/{password}")
     @Override
-    public Topic checkCredentials(String username, String password) {
-        Topic userName = getUsername(username);
-        if (userName == null) {
-            return null;
-        }
-        if (!matches(userName, password)) {
-            return null;
-        }
-        return userName;
+    public Topic login(@PathParam("username") String username, @PathParam("password") String password) {
+        return login(username, password, request);
     }
 
     @GET
@@ -206,6 +200,35 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
+    // **************************************
+    // *** SecurityContext Implementation ***
+    // **************************************
+
+
+
+    /**
+     * Checks weather the credentials match an existing User Account.
+     *
+     * @return  The username of the matched User Account (a Topic of type "Username" /
+     *          <code>dm4.accesscontrol.username</code>), or <code>null</code> if there is no matching User Account.
+     */
+    @Override
+    public Topic login(String username, String password, HttpServletRequest request) {
+        Topic userName = checkCredentials(username, password);
+        //
+        if (userName != null) {
+            HttpSession session = createSession(userName, request);
+            logger.info("#####      Logging in as \"" + username + "\" => SUCCESSFUL!" +
+                "\n      #####      Creating new " + info(session));
+            return userName;
+        } else {
+            logger.info("#####      Logging in as \"" + username + "\" => FAILED!");
+            return null;
+        }
+    }
+
+
+
     // ********************************
     // *** Listener Implementations ***
     // ********************************
@@ -215,7 +238,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void initializePlugin() {
         try {
-            registerFilter(new SecurityFilter(this));
+            registerFilter(new RequestFilter(this));
         } catch (Exception e) {
             throw new RuntimeException("Registering the security filter failed", e);
         }
@@ -289,7 +312,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postInstallPlugin() {
-        Topic userAccount = createUserAccount(DEFAULT_USERNAME, DEFAULT_PASSWORD);
+        Topic userAccount = createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
         logger.info("Creating \"admin\" user account => ID=" + userAccount.getId());
     }
 
@@ -317,10 +340,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private Topic createUserAccount(String username, String password) {
+    private Topic createUserAccount(Credentials cred) {
         return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new CompositeValue()
-            .put("dm4.accesscontrol.username", username)
-            .put("dm4.accesscontrol.password", encryptPassword(password))), null);  // clientState=null
+            .put("dm4.accesscontrol.username", cred.username)
+            .put("dm4.accesscontrol.password", cred.password)), null);  // clientState=null
     }
 
     // ---
@@ -364,7 +387,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username), false, null);
     }
 
-    // ### FIXME: there is a principal copy in SecurityFilter
+    // ### FIXME: there is a principal copy in RequestFilter
     private Topic getUsername(HttpSession session) {
         Topic username = (Topic) session.getAttribute("username");
         if (username == null) {
@@ -391,29 +414,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    /**
-     * @return  The encryted password of the specified User Account.
-     */
-    private String getPassword(Topic userAccount) {
-        return userAccount.getCompositeValue().getString("dm4.accesscontrol.password");
-    }
-
-    private String encryptPassword(String password) {
-        return ENCRYPTED_PASSWORD_PREFIX + JavaUtils.encodeSHA256(password);
-    }
-
-    /**
-     * Prerequisite: username is not <code>null</code>.
-     *
-     * @param   password    The plain text password.
-     */
-    private boolean matches(Topic username, String password) {
-        String encryptedPassword = getPassword(getUserAccount(username));
-        return encryptedPassword.equals(encryptPassword(password));
-    }
-
-    // ---
-
     private void setCreator(Topic topic) {
         Topic username = getUsername();
         if (username == null) {
@@ -426,6 +426,41 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private void setCreator(Topic topic, long usernameId) {
         facetsService.updateFacet(topic, "dm4.accesscontrol.creator_facet", creatorModel(usernameId), null, null);
+    }
+
+    // === Login ===
+
+    private Topic checkCredentials(String username, String password) {
+        Topic userName = getUsername(username);
+        if (userName == null) {
+            return null;
+        }
+        if (!matches(userName, password)) {
+            return null;
+        }
+        return userName;
+    }
+
+    /**
+     * Prerequisite: username is not <code>null</code>.
+     *
+     * @param   password    The encrypted password.
+     */
+    private boolean matches(Topic username, String password) {
+        return getPassword(getUserAccount(username)).equals(password);
+    }
+
+    /**
+     * @return  The encryted password of the specified User Account.
+     */
+    private String getPassword(Topic userAccount) {
+        return userAccount.getCompositeValue().getString("dm4.accesscontrol.password");
+    }
+
+    private HttpSession createSession(Topic username, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        session.setAttribute("username", username);
+        return session;
     }
 
     // === ACL Entries ===
@@ -705,5 +740,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return "topic <null>";
         }
         return "topic " + topic.getId() + " (typeUri=\"" + topic.getTypeUri() + "\", uri=\"" + topic.getUri() + "\")";
+    }
+
+    private String info(HttpSession session) {
+        return "session" + (session != null ? " " + session.getId() +
+            " (username=\"" + getUsername(session) + "\")" : ": null");
     }
 }

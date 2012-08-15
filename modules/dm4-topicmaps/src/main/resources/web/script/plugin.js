@@ -318,7 +318,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     // === Access Control Listeners ===
 
-    dm4c.add_listener("logged_in", function(user) {
+    dm4c.add_listener("logged_in", function(username) {
         refresh_topicmap_menu()
         // Note: the topicmap permissions are refreshed in the course of refetching the topicmap topics.
         //

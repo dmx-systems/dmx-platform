@@ -84,7 +84,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     // === Access Control Listeners ===
 
-    dm4c.add_listener("logged_in", function(user) {
+    dm4c.add_listener("logged_in", function(username) {
         refresh_workspace_menu()
     })
 

@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.accesscontrol;
 
+import de.deepamehta.plugins.accesscontrol.model.Credentials;
 import de.deepamehta.core.Topic;
-import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -17,14 +17,12 @@ import javax.servlet.http.HttpSession;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
-import com.sun.jersey.core.util.Base64;
-
 import java.io.IOException;
 import java.util.logging.Logger;
 
 
 
-class SecurityFilter implements Filter {
+class RequestFilter implements Filter {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -32,16 +30,16 @@ class SecurityFilter implements Filter {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    AccessControlService acService;
+    SecurityContext securityContext;
     private InstallationType installationType;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    SecurityFilter(AccessControlService acService) {
+    RequestFilter(SecurityContext securityContext) {
         try {
-            this.acService = acService;
+            this.securityContext = securityContext;
             this.installationType = InstallationType.valueOf(INSTALLATION_TYPE);
             logger.info("########## Installation type is \"" + installationType + "\"");
         } catch (IllegalArgumentException e) {
@@ -62,7 +60,7 @@ class SecurityFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
         String authHeader = req.getHeader("Authorization");
         HttpSession session = req.getSession(false);    // create=false
-        logger.info("#####      " + req.getRequestURL() +
+        logger.info("#####      " + req.getMethod() + " " + req.getRequestURL() +
             "\n      #####      \"Authorization\"=\"" + authHeader + "\"" + 
             "\n      #####      " + info(session));
         //
@@ -75,15 +73,9 @@ class SecurityFilter implements Filter {
             } else {
                 if (authHeader != null) {
                     Credentials cred = new Credentials(authHeader);
-                    Topic username = acService.checkCredentials(cred.username, cred.password);
+                    Topic username = securityContext.login(cred.username, cred.password, req);
                     if (username != null) {
-                        session = req.getSession();
-                        session.setAttribute("username", username);
-                        logger.info("#####      Logging in with " + cred + " => SUCCESSFUL!" +
-                            "\n      #####      Creating new " + info(session));
                         allowed = true;
-                    } else {
-                        logger.info("#####      Logging in with " + cred + " => FAILED!");
                     }
                 }
             }
@@ -106,6 +98,7 @@ class SecurityFilter implements Filter {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    // ### FIXME: there is a copy in AccessControlPlugin
     private String info(HttpSession session) {
         return "session" + (session != null ? " " + session.getId() +
             " (username=\"" + getUsername(session) + "\")" : ": null");
@@ -150,23 +143,6 @@ class SecurityFilter implements Filter {
 
         boolean lookup(boolean isReadRequest) {
             return isReadRequest ? readAllowed : writeAllowed;
-        }
-    }
-
-    private class Credentials {
-
-        String username;
-        String password;
-
-        Credentials(String authHeader) {
-            authHeader = authHeader.substring("Basic ".length());
-            String[] values = new String(Base64.base64Decode(authHeader)).split(":");
-            this.username = values[0];
-            this.password = values.length > 1 ? values[1] : "";
-        }
-
-        public String toString() {
-            return "username=\"" + username + "\", password=\""+ password + "\"";
         }
     }
 }
