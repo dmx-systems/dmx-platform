@@ -26,25 +26,28 @@ class RequestFilter implements Filter {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String INSTALLATION_TYPE = System.getProperty("dm4.installation.type");
+    private static final String READ_REQUIRES_LOGIN = System.getProperty("dm4.security.read_requires_login");
+    private static final String WRITE_REQUIRES_LOGIN = System.getProperty("dm4.security.write_requires_login");
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     SecurityContext securityContext;
-    private InstallationType installationType;
+
+    private boolean readRequiresLogin;
+    private boolean writeRequiresLogin;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     RequestFilter(SecurityContext securityContext) {
-        try {
-            this.securityContext = securityContext;
-            this.installationType = InstallationType.valueOf(INSTALLATION_TYPE);
-            logger.info("########## Installation type is \"" + installationType + "\"");
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("\"" + INSTALLATION_TYPE + "\" is an unexpected installation type");
-        }
+        this.securityContext = securityContext;
+        //
+        this.readRequiresLogin = Boolean.valueOf(READ_REQUIRES_LOGIN);
+        this.writeRequiresLogin = Boolean.valueOf(WRITE_REQUIRES_LOGIN);
+        //
+        logger.info("########## Security settings:\n                 readRequiresLogin=" + readRequiresLogin +
+            "\n                 writeRequiresLogin=" + writeRequiresLogin);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -64,8 +67,7 @@ class RequestFilter implements Filter {
             "\n      #####      \"Authorization\"=\"" + authHeader + "\"" + 
             "\n      #####      " + info(session));
         //
-        boolean isReadRequest = req.getMethod().equals("GET");
-        boolean loginRequired = !installationType.lookup(isReadRequest);
+        boolean loginRequired = isLoginRequired(req);
         boolean allowed = false;
         if (loginRequired) {
             if (session != null) {
@@ -115,34 +117,14 @@ class RequestFilter implements Filter {
 
     // ---
 
+    private boolean isLoginRequired(HttpServletRequest request) {
+        return request.getMethod().equals("GET") ? readRequiresLogin : writeRequiresLogin;
+    }
+
     private void unauthorized(HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setHeader("WWW-Authenticate", "Basic realm=\"DeepaMehta\"");
         response.setHeader("Content-Type", "text/html");    // for text/plain (default) Safari provides no Web Console
         response.getWriter().println("Not authorized. Sorry.");     // throws IOException
-    }
-
-
-
-    // ------------------------------------------------------------------------------------------------- Private Classes
-
-    private enum InstallationType {
-
-        SINGLE_USER(true, true),
-        PRIVATE(false, false),
-        PUBLIC(true, false),
-        SANDBOX(true, true);    // Note: the difference between SINGLE_USER and SANDBOX is the network interface
-
-        boolean readAllowed;
-        boolean writeAllowed;
-
-        InstallationType(boolean readAllowed, boolean writeAllowed) {
-            this.readAllowed = readAllowed;
-            this.writeAllowed = writeAllowed;
-        }
-
-        boolean lookup(boolean isReadRequest) {
-            return isReadRequest ? readAllowed : writeAllowed;
-        }
     }
 }

@@ -241,7 +241,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         try {
             registerFilter(new RequestFilter(this));
         } catch (Exception e) {
-            throw new RuntimeException("Registering the security filter failed", e);
+            throw new RuntimeException("Registering the request filter failed", e);
         }
     }
 
