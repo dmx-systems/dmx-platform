@@ -9,13 +9,9 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -24,17 +20,9 @@ import java.util.logging.Logger;
 
 class RequestFilter implements Filter {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static final String READ_REQUIRES_LOGIN = System.getProperty("dm4.security.read_requires_login");
-    private static final String WRITE_REQUIRES_LOGIN = System.getProperty("dm4.security.write_requires_login");
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     SecurityContext securityContext;
-
-    private boolean readRequiresLogin;
-    private boolean writeRequiresLogin;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -42,12 +30,6 @@ class RequestFilter implements Filter {
 
     RequestFilter(SecurityContext securityContext) {
         this.securityContext = securityContext;
-        //
-        this.readRequiresLogin = Boolean.valueOf(READ_REQUIRES_LOGIN);
-        this.writeRequiresLogin = Boolean.valueOf(WRITE_REQUIRES_LOGIN);
-        //
-        logger.info("########## Security settings:\n                 readRequiresLogin=" + readRequiresLogin +
-            "\n                 writeRequiresLogin=" + writeRequiresLogin);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -67,7 +49,7 @@ class RequestFilter implements Filter {
             "\n      #####      \"Authorization\"=\"" + authHeader + "\"" + 
             "\n      #####      " + info(session));
         //
-        boolean loginRequired = isLoginRequired(req);
+        boolean loginRequired = securityContext.isLoginRequired(req);
         boolean allowed = false;
         if (loginRequired) {
             if (session != null) {
@@ -116,10 +98,6 @@ class RequestFilter implements Filter {
     }
 
     // ---
-
-    private boolean isLoginRequired(HttpServletRequest request) {
-        return request.getMethod().equals("GET") ? readRequiresLogin : writeRequiresLogin;
-    }
 
     private void unauthorized(HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

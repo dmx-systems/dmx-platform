@@ -70,6 +70,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
+    private static final String READ_REQUIRES_LOGIN = System.getProperty("dm4.security.read_requires_login");
+    private static final String WRITE_REQUIRES_LOGIN = System.getProperty("dm4.security.write_requires_login");
+
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
 
@@ -77,8 +80,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final String WORKSPACE_MEMBERSHIP = "dm4.accesscontrol.membership";
     private static final String ROLE_TYPE_USER       = "dm4.core.default";
     private static final String ROLE_TYPE_WORKSPACE  = "dm4.core.default";
-
-    // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private static final Permissions DEFAULT_TOPIC_PERMISSIONS = new Permissions();
     private static final Permissions DEFAULT_TYPE_PERMISSIONS  = new Permissions();
@@ -88,8 +89,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         DEFAULT_TYPE_PERMISSIONS.add(Operation.CREATE, true);
     }
 
+    // ---------------------------------------------------------------------------------------------- Instance Variables
+
     private FacetsService facetsService;
     private WorkspacesService wsService;
+
+    private boolean readRequiresLogin;
+    private boolean writeRequiresLogin;
 
     @Context
     private HttpServletRequest request;
@@ -115,9 +121,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @POST
     @Path("/logout")
+    @Produces("text/plain")
     @Override
-    public void logout() {
+    public boolean logout() {
         request.getSession(false).invalidate();             // create=false
+        return readRequiresLogin;
     }
 
     // ---
@@ -207,6 +215,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
+    @Override
+    public boolean isLoginRequired(HttpServletRequest request) {
+        return request.getMethod().equals("GET") ? readRequiresLogin : writeRequiresLogin;
+    }
+
     /**
      * Checks weather the credentials match an existing User Account.
      *
@@ -239,6 +252,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void initializePlugin() {
         try {
+            this.readRequiresLogin = Boolean.valueOf(READ_REQUIRES_LOGIN);
+            this.writeRequiresLogin = Boolean.valueOf(WRITE_REQUIRES_LOGIN);
+            //
+            logger.info("### Security settings:\n          readRequiresLogin=" + readRequiresLogin +
+                "\n          writeRequiresLogin=" + writeRequiresLogin);
+            //
             registerFilter(new RequestFilter(this));
         } catch (Exception e) {
             throw new RuntimeException("Registering the request filter failed", e);

@@ -18,7 +18,14 @@ public interface AccessControlService extends PluginService {
      */
     Topic login(String username, String password);
 
-    void logout();
+    /**
+     * @return  A <code>true</code> value instructs the webclient to shutdown. That is, its GUI must no longer be
+     *          presented to the user.
+     *          This is used for "private" DM installations. The webclient of a "private" installation is only
+     *          accessible when logged in. A DM installation is made "private" by setting the config property
+     *          <code>dm4.security.read_requires_login</code> to <code>true</code> (in global <code>pom.xml</code>).
+     */
+    boolean logout();
 
     // ---
 

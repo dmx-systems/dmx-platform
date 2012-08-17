@@ -13,7 +13,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         return this.request("GET", "/accesscontrol/login/" + username + "/" + password)
     }
     dm4c.restc.logout = function() {
-        this.request("POST", "/accesscontrol/logout")
+        return this.request("POST", "/accesscontrol/logout")
     }
     dm4c.restc.get_username = function() {
         return this.request("GET", "/accesscontrol/user")   // Note: 204 No Content yields to null result
@@ -73,8 +73,12 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 function show_user(username) {
                     dom.append("Logged in as \"" + username + "\"<br>")
                     dom.append($("<a>").attr("href", "#").text("Logout").click(function() {
-                        dm4c.restc.logout()
-                        logout()
+                        var response = dm4c.restc.logout()
+                        if (response == "true") {
+                            shutdown_gui()
+                        } else {
+                            update_gui_logout()
+                        }
                         return false
                     }))
                 }
@@ -117,7 +121,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 var username_topic = dm4c.restc.login(username, password)
                 if (username_topic) {
                     show_message("Login OK", "ok", close_login_dialog)
-                    login(username_topic)
+                    update_gui_login(username_topic)
                 } else {
                     show_message("Login failed", "failed")
                 }
@@ -141,10 +145,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
         // ---
 
-        /**
-         * Updates the GUI once logged in.
-         */
-        function login(username_topic) {
+        function update_gui_login(username_topic) {
             // Note: the types must be reloaded *before* the logged_in event is fired.
             // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
             dm4c.reload_types(function() {
@@ -157,10 +158,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             })
         }
 
-        /**
-         * Updates the GUI once logged out.
-         */
-        function logout() {
+        function update_gui_logout() {
             // Note: the types must be reloaded *before* the logged_out event is fired.
             // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
             dm4c.reload_types(function() {
@@ -170,6 +168,12 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 // fire event
                 dm4c.trigger_plugin_hook("logged_out")
             })
+        }
+
+        // ---
+
+        function shutdown_gui() {
+            $("body").text("You're logged out now.")
         }
     })
 

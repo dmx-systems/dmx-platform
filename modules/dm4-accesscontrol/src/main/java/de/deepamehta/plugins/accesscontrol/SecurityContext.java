@@ -6,5 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 interface SecurityContext {
 
+    boolean isLoginRequired(HttpServletRequest request);
+
     Topic login(String username, String password, HttpServletRequest request);
 }
