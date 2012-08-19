@@ -43,34 +43,23 @@ class RequestFilter implements Filter {
                                                                                                      ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
-        String authHeader = req.getHeader("Authorization");
-        HttpSession session = req.getSession(false);    // create=false
-        logger.info("#####      " + req.getMethod() + " " + req.getRequestURL() +
-            "\n      #####      \"Authorization\"=\"" + authHeader + "\"" + 
-            "\n      #####      " + info(session));
-        //
-        boolean loginRequired = securityContext.isLoginRequired(req);
-        boolean allowed = false;
-        if (loginRequired) {
-            if (session != null) {
-                allowed = true;
-            } else {
-                if (authHeader != null) {
-                    Credentials cred = new Credentials(authHeader);
-                    Topic username = securityContext.login(cred.username, cred.password, req);
-                    if (username != null) {
-                        allowed = true;
-                    }
-                }
-            }
-        } else {
-            allowed = true;
-        }
-        //
-        if (allowed) {
+        try {
+            //
+            securityContext.checkRequest(req);  // throws AccessControlException
+            //
             chain.doFilter(request, response);
-        } else {
-            unauthorized(resp);
+            //
+        } catch (AccessControlException e) {
+            switch (e.getStatusCode()) {
+            case HttpServletResponse.SC_UNAUTHORIZED:
+                unauthorized(resp);
+                break;
+            case HttpServletResponse.SC_FORBIDDEN:
+                forbidden(resp);
+                break;
+            default:
+                throw new ServletException("Unexpected AccessControlException", e);
+            }
         }
     }
 
@@ -82,27 +71,16 @@ class RequestFilter implements Filter {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    // ### FIXME: there is a copy in AccessControlPlugin
-    private String info(HttpSession session) {
-        return "session" + (session != null ? " " + session.getId() +
-            " (username=\"" + getUsername(session) + "\")" : ": null");
-    }
-    
-    // ### FIXME: there is a principal copy in AccessControlPlugin
-    private String getUsername(HttpSession session) {
-        Topic username = (Topic) session.getAttribute("username");
-        if (username == null) {
-            throw new RuntimeException("Session data inconsistency: \"username\" attribute is missing");
-        }
-        return username.getSimpleValue().toString();
-    }
-
-    // ---
-
     private void unauthorized(HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setHeader("WWW-Authenticate", "Basic realm=\"DeepaMehta\"");
         response.setHeader("Content-Type", "text/html");    // for text/plain (default) Safari provides no Web Console
-        response.getWriter().println("Not authorized. Sorry.");     // throws IOException
+        response.getWriter().println("You're not authorized. Sorry.");  // throws IOException
+    }
+
+    private void forbidden(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setHeader("Content-Type", "text/html");    // for text/plain (default) Safari provides no Web Console
+        response.getWriter().println("Access is forbidden. Sorry.");    // throws IOException
     }
 }

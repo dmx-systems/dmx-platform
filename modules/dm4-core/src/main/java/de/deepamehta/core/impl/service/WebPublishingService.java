@@ -3,7 +3,6 @@ package de.deepamehta.core.impl.service;
 import de.deepamehta.core.service.SecurityHandler;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 import org.osgi.framework.Bundle;
@@ -16,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Application;
 
 import java.net.URL;
 import java.util.HashSet;
@@ -32,7 +32,7 @@ public class WebPublishingService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DefaultResourceConfig rootApplication;
+    private Application rootApplication;
     private int classCount = 0;         // counts DM root resource and provider classes
     private int singletonCount = 0;     // counts DM root resource and provider instances
     // Note: we count DM resources separately as Jersey adds its own ones to the application.
@@ -54,10 +54,6 @@ public class WebPublishingService {
             //
             // create web application
             this.rootApplication = new DefaultResourceConfig();
-            //
-            // setup request filter ### FIXME: experimental
-            rootApplication.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-                new JerseyRequestFilter());
             //
             // deploy web application in container
             this.jerseyServlet = new ServletContainer(rootApplication);

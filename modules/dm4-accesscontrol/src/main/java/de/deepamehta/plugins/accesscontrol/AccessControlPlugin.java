@@ -29,8 +29,10 @@ import de.deepamehta.core.service.listener.PreSendTopicTypeListener;
 import de.deepamehta.core.service.listener.PostInstallPluginListener;
 import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
 import de.deepamehta.core.service.listener.PluginServiceGoneListener;
+import de.deepamehta.core.util.JavaUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import javax.ws.rs.DefaultValue;
@@ -70,8 +72,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String READ_REQUIRES_LOGIN = System.getProperty("dm4.security.read_requires_login");
-    private static final String WRITE_REQUIRES_LOGIN = System.getProperty("dm4.security.write_requires_login");
+    private static final boolean READ_REQUIRES_LOGIN  = Boolean.valueOf(
+                                                        System.getProperty("dm4.security.read_requires_login"));
+    private static final boolean WRITE_REQUIRES_LOGIN = Boolean.valueOf(
+                                                        System.getProperty("dm4.security.write_requires_login"));
+    private static final String SUBNET_FILTER         = System.getProperty("dm4.security.subnet_filter");
 
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
@@ -93,9 +98,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private FacetsService facetsService;
     private WorkspacesService wsService;
-
-    private boolean readRequiresLogin;
-    private boolean writeRequiresLogin;
 
     @Context
     private HttpServletRequest request;
@@ -125,7 +127,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public boolean logout() {
         request.getSession(false).invalidate();             // create=false
-        return readRequiresLogin;
+        return READ_REQUIRES_LOGIN;
     }
 
     // ---
@@ -216,8 +218,59 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     @Override
-    public boolean isLoginRequired(HttpServletRequest request) {
-        return request.getMethod().equals("GET") ? readRequiresLogin : writeRequiresLogin;
+    public void checkRequest(HttpServletRequest request) throws AccessControlException {
+        String authHeader = request.getHeader("Authorization");
+        HttpSession session = request.getSession(false);    // create=false
+        logger.info("##### " + request.getMethod() + " " + request.getRequestURL() +
+            "\n      ##### \"Authorization\"=\"" + authHeader + "\"" + 
+            "\n      ##### " + info(session));
+        //
+        checkRequestOrigin(request);
+        checkAuthorization(request, authHeader, session);
+    }
+
+    // ---
+
+    private void checkRequestOrigin(HttpServletRequest request) throws AccessControlException {
+        String remoteAddr = request.getRemoteAddr();
+        boolean isInRange = JavaUtils.isInRange(remoteAddr, SUBNET_FILTER);
+        //
+        logger.info("Remote address=\"" + remoteAddr + "\", dm4.security.subnet_filter=\"" + SUBNET_FILTER +
+            "\" => " + (isInRange ? "ALLOWED" : "FORBIDDEN"));
+        //
+        if (!isInRange) {
+            throw new AccessControlException("Request from \"" + remoteAddr + "\" is not allowed " +
+                "(dm4.security.subnet_filter=\"" + SUBNET_FILTER + "\")", HttpServletResponse.SC_FORBIDDEN);
+        }
+    }
+
+    private void checkAuthorization(HttpServletRequest request, String authHeader, HttpSession session)
+                                                                                        throws AccessControlException {
+        boolean authorized = false;
+        if (isLoginRequired(request)) {
+            if (session != null) {
+                authorized = true;
+            } else {
+                if (authHeader != null) {
+                    Credentials cred = new Credentials(authHeader);
+                    Topic username = login(cred.username, cred.password, request);
+                    if (username != null) {
+                        authorized = true;
+                    }
+                }
+            }
+        } else {
+            authorized = true;
+        }
+        //
+        if (!authorized) {
+            throw new AccessControlException("Request " + request + " is not authorized",
+                HttpServletResponse.SC_UNAUTHORIZED);
+        }
+    }
+
+    private boolean isLoginRequired(HttpServletRequest request) {
+        return request.getMethod().equals("GET") ? READ_REQUIRES_LOGIN : WRITE_REQUIRES_LOGIN;
     }
 
     /**
@@ -226,17 +279,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @return  The username of the matched User Account (a Topic of type "Username" /
      *          <code>dm4.accesscontrol.username</code>), or <code>null</code> if there is no matching User Account.
      */
-    @Override
-    public Topic login(String username, String password, HttpServletRequest request) {
+    private Topic login(String username, String password, HttpServletRequest request) {
         Topic userName = checkCredentials(username, password);
         //
         if (userName != null) {
             HttpSession session = createSession(userName, request);
-            logger.info("#####      Logging in as \"" + username + "\" => SUCCESSFUL!" +
-                "\n      #####      Creating new " + info(session));
+            logger.info("##### Logging in as \"" + username + "\" => SUCCESSFUL!" +
+                "\n      ##### Creating new " + info(session));
             return userName;
         } else {
-            logger.info("#####      Logging in as \"" + username + "\" => FAILED!");
+            logger.info("##### Logging in as \"" + username + "\" => FAILED!");
             return null;
         }
     }
@@ -252,11 +304,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void initializePlugin() {
         try {
-            this.readRequiresLogin = Boolean.valueOf(READ_REQUIRES_LOGIN);
-            this.writeRequiresLogin = Boolean.valueOf(WRITE_REQUIRES_LOGIN);
-            //
-            logger.info("### Security settings:\n          readRequiresLogin=" + readRequiresLogin +
-                "\n          writeRequiresLogin=" + writeRequiresLogin);
+            logger.info("### Security settings:" +
+                "\n          READ_REQUIRES_LOGIN=" + READ_REQUIRES_LOGIN +
+                "\n          WRITE_REQUIRES_LOGIN=" + WRITE_REQUIRES_LOGIN +
+                "\n          SUBNET_FILTER="+ SUBNET_FILTER);
             //
             registerFilter(new RequestFilter(this));
         } catch (Exception e) {
@@ -393,7 +444,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username), false, null);
     }
 
-    // ### FIXME: there is a principal copy in RequestFilter
     private Topic getUsername(HttpSession session) {
         Topic username = (Topic) session.getAttribute("username");
         if (username == null) {
@@ -750,6 +800,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private String info(HttpSession session) {
         return "session" + (session != null ? " " + session.getId() +
-            " (username=\"" + getUsername(session) + "\")" : ": null");
+            " (username=" + getUsername(session) + ")" : ": null");
     }
 }

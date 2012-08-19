@@ -2,7 +2,6 @@ package de.deepamehta.plugins.files;
 
 import de.deepamehta.plugins.files.service.FilesService;
 
-import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
@@ -10,21 +9,17 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.ClientState;
-import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.SecurityHandler;
 import de.deepamehta.core.service.listener.InitializePluginListener;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.awt.Desktop;
 import java.io.File;
-import java.io.IOException;
 import java.util.logging.Logger;
 
 
@@ -44,13 +38,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path");
-    private static final String REMOTE_ACCESS_FILTER = System.getProperty("dm4.filerepo.netfilter");
     private static final String FILE_REPOSITORY_URI = "/filerepo";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    @Context
-    private HttpServletRequest request;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -79,7 +69,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             path = JavaUtils.stripDriveLetter(path);
             //
             // 1) enforce security
-            File file = enforeSecurity(request, path);
+            File file = enforeSecurity(path);
             //
             // 2) check if topic already exists
             Topic fileTopic = fetchFileTopic(file);
@@ -110,7 +100,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             path = JavaUtils.stripDriveLetter(path);
             //
             // 1) enforce security
-            File file = enforeSecurity(request, path);
+            File file = enforeSecurity(path);
             //
             // 2) check if topic already exists
             Topic folderTopic = fetchFolderTopic(file);
@@ -161,7 +151,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         try {
             logger.info(operation);
             // 1) enforce security
-            File directory = enforeSecurity(request, path);
+            File directory = enforeSecurity(path);
             //
             // 2) store file
             File repoFile = repoFile(directory, file);
@@ -186,7 +176,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         try {
             logger.info(operation);
             // 1) enforce security
-            File directory = enforeSecurity(request, path);
+            File directory = enforeSecurity(path);
             //
             // 2) create directory
             File repoFile = repoFile(directory, folderName);
@@ -217,7 +207,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         try {
             logger.info(operation);
             //
-            File file = enforeSecurity(request, path);
+            File file = enforeSecurity(path);
             //
             return new ResourceInfo(file);
             //
@@ -236,7 +226,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         try {
             logger.info(operation);
             //
-            File folder = enforeSecurity(request, path);
+            File folder = enforeSecurity(path);
             //
             return new DirectoryListing(folder);    // ### TODO: if folder is no directory send NOT FOUND
             //
@@ -258,7 +248,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             logger.info(operation);
             String path = repoPath(fileTopicId);
             //
-            File file = enforeSecurity(request, path);
+            File file = enforeSecurity(path);
             //
             return file;
             //
@@ -276,7 +266,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             logger.info(operation);
             String path = repoPath(fileTopicId);
             //
-            File file = enforeSecurity(request, path);
+            File file = enforeSecurity(path);
             //
             logger.info("### Opening file \"" + file + "\"");
             Desktop.getDesktop().open(file);
@@ -296,13 +286,14 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
 
 
+    // ### TODO: to be dropped?
     @Override
     public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) {
         try {
             String path = request.getRequestURI().substring(FILE_REPOSITORY_URI.length());
             path = JavaUtils.decodeURIComponent(path);
             logger.info("### repository path=\"" + path + "\"");
-            File file = enforeSecurity(request, path);
+            File file = enforeSecurity(path);
             return true;
         } catch (FileRepositoryException e) {
             response.setStatus(e.getStatusCode());
@@ -454,30 +445,12 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     // === Security ===
 
-    private File enforeSecurity(HttpServletRequest request, String path) throws FileRepositoryException {
-        checkRemoteAccess(request);
-        //
+    private File enforeSecurity(String path) throws FileRepositoryException {
         File file = repoFile(path);
         checkFilePath(file);
         checkFileExistence(file);
         //
         return file;
-    }
-
-    // --- Remote Access ---
-
-    private void checkRemoteAccess(HttpServletRequest request) throws FileRepositoryException {
-        String remoteAddr = request.getRemoteAddr();
-        boolean isInRange = JavaUtils.isInRange(remoteAddr, REMOTE_ACCESS_FILTER);
-        //
-        logger.info("Checking remote access to \"" + request.getRequestURL() + "\"\n      dm4.filerepo.netfilter=\"" +
-            REMOTE_ACCESS_FILTER + "\", remote address=\"" + remoteAddr + "\" => " +
-            (isInRange ? "ALLOWED" : "FORBIDDEN"));
-        //
-        if (!isInRange) {
-            throw new FileRepositoryException("Request from \"" + remoteAddr + "\" is not allowed " +
-                "(dm4.filerepo.netfilter=\"" + REMOTE_ACCESS_FILTER + "\")", Status.FORBIDDEN);
-        }
     }
 
     // --- File Access ---
