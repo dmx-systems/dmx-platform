@@ -136,11 +136,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/user")
     @Override
     public Topic getUsername() {
-        HttpSession session = request.getSession(false);    // create=false
-        if (session == null) {
-            return null;
+        try {
+            HttpSession session = request.getSession(false);    // create=false
+            if (session == null) {
+                return null;
+            }
+            return getUsername(session);
+        } catch (IllegalStateException e) {
+            // Note: if not invoked through network no request (and thus no session) is available.
+            // This happens e.g. while starting up.
+            return null;    // user is unknown
         }
-        return getUsername(session);
     }
 
     // ---
