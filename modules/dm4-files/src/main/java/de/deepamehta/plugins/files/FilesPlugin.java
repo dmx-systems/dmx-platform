@@ -212,7 +212,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             File file = enforeSecurity(path);
             //
             return new ResourceInfo(file);
-            //
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
@@ -231,7 +230,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             File folder = enforeSecurity(path);
             //
             return new DirectoryListing(folder);    // ### TODO: if folder is no directory send NOT FOUND
-            //
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
@@ -241,14 +239,25 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     @Override
     public String getRepositoryPath(URL url) {
-        if (!JSONHelper.isDeepaMehtaURL(url)) {
-            return null;
+        String operation = "Checking for file repository URL (\"" + url + "\")";
+        try {
+            if (!JSONHelper.isDeepaMehtaURL(url)) {
+                logger.info(operation + " => null");
+                return null;
+            }
+            //
+            String path = url.getPath();
+            if (!path.startsWith(FILE_REPOSITORY_URI)) {
+                logger.info(operation + " => null");
+                return null;
+            }
+            //
+            String repoPath = path.substring(FILE_REPOSITORY_URI.length());
+            logger.info(operation + " => \"" + repoPath + "\"");
+            return repoPath;
+        } catch (Exception e) {
+            throw new RuntimeException(operation + " failed", e);
         }
-        String path = url.getPath();
-        if (!path.startsWith(FILE_REPOSITORY_URI)) {
-            return null;
-        }
-        return path.substring(FILE_REPOSITORY_URI.length());
     }
 
     // ---
@@ -257,22 +266,28 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     // To access a file remotely use the /filerepo resource.
     @Override
     public File getFile(String path) {
-        return repoFile(path);
+        String operation = "Accessing the file at \"" + path + "\"";
+        try {
+            logger.info(operation);
+            //
+            File file = enforeSecurity(path);
+            return file;
+        } catch (Exception e) {
+            throw new RuntimeException(operation + " failed", e);
+        }
     }
 
     // Note: this is not a resource method.
     // To access a file remotely use the /filerepo resource.
     @Override
     public File getFile(long fileTopicId) {
-        String operation = "Getting the file represented by file topic " + fileTopicId;
+        String operation = "Accessing the file of file topic " + fileTopicId;
         try {
             logger.info(operation);
+            //
             String path = repoPath(fileTopicId);
-            //
             File file = enforeSecurity(path);
-            //
             return file;
-            //
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
@@ -284,16 +299,15 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     @Path("/open/{id}")
     @Override
     public void openFile(@PathParam("id") long fileTopicId) {
-        String operation = "Opening the file represented by file topic " + fileTopicId;
+        String operation = "Opening the file of file topic " + fileTopicId;
         try {
             logger.info(operation);
-            String path = repoPath(fileTopicId);
             //
+            String path = repoPath(fileTopicId);
             File file = enforeSecurity(path);
             //
             logger.info("### Opening file \"" + file + "\"");
             Desktop.getDesktop().open(file);
-            //
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
