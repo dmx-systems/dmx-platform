@@ -912,7 +912,7 @@ function DefaultTopicmapRenderer() {
     /**
      * @return  an object with "x" and "y" properties.
      */
-    function random_position(pos) {
+    function random_position() {
         return {
             x: width  * Math.random() - trans_x,
             y: height * Math.random() - trans_y

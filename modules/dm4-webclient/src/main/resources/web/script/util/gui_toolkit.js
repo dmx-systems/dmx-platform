@@ -28,7 +28,7 @@ function GUIToolkit(config) {
             alert("WARNING (GUIToolkit.button): No handler specified for button");
         }
         //
-        button = $('<button type="' + (is_submit ? "submit" : "button") + '">').click(handler)
+        var button = $('<button type="' + (is_submit ? "submit" : "button") + '">').click(handler)
         // build options
         var options = {}
         if (label) {

@@ -57,7 +57,7 @@ TopicType.prototype.get_label_config = function(assoc_def_uri) {
 
 // --- View Configuration ---
 
-TopicType.prototype.get_icon = function(type_uri) {
+TopicType.prototype.get_icon = function() {
     return this.icon
 }
 

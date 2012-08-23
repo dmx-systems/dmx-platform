@@ -149,8 +149,8 @@ function RenderHelper() {
         var topics = dm4c.restc.get_topics(topic_type_uri, false, true).items   // fetch_composite=false, sort=true
         //
         var menu = dm4c.ui.menu()
-        for (var i in topics) {
-            menu.add_item({label: topics[i].value, value: topics[i].uri})
+        for (var i = 0, topic; topic = topics[i]; i++) {
+            menu.add_item({label: topic.value, value: topic.uri})
         }
         menu.select(selected_uri)
         //
