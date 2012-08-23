@@ -15,7 +15,8 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.io.InputStream;
-
+import java.net.InetAddress;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,6 +33,37 @@ import java.util.logging.Logger;
 public class JSONHelper {
 
     private static Logger logger = Logger.getLogger("de.deepamehta.core.util.JSONHelper");
+
+
+
+    // ************
+    // *** URLs ***
+    // ************
+
+
+
+    /**
+     * Checks if the given URL's host and port refers to this DeepaMehta installation.
+     */
+    public static boolean isDeepaMehtaURL(URL url) {
+        try {
+            // check host
+            InetAddress dmAddress = InetAddress.getLocalHost();             // throws UnknownHostException
+            InetAddress urlAddress = InetAddress.getByName(url.getHost());  // throws UnknownHostException
+            if (!dmAddress.equals(urlAddress)) {
+                return false;
+            }
+            // check port
+            int dmPort = Integer.parseInt(System.getProperty("org.osgi.service.http.port"));
+            int urlPort = url.getPort();
+            if (urlPort == -1) {
+                urlPort = url.getDefaultPort();
+            }
+            return dmPort == urlPort;
+        } catch (Exception e) {
+            throw new RuntimeException("Checking for DeepaMehta URL failed (url=\"" + url + "\")", e);
+        }
+    }
 
 
 

@@ -12,6 +12,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.SecurityHandler;
 import de.deepamehta.core.service.listener.InitializePluginListener;
 import de.deepamehta.core.util.JavaUtils;
+import de.deepamehta.core.util.JSONHelper;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -27,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.net.URL;
 import java.util.logging.Logger;
 
 
@@ -237,7 +239,26 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         }
     }
 
+    @Override
+    public String getRepositoryPath(URL url) {
+        if (!JSONHelper.isDeepaMehtaURL(url)) {
+            return null;
+        }
+        String path = url.getPath();
+        if (!path.startsWith(FILE_REPOSITORY_URI)) {
+            return null;
+        }
+        return path.substring(FILE_REPOSITORY_URI.length());
+    }
+
     // ---
+
+    // Note: this is not a resource method.
+    // To access a file remotely use the /filerepo resource.
+    @Override
+    public File getFile(String path) {
+        return repoFile(path);
+    }
 
     // Note: this is not a resource method.
     // To access a file remotely use the /filerepo resource.
@@ -256,6 +277,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             throw new RuntimeException(operation + " failed", e);
         }
     }
+
+    // ---
 
     @POST
     @Path("/open/{id}")

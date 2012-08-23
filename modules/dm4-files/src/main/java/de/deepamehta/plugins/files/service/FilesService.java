@@ -6,10 +6,10 @@ import de.deepamehta.plugins.files.StoredFile;
 import de.deepamehta.plugins.files.UploadedFile;
 
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
 
 import java.io.File;
+import java.net.URL;
 
 
 
@@ -56,9 +56,30 @@ public interface FilesService extends PluginService {
 
     DirectoryListing getDirectoryListing(String path);
 
+    /**
+     * Checks if the given URL refers to the file repository of this DeepaMehta installation.
+     *
+     * @return  the refered file's/directory's repository path, or <code>null</code> if the URL
+     *          does not refer to the file repository of this DeepaMehta installation.
+     */
+    String getRepositoryPath(URL url);
+
     // ---
 
+    /**
+     * Accesses a file/directory in the file repository by its path.
+     * Note: this method doesn't require the corresponding File/Folder topic to exist.
+     *
+     * @param   path    a file repository path. Must begin with slash ('/'), no slash at the end.
+     */
+    File getFile(String path);
+
+    /**
+     * Accesses a file/directory in the file repository that is represented by the given File/Folder topic.
+     */
     File getFile(long fileTopicId);
+
+    // ---
 
     void openFile(long fileTopicId);
 }

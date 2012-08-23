@@ -126,7 +126,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public boolean logout() {
-        request.getSession(false).invalidate();             // create=false
+        request.getSession(false).invalidate();                 // create=false
         return READ_REQUIRES_LOGIN;
     }
 
