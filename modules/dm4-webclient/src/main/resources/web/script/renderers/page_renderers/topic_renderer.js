@@ -259,7 +259,7 @@
                 page_model.topic.composite = composite
                 return page_model.topic
             } else {
-                throw "TopicRendererError: invalid page model "
+                throw "TopicRendererError: invalid page model"
             }
         }
     }

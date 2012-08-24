@@ -43,7 +43,7 @@ public class Permissions extends HashMap<String, Boolean> implements JSONEnabled
         List<TopicModel> permissions = new ArrayList();
         for (String operationUri : keySet()) {
             TopicModel permission = new TopicModel("dm4.accesscontrol.permission", new CompositeValue()
-                .put_ref("dm4.accesscontrol.operation", operationUri)
+                .putRef("dm4.accesscontrol.operation", operationUri)
                 .put("dm4.accesscontrol.allowed", get(operationUri))
             );
             permissions.add(permission);

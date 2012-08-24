@@ -745,20 +745,20 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private TopicModel creatorModel(long usernameId) {
         return new TopicModel("dm4.accesscontrol.creator", new CompositeValue()
-            .put_ref("dm4.accesscontrol.username", usernameId)
+            .putRef("dm4.accesscontrol.username", usernameId)
         );
     }
 
     // ### FIXME: ref username instead of user account
     private TopicModel ownerModel(long userId) {
         return new TopicModel("dm4.accesscontrol.owner", new CompositeValue()
-            .put_ref("dm4.accesscontrol.user_account", userId)
+            .putRef("dm4.accesscontrol.user_account", userId)
         );
     }
 
     private TopicModel aclEntryModel(Role role, Permissions permissions) {
         return new TopicModel("dm4.accesscontrol.acl_entry", new CompositeValue()
-            .put_ref("dm4.accesscontrol.role", role.uri)
+            .putRef("dm4.accesscontrol.role", role.uri)
             .put("dm4.accesscontrol.permission", permissions.asTopics())
         );
     }

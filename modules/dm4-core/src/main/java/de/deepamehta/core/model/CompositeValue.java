@@ -184,12 +184,12 @@ public class CompositeValue {
 
     // ---
 
-    public CompositeValue put_ref(String key, long refTopicId) {
+    public CompositeValue putRef(String key, long refTopicId) {
         put(key, new TopicModel(refTopicId, key));
         return this;
     }
 
-    public CompositeValue put_ref(String key, String refTopicUri) {
+    public CompositeValue putRef(String key, String refTopicUri) {
         put(key, new TopicModel(refTopicUri, key));
         return this;
     }
