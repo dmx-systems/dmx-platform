@@ -30,9 +30,9 @@ import java.util.logging.Logger;
 
 
 
-public class JSONHelper {
+public class DeepaMehtaUtils {
 
-    private static Logger logger = Logger.getLogger("de.deepamehta.core.util.JSONHelper");
+    private static Logger logger = Logger.getLogger("de.deepamehta.core.util.DeepaMehtaUtils");
 
 
 

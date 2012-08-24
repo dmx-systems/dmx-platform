@@ -1,6 +1,6 @@
 package de.deepamehta.core.model;
 
-import de.deepamehta.core.util.JSONHelper;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
@@ -178,7 +178,7 @@ public abstract class TypeModel extends TopicModel {
             o.put("data_type_uri", getDataTypeUri());
             IndexMode.toJSON(indexModes, o);
             AssociationDefinitionModel.toJSON(assocDefModels.values(), o);
-            o.put("label_config", JSONHelper.stringsToJson(getLabelConfig()));
+            o.put("label_config", DeepaMehtaUtils.stringsToJson(getLabelConfig()));
             getViewConfigModel().toJSON(o);
             //
             return o;
@@ -209,7 +209,7 @@ public abstract class TypeModel extends TopicModel {
 
     private List<String> parseLabelConfig(JSONObject typeModel) throws Exception {
         if (typeModel.has("label_config")) {
-            return JSONHelper.toList(typeModel.getJSONArray("label_config"));
+            return DeepaMehtaUtils.toList(typeModel.getJSONArray("label_config"));
         }
         return new ArrayList();
     }

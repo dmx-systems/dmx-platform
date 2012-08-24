@@ -17,7 +17,7 @@ import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.listener.AllPluginsActiveListener;
 import de.deepamehta.core.service.listener.PreUpdateTopicListener;
 import de.deepamehta.core.service.listener.PostUpdateTopicListener;
-import de.deepamehta.core.util.JSONHelper;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -188,7 +188,7 @@ public class WebclientPlugin extends PluginActivator implements PreUpdateTopicLi
             if (isSearchableUnit(topic)) {
                 searchableUnits.add(topic);
             } else {
-                Set<Topic> parentTopics = JSONHelper.toTopicSet(topic.getRelatedTopics((List) null,
+                Set<Topic> parentTopics = DeepaMehtaUtils.toTopicSet(topic.getRelatedTopics((List) null,
                     "dm4.core.part", "dm4.core.whole", null, false, false, 0, clientState)).getItems();
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);

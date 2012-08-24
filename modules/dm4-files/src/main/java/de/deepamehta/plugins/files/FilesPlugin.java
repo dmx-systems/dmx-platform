@@ -11,8 +11,8 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.SecurityHandler;
 import de.deepamehta.core.service.listener.InitializePluginListener;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
-import de.deepamehta.core.util.JSONHelper;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -241,7 +241,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     public String getRepositoryPath(URL url) {
         String operation = "Checking for file repository URL (\"" + url + "\")";
         try {
-            if (!JSONHelper.isDeepaMehtaURL(url)) {
+            if (!DeepaMehtaUtils.isDeepaMehtaURL(url)) {
                 logger.info(operation + " => null");
                 return null;
             }

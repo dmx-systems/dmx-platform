@@ -8,7 +8,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.core.util.JSONHelper;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -78,8 +78,8 @@ public class Topicmap implements JSONEnabled {
         try {
             JSONObject topicmap = new JSONObject();
             topicmap.put("info", topicmapTopic.toJSON());
-            topicmap.put("topics", JSONHelper.objectsToJSON(topics.values()));
-            topicmap.put("assocs", JSONHelper.objectsToJSON(assocs.values()));
+            topicmap.put("topics", DeepaMehtaUtils.objectsToJSON(topics.values()));
+            topicmap.put("assocs", DeepaMehtaUtils.objectsToJSON(assocs.values()));
             return topicmap;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);

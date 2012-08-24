@@ -1,7 +1,7 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.Type;
-import de.deepamehta.core.util.JSONHelper;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import java.io.InputStream;
 
@@ -44,6 +44,6 @@ public abstract class Migration {
 
     protected final void readMigrationFile(String migrationFile) {
         InputStream migrationIn = getClass().getResourceAsStream(migrationFile);
-        JSONHelper.readMigrationFile(migrationIn, migrationFile, dms);
+        DeepaMehtaUtils.readMigrationFile(migrationIn, migrationFile, dms);
     }
 }

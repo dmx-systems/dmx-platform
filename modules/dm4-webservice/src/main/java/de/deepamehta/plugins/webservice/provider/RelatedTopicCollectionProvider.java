@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.webservice.provider;
 
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.util.JSONHelper;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class RelatedTopicCollectionProvider implements MessageBodyWriter<Collect
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            JSONHelper.relatedTopicsToJson(relTopics).write(writer);
+            DeepaMehtaUtils.relatedTopicsToJson(relTopics).write(writer);
             writer.flush();
         } catch (Exception e) {
             throw new IOException("Writing message body failed (" + relTopics + ")", e);

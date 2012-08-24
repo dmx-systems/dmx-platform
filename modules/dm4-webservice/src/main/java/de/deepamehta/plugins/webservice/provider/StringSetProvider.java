@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.webservice.provider;
 
-import de.deepamehta.core.util.JSONHelper;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class StringSetProvider implements MessageBodyWriter<Set<String>> {
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            JSONHelper.stringsToJson(strings).write(writer);
+            DeepaMehtaUtils.stringsToJson(strings).write(writer);
             writer.flush();
         } catch (Exception e) {
             throw new IOException("Writing message body failed (" + strings + ")", e);

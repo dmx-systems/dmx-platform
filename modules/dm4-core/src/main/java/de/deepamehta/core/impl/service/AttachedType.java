@@ -16,7 +16,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
-import de.deepamehta.core.util.JSONHelper;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -297,7 +297,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
                 assocDefs.size() + " valid association definitions but expected are " + sequence.size());
         }
         //
-        addAssocDefsSorted(assocDefs, JSONHelper.idList(sequence));
+        addAssocDefsSorted(assocDefs, DeepaMehtaUtils.idList(sequence));
     }
 
     private Map<Long, AssociationDefinition> fetchAssociationDefinitions() {

@@ -3,7 +3,7 @@ package de.deepamehta.plugins.accesscontrol.model;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.util.JSONHelper;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -30,7 +30,7 @@ public class Permissions extends HashMap<String, Boolean> implements JSONEnabled
     }
 
     public Permissions(JSONObject permissions) {
-        JSONHelper.toMap(permissions, this);
+        DeepaMehtaUtils.toMap(permissions, this);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

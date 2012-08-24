@@ -18,11 +18,11 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.util.JavaUtils;
-import de.deepamehta.core.util.JSONHelper;
 import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -668,7 +668,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
                     ResultSet<RelatedTopic> childTopics = fetchChildTopics(assocDef, true); // fetchComposite=true
-                    comp.put(assocDef.getUri(), JSONHelper.toTopicModels(childTopics));
+                    comp.put(assocDef.getUri(), DeepaMehtaUtils.toTopicModels(childTopics));
                 } else {
                     throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
                 }

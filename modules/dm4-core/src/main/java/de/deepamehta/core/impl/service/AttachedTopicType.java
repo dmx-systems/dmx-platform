@@ -6,10 +6,10 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.util.JSONHelper;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -130,7 +130,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         if (hasSequenceChanged(newAssocDefs)) {
             logger.info("### Changing assoc def sequence");
             // update memory
-            addAssocDefsSorted(hashAssocDefsById(), JSONHelper.idList(newAssocDefs));
+            addAssocDefsSorted(hashAssocDefsById(), DeepaMehtaUtils.idList(newAssocDefs));
             // update DB
             rebuildSequence();
         }

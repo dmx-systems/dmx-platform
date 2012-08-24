@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.webservice.provider;
 
+import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
-import de.deepamehta.core.util.JSONHelper;
 
 import org.codehaus.jettison.json.JSONArray;
 
@@ -60,7 +60,7 @@ public class StringListProvider implements MessageBodyReader<List<String>> {
                                                                 throws IOException, WebApplicationException {
         try {
             String json = JavaUtils.readText(entityStream);
-            return JSONHelper.toList(new JSONArray(json));
+            return DeepaMehtaUtils.toList(new JSONArray(json));
         } catch (Exception e) {
             throw new IOException("Creating a list of strings from message body failed", e);
         }

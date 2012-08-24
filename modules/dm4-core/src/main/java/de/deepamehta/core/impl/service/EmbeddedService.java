@@ -30,7 +30,7 @@ import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
-import de.deepamehta.core.util.JSONHelper;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -126,7 +126,7 @@ public class EmbeddedService implements DeepaMehtaService {
                                                                               ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            ResultSet<Topic> topics = JSONHelper.toTopicSet(getTopicType(typeUri, clientState).getRelatedTopics(
+            ResultSet<Topic> topics = DeepaMehtaUtils.toTopicSet(getTopicType(typeUri, clientState).getRelatedTopics(
                 "dm4.core.instantiation", "dm4.core.type", "dm4.core.instance", null, fetchComposite, false,
                 maxResultSize, clientState));   // othersTopicTypeUri=null
             tx.success();

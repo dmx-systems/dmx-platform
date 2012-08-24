@@ -1,7 +1,7 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.service.Migration;
-import de.deepamehta.core.util.JSONHelper;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -126,7 +126,7 @@ class MigrationManager {
                 mi.runMode.equals(MigrationRunMode.ALWAYS.name())) {
                 logger.info("Running " + mi.migrationInfo + runInfo);
                 if (mi.isDeclarative) {
-                    JSONHelper.readMigrationFile(mi.migrationIn, mi.migrationFile, dms);
+                    DeepaMehtaUtils.readMigrationFile(mi.migrationIn, mi.migrationFile, dms);
                 } else {
                     Migration migration = (Migration) mi.migrationClass.newInstance();
                     logger.info("Running " + mi.migrationType + " migration class " + mi.migrationClassName);

@@ -1,6 +1,6 @@
 package de.deepamehta.core.model;
 
-import de.deepamehta.core.util.JSONHelper;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -269,7 +269,7 @@ public class CompositeValue {
                 if (value instanceof TopicModel) {
                     json.put(key, ((TopicModel) value).toJSON());
                 } else if (value instanceof List) {
-                    json.put(key, JSONHelper.objectsToJSON((List<TopicModel>) value));
+                    json.put(key, DeepaMehtaUtils.objectsToJSON((List<TopicModel>) value));
                 } else {
                     throw new RuntimeException("Unexpected value in a CompositeValue: " + value);
                 }
