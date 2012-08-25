@@ -12,6 +12,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.listener.InitializePluginListener;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -35,7 +36,7 @@ import java.util.logging.Logger;
 @Path("/topicmap")
 @Consumes("application/json")
 @Produces("application/json")
-public class TopicmapsPlugin extends PluginActivator implements TopicmapsService {
+public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, InitializePluginListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -47,6 +48,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private static final String ROLE_TYPE_ASSOCIATION  = "dm4.topicmaps.topicmap_association";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    Map<String, TopicmapRenderer> topicmapRendererRegistry = new HashMap();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -65,6 +68,19 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public Topicmap getTopicmap(@PathParam("id") long topicmapId, @HeaderParam("Cookie") ClientState clientState) {
         return new Topicmap(topicmapId, dms, clientState);
+    }
+
+    @POST
+    @Path("/{name}/{topicmap_renderer_uri}")
+    @Override
+    public void createTopicmap(@PathParam("name") String name,
+                               @PathParam("topicmap_renderer_uri") String topicmapRendererUri) {
+        CompositeValue topicmapState = getTopicmapRenderer(topicmapRendererUri).initialTopicmapState();
+        dms.createTopic(new TopicModel("dm4.topicmaps.topicmap", new CompositeValue()
+            .put("dm4.topicmaps.name", name)
+            .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
+            .put("dm4.topicmaps.state", topicmapState)
+        ), null);   // FIXME: clientState=null
     }
 
     // ---
@@ -141,6 +157,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ---
 
+    @Override
+    public void registerTopicmapRenderer(TopicmapRenderer renderer) {
+        topicmapRendererRegistry.put(renderer.getUri(), renderer);
+    }
+
+    // ---
+
     // Note: not part of topicmaps service
     @GET
     @Path("/{id}")
@@ -161,6 +184,19 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
 
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
+
+
+
+    @Override
+    public void initializePlugin() {
+        registerTopicmapRenderer(new DefaultTopicmapRenderer());
+    }
+
+
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Association getTopicRefAssociation(long topicmapId, long topicId) {
@@ -171,6 +207,18 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private Association getAssociationRefAssociation(long topicmapId, long assocId) {
         return dms.getAssociationBetweenTopicAndAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
             ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION, false, null);    // fetchComposite=false, clientState=null
+    }
+
+    // ---
+
+    private TopicmapRenderer getTopicmapRenderer(String rendererUri) {
+        TopicmapRenderer renderer = topicmapRendererRegistry.get(rendererUri);
+        //
+        if (renderer == null) {
+            throw new RuntimeException("\"" + rendererUri + "\" is an unknown topicmap renderer");
+        }
+        //
+        return renderer;
     }
 
     // ---
