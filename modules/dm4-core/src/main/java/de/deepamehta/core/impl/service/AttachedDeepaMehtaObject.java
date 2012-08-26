@@ -480,13 +480,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 updateCompositionMany(assocDef, newChildTopics, clientState, directives);
             }
         } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
-            // error check
-            String childTopicTypeUri = assocDef.getPartTopicTypeUri();
-            TopicType childTopicType = dms.getTopicType(childTopicTypeUri, null);
-            if (childTopicType.getDataTypeUri().equals("dm4.core.composite")) {
-                throw new RuntimeException("Aggregation of composite topic types not yet supported");
-            }
-            //
             if (one) {
                 updateAggregationOne(assocDef, newChildTopic, clientState, directives);
             } else {
