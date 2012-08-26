@@ -79,13 +79,4 @@ function TopicmapRendererExtension() {
             }
         }
     }
-
-    this.initial_topicmap_state = function() {
-        return {
-            "dm4.topicmaps.translation": {
-                "dm4.topicmaps.translation_x": 0,
-                "dm4.topicmaps.translation_y": 0
-            }
-        }
-    }
 }

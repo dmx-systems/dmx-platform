@@ -681,7 +681,7 @@ public class PluginImpl implements Plugin, EventHandler {
             return null;
         }
         //
-        logger.info("### Delivering internal plugin event " + event + " from/to " + this);
+        logger.fine("### Delivering internal plugin event " + event + " from/to " + this);
         return dms.listenerRegistry.deliverEvent((Listener) pluginContext, event, params);
     }
 

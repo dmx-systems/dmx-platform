@@ -4,6 +4,7 @@ import de.deepamehta.plugins.topicmaps.model.Topicmap;
 import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.CompositeValue;
@@ -12,7 +13,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.listener.InitializePluginListener;
+import de.deepamehta.core.service.listener.PostInstallPluginListener;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -36,9 +37,12 @@ import java.util.logging.Logger;
 @Path("/topicmap")
 @Consumes("application/json")
 @Produces("application/json")
-public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, InitializePluginListener {
+public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, PostInstallPluginListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String DEFAULT_TOPICMAP_NAME     = "untitled";
+    private static final String DEFAULT_TOPICMAP_RENDERER = "dm4.webclient.default_topicmap_renderer";
 
     // association type semantics ### TODO: to be dropped. Model-driven manipulators required.
     private static final String TOPIC_MAPCONTEXT       = "dm4.topicmaps.topic_mapcontext";
@@ -54,6 +58,14 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+
+
+    public TopicmapsPlugin() {
+        // Note: registering the default renderer in the InitializePluginListener would be too late.
+        // The renderer is already needed in the PostInstallPluginListener.
+        registerTopicmapRenderer(new DefaultTopicmapRenderer());
+    }
 
 
 
@@ -73,10 +85,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @POST
     @Path("/{name}/{topicmap_renderer_uri}")
     @Override
-    public void createTopicmap(@PathParam("name") String name,
-                               @PathParam("topicmap_renderer_uri") String topicmapRendererUri) {
+    public Topic createTopicmap(@PathParam("name") String name,
+                                @PathParam("topicmap_renderer_uri") String topicmapRendererUri) {
         CompositeValue topicmapState = getTopicmapRenderer(topicmapRendererUri).initialTopicmapState();
-        dms.createTopic(new TopicModel("dm4.topicmaps.topicmap", new CompositeValue()
+        return dms.createTopic(new TopicModel("dm4.topicmaps.topicmap", new CompositeValue()
             .put("dm4.topicmaps.name", name)
             .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
             .put("dm4.topicmaps.state", topicmapState)
@@ -159,6 +171,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @Override
     public void registerTopicmapRenderer(TopicmapRenderer renderer) {
+        logger.info("### Registering topicmap renderer \"" + renderer.getClass().getName() + "\"");
         topicmapRendererRegistry.put(renderer.getUri(), renderer);
     }
 
@@ -191,8 +204,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
     @Override
-    public void initializePlugin() {
-        registerTopicmapRenderer(new DefaultTopicmapRenderer());
+    public void postInstallPlugin() {
+        createTopicmap(DEFAULT_TOPICMAP_NAME, DEFAULT_TOPICMAP_RENDERER);
     }
 
 

@@ -10,11 +10,11 @@ import java.util.Set;
 
 public interface WorkspacesService extends PluginService {
 
-    public Topic createWorkspace(String name);
+    Topic createWorkspace(String name);
 
-    public void assignTopic(long workspaceId, long topicId);
+    void assignTopic(long workspaceId, long topicId);
 
-    public void assignType(long workspaceId, long typeId);
+    void assignType(long workspaceId, long typeId);
 
     /**
      * Returns the workspaces a type is assigned to.
@@ -24,5 +24,5 @@ public interface WorkspacesService extends PluginService {
      * retrieving the type itself. This in turn would involve determining its permissions ...
      * See AccessControlPlugin.userIsMember() ### TODO: still true?
      */
-    public Set<RelatedTopic> getWorkspaces(long typeId);
+    Set<RelatedTopic> getWorkspaces(long typeId);
 }

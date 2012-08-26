@@ -227,7 +227,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void checkRequest(HttpServletRequest request) throws AccessControlException {
         String authHeader = request.getHeader("Authorization");
         HttpSession session = request.getSession(false);    // create=false
-        logger.info("##### " + request.getMethod() + " " + request.getRequestURL() +
+        logger.fine("##### " + request.getMethod() + " " + request.getRequestURL() +
             "\n      ##### \"Authorization\"=\"" + authHeader + "\"" + 
             "\n      ##### " + info(session));
         //
@@ -241,7 +241,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         String remoteAddr = request.getRemoteAddr();
         boolean isInRange = JavaUtils.isInRange(remoteAddr, SUBNET_FILTER);
         //
-        logger.info("Remote address=\"" + remoteAddr + "\", dm4.security.subnet_filter=\"" + SUBNET_FILTER +
+        logger.fine("Remote address=\"" + remoteAddr + "\", dm4.security.subnet_filter=\"" + SUBNET_FILTER +
             "\" => " + (isInRange ? "ALLOWED" : "FORBIDDEN"));
         //
         if (!isInRange) {
@@ -310,10 +310,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void initializePlugin() {
         try {
-            logger.info("### Security settings:" +
-                "\n          READ_REQUIRES_LOGIN=" + READ_REQUIRES_LOGIN +
-                "\n          WRITE_REQUIRES_LOGIN=" + WRITE_REQUIRES_LOGIN +
-                "\n          SUBNET_FILTER="+ SUBNET_FILTER);
+            logger.info("Security settings:" +
+                "\n      READ_REQUIRES_LOGIN=" + READ_REQUIRES_LOGIN +
+                "\n      WRITE_REQUIRES_LOGIN=" + WRITE_REQUIRES_LOGIN +
+                "\n      SUBNET_FILTER="+ SUBNET_FILTER);
             //
             registerFilter(new RequestFilter(this));
         } catch (Exception e) {
@@ -366,7 +366,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return;
         }
         //
-        logger.info("### Enriching " + info(topic) + " with its permissions (clientState=" + clientState + ")");
+        logger.fine("### Enriching " + info(topic) + " with its permissions (clientState=" + clientState + ")");
         enrichWithPermissions(topic, hasPermission(getUsername(), Operation.WRITE, topic));
     }
 
@@ -380,7 +380,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return;
         }
         //
-        logger.info("### Enriching topic type \"" + topicType.getUri() + "\" with its permissions");
+        logger.fine("### Enriching topic type \"" + topicType.getUri() + "\" with its permissions");
         Topic username = getUsername();
         enrichWithPermissions(topicType,
             hasPermission(username, Operation.WRITE, topicType),
@@ -478,11 +478,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private void setCreator(Topic topic) {
         Topic username = getUsername();
+        //
         if (username == null) {
-            logger.warning("Assigning a creator to " + info(topic) + " failed (no user is logged in). " +
-                "Assigning user \"admin\" instead.");
+            logger.fine("Assigning a creator to " + info(topic) + " failed " +
+                "(no user is logged in). Assigning user \"admin\" instead.");
             username = getAdminUser();
         }
+        //
         setCreator(topic, username.getId());
     }
 

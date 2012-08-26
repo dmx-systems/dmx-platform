@@ -25,6 +25,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     dm4c.restc.get_topicmap = function(topicmap_id) {
         return this.request("GET", "/topicmap/" + topicmap_id)
     }
+    dm4c.restc.create_topicmap = function(name, topicmap_renderer_uri) {
+        return this.request("POST", "/topicmap/" + encodeURIComponent(name) + "/" + topicmap_renderer_uri)
+    }
     dm4c.restc.add_topic_to_topicmap = function(topicmap_id, topic_id, x, y) {
         this.request("POST", "/topicmap/" + topicmap_id + "/topic/" + topic_id + "/" + x + "/" + y)
     }
@@ -54,7 +57,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
         fetch_topicmap_topics()
         register_topicmap_renderers()
-        create_default_topicmap()
         create_topicmap_menu()
         create_topicmap_dialog()
         display_initial_topicmap()
@@ -70,13 +72,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
             function register(renderer) {
                 topicmap_renderers[renderer.get_info().uri] = renderer
-            }
-        }
-
-        function create_default_topicmap() {
-            if (!js.size(topicmap_topics)) {
-                create_topicmap_topic("untitled")
-                fetch_topicmap_topics()
             }
         }
 
@@ -262,7 +257,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             if (topicmap_id == topic.id) {
                 if (LOG_TOPICMAPS) dm4c.log("..... updating the topicmap menu and selecting the first item " +
                     "(the deleted topic was the CURRENT topicmap)")
-                if (!js.size(topicmap_cache)) {
+                if (!js.size(topicmap_cache)) {     // ### FIXME: should check topicmap_topics?
                     create_topicmap_topic("untitled")
                 }
                 refresh_topicmap_menu()
@@ -501,16 +496,11 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         if (LOG_TOPICMAPS) dm4c.log("Creating topicmap \"" + name + "\" (topicmap_renderer_uri=\"" +
             topicmap_renderer_uri + "\")")
         //
-        var topicmap_state = get_topicmap_renderer(topicmap_renderer_uri).initial_topicmap_state()
-        var topicmap = dm4c.create_topic("dm4.topicmaps.topicmap", {
-            "dm4.topicmaps.name": name,
-            "dm4.topicmaps.topicmap_renderer_uri": topicmap_renderer_uri,
-            "dm4.topicmaps.state": topicmap_state
-        })
+        var topicmap_topic = dm4c.restc.create_topicmap(name, topicmap_renderer_uri)
         //
-        if (LOG_TOPICMAPS) dm4c.log("..... " + topicmap.id)
+        if (LOG_TOPICMAPS) dm4c.log("..... " + topicmap_topic.id)
         //
-        return topicmap
+        return topicmap_topic
     }
 
 
