@@ -963,9 +963,13 @@ function Webclient() {
 
     // === Permissions ===
 
-    // ### TODO: handle associations as well
-    this.has_write_permission = function(topic) {
-        var result = dm4c.trigger_plugin_hook("has_write_permission", topic)
+    this.has_write_permission_for_topic = function(topic) {
+        var result = dm4c.trigger_plugin_hook("has_write_permission_for_topic", topic)
+        return !js.contains(result, false)
+    }
+
+    this.has_write_permission_for_association = function(assoc) {
+        var result = dm4c.trigger_plugin_hook("has_write_permission_for_association", assoc)
         return !js.contains(result, false)
     }
 

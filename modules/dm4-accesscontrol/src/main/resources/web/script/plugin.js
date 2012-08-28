@@ -179,11 +179,22 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     // ---
 
-    dm4c.add_listener("has_write_permission", function(topic) {
+    dm4c.add_listener("has_write_permission_for_topic", function(topic) {
         var permissions = topic.composite["dm4.accesscontrol.permissions"]
         // error check
         if (!permissions) {
             throw "AccessControlError: topic " + topic.id + " (type_uri=\"" + topic.type_uri +
+                "\") has no permissions info"
+        }
+        //
+        return permissions.composite["dm4.accesscontrol.operation_write"].value
+    })
+
+    dm4c.add_listener("has_write_permission_for_association", function(assoc) {
+        var permissions = assoc.composite["dm4.accesscontrol.permissions"]
+        // error check
+        if (!permissions) {
+            throw "AccessControlError: association " + assoc.id + " (type_uri=\"" + assoc.type_uri +
                 "\") has no permissions info"
         }
         //

@@ -22,8 +22,6 @@ import java.util.List;
  */
 public class Permissions extends HashMap<String, Boolean> implements JSONEnabled {
 
-    // private Map<String, Boolean> permissions = new HashMap();
-
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public Permissions() {

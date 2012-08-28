@@ -41,6 +41,7 @@ var hook_names = [
     "pre_push_history",
     "pre_pop_history",
     // Permissions
-    "has_write_permission",
+    "has_write_permission_for_topic",
+    "has_write_permission_for_association",
     "has_create_permission"
 ]

@@ -3,6 +3,7 @@ package de.deepamehta.core.service;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.listener.*;
 
@@ -30,8 +31,13 @@ public enum CoreEvent {
 
     PRE_CREATE_TOPIC(PreCreateTopicListener.class,
         "preCreateTopic", TopicModel.class, ClientState.class),
+    PRE_CREATE_ASSOCIATION(PreCreateAssociationListener.class,
+        "preCreateAssociation", AssociationModel.class, ClientState.class),
+
     POST_CREATE_TOPIC(PostCreateTopicListener.class,
         "postCreateTopic", Topic.class, ClientState.class, Directives.class),
+    POST_CREATE_ASSOCIATION(PostCreateAssociationListener.class,
+        "postCreateAssociation", Association.class, ClientState.class, Directives.class),
 
     PRE_UPDATE_TOPIC(PreUpdateTopicListener.class,
         "preUpdateTopic", Topic.class, TopicModel.class, Directives.class),
@@ -49,6 +55,8 @@ public enum CoreEvent {
 
     PRE_SEND_TOPIC(PreSendTopicListener.class,
         "preSendTopic", Topic.class, ClientState.class),
+    PRE_SEND_ASSOCIATION(PreSendAssociationListener.class,
+        "preSendAssociation", Association.class, ClientState.class),
     PRE_SEND_TOPIC_TYPE(PreSendTopicTypeListener.class,
         "preSendTopicType", TopicType.class, ClientState.class),
 

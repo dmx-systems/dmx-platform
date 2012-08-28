@@ -3,6 +3,7 @@ package de.deepamehta.plugins.facets;
 import de.deepamehta.plugins.facets.service.FacetsService;
 
 import de.deepamehta.core.AssociationDefinition;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -43,17 +44,17 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     }
 
     @Override
-    public Topic getFacet(Topic topic, String facetTypeUri) {
-        // ### TODO: integrity check: is the topic an instance of that facet type?
-        return fetchChildTopic(topic, getAssocDef(facetTypeUri), true);     // fetchComposite=true
+    public Topic getFacet(DeepaMehtaObject object, String facetTypeUri) {
+        // ### TODO: integrity check: is the object an instance of that facet type?
+        return fetchChildTopic(object, getAssocDef(facetTypeUri), true);    // fetchComposite=true
     }
 
     // ---
 
     @Override
-    public Set<RelatedTopic> getFacets(Topic topic, String facetTypeUri) {
-        // ### TODO: integrity check: is the topic an instance of that facet type?
-        return fetchChildTopics(topic, getAssocDef(facetTypeUri), true);    // fetchComposite=true
+    public Set<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri) {
+        // ### TODO: integrity check: is the object an instance of that facet type?
+        return fetchChildTopics(object, getAssocDef(facetTypeUri), true);   // fetchComposite=true
     }
 
     // ---
@@ -68,17 +69,17 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     // ---
 
     @Override
-    public void updateFacet(Topic topic, String facetTypeUri, TopicModel facet, ClientState clientState,
-                                                                                Directives directives) {
+    public void updateFacet(DeepaMehtaObject object, String facetTypeUri, TopicModel facetValue,
+                                                     ClientState clientState, Directives directives) {
         // ### TODO: incorporate the Facets module into the DeepaMehta core?
-        topic.updateChildTopic(getAssocDef(facetTypeUri), facet, clientState, directives);
+        object.updateChildTopic(getAssocDef(facetTypeUri), facetValue, clientState, directives);
     }
 
     @Override
-    public void updateFacets(Topic topic, String facetTypeUri, List<TopicModel> facets, ClientState clientState,
-                                                                                        Directives directives) {
+    public void updateFacets(DeepaMehtaObject object, String facetTypeUri, List<TopicModel> facetValues,
+                                                      ClientState clientState, Directives directives) {
         // ### TODO: incorporate the Facets module into the DeepaMehta core?
-        topic.updateChildTopics(getAssocDef(facetTypeUri), facets, clientState, directives);
+        object.updateChildTopics(getAssocDef(facetTypeUri), facetValues, clientState, directives);
     }
 
 
@@ -91,13 +92,14 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      * ### Note: There is a principal copy in AttachedDeepaMehtaObject but here the precondition is different:
      * The given AssociationDefinition is not necessarily part of the given topic's type.
      */
-    private RelatedTopic fetchChildTopic(Topic topic, AssociationDefinition assocDef, boolean fetchComposite) {
+    private RelatedTopic fetchChildTopic(DeepaMehtaObject object, AssociationDefinition assocDef,
+                                                                  boolean fetchComposite) {
         String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
         String myRoleTypeUri      = assocDef.getWholeRoleTypeUri();
         String othersRoleTypeUri  = assocDef.getPartRoleTypeUri();
         String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
         //
-        return topic.getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+        return object.getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
             fetchComposite, false, null);
     }
 
@@ -107,13 +109,14 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      * ### Note: There is a principal copy in AttachedDeepaMehtaObject but here the precondition is different:
      * The given AssociationDefinition is not necessarily part of the given topic's type.
      */
-    private Set<RelatedTopic> fetchChildTopics(Topic topic, AssociationDefinition assocDef, boolean fetchComposite) {
+    private Set<RelatedTopic> fetchChildTopics(DeepaMehtaObject object, AssociationDefinition assocDef,
+                                                                        boolean fetchComposite) {
         String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
         String myRoleTypeUri      = assocDef.getWholeRoleTypeUri();
         String othersRoleTypeUri  = assocDef.getPartRoleTypeUri();
         String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
         //
-        return topic.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+        return object.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
             fetchComposite, false, 0, null).getItems();
     }
 

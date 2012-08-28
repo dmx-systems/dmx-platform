@@ -562,12 +562,12 @@ function DefaultTopicmapRenderer() {
         var ct, ca
         if (ct = find_topic(event)) {
             dm4c.do_select_topic(ct.id)
-            // Note: only dm4c.selected_object has the auxiliary attributes (the canvas topic has not)
+            // Note: only dm4c.selected_object has the composite value (the canvas topic has not)
             var commands = dm4c.get_topic_commands(dm4c.selected_object, "context-menu")
         } else if (ca = find_association(event)) {
             dm4c.do_select_association(ca.id)
-            // ### FIXME: use dm4c.selected assoc?
-            var commands = dm4c.get_association_commands(ca, "context-menu")
+            // Note: only dm4c.selected_object has the composite value (the canvas assiation has not)
+            var commands = dm4c.get_association_commands(dm4c.selected_object, "context-menu")
         } else {
             var p = pos(event, Coord.CANVAS_SPACE)
             var commands = dm4c.get_canvas_commands(p.x, p.y, "context-menu")

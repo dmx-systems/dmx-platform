@@ -314,9 +314,13 @@ public class EmbeddedService implements DeepaMehtaService {
     public Association createAssociation(AssociationModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
+            fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model, clientState);
+            //
             AttachedAssociation assoc = new AttachedAssociation(model, this);
             Directives directives = new Directives();   // ### FIXME: directives are ignored
             assoc.store(clientState, directives);
+            //
+            fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc, clientState, directives);
             //
             tx.success();
             return assoc;

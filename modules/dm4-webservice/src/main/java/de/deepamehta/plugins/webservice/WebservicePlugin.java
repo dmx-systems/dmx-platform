@@ -160,7 +160,7 @@ public class WebservicePlugin extends PluginActivator {
         try {
             Association assoc = dms.getAssociation(assocId, fetchComposite, clientState);
             //
-            // firePreSend(assoc, clientState);  ### TODO
+            firePreSend(assoc, clientState);
             //
             return assoc;
         } catch (Exception e) {
@@ -415,6 +415,10 @@ public class WebservicePlugin extends PluginActivator {
 
     private void firePreSend(Topic topic, ClientState clientState) {
         dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, topic, clientState);
+    }
+
+    private void firePreSend(Association assoc, ClientState clientState) {
+        dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION, assoc, clientState);
     }
 
     private void firePreSend(TopicType topicType, ClientState clientState) {

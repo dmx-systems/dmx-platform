@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.facets.service;
 
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.TopicModel;
@@ -17,26 +18,26 @@ public interface FacetsService extends PluginService {
     Topic getFacet(long topicId, String facetTypeUri);
 
     /**
-     * Retrieves a topic facet from the DB.
+     * Retrieves a facet.
      *
-     * @param   topic           The facetted topic.
+     * @param   object          The facetted object: a topic, association, a type ...
      * @param   facetTypeUri    URI of the facet type.
      *
      * @return  The retrieved facet.
      */
-    Topic getFacet(Topic topic, String facetTypeUri);
+    Topic getFacet(DeepaMehtaObject object, String facetTypeUri);
 
     // ---
 
     /**
-     * Retrieves a topic multi-facet from the DB.
+     * Retrieves a multi-facet.
      *
-     * @param   topic           The facetted topic.
+     * @param   object          The facetted object: a topic, association, a type ...
      * @param   facetTypeUri    URI of the facet type.
      *
      * @return  The retrieved multi-facet.
      */
-    Set<RelatedTopic> getFacets(Topic topic, String facetTypeUri);
+    Set<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri);
 
     // ---
 
@@ -45,22 +46,22 @@ public interface FacetsService extends PluginService {
     // ---
 
     /**
-     * Updates a topic facet.
+     * Updates a facet.
      *
-     * @param   topic           The facetted topic.
+     * @param   object          The facetted object: a topic, association, a type ...
      * @param   facetTypeUri    URI of the facet type.
-     * @param   facet           The new facet value.
+     * @param   facetValue      The new facet value.
      */
-    void updateFacet(Topic topic, String facetTypeUri, TopicModel facet, ClientState clientState,
-                                                                         Directives directives);
+    void updateFacet(DeepaMehtaObject object, String facetTypeUri, TopicModel facetValue,
+                                                                   ClientState clientState, Directives directives);
 
     /**
-     * Updates a topic multi-facet.
+     * Updates a multi-facet.
      *
-     * @param   topic           The facetted topic.
+     * @param   object          The facetted object: a topic, association, a type ...
      * @param   facetTypeUri    URI of the facet type.
-     * @param   facets          The new facet values.
+     * @param   facetValues     The new facet values.
      */
-    void updateFacets(Topic topic, String facetTypeUri, List<TopicModel> facets, ClientState clientState,
-                                                                                 Directives directives);
+    void updateFacets(DeepaMehtaObject object, String facetTypeUri, List<TopicModel> facetValues,
+                                                                    ClientState clientState, Directives directives);
 }

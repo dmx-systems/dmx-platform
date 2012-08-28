@@ -1,8 +1,11 @@
 function Association(assoc) {
-    this.id       = assoc.id
-    this.type_uri = assoc.type_uri
-    this.role_1   = assoc.role_1
-    this.role_2   = assoc.role_2
+    this.id        = assoc.id
+    this.uri       = assoc.uri
+    this.type_uri  = assoc.type_uri
+    this.value     = assoc.value
+    this.composite = assoc.composite
+    this.role_1    = assoc.role_1
+    this.role_2    = assoc.role_2
 }
 
 // === "Page Displayable" implementation ===

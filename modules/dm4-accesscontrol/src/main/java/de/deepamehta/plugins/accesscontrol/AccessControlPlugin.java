@@ -8,6 +8,8 @@ import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.facets.service.FacetsService;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
+import de.deepamehta.core.Association;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
@@ -23,19 +25,20 @@ import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.listener.InitializePluginListener;
 import de.deepamehta.core.service.listener.IntroduceTopicTypeListener;
-import de.deepamehta.core.service.listener.PostCreateTopicListener;
-import de.deepamehta.core.service.listener.PreSendTopicListener;
-import de.deepamehta.core.service.listener.PreSendTopicTypeListener;
-import de.deepamehta.core.service.listener.PostInstallPluginListener;
 import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
 import de.deepamehta.core.service.listener.PluginServiceGoneListener;
+import de.deepamehta.core.service.listener.PostCreateAssociationListener;
+import de.deepamehta.core.service.listener.PostCreateTopicListener;
+import de.deepamehta.core.service.listener.PostInstallPluginListener;
+import de.deepamehta.core.service.listener.PreSendAssociationListener;
+import de.deepamehta.core.service.listener.PreSendTopicListener;
+import de.deepamehta.core.service.listener.PreSendTopicTypeListener;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
@@ -43,10 +46,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import static java.util.Arrays.asList;
@@ -63,7 +63,9 @@ import java.util.logging.Logger;
 @Produces("application/json")
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, InitializePluginListener,
                                                                     SecurityContext,      PostCreateTopicListener,
+                                                                                          PostCreateAssociationListener,
                                                                                           PreSendTopicListener,
+                                                                                          PreSendAssociationListener,
                                                                                           PreSendTopicTypeListener,
                                                                                           PostInstallPluginListener,
                                                                                           IntroduceTopicTypeListener,
@@ -72,27 +74,32 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
+    // security settings
     private static final boolean READ_REQUIRES_LOGIN  = Boolean.valueOf(
                                                         System.getProperty("dm4.security.read_requires_login"));
     private static final boolean WRITE_REQUIRES_LOGIN = Boolean.valueOf(
                                                         System.getProperty("dm4.security.write_requires_login"));
     private static final String SUBNET_FILTER         = System.getProperty("dm4.security.subnet_filter");
 
+    // default user
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
+
+    // default permissions
+    private static final Permissions DEFAULT_TOPIC_PERMISSIONS = new Permissions();
+    private static final Permissions DEFAULT_ASSOCIATION_PERMISSIONS = new Permissions();
+    private static final Permissions DEFAULT_TYPE_PERMISSIONS = new Permissions();
+    static {
+        DEFAULT_TOPIC_PERMISSIONS.add(Operation.WRITE, true);
+        DEFAULT_ASSOCIATION_PERMISSIONS.add(Operation.WRITE, true);
+        DEFAULT_TYPE_PERMISSIONS.add(Operation.WRITE, true);
+        DEFAULT_TYPE_PERMISSIONS.add(Operation.CREATE, true);
+    }
 
     // association type semantics ### TODO: to be dropped. Model-driven manipulators required.
     private static final String WORKSPACE_MEMBERSHIP = "dm4.accesscontrol.membership";
     private static final String ROLE_TYPE_USER       = "dm4.core.default";
     private static final String ROLE_TYPE_WORKSPACE  = "dm4.core.default";
-
-    private static final Permissions DEFAULT_TOPIC_PERMISSIONS = new Permissions();
-    private static final Permissions DEFAULT_TYPE_PERMISSIONS  = new Permissions();
-    static {
-        DEFAULT_TOPIC_PERMISSIONS.add(Operation.WRITE, true);
-        DEFAULT_TYPE_PERMISSIONS.add(Operation.WRITE, true);
-        DEFAULT_TYPE_PERMISSIONS.add(Operation.CREATE, true);
-    }
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -199,9 +206,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void createACLEntry(Topic topic, Role role, Permissions permissions) {
+    public void createACLEntry(DeepaMehtaObject object, Role role, Permissions permissions) {
         TopicModel aclEntry = aclEntryModel(role, permissions);
-        facetsService.updateFacets(topic, "dm4.accesscontrol.acl_facet", asList(aclEntry), null, null);
+        facetsService.updateFacets(object, "dm4.accesscontrol.acl_facet", asList(aclEntry), null, null);
     }
 
     // ---
@@ -328,8 +335,19 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return;
         }
         //
-        setCreator(topic);
+        assignCreator(topic);
         createACLEntry(topic, Role.CREATOR, DEFAULT_TOPIC_PERMISSIONS);
+    }
+
+    @Override
+    public void postCreateAssociation(Association assoc, ClientState clientState, Directives directives) {
+        /* ### TODO: explain
+        if (isPluginTopic(topic)) {
+            return;
+        } */
+        //
+        assignCreator(assoc);
+        createACLEntry(assoc, Role.CREATOR, DEFAULT_ASSOCIATION_PERMISSIONS);
     }
 
     /* ### TODO: adapt to DM4
@@ -352,7 +370,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return;
         }
         //
-        setCreator(topicType);
+        assignCreator(topicType);
         createACLEntry(topicType, Role.CREATOR, DEFAULT_TYPE_PERMISSIONS);
     }
 
@@ -368,6 +386,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         //
         logger.fine("### Enriching " + info(topic) + " with its permissions (clientState=" + clientState + ")");
         enrichWithPermissions(topic, hasPermission(getUsername(), Operation.WRITE, topic));
+    }
+
+    @Override
+    public void preSendAssociation(Association assoc, ClientState clientState) {
+        /* ### TODO: explain
+        if (isPluginTopic(topic)) {
+            enrichWithPermissions(topic, false);    // write=false
+            return;
+        } */
+        //
+        logger.fine("### Enriching " + info(assoc) + " with its permissions (clientState=" + clientState + ")");
+        enrichWithPermissions(assoc, hasPermission(getUsername(), Operation.WRITE, assoc));
     }
 
     @Override
@@ -476,20 +506,27 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    private void setCreator(Topic topic) {
+    /**
+     * Assigns the logged in user as the creator of the specified object.
+     * If no user is logged in, the default user ("admin") is assigned.
+     */
+    private void assignCreator(DeepaMehtaObject object) {
         Topic username = getUsername();
         //
         if (username == null) {
-            logger.fine("Assigning a creator to " + info(topic) + " failed " +
-                "(no user is logged in). Assigning user \"admin\" instead.");
+            logger.fine("Assigning a creator to " + info(object) + " failed (no user is logged in). " +
+                "The default user (\"admin\") is assigned instead.");
             username = getAdminUser();
         }
         //
-        setCreator(topic, username.getId());
+        assignCreator(object, username.getId());
     }
 
-    private void setCreator(Topic topic, long usernameId) {
-        facetsService.updateFacet(topic, "dm4.accesscontrol.creator_facet", creatorModel(usernameId), null, null);
+    /**
+     * Assigns the specified user as the creator of the specified object.
+     */
+    private void assignCreator(DeepaMehtaObject object, long usernameId) {
+        facetsService.updateFacet(object, "dm4.accesscontrol.creator_facet", creatorModel(usernameId), null, null);
     }
 
     // ---
@@ -531,7 +568,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     /**
      * Checks if a user is allowed to perform an operation on a topic.
-     * In this case <code>true</code> is returned.
+     * If so, <code>true</code> is returned.
      *
      * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
      *                      or <code>null</code> if no user is logged in.
@@ -542,20 +579,20 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     /**
-     * Checks if a user is allowed to perform an operation on a topic.
-     * In this case <code>true</code> is returned.
+     * Checks if a user is allowed to perform an operation on an object.
+     * If so, <code>true</code> is returned.
      *
      * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
      *                      or <code>null</code> if no user is logged in.
      */
-    private boolean hasPermission(Topic username, Operation operation, Topic topic) {
-        logger.fine("Determining permission for " + userInfo(username) + " to " + operation + " " + info(topic));
-        for (RelatedTopic aclEntry : getACLEntries(topic)) {
+    private boolean hasPermission(Topic username, Operation operation, DeepaMehtaObject object) {
+        logger.fine("Determining permission for " + userInfo(username) + " to " + operation + " " + info(object));
+        for (RelatedTopic aclEntry : getACLEntries(object)) {
             String roleUri = aclEntry.getCompositeValue().getTopic("dm4.accesscontrol.role").getUri();
             logger.fine("There is an ACL entry for role \"" + roleUri + "\"");
-            boolean allowedForRole = getAllowed(aclEntry, operation);
+            boolean allowedForRole = allowed(aclEntry, operation);
             logger.fine("value=" + allowedForRole);
-            if (allowedForRole && userOccupiesRole(topic, username, roleUri)) {
+            if (allowedForRole && userOccupiesRole(object, username, roleUri)) {
                 logger.fine("=> ALLOWED");
                 return true;
             }
@@ -567,13 +604,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     /**
-     * Checks if a user occupies a role with regard to the specified topic.
-     * In this case <code>true</code> is returned.
+     * Checks if a user occupies a role with regard to the specified object.
+     * If so, <code>true</code> is returned.
      *
      * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
      *                      or <code>null</code> if no user is logged in.
      */
-    private boolean userOccupiesRole(Topic topic, Topic username, String roleUri) {
+    private boolean userOccupiesRole(DeepaMehtaObject object, Topic username, String roleUri) {
         //
         if (roleUri.equals("dm4.accesscontrol.role_everyone")) {
             return true;
@@ -586,15 +623,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         if (roleUri.equals("dm4.accesscontrol.role_user")) {
             return true;
         } else if (roleUri.equals("dm4.accesscontrol.role_member")) {
-            if (userIsMember(username, topic)) {
+            if (userIsMember(username, object)) {
                 return true;
             }
         } else if (roleUri.equals("dm4.accesscontrol.role_owner")) {
-            if (userIsOwner(username, topic)) {
+            if (userIsOwner(username, object)) {
                 return true;
             }
         } else if (roleUri.equals("dm4.accesscontrol.role_creator")) {
-            if (userIsCreator(username, topic)) {
+            if (userIsCreator(username, object)) {
                 return true;
             }
         } else {
@@ -606,19 +643,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     /**
-     * Checks if a user is a member of a workspace the topic type is assigned to.
-     * In this case <code>true</code> is returned.
+     * Checks if a user is a member of any workspace the object is assigned to.
+     * If so, <code>true</code> is returned.
      *
      * Prerequisite: a user is logged in (<code>username</code> is not <code>null</code>).
-     *
-     * FIXME: for the moment only implemented for types, not for regular topics.
      *
      * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
      * @param   topic       actually a topic type.
      */
-    private boolean userIsMember(Topic username, Topic topic) {
-        Set<RelatedTopic> workspaces = wsService.getWorkspaces(topic.getId());
-        logger.fine("Topic type \"" + topic.getUri() + "\" is assigned to " + workspaces.size() + " workspaces");
+    private boolean userIsMember(Topic username, DeepaMehtaObject object) {
+        Set<RelatedTopic> workspaces = wsService.getWorkspaces(object.getId()); // ### FIXME: check instance, not type
+        logger.fine(info(object) + " is assigned to " + workspaces.size() + " workspaces");
         for (RelatedTopic workspace : workspaces) {
             if (isMemberOfWorkspace(username.getId(), workspace.getId())) {
                 logger.fine(userInfo(username) + " IS member of workspace " + workspace);
@@ -631,40 +666,47 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     /**
-     * Checks if a user is the owner of the topic.
-     * In this case <code>true</code> is returned.
+     * Checks if a user is the owner of the object.
+     * If so, <code>true</code> is returned.
      *
      * Prerequisite: a user is logged in (<code>username</code> is not <code>null</code>).
      *
      * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
      */
-    private boolean userIsOwner(Topic username, Topic topic) {
-        Topic owner = getOwner(topic);
+    private boolean userIsOwner(Topic username, DeepaMehtaObject object) {
+        Topic owner = getOwner(object);
         logger.fine("The owner is " + userInfo(owner));
-        return owner != null && username.getId() == owner.getId();
+        return owner != null && owner.getId() == username.getId();
     }
 
     /**
-     * Checks if a user is the creator of the topic.
-     * In this case <code>true</code> is returned.
+     * Checks if a user is the creator of the object.
+     * If so, <code>true</code> is returned.
      *
      * Prerequisite: a user is logged in (<code>username</code> is not <code>null</code>).
      *
      * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
      */
-    private boolean userIsCreator(Topic username, Topic topic) {
-        Topic creator = getCreator(topic);
+    private boolean userIsCreator(Topic username, DeepaMehtaObject object) {
+        Topic creator = getCreator(object);
         logger.fine("The creator is " + userInfo(creator));
-        return creator != null && username.getId() == creator.getId();
+        return creator != null && creator.getId() == username.getId();
     }
 
     // ---
 
-    private Set<RelatedTopic> getACLEntries(Topic topic) {
-        return facetsService.getFacets(topic, "dm4.accesscontrol.acl_facet");
+    /**
+     * Retrieves all ACL entries of the specified object.
+     */
+    private Set<RelatedTopic> getACLEntries(DeepaMehtaObject object) {
+        return facetsService.getFacets(object, "dm4.accesscontrol.acl_facet");
     }
 
-    private boolean getAllowed(Topic aclEntry, Operation operation) {
+    /**
+     * For the specified ACL entry: reads out the "allowed" value for the specified operation.
+     * If no "allowed" value is set for that operation <code>false</code> is returned.
+     */
+    private boolean allowed(Topic aclEntry, Operation operation) {
         for (TopicModel permission : aclEntry.getCompositeValue().getTopics("dm4.accesscontrol.permission")) {
             if (permission.getCompositeValue().getTopic("dm4.accesscontrol.operation").getUri().equals(operation.uri)) {
                 return permission.getCompositeValue().getBoolean("dm4.accesscontrol.allowed");
@@ -676,12 +718,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     /**
-     * Returns the creator of a topic, or <code>null</code> if no creator is set.
+     * Retrieves the creator of an object, or <code>null</code> if no creator is set.
      *
      * @return  a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
      */
-    private Topic getCreator(Topic topic) {
-        Topic creator = facetsService.getFacet(topic, "dm4.accesscontrol.creator_facet");
+    private Topic getCreator(DeepaMehtaObject object) {
+        Topic creator = facetsService.getFacet(object, "dm4.accesscontrol.creator_facet");
         if (creator == null) {
             return null;
         }
@@ -690,12 +732,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     /**
-     * Returns the owner of a topic, or <code>null</code> if no owner is set.
+     * Retrieves the owner of an object, or <code>null</code> if no owner is set.
      *
      * @return  a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
      */
-    private Topic getOwner(Topic topic) {
-        Topic owner = facetsService.getFacet(topic, "dm4.accesscontrol.owner_facet");
+    private Topic getOwner(DeepaMehtaObject object) {
+        Topic owner = facetsService.getFacet(object, "dm4.accesscontrol.owner_facet");
         if (owner == null) {
             return null;
         }
@@ -712,10 +754,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    private void enrichWithPermissions(Topic topic, boolean write) {
+    private void enrichWithPermissions(DeepaMehtaObject object, boolean write) {
         // Note: we must extend/override possibly existing permissions.
         // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
-        CompositeValue permissions = getPermissions(topic);
+        CompositeValue permissions = getPermissions(object);
         permissions.put(Operation.WRITE.uri, write);
     }
 
@@ -729,16 +771,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    private CompositeValue getPermissions(Topic topic) {
+    private CompositeValue getPermissions(DeepaMehtaObject object) {
         // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
         // Permissions are transient data, not stored in DB, recalculated for each request.
-        TopicModel permissionsTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.permissions", null);
+        TopicModel permissionsTopic = object.getCompositeValue().getTopic("dm4.accesscontrol.permissions", null);
         CompositeValue permissions;
         if (permissionsTopic != null) {
             permissions = permissionsTopic.getCompositeValue();
         } else {
             permissions = new CompositeValue();
-            topic.getCompositeValue().put("dm4.accesscontrol.permissions", permissions);
+            object.getCompositeValue().put("dm4.accesscontrol.permissions", permissions);
         }
         return permissions;
     }
@@ -791,12 +833,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === Logging ===
 
-    private String userInfo(Topic topic) {
-        if (topic == null) {
-            return "user <anonymous>";
+    private String info(DeepaMehtaObject object) {
+        if (object instanceof Topic) {
+            return info((Topic) object);
+        } else if (object instanceof Association) {
+            return info((Association) object);
+        } else {
+            throw new RuntimeException("Unexpected object: " + object);
         }
-        return "user \"" + topic.getSimpleValue() + "\" (id=" + topic.getId() + ", typeUri=\"" + topic.getTypeUri() +
-            "\")";
     }
 
     private String info(Topic topic) {
@@ -804,6 +848,23 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return "topic <null>";
         }
         return "topic " + topic.getId() + " (typeUri=\"" + topic.getTypeUri() + "\", uri=\"" + topic.getUri() + "\")";
+    }
+
+    private String info(Association assoc) {
+        if (assoc == null) {
+            return "association <null>";
+        }
+        return "association " + assoc.getId() + " (typeUri=\"" + assoc.getTypeUri() + "\")";
+    }
+
+    // ---
+
+    private String userInfo(Topic topic) {
+        if (topic == null) {
+            return "user <anonymous>";
+        }
+        return "user \"" + topic.getSimpleValue() + "\" (id=" + topic.getId() + ", typeUri=\"" + topic.getTypeUri() +
+            "\")";
     }
 
     private String info(HttpSession session) {
