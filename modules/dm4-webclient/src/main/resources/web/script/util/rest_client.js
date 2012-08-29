@@ -180,14 +180,6 @@ function RESTClient(core_service_uri) {
 
 
 
-    // === Commands ===
-
-    this.execute_command = function(command, params) {
-        return request("POST", "/command/" + command, params)
-    }
-
-
-
     // === Plugins ===
 
     this.get_plugins = function() {
@@ -205,8 +197,8 @@ function RESTClient(core_service_uri) {
      * namespace (server-side) and add corresponding service calls to the REST client instance.
      * For example, see the DeepaMehta 4 Topicmaps plugin.
      */
-    this.request = function(method, uri, data, content_type) {
-        return request(method, uri, data, undefined, content_type, true)    // callback=undefined
+    this.request = function(method, uri, data, headers) {
+        return request(method, uri, data, undefined, headers, true)     // callback=undefined
     }
 
     /**
@@ -225,19 +217,19 @@ function RESTClient(core_service_uri) {
      *
      * @param   data                The data to be send as the request body. This argument depends on the
      *                              content_type argument. By default the data object (key/value pairs) is
-     *                              serialized to JSON. Note: pairs with undefined values are not serialzed.
-     * @param   content_type        Optional: the content type of the data. Default is "application/json".
+     *                              serialized to JSON. Note: pairs with undefined values are not serialzed. ### FIXDOC
+     * @param   content_type        Optional: the content type of the data. Default is "application/json".   ### FIXDOC
      * @param   is_absolute_uri     If true, the URI is interpreted as relative to the DeepaMehta core service URI.
      *                              If false, the URI is interpreted as an absolute URI.
      */
-    function request(method, uri, data, callback, content_type, is_absolute_uri) {
+    function request(method, uri, data, callback, headers, is_absolute_uri) {
         var async = callback != undefined
         var status          // used only for synchronous request: "success" if request was successful
         var response_data   // used only for synchronous successful request: the response data (response body)
         //
         if (LOG_AJAX_REQUESTS) dm4c.log(method + " " + uri + "\n..... " + JSON.stringify(data))
         //
-        content_type = content_type || "application/json"       // set default
+        var content_type = headers && headers["Content-Type"] || "application/json"       // set default
         if (content_type == "application/json") {
             data = JSON.stringify(data)
         }
@@ -246,6 +238,7 @@ function RESTClient(core_service_uri) {
             type: method,
             url: is_absolute_uri ? uri : core_service_uri + uri,
             contentType: content_type,
+            headers: headers,
             data: data,
             processData: false,
             async: async,

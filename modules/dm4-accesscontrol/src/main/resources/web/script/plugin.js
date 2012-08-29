@@ -9,8 +9,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     // === REST Client Extension ===
 
-    dm4c.restc.login = function(username, password) {
-        return this.request("GET", "/accesscontrol/login/" + username + "/" + password)
+    dm4c.restc.login = function(authorization) {
+        return this.request("POST", "/accesscontrol/login", undefined, {"Authorization": authorization})
     }
     dm4c.restc.logout = function() {
         return this.request("POST", "/accesscontrol/logout")
@@ -117,13 +117,20 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
             function do_try_login() {
                 var username = username_input.val()
-                var password = encrypt_password(password_input.val())
-                var username_topic = dm4c.restc.login(username, password)
+                var password = password_input.val()
+                var username_topic = dm4c.restc.login(authorization())
                 if (username_topic) {
                     show_message("Login OK", "ok", close_login_dialog)
                     update_gui_login(username_topic)
                 } else {
                     show_message("Login failed", "failed")
+                }
+
+                /**
+                 * Returns value for the "Authorization" header.
+                 */
+                function authorization() {
+                    return "Basic " + btoa(username + ":" + password)   // ### FIXME: btoa() might not work in IE
                 }
             }
 

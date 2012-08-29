@@ -11,12 +11,17 @@ import de.deepamehta.core.service.PluginService;
 public interface AccessControlService extends PluginService {
 
     /**
-     * Checks weather the credentials match an existing User Account, and if so, creates an HTTP session.
+     * Checks weather the credentials in the authorization string match an existing User Account,
+     * and if so, creates an HTTP session. ### FIXDOC
+     *
+     * @param   authHeader  the authorization string containing the credentials. ### FIXDOC
+     *                      Formatted like a "Authorization" HTTP header value. That is, "Basic " appended by the
+     *                      Base64 encoded form of "{username}:{password}".
      *
      * @return  The username of the matched User Account (a Topic of type "Username" /
      *          <code>dm4.accesscontrol.username</code>), or <code>null</code> if there is no matching User Account.
      */
-    Topic login(String username, String password);
+    Topic login();
 
     /**
      * @return  A <code>true</code> value instructs the webclient to shutdown. That is, its GUI must no longer be

@@ -40,12 +40,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
@@ -114,11 +114,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    @GET    // ### FIXME: should be POST (requires exception for request filter rules)
-    @Path("/login/{username}/{password}")
+    @POST
+    @Path("/login")
     @Override
-    public Topic login(@PathParam("username") String username, @PathParam("password") String password) {
-        return login(username, password, request);
+    public Topic login() {
+        // Note: the actual login is triggered by the RequestFilter. See checkRequest() below.
+        return getUsername();
     }
 
     @POST
@@ -141,7 +142,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             if (session == null) {
                 return null;
             }
-            return getUsername(session);
+            return username(session);
         } catch (IllegalStateException e) {
             // Note: if not invoked through network no request (and thus no session) is available.
             // This happens e.g. while starting up.
@@ -155,7 +156,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/topic/{topic_id}")
     @Override
     public Permissions getTopicPermissions(@PathParam("topic_id") long topicId) {
-        return permissions(hasPermission(getUsername(), Operation.WRITE, topicId));
+        return createPermissions(hasPermission(getUsername(), Operation.WRITE, topicId));
     }
 
     // ---
@@ -185,7 +186,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void setOwner(@PathParam("topic_id") long topicId, @PathParam("user_id") long userId) {
         Topic topic = dms.getTopic(topicId, false, null);
-        facetsService.updateFacet(topic, "dm4.accesscontrol.owner_facet", ownerModel(userId), null, null);
+        facetsService.updateFacet(topic, "dm4.accesscontrol.owner_facet", createOwnerModel(userId), null, null);
     }
 
     // ---
@@ -200,7 +201,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void createACLEntry(Topic topic, Role role, Permissions permissions) {
-        TopicModel aclEntry = aclEntryModel(role, permissions);
+        TopicModel aclEntry = createAclEntryModel(role, permissions);
+        // Note: acl_facet is a multi-facet. So we must pass a (one-element) list.
         facetsService.updateFacets(topic, "dm4.accesscontrol.acl_facet", asList(aclEntry), null, null);
     }
 
@@ -223,16 +225,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
+    /**
+     * Called from {@link RequestFilter#doFilter}.
+     */
     @Override
     public void checkRequest(HttpServletRequest request) throws AccessControlException {
-        String authHeader = request.getHeader("Authorization");
-        HttpSession session = request.getSession(false);    // create=false
         logger.fine("##### " + request.getMethod() + " " + request.getRequestURL() +
-            "\n      ##### \"Authorization\"=\"" + authHeader + "\"" + 
-            "\n      ##### " + info(session));
+            "\n      ##### \"Authorization\"=\"" + request.getHeader("Authorization") + "\"" + 
+            "\n      ##### " + info(request.getSession(false)));    // create=false
         //
         checkRequestOrigin(request);
-        checkAuthorization(request, authHeader, session);
+        checkAuthorization(request);
     }
 
     // ---
@@ -250,16 +253,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
-    private void checkAuthorization(HttpServletRequest request, String authHeader, HttpSession session)
-                                                                                        throws AccessControlException {
+    private void checkAuthorization(HttpServletRequest request) throws AccessControlException {
         boolean authorized = false;
         if (isLoginRequired(request)) {
+            HttpSession session = request.getSession(false);    // create=false
             if (session != null) {
                 authorized = true;
             } else {
+                String authHeader = request.getHeader("Authorization");
                 if (authHeader != null) {
-                    Credentials cred = new Credentials(authHeader);
-                    Topic username = login(cred.username, cred.password, request);
+                    Topic username = login(new Credentials(authHeader), request);
                     if (username != null) {
                         authorized = true;
                     }
@@ -275,6 +278,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
+    // ---
+
     private boolean isLoginRequired(HttpServletRequest request) {
         return request.getMethod().equals("GET") ? READ_REQUIRES_LOGIN : WRITE_REQUIRES_LOGIN;
     }
@@ -285,18 +290,76 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @return  The username of the matched User Account (a Topic of type "Username" /
      *          <code>dm4.accesscontrol.username</code>), or <code>null</code> if there is no matching User Account.
      */
-    private Topic login(String username, String password, HttpServletRequest request) {
-        Topic userName = checkCredentials(username, password);
+    private Topic login(Credentials cred, HttpServletRequest request) {
+        Topic username = checkCredentials(cred);
         //
-        if (userName != null) {
-            HttpSession session = createSession(userName, request);
-            logger.info("##### Logging in as \"" + username + "\" => SUCCESSFUL!" +
+        if (username != null) {
+            HttpSession session = createSession(username, request);
+            logger.info("##### Logging in as \"" + cred.username + "\" => SUCCESSFUL!" +
                 "\n      ##### Creating new " + info(session));
-            return userName;
+            return username;
         } else {
-            logger.info("##### Logging in as \"" + username + "\" => FAILED!");
+            logger.info("##### Logging in as \"" + cred.username + "\" => FAILED!");
             return null;
         }
+    }
+
+    private Topic checkCredentials(Credentials cred) {
+        Topic username = fetchUsername(cred.username);
+        if (username == null) {
+            return null;
+        }
+        if (!matches(username, cred.password)) {
+            return null;
+        }
+        return username;
+    }
+
+    private HttpSession createSession(Topic username, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        session.setAttribute("username", username);
+        return session;
+    }
+
+    // ---
+
+    /**
+     * Prerequisite: username is not <code>null</code>.
+     *
+     * @param   password    The encrypted password.
+     */
+    private boolean matches(Topic username, String password) {
+        return password(fetchUserAccount(username)).equals(password);
+    }
+
+    /**
+     * Prerequisite: username is not <code>null</code>.
+     */
+    private Topic fetchUserAccount(Topic username) {
+        Topic userAccount = username.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole",
+            "dm4.accesscontrol.user_account", true, false, null);  // fetchComposite=true, fetchRelatingComposite=false
+        if (userAccount == null) {
+            throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
+                username.getSimpleValue() + "\" (username=" + username + ")");
+        }
+        return userAccount;
+    }
+
+    // ---
+
+    private Topic username(HttpSession session) {
+        Topic username = (Topic) session.getAttribute("username");
+        if (username == null) {
+            throw new RuntimeException("Session data inconsistency: \"username\" attribute is missing");
+        }
+        return username;
+    }
+
+    /**
+     * @return  The encryted password of the specified User Account.
+     */
+    private String password(Topic userAccount) {
+        return userAccount.getCompositeValue().getString("dm4.accesscontrol.password");
     }
 
 
@@ -425,107 +488,49 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    /**
-     * Prerequisite: username is not <code>null</code>.
-     */
-    private Topic getUserAccount(Topic username) {
-        Topic userAccount = username.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole",
-            "dm4.accesscontrol.user_account", true, false, null);  // fetchComposite=true, fetchRelatingComposite=false
-        if (userAccount == null) {
-            throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
-                username.getSimpleValue() + "\" (username=" + username + ")");
-        }
-        return userAccount;
-    }
-
-    // ---
-
-    /**
-     * Retrieves the "Username" topic for the specified username.
-     *
-     * @return  The retrieved Username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
-     *          or <code>null</code> if no such Username topic exists.
-     */
-    private Topic getUsername(String username) {
-        return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username), false, null);
-    }
-
-    private Topic getUsername(HttpSession session) {
-        Topic username = (Topic) session.getAttribute("username");
-        if (username == null) {
-            throw new RuntimeException("Session data inconsistency: \"username\" attribute is missing");
-        }
-        return username;
-    }
-
-    // ---
-
-    /**
-     * Retrieves the "Username" topic for the "admin" user.
-     * If the "admin" user doesn't exist an exception is thrown.
-     *
-     * @return  The retrieved Username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>).
-     */
-    private Topic getAdminUser() {
-        Topic username = getUsername(DEFAULT_USERNAME);
-        if (username == null) {
-            throw new RuntimeException("The \"" + DEFAULT_USERNAME + "\" user doesn't exist");
-        }
-        return username;
-    }
-
-    // ---
-
     private void setCreator(Topic topic) {
         Topic username = getUsername();
         //
         if (username == null) {
             logger.fine("Assigning a creator to " + info(topic) + " failed " +
                 "(no user is logged in). Assigning user \"admin\" instead.");
-            username = getAdminUser();
+            username = fetchAdminUser();
         }
         //
         setCreator(topic, username.getId());
     }
 
     private void setCreator(Topic topic, long usernameId) {
-        facetsService.updateFacet(topic, "dm4.accesscontrol.creator_facet", creatorModel(usernameId), null, null);
+        facetsService.updateFacet(topic, "dm4.accesscontrol.creator_facet", createCreatorModel(usernameId), null, null);
     }
 
     // ---
 
-    private Topic checkCredentials(String username, String password) {
-        Topic userName = getUsername(username);
-        if (userName == null) {
-            return null;
-        }
-        if (!matches(userName, password)) {
-            return null;
-        }
-        return userName;
-    }
-
     /**
-     * Prerequisite: username is not <code>null</code>.
+     * Fetches the "Username" topic for the "admin" user.
+     * If the "admin" user doesn't exist an exception is thrown.
      *
-     * @param   password    The encrypted password.
+     * @return  The retrieved Username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>).
      */
-    private boolean matches(Topic username, String password) {
-        return getPassword(getUserAccount(username)).equals(password);
+    private Topic fetchAdminUser() {
+        Topic username = fetchUsername(DEFAULT_USERNAME);
+        if (username == null) {
+            throw new RuntimeException("The \"" + DEFAULT_USERNAME + "\" user doesn't exist");
+        }
+        return username;
     }
 
     /**
-     * @return  The encryted password of the specified User Account.
+     * Fetches the "Username" topic for the specified username.
+     *
+     * @return  The retrieved Username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
+     *          or <code>null</code> if no such Username topic exists.
      */
-    private String getPassword(Topic userAccount) {
-        return userAccount.getCompositeValue().getString("dm4.accesscontrol.password");
+    private Topic fetchUsername(String username) {
+        return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username), false, null);
     }
 
-    private HttpSession createSession(Topic username, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        session.setAttribute("username", username);
-        return session;
-    }
+
 
     // === ACL Entries ===
 
@@ -550,10 +555,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     private boolean hasPermission(Topic username, Operation operation, Topic topic) {
         logger.fine("Determining permission for " + userInfo(username) + " to " + operation + " " + info(topic));
-        for (RelatedTopic aclEntry : getACLEntries(topic)) {
+        for (RelatedTopic aclEntry : fetchACLEntries(topic)) {
             String roleUri = aclEntry.getCompositeValue().getTopic("dm4.accesscontrol.role").getUri();
             logger.fine("There is an ACL entry for role \"" + roleUri + "\"");
-            boolean allowedForRole = getAllowed(aclEntry, operation);
+            boolean allowedForRole = allowed(aclEntry, operation);
             logger.fine("value=" + allowedForRole);
             if (allowedForRole && userOccupiesRole(topic, username, roleUri)) {
                 logger.fine("=> ALLOWED");
@@ -561,6 +566,21 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             }
         }
         logger.fine("=> DENIED");
+        return false;
+    }
+
+    // ---
+
+    private Set<RelatedTopic> fetchACLEntries(Topic topic) {
+        return facetsService.getFacets(topic, "dm4.accesscontrol.acl_facet");
+    }
+
+    private boolean allowed(Topic aclEntry, Operation operation) {
+        for (TopicModel permission : aclEntry.getCompositeValue().getTopics("dm4.accesscontrol.permission")) {
+            if (permission.getCompositeValue().getTopic("dm4.accesscontrol.operation").getUri().equals(operation.uri)) {
+                return permission.getCompositeValue().getBoolean("dm4.accesscontrol.allowed");
+            }
+        }
         return false;
     }
 
@@ -660,21 +680,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    private Set<RelatedTopic> getACLEntries(Topic topic) {
-        return facetsService.getFacets(topic, "dm4.accesscontrol.acl_facet");
-    }
-
-    private boolean getAllowed(Topic aclEntry, Operation operation) {
-        for (TopicModel permission : aclEntry.getCompositeValue().getTopics("dm4.accesscontrol.permission")) {
-            if (permission.getCompositeValue().getTopic("dm4.accesscontrol.operation").getUri().equals(operation.uri)) {
-                return permission.getCompositeValue().getBoolean("dm4.accesscontrol.allowed");
-            }
-        }
-        return false;
-    }
-
-    // ---
-
     /**
      * Returns the creator of a topic, or <code>null</code> if no creator is set.
      *
@@ -715,21 +720,21 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private void enrichWithPermissions(Topic topic, boolean write) {
         // Note: we must extend/override possibly existing permissions.
         // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
-        CompositeValue permissions = getPermissions(topic);
+        CompositeValue permissions = permissions(topic);
         permissions.put(Operation.WRITE.uri, write);
     }
 
     private void enrichWithPermissions(TopicType topicType, boolean write, boolean create) {
         // Note: we must extend/override possibly existing permissions.
         // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
-        CompositeValue permissions = getPermissions(topicType);
+        CompositeValue permissions = permissions(topicType);
         permissions.put(Operation.WRITE.uri, write);
         permissions.put(Operation.CREATE.uri, create);
     }
 
     // ---
 
-    private CompositeValue getPermissions(Topic topic) {
+    private CompositeValue permissions(Topic topic) {
         // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
         // Permissions are transient data, not stored in DB, recalculated for each request.
         TopicModel permissionsTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.permissions", null);
@@ -745,20 +750,20 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    private TopicModel creatorModel(long usernameId) {
+    private TopicModel createCreatorModel(long usernameId) {
         return new TopicModel("dm4.accesscontrol.creator", new CompositeValue()
             .putRef("dm4.accesscontrol.username", usernameId)
         );
     }
 
     // ### FIXME: ref username instead of user account
-    private TopicModel ownerModel(long userId) {
+    private TopicModel createOwnerModel(long userId) {
         return new TopicModel("dm4.accesscontrol.owner", new CompositeValue()
             .putRef("dm4.accesscontrol.user_account", userId)
         );
     }
 
-    private TopicModel aclEntryModel(Role role, Permissions permissions) {
+    private TopicModel createAclEntryModel(Role role, Permissions permissions) {
         return new TopicModel("dm4.accesscontrol.acl_entry", new CompositeValue()
             .putRef("dm4.accesscontrol.role", role.uri)
             .put("dm4.accesscontrol.permission", permissions.asTopics())
@@ -767,14 +772,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    private Permissions permissions(boolean write) {
+    private Permissions createPermissions(boolean write) {
         Permissions permissions = new Permissions();
         permissions.add(Operation.WRITE, write);
         return permissions;
     }
 
-    private Permissions permissions(boolean write, boolean create) {
-        Permissions permissions = permissions(write);
+    private Permissions createPermissions(boolean write, boolean create) {
+        Permissions permissions = createPermissions(write);
         permissions.add(Operation.CREATE, create);
         return permissions;
     }
@@ -788,6 +793,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private boolean isPluginType(TopicType type) {
         return type.getUri().startsWith("dm4.accesscontrol.");
     }
+
+
 
     // === Logging ===
 
@@ -808,6 +815,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private String info(HttpSession session) {
         return "session" + (session != null ? " " + session.getId() +
-            " (username=" + getUsername(session) + ")" : ": null");
+            " (username=" + username(session) + ")" : ": null");
     }
 }
