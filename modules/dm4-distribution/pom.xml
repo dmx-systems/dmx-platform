@@ -17,7 +17,7 @@
         <version>4.0.12-SNAPSHOT</version>
     </parent>
 
-    <!-- These 2 properties are overridden. We must use relative paths for the distribution. -->
+    <!-- These 2 properties are overridden. For the distribution we must use relative paths. -->
     <properties>
         <java.util.logging.config.file>conf/logging.properties</java.util.logging.config.file>
         <dm4.database.path>deepamehta-db</dm4.database.path>

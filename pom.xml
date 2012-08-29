@@ -17,13 +17,21 @@
         <relativePath>modules/dm4-parent/pom.xml</relativePath>
     </parent>
 
-    <!-- Note: the dm4.database.path property is required by both, the 'run' and the 'neo4j' profile. -->
-    <!-- The other dm4.* properties are required by 'run' only. They are placed here for clarity.     -->
     <properties>
+        <!-- Webserver -->
+        <org.osgi.service.http.port>8080</org.osgi.service.http.port>
+        <org.osgi.service.http.port.secure>4433</org.osgi.service.http.port.secure>
+        <org.apache.felix.http.enable>true</org.apache.felix.http.enable>
+        <org.apache.felix.https.enable>false</org.apache.felix.https.enable>
+        <org.apache.felix.https.keystore.password></org.apache.felix.https.keystore.password>
+        <org.apache.felix.https.keystore.key.password></org.apache.felix.https.keystore.key.password>
+        <!-- Request Filter -->
         <dm4.security.read_requires_login>false</dm4.security.read_requires_login>
         <dm4.security.write_requires_login>true</dm4.security.write_requires_login>
         <dm4.security.subnet_filter>127.0.0.1/32</dm4.security.subnet_filter>
+        <!-- Database -->
         <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
+        <!-- File Repository -->
         <dm4.filerepo.path></dm4.filerepo.path>
     </properties>
 
@@ -34,7 +42,6 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <org.osgi.service.http.port>8080</org.osgi.service.http.port>
                 <file.encoding>UTF-8</file.encoding>
                 <java.util.logging.config.file>
                     ${project.basedir}/modules/dm4-distribution/conf/logging.properties
