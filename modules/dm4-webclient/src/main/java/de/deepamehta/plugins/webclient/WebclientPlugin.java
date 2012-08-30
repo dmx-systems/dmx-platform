@@ -253,7 +253,16 @@ public class WebclientPlugin extends PluginActivator implements PreUpdateTopicLi
     // === Webclient Start ===
 
     private String getWebclientUrl() {
-        String port = System.getProperty("org.osgi.service.http.port");
-        return "http://localhost:" + port + "/de.deepamehta.webclient/";
+        boolean isHttpsEnabled = Boolean.valueOf(System.getProperty("org.apache.felix.https.enable"));
+        String protocol, port;
+        if (isHttpsEnabled) {
+            // Note: if both protocols are enabled HTTPS takes precedence
+            protocol = "https";
+            port = System.getProperty("org.osgi.service.http.port.secure");
+        } else {
+            protocol = "http";
+            port = System.getProperty("org.osgi.service.http.port");
+        }
+        return protocol + "://localhost:" + port + "/de.deepamehta.webclient/";
     }
 }
