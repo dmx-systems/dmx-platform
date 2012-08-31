@@ -321,24 +321,11 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         }
     }
 
-    // ---
-
     private void filterTopic(Role role, String roleTypeUri, Set<Topic> topics) {
         if (role instanceof TopicRole && role.getRoleTypeUri().equals(roleTypeUri)) {
-            topics.add(fetchRoleTopic((TopicRole) role));
+            topics.add(((TopicRole) role).getTopic());
         }
     }
-
-    // FIXME: move to AttachedTopicRole / extend TopicRole interface?
-    private Topic fetchRoleTopic(TopicRole role) {
-        if (role.topicIdentifiedByUri()) {
-            return dms.getTopic("uri", new SimpleValue(role.getTopicUri()), false, null);   // fetchComposite=false
-        } else {
-            return dms.getTopic(role.getTopicId(), false, null);    // fetchComposite=false, clientState=null
-        }
-    }
-
-    // ---
 
     private RelatedTopic fetchTypeTopic() {
         // assocTypeUri=null (supposed to be "dm4.core.instantiation" but not possible ### explain)

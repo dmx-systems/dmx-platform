@@ -475,7 +475,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             is_writable: function() {
                 return topicmap_topics[topicmap_id]
                     .composite["dm4.accesscontrol.permissions"]
-                    .composite["dm4.accesscontrol.operation_write"].value
+                    .composite["dm4.accesscontrol.operation.write"].value
             }
         }
         // load topicmap

@@ -27,8 +27,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     dm4c.restc.set_owner = function(topic_id, user_id) {
         this.request("POST", "/accesscontrol/topic/" + topic_id + "/owner/" + user_id)
     }
-    dm4c.restc.create_acl_entry = function(topic_id, role, permissions) {
-        this.request("POST", "/accesscontrol/topic/" + topic_id + "/role/" + role, permissions)
+    dm4c.restc.create_acl_entry = function(topic_id, user_role_uri, permissions) {
+        this.request("POST", "/accesscontrol/topic/" + topic_id + "/userrole/" + user_role_uri, permissions)
     }
     dm4c.restc.join_workspace = function(workspace_id, user_id) {
         this.request("POST", "/accesscontrol/user/" + user_id + "/" + workspace_id)
@@ -194,7 +194,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 "\") has no permissions info"
         }
         //
-        return permissions.composite["dm4.accesscontrol.operation_write"].value
+        return permissions.composite["dm4.accesscontrol.operation.write"].value
     })
 
     dm4c.add_listener("has_write_permission_for_association", function(assoc) {
@@ -205,7 +205,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 "\") has no permissions info"
         }
         //
-        return permissions.composite["dm4.accesscontrol.operation_write"].value
+        return permissions.composite["dm4.accesscontrol.operation.write"].value
     })
 
     dm4c.add_listener("has_create_permission", function(topic_type) {
@@ -215,7 +215,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             throw "AccessControlError: topic type \"" + topic_type.uri + "\" has no permissions info"
         }
         //
-        return permissions.composite["dm4.accesscontrol.operation_create"].value
+        return permissions.composite["dm4.accesscontrol.operation.create"].value
     })
 
 
@@ -251,8 +251,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         dm4c.restc.set_owner(topic_id, user_id)
     }
 
-    this.create_acl_entry = function(topic_id, role, permissions) {
-        dm4c.restc.create_acl_entry(topic_id, role, permissions)
+    this.create_acl_entry = function(topic_id, user_role_uri, permissions) {
+        dm4c.restc.create_acl_entry(topic_id, user_role_uri, permissions)
     }
 
     this.join_workspace = function(workspace_id, user_id) {

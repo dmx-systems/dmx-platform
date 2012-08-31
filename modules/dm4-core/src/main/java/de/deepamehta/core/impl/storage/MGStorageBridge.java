@@ -150,7 +150,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public void setTopicUri(long topicId, String uri) {
-        setNodeUri(mg.getMehtaNode(topicId), uri);
+        storeAndIndexUri(mg.getMehtaNode(topicId), uri);
     }
 
     @Override
@@ -170,13 +170,18 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     @Override
     public void createTopic(TopicModel topicModel) {
         String uri = topicModel.getUri();
-        // 1) check uniqueness
         checkUniqueness(uri);
-        // 2) create node
+        // 1) update DB
         MehtaNode node = mg.createMehtaNode();
+        storeAndIndexUri(node, uri);
+        // Note: an initial topic value is needed.
+        // Consider this case: in the POST_CREATE_ASSOCIATION listener a plugin fetches both of the associated
+        // topics (the Access Control plugin does). If that association is created in the course of storing the
+        // topic's composite value, that very topic doesn't have a simple value yet (it is known only once storing
+        // the composite value is complete). Fetching the topic would fail.
+        node.setString("value", "");
+        // 2) update model
         topicModel.setId(node.getId());
-        // 3) set URI
-        setNodeUri(node, uri);
     }
 
     @Override
@@ -318,7 +323,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public void setAssociationUri(long assocId, String uri) {
-        setEdgeUri(mg.getMehtaEdge(assocId), uri);
+        storeAndIndexUri(mg.getMehtaEdge(assocId), uri);
     }
 
     @Override
@@ -579,7 +584,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     /**
-     * Throws an exception if there is a topic with the given URI in the database.
+     * Checks if a topic with the given URI exists in the database, and if so, throws an exception.
      * If an empty string is given no check is performed.
      *
      * @param   uri     The URI to check. Must not be null.
@@ -596,13 +601,13 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
-    private void setNodeUri(MehtaNode node, String uri) {
+    private void storeAndIndexUri(MehtaNode node, String uri) {
         String oldUri = node.getString("uri", null);
         node.setString("uri", uri);
         node.indexAttribute(MehtaGraphIndexMode.KEY, "uri", uri, oldUri);
     }
 
-    private void setEdgeUri(MehtaEdge edge, String uri) {
+    private void storeAndIndexUri(MehtaEdge edge, String uri) {
         String oldUri = edge.getString("uri", null);
         edge.setString("uri", uri);
         edge.indexAttribute(MehtaGraphIndexMode.KEY, "uri", uri, oldUri);

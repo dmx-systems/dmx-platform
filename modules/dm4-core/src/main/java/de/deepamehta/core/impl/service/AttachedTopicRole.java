@@ -1,7 +1,9 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicRole;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
 
 import java.util.logging.Logger;
@@ -44,6 +46,17 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
         return getModel().topicIdentifiedByUri();
     }
 
+    // ---
+
+    @Override
+    public Topic getTopic() {
+        if (topicIdentifiedByUri()) {
+            return dms.getTopic("uri", new SimpleValue(getTopicUri()), false, null);    // fetchComposite=false
+        } else {
+            return dms.getTopic(getTopicId(), false, null);     // fetchComposite=false, clientState=null
+        }
+    }
+
 
 
     // === Role Overrides ===
@@ -55,6 +68,8 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
         // 2) update DB
         storeRoleTypeUri(roleTypeUri);
     }
+
+
 
     // === AttachedRole Overrides ===
 

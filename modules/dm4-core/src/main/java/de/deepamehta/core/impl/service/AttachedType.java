@@ -231,7 +231,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     void store() {
-        // 1) store the base-topic parts
+        // 1) store the base-topic parts ### FIXME: call super.store() instead?
         dms.storage.createTopic(getModel());
         dms.associateWithTopicType(getModel());
         setSimpleValue(getSimpleValue());

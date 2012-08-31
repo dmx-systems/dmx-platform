@@ -9,4 +9,8 @@ public interface TopicRole extends Role {
     String getTopicUri();
 
     boolean topicIdentifiedByUri();
+
+    // ---
+
+    Topic getTopic();
 }

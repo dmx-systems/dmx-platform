@@ -5,7 +5,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 
-public interface Role {
+public interface Role extends JSONEnabled {
 
     String getRoleTypeUri();
 
@@ -18,8 +18,4 @@ public interface Role {
     // ---
 
     RoleModel getModel();
-
-    // ---
-
-    JSONObject toJSON();
 }

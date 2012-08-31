@@ -3,7 +3,7 @@ package de.deepamehta.plugins.accesscontrol;
 import de.deepamehta.plugins.accesscontrol.model.Credentials;
 import de.deepamehta.plugins.accesscontrol.model.Operation;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
-import de.deepamehta.plugins.accesscontrol.model.Role;
+import de.deepamehta.plugins.accesscontrol.model.UserRole;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.facets.service.FacetsService;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
@@ -12,7 +12,9 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
+import de.deepamehta.core.Role;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.TopicRole;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
@@ -199,16 +201,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @POST
-    @Path("/topic/{topic_id}/role/{role_uri}")
+    @Path("/topic/{topic_id}/userrole/{user_role_uri}")
     @Override
-    public void createACLEntry(@PathParam("topic_id") long topicId, @PathParam("role_uri") Role role,
-                                                                                           Permissions permissions) {
-        createACLEntry(dms.getTopic(topicId, false, null), role, permissions);
+    public void createACLEntry(@PathParam("topic_id") long topicId, @PathParam("user_role_uri") UserRole userRole,
+                                                                                              Permissions permissions) {
+        createACLEntry(dms.getTopic(topicId, false, null), userRole, permissions);
     }
 
     @Override
-    public void createACLEntry(DeepaMehtaObject object, Role role, Permissions permissions) {
-        TopicModel aclEntry = createAclEntryModel(role, permissions);
+    public void createACLEntry(DeepaMehtaObject object, UserRole userRole, Permissions permissions) {
+        TopicModel aclEntry = createAclEntryModel(userRole, permissions);
         // Note: acl_facet is a multi-facet. So we must pass a (one-element) list.
         facetsService.updateFacets(object, "dm4.accesscontrol.acl_facet", asList(aclEntry), null, null);
     }
@@ -399,18 +401,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
         //
         assignCreator(topic);
-        createACLEntry(topic, Role.CREATOR, DEFAULT_TOPIC_PERMISSIONS);
+        createACLEntry(topic, UserRole.CREATOR, DEFAULT_TOPIC_PERMISSIONS);
     }
 
     @Override
     public void postCreateAssociation(Association assoc, ClientState clientState, Directives directives) {
-        /* ### TODO: explain
-        if (isPluginTopic(topic)) {
+        // ### TODO: explain
+        if (isPluginAssociation(assoc)) {
             return;
-        } */
+        }
         //
         assignCreator(assoc);
-        createACLEntry(assoc, Role.CREATOR, DEFAULT_ASSOCIATION_PERMISSIONS);
+        createACLEntry(assoc, UserRole.CREATOR, DEFAULT_ASSOCIATION_PERMISSIONS);
     }
 
     /* ### TODO: adapt to DM4
@@ -434,7 +436,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
         //
         assignCreator(topicType);
-        createACLEntry(topicType, Role.CREATOR, DEFAULT_TYPE_PERMISSIONS);
+        createACLEntry(topicType, UserRole.CREATOR, DEFAULT_TYPE_PERMISSIONS);
     }
 
     // ---
@@ -453,11 +455,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void preSendAssociation(Association assoc, ClientState clientState) {
-        /* ### TODO: explain
-        if (isPluginTopic(topic)) {
-            enrichWithPermissions(topic, false);    // write=false
+        // ### TODO: explain
+        if (isPluginAssociation(assoc)) {
+            enrichWithPermissions(assoc, false);    // write=false
             return;
-        } */
+        }
         //
         logger.fine("### Enriching " + info(assoc) + " with its permissions (clientState=" + clientState + ")");
         enrichWithPermissions(assoc, hasPermission(getUsername(), Operation.WRITE, assoc));
@@ -594,11 +596,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private boolean hasPermission(Topic username, Operation operation, DeepaMehtaObject object) {
         logger.fine("Determining permission for " + userInfo(username) + " to " + operation + " " + info(object));
         for (RelatedTopic aclEntry : fetchACLEntries(object)) {
-            String roleUri = aclEntry.getCompositeValue().getTopic("dm4.accesscontrol.role").getUri();
-            logger.fine("There is an ACL entry for role \"" + roleUri + "\"");
-            boolean allowedForRole = allowed(aclEntry, operation);
-            logger.fine("value=" + allowedForRole);
-            if (allowedForRole && userOccupiesRole(object, username, roleUri)) {
+            String userRoleUri = aclEntry.getCompositeValue().getTopic("dm4.accesscontrol.user_role").getUri();
+            logger.fine("There is an ACL entry for user role \"" + userRoleUri + "\"");
+            boolean allowedForUserRole = allowed(aclEntry, operation);
+            logger.fine("value=" + allowedForUserRole);
+            if (allowedForUserRole && userOccupiesRole(object, username, userRoleUri)) {
                 logger.fine("=> ALLOWED");
                 return true;
             }
@@ -638,9 +640,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
      *                      or <code>null</code> if no user is logged in.
      */
-    private boolean userOccupiesRole(DeepaMehtaObject object, Topic username, String roleUri) {
+    private boolean userOccupiesRole(DeepaMehtaObject object, Topic username, String userRoleUri) {
         //
-        if (roleUri.equals("dm4.accesscontrol.role_everyone")) {
+        if (userRoleUri.equals("dm4.accesscontrol.user_role.everyone")) {
             return true;
         }
         //
@@ -648,22 +650,22 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return false;
         }
         //
-        if (roleUri.equals("dm4.accesscontrol.role_user")) {
+        if (userRoleUri.equals("dm4.accesscontrol.user_role.user")) {
             return true;
-        } else if (roleUri.equals("dm4.accesscontrol.role_member")) {
+        } else if (userRoleUri.equals("dm4.accesscontrol.user_role.member")) {
             if (userIsMember(username, object)) {
                 return true;
             }
-        } else if (roleUri.equals("dm4.accesscontrol.role_owner")) {
+        } else if (userRoleUri.equals("dm4.accesscontrol.user_role.owner")) {
             if (userIsOwner(username, object)) {
                 return true;
             }
-        } else if (roleUri.equals("dm4.accesscontrol.role_creator")) {
+        } else if (userRoleUri.equals("dm4.accesscontrol.user_role.creator")) {
             if (userIsCreator(username, object)) {
                 return true;
             }
         } else {
-            throw new RuntimeException("\"" + roleUri + "\" is an unexpected role URI");
+            throw new RuntimeException("\"" + userRoleUri + "\" is an unexpected user role URI");
         }
         return false;
     }
@@ -806,9 +808,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         );
     }
 
-    private TopicModel createAclEntryModel(Role role, Permissions permissions) {
+    private TopicModel createAclEntryModel(UserRole userRole, Permissions permissions) {
         return new TopicModel("dm4.accesscontrol.acl_entry", new CompositeValue()
-            .putRef("dm4.accesscontrol.role", role.uri)
+            .putRef("dm4.accesscontrol.user_role", userRole.uri)
             .put("dm4.accesscontrol.permission", permissions.asTopics())
         );
     }
@@ -827,14 +829,30 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return permissions;
     }
 
-    // ---
-
-    private boolean isPluginTopic(Topic topic) {
-        return topic.getTypeUri().startsWith("dm4.accesscontrol.");
-    }
+    // ===
 
     private boolean isPluginType(TopicType type) {
-        return type.getUri().startsWith("dm4.accesscontrol.");
+        return isPluginUri(type.getUri());
+    }
+
+    private boolean isPluginTopic(Topic topic) {
+        return isPluginUri(topic.getTypeUri());
+    }
+
+    private boolean isPluginAssociation(Association assoc) {
+        return isPluginRole(assoc.getRole1()) || isPluginRole(assoc.getRole2());            
+    }
+
+    private boolean isPluginRole(Role role) {
+        if (!(role instanceof TopicRole)) {
+            return false;
+        }
+        Topic topic = ((TopicRole) role).getTopic();
+        return isPluginTopic(topic);
+    }
+
+    private boolean isPluginUri(String uri) {
+        return uri.startsWith("dm4.accesscontrol.");
     }
 
 

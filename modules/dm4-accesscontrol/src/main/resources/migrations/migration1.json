@@ -71,8 +71,8 @@
             ]
         },
         {
-            value: "Role",
-            uri: "dm4.accesscontrol.role",
+            value: "User Role",
+            uri: "dm4.accesscontrol.user_role",
             data_type_uri: "dm4.core.text",
             view_config_topics: [
                 {
@@ -89,7 +89,7 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:   "dm4.accesscontrol.role",
+                    part_topic_type_uri:   "dm4.accesscontrol.user_role",
                     part_cardinality_uri:  "dm4.core.one",
                     whole_cardinality_uri: "dm4.core.many",
                     assoc_type_uri:        "dm4.core.aggregation_def"
@@ -182,41 +182,41 @@
 
         {
             value:    "Write",
-            uri:      "dm4.accesscontrol.operation_write",
+            uri:      "dm4.accesscontrol.operation.write",
             type_uri: "dm4.accesscontrol.operation"
         },
         {
             value:    "Create",
-            uri:      "dm4.accesscontrol.operation_create",
+            uri:      "dm4.accesscontrol.operation.create",
             type_uri: "dm4.accesscontrol.operation"
         },
 
-        ### Roles ###
+        ### User Roles ###
 
         {
             value:    "Creator",
-            uri:      "dm4.accesscontrol.role_creator",
-            type_uri: "dm4.accesscontrol.role"
+            uri:      "dm4.accesscontrol.user_role.creator",
+            type_uri: "dm4.accesscontrol.user_role"
         },
         {
             value:    "Owner",
-            uri:      "dm4.accesscontrol.role_owner",
-            type_uri: "dm4.accesscontrol.role"
+            uri:      "dm4.accesscontrol.user_role.owner",
+            type_uri: "dm4.accesscontrol.user_role"
         },
         {
             value:    "Member",
-            uri:      "dm4.accesscontrol.role_member",
-            type_uri: "dm4.accesscontrol.role"
+            uri:      "dm4.accesscontrol.user_role.member",
+            type_uri: "dm4.accesscontrol.user_role"
         },
         {
             value:    "User",
-            uri:      "dm4.accesscontrol.role_user",
-            type_uri: "dm4.accesscontrol.role"
+            uri:      "dm4.accesscontrol.user_role.user",
+            type_uri: "dm4.accesscontrol.user_role"
         },
         {
             value:    "Everyone",
-            uri:      "dm4.accesscontrol.role_everyone",
-            type_uri: "dm4.accesscontrol.role"
+            uri:      "dm4.accesscontrol.user_role.everyone",
+            type_uri: "dm4.accesscontrol.user_role"
         }
     ]
 }
