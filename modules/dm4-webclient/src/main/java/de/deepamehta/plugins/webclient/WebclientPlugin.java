@@ -11,7 +11,6 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
-import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.listener.AllPluginsActiveListener;
@@ -83,9 +82,6 @@ public class WebclientPlugin extends PluginActivator implements PreUpdateTopicLi
             logger.info(singleTopics.size() + " single topics found, " + searchableUnits.size() + " searchable units");
             Topic searchTopic = createSearchTopic("\"" + searchTerm + "\"", searchableUnits, clientState);
             tx.success();
-            // ### TODO: firing PRE_SEND should not be up to the plugin developer.
-            // ### Possibly a JAX-RS 2.0 entity interceptor could be used instead.
-            dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, searchTopic, clientState);
             return searchTopic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -114,9 +110,6 @@ public class WebclientPlugin extends PluginActivator implements PreUpdateTopicLi
             ResultSet<Topic> result = dms.getTopics(typeUri, false, maxResultSize, clientState); // fetchComposite=false
             Topic searchTopic = createSearchTopic(searchTerm, result.getItems(), clientState);
             tx.success();
-            // ### TODO: firing PRE_SEND should not be up to the plugin developer.
-            // ### Possibly a JAX-RS 2.0 entity interceptor could be used instead.
-            dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, searchTopic, clientState);
             return searchTopic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");

@@ -18,13 +18,9 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
-import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.ObjectFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
@@ -32,15 +28,9 @@ import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -577,15 +567,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
-    // === Events ===
-
-    @Override
-    public List<Object> fireEvent(CoreEvent event, Object... params) {
-        return listenerRegistry.fireEvent(event, params);
-    }
-
-
-
     // === Misc ===
 
     @Override
@@ -643,9 +624,17 @@ public class EmbeddedService implements DeepaMehtaService {
         storage.shutdown();
     }
 
-
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
+
+
+
+    // === Events ===
+
+    List<Object> fireEvent(CoreEvent event, Object... params) {
+        return listenerRegistry.fireEvent(event, params);
+    }
+
+
 
     // === Helper ===
 

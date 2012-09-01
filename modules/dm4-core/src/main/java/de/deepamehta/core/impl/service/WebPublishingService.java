@@ -3,11 +3,11 @@ package de.deepamehta.core.impl.service;
 import de.deepamehta.core.service.SecurityHandler;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 
@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Application;
 
 import java.net.URL;
 import java.util.HashSet;
@@ -32,7 +31,7 @@ public class WebPublishingService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Application rootApplication;
+    private ResourceConfig rootApplication;
     private int classCount = 0;         // counts DM root resource and provider classes
     private int singletonCount = 0;     // counts DM root resource and provider instances
     // Note: we count DM resources separately as Jersey adds its own ones to the application.
@@ -42,25 +41,25 @@ public class WebPublishingService {
     private boolean isJerseyServletRegistered = false;
 
     private HttpService httpService;
-    private ServiceRegistration registration;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public WebPublishingService(BundleContext context, HttpService httpService) {
+    public WebPublishingService(EmbeddedService dms, HttpService httpService) {
         try {
             logger.info("Setting up the Web Publishing service");
             //
             // create web application
             this.rootApplication = new DefaultResourceConfig();
             //
+            // setup response filter
+            rootApplication.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                new JerseyResponseFilter(dms));
+            //
             // deploy web application in container
             this.jerseyServlet = new ServletContainer(rootApplication);
             this.httpService = httpService;
-            //
-            logger.info("Registering Web Publishing service at OSGi framework");
-            this.registration = context.registerService(getClass().getName(), this, null);
         } catch (Exception e) {
             // unregister...();     // ### TODO?
             throw new RuntimeException("Setting up the Web Publishing service failed", e);

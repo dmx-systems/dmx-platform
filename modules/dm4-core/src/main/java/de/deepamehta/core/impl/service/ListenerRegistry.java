@@ -1,6 +1,5 @@
 package de.deepamehta.core.impl.service;
 
-import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.Listener;
 
 import java.lang.reflect.Method;

@@ -8,7 +8,6 @@ import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginContext;
-import de.deepamehta.core.service.CoreEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.Plugin;

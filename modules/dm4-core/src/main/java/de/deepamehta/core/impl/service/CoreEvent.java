@@ -1,10 +1,13 @@
-package de.deepamehta.core.service;
+package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.listener.*;
 
 import java.util.HashMap;
@@ -27,7 +30,7 @@ import java.util.Map;
  *
  * @see de.deepamehta.core.service.listener
  */
-public enum CoreEvent {
+enum CoreEvent {
 
     PRE_CREATE_TOPIC(PreCreateTopicListener.class,
         "preCreateTopic", TopicModel.class, ClientState.class),
@@ -80,11 +83,15 @@ public enum CoreEvent {
     PLUGIN_SERVICE_GONE(PluginServiceGoneListener.class,
         "pluginServiceGone", PluginService.class);
 
-    public final Class listenerInterface;
-    public final String handlerMethodName;
-    public final Class[] paramClasses;
+    // ------------------------------------------------------------------------------------------------- Class Variables
 
     private static Map<String, CoreEvent> events;
+
+    // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    final Class listenerInterface;
+    final String handlerMethodName;
+    final Class[] paramClasses;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -97,9 +104,9 @@ public enum CoreEvent {
         put(this);              // ### Lazy initialization outside the constructor solves it.
     }
 
-    // -------------------------------------------------------------------------------------------------- Public Methods
+    // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    public static CoreEvent fromListenerInterface(Class listenerInterface) {
+    static CoreEvent fromListenerInterface(Class listenerInterface) {
         return events.get(listenerInterface.getSimpleName());
     }
 

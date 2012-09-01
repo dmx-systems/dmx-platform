@@ -148,12 +148,6 @@ public interface DeepaMehtaService {
 
 
 
-    // === Events ===
-
-    List<Object> fireEvent(CoreEvent event, Object... params);
-
-
-
     // === Misc ===
 
     DeepaMehtaTransaction beginTx();

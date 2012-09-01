@@ -81,7 +81,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             }
             // 3) create topic
             return createFileTopic(file);
-            //
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
@@ -112,7 +111,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             }
             // 3) create topic
             return createFolderTopic(file);
-            //
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
@@ -162,7 +160,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             // 3) create topic
             Topic fileTopic = createFileTopic(repoFile);
             return new StoredFile(repoFile.getName(), fileTopic.getId());
-            //
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
@@ -191,7 +188,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             if (!success) {
                 throw new RuntimeException("The File.mkdir() call had no success (file=\"" + repoFile + "\")");
             }
-            //
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {

@@ -25,11 +25,9 @@ public class CoreActivator implements BundleActivator {
 
     private static final String DATABASE_PATH = System.getProperty("dm4.database.path");
 
-    // ------------------------------------------------------------------------------------------------- Class Variables
-
-    private static EmbeddedService dms;
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    private EmbeddedService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -78,22 +76,6 @@ public class CoreActivator implements BundleActivator {
 
 
 
-    // **************
-    // *** Helper ***
-    // **************
-
-
-
-    public static DeepaMehtaService getService() {
-        // DeepaMehtaService dms = (DeepaMehtaService) deepamehtaServiceTracker.getService();
-        if (dms == null) {
-            throw new RuntimeException("DeepaMehta 4 core service is not yet available");
-        }
-        return dms;
-    }
-
-
-
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private MehtaGraph openDB() {
@@ -130,7 +112,10 @@ public class CoreActivator implements BundleActivator {
             if (service instanceof HttpService) {
                 logger.info("Adding HTTP service to DeepaMehta 4 Core");
                 httpService = (HttpService) service;
-                new WebPublishingService(context, httpService);
+                //
+                WebPublishingService wpService = new WebPublishingService(dms, httpService);
+                logger.info("Registering Web Publishing service at OSGi framework");
+                context.registerService(WebPublishingService.class.getName(), wpService, null);
             }
             return service;
         }
