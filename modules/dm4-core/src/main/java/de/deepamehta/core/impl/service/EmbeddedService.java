@@ -57,6 +57,9 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    /**
+     * @param   bundleContext   The context of the DeepaMehta 4 Core bundle.
+     */
     public EmbeddedService(DeepaMehtaStorage storage, BundleContext bundleContext) {
         this.storage = storage;
         this.migrationManager = new MigrationManager(this);

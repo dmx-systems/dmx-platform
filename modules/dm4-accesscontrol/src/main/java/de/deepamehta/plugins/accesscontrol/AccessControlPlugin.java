@@ -383,9 +383,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void initializePlugin() {
         try {
             logger.info("Security settings:" +
-                "\n      READ_REQUIRES_LOGIN=" + READ_REQUIRES_LOGIN +
-                "\n      WRITE_REQUIRES_LOGIN=" + WRITE_REQUIRES_LOGIN +
-                "\n      SUBNET_FILTER="+ SUBNET_FILTER);
+                "\n    dm4.security.read_requires_login=" + READ_REQUIRES_LOGIN +
+                "\n    dm4.security.write_requires_login=" + WRITE_REQUIRES_LOGIN +
+                "\n    dm4.security.subnet_filter=\""+ SUBNET_FILTER + "\"");
             //
             registerFilter(new RequestFilter(this));
         } catch (Exception e) {

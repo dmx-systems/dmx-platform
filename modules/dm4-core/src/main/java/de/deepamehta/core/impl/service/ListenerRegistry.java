@@ -41,19 +41,23 @@ class ListenerRegistry {
     // ---
 
     List<Object> fireEvent(CoreEvent event, Object... params) {
-        List results = new ArrayList();
-        List<Listener> listeners = getListeners(event);
-        if (listeners == null) {
-            return results;
-        }
-        // ### FIXME: ConcurrentModificationException might occur
-        for (Listener listener : listeners) {
-            Object result = deliverEvent(listener, event, params);
-            if (result != null) {
-                results.add(result);
+        try {
+            List results = new ArrayList();
+            List<Listener> listeners = getListeners(event);
+            if (listeners == null) {
+                return results;
             }
+            // ### FIXME: ConcurrentModificationException might occur
+            for (Listener listener : listeners) {
+                Object result = deliverEvent(listener, event, params);
+                if (result != null) {
+                    results.add(result);
+                }
+            }
+            return results;
+        } catch (Exception e) {
+            throw new RuntimeException("Firing event " + event + " failed (params=" + params + ")", e);
         }
-        return results;
     }
 
     Object deliverEvent(Listener listener, CoreEvent event, Object... params) {

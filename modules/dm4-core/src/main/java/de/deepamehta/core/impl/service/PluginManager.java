@@ -14,39 +14,117 @@ import java.util.logging.Logger;
 
 
 /**
- * ### FIXDOC
- * A cache that holds the registered {@link Plugin} instances.
+ * Activates and deactivates plugins. Keeps a pool of activated plugins.
  * <p>
  * A PluginManager singleton is hold by the {@link EmbeddedService} and is accessed concurrently by all
  * bundle activation threads (as created by the File Install bundle).
- * <p>
- * Iteration over all plugins is synchronized with cache modifications ({@link put}, {@link remove}).
- * To iterate create a {@link PluginManager.Iterator} instance and provide a {@link #body} method.
  */
 class PluginManager {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     /**
-     * Registered plugins.
+     * The pool of activated plugins.
+     *
      * Hashed by plugin bundle's symbolic name, e.g. "de.deepamehta.topicmaps".
      */
-    static private Map<String, PluginImpl> plugins = new HashMap();
+    static private Map<String, PluginImpl> activatedPlugins = new HashMap();
 
+    /**
+     * Context of the DeepaMehta 4 Core bundle.
+     */
     private BundleContext bundleContext;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    /**
+     * @param   bundleContext   The context of the DeepaMehta 4 Core bundle.
+     */
     PluginManager(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    /**
+     * Finally activates a plugin. Called once the plugin's requirements are met (see
+     * PluginImpl.checkRequirementsForActivation()).
+     *
+     * Activation comprises:
+     * - install the plugin in the database (includes migrations, post-install event, type introduction)
+     * - initialize the plugin
+     * - register the plugin's listeners
+     * - put the plugin in the pool of activated plugins
+     *
+     * If this plugin is already activated, nothing is performed and false is returned.
+     * Otherwise true is returned.
+     *
+     * Note: this method is synchronized. While a plugin is activated no other plugin must be activated. Otherwise
+     * the "type introduction" mechanism might miss some types. Consider this unsynchronized scenario: plugin B
+     * starts running its migrations just in the moment between plugin A's type introduction and listener registration.
+     * Plugin A might miss some of the types created by plugin B.
+     */
+    synchronized boolean activatePlugin(PluginImpl plugin) {
+        try {
+            // Note: we must not activate a plugin twice.
+            // This would happen e.g. if a dependency plugin is redeployed.
+            if (isPluginActivated(plugin.getUri())) {
+                logger.info("Activation of " + plugin + " ABORTED -- already activated");
+                return false;
+            }
+            //
+            logger.info("----- Activating " + plugin + " -----");
+            plugin.installPluginInDB();
+            plugin.initializePlugin();
+            plugin.registerListeners();
+            // Note: registering the listeners is deferred until the plugin is installed in the database and the
+            // POST_INSTALL_PLUGIN event is delivered (see PluginImpl.installPluginInDB()).
+            // Consider the Access Control plugin: it can't set a topic's creator before the "admin" user is created.
+            addToActivatedPlugins(plugin);
+            logger.info("----- Activation of " + plugin + " complete -----");
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Activation of " + plugin + " failed", e);
+        }
+    }
+
+    void deactivatePlugin(PluginImpl plugin) {
+        plugin.unregisterListeners();
+        removeFromActivatedPlugins(plugin.getUri());
+    }
+
+    // ---
+
+    /**
+     * Checks if all plugins are activated.
+     */
+    boolean checkAllPluginsActivated() {
+        Bundle[] bundles = bundleContext.getBundles();
+        int plugins = 0;
+        int activated = 0;
+        for (Bundle bundle : bundles) {
+            if (isDeepaMehtaPlugin(bundle)) {
+                plugins++;
+                if (isPluginActivated(bundle.getSymbolicName())) {
+                    activated++;
+                }
+            }
+        }
+        logger.info("### Bundles total: " + bundles.length +
+            ", DeepaMehta plugins: " + plugins + ", Activated: " + activated);
+        return plugins == activated;
+    }
+
+    boolean isPluginActivated(String pluginUri) {
+        return activatedPlugins.get(pluginUri) != null;
+    }
+
+    // ---
+
     PluginImpl getPlugin(String pluginUri) {
-        PluginImpl plugin = plugins.get(pluginUri);
+        PluginImpl plugin = activatedPlugins.get(pluginUri);
         if (plugin == null) {
             throw new RuntimeException("Plugin \"" + pluginUri + "\" not found");
         }
@@ -55,52 +133,29 @@ class PluginManager {
 
     Set<PluginInfo> getPluginInfo() {
         Set info = new HashSet();
-        for (PluginImpl plugin : plugins.values()) {
+        for (PluginImpl plugin : activatedPlugins.values()) {
             info.add(plugin.getInfo());
         }
         return info;
     }
 
-    // ---
 
-    void registerPlugin(PluginImpl plugin) {
-        plugins.put(plugin.getUri(), plugin);
-    }
-
-    void unregisterPlugin(String pluginUri) {
-        plugins.remove(pluginUri);
-    }
-
-    boolean isPluginRegistered(String pluginUri) {
-        return plugins.get(pluginUri) != null;
-    }
-
-    /**
-     * Checks if all DeepaMehta plugin bundles are registered at core.
-     * Fires the {@link CoreEvent.ALL_PLUGINS_ACTIVE} event if so.
-     * <p>
-     * Called from the Plugin class.
-     * Not meant to be called by a plugin developer.
-     */
-    boolean checkAllPluginsActive() {
-        Bundle[] bundles = bundleContext.getBundles();
-        int plugins = 0;
-        int active = 0;
-        for (Bundle bundle : bundles) {
-            if (isDeepaMehtaPlugin(bundle)) {
-                plugins++;
-                if (isPluginRegistered(bundle.getSymbolicName())) {
-                    active++;
-                }
-            }
-        }
-        logger.info("### Bundles total: " + bundles.length +
-            ", DeepaMehta plugins: " + plugins + ", Active: " + active);
-        return plugins == active;
-    }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private void addToActivatedPlugins(PluginImpl plugin) {
+        activatedPlugins.put(plugin.getUri(), plugin);
+    }
+
+    private void removeFromActivatedPlugins(String pluginUri) {
+        activatedPlugins.remove(pluginUri);
+    }
+
+    // ---
+
+    /**
+     * Checks if an arbitrary bundle is a DeepaMehta plugin.
+     */
     private boolean isDeepaMehtaPlugin(Bundle bundle) {
         String packages = (String) bundle.getHeaders().get("Import-Package");
         // Note 1: 3rd party bundles might not import any package. So, "packages" might be null.
