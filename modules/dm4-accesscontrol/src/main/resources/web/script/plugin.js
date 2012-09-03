@@ -1,6 +1,6 @@
 dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
-    var ENCRYPTED_PASSWORD_PREFIX = "-SHA256-"  // don't change this
+    var ENCRYPTED_PASSWORD_PREFIX = "-SHA256-"
     var self = this
 
     dm4c.load_script("/de.deepamehta.accesscontrol/script/vendor/sha256.js")
@@ -181,6 +181,29 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
         function shutdown_gui() {
             $("body").text("You're logged out now.")
+        }
+    })
+
+    dm4c.add_listener("post_refresh_create_menu", function(type_menu) {
+        if (!dm4c.has_create_permission("dm4.accesscontrol.user_account")) {
+            return
+        }
+        //
+        type_menu.add_separator()
+        type_menu.add_item({label: "New User Account", handler: function() {
+            dm4c.do_create_topic("dm4.accesscontrol.user_account");
+        }})
+    })
+
+    dm4c.add_listener("pre_update_topic", function(topic_model) {
+        if (topic_model.type_uri != "dm4.accesscontrol.user_account") {
+            return
+        }
+        //
+        var password_topic = topic_model.composite["dm4.accesscontrol.password"]
+        var password = password_topic.value
+        if (!js.begins_with(password, ENCRYPTED_PASSWORD_PREFIX)) {
+            password_topic.value = encrypt_password(password)
         }
     })
 

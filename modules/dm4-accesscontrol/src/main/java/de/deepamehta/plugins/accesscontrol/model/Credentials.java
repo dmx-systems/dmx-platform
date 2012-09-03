@@ -10,7 +10,7 @@ public class Credentials {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String ENCRYPTED_PASSWORD_PREFIX = "-SHA256-";  // don't change this
+    private static final String ENCRYPTED_PASSWORD_PREFIX = "-SHA256-";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

@@ -8,11 +8,9 @@ dm4c.add_plugin("de.deepamehta.filemanager", function() {
         }
         //
         type_menu.add_separator()
-        type_menu.add_item({label: "New File Browser", handler: do_new_file_browser})
-
-        function do_new_file_browser() {
+        type_menu.add_item({label: "New File Browser", handler: function() {
             dm4c.get_plugin("de.deepamehta.files").create_folder_topic({path: "/"}, true, true)
-        }
+        }})
     })
 
     // === Files Listeners ===

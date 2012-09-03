@@ -9,6 +9,8 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 
+import javax.ws.rs.WebApplicationException;
+
 import java.lang.reflect.Type;
 import java.lang.reflect.ParameterizedType;
 import java.util.Set;
@@ -34,23 +36,27 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     @Override
     public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-        Object entity = response.getEntity();
-        if (entity != null) {
-            if (entity instanceof TopicType) {      // Note: type matches both, must take precedence over topic
-                firePreSend((TopicType) entity);
-            } else if (entity instanceof Topic) {
-                firePreSend((Topic) entity);
-            } else if (entity instanceof Association) {
-                firePreSend((Association) entity);
-            } else if (entity instanceof Directives) {
-                firePreSend((Directives) entity);
-            } else if (isIterable(response, TopicType.class)) {
-                firePreSendTopicTypes((Iterable<TopicType>) entity);
-            } else if (isIterable(response, Topic.class)) {
-                firePreSendTopics((Iterable<Topic>) entity);
+        try {
+            Object entity = response.getEntity();
+            if (entity != null) {
+                if (entity instanceof TopicType) {      // Note: type matches both, must take precedence over topic
+                    firePreSend((TopicType) entity);
+                } else if (entity instanceof Topic) {
+                    firePreSend((Topic) entity);
+                } else if (entity instanceof Association) {
+                    firePreSend((Association) entity);
+                } else if (entity instanceof Directives) {
+                    firePreSend((Directives) entity);
+                } else if (isIterable(response, TopicType.class)) {
+                    firePreSendTopicTypes((Iterable<TopicType>) entity);
+                } else if (isIterable(response, Topic.class)) {
+                    firePreSendTopics((Iterable<Topic>) entity);
+                }
             }
+            return response;
+        } catch (Exception e) {
+            throw new WebApplicationException(new RuntimeException("Jersey response filtering failed", e));
         }
-        return response;
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

@@ -59,13 +59,15 @@ function Webclient() {
 
 
 
-    // Note: the controller methods are the top-level entry points to be called by event handlers.
-    // The controller methods are responsible for
+    // Note: the controller methods consistently update the database and the view.
+    // In particular they are responsible for
     //     a) updating the database,
     //     b) updating the client model,
     //     c) updating the view,
     //     d) triggering hooks
     // The names of the controller methods begins with "do_".
+    //
+    // Your plugin can call the controller methods via the global "dm4c" object.
 
 
 
@@ -188,6 +190,9 @@ function Webclient() {
     // ---
 
     /**
+     * Creates an empty topic in the DB, shows it on the canvas and displays the edit form in the page panel.
+     *
+     * @param   type_uri    The type of the topic to create.
      * @param   x, y        Optional: the coordinates for placing the topic on the canvas.
      *                      If not specified, placement is up to the canvas.
      */
@@ -223,17 +228,16 @@ function Webclient() {
 
     /**
      * Updates a topic in the DB and on the GUI.
-     * Triggers the "post_update_topic" hook (indirectly).
+     * Triggers the "pre_update_topic" and "post_update_topic" (indirectly) hooks.
      *
      * @param   topic_model     Optional: a topic model containing the data to be udpated.
      *                          If not specified no DB update is performed but the page panel is still refreshed.
      */
     this.do_update_topic = function(topic_model) {
-        // alert("do_update_topic(): topic_model=" + js.stringify(topic_model))
         if (topic_model) {
+            dm4c.trigger_plugin_hook("pre_update_topic", topic_model)
             // update DB
             var directives = dm4c.restc.update_topic(topic_model)
-            // alert("do_update_topic(): directives=" + js.stringify(directives))
             // update GUI (client model and view)
             process_directives(directives)
         } else {
@@ -250,7 +254,6 @@ function Webclient() {
     this.do_update_association = function(assoc_model) {
         // update DB
         var directives = dm4c.restc.update_association(assoc_model)
-        // alert("do_update_association(): directives=" + js.stringify(directives))
         // update GUI (client model and view)
         process_directives(directives)
     }
@@ -264,7 +267,6 @@ function Webclient() {
     this.do_update_topic_type = function(topic_type_model) {
         // update DB
         var directives = dm4c.restc.update_topic_type(topic_type_model)
-        // alert("do_update_topic_type(): directives=" + js.stringify(directives))
         // update GUI (client model and view)
         process_directives(directives)
     }

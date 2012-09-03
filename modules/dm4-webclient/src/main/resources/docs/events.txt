@@ -7,6 +7,7 @@ var hook_names = [
     "association_commands",
     "canvas_commands",
     // Storage (DB updates)
+    "pre_update_topic",
     "post_create_topic",
     "post_update_topic",
     "post_update_association",

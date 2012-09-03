@@ -44,13 +44,8 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
         }
         //
         type_menu.add_separator()
-        type_menu.add_item({
-            label: "New Topic Type",
-            value: "create_topic_type",
-            is_trigger: true,
-            handler: function() {
-                dm4c.do_create_topic_type(DEFAULT_TOPIC_TYPE)
-            }
-        })
+        type_menu.add_item({label: "New Topic Type", handler: function() {
+            dm4c.do_create_topic_type(DEFAULT_TOPIC_TYPE)
+        }})
     })
 })

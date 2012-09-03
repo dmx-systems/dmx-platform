@@ -63,14 +63,14 @@ import java.util.logging.Logger;
 @Path("/accesscontrol")
 @Consumes("application/json")
 @Produces("application/json")
-public class AccessControlPlugin extends PluginActivator implements AccessControlService, InitializePluginListener,
-                                                                    SecurityContext,      PostCreateTopicListener,
+public class AccessControlPlugin extends PluginActivator implements AccessControlService, PostInstallPluginListener,
+                                                                    SecurityContext,      InitializePluginListener,
+                                                                                          PostCreateTopicListener,
                                                                                           PostCreateAssociationListener,
+                                                                                          IntroduceTopicTypeListener,
                                                                                           PreSendTopicListener,
                                                                                           PreSendAssociationListener,
                                                                                           PreSendTopicTypeListener,
-                                                                                          PostInstallPluginListener,
-                                                                                          IntroduceTopicTypeListener,
                                                                                           PluginServiceArrivedListener,
                                                                                           PluginServiceGoneListener {
 
@@ -380,6 +380,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     @Override
+    public void postInstallPlugin() {
+        Topic userAccount = createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
+        logger.info("Creating \"admin\" user account => ID=" + userAccount.getId());
+    }
+
+    @Override
     public void initializePlugin() {
         try {
             logger.info("Security settings:" +
@@ -393,10 +399,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
+    // ---
+
     @Override
     public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
         // ### TODO: explain
-        if (isPluginTopic(topic)) {
+        if (isOwnTopic(topic)) {
             return;
         }
         //
@@ -407,26 +415,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void postCreateAssociation(Association assoc, ClientState clientState, Directives directives) {
         // ### TODO: explain
-        if (isPluginAssociation(assoc)) {
+        if (isOwnAssociation(assoc)) {
             return;
         }
         //
         assignCreator(assoc);
         createACLEntry(assoc, UserRole.CREATOR, DEFAULT_ASSOCIATION_PERMISSIONS);
     }
-
-    /* ### TODO: adapt to DM4
-    @Override
-    public void preUpdateHook(Topic topic, Properties newProperties) {
-        // encrypt password of new users
-        if (topic.typeUri.equals("de/deepamehta/core/topictype/user")) {
-            // we recognize a new user (or changed password) if password doesn't begin with ENCRYPTED_PASSWORD_PREFIX
-            String password = newProperties.get("de/deepamehta/core/property/password").toString();
-            if (!password.startsWith(ENCRYPTED_PASSWORD_PREFIX)) {
-                newProperties.put("de/deepamehta/core/property/password", encryptPassword(password));
-            }
-        }
-    } */
 
     @Override
     public void introduceTopicType(TopicType topicType, ClientState clientState) {
@@ -444,7 +439,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void preSendTopic(Topic topic, ClientState clientState) {
         // ### TODO: explain
-        if (isPluginTopic(topic)) {
+        if (isOwnTopic(topic)) {
             enrichWithPermissions(topic, false);    // write=false
             return;
         }
@@ -456,7 +451,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void preSendAssociation(Association assoc, ClientState clientState) {
         // ### TODO: explain
-        if (isPluginAssociation(assoc)) {
+        if (isOwnAssociation(assoc)) {
             enrichWithPermissions(assoc, false);    // write=false
             return;
         }
@@ -467,10 +462,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void preSendTopicType(TopicType topicType, ClientState clientState) {
-        // Note: there are 2 types whose permissions must be set manually as they can't be calculated the usual way:
-        // - "Access Control List Facet": endless recursion would occur. ### FIXDOC
-        // - "Meta Meta Type": doesn't exist in DB. Retrieving its ACL would fail.
-        if (isPluginType(topicType) || topicType.getUri().equals("dm4.core.meta_meta_type")) {
+        // Note: the permissions for "Meta Meta Type" must be set manually.
+        // This type doesn't exist in DB. Fetching its ACL entries would fail.
+        if (topicType.getUri().equals("dm4.core.meta_meta_type")) {
             enrichWithPermissions(topicType, false, false);     // write=false, create=false
             return;
         }
@@ -483,12 +477,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     // ---
-
-    @Override
-    public void postInstallPlugin() {
-        Topic userAccount = createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
-        logger.info("Creating \"admin\" user account => ID=" + userAccount.getId());
-    }
 
     @Override
     public void pluginServiceArrived(PluginService service) {
@@ -596,19 +584,24 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      *                      or <code>null</code> if no user is logged in.
      */
     private boolean hasPermission(Topic username, Operation operation, DeepaMehtaObject object) {
-        logger.fine("Determining permission for " + userInfo(username) + " to " + operation + " " + info(object));
-        for (RelatedTopic aclEntry : fetchACLEntries(object)) {
-            String userRoleUri = aclEntry.getCompositeValue().getTopic("dm4.accesscontrol.user_role").getUri();
-            logger.fine("There is an ACL entry for user role \"" + userRoleUri + "\"");
-            boolean allowedForUserRole = allowed(aclEntry, operation);
-            logger.fine("value=" + allowedForUserRole);
-            if (allowedForUserRole && userOccupiesRole(object, username, userRoleUri)) {
-                logger.fine("=> ALLOWED");
-                return true;
+        try {
+            logger.fine("Determining permission for " + userInfo(username) + " to " + operation + " " + info(object));
+            for (RelatedTopic aclEntry : fetchACLEntries(object)) {
+                String userRoleUri = aclEntry.getCompositeValue().getTopic("dm4.accesscontrol.user_role").getUri();
+                logger.fine("There is an ACL entry for user role \"" + userRoleUri + "\"");
+                boolean allowedForUserRole = allowed(aclEntry, operation);
+                logger.fine("value=" + allowedForUserRole);
+                if (allowedForUserRole && userOccupiesRole(object, username, userRoleUri)) {
+                    logger.fine("=> ALLOWED");
+                    return true;
+                }
             }
+            logger.fine("=> DENIED");
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException("Determining permission for " + info(object) + " failed (" +
+                userInfo(username) + ", operation=" + operation + ")");
         }
-        logger.fine("=> DENIED");
-        return false;
     }
 
     // ---
@@ -835,27 +828,23 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ===
 
-    private boolean isPluginType(TopicType type) {
-        return isPluginUri(type.getUri());
+    private boolean isOwnTopic(Topic topic) {
+        return isOwnUri(topic.getTypeUri());
     }
 
-    private boolean isPluginTopic(Topic topic) {
-        return isPluginUri(topic.getTypeUri());
+    private boolean isOwnAssociation(Association assoc) {
+        return isOwnRole(assoc.getRole1()) || isOwnRole(assoc.getRole2());            
     }
 
-    private boolean isPluginAssociation(Association assoc) {
-        return isPluginRole(assoc.getRole1()) || isPluginRole(assoc.getRole2());            
-    }
-
-    private boolean isPluginRole(Role role) {
+    private boolean isOwnRole(Role role) {
         if (!(role instanceof TopicRole)) {
             return false;
         }
         Topic topic = ((TopicRole) role).getTopic();
-        return isPluginTopic(topic);
+        return isOwnTopic(topic);
     }
 
-    private boolean isPluginUri(String uri) {
+    private boolean isOwnUri(String uri) {
         return uri.startsWith("dm4.accesscontrol.");
     }
 
@@ -864,37 +853,24 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // === Logging ===
 
     private String info(DeepaMehtaObject object) {
-        if (object instanceof Topic) {
-            return info((Topic) object);
+        if (object instanceof TopicType) {
+            return "topic type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
+        } else if (object instanceof Topic) {
+            return "topic " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\", uri=\"" + object.getUri() +
+                "\")";
         } else if (object instanceof Association) {
-            return info((Association) object);
+            return "association " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\")";
         } else {
             throw new RuntimeException("Unexpected object: " + object);
         }
     }
 
-    private String info(Topic topic) {
-        if (topic == null) {
-            return "topic <null>";
-        }
-        return "topic " + topic.getId() + " (typeUri=\"" + topic.getTypeUri() + "\", uri=\"" + topic.getUri() + "\")";
-    }
-
-    private String info(Association assoc) {
-        if (assoc == null) {
-            return "association <null>";
-        }
-        return "association " + assoc.getId() + " (typeUri=\"" + assoc.getTypeUri() + "\")";
-    }
-
-    // ---
-
-    private String userInfo(Topic topic) {
-        if (topic == null) {
+    private String userInfo(Topic username) {
+        if (username == null) {
             return "user <anonymous>";
         }
-        return "user \"" + topic.getSimpleValue() + "\" (id=" + topic.getId() + ", typeUri=\"" + topic.getTypeUri() +
-            "\")";
+        return "user \"" + username.getSimpleValue() + "\" (id=" + username.getId() + ", typeUri=\"" +
+            username.getTypeUri() + "\")";
     }
 
     private String info(HttpSession session) {
