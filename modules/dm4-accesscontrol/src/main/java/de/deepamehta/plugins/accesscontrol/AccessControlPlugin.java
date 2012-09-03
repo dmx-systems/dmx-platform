@@ -482,6 +482,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             hasPermission(username, Operation.CREATE, topicType));
     }
 
+    // ---
+
     @Override
     public void postInstallPlugin() {
         Topic userAccount = createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
@@ -550,7 +552,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * Fetches the "Username" topic for the "admin" user.
      * If the "admin" user doesn't exist an exception is thrown.
      *
-     * @return  The retrieved Username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>).
+     * @return  The fetched Username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>).
      */
     private Topic fetchAdminUser() {
         Topic username = fetchUsername(DEFAULT_USERNAME);
@@ -563,7 +565,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     /**
      * Fetches the "Username" topic for the specified username.
      *
-     * @return  The retrieved Username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
+     * @return  The fetched Username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
      *          or <code>null</code> if no such Username topic exists.
      */
     private Topic fetchUsername(String username) {
@@ -612,7 +614,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     /**
-     * Retrieves all ACL entries of the specified object.
+     * Fetches all ACL entries of the specified object.
      */
     private Set<RelatedTopic> fetchACLEntries(DeepaMehtaObject object) {
         return facetsService.getFacets(object, "dm4.accesscontrol.acl_facet");
@@ -704,7 +706,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
      */
     private boolean userIsOwner(Topic username, DeepaMehtaObject object) {
-        Topic owner = getOwner(object);
+        Topic owner = fetchOwner(object);
         logger.fine("The owner is " + userInfo(owner));
         return owner != null && owner.getId() == username.getId();
     }
@@ -718,7 +720,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
      */
     private boolean userIsCreator(Topic username, DeepaMehtaObject object) {
-        Topic creator = getCreator(object);
+        Topic creator = fetchCreator(object);
         logger.fine("The creator is " + userInfo(creator));
         return creator != null && creator.getId() == username.getId();
     }
@@ -726,11 +728,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     /**
-     * Retrieves the creator of an object, or <code>null</code> if no creator is set.
+     * Fetches the creator of an object.
      *
-     * @return  a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
+     * @return  a Topic of type "Username" (<code>dm4.accesscontrol.username</code>),
+     *          or <code>null</code> if no creator is set.
      */
-    private Topic getCreator(DeepaMehtaObject object) {
+    private Topic fetchCreator(DeepaMehtaObject object) {
         Topic creator = facetsService.getFacet(object, "dm4.accesscontrol.creator_facet");
         if (creator == null) {
             return null;
@@ -740,11 +743,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     /**
-     * Retrieves the owner of an object, or <code>null</code> if no owner is set.
+     * Fetches the owner of an object.
      *
-     * @return  a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
+     * @return  a Topic of type "Username" (<code>dm4.accesscontrol.username</code>),
+     *          or <code>null</code> if no owner is set.
      */
-    private Topic getOwner(DeepaMehtaObject object) {
+    private Topic fetchOwner(DeepaMehtaObject object) {
         Topic owner = facetsService.getFacet(object, "dm4.accesscontrol.owner_facet");
         if (owner == null) {
             return null;

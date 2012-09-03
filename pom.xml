@@ -152,7 +152,9 @@
                                 <artifactId>umlgraph</artifactId>
                                 <version>5.6</version>
                             </docletArtifact>
-                            <additionalparam>-collapsible -hide java.* -hide org.* -inferdepvis public -inferrel</additionalparam>
+                            <additionalparam>
+                                -collapsible -hide java.* -hide org.* -inferdepvis public -inferrel
+                            </additionalparam>
                             <useStandardDocletOptions>true</useStandardDocletOptions>
                         </configuration>
                     </plugin>

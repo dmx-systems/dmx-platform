@@ -28,7 +28,7 @@ class PluginManager {
      *
      * Hashed by plugin bundle's symbolic name, e.g. "de.deepamehta.topicmaps".
      */
-    static private Map<String, PluginImpl> activatedPlugins = new HashMap();
+    private Map<String, PluginImpl> activatedPlugins = new HashMap();
 
     /**
      * Context of the DeepaMehta 4 Core bundle.
@@ -56,7 +56,7 @@ class PluginManager {
      * - install the plugin in the database (includes migrations, post-install event, type introduction)
      * - initialize the plugin
      * - register the plugin's listeners
-     * - put the plugin in the pool of activated plugins
+     * - add the plugin to the pool of activated plugins
      *
      * If this plugin is already activated, nothing is performed and false is returned.
      * Otherwise true is returned.

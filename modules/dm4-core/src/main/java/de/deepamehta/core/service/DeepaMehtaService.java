@@ -40,15 +40,12 @@ public interface DeepaMehtaService {
     Topic getTopic(long id, boolean fetchComposite, ClientState clientState);
 
     /**
-     * Looks up a single topic by exact property value.
+     * Looks up a single topic by exact value.
      * If no such topic exists <code>null</code> is returned.
      * If more than one topic is found a runtime exception is thrown.
      * <p>
-     * IMPORTANT: Looking up a topic this way requires the property to be indexed with indexing mode <code>KEY</code>.
-     * This is achieved by declaring the respective data field with <code>indexing_mode: "KEY"</code>
-     * (for statically declared data field, typically in <code>types.json</code>) or
-     * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
-     * (for dynamically created data fields, typically in migration classes).
+     * IMPORTANT: Looking up a topic this way requires the corresponding type to be indexed with indexing mode
+     * <code>dm4.core.key</code>.
      */
     Topic getTopic(String key, SimpleValue value, boolean fetchComposite, ClientState clientState);
 
@@ -56,8 +53,11 @@ public interface DeepaMehtaService {
 
     /**
      * Performs a fulltext search.
+     * <p>
+     * IMPORTANT: Searching topics this way requires the corresponding type to be indexed with indexing mode
+     * <code>dm4.core.fulltext</code> or <code>dm4.core.fulltext_key</code>.
      *
-     * @param   fieldUri    The URI of the data field to search. If null is provided all fields are searched.
+     * @param   fieldUri    The URI of the data field to search. If null is provided all fields are searched. ### FIXDOC
      * @param   wholeWord   If true the searchTerm is regarded as whole word.
      *                      If false the searchTerm is regarded as begin-of-word substring.
      */

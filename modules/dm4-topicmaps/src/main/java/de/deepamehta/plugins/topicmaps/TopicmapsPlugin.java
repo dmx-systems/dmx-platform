@@ -13,7 +13,8 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.listener.PostInstallPluginListener;
+import de.deepamehta.core.service.listener.AllPluginsActiveListener;
+import de.deepamehta.core.service.listener.InitializePluginListener;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -37,7 +38,8 @@ import java.util.logging.Logger;
 @Path("/topicmap")
 @Consumes("application/json")
 @Produces("application/json")
-public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, PostInstallPluginListener {
+public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, InitializePluginListener,
+                                                                                  AllPluginsActiveListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -61,14 +63,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
 
-    public TopicmapsPlugin() {
-        // Note: registering the default renderer in the InitializePluginListener would be too late.
-        // The renderer is already needed in the PostInstallPluginListener.
-        registerTopicmapRenderer(new DefaultTopicmapRenderer());
-    }
-
-
-
     // ***************************************
     // *** TopicmapsService Implementation ***
     // ***************************************
@@ -82,6 +76,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         return new Topicmap(topicmapId, dms, clientState);
     }
 
+    // ---
+
     @POST
     @Path("/{name}/{topicmap_renderer_uri}")
     @Override
@@ -93,6 +89,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
             .put("dm4.topicmaps.state", topicmapState)
         ), null);   // FIXME: clientState=null
+    }
+
+    @Override
+    public void registerTopicmapRenderer(TopicmapRenderer renderer) {
+        logger.info("### Registering topicmap renderer \"" + renderer.getClass().getName() + "\"");
+        topicmapRendererRegistry.put(renderer.getUri(), renderer);
     }
 
     // ---
@@ -121,14 +123,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         ), null);   // FIXME: clientState=null
     }
 
-    // ---
-
     @PUT
     @Path("/{id}/topic/{topic_id}/{x}/{y}")
     @Override
     public void moveTopic(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId, @PathParam("x") int x,
                                                                                                 @PathParam("y") int y) {
-        getTopicRefAssociation(topicmapId, topicId).setCompositeValue(new CompositeValue()
+        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(new CompositeValue()
             .put("dm4.topicmaps.x", x)
             .put("dm4.topicmaps.y", y), null, new Directives());    // clientState=null
     }
@@ -138,20 +138,16 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
-        getTopicRefAssociation(topicmapId, topicId).setCompositeValue(new CompositeValue()
+        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(new CompositeValue()
             .put("dm4.topicmaps.visibility", visibility), null, new Directives());  // clientState=null
     }
-
-    // ---
 
     @DELETE
     @Path("/{id}/association/{assoc_id}")
     @Override
     public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
-        getAssociationRefAssociation(topicmapId, assocId).delete(new Directives());
+        fetchAssociationRefAssociation(topicmapId, assocId).delete(new Directives());
     }
-
-    // ---
 
     @PUT
     @Path("/{id}/translation/{x}/{y}")
@@ -169,20 +165,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ---
 
-    @Override
-    public void registerTopicmapRenderer(TopicmapRenderer renderer) {
-        logger.info("### Registering topicmap renderer \"" + renderer.getClass().getName() + "\"");
-        topicmapRendererRegistry.put(renderer.getUri(), renderer);
-    }
-
-    // ---
-
     // Note: not part of topicmaps service
     @GET
     @Path("/{id}")
     @Produces("text/html")
     public InputStream getTopicmapInWebclient() {
-        // Note: the template parameter is evaluated at client-side
+        // Note: the path parameter is evaluated at client-side
         return invokeWebclient();
     }
 
@@ -191,7 +179,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Path("/{id}/topic/{topic_id}")
     @Produces("text/html")
     public InputStream getTopicmapAndTopicInWebclient() {
-        // Note: the template parameters are evaluated at client-side
+        // Note: the path parameters are evaluated at client-side
         return invokeWebclient();
     }
 
@@ -204,20 +192,31 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
     @Override
-    public void postInstallPlugin() {
-        createTopicmap(DEFAULT_TOPICMAP_NAME, DEFAULT_TOPICMAP_RENDERER);
+    public void initializePlugin() {
+        registerTopicmapRenderer(new DefaultTopicmapRenderer());
+    }
+
+    @Override
+    public void allPluginsActive() {
+        // create default topicmap if no one exists
+        if (dms.searchTopics(DEFAULT_TOPICMAP_NAME, "dm4.topicmaps.name", true, null).size() == 0) {   // wholeWord=true
+            // Note: naturally we would create the default topicmap in the PostInstallPluginListener.
+            // But we defer it to the AllPluginsActiveListener to ensure the Access Control plugin is ready.
+            // The default topicmap needs ACL entries and creator information.
+            createTopicmap(DEFAULT_TOPICMAP_NAME, DEFAULT_TOPICMAP_RENDERER);
+        }
     }
 
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private Association getTopicRefAssociation(long topicmapId, long topicId) {
+    private Association fetchTopicRefAssociation(long topicmapId, long topicId) {
         return dms.getAssociation(TOPIC_MAPCONTEXT, topicmapId, topicId,
             ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC, false, null);          // fetchComposite=false, clientState=null
     }
 
-    private Association getAssociationRefAssociation(long topicmapId, long assocId) {
+    private Association fetchAssociationRefAssociation(long topicmapId, long assocId) {
         return dms.getAssociationBetweenTopicAndAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
             ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION, false, null);    // fetchComposite=false, clientState=null
     }
