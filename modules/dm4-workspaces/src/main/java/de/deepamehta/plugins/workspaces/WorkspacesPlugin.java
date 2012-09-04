@@ -1,45 +1,40 @@
 package de.deepamehta.plugins.workspaces;
 
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
+import de.deepamehta.plugins.facets.service.FacetsService;
 
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.TopicType;
-import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
+import de.deepamehta.core.service.listener.PluginServiceGoneListener;
 import de.deepamehta.core.service.listener.PostCreateTopicListener;
 import de.deepamehta.core.service.listener.PostInstallPluginListener;
 
 import static java.util.Arrays.asList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
 
 
-public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, PostCreateTopicListener,
-                                                                                    PostInstallPluginListener {
+public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, PostInstallPluginListener,
+                                                                                    PostCreateTopicListener,
+                                                                                    PluginServiceArrivedListener,
+                                                                                    PluginServiceGoneListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String DEFAULT_WORKSPACE_NAME = "Default";
 
-    // association type semantics ### TODO: to be dropped. Model-driven manipulators required.
-    private static final String WORKSPACE_TOPIC     = "dm4.workspaces.workspace_context";
-    private static final String WORKSPACE_TYPE      = "dm4.workspaces.workspace_context";
-    private static final String ROLE_TYPE_TOPIC     = "dm4.workspaces.workspace_topic";
-    private static final String ROLE_TYPE_TYPE      = "dm4.workspaces.workspace_type";
-    private static final String ROLE_TYPE_WORKSPACE = "dm4.core.default";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    private FacetsService facetsService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -56,35 +51,22 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public Topic createWorkspace(String name) {
         logger.info("Creating workspace \"" + name + "\"");
-        CompositeValue comp = new CompositeValue().put("dm4.workspaces.name", name);
-        return dms.createTopic(new TopicModel("dm4.workspaces.workspace", comp), null); // FIXME: clientState=null
+        return dms.createTopic(new TopicModel("dm4.workspaces.workspace", new CompositeValue()
+            .put("dm4.workspaces.name", name)
+        ), null);   // FIXME: clientState=null
     }
 
+    // ---
+
     @Override
-    public void assignTopic(long workspaceId, long topicId) {
+    public void assignWorkspace(DeepaMehtaObject object, long workspaceId) {
         checkWorkspaceId(workspaceId);
-        //
-        AssociationModel assocModel = new AssociationModel(WORKSPACE_TOPIC);
-        assocModel.setRoleModel1(new TopicRoleModel(workspaceId, ROLE_TYPE_WORKSPACE));
-        assocModel.setRoleModel2(new TopicRoleModel(topicId, ROLE_TYPE_TOPIC));
-        dms.createAssociation(assocModel, null);         // clientState=null
+        facetsService.updateFacet(object, "dm4.workspaces.workspace_facet", new TopicModel(workspaceId), null, null);
     }
 
     @Override
-    public void assignType(long workspaceId, long typeId) {
-        checkWorkspaceId(workspaceId);
-        //
-        AssociationModel assocModel = new AssociationModel(WORKSPACE_TYPE);
-        assocModel.setRoleModel1(new TopicRoleModel(workspaceId, ROLE_TYPE_WORKSPACE));
-        assocModel.setRoleModel2(new TopicRoleModel(typeId, ROLE_TYPE_TYPE));
-        dms.createAssociation(assocModel, null);         // clientState=null
-    }
-
-    @Override
-    public Set<RelatedTopic> getWorkspaces(long typeId) {
-        Topic typeTopic = dms.getTopic(typeId, false, null);                // fetchComposite=false, clientState=null
-        return typeTopic.getRelatedTopics(WORKSPACE_TYPE, ROLE_TYPE_TYPE, null,
-            "dm4.workspaces.workspace", false, false, 0, null).getItems();  // fetchComposite=false
+    public Set<RelatedTopic> getAssignedWorkspaces(DeepaMehtaObject object) {
+        return facetsService.getFacets(object, "dm4.workspaces.workspace_facet");
     }
 
 
@@ -94,6 +76,14 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ********************************
 
 
+
+    /**
+     * Creates the "Default" workspace.
+     */
+    @Override
+    public void postInstallPlugin() {
+        createWorkspace(DEFAULT_WORKSPACE_NAME);
+    }
 
     /**
      * Assigns a newly created topic to the current workspace.
@@ -126,49 +116,29 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             }
             // assign topic to workspace
             workspaceId = Long.parseLong(wsId);
-            assignTopic(workspaceId, topic.getId());
+            assignWorkspace(topic, workspaceId);
         } catch (Exception e) {
             logger.warning("Assigning topic " + topic.getId() + " to workspace " + workspaceId + " failed (" + e +
                 ").\n    => This can happen after a DB reset if there is a stale \"dm4_workspace_id\" browser cookie.");
         }
     }
 
-    /**
-     * Adds a "Workspace" association to all topic types.
-     * FIXME: not ready for the prime time ### Realize as a facet?
-    @Override
-    public void modifyTopicTypeHook(TopicType topicType, ClientState clientState) {
-        String topicTypeUri = topicType.getUri();
-        // skip our own types
-        if (topicTypeUri.startsWith("dm4.workspaces.")) {
-            return;
-        }
-        //
-        if (!topicType.getDataTypeUri().equals("dm4.core.composite")) {
-            return;
-        }
-        //
-        if (!isSearchableUnit(topicType)) {
-            return;
-        }
-        //
-        logger.info("########## Associate type \"" + topicTypeUri + "\" with type \"dm4.workspaces.workspace\"");
-        AssociationDefinition assocDef = new AssociationDefinition(topicTypeUri, "dm4.workspaces.workspace");
-        assocDef.setAssocTypeUri("dm4.core.aggregation_def");
-        assocDef.setWholeCardinalityUri("dm4.core.many");
-        assocDef.setPartCardinalityUri("dm4.core.many");
-        assocDef.setViewConfigModel(new ViewConfigurationModel());  // FIXME: serialization fails if plugin developer
-                                                                    // forget to set
-        //
-        topicType.addAssocDef(assocDef);
-    } */
+    // ---
 
-    /**
-     * Creates the "Default" workspace.
-     */
     @Override
-    public void postInstallPlugin() {
-        createWorkspace(DEFAULT_WORKSPACE_NAME);
+    public void pluginServiceArrived(PluginService service) {
+        logger.info("########## Service arrived: " + service);
+        if (service instanceof FacetsService) {
+            facetsService = (FacetsService) service;
+        }
+    }
+
+    @Override
+    public void pluginServiceGone(PluginService service) {
+        logger.info("########## Service gone: " + service);
+        if (service == facetsService) {
+            facetsService = null;
+        }
     }
 
 
@@ -181,15 +151,5 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             throw new IllegalArgumentException("Topic " + workspaceId + " is not a workspace (but of type \"" +
                 typeUri + "\")");
         }
-    }
-
-    // FIXME: the "is_searchable_unit" setting is possibly not a view configuration but part of the topic type model.
-    // Evidence:
-    // - Code is doubled, see isSearchableUnit() and getViewConfig() in WebclientPlugin.
-    // - Dependency on Webclient plugin.
-    private boolean isSearchableUnit(TopicType topicType) {
-        Boolean isSearchableUnit = (Boolean) topicType.getViewConfig("dm4.webclient.view_config",
-            "dm4.webclient.is_searchable_unit");
-        return isSearchableUnit != null ? isSearchableUnit.booleanValue() : false;  // default is false
     }
 }

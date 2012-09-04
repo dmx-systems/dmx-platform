@@ -87,6 +87,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
 
+    // default user role
+    private static final UserRole DEFAULT_USER_ROLE = UserRole.CREATOR;
+
     // default permissions
     private static final Permissions DEFAULT_TOPIC_PERMISSIONS = new Permissions();
     private static final Permissions DEFAULT_ASSOCIATION_PERMISSIONS = new Permissions();
@@ -409,7 +412,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
         //
         assignCreator(topic);
-        createACLEntry(topic, UserRole.CREATOR, DEFAULT_TOPIC_PERMISSIONS);
+        createACLEntry(topic, DEFAULT_USER_ROLE, DEFAULT_TOPIC_PERMISSIONS);
     }
 
     @Override
@@ -420,7 +423,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
         //
         assignCreator(assoc);
-        createACLEntry(assoc, UserRole.CREATOR, DEFAULT_ASSOCIATION_PERMISSIONS);
+        createACLEntry(assoc, DEFAULT_USER_ROLE, DEFAULT_ASSOCIATION_PERMISSIONS);
     }
 
     @Override
@@ -431,7 +434,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
         //
         assignCreator(topicType);
-        createACLEntry(topicType, UserRole.CREATOR, DEFAULT_TYPE_PERMISSIONS);
+        createACLEntry(topicType, DEFAULT_USER_ROLE, DEFAULT_TYPE_PERMISSIONS);
     }
 
     // ---
@@ -600,7 +603,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return false;
         } catch (Exception e) {
             throw new RuntimeException("Determining permission for " + info(object) + " failed (" +
-                userInfo(username) + ", operation=" + operation + ")");
+                userInfo(username) + ", operation=" + operation + ")", e);
         }
     }
 
@@ -677,7 +680,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @param   topic       actually a topic type.
      */
     private boolean userIsMember(Topic username, DeepaMehtaObject object) {
-        Set<RelatedTopic> workspaces = wsService.getWorkspaces(object.getId()); // ### FIXME: check instance, not type
+        Set<RelatedTopic> workspaces = wsService.getAssignedWorkspaces(object);
         logger.fine(info(object) + " is assigned to " + workspaces.size() + " workspaces");
         for (RelatedTopic workspace : workspaces) {
             if (isMemberOfWorkspace(username.getId(), workspace.getId())) {

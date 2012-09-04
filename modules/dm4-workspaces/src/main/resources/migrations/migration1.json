@@ -1,21 +1,24 @@
 {
     topic_types: [
+
+        ### Workspace ###
+
         {
-            value: "Name",
-            uri: "dm4.workspaces.name",
-            data_type_uri: "dm4.core.text",
+            value:           "Name",
+            uri:             "dm4.workspaces.name",
+            data_type_uri:   "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+        },
+        {
+            value:           "Description",
+            uri:             "dm4.workspaces.description",
+            data_type_uri:   "dm4.core.html",
             index_mode_uris: ["dm4.core.fulltext"]
         },
         {
-            value: "Description",
-            uri: "dm4.workspaces.description",
-            data_type_uri: "dm4.core.html",
-            index_mode_uris: ["dm4.core.fulltext"]
-        },
-        {
-            value: "Workspace",
-            uri: "dm4.workspaces.workspace",
-            data_type_uri: "dm4.core.composite",
+            value:           "Workspace",
+            uri:             "dm4.workspaces.workspace",
+            data_type_uri:   "dm4.core.composite",
             assoc_defs: [
                 {
                     part_topic_type_uri:  "dm4.workspaces.name",
@@ -36,28 +39,19 @@
                     }
                 }
             ]
-        }
-    ],
-
-    assoc_types: [
-        {
-            value:         "Workspace Context",
-            uri:           "dm4.workspaces.workspace_context",
-            data_type_uri: "dm4.core.text"
-        }
-    ],
-
-    topics: [
-        ### Role Types ###
-        {
-            value:    "Workspace Topic",
-            uri:      "dm4.workspaces.workspace_topic",
-            type_uri: "dm4.core.role_type"
         },
         {
-            value:    "Workspace Type",
-            uri:      "dm4.workspaces.workspace_type",
-            type_uri: "dm4.core.role_type"
+            value: "Workspace Facet",
+            uri: "dm4.workspaces.workspace_facet",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:   "dm4.workspaces.workspace",
+                    part_cardinality_uri:  "dm4.core.many",
+                    whole_cardinality_uri: "dm4.core.many",
+                    assoc_type_uri:        "dm4.core.aggregation_def"
+                }
+            ]
         }
     ]
 }

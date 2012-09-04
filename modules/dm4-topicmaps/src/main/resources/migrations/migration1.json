@@ -1,21 +1,21 @@
 {
     topic_types: [
         {
-            value:            "Name",
-            uri:              "dm4.topicmaps.name",
-            data_type_uri:    "dm4.core.text",
-            index_mode_uris:  ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+            value:           "Name",
+            uri:             "dm4.topicmaps.name",
+            data_type_uri:   "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"]
         },
         {
-            value:            "Description",
-            uri:              "dm4.topicmaps.description",
-            data_type_uri:    "dm4.core.html",
-            index_mode_uris:  ["dm4.core.fulltext"]
+            value:           "Description",
+            uri:             "dm4.topicmaps.description",
+            data_type_uri:   "dm4.core.html",
+            index_mode_uris: ["dm4.core.fulltext"]
         },
         {
-            value:            "Topicmap Renderer URI",
-            uri:              "dm4.topicmaps.topicmap_renderer_uri",
-            data_type_uri:    "dm4.core.text",
+            value:           "Topicmap Renderer URI",
+            uri:             "dm4.topicmaps.topicmap_renderer_uri",
+            data_type_uri:   "dm4.core.text",
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
@@ -27,9 +27,9 @@
             ]
         },
         {
-            value:            "Topicmap",
-            uri:              "dm4.topicmaps.topicmap",
-            data_type_uri:    "dm4.core.composite",
+            value:           "Topicmap",
+            uri:             "dm4.topicmaps.topicmap",
+            data_type_uri:   "dm4.core.composite",
             assoc_defs: [
                 {
                     part_topic_type_uri:  "dm4.topicmaps.name",
