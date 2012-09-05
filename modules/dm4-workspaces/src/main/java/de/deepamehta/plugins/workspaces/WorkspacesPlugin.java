@@ -6,12 +6,15 @@ import de.deepamehta.plugins.facets.service.FacetsService;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.listener.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
 import de.deepamehta.core.service.listener.PluginServiceGoneListener;
 import de.deepamehta.core.service.listener.PostCreateTopicListener;
@@ -24,13 +27,15 @@ import java.util.logging.Logger;
 
 
 public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, PostInstallPluginListener,
+                                                                                    IntroduceTopicTypeListener,
                                                                                     PostCreateTopicListener,
                                                                                     PluginServiceArrivedListener,
                                                                                     PluginServiceGoneListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String DEFAULT_WORKSPACE_NAME = "Default";
+    private static final String DEFAULT_WORKSPACE_NAME = "DeepaMehta";
+    private static final String DEFAULT_WORKSPACE_URI = "de.workspaces.deepamehta";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -50,8 +55,13 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     @Override
     public Topic createWorkspace(String name) {
+        return createWorkspace(name, null);
+    }
+
+    @Override
+    public Topic createWorkspace(String name, String uri) {
         logger.info("Creating workspace \"" + name + "\"");
-        return dms.createTopic(new TopicModel("dm4.workspaces.workspace", new CompositeValue()
+        return dms.createTopic(new TopicModel(uri, "dm4.workspaces.workspace", new CompositeValue()
             .put("dm4.workspaces.name", name)
         ), null);   // FIXME: clientState=null
     }
@@ -82,40 +92,47 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      */
     @Override
     public void postInstallPlugin() {
-        createWorkspace(DEFAULT_WORKSPACE_NAME);
+        createWorkspace(DEFAULT_WORKSPACE_NAME, DEFAULT_WORKSPACE_URI);
     }
 
+    @Override
+    public void introduceTopicType(TopicType topicType, ClientState clientState) {
+        try {
+            long workspaceId = workspaceId(clientState);
+            if (workspaceId != -1) {
+                assignWorkspace(topicType, workspaceId);
+            } else if (isDeepaMehtaStandardType(topicType)) {
+                Topic defaultWorkspace = fetchDefaultWorkspace();
+                if (defaultWorkspace != null) {
+                    assignWorkspace(topicType, defaultWorkspace.getId());
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Assigning a workspace to topic type \"" + topicType.getUri() + "\" failed", e);
+        }
+    }
+
+    // ---
+
     /**
-     * Assigns a newly created topic to the current workspace.
+     * Assigns a every created topic to the current workspace.
      */
     @Override
     public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
         long workspaceId = -1;
         try {
-            // check precondition 1
+            // Note: we do not assign a workspace to Searches and to Workspaces
             if (topic.getTypeUri().equals("dm4.webclient.search") ||
                 topic.getTypeUri().equals("dm4.workspaces.workspace")) {
-                // Note 1: we do not relate search topics to a workspace.
-                // Note 2: we do not relate workspaces to a workspace.
-                logger.info("Assigning topic to a workspace ABORTED: searches and workspaces are not assigned (" +
-                    topic + ")");
                 return;
             }
-            // check precondition 2
-            if (clientState == null) {
-                // ### logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +
-                // ###     "(client context is not initialzed))");
+            //
+            workspaceId = workspaceId(clientState);
+            //
+            if (workspaceId == -1) {
                 return;
             }
-            // check precondition 3
-            String wsId = clientState.get("dm4_workspace_id");
-            if (wsId == null) {
-                logger.warning("Assigning " + topic + " to a workspace failed (current workspace is unknown " +
-                    "(no setting found in client context))");
-                return;
-            }
-            // assign topic to workspace
-            workspaceId = Long.parseLong(wsId);
+            //
             assignWorkspace(topic, workspaceId);
         } catch (Exception e) {
             logger.warning("Assigning topic " + topic.getId() + " to workspace " + workspaceId + " failed (" + e +
@@ -144,6 +161,27 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private Topic fetchDefaultWorkspace() {
+        return dms.getTopic("uri", new SimpleValue(DEFAULT_WORKSPACE_URI), false, null);    // fetchComposite=false
+    }
+
+    private boolean isDeepaMehtaStandardType(TopicType topicType) {
+        return topicType.getUri().startsWith("dm4.");
+    }
+
+    private long workspaceId(ClientState clientState) {
+        if (clientState == null) {
+            return -1;
+        }
+        //
+        String workspaceId = clientState.get("dm4_workspace_id");
+        if (workspaceId == null) {
+            return -1;
+        }
+        //
+        return Long.parseLong(workspaceId);
+    }
 
     private void checkWorkspaceId(long workspaceId) {
         String typeUri = dms.getTopic(workspaceId, false, null).getTypeUri();   // fetchComposite=false

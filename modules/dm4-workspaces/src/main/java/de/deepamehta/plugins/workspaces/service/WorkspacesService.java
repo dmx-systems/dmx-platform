@@ -13,6 +13,8 @@ public interface WorkspacesService extends PluginService {
 
     Topic createWorkspace(String name);
 
+    Topic createWorkspace(String name, String uri);
+
     // ---
 
     /**

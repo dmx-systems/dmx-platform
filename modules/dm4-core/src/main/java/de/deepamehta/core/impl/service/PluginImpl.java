@@ -498,13 +498,18 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private void introduceTypesToPlugin() {
-        for (String topicTypeUri : dms.getTopicTypeUris()) {
-            try {
+        try {
+            for (String topicTypeUri : dms.getTopicTypeUris()) {
+                // ### TODO: explain
+                if (topicTypeUri.equals("dm4.core.meta_meta_type")) {
+                    continue;
+                }
+                //
                 TopicType topicType = dms.getTopicType(topicTypeUri, null);     // clientState=null
                 deliverEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);  // clientState=null
-            } catch (Exception e) {
-                throw new RuntimeException("Introducing topic type \"" + topicTypeUri + "\" to " + this + " failed", e);
             }
+        } catch (Exception e) {
+            throw new RuntimeException("Introducing topic types to " + this + " failed", e);
         }
     }
 

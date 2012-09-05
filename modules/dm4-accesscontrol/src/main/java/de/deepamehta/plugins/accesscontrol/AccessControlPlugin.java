@@ -428,11 +428,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void introduceTopicType(TopicType topicType, ClientState clientState) {
-        // ### TODO: explain
-        if (topicType.getUri().equals("dm4.core.meta_meta_type")) {
-            return;
-        }
-        //
         assignCreator(topicType);
         createACLEntry(topicType, DEFAULT_USER_ROLE, DEFAULT_TYPE_PERMISSIONS);
     }
