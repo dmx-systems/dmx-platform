@@ -10,23 +10,37 @@ public class StoredFile implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private JSONObject storedFile = new JSONObject();
+    private String fileName;
+    private long fileTopicId;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     StoredFile(String fileName, long fileTopicId) {
-        try {
-            storedFile.put("file_name", fileName);
-            storedFile.put("topic_id", fileTopicId);
-        } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
-        }
+        this.fileName = fileName;
+        this.fileTopicId = fileTopicId;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    public String getFileName() {
+        return fileName;
+    }
+
+    public long getFileTopicId() {
+        return fileTopicId;
+    }
+
+    // ---
+
     @Override
     public JSONObject toJSON() {
-        return storedFile;
+        try {
+            JSONObject storedFile = new JSONObject();
+            storedFile.put("file_name", fileName);
+            storedFile.put("topic_id", fileTopicId);
+            return storedFile;
+        } catch (Exception e) {
+            throw new RuntimeException("Serialization failed (" + this + ")", e);
+        }
     }
 }

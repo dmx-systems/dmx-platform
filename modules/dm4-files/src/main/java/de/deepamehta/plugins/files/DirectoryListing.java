@@ -40,6 +40,12 @@ public class DirectoryListing implements JSONEnabled {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    public List<FileItem> getFileItems() {
+        return fileItems;
+    }
+
+    // ---
+
     @Override
     public JSONObject toJSON() {
         try {
@@ -57,32 +63,58 @@ public class DirectoryListing implements JSONEnabled {
 
     // --------------------------------------------------------------------------------------------------- Inner Classes
 
-    class FileItem {
+    public enum ItemKind {
+        FILE, DIRECTORY;
+    }
 
-        String kind;    // "file", "directory"
+    public class FileItem implements JSONEnabled {
+
+        ItemKind kind;  // FILE or DIRECTORY
         String name;
         String path;
-        long   size;    // for files only
+        long size;      // for files only
         String type;    // for files only
 
         /**
-         * Constructs a "directory" item.
+         * Constructs a DIRECTORY item.
          */
         FileItem(String name, String path) {
-            this.kind = "directory";
+            this.kind = ItemKind.DIRECTORY;
             this.name = name;
             this.path = truncate(path);
         }
 
         /**
-         * Constructs a "file" item.
+         * Constructs a FILE item.
          */
         FileItem(String name, String path, long size, String type) {
-            this.kind = "file";
+            this.kind = ItemKind.FILE;
             this.name = name;
             this.path = truncate(path);
             this.size = size;
             this.type = type;
+        }
+
+        // ---
+
+        public ItemKind getItemKind() {
+            return kind;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public long getSize() {
+            return size;
+        }
+
+        public String getMediaType() {
+            return type;
         }
 
         // ---
@@ -98,10 +130,11 @@ public class DirectoryListing implements JSONEnabled {
 
         // ---
 
-        JSONObject toJSON() {
+        @Override
+        public JSONObject toJSON() {
             try {
                 JSONObject item = new JSONObject();
-                item.put("kind", kind);
+                item.put("kind", kind.name().toLowerCase());
                 item.put("name", name);
                 item.put("path", path);
                 if (kind.equals("file")) {
