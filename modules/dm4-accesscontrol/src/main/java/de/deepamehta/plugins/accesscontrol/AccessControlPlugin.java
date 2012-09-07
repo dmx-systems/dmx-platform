@@ -25,6 +25,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.listener.AllPluginsActiveListener;
 import de.deepamehta.core.service.listener.InitializePluginListener;
 import de.deepamehta.core.service.listener.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
@@ -35,6 +36,7 @@ import de.deepamehta.core.service.listener.PostInstallPluginListener;
 import de.deepamehta.core.service.listener.PreSendAssociationListener;
 import de.deepamehta.core.service.listener.PreSendTopicListener;
 import de.deepamehta.core.service.listener.PreSendTopicTypeListener;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -65,6 +67,7 @@ import java.util.logging.Logger;
 @Produces("application/json")
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, PostInstallPluginListener,
                                                                     SecurityContext,      InitializePluginListener,
+                                                                                          AllPluginsActiveListener,
                                                                                           PostCreateTopicListener,
                                                                                           PostCreateAssociationListener,
                                                                                           IntroduceTopicTypeListener,
@@ -88,7 +91,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final String DEFAULT_PASSWORD = "";
 
     // default user role
-    private static final UserRole DEFAULT_USER_ROLE = UserRole.CREATOR;
+    private static final UserRole DEFAULT_USER_ROLE = UserRole.MEMBER;
 
     // default permissions
     private static final Permissions DEFAULT_TOPIC_PERMISSIONS = new Permissions();
@@ -100,11 +103,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         DEFAULT_TYPE_PERMISSIONS.add(Operation.WRITE, true);
         DEFAULT_TYPE_PERMISSIONS.add(Operation.CREATE, true);
     }
-
-    // association type semantics ### TODO: to be dropped. Model-driven manipulators required.
-    private static final String WORKSPACE_MEMBERSHIP = "dm4.accesscontrol.membership";
-    private static final String ROLE_TYPE_USER       = "dm4.core.default";
-    private static final String ROLE_TYPE_WORKSPACE  = "dm4.core.default";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -223,10 +221,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @POST
     @Path("/user/{user_id}/{workspace_id}")
     @Override
-    public void joinWorkspace(@PathParam("workspace_id") long workspaceId, @PathParam("user_id") long userId) {
-        dms.createAssociation(new AssociationModel(WORKSPACE_MEMBERSHIP,
-            new TopicRoleModel(userId, ROLE_TYPE_USER),
-            new TopicRoleModel(workspaceId, ROLE_TYPE_WORKSPACE)), null);
+    public void joinWorkspace(@PathParam("user_id") long userId, @PathParam("workspace_id") long workspaceId) {
+        Topic username = dms.getTopic(userId, false, null);
+        joinWorkspace(username, workspaceId);
+    }
+
+    @Override
+    public void joinWorkspace(Topic username, long workspaceId) {
+        wsService.assignToWorkspace(username, workspaceId);
     }
 
 
@@ -402,6 +404,27 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
+    @Override
+    public void allPluginsActive() {
+        String info = "### Assigning the default user (\"admin\") to the default workspace (\"DeepaMehta\")";
+        try {
+            Topic defaultUser = fetchDefaultUser();
+            // abort if already assigned
+            Set<RelatedTopic> workspaces = wsService.getWorkspaces(defaultUser);
+            if (workspaces.size() != 0) {
+                logger.info("### Assigning the default user (\"admin\") to a workspace ABORTED -- already assigned (" +
+                    DeepaMehtaUtils.topicNames(workspaces) + ")");
+                return;
+            }
+            //
+            logger.info(info);
+            Topic defaultWorkspace = wsService.getDefaultWorkspace();
+            wsService.assignToWorkspace(defaultUser, defaultWorkspace.getId());
+        } catch (Exception e) {
+            throw new RuntimeException(info + " failed", e);
+        }
+    }
+
     // ---
 
     @Override
@@ -518,7 +541,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         if (username == null) {
             logger.fine("Assigning a creator to " + info(object) + " failed (no user is logged in). " +
                 "The default user (\"admin\") is assigned instead.");
-            username = fetchAdminUser();
+            username = fetchDefaultUser();
         }
         //
         assignCreator(object, username.getId());
@@ -535,15 +558,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     /**
-     * Fetches the "Username" topic for the "admin" user.
-     * If the "admin" user doesn't exist an exception is thrown.
+     * Fetches the default user ("admin").
      *
-     * @return  The fetched Username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>).
+     * @throws  RuntimeException    If the default user doesn't exist.
+     *
+     * @return  The default user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>).
      */
-    private Topic fetchAdminUser() {
+    private Topic fetchDefaultUser() {
         Topic username = fetchUsername(DEFAULT_USERNAME);
         if (username == null) {
-            throw new RuntimeException("The \"" + DEFAULT_USERNAME + "\" user doesn't exist");
+            throw new RuntimeException("The default user (\"" + DEFAULT_USERNAME + "\") doesn't exist");
         }
         return username;
     }
@@ -672,13 +696,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * Prerequisite: a user is logged in (<code>username</code> is not <code>null</code>).
      *
      * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>).
-     * @param   topic       actually a topic type.
+     * @param   object      the object in question.
      */
     private boolean userIsMember(Topic username, DeepaMehtaObject object) {
-        Set<RelatedTopic> workspaces = wsService.getAssignedWorkspaces(object);
+        Set<RelatedTopic> workspaces = wsService.getWorkspaces(object);
         logger.fine(info(object) + " is assigned to " + workspaces.size() + " workspaces");
         for (RelatedTopic workspace : workspaces) {
-            if (isMemberOfWorkspace(username.getId(), workspace.getId())) {
+            if (wsService.isAssignedToWorkspace(username, workspace.getId())) {
                 logger.fine(userInfo(username) + " IS member of workspace " + workspace);
                 return true;
             } else {
@@ -746,13 +770,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
         return owner.getRelatedTopic("dm4.core.aggregation", "dm4.core.whole", "dm4.core.part",
             "dm4.accesscontrol.username", false, false, null);  // fetchComposite=false, fetchRelatingComposite=false
-    }
-
-    // ---
-
-    private boolean isMemberOfWorkspace(long userId, long workspaceId) {
-        return dms.getAssociation(WORKSPACE_MEMBERSHIP, userId, workspaceId,
-            ROLE_TYPE_USER, ROLE_TYPE_WORKSPACE, false, null) != null;  // fetchComposite=false
     }
 
     // ---

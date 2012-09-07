@@ -168,14 +168,6 @@
         }
     ],
 
-    assoc_types: [
-        {
-            value:         "Membership",
-            uri:           "dm4.accesscontrol.membership",
-            data_type_uri: "dm4.core.text"
-        }
-    ],
-
     topics: [
 
         ### Operations ###

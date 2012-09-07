@@ -69,14 +69,29 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     @Override
-    public void assignWorkspace(DeepaMehtaObject object, long workspaceId) {
+    public void assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
         checkWorkspaceId(workspaceId);
-        facetsService.updateFacet(object, "dm4.workspaces.workspace_facet", new TopicModel(workspaceId), null, null);
+        facetsService.updateFacet(object, "dm4.workspaces.workspace_facet", new TopicModel(workspaceId),
+            null, new Directives());    // clientState=null
+    }
+
+    // ---
+
+    @Override
+    public Set<RelatedTopic> getWorkspaces(DeepaMehtaObject object) {
+        return facetsService.getFacets(object, "dm4.workspaces.workspace_facet");
     }
 
     @Override
-    public Set<RelatedTopic> getAssignedWorkspaces(DeepaMehtaObject object) {
-        return facetsService.getFacets(object, "dm4.workspaces.workspace_facet");
+    public boolean isAssignedToWorkspace(Topic topic, long workspaceId) {
+        return facetsService.hasFacet(topic.getId(), "dm4.workspaces.workspace_facet", workspaceId);
+    }
+
+    // ---
+
+    @Override
+    public Topic getDefaultWorkspace() {
+        return fetchDefaultWorkspace();
     }
 
 
@@ -100,11 +115,15 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         try {
             long workspaceId = workspaceId(clientState);
             if (workspaceId != -1) {
-                assignWorkspace(topicType, workspaceId);
-            } else if (isDeepaMehtaStandardType(topicType)) {
-                Topic defaultWorkspace = fetchDefaultWorkspace();
-                if (defaultWorkspace != null) {
-                    assignWorkspace(topicType, defaultWorkspace.getId());
+                assignToWorkspace(topicType, workspaceId);
+            } else {
+                // assign types of the DeepaMehta standard distribution to the default workspace
+                if (isDeepaMehtaStandardType(topicType)) {
+                    Topic defaultWorkspace = fetchDefaultWorkspace();
+                    // Note: the default workspace is NOT required to exist ### TODO: think about it
+                    if (defaultWorkspace != null) {
+                        assignToWorkspace(topicType, defaultWorkspace.getId());
+                    }
                 }
             }
         } catch (Exception e) {
@@ -115,25 +134,30 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     /**
-     * Assigns a every created topic to the current workspace.
+     * Every created topic is assigned to the current workspace.
      */
     @Override
     public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
         long workspaceId = -1;
         try {
-            // Note: we do not assign a workspace to Searches and to Workspaces
+            // Note: we do not assign Searches and Workspaces to a workspace
             if (topic.getTypeUri().equals("dm4.webclient.search") ||
                 topic.getTypeUri().equals("dm4.workspaces.workspace")) {
                 return;
             }
             //
             workspaceId = workspaceId(clientState);
-            //
+            // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
+            // the default workspace. This would not help in gaining data consistency because the topics created so far
+            // (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
+            // Note: for types the situation is different. The type-introduction mechanism (see introduceTopicType()
+            // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
+            // the other hand we don't have such a mechanism (and neither want one).
             if (workspaceId == -1) {
                 return;
             }
             //
-            assignWorkspace(topic, workspaceId);
+            assignToWorkspace(topic, workspaceId);
         } catch (Exception e) {
             logger.warning("Assigning topic " + topic.getId() + " to workspace " + workspaceId + " failed (" + e +
                 ").\n    => This can happen after a DB reset if there is a stale \"dm4_workspace_id\" browser cookie.");

@@ -98,6 +98,19 @@ public class DeepaMehtaUtils {
         return topicModels;
     }
 
+    public static String topicNames(Collection<? extends Topic> topics) {
+        StringBuilder names = new StringBuilder();
+        Iterator<? extends Topic> i = topics.iterator();
+        while (i.hasNext()) {
+            Topic topic = i.next();
+            names.append('"').append(topic.getSimpleValue()).append('"');
+            if (i.hasNext()) {
+                names.append(", ");
+            }
+        }
+        return names.toString();
+    }
+
 
 
     // ************

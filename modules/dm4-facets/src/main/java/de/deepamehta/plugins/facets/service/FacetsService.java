@@ -51,6 +51,7 @@ public interface FacetsService extends PluginService {
      * @param   object          The facetted object: a topic, association, a type ...
      * @param   facetTypeUri    URI of the facet type.
      * @param   facetValue      The new facet value.
+     * @param   directives      Must be not null at least for aggregated facets ### FIXME: directives are ignored
      */
     void updateFacet(DeepaMehtaObject object, String facetTypeUri, TopicModel facetValue,
                                                                    ClientState clientState, Directives directives);
@@ -61,7 +62,12 @@ public interface FacetsService extends PluginService {
      * @param   object          The facetted object: a topic, association, a type ...
      * @param   facetTypeUri    URI of the facet type.
      * @param   facetValues     The new facet values.
+     * @param   directives      Must be not null at least for aggregated facets ### FIXME: directives are ignored
      */
     void updateFacets(DeepaMehtaObject object, String facetTypeUri, List<TopicModel> facetValues,
                                                                     ClientState clientState, Directives directives);
+
+    // ---
+
+    boolean hasFacet(long topicId, String facetTypeUri, long facetTopicId);
 }

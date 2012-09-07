@@ -59,5 +59,6 @@ public interface AccessControlService extends PluginService {
 
     // ---
 
-    void joinWorkspace(long workspaceId, long userId);
+    void joinWorkspace(long userId, long workspaceId);
+    void joinWorkspace(Topic username, long workspaceId);
 }

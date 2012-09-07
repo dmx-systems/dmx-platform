@@ -277,6 +277,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      */
     @Override
     public void delete(Directives directives) {
+        // Note: directives must be initialized.
+        // The subclass's delete() methods adds DELETE_TOPIC and DELETE_ASSOCIATION directives to it respectively.
+        if (directives == null) {
+            throw new IllegalArgumentException("directives is null");
+        }
         // 1) recursively delete sub-topics
         ResultSet<RelatedTopic> partTopics = getRelatedTopics("dm4.core.composition",
             "dm4.core.whole", "dm4.core.part", null, false, false, 0, null);

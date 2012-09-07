@@ -18,12 +18,30 @@ public interface WorkspacesService extends PluginService {
     // ---
 
     /**
-     * Assigns a workspace to the specified object.
+     * Assigns the specified object to a workspace.
      */
-    void assignWorkspace(DeepaMehtaObject object, long workspaceId);
+    void assignToWorkspace(DeepaMehtaObject object, long workspaceId);
+
+    // ---
 
     /**
-     * Fetches the workspaces assigned to the specified object.
+     * Fetches the workspaces the specified object is assigned to.
      */
-    Set<RelatedTopic> getAssignedWorkspaces(DeepaMehtaObject object);
+    Set<RelatedTopic> getWorkspaces(DeepaMehtaObject object);
+
+    /**
+     * Checks weather the specified topic is assigned to the specified workspace
+     */
+    boolean isAssignedToWorkspace(Topic topic, long workspaceId);
+
+    // ---
+
+    /**
+     * Fetches the default workspace ("DeepaMehta").
+     *
+     * @return  The default workspace (a topic of type "Workspace" / "dm4.workspaces.workspace"),
+     *          or <code>null</code> if it doesn't exist.
+     *          Note: the default workspace is NOT required to exist ### TODO: think about it
+     */
+    Topic getDefaultWorkspace();
 }

@@ -2,13 +2,12 @@ package de.deepamehta.plugins.facets;
 
 import de.deepamehta.plugins.facets.service.FacetsService;
 
+import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
@@ -80,6 +79,19 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
                                                       ClientState clientState, Directives directives) {
         // ### TODO: incorporate the Facets module into the DeepaMehta core?
         object.updateChildTopics(getAssocDef(facetTypeUri), facetValues, clientState, directives);
+    }
+
+    // ---
+
+    // Note: there is a similar private method in AttachedDeepaMehtaObject:
+    // fetchChildTopic(AssociationDefinition assocDef, long childTopicId, boolean fetchComposite)
+    // ### TODO: Extend DeepaMehtaObject interface by hasChildTopic()?
+    @Override
+    public boolean hasFacet(long topicId, String facetTypeUri, long facetTopicId) {
+        String assocTypeUri = getAssocDef(facetTypeUri).getInstanceLevelAssocTypeUri();
+        Association assoc = dms.getAssociation(assocTypeUri, topicId, facetTopicId, "dm4.core.whole", "dm4.core.part",
+            false, null);   // fetchComposite=false, clientState=null
+        return assoc != null;
     }
 
 
