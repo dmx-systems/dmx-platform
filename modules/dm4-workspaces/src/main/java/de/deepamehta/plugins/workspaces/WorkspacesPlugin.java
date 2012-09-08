@@ -152,7 +152,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             // (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
             // Note: for types the situation is different. The type-introduction mechanism (see introduceTopicType()
             // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
-            // the other hand we don't have such a mechanism (and neither want one).
+            // the other hand we don't have such a mechanism (and don't want one either).
             if (workspaceId == -1) {
                 return;
             }

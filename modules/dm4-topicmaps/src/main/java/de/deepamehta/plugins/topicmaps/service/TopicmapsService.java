@@ -11,13 +11,11 @@ import de.deepamehta.core.service.PluginService;
 
 public interface TopicmapsService extends PluginService {
 
-    Topicmap getTopicmap(long topicmapId, ClientState clientState);
+    Topic createTopicmap(String name, String topicmapRendererUri);
 
     // ---
 
-    Topic createTopicmap(String name, String topicmapRendererUri);
-
-    void registerTopicmapRenderer(TopicmapRenderer renderer);
+    Topicmap getTopicmap(long topicmapId, ClientState clientState);
 
     // ---
 
@@ -32,4 +30,8 @@ public interface TopicmapsService extends PluginService {
     void removeAssociationFromTopicmap(long topicmapId, long assocId);
 
     void setTopicmapTranslation(long topicmapId, int trans_x, int trans_y);
+
+    // ---
+
+    void registerTopicmapRenderer(TopicmapRenderer renderer);
 }

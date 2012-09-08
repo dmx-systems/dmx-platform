@@ -69,15 +69,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
 
-    @GET
-    @Path("/{id}")
-    @Override
-    public Topicmap getTopicmap(@PathParam("id") long topicmapId, @HeaderParam("Cookie") ClientState clientState) {
-        return new Topicmap(topicmapId, dms, clientState);
-    }
-
-    // ---
-
     @POST
     @Path("/{name}/{topicmap_renderer_uri}")
     @Override
@@ -91,10 +82,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         ), null);   // FIXME: clientState=null
     }
 
+    // ---
+
+    @GET
+    @Path("/{id}")
     @Override
-    public void registerTopicmapRenderer(TopicmapRenderer renderer) {
-        logger.info("### Registering topicmap renderer \"" + renderer.getClass().getName() + "\"");
-        topicmapRendererRegistry.put(renderer.getUri(), renderer);
+    public Topicmap getTopicmap(@PathParam("id") long topicmapId, @HeaderParam("Cookie") ClientState clientState) {
+        return new Topicmap(topicmapId, dms, clientState);
     }
 
     // ---
@@ -161,6 +155,14 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             )
         );
         dms.updateTopic(new TopicModel(topicmapId, topicmapState), null);
+    }
+
+    // ---
+
+    @Override
+    public void registerTopicmapRenderer(TopicmapRenderer renderer) {
+        logger.info("### Registering topicmap renderer \"" + renderer.getClass().getName() + "\"");
+        topicmapRendererRegistry.put(renderer.getUri(), renderer);
     }
 
     // ---

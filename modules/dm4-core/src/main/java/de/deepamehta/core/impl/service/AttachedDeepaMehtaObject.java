@@ -277,8 +277,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      */
     @Override
     public void delete(Directives directives) {
-        // Note: directives must be initialized.
-        // The subclass's delete() methods adds DELETE_TOPIC and DELETE_ASSOCIATION directives to it respectively.
+        // Note: directives must be not null.
+        // The subclass's delete() methods add DELETE_TOPIC and DELETE_ASSOCIATION directives to it respectively.
         if (directives == null) {
             throw new IllegalArgumentException("directives is null");
         }
@@ -516,7 +516,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             childTopic.update(newChildTopic, clientState, directives);
         } else {
             // create new child
-            childTopic = dms.createTopic(newChildTopic, null);
+            childTopic = dms.createTopic(newChildTopic, clientState);
             associateChildTopic(assocDef, childTopic.getId());
         }
         // 2) update memory
@@ -590,7 +590,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             childTopic.getAssociation().delete(directives);
         }
         // create new assignment
-        Topic topic = createAssignment(assocDef, newChildTopic);
+        Topic topic = createAssignment(assocDef, newChildTopic, clientState);
         // 2) update memory
         updateCompositeModelOne(assocDef, topic.getModel());
     }
@@ -607,7 +607,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         // create new assignments
         List<TopicModel> topics = new ArrayList();
         for (TopicModel newChildTopic : newChildTopics) {
-            Topic topic = createAssignment(assocDef, newChildTopic);
+            Topic topic = createAssignment(assocDef, newChildTopic, clientState);
             topics.add(topic.getModel());
         }
         // 2) update memory
@@ -617,7 +617,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     /**
      * Updates the DB.
      */
-    Topic createAssignment(AssociationDefinition assocDef, TopicModel newChildTopic) {
+    Topic createAssignment(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState) {
         long childTopicId = newChildTopic.getId();
         String childTopicUri = newChildTopic.getUri();
         if (childTopicId != -1) {
@@ -630,7 +630,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             return fetchChildTopic(assocDef, childTopicUri, false);             // fetchComposite=false
         } else {
             // create new child
-            Topic childTopic = dms.createTopic(newChildTopic, null);
+            Topic childTopic = dms.createTopic(newChildTopic, clientState);
             associateChildTopic(assocDef, childTopic.getId());
             return childTopic;
         }
@@ -797,7 +797,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             } else {
                 // create child topic
                 String topicTypeUri = assocDef.getPartTopicTypeUri();
-                childTopic = dms.createTopic(new TopicModel(topicTypeUri, value), null);
+                childTopic = dms.createTopic(new TopicModel(topicTypeUri, value), null);    // clientState=null
                 // associate child topic
                 associateChildTopic(assocDef, childTopic.getId());
             }

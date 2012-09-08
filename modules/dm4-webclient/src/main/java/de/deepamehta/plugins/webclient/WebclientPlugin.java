@@ -6,6 +6,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
@@ -42,9 +43,9 @@ import java.util.logging.Logger;
 @Path("/webclient")
 @Consumes("application/json")
 @Produces("application/json")
-public class WebclientPlugin extends PluginActivator implements PreUpdateTopicListener,
-                                                                PostUpdateTopicListener,
-                                                                AllPluginsActiveListener {
+public class WebclientPlugin extends PluginActivator implements AllPluginsActiveListener,
+                                                                PreUpdateTopicListener,
+                                                                PostUpdateTopicListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -146,6 +147,8 @@ public class WebclientPlugin extends PluginActivator implements PreUpdateTopicLi
         }
     }
 
+    // ---
+
     @Override
     public void preUpdateTopic(Topic topic, TopicModel newModel, Directives directives) {
         if (topic.getTypeUri().equals("dm4.files.file") && newModel.getTypeUri().equals("dm4.webclient.icon")) {
@@ -197,18 +200,18 @@ public class WebclientPlugin extends PluginActivator implements PreUpdateTopicLi
      * Creates a "Search" topic (a bucket).
      */
     private Topic createSearchTopic(String searchTerm, Set<Topic> resultItems, ClientState clientState) {
-        // CompositeValue comp = new CompositeValue("{dm4.webclient.search_term: \"" + searchTerm + "\"}");
-        Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search" /*, comp */), clientState);
-        searchTopic.setChildTopicValue("dm4.webclient.search_term", new SimpleValue(searchTerm));
+        Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new CompositeValue()
+            .put("dm4.webclient.search_term", searchTerm)
+        ), clientState);
         //
         // associate result items
         logger.fine("Associating " + resultItems.size() + " result items to search (ID " + searchTopic.getId() + ")");
         for (Topic resultItem : resultItems) {
             logger.fine("Associating " + resultItem);
-            AssociationModel assocModel = new AssociationModel("dm4.webclient.search_result_item");
-            assocModel.setRoleModel1(new TopicRoleModel(searchTopic.getId(), "dm4.core.default"));
-            assocModel.setRoleModel2(new TopicRoleModel(resultItem.getId(), "dm4.core.default"));
-            dms.createAssociation(assocModel, clientState);
+            dms.createAssociation(new AssociationModel("dm4.webclient.search_result_item",
+                new TopicRoleModel(searchTopic.getId(), "dm4.core.default"),
+                new TopicRoleModel(resultItem.getId(), "dm4.core.default")
+            ), clientState);
         }
         return searchTopic;
     }
