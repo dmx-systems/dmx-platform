@@ -406,22 +406,22 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void allPluginsActive() {
-        String info = "### Assigning the default user (\"admin\") to the default workspace (\"DeepaMehta\")";
-        try {
-            Topic defaultUser = fetchDefaultUser();
-            // abort if already assigned
-            Set<RelatedTopic> workspaces = wsService.getWorkspaces(defaultUser);
-            if (workspaces.size() != 0) {
-                logger.info("### Assigning the default user (\"admin\") to a workspace ABORTED -- already assigned (" +
-                    DeepaMehtaUtils.topicNames(workspaces) + ")");
-                return;
-            }
+        //
+        Topic defaultUser = fetchDefaultUser();
+        assignToDefaultWorkspace(defaultUser, "default user (\"admin\")");
+        //
+        // Note: the Access Control plugin does not DEPEND on the Topicmaps plugin but is designed to work TOGETHER
+        // with the Topicmaps plugin.
+        // Currently the Access Control plugin needs to know some Topicmaps internals e.g. the URI of the default
+        // topicmap. ### TODO: make "optional plugin dependencies" an explicit concept. Plugins must be able to ask
+        // the core weather a certain plugin is installed (regardles weather it is activated already) and would wait
+        // for its service only if installed.
+        //
+        Topic defaultTopicmap = fetchDefaultTopicmap();
+        if (defaultTopicmap != null) {
+            assignToDefaultWorkspace(defaultTopicmap, "default topicmap (\"untitled\")");
             //
-            logger.info(info);
-            Topic defaultWorkspace = wsService.getDefaultWorkspace();
-            wsService.assignToWorkspace(defaultUser, defaultWorkspace.getId());
-        } catch (Exception e) {
-            throw new RuntimeException(info + " failed", e);
+            setupAccessControlForDefaultTopicmap(defaultTopicmap);
         }
     }
 
@@ -580,6 +580,52 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     private Topic fetchUsername(String username) {
         return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username), false, null);
+    }
+
+
+
+    // === All Plugins Activated ===
+
+    private void assignToDefaultWorkspace(Topic topic, String info) {
+        String operation = "### Assigning the " + info + " to the default workspace (\"DeepaMehta\")";
+        try {
+            // abort if already assigned
+            Set<RelatedTopic> workspaces = wsService.getWorkspaces(topic);
+            if (workspaces.size() != 0) {
+                logger.info("### Assigning the " + info + " to a workspace ABORTED -- " +
+                    "already assigned (" + DeepaMehtaUtils.topicNames(workspaces) + ")");
+                return;
+            }
+            //
+            logger.info(operation);
+            Topic defaultWorkspace = wsService.getDefaultWorkspace();
+            wsService.assignToWorkspace(topic, defaultWorkspace.getId());
+        } catch (Exception e) {
+            throw new RuntimeException(operation + " failed", e);
+        }
+    }
+
+    private void setupAccessControlForDefaultTopicmap(Topic defaultTopicmap) {
+        String operation = "### Setup access control for the default topicmap (\"untitled\")";
+        try {
+            // Note: we only check for creator assignment.
+            // If an object has a creator set it is expected to have an ACL entry as well.
+            Topic username = fetchCreator(defaultTopicmap);
+            if (username != null) {
+                logger.info(operation + " ABORTED -- already setup");
+                return;
+            }
+            //
+            logger.info(operation);
+            assignCreator(defaultTopicmap);
+            createACLEntry(defaultTopicmap, DEFAULT_USER_ROLE, DEFAULT_TOPIC_PERMISSIONS);
+        } catch (Exception e) {
+            throw new RuntimeException(operation + " failed", e);
+        }
+    }
+
+    private Topic fetchDefaultTopicmap() {
+        return dms.getTopic("uri", new SimpleValue("dm4.topicmaps.default_topicmap"), false, null);
     }
 
 
