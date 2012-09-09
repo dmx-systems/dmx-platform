@@ -15,7 +15,7 @@ dm4c.add_page_renderer("dm4.typeeditor.topictype_renderer", {
         dm4c.render.field_label("Data Type")
         dm4c.render.page(data_type.value)
         //
-        dm4c.render.associations(topic.id)
+        dm4c.render.topic_associations(topic.id)
     },
 
     render_form: function(topic) {

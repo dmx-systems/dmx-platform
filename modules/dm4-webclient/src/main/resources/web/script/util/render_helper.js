@@ -176,12 +176,23 @@ function RenderHelper() {
 
     // === Direct-to-page Rendering ===
 
-    this.associations = function(topic_id) {
-        var result = dm4c.restc.get_related_topics(topic_id, undefined, true, dm4c.MAX_RESULT_SIZE)
+    this.topic_associations = function(topic_id) {
+        var result = dm4c.restc.get_topic_related_topics(topic_id, undefined, true, dm4c.MAX_RESULT_SIZE)
                                                                 // traversal_filter=undefined, sort=true
         this.field_label("Associations", undefined, result)     // parent_element=undefined
         this.page(this.topic_list(result.items))
     }
+
+    this.association_associations = function(assoc_id) {
+        var result = dm4c.restc.get_association_related_topics(assoc_id, undefined, true, dm4c.MAX_RESULT_SIZE)
+                                                                // traversal_filter=undefined, sort=true
+        this.field_label("Associations", undefined, result)     // parent_element=undefined
+        this.page(this.topic_list(result.items, function(topic) {
+            dm4c.show_topic(dm4c.fetch_topic(topic.id), "show", undefined, true)    // coordinates=undefined,
+        }))                                                                         // do_center=true
+    }
+
+    // ---
 
     this.page = function(html) {
         $("#page-content").append(html)

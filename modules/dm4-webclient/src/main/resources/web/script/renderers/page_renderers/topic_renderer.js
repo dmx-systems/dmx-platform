@@ -16,7 +16,7 @@
             //
             render_page_model(page_model, this.mode.INFO)
             //
-            dm4c.render.associations(topic.id)
+            dm4c.render.topic_associations(topic.id)
         },
 
         render_form: function(topic) {
