@@ -2,6 +2,7 @@ package de.deepamehta.plugins.webservice;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
@@ -341,24 +342,19 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/topic/{id}/related_topics")
-    public ResultSet<RelatedTopic> getRelatedTopics(@PathParam("id")                     long topicId,
-                                                    @QueryParam("assoc_type_uri")        String assocTypeUri,
-                                                    @QueryParam("my_role_type_uri")      String myRoleTypeUri,
-                                                    @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
-                                                    @QueryParam("others_topic_type_uri") String othersTopicTypeUri,
-                                                    @QueryParam("max_result_size")       int maxResultSize,
-                                                    @HeaderParam("Cookie")               ClientState clientState) {
-        logger.info("topicId=" + topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
-            "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri +
-            "\", maxResultSize=" + maxResultSize);
+    public ResultSet<RelatedTopic> getTopicRelatedTopics(@PathParam("id")                     long topicId,
+                                                         @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                         @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                         @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                         @QueryParam("others_topic_type_uri") String othersTopicTypeUri,
+                                                         @QueryParam("max_result_size")       int maxResultSize,
+                                                         @HeaderParam("Cookie")               ClientState clientState) {
         try {
-            return dms.getTopic(topicId, false, clientState).getRelatedTopics(assocTypeUri, myRoleTypeUri,
-                othersRoleTypeUri, othersTopicTypeUri, false, false, maxResultSize, clientState);
+            Topic topic = dms.getTopic(topicId, false, clientState);
+            return getRelatedTopics(topic, "topic", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+                othersTopicTypeUri, maxResultSize, clientState);
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Retrieving related topics of topic " + topicId +
-                " failed (assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
-                "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri +
-                "\", maxResultSize=" + maxResultSize + ")", e));
+            throw new WebApplicationException(e);
         }
     }
 
@@ -368,5 +364,43 @@ public class WebservicePlugin extends PluginActivator {
     // *** Association REST API ***
     // ****************************
 
-    // ### TODO
+
+
+    @GET
+    @Path("/association/{id}/related_topics")
+    public ResultSet<RelatedTopic> getAssociationRelatedTopics(@PathParam("id")               long assocId,
+                                                         @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                         @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                         @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                         @QueryParam("others_topic_type_uri") String othersTopicTypeUri,
+                                                         @QueryParam("max_result_size")       int maxResultSize,
+                                                         @HeaderParam("Cookie")               ClientState clientState) {
+        try {
+            Association assoc = dms.getAssociation(assocId, false, clientState);
+            return getRelatedTopics(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+                othersTopicTypeUri, maxResultSize, clientState);
+        } catch (Exception e) {
+            throw new WebApplicationException(e);
+        }
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private ResultSet<RelatedTopic> getRelatedTopics(DeepaMehtaObject object, String objectInfo,
+                        String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri,
+                        int maxResultSize, ClientState clientState) {
+        String operation = "Retrieving related topics of " + objectInfo + " " + object.getId();
+        String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
+            "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri +
+            "\", maxResultSize=" + maxResultSize + ")";
+        try {
+            logger.info(operation + " " + paramInfo);
+            return object.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+                false, false, maxResultSize, clientState);
+        } catch (Exception e) {
+            throw new RuntimeException(operation + " failed " + paramInfo, e);
+        }
+    }
 }

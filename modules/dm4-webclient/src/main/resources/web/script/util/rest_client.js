@@ -48,12 +48,13 @@ function RESTClient(core_service_uri) {
     }
 
     /**
-     * @param   traversal_filter    Optional: Traversal Filtering (if not specified no filter is applied).
+     * @param   traversal_filter    Optional: Traversal Filtering.
      *                              An object with 4 possible properties (each one is optional):
      *                                  "assoc_type_uri"
      *                                  "my_role_type_uri"
      *                                  "others_role_type_uri"
      *                                  "others_topic_type_uri"
+     *                              If not specified no filter is applied.
      * @param   sort                Optional: Result sorting.
      *                              If evaluates to true the returned topics are sorted.
      * @param   max_result_size     Optional: Result limitation (a number).
@@ -63,7 +64,7 @@ function RESTClient(core_service_uri) {
      *              "items"       - array of topics, possibly empty.
      *              "total_count" - result set size before limitation.
      */
-    this.get_related_topics = function(topic_id, traversal_filter, sort, max_result_size) {
+    this.get_topic_related_topics = function(topic_id, traversal_filter, sort, max_result_size) {
         var params = new RequestParameter(traversal_filter)
         params.add("max_result_size", max_result_size)
         var result = request("GET", "/topic/" + topic_id + "/related_topics?" + params.to_query_string())
@@ -124,6 +125,31 @@ function RESTClient(core_service_uri) {
      */
     this.get_associations = function(topic1_id, topic2_id, assoc_type_uri) {
         return request("GET", "/association/multiple/" + topic1_id + "/" + topic2_id + "/" + (assoc_type_uri || ""))
+    }
+
+    /**
+     * @param   traversal_filter    Optional: Traversal Filtering.
+     *                              An object with 4 possible properties (each one is optional):
+     *                                  "assoc_type_uri"
+     *                                  "my_role_type_uri"
+     *                                  "others_role_type_uri"
+     *                                  "others_topic_type_uri"
+     *                              If not specified no filter is applied.
+     * @param   sort                Optional: Result sorting.
+     *                              If evaluates to true the returned topics are sorted.
+     * @param   max_result_size     Optional: Result limitation (a number).
+     *                              If 0 or if not specified the result is not limited.
+     *
+     * @return  An object with 2 properties:
+     *              "items"       - array of topics, possibly empty.
+     *              "total_count" - result set size before limitation.
+     */
+    this.get_association_related_topics = function(assoc_id, traversal_filter, sort, max_result_size) {
+        var params = new RequestParameter(traversal_filter)
+        params.add("max_result_size", max_result_size)
+        var result = request("GET", "/association/" + assoc_id + "/related_topics?" + params.to_query_string())
+        sort_topics(result.items, sort)
+        return result
     }
 
     this.create_association = function(assoc_model) {
