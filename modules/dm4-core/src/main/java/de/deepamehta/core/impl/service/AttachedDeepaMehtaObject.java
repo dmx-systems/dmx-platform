@@ -517,7 +517,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         } else {
             // create new child
             childTopic = dms.createTopic(newChildTopic, clientState);
-            associateChildTopic(assocDef, childTopic.getId());
+            associateChildTopic(assocDef, childTopic.getId(), clientState);
         }
         // 2) update memory
         updateCompositeModel(assocDef, childTopic.getModel());
@@ -622,16 +622,16 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         String childTopicUri = newChildTopic.getUri();
         if (childTopicId != -1) {
             // assign existing child (ref'd by ID)
-            associateChildTopic(assocDef, childTopicId);
+            associateChildTopic(assocDef, childTopicId, clientState);
             return fetchChildTopic(assocDef, childTopicId, false);              // fetchComposite=false
         } else if (!childTopicUri.equals("")) {
             // assign existing child (ref'd by URI)
-            associateChildTopic(assocDef, childTopicUri);
+            associateChildTopic(assocDef, childTopicUri, clientState);
             return fetchChildTopic(assocDef, childTopicUri, false);             // fetchComposite=false
         } else {
             // create new child
             Topic childTopic = dms.createTopic(newChildTopic, clientState);
-            associateChildTopic(assocDef, childTopic.getId());
+            associateChildTopic(assocDef, childTopic.getId(), clientState);
             return childTopic;
         }
     }
@@ -797,9 +797,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             } else {
                 // create child topic
                 String topicTypeUri = assocDef.getPartTopicTypeUri();
-                childTopic = dms.createTopic(new TopicModel(topicTypeUri, value), null);    // clientState=null
+                childTopic = dms.createTopic(new TopicModel(topicTypeUri, value), null);  // ### FIXME: clientState=null
                 // associate child topic
-                associateChildTopic(assocDef, childTopic.getId());
+                associateChildTopic(assocDef, childTopic.getId(), null);                  // ### FIXME: clientState=null
             }
             return childTopic;
         } catch (Exception e) {
@@ -897,17 +897,17 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // === Helper ===
 
-    private void associateChildTopic(AssociationDefinition assocDef, long childTopicId) {
+    private void associateChildTopic(AssociationDefinition assocDef, long childTopicId, ClientState clientState) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
             createRoleModel(assocDef.getWholeRoleTypeUri()),
-            new TopicRoleModel(childTopicId, assocDef.getPartRoleTypeUri())
+            new TopicRoleModel(childTopicId, assocDef.getPartRoleTypeUri()), clientState
         );
     }
 
-    private void associateChildTopic(AssociationDefinition assocDef, String childTopicUri) {
+    private void associateChildTopic(AssociationDefinition assocDef, String childTopicUri, ClientState clientState) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
             createRoleModel(assocDef.getWholeRoleTypeUri()),
-            new TopicRoleModel(childTopicUri, assocDef.getPartRoleTypeUri())
+            new TopicRoleModel(childTopicUri, assocDef.getPartRoleTypeUri()), clientState
         );
     }
 

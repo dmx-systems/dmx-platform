@@ -649,12 +649,20 @@ public class EmbeddedService implements DeepaMehtaService {
         return models;
     }
 
+    // ---
+
     /**
      * Convenience method.
      */
     Association createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
-        // FIXME: clientState=null
-        return createAssociation(new AssociationModel(typeUri, roleModel1, roleModel2), null);
+        return createAssociation(typeUri, roleModel1, roleModel2, null);    // ### FIXME: clientState=null
+    }
+
+    /**
+     * Convenience method.
+     */
+    Association createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2, ClientState clientState) {
+        return createAssociation(new AssociationModel(typeUri, roleModel1, roleModel2), clientState);
     }
 
 

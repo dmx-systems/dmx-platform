@@ -3,6 +3,7 @@ package de.deepamehta.plugins.workspaces;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 import de.deepamehta.plugins.facets.service.FacetsService;
 
+import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -17,10 +18,10 @@ import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.listener.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
 import de.deepamehta.core.service.listener.PluginServiceGoneListener;
+import de.deepamehta.core.service.listener.PostCreateAssociationListener;
 import de.deepamehta.core.service.listener.PostCreateTopicListener;
 import de.deepamehta.core.service.listener.PostInstallPluginListener;
 
-import static java.util.Arrays.asList;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -29,6 +30,7 @@ import java.util.logging.Logger;
 public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, PostInstallPluginListener,
                                                                                     IntroduceTopicTypeListener,
                                                                                     PostCreateTopicListener,
+                                                                                    PostCreateAssociationListener,
                                                                                     PluginServiceArrivedListener,
                                                                                     PluginServiceGoneListener {
 
@@ -160,6 +162,31 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             assignToWorkspace(topic, workspaceId);
         } catch (Exception e) {
             logger.warning("Assigning topic " + topic.getId() + " to workspace " + workspaceId + " failed (" + e +
+                ").\n    => This can happen after a DB reset if there is a stale \"dm4_workspace_id\" browser cookie.");
+        }
+    }
+
+    /**
+     * Every created association is assigned to the current workspace.
+     */
+    @Override
+    public void postCreateAssociation(Association assoc, ClientState clientState, Directives directives) {
+        long workspaceId = -1;
+        try {
+            workspaceId = workspaceId(clientState);
+            // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
+            // the default workspace. This would not help in gaining data consistency because the associations created
+            // so far (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
+            // Note: for types the situation is different. The type-introduction mechanism (see introduceTopicType()
+            // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
+            // the other hand we don't have such a mechanism (and don't want one either).
+            if (workspaceId == -1) {
+                return;
+            }
+            //
+            assignToWorkspace(assoc, workspaceId);
+        } catch (Exception e) {
+            logger.warning("Assigning association " + assoc.getId() + " to workspace " + workspaceId + " failed (" + e +
                 ").\n    => This can happen after a DB reset if there is a stale \"dm4_workspace_id\" browser cookie.");
         }
     }
