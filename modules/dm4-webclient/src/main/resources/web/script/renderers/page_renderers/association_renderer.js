@@ -13,9 +13,11 @@
             dm4c.render.field_label("Association Type")
             dm4c.render.page(assoc_type.value)
             //
-            dm4c.render.field_label("Associated Topics")
+            dm4c.render.field_label("Topics")
             render_assoc_role(topic_1, role_type_1)
             render_assoc_role(topic_2, role_type_2)
+            //
+            dm4c.render.association_associations(assoc.id)
         },
 
         render_form: function(assoc) {
@@ -26,7 +28,7 @@
             dm4c.render.field_label("Association Type")
             dm4c.render.page(assoc_type_menu.dom)
             //
-            dm4c.render.field_label("Associated Topics")
+            dm4c.render.field_label("Topics")
             render_assoc_role_editor(topic_1, role_type_menu_1)
             render_assoc_role_editor(topic_2, role_type_menu_2)
             //
