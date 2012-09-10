@@ -1,25 +1,16 @@
 package de.deepamehta.plugins.files.test;
 
 import de.deepamehta.plugins.files.DirectoryListing;
-import de.deepamehta.plugins.files.DirectoryListing.FileItem;
-import de.deepamehta.plugins.files.DirectoryListing.ItemKind;
+import de.deepamehta.plugins.files.FileItem;
+import de.deepamehta.plugins.files.ItemKind;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import org.junit.Test;
 
 import org.codehaus.jettison.json.JSONException;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 
 
 

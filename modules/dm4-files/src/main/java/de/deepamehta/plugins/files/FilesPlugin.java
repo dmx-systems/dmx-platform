@@ -326,7 +326,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             String path = request.getRequestURI().substring(FILE_REPOSITORY_URI.length());
             path = JavaUtils.decodeURIComponent(path);
             logger.info("### repository path=\"" + path + "\"");
-            File file = enforeSecurity(path);
+            enforeSecurity(path);
             return true;
         } catch (FileRepositoryException e) {
             response.setStatus(e.getStatusCode());
