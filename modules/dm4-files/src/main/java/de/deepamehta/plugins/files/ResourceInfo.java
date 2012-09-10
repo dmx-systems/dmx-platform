@@ -12,7 +12,7 @@ public class ResourceInfo implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String kind;    // "file", "directory"
+    private ItemKind kind;  // FILE or DIRECTORY
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -20,16 +20,20 @@ public class ResourceInfo implements JSONEnabled {
      * Precondition: the file exists.
      */
     public ResourceInfo(File file) {
-        kind = file.isDirectory() ? "directory" : "file";
+        kind = file.isDirectory() ? ItemKind.DIRECTORY : ItemKind.FILE;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    public ItemKind getItemKind() {
+        return kind;
+    }
 
     @Override
     public JSONObject toJSON() {
         try {
             JSONObject info = new JSONObject();
-            info.put("kind", kind);
+            info.put("kind", kind.stringify());
             return info;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);

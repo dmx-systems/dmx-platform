@@ -21,7 +21,7 @@ public class DirectoryListing implements JSONEnabled {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private FileItem dirInfo;
-    private List<FileItem> fileItems = new ArrayList();
+    private List<FileItem> fileItems = new ArrayList<FileItem>();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -62,10 +62,6 @@ public class DirectoryListing implements JSONEnabled {
     }
 
     // --------------------------------------------------------------------------------------------------- Inner Classes
-
-    public enum ItemKind {
-        FILE, DIRECTORY;
-    }
 
     public class FileItem implements JSONEnabled {
 
@@ -134,7 +130,7 @@ public class DirectoryListing implements JSONEnabled {
         public JSONObject toJSON() {
             try {
                 JSONObject item = new JSONObject();
-                item.put("kind", kind.name().toLowerCase());
+                item.put("kind", kind.stringify());
                 item.put("name", name);
                 item.put("path", path);
                 if (kind.equals("file")) {
