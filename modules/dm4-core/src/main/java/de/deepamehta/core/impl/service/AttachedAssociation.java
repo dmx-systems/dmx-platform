@@ -261,9 +261,17 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // --- Association Retrieval ---
 
     @Override
+    public Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                   long othersTopicId) {
+        AssociationModel assoc = dms.storage.getAssociationBetweenTopicAndAssociation(assocTypeUri,
+            othersTopicId, getId(), othersRoleTypeUri, myRoleTypeUri);
+        return assoc != null ? dms.attach(assoc, false) : null;         // fetchComposite=false
+    }
+
+    @Override
     public Set<Association> getAssociations(String myRoleTypeUri) {
         return dms.attach(dms.storage.getAssociationAssociations(getId(), myRoleTypeUri), false);
-        // fetchComposite=false
+                                                                        // fetchComposite=false
     }
 
 

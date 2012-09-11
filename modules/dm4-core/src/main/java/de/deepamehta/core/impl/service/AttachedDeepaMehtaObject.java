@@ -245,6 +245,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         return getAssociations(null);
     }
 
+    // Note: these methods are implemented in the subclasses (this is an abstract class):
+    //     getAssociation(...);
+    //     getAssociations(String myRoleTypeUri);
+
 
 
     // === Updating ===
@@ -699,33 +703,31 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             false, null);
     }
 
+    /**
+     * Fetches and returns the child topic with the specified ID. If that topic is not a child topic of this object
+     * according to the specified association definition an exception is thrown.
+     */
     private Topic fetchChildTopic(AssociationDefinition assocDef, long childTopicId, boolean fetchComposite) {
-        Topic childTopic = dms.getTopic(childTopicId, fetchComposite, null);            // clientState=null
+        Topic childTopic = dms.getTopic(childTopicId, fetchComposite, null);                // clientState=null
         // error check
-        String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();
-        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();
-        AssociationModel assoc = dms.storage.getAssociation(assocTypeUri, getId(), childTopicId, myRoleTypeUri,
-                                                                                                 othersRoleTypeUri);
-        if (assoc == null) {
-            throw new RuntimeException("Topic " + childTopicId + " is not a child of topic " + getId() +
-                " according to " + assocDef);
+        if (getAssociation(assocDef, childTopicId) == null) {
+            throw new RuntimeException("Topic " + childTopicId + " is not a child of " + className() +
+                " " + getId() + " according to " + assocDef);
         }
         //
         return childTopic;
     }
 
+    /**
+     * Fetches and returns the child topic with the specified URI. If that topic is not a child topic of this object
+     * according to the specified association definition an exception is thrown.
+     */
     private Topic fetchChildTopic(AssociationDefinition assocDef, String childTopicUri, boolean fetchComposite) {
         Topic childTopic = dms.getTopic("uri", new SimpleValue(childTopicUri), fetchComposite, null);
-        // error check
-        String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();
-        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();
-        AssociationModel assoc = dms.storage.getAssociation(assocTypeUri, getId(), childTopic.getId(), myRoleTypeUri,
-                                                                                                 othersRoleTypeUri);
-        if (assoc == null) {
-            throw new RuntimeException("Topic with URI \"" + childTopicUri + "\" is not a child of topic " + getId() +
-                " according to " + assocDef);
+        // error check                                                                      // clientState=null
+        if (getAssociation(assocDef, childTopic.getId()) == null) {
+            throw new RuntimeException("Topic with URI \"" + childTopicUri + "\" is not a child of " + className() +
+                " " + getId() + " according to " + assocDef);
         }
         //
         return childTopic;
@@ -909,6 +911,15 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             createRoleModel(assocDef.getWholeRoleTypeUri()),
             new TopicRoleModel(childTopicUri, assocDef.getPartRoleTypeUri()), clientState
         );
+    }
+
+    // ---
+
+    private Association getAssociation(AssociationDefinition assocDef, long childTopicId) {
+        String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
+        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();
+        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();
+        return getAssociation(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, childTopicId);
     }
 
     // ---

@@ -112,6 +112,9 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
      // --- Association Retrieval ---
 
+     Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                             long othersTopicId);
+
      Set<Association> getAssociations();
 
      Set<Association> getAssociations(String myRoleTypeUri);

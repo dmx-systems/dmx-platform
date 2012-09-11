@@ -711,7 +711,7 @@ public class EmbeddedService implements DeepaMehtaService {
      * Attaches this core service to an association fetched from storage layer.
      * Optionally fetches the topic's composite value from storage layer.
      */
-    private AttachedAssociation attach(AssociationModel model, boolean fetchComposite) {
+    AttachedAssociation attach(AssociationModel model, boolean fetchComposite) {
         AttachedAssociation assoc = new AttachedAssociation(model, this);
         fetchComposite(assoc, fetchComposite);
         return assoc;

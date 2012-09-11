@@ -8,6 +8,7 @@ import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -223,8 +224,16 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // --- Association Retrieval ---
 
     @Override
+    public Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                   long othersTopicId) {
+        AssociationModel assoc = dms.storage.getAssociation(assocTypeUri, getId(), othersTopicId, myRoleTypeUri,
+                                                                                                  othersRoleTypeUri);
+        return assoc != null ? dms.attach(assoc, false) : null;                             // fetchComposite=false
+    }
+
+    @Override
     public Set<Association> getAssociations(String myRoleTypeUri) {
-        return dms.attach(dms.storage.getTopicAssociations(getId(), myRoleTypeUri), false);     // fetchComposite=false
+        return dms.attach(dms.storage.getTopicAssociations(getId(), myRoleTypeUri), false); // fetchComposite=false
     }
 
 
