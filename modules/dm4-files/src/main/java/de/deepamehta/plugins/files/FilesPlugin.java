@@ -186,7 +186,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             boolean success = repoFile.mkdir();
             //
             if (!success) {
-                throw new RuntimeException("The File.mkdir() call had no success (file=\"" + repoFile + "\")");
+                throw new RuntimeException("File.mkdir() failed (file=\"" + repoFile + "\")");
             }
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());

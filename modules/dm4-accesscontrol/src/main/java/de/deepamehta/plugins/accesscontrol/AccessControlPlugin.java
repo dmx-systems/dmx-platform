@@ -609,7 +609,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         String operation = "### Setup access control for the default topicmap (\"untitled\")";
         try {
             // Note: we only check for creator assignment.
-            // If an object has a creator set it is expected to have an ACL entry as well.
+            // If an object has a creator assignment it is expected to have an ACL entry as well.
             Topic username = fetchCreator(defaultTopicmap);
             if (username != null) {
                 logger.info(operation + " ABORTED -- already setup");

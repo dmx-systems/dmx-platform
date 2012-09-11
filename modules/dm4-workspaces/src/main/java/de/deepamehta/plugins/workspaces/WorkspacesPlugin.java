@@ -114,8 +114,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     @Override
     public void introduceTopicType(TopicType topicType, ClientState clientState) {
+        long workspaceId = -1;
         try {
-            long workspaceId = workspaceId(clientState);
+            workspaceId = workspaceId(clientState);
             if (workspaceId != -1) {
                 assignToWorkspace(topicType, workspaceId);
             } else {
@@ -124,12 +125,14 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                     Topic defaultWorkspace = fetchDefaultWorkspace();
                     // Note: the default workspace is NOT required to exist ### TODO: think about it
                     if (defaultWorkspace != null) {
-                        assignToWorkspace(topicType, defaultWorkspace.getId());
+                        workspaceId = defaultWorkspace.getId();
+                        assignToWorkspace(topicType, workspaceId);
                     }
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Assigning a workspace to topic type \"" + topicType.getUri() + "\" failed", e);
+            throw new RuntimeException("Assigning topic type \"" + topicType.getUri() + "\" to workspace " +
+                workspaceId + " failed", e);
         }
     }
 
@@ -161,8 +164,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             //
             assignToWorkspace(topic, workspaceId);
         } catch (Exception e) {
-            logger.warning("Assigning topic " + topic.getId() + " to workspace " + workspaceId + " failed (" + e +
-                ").\n    => This can happen after a DB reset if there is a stale \"dm4_workspace_id\" browser cookie.");
+            throw new RuntimeException("Assigning topic " + topic.getId() + " to workspace " + workspaceId +
+                " failed", e);
         }
     }
 
@@ -186,8 +189,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             //
             assignToWorkspace(assoc, workspaceId);
         } catch (Exception e) {
-            logger.warning("Assigning association " + assoc.getId() + " to workspace " + workspaceId + " failed (" + e +
-                ").\n    => This can happen after a DB reset if there is a stale \"dm4_workspace_id\" browser cookie.");
+            throw new RuntimeException("Assigning association " + assoc.getId() + " to workspace " + workspaceId +
+                " failed", e);
         }
     }
 
@@ -234,6 +237,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return Long.parseLong(workspaceId);
     }
 
+    /**
+     * Checks if the topic with the specified ID exists and is a Workspace. If not, an exception is thrown.
+     */
     private void checkWorkspaceId(long workspaceId) {
         String typeUri = dms.getTopic(workspaceId, false, null).getTypeUri();   // fetchComposite=false
         if (!typeUri.equals("dm4.workspaces.workspace")) {
