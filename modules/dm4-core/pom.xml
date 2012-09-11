@@ -70,7 +70,7 @@
                             de.deepamehta.core.model,
                             de.deepamehta.core.osgi,
                             de.deepamehta.core.service,
-                            de.deepamehta.core.service.listener,
+                            de.deepamehta.core.service.event,
                             de.deepamehta.core.util,
                             org.osgi.service.log        <!-- required when running without Gogo Shell -->
                         </Export-Package>

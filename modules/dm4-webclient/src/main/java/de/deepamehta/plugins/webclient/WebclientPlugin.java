@@ -14,9 +14,9 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.listener.AllPluginsActiveListener;
-import de.deepamehta.core.service.listener.PreUpdateTopicListener;
-import de.deepamehta.core.service.listener.PostUpdateTopicListener;
+import de.deepamehta.core.service.event.AllPluginsActiveListener;
+import de.deepamehta.core.service.event.PreUpdateTopicListener;
+import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import javax.ws.rs.Consumes;

@@ -1,4 +1,4 @@
-package de.deepamehta.core.service.listener;
+package de.deepamehta.core.service.event;
 
 import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.PluginService;

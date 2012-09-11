@@ -15,12 +15,12 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.listener.IntroduceTopicTypeListener;
-import de.deepamehta.core.service.listener.PluginServiceArrivedListener;
-import de.deepamehta.core.service.listener.PluginServiceGoneListener;
-import de.deepamehta.core.service.listener.PostCreateAssociationListener;
-import de.deepamehta.core.service.listener.PostCreateTopicListener;
-import de.deepamehta.core.service.listener.PostInstallPluginListener;
+import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
+import de.deepamehta.core.service.event.PluginServiceArrivedListener;
+import de.deepamehta.core.service.event.PluginServiceGoneListener;
+import de.deepamehta.core.service.event.PostCreateAssociationListener;
+import de.deepamehta.core.service.event.PostCreateTopicListener;
+import de.deepamehta.core.service.event.PostInstallPluginListener;
 
 import java.util.Set;
 import java.util.logging.Logger;

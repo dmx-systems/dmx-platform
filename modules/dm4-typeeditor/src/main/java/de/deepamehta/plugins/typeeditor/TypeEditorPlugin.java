@@ -7,8 +7,8 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.listener.PostDeleteAssociationListener;
-import de.deepamehta.core.service.listener.PostRetypeAssociationListener;
+import de.deepamehta.core.service.event.PostDeleteAssociationListener;
+import de.deepamehta.core.service.event.PostRetypeAssociationListener;
 
 import java.util.logging.Logger;
 

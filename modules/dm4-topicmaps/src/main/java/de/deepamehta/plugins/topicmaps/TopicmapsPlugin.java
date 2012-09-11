@@ -13,7 +13,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.listener.PostInstallPluginListener;
+import de.deepamehta.core.service.event.PostInstallPluginListener;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;

@@ -10,7 +10,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.SecurityHandler;
-import de.deepamehta.core.service.listener.InitializePluginListener;
+import de.deepamehta.core.service.event.InitializePluginListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
 

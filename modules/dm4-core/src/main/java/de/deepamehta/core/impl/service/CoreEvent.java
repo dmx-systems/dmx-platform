@@ -8,7 +8,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.listener.*;
+import de.deepamehta.core.service.event.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ import java.util.Map;
  *     - PLUGIN_SERVICE_ARRIVED
  *     - PLUGIN_SERVICE_GONE
  *
- * @see de.deepamehta.core.service.listener
+ * @see de.deepamehta.core.service.event
  */
 enum CoreEvent {
 
