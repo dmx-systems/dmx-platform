@@ -116,13 +116,13 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             })
 
             function do_try_login() {
-                var username = username_input.val()
-                var password = password_input.val()
-                var username_topic = dm4c.restc.login(authorization())
-                if (username_topic) {
+                try {
+                    var username = username_input.val()
+                    var password = password_input.val()
+                    var username_topic = dm4c.restc.login(authorization())  // throws 401 if login fails
                     show_message("Login OK", "ok", close_login_dialog)
                     update_gui_login(username_topic)
-                } else {
+                } catch (e) {
                     show_message("Login failed", "failed")
                 }
 
