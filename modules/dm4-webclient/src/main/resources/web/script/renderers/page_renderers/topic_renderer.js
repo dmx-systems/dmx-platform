@@ -11,8 +11,8 @@
 
         render_page: function(topic) {
             var page_model = create_page_model(topic, this.mode.INFO)
-            // trigger hook
-            dm4c.trigger_plugin_hook("pre_render_page", topic, page_model)
+            // fire event
+            dm4c.fire_event("pre_render_page", topic, page_model)
             //
             render_page_model(page_model, this.mode.INFO)
             //
@@ -21,8 +21,8 @@
 
         render_form: function(topic) {
             var page_model = create_page_model(topic, this.mode.FORM)
-            // trigger hook
-            dm4c.trigger_plugin_hook("pre_render_form", topic, page_model)
+            // fire event
+            dm4c.fire_event("pre_render_form", topic, page_model)
             //
             render_page_model(page_model, this.mode.FORM)
             //

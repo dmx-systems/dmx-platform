@@ -43,7 +43,7 @@ function ToolbarPanel() {
 
     this.select_searchmode = function(searchmode) {
         searchmode_widget.empty()
-        searchmode_widget.append(dm4c.trigger_plugin_hook("searchmode_widget", searchmode)[0])
+        searchmode_widget.append(dm4c.fire_event("searchmode_widget", searchmode)[0])
     }
 
     this.get_recent_type_uri = function() {

@@ -64,7 +64,7 @@ function Webclient() {
     //     a) updating the database,
     //     b) updating the client model,
     //     c) updating the view,
-    //     d) triggering hooks
+    //     d) firing events
     // The names of the controller methods begins with "do_".
     //
     // Your plugin can call the controller methods via the global "dm4c" object.
@@ -73,7 +73,7 @@ function Webclient() {
 
     /**
      * Fetches the topic and displays it on the page panel.
-     * Triggers the "post_select_topic" hook (indirectly).
+     * Fires the "post_select_topic" event (indirectly).
      *
      * Precondition: the topic is shown on the canvas.
      *
@@ -92,7 +92,7 @@ function Webclient() {
 
     /**
      * Fetches the association and displays it on the page panel.
-     * Triggers the "post_select_association" hook (indirectly).
+     * Fires the "post_select_association" event (indirectly).
      *
      * Precondition: the association is shown on the canvas.
      *
@@ -110,7 +110,7 @@ function Webclient() {
     }
 
     /**
-     * Triggers the "post_reset_selection" hook (indirectly).
+     * Fires the "post_reset_selection" event (indirectly).
      *
      * @param   no_history_update   Optional: boolean.
      */
@@ -121,8 +121,8 @@ function Webclient() {
         // update view
         dm4c.canvas.reset_selection(true)    // refresh_canvas=true
         dm4c.page_panel.clear()
-        // trigger hook
-        var result = dm4c.trigger_plugin_hook("default_page_rendering")
+        // fire event
+        var result = dm4c.fire_event("default_page_rendering")
         if (!js.contains(result, false)) {
             dm4c.page_panel.show_splash()
         }
@@ -134,7 +134,7 @@ function Webclient() {
         dm4c.page_panel.save()
         //
         try {
-            var search_topic = build_topic(dm4c.trigger_plugin_hook("search", searchmode)[0])
+            var search_topic = build_topic(dm4c.fire_event("search", searchmode)[0])
             // alert("search_topic=" + JSON.stringify(search_topic))
             dm4c.show_topic(search_topic, "show")
         } catch (e) {
@@ -148,8 +148,8 @@ function Webclient() {
      * Reveals a topic that is related to the selected topic.
      * Precondition: a topic is selected.
      * <p>
-     * Triggers the "pre_show_topic" and "post_show_topic" hooks (indirectly).
-     * Triggers the "post_show_association" hook (for each association).
+     * Fires the "pre_show_topic" and "post_show_topic" events (indirectly).
+     * Fires the "post_show_association" event (for each association).
      *
      * @param   topic_id    ID of the related topic.
      */
@@ -167,13 +167,13 @@ function Webclient() {
 
     /**
      * Hides a topic and its visible direct associations from the view (canvas and page panel).
-     * Triggers the "post_hide_topic" hook and the "post_hide_association" hook (for each association).
+     * Fires the "post_hide_topic" event and the "post_hide_association" event (for each association).
      */
     this.do_hide_topic = function(topic) {
         var assocs = dm4c.canvas.get_associations(topic.id)
         for (var i = 0; i < assocs.length; i++) {
-            dm4c.canvas.remove_association(assocs[i].id, false)             // refresh_canvas=false
-            dm4c.trigger_plugin_hook("post_hide_association", assocs[i])    // trigger hook
+            dm4c.canvas.remove_association(assocs[i].id, false)     // refresh_canvas=false
+            dm4c.fire_event("post_hide_association", assocs[i])     // fire event
         }
         //
         remove_topic(topic, "post_hide_topic")
@@ -181,7 +181,7 @@ function Webclient() {
 
     /**
      * Hides an association from the view (canvas and page panel).
-     * Triggers the "post_hide_association" hook.
+     * Fires the "post_hide_association" event.
      */
     this.do_hide_association = function(assoc) {
         remove_association(assoc, "post_hide_association")
@@ -228,14 +228,14 @@ function Webclient() {
 
     /**
      * Updates a topic in the DB and on the GUI.
-     * Triggers the "pre_update_topic" and "post_update_topic" (indirectly) hooks.
+     * Fires the "pre_update_topic" and "post_update_topic" (indirectly) event.
      *
      * @param   topic_model     Optional: a topic model containing the data to be udpated.
      *                          If not specified no DB update is performed but the page panel is still refreshed.
      */
     this.do_update_topic = function(topic_model) {
         if (topic_model) {
-            dm4c.trigger_plugin_hook("pre_update_topic", topic_model)
+            dm4c.fire_event("pre_update_topic", topic_model)
             // update DB
             var directives = dm4c.restc.update_topic(topic_model)
             // update GUI (client model and view)
@@ -247,7 +247,7 @@ function Webclient() {
 
     /**
      * Updates an association in the DB and on the GUI.
-     * Triggers the "post_update_association" hook (indirectly).
+     * Fires the "post_update_association" event (indirectly).
      *
      * @param   assoc_model     an association model containing the data to be udpated.
      */
@@ -260,7 +260,7 @@ function Webclient() {
 
     /**
      * Updates a topic type in the DB and on the GUI.
-     * Triggers the "post_update_topic" hook (indirectly).
+     * Fires the "post_update_topic" event (indirectly).
      *
      * @param   topic_type_model    a topic type model containing the data to be udpated.
      */
@@ -284,7 +284,7 @@ function Webclient() {
 
     /**
      * Deletes a topic (including its associations) from the DB and the GUI.
-     * Triggers the "post_delete_topic" hook and the "post_delete_association" hook (for each association).
+     * Fires the "post_delete_topic" event and the "post_delete_association" event (for each association).
      */
     this.do_delete_topic = function(topic) {
         // update DB
@@ -295,7 +295,7 @@ function Webclient() {
 
     /**
      * Deletes an association from the DB and the GUI.
-     * Triggers the "post_delete_association" hook.
+     * Fires the "post_delete_association" event.
      */
     this.do_delete_association = function(assoc) {
         // update DB
@@ -315,7 +315,7 @@ function Webclient() {
 
     /**
      * Shows a topic on the canvas, and refreshes the page panel according to the specified action.
-     * Triggers the "pre_show_topic" and "post_show_topic" hooks.
+     * Fires the "pre_show_topic" and "post_show_topic" events.
      * <p>
      * Preconditions:
      * - the topic exists in the DB.
@@ -339,8 +339,8 @@ function Webclient() {
             topic.y = coordinates.y
         }
         var do_select = action != "none"
-        // Note: the pre_show_topic() hook allows plugins to manipulate the topic, e.g. by setting coordinates
-        dm4c.trigger_plugin_hook("pre_show_topic", topic)               // trigger hook
+        // Note: the "pre_show_topic" event allows plugins to manipulate the topic, e.g. by setting coordinates
+        dm4c.fire_event("pre_show_topic", topic)                // fire event
         // update view (canvas)
         var topic_shown = dm4c.canvas.add_topic(topic, do_select)
         if (topic_shown) {
@@ -353,7 +353,7 @@ function Webclient() {
                 set_selected_topic(topic_shown)
             }
             //
-            dm4c.trigger_plugin_hook("post_show_topic", topic_shown)    // trigger hook
+            dm4c.fire_event("post_show_topic", topic_shown)     // fire event
         } else {
             // update client model
             if (do_select) {
@@ -382,7 +382,7 @@ function Webclient() {
     this.show_association = function(assoc, refresh_canvas) {
         // update view (canvas)
         dm4c.canvas.add_association(assoc, refresh_canvas)
-        dm4c.trigger_plugin_hook("post_show_association", assoc)    // trigger hook
+        dm4c.fire_event("post_show_association", assoc)    // fire event
     }
 
     // ---
@@ -433,7 +433,7 @@ function Webclient() {
 
     /**
      * Updates a topic on the view (canvas and page panel).
-     * Triggers the "post_update_topic" hook.
+     * Fires the "post_update_topic" event.
      *
      * Processes an UPDATE_TOPIC directive.
      *
@@ -443,13 +443,13 @@ function Webclient() {
         // update view
         dm4c.canvas.update_topic(topic, true)           // refresh_canvas=true
         dm4c.page_panel.display_conditionally(topic)
-        // trigger hook
-        dm4c.trigger_plugin_hook("post_update_topic", topic)
+        // fire event
+        dm4c.fire_event("post_update_topic", topic)
     }
 
     /**
      * Updates an association on the view (canvas and page panel).
-     * Triggers the "post_update_association" hook.
+     * Fires the "post_update_association" event.
      *
      * Processes an UPDATE_ASSOCIATION directive.
      *
@@ -459,8 +459,8 @@ function Webclient() {
         // update view
         dm4c.canvas.update_association(assoc, true)     // refresh_canvas=true
         dm4c.page_panel.display_conditionally(assoc)
-        // trigger hook
-        dm4c.trigger_plugin_hook("post_update_association", assoc)
+        // fire event
+        dm4c.fire_event("post_update_association", assoc)
     }
 
     /**
@@ -468,47 +468,47 @@ function Webclient() {
      */
     function update_topic_type(topic_type) {
         // update client model (type cache)
-        // Note: the type cache must be updated *before* the "post_update_topic" hook is triggered.
+        // Note: the type cache must be updated *before* the "post_update_topic" event is fired.
         // Other plugins might rely on an up-to-date type cache (e.g. the Type Search plugin does).
         type_cache.put_topic_type(topic_type)
         // update view
         // ### Note: the view is already updated through the accompanying UPDATE_TOPIC directive
         // ### dm4c.canvas.update_topic(topic_type, true)       // refresh_canvas=true
         // ### dm4c.page_panel.display_conditionally(topic_type)
-        // trigger hook
-        dm4c.trigger_plugin_hook("post_update_topic", topic_type)
+        // fire event
+        dm4c.fire_event("post_update_topic", topic_type)
     }
 
     // ---
 
     /**
      * Removes an topic from the view (canvas and page panel).
-     * Triggers the "post_hide_topic" or "post_delete_topic" hook.
+     * Fires the "post_hide_topic" or "post_delete_topic" event.
      *
      * Processes a DELETE_TOPIC directive.
      */
-    function remove_topic(topic, hook_name) {
+    function remove_topic(topic, event_name) {
         // update view (canvas)
-        dm4c.canvas.remove_topic(topic.id, true)        // refresh_canvas=true
+        dm4c.canvas.remove_topic(topic.id, true)            // refresh_canvas=true
         // update client model and view
         reset_selection_conditionally(topic.id)
-        // trigger hook
-        dm4c.trigger_plugin_hook(hook_name, topic)
+        // fire event
+        dm4c.fire_event(event_name, topic)
     }
 
     /**
      * Removes an association from the view (canvas and page panel).
-     * Triggers "post_hide_association" or "post_delete_association" the hook.
+     * Fires "post_hide_association" or "post_delete_association" the event.
      *
      * Processes a DELETE_ASSOCIATION directive.
      */
-    function remove_association(assoc, hook_name) {
+    function remove_association(assoc, event_name) {
         // update view (canvas)
         dm4c.canvas.remove_association(assoc.id, true)      // refresh_canvas=true
         // update client model and view
         reset_selection_conditionally(assoc.id)
-        // trigger hook
-        dm4c.trigger_plugin_hook(hook_name, assoc)
+        // fire event
+        dm4c.fire_event(event_name, assoc)
     }
 
     /**
@@ -544,15 +544,15 @@ function Webclient() {
         if (!no_history_update) {
             push_history(topic)
         }
-        // trigger hook
-        dm4c.trigger_plugin_hook("post_select_topic", topic)
+        // fire event
+        dm4c.fire_event("post_select_topic", topic)
     }
 
     function set_selected_association(assoc, no_history_update) {
         // update client model
         dm4c.selected_object = assoc
-        // trigger hook
-        dm4c.trigger_plugin_hook("post_select_association", assoc)
+        // fire event
+        dm4c.fire_event("post_select_association", assoc)
     }
 
     function reset_selection(no_history_update) {
@@ -562,8 +562,8 @@ function Webclient() {
         if (!no_history_update) {
             push_history()
         }
-        // trigger hook
-        dm4c.trigger_plugin_hook("post_reset_selection")
+        // fire event
+        dm4c.fire_event("post_reset_selection")
     }
 
 
@@ -576,7 +576,7 @@ function Webclient() {
 
     /**
      * Creates a topic in the DB.
-     * Triggers the "post_create_topic" hook.
+     * Fires the "post_create_topic" event.
      *
      * @param   type_uri        The topic type URI, e.g. "dm4.notes.note".
      * @param   composite       Optional.
@@ -591,8 +591,8 @@ function Webclient() {
             composite: composite    // not serialized to request body if undefined
         }
         var topic = build_topic(dm4c.restc.create_topic(topic_model))
-        // trigger hook
-        dm4c.trigger_plugin_hook("post_create_topic", topic)
+        // fire event
+        dm4c.fire_event("post_create_topic", topic)
         //
         return topic
     }
@@ -619,7 +619,7 @@ function Webclient() {
             role_1: role_1,
             role_2: role_2
         }
-        // FIXME: "create" hooks are not triggered
+        // FIXME: no "create" events are fired
         return build_association(dm4c.restc.create_association(assoc_model))
     }
 
@@ -627,11 +627,11 @@ function Webclient() {
         // 1) update DB
         var topic_type = build_topic_type(dm4c.restc.create_topic_type(topic_type_model))
         // 2) update client model (type cache)
-        // Note: the type cache must be updated *before* the "post_create_topic" hook is triggered.
+        // Note: the type cache must be updated *before* the "post_create_topic" event is fired.
         // Other plugins might rely on an up-to-date type cache (e.g. the Type Search plugin does).
         type_cache.put_topic_type(topic_type)
-        // 3) trigger hook
-        dm4c.trigger_plugin_hook("post_create_topic", topic_type)
+        // 3) fire event
+        dm4c.fire_event("post_create_topic", topic_type)
         //
         return topic_type
     }
@@ -709,20 +709,20 @@ function Webclient() {
 
     // ---
 
-    this.add_listener = function(hook_name, listener) {
-        pm.add_listener(hook_name, listener)
+    this.add_listener = function(event_name, listener) {
+        pm.add_listener(event_name, listener)
     }
 
     // ---
 
     /**
-     * Triggers the registered listeners for the named hook.
+     * Fires an event.
      *
-     * @param   hook_name   Name of the hook.
-     * @param   <varargs>   Variable number of arguments. Passed to the listeners.
+     * @param   event_name  Name of the event.
+     * @param   <varargs>   Variable number of event arguments.
      */
-    this.trigger_plugin_hook = function(hook_name) {
-        return pm.trigger_listeners.apply(undefined, arguments)
+    this.fire_event = function(event_name) {
+        return pm.deliver_event.apply(undefined, arguments)
     }
 
 
@@ -932,15 +932,15 @@ function Webclient() {
     // === Commands ===
 
     this.get_topic_commands = function(topic, context) {
-        return get_commands(dm4c.trigger_plugin_hook("topic_commands", topic), context)
+        return get_commands(dm4c.fire_event("topic_commands", topic), context)
     }
 
     this.get_association_commands = function(assoc, context) {
-        return get_commands(dm4c.trigger_plugin_hook("association_commands", assoc), context)
+        return get_commands(dm4c.fire_event("association_commands", assoc), context)
     }
 
     this.get_canvas_commands = function(cx, cy, context) {
-        return get_commands(dm4c.trigger_plugin_hook("canvas_commands", cx, cy), context)
+        return get_commands(dm4c.fire_event("canvas_commands", cx, cy), context)
     }
 
     function get_commands(cmd_lists, context) {
@@ -966,18 +966,18 @@ function Webclient() {
     // === Permissions ===
 
     this.has_write_permission_for_topic = function(topic) {
-        var result = dm4c.trigger_plugin_hook("has_write_permission_for_topic", topic)
+        var result = dm4c.fire_event("has_write_permission_for_topic", topic)
         return !js.contains(result, false)
     }
 
     this.has_write_permission_for_association = function(assoc) {
-        var result = dm4c.trigger_plugin_hook("has_write_permission_for_association", assoc)
+        var result = dm4c.fire_event("has_write_permission_for_association", assoc)
         return !js.contains(result, false)
     }
 
     // ### TODO: handle association types as well
     this.has_create_permission = function(type_uri) {
-        var result = dm4c.trigger_plugin_hook("has_create_permission", dm4c.get_topic_type(type_uri))
+        var result = dm4c.fire_event("has_create_permission", dm4c.get_topic_type(type_uri))
         return !js.contains(result, false)
     }
 
@@ -992,16 +992,16 @@ function Webclient() {
         //
         // 1) Setting up the create widget
         // Note: the create menu must be popularized *after* the plugins are loaded.
-        // Two hooks are involved: post_refresh_create_menu() and has_create_permission().
+        // Two events are involved: "post_refresh_create_menu" and "has_create_permission".
         adjust_create_widget()
         //
         // 2) Initialize plugins
         // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta-topicmaps plugin
-        // does!) the "init" hook is triggered *after* creating the canvas.
-        // Note: for displaying an initial topic (the deepamehta-topicmaps plugin does!) the "init" hook must
-        // be triggered *after* the GUI setup is complete.
+        // does!) the "init" event is fired *after* creating the canvas.
+        // Note: for displaying an initial topic (the deepamehta-topicmaps plugin does!) the "init" event must
+        // be fired *after* the GUI setup is complete.
         dm4c.log("Initializing plugins")
-        dm4c.trigger_plugin_hook("init")
+        dm4c.fire_event("init")
     }
 
     function adjust_create_widget() {
@@ -1083,7 +1083,7 @@ function Webclient() {
             return dm4c.has_create_permission(topic_type.uri) && topic_type.get_menu_config("create-type-menu")
         })
         //
-        dm4c.trigger_plugin_hook("post_refresh_create_menu", dm4c.toolbar.create_menu)
+        dm4c.fire_event("post_refresh_create_menu", dm4c.toolbar.create_menu)
     }
 
     // ---
@@ -1200,7 +1200,7 @@ function Webclient() {
 
     function pop_history(state) {
         if (dm4c.LOG_HISTORY) dm4c.log("Popping history state: " + JSON.stringify(state))
-        var result = dm4c.trigger_plugin_hook("pre_pop_history", state)
+        var result = dm4c.fire_event("pre_pop_history", state)
         if (!js.contains(result, false)) {
             var topic_id = state.topic_id
             dm4c.do_select_topic(topic_id, true)    // no_history_update=true
@@ -1224,8 +1224,8 @@ function Webclient() {
             var url = ""
         }
         var history_entry = {state: state, url: url}
-        // trigger hook
-        dm4c.trigger_plugin_hook("pre_push_history", history_entry)
+        // fire event
+        dm4c.fire_event("pre_push_history", history_entry)
         //
         if (dm4c.LOG_HISTORY) dm4c.log("Pushing history state: " + JSON.stringify(history_entry.state) +
             ", url=\"" + history_entry.url + "\"")

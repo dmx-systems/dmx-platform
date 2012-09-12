@@ -161,7 +161,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 login_widget.show_user(username)
                 dm4c.restore_selection()
                 // fire event
-                dm4c.trigger_plugin_hook("logged_in", username)
+                dm4c.fire_event("logged_in", username)
             })
         }
 
@@ -173,7 +173,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 login_widget.show_login()
                 dm4c.restore_selection()
                 // fire event
-                dm4c.trigger_plugin_hook("logged_out")
+                dm4c.fire_event("logged_out")
             })
         }
 

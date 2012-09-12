@@ -303,8 +303,8 @@ function DefaultTopicmapRenderer() {
 
     function draw() {
         ctx.clearRect(-trans_x, -trans_y, width, height)
-        // trigger hook
-        dm4c.trigger_plugin_hook("pre_draw_canvas", ctx)
+        // fire event
+        dm4c.fire_event("pre_draw_canvas", ctx)
         //
         draw_associations()
         //
@@ -474,7 +474,7 @@ function DefaultTopicmapRenderer() {
         if (dm4c.LOG_GUI) dm4c.log("Canvas double clicked!")
         var ct = find_topic(event)
         if (ct) {
-            dm4c.trigger_plugin_hook("topic_doubleclicked", ct)
+            dm4c.fire_event("topic_doubleclicked", ct)
         }
     }
 
@@ -532,14 +532,14 @@ function DefaultTopicmapRenderer() {
 
     function end_topic_move() {
         topic_move_in_progress = false
-        // trigger hook
-        dm4c.trigger_plugin_hook("post_move_topic", action_topic)
+        // fire event
+        dm4c.fire_event("post_move_topic", action_topic)
     }
 
     function end_canvas_move() {
         canvas_move_in_progress = false
-        // trigger_hook
-        dm4c.trigger_plugin_hook("post_move_canvas", trans_x, trans_y)
+        // fire event
+        dm4c.fire_event("post_move_canvas", trans_x, trans_y)
     }
 
     function end_association_in_progress() {
@@ -646,7 +646,7 @@ function DefaultTopicmapRenderer() {
 
     function do_drop(event) {
         // e.preventDefault();  // Useful for debugging when exception is thrown before false is returned.
-        dm4c.trigger_plugin_hook("process_drop", event.originalEvent.dataTransfer)
+        dm4c.fire_event("process_drop", event.originalEvent.dataTransfer)
         return false
     }
 

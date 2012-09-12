@@ -51,7 +51,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
             }
             // Note: if an error occurred "files" is not initialized
             if (files) {
-                dm4c.trigger_plugin_hook("process_files_drop", files)
+                dm4c.fire_event("process_files_drop", files)
             }
         } else if (js.contains(data_transfer.types, "text/plain")) {
             alert("WARNING: drag'n'drop operation is ignored.\n\nType: text/plain " +

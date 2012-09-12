@@ -153,7 +153,7 @@ function PagePanel() {
         hide_splash()
         // fire event
         if (page_state == PageState.FORM) {
-            dm4c.trigger_plugin_hook("post_destroy_form")
+            dm4c.fire_event("post_destroy_form")
         }
         // update model
         page_state = new_page_state

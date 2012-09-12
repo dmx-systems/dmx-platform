@@ -65,7 +65,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             // default renderer
             register(dm4c.canvas)
             // custom renderers
-            var renderers = dm4c.trigger_plugin_hook("topicmap_renderer")
+            var renderers = dm4c.fire_event("topicmap_renderer")
             renderers.forEach(function(renderer) {
                 register(renderer)
             })

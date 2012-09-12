@@ -8,7 +8,7 @@ function PluginManager(config) {
     var plugin_list
     var load_tracker
 
-    // key: hook name (string), value: registered listeners (array of functions)
+    // key: event name (string), value: registered listeners (array of functions)
     var listener_registry = {}
 
     // ------------------------------------------------------------------------------------------------------ Public API
@@ -142,34 +142,34 @@ function PluginManager(config) {
 
     // === Listener Registry ===
 
-    this.add_listener = function(hook_name, listener) {
-        // introduce hook on-demand
-        if (!hook_exists(hook_name)) {
-            listener_registry[hook_name] = []
+    this.add_listener = function(event_name, listener) {
+        // introduce event on-demand
+        if (!event_exists(event_name)) {
+            listener_registry[event_name] = []
         }
         //
-        add_listener(hook_name, listener)
+        add_listener(event_name, listener)
     }
 
     // ---
 
     /**
-     * Triggers the registered listeners for the named hook.
+     * Delivers the event to the registered listeners.
      *
-     * @param   hook_name   Name of the hook.
+     * @param   event_name  Name of the event.
      * @param   <varargs>   Variable number of arguments. Passed to the listeners.
      */
-    this.trigger_listeners = function(hook_name) {
+    this.deliver_event = function(event_name) {
         var result = []
         //
-        var listeners = listener_registry[hook_name]
+        var listeners = listener_registry[event_name]
         if (listeners) {
             // build arguments
             var args = Array.prototype.slice.call(arguments)    // create real array from arguments object
-            args.shift()                                        // drop hook_name argument
+            args.shift()                                        // drop event_name argument
             //
             for (var i = 0, listener; listener = listeners[i]; i++) {
-                // trigger listener
+                // call listener
                 var res = listener.apply(undefined, args)       // FIXME: pass plugin reference for "this"?
                 // store result
                 if (res !== undefined) {    // Note: undefined is not added to the result, but null is
@@ -205,12 +205,12 @@ function PluginManager(config) {
 
     // ---
 
-    function add_listener(hook_name, listener) {
-        listener_registry[hook_name].push(listener)
+    function add_listener(event_name, listener) {
+        listener_registry[event_name].push(listener)
     }
 
-    function hook_exists(hook_name) {
-        return listener_registry[hook_name]
+    function event_exists(event_name) {
+        return listener_registry[event_name]
     }
 
     // ---
