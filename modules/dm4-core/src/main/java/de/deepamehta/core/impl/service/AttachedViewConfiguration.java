@@ -7,6 +7,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.service.ClientState;
 
 
 
@@ -48,7 +49,7 @@ class AttachedViewConfiguration implements ViewConfiguration {
         // update memory
         model.addConfigTopic(configTopic);
         // update DB
-        storeConfigTopic(configTopic);
+        storeConfigTopic(configTopic, null);    // ### FIXME: clientState=null. addConfigTopic() is not uesd anyway.
     }
 
     @Override
@@ -68,10 +69,10 @@ class AttachedViewConfiguration implements ViewConfiguration {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void store() {
+    void store(ClientState clientState) {
         try {
             for (TopicModel configTopic : getConfigTopics()) {
-                storeConfigTopic(configTopic);
+                storeConfigTopic(configTopic, clientState);
             }
         } catch (Exception e) {
             throw new RuntimeException("Storing view configuration failed (configurable=" + configurable + ")", e);
@@ -80,8 +81,8 @@ class AttachedViewConfiguration implements ViewConfiguration {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    private void storeConfigTopic(TopicModel configTopic) {
-        Topic topic = dms.createTopic(configTopic, null);   // FIXME: clientState=null
+    private void storeConfigTopic(TopicModel configTopic, ClientState clientState) {
+        Topic topic = dms.createTopic(configTopic, clientState);
         dms.createAssociation("dm4.core.aggregation", configurable,
             new TopicRoleModel(topic.getId(), "dm4.core.view_config"));
     }
@@ -89,7 +90,9 @@ class AttachedViewConfiguration implements ViewConfiguration {
     private void storeSetting(boolean configTopicCreated, String configTypeUri, String settingUri, Object value) {
         TopicModel configTopic = getConfigTopic(configTypeUri);
         if (configTopicCreated) {
-            storeConfigTopic(configTopic);
+            // Note: null is passed as clientState.
+            // addSetting() is called from a migration and in a migration we have no clientState anyway.
+            storeConfigTopic(configTopic, null);
         } else {
             Topic topic = new AttachedTopic(configTopic, dms);
             topic.setChildTopicValue(settingUri, new SimpleValue(value));

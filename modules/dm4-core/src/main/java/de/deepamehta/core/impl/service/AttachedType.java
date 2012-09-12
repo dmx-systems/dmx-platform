@@ -16,6 +16,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import java.util.ArrayList;
@@ -230,7 +231,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // ### initViewConfig();   // Note: initialized through fetchViewConfig()
     }
 
-    void store() {
+    void store(ClientState clientState) {
         // 1) store the base-topic parts ### FIXME: call super.store() instead?
         dms.storage.createTopic(getModel());
         dms.associateWithTopicType(getModel());
@@ -252,7 +253,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         storeIndexModes();
         storeAssocDefs();
         storeLabelConfig();
-        getViewConfig().store();
+        getViewConfig().store(clientState);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

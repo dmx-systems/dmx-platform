@@ -437,7 +437,7 @@ public class EmbeddedService implements DeepaMehtaService {
             AttachedTopicType topicType = new AttachedTopicType(topicTypeModel, this);
             // Note: the topic type is put in type cache *before* it is stored. See createAssociationType().
             typeCache.put(topicType);
-            topicType.store();
+            topicType.store(clientState);
             //
             // Note: the modification must be applied *before* the enrichment. ### FIXDOC
             // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
@@ -541,7 +541,7 @@ public class EmbeddedService implements DeepaMehtaService {
             // Storing an object requires its data type to be known. See AttachedDeepaMehtaObject.store()
             // Consider creation of association type "Composition Definition": it has a composition definition itself.
             typeCache.put(assocType);
-            assocType.store();
+            assocType.store(clientState);
             //
             tx.success();
             return assocType;
