@@ -6,6 +6,7 @@ import de.deepamehta.plugins.files.StoredFile;
 import de.deepamehta.plugins.files.UploadedFile;
 
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
 
 import java.io.File;
@@ -23,19 +24,19 @@ public interface FilesService extends PluginService {
      * Creates a File topic for a given path.
      * If a File topic for that path exists already that topic is returned.
      */
-    Topic createFileTopic(String path);
+    Topic createFileTopic(String path, ClientState clientState);
 
     /**
      * Creates a Folder topic for a given path.
      * If a Folder topic for that path exists already that topic is returned.
      */
-    Topic createFolderTopic(String path);
+    Topic createFolderTopic(String path, ClientState clientState);
 
     // ---
 
-    Topic createChildFileTopic(long folderTopicId, String path);
+    Topic createChildFileTopic(long folderTopicId, String path, ClientState clientState);
 
-    Topic createChildFolderTopic(long folderTopicId, String path);
+    Topic createChildFolderTopic(long folderTopicId, String path, ClientState clientState);
 
 
 
@@ -46,7 +47,7 @@ public interface FilesService extends PluginService {
      *                  Must begin with slash ('/'), no slash at the end.
      *                  The directory must exist.
      */
-    StoredFile storeFile(UploadedFile file, String path);
+    StoredFile storeFile(UploadedFile file, String path, ClientState clientState);
 
     void createFolder(String folderName, String path);
 

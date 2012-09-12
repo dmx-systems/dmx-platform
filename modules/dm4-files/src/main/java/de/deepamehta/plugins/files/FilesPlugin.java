@@ -9,6 +9,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.SecurityHandler;
 import de.deepamehta.core.service.event.InitializePluginListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
@@ -16,6 +17,7 @@ import de.deepamehta.core.util.JavaUtils;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.POST;
@@ -61,7 +63,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     @POST
     @Path("/file/{path:.+}")       // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
-    public Topic createFileTopic(@PathParam("path") String path) {
+    public Topic createFileTopic(@PathParam("path") String path, @HeaderParam("Cookie") ClientState clientState) {
         String operation = "Creating file topic for repository path \"" + path + "\"";
         try {
             logger.info(operation);
@@ -80,7 +82,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
                 return fileTopic;
             }
             // 3) create topic
-            return createFileTopic(file);
+            return createFileTopic(file, clientState);
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
@@ -91,7 +93,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     @POST
     @Path("/folder/{path:.+}")     // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Override
-    public Topic createFolderTopic(@PathParam("path") String path) {
+    public Topic createFolderTopic(@PathParam("path") String path, @HeaderParam("Cookie") ClientState clientState) {
         String operation = "Creating folder topic for repository path \"" + path + "\"";
         try {
             logger.info(operation);
@@ -110,7 +112,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
                 return folderTopic;
             }
             // 3) create topic
-            return createFolderTopic(file);
+            return createFolderTopic(file, clientState);
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
@@ -123,8 +125,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     @POST
     @Path("/parent/{id}/file/{path:.+}")    // Note: we also match slashes as they are already decoded by an apache ...
     @Override
-    public Topic createChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
-        Topic childTopic = createFileTopic(path);
+    public Topic createChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path,
+                                      @HeaderParam("Cookie") ClientState clientState) {
+        Topic childTopic = createFileTopic(path, clientState);
         associateChildTopic(folderTopicId, childTopic.getId());
         return childTopic;
     }
@@ -132,8 +135,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     @POST
     @Path("/parent/{id}/folder/{path:.+}")  // Note: we also match slashes as they are already decoded by an apache ...
     @Override
-    public Topic createChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
-        Topic childTopic = createFolderTopic(path);
+    public Topic createChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path,
+                                        @HeaderParam("Cookie") ClientState clientState) {
+        Topic childTopic = createFolderTopic(path, clientState);
         associateChildTopic(folderTopicId, childTopic.getId());
         return childTopic;
     }
@@ -146,7 +150,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     @Path("/{path:.+}")     // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Consumes("multipart/form-data")
     @Override
-    public StoredFile storeFile(UploadedFile file, @PathParam("path") String path) {
+    public StoredFile storeFile(UploadedFile file, @PathParam("path") String path,
+                                                   @HeaderParam("Cookie") ClientState clientState) {
         String operation = "Storing " + file + " at repository path \"" + path + "\"";
         try {
             logger.info(operation);
@@ -158,7 +163,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             file.write(repoFile);
             //
             // 3) create topic
-            Topic fileTopic = createFileTopic(repoFile);
+            Topic fileTopic = createFileTopic(repoFile, clientState);
             return new StoredFile(repoFile.getName(), fileTopic.getId());
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
@@ -378,7 +383,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     // ---
 
-    private Topic createFileTopic(File file) {
+    private Topic createFileTopic(File file, ClientState clientState) {
         String mediaType = JavaUtils.getFileType(file.getName());
         //
         CompositeValue comp = new CompositeValue();
@@ -389,10 +394,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         }
         comp.put("dm4.files.size",      file.length());
         //
-        return dms.createTopic(new TopicModel("dm4.files.file", comp), null);       // FIXME: clientState=null
+        return dms.createTopic(new TopicModel("dm4.files.file", comp), clientState);
     }
 
-    private Topic createFolderTopic(File file) {
+    private Topic createFolderTopic(File file, ClientState clientState) {
         String folderName = file.getName();
         String path = repoPath(file);
         //
@@ -405,7 +410,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         comp.put("dm4.files.folder_name", folderName);
         comp.put("dm4.files.path",        path);
         //
-        return dms.createTopic(new TopicModel("dm4.files.folder", comp), null);     // FIXME: clientState=null
+        return dms.createTopic(new TopicModel("dm4.files.folder", comp), clientState);
     }
 
     // ---
