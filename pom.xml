@@ -141,7 +141,7 @@
                             <show>private</show>
                             <linksource>true</linksource>
                             <links>
-                                <link>http://www.deepamehta.de/apidocs/neo4j-mehtagraph/1.0-SNAPSHOT/</link>
+                                <link>http://www.deepamehta.de/apidocs/neo4j-mehtagraph/1.0/</link>
                                 <link>http://jersey.java.net/nonav/apidocs/1.8/jersey/</link>
                                 <link>http://jettison.codehaus.org/apidocs/</link> <!-- version 1.2 -->
                                 <link>http://www.osgi.org/javadoc/r4v401/</link>

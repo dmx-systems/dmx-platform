@@ -79,10 +79,10 @@
             ]
         },
 
-        ### Email ###
+        ### Email Address ###
 
         {
-            value: "Email",
+            value: "Email Address",
             uri: "dm4.contacts.email_address",
             data_type_uri: "dm4.core.text",
             index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"]
