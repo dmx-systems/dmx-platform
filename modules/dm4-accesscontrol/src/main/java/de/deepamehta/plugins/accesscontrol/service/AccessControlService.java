@@ -10,6 +10,8 @@ import de.deepamehta.core.service.PluginService;
 
 public interface AccessControlService extends PluginService {
 
+    static final String DEFAULT_USERNAME = "admin";
+
     /**
      * Checks weather the credentials in the authorization string match an existing User Account,
      * and if so, creates an HTTP session. ### FIXDOC
@@ -37,10 +39,18 @@ public interface AccessControlService extends PluginService {
     /**
      * Returns the username of the logged in user.
      *
-     * @return  the username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
+     * @return  The username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
      *          or <code>null</code> if no user is logged in.
      */
     Topic getUsername();
+
+    /**
+     * Fetches the "Username" topic for the specified username.
+     *
+     * @return  The fetched Username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
+     *          or <code>null</code> if no such user exists.
+     */
+    Topic getUsername(String username);
 
     // ---
 
@@ -48,9 +58,33 @@ public interface AccessControlService extends PluginService {
 
     // ---
 
-    Topic getOwnedTopic(long userId, String typeUri);
+    /**
+     * Assigns the specified user as the creator of the specified object.
+     */
+    void setCreator(DeepaMehtaObject object, long usernameId);
 
-    void setOwner(long topicId, long userId);
+    /**
+     * Assigns the specified user as the owner of the specified object.
+     */
+    void setOwner(DeepaMehtaObject object, long usernameId);
+
+    // ---
+
+    /**
+     * Fetches the creator of an object.
+     *
+     * @return  The creator (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
+     *          or <code>null</code> if no creator is set.
+     */
+    Topic getCreator(DeepaMehtaObject object);
+
+    /**
+     * Fetches the owner of an object.
+     *
+     * @return  The owner (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
+     *          or <code>null</code> if no owner is set.
+     */
+    Topic getOwner(DeepaMehtaObject object);
 
     // ---
 
@@ -59,6 +93,6 @@ public interface AccessControlService extends PluginService {
 
     // ---
 
-    void joinWorkspace(long userId, long workspaceId);
-    void joinWorkspace(Topic username, long workspaceId);
+    void joinWorkspace(long usernameId, long workspaceId);
+    void joinWorkspace(Topic username,  long workspaceId);
 }

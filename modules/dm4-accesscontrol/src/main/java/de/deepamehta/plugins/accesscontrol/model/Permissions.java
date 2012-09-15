@@ -33,8 +33,9 @@ public class Permissions extends HashMap<String, Boolean> implements JSONEnabled
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public void add(Operation operation, boolean allowed) {
+    public Permissions add(Operation operation, boolean allowed) {
         put(operation.uri, allowed);
+        return this;
     }
 
     public List<TopicModel> asTopics() {
