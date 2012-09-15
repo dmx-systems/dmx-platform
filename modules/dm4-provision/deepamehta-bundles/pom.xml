@@ -87,26 +87,15 @@
             <artifactId>deepamehta-help</artifactId>
             <version>4.0.12-SNAPSHOT</version>
         </dependency>
-        <!-- not yet adapted to DeepaMehta 4.0 resp. obsolete -->
-        <!--dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-coretypes</artifactId>
-            <version>0.4.3</version>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-time</artifactId>
-            <version>0.4.3</version>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-projects</artifactId>
-            <version>0.4.3</version>
-        </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-accesscontrol</artifactId>
-            <version>0.4.2</version>
-        </dependency-->
+            <version>4.0.12-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-facets</artifactId>
+            <version>4.0.12-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
