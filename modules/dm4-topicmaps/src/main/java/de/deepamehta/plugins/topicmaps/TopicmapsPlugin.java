@@ -80,18 +80,19 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Path("/{name}/{topicmap_renderer_uri}")
     @Override
     public Topic createTopicmap(@PathParam("name") String name,
-                                @PathParam("topicmap_renderer_uri") String topicmapRendererUri) {
-        return createTopicmap(name, null, topicmapRendererUri);
+                                @PathParam("topicmap_renderer_uri") String topicmapRendererUri,
+                                @HeaderParam("Cookie") ClientState clientState) {
+        return createTopicmap(name, null, topicmapRendererUri, clientState);
     }
 
     @Override
-    public Topic createTopicmap(String name, String uri, String topicmapRendererUri) {
+    public Topic createTopicmap(String name, String uri, String topicmapRendererUri, ClientState clientState) {
         CompositeValue topicmapState = getTopicmapRenderer(topicmapRendererUri).initialTopicmapState();
         return dms.createTopic(new TopicModel(uri, "dm4.topicmaps.topicmap", new CompositeValue()
             .put("dm4.topicmaps.name", name)
             .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
             .put("dm4.topicmaps.state", topicmapState)
-        ), null);   // FIXME: clientState=null
+        ), clientState);
     }
 
     // ---
@@ -112,10 +113,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                    @PathParam("x") int x, @PathParam("y") int y) {
         dms.createAssociation(new AssociationModel(TOPIC_MAPCONTEXT,
             new TopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
-            new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC),
-            new CompositeValue().put("dm4.topicmaps.x", x)
-                                .put("dm4.topicmaps.y", y)
-                                .put("dm4.topicmaps.visibility", true)
+            new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC), new CompositeValue()
+                .put("dm4.topicmaps.x", x)
+                .put("dm4.topicmaps.y", y)
+                .put("dm4.topicmaps.visibility", true)
         ), null);   // FIXME: clientState=null
     }
 
@@ -207,7 +208,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @Override
     public void postInstallPlugin() {
-        createTopicmap(DEFAULT_TOPICMAP_NAME, DEFAULT_TOPICMAP_URI, DEFAULT_TOPICMAP_RENDERER);
+        createTopicmap(DEFAULT_TOPICMAP_NAME, DEFAULT_TOPICMAP_URI, DEFAULT_TOPICMAP_RENDERER, null);
+        // Note: null is passed as clientState. On post-install we have no clientState.
+        // The workspace assignment is made by the Access Control plugin on all-plugins-active.
     }
 
 

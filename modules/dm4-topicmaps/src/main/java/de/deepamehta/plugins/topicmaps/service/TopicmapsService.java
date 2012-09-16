@@ -11,8 +11,8 @@ import de.deepamehta.core.service.PluginService;
 
 public interface TopicmapsService extends PluginService {
 
-    Topic createTopicmap(String name,             String topicmapRendererUri);
-    Topic createTopicmap(String name, String uri, String topicmapRendererUri);
+    Topic createTopicmap(String name,             String topicmapRendererUri, ClientState clientState);
+    Topic createTopicmap(String name, String uri, String topicmapRendererUri, ClientState clientState);
 
     // ---
 
