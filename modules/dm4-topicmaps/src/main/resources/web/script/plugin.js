@@ -55,7 +55,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
         var topicmap_dialog
 
-        fetch_topicmap_topics()
         register_topicmap_renderers()
         create_topicmap_menu()
         create_topicmap_dialog()
@@ -89,7 +88,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
                 dm4c.toolbar.dom.prepend(topicmap_widget)
             }
             //
-            refresh_topicmap_menu(undefined, true)  // no_refetch=true
+            refresh_topicmap_menu()
 
             function do_select_topicmap(menu_item) {
                 var topicmap_id = menu_item.value
@@ -324,6 +323,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     dm4c.add_listener("logged_out", function() {
         refresh_topicmap_menu()
         // Note: the topicmap permissions are refreshed in the course of refetching the topicmap topics.
+        //
+        clear_topicmap_cache()
+        reload_topicmap()
     })
 
 
@@ -472,11 +474,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     function load_topicmap(topicmap_id) {
         // prepare config
         var config = {
-            is_writable: function() {
-                return topicmap_topics[topicmap_id]
-                    .composite["dm4.accesscontrol.permissions"]
-                    .composite["dm4.accesscontrol.operation.write"].value
-            }
+            is_writable: dm4c.has_write_permission_for_topic(topicmap_topics[topicmap_id])
         }
         // load topicmap
         return topicmap_renderer.load_topicmap(topicmap_id, config)
@@ -571,16 +569,17 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // === Topicmap Menu ===
 
     /**
+     * Re-fetches the topicmap topics and re-populates the topicmap menu.
+     *
      * @param   topicmap_id     Optional: ID of the topicmap to select.
      *                          If not given, the current selection is preserved.
      */
-    function refresh_topicmap_menu(topicmap_id, no_refetch) {
+    function refresh_topicmap_menu(topicmap_id) {
         if (!topicmap_id) {
             topicmap_id = get_topicmap_id_from_menu()
         }
-        if (!no_refetch) {
-            fetch_topicmap_topics()
-        }
+        //
+        fetch_topicmap_topics()
         //
         topicmap_menu.empty()
         var icon_src = dm4c.get_icon_src("dm4.topicmaps.topicmap")

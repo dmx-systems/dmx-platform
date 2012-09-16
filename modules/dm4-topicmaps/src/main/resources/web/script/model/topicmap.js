@@ -251,7 +251,7 @@ function Topicmap(topicmap_id, config) {
     // ---
 
     function is_writable() {
-        return config.is_writable()
+        return config.is_writable
     }
 
 
