@@ -443,6 +443,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
         //
         setupDefaultAccessControl(topic, DEFAULT_TOPIC_PERMISSIONS);
+        //
+        // if a workspace is created its creator joins automatically
+        if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
+            joinWorkspace(getUsername(), topic.getId());
+        }
     }
 
     @Override
