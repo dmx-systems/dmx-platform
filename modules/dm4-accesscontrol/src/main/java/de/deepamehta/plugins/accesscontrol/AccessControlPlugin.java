@@ -236,7 +236,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void joinWorkspace(Topic username, long workspaceId) {
-        wsService.assignToWorkspace(username, workspaceId);
+        try {
+            wsService.assignToWorkspace(username, workspaceId);
+        } catch (Exception e) {
+            throw new RuntimeException("Joining user " + username + " to workspace " + workspaceId + " failed", e);
+        }
     }
 
 
@@ -444,9 +448,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         //
         setupDefaultAccessControl(topic, DEFAULT_TOPIC_PERMISSIONS);
         //
-        // if a workspace is created its creator joins automatically
+        // when a workspace is created its creator joins automatically
         if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
-            joinWorkspace(getUsername(), topic.getId());
+            Topic username = getUsername();
+            // Note: when the default workspace is created there is no user logged in yet.
+            // The default user is assigned to the default workspace later on (see allPluginsActive()).
+            if (username != null) {
+                joinWorkspace(username, topic.getId());
+            }
         }
     }
 
