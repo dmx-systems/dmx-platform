@@ -39,7 +39,7 @@ Requirements
 **Java 1.6** and a "modern" **webbrowser**.
 
 Works fine with Firefox 3.6 (or newer) and Safari 5. Works mostly fine with Google Chrome.  
-Doesn't work with IE8. Potentially works with IE9.
+Doesn't work with IE8. Potentially works with IE9 or IE10.
 
 
 Install
@@ -48,25 +48,21 @@ Install
 1. Download the latest release from here:  
    <https://github.com/jri/deepamehta/downloads/>
 2. Unzip the file.  
-   A folder `deepamehta-4.0.11` is created.
+   A folder `deepamehta-4.0.12` is created.
 
 
 Update
 ------
 
-You can update from DeepaMehta 4.0.7 (or later) to 4.0.11 while using your existing database:
-
-1. Stop old DeepaMehta if running. (Stop new DeepaMehta as well if already started.)
-2. Copy your `deepamehta-db` folder from old DeepaMehta into the `deepamehta-4.0.11` folder.
-
-Note: Updating from DeepaMehta versions prior to 4.0.7 is not supported.  
+Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is not supported.  
+Even updating from 4.0.x to 4.0.12 is not supported.  
 Please see the note at the top.
 
 
 Start
 -----
 
-Open the `deepamehta-4.0.11` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.0.12` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -76,7 +72,9 @@ While DeepaMehta starts a terminal window opens and you see some information log
 Then a browser window opens and DeepaMehta is ready to use.
 
 If no browser window appears open it manually:  
-<http://localhost:8080/>
+<http://localhost:8080/de.deepamehta.webclient/>
+
+Login with `admin` and an empty password.
 
 
 Stop
@@ -114,7 +112,7 @@ Uninstall
 To remove DeepaMehta completely from your computer, including the database:
 
 1. Stop DeepaMehta.
-2. Delete the entire `deepamehta-4.0.11` folder.
+2. Delete the entire `deepamehta-4.0.12` folder.
 
 
 Build from Source
@@ -125,6 +123,29 @@ Build from Source
 
 Version History
 ---------------
+
+**4.0.12** -- Sep 18, 2012
+
+* New features:
+    * Access Control foundation.
+    * Backend security.
+    * File repository.
+* New use cases:
+    * Publishing of fully interactive read-only topicmaps.
+    * Fully closed workgroup installations.
+* Improvements:
+    * The detail panel lists the topics associated with the selected association.
+    * Checkbox Renderer for multiple selection.
+    * HTTPS is optional.
+* Plugin development framework:
+    * Simplified plugin development (more Convention Over Configuration).
+    * Fix: Hot Deployment works as expected.
+    * The core service processes update requests where aggreagted composite child topics are involved.
+    * For handling core events plugins implement listener interfaces instead of overriding methods.
+    * A plugin's client-side main file and the custom renderer implementations are namespaced per URI.
+    * New renderer type: Multi Renderer.
+* See details in the release notes:
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.11** -- May 19, 2012
 
@@ -338,4 +359,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-May 19, 2012
+Sep 18, 2012
