@@ -29,6 +29,11 @@ body {
     margin-left: 3em;
 }
 
+.dm-toolbar {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+
 /*** Split Panel ***/
 
 #split-panel {
@@ -38,6 +43,11 @@ body {
 #split-panel > tbody > tr > td {
     padding: 0;
     vertical-align: top;
+}
+
+#split-panel > tbody > tr > td:first-child {
+    -moz-user-select: none;
+    -webkit-user-select: none;
 }
 
 /*** Canvas ***/
