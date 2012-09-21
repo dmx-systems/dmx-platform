@@ -1279,8 +1279,8 @@ function Webclient() {
     // === REST client ===
 
     function extend_rest_client() {
-        dm4c.restc.search_topics_and_create_bucket = function(text, field_uri, whole_word) {
-            var params = this.createRequestParameter({search: text, field: field_uri, wholeword: whole_word})
+        dm4c.restc.search_topics_and_create_bucket = function(text, field_uri) {
+            var params = this.createRequestParameter({search: text, field: field_uri})
             return this.request("GET", "/webclient/search?" + params.to_query_string())
         }
         // Note: this method is actually part of the Type Search plugin.

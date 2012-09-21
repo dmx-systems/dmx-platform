@@ -76,7 +76,7 @@ public interface DeepaMehtaStorage {
 
     // ---
 
-    Set<TopicModel> searchTopics(String searchTerm, String fieldUri, boolean wholeWord);
+    Set<TopicModel> searchTopics(String searchTerm, String fieldUri);
 
     // ---
 

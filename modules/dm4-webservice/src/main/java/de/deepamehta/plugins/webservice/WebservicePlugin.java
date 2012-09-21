@@ -91,10 +91,9 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/topic")
     public Set<Topic> searchTopics(@QueryParam("search")    String searchTerm,
                                    @QueryParam("field")     String fieldUri,
-                                   @QueryParam("wholeword") boolean wholeWord,
                                    @HeaderParam("Cookie")   ClientState clientState) {
         try {
-            return dms.searchTopics(searchTerm, fieldUri, wholeWord, clientState);
+            return dms.searchTopics(searchTerm, fieldUri, clientState);
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }

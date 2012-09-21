@@ -72,9 +72,8 @@ function RESTClient(core_service_uri) {
         return result
     }
 
-    // FIXME: index parameter not used
-    this.search_topics = function(index, text, field_uri, whole_word) {
-        var params = new RequestParameter({search: text, field: field_uri, wholeword: whole_word})
+    this.search_topics = function(text, field_uri) {
+        var params = new RequestParameter({search: text, field: field_uri})
         return request("GET", "/topic?" + params.to_query_string())
     }
 

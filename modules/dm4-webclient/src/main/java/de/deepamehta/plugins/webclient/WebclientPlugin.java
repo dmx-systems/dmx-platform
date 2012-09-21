@@ -72,13 +72,11 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     @Path("/search")
     public Topic searchTopics(@QueryParam("search") String searchTerm,
                               @QueryParam("field")  String fieldUri,
-                              @QueryParam("wholeword") boolean wholeWord,
                               @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\", wholeWord=" + wholeWord +
-                ", clientState=" + clientState);
-            Set<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri, wholeWord, clientState);
+            logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\", clientState=" + clientState);
+            Set<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri, clientState);
             Set<Topic> searchableUnits = findSearchableUnits(singleTopics, clientState);
             logger.info(singleTopics.size() + " single topics found, " + searchableUnits.size() + " searchable units");
             Topic searchTopic = createSearchTopic("\"" + searchTerm + "\"", searchableUnits, clientState);

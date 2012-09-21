@@ -139,10 +139,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public Set<TopicModel> searchTopics(String searchTerm, String fieldUri, boolean wholeWord) {
-        if (!wholeWord) {
-            searchTerm += "*";
-        }
+    public Set<TopicModel> searchTopics(String searchTerm, String fieldUri) {
         return buildTopics(mg.queryMehtaNodes(fieldUri, searchTerm));
     }
 

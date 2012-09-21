@@ -58,10 +58,8 @@ public interface DeepaMehtaService {
      * <code>dm4.core.fulltext</code> or <code>dm4.core.fulltext_key</code>.
      *
      * @param   fieldUri    The URI of the data field to search. If null is provided all fields are searched. ### FIXDOC
-     * @param   wholeWord   If true the searchTerm is regarded as whole word.
-     *                      If false the searchTerm is regarded as begin-of-word substring.
      */
-    Set<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, ClientState clientState);
+    Set<Topic> searchTopics(String searchTerm, String fieldUri, ClientState clientState);
 
     Topic createTopic(TopicModel model, ClientState clientState);
 

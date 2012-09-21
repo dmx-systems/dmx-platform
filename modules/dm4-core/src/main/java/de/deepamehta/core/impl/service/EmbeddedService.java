@@ -133,17 +133,17 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Set<Topic> searchTopics(String searchTerm, String fieldUri, boolean wholeWord, ClientState clientState) {
+    public Set<Topic> searchTopics(String searchTerm, String fieldUri, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             // ### FIXME: fetchComposite=false, parameterize it
-            Set<Topic> topics = attach(storage.searchTopics(searchTerm, fieldUri, wholeWord), false, clientState);
+            Set<Topic> topics = attach(storage.searchTopics(searchTerm, fieldUri), false, clientState);
             tx.success();
             return topics;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Searching topics failed (searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
-                fieldUri + "\", wholeWord=" + wholeWord + ", clientState=" + clientState + ")", e);
+                fieldUri + "\", clientState=" + clientState + ")", e);
         } finally {
             tx.finish();
         }
