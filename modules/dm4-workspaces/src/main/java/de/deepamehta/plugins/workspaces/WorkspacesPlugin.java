@@ -22,6 +22,7 @@ import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostInstallPluginListener;
 
+import static java.util.Arrays.asList;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -73,7 +74,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public void assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
         checkWorkspaceId(workspaceId);
-        facetsService.updateFacet(object, "dm4.workspaces.workspace_facet", new TopicModel(workspaceId),
+        // Note: workspace_facet is a multi-facet. So we must pass a (one-element) list.
+        facetsService.updateFacets(object, "dm4.workspaces.workspace_facet", asList(new TopicModel(workspaceId)),
             null, new Directives());    // clientState=null
     }
 
@@ -145,9 +147,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
         long workspaceId = -1;
         try {
-            // Note: we do not assign Searches and Workspaces to a workspace
-            if (topic.getTypeUri().equals("dm4.webclient.search") ||
-                topic.getTypeUri().equals("dm4.workspaces.workspace")) {
+            // Note: we do not assign Workspaces to a workspace
+            if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
                 return;
             }
             //
