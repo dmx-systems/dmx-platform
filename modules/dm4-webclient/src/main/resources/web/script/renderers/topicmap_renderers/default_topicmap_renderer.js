@@ -388,6 +388,11 @@ function DefaultTopicmapRenderer() {
 
     // === Mouse Events ===
 
+    /**
+     * @param   event   a jQuery event object (the browser's event object normalized according to W3C standards).
+     *                  http://api.jquery.com/category/events/event-object/
+     *                  http://www.w3.org/TR/2003/WD-DOM-Level-3-Events-20030331/ecma-script-binding.html
+     */
     function do_mousedown(event) {
         if (dm4c.LOG_GUI) dm4c.log("Mouse down on canvas!")
         //
@@ -398,7 +403,12 @@ function DefaultTopicmapRenderer() {
             //
             var ct = find_topic(event)
             if (ct) {
-                action_topic = ct
+                if (event.altKey) {
+                    dm4c.do_select_topic(ct.id)
+                    self.begin_association(ct.id, p.x, p.y)
+                } else {
+                    action_topic = ct
+                }
             } else {
                 var ca = find_association(event)
                 if (ca) {
@@ -460,9 +470,8 @@ function DefaultTopicmapRenderer() {
         } else if (canvas_move_in_progress) {
             end_canvas_move()
         } else {
-            var ct = find_topic(event)   // ### FIXME: use actionTopic instead of searching again?
-            if (ct) {
-                dm4c.do_select_topic(ct.id)
+            if (action_topic) {
+                dm4c.do_select_topic(action_topic.id)
             } else if (action_assoc) {
                 dm4c.do_select_association(action_assoc.id)
             }

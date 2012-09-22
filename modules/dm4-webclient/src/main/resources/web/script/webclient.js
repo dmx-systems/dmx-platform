@@ -75,7 +75,7 @@ function Webclient() {
      * Fetches the topic and displays it on the page panel.
      * Fires the "post_select_topic" event (indirectly).
      *
-     * Precondition: the topic is shown on the canvas.
+     * Precondition: the topic exists in the database AND is shown on the canvas.
      *
      * @param   no_history_update   Optional: boolean.
      */
@@ -94,7 +94,7 @@ function Webclient() {
      * Fetches the association and displays it on the page panel.
      * Fires the "post_select_association" event (indirectly).
      *
-     * Precondition: the association is shown on the canvas.
+     * Precondition: the association exists in the database AND is shown on the canvas.
      *
      * @param   no_history_update   Optional: boolean.
      */
