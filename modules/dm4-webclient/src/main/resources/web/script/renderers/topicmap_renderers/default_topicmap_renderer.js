@@ -460,7 +460,7 @@ function DefaultTopicmapRenderer() {
             end_association_in_progress()
             //
             var ct = find_topic(event)
-            if (ct) {
+            if (ct && ct.id != action_topic.id) {
                 dm4c.do_create_association("dm4.core.association", ct)
             } else {
                 draw()
