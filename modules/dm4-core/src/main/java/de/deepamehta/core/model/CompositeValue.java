@@ -196,6 +196,33 @@ public class CompositeValue {
 
     // ---
 
+    /**
+     * Adds a value to a multiple-valued child.
+     */
+    public CompositeValue add(String key, TopicModel value) {
+        List<TopicModel> topics = getTopics(key, null);     // defaultValue=null
+        // Note: topics just created have no child topics yet
+        if (topics == null) {
+            topics = new ArrayList();
+            put(key, topics);
+        }
+        topics.add(value);
+        return this;
+    }
+
+    /**
+     * Removes a value from a multiple-valued child.
+     */
+    public CompositeValue remove(String key, TopicModel value) {
+        List<TopicModel> topics = getTopics(key, null);     // defaultValue=null
+        if (topics != null) {
+            topics.remove(value);
+        }
+        return this;
+    }
+
+    // ---
+
     public Iterable<String> keys() {
         return values.keySet();
     }
