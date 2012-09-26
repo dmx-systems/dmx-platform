@@ -839,10 +839,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     private TopicModel createAclEntryModel(UserRole userRole, Permissions permissions) {
-        return new TopicModel("dm4.accesscontrol.acl_entry", new CompositeValue()
-            .putRef("dm4.accesscontrol.user_role", userRole.uri)
-            .put("dm4.accesscontrol.permission", permissions.asTopics())
-        );
+        CompositeValue comp = new CompositeValue().putRef("dm4.accesscontrol.user_role", userRole.uri);
+        for (String operationUri : permissions.keySet()) {
+            comp.add("dm4.accesscontrol.permission", new TopicModel("dm4.accesscontrol.permission", new CompositeValue()
+                .putRef("dm4.accesscontrol.operation", operationUri)
+                .put("dm4.accesscontrol.allowed", permissions.get(operationUri))
+            ));
+        }
+        return new TopicModel("dm4.accesscontrol.acl_entry", comp);
     }
 
     // ---

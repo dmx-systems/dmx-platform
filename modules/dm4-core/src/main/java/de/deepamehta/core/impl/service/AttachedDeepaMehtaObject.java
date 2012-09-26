@@ -519,13 +519,13 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (childTopic != null) {
-            // == update existing child ==
+            // == update child ==
             // update DB
             childTopic.update(newChildTopic, clientState, directives);
             // update memory
             putInCompositeModel(assocDef, childTopic);
         } else {
-            // == create new child ==
+            // == create child ==
             // update DB
             childTopic = dms.createTopic(newChildTopic, clientState);
             associateChildTopic(assocDef, childTopic.getId(), clientState);
@@ -540,22 +540,26 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         // POST_UPDATE_TOPIC hook as part of the "old model" (when the child topic is updated). ### FIXDOC
         ResultSet<RelatedTopic> childTopics = fetchChildTopics(assocDef, true);     // fetchComposite=true
         for (TopicModel newChildTopic : newChildTopics) {
-            if (newChildTopic instanceof TopicDeletionModel) {
-                // == delete child ==
-                // update DB
-                Topic childTopic = findChildTopic(newChildTopic.getId(), childTopics, assocDef);
-                childTopic.delete(directives);
-                // update memory
-                removeFromCompositeModel(assocDef, childTopic);
+            if (newChildTopic instanceof TopicDeletionModel) {                               // throwsIfNotFound=false
+                Topic childTopic = findChildTopic(newChildTopic.getId(), childTopics, assocDef, false);
+                // Note: "delete child" is an idempotent operation. A delete request for an child which has been
+                // deleted already (resp. is non-existing) is not an error. Instead, nothing is performed.
+                if (childTopic != null) {
+                    // == delete child ==
+                    // update DB
+                    childTopic.delete(directives);
+                    // update memory
+                    removeFromCompositeModel(assocDef, childTopic);
+                }
             } else if (newChildTopic.getId() != -1) {
-                // == update existing child ==
-                // update DB
-                Topic childTopic = findChildTopic(newChildTopic.getId(), childTopics, assocDef);
+                // == update child ==
+                // update DB                                                                 // throwsIfNotFound=true
+                Topic childTopic = findChildTopic(newChildTopic.getId(), childTopics, assocDef, true);
                 childTopic.update(newChildTopic, clientState, directives);
                 // update memory
                 replaceInCompositeModel(assocDef, childTopic);
             } else {
-                // == create new child ==
+                // == create child ==
                 // update DB
                 Topic childTopic = dms.createTopic(newChildTopic, clientState);
                 associateChildTopic(assocDef, childTopic.getId(), clientState);
@@ -573,7 +577,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         if (isReference(newChildTopic)) {
             if (childTopic != null) {
                 if (!matches(newChildTopic, childTopic)) {
-                    // == change assignment ==
+                    // == update assignment ==
                     // update DB
                     childTopic.getAssociation().delete(directives);
                     Topic topic = associateChildTopic(assocDef, newChildTopic, clientState);
@@ -588,7 +592,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 putInCompositeModel(assocDef, topic);
             }
         } else {
-            // == create new child ==
+            // == create child ==
             // update DB
             if (childTopic != null) {
                 childTopic.getAssociation().delete(directives);
@@ -605,17 +609,19 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         ResultSet<RelatedTopic> childTopics = fetchChildTopics(assocDef, false);
         for (TopicModel newChildTopic : newChildTopics) {
             if (newChildTopic instanceof TopicDeletionModel) {
-                // == delete assignment ==
-                // update DB
                 RelatedTopic childTopic = matches(newChildTopic, childTopics);
-                if (childTopic == null) {
-                    throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " + className() +
-                        " " + getId() + " according to " + assocDef);
+                // Note: "delete assignment" is an idempotent operation. A delete request for an assignment which
+                // has been deleted already (resp. is non-existing) is not an error. Instead, nothing is performed.
+                if (childTopic != null) {
+                    // == delete assignment ==
+                    // update DB
+                    childTopic.getAssociation().delete(directives);
+                    // update memory
+                    removeFromCompositeModel(assocDef, childTopic);
                 }
-                childTopic.getAssociation().delete(directives);
-                // update memory
-                removeFromCompositeModel(assocDef, childTopic);
             } else if (isReference(newChildTopic)) {
+                // Note: "create assignment" is an idempotent operation. A create request for an assignment which
+                // exists already is not an error. Instead, nothing is performed.
                 if (matches(newChildTopic, childTopics) == null) {
                     // == create assignment ==
                     // update DB
@@ -624,7 +630,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                     addToCompositeModel(assocDef, topic);
                 }
             } else {
-                // == create new child ==
+                // == create child ==
                 // update DB
                 Topic topic = dms.createTopic(newChildTopic, clientState);
                 associateChildTopic(assocDef, topic.getId(), clientState);
@@ -642,13 +648,14 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
                 String cardinalityUri = assocDef.getPartCardinalityUri();
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    Topic childTopic = fetchChildTopic(assocDef, true);                     // fetchComposite=true
+                    Topic childTopic = fetchChildTopic(assocDef, true);             // fetchComposite=true
                     if (childTopic != null) {
                         comp.put(assocDef.getUri(), childTopic.getModel());
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    ResultSet<RelatedTopic> childTopics = fetchChildTopics(assocDef, true); // fetchComposite=true
-                    comp.put(assocDef.getUri(), DeepaMehtaUtils.toTopicModels(childTopics));
+                    for (Topic childTopic : fetchChildTopics(assocDef, true)) {     // fetchComposite=true
+                        comp.add(assocDef.getUri(), childTopic.getModel());
+                    }
                 } else {
                     throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
                 }
@@ -854,9 +861,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---
 
-    private Topic findChildTopic(long topicId, Iterable<? extends Topic> childTopics, AssociationDefinition assocDef) {
+    private Topic findChildTopic(long topicId, Iterable<? extends Topic> childTopics, AssociationDefinition assocDef,
+                                                                                      boolean throwsIfNotFound) {
         Topic childTopic = findTopic(topicId, childTopics);
-        if (childTopic == null) {
+        if (childTopic == null && throwsIfNotFound) {
             throw new RuntimeException("Topic " + topicId + " is not a child of " + className() + " " + getId() +
                 " according to " + assocDef);
         }

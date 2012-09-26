@@ -237,7 +237,7 @@ public class EmbeddedService implements DeepaMehtaService {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\", fetchComposite=" +
             fetchComposite + ", clientState=" + clientState;
-        logger.info(info);
+        // logger.info(info);   ### TODO: the Access Control plugin calls getAssociation() very often. It should cache.
         DeepaMehtaTransaction tx = beginTx();
         try {
             AssociationModel model = storage.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1,
