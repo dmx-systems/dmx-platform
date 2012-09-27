@@ -11,7 +11,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -23,10 +22,6 @@ import javax.ws.rs.ext.Provider;
 
 @Provider
 public class RelatedTopicCollectionProvider implements MessageBodyWriter<Collection<RelatedTopic>> {
-
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 

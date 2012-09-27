@@ -3,10 +3,7 @@ package de.deepamehta.plugins.topicmaps.model;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-
-import java.util.Map;
 
 
 

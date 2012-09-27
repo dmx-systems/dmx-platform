@@ -7,7 +7,6 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 
@@ -17,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Path;
 
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 

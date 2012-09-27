@@ -6,15 +6,15 @@
     <name>Felix Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>felix-bundles</artifactId>
-    <version>4.0.1</version>
+    <version>4.0.13-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-provision</artifactId>
-        <version>4.0.1</version>
+        <version>4.0.13-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
-
     <!-- All Apache Felix bundles that belong to the DeepaMehta 4 standard distribution.
 
         These dependencies are deployed as bundles in Felix when
@@ -43,6 +43,7 @@
             <artifactId>org.apache.felix.fileinstall</artifactId>
             <version>3.1.10</version>
         </dependency>
+
         <!-- FIXME: these bundles are not required when Felix is started via Pax Runner.              -->
         <!-- The Felix ditribution deployed via Pax Runner brings its own Gogo shell.                 -->
         <!-- When the version numbers do not match 2 versions of the Gogo shell bundles are deployed. -->

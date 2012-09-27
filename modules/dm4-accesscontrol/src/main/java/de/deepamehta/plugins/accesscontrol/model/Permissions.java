@@ -20,6 +20,7 @@ import java.util.List;
  * - a part of a static ACL entry
  * - calculated permissions for the current user
  */
+@SuppressWarnings("serial")
 public class Permissions extends HashMap<String, Boolean> implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -39,7 +40,7 @@ public class Permissions extends HashMap<String, Boolean> implements JSONEnabled
     }
 
     public List<TopicModel> asTopics() {
-        List<TopicModel> permissions = new ArrayList();
+        List<TopicModel> permissions = new ArrayList<TopicModel>();
         for (String operationUri : keySet()) {
             TopicModel permission = new TopicModel("dm4.accesscontrol.permission", new CompositeValue()
                 .putRef("dm4.accesscontrol.operation", operationUri)

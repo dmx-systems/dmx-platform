@@ -7,14 +7,14 @@
     <name>DeepaMehta 4 Provision</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-provision</artifactId>
-    <version>4.0.1</version>
+    <version>4.0.13-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
-        <artifactId>deepamehta-parent</artifactId>
-        <version>3</version>
-        <relativePath>../dm4-parent/pom.xml</relativePath>
+        <artifactId>deepamehta-global</artifactId>
+        <version>4.0.13-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modules>

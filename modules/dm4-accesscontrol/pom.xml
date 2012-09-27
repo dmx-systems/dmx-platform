@@ -13,14 +13,14 @@
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-parent</artifactId>
-        <version>3</version>
+        <version>4</version>
         <relativePath>../dm4-parent/pom.xml</relativePath>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-core</artifactId>
+            <artifactId>deepamehta-api</artifactId>
             <version>4.0.13-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -36,6 +36,10 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
         </dependency>
     </dependencies>
 

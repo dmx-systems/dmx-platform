@@ -24,7 +24,6 @@ import de.deepamehta.mehtagraph.MehtaObjectRole;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -93,13 +92,13 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                               String othersRoleTypeUri, String othersTopicTypeUri,
                                                               int maxResultSize) {
-        List assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
+        List<String> assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
         return getTopicRelatedTopics(topicId, assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
             maxResultSize);
     }
 
     @Override
-    public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, List assocTypeUris, String myRoleTypeUri,
+    public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, List<String> assocTypeUris, String myRoleTypeUri,
                                                               String othersRoleTypeUri, String othersTopicTypeUri,
                                                               int maxResultSize) {
         Set<ConnectedMehtaNode> nodes = mg.getMehtaNode(topicId).getConnectedMehtaNodes(myRoleTypeUri,
@@ -274,13 +273,13 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     public ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri,
                                                                     String myRoleTypeUri, String othersRoleTypeUri,
                                                                     String othersTopicTypeUri, int maxResultSize) {
-        List assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
+        List<String> assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
         return getAssociationRelatedTopics(assocId, assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
             maxResultSize);
     }
 
     @Override
-    public ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, List assocTypeUris,
+    public ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, List<String> assocTypeUris,
                                                                     String myRoleTypeUri, String othersRoleTypeUri,
                                                                     String othersTopicTypeUri, int maxResultSize) {
         Set<ConnectedMehtaNode> nodes = mg.getMehtaEdge(assocId).getConnectedMehtaNodes(myRoleTypeUri,
@@ -414,7 +413,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     }
 
     private Set<TopicModel> buildTopics(List<MehtaNode> nodes) {
-        Set<TopicModel> topics = new LinkedHashSet();
+        Set<TopicModel> topics = new LinkedHashSet<TopicModel>();
         for (MehtaNode node : nodes) {
             topics.add(buildTopic(node));
         }
@@ -429,7 +428,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     }
 
     private ResultSet<RelatedTopicModel> buildRelatedTopics(Set<ConnectedMehtaNode> nodes, int maxResultSize) {
-        Set<RelatedTopicModel> relTopics = new LinkedHashSet();
+        Set<RelatedTopicModel> relTopics = new LinkedHashSet<RelatedTopicModel>();
         for (ConnectedMehtaNode node : nodes) {
             relTopics.add(buildRelatedTopic(node));
             // limit result set
@@ -456,7 +455,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     }
 
     private Set<AssociationModel> buildAssociations(Iterable<MehtaEdge> edges) {
-        Set<AssociationModel> assocs = new LinkedHashSet();
+        Set<AssociationModel> assocs = new LinkedHashSet<AssociationModel>();
         for (MehtaEdge edge : edges) {
             assocs.add(buildAssociation(edge));
         }
@@ -471,7 +470,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     }
 
     private Set<RelatedAssociationModel> buildRelatedAssociations(Set<ConnectedMehtaEdge> edges) {
-        Set<RelatedAssociationModel> relAssocs = new LinkedHashSet();
+        Set<RelatedAssociationModel> relAssocs = new LinkedHashSet<RelatedAssociationModel>();
         for (ConnectedMehtaEdge edge : edges) {
             relAssocs.add(buildRelatedAssociation(edge));
         }
@@ -482,11 +481,12 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     // === Type Filter ===
 
+    @SuppressWarnings("unused")
     private void filterNodesByAssociationType(Set<ConnectedMehtaNode> nodes, String assocTypeUri) {
         filterNodesByAssociationType(nodes, Arrays.asList(assocTypeUri));
     }
 
-    private void filterNodesByAssociationType(Set<ConnectedMehtaNode> nodes, List assocTypeUris) {
+    private void filterNodesByAssociationType(Set<ConnectedMehtaNode> nodes, List<String> assocTypeUris) {
         ConnectedMehtaNode node = null;
         MehtaEdge edge = null;
         try {
@@ -675,7 +675,7 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     }
 
     private List<RoleModel> getRoleModels(MehtaEdge edge) {
-        List<RoleModel> roleModels = new ArrayList();
+        List<RoleModel> roleModels = new ArrayList<RoleModel>();
         for (MehtaObjectRole objectRole : edge.getMehtaObjects()) {
             MehtaObject mehtaObject = objectRole.getMehtaObject();
             String roleTypeUri = objectRole.getRoleType();

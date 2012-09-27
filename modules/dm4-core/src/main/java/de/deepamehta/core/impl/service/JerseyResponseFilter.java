@@ -4,6 +4,7 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -13,8 +14,6 @@ import javax.ws.rs.WebApplicationException;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.ParameterizedType;
-import java.util.Set;
-import java.util.logging.Logger;
 
 
 
@@ -23,8 +22,6 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private EmbeddedService dms;
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -48,9 +45,9 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                 } else if (entity instanceof Directives) {
                     firePreSend((Directives) entity);
                 } else if (isIterable(response, TopicType.class)) {
-                    firePreSendTopicTypes((Iterable<TopicType>) entity);
+                    firePreSendTopicTypes(DeepaMehtaUtils.<Iterable<TopicType>>cast(entity));
                 } else if (isIterable(response, Topic.class)) {
-                    firePreSendTopics((Iterable<Topic>) entity);
+                    firePreSendTopics(DeepaMehtaUtils.<Iterable<Topic>>cast(entity));
                 }
             }
             return response;
@@ -103,13 +100,14 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // ---
 
-    private boolean isIterable(ContainerResponse response, Class elementType) {
+    private boolean isIterable(ContainerResponse response, Class<?> elementType) {
         Type genericType = response.getEntityType();
         if (genericType instanceof ParameterizedType) {
             Type[] typeArgs = ((ParameterizedType) genericType).getActualTypeArguments();
             Class<?> type = response.getEntity().getClass();
+            //FIX FOO CHECK THIS OUT!!!!
             if (typeArgs.length == 1 && Iterable.class.isAssignableFrom(type) &&
-                                           elementType.isAssignableFrom((Class) typeArgs[0])) {
+                                           elementType.isAssignableFrom((Class<?>) typeArgs[0])) {
                 return true;
             }
         }

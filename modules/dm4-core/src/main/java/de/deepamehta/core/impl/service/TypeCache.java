@@ -7,7 +7,6 @@ import de.deepamehta.core.model.TopicTypeModel;
 
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -25,8 +24,8 @@ class TypeCache {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Map<String, AttachedTopicType>       topicTypes = new HashMap();   // key: topic type URI
-    private Map<String, AttachedAssociationType> assocTypes = new HashMap();   // key: assoc type URI
+    private Map<String, AttachedTopicType>       topicTypes = new HashMap<String, AttachedTopicType>();       // key: topic type URI
+    private Map<String, AttachedAssociationType> assocTypes = new HashMap<String, AttachedAssociationType>(); // key: assoc type URI
 
     private EmbeddedService dms;
 
@@ -114,9 +113,10 @@ class TypeCache {
 
     // ---
 
+    @SuppressWarnings("unused")
     private class EndlessRecursionProtection {
 
-        private Map<String, Integer> callCount = new HashMap();
+        private Map<String, Integer> callCount = new HashMap<String, Integer>();
 
         private void check(String typeUri) {
             Integer count = callCount.get(typeUri);

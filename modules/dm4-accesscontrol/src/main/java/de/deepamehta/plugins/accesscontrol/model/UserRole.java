@@ -46,7 +46,7 @@ public enum UserRole {
     private void put(UserRole role) {
         // ### must initialize lazily, see above
         if (userRoles == null) {
-            userRoles = new HashMap();
+            userRoles = new HashMap<String, UserRole>();
         }
         //
         userRoles.put(role.uri, role);

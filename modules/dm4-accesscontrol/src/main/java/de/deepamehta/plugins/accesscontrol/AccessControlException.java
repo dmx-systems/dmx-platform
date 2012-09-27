@@ -2,6 +2,7 @@ package de.deepamehta.plugins.accesscontrol;
 
 
 
+@SuppressWarnings("serial")
 class AccessControlException extends Exception {
 
     int statusCode;

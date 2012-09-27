@@ -203,7 +203,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     public Set<Topic> getTopics(String roleTypeUri) {
-        Set<Topic> topics = new HashSet();
+        Set<Topic> topics = new HashSet<Topic>();
         filterTopic(getRole1(), roleTypeUri, topics);
         filterTopic(getRole2(), roleTypeUri, topics);
         return topics;
@@ -250,7 +250,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     }
 
     @Override
-    public ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+    public ResultSet<RelatedTopic> getRelatedTopics(List<String> assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
                                     int maxResultSize, ClientState clientState) {
         ResultSet<RelatedTopicModel> topics = dms.storage.getAssociationRelatedTopics(getId(), assocTypeUris,

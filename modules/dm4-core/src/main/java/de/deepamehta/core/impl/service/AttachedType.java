@@ -5,7 +5,6 @@ import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
-import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationRoleModel;
@@ -134,7 +133,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     public void removeAssocDef(String assocDefUri) {
         // update memory
         getModel().removeAssocDef(assocDefUri);                                 // update model
-        AttachedAssociationDefinition assocDef = _removeAssocDef(assocDefUri);  // update attached object cache
+        _removeAssocDef(assocDefUri);                                           // update attached object cache
         // update DB
         rebuildSequence();
     }
@@ -306,14 +305,14 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
         // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
         // loading its ACL which in turn would rely on this very topic type.
-        List assocTypeFilter = Arrays.asList("dm4.core.aggregation_def", "dm4.core.composition_def");
+        List<String> assocTypeFilter = Arrays.asList("dm4.core.aggregation_def", "dm4.core.composition_def");
         ResultSet<RelatedTopicModel> partTopicTypes = dms.storage.getTopicRelatedTopics(getId(), assocTypeFilter,
             "dm4.core.whole_type", "dm4.core.part_type", "dm4.core.topic_type", 0);
         //
         // 2) create association definitions
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
         // subsequently build from it by sorting the assoc def's according to the sequence IDs.
-        Map<Long, AssociationDefinition> assocDefs = new HashMap();
+        Map<Long, AssociationDefinition> assocDefs = new HashMap<Long, AssociationDefinition>();
         for (RelatedTopicModel partTopicType : partTopicTypes) {
             Association assoc = new AttachedAssociation(partTopicType.getAssociationModel(), dms);
             AssociationDefinition assocDef = dms.objectFactory.fetchAssociationDefinition(assoc, getUri(),
@@ -328,8 +327,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
      * ### FIXME: should be private
      */
     protected void addAssocDefsSorted(Map<Long, AssociationDefinition> assocDefs, List<Long> sequence) {
-        getModel().setAssocDefs(new LinkedHashMap());           // init model
-        this.assocDefs = new LinkedHashMap();                   // init attached object cache
+        getModel().setAssocDefs(new LinkedHashMap<String, AssociationDefinitionModel>()); // init model
+        this.assocDefs = new LinkedHashMap<String, AssociationDefinition>();              // init attached object cache
         for (long assocDefId : sequence) {
             AssociationDefinition assocDef = assocDefs.get(assocDefId);
             // sanity check
@@ -348,7 +347,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // ---
 
     private List<String> fetchLabelConfig() {
-        List<String> labelConfig = new ArrayList();
+        List<String> labelConfig = new ArrayList<String>();
         for (AssociationDefinition assocDef : getAssocDefs().values()) {
             SimpleValue includeInLabel = assocDef.getChildTopicValue("dm4.core.include_in_label");
             if (includeInLabel != null && includeInLabel.booleanValue()) {
@@ -426,7 +425,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private List<RelatedAssociation> fetchSequence() {
         try {
-            List<RelatedAssociation> sequence = new ArrayList();
+            List<RelatedAssociation> sequence = new ArrayList<RelatedAssociation>();
             // find sequence start
             RelatedAssociation assocDef = getRelatedAssociation("dm4.core.aggregation", "dm4.core.type",
                 "dm4.core.sequence_start", null, false, false);   // othersAssocTypeUri=null
@@ -498,7 +497,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // === Attached Object Cache ===
 
     private void initAssocDefs() {
-        this.assocDefs = new LinkedHashMap();
+        this.assocDefs = new LinkedHashMap<String, AssociationDefinition>();
         for (AssociationDefinitionModel model : getModel().getAssocDefs().values()) {
             _addAssocDef(model);
         }

@@ -1,6 +1,5 @@
 package de.deepamehta.core.impl.service;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -8,12 +7,12 @@ import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginContext;
-import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.SecurityHandler;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -27,18 +26,13 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -61,7 +55,6 @@ public class PluginImpl implements Plugin, EventHandler {
     private Bundle      pluginBundle;
     private String      pluginUri;          // This bundle's symbolic name, e.g. "de.deepamehta.webclient"
     private String      pluginName;         // This bundle's name = POM project name, e.g. "DeepaMehta 4 Webclient"
-    private String      pluginClass;
 
     private Properties  pluginProperties;   // Read from file "plugin.properties"
     private String      pluginPackage;
@@ -75,6 +68,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private EventAdmin eventService;        // needed to post the PLUGIN_ACTIVATED OSGi event
 
     // Provided OSGi service
+    @SuppressWarnings("unused")
     private ServiceRegistration registration;
 
     // Provided resources
@@ -82,8 +76,10 @@ public class PluginImpl implements Plugin, EventHandler {
     private WebResources directoryResource;
     private RestResource restResource;
 
-    private List<ServiceTracker> coreServiceTrackers = new ArrayList();
-    private List<ServiceTracker> pluginServiceTrackers = new ArrayList();
+    private List<ServiceTracker> coreServiceTrackers = new ArrayList<ServiceTracker>();
+    private List<ServiceTracker> pluginServiceTrackers = new ArrayList<ServiceTracker>();
+    private List<PluginService> plugins = new ArrayList<PluginService>();
+    private String[] serviceInterfaces = null; // needed to track count of arrived plugin services
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -91,42 +87,58 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public PluginImpl(PluginContext pluginContext) {
+    public PluginImpl(EmbeddedService dms, PluginContext pluginContext) {
+
+        this.dms = dms;
         this.pluginContext = pluginContext;
         this.bundleContext = pluginContext.getBundleContext();
         //
         this.pluginBundle = bundleContext.getBundle();
         this.pluginUri = pluginBundle.getSymbolicName();
         this.pluginName = (String) pluginBundle.getHeaders().get("Bundle-Name");
-        this.pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
-        //
+        String pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
+        logger.info("Instantiate " + pluginClass);
+
         this.pluginProperties = readConfigFile();
         this.pluginPackage = getConfigProperty("pluginPackage", pluginContext.getClass().getPackage().getName());
         this.pluginInfo = new PluginInfoImpl(pluginUri, pluginBundle);
         this.pluginDependencies = pluginDependencies();
+
+        String consumedServiceInterfaces = getConfigProperty("consumedServiceInterfaces");
+        if (consumedServiceInterfaces != null) {
+            serviceInterfaces = consumedServiceInterfaces.split(", *");
+        }
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    @Override
     public void start() {
+        logger.info("========== Starting " + pluginName + " ==========");
+
+        createCoreServiceTrackers();
+        openCoreServiceTrackers();
+        createPluginServiceTrackers();
+        openPluginServiceTrackers();
+
         if (pluginDependencies.size() > 0) {
             registerEventListener();
         }
-        //
         registerPluginService();
-        //
-        createCoreServiceTrackers();    // ### FIXME: move to constructor?
-        createPluginServiceTrackers();  // ### FIXME: move to constructor?
-        //
-        openCoreServiceTrackers();
     }
 
+    @Override
     public void stop() {
+        logger.info("========== Stopping " + pluginName + " ==========");
         closeCoreServiceTrackers();
+        closePluginServiceTrackers();
+        // core service is needed to deliver the PLUGIN_SERVICE_GONE events
+        dms.pluginManager.deactivatePlugin(this);
     }
 
     // ---
 
+    @Override
     public void publishDirectory(String directoryPath, String uriNamespace, SecurityHandler securityHandler) {
         try {
             logger.info("### Publishing directory \"" + directoryPath + "\" at URI namespace \"" + uriNamespace + "\"");
@@ -228,7 +240,7 @@ public class PluginImpl implements Plugin, EventHandler {
      *
      * @return  the class, or <code>null</code> if the class is not found.
      */
-    Class loadClass(String className) {
+    Class<?> loadClass(String className) {
         try {
             return pluginBundle.loadClass(className);
         } catch (ClassNotFoundException e) {
@@ -264,26 +276,21 @@ public class PluginImpl implements Plugin, EventHandler {
     // === Service Tracking ===
 
     private void createCoreServiceTrackers() {
-        coreServiceTrackers.add(createServiceTracker(DeepaMehtaService.class));
         coreServiceTrackers.add(createServiceTracker(WebPublishingService.class));
         coreServiceTrackers.add(createServiceTracker(EventAdmin.class));
     }
 
     private void createPluginServiceTrackers() {
-        String consumedServiceInterfaces = getConfigProperty("consumedServiceInterfaces");
-        if (consumedServiceInterfaces == null) {
-            return;
-        }
-        //
-        String[] serviceInterfaces = consumedServiceInterfaces.split(", *");
-        for (int i = 0; i < serviceInterfaces.length; i++) {
-            pluginServiceTrackers.add(createServiceTracker(serviceInterfaces[i]));
+        if (serviceInterfaces != null) {
+            for (int i = 0; i < serviceInterfaces.length; i++) {
+                pluginServiceTrackers.add(createServiceTracker(serviceInterfaces[i]));
+            }
         }
     }
 
     // ---
 
-    private ServiceTracker createServiceTracker(Class serviceInterface) {
+    private ServiceTracker createServiceTracker(Class<?> serviceInterface) {
         return createServiceTracker(serviceInterface.getName());
     }
 
@@ -359,13 +366,7 @@ public class PluginImpl implements Plugin, EventHandler {
     // ---
 
     private void addService(Object service, String serviceInterface) {
-        if (service instanceof DeepaMehtaService) {
-            logger.info("Adding DeepaMehta 4 core service to " + this);
-            setCoreService((EmbeddedService) service);
-            openPluginServiceTrackers();
-            // Note: activating the plugin is deferred until its requirements are met
-            checkRequirementsForActivation();
-        } else if (service instanceof WebPublishingService) {
+        if (service instanceof WebPublishingService) {
             logger.info("Adding Web Publishing service to " + this);
             webPublishingService = (WebPublishingService) service;
             registerWebResources();
@@ -377,17 +378,15 @@ public class PluginImpl implements Plugin, EventHandler {
             checkRequirementsForActivation();
         } else if (service instanceof PluginService) {
             logger.info("Adding \"" + serviceInterface + "\" to " + this);
-            deliverEvent(CoreEvent.PLUGIN_SERVICE_ARRIVED, (PluginService) service);
+            PluginService pluginService = (PluginService) service;
+            deliverEvent(CoreEvent.PLUGIN_SERVICE_ARRIVED, pluginService);
+            plugins.add(pluginService);
+            checkRequirementsForActivation();
         }
     }
 
     private void removeService(Object service, String serviceInterface) {
-        if (service == dms) {
-            logger.info("Removing DeepaMehta 4 core service from " + this);
-            closePluginServiceTrackers();   // core service is needed to deliver the PLUGIN_SERVICE_GONE events
-            dms.pluginManager.deactivatePlugin(this);
-            setCoreService(null);
-        } else if (service == webPublishingService) {
+        if (service == webPublishingService) {
             logger.info("Removing Web Publishing service from " + this);
             unregisterRestResources();
             unregisterWebResources();
@@ -398,15 +397,10 @@ public class PluginImpl implements Plugin, EventHandler {
             eventService = null;
         } else if (service instanceof PluginService) {
             logger.info("Removing plugin service \"" + serviceInterface + "\" from " + this);
-            deliverEvent(CoreEvent.PLUGIN_SERVICE_GONE, (PluginService) service);
+            PluginService pluginService = (PluginService) service;
+            deliverEvent(CoreEvent.PLUGIN_SERVICE_GONE, pluginService);
+            plugins.remove(pluginService);
         }
-    }
-
-    // ---
-
-    private void setCoreService(EmbeddedService dms) {
-        this.dms = dms;
-        pluginContext.setCoreService(dms);
     }
 
     // ---
@@ -425,7 +419,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private void checkRequirementsForActivation() {
         // Note: The Web Publishing service is not strictly required for activation, but we must ensure
         // ALL_PLUGINS_ACTIVE is not fired before the Web Publishing service becomes available.
-        if (dms == null || webPublishingService == null || eventService == null || !dependenciesAvailable()) {
+        if (webPublishingService == null || eventService == null || !dependenciesAvailable()) {
             return;
         }
         //
@@ -558,10 +552,11 @@ public class PluginImpl implements Plugin, EventHandler {
      * Returns the events this plugin is listening to.
      */
     private List<CoreEvent> getEvents() {
-        List<CoreEvent> events = new ArrayList();
-        for (Class interfaze : pluginContext.getClass().getInterfaces()) {
+        List<CoreEvent> events = new ArrayList<CoreEvent>();
+        for (Class<?> interfaze : pluginContext.getClass().getInterfaces()) {
             if (isListenerInterface(interfaze)) {
-                CoreEvent event = CoreEvent.fromListenerInterface(interfaze);
+                CoreEvent event = CoreEvent.fromListenerInterface(//
+                        DeepaMehtaUtils.<Class<Listener>>cast(interfaze));
                 logger.fine("### Listener Interface: " + interfaze + ", event=" + event);
                 events.add(event);
             }
@@ -582,13 +577,11 @@ public class PluginImpl implements Plugin, EventHandler {
      *   - PLUGIN_SERVICE_ARRIVED
      *   - PLUGIN_SERVICE_GONE
      */
-    private Object deliverEvent(CoreEvent event, Object... params) {
-        if (!isListener(event)) {
-            return null;
+    private void deliverEvent(CoreEvent event, Object... params) {
+        if (isListener(event)) {
+            logger.fine("### Delivering internal plugin event " + event + " from/to " + this);
+            dms.listenerRegistry.deliverEvent((Listener) pluginContext, event, params);
         }
-        //
-        logger.fine("### Delivering internal plugin event " + event + " from/to " + this);
-        return dms.listenerRegistry.deliverEvent((Listener) pluginContext, event, params);
     }
 
     // ---
@@ -597,7 +590,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * Returns true if the specified interface is a listener interface.
      * A listener interface is a sub-interface of {@link Listener}.
      */
-    private boolean isListenerInterface(Class interfaze) {
+    private boolean isListenerInterface(Class<?> interfaze) {
         return Listener.class.isAssignableFrom(interfaze);
     }
 
@@ -737,9 +730,9 @@ public class PluginImpl implements Plugin, EventHandler {
     // ---
 
     private Set<Class<?>> getProviderClasses() throws IOException {
-        Set<Class<?>> providerClasses = new HashSet();
+        Set<Class<?>> providerClasses = new HashSet<Class<?>>();
         String providerPackage = ("/" + pluginPackage + ".provider").replace('.', '/');
-        Enumeration<String> e = pluginBundle.getEntryPaths(providerPackage);
+        Enumeration<String> e = DeepaMehtaUtils.cast(pluginBundle.getEntryPaths(providerPackage));
         logger.fine("### Scanning package " + pluginPackage + ".provider");
         if (e != null) {
             while (e.hasMoreElements()) {
@@ -747,7 +740,7 @@ public class PluginImpl implements Plugin, EventHandler {
                 entryPath = entryPath.substring(0, entryPath.length() - 6);     // cut ".class"
                 String className = entryPath.replace('/', '.');
                 logger.fine("  # Found provider class: " + className);
-                Class providerClass = loadClass(className);
+                Class<?> providerClass = loadClass(className);
                 if (providerClass == null) {
                     throw new RuntimeException("Loading provider class \"" + className + "\" failed");
                 }
@@ -769,7 +762,7 @@ public class PluginImpl implements Plugin, EventHandler {
     // === Plugin Dependencies ===
 
     private Set<String> pluginDependencies() {
-        Set<String> pluginDependencies = new HashSet();
+        Set<String> pluginDependencies = new HashSet<String>();
         String importModels = getConfigProperty("importModels");
         if (importModels != null) {
             String[] pluginUris = importModels.split(", *");
@@ -790,7 +783,11 @@ public class PluginImpl implements Plugin, EventHandler {
                 return false;
             }
         }
-        return true;
+        if(serviceInterfaces != null && plugins.size() != serviceInterfaces.length) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private boolean isPluginActivated(String pluginUri) {
@@ -803,7 +800,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private void registerEventListener() {
         String[] topics = new String[] {PLUGIN_ACTIVATED};
-        Hashtable properties = new Hashtable();
+        Dictionary<String, String[]> properties = new Hashtable<String, String[]>();
         properties.put(EventConstants.EVENT_TOPIC, topics);
         bundleContext.registerService(EventHandler.class.getName(), this, properties);
     }
