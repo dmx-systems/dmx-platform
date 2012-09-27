@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 
 
@@ -34,13 +33,11 @@ public class CompositeValue {
      * Internal representation.
      * Key: String, value: TopicModel or List<TopicModel>
      */
-    private Map<String, Object> values = new HashMap();
+    private Map<String, Object> values = new HashMap<String, Object>();
     // Note: it must be List<TopicModel>, not Set<TopicModel> (like before).
     // There may be several TopicModels with the same ID. That occurrs if the webclient user adds several new topics
     // at once (by the means of an "Add" button). In this case the ID is -1. TopicModel equality is defined solely as
     // ID equality (see DeepaMehtaObjectModel.equals()).
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -49,12 +46,12 @@ public class CompositeValue {
 
     public CompositeValue(JSONObject values) {
         try {
-            Iterator<String> i = values.keys();
+            Iterator<String> i = DeepaMehtaUtils.cast(values.keys());
             while (i.hasNext()) {
                 String key = i.next();
                 Object value = values.get(key);
                 if (value instanceof JSONArray) {
-                    List<TopicModel> models = new ArrayList();
+                    List<TopicModel> models = new ArrayList<TopicModel>();
                     for (int j = 0; j < ((JSONArray) value).length(); j++) {
                         models.add(createTopicModel(key, ((JSONArray) value).get(j)));
                     }
@@ -90,7 +87,7 @@ public class CompositeValue {
 
     public List<TopicModel> getTopics(String key) {
         try {
-            List<TopicModel> topics = (List<TopicModel>) values.get(key);
+            List<TopicModel> topics = DeepaMehtaUtils.cast(values.get(key));
             // error check
             if (topics == null) {
                 throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\": " +
@@ -106,7 +103,7 @@ public class CompositeValue {
 
     public List<TopicModel> getTopics(String key, List<TopicModel> defaultValue) {
         try {
-            List<TopicModel> topics = (List<TopicModel>) values.get(key);
+            List<TopicModel> topics = DeepaMehtaUtils.cast(values.get(key));
             return topics != null ? topics : defaultValue;
         } catch (ClassCastException e) {
             throwInvalidAccess(key, e);
@@ -269,7 +266,8 @@ public class CompositeValue {
                 if (value instanceof TopicModel) {
                     json.put(key, ((TopicModel) value).toJSON());
                 } else if (value instanceof List) {
-                    json.put(key, DeepaMehtaUtils.objectsToJSON((List<TopicModel>) value));
+                    List<TopicModel> topics = DeepaMehtaUtils.cast(value);
+                    json.put(key, DeepaMehtaUtils.objectsToJSON(topics));
                 } else {
                     throw new RuntimeException("Unexpected value in a CompositeValue: " + value);
                 }
@@ -297,8 +295,9 @@ public class CompositeValue {
                 TopicModel model = ((TopicModel) value).clone();
                 clone.put(key, model);
             } else if (value instanceof List) {
-                List<TopicModel> models = new ArrayList();
-                for (TopicModel model : (List<TopicModel>) value) {
+                List<TopicModel> models = new ArrayList<TopicModel>();
+                List<TopicModel> valueList = DeepaMehtaUtils.cast(value);
+                for (TopicModel model : valueList) {
                     models.add(model.clone());
                 }
                 clone.put(key, models);

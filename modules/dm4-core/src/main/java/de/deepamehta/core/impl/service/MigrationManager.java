@@ -161,7 +161,7 @@ class MigrationManager {
         InputStream migrationIn;    // for declarative migration
         //
         String migrationClassName;  // for imperative migration
-        Class migrationClass;       // for imperative migration
+        Class<? extends Migration> migrationClass; // for imperative migration
         //
         boolean success;            // error occurred?
         Exception exception;        // the error
@@ -187,7 +187,7 @@ class MigrationManager {
                     migrationIn  = plugin.getResourceAsStream(migrationFile);
                     migrationClassName = plugin.getMigrationClassName(migrationNr);
                     if (migrationClassName != null) {
-                        migrationClass = plugin.loadClass(migrationClassName);
+                        migrationClass = DeepaMehtaUtils.cast(plugin.loadClass(migrationClassName));
                     }
                 }
                 //
@@ -245,9 +245,9 @@ class MigrationManager {
          *
          * @return  the class, or <code>null</code> if the class is not found.
          */
-        private Class loadClass(String className) {
+        private Class<? extends Migration> loadClass(String className) {
             try {
-                return Class.forName(className);
+                return DeepaMehtaUtils.cast(Class.forName(className));
             } catch (ClassNotFoundException e) {
                 return null;
             }

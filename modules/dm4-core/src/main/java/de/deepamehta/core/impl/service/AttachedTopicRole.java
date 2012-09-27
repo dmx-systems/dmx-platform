@@ -6,8 +6,6 @@ import de.deepamehta.core.TopicRole;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
 
-import java.util.logging.Logger;
-
 
 
 /**
@@ -15,10 +13,6 @@ import java.util.logging.Logger;
  */
 class AttachedTopicRole extends AttachedRole implements TopicRole {
 
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private Logger logger = Logger.getLogger(getClass().getName());
-    
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedTopicRole(TopicRoleModel model, Association assoc, EmbeddedService dms) {

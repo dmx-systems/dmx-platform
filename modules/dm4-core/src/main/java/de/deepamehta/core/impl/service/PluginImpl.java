@@ -1,6 +1,5 @@
 package de.deepamehta.core.impl.service;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -8,12 +7,12 @@ import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginContext;
-import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.SecurityHandler;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -27,18 +26,13 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -74,6 +68,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private EventAdmin eventService;        // needed to post the PLUGIN_ACTIVATED OSGi event
 
     // Provided OSGi service
+    @SuppressWarnings("unused")
     private ServiceRegistration registration;
 
     // Provided resources
@@ -245,7 +240,7 @@ public class PluginImpl implements Plugin, EventHandler {
      *
      * @return  the class, or <code>null</code> if the class is not found.
      */
-    Class loadClass(String className) {
+    Class<?> loadClass(String className) {
         try {
             return pluginBundle.loadClass(className);
         } catch (ClassNotFoundException e) {
@@ -295,7 +290,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
-    private ServiceTracker createServiceTracker(Class serviceInterface) {
+    private ServiceTracker createServiceTracker(Class<?> serviceInterface) {
         return createServiceTracker(serviceInterface.getName());
     }
 
@@ -558,9 +553,10 @@ public class PluginImpl implements Plugin, EventHandler {
      */
     private List<CoreEvent> getEvents() {
         List<CoreEvent> events = new ArrayList<CoreEvent>();
-        for (Class interfaze : pluginContext.getClass().getInterfaces()) {
+        for (Class<?> interfaze : pluginContext.getClass().getInterfaces()) {
             if (isListenerInterface(interfaze)) {
-                CoreEvent event = CoreEvent.fromListenerInterface(interfaze);
+                CoreEvent event = CoreEvent.fromListenerInterface(//
+                        DeepaMehtaUtils.<Class<Listener>>cast(interfaze));
                 logger.fine("### Listener Interface: " + interfaze + ", event=" + event);
                 events.add(event);
             }
@@ -594,7 +590,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * Returns true if the specified interface is a listener interface.
      * A listener interface is a sub-interface of {@link Listener}.
      */
-    private boolean isListenerInterface(Class interfaze) {
+    private boolean isListenerInterface(Class<?> interfaze) {
         return Listener.class.isAssignableFrom(interfaze);
     }
 
@@ -734,9 +730,9 @@ public class PluginImpl implements Plugin, EventHandler {
     // ---
 
     private Set<Class<?>> getProviderClasses() throws IOException {
-        Set<Class<?>> providerClasses = new HashSet();
+        Set<Class<?>> providerClasses = new HashSet<Class<?>>();
         String providerPackage = ("/" + pluginPackage + ".provider").replace('.', '/');
-        Enumeration<String> e = pluginBundle.getEntryPaths(providerPackage);
+        Enumeration<String> e = DeepaMehtaUtils.cast(pluginBundle.getEntryPaths(providerPackage));
         logger.fine("### Scanning package " + pluginPackage + ".provider");
         if (e != null) {
             while (e.hasMoreElements()) {
@@ -744,7 +740,7 @@ public class PluginImpl implements Plugin, EventHandler {
                 entryPath = entryPath.substring(0, entryPath.length() - 6);     // cut ".class"
                 String className = entryPath.replace('/', '.');
                 logger.fine("  # Found provider class: " + className);
-                Class providerClass = loadClass(className);
+                Class<?> providerClass = loadClass(className);
                 if (providerClass == null) {
                     throw new RuntimeException("Loading provider class \"" + className + "\" failed");
                 }
@@ -766,7 +762,7 @@ public class PluginImpl implements Plugin, EventHandler {
     // === Plugin Dependencies ===
 
     private Set<String> pluginDependencies() {
-        Set<String> pluginDependencies = new HashSet();
+        Set<String> pluginDependencies = new HashSet<String>();
         String importModels = getConfigProperty("importModels");
         if (importModels != null) {
             String[] pluginUris = importModels.split(", *");
@@ -804,7 +800,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private void registerEventListener() {
         String[] topics = new String[] {PLUGIN_ACTIVATED};
-        Hashtable properties = new Hashtable();
+        Dictionary<String, String[]> properties = new Hashtable<String, String[]>();
         properties.put(EventConstants.EVENT_TOPIC, topics);
         bundleContext.registerService(EventHandler.class.getName(), this, properties);
     }

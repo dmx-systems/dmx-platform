@@ -16,15 +16,10 @@ import de.deepamehta.core.service.Directives;
 
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 
 
 public class FacetsPlugin extends PluginActivator implements FacetsService {
-
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 

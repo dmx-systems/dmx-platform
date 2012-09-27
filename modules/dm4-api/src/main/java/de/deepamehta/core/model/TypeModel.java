@@ -6,13 +6,11 @@ import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 
 
@@ -26,16 +24,14 @@ public abstract class TypeModel extends TopicModel {
     private List<String> labelConfig;                               // is never null, may be empty
     private ViewConfigurationModel viewConfigModel;                 // is never null
 
-    private Logger logger = Logger.getLogger(getClass().getName());
-
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public TypeModel(String uri, String topicTypeUri, SimpleValue value, String dataTypeUri) {
         super(uri, topicTypeUri, value);
         this.dataTypeUri = dataTypeUri;
-        this.indexModes = new HashSet();
-        this.assocDefModels = new LinkedHashMap();
-        this.labelConfig = new ArrayList();
+        this.indexModes = new HashSet<IndexMode>();
+        this.assocDefModels = new LinkedHashMap<String, AssociationDefinitionModel>();
+        this.labelConfig = new ArrayList<String>();
         this.viewConfigModel = new ViewConfigurationModel();
     }
 
@@ -58,7 +54,7 @@ public abstract class TypeModel extends TopicModel {
         try {
             this.dataTypeUri = typeModel.getString("data_type_uri");
             this.indexModes = IndexMode.parse(typeModel);
-            this.assocDefModels = new LinkedHashMap();
+            this.assocDefModels = new LinkedHashMap<String, AssociationDefinitionModel>();
             this.labelConfig = parseLabelConfig(typeModel);
             this.viewConfigModel = new ViewConfigurationModel(typeModel);
             parseAssocDefs(typeModel);
@@ -211,7 +207,7 @@ public abstract class TypeModel extends TopicModel {
         if (typeModel.has("label_config")) {
             return DeepaMehtaUtils.toList(typeModel.getJSONArray("label_config"));
         }
-        return new ArrayList();
+        return new ArrayList<String>();
     }
 
     private void parseAssocDefs(JSONObject typeModel) throws Exception {

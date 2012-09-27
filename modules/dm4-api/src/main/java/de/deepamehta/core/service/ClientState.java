@@ -9,7 +9,7 @@ public class ClientState {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Map<String, String> values = new HashMap();
+    private Map<String, String> values = new HashMap<String, String>();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 

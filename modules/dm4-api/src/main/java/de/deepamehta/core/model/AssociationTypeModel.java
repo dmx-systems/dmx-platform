@@ -2,9 +2,6 @@ package de.deepamehta.core.model;
 
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.Set;
-import java.util.logging.Logger;
-
 
 
 /**
@@ -13,10 +10,6 @@ import java.util.logging.Logger;
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
 public class AssociationTypeModel extends TypeModel {
-
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 

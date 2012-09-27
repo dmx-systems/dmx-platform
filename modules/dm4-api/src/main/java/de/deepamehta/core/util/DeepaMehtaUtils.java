@@ -19,13 +19,9 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -73,25 +69,16 @@ public class DeepaMehtaUtils {
 
 
 
-    public static List<Long> idList(Collection objects) {
-        List<Long> ids = new ArrayList();
+    public static List<Long> idList(Collection<? extends Identifiable> objects) {
+        List<Long> ids = new ArrayList<Long>();
         for (Object object : objects) {
-            ids.add(((Identifiable) object).getId());
+            ids.add(DeepaMehtaUtils.<Identifiable>cast(object).getId());
         }
         return ids;
     }
 
-    // ### FIXME: can we drop this method? Work with "? extends Topic" instead?
-    public static ResultSet<Topic> toTopicSet(ResultSet<RelatedTopic> relTopics) {
-        Set<Topic> topics = new LinkedHashSet();
-        for (Topic topic : relTopics) {
-            topics.add(topic);
-        }
-        return new ResultSet(relTopics.getTotalCount(), topics);
-    }
-
     public static List<TopicModel> toTopicModels(ResultSet<RelatedTopic> relTopics) {
-        List<TopicModel> topicModels = new ArrayList();
+        List<TopicModel> topicModels = new ArrayList<TopicModel>();
         for (Topic topic : relTopics) {
             topicModels.add(topic.getModel());
         }
@@ -121,16 +108,12 @@ public class DeepaMehtaUtils {
 
     // === Generic ===
 
-    public static Map toMap(JSONObject o) {
-        return toMap(o, new HashMap());
-    }
-
-    public static Map toMap(JSONObject o, Map map) {
+    public static <T> Map<String, T> toMap(JSONObject o, Map<String, T> map) {
         try {
-            Iterator<String> i = o.keys();
+            Iterator<String> i = DeepaMehtaUtils.cast(o.keys());
             while (i.hasNext()) {
                 String key = i.next();
-                map.put(key, o.get(key));   // throws JSONException
+                map.put(key, DeepaMehtaUtils.<T>cast(o.get(key)));   // throws JSONException
             }
             return map;
         } catch (Exception e) {
@@ -140,16 +123,24 @@ public class DeepaMehtaUtils {
 
     // ---
 
-    public static List toList(JSONArray o) {
+    public static <T> List<T> toList(JSONArray o) {
         try {
-            List list = new ArrayList();
+            List<T> list = new ArrayList<T>();
             for (int i = 0; i < o.length(); i++) {
-                list.add(o.get(i));         // throws JSONException
+                list.add(DeepaMehtaUtils.<T>cast(o.get(i)));         // throws JSONException
             }
             return list;
         } catch (Exception e) {
             throw new RuntimeException("Converting JSONArray to List failed", e);
         }
+    }
+
+    // ---
+
+
+    @SuppressWarnings("unchecked")
+    public static <T> T cast(Object o) {
+        return (T) o;
     }
 
     // ---

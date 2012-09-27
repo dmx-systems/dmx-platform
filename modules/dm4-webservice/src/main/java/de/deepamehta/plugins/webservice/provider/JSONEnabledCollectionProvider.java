@@ -11,7 +11,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -23,10 +22,6 @@ import javax.ws.rs.ext.Provider;
 
 @Provider
 public class JSONEnabledCollectionProvider implements MessageBodyWriter<Collection<JSONEnabled>> {
-
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -43,7 +38,7 @@ public class JSONEnabledCollectionProvider implements MessageBodyWriter<Collecti
         if (genericType instanceof ParameterizedType) {
             Type[] typeArgs = ((ParameterizedType) genericType).getActualTypeArguments();
             if (Collection.class.isAssignableFrom(type) && typeArgs.length == 1 &&
-                JSONEnabled.class.isAssignableFrom((Class) typeArgs[0])) {
+                JSONEnabled.class.isAssignableFrom((Class<?>) typeArgs[0])) {
                 // Note: unlike equals() isCompatible() ignores parameters
                 // like "charset" in "application/json;charset=UTF-8"
                 if (mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)) {

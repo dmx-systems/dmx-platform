@@ -28,7 +28,6 @@ import javax.ws.rs.WebApplicationException;
 
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -54,7 +53,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    Map<String, TopicmapRenderer> topicmapRendererRegistry = new HashMap();
+    Map<String, TopicmapRenderer> topicmapRendererRegistry = new HashMap<String, TopicmapRenderer>();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 

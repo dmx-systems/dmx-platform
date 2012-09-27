@@ -1,9 +1,5 @@
 package de.deepamehta.core.model;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
-
 
 
 /**
@@ -14,8 +10,6 @@ public class SimpleValue {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Object value;
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 

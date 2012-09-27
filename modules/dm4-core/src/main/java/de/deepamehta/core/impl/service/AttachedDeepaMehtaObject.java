@@ -7,9 +7,7 @@ import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
-import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
@@ -27,10 +25,7 @@ import de.deepamehta.core.util.JavaUtils;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -562,7 +557,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             List<TopicModel> topics = comp.getTopics(assocDefUri, null);        // defaultValue=null
             // Note: topics just created have no child topics yet
             if (topics == null) {
-                topics = new ArrayList();
+                topics = new ArrayList<TopicModel>();
                 comp.put(assocDefUri, topics);
             }
             topics.remove(topic);
@@ -609,7 +604,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             childTopic.getAssociation().delete(directives);
         }
         // create new assignments
-        List<TopicModel> topics = new ArrayList();
+        List<TopicModel> topics = new ArrayList<TopicModel>();
         for (TopicModel newChildTopic : newChildTopics) {
             Topic topic = createAssignment(assocDef, newChildTopic, clientState);
             topics.add(topic.getModel());

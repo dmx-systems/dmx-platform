@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.service.PluginInfo;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -11,7 +12,6 @@ import org.osgi.framework.Bundle;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.logging.Logger;
 
 
 
@@ -27,8 +27,6 @@ class PluginInfoImpl implements PluginInfo {
 
     private Bundle pluginBundle;
     private JSONObject pluginInfo = new JSONObject();
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -77,8 +75,8 @@ class PluginInfoImpl implements PluginInfo {
     // ---
 
     private List<String> getFilenames(String path) {
-        List<String> filenames = new ArrayList();
-        Enumeration<String> e = pluginBundle.getEntryPaths(path);
+        List<String> filenames = new ArrayList<String>();
+        Enumeration<String> e = DeepaMehtaUtils.cast(pluginBundle.getEntryPaths(path));
         if (e != null) {
             while (e.hasMoreElements()) {
                 String entryPath = e.nextElement();

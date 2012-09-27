@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 
 
@@ -23,7 +22,7 @@ public enum IndexMode {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     public static Set<IndexMode> fromTopics(Set<RelatedTopic> topics) {
-        Set<IndexMode> indexModes = new HashSet();
+        Set<IndexMode> indexModes = new HashSet<IndexMode>();
         for (Topic topic : topics) {
             indexModes.add(fromUri(topic.getUri()));
         }
@@ -38,7 +37,7 @@ public enum IndexMode {
 
     static Set<IndexMode> parse(JSONObject topicTypeModel) {
         try {
-            Set<IndexMode> indexModes = new HashSet();
+            Set<IndexMode> indexModes = new HashSet<IndexMode>();
             JSONArray indexModeUris = topicTypeModel.optJSONArray("index_mode_uris");
             if (indexModeUris != null) {
                 for (int i = 0; i < indexModeUris.length(); i++) {
@@ -52,7 +51,7 @@ public enum IndexMode {
     }
 
     static void toJSON(Set<IndexMode> indexModes, JSONObject o) throws Exception {
-        List indexModeUris = new ArrayList();
+        List<String> indexModeUris = new ArrayList<String>();
         for (IndexMode indexMode : indexModes) {
             indexModeUris.add(indexMode.toUri());
         }

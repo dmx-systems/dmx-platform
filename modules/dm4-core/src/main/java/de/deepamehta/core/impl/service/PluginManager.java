@@ -29,7 +29,7 @@ class PluginManager {
      *
      * Hashed by plugin bundle's symbolic name, e.g. "de.deepamehta.topicmaps".
      */
-    private Map<String, PluginImpl> activatedPlugins = new HashMap();
+    private Map<String, PluginImpl> activatedPlugins = new HashMap<String, PluginImpl>();
 
     /**
      * Context of the DeepaMehta 4 Core bundle.
@@ -133,7 +133,7 @@ class PluginManager {
     }
 
     Set<PluginInfo> getPluginInfo() {
-        Set info = new HashSet();
+        Set<PluginInfo> info = new HashSet<PluginInfo>();
         for (PluginImpl plugin : activatedPlugins.values()) {
             info.add(plugin.getInfo());
         }

@@ -4,13 +4,10 @@ import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 
 
@@ -24,7 +21,7 @@ public class ViewConfigurationModel {
     /**
      * Key: config topic type URI
      */
-    private Map<String, TopicModel> viewConfig = new HashMap();
+    private Map<String, TopicModel> viewConfig = new HashMap<String, TopicModel>();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -127,7 +124,7 @@ public class ViewConfigurationModel {
 
     public void toJSON(JSONObject configurable) {
         try {
-            List viewConfigTopics = new ArrayList();
+            List<JSONObject> viewConfigTopics = new ArrayList<JSONObject>();
             for (TopicModel configTopic : getConfigTopics()) {
                 viewConfigTopics.add(configTopic.toJSON());
             }

@@ -15,7 +15,7 @@ public class Directives implements Iterable<Directives.Entry> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private List<Entry> directives = new ArrayList();
+    private List<Entry> directives = new ArrayList<Entry>();
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 

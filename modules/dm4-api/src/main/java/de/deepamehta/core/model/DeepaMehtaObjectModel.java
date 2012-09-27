@@ -1,17 +1,9 @@
 package de.deepamehta.core.model;
 
-import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Identifiable;
 import de.deepamehta.core.JSONEnabled;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 

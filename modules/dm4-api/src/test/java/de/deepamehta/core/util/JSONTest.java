@@ -14,13 +14,10 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 
 
 
 public class JSONTest {
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // --- Serialization ---
 
@@ -144,11 +141,11 @@ public class JSONTest {
 
     @Test
     public void iteration() throws JSONException {
-        List keys = new ArrayList();
+        List<String> keys = new ArrayList<String>();
         JSONObject o = new JSONObject("{d: 78, c: 90, a: 56, e: 12, b: 34}");
-        Iterator<String> i = o.keys();
+        Iterator<?> i = (Iterator<?>) o.keys();
         while (i.hasNext()) {
-            String key = i.next();
+            String key = (String) i.next();
             keys.add(key);
         }
         assertEquals(Arrays.asList("d", "c", "a", "e", "b"), keys);

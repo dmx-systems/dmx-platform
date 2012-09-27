@@ -9,7 +9,6 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 
-import java.util.Map;
 import java.util.List;
 import java.util.Set;
 
@@ -54,7 +53,7 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, List assocTypeUris, String myRoleTypeUri,
+    ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, List<String> assocTypeUris, String myRoleTypeUri,
                                                        String othersRoleTypeUri, String othersTopicTypeUri,
                                                        int maxResultSize);
 
@@ -162,7 +161,7 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, List assocTypeUris, String myRoleTypeUri,
+    ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, List<String> assocTypeUris, String myRoleTypeUri,
                                                              String othersRoleTypeUri, String othersTopicTypeUri,
                                                              int maxResultSize);
 

@@ -14,7 +14,6 @@ import org.codehaus.jettison.json.JSONObject;
 
 import java.awt.Point;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -34,8 +33,8 @@ public class Topicmap implements JSONEnabled {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     protected Topic topicmapTopic;
-    protected Map<Long, TopicmapTopic> topics = new HashMap();
-    protected Map<Long, TopicmapAssociation> assocs = new HashMap();
+    protected Map<Long, TopicmapTopic> topics = new HashMap<Long, TopicmapTopic>();
+    protected Map<Long, TopicmapAssociation> assocs = new HashMap<Long, TopicmapAssociation>();
 
     protected DeepaMehtaService dms;
 

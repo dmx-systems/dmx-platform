@@ -1,7 +1,6 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.RoleModel;
-import org.codehaus.jettison.json.JSONObject;
 
 
 

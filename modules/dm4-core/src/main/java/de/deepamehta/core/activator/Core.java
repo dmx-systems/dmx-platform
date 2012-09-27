@@ -14,7 +14,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import java.util.Map;
 import java.util.logging.Logger;
 
 

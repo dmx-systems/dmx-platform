@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.files.provider;
 
+import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.plugins.files.UploadedFile;
 
 import org.apache.commons.fileupload.FileItem;
@@ -72,7 +73,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile> {
             UploadedFile file = null;
             FileItemFactory factory = new DiskFileItemFactory();        // create a factory for disk-based file items
             ServletFileUpload upload = new ServletFileUpload(factory);  // create a new file upload handler
-            List<FileItem> items = upload.parseRequest(request);        // parse the request
+            List<FileItem> items = DeepaMehtaUtils.cast(upload.parseRequest(request)); // parse the request
             // FIXME: check if we can use a FileUpload low-level method to parse the request body instead of the
             // entire request. Advantage: a) no need to inject the HttpServletRequest, b) no double work as the
             // request is already parsed by jersey, c) no dependency on servlet-api.

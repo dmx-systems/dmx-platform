@@ -2,15 +2,7 @@ package de.deepamehta.core.model;
 
 import de.deepamehta.core.Association;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 
 

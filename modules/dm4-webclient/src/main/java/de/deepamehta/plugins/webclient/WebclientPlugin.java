@@ -1,13 +1,13 @@
 package de.deepamehta.plugins.webclient;
 
 import de.deepamehta.core.DeepaMehtaTransaction;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
-import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
@@ -30,11 +30,8 @@ import javax.ws.rs.WebApplicationException;
 
 import java.awt.Desktop;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -177,13 +174,14 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // === Search ===
 
     private Set<Topic> findSearchableUnits(Set<Topic> topics, ClientState clientState) {
-        Set<Topic> searchableUnits = new LinkedHashSet();
+        Set<Topic> searchableUnits = new LinkedHashSet<Topic>();
         for (Topic topic : topics) {
             if (isSearchableUnit(topic)) {
                 searchableUnits.add(topic);
             } else {
-                Set<Topic> parentTopics = DeepaMehtaUtils.toTopicSet(topic.getRelatedTopics((List) null,
-                    "dm4.core.part", "dm4.core.whole", null, false, false, 0, clientState)).getItems();
+                ResultSet<RelatedTopic> relatedTopics = topic.getRelatedTopics((List<String>) null,
+                    "dm4.core.part", "dm4.core.whole", null, false, false, 0, clientState);
+                Set<Topic> parentTopics = DeepaMehtaUtils.<ResultSet<Topic>>cast(relatedTopics).getItems();
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
                 } else {

@@ -4,7 +4,6 @@ import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
-import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
@@ -154,7 +153,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
     }
 
     private Map<Long, AssociationDefinition> hashAssocDefsById() {
-        Map assocDefs = new HashMap();
+        Map<Long, AssociationDefinition> assocDefs = new HashMap<Long, AssociationDefinition>();
         for (AssociationDefinition assocDef : getAssocDefs().values()) {
             assocDefs.put(assocDef.getId(), assocDef);
         }

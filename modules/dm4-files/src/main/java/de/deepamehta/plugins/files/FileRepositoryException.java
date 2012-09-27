@@ -4,6 +4,7 @@ import javax.ws.rs.core.Response.Status;
 
 
 
+@SuppressWarnings("serial")
 class FileRepositoryException extends Exception {
 
     Status status;

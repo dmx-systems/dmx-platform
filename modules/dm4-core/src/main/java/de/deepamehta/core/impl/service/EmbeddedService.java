@@ -25,7 +25,6 @@ import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ObjectFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
-import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -33,8 +32,6 @@ import org.osgi.framework.BundleContext;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -120,11 +117,11 @@ public class EmbeddedService implements DeepaMehtaService {
                                                                               ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            ResultSet<Topic> topics = DeepaMehtaUtils.toTopicSet(getTopicType(typeUri, clientState).getRelatedTopics(
-                "dm4.core.instantiation", "dm4.core.type", "dm4.core.instance", null, fetchComposite, false,
-                maxResultSize, clientState));   // othersTopicTypeUri=null
+            ResultSet<RelatedTopic> relatedTopics = getTopicType(typeUri, clientState).getRelatedTopics(
+                "dm4.core.instantiation", "dm4.core.type", "dm4.core.instance",
+                null, fetchComposite, false, maxResultSize, clientState);
             tx.success();
-            return topics;
+            return DeepaMehtaUtils.cast(relatedTopics);
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Retrieving topics by type failed (typeUri=\"" + typeUri + "\")", e);
@@ -378,7 +375,7 @@ public class EmbeddedService implements DeepaMehtaService {
             Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm4.core.topic_type")), false, null);
             ResultSet<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.topic_type", false, false, 0, null);
-            Set<String> topicTypeUris = new HashSet();
+            Set<String> topicTypeUris = new HashSet<String>();
             // add meta types
             topicTypeUris.add("dm4.core.topic_type");
             topicTypeUris.add("dm4.core.assoc_type");
@@ -416,7 +413,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public Set<TopicType> getAllTopicTypes(ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Set<TopicType> topicTypes = new HashSet();
+            Set<TopicType> topicTypes = new HashSet<TopicType>();
             for (String uri : getTopicTypeUris()) {
                 TopicType topicType = getTopicType(uri, clientState);
                 topicTypes.add(topicType);
@@ -486,7 +483,7 @@ public class EmbeddedService implements DeepaMehtaService {
             Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm4.core.assoc_type")), false, null);
             ResultSet<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.assoc_type", false, false, 0, null);
-            Set<String> assocTypeUris = new HashSet();
+            Set<String> assocTypeUris = new HashSet<String>();
             for (Topic assocType : assocTypes) {
                 assocTypeUris.add(assocType.getUri());
             }
@@ -518,7 +515,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public Set<AssociationType> getAllAssociationTypes(ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Set<AssociationType> assocTypes = new HashSet();
+            Set<AssociationType> assocTypes = new HashSet<AssociationType>();
             for (String uri : getAssociationTypeUris()) {
                 AssociationType assocType = getAssociationType(uri, clientState);
                 assocTypes.add(assocType);
@@ -648,7 +645,7 @@ public class EmbeddedService implements DeepaMehtaService {
     // === Helper ===
 
     Set<TopicModel> getTopicModels(Set<RelatedTopic> topics) {
-        Set<TopicModel> models = new HashSet();
+        Set<TopicModel> models = new HashSet<TopicModel>();
         for (Topic topic : topics) {
             models.add(((AttachedTopic) topic).getModel());
         }
@@ -686,7 +683,7 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     private Set<Topic> attach(Set<TopicModel> models, boolean fetchComposite, ClientState clientState) {
-        Set<Topic> topics = new LinkedHashSet();
+        Set<Topic> topics = new LinkedHashSet<Topic>();
         for (TopicModel model : models) {
             topics.add(attach(model, fetchComposite, clientState));
         }
@@ -704,7 +701,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     ResultSet<RelatedTopic> attach(ResultSet<RelatedTopicModel> models, boolean fetchComposite,
                                    boolean fetchRelatingComposite, ClientState clientState) {
-        Set<RelatedTopic> relTopics = new LinkedHashSet();
+        Set<RelatedTopic> relTopics = new LinkedHashSet<RelatedTopic>();
         for (RelatedTopicModel model : models) {
             relTopics.add(attach(model, fetchComposite, fetchRelatingComposite, clientState));
         }
@@ -724,7 +721,7 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     Set<Association> attach(Set<AssociationModel> models, boolean fetchComposite) {
-        Set<Association> assocs = new LinkedHashSet();
+        Set<Association> assocs = new LinkedHashSet<Association>();
         for (AssociationModel model : models) {
             assocs.add(attach(model, fetchComposite));
         }
@@ -740,7 +737,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     Set<RelatedAssociation> attach(Iterable<RelatedAssociationModel> models,
                                    boolean fetchComposite, boolean fetchRelatingComposite) {
-        Set<RelatedAssociation> relAssocs = new LinkedHashSet();
+        Set<RelatedAssociation> relAssocs = new LinkedHashSet<RelatedAssociation>();
         for (RelatedAssociationModel model : models) {
             relAssocs.add(attach(model));
         }

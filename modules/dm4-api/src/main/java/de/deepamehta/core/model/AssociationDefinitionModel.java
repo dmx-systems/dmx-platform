@@ -1,15 +1,10 @@
 package de.deepamehta.core.model;
 
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
 
 
 
@@ -36,8 +31,6 @@ public class AssociationDefinitionModel extends AssociationModel {
     private String partCardinalityUri;
 
     private ViewConfigurationModel viewConfigModel;   // is never null
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -187,7 +180,7 @@ public class AssociationDefinitionModel extends AssociationModel {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     static void toJSON(Collection<AssociationDefinitionModel> assocDefs, JSONObject o) throws Exception {
-        List assocDefList = new ArrayList();
+        List<JSONObject> assocDefList = new ArrayList<JSONObject>();
         for (AssociationDefinitionModel assocDef : assocDefs) {
             assocDefList.add(assocDef.toJSON());
         }
