@@ -53,6 +53,7 @@
                 <felix.log.level>1</felix.log.level>
                 <felix.fileinstall.dir>
                     <![CDATA[
+                        ${project.basedir}/modules/dm4-api/target,
                         ${project.basedir}/modules/dm4-core/target,
                         ${project.basedir}/modules/dm4-webservice/target,
                         ${project.basedir}/modules/dm4-webclient/target,
@@ -115,6 +116,7 @@
             <id>all</id>
             <modules>
                 <module>modules/dm4-parent</module>
+                <module>modules/dm4-api</module>
                 <module>modules/dm4-core</module>
                 <module>modules/dm4-webservice</module>
                 <module>modules/dm4-workspaces</module>
