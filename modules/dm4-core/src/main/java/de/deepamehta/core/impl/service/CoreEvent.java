@@ -7,6 +7,7 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.event.*;
 
@@ -85,39 +86,32 @@ enum CoreEvent {
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 
-    private static Map<String, CoreEvent> events;
+    private static final Map<String, CoreEvent> events = new HashMap<String, CoreEvent>();
+
+    static {
+        for (CoreEvent event : CoreEvent.values()) {
+            events.put(event.listenerInterface.getSimpleName(), event);
+        }
+    }
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    final Class listenerInterface;
+    final Class<? extends Listener> listenerInterface;
     final String handlerMethodName;
-    final Class[] paramClasses;
+    final Class<?>[] paramClasses;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    private CoreEvent(Class listenerInterface, String handlerMethodName, Class... paramClasses) {
+    private CoreEvent(Class<? extends Listener> listenerInterface, String handlerMethodName, Class<?>... paramClasses) {
         this.listenerInterface = listenerInterface;
         this.handlerMethodName = handlerMethodName;
         this.paramClasses = paramClasses;
-        // events.put(..);      // ### Doesn't compile: "illegal reference to static field from initializer".
-                                // ### Enum constants are initialzed before other static fields.
-        put(this);              // ### Lazy initialization outside the constructor solves it.
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    static CoreEvent fromListenerInterface(Class listenerInterface) {
+    static CoreEvent fromListenerInterface(Class<Listener> listenerInterface) {
         return events.get(listenerInterface.getSimpleName());
     }
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private void put(CoreEvent event) {
-        // ### must initialize lazily, see above
-        if (events == null) {
-            events = new HashMap();
-        }
-        //
-        events.put(event.listenerInterface.getSimpleName(), event);
-    }
 }

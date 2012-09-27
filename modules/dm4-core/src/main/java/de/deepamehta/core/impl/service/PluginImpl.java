@@ -581,13 +581,11 @@ public class PluginImpl implements Plugin, EventHandler {
      *   - PLUGIN_SERVICE_ARRIVED
      *   - PLUGIN_SERVICE_GONE
      */
-    private Object deliverEvent(CoreEvent event, Object... params) {
-        if (!isListener(event)) {
-            return null;
+    private void deliverEvent(CoreEvent event, Object... params) {
+        if (isListener(event)) {
+            logger.fine("### Delivering internal plugin event " + event + " from/to " + this);
+            dms.listenerRegistry.deliverEvent((Listener) pluginContext, event, params);
         }
-        //
-        logger.fine("### Delivering internal plugin event " + event + " from/to " + this);
-        return dms.listenerRegistry.deliverEvent((Listener) pluginContext, event, params);
     }
 
     // ---

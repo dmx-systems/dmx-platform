@@ -639,8 +639,8 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // === Events ===
 
-    List<Object> fireEvent(CoreEvent event, Object... params) {
-        return listenerRegistry.fireEvent(event, params);
+    void fireEvent(CoreEvent event, Object... params) {
+        listenerRegistry.fireEvent(event, params);
     }
 
 
