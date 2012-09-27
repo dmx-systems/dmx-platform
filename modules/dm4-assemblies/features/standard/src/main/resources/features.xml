@@ -23,6 +23,7 @@
   <feature name="dm4-core" description="Deepamehta Core" version="${project.version}" resolver="(obr)">
     <feature version="${project.version}">dm4-3rd-party</feature>
     <feature version="${project.version}">dm4-felix</feature>
+    <bundle start-level="73">mvn:de.deepamehta/deepamehta-api/4.0.13-SNAPSHOT</bundle>
     <bundle start-level="74">mvn:de.deepamehta/deepamehta-core/4.0.13-SNAPSHOT</bundle>
     <bundle start-level="74">mvn:de.deepamehta/deepamehta-webservice/4.0.13-SNAPSHOT</bundle>
     <bundle start-level="74">mvn:de.deepamehta/deepamehta-workspaces/4.0.13-SNAPSHOT</bundle>

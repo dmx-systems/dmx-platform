@@ -4,9 +4,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Core</name>
+    <name>DeepaMehta 4 API</name>
     <groupId>de.deepamehta</groupId>
-    <artifactId>deepamehta-core</artifactId>
+    <artifactId>deepamehta-api</artifactId>
     <version>4.0.13-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
@@ -18,28 +18,29 @@
     </parent>
 
     <dependencies>
+        <!-- OSGi -->
         <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-api</artifactId>
-            <version>4.0.13-SNAPSHOT</version>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi_R4_core</artifactId>
         </dependency>
-
-        <!-- Neo4j Metagraph -->
         <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>neo4j-mehtagraph</artifactId>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi_R4_compendium</artifactId>
         </dependency>
-
+        <!-- Jettison -->
+        <dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+        </dependency>
         <!-- Servlet API -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
-
-        <!-- Jersey -->
+        <!-- Felix HTTP API -->
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-servlet</artifactId>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.http.api</artifactId>
         </dependency>
     </dependencies>
 
@@ -51,10 +52,15 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            org.osgi.service.log        <!-- required when running without Gogo Shell -->
+                            de.deepamehta.core,
+                            de.deepamehta.core.model,
+                            de.deepamehta.core.osgi,
+                            de.deepamehta.core.service,
+                            de.deepamehta.core.service.event,
+                            de.deepamehta.core.util
                         </Export-Package>
-                        <Bundle-Activator>
-                            de.deepamehta.core.activator.Core
+                        <Bundle-Activator> <!-- overwrite default plugin activator -->
+                            de.deepamehta.core.osgi.FunctionlessActivator
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

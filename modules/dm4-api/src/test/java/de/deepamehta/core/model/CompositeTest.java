@@ -1,4 +1,4 @@
-package de.deepamehta.core.impl.service;
+package de.deepamehta.core.model;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.CompositeValue;

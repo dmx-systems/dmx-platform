@@ -1,4 +1,4 @@
-package de.deepamehta.core.impl.service;
+package de.deepamehta.core.util;
 
 import de.deepamehta.core.util.JavaUtils;
 

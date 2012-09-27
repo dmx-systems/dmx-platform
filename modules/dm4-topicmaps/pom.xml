@@ -20,8 +20,12 @@
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-core</artifactId>
+            <artifactId>deepamehta-api</artifactId>
             <version>4.0.13-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
         </dependency>
     </dependencies>
 

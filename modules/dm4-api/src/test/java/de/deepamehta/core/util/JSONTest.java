@@ -1,4 +1,4 @@
-package de.deepamehta.test;
+package de.deepamehta.core.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -79,7 +79,7 @@ public class JSONTest {
         o.put("value", new ClassWithoutToStringMethod());
         // if toString() is not overridden:
         assertTrue(o.toString().startsWith(
-            "{\"id\":123,\"value\":\"de.deepamehta.test.JSONTest$ClassWithoutToStringMethod@"));
+            "{\"id\":123,\"value\":\"" + ClassWithoutToStringMethod.class.getName()));
     }
 
     // --- Get ---
@@ -94,7 +94,7 @@ public class JSONTest {
         assertEquals("{\"id\":123,\"value\":\"456\"}", o.toString());
         //
         Object obj = o.get("value");
-        assertEquals("de.deepamehta.test.JSONTest$ClassWithToStringMethod", obj.getClass().getName());
+        assertEquals(ClassWithToStringMethod.class.getName(), obj.getClass().getName());
         assertSame(val, obj);   // the very object is stored in the JSONObject
         //
         String s = o.getString("value");

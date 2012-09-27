@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-core</artifactId>
+            <artifactId>deepamehta-api</artifactId>
             <version>4.0.13-SNAPSHOT</version>
         </dependency>
     </dependencies>

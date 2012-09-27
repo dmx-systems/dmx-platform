@@ -1,4 +1,4 @@
-package de.deepamehta.core.osgi;
+package de.deepamehta.core.activator;
 
 import de.deepamehta.core.impl.service.EmbeddedService;
 import de.deepamehta.core.impl.service.WebPublishingService;
@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 
 
-public class CoreActivator implements BundleActivator {
+public class Core implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
