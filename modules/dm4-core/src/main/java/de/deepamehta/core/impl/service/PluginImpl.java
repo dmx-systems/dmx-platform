@@ -61,7 +61,6 @@ public class PluginImpl implements Plugin, EventHandler {
     private Bundle      pluginBundle;
     private String      pluginUri;          // This bundle's symbolic name, e.g. "de.deepamehta.webclient"
     private String      pluginName;         // This bundle's name = POM project name, e.g. "DeepaMehta 4 Webclient"
-    private String      pluginClass;
 
     private Properties  pluginProperties;   // Read from file "plugin.properties"
     private String      pluginPackage;
@@ -82,8 +81,10 @@ public class PluginImpl implements Plugin, EventHandler {
     private WebResources directoryResource;
     private RestResource restResource;
 
-    private List<ServiceTracker> coreServiceTrackers = new ArrayList();
-    private List<ServiceTracker> pluginServiceTrackers = new ArrayList();
+    private List<ServiceTracker> coreServiceTrackers = new ArrayList<ServiceTracker>();
+    private List<ServiceTracker> pluginServiceTrackers = new ArrayList<ServiceTracker>();
+    private List<PluginService> plugins = new ArrayList<PluginService>();
+    private String[] serviceInterfaces = null; // needed to track count of arrived plugin services
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -91,42 +92,58 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public PluginImpl(PluginContext pluginContext) {
+    public PluginImpl(EmbeddedService dms, PluginContext pluginContext) {
+
+        this.dms = dms;
         this.pluginContext = pluginContext;
         this.bundleContext = pluginContext.getBundleContext();
         //
         this.pluginBundle = bundleContext.getBundle();
         this.pluginUri = pluginBundle.getSymbolicName();
         this.pluginName = (String) pluginBundle.getHeaders().get("Bundle-Name");
-        this.pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
-        //
+        String pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
+        logger.info("Instantiate " + pluginClass);
+
         this.pluginProperties = readConfigFile();
         this.pluginPackage = getConfigProperty("pluginPackage", pluginContext.getClass().getPackage().getName());
         this.pluginInfo = new PluginInfoImpl(pluginUri, pluginBundle);
         this.pluginDependencies = pluginDependencies();
+
+        String consumedServiceInterfaces = getConfigProperty("consumedServiceInterfaces");
+        if (consumedServiceInterfaces != null) {
+            serviceInterfaces = consumedServiceInterfaces.split(", *");
+        }
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    @Override
     public void start() {
+        logger.info("========== Starting " + pluginName + " ==========");
+
+        createCoreServiceTrackers();
+        openCoreServiceTrackers();
+        createPluginServiceTrackers();
+        openPluginServiceTrackers();
+
         if (pluginDependencies.size() > 0) {
             registerEventListener();
         }
-        //
         registerPluginService();
-        //
-        createCoreServiceTrackers();    // ### FIXME: move to constructor?
-        createPluginServiceTrackers();  // ### FIXME: move to constructor?
-        //
-        openCoreServiceTrackers();
     }
 
+    @Override
     public void stop() {
+        logger.info("========== Stopping " + pluginName + " ==========");
         closeCoreServiceTrackers();
+        closePluginServiceTrackers();
+        // core service is needed to deliver the PLUGIN_SERVICE_GONE events
+        dms.pluginManager.deactivatePlugin(this);
     }
 
     // ---
 
+    @Override
     public void publishDirectory(String directoryPath, String uriNamespace, SecurityHandler securityHandler) {
         try {
             logger.info("### Publishing directory \"" + directoryPath + "\" at URI namespace \"" + uriNamespace + "\"");
@@ -264,20 +281,15 @@ public class PluginImpl implements Plugin, EventHandler {
     // === Service Tracking ===
 
     private void createCoreServiceTrackers() {
-        coreServiceTrackers.add(createServiceTracker(DeepaMehtaService.class));
         coreServiceTrackers.add(createServiceTracker(WebPublishingService.class));
         coreServiceTrackers.add(createServiceTracker(EventAdmin.class));
     }
 
     private void createPluginServiceTrackers() {
-        String consumedServiceInterfaces = getConfigProperty("consumedServiceInterfaces");
-        if (consumedServiceInterfaces == null) {
-            return;
-        }
-        //
-        String[] serviceInterfaces = consumedServiceInterfaces.split(", *");
-        for (int i = 0; i < serviceInterfaces.length; i++) {
-            pluginServiceTrackers.add(createServiceTracker(serviceInterfaces[i]));
+        if (serviceInterfaces != null) {
+            for (int i = 0; i < serviceInterfaces.length; i++) {
+                pluginServiceTrackers.add(createServiceTracker(serviceInterfaces[i]));
+            }
         }
     }
 
@@ -359,13 +371,7 @@ public class PluginImpl implements Plugin, EventHandler {
     // ---
 
     private void addService(Object service, String serviceInterface) {
-        if (service instanceof DeepaMehtaService) {
-            logger.info("Adding DeepaMehta 4 core service to " + this);
-            setCoreService((EmbeddedService) service);
-            openPluginServiceTrackers();
-            // Note: activating the plugin is deferred until its requirements are met
-            checkRequirementsForActivation();
-        } else if (service instanceof WebPublishingService) {
+        if (service instanceof WebPublishingService) {
             logger.info("Adding Web Publishing service to " + this);
             webPublishingService = (WebPublishingService) service;
             registerWebResources();
@@ -377,17 +383,15 @@ public class PluginImpl implements Plugin, EventHandler {
             checkRequirementsForActivation();
         } else if (service instanceof PluginService) {
             logger.info("Adding \"" + serviceInterface + "\" to " + this);
-            deliverEvent(CoreEvent.PLUGIN_SERVICE_ARRIVED, (PluginService) service);
+            PluginService pluginService = (PluginService) service;
+            deliverEvent(CoreEvent.PLUGIN_SERVICE_ARRIVED, pluginService);
+            plugins.add(pluginService);
+            checkRequirementsForActivation();
         }
     }
 
     private void removeService(Object service, String serviceInterface) {
-        if (service == dms) {
-            logger.info("Removing DeepaMehta 4 core service from " + this);
-            closePluginServiceTrackers();   // core service is needed to deliver the PLUGIN_SERVICE_GONE events
-            dms.pluginManager.deactivatePlugin(this);
-            setCoreService(null);
-        } else if (service == webPublishingService) {
+        if (service == webPublishingService) {
             logger.info("Removing Web Publishing service from " + this);
             unregisterRestResources();
             unregisterWebResources();
@@ -398,15 +402,10 @@ public class PluginImpl implements Plugin, EventHandler {
             eventService = null;
         } else if (service instanceof PluginService) {
             logger.info("Removing plugin service \"" + serviceInterface + "\" from " + this);
-            deliverEvent(CoreEvent.PLUGIN_SERVICE_GONE, (PluginService) service);
+            PluginService pluginService = (PluginService) service;
+            deliverEvent(CoreEvent.PLUGIN_SERVICE_GONE, pluginService);
+            plugins.remove(pluginService);
         }
-    }
-
-    // ---
-
-    private void setCoreService(EmbeddedService dms) {
-        this.dms = dms;
-        pluginContext.setCoreService(dms);
     }
 
     // ---
@@ -425,7 +424,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private void checkRequirementsForActivation() {
         // Note: The Web Publishing service is not strictly required for activation, but we must ensure
         // ALL_PLUGINS_ACTIVE is not fired before the Web Publishing service becomes available.
-        if (dms == null || webPublishingService == null || eventService == null || !dependenciesAvailable()) {
+        if (webPublishingService == null || eventService == null || !dependenciesAvailable()) {
             return;
         }
         //
@@ -558,7 +557,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * Returns the events this plugin is listening to.
      */
     private List<CoreEvent> getEvents() {
-        List<CoreEvent> events = new ArrayList();
+        List<CoreEvent> events = new ArrayList<CoreEvent>();
         for (Class interfaze : pluginContext.getClass().getInterfaces()) {
             if (isListenerInterface(interfaze)) {
                 CoreEvent event = CoreEvent.fromListenerInterface(interfaze);
@@ -790,7 +789,11 @@ public class PluginImpl implements Plugin, EventHandler {
                 return false;
             }
         }
-        return true;
+        if(serviceInterfaces != null && plugins.size() != serviceInterfaces.length) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private boolean isPluginActivated(String pluginUri) {

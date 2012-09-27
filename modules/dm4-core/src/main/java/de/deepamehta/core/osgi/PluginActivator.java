@@ -1,12 +1,13 @@
 package de.deepamehta.core.osgi;
 
 import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.SecurityHandler;
-import de.deepamehta.core.impl.service.PluginImpl;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
 
 import org.apache.felix.http.api.ExtHttpService;
 
@@ -24,16 +25,16 @@ public class PluginActivator implements BundleActivator, PluginContext {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private BundleContext bundleContext;
-    private PluginImpl plugin;
+    private Plugin plugin;
 
     // Consumed service
     protected DeepaMehtaService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
+    private String bundleName;
+
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-
 
     // **************************************
     // *** BundleActivator Implementation ***
@@ -44,32 +45,32 @@ public class PluginActivator implements BundleActivator, PluginContext {
     @Override
     public void start(BundleContext context) {
         this.bundleContext = context;
-        this.plugin = new PluginImpl(this);
-        //
-        try {
-            logger.info("========== Starting " + this + " ==========");
-            plugin.start();
-        } catch (Exception e) {
-            logger.severe("Starting " + this + " failed:");
-            e.printStackTrace();
-            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
-            // File Install would retry to start the bundle endlessly.
-        }
+        bundleName = (String) bundleContext.getBundle().getHeaders().get("Bundle-Name");
+        new ServiceTracker(bundleContext, DeepaMehtaService.class.getName(), null) {
+            @Override
+            public Object addingService(ServiceReference reference) {
+                Object service = super.addingService(reference);
+                if (service instanceof DeepaMehtaService) {
+                    setCoreService((DeepaMehtaService) service);
+                }
+                return service;
+            }
+
+            @Override
+            public void removedService(ServiceReference reference, Object service) {
+                super.removedService(reference, service);
+                if (service == dms) {
+                    stop();
+                }
+            }
+
+        }.open();
     }
 
     @Override
     public void stop(BundleContext context) {
-        try {
-            logger.info("========== Stopping " + this + " ==========");
-            plugin.stop();
-        } catch (Exception e) {
-            logger.severe("Stopping " + this + " failed:");
-            e.printStackTrace();
-            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
-        }
+        stop();
     }
-
-
 
     // ************************************
     // *** PluginContext Implementation ***
@@ -82,22 +83,28 @@ public class PluginActivator implements BundleActivator, PluginContext {
         return bundleContext;
     }
 
-    @Override
-    public void setCoreService(DeepaMehtaService dms) {
-        this.dms = dms;
-    }
-
-
-
     // ===
 
     public String toString() {
-        return plugin.toString();
+        return bundleName;
     }
 
-
-
     // ----------------------------------------------------------------------------------------------- Protected Methods
+
+    protected void setCoreService(DeepaMehtaService dms) {
+        this.dms = dms;
+        //
+        try {
+            plugin = dms.createPlugin(this);
+            plugin.start();
+        } catch (Exception e) {
+            logger.severe("Starting " + this + " failed:");
+            e.printStackTrace();
+            // Note: we don't throw through the OSGi container here.
+            // It would not print out the stacktrace.
+            // File Install would retry to start the bundle endlessly.
+        }
+    }
 
     /**
      * @param   securityHandler     Optional. If null no security is provided.
@@ -120,4 +127,22 @@ public class PluginActivator implements BundleActivator, PluginContext {
             throw new RuntimeException("Registering filter " + filter + " failed", e);
         }
     }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void stop() {
+        try {
+            if(plugin != null) { // do not call it twice
+                plugin.stop();
+            }
+            plugin = null;
+            dms = null;
+        } catch (Exception e) {
+            logger.severe("Stopping " + this + " failed:");
+            e.printStackTrace();
+            // Note: we don't throw through the OSGi container here.
+            // It would not print out the stacktrace.
+        }
+    }
+
 }

@@ -11,11 +11,14 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.osgi.PluginContext;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.osgi.framework.BundleContext;
 
 
 
@@ -139,6 +142,8 @@ public interface DeepaMehtaService {
 
 
     // === Plugins ===
+
+    Plugin createPlugin(PluginContext bundleContext);
 
     Plugin getPlugin(String pluginUri);
 

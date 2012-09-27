@@ -18,6 +18,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.osgi.PluginContext;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directives;
@@ -557,6 +558,11 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
     // === Plugins ===
+
+    @Override
+    public Plugin createPlugin(PluginContext pluginContext) {
+        return new PluginImpl(this, pluginContext);
+    }
 
     @Override
     public Plugin getPlugin(String pluginUri) {
