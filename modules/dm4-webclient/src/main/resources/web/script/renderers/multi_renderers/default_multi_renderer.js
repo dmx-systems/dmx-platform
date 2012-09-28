@@ -19,17 +19,7 @@ dm4c.add_multi_renderer("dm4.webclient.default_multi_renderer", {
             //
             for (var i = 0; i < page_models.length; i++) {
                 if (page_models[i].topic.delete) {
-                    switch (page_models[i].assoc_def.assoc_type_uri) {
-                    case "dm4.core.composition_def":
-                        values.push(dm4c.DEL_PREFIX + page_models[i].topic.id)
-                        break
-                    case "dm4.core.aggregation_def":
-                        // do nothing
-                        break
-                    default:
-                        throw "TopicRendererError: \"" + page_models[i].assoc_def.assoc_type_uri +
-                            "\" is an unexpected assoc type URI"
-                    }
+                    values.push(dm4c.DEL_PREFIX + page_models[i].topic.id)
                 } else {
                     var value = topic_renderer.build_topic_model(page_models[i])
                     if (value != null) {

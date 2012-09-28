@@ -15,10 +15,15 @@ import java.util.logging.Logger;
 
 
 /**
- * A recursive composite of key/value pairs. ### FIXDOC
+ * A recursive composite of key/value pairs.
  * <p>
  * Keys are strings, values are non-null atomic (string, int, long, double, boolean)
  * or again a <code>CompositeValue</code>.
+ *
+ * ### FIXDOC
+ * ### TODO: wording. The keys are actually Topic Type URIs. The values are topic(model)s meanwhile.
+ * ### This class could be named ChildTopics.
+ * ### The corresponding flags could be named "fetch(Topic)Childs" and "fetchAssociationChilds"
  */
 public class CompositeValue {
 
@@ -54,11 +59,10 @@ public class CompositeValue {
                 String key = i.next();
                 Object value = values.get(key);
                 if (value instanceof JSONArray) {
-                    List<TopicModel> models = new ArrayList();
-                    for (int j = 0; j < ((JSONArray) value).length(); j++) {
-                        models.add(createTopicModel(key, ((JSONArray) value).get(j)));
+                    JSONArray valueArray = (JSONArray) value;
+                    for (int j = 0; j < valueArray.length(); j++) {
+                        add(key, createTopicModel(key, valueArray.get(j)));
                     }
-                    put(key, models);
                 } else {
                     put(key, createTopicModel(key, value));
                 }
@@ -70,6 +74,10 @@ public class CompositeValue {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    /**
+     * Accesses a single-valued child.
+     * Throws if there is no such child.
+     */
     public TopicModel getTopic(String key) {
         TopicModel topic = (TopicModel) values.get(key);
         // error check
@@ -81,6 +89,10 @@ public class CompositeValue {
         return topic;
     }
 
+    /**
+     * Accesses a single-valued child.
+     * Returns a default value if there is no such child.
+     */
     public TopicModel getTopic(String key, TopicModel defaultValue) {
         TopicModel topic = (TopicModel) values.get(key);
         return topic != null ? topic : defaultValue;
@@ -88,6 +100,10 @@ public class CompositeValue {
 
     // ---
 
+    /**
+     * Accesses a multiple-valued child.
+     * Throws if there is no such child.
+     */
     public List<TopicModel> getTopics(String key) {
         try {
             List<TopicModel> topics = (List<TopicModel>) values.get(key);
@@ -104,6 +120,10 @@ public class CompositeValue {
         }
     }
 
+    /**
+     * Accesses a multiple-valued child.
+     * Returns a default value if there is no such child.
+     */
     public List<TopicModel> getTopics(String key, List<TopicModel> defaultValue) {
         try {
             List<TopicModel> topics = (List<TopicModel>) values.get(key);
@@ -112,96 +132,6 @@ public class CompositeValue {
             throwInvalidAccess(key, e);
             return null;    // never reached
         }
-    }
-
-    // ---
-
-    public CompositeValue put(String key, TopicModel value) {
-        try {
-            // check argument
-            if (value == null) {
-                throw new IllegalArgumentException("Tried to put null in a CompositeValue");
-            }
-            // put value
-            values.put(key, value);
-            //
-            return this;
-        } catch (Exception e) {
-            throw new RuntimeException("Putting a value in a CompositeValue failed (key=\"" + key +
-                "\", value=" + value + ", composite=" + this + ")", e);
-        }
-    }
-
-    public CompositeValue put(String key, List<TopicModel> value) {
-        try {
-            // check argument
-            if (value == null) {
-                throw new IllegalArgumentException("Tried to put null in a CompositeValue");
-            }
-            // put value
-            values.put(key, value);
-            //
-            return this;
-        } catch (Exception e) {
-            throw new RuntimeException("Putting a value in a CompositeValue failed (key=\"" + key +
-                "\", value=" + value + ", composite=" + this + ")", e);
-        }
-    }
-
-    /**
-     * Convenience method.
-     *
-     * @param   value   a String, Integer, Long, Double, Boolean, or a CompositeValue.
-     *
-     * @return  this CompositeValue.
-     */
-    public CompositeValue put(String key, Object value) {
-        try {
-            // check argument
-            if (value == null) {
-                throw new IllegalArgumentException("Tried to put null in a CompositeValue");
-            }
-            if (!(value instanceof String || value instanceof Integer || value instanceof Long ||
-                  value instanceof Double || value instanceof Boolean || value instanceof CompositeValue)) {
-                throw new IllegalArgumentException("Tried to put a " + value.getClass().getName() + " in a " +
-                    "CompositeValue (expected are String, Integer, Long, Double, Boolean, or CompositeValue)");
-            }
-            // put value
-            TopicModel model;
-            if (value instanceof CompositeValue) {
-                model = new TopicModel(key, (CompositeValue) value);
-            } else {
-                model = new TopicModel(key, new SimpleValue(value));
-            }
-            put(key, model);
-            //
-            return this;
-        } catch (Exception e) {
-            throw new RuntimeException("Putting a value in a CompositeValue failed (key=\"" + key +
-                "\", value=" + value + ", composite=" + this + ")", e);
-        }
-    }
-
-    // ---
-
-    public CompositeValue putRef(String key, long refTopicId) {
-        put(key, new TopicModel(refTopicId, key));
-        return this;
-    }
-
-    public CompositeValue putRef(String key, String refTopicUri) {
-        put(key, new TopicModel(refTopicUri, key));
-        return this;
-    }
-
-    // ---
-
-    public Iterable<String> keys() {
-        return values.keySet();
-    }
-
-    public boolean has(String key) {
-        return values.containsKey(key);
     }
 
     // ---
@@ -261,6 +191,114 @@ public class CompositeValue {
 
     // ---
 
+    public Iterable<String> keys() {
+        return values.keySet();
+    }
+
+    public boolean has(String key) {
+        return values.containsKey(key);
+    }
+
+    // ---
+
+    /**
+     * Puts a single-valued child. An existing value is overwritten.
+     */
+    public CompositeValue put(String key, TopicModel value) {
+        // ### FIXME: drop "key" argument? It is supposed to be equal to value.getTypeUri().
+        try {
+            // check argument
+            if (value == null) {
+                throw new IllegalArgumentException("Tried to put null in a CompositeValue");
+            }
+            // put value
+            values.put(key, value);
+            //
+            return this;
+        } catch (Exception e) {
+            throw new RuntimeException("Putting a value in a CompositeValue failed (key=\"" + key +
+                "\", value=" + value + ", composite=" + this + ")", e);
+        }
+    }
+
+    /**
+     * Convenience method to put a single-valued child. An existing value is overwritten.
+     *
+     * @param   value   a String, Integer, Long, Double, Boolean, or a CompositeValue.
+     *
+     * @return  this CompositeValue.
+     */
+    public CompositeValue put(String key, Object value) {
+        try {
+            // check argument
+            if (value == null) {
+                throw new IllegalArgumentException("Tried to put null in a CompositeValue");
+            } else if (value instanceof Iterable) {
+                throw new IllegalArgumentException("Tried to put a " + value.getClass().getName() + " in a " +
+                    "CompositeValue => for multiple values use add() instead of put()");
+            } else if (!(value instanceof String || value instanceof Integer || value instanceof Long ||
+                  value instanceof Double || value instanceof Boolean || value instanceof CompositeValue)) {
+                throw new IllegalArgumentException("Tried to put a " + value.getClass().getName() + " in a " +
+                    "CompositeValue (expected are String, Integer, Long, Double, Boolean, or CompositeValue)");
+            }
+            // put value
+            TopicModel model;
+            if (value instanceof CompositeValue) {
+                model = new TopicModel(key, (CompositeValue) value);
+            } else {
+                model = new TopicModel(key, new SimpleValue(value));
+            }
+            put(key, model);
+            //
+            return this;
+        } catch (Exception e) {
+            throw new RuntimeException("Putting a value in a CompositeValue failed (key=\"" + key +
+                "\", value=" + value + ", composite=" + this + ")", e);
+        }
+    }
+
+    // ---
+
+    public CompositeValue putRef(String key, long refTopicId) {
+        put(key, new TopicModel(refTopicId, key));
+        return this;
+    }
+
+    public CompositeValue putRef(String key, String refTopicUri) {
+        put(key, new TopicModel(refTopicUri, key));
+        return this;
+    }
+
+    // ---
+
+    /**
+     * Adds a value to a multiple-valued child.
+     */
+    public CompositeValue add(String key, TopicModel value) {
+        // ### FIXME: drop "key" argument? It is supposed to be equal to value.getTypeUri().
+        List<TopicModel> topics = getTopics(key, null);     // defaultValue=null
+        // Note: topics just created have no child topics yet
+        if (topics == null) {
+            topics = new ArrayList();
+            values.put(key, topics);
+        }
+        topics.add(value);
+        return this;
+    }
+
+    /**
+     * Removes a value from a multiple-valued child.
+     */
+    public CompositeValue remove(String key, TopicModel value) {
+        List<TopicModel> topics = getTopics(key, null);     // defaultValue=null
+        if (topics != null) {
+            topics.remove(value);
+        }
+        return this;
+    }
+
+    // ---
+
     public JSONObject toJSON() {
         try {
             JSONObject json = new JSONObject();
@@ -294,14 +332,12 @@ public class CompositeValue {
         for (String key : keys()) {
             Object value = values.get(key);
             if (value instanceof TopicModel) {
-                TopicModel model = ((TopicModel) value).clone();
-                clone.put(key, model);
+                TopicModel model = (TopicModel) value;
+                clone.put(key, model.clone());
             } else if (value instanceof List) {
-                List<TopicModel> models = new ArrayList();
                 for (TopicModel model : (List<TopicModel>) value) {
-                    models.add(model.clone());
+                    clone.add(key, model.clone());
                 }
-                clone.put(key, models);
             } else {
                 throw new RuntimeException("Unexpected value in a CompositeValue: " + value);
             }
@@ -370,7 +406,7 @@ public class CompositeValue {
     // ---
 
     private void throwInvalidAccess(String key, ClassCastException e) {
-        if (e.getMessage().equals("de.deepamehta.core.model.TopicModel cannot be cast to java.util.List")) {
+        if (e.getMessage().endsWith("cannot be cast to java.util.List")) {
             throw new RuntimeException("Invalid access to CompositeValue entry \"" + key + "\": " +
                 "the caller assumes it to be multiple-value but it is single-value in\n" + this, e);
         } else {

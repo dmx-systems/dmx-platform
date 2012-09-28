@@ -32,8 +32,11 @@ dm4c.add_multi_renderer("dm4.webclient.checkbox_renderer", {
             var values = []
             //
             for (var topic_id in checkboxes) {
+                // ### TODO: returning only the changed values would be more efficient
                 if (checkboxes[topic_id].get(0).checked) {
                     values.push(dm4c.REF_PREFIX + topic_id)
+                } else {
+                    values.push(dm4c.DEL_PREFIX + topic_id)
                 }
             }
             return values

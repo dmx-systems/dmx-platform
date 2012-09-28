@@ -513,147 +513,131 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     private void updateCompositionOne(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
                                                                                                 Directives directives) {
-        // 1) update DB
-        Topic childTopic = fetchChildTopic(assocDef, newChildTopic);
+        // Note: the child topic's composite must be fetched. It needs to be passed to the
+        // POST_UPDATE_TOPIC hook as part of the "old model" (when the child topic is updated). ### FIXDOC
+        Topic childTopic = fetchChildTopic(assocDef, true);     // fetchComposite=true
+        // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
+        // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (childTopic != null) {
-            // update existing child
+            // == update child ==
+            // update DB
             childTopic.update(newChildTopic, clientState, directives);
+            // update memory
+            putInCompositeModel(assocDef, childTopic);
         } else {
-            // create new child
+            // == create child ==
+            // update DB
             childTopic = dms.createTopic(newChildTopic, clientState);
             associateChildTopic(assocDef, childTopic.getId(), clientState);
+            // update memory
+            putInCompositeModel(assocDef, childTopic);
         }
-        // 2) update memory
-        updateCompositeModel(assocDef, childTopic.getModel());
     }
 
     private void updateCompositionMany(AssociationDefinition assocDef, List<TopicModel> newChildTopics,
                                                                        ClientState clientState, Directives directives) {
+        // Note: the child topic's composite must be fetched. It needs to be passed to the
+        // POST_UPDATE_TOPIC hook as part of the "old model" (when the child topic is updated). ### FIXDOC
+        ResultSet<RelatedTopic> childTopics = fetchChildTopics(assocDef, true);     // fetchComposite=true
         for (TopicModel newChildTopic : newChildTopics) {
-            if (newChildTopic instanceof TopicDeletionModel) {
-                deleteChildTopic(assocDef, newChildTopic, clientState, directives);
+            if (newChildTopic instanceof TopicDeletionModel) {                               // throwsIfNotFound=false
+                Topic childTopic = findChildTopic(newChildTopic.getId(), childTopics, assocDef, false);
+                // Note: "delete child" is an idempotent operation. A delete request for an child which has been
+                // deleted already (resp. is non-existing) is not an error. Instead, nothing is performed.
+                if (childTopic != null) {
+                    // == delete child ==
+                    // update DB
+                    childTopic.delete(directives);
+                    // update memory
+                    removeFromCompositeModel(assocDef, childTopic);
+                }
+            } else if (newChildTopic.getId() != -1) {
+                // == update child ==
+                // update DB                                                                 // throwsIfNotFound=true
+                Topic childTopic = findChildTopic(newChildTopic.getId(), childTopics, assocDef, true);
+                childTopic.update(newChildTopic, clientState, directives);
+                // update memory
+                replaceInCompositeModel(assocDef, childTopic);
             } else {
-                updateCompositionOne(assocDef, newChildTopic, clientState, directives);
+                // == create child ==
+                // update DB
+                Topic childTopic = dms.createTopic(newChildTopic, clientState);
+                associateChildTopic(assocDef, childTopic.getId(), clientState);
+                // update memory
+                addToCompositeModel(assocDef, childTopic);
             }
         }
-    }
-
-    private void deleteChildTopic(AssociationDefinition assocDef, TopicModel childTopic, ClientState clientState,
-                                                                                         Directives directives) {
-        // 1) update DB
-        dms.getTopic(childTopic.getId(), false, null).delete(directives);       // fetchComposite=false
-        // 2) update memory
-        updateCompositeModelDeletion(assocDef, childTopic);
-    }
-
-    // ---
-
-    /**
-     * Updates memory.
-     */
-    private void updateCompositeModel(AssociationDefinition assocDef, TopicModel topic) {
-        CompositeValue comp = getCompositeValue();
-        String assocDefUri = assocDef.getUri();
-        String cardinalityUri = assocDef.getPartCardinalityUri();
-        //
-        if (cardinalityUri.equals("dm4.core.one")) {
-            comp.put(assocDefUri, topic);
-        } else if (cardinalityUri.equals("dm4.core.many")) {
-            List<TopicModel> topics = comp.getTopics(assocDefUri, null);        // defaultValue=null
-            // Note: topics just created have no child topics yet
-            if (topics == null) {
-                topics = new ArrayList();
-                comp.put(assocDefUri, topics);
-            }
-            topics.remove(topic);
-            topics.add(topic);
-        } else {
-            throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
-        }
-    }
-
-    /**
-     * Updates memory.
-     */
-    private void updateCompositeModelDeletion(AssociationDefinition assocDef, TopicModel topic) {
-        CompositeValue comp = getCompositeValue();
-        String assocDefUri = assocDef.getUri();
-        //
-        List<TopicModel> topics = comp.getTopics(assocDefUri, null);            // defaultValue=null
-        topics.remove(topic);
     }
 
     // --- Aggregation ---
 
     private void updateAggregationOne(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
                                                                                                 Directives directives) {
-        // 1) update DB
-        // remove current assignment
-        RelatedTopic childTopic = fetchChildTopic(assocDef, false);             // fetchComposite=false
-        if (childTopic != null) {
-            childTopic.getAssociation().delete(directives);
+        RelatedTopic childTopic = fetchChildTopic(assocDef, false);     // fetchComposite=false
+        if (isReference(newChildTopic)) {
+            if (childTopic != null) {
+                if (!matches(newChildTopic, childTopic)) {
+                    // == update assignment ==
+                    // update DB
+                    childTopic.getAssociation().delete(directives);
+                    Topic topic = associateChildTopic(assocDef, newChildTopic, clientState);
+                    // update memory
+                    putInCompositeModel(assocDef, topic);
+                }
+            } else {
+                // == create assignment ==
+                // update DB
+                Topic topic = associateChildTopic(assocDef, newChildTopic, clientState);
+                // update memory
+                putInCompositeModel(assocDef, topic);
+            }
+        } else {
+            // == create child ==
+            // update DB
+            if (childTopic != null) {
+                childTopic.getAssociation().delete(directives);
+            }
+            Topic topic = dms.createTopic(newChildTopic, clientState);
+            associateChildTopic(assocDef, topic.getId(), clientState);
+            // update memory
+            putInCompositeModel(assocDef, topic);
         }
-        // create new assignment
-        Topic topic = createAssignment(assocDef, newChildTopic, clientState);
-        // 2) update memory
-        updateCompositeModelOne(assocDef, topic.getModel());
     }
 
     private void updateAggregationMany(AssociationDefinition assocDef, List<TopicModel> newChildTopics,
                                                                        ClientState clientState, Directives directives) {
-        // 1) update DB
-        // remove current assignments
-        // ### FIXME: in case of "aggregation many" we expect the update request to contain *all* the childs.
-        // ### Childs not contained in the update request are removed.
-        for (RelatedTopic childTopic : fetchChildTopics(assocDef, false)) {     // fetchComposite=false
-            childTopic.getAssociation().delete(directives);
-        }
-        // create new assignments
-        List<TopicModel> topics = new ArrayList();
+        ResultSet<RelatedTopic> childTopics = fetchChildTopics(assocDef, false);
         for (TopicModel newChildTopic : newChildTopics) {
-            Topic topic = createAssignment(assocDef, newChildTopic, clientState);
-            topics.add(topic.getModel());
+            if (newChildTopic instanceof TopicDeletionModel) {
+                RelatedTopic childTopic = matches(newChildTopic, childTopics);
+                // Note: "delete assignment" is an idempotent operation. A delete request for an assignment which
+                // has been deleted already (resp. is non-existing) is not an error. Instead, nothing is performed.
+                if (childTopic != null) {
+                    // == delete assignment ==
+                    // update DB
+                    childTopic.getAssociation().delete(directives);
+                    // update memory
+                    removeFromCompositeModel(assocDef, childTopic);
+                }
+            } else if (isReference(newChildTopic)) {
+                // Note: "create assignment" is an idempotent operation. A create request for an assignment which
+                // exists already is not an error. Instead, nothing is performed.
+                if (matches(newChildTopic, childTopics) == null) {
+                    // == create assignment ==
+                    // update DB
+                    Topic topic = associateChildTopic(assocDef, newChildTopic, clientState);
+                    // update memory
+                    addToCompositeModel(assocDef, topic);
+                }
+            } else {
+                // == create child ==
+                // update DB
+                Topic topic = dms.createTopic(newChildTopic, clientState);
+                associateChildTopic(assocDef, topic.getId(), clientState);
+                // update memory
+                addToCompositeModel(assocDef, topic);
+            }
         }
-        // 2) update memory
-        updateCompositeModelMany(assocDef, topics);
-    }
-
-    /**
-     * Updates the DB.
-     */
-    Topic createAssignment(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState) {
-        long childTopicId = newChildTopic.getId();
-        String childTopicUri = newChildTopic.getUri();
-        if (childTopicId != -1) {
-            // assign existing child (ref'd by ID)
-            associateChildTopic(assocDef, childTopicId, clientState);
-            return fetchChildTopic(assocDef, childTopicId, false);              // fetchComposite=false
-        } else if (!childTopicUri.equals("")) {
-            // assign existing child (ref'd by URI)
-            associateChildTopic(assocDef, childTopicUri, clientState);
-            return fetchChildTopic(assocDef, childTopicUri, false);             // fetchComposite=false
-        } else {
-            // create new child
-            Topic childTopic = dms.createTopic(newChildTopic, clientState);
-            associateChildTopic(assocDef, childTopic.getId(), clientState);
-            return childTopic;
-        }
-    }
-
-    // ---
-
-    /**
-     * Updates memory.
-     */
-    private void updateCompositeModelOne(AssociationDefinition assocDef, TopicModel topic) {
-        getCompositeValue().put(assocDef.getUri(), topic);
-    }
-
-    /**
-     * Updates memory.
-     */
-    private void updateCompositeModelMany(AssociationDefinition assocDef, List<TopicModel> topics) {
-        getCompositeValue().put(assocDef.getUri(), topics);
     }
 
     // === Fetch ===
@@ -664,13 +648,14 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
                 String cardinalityUri = assocDef.getPartCardinalityUri();
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    Topic childTopic = fetchChildTopic(assocDef, true);                     // fetchComposite=true
+                    Topic childTopic = fetchChildTopic(assocDef, true);             // fetchComposite=true
                     if (childTopic != null) {
                         comp.put(assocDef.getUri(), childTopic.getModel());
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    ResultSet<RelatedTopic> childTopics = fetchChildTopics(assocDef, true); // fetchComposite=true
-                    comp.put(assocDef.getUri(), DeepaMehtaUtils.toTopicModels(childTopics));
+                    for (Topic childTopic : fetchChildTopics(assocDef, true)) {     // fetchComposite=true
+                        comp.add(assocDef.getUri(), childTopic.getModel());
+                    }
                 } else {
                     throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
                 }
@@ -701,58 +686,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         //
         return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, fetchComposite,
             false, null);
-    }
-
-    /**
-     * Fetches and returns the child topic with the specified ID. If that topic is not a child topic of this object
-     * according to the specified association definition an exception is thrown.
-     */
-    private Topic fetchChildTopic(AssociationDefinition assocDef, long childTopicId, boolean fetchComposite) {
-        Topic childTopic = dms.getTopic(childTopicId, fetchComposite, null);                // clientState=null
-        // error check
-        if (getAssociation(assocDef, childTopicId) == null) {
-            throw new RuntimeException("Topic " + childTopicId + " is not a child of " + className() +
-                " " + getId() + " according to " + assocDef);
-        }
-        //
-        return childTopic;
-    }
-
-    /**
-     * Fetches and returns the child topic with the specified URI. If that topic is not a child topic of this object
-     * according to the specified association definition an exception is thrown.
-     */
-    private Topic fetchChildTopic(AssociationDefinition assocDef, String childTopicUri, boolean fetchComposite) {
-        Topic childTopic = dms.getTopic("uri", new SimpleValue(childTopicUri), fetchComposite, null);
-        // error check                                                                      // clientState=null
-        if (getAssociation(assocDef, childTopic.getId()) == null) {
-            throw new RuntimeException("Topic with URI \"" + childTopicUri + "\" is not a child of " + className() +
-                " " + getId() + " according to " + assocDef);
-        }
-        //
-        return childTopic;
-    }
-
-    /**
-     * Fetches and returns the child topic that matches an update topic model,
-     * or <code>null</code> if no such topic extists.
-     */
-    private Topic fetchChildTopic(AssociationDefinition assocDef, TopicModel newChildTopic) {
-        String cardinalityUri = assocDef.getPartCardinalityUri();
-        if (cardinalityUri.equals("dm4.core.one")) {
-            // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
-            // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
-            return fetchChildTopic(assocDef, true);                             // fetchComposite=true
-        } else {
-            long childTopicId = newChildTopic.getId();
-            if (childTopicId != -1) {
-                // Note: the child topic's composite must be fetched. It needs to be passed to the
-                // POST_UPDATE_TOPIC hook as part of the "old model" (when the child topic is updated). ### FIXDOC
-                return fetchChildTopic(assocDef, childTopicId, true);           // fetchComposite=true
-            } else {
-                return null;
-            }
-        }
     }
 
     // ---
@@ -899,6 +832,85 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // === Helper ===
 
+    /**
+     * Checks weather the specified update topic model matches the specified topic.
+     */
+    private boolean matches(TopicModel childTopic, Topic topic) {
+        if (isReferenceById(childTopic)) {
+            return childTopic.getId() == topic.getId();
+        } else if (isReferenceByUri(childTopic)) {
+            return childTopic.getUri().equals(topic.getUri());
+        } else {
+            throw new RuntimeException("Not a topic reference model (childTopic=" + childTopic + ")");
+        }
+    }
+
+    /**
+     * Checks weather the specified update topic model matches one of the specified topics.
+     *
+     * @return  The matched topic, or <code>null</code> if there is no match.
+     */
+    private RelatedTopic matches(TopicModel childTopic, Iterable<RelatedTopic> topics) {
+        for (RelatedTopic topic : topics) {
+            if (matches(childTopic, topic)) {
+                return topic;
+            }
+        }
+        return null;
+    }
+
+    // ---
+
+    private Topic findChildTopic(long topicId, Iterable<? extends Topic> childTopics, AssociationDefinition assocDef,
+                                                                                      boolean throwsIfNotFound) {
+        Topic childTopic = findTopic(topicId, childTopics);
+        if (childTopic == null && throwsIfNotFound) {
+            throw new RuntimeException("Topic " + topicId + " is not a child of " + className() + " " + getId() +
+                " according to " + assocDef);
+        }
+        return childTopic;
+    }
+
+    private Topic findTopic(long topicId, Iterable<? extends Topic> topics) {
+        for (Topic topic : topics) {
+            if (topic.getId() == topicId) {
+                return topic;
+            }
+        }
+        return null;
+    }
+
+    // ---
+
+    /**
+     * Checks weather an update topic model represents a reference.
+     */
+    private boolean isReference(TopicModel childTopic) {
+        return isReferenceById(childTopic) || isReferenceByUri(childTopic);
+    }
+
+    private boolean isReferenceById(TopicModel childTopic) {
+        return childTopic.getId() != -1;
+    }
+
+    private boolean isReferenceByUri(TopicModel childTopic) {
+        return !childTopic.getUri().equals("");
+    }
+
+    // ---
+
+    private Topic associateChildTopic(AssociationDefinition assocDef, TopicModel childTopic, ClientState clientState) {
+        if (isReferenceById(childTopic)) {
+            associateChildTopic(assocDef, childTopic.getId(), clientState);
+            return dms.getTopic(childTopic.getId(), false, null);       // fetchComposite=false, clientState=null
+        } else if (isReferenceByUri(childTopic)) {
+            associateChildTopic(assocDef, childTopic.getUri(), clientState);
+            return dms.getTopic("uri", new SimpleValue(childTopic.getUri()), false, null);
+        } else {
+            throw new RuntimeException("Not a topic reference model (childTopic=" + childTopic + ")");
+        }
+    }
+
     private void associateChildTopic(AssociationDefinition assocDef, long childTopicId, ClientState clientState) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
             createRoleModel(assocDef.getWholeRoleTypeUri()),
@@ -915,11 +927,33 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---
 
-    private Association getAssociation(AssociationDefinition assocDef, long childTopicId) {
-        String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();
-        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();
-        return getAssociation(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, childTopicId);
+    /**
+     * For single-valued childs
+     */
+    private void putInCompositeModel(AssociationDefinition assocDef, Topic topic) {
+        getCompositeValue().put(assocDef.getUri(), topic.getModel());
+    }
+
+    /**
+     * For multiple-valued childs
+     */
+    private void addToCompositeModel(AssociationDefinition assocDef, Topic topic) {
+        getCompositeValue().add(assocDef.getUri(), topic.getModel());
+    }
+
+    /**
+     * For multiple-valued childs
+     */
+    private void removeFromCompositeModel(AssociationDefinition assocDef, Topic topic) {
+        getCompositeValue().remove(assocDef.getUri(), topic.getModel());
+    }
+
+    /**
+     * For multiple-valued childs
+     */
+    private void replaceInCompositeModel(AssociationDefinition assocDef, Topic topic) {
+        removeFromCompositeModel(assocDef, topic);
+        addToCompositeModel(assocDef, topic);
     }
 
     // ---
