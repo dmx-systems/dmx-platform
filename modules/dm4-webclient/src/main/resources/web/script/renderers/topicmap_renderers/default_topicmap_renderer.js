@@ -34,7 +34,7 @@ function DefaultTopicmapRenderer() {
     var topic_move_in_progress      // true while topic move is in progress (boolean)
     var canvas_move_in_progress     // true while canvas translation is in progress (boolean)
     var association_in_progress     // true while new association is pulled (boolean)
-    var action_topic                // the topic being moved/associated (CanvasTopic)
+    var action_topic                // the topic being selected/moved/associated (CanvasTopic)
     var action_assoc                // the association being clicked (CanvasAssoc)
     var tmp_x, tmp_y                // coordinates while action is in progress
 
@@ -395,6 +395,9 @@ function DefaultTopicmapRenderer() {
      */
     function do_mousedown(event) {
         if (dm4c.LOG_GUI) dm4c.log("Mouse down on canvas!")
+        if (association_in_progress) {
+            return
+        }
         //
         if (event.which == 1) {
             var p = pos(event)
@@ -403,7 +406,7 @@ function DefaultTopicmapRenderer() {
             //
             var ct = find_topic(event)
             if (ct) {
-                if (event.altKey) {
+                if (event.shiftKey) {
                     dm4c.do_select_topic(ct.id)
                     self.begin_association(ct.id, p.x, p.y)
                 } else {
