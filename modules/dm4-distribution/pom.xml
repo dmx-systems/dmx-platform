@@ -15,6 +15,7 @@
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-global</artifactId>
         <version>4.0.13-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <!-- These 2 properties are overridden. For the distribution we must use relative paths. -->
@@ -27,18 +28,18 @@
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.main</artifactId>
-            <version>3.2.1</version>
+            <version>${felix.version}</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>3rd-party-bundles</artifactId>
-            <version>4.0.1</version>
+            <version>4.0.13-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>felix-bundles</artifactId>
-            <version>4.0.1</version>
+            <version>4.0.13-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
         <dependency>
@@ -55,7 +56,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2</version>
+                <version>2.3</version>
                 <executions>
                     <execution>
                         <id>build distribution</id>

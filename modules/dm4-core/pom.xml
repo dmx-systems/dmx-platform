@@ -13,7 +13,7 @@
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-parent</artifactId>
-        <version>3</version>
+        <version>4</version>
         <relativePath>../dm4-parent/pom.xml</relativePath>
     </parent>
 
@@ -33,13 +33,9 @@
             <artifactId>osgi_R4_compendium</artifactId>
         </dependency>
         <!-- Jersey -->
-        <!--
-            JAX-RS jersey-core exports javax.ws.rs,version=0.0.0 but jsr311-api
-            1.1.1 needs javax.ws.rs,version=1.1 => use core instead of api
-        -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
+            <artifactId>jersey-servlet</artifactId>
         </dependency>
         <!-- Jettison -->
         <dependency>
