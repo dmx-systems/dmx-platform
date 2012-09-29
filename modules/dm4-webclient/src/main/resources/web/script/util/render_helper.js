@@ -87,7 +87,7 @@ function RenderHelper() {
         } else {
             var text = topic.value.toString()   // value can be a number or a boolean as well (truncate would fail)
         }
-        return js.truncate(text, dm4c.MAX_LINK_TEXT_LENGTH)
+        return js.truncate(text, dm4c.MAX_TOPIC_LINK_CHARS)
     }
 
     /**

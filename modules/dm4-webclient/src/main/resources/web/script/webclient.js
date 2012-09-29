@@ -13,7 +13,8 @@ function Webclient() {
 
     // preferences
     this.MAX_RESULT_SIZE = 100
-    this.MAX_LINK_TEXT_LENGTH = 50
+    this.MAX_TOPIC_LINK_CHARS = 50
+    this.MAX_TOPIC_LABEL_CHARS = 100
     this.DEFAULT_TOPIC_ICON = "/de.deepamehta.webclient/images/ball-gray.png"
     var DEFAULT_FIELD_ROWS = 1
 

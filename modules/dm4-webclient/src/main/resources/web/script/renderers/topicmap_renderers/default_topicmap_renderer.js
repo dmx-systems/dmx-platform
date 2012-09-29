@@ -16,7 +16,7 @@ function DefaultTopicmapRenderer() {
     var LABEL_FONT = "1em 'Lucida Grande', Verdana, Arial, Helvetica, sans-serif"   // copied from webclient.css
     var LABEL_COLOR = "black"
     var LABEL_DIST_Y = 4            // in pixel
-    var LABEL_MAX_WIDTH = 200       // in pixel
+    var MAX_LABEL_WIDTH = 200       // in pixel
 
     // Model
     var canvas_topics               // topics displayed on canvas (Object, key: topic ID, value: CanvasTopic)
@@ -998,7 +998,8 @@ function DefaultTopicmapRenderer() {
             self.width  = icon.width
             self.height = icon.height
             //
-            label_wrapper = new js.TextWrapper(self.label, LABEL_MAX_WIDTH, 19, ctx)    // line height 19px = 1.2em
+            var label = js.truncate(self.label, dm4c.MAX_TOPIC_LABEL_CHARS)
+            label_wrapper = new js.TextWrapper(label, MAX_LABEL_WIDTH, 19, ctx)    // line height 19px = 1.2em
         }
     }
 
@@ -1077,7 +1078,7 @@ function DefaultTopicmapRenderer() {
     function GridPositioning() {
 
         // Settings
-        var GRID_DIST_X = 220   // LABEL_MAX_WIDTH + 20 pixel padding
+        var GRID_DIST_X = 220   // MAX_LABEL_WIDTH + 20 pixel padding
         var GRID_DIST_Y = 80
         var START_X = 50 - trans_x
         var START_Y = 50
