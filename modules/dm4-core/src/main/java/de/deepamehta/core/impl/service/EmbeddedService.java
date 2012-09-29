@@ -279,6 +279,25 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     @Override
+    public Set<RelatedAssociation> getAssociations(String assocTypeUri) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            Set<RelatedAssociation> assocs = getAssociationType(assocTypeUri, null).getRelatedAssociations(
+                null, "dm4.core.type", "dm4.core.instance", null, false, false);
+                // ### FIXME: assocTypeUri=null but should be "dm4.core.instantiation", but not stored for assocs.
+                // othersAssocTypeUri=null, fetchComposite=false, fetchRelatingComposite=false
+            tx.success();
+            return assocs;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Retrieving associations by type failed (assocTypeUri=\"" + assocTypeUri + "\")",
+                e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Override
     public Set<Association> getAssociations(long topic1Id, long topic2Id) {
         return getAssociations(topic1Id, topic2Id, null);
     }

@@ -3,6 +3,7 @@ package de.deepamehta.core.service;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaTransaction;
+import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -89,6 +90,8 @@ public interface DeepaMehtaService {
                                                     boolean fetchComposite, ClientState clientState);
 
     // ---
+
+    Set<RelatedAssociation> getAssociations(String assocTypeUri);
 
     /**
      * Returns all associations between two topics. If no such association exists an empty set is returned.
