@@ -281,25 +281,36 @@ var js = {
             }
             //
             var line = ""   // current line
-            var width = 0   // current line's width
-            var words = text.split(" ")
-            for (var i = 0, word; word = words[i]; i++) {
-                wrap_word(word + " ")
+            var width = 0   // width of current line
+            var w           // width of current word
+            var words = text.split(/([ \n])/)
+            for (var i = 0; i < words.length; i += 2) {
+                wrap_word(words[i - 1], words[i] + " ")     // Note: words[-1] == undefined
             }
             wrapped_lines.push(line)
 
-            function wrap_word(word) {
-                var w = ctx.measureText(word).width
-                if (width + w <= max_width) {
-                    line  += word
-                    width += w
+            function wrap_word(sep, word) {
+                w = ctx.measureText(word).width
+                if (sep == "\n") {
+                    begin_new_line(word)
+                } else if (width + w <= max_width) {
+                    append_to_line(word)
                 } else {
-                    if (line) {
-                        wrapped_lines.push(line)
-                    }
-                    line = word
-                    width = w
+                    begin_new_line(word)
                 }
+            }
+
+            function append_to_line(word) {
+                line  += word
+                width += w
+            }
+
+            function begin_new_line(word) {
+                if (line) {
+                    wrapped_lines.push(line)
+                }
+                line  = word
+                width = w
             }
         }
     },
