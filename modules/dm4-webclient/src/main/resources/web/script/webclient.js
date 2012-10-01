@@ -136,8 +136,7 @@ function Webclient() {
         //
         try {
             var search_topic = build_topic(dm4c.fire_event("search", searchmode)[0])
-            // alert("search_topic=" + JSON.stringify(search_topic))
-            dm4c.show_topic(search_topic, "show")
+            dm4c.show_topic(search_topic, "show", undefined, true)      // coordinates=undefined, do_center=true
         } catch (e) {
             alert("ERROR while searching:\n\n" + JSON.stringify(e))
         }
@@ -201,7 +200,7 @@ function Webclient() {
         // update DB
         var topic = dm4c.create_topic(type_uri)
         // update client model and view
-        dm4c.show_topic(topic, "edit", {x: x, y: y})
+        dm4c.show_topic(topic, "edit", {x: x, y: y}, true)      // do_center=true
     }
 
     /**
@@ -214,7 +213,7 @@ function Webclient() {
             {topic_id: topic.id,                role_type_uri: "dm4.core.default"}
         )
         // update client model and view
-        dm4c.show_association(assoc, true)                          // refresh_canvas=true
+        dm4c.show_association(assoc, true)                      // refresh_canvas=true
         dm4c.page_panel.display(dm4c.selected_object)
     }
 
@@ -222,7 +221,7 @@ function Webclient() {
         // update DB
         var topic_type = dm4c.create_topic_type(topic_type_model)
         // update client model and view
-        dm4c.show_topic(topic_type, "edit")
+        dm4c.show_topic(topic_type, "edit", undefined, true)    // coordinates=undefined, do_center=true
     }
 
     // ---
