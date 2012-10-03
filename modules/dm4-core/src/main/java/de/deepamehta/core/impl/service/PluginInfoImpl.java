@@ -70,7 +70,7 @@ class PluginInfoImpl implements PluginInfo {
         renderers.put("page_renderers",   getRenderers("page_renderers"));
         renderers.put("simple_renderers", getRenderers("simple_renderers"));
         renderers.put("multi_renderers",  getRenderers("multi_renderers"));
-        // ### renderers.put("topicmap_renderers", getRenderers("topicmap_renderers"));
+        // ### TODO: renderers.put("topicmap_renderers", getRenderers("topicmap_renderers"));
         return renderers;
     }
 
@@ -82,6 +82,11 @@ class PluginInfoImpl implements PluginInfo {
         if (e != null) {
             while (e.hasMoreElements()) {
                 String entryPath = e.nextElement();
+                // ignore directories
+                if (entryPath.endsWith("/")) {
+                    continue;
+                }
+                //
                 filenames.add(JavaUtils.getFilename(entryPath));
             }
         }
