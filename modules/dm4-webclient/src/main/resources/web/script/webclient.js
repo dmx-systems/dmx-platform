@@ -757,9 +757,9 @@ function Webclient() {
      * Creates an empty topic.
      */
     this.empty_topic = function(topic_type_uri) {
-        return {
+        return new Topic({
             id: -1, uri: "", type_uri: topic_type_uri, value: "", composite: {}
-        }
+        })
     }
 
     // === Types ===

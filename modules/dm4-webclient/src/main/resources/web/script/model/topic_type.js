@@ -14,15 +14,14 @@ function TopicType(topic_type) {
     //
     this.icon = null    // The topic type's icon (JavaScript Image object).
                         // Note: it must be loaded *after* loading the topic types (see Webclient's load_types()).
+}
 
-    // ----------------------------------------------------------------------------------------------- Private Functions
-
-    function deserialize(assoc_defs) {
-        for (var i = 0, assoc_def; assoc_def = assoc_defs[i]; i++) {
-            assoc_def.view_config_topics = dm4c.hash_by_type(dm4c.build_topics(assoc_def.view_config_topics))
-        }
-        return assoc_defs
+// ### TODO: create common base class (Type) for topic types and association types.
+function deserialize(assoc_defs) {
+    for (var i = 0, assoc_def; assoc_def = assoc_defs[i]; i++) {
+        assoc_def.view_config_topics = dm4c.hash_by_type(dm4c.build_topics(assoc_def.view_config_topics))
     }
+    return assoc_defs
 }
 
 // === "Page Displayable" implementation ===

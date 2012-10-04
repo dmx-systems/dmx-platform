@@ -17,6 +17,11 @@
             render_assoc_role(topic_1, role_type_1)
             render_assoc_role(topic_2, role_type_2)
             //
+            var render_mode = dm4c.render.page_model.mode.INFO
+            var page_model = create_page_model(assoc, render_mode)
+            // dm4c.fire_event("pre_render_page", assoc, page_model)   // ### TODO
+            render_page_model(page_model, render_mode)
+            //
             dm4c.render.association_associations(assoc.id)
         },
 
@@ -77,5 +82,22 @@
             .append($("<div>").append(role_type_element))
         dm4c.render.page($("<div>").addClass("assoc-role")
             .append(topic_div).append(role_type_div))
+    }
+
+    // === Page Model ===
+
+    /**
+     * @param   render_mode     this.mode.INFO or this.mode.FORM (object). ### FIXDOC
+     */
+    function create_page_model(assoc, render_mode) {
+        return dm4c.render.page_model.create_page_model(assoc, undefined, "", assoc, render_mode)
+    }
+
+    /**
+     * @param   page_model      the page model to render. If undefined nothing is rendered.
+     * @param   render_mode     this.mode.INFO or this.mode.FORM (object). ### FIXDOC
+     */
+    function render_page_model(page_model, render_mode) {
+        dm4c.render.page_model.render_page_model(page_model, render_mode, 0, $("#page-content"))
     }
 })()

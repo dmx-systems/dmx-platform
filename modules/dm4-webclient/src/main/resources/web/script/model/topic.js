@@ -11,7 +11,24 @@ function Topic(topic) {
     this.uri       = topic.uri
     this.type_uri  = topic.type_uri
     this.value     = topic.value
-    this.composite = topic.composite
+    this.composite = build_composite(topic.composite)
+}
+
+// ### TODO: create common base class (DeepaMehtaObject) for topics and associations.
+function build_composite(composite) {
+    var comp = {}
+    for (var child_type_uri in composite) {
+        var child_topic = composite[child_type_uri]
+        if (js.is_array(child_topic)) {
+            comp[child_type_uri] = []
+            for (var i = 0, topic; topic = child_topic[i]; i++) {
+                comp[child_type_uri].push(new Topic(topic))
+            }
+        } else {
+            comp[child_type_uri] = new Topic(child_topic)
+        }
+    }
+    return comp
 }
 
 // === "Page Displayable" implementation ===
@@ -47,16 +64,13 @@ Topic.prototype.get = function(child_type_uri) {
         if (topic_type.is_simple()) {
             return child_topic.value
         } else {
-            return new Topic(child_topic)
+            return child_topic
         }
     }
 }
 
 Topic.prototype.find_child_topic = function(type_uri) {
-    var child_topic = find_child_topic(this)
-    if (child_topic) {
-        return new Topic(child_topic)
-    }
+    return find_child_topic(this)
 
     function find_child_topic(topic) {
         if (topic.type_uri == type_uri) {

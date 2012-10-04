@@ -3,9 +3,25 @@ function Association(assoc) {
     this.uri       = assoc.uri
     this.type_uri  = assoc.type_uri
     this.value     = assoc.value
-    this.composite = assoc.composite
+    this.composite = build_composite(assoc.composite)
     this.role_1    = assoc.role_1
     this.role_2    = assoc.role_2
+}
+
+function build_composite(composite) {
+    var comp = {}
+    for (var child_type_uri in composite) {
+        var child_topic = composite[child_type_uri]
+        if (js.is_array(child_topic)) {
+            comp[child_type_uri] = []
+            for (var i = 0, topic; topic = child_topic[i]; i++) {
+                comp[child_type_uri].push(new Topic(topic))
+            }
+        } else {
+            comp[child_type_uri] = new Topic(child_topic)
+        }
+    }
+    return comp
 }
 
 // === "Page Displayable" implementation ===

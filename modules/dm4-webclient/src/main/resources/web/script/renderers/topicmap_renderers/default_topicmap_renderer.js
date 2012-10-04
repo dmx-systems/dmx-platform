@@ -212,9 +212,7 @@ function DefaultTopicmapRenderer() {
 
     this.select_association = function(assoc_id) {
         // 1) fetch from DB
-        // Note: the association's composite doesn't need to be fetched
-        // as is not used by the default association renderer
-        var assoc = dm4c.fetch_association(assoc_id, false)     // fetch_composite=false
+        var assoc = dm4c.fetch_association(assoc_id)
         // 2) update model
         set_highlight_association(assoc_id)
         //

@@ -3,25 +3,25 @@ dm4c.render.page_model = (function() {
     // ------------------------------------------------------------------------------------------------- Private Classes
 
     /**
-     * @param   topic           The topic underlying this field. Its "value" is rendered through this page model.
-     *                          A topic "id" -1 indicates a topic to be created.
+     * @param   object          The object underlying this field (a Topic or an Association). Its "value" is rendered
+     *                          through this page model. A topic "id" -1 indicates a topic to be created.
      * @param   assoc_def       The direct association definition that leads to this field.
-     *                          For a non-composite topic it is <code>undefined</code>.
+     *                          For a non-composite object it is <code>undefined</code>.
      *                          The association definition has 2 meanings:
-     *                              1) its view configuration has precedence over the topic type's view configuration
+     *                              1) its view configuration has precedence over the object type's view configuration
      *                              2) The particular simple renderers are free to operate on it.
      *                                 Simple renderers which do so:
      *                                  - TextRenderer (Webclient module)
      * @param   field_uri       The field URI. Unique within the page/form. The field URI is a path composed of
      *                          association definition URIs that leads to this field, e.g.
      *                          "/dm4.contacts.address/dm4.contacts.street".
-     *                          For a non-composite topic the field URI is an empty string.
+     *                          For a non-composite object the field URI is an empty string.
      *                          This URI is passed to the simple renderer constructors (as a property of the "field"
      *                          argument). The particular simple renderers are free to operate on it. Simple renderers
      *                          which do so:
      *                              - HTMLRenderer (Webclient module)
      *                              - IconRenderer (Icon Picker module)
-     * @param   toplevel_topic  The topic the page/form is rendered for. Usually that is the selected topic.
+     * @param   toplevel_object The topic the page/form is rendered for. Usually that is the selected topic. ### FIXDOC
      *                          (So, that is the same topic for all the PageModel objects making up one page/form.)
      *                          This topic is passed to the simple renderer constructors.
      *                          The particular simple renderers are free to operate on it. Simple renderers which do so:
@@ -29,20 +29,20 @@ dm4c.render.page_model = (function() {
      *                              - FileContentRenderer   (Files module)
      *                              - FolderContentRenderer (Files module)
      */
-    function PageModel(type, topic, assoc_def, field_uri, toplevel_topic) {
+    function PageModel(type, object, assoc_def, field_uri, toplevel_object) {
 
         var self = this
         this.type = type        // page model type (SIMPLE, COMPOSITE, MULTI)
-        this.topic = topic      // the SIMPLE topic, the COMPOSITE topic, or the 1st MULTI topic
+        this.object = object    // the SIMPLE topic, the COMPOSITE topic, or the 1st MULTI topic ### FIXDOC
         this.childs = {}        // used for COMPOSITE
         this.values = []        // used for MULTI
         this.assoc_def = assoc_def
         this.uri = field_uri
-        this.toplevel_topic = toplevel_topic
-        this.topic_type = dm4c.get_topic_type(topic.type_uri)   // ### TODO: real Topics would allow topic.get_type()
-        this.value = topic.value
-        this.label = this.topic_type.value
-        this.rows = dm4c.get_view_config(self.topic_type, "rows", assoc_def)
+        this.toplevel_object = toplevel_object
+        this.object_type = object.get_type()
+        this.value = object.value
+        this.label = this.object_type.value
+        this.rows = dm4c.get_view_config(self.object_type, "rows", assoc_def)
         var renderer_uri
         var renderer = lookup_renderer()
         var form_reading_function
@@ -107,13 +107,13 @@ dm4c.render.page_model = (function() {
         function lookup_renderer() {
             switch (type) {
             case PageModel.SIMPLE:
-                renderer_uri = dm4c.get_view_config(self.topic_type, "simple_renderer_uri", assoc_def)
+                renderer_uri = dm4c.get_view_config(self.object_type, "simple_renderer_uri", assoc_def)
                 return dm4c.get_simple_renderer(renderer_uri)
             case PageModel.COMPOSITE:
                 // ### TODO
                 return null
             case PageModel.MULTI:
-                renderer_uri = dm4c.get_view_config(self.topic_type, "multi_renderer_uri", assoc_def)
+                renderer_uri = dm4c.get_view_config(self.object_type, "multi_renderer_uri", assoc_def)
                 return dm4c.get_multi_renderer(renderer_uri)
             default:
                 throw "TopicRendererError: \"" + type + "\" is an unknown page model type"
@@ -143,42 +143,42 @@ dm4c.render.page_model = (function() {
         },
 
         /**
-         * Creates a page model for a topic.
+         * Creates a page model for a topic or an association.
          *
          * A page model comprises all the information required to render a topic in the page panel (a.k.a. detail
-         * panel).
+         * panel). ### FIXDOC
          *
          * A page model is represented by a hierarchical structure of PageModel objects.
          *
-         * @param   topic           The topic the page model is created for.
+         * @param   object          The object the page model is created for (a Topic or an Association).
          * @param   assoc_def       The association definition that leads to that topic. Undefined for the top-level
          *                          call. The association definition is used to create the PageModel object.
-         *                          See there for further documentation.
+         *                          See there for further documentation. ### FIXDOC
          * @param   field_uri       The (base) URI for the (child) model(s) to create (string). Empty ("") for the
          *                          top-level call. The field URI is used to create the child PageModel objects.
          *                          See there for further documentation.
-         * @param   toplevel_topic  The topic the page/form is rendered for. Usually that is the selected topic.
+         * @param   toplevel_object The topic the page/form is rendered for. Usually that is the selected topic.
          *                          For a simple topic the top-level topic is used to create the corresponding field
          *                          model. For a complex topic the top-level topic is just passed recursively.
          *                          ### FIXDOC
-         *                          Note: for the top-level call "toplevel_topic" and "topic" are usually the same.
+         *                          Note: for the top-level call "toplevel_object" and "object" are usually the same.
          * @param   render_mode     this.mode.INFO or this.mode.FORM (object).
          *
-         * @return  The created page model, or undefined. Undefined is returned if the topic is a simple one and is not
+         * @return  The created page model, or undefined. Undefined is returned if the object is a simple one and is not
          *          viewable/editable.
          */
-        create_page_model: function(topic, assoc_def, field_uri, toplevel_topic, render_mode) {
-            var topic_type = dm4c.get_topic_type(topic.type_uri)   // ### TODO: real Topics would allow topic.get_type()
-            if (topic_type.is_simple()) {
+        create_page_model: function(object, assoc_def, field_uri, toplevel_object, render_mode) {
+            var object_type = object.get_type()
+            if (object_type.is_simple()) {
                 //
-                if (!dm4c.get_view_config(topic_type, render_mode.render_setting, assoc_def)) {
+                if (!dm4c.get_view_config(object_type, render_mode.render_setting, assoc_def)) {
                     return
                 }
                 //
-                return new PageModel(PageModel.SIMPLE, topic, assoc_def, field_uri, toplevel_topic)
+                return new PageModel(PageModel.SIMPLE, object, assoc_def, field_uri, toplevel_object)
             } else {
-                var page_model = new PageModel(PageModel.COMPOSITE, topic, assoc_def, field_uri, toplevel_topic)
-                for (var i = 0, assoc_def; assoc_def = topic_type.assoc_defs[i]; i++) {
+                var page_model = new PageModel(PageModel.COMPOSITE, object, assoc_def, field_uri, toplevel_object)
+                for (var i = 0, assoc_def; assoc_def = object_type.assoc_defs[i]; i++) {
                     var child_topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
                     //
                     if (!dm4c.get_view_config(child_topic_type, render_mode.render_setting, assoc_def)) {
@@ -188,25 +188,25 @@ dm4c.render.page_model = (function() {
                     var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
                     var cardinality_uri = assoc_def.part_cardinality_uri
                     if (cardinality_uri == "dm4.core.one") {
-                        var child_topic = topic.composite[assoc_def.uri] || dm4c.empty_topic(child_topic_type.uri)
+                        var child_topic = object.composite[assoc_def.uri] || dm4c.empty_topic(child_topic_type.uri)
                         var child_model = this.create_page_model(child_topic, assoc_def, child_field_uri,
-                            toplevel_topic, render_mode)
+                            toplevel_object, render_mode)
                         page_model.childs[assoc_def.uri] = child_model
                     } else if (cardinality_uri == "dm4.core.many") {
                         // ### TODO: server: don't send empty arrays
-                        var child_topics = topic.composite[assoc_def.uri] || []
+                        var child_topics = object.composite[assoc_def.uri] || []
                         if (!js.is_array(child_topics)) {
                             throw "TopicRendererError: field \"" + assoc_def.uri + "\" is defined as multi-value but " +
-                                "appears as single-value in " + JSON.stringify(topic)
+                                "appears as single-value in " + JSON.stringify(object)
                         }
                         if (child_topics.length == 0) {
                             child_topics.push(dm4c.empty_topic(child_topic_type.uri))
                         }
                         var child_model = new PageModel(PageModel.MULTI, child_topics[0], assoc_def, field_uri,
-                            toplevel_topic)
+                            toplevel_object)
                         for (var j = 0, child_topic; child_topic = child_topics[j]; j++) {
                             var child_field = this.create_page_model(child_topic, assoc_def, child_field_uri,
-                                toplevel_topic, render_mode)
+                                toplevel_object, render_mode)
                             child_model.values.push(child_field)
                         }
                         page_model.childs[assoc_def.uri] = child_model
