@@ -11,7 +11,7 @@ dm4c.add_multi_renderer("dm4.webclient.checkbox_renderer", {
 
     render_form: function(page_models, parent_element, level) {
         // fetch all instances                         // fetch_composite=false, sort=true
-        var topics = dm4c.restc.get_topics(page_models[0].topic_type.uri, false, true).items
+        var topics = dm4c.restc.get_topics(page_models[0].object_type.uri, false, true).items
         var checkboxes = {}
         dm4c.render.field_label(page_models[0], parent_element)
         //
@@ -44,7 +44,7 @@ dm4c.add_multi_renderer("dm4.webclient.checkbox_renderer", {
 
         function is_checked(topic) {
             return js.includes(page_models, function(page_model) {
-                return page_model.topic.id == topic.id
+                return page_model.object.id == topic.id
             })
         }
     }

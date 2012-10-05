@@ -27,7 +27,7 @@
             render_page_model(page_model, render_mode)
             //
             return function() {
-                dm4c.do_update_topic(dm4c.render.page_model.build_topic_model(page_model))
+                dm4c.do_update_topic(dm4c.render.page_model.build_object_model(page_model))
             }
         }
     })

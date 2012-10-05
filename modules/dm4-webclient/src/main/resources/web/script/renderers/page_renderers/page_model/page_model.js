@@ -29,13 +29,13 @@ dm4c.render.page_model = (function() {
      *                              - FileContentRenderer   (Files module)
      *                              - FolderContentRenderer (Files module)
      */
-    function PageModel(type, object, assoc_def, field_uri, toplevel_object) {
+    function PageModel(page_model_type, object, assoc_def, field_uri, toplevel_object) {
 
         var self = this
-        this.type = type        // page model type (SIMPLE, COMPOSITE, MULTI)
-        this.object = object    // the SIMPLE topic, the COMPOSITE topic, or the 1st MULTI topic ### FIXDOC
-        this.childs = {}        // used for COMPOSITE
-        this.values = []        // used for MULTI
+        this.type = page_model_type // page model type (SIMPLE, COMPOSITE, MULTI)
+        this.object = object        // the SIMPLE topic, the COMPOSITE topic, or the 1st MULTI topic ### FIXDOC
+        this.childs = {}            // used for COMPOSITE
+        this.values = []            // used for MULTI
         this.assoc_def = assoc_def
         this.uri = field_uri
         this.toplevel_object = toplevel_object
@@ -105,7 +105,7 @@ dm4c.render.page_model = (function() {
         // ===
 
         function lookup_renderer() {
-            switch (type) {
+            switch (page_model_type) {
             case PageModel.SIMPLE:
                 renderer_uri = dm4c.get_view_config(self.object_type, "simple_renderer_uri", assoc_def)
                 return dm4c.get_simple_renderer(renderer_uri)
@@ -116,7 +116,7 @@ dm4c.render.page_model = (function() {
                 renderer_uri = dm4c.get_view_config(self.object_type, "multi_renderer_uri", assoc_def)
                 return dm4c.get_multi_renderer(renderer_uri)
             default:
-                throw "TopicRendererError: \"" + type + "\" is an unknown page model type"
+                throw "TopicRendererError: \"" + page_model_type + "\" is an unknown page model type"
             }
         }
     }
@@ -298,7 +298,7 @@ dm4c.render.page_model = (function() {
 
                 function do_remove() {
                     // update model
-                    page_model.topic.delete = true
+                    page_model.object.delete = true
                     // update view
                     parent_element.remove()
                 }
@@ -306,9 +306,10 @@ dm4c.render.page_model = (function() {
         },
 
         /**
-         * Reads out values from a page model's GUI elements and builds a topic model from it.
+         * Reads out values from a page model's GUI elements and builds an object model (a topic model or an
+         * association model) from it.
          *
-         * @return  a topic model (object), a topic reference (string), a simple topic value, or null.
+         * @return  a topic model (object), a topic reference (string), a simple topic value, or null. ### FIXDOC
          *          Note 1: null is returned if a simple topic is being edited and the simple renderer prevents the
          *          field from being updated.
          *          Note 2: despite at deeper recursion levels this method might return a topic reference (string), or
@@ -316,7 +317,7 @@ dm4c.render.page_model = (function() {
          *          This is because topic references are only contained in composite topic models. A simple topic model
          *          on the other hand never represents a topic reference.
          */
-        build_topic_model: function(page_model) {
+        build_object_model: function(page_model) {
             if (page_model.type == PageModel.SIMPLE) {
                 var value = page_model.read_form_value()
                 // Note: undefined form value is an error (means: simple renderer returned no value).
@@ -328,8 +329,8 @@ dm4c.render.page_model = (function() {
                 switch (page_model.assoc_def && page_model.assoc_def.assoc_type_uri) {
                 case undefined:
                 case "dm4.core.composition_def":
-                    page_model.topic.value = value
-                    return page_model.topic
+                    page_model.object.value = value
+                    return page_model.object
                 case "dm4.core.aggregation_def":
                     return value
                 default:
@@ -346,14 +347,14 @@ dm4c.render.page_model = (function() {
                         composite[assoc_def_uri] = values
                     } else {
                         // cardinality "one"
-                        var value = this.build_topic_model(child_model)
+                        var value = this.build_object_model(child_model)
                         if (value != null) {
                             composite[assoc_def_uri] = value
                         }
                     }
                 }
-                page_model.topic.composite = composite
-                return page_model.topic
+                page_model.object.composite = composite
+                return page_model.object
             } else {
                 throw "TopicRendererError: invalid page model"
             }

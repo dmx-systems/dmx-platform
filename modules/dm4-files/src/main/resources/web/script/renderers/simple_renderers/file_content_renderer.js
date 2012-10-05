@@ -7,8 +7,8 @@ dm4c.add_simple_renderer("dm4.files.file_content_renderer", {
 
         function render_content() {
             try {
-                var path       = page_model.toplevel_topic.get("dm4.files.path")
-                var media_type = page_model.toplevel_topic.get("dm4.files.media_type")
+                var path       = page_model.toplevel_object.get("dm4.files.path")
+                var media_type = page_model.toplevel_object.get("dm4.files.media_type")
                 var src = filerepo_URI()
                 // Note: for unknown file types media_type is null
                 /*if (!media_type) {

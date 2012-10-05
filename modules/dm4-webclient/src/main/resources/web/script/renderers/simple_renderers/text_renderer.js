@@ -70,7 +70,7 @@ dm4c.add_simple_renderer("dm4.webclient.text_renderer", {
 
             function render_combobox() {
                 // fetch all instances                                         // fetch_composite=false, sort=true
-                var topics = dm4c.restc.get_topics(page_model.topic_type.uri, false, true).items  
+                var topics = dm4c.restc.get_topics(page_model.object_type.uri, false, true).items  
                 //
                 var combobox = create_combobox()
                 //
