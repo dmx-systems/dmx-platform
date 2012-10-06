@@ -14,18 +14,17 @@ import java.util.List;
 
 public class DirectoryListing implements JSONEnabled {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path");
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    private String fileRepositoryPath;
 
     private FileItem dirInfo;
     private List<FileItem> fileItems = new ArrayList<FileItem>();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public DirectoryListing(File directory) {
+    public DirectoryListing(File directory, String fileRepositoryPath) {
+        this.fileRepositoryPath = fileRepositoryPath;
         dirInfo = new FileItem(directory.getName(), directory.getPath());
         for (File file : directory.listFiles()) {
             String name = file.getName();
@@ -117,11 +116,11 @@ public class DirectoryListing implements JSONEnabled {
 
         private String truncate(String path) {
             // error check
-            if (!path.startsWith(FILE_REPOSITORY_PATH)) {
+            if (!path.startsWith(fileRepositoryPath)) {
                 throw new RuntimeException("Path \"" + path + "\" is not a file repository path");
             }
             //
-            return JavaUtils.stripDriveLetter(path.substring(FILE_REPOSITORY_PATH.length()));
+            return JavaUtils.stripDriveLetter(path.substring(fileRepositoryPath.length()));
         }
 
         // ---

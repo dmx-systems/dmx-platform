@@ -41,7 +41,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path");
+    private static final String DM4_FILEREPO_PATH = System.getProperty("dm4.filerepo.path");
+    
+    private static final String FILE_REPOSITORY_PATH = new File(DM4_FILEREPO_PATH).getAbsolutePath();
     private static final String FILE_REPOSITORY_URI = "/filerepo";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -230,7 +232,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             //
             File folder = enforeSecurity(path);
             //
-            return new DirectoryListing(folder);    // ### TODO: if folder is no directory send NOT FOUND
+            return new DirectoryListing(folder, FILE_REPOSITORY_PATH);
+            // ### TODO: if folder is no directory send NOT FOUND
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
@@ -352,6 +355,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     @Override
     public void initializePlugin() {
+        logger.info("File repository settings:" +
+            "\n    dm4.filerepo.path=\"" + DM4_FILEREPO_PATH + "\"" +
+            "\n        absolute path=\"" + FILE_REPOSITORY_PATH + "\"");
+        //
         publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI, this);      // securityHandler=this
     }
 
