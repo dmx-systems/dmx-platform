@@ -240,12 +240,20 @@ function RESTClient(core_service_uri) {
     /**
      * Sends an AJAX request.
      *
-     * @param   data                The data to be send as the request body. This argument depends on the
-     *                              content_type argument. By default the data object (key/value pairs) is
-     *                              serialized to JSON. Note: pairs with undefined values are not serialzed. ### FIXDOC
-     * @param   content_type        Optional: the content type of the data. Default is "application/json".   ### FIXDOC
+     * @param   method              The HTTP method: "GET", "POST", "PUT", "DELETE".
+     * @patam   uri                 The request URI.
+     * @param   data                Optional: the data to be sent to the server (an object). By default the data object
+     *                              is serialized to JSON format. Note: key/value pairs with undefined values are not
+     *                              serialized.
+     *                              To use an alternate format set the Content-Type header (see "headers" parameter).
+     * @param   callback            Optional: the function to be called if the request is successful. One argument is
+     *                              passed: the data returned from the server.
+     *                              If not specified, the request is send synchronously.
+     * @param   headers             Optional: a map of additional header key/value pairs to send along with the request.
      * @param   is_absolute_uri     If true, the URI is interpreted as relative to the DeepaMehta core service URI.
      *                              If false, the URI is interpreted as an absolute URI.
+     *
+     * @return  For successful synchronous requests: the data returned from the server. Otherwise undefined.
      */
     function request(method, uri, data, callback, headers, is_absolute_uri) {
         var async = callback != undefined
@@ -265,6 +273,7 @@ function RESTClient(core_service_uri) {
             contentType: content_type,
             headers: headers,
             data: data,
+            dataType: "json",
             processData: false,
             async: async,
             success: function(data, text_status, jq_xhr) {
