@@ -222,8 +222,8 @@ function RESTClient(core_service_uri) {
      * namespace (server-side) and add corresponding service calls to the REST client instance.
      * For example, see the DeepaMehta 4 Topicmaps plugin.
      */
-    this.request = function(method, uri, data, headers) {
-        return request(method, uri, data, undefined, headers, true)     // callback=undefined
+    this.request = function(method, uri, data, headers, response_data_type) {
+        return request(method, uri, data, undefined, headers, response_data_type, true)     // callback=undefined
     }
 
     /**
@@ -250,12 +250,16 @@ function RESTClient(core_service_uri) {
      *                              passed: the data returned from the server.
      *                              If not specified, the request is send synchronously.
      * @param   headers             Optional: a map of additional header key/value pairs to send along with the request.
+     * @param   response_data_type  Optional: affects the "Accept" header to be sent and controls the post-processing
+     *                              of the response data. 2 possible values:
+     *                                  "json" - the response data is parsed into a JavaScript object. The default.
+     *                                  "text" - the response data is returned as is.
      * @param   is_absolute_uri     If true, the URI is interpreted as relative to the DeepaMehta core service URI.
      *                              If false, the URI is interpreted as an absolute URI.
      *
      * @return  For successful synchronous requests: the data returned from the server. Otherwise undefined.
      */
-    function request(method, uri, data, callback, headers, is_absolute_uri) {
+    function request(method, uri, data, callback, headers, response_data_type, is_absolute_uri) {
         var async = callback != undefined
         var status          // used only for synchronous request: "success" if request was successful
         var response_data   // used only for synchronous successful request: the response data (response body)
@@ -267,13 +271,15 @@ function RESTClient(core_service_uri) {
             data = JSON.stringify(data)
         }
         //
+        response_data_type = response_data_type || "json"
+        //
         $.ajax({
             type: method,
             url: is_absolute_uri ? uri : core_service_uri + uri,
             contentType: content_type,
             headers: headers,
             data: data,
-            dataType: "json",
+            dataType: response_data_type,
             processData: false,
             async: async,
             success: function(data, text_status, jq_xhr) {

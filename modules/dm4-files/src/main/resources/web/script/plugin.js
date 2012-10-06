@@ -20,7 +20,9 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     //
     dm4c.restc.get_file = function(path) {
         // ### FIXME: principle copy in File Content Renderers's filerepo_URI()
-        return this.request("GET", "/filerepo/" + encodeURIComponent(path))
+        return this.request("GET", "/filerepo/" + encodeURIComponent(path), undefined, undefined, "text")
+        // Note: response_data_type="text" causes the response data to be returned as is
+        // (instead of trying to JSON-parse it). It works for non-text files as well.
     }
     dm4c.restc.create_folder = function(folder_name, path) {
         return this.request("POST", "/files/" + encodeURIComponent(path) + "/folder/" + encodeURIComponent(folder_name))
