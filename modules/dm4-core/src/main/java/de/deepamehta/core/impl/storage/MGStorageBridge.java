@@ -171,11 +171,11 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         // 1) update DB
         MehtaNode node = mg.createMehtaNode();
         storeAndIndexUri(node, uri);
-        // Note: an initial topic value is needed.
+        // Note: for the moment an initial topic value is needed.
         // Consider this case: in the POST_CREATE_ASSOCIATION listener a plugin fetches both of the associated
         // topics (the Access Control plugin does). If that association is created in the course of storing the
         // topic's composite value, that very topic doesn't have a simple value yet (it is known only once storing
-        // the composite value is complete). Fetching the topic would fail.
+        // the composite value is complete). Fetching the topic would fail. ### TODO: remove set value
         node.setString("value", "");
         // 2) update model
         topicModel.setId(node.getId());
@@ -341,12 +341,6 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public void createAssociation(AssociationModel assocModel) {
-        // error check
-        if (assocModel.getTypeUri() == null) {
-            throw new IllegalArgumentException("Tried to create an association with null association type " +
-                "(typeUri=null)");
-        }
-        //
         MehtaEdge edge = mg.createMehtaEdge(
             getMehtaObjectRole(assocModel.getRoleModel1()),
             getMehtaObjectRole(assocModel.getRoleModel2()));
@@ -402,10 +396,6 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     // === Build Topic models from MehtaNodes ===
 
     private TopicModel buildTopic(MehtaNode node) {
-        if (node == null) {
-            throw new IllegalArgumentException("Tried to build a TopicModel from a null MehtaNode");
-        }
-        //
         long id = node.getId();
         String uri = node.getString("uri");
         String typeUri = getTopicTypeUri(node);
@@ -422,10 +412,15 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     }
 
     private RelatedTopicModel buildRelatedTopic(ConnectedMehtaNode node) {
-        RelatedTopicModel relTopic = new RelatedTopicModel(
-            buildTopic(node.getMehtaNode()),
-            buildAssociation(node.getConnectingMehtaEdge()));
-        return relTopic;
+        try {
+            RelatedTopicModel relTopic = new RelatedTopicModel(
+                buildTopic(node.getMehtaNode()),
+                buildAssociation(node.getConnectingMehtaEdge()));
+            return relTopic;
+        } catch (Exception e) {
+            throw new RuntimeException("Building a RelatedTopicModel from a ConnectedMehtaNode failed (" + node + ")",
+                e);
+        }
     }
 
     private ResultSet<RelatedTopicModel> buildRelatedTopics(Set<ConnectedMehtaNode> nodes, int maxResultSize) {
@@ -445,14 +440,16 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     // === Build Association models from MehtaEdges ===
 
     private AssociationModel buildAssociation(MehtaEdge edge) {
-        if (edge == null) {
-            throw new IllegalArgumentException("Tried to build an AssociationModel from a null MehtaEdge");
+        try {
+            long id = edge.getId();
+            // ### TODO: retrieve association URI
+            String typeUri = getAssociationTypeUri(edge);
+            SimpleValue value = new SimpleValue(edge.getObject("value"));
+            List<RoleModel> roleModels = getRoleModels(edge);
+            return new AssociationModel(id, typeUri, roleModels.get(0), roleModels.get(1), value, null);
+        } catch (Exception e) {                                                                // composite=null
+            throw new RuntimeException("Building an AssociationModel from a MehtaEdge failed (edge=" + edge + ")", e);
         }
-        //
-        long id = edge.getId();
-        String typeUri = getAssociationTypeUri(edge);
-        List<RoleModel> roleModels = getRoleModels(edge);
-        return new AssociationModel(id, typeUri, roleModels.get(0), roleModels.get(1));
     }
 
     private Set<AssociationModel> buildAssociations(Iterable<MehtaEdge> edges) {

@@ -84,7 +84,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public AttachedTopic getTopic(long topicId, boolean fetchComposite, ClientState clientState) {
-        // logger.info("topicId=" + topicId + ", fetchComposite=" + fetchComposite);
+        // logger.info("topicId=" + topicId + ", fetchComposite=" + fetchComposite + ", clientState=" + clientState);
         DeepaMehtaTransaction tx = beginTx();
         try {
             AttachedTopic topic = attach(storage.getTopic(topicId), fetchComposite, clientState);
@@ -92,7 +92,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving topic " + topicId + " failed", e);
+            throw new RuntimeException("Fetching topic " + topicId + " failed", e);
         } finally {
             tx.finish();
         }
@@ -108,7 +108,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return topic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
+            throw new RuntimeException("Fetching topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         } finally {
             tx.finish();
         }
@@ -126,7 +126,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return topics;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving topics by type failed (typeUri=\"" + typeUri + "\")", e);
+            throw new RuntimeException("Fetching topics by type failed (typeUri=\"" + typeUri + "\")", e);
         } finally {
             tx.finish();
         }
@@ -225,7 +225,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return assoc;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving association " + assocId + " failed", e);
+            throw new RuntimeException("Fetching association " + assocId + " failed", e);
         } finally {
             tx.finish();
         }
@@ -247,7 +247,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return assoc;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving association failed (" + info + ")", e);
+            throw new RuntimeException("Fetching association failed (" + info + ")", e);
         } finally {
             tx.finish();
         }
@@ -270,7 +270,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return assoc;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving association failed (" + info + ")", e);
+            throw new RuntimeException("Fetching association failed (" + info + ")", e);
         } finally {
             tx.finish();
         }
@@ -290,7 +290,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return assocs;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving associations by type failed (assocTypeUri=\"" + assocTypeUri + "\")",
+            throw new RuntimeException("Fetching associations by type failed (assocTypeUri=\"" + assocTypeUri + "\")",
                 e);
         } finally {
             tx.finish();
@@ -313,7 +313,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return assocs;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving associations between topics " + topic1Id + " and " + topic2Id +
+            throw new RuntimeException("Fetching associations between topics " + topic1Id + " and " + topic2Id +
                 " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
         } finally {
             tx.finish();
@@ -408,7 +408,7 @@ public class EmbeddedService implements DeepaMehtaService {
             }
             return topicTypeUris;
         } catch (Exception e) {
-            throw new RuntimeException("Retrieving list of topic type URIs failed", e);
+            throw new RuntimeException("Fetching list of topic type URIs failed", e);
         }
     }
 
@@ -424,7 +424,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return topicType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving topic type \"" + uri + "\" failed", e);
+            throw new RuntimeException("Fetching topic type \"" + uri + "\" failed", e);
         } finally {
             tx.finish();
         }
@@ -443,7 +443,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return topicTypes;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving all topic types failed", e);
+            throw new RuntimeException("Fetching all topic types failed", e);
         } finally {
             tx.finish();
         }
@@ -510,7 +510,7 @@ public class EmbeddedService implements DeepaMehtaService {
             }
             return assocTypeUris;
         } catch (Exception e) {
-            throw new RuntimeException("Retrieving list of association type URIs failed", e);
+            throw new RuntimeException("Fetching list of association type URIs failed", e);
         }
     }
 
@@ -526,7 +526,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return assocType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving association type \"" + uri + "\" failed", e);
+            throw new RuntimeException("Fetching association type \"" + uri + "\" failed", e);
         } finally {
             tx.finish();
         }
@@ -545,7 +545,7 @@ public class EmbeddedService implements DeepaMehtaService {
             return assocTypes;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Retrieving all association types failed", e);
+            throw new RuntimeException("Fetching all association types failed", e);
         } finally {
             tx.finish();
         }
@@ -805,10 +805,11 @@ public class EmbeddedService implements DeepaMehtaService {
                 throw new IllegalArgumentException("The type of topic " + topic.getId() + " is unknown (null)");
             }
             //
-            AssociationModel model = new AssociationModel("dm4.core.instantiation");
-            model.setRoleModel1(new TopicRoleModel(topic.getTypeUri(), "dm4.core.type"));
-            model.setRoleModel2(new TopicRoleModel(topic.getId(), "dm4.core.instance"));
+            AssociationModel model = new AssociationModel("dm4.core.instantiation",
+                new TopicRoleModel(topic.getTypeUri(), "dm4.core.type"),
+                new TopicRoleModel(topic.getId(), "dm4.core.instance"));
             storage.createAssociation(model);
+            storage.setAssociationValue(model.getId(), model.getSimpleValue());
             associateWithAssociationType(model);
             // low-level (storage) call used here ### explain
         } catch (Exception e) {
@@ -819,32 +820,14 @@ public class EmbeddedService implements DeepaMehtaService {
 
     void associateWithAssociationType(AssociationModel assoc) {
         try {
-            AssociationModel model = new AssociationModel("dm4.core.instantiation");
-            model.setRoleModel1(new TopicRoleModel(assoc.getTypeUri(), "dm4.core.type"));
-            model.setRoleModel2(new AssociationRoleModel(assoc.getId(), "dm4.core.instance"));
+            AssociationModel model = new AssociationModel("dm4.core.instantiation",
+                new TopicRoleModel(assoc.getTypeUri(), "dm4.core.type"),
+                new AssociationRoleModel(assoc.getId(), "dm4.core.instance"));
             storage.createAssociation(model);  // low-level (storage) call used here ### explain
+            storage.setAssociationValue(model.getId(), model.getSimpleValue());
         } catch (Exception e) {
             throw new RuntimeException("Associating association with association type \"" +
                 assoc.getTypeUri() + "\" failed (" + assoc + ")", e);
-        }
-    }
-
-
-
-    // === Type Storage ===
-
-    // FIXME: move to AttachedType
-    /**
-     * @param   typeUri     a topic type URI or a association type URI
-     */
-    void associateDataType(String typeUri, String dataTypeUri) {
-        try {
-            createAssociation("dm4.core.aggregation",
-                new TopicRoleModel(typeUri,     "dm4.core.type"),
-                new TopicRoleModel(dataTypeUri, "dm4.core.default"));
-        } catch (Exception e) {
-            throw new RuntimeException("Associating type \"" + typeUri + "\" with data type \"" +
-                dataTypeUri + "\" failed", e);
         }
     }
 
@@ -904,27 +887,46 @@ public class EmbeddedService implements DeepaMehtaService {
         // Note: associateDataType() creates the association by a *high-level* (service) call.
         // This requires the association type (here: dm4.core.aggregation) to be fully constructed already.
         // That's why the topic type associations (step 1) must be performed *before* the data type associations.
+        // ### FIXDOC: not true anymore
         //
         // Note: at time of the first associateDataType() call the required association type (dm4.core.aggregation)
         // is *not* fully constructed yet! (it gets constructed through this very call). This works anyway because
         // the data type assigning association is created *before* the association type is fetched.
         // (see AttachedAssociation.store(): storage.createAssociation() is called before getType()
         // in AttachedDeepaMehtaObject.store().)
-        // Important is that associateDataType("dm4.core.aggregation") is the first call here.
-        associateDataType("dm4.core.aggregation",   "dm4.core.text");
-        associateDataType("dm4.core.instantiation", "dm4.core.text");
+        // ### FIXDOC: not true anymore
         //
-        associateDataType("dm4.core.meta_type",  "dm4.core.text");
-        associateDataType("dm4.core.topic_type", "dm4.core.text");
-        associateDataType("dm4.core.assoc_type", "dm4.core.text");
-        associateDataType("dm4.core.data_type",  "dm4.core.text");
-        associateDataType("dm4.core.role_type",  "dm4.core.text");
+        // Important is that associateDataType("dm4.core.aggregation") is the first call here.
+        // ### FIXDOC: not true anymore
+        //
+        // Note: _associateDataType() creates the data type assigning association by a *low-level* (storage) call.
+        // A high-level (service) call would fail while setting the association's value. The involved getType()
+        // would fail (not because the association is missed -- it's created meanwhile, but)
+        // because this involves fetching the association including its value. The value doesn't exist yet,
+        // because its setting forms the begin of this vicious circle.
+        _associateDataType("dm4.core.meta_type",  "dm4.core.text");
+        _associateDataType("dm4.core.topic_type", "dm4.core.text");
+        _associateDataType("dm4.core.assoc_type", "dm4.core.text");
+        _associateDataType("dm4.core.data_type",  "dm4.core.text");
+        _associateDataType("dm4.core.role_type",  "dm4.core.text");
+        //
+        _associateDataType("dm4.core.aggregation",   "dm4.core.text");
+        _associateDataType("dm4.core.instantiation", "dm4.core.text");
     }
 
     private void _createTopic(TopicModel model) {
         // Note: low-level (storage) call used here ### explain
         storage.createTopic(model);
         storage.setTopicValue(model.getId(), model.getSimpleValue());
+    }
+
+    void _associateDataType(String typeUri, String dataTypeUri) {
+        AssociationModel model = new AssociationModel("dm4.core.aggregation",
+            new TopicRoleModel(typeUri,     "dm4.core.type"),
+            new TopicRoleModel(dataTypeUri, "dm4.core.default"));
+        storage.createAssociation(model);
+        storage.setAssociationValue(model.getId(), model.getSimpleValue());
+        associateWithAssociationType(model);
     }
 
     private void bootstrapTypeCache() {

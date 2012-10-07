@@ -69,8 +69,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     }
 
     @Override
-    protected void storeUri(String uri) {
-        dms.storage.setAssociationUri(getId(), uri);
+    protected void storeUri() {
+        dms.storage.setAssociationUri(getId(), getUri());
     }
 
     @Override

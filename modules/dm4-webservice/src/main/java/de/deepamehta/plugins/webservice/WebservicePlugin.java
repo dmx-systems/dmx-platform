@@ -390,7 +390,7 @@ public class WebservicePlugin extends PluginActivator {
     private ResultSet<RelatedTopic> getRelatedTopics(DeepaMehtaObject object, String objectInfo,
                         String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri,
                         int maxResultSize, ClientState clientState) {
-        String operation = "Retrieving related topics of " + objectInfo + " " + object.getId();
+        String operation = "Fetching related topics of " + objectInfo + " " + object.getId();
         String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
             "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri +
             "\", maxResultSize=" + maxResultSize + ")";

@@ -64,8 +64,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     }
 
     @Override
-    protected void storeUri(String uri) {
-        dms.storage.setTopicUri(getId(), uri);
+    protected void storeUri() {
+        dms.storage.setTopicUri(getId(), getUri());
     }
 
     @Override

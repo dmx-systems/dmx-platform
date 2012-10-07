@@ -249,7 +249,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // storeAssocDefs() relies on the association definitions.
         //
         // 2) store the type-specific parts
-        dms.associateDataType(getUri(), getDataTypeUri());
+        associateDataType();
         storeIndexModes();
         storeAssocDefs();
         storeLabelConfig();
@@ -380,13 +380,24 @@ abstract class AttachedType extends AttachedTopic implements Type {
         long assocId = fetchDataTypeTopic().getAssociationModel().getId();
         dms.deleteAssociation(assocId, null);  // clientState=null
         // create new assignment
-        dms.associateDataType(getUri(), getDataTypeUri());
+        associateDataType();
+    }
+
+    private void associateDataType() {
+        try {
+            dms.createAssociation("dm4.core.aggregation",
+                new TopicRoleModel(getUri(),         "dm4.core.type"),
+                new TopicRoleModel(getDataTypeUri(), "dm4.core.default"));
+        } catch (Exception e) {
+            throw new RuntimeException("Associating type \"" + getUri() + "\" with data type \"" +
+                getDataTypeUri() + "\" failed", e);
+        }
     }
 
     private void storeIndexModes() {
         for (IndexMode indexMode : getIndexModes()) {
             dms.createAssociation("dm4.core.aggregation",
-                new TopicRoleModel(getUri(), "dm4.core.type"),
+                new TopicRoleModel(getUri(),          "dm4.core.type"),
                 new TopicRoleModel(indexMode.toUri(), "dm4.core.default"));
         }
     }

@@ -113,7 +113,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         // update memory
         model.setUri(uri);
         // update DB
-        storeUri(uri);      // abstract
+        storeUri();         // abstract
     }
 
     // --- Type URI ---
@@ -375,7 +375,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     protected abstract String className();
 
-    protected abstract void storeUri(String uri);
+    protected abstract void storeUri();
 
     protected abstract void storeTypeUri();
 
@@ -392,17 +392,22 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void store(ClientState clientState, Directives directives) {
-        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            CompositeValue comp = getCompositeValue();
-            // Note: we build the composite value memory representation from scratch.
-            // Uninitialized IDs, URIs, and values in the TopicModels must be replaced with the real ones.
-            // In case of many-relationships the TopicModel arrays can not be updated incrementally because
-            // they can't be looked up by ID (because topics to be created have no ID yet.)
-            model.setCompositeValue(new CompositeValue());
-            updateCompositeValue(comp, clientState, directives);
-            refreshLabel();
-        } else {
-            storeAndIndexValue(getSimpleValue());
+        try {
+            if (getType().getDataTypeUri().equals("dm4.core.composite")) {
+                CompositeValue comp = getCompositeValue();
+                // Note: we build the composite value memory representation from scratch.
+                // Uninitialized IDs, URIs, and values in the TopicModels must be replaced with the real ones.
+                // In case of many-relationships the TopicModel arrays can not be updated incrementally because
+                // they can't be looked up by ID (because topics to be created have no ID yet.)
+                model.setCompositeValue(new CompositeValue());
+                updateCompositeValue(comp, clientState, directives);
+                refreshLabel();
+            } else {
+                storeAndIndexValue(getSimpleValue());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Storing the simple/composite value of " + className() + " " + getId() +
+                " failed", e);
         }
     }
 
