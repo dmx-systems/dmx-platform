@@ -61,6 +61,7 @@ class ObjectFactoryImpl implements ObjectFactory {
             // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
             // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
             // loading its ACL which in turn would rely on this very topic type.
+            // ### FIXME: is this still true? The POST_FETCH_HOOK is dropped meanwhile.
             String partTopicTypeUri = dms.storage.getTopic(partTopicTypeId).getUri();
             Cardinality cardinality = fetchCardinality(assoc);
             AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
@@ -108,6 +109,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
         // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
         // loading its ACL which in turn would rely on this very topic type.
+        // ### FIXME: is this still true? The POST_FETCH_HOOK is dropped meanwhile.
         RelatedTopicModel model = dms.storage.getAssociationRelatedTopic(assoc.getId(), "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.whole_cardinality", "dm4.core.cardinality");    // fetchComposite=false
         // error check
@@ -123,6 +125,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
         // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
         // loading its ACL which in turn would rely on this very topic type.
+        // ### FIXME: is this still true? The POST_FETCH_HOOK is dropped meanwhile.
         RelatedTopicModel model = dms.storage.getAssociationRelatedTopic(assoc.getId(), "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.part_cardinality", "dm4.core.cardinality");     // fetchComposite=false
         // error check

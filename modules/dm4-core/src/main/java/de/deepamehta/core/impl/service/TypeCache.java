@@ -86,28 +86,37 @@ class TypeCache {
         // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
         // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
         // loading its ACL which in turn would rely on this very topic type.
-        TopicModel model = dms.storage.getTopic("uri", new SimpleValue(topicTypeUri));
+        // ### FIXME: is this still true? The POST_FETCH_HOOK is dropped meanwhile.
+        TopicModel typeTopic = dms.storage.getTopic("uri", new SimpleValue(topicTypeUri));
         // error check
-        if (model == null) {
+        if (typeTopic == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
+        } else if (!typeTopic.getTypeUri().equals("dm4.core.topic_type") &&
+                   !typeTopic.getTypeUri().equals("dm4.core.meta_type") &&
+                   !typeTopic.getTypeUri().equals("dm4.core.meta_meta_type")) {
+            throw new RuntimeException("URI \"" + topicTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
+                "\" when the caller expects a \"dm4.core.topic_type\"");
         }
         //
         AttachedTopicType topicType = new AttachedTopicType(dms);
-        topicType.fetch(new TopicTypeModel(model));
+        topicType.fetch(new TopicTypeModel(typeTopic));
         //
         return topicType;
     }
 
     private AttachedAssociationType loadAssociationType(String assocTypeUri) {
         logger.info("Loading association type \"" + assocTypeUri + "\"");
-        TopicModel model = dms.storage.getTopic("uri", new SimpleValue(assocTypeUri));
+        TopicModel typeTopic = dms.storage.getTopic("uri", new SimpleValue(assocTypeUri));
         // error check
-        if (model == null) {
+        if (typeTopic == null) {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found");
+        } else if (!typeTopic.getTypeUri().equals("dm4.core.assoc_type")) {
+            throw new RuntimeException("URI \"" + assocTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
+                "\" when the caller expects a \"dm4.core.assoc_type\"");
         }
         //
         AttachedAssociationType assocType = new AttachedAssociationType(dms);
-        assocType.fetch(new AssociationTypeModel(model));
+        assocType.fetch(new AssociationTypeModel(typeTopic));
         //
         return assocType;
     }

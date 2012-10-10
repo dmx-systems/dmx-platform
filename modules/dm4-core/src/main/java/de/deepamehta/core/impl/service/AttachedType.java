@@ -267,6 +267,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
             // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
             // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
             // loading its ACL which in turn would rely on this very topic type.
+            // ### FIXME: is this still true? The POST_FETCH_HOOK is dropped meanwhile.
             RelatedTopicModel dataType = dms.storage.getTopicRelatedTopic(getId(), "dm4.core.aggregation",
                 "dm4.core.type", null, "dm4.core.data_type");
             if (dataType == null) {
@@ -306,6 +307,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
         // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
         // loading its ACL which in turn would rely on this very topic type.
+        // ### FIXME: is this still true? The POST_FETCH_HOOK is dropped meanwhile.
         List assocTypeFilter = Arrays.asList("dm4.core.aggregation_def", "dm4.core.composition_def");
         ResultSet<RelatedTopicModel> partTopicTypes = dms.storage.getTopicRelatedTopics(getId(), assocTypeFilter,
             "dm4.core.whole_type", "dm4.core.part_type", "dm4.core.topic_type", 0);
