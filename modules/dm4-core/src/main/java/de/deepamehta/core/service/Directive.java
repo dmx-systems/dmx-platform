@@ -9,5 +9,8 @@ public enum Directive {
     DELETE_ASSOCIATION,
 
     UPDATE_TOPIC_TYPE,
-    DELETE_TOPIC_TYPE
+    DELETE_TOPIC_TYPE,
+
+    UPDATE_ASSOCIATION_TYPE,
+    DELETE_ASSOCIATION_TYPE     // ### TODO: not yet implemened
 }

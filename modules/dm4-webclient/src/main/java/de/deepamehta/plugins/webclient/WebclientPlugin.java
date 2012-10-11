@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.webclient;
 
+import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
@@ -163,10 +164,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
                                                                                        Directives directives) {
         if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
-            Type type = getType(topic);
-            logger.info("### Updating view configuration for topic type \"" + type.getUri() + "\" (" + topic + ")");
-            type.getViewConfig().getModel().updateConfigTopic(topic.getModel());
-            directives.add(Directive.UPDATE_TOPIC_TYPE, type);
+            updateType(topic, directives);
         }
     }
 
@@ -238,10 +236,29 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // === View Configuration ===
 
-    private Type getType(Topic viewConfig) {
+    private void updateType(Topic viewConfig, Directives directives) {
         Topic typeTopic = viewConfig.getRelatedTopic("dm4.core.aggregation",
             "dm4.core.view_config", "dm4.core.type", null, false, false, null);
-        return dms.getTopicType(typeTopic.getUri(), null);  // ### FIXME: handle assoc types
+        if (typeTopic != null) {
+            if (typeTopic.getTypeUri().equals("dm4.core.topic_type")) {
+                TopicType topicType = dms.getTopicType(typeTopic.getUri(), null);
+                logger.info("### Updating view configuration for topic type \"" + topicType.getUri() +
+                    "\" (viewConfig=" + viewConfig + ")");
+                topicType.getViewConfig().getModel().updateConfigTopic(viewConfig.getModel());
+                directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
+            } else if (typeTopic.getTypeUri().equals("dm4.core.assoc_type")) {
+                AssociationType assocType = dms.getAssociationType(typeTopic.getUri(), null);
+                logger.info("### Updating view configuration for association type \"" + assocType.getUri() +
+                    "\" (viewConfig=" + viewConfig + ")");
+                assocType.getViewConfig().getModel().updateConfigTopic(viewConfig.getModel());
+                directives.add(Directive.UPDATE_ASSOCIATION_TYPE, assocType);
+            } else {
+                throw new RuntimeException("View Configuration is associated to an unexpected topic (typeTopic=" +
+                    typeTopic + "\nviewConfig=" + viewConfig + ")");
+            }
+        } else {
+            // ### TODO: association definitions
+        }
     }
 
     // === Webclient Start ===

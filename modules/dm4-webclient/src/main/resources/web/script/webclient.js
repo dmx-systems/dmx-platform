@@ -423,6 +423,9 @@ function Webclient() {
             case "DELETE_TOPIC_TYPE":
                 remove_topic_type(directive.arg.uri)
                 break
+            case "UPDATE_ASSOCIATION_TYPE":
+                update_association_type(build_association_type(directive.arg))
+                break
             default:
                 throw "WebclientError: \"" + directive.type + "\" is an unknown directive"
             }
@@ -467,16 +470,30 @@ function Webclient() {
      * Processes an UPDATE_TOPIC_TYPE directive.
      */
     function update_topic_type(topic_type) {
-        // update client model (type cache)
+        // 1) update client model (type cache)
         // Note: the type cache must be updated *before* the "post_update_topic" event is fired.
         // Other plugins might rely on an up-to-date type cache (e.g. the Type Search plugin does).
         type_cache.put_topic_type(topic_type)
-        // update view
-        // ### Note: the view is already updated through the accompanying UPDATE_TOPIC directive
-        // ### dm4c.canvas.update_topic(topic_type, true)       // refresh_canvas=true
-        // ### dm4c.page_panel.display_conditionally(topic_type)
-        // fire event
+        // 2) update view
+        // Note: the UPDATE_TOPIC_TYPE directive might result from editing a View Configuration topic.
+        // In this case the canvas must be refreshed in order to reflect changed topic icons.
+        dm4c.canvas.refresh()
+        // 3) fire event
         dm4c.fire_event("post_update_topic", topic_type)
+    }
+
+    /**
+     * Processes an UPDATE_ASSOCIATION_TYPE directive.
+     */
+    function update_association_type(assoc_type) {
+        // 1) update client model (type cache)
+        type_cache.put_association_type(assoc_type)
+        // 2) update view
+        // Note: the UPDATE_ASSOCIATION_TYPE directive might result from editing a View Configuration topic.
+        // In this case the canvas must be refreshed in order to reflect changed association colors.
+        dm4c.canvas.refresh()
+        // 3) fire event
+        // ### dm4c.fire_event("post_update_topic", topic_type)
     }
 
     // ---
@@ -1271,7 +1288,6 @@ function Webclient() {
         return tt
     }
 
-    // ### FIXME: not yet used
     function build_association_type(assoc_type) {
         return new AssociationType(assoc_type)
     }

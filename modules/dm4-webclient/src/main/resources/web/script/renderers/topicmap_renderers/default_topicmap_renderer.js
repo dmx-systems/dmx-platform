@@ -946,6 +946,7 @@ function DefaultTopicmapRenderer() {
         var self = this
         var label_wrapper
 
+        this.id = topic.id
         this.x = topic.x
         this.y = topic.y
 
@@ -988,7 +989,6 @@ function DefaultTopicmapRenderer() {
         // ---
 
         function init(topic) {
-            self.id       = topic.id
             self.type_uri = topic.type_uri
             self.label    = topic.value
             //
@@ -1005,7 +1005,6 @@ function DefaultTopicmapRenderer() {
      * Properties:
      *  id, type_uri
      *  role_1, role_2
-     *  color           (CSS string)
      */
     function CanvasAssoc(assoc) {
 
@@ -1046,7 +1045,8 @@ function DefaultTopicmapRenderer() {
                 return
             }
             //
-            draw_line(ct1.x, ct1.y, ct2.x, ct2.y, ASSOC_WIDTH, this.color)
+            var color = dm4c.get_type_color(this.type_uri)
+            draw_line(ct1.x, ct1.y, ct2.x, ct2.y, ASSOC_WIDTH, color)
         }
 
         this.update = function(assoc) {
@@ -1067,7 +1067,6 @@ function DefaultTopicmapRenderer() {
 
         function init(assoc) {
             self.type_uri = assoc.type_uri
-            self.color = dm4c.get_type_color(assoc.type_uri)
         }
     }
 

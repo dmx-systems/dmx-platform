@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
@@ -62,6 +63,8 @@ enum CoreEvent {
         "preSendAssociation", Association.class, ClientState.class),
     PRE_SEND_TOPIC_TYPE(PreSendTopicTypeListener.class,
         "preSendTopicType", TopicType.class, ClientState.class),
+    PRE_SEND_ASSOCIATION_TYPE(PreSendAssociationTypeListener.class,
+        "preSendAssociationType", AssociationType.class, ClientState.class),
 
     ALL_PLUGINS_ACTIVE(AllPluginsActiveListener.class,
         "allPluginsActive"),

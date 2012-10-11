@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.service.Directives;
@@ -39,8 +40,10 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         try {
             Object entity = response.getEntity();
             if (entity != null) {
-                if (entity instanceof TopicType) {      // Note: type matches both, must take precedence over topic
+                if (entity instanceof TopicType) {          // Note: type matches both, must take precedence over topic
                     firePreSend((TopicType) entity);
+                } else if (entity instanceof AssociationType) {
+                    firePreSend((AssociationType) entity);  // Note: type matches both, must take precedence over topic
                 } else if (entity instanceof Topic) {
                     firePreSend((Topic) entity);
                 } else if (entity instanceof Association) {
@@ -62,15 +65,19 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void firePreSend(Topic topic) {
-        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, topic, null);           // clientState=null
+        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, topic, null);                   // clientState=null
     }
 
     private void firePreSend(Association assoc) {
-        dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION, assoc, null);     // clientState=null
+        dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION, assoc, null);             // clientState=null
     }
 
     private void firePreSend(TopicType topicType) {
-        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC_TYPE, topicType, null);  // clientState=null
+        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC_TYPE, topicType, null);          // clientState=null
+    }
+
+    private void firePreSend(AssociationType assocType) {
+        dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION_TYPE, assocType, null);    // clientState=null
     }
 
     private void firePreSend(Directives directives) {
@@ -84,6 +91,9 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                 break;
             case UPDATE_TOPIC_TYPE:
                 firePreSend((TopicType) entry.arg);
+                break;
+            case UPDATE_ASSOCIATION_TYPE:
+                firePreSend((AssociationType) entry.arg);
                 break;
             }
         }
