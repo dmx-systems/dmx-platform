@@ -168,7 +168,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/topic/{topic_id}")
     @Override
     public Permissions getTopicPermissions(@PathParam("topic_id") long topicId) {
-        return createPermissions(hasPermission(getUsername(), Operation.WRITE, topicId));
+        Topic topic = dms.getTopic(topicId, false, null);
+        return createPermissions(hasPermission(getUsername(), Operation.WRITE, topic));
     }
 
     // ---
@@ -436,11 +437,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
-        // ### TODO: explain
-        if (isOwnTopic(topic)) {
-            return;
-        }
-        //
         setupDefaultAccessControl(topic, DEFAULT_TOPIC_ACL);
         //
         // when a workspace is created its creator joins automatically
@@ -456,11 +452,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postCreateAssociation(Association assoc, ClientState clientState, Directives directives) {
-        // ### TODO: explain
-        if (isOwnAssociation(assoc)) {
-            return;
-        }
-        //
         setupDefaultAccessControl(assoc, DEFAULT_ASSOCIATION_ACL);
     }
 
@@ -646,27 +637,29 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
      *                      or <code>null</code> if no user is logged in.
      */
-    private boolean hasPermission(Topic username, Operation operation, long topicId) {
-        Topic topic = dms.getTopic(topicId, false, null);
-        return hasPermission(username, operation, topic);
+    private boolean hasPermission(Topic username, Operation operation, Topic topic) {
+        return hasPermission(username, operation, topic, dms.getTopicACL(topic.getId()));
     }
 
     /**
-     * Checks if a user is allowed to perform an operation on an object.
+     * Checks if a user is allowed to perform an operation on an association.
      * If so, <code>true</code> is returned.
      *
      * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
      *                      or <code>null</code> if no user is logged in.
      */
-    private boolean hasPermission(Topic username, Operation operation, DeepaMehtaObject object) {
+    private boolean hasPermission(Topic username, Operation operation, Association assoc) {
+        return hasPermission(username, operation, assoc, dms.getAssociationACL(assoc.getId()));
+    }
+
+    // ---
+
+    private boolean hasPermission(Topic username, Operation operation, DeepaMehtaObject object, AccessControlList acl) {
         try {
             logger.fine("Determining permission for " + userInfo(username) + " to " + operation + " " + info(object));
-            for (RelatedTopic aclEntry : fetchACLEntries(object)) {
-                String userRoleUri = aclEntry.getCompositeValue().getTopic("dm4.accesscontrol.user_role").getUri();
-                logger.fine("There is an ACL entry for user role \"" + userRoleUri + "\"");
-                boolean allowedForUserRole = allowed(aclEntry, operation);
-                logger.fine("value=" + allowedForUserRole);
-                if (allowedForUserRole && userOccupiesRole(object, username, userRoleUri)) {
+            for (UserRole userRole : acl.getUserRoles(operation)) {
+                logger.fine("There is an ACL entry for user role " + userRole);
+                if (userOccupiesRole(object, username, userRole)) {
                     logger.fine("=> ALLOWED");
                     return true;
                 }
@@ -679,30 +672,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
-    // ---
-
-    /**
-     * Fetches all ACL entries of the specified object.
-     */
-    private Set<RelatedTopic> fetchACLEntries(DeepaMehtaObject object) {
-        return facetsService.getFacets(object, "dm4.accesscontrol.acl_facet");
-    }
-
-    /**
-     * For the specified ACL entry: reads out the "allowed" value for the specified operation.
-     * If no "allowed" value is set for that operation <code>false</code> is returned.
-     */
-    private boolean allowed(Topic aclEntry, Operation operation) {
-        for (TopicModel permission : aclEntry.getCompositeValue().getTopics("dm4.accesscontrol.permission")) {
-            if (permission.getCompositeValue().getTopic("dm4.accesscontrol.operation").getUri().equals(operation.uri)) {
-                return permission.getCompositeValue().getBoolean("dm4.accesscontrol.allowed");
-            }
-        }
-        return false;
-    }
-
-    // ---
-
     /**
      * Checks if a user occupies a role with regard to the specified object.
      * If so, <code>true</code> is returned.
@@ -710,34 +679,21 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
      *                      or <code>null</code> if no user is logged in.
      */
-    private boolean userOccupiesRole(DeepaMehtaObject object, Topic username, String userRoleUri) {
-        //
-        if (userRoleUri.equals("dm4.accesscontrol.user_role.everyone")) {
+    private boolean userOccupiesRole(DeepaMehtaObject object, Topic username, UserRole userRole) {
+        switch (userRole) {
+        case EVERYONE:
             return true;
+        case USER:
+            return username != null;
+        case MEMBER:
+            return username != null && userIsMember(username, object);
+        case OWNER:
+            return username != null && userIsOwner(username, object);
+        case CREATOR:
+            return username != null && userIsCreator(username, object);
+        default:
+            throw new RuntimeException(userRole + " is an unsupported user role");
         }
-        //
-        if (username == null) {
-            return false;
-        }
-        //
-        if (userRoleUri.equals("dm4.accesscontrol.user_role.user")) {
-            return true;
-        } else if (userRoleUri.equals("dm4.accesscontrol.user_role.member")) {
-            if (userIsMember(username, object)) {
-                return true;
-            }
-        } else if (userRoleUri.equals("dm4.accesscontrol.user_role.owner")) {
-            if (userIsOwner(username, object)) {
-                return true;
-            }
-        } else if (userRoleUri.equals("dm4.accesscontrol.user_role.creator")) {
-            if (userIsCreator(username, object)) {
-                return true;
-            }
-        } else {
-            throw new RuntimeException("\"" + userRoleUri + "\" is an unexpected user role URI");
-        }
-        return false;
     }
 
     // ---
@@ -848,29 +804,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private Permissions createPermissions(boolean write, boolean create) {
         return createPermissions(write).add(Operation.CREATE, create);
-    }
-
-    // ===
-
-    private boolean isOwnTopic(Topic topic) {
-        return isOwnUri(topic.getTypeUri());
-    }
-
-    private boolean isOwnAssociation(Association assoc) {
-        return !assoc.getTypeUri().equals("dm4.core.association") && (isOwnRole(assoc.getRole1()) ||
-                                                                      isOwnRole(assoc.getRole2()));
-    }
-
-    private boolean isOwnRole(Role role) {
-        if (!(role instanceof TopicRole)) {
-            return false;
-        }
-        Topic topic = ((TopicRole) role).getTopic();
-        return isOwnTopic(topic);
-    }
-
-    private boolean isOwnUri(String uri) {
-        return uri.startsWith("dm4.accesscontrol.");
     }
 
 

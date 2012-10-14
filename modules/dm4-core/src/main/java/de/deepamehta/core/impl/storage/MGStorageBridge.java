@@ -23,6 +23,8 @@ import de.deepamehta.mehtagraph.MehtaNode;
 import de.deepamehta.mehtagraph.MehtaObject;
 import de.deepamehta.mehtagraph.MehtaObjectRole;
 
+import org.codehaus.jettison.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -365,6 +367,24 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     @Override
     public void createAssociationACL(long assocId, AccessControlList acl) {
         mg.getMehtaEdge(assocId).setString("acl", acl.toJSON().toString());
+    }
+
+    @Override
+    public AccessControlList getTopicACL(long topicId) {
+        try {
+            return new AccessControlList(new JSONObject(mg.getMehtaNode(topicId).getString("acl", "{}")));
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching access control list for topic " + topicId + " failed", e);
+        }
+    }
+
+    @Override
+    public AccessControlList getAssociationACL(long assocId) {
+        try {
+            return new AccessControlList(new JSONObject(mg.getMehtaEdge(assocId).getString("acl", "{}")));
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching access control list for association " + assocId + " failed", e);
+        }
     }
 
 

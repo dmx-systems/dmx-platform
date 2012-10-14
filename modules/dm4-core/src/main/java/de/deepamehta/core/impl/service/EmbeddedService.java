@@ -594,12 +594,40 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public void createTopicACL(long topicId, AccessControlList acl) {
-        storage.createTopicACL(topicId, acl);
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            storage.createTopicACL(topicId, acl);
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Creating access control list for topic " + topicId + " failed", e);
+        } finally {
+            tx.finish();
+        }
     }
 
     @Override
     public void createAssociationACL(long assocId, AccessControlList acl) {
-        storage.createAssociationACL(assocId, acl);
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            storage.createAssociationACL(assocId, acl);
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Creating access control list for association " + assocId + " failed", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Override
+    public AccessControlList getTopicACL(long topicId) {
+        return storage.getTopicACL(topicId);
+    }
+
+    @Override
+    public AccessControlList getAssociationACL(long assocId) {
+        return storage.getAssociationACL(assocId);
     }
 
 

@@ -156,6 +156,18 @@ public interface DeepaMehtaService {
 
     void createAssociationACL(long assocId, AccessControlList acl);
 
+    /**
+     * Fetches the Access Control List for the specified topic.
+     * If no one is stored an empty Access Control List is returned.
+     */
+    AccessControlList getTopicACL(long topicId);
+
+    /**
+     * Fetches the Access Control List for the specified association.
+     * If no one is stored an empty Access Control List is returned.
+     */
+    AccessControlList getAssociationACL(long assocId);
+
 
 
     // === Misc ===
