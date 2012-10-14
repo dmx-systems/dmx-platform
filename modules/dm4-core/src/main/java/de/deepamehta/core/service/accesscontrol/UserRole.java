@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.accesscontrol.model;
+package de.deepamehta.core.service.accesscontrol;
 
 import java.util.HashMap;
 import java.util.Map;

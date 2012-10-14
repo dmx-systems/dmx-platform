@@ -11,6 +11,7 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.service.accesscontrol.AccessControlList;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
 
 import de.deepamehta.mehtagraph.ConnectedMehtaEdge;
@@ -350,6 +351,20 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     @Override
     public void deleteAssociation(long assocId) {
         mg.getMehtaEdge(assocId).delete();
+    }
+
+
+
+    // === Access Control ===
+
+    @Override
+    public void createTopicACL(long topicId, AccessControlList acl) {
+        mg.getMehtaNode(topicId).setString("acl", acl.toJSON().toString());
+    }
+
+    @Override
+    public void createAssociationACL(long assocId, AccessControlList acl) {
+        mg.getMehtaEdge(assocId).setString("acl", acl.toJSON().toString());
     }
 
 

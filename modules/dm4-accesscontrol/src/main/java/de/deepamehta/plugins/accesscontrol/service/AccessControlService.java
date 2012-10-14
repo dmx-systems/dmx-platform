@@ -1,10 +1,10 @@
 package de.deepamehta.plugins.accesscontrol.service;
 
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
-import de.deepamehta.plugins.accesscontrol.model.UserRole;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.accesscontrol.AccessControlList;
 
 
 
@@ -88,8 +88,9 @@ public interface AccessControlService extends PluginService {
 
     // ---
 
-    void createACLEntry(long topicId,            UserRole userRole, Permissions permissions);
-    void createACLEntry(DeepaMehtaObject object, UserRole userRole, Permissions permissions);
+    void createTopicACL(long topicId, AccessControlList acl);
+
+    void createAssociationACL(long assocId, AccessControlList acl);
 
     // ---
 

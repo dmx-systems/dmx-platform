@@ -12,6 +12,7 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.service.accesscontrol.AccessControlList;
 
 import java.util.Collection;
 import java.util.List;
@@ -146,6 +147,14 @@ public interface DeepaMehtaService {
     Plugin getPlugin(String pluginUri);
 
     Set<PluginInfo> getPluginInfo();
+
+
+
+    // === Access Control ===
+
+    void createTopicACL(long topicId, AccessControlList acl);
+
+    void createAssociationACL(long assocId, AccessControlList acl);
 
 
 

@@ -25,6 +25,7 @@ import de.deepamehta.core.service.ObjectFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.accesscontrol.AccessControlList;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -585,6 +586,20 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Set<PluginInfo> getPluginInfo() {
         return pluginManager.getPluginInfo();
+    }
+
+
+
+    // === Access Control ===
+
+    @Override
+    public void createTopicACL(long topicId, AccessControlList acl) {
+        storage.createTopicACL(topicId, acl);
+    }
+
+    @Override
+    public void createAssociationACL(long assocId, AccessControlList acl) {
+        storage.createAssociationACL(assocId, acl);
     }
 
 

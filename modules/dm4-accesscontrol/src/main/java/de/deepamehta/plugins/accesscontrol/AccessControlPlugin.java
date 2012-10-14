@@ -1,9 +1,7 @@
 package de.deepamehta.plugins.accesscontrol;
 
 import de.deepamehta.plugins.accesscontrol.model.Credentials;
-import de.deepamehta.plugins.accesscontrol.model.Operation;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
-import de.deepamehta.plugins.accesscontrol.model.UserRole;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.facets.service.FacetsService;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
@@ -25,6 +23,10 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.accesscontrol.AccessControlList;
+import de.deepamehta.core.service.accesscontrol.ACLEntry;
+import de.deepamehta.core.service.accesscontrol.Operation;
+import de.deepamehta.core.service.accesscontrol.UserRole;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
 import de.deepamehta.core.service.event.InitializePluginListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
@@ -80,26 +82,24 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // security settings
-    private static final boolean READ_REQUIRES_LOGIN  = Boolean.valueOf(
-                                                        System.getProperty("dm4.security.read_requires_login"));
-    private static final boolean WRITE_REQUIRES_LOGIN = Boolean.valueOf(
-                                                        System.getProperty("dm4.security.write_requires_login"));
+    private static final boolean READ_REQUIRES_LOGIN  = Boolean.getBoolean("dm4.security.read_requires_login");
+    private static final boolean WRITE_REQUIRES_LOGIN = Boolean.getBoolean("dm4.security.write_requires_login");
     private static final String SUBNET_FILTER         = System.getProperty("dm4.security.subnet_filter");
 
     // default user
     private static final String DEFAULT_PASSWORD = "";
 
-    // default user role
-    private static final UserRole DEFAULT_USER_ROLE = UserRole.MEMBER;
-
-    // default permissions
-    private static final Permissions DEFAULT_TOPIC_PERMISSIONS       = new Permissions()
-                                                                            .add(Operation.WRITE, true);
-    private static final Permissions DEFAULT_ASSOCIATION_PERMISSIONS = new Permissions()
-                                                                            .add(Operation.WRITE, true);
-    private static final Permissions DEFAULT_TYPE_PERMISSIONS        = new Permissions()
-                                                                            .add(Operation.WRITE, true)
-                                                                            .add(Operation.CREATE, true);
+    // default ACLs
+    private static final AccessControlList DEFAULT_TOPIC_ACL = new AccessControlList(
+        new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER, UserRole.MEMBER)
+    );
+    private static final AccessControlList DEFAULT_ASSOCIATION_ACL = new AccessControlList(
+        new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER, UserRole.MEMBER)
+    );
+    private static final AccessControlList DEFAULT_TYPE_ACL = new AccessControlList(
+        new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER, UserRole.MEMBER),
+        new ACLEntry(Operation.CREATE, UserRole.CREATOR, UserRole.OWNER, UserRole.MEMBER)
+    );
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -209,19 +209,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    @POST
-    @Path("/topic/{topic_id}/userrole/{user_role_uri}")
     @Override
-    public void createACLEntry(@PathParam("topic_id") long topicId, @PathParam("user_role_uri") UserRole userRole,
-                                                                                              Permissions permissions) {
-        createACLEntry(dms.getTopic(topicId, false, null), userRole, permissions);
+    public void createTopicACL(long topicId, AccessControlList acl) {
+        dms.createTopicACL(topicId, acl);
     }
 
     @Override
-    public void createACLEntry(DeepaMehtaObject object, UserRole userRole, Permissions permissions) {
-        TopicModel aclEntry = createAclEntryModel(userRole, permissions);
-        // Note: acl_facet is a multi-facet. So we must pass a (one-element) list.
-        facetsService.updateFacets(object, "dm4.accesscontrol.acl_facet", asList(aclEntry), null, null);
+    public void createAssociationACL(long assocId, AccessControlList acl) {
+        dms.createAssociationACL(assocId, acl);
     }
 
     // ---
@@ -446,7 +441,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return;
         }
         //
-        setupDefaultAccessControl(topic, DEFAULT_TOPIC_PERMISSIONS);
+        setupDefaultAccessControl(topic, DEFAULT_TOPIC_ACL);
         //
         // when a workspace is created its creator joins automatically
         if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
@@ -466,12 +461,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return;
         }
         //
-        setupDefaultAccessControl(assoc, DEFAULT_ASSOCIATION_PERMISSIONS);
+        setupDefaultAccessControl(assoc, DEFAULT_ASSOCIATION_ACL);
     }
 
     @Override
     public void introduceTopicType(TopicType topicType, ClientState clientState) {
-        setupDefaultAccessControl(topicType, DEFAULT_TYPE_PERMISSIONS, fetchDefaultUser());
+        setupDefaultAccessControl(topicType, DEFAULT_TYPE_ACL, fetchDefaultUser());
     }
 
     // ---
@@ -586,7 +581,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             }
             //
             logger.info(operation);
-            setupDefaultAccessControl(defaultTopicmap, DEFAULT_TOPIC_PERMISSIONS, defaultUser);
+            setupDefaultAccessControl(defaultTopicmap, DEFAULT_TOPIC_ACL, defaultUser);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
@@ -606,21 +601,40 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      *
      * If no user is logged in, nothing is performed.
      */
-    private void setupDefaultAccessControl(DeepaMehtaObject object, Permissions permissions) {
+    private void setupDefaultAccessControl(Topic topic, AccessControlList acl) {
         Topic username = getUsername();
         //
         if (username == null) {
             logger.fine("Assigning a creator and default access control entry to " +
-                info(object) + " ABORTED -- no user is logged in");
+                info(topic) + " ABORTED -- no user is logged in");
             return;
         }
         //
-        setupDefaultAccessControl(object, permissions, username);
+        setupDefaultAccessControl(topic, acl, username);
     }
 
-    private void setupDefaultAccessControl(DeepaMehtaObject object, Permissions permissions, Topic username) {
-        setCreator(object, username.getId());
-        createACLEntry(object, DEFAULT_USER_ROLE, permissions);
+    private void setupDefaultAccessControl(Topic topic, AccessControlList acl, Topic username) {
+        setCreator(topic, username.getId());
+        createTopicACL(topic.getId(), acl);
+    }
+
+    // ---
+
+    private void setupDefaultAccessControl(Association assoc, AccessControlList acl) {
+        Topic username = getUsername();
+        //
+        if (username == null) {
+            logger.fine("Assigning a creator and default access control entry to " +
+                info(assoc) + " ABORTED -- no user is logged in");
+            return;
+        }
+        //
+        setupDefaultAccessControl(assoc, acl, username);
+    }
+
+    private void setupDefaultAccessControl(Association assoc, AccessControlList acl, Topic username) {
+        setCreator(assoc, username.getId());
+        createAssociationACL(assoc.getId(), acl);
     }
 
     // ---
@@ -824,17 +838,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return new TopicModel("dm4.accesscontrol.owner", new CompositeValue()
             .putRef("dm4.accesscontrol.username", usernameId)
         );
-    }
-
-    private TopicModel createAclEntryModel(UserRole userRole, Permissions permissions) {
-        CompositeValue comp = new CompositeValue().putRef("dm4.accesscontrol.user_role", userRole.uri);
-        for (String operationUri : permissions.keySet()) {
-            comp.add("dm4.accesscontrol.permission", new TopicModel("dm4.accesscontrol.permission", new CompositeValue()
-                .putRef("dm4.accesscontrol.operation", operationUri)
-                .put("dm4.accesscontrol.allowed", permissions.get(operationUri))
-            ));
-        }
-        return new TopicModel("dm4.accesscontrol.acl_entry", comp);
     }
 
     // ---

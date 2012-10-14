@@ -8,6 +8,7 @@ import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.service.accesscontrol.AccessControlList;
 
 import java.util.Map;
 import java.util.List;
@@ -207,6 +208,14 @@ public interface DeepaMehtaStorage {
     void createAssociation(AssociationModel assocModel);
 
     void deleteAssociation(long assocId);
+
+
+
+    // === Access Control ===
+
+    void createTopicACL(long topicId, AccessControlList acl);
+
+    void createAssociationACL(long assocId, AccessControlList acl);
 
 
 
