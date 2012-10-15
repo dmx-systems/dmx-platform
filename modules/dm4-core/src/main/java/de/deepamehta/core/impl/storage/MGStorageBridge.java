@@ -360,30 +360,16 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     // === Access Control ===
 
     @Override
-    public void createTopicACL(long topicId, AccessControlList acl) {
-        mg.getMehtaNode(topicId).setString("acl", acl.toJSON().toString());
+    public void createACL(long objectId, AccessControlList acl) {
+        mg.getMehtaObject(objectId).setString("acl", acl.toJSON().toString());
     }
 
     @Override
-    public void createAssociationACL(long assocId, AccessControlList acl) {
-        mg.getMehtaEdge(assocId).setString("acl", acl.toJSON().toString());
-    }
-
-    @Override
-    public AccessControlList getTopicACL(long topicId) {
+    public AccessControlList getACL(long objectId) {
         try {
-            return new AccessControlList(new JSONObject(mg.getMehtaNode(topicId).getString("acl", "{}")));
+            return new AccessControlList(new JSONObject(mg.getMehtaObject(objectId).getString("acl", "{}")));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching access control list for topic " + topicId + " failed", e);
-        }
-    }
-
-    @Override
-    public AccessControlList getAssociationACL(long assocId) {
-        try {
-            return new AccessControlList(new JSONObject(mg.getMehtaEdge(assocId).getString("acl", "{}")));
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching access control list for association " + assocId + " failed", e);
+            throw new RuntimeException("Fetching access control list for object " + objectId + " failed", e);
         }
     }
 

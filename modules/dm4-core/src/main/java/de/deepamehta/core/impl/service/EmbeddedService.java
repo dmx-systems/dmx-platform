@@ -592,42 +592,25 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // === Access Control ===
 
+    // Note: once the Access Control plugin is incorporated into the Core these methods will be dropped from public API
+
     @Override
-    public void createTopicACL(long topicId, AccessControlList acl) {
+    public void createACL(long objectId, AccessControlList acl) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.createTopicACL(topicId, acl);
+            storage.createACL(objectId, acl);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating access control list for topic " + topicId + " failed", e);
+            throw new RuntimeException("Creating access control list for object " + objectId + " failed", e);
         } finally {
             tx.finish();
         }
     }
 
     @Override
-    public void createAssociationACL(long assocId, AccessControlList acl) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            storage.createAssociationACL(assocId, acl);
-            tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating access control list for association " + assocId + " failed", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
-    @Override
-    public AccessControlList getTopicACL(long topicId) {
-        return storage.getTopicACL(topicId);
-    }
-
-    @Override
-    public AccessControlList getAssociationACL(long assocId) {
-        return storage.getAssociationACL(assocId);
+    public AccessControlList getACL(long objectId) {
+        return storage.getACL(objectId);
     }
 
 

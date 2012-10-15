@@ -211,13 +211,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
-    public void createTopicACL(long topicId, AccessControlList acl) {
-        dms.createTopicACL(topicId, acl);
-    }
-
-    @Override
-    public void createAssociationACL(long assocId, AccessControlList acl) {
-        dms.createAssociationACL(assocId, acl);
+    public void createACL(long objectId, AccessControlList acl) {
+        dms.createACL(objectId, acl);
     }
 
     // ---
@@ -592,72 +587,37 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      *
      * If no user is logged in, nothing is performed.
      */
-    private void setupDefaultAccessControl(Topic topic, AccessControlList acl) {
+    private void setupDefaultAccessControl(DeepaMehtaObject object, AccessControlList acl) {
         Topic username = getUsername();
         //
         if (username == null) {
             logger.fine("Assigning a creator and default access control entry to " +
-                info(topic) + " ABORTED -- no user is logged in");
+                info(object) + " ABORTED -- no user is logged in");
             return;
         }
         //
-        setupDefaultAccessControl(topic, acl, username);
+        setupDefaultAccessControl(object, acl, username);
     }
 
-    private void setupDefaultAccessControl(Topic topic, AccessControlList acl, Topic username) {
-        setCreator(topic, username.getId());
-        createTopicACL(topic.getId(), acl);
-    }
-
-    // ---
-
-    private void setupDefaultAccessControl(Association assoc, AccessControlList acl) {
-        Topic username = getUsername();
-        //
-        if (username == null) {
-            logger.fine("Assigning a creator and default access control entry to " +
-                info(assoc) + " ABORTED -- no user is logged in");
-            return;
-        }
-        //
-        setupDefaultAccessControl(assoc, acl, username);
-    }
-
-    private void setupDefaultAccessControl(Association assoc, AccessControlList acl, Topic username) {
-        setCreator(assoc, username.getId());
-        createAssociationACL(assoc.getId(), acl);
+    private void setupDefaultAccessControl(DeepaMehtaObject object, AccessControlList acl, Topic username) {
+        setCreator(object, username.getId());
+        createACL(object.getId(), acl);
     }
 
     // ---
 
     /**
-     * Checks if a user is allowed to perform an operation on a topic.
+     * Checks if a user is allowed to perform an operation on an object (topic or association).
      * If so, <code>true</code> is returned.
      *
      * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
      *                      or <code>null</code> if no user is logged in.
      */
-    private boolean hasPermission(Topic username, Operation operation, Topic topic) {
-        return hasPermission(username, operation, topic, dms.getTopicACL(topic.getId()));
-    }
-
-    /**
-     * Checks if a user is allowed to perform an operation on an association.
-     * If so, <code>true</code> is returned.
-     *
-     * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
-     *                      or <code>null</code> if no user is logged in.
-     */
-    private boolean hasPermission(Topic username, Operation operation, Association assoc) {
-        return hasPermission(username, operation, assoc, dms.getAssociationACL(assoc.getId()));
-    }
-
-    // ---
-
-    private boolean hasPermission(Topic username, Operation operation, DeepaMehtaObject object, AccessControlList acl) {
+    private boolean hasPermission(Topic username, Operation operation, DeepaMehtaObject object) {
         try {
             logger.fine("Determining permission for " + userInfo(username) + " to " + operation + " " + info(object));
-            for (UserRole userRole : acl.getUserRoles(operation)) {
+            UserRole[] userRoles = dms.getACL(object.getId()).getUserRoles(operation);
+            for (UserRole userRole : userRoles) {
                 logger.fine("There is an ACL entry for user role " + userRole);
                 if (userOccupiesRole(object, username, userRole)) {
                     logger.fine("=> ALLOWED");

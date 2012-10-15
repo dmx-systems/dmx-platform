@@ -88,9 +88,7 @@ public interface AccessControlService extends PluginService {
 
     // ---
 
-    void createTopicACL(long topicId, AccessControlList acl);
-
-    void createAssociationACL(long assocId, AccessControlList acl);
+    void createACL(long objectId, AccessControlList acl);
 
     // ---
 
