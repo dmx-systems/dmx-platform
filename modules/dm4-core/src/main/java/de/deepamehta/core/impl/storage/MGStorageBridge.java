@@ -361,16 +361,40 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     @Override
     public void createACL(long objectId, AccessControlList acl) {
-        mg.getMehtaObject(objectId).setString("acl", acl.toJSON().toString());
+        setProperty(objectId, "acl", acl.toJSON().toString());
     }
 
     @Override
     public AccessControlList getACL(long objectId) {
         try {
-            return new AccessControlList(new JSONObject(mg.getMehtaObject(objectId).getString("acl", "{}")));
+            return new AccessControlList(new JSONObject(getProperty(objectId, "acl", "{}")));
         } catch (Exception e) {
             throw new RuntimeException("Fetching access control list for object " + objectId + " failed", e);
         }
+    }
+
+    // ---
+
+    @Override
+    public void setCreator(long objectId, String username) {
+        setProperty(objectId, "creator", username);
+    }
+
+    @Override
+    public String getCreator(long objectId) {
+        return getProperty(objectId, "creator", null);
+    }
+
+    // ---
+
+    @Override
+    public void setOwner(long objectId, String username) {
+        setProperty(objectId, "owner", username);
+    }
+
+    @Override
+    public String getOwner(long objectId) {
+        return getProperty(objectId, "owner", null);
     }
 
 
@@ -740,6 +764,16 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     private MehtaGraphIndexMode fromIndexMode(IndexMode indexMode) {
         return MehtaGraphIndexMode.valueOf(indexMode.name());
+    }
+
+    // ---
+
+    private void setProperty(long objectId, String key, String value) {
+        mg.getMehtaObject(objectId).setString(key, value);
+    }
+
+    private String getProperty(long objectId, String key, String defaultValue) {
+        return mg.getMehtaObject(objectId).getString(key, defaultValue);
     }
 
     // ---

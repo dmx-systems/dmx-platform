@@ -592,7 +592,10 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // === Access Control ===
 
-    // Note: once the Access Control plugin is incorporated into the Core these methods will be dropped from public API
+    @Override
+    public AccessControlList getACL(long objectId) {
+        return storage.getACL(objectId);
+    }
 
     @Override
     public void createACL(long objectId, AccessControlList acl) {
@@ -608,9 +611,48 @@ public class EmbeddedService implements DeepaMehtaService {
         }
     }
 
+    // ---
+
     @Override
-    public AccessControlList getACL(long objectId) {
-        return storage.getACL(objectId);
+    public String getCreator(long objectId) {
+        return storage.getCreator(objectId);
+    }
+
+    @Override
+    public void setCreator(long objectId, String username) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            storage.setCreator(objectId, username);
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Setting the creator of object " + objectId + " failed (username=\"" +
+                username + "\")", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    // ---
+
+    @Override
+    public String getOwner(long objectId) {
+        return storage.getOwner(objectId);
+    }
+
+    @Override
+    public void setOwner(long objectId, String username) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            storage.setOwner(objectId, username);
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Setting the owner of object " + objectId + " failed (username=\"" +
+                username + "\")", e);
+        } finally {
+            tx.finish();
+        }
     }
 
 

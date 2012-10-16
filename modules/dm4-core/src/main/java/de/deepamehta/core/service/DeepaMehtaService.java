@@ -152,16 +152,30 @@ public interface DeepaMehtaService {
 
     // === Access Control ===
 
-    /**
-     * Creates the Access Control List for the specified topic or association.
-     */
-    void createACL(long objectId, AccessControlList acl);
+    // Note: once the Access Control plugin is incorporated into the Core these methods will be dropped from public API
 
     /**
      * Fetches the Access Control List for the specified topic or association.
      * If no one is stored an empty Access Control List is returned.
      */
     AccessControlList getACL(long objectId);
+
+    /**
+     * Creates the Access Control List for the specified topic or association.
+     */
+    void createACL(long objectId, AccessControlList acl);
+
+    // ---
+
+    String getCreator(long objectId);
+
+    void setCreator(long objectId, String username);
+
+    // ---
+
+    String getOwner(long objectId);
+
+    void setOwner(long objectId, String username);
 
 
 

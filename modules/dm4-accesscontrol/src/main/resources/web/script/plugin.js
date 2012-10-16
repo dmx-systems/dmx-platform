@@ -16,8 +16,10 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         return this.request("POST", "/accesscontrol/logout")
     }
     dm4c.restc.get_username = function() {
-        return this.request("GET", "/accesscontrol/user")   // Note: 204 No Content yields to null result
+        return this.request("GET", "/accesscontrol/user", undefined, undefined, "text")
+        // Note: response 204 No Content yields to null result
     }
+    // ### FIXME: adapt to server-side
     dm4c.restc.get_topic_permissions = function(topic_id) {
         return this.request("GET", "/accesscontrol/topic/" + topic_id)
     }
@@ -30,8 +32,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     dm4c.restc.create_acl_entry = function(topic_id, user_role_uri, permissions) {
         this.request("POST", "/accesscontrol/topic/" + topic_id + "/userrole/" + user_role_uri, permissions)
     }
-    dm4c.restc.join_workspace = function(workspace_id, user_id) {
-        this.request("POST", "/accesscontrol/user/" + user_id + "/" + workspace_id)
+    dm4c.restc.join_workspace = function(username, workspace_id) {
+        this.request("POST", "/accesscontrol/user/" + username + "/workspace/" + workspace_id)
     }
 
 
@@ -52,7 +54,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
             function LoginWidget() {
                 var dom = $("<div>").attr({id: "login-widget"})    // attr("id", ...) doesn't create the div!
-                var username = get_username()
+                var username = self.get_username()
                 if (username) {
                     show_user(username)
                 } else {
@@ -119,9 +121,9 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 try {
                     var username = username_input.val()
                     var password = password_input.val()
-                    var username_topic = dm4c.restc.login(authorization())  // throws 401 if login fails
+                    dm4c.restc.login(authorization())  // throws 401 if login fails
                     show_message("Login OK", "ok", close_login_dialog)
-                    update_gui_login(username_topic)
+                    update_gui_login(username)
                 } catch (e) {
                     show_message("Login failed", "failed")
                 }
@@ -152,11 +154,10 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
         // ---
 
-        function update_gui_login(username_topic) {
+        function update_gui_login(username) {
             // Note: the types must be reloaded *before* the logged_in event is fired.
             // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
             dm4c.reload_types(function() {
-                var username = username_topic.value
                 // update view
                 login_widget.show_user(username)
                 dm4c.restore_selection()
@@ -252,49 +253,16 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         })
     }
 
-    // ---
-
     /**
-     * Returns the username (a Topic of type "dm4.accesscontrol.username") of the logged in user,
-     * or null if no user is logged in.
+     * Returns the username (string) of the logged in user, or null if no user is logged in.
      */
     this.get_username = function() {
         return dm4c.restc.get_username()
     }
 
-    this.get_topic_permissions = function(topic_id) {
-        return dm4c.restc.get_topic_permissions(topic_id)
-    }
-
-    this.get_owned_topic = function(user_id, type_uri) {
-        return dm4c.restc.get_owned_topic(user_id, type_uri)
-    }
-
-    this.set_owner = function(topic_id, user_id) {
-        dm4c.restc.set_owner(topic_id, user_id)
-    }
-
-    this.create_acl_entry = function(topic_id, user_role_uri, permissions) {
-        dm4c.restc.create_acl_entry(topic_id, user_role_uri, permissions)
-    }
-
-    this.join_workspace = function(workspace_id, user_id) {
-        dm4c.restc.join_workspace(workspace_id, user_id)
-    }
-
 
 
     // ----------------------------------------------------------------------------------------------- Private Functions
-
-    /**
-     * Returns the username (string) of the logged in user, or null if no user is logged in.
-     */
-    function get_username() {
-        var username = self.get_username();
-        return username && username.value
-    }
-
-    // ---
 
     function encrypt_password(password) {
         return ENCRYPTED_PASSWORD_PREFIX + SHA256(password)

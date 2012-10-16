@@ -214,15 +214,27 @@ public interface DeepaMehtaStorage {
     // === Access Control ===
 
     /**
-     * Creates the Access Control List for the specified topic or association.
-     */
-    void createACL(long objectId, AccessControlList acl);
-
-    /**
      * Fetches the Access Control List for the specified topic or association.
      * If no one is stored an empty Access Control List is returned.
      */
     AccessControlList getACL(long objectId);
+
+    /**
+     * Creates the Access Control List for the specified topic or association.
+     */
+    void createACL(long objectId, AccessControlList acl);
+
+    // ---
+
+    String getCreator(long objectId);
+
+    void setCreator(long objectId, String username);
+
+    // ---
+
+    String getOwner(long objectId);
+
+    void setOwner(long objectId, String username);
 
 
 
