@@ -103,7 +103,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private FacetsService facetsService;
     private WorkspacesService wsService;
 
     @Context
@@ -470,9 +469,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void pluginServiceArrived(PluginService service) {
         logger.info("########## Service arrived: " + service);
-        if (service instanceof FacetsService) {
-            facetsService = (FacetsService) service;
-        } else if (service instanceof WorkspacesService) {
+        if (service instanceof WorkspacesService) {
             wsService = (WorkspacesService) service;
         }
     }
@@ -480,9 +477,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void pluginServiceGone(PluginService service) {
         logger.info("########## Service gone: " + service);
-        if (service == facetsService) {
-            facetsService = null;
-        } else if (service == wsService) {
+        if (service == wsService) {
             wsService = null;
         }
     }
@@ -562,7 +557,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // === ACL Entries ===
 
     /**
-     * Sets the logged in user as the creator of the specified object
+     * Sets the logged in user as the creator and the owner of the specified object
      * and creates a default access control entry for it.
      *
      * If no user is logged in, nothing is performed.
@@ -581,6 +576,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private void setupDefaultAccessControl(DeepaMehtaObject object, AccessControlList acl, String username) {
         setCreator(object.getId(), username);
+        setOwner(object.getId(), username);
         createACL(object.getId(), acl);
     }
 
@@ -750,7 +746,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     private String userInfo(String username) {
-        return "user " + username != null ? "\"" + username + "\"" : "<anonymous>";
+        return "user " + (username != null ? "\"" + username + "\"" : "<anonymous>");
     }
 
     private String info(HttpSession session) {

@@ -360,11 +360,6 @@ public class MGStorageBridge implements DeepaMehtaStorage {
     // === Access Control ===
 
     @Override
-    public void createACL(long objectId, AccessControlList acl) {
-        setProperty(objectId, "acl", acl.toJSON().toString());
-    }
-
-    @Override
     public AccessControlList getACL(long objectId) {
         try {
             return new AccessControlList(new JSONObject(getProperty(objectId, "acl", "{}")));
@@ -373,28 +368,33 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         }
     }
 
-    // ---
-
     @Override
-    public void setCreator(long objectId, String username) {
-        setProperty(objectId, "creator", username);
+    public void createACL(long objectId, AccessControlList acl) {
+        setProperty(objectId, "acl", acl.toJSON().toString());
     }
+
+    // ---
 
     @Override
     public String getCreator(long objectId) {
         return getProperty(objectId, "creator", null);
     }
 
-    // ---
-
     @Override
-    public void setOwner(long objectId, String username) {
-        setProperty(objectId, "owner", username);
+    public void setCreator(long objectId, String username) {
+        setProperty(objectId, "creator", username);
     }
+
+    // ---
 
     @Override
     public String getOwner(long objectId) {
         return getProperty(objectId, "owner", null);
+    }
+
+    @Override
+    public void setOwner(long objectId, String username) {
+        setProperty(objectId, "owner", username);
     }
 
 
