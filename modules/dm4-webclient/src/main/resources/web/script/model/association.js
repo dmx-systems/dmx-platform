@@ -3,25 +3,9 @@ function Association(assoc) {
     this.uri       = assoc.uri
     this.type_uri  = assoc.type_uri
     this.value     = assoc.value
-    this.composite = build_composite(assoc.composite)
+    this.composite = build_composite(assoc.composite)   // build_composite is defined in topic.js
     this.role_1    = assoc.role_1
     this.role_2    = assoc.role_2
-}
-
-function build_composite(composite) {
-    var comp = {}
-    for (var child_type_uri in composite) {
-        var child_topic = composite[child_type_uri]
-        if (js.is_array(child_topic)) {
-            comp[child_type_uri] = []
-            for (var i = 0, topic; topic = child_topic[i]; i++) {
-                comp[child_type_uri].push(new Topic(topic))
-            }
-        } else {
-            comp[child_type_uri] = new Topic(child_topic)
-        }
-    }
-    return comp
 }
 
 // === "Page Displayable" implementation ===
@@ -52,4 +36,18 @@ Association.prototype.get_role_type_1 = function() {
 
 Association.prototype.get_role_type_2 = function() {
     return dm4c.restc.get_topic_by_value("uri", this.role_2.role_type_uri)
+}
+
+// ---
+
+Association.prototype.get_topic_by_type = function(topic_type_uri) {
+    var topic_1 = this.get_topic_1()
+    var topic_2 = this.get_topic_2()
+    var match_1 = topic_1.type_uri == topic_type_uri
+    var match_2 = topic_2.type_uri == topic_type_uri
+    if (match_1 && match_2) {
+        throw "AssociationError: ambiguity in association " + this.id +
+            " when looking for a \"" + topic_type_uri + "\" topic"
+    }
+    return match_1 ? topic_1 : match_2 ? topic_2 : undefined
 }

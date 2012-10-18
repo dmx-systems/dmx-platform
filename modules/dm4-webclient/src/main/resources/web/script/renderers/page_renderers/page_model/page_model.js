@@ -33,14 +33,14 @@ dm4c.render.page_model = (function() {
 
         var self = this
         this.type = page_model_type // page model type (SIMPLE, COMPOSITE, MULTI)
-        this.object = object        // the SIMPLE topic, the COMPOSITE topic, or the 1st MULTI topic ### FIXDOC
         this.childs = {}            // used for COMPOSITE
         this.values = []            // used for MULTI
+        this.object = object        // the SIMPLE topic, the COMPOSITE topic, or the 1st MULTI topic ### FIXDOC
+        this.object_type = object.get_type()
+        this.value = object.value
         this.assoc_def = assoc_def
         this.uri = field_uri
         this.toplevel_object = toplevel_object
-        this.object_type = object.get_type()
-        this.value = object.value
         this.label = this.object_type.value
         this.rows = dm4c.get_view_config(self.object_type, "rows", assoc_def)
         var renderer_uri

@@ -31,8 +31,6 @@ dm4c.add_simple_renderer("dm4.webclient.text_renderer", {
             }
         }
 
-        // ------------------------------------------------------------------------------------------- Private Functions
-
         function render_form_element() {
             // error check
             if (!page_model.rows) {
@@ -69,11 +67,8 @@ dm4c.add_simple_renderer("dm4.webclient.text_renderer", {
             }
 
             function render_combobox() {
-                // fetch all instances                                         // fetch_composite=false, sort=true
-                var topics = dm4c.restc.get_topics(page_model.object_type.uri, false, true).items  
-                //
+                var topics = option_topics(page_model)
                 var combobox = create_combobox()
-                //
                 render(combobox.dom)
                 return combobox
 
@@ -87,6 +82,23 @@ dm4c.add_simple_renderer("dm4.webclient.text_renderer", {
                     combobox.select_by_label(page_model.value)
                     //
                     return combobox
+                }
+
+                // ### TODO: there is a copy in CheckboxRenderer
+                function option_topics(page_model) {
+                    var topic_type_uri = page_model.object_type.uri
+                    var result = dm4c.fire_event("option_topics", page_model.toplevel_object, topic_type_uri,
+                                                                  page_model.assoc_def)
+                    switch (result.length) {
+                    case 0:
+                        // fetch all instances                        // fetch_composite=false, sort=true
+                        return dm4c.restc.get_topics(topic_type_uri, false, true).items
+                    case 1:
+                        return result[0]
+                    default:
+                        throw "TextRendererError: " + result.length + " plugins are competing with " +
+                            "providing the option topics for \"" + topic_type_uri + "\""
+                    }
                 }
             }
 
