@@ -1,12 +1,22 @@
 dm4c.add_multi_renderer("dm4.webclient.checkbox_renderer", {
 
     render_info: function(page_models, parent_element, level) {
+        sort_page_models()
+        //
         var list = $("<ul>")
         for (var i = 0; i < page_models.length; i++) {
             list.append($("<li>").text(page_models[i].value))
         }
         dm4c.render.field_label(page_models[0], parent_element)
         parent_element.append(list)
+
+        function sort_page_models() {
+            page_models.sort(function(pm_1, pm_2) {
+                var val_1 = pm_1.value
+                var val_2 = pm_2.value
+                return val_1 < val_2 ? -1 : val_1 == val_2 ? 0 : 1
+            })
+        }
     },
 
     render_form: function(page_models, parent_element, level) {

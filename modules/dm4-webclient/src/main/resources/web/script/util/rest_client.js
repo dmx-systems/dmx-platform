@@ -365,13 +365,7 @@ function RESTClient(core_service_uri) {
         return compare(topic_1.type_uri, topic_2.type_uri)
 
         function compare(val_1, val_2) {
-            if (val_1 < val_2) {
-                return -1
-            } else if (val_1 == val_2) {
-                return 0
-            } else {
-                return 1
-            }
+            return val_1 < val_2 ? -1 : val_1 == val_2 ? 0 : 1
         }
     }
 }
