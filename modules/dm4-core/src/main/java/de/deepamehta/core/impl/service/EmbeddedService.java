@@ -176,7 +176,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public Directives updateTopic(TopicModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopic topic = getTopic(model.getId(), true, clientState);     // fetchComposite=true
+            AttachedTopic topic = getTopic(model.getId(), true, clientState);   // fetchComposite=true
             Directives directives = new Directives();
             //
             topic.update(model, clientState, directives);
@@ -349,7 +349,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public Directives updateAssociation(AssociationModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Association assoc = getAssociation(model.getId(), false, null);     // fetchComposite=false
+            Association assoc = getAssociation(model.getId(), true, null);      // fetchComposite=true
             Directives directives = new Directives();
             //
             assoc.update(model, clientState, directives);
