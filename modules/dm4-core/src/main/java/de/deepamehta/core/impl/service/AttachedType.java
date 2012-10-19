@@ -20,7 +20,7 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -304,22 +304,20 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private Map<Long, AssociationDefinition> fetchAssociationDefinitions() {
         // 1) fetch part topic types
-        // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
-        // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
-        // loading its ACL which in turn would rely on this very topic type.
-        // ### FIXME: is this still true? The POST_FETCH_HOOK is dropped meanwhile.
-        List assocTypeFilter = Arrays.asList("dm4.core.aggregation_def", "dm4.core.composition_def");
-        ResultSet<RelatedTopicModel> partTopicTypes = dms.storage.getTopicRelatedTopics(getId(), assocTypeFilter,
-            "dm4.core.whole_type", "dm4.core.part_type", "dm4.core.topic_type", 0);
+        // Note: we must set fetchRelatingComposite to false here. Fetching the composite of association type
+        // Composition Definition would cause an endless recursion. Composition Definition is defined through
+        // Composition Definition itself (child types "Include in Label", "Ordered").
+        ResultSet<RelatedTopic> partTopicTypes = getRelatedTopics(asList("dm4.core.aggregation_def",
+            "dm4.core.composition_def"), "dm4.core.whole_type", "dm4.core.part_type", "dm4.core.topic_type",
+            false, false, 0, null);     // fetchComposite=false, fetchRelatingComposite=false
         //
         // 2) create association definitions
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
         // subsequently build from it by sorting the assoc def's according to the sequence IDs.
         Map<Long, AssociationDefinition> assocDefs = new HashMap();
-        for (RelatedTopicModel partTopicType : partTopicTypes) {
-            Association assoc = new AttachedAssociation(partTopicType.getAssociationModel(), dms);
-            AssociationDefinition assocDef = dms.objectFactory.fetchAssociationDefinition(assoc, getUri(),
-                partTopicType.getId());
+        for (RelatedTopic partTopicType : partTopicTypes) {
+            AssociationDefinition assocDef = dms.objectFactory.fetchAssociationDefinition(
+                partTopicType.getAssociation(), getUri(), partTopicType.getId());
             assocDefs.put(assocDef.getId(), assocDef);
         }
         return assocDefs;

@@ -6,6 +6,11 @@
             value:         "Include in Label",
             uri:           "dm4.core.include_in_label",
             data_type_uri: "dm4.core.boolean"
+        },
+        {
+            value:         "Ordered",
+            uri:           "dm4.core.ordered",
+            data_type_uri: "dm4.core.boolean"
         }
     ],
 
@@ -21,6 +26,11 @@
                     part_topic_type_uri:  "dm4.core.include_in_label",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.core.ordered",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
                 }
             ]
         },
@@ -31,6 +41,11 @@
             assoc_defs: [
                 {
                     part_topic_type_uri:  "dm4.core.include_in_label",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.core.ordered",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
