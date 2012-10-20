@@ -4,6 +4,8 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.TopicModel;
 
 
 
@@ -13,13 +15,13 @@ public interface ObjectFactory {
 
     // ---
 
-    public Topic fetchWholeTopicType(Association assoc);
+    Topic fetchWholeTopicType(Association assoc);
 
-    public Topic fetchPartTopicType(Association assoc);
+    Topic fetchPartTopicType(Association assoc);
 
     // ---
 
-    RelatedTopic fetchWholeCardinality(Association assoc);
+    RelatedTopicModel fetchWholeCardinality(long assocDefId);
 
-    RelatedTopic fetchPartCardinality(Association assoc);
+    RelatedTopicModel fetchPartCardinality(long assocDefId);
 }

@@ -2,6 +2,7 @@ package de.deepamehta.core.model;
 
 import org.codehaus.jettison.json.JSONObject;
 
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -25,8 +26,9 @@ public class AssociationTypeModel extends TypeModel {
     }
 
     // ### TODO: to be completed
-    public AssociationTypeModel(TopicModel model, String dataTypeUri, Set<IndexMode> indexModes) {
-        super(model, dataTypeUri, indexModes);
+    public AssociationTypeModel(TopicModel model, String dataTypeUri, Set<IndexMode> indexModes,
+                                List<AssociationDefinitionModel> assocDefs) {
+        super(model, dataTypeUri, indexModes, assocDefs);
     }
 
     public AssociationTypeModel(JSONObject assocTypeModel) {

@@ -289,9 +289,9 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // subsequently build from it by sorting the assoc def's according to the sequence IDs.
         Map<Long, AssociationDefinition> assocDefs = new HashMap();
         for (RelatedTopic partTopicType : partTopicTypes) {
-            AssociationDefinition assocDef = dms.objectFactory.fetchAssociationDefinition(
-                partTopicType.getAssociation(), getUri(), partTopicType.getId());
-            assocDefs.put(assocDef.getId(), assocDef);
+            // ### AssociationDefinition assocDef = dms.objectFactory.fetchAssociationDefinition(
+            // ###     partTopicType.getAssociation(), getUri(), partTopicType.getId());
+            // ### assocDefs.put(assocDef.getId(), assocDef);
         }
         return assocDefs;
     }
@@ -352,7 +352,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // remove current assignment
         long assocId = dms.objectFactory.fetchDataTypeTopic(getId(), getUri(), className())
             .getAssociationModel().getId();
-        dms.deleteAssociation(assocId, null);  // clientState=null
+        dms.deleteAssociation(assocId, null);   // clientState=null
         // create new assignment
         associateDataType();
     }

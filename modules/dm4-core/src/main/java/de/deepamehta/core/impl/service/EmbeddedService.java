@@ -814,16 +814,20 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ---
 
-    AttachedRelatedAssociation attach(RelatedAssociationModel model) {
+    AttachedRelatedAssociation attach(RelatedAssociationModel model, boolean fetchComposite,
+                                                                     boolean fetchRelatingComposite) {
+        if (fetchComposite || fetchRelatingComposite) {
+            // ### TODO
+            throw new RuntimeException("not yet implemented");
+        }
         return new AttachedRelatedAssociation(model, this);
-        // ### TODO: fetch composite
     }
 
     Set<RelatedAssociation> attach(Iterable<RelatedAssociationModel> models,
                                    boolean fetchComposite, boolean fetchRelatingComposite) {
         Set<RelatedAssociation> relAssocs = new LinkedHashSet();
         for (RelatedAssociationModel model : models) {
-            relAssocs.add(attach(model));
+            relAssocs.add(attach(model, fetchComposite, fetchRelatingComposite));
         }
         return relAssocs;
     }

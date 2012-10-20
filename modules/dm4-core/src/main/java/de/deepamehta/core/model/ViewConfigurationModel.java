@@ -31,7 +31,7 @@ public class ViewConfigurationModel {
     public ViewConfigurationModel() {
     }
 
-    public ViewConfigurationModel(Set<TopicModel> configTopics) {
+    public ViewConfigurationModel(Set<? extends TopicModel> configTopics) {
         for (TopicModel topic : configTopics) {
             addConfigTopic(topic);
         }

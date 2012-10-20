@@ -123,6 +123,25 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         return buildAssociations(mg.getMehtaNode(topicId).getMehtaEdges(myRoleTypeUri));
     }
 
+    // ---
+
+    @Override
+    public RelatedAssociationModel getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                              String othersRoleTypeUri, String othersAssocTypeUri) {
+        Set<RelatedAssociationModel> assocs = getTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersAssocTypeUri);
+        switch (assocs.size()) {
+        case 0:
+            return null;
+        case 1:
+            return assocs.iterator().next();
+        default:
+            throw new RuntimeException("Ambiguity: there are " + assocs.size() + " related associations (topicId=" +
+                topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
+                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")");
+        }
+    }
+
     @Override
     public Set<RelatedAssociationModel> getTopicRelatedAssociations(long topicId, String assocTypeUri,
                                                                     String myRoleTypeUri, String othersRoleTypeUri,

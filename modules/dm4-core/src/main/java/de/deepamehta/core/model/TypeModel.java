@@ -40,10 +40,14 @@ public abstract class TypeModel extends TopicModel {
     }
 
     // ### TODO: to be completed
-    public TypeModel(TopicModel model, String dataTypeUri, Set<IndexMode> indexModes) {
+    public TypeModel(TopicModel model, String dataTypeUri, Set<IndexMode> indexModes,
+                     List<AssociationDefinitionModel> assocDefs) {
         super(model);
         this.dataTypeUri = dataTypeUri;
         this.indexModes = indexModes;
+        for (AssociationDefinitionModel assocDef : assocDefs) {
+            addAssocDef(assocDef);
+        }
     }
 
     public TypeModel(TypeModel model) {

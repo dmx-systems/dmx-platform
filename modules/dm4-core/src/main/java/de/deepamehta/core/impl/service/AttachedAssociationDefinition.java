@@ -201,16 +201,20 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     // === Store ===
 
+    // ### FIXME: argument not used
     private void storeWholeCardinalityUri(Directives directives) {
         // remove current assignment
-        dms.getObjectFactory().fetchWholeCardinality(this).getAssociation().delete(directives);
+        long assocId = dms.getObjectFactory().fetchWholeCardinality(getId()).getAssociationModel().getId();
+        dms.deleteAssociation(assocId, null);   // clientState=null
         // create new assignment
         associateWholeCardinality();
     }    
 
+    // ### FIXME: argument not used
     private void storePartCardinalityUri(Directives directives) {
         // remove current assignment
-        dms.getObjectFactory().fetchPartCardinality(this).getAssociation().delete(directives);
+        long assocId = dms.getObjectFactory().fetchPartCardinality(getId()).getAssociationModel().getId();
+        dms.deleteAssociation(assocId, null);   // clientState=null
         // create new assignment
         associatePartCardinality();
     }    
