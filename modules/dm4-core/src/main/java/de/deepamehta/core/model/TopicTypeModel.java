@@ -28,8 +28,9 @@ public class TopicTypeModel extends TypeModel {
         super(uri, topicTypeUri, new SimpleValue(value), dataTypeUri);
     }
 
-    public TopicTypeModel(TopicModel model) {
-        super(model);
+    // ### TODO: to be completed
+    public TopicTypeModel(TopicModel model, String dataTypeUri, Set<IndexMode> indexModes) {
+        super(model, dataTypeUri, indexModes);
     }
 
     public TopicTypeModel(TopicTypeModel model) {

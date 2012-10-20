@@ -1,5 +1,7 @@
 package de.deepamehta.core.impl.service;
 
+import de.deepamehta.core.TopicType;
+import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.SimpleValue;
@@ -25,8 +27,8 @@ class TypeCache {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Map<String, AttachedTopicType>       topicTypes = new HashMap();   // key: topic type URI
-    private Map<String, AttachedAssociationType> assocTypes = new HashMap();   // key: assoc type URI
+    private Map<String, TopicType>       topicTypes = new HashMap();   // key: topic type URI
+    private Map<String, AssociationType> assocTypes = new HashMap();   // key: assoc type URI
 
     private EmbeddedService dms;
 
@@ -42,8 +44,8 @@ class TypeCache {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    AttachedTopicType getTopicType(String topicTypeUri) {
-        AttachedTopicType topicType = topicTypes.get(topicTypeUri);
+    TopicType getTopicType(String topicTypeUri) {
+        TopicType topicType = topicTypes.get(topicTypeUri);
         if (topicType == null) {
             // ### endlessRecursionProtection.check(topicTypeUri);
             topicType = loadTopicType(topicTypeUri);
@@ -51,8 +53,8 @@ class TypeCache {
         return topicType;
     }
 
-    AttachedAssociationType getAssociationType(String assocTypeUri) {
-        AttachedAssociationType assocType = assocTypes.get(assocTypeUri);
+    AssociationType getAssociationType(String assocTypeUri) {
+        AssociationType assocType = assocTypes.get(assocTypeUri);
         if (assocType == null) {
             // ### endlessRecursionProtection.check(assocTypeUri);
             assocType = loadAssociationType(assocTypeUri);
@@ -62,11 +64,11 @@ class TypeCache {
 
     // ---
 
-    void put(AttachedTopicType topicType) {
+    void put(TopicType topicType) {
         topicTypes.put(topicType.getUri(), topicType);
     }
 
-    void put(AttachedAssociationType assocType) {
+    void put(AssociationType assocType) {
         assocTypes.put(assocType.getUri(), assocType);
     }
 
@@ -81,44 +83,14 @@ class TypeCache {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private AttachedTopicType loadTopicType(String topicTypeUri) {
+    private TopicType loadTopicType(String topicTypeUri) {
         logger.info("Loading topic type \"" + topicTypeUri + "\"");
-        // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
-        // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
-        // loading its ACL which in turn would rely on this very topic type.
-        // ### FIXME: is this still true? The POST_FETCH_HOOK is dropped meanwhile.
-        TopicModel typeTopic = dms.storage.getTopic("uri", new SimpleValue(topicTypeUri));
-        // error check
-        if (typeTopic == null) {
-            throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
-        } else if (!typeTopic.getTypeUri().equals("dm4.core.topic_type") &&
-                   !typeTopic.getTypeUri().equals("dm4.core.meta_type") &&
-                   !typeTopic.getTypeUri().equals("dm4.core.meta_meta_type")) {
-            throw new RuntimeException("URI \"" + topicTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
-                "\" when the caller expects a \"dm4.core.topic_type\"");
-        }
-        //
-        AttachedTopicType topicType = new AttachedTopicType(dms);
-        topicType.fetch(new TopicTypeModel(typeTopic));
-        //
-        return topicType;
+        return dms.objectFactory.fetchTopicType(topicTypeUri);
     }
 
-    private AttachedAssociationType loadAssociationType(String assocTypeUri) {
+    private AssociationType loadAssociationType(String assocTypeUri) {
         logger.info("Loading association type \"" + assocTypeUri + "\"");
-        TopicModel typeTopic = dms.storage.getTopic("uri", new SimpleValue(assocTypeUri));
-        // error check
-        if (typeTopic == null) {
-            throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found");
-        } else if (!typeTopic.getTypeUri().equals("dm4.core.assoc_type")) {
-            throw new RuntimeException("URI \"" + assocTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
-                "\" when the caller expects a \"dm4.core.assoc_type\"");
-        }
-        //
-        AttachedAssociationType assocType = new AttachedAssociationType(dms);
-        assocType.fetch(new AssociationTypeModel(typeTopic));
-        //
-        return assocType;
+        return dms.objectFactory.fetchAssociationType(assocTypeUri);
     }
 
     // ---

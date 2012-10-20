@@ -18,6 +18,8 @@ public interface Topic extends DeepaMehtaObject {
 
     TopicModel getModel();
 
+    // === Updating ===
+
     ChangeReport update(TopicModel model, ClientState clientState, Directives directives);
 
     // === Traversal ===

@@ -39,9 +39,11 @@ public abstract class TypeModel extends TopicModel {
         this.viewConfigModel = new ViewConfigurationModel();
     }
 
-    public TypeModel(TopicModel model) {
+    // ### TODO: to be completed
+    public TypeModel(TopicModel model, String dataTypeUri, Set<IndexMode> indexModes) {
         super(model);
-        // ### FIXME: initialization
+        this.dataTypeUri = dataTypeUri;
+        this.indexModes = indexModes;
     }
 
     public TypeModel(TypeModel model) {

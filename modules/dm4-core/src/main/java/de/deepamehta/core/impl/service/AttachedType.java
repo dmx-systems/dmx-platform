@@ -200,10 +200,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
     void fetch(TypeModel model) {
         setModel(model);
         //
-        // 1) init data type
-        getModel().setDataTypeUri(fetchDataTypeTopic().getUri());
-        // 2) init index modes
-        getModel().setIndexModes(fetchIndexModes());
+        // ### 1) init data type
+        // ### getModel().setDataTypeUri(fetchDataTypeTopic().getUri());
+        // ### 2) init index modes
+        // ### getModel().setIndexModes(fetchIndexModes());
         // 3) init association definitions
         initAssociationDefinitions();
         //
@@ -261,33 +261,6 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
 
     // === Fetch ===
-
-    private RelatedTopicModel fetchDataTypeTopic() {
-        try {
-            // Note: the low-level storage call prevents possible endless recursion (caused by POST_FETCH_HOOK).
-            // Consider the Access Control plugin: loading topic type dm4.accesscontrol.acl_facet would imply
-            // loading its ACL which in turn would rely on this very topic type.
-            // ### FIXME: is this still true? The POST_FETCH_HOOK is dropped meanwhile.
-            RelatedTopicModel dataType = dms.storage.getTopicRelatedTopic(getId(), "dm4.core.aggregation",
-                "dm4.core.type", null, "dm4.core.data_type");
-            if (dataType == null) {
-                throw new RuntimeException("No data type topic is associated to " + className() + " \"" +
-                    getUri() + "\"");
-            }
-            return dataType;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching the data type topic for " + className() + " \"" +
-                getUri() + "\" failed", e);
-        }
-    }
-
-    private Set<IndexMode> fetchIndexModes() {
-        ResultSet<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type", null,
-            "dm4.core.index_mode", false, false, 0, null);      // fetchComposite=false
-        return IndexMode.fromTopics(topics.getItems());
-    }
-
-    // ---
 
     private void initAssociationDefinitions() {
         Map<Long, AssociationDefinition> assocDefs = fetchAssociationDefinitions();
@@ -377,7 +350,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private void storeDataTypeUri() {
         // remove current assignment
-        long assocId = fetchDataTypeTopic().getAssociationModel().getId();
+        long assocId = dms.objectFactory.fetchDataTypeTopic(getId(), getUri(), className())
+            .getAssociationModel().getId();
         dms.deleteAssociation(assocId, null);  // clientState=null
         // create new assignment
         associateDataType();

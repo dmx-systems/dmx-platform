@@ -414,13 +414,13 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public AttachedTopicType getTopicType(String uri, ClientState clientState) {
+    public TopicType getTopicType(String uri, ClientState clientState) {
         if (uri == null) {
             throw new IllegalArgumentException("Tried to get a topic type with null URI");
         }
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopicType topicType = typeCache.getTopicType(uri);
+            TopicType topicType = typeCache.getTopicType(uri);
             tx.success();
             return topicType;
         } catch (Exception e) {
@@ -480,7 +480,7 @@ public class EmbeddedService implements DeepaMehtaService {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
             String topicTypeUri = getTopic(model.getId(), false, clientState).getUri();     // fetchComposite=false
-            AttachedTopicType topicType = getTopicType(topicTypeUri, clientState);
+            TopicType topicType = getTopicType(topicTypeUri, clientState);
             Directives directives = new Directives();
             //
             topicType.update(model, clientState, directives);
@@ -516,13 +516,13 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public AttachedAssociationType getAssociationType(String uri, ClientState clientState) {
+    public AssociationType getAssociationType(String uri, ClientState clientState) {
         if (uri == null) {
             throw new IllegalArgumentException("Tried to get an association type with null URI");
         }
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedAssociationType assocType = typeCache.getAssociationType(uri);
+            AssociationType assocType = typeCache.getAssociationType(uri);
             tx.success();
             return assocType;
         } catch (Exception e) {

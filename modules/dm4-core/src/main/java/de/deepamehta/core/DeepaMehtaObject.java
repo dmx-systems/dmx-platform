@@ -51,6 +51,12 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     void setCompositeValue(CompositeValue comp, ClientState clientState, Directives directives);
 
+
+
+    // === Updating ===
+
+    ChangeReport update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives);
+
     // ---
 
     void updateChildTopic(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
@@ -118,12 +124,6 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      Set<Association> getAssociations();
 
      Set<Association> getAssociations(String myRoleTypeUri);
-
-
-
-    // === Updating ===
-
-    ChangeReport update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives);
 
 
 

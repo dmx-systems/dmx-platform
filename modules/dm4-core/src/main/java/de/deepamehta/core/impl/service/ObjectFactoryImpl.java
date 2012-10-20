@@ -1,14 +1,23 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
+import de.deepamehta.core.model.AssociationTypeModel;
+import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.ObjectFactory;
+
+import java.util.Set;
 
 
 
@@ -134,6 +143,79 @@ class ObjectFactoryImpl implements ObjectFactory {
         }
         //
         return new AttachedRelatedTopic(model, dms);
+    }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    TopicType fetchTopicType(String topicTypeUri) {
+        TopicModel typeTopic = dms.storage.getTopic("uri", new SimpleValue(topicTypeUri));
+        checkTopicType(topicTypeUri, typeTopic);
+        //
+        // 1) init data type
+        String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), topicTypeUri, "topic type").getUri();
+        // 2) init index modes
+        Set<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
+        //
+        TopicTypeModel topicType = new TopicTypeModel(typeTopic, dataTypeUri, indexModes);
+        return new AttachedTopicType(topicType, dms);
+    }
+
+    AssociationType fetchAssociationType(String assocTypeUri) {
+        TopicModel typeTopic = dms.storage.getTopic("uri", new SimpleValue(assocTypeUri));
+        checkAssociationType(assocTypeUri, typeTopic);
+        //
+        // 1) init data type
+        String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), assocTypeUri, "association type").getUri();
+        // 2) init index modes
+        Set<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
+        // ### TODO: to be completed
+        //
+        AssociationTypeModel assocType = new AssociationTypeModel(typeTopic, dataTypeUri, indexModes);
+        return new AttachedAssociationType(assocType, dms);
+    }
+
+    // ---
+
+    RelatedTopicModel fetchDataTypeTopic(long typeId, String typeUri, String className) {
+        try {
+            RelatedTopicModel dataType = dms.storage.getTopicRelatedTopic(typeId, "dm4.core.aggregation",
+                "dm4.core.type", null, "dm4.core.data_type");   // ### FIXME: null
+            if (dataType == null) {
+                throw new RuntimeException("No data type topic is associated to " + className + " \"" + typeUri + "\"");
+            }
+            return dataType;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching the data type topic for " + className + " \"" + typeUri + "\" failed",
+                e);
+        }
+    }
+
+    private Set<IndexMode> fetchIndexModes(long typeId) {
+        ResultSet<RelatedTopicModel> indexModes = dms.storage.getTopicRelatedTopics(typeId, "dm4.core.aggregation",
+            "dm4.core.type", null, "dm4.core.index_mode", 0);   // ### FIXME: null
+        return IndexMode.fromTopics(indexModes.getItems());
+    }
+
+    // ---
+
+    private void checkTopicType(String topicTypeUri, TopicModel typeTopic) {
+        if (typeTopic == null) {
+            throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
+        } else if (!typeTopic.getTypeUri().equals("dm4.core.topic_type") &&
+                   !typeTopic.getTypeUri().equals("dm4.core.meta_type") &&
+                   !typeTopic.getTypeUri().equals("dm4.core.meta_meta_type")) {
+            throw new RuntimeException("URI \"" + topicTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
+                "\" when the caller expects a \"dm4.core.topic_type\"");
+        }
+    }
+
+    private void checkAssociationType(String assocTypeUri, TopicModel typeTopic) {
+        if (typeTopic == null) {
+            throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found");
+        } else if (!typeTopic.getTypeUri().equals("dm4.core.assoc_type")) {
+            throw new RuntimeException("URI \"" + assocTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
+                "\" when the caller expects a \"dm4.core.assoc_type\"");
+        }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
