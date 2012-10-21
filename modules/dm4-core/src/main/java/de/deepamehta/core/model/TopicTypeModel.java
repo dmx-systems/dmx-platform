@@ -29,18 +29,18 @@ public class TopicTypeModel extends TypeModel {
         super(uri, topicTypeUri, new SimpleValue(value), dataTypeUri);
     }
 
-    // ### TODO: to be completed
-    public TopicTypeModel(TopicModel model, String dataTypeUri, Set<IndexMode> indexModes,
-                          List<AssociationDefinitionModel> assocDefs) {
-        super(model, dataTypeUri, indexModes, assocDefs);
+    public TopicTypeModel(TopicModel topic, String dataTypeUri, Set<IndexMode> indexModes,
+                          List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
+                          ViewConfigurationModel viewConfig) {
+        super(topic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
     }
 
-    public TopicTypeModel(TopicTypeModel model) {
-        super(model);
+    public TopicTypeModel(TopicTypeModel topicType) {
+        super(topicType);
     }
 
-    public TopicTypeModel(JSONObject topicTypeModel) {
-        super(topicTypeModel, "dm4.core.topic_type");
+    public TopicTypeModel(JSONObject topicType) {
+        super(topicType, "dm4.core.topic_type");
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

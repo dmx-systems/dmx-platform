@@ -60,7 +60,7 @@ class ObjectFactoryImpl implements ObjectFactory {
             AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
                 topicTypes.wholeTopicTypeUri, topicTypes.partTopicTypeUri,
                 cardinality.wholeCardinalityUri, cardinality.partCardinalityUri,
-                fetchViewConfig(assoc.getId()));
+                fetchAssocDefViewConfig(assoc.getId()));
             //
             return new AttachedAssociationDefinition(model, dms);
         } catch (Exception e) {
@@ -98,28 +98,28 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public RelatedTopicModel fetchWholeCardinality(long assocDefId) {
-        RelatedTopicModel model = dms.storage.getAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
+        RelatedTopicModel wholeCard = dms.storage.getAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.whole_cardinality", "dm4.core.cardinality");
         // error check
-        if (model == null) {
+        if (wholeCard == null) {
             throw new RuntimeException("Invalid association definition: whole cardinality is missing (assocDefId=" +
                 assocDefId + ")");
         }
         //
-        return model;
+        return wholeCard;
     }
 
     @Override
     public RelatedTopicModel fetchPartCardinality(long assocDefId) {
-        RelatedTopicModel model = dms.storage.getAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
+        RelatedTopicModel partCard = dms.storage.getAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.part_cardinality", "dm4.core.cardinality");
         // error check
-        if (model == null) {
+        if (partCard == null) {
             throw new RuntimeException("Invalid association definition: part cardinality is missing (assocDefId=" +
                 assocDefId + ")");
         }
         //
-        return model;
+        return partCard;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -135,9 +135,13 @@ class ObjectFactoryImpl implements ObjectFactory {
         // 3) init association definitions
         List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic.getId(), topicTypeUri,
             "topic type");
-        // ### TODO: to be completed
+        // 4) init label configuration
+        List<String> labelConfig = fetchLabelConfig(assocDefs);
+        // 5) init view configuration
+        ViewConfigurationModel viewConfig = fetchViewConfig(typeTopic.getId(), topicTypeUri, "topic type");
         //
-        TopicTypeModel topicType = new TopicTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs);
+        TopicTypeModel topicType = new TopicTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
+            viewConfig);
         return new AttachedTopicType(topicType, dms);
     }
 
@@ -152,9 +156,13 @@ class ObjectFactoryImpl implements ObjectFactory {
         // 3) init association definitions
         List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic.getId(), assocTypeUri,
             "association type");
-        // ### TODO: to be completed
+        // 4) init label configuration
+        List<String> labelConfig = fetchLabelConfig(assocDefs);
+        // 5) init view configuration
+        ViewConfigurationModel viewConfig = fetchViewConfig(typeTopic.getId(), assocTypeUri, "association type");
         //
-        AssociationTypeModel assocType = new AssociationTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs);
+        AssociationTypeModel assocType = new AssociationTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs,
+            labelConfig, viewConfig);
         return new AttachedAssociationType(assocType, dms);
     }
 
@@ -187,14 +195,14 @@ class ObjectFactoryImpl implements ObjectFactory {
     private List<AssociationDefinitionModel> fetchAssociationDefinitions(long typeId, String typeUri,
                                                                                       String className) {
         Map<Long, AssociationDefinitionModel> assocDefs = fetchAssociationDefinitionsUnsorted(typeId, typeUri);
-        List<Long> sequence = fetchSequence(typeId, typeUri, className);
+        List<RelatedAssociationModel> sequence = fetchSequence(typeId, typeUri, className);
         // error check
         if (assocDefs.size() != sequence.size()) {
             throw new RuntimeException("DB inconsistency: for " + className + " \"" + typeUri + "\" there are " +
                 assocDefs.size() + " association definitions but sequence has " + sequence.size());
         }
         //
-        return sortAssocDefs(assocDefs, sequence);
+        return sortAssocDefs(assocDefs, DeepaMehtaUtils.idList(sequence));
     }
 
     private Map<Long, AssociationDefinitionModel> fetchAssociationDefinitionsUnsorted(long typeId, String typeUri) {
@@ -226,7 +234,7 @@ class ObjectFactoryImpl implements ObjectFactory {
             return new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
                 wholeTopicTypeUri, partTopicTypeUri,
                 cardinality.wholeCardinalityUri, cardinality.partCardinalityUri,
-                fetchViewConfig(assoc.getId()));
+                fetchAssocDefViewConfig(assoc.getId()));
         } catch (Exception e) {
             throw new RuntimeException("Fetching association definition failed (wholeTopicTypeUri=\"" +
                 wholeTopicTypeUri + "\", partTopicTypeUri=" + partTopicTypeUri + ", " + assoc + ")", e);
@@ -250,19 +258,19 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // --- Sequence ---
 
-    private List<Long> fetchSequence(long typeId, String typeUri, String className) {
+    List<RelatedAssociationModel> fetchSequence(long typeId, String typeUri, String className) {
         try {
-            List<Long> sequence = new ArrayList();
+            List<RelatedAssociationModel> sequence = new ArrayList();
             // find sequence start
             RelatedAssociationModel assocDef = dms.storage.getTopicRelatedAssociation(typeId, "dm4.core.aggregation",
                 "dm4.core.type", "dm4.core.sequence_start", null);      // othersAssocTypeUri=null
             // fetch sequence segments
             if (assocDef != null) {
-                sequence.add(assocDef.getId());
+                sequence.add(assocDef);
                 while ((assocDef = dms.storage.getAssociationRelatedAssociation(assocDef.getId(), "dm4.core.sequence",
                     "dm4.core.predecessor", "dm4.core.successor")) != null) {
                     //
-                    sequence.add(assocDef.getId());
+                    sequence.add(assocDef);
                 }
             }
             //
@@ -270,6 +278,22 @@ class ObjectFactoryImpl implements ObjectFactory {
         } catch (Exception e) {
             throw new RuntimeException("Fetching sequence for " + className + " \"" + typeUri + "\" failed", e);
         }
+    }
+
+
+
+    // ===
+
+    private List<String> fetchLabelConfig(List<AssociationDefinitionModel> assocDefs) {
+        List<String> labelConfig = new ArrayList();
+        for (AssociationDefinitionModel assocDef : assocDefs) {
+            RelatedTopicModel includeInLabel = dms.storage.getAssociationRelatedTopic(assocDef.getId(),
+                "dm4.core.composition", "dm4.core.whole", "dm4.core.part", "dm4.core.include_in_label");
+            if (includeInLabel != null && includeInLabel.getSimpleValue().booleanValue()) {
+                labelConfig.add(assocDef.getUri());
+            }
+        }
+        return labelConfig;
     }
 
     // ---
@@ -310,12 +334,25 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // ---
 
-    private ViewConfigurationModel fetchViewConfig(long assocDefId) {
+    private ViewConfigurationModel fetchAssocDefViewConfig(long assocDefId) {
         ResultSet<RelatedTopicModel> topics = dms.storage.getAssociationRelatedTopics(assocDefId,
             "dm4.core.aggregation", "dm4.core.assoc_def", "dm4.core.view_config", null, 0);
         // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
         // ### FIXME: the composites must be fetched
         return new ViewConfigurationModel(topics.getItems());
+    }
+
+    private ViewConfigurationModel fetchViewConfig(long typeId, String typeUri, String className) {
+        try {
+            ResultSet<RelatedTopicModel> topics = dms.storage.getTopicRelatedTopics(typeId,
+                "dm4.core.aggregation", "dm4.core.type", "dm4.core.view_config", null, 0);
+            // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
+            // ### FIXME: the composites must be fetched
+            return new ViewConfigurationModel(topics.getItems());
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching view configuration for " + className + " \"" + typeUri +
+                "\" failed", e);
+        }
     }
 
 

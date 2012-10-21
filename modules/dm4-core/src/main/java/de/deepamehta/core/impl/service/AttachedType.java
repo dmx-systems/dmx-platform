@@ -10,6 +10,7 @@ import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
@@ -43,12 +44,11 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedType(EmbeddedService dms) {
-        super(dms);         // Note: the model and the attached object cache are initialized through fetch().
-    }
-
     AttachedType(TypeModel model, EmbeddedService dms) {
-        super(model, dms);  // Note: the attached object cache is initialized through store().
+        super(model, dms);
+        // init attached object cache
+        initAssocDefs();
+        initViewConfig();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -182,54 +182,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
 
 
-    // ----------------------------------------------------------------------------------------------- Protected Methods
-
-    protected abstract void putInTypeCache();
-
-
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    /**
-     * Fetches this type from DB, initializes its model, and puts the type in the type cache.
-     * <p>
-     * Called from {@link TypeCache#loadTopicType}.
-     *
-     * @param   model   A type model with only the base-topic parts initialized.
-     */
-    void fetch(TypeModel model) {
-        setModel(model);
-        //
-        // ### 1) init data type
-        // ### getModel().setDataTypeUri(fetchDataTypeTopic().getUri());
-        // ### 2) init index modes
-        // ### getModel().setIndexModes(fetchIndexModes());
-        // 3) init association definitions
-        initAssociationDefinitions();
-        //
-        // Note 1: the type's association definitions must be initialized and the type must be
-        // put in cache *before* its label configuration is fetched.
-        //
-        // Note 2: the type must be put in cache *before* its view configuration is fetched.
-        // Othewise endless recursion might occur. Consider this case: fetching the topic type "Icon"
-        // implies fetching its view configuration which in turn implies fetching the topic type "Icon"!
-        // This is because "Icon" *is part of* "View Configuration" and has a view configuration itself
-        // (provided by the deepamehta-iconpicker module).
-        // We resolve that circle by postponing the view configuration retrieval. This works because Icon's
-        // view configuration is actually not required while fetching, but solely its data type is
-        // (see AttachedDeepaMehtaObject.fetchComposite()).
-        //
-        putInTypeCache();   // abstract
-        //
-        // 4) init label configuration
-        getModel().setLabelConfig(fetchLabelConfig());
-        // 5) init view configuration
-        fetchViewConfig();
-        //
-        // init attached object cache
-        // ### initAssocDefs();    // Note: the assoc defs are already initialized through previous addAssocDefsSorted()
-        // ### initViewConfig();   // Note: initialized through fetchViewConfig()
-    }
 
     void store(ClientState clientState) {
         // 1) store the base-topic parts ### FIXME: call super.store() instead?
@@ -240,13 +193,13 @@ abstract class AttachedType extends AttachedTopic implements Type {
         if (getUri().equals("")) {
             setUri(DEFAULT_URI_PREFIX + getId());
         }
-        // init attached object cache
-        initAssocDefs();
-        initViewConfig();
         // Note: the attached object cache must be initialized *after* storing the base-topic parts because
         // initViewConfig() relies on the type's ID (unknown before stored) or URI (possibly unknown before stored).
+        // ### FIXME: this requirment must be dropped. Storage must be performed outside of this object.
+        //
         // Note: the attached object cache must be initialized *before* storing the type-specific parts because
         // storeAssocDefs() relies on the association definitions.
+        // ### FIXME: this requirment must be dropped. Storage must rely solely on the model.
         //
         // 2) store the type-specific parts
         associateDataType();
@@ -257,92 +210,6 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-
-
-    // === Fetch ===
-
-    private void initAssociationDefinitions() {
-        Map<Long, AssociationDefinition> assocDefs = fetchAssociationDefinitions();
-        List<RelatedAssociation> sequence = fetchSequence();
-        // sanity check
-        if (assocDefs.size() != sequence.size()) {
-            // ### TODO: avoid that inconsistency to occur
-            logger.warning("### Data inconsistency in " + className() + " \"" + getUri() + "\": there are " +
-                assocDefs.size() + " valid association definitions but expected are " + sequence.size());
-        }
-        //
-        addAssocDefsSorted(assocDefs, DeepaMehtaUtils.idList(sequence));
-    }
-
-    private Map<Long, AssociationDefinition> fetchAssociationDefinitions() {
-        // 1) fetch part topic types
-        // Note: we must set fetchRelatingComposite to false here. Fetching the composite of association type
-        // Composition Definition would cause an endless recursion. Composition Definition is defined through
-        // Composition Definition itself (child types "Include in Label", "Ordered").
-        ResultSet<RelatedTopic> partTopicTypes = getRelatedTopics(asList("dm4.core.aggregation_def",
-            "dm4.core.composition_def"), "dm4.core.whole_type", "dm4.core.part_type", "dm4.core.topic_type",
-            false, false, 0, null);     // fetchComposite=false, fetchRelatingComposite=false
-        //
-        // 2) create association definitions
-        // Note: the returned map is an intermediate, hashed by ID. The actual type model is
-        // subsequently build from it by sorting the assoc def's according to the sequence IDs.
-        Map<Long, AssociationDefinition> assocDefs = new HashMap();
-        for (RelatedTopic partTopicType : partTopicTypes) {
-            // ### AssociationDefinition assocDef = dms.objectFactory.fetchAssociationDefinition(
-            // ###     partTopicType.getAssociation(), getUri(), partTopicType.getId());
-            // ### assocDefs.put(assocDef.getId(), assocDef);
-        }
-        return assocDefs;
-    }
-
-    /**
-     * Updates model and attached object cache.
-     * ### FIXME: should be private
-     */
-    protected void addAssocDefsSorted(Map<Long, AssociationDefinition> assocDefs, List<Long> sequence) {
-        getModel().setAssocDefs(new LinkedHashMap());           // init model
-        this.assocDefs = new LinkedHashMap();                   // init attached object cache
-        for (long assocDefId : sequence) {
-            AssociationDefinition assocDef = assocDefs.get(assocDefId);
-            // sanity check
-            if (assocDef == null) {
-                // ### TODO: avoid that inconsistency to occur
-                logger.warning("### Data inconsistency in " + className() + " \"" + getUri() +
-                    "\": association definition " + assocDefId + " is invalid");
-                continue;
-            }
-            // Note: the model and the attached object cache are updated together
-            getModel().addAssocDef(assocDef.getModel());        // update model
-            this.assocDefs.put(assocDef.getUri(), assocDef);    // update attached object cache
-        }
-    }
-
-    // ---
-
-    private List<String> fetchLabelConfig() {
-        List<String> labelConfig = new ArrayList();
-        for (AssociationDefinition assocDef : getAssocDefs().values()) {
-            SimpleValue includeInLabel = assocDef.getChildTopicValue("dm4.core.include_in_label");
-            if (includeInLabel != null && includeInLabel.booleanValue()) {
-                labelConfig.add(assocDef.getUri());
-            }
-        }
-        return labelConfig;
-    }
-
-    private void fetchViewConfig() {
-        try {
-            ResultSet<RelatedTopic> topics = getRelatedTopics("dm4.core.aggregation", "dm4.core.type",
-                "dm4.core.view_config", null, true, false, 0, null);
-            // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
-            getModel().setViewConfig(new ViewConfigurationModel(dms.getTopicModels(topics.getItems())));
-            initViewConfig();
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching view configuration for " + className() + " \"" + getUri() +
-                "\" failed", e);
-        }
-    }
 
 
 
@@ -409,28 +276,6 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // --- Sequence ---
 
-    private List<RelatedAssociation> fetchSequence() {
-        try {
-            List<RelatedAssociation> sequence = new ArrayList();
-            // find sequence start
-            RelatedAssociation assocDef = getRelatedAssociation("dm4.core.aggregation", "dm4.core.type",
-                "dm4.core.sequence_start", null, false, false);   // othersAssocTypeUri=null
-            // fetch sequence segments
-            if (assocDef != null) {
-                sequence.add(assocDef);
-                while ((assocDef = assocDef.getRelatedAssociation("dm4.core.sequence",
-                    "dm4.core.predecessor", "dm4.core.successor")) != null) {
-                    //
-                    sequence.add(assocDef);
-                }
-            }
-            //
-            return sequence;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching sequence for " + className() + " \"" + getUri() + "\" failed", e);
-        }
-    }
-
     private void storeSequence() {
         AssociationDefinition predecessor = null;
         int count = 0;
@@ -470,9 +315,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private void deleteSequence() {
         int count = 0;
-        for (RelatedAssociation relAssoc : fetchSequence()) {
-            Association assoc = relAssoc.getRelatingAssociation();
-            dms.deleteAssociation(assoc.getId(), null);    // clientState=null
+        List<RelatedAssociationModel> sequence = dms.objectFactory.fetchSequence(getId(), getUri(), className());
+        for (RelatedAssociationModel assoc : sequence) {
+            long assocId = assoc.getRelatingAssociationModel().getId();
+            dms.deleteAssociation(assocId, null);   // clientState=null
             count++;
         }
         logger.info("### Deleting " + count + " sequence segments of " + className() + " \"" + getUri() + "\"");

@@ -25,14 +25,14 @@ public class AssociationTypeModel extends TypeModel {
         super(uri, "dm4.core.assoc_type", new SimpleValue(value), dataTypeUri);
     }
 
-    // ### TODO: to be completed
-    public AssociationTypeModel(TopicModel model, String dataTypeUri, Set<IndexMode> indexModes,
-                                List<AssociationDefinitionModel> assocDefs) {
-        super(model, dataTypeUri, indexModes, assocDefs);
+    public AssociationTypeModel(TopicModel topic, String dataTypeUri, Set<IndexMode> indexModes,
+                                List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
+                                ViewConfigurationModel viewConfig) {
+        super(topic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
     }
 
-    public AssociationTypeModel(JSONObject assocTypeModel) {
-        super(assocTypeModel, "dm4.core.assoc_type");
+    public AssociationTypeModel(JSONObject assocType) {
+        super(assocType, "dm4.core.assoc_type");
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

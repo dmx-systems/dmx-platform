@@ -16,6 +16,7 @@ import org.codehaus.jettison.json.JSONObject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -33,11 +34,6 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedTopicType(EmbeddedService dms) {
-        super(dms);     // The model and the attached object cache remain uninitialized.
-                        // They are initialized later on through fetch().
-    }
-
     AttachedTopicType(TopicTypeModel model, EmbeddedService dms) {
         super(model, dms);
     }
@@ -52,13 +48,6 @@ class AttachedTopicType extends AttachedType implements TopicType {
     }
 
     // ----------------------------------------------------------------------------------------------- Protected Methods
-
-    // === AttachedType Overrides ===
-
-    @Override
-    protected void putInTypeCache() {
-        dms.typeCache.put(this);
-    }
 
     // === AttachedTopic Overrides ===
 
@@ -130,7 +119,12 @@ class AttachedTopicType extends AttachedType implements TopicType {
         if (hasSequenceChanged(newAssocDefs)) {
             logger.info("### Changing assoc def sequence");
             // update memory
-            addAssocDefsSorted(hashAssocDefsById(), DeepaMehtaUtils.idList(newAssocDefs));
+            getModel().setAssocDefs(new LinkedHashMap());   // ### TODO: there should be removeAllAssocDefs()
+            for (AssociationDefinitionModel assocDef : newAssocDefs) {
+                getModel().addAssocDef(assocDef);
+            }
+            // ### FIXME: must update attached object cache? Is order important? Serialized is the model.
+            // ### addAssocDefsSorted(hashAssocDefsById(), DeepaMehtaUtils.idList(newAssocDefs));
             // update DB
             rebuildSequence();
         }

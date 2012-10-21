@@ -12,11 +12,6 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedAssociationType(EmbeddedService dms) {
-        super(dms);     // The model remains uninitialized.
-                        // It is initialized later on through fetch().
-    }
-
     AttachedAssociationType(AssociationTypeModel model, EmbeddedService dms) {
         super(model, dms);
     }
@@ -31,13 +26,6 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
     }
 
     // ----------------------------------------------------------------------------------------------- Protected Methods
-
-    // === AttachedType Overrides ===
-
-    @Override
-    protected void putInTypeCache() {
-        dms.typeCache.put(this);
-    }
 
     // === AttachedTopic Overrides ===
 

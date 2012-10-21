@@ -193,6 +193,26 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
+
+
+    // === Updating ===
+
+    @Override
+    public ChangeReport update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives) {
+        ChangeReport report = new ChangeReport();
+        updateUri(model.getUri());
+        updateTypeUri(model.getTypeUri(), report);
+        // ### TODO: compare new model with current one and update only if changed.
+        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
+            updateCompositeValue(model.getCompositeValue(), clientState, directives);
+            refreshLabel();
+        } else {
+            updateSimpleValue(model.getSimpleValue());
+        }
+        //
+        return report;
+    }
+
     // ---
 
     @Override
@@ -248,26 +268,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // Note: these methods are implemented in the subclasses (this is an abstract class):
     //     getAssociation(...);
     //     getAssociations(String myRoleTypeUri);
-
-
-
-    // === Updating ===
-
-    @Override
-    public ChangeReport update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives) {
-        ChangeReport report = new ChangeReport();
-        updateUri(model.getUri());
-        updateTypeUri(model.getTypeUri(), report);
-        // ### TODO: compare new model with current one and update only if changed.
-        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            updateCompositeValue(model.getCompositeValue(), clientState, directives);
-            refreshLabel();
-        } else {
-            updateSimpleValue(model.getSimpleValue());
-        }
-        //
-        return report;
-    }
 
 
 

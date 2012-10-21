@@ -32,7 +32,7 @@ class TypeCache {
 
     private EmbeddedService dms;
 
-    // ### private EndlessRecursionProtection endlessRecursionProtection = new EndlessRecursionProtection();
+    private EndlessRecursionProtection endlessRecursionProtection = new EndlessRecursionProtection();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -47,8 +47,9 @@ class TypeCache {
     TopicType getTopicType(String topicTypeUri) {
         TopicType topicType = topicTypes.get(topicTypeUri);
         if (topicType == null) {
-            // ### endlessRecursionProtection.check(topicTypeUri);
+            endlessRecursionProtection.check(topicTypeUri);
             topicType = loadTopicType(topicTypeUri);
+            put(topicType);
         }
         return topicType;
     }
@@ -56,8 +57,9 @@ class TypeCache {
     AssociationType getAssociationType(String assocTypeUri) {
         AssociationType assocType = assocTypes.get(assocTypeUri);
         if (assocType == null) {
-            // ### endlessRecursionProtection.check(assocTypeUri);
+            endlessRecursionProtection.check(assocTypeUri);
             assocType = loadAssociationType(assocTypeUri);
+            put(assocType);
         }
         return assocType;
     }

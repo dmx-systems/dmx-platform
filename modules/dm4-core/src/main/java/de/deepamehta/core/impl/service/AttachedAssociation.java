@@ -47,6 +47,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     AttachedAssociation(AssociationModel model, EmbeddedService dms) {
         super(model, dms);
+        // init attached object cache
         this.role1 = createAttachedRole(model.getRoleModel1());
         this.role2 = createAttachedRole(model.getRoleModel2());
     }

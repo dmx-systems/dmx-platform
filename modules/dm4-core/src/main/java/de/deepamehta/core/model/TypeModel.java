@@ -22,9 +22,9 @@ public abstract class TypeModel extends TopicModel {
 
     private String dataTypeUri;
     private Set<IndexMode> indexModes;
-    private Map<String, AssociationDefinitionModel> assocDefModels; // is never null, may be empty
-    private List<String> labelConfig;                               // is never null, may be empty
-    private ViewConfigurationModel viewConfigModel;                 // is never null
+    private Map<String, AssociationDefinitionModel> assocDefs;  // is never null, may be empty
+    private List<String> labelConfig;                           // is never null, may be empty
+    private ViewConfigurationModel viewConfig;                  // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -34,29 +34,32 @@ public abstract class TypeModel extends TopicModel {
         super(uri, topicTypeUri, value);
         this.dataTypeUri = dataTypeUri;
         this.indexModes = new HashSet();
-        this.assocDefModels = new LinkedHashMap();
+        this.assocDefs = new LinkedHashMap();
         this.labelConfig = new ArrayList();
-        this.viewConfigModel = new ViewConfigurationModel();
+        this.viewConfig = new ViewConfigurationModel();
     }
 
-    // ### TODO: to be completed
-    public TypeModel(TopicModel model, String dataTypeUri, Set<IndexMode> indexModes,
-                     List<AssociationDefinitionModel> assocDefs) {
-        super(model);
+    public TypeModel(TopicModel topic, String dataTypeUri, Set<IndexMode> indexModes,
+                     List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
+                     ViewConfigurationModel viewConfig) {
+        super(topic);
         this.dataTypeUri = dataTypeUri;
         this.indexModes = indexModes;
+        this.assocDefs = new LinkedHashMap();
         for (AssociationDefinitionModel assocDef : assocDefs) {
             addAssocDef(assocDef);
         }
+        this.labelConfig = labelConfig;
+        this.viewConfig = viewConfig;
     }
 
-    public TypeModel(TypeModel model) {
-        super(model);
-        this.dataTypeUri = model.getDataTypeUri();
-        this.indexModes = model.getIndexModes();
-        this.assocDefModels = model.getAssocDefs();
-        this.labelConfig = model.getLabelConfig();
-        this.viewConfigModel = model.getViewConfigModel();
+    public TypeModel(TypeModel type) {
+        super(type);
+        this.dataTypeUri = type.getDataTypeUri();
+        this.indexModes = type.getIndexModes();
+        this.assocDefs = type.getAssocDefs();
+        this.labelConfig = type.getLabelConfig();
+        this.viewConfig = type.getViewConfigModel();
     }
 
     public TypeModel(JSONObject typeModel, String typeUri) {
@@ -64,9 +67,9 @@ public abstract class TypeModel extends TopicModel {
         try {
             this.dataTypeUri = typeModel.getString("data_type_uri");
             this.indexModes = IndexMode.parse(typeModel);
-            this.assocDefModels = new LinkedHashMap();
+            this.assocDefs = new LinkedHashMap();
             this.labelConfig = parseLabelConfig(typeModel);
-            this.viewConfigModel = new ViewConfigurationModel(typeModel);
+            this.viewConfig = new ViewConfigurationModel(typeModel);
             parseAssocDefs(typeModel);
         } catch (Exception e) {
             throw new RuntimeException("Parsing TypeModel failed (JSONObject=" + typeModel + ")", e);
@@ -98,20 +101,20 @@ public abstract class TypeModel extends TopicModel {
     // === Association Definitions ===
 
     public Map<String, AssociationDefinitionModel> getAssocDefs() {
-        return assocDefModels;
+        return assocDefs;
     }
 
-    public void setAssocDefs(Map<String, AssociationDefinitionModel> assocDefModels) {
-        this.assocDefModels = assocDefModels;
+    public void setAssocDefs(Map<String, AssociationDefinitionModel> assocDefs) {
+        this.assocDefs = assocDefs;
     }
 
     public AssociationDefinitionModel getAssocDef(String assocDefUri) {
-        AssociationDefinitionModel model = assocDefModels.get(assocDefUri);
-        if (model == null) {
+        AssociationDefinitionModel assocDef = assocDefs.get(assocDefUri);
+        if (assocDef == null) {
             throw new RuntimeException("Schema violation: association definition \"" +
                 assocDefUri + "\" not found in " + this);
         }
-        return model;
+        return assocDef;
     }
 
     public void addAssocDef(AssociationDefinitionModel assocDef) {
@@ -122,24 +125,24 @@ public abstract class TypeModel extends TopicModel {
                 "Topic type \"" + getUri() + "\" is of data type \"" + getDataTypeUri() + "\". (" + assocDef + ")");
         }
         // error check
-        AssociationDefinitionModel existing = assocDefModels.get(assocDefUri);
+        AssociationDefinitionModel existing = assocDefs.get(assocDefUri);
         if (existing != null) {
-            throw new RuntimeException("Schema ambiguity: topic type \"" + uri + "\" has more than one " +
-                "association definitions with uri \"" + assocDefUri + "\" -- Use distinct role types at position 2");
+            throw new RuntimeException("Schema ambiguity: topic type \"" + uri +
+                "\" has more than one association definitions with uri \"" + assocDefUri + "\"");
         }
         //
         updateAssocDef(assocDef);
     }
 
     public void updateAssocDef(AssociationDefinitionModel assocDef) {
-        assocDefModels.put(assocDef.getUri(), assocDef);
+        assocDefs.put(assocDef.getUri(), assocDef);
     }
 
     public AssociationDefinitionModel removeAssocDef(String assocDefUri) {
         // error check
         getAssocDef(assocDefUri);
         //
-        return assocDefModels.remove(assocDefUri);
+        return assocDefs.remove(assocDefUri);
     }
 
     // === Label Configuration ===
@@ -155,17 +158,17 @@ public abstract class TypeModel extends TopicModel {
     // === View Configuration ===
 
     public ViewConfigurationModel getViewConfigModel() {
-        return viewConfigModel;
+        return viewConfig;
     }
 
     // FIXME: server-side operations on the view config settings possibly suggest they are not acually
     // view config settings but part of the topic type model. Possibly this method should be dropped.
     public Object getViewConfig(String typeUri, String settingUri) {
-        return viewConfigModel.getSetting(typeUri, settingUri);
+        return viewConfig.getSetting(typeUri, settingUri);
     }
 
-    public void setViewConfig(ViewConfigurationModel viewConfigModel) {
-        this.viewConfigModel = viewConfigModel;
+    public void setViewConfig(ViewConfigurationModel viewConfig) {
+        this.viewConfig = viewConfig;
     }
 
 
@@ -183,7 +186,7 @@ public abstract class TypeModel extends TopicModel {
             //
             o.put("data_type_uri", getDataTypeUri());
             IndexMode.toJSON(indexModes, o);
-            AssociationDefinitionModel.toJSON(assocDefModels.values(), o);
+            AssociationDefinitionModel.toJSON(assocDefs.values(), o);
             o.put("label_config", DeepaMehtaUtils.stringsToJson(getLabelConfig()));
             getViewConfigModel().toJSON(o);
             //
@@ -206,7 +209,7 @@ public abstract class TypeModel extends TopicModel {
         return "id=" + id + ", uri=\"" + uri + "\", value=\"" + value + "\", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + getDataTypeUri() + "\", indexModes=" + getIndexModes() + ", assocDefs=" +
             getAssocDefs() + ", labelConfig=" + getLabelConfig() + ",\n    topic type " + getViewConfigModel();
-        // FIXME: "topic type" is not generic wording
+        // ### FIXME: "topic type" is not generic wording
     }
 
 
@@ -221,10 +224,10 @@ public abstract class TypeModel extends TopicModel {
     }
 
     private void parseAssocDefs(JSONObject typeModel) throws Exception {
-        JSONArray models = typeModel.optJSONArray("assoc_defs");
-        if (models != null) {
-            for (int i = 0; i < models.length(); i++) {
-                addAssocDef(new AssociationDefinitionModel(models.getJSONObject(i), this.uri));
+        JSONArray assocDefs = typeModel.optJSONArray("assoc_defs");
+        if (assocDefs != null) {
+            for (int i = 0; i < assocDefs.length(); i++) {
+                addAssocDef(new AssociationDefinitionModel(assocDefs.getJSONObject(i), this.uri));
             }
         }
     }
