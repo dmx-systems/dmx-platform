@@ -17,6 +17,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.ObjectFactory;
 import de.deepamehta.core.util.DeepaMehtaUtils;
@@ -32,13 +33,20 @@ import java.util.Set;
 
 class ObjectFactoryImpl implements ObjectFactory {
 
+    private static final String DEFAULT_URI_PREFIX = "domain.project.topic_type_";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    private Storage topicStorage;
+    private Storage assocStorage;
 
     private EmbeddedService dms;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     ObjectFactoryImpl(EmbeddedService dms) {
+        this.topicStorage = new TopicStorage(dms);
+        this.assocStorage = new AssociationStorage(dms);
         this.dms = dms;
     }
 
@@ -379,5 +387,28 @@ class ObjectFactoryImpl implements ObjectFactory {
             this.wholeCardinalityUri = wholeCardinalityUri;
             this.partCardinalityUri = partCardinalityUri;
         }
+    }
+
+
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+
+
+    // *************
+    // *** Store ***
+    // *************
+
+
+
+    void storeType(TypeModel type) {
+        // Note: if no URI is set a default URI is generated
+        if (type.getUri().equals("")) {
+            type.setUri(DEFAULT_URI_PREFIX + type.getId());
+        }
+        //
+        dms.storage.createTopic(type);
+        dms.associateWithTopicType(type);
+        topicStorage.storeAndIndexValue(type.getId(), type.getUri(), type.getSimpleValue());
     }
 }

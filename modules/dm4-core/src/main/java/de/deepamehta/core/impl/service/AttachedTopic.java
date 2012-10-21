@@ -77,16 +77,19 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         dms.associateWithTopicType(getModel());
     }    
 
+    // ### to be dropped
     @Override
     protected SimpleValue storeValue(SimpleValue value) {
         return dms.storage.setTopicValue(getId(), value);
     }
 
+    // ### to be dropped
     @Override
     protected void indexValue(IndexMode indexMode, String indexKey, SimpleValue value, SimpleValue oldValue) {
         dms.storage.indexTopicValue(getId(), indexMode, indexKey, value, oldValue);
     }
 
+    // ### to be dropped
     @Override
     protected Type getType() {
         return dms.getTopicType(getTypeUri(), null);    // FIXME: clientState=null

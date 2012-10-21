@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 
 abstract class AttachedType extends AttachedTopic implements Type {
 
+    // ### to be dropped
     private static final String DEFAULT_URI_PREFIX = "domain.project.topic_type_";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -184,6 +185,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    // ### to be dropped
     void store(ClientState clientState) {
         // 1) store the base-topic parts ### FIXME: call super.store() instead?
         dms.storage.createTopic(getModel());
@@ -196,6 +198,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // Note: the attached object cache must be initialized *after* storing the base-topic parts because
         // initViewConfig() relies on the type's ID (unknown before stored) or URI (possibly unknown before stored).
         // ### FIXME: this requirment must be dropped. Storage must be performed outside of this object.
+        //
+        // init attached object cache ### FIXME: to be dropped
+        initAssocDefs();
+        initViewConfig();
         //
         // Note: the attached object cache must be initialized *before* storing the type-specific parts because
         // storeAssocDefs() relies on the association definitions.

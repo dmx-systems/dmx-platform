@@ -451,24 +451,21 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public TopicType createTopicType(TopicTypeModel topicTypeModel, ClientState clientState) {
+    public TopicType createTopicType(TopicTypeModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopicType topicType = new AttachedTopicType(topicTypeModel, this);
-            // Note: the topic type is put in type cache *before* it is stored. See createAssociationType().
+            objectFactory.storeType(model);
+            AttachedTopicType topicType = new AttachedTopicType(model, this);
+            // ### Note: the topic type is put in type cache *before* it is stored. See createAssociationType().
             typeCache.put(topicType);
-            topicType.store(clientState);
             //
-            // Note: the modification must be applied *before* the enrichment. ### FIXDOC
-            // Consider the Access Control plugin: the creator must be set *before* the permissions can be determined.
             fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, clientState);
             //
             tx.success();
             return topicType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating topic type \"" + topicTypeModel.getUri() + "\" failed (" +
-                topicTypeModel + ")", e);
+            throw new RuntimeException("Creating topic type \"" + model.getUri() + "\" failed (" + model + ")", e);
         } finally {
             tx.finish();
         }
@@ -553,22 +550,22 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public AssociationType createAssociationType(AssociationTypeModel assocTypeModel, ClientState clientState) {
+    public AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedAssociationType assocType = new AttachedAssociationType(assocTypeModel, this);
+            objectFactory.storeType(model);
+            AttachedAssociationType assocType = new AttachedAssociationType(model, this);
             // Note: the association type must be put in type cache *before* it is stored.
             // Storing an object requires its data type to be known. See AttachedDeepaMehtaObject.store()
             // Consider creation of association type "Composition Definition": it has a composition definition itself.
             typeCache.put(assocType);
-            assocType.store(clientState);
             //
             tx.success();
             return assocType;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating association type \"" + assocTypeModel.getUri() + "\" failed (" +
-                assocTypeModel + ")", e);
+            throw new RuntimeException("Creating association type \"" + model.getUri() + "\" failed (" + model + ")",
+                e);
         } finally {
             tx.finish();
         }
