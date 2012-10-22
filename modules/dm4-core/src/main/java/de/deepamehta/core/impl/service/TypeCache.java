@@ -87,12 +87,14 @@ class TypeCache {
 
     private TopicType loadTopicType(String topicTypeUri) {
         logger.info("Loading topic type \"" + topicTypeUri + "\"");
-        return dms.objectFactory.fetchTopicType(topicTypeUri);
+        TopicTypeModel topicType = dms.objectFactory.fetchTopicType(topicTypeUri);
+        return new AttachedTopicType(topicType, dms);
     }
 
     private AssociationType loadAssociationType(String assocTypeUri) {
         logger.info("Loading association type \"" + assocTypeUri + "\"");
-        return dms.objectFactory.fetchAssociationType(assocTypeUri);
+        AssociationTypeModel assocType = dms.objectFactory.fetchAssociationType(assocTypeUri);
+        return new AttachedAssociationType(assocType, dms);
     }
 
     // ---

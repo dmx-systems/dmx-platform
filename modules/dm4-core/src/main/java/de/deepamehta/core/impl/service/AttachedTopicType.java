@@ -116,18 +116,19 @@ class AttachedTopicType extends AttachedType implements TopicType {
     // ---
 
     private void updateSequence(Collection<AssociationDefinitionModel> newAssocDefs) {
-        if (hasSequenceChanged(newAssocDefs)) {
-            logger.info("### Changing assoc def sequence");
-            // update memory
-            getModel().setAssocDefs(new LinkedHashMap());   // ### TODO: there should be removeAllAssocDefs()
-            for (AssociationDefinitionModel assocDef : newAssocDefs) {
-                getModel().addAssocDef(assocDef);
-            }
-            // ### FIXME: must update attached object cache? Is order important? Serialized is the model.
-            // ### addAssocDefsSorted(hashAssocDefsById(), DeepaMehtaUtils.idList(newAssocDefs));
-            // update DB
-            rebuildSequence();
+        if (!hasSequenceChanged(newAssocDefs)) {
+            return;
         }
+        logger.info("### Changing assoc def sequence");
+        // update memory
+        getModel().setAssocDefs(new LinkedHashMap());   // ### TODO: TypeModel should provide removeAllAssocDefs()
+        for (AssociationDefinitionModel assocDef : newAssocDefs) {
+            getModel().addAssocDef(assocDef);
+        }
+        // ### FIXME: must update attached object cache? Is order important? Serialized is the model.
+        // ### addAssocDefsSorted(hashAssocDefsById(), DeepaMehtaUtils.idList(newAssocDefs));
+        // update DB
+        dms.objectFactory.rebuildSequence(getId(), getUri(), className(), getModel().getAssocDefs().values());
     }
 
     private boolean hasSequenceChanged(Collection<AssociationDefinitionModel> newAssocDefs) {

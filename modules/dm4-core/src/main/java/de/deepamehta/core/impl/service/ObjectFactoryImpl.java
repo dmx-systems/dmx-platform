@@ -10,12 +10,14 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
@@ -24,10 +26,12 @@ import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import static java.util.Arrays.asList;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 
 
@@ -41,6 +45,8 @@ class ObjectFactoryImpl implements ObjectFactory {
     private Storage assocStorage;
 
     private EmbeddedService dms;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -130,53 +136,91 @@ class ObjectFactoryImpl implements ObjectFactory {
         return partCard;
     }
 
-    // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    TopicType fetchTopicType(String topicTypeUri) {
+
+    // === Types ===
+
+    // --- Fetch ---
+
+    TopicTypeModel fetchTopicType(String topicTypeUri) {
         TopicModel typeTopic = dms.storage.getTopic("uri", new SimpleValue(topicTypeUri));
         checkTopicType(topicTypeUri, typeTopic);
         //
-        // 1) init data type
+        // 1) fetch type components
         String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), topicTypeUri, "topic type").getUri();
-        // 2) init index modes
         Set<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
-        // 3) init association definitions
         List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic.getId(), topicTypeUri,
             "topic type");
-        // 4) init label configuration
         List<String> labelConfig = fetchLabelConfig(assocDefs);
-        // 5) init view configuration
         ViewConfigurationModel viewConfig = fetchViewConfig(typeTopic.getId(), topicTypeUri, "topic type");
         //
-        TopicTypeModel topicType = new TopicTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
-            viewConfig);
-        return new AttachedTopicType(topicType, dms);
+        // 2) build type model
+        return new TopicTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
     }
 
-    AssociationType fetchAssociationType(String assocTypeUri) {
+    AssociationTypeModel fetchAssociationType(String assocTypeUri) {
         TopicModel typeTopic = dms.storage.getTopic("uri", new SimpleValue(assocTypeUri));
         checkAssociationType(assocTypeUri, typeTopic);
         //
-        // 1) init data type
+        // 1) fetch type components
         String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), assocTypeUri, "association type").getUri();
-        // 2) init index modes
         Set<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
-        // 3) init association definitions
         List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic.getId(), assocTypeUri,
             "association type");
-        // 4) init label configuration
         List<String> labelConfig = fetchLabelConfig(assocDefs);
-        // 5) init view configuration
         ViewConfigurationModel viewConfig = fetchViewConfig(typeTopic.getId(), assocTypeUri, "association type");
         //
-        AssociationTypeModel assocType = new AssociationTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs,
-            labelConfig, viewConfig);
-        return new AttachedAssociationType(assocType, dms);
+        // 2) build type model
+        return new AssociationTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
     }
 
     // ---
 
-    RelatedTopicModel fetchDataTypeTopic(long typeId, String typeUri, String className) {
+    private void checkTopicType(String topicTypeUri, TopicModel typeTopic) {
+        if (typeTopic == null) {
+            throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
+        } else if (!typeTopic.getTypeUri().equals("dm4.core.topic_type") &&
+                   !typeTopic.getTypeUri().equals("dm4.core.meta_type") &&
+                   !typeTopic.getTypeUri().equals("dm4.core.meta_meta_type")) {
+            throw new RuntimeException("URI \"" + topicTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
+                "\" when the caller expects a \"dm4.core.topic_type\"");
+        }
+    }
+
+    private void checkAssociationType(String assocTypeUri, TopicModel typeTopic) {
+        if (typeTopic == null) {
+            throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found");
+        } else if (!typeTopic.getTypeUri().equals("dm4.core.assoc_type")) {
+            throw new RuntimeException("URI \"" + assocTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
+                "\" when the caller expects a \"dm4.core.assoc_type\"");
+        }
+    }
+
+    // --- Store ---
+
+    void storeType(TypeModel type) {
+        // 1) store the base-topic parts ### FIXME: call super.store() instead?
+        // Note: if no URI is set a default URI is generated
+        if (type.getUri().equals("")) {
+            type.setUri(DEFAULT_URI_PREFIX + type.getId());
+        }
+        //
+        dms.storage.createTopic(type);
+        dms.associateWithTopicType(type);
+        topicStorage.storeAndIndexValue(type.getId(), type.getTypeUri(), type.getSimpleValue());
+        //
+        // 2) store the type-specific parts
+        associateDataType(type.getUri(), type.getDataTypeUri());
+        storeIndexModes(type.getUri(), type.getIndexModes());
+        storeAssocDefs(type.getUri(), type.getAssocDefs().values());
+        // ### to be completed
+    }
+
+
+
+    // === Data Type ===
+
+    private RelatedTopicModel fetchDataTypeTopic(long typeId, String typeUri, String className) {
         try {
             RelatedTopicModel dataType = dms.storage.getTopicRelatedTopic(typeId, "dm4.core.aggregation",
                 "dm4.core.type", null, "dm4.core.data_type");   // ### FIXME: null
@@ -190,15 +234,48 @@ class ObjectFactoryImpl implements ObjectFactory {
         }
     }
 
+    void storeDataTypeUri(long typeId, String typeUri, String className, String dataTypeUri) {
+        // remove current assignment
+        long assocId = fetchDataTypeTopic(typeId, typeUri, className).getAssociationModel().getId();
+        dms.deleteAssociation(assocId, null);   // clientState=null
+        // create new assignment
+        associateDataType(typeUri, dataTypeUri);
+    }
+
+    private void associateDataType(String typeUri, String dataTypeUri) {
+        try {
+            dms.createAssociation("dm4.core.aggregation",
+                new TopicRoleModel(typeUri,     "dm4.core.type"),
+                new TopicRoleModel(dataTypeUri, "dm4.core.default"));
+        } catch (Exception e) {
+            throw new RuntimeException("Associating type \"" + typeUri + "\" with data type \"" +
+                dataTypeUri + "\" failed", e);
+        }
+    }
+
+
+
+    // === Index Modes ===
+
     private Set<IndexMode> fetchIndexModes(long typeId) {
         ResultSet<RelatedTopicModel> indexModes = dms.storage.getTopicRelatedTopics(typeId, "dm4.core.aggregation",
             "dm4.core.type", null, "dm4.core.index_mode", 0);   // ### FIXME: null
         return IndexMode.fromTopics(indexModes.getItems());
     }
 
+    void storeIndexModes(String typeUri, Set<IndexMode> indexModes) {
+        for (IndexMode indexMode : indexModes) {
+            dms.createAssociation("dm4.core.aggregation",
+                new TopicRoleModel(typeUri,           "dm4.core.type"),
+                new TopicRoleModel(indexMode.toUri(), "dm4.core.default"));
+        }
+    }
+
 
 
     // === Association Definitions ===
+
+    // --- Fetch ---
 
     private List<AssociationDefinitionModel> fetchAssociationDefinitions(long typeId, String typeUri,
                                                                                       String className) {
@@ -264,7 +341,89 @@ class ObjectFactoryImpl implements ObjectFactory {
         return sortedAssocDefs;
     }
 
-    // --- Sequence ---
+    // --- Store ---
+
+    private void storeAssocDefs(String typeUri, Collection<AssociationDefinitionModel> assocDefs) {
+        for (AssociationDefinitionModel assocDef : assocDefs) {
+            storeAssociationDefinition(assocDef);
+        }
+        storeSequence(typeUri, assocDefs);
+    }
+
+    void storeAssociationDefinition(AssociationDefinitionModel assocDef) {
+        try {
+            long assocDefId = assocDef.getId();
+            // Note: creating the underlying association is conditional. It exists already for
+            // an interactively created association definition. Its ID is already set.
+            if (assocDefId == -1) {
+                dms.createAssociation(assocDef, null);      // clientState=null
+            }
+            // role types
+            associateWholeRoleType(assocDefId, assocDef.getWholeRoleTypeUri());
+            associatePartRoleType(assocDefId,  assocDef.getPartRoleTypeUri());
+            // cardinality
+            associateWholeCardinality(assocDefId, assocDef.getWholeCardinalityUri());
+            associatePartCardinality(assocDefId,  assocDef.getPartCardinalityUri());
+            //
+            storeAssocDefViewConfig(assocDefId, assocDef.getUri(), assocDef.getViewConfigModel());
+        } catch (Exception e) {
+            // ### FIXME wording: "type" should be "topic type" or "association type"
+            throw new RuntimeException("Storing association definition \"" + assocDef.getUri() +
+                "\" of type \"" + assocDef.getWholeTopicTypeUri() + "\" failed", e);
+        }
+    }
+
+    // ---
+
+    private void associateWholeRoleType(long assocDefId, String wholeRoleTypeUri) {
+        dms.createAssociation("dm4.core.aggregation",
+            new TopicRoleModel(wholeRoleTypeUri, "dm4.core.whole_role_type"),
+            new AssociationRoleModel(assocDefId, "dm4.core.assoc_def"));
+    }
+
+    private void associatePartRoleType(long assocDefId, String partRoleTypeUri) {
+        dms.createAssociation("dm4.core.aggregation",
+            new TopicRoleModel(partRoleTypeUri,  "dm4.core.part_role_type"),
+            new AssociationRoleModel(assocDefId, "dm4.core.assoc_def"));
+    }
+
+    // ---
+
+    void storeWholeCardinalityUri(long assocDefId, String wholeCardinalityUri) {
+        // remove current assignment
+        long assocId = fetchWholeCardinality(assocDefId).getAssociationModel().getId();
+        dms.deleteAssociation(assocId, null);   // clientState=null
+        // create new assignment
+        associateWholeCardinality(assocDefId, wholeCardinalityUri);
+    }    
+
+    void storePartCardinalityUri(long assocDefId, String partCardinalityUri) {
+        // remove current assignment
+        long assocId = fetchPartCardinality(assocDefId).getAssociationModel().getId();
+        dms.deleteAssociation(assocId, null);   // clientState=null
+        // create new assignment
+        associatePartCardinality(assocDefId, partCardinalityUri);
+    }    
+
+    // ---
+
+    private void associateWholeCardinality(long assocDefId, String wholeCardinalityUri) {
+        dms.createAssociation("dm4.core.aggregation",
+            new TopicRoleModel(wholeCardinalityUri, "dm4.core.whole_cardinality"),
+            new AssociationRoleModel(assocDefId, "dm4.core.assoc_def"));
+    }
+
+    private void associatePartCardinality(long assocDefId, String partCardinalityUri) {
+        dms.createAssociation("dm4.core.aggregation",
+            new TopicRoleModel(partCardinalityUri, "dm4.core.part_cardinality"),
+            new AssociationRoleModel(assocDefId, "dm4.core.assoc_def"));
+    }
+
+
+
+    // === Sequence ===
+
+    // --- Fetch ---
 
     List<RelatedAssociationModel> fetchSequence(long typeId, String typeUri, String className) {
         try {
@@ -288,9 +447,57 @@ class ObjectFactoryImpl implements ObjectFactory {
         }
     }
 
+    // --- Store ---
+
+    private void storeSequence(String typeUri, Collection<AssociationDefinitionModel> assocDefs) {
+        logger.fine("Storing " + assocDefs.size() + " sequence segments for type \"" + typeUri + "\"");
+        AssociationDefinitionModel predecessor = null;
+        for (AssociationDefinitionModel assocDef : assocDefs) {
+            appendToSequence(typeUri, assocDef, predecessor);
+            predecessor = assocDef;
+        }
+    }
+
+    void appendToSequence(String typeUri, AssociationDefinitionModel assocDef, AssociationDefinitionModel predecessor) {
+        if (predecessor == null) {
+            storeSequenceStart(typeUri, assocDef.getId());
+        } else {
+            storeSequenceSegment(predecessor.getId(), assocDef.getId());
+        }
+    }
+
+    private void storeSequenceStart(String typeUri, long assocDefId) {
+        dms.createAssociation("dm4.core.aggregation",
+            new TopicRoleModel(typeUri, "dm4.core.type"),
+            new AssociationRoleModel(assocDefId, "dm4.core.sequence_start"));
+    }
+
+    private void storeSequenceSegment(long predAssocDefId, long succAssocDefId) {
+        dms.createAssociation("dm4.core.sequence",
+            new AssociationRoleModel(predAssocDefId, "dm4.core.predecessor"),
+            new AssociationRoleModel(succAssocDefId, "dm4.core.successor"));
+    }
+
+    // ---
+
+    void rebuildSequence(long typeId, String typeUri, String className,
+                         Collection<AssociationDefinitionModel> assocDefs) {
+        deleteSequence(typeId, typeUri, className);
+        storeSequence(typeUri, assocDefs);
+    }
+
+    private void deleteSequence(long typeId, String typeUri, String className) {
+        List<RelatedAssociationModel> sequence = fetchSequence(typeId, typeUri, className);
+        logger.info("### Deleting " + sequence.size() + " sequence segments of " + className + " \"" + typeUri + "\"");
+        for (RelatedAssociationModel assoc : sequence) {
+            long assocId = assoc.getRelatingAssociationModel().getId();
+            dms.deleteAssociation(assocId, null);   // clientState=null
+        }
+    }
 
 
-    // ===
+
+    // === Label Configuration ===
 
     private List<String> fetchLabelConfig(List<AssociationDefinitionModel> assocDefs) {
         List<String> labelConfig = new ArrayList();
@@ -306,28 +513,6 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // ---
 
-    private void checkTopicType(String topicTypeUri, TopicModel typeTopic) {
-        if (typeTopic == null) {
-            throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
-        } else if (!typeTopic.getTypeUri().equals("dm4.core.topic_type") &&
-                   !typeTopic.getTypeUri().equals("dm4.core.meta_type") &&
-                   !typeTopic.getTypeUri().equals("dm4.core.meta_meta_type")) {
-            throw new RuntimeException("URI \"" + topicTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
-                "\" when the caller expects a \"dm4.core.topic_type\"");
-        }
-    }
-
-    private void checkAssociationType(String assocTypeUri, TopicModel typeTopic) {
-        if (typeTopic == null) {
-            throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found");
-        } else if (!typeTopic.getTypeUri().equals("dm4.core.assoc_type")) {
-            throw new RuntimeException("URI \"" + assocTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
-                "\" when the caller expects a \"dm4.core.assoc_type\"");
-        }
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
     private TopicTypes fetchTopicTypes(Association assoc) {
         Topic wholeTopicType = fetchWholeTopicType(assoc);
         Topic partTopicType  = fetchPartTopicType(assoc);
@@ -340,7 +525,9 @@ class ObjectFactoryImpl implements ObjectFactory {
         return new Cardinality(wholeCardinality.getUri(), partCardinality.getUri());
     }
 
-    // ---
+
+
+    // === View Configurations ===
 
     private ViewConfigurationModel fetchAssocDefViewConfig(long assocDefId) {
         ResultSet<RelatedTopicModel> topics = dms.storage.getAssociationRelatedTopics(assocDefId,
@@ -359,6 +546,22 @@ class ObjectFactoryImpl implements ObjectFactory {
             return new ViewConfigurationModel(topics.getItems());
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for " + className + " \"" + typeUri +
+                "\" failed", e);
+        }
+    }
+
+    // ---
+
+    private void storeAssocDefViewConfig(long assocDefId, String assocDefUri, ViewConfigurationModel viewConfig) {
+        try {
+            for (TopicModel configTopic : viewConfig.getConfigTopics()) {
+                Topic topic = dms.createTopic(configTopic, null);   // FIXME: clientState=null
+                dms.createAssociation("dm4.core.aggregation",
+                    new AssociationRoleModel(assocDefId, "dm4.core.assoc_def"),
+                    new TopicRoleModel(topic.getId(),    "dm4.core.view_config"));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Storing view configuration of association definition \"" + assocDefUri +
                 "\" failed", e);
         }
     }
@@ -387,28 +590,5 @@ class ObjectFactoryImpl implements ObjectFactory {
             this.wholeCardinalityUri = wholeCardinalityUri;
             this.partCardinalityUri = partCardinalityUri;
         }
-    }
-
-
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-
-
-    // *************
-    // *** Store ***
-    // *************
-
-
-
-    void storeType(TypeModel type) {
-        // Note: if no URI is set a default URI is generated
-        if (type.getUri().equals("")) {
-            type.setUri(DEFAULT_URI_PREFIX + type.getId());
-        }
-        //
-        dms.storage.createTopic(type);
-        dms.associateWithTopicType(type);
-        topicStorage.storeAndIndexValue(type.getId(), type.getUri(), type.getSimpleValue());
     }
 }

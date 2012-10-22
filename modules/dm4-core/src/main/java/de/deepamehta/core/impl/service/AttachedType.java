@@ -74,7 +74,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // update memory
         getModel().setDataTypeUri(dataTypeUri);
         // update DB
-        storeDataTypeUri();
+        dms.objectFactory.storeDataTypeUri(getId(), getUri(), className(), dataTypeUri);
     }
 
     // === Index Modes ===
@@ -89,7 +89,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // update memory
         getModel().setIndexModes(indexModes);
         // update DB
-        storeIndexModes();
+        dms.objectFactory.storeIndexModes(getUri(), indexModes);
     }
 
     // === Association Definitions ===
@@ -112,13 +112,13 @@ abstract class AttachedType extends AttachedTopic implements Type {
     @Override
     public void addAssocDef(AssociationDefinitionModel model) {
         // Note: the predecessor must be determined *before* the memory is updated
-        AssociationDefinition predecessor = lastAssocDef();
+        AssociationDefinitionModel predecessor = lastAssocDef();
         // update memory
         getModel().addAssocDef(model);                                          // update model
-        AttachedAssociationDefinition assocDef = _addAssocDef(model);           // update attached object cache
+        _addAssocDef(model);                                                    // update attached object cache
         // update DB
-        assocDef.store();
-        appendToSequence(assocDef, predecessor);
+        dms.objectFactory.storeAssociationDefinition(model);
+        dms.objectFactory.appendToSequence(getUri(), model, predecessor);
     }
 
     @Override
@@ -137,7 +137,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         getModel().removeAssocDef(assocDefUri);                                 // update model
         AttachedAssociationDefinition assocDef = _removeAssocDef(assocDefUri);  // update attached object cache
         // update DB
-        rebuildSequence();
+        dms.objectFactory.rebuildSequence(getId(), getUri(), className(), getModel().getAssocDefs().values());
     }
 
     // === Label Configuration ===
@@ -208,9 +208,9 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // ### FIXME: this requirment must be dropped. Storage must rely solely on the model.
         //
         // 2) store the type-specific parts
-        associateDataType();
-        storeIndexModes();
-        storeAssocDefs();
+        // ### associateDataType();
+        // ### storeIndexModes();
+        // ### storeAssocDefs();
         storeLabelConfig();
         getViewConfig().store(clientState);
     }
@@ -220,41 +220,6 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
 
     // === Store ===
-
-    private void storeDataTypeUri() {
-        // remove current assignment
-        long assocId = dms.objectFactory.fetchDataTypeTopic(getId(), getUri(), className())
-            .getAssociationModel().getId();
-        dms.deleteAssociation(assocId, null);   // clientState=null
-        // create new assignment
-        associateDataType();
-    }
-
-    private void associateDataType() {
-        try {
-            dms.createAssociation("dm4.core.aggregation",
-                new TopicRoleModel(getUri(),         "dm4.core.type"),
-                new TopicRoleModel(getDataTypeUri(), "dm4.core.default"));
-        } catch (Exception e) {
-            throw new RuntimeException("Associating type \"" + getUri() + "\" with data type \"" +
-                getDataTypeUri() + "\" failed", e);
-        }
-    }
-
-    private void storeIndexModes() {
-        for (IndexMode indexMode : getIndexModes()) {
-            dms.createAssociation("dm4.core.aggregation",
-                new TopicRoleModel(getUri(),          "dm4.core.type"),
-                new TopicRoleModel(indexMode.toUri(), "dm4.core.default"));
-        }
-    }
-
-    private void storeAssocDefs() {
-        for (AssociationDefinition assocDef : getAssocDefs().values()) {
-            ((AttachedAssociationDefinition) assocDef).store();
-        }
-        storeSequence();
-    }
 
     private void storeLabelConfig() {
         List<String> labelConfig = getLabelConfig();
@@ -271,63 +236,15 @@ abstract class AttachedType extends AttachedTopic implements Type {
     /**
      * Returns the last association definition of this type or
      * <code>null</code> if there are no association definitions.
+     *
+     * ### TODO: move to class TypeModel?
      */
-    private AssociationDefinition lastAssocDef() {
-        AssociationDefinition lastAssocDef = null;
-        for (AssociationDefinition assocDef : getAssocDefs().values()) {
+    private AssociationDefinitionModel lastAssocDef() {
+        AssociationDefinitionModel lastAssocDef = null;
+        for (AssociationDefinitionModel assocDef : getModel().getAssocDefs().values()) {
             lastAssocDef = assocDef;
         }
         return lastAssocDef;
-    }
-
-    // --- Sequence ---
-
-    private void storeSequence() {
-        AssociationDefinition predecessor = null;
-        int count = 0;
-        for (AssociationDefinition assocDef : getAssocDefs().values()) {
-            appendToSequence(assocDef, predecessor);
-            predecessor = assocDef;
-            count++;
-        }
-        logger.fine("Storing " + count + " sequence segments for " + className() + " \"" + getUri() + "\"");
-    }
-
-    private void appendToSequence(AssociationDefinition assocDef, AssociationDefinition predecessor) {
-        if (predecessor == null) {
-            storeSequenceStart(assocDef.getId());
-        } else {
-            storeSequenceSegment(predecessor.getId(), assocDef.getId());
-        }
-    }
-
-    private void storeSequenceStart(long assocDefId) {
-        dms.createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(getId(), "dm4.core.type"),
-            new AssociationRoleModel(assocDefId, "dm4.core.sequence_start"));
-    }
-
-    private void storeSequenceSegment(long predAssocDefId, long succAssocDefId) {
-        dms.createAssociation("dm4.core.sequence",
-            new AssociationRoleModel(predAssocDefId, "dm4.core.predecessor"),
-            new AssociationRoleModel(succAssocDefId, "dm4.core.successor"));
-    }
-
-    // ### FIXME: should be private
-    protected void rebuildSequence() {
-        deleteSequence();
-        storeSequence();
-    }
-
-    private void deleteSequence() {
-        int count = 0;
-        List<RelatedAssociationModel> sequence = dms.objectFactory.fetchSequence(getId(), getUri(), className());
-        for (RelatedAssociationModel assoc : sequence) {
-            long assocId = assoc.getRelatingAssociationModel().getId();
-            dms.deleteAssociation(assocId, null);   // clientState=null
-            count++;
-        }
-        logger.info("### Deleting " + count + " sequence segments of " + className() + " \"" + getUri() + "\"");
     }
 
 
@@ -345,10 +262,9 @@ abstract class AttachedType extends AttachedTopic implements Type {
      * @param   model   the new association definition.
      *                  Note: all fields must be initialized.
      */
-    private AttachedAssociationDefinition _addAssocDef(AssociationDefinitionModel model) {
+    private void _addAssocDef(AssociationDefinitionModel model) {
         AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(model, dms);
         assocDefs.put(assocDef.getUri(), assocDef);
-        return assocDef;
     }
 
     private AttachedAssociationDefinition _removeAssocDef(String assocDefUri) {

@@ -108,7 +108,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         // update memory
         getModel().setWholeCardinalityUri(wholeCardinalityUri);
         // update DB
-        storeWholeCardinalityUri(directives);
+        dms.objectFactory.storeWholeCardinalityUri(getId(), wholeCardinalityUri);
     }
 
     @Override
@@ -116,7 +116,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         // update memory
         getModel().setPartCardinalityUri(partCardinalityUri);
         // update DB
-        storePartCardinalityUri(directives);
+        dms.objectFactory.storePartCardinalityUri(getId(), partCardinalityUri);
     }
 
     // === Updating ===
@@ -128,30 +128,6 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         // cardinality
         updateWholeCardinality(newModel.getWholeCardinalityUri(), clientState, directives);
         updatePartCardinality(newModel.getPartCardinalityUri(), clientState, directives);
-    }
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    void store() {
-        try {
-            // Note: creating the underlying association is conditional. It exists already for
-            // an interactively created association definition. Its ID is already set.
-            if (getId() == -1) {
-                dms.createAssociation(getModel(), null);    // clientState=null
-            }
-            // role types
-            associateWholeRoleType();
-            associatePartRoleType();
-            // cardinality
-            associateWholeCardinality();
-            associatePartCardinality();
-            //
-            storeViewConfig();
-        } catch (Exception e) {
-            // ### FIXME wording: "type" should be "topic type" or "association type"
-            throw new RuntimeException("Storing association definition \"" + getUri() +
-                "\" of type \"" + getWholeTopicTypeUri() + "\" failed", e);
-        }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -196,70 +172,6 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
             logger.info("### Changing part cardinality URI from \"" + partCardinalityUri + "\" -> \"" +
                 newPartCardinalityUri + "\"");
             setPartCardinalityUri(newPartCardinalityUri, clientState, directives);
-        }
-    }
-
-    // === Store ===
-
-    // ### FIXME: argument not used
-    private void storeWholeCardinalityUri(Directives directives) {
-        // remove current assignment
-        long assocId = dms.getObjectFactory().fetchWholeCardinality(getId()).getAssociationModel().getId();
-        dms.deleteAssociation(assocId, null);   // clientState=null
-        // create new assignment
-        associateWholeCardinality();
-    }    
-
-    // ### FIXME: argument not used
-    private void storePartCardinalityUri(Directives directives) {
-        // remove current assignment
-        long assocId = dms.getObjectFactory().fetchPartCardinality(getId()).getAssociationModel().getId();
-        dms.deleteAssociation(assocId, null);   // clientState=null
-        // create new assignment
-        associatePartCardinality();
-    }    
-
-    // ---
-
-    private void associateWholeCardinality() {
-        dms.createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(getWholeCardinalityUri(), "dm4.core.whole_cardinality"),
-            new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
-    }
-
-    private void associatePartCardinality() {
-        dms.createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(getPartCardinalityUri(), "dm4.core.part_cardinality"),
-            new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
-    }
-
-    // ---
-
-    private void associateWholeRoleType() {
-        dms.createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(getWholeRoleTypeUri(), "dm4.core.whole_role_type"),
-            new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
-    }
-
-    private void associatePartRoleType() {
-        dms.createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(getPartRoleTypeUri(), "dm4.core.part_role_type"),
-            new AssociationRoleModel(getId(), "dm4.core.assoc_def"));
-    }
-
-    // ---
-
-    private void storeViewConfig() {
-        try {
-            for (TopicModel configTopic : getModel().getViewConfigModel().getConfigTopics()) {
-                Topic topic = dms.createTopic(configTopic, null);   // FIXME: clientState=null
-                dms.createAssociation("dm4.core.aggregation",
-                    new AssociationRoleModel(getId(), "dm4.core.assoc_def"),
-                    new TopicRoleModel(topic.getId(), "dm4.core.view_config"));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Storing view configuration of association definition \"" +
-                getUri() + "\" failed", e);
         }
     }
 
