@@ -415,9 +415,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public TopicType getTopicType(String uri, ClientState clientState) {
-        if (uri == null) {
-            throw new IllegalArgumentException("Tried to get a topic type with null URI");
-        }
         DeepaMehtaTransaction tx = beginTx();
         try {
             TopicType topicType = typeCache.getTopicType(uri);
@@ -454,10 +451,9 @@ public class EmbeddedService implements DeepaMehtaService {
     public TopicType createTopicType(TopicTypeModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopicType topicType = new AttachedTopicType(model, this);
-            // Note: the topic type is put in type cache *before* it is stored. See createAssociationType().
-            typeCache.put(topicType);
             objectFactory.storeType(model);
+            AttachedTopicType topicType = new AttachedTopicType(model, this);
+            typeCache.put(topicType);
             //
             fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, clientState);
             //
@@ -514,9 +510,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public AssociationType getAssociationType(String uri, ClientState clientState) {
-        if (uri == null) {
-            throw new IllegalArgumentException("Tried to get an association type with null URI");
-        }
         DeepaMehtaTransaction tx = beginTx();
         try {
             AssociationType assocType = typeCache.getAssociationType(uri);
@@ -553,12 +546,9 @@ public class EmbeddedService implements DeepaMehtaService {
     public AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedAssociationType assocType = new AttachedAssociationType(model, this);
-            // Note: the association type must be put in type cache *before* it is stored.
-            // Storing an object requires its data type to be known. See AttachedDeepaMehtaObject.store()
-            // Consider creation of association type "Composition Definition": it has a composition definition itself.
-            typeCache.put(assocType);
             objectFactory.storeType(model);
+            AttachedAssociationType assocType = new AttachedAssociationType(model, this);
+            typeCache.put(assocType);
             //
             tx.success();
             return assocType;

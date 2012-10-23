@@ -46,22 +46,12 @@ class TypeCache {
 
     TopicType getTopicType(String topicTypeUri) {
         TopicType topicType = topicTypes.get(topicTypeUri);
-        if (topicType == null) {
-            endlessRecursionProtection.check(topicTypeUri);
-            topicType = loadTopicType(topicTypeUri);
-            put(topicType);
-        }
-        return topicType;
+        return topicType != null ? topicType : loadTopicType(topicTypeUri);
     }
 
     AssociationType getAssociationType(String assocTypeUri) {
         AssociationType assocType = assocTypes.get(assocTypeUri);
-        if (assocType == null) {
-            endlessRecursionProtection.check(assocTypeUri);
-            assocType = loadAssociationType(assocTypeUri);
-            put(assocType);
-        }
-        return assocType;
+        return assocType != null ? assocType : loadAssociationType(assocTypeUri);
     }
 
     // ---
@@ -87,14 +77,26 @@ class TypeCache {
 
     private TopicType loadTopicType(String topicTypeUri) {
         logger.info("Loading topic type \"" + topicTypeUri + "\"");
-        TopicTypeModel topicType = dms.objectFactory.fetchTopicType(topicTypeUri);
-        return new AttachedTopicType(topicType, dms);
+        endlessRecursionProtection.check(topicTypeUri);
+        //
+        TopicTypeModel model = dms.objectFactory.getTopicType(topicTypeUri);
+        AttachedTopicType topicType = new AttachedTopicType(model, dms);
+        // put in type cache
+        put(topicType);
+        //
+        return topicType;
     }
 
     private AssociationType loadAssociationType(String assocTypeUri) {
         logger.info("Loading association type \"" + assocTypeUri + "\"");
-        AssociationTypeModel assocType = dms.objectFactory.fetchAssociationType(assocTypeUri);
-        return new AttachedAssociationType(assocType, dms);
+        endlessRecursionProtection.check(assocTypeUri);
+        //
+        AssociationTypeModel model = dms.objectFactory.getAssociationType(assocTypeUri);
+        AttachedAssociationType assocType = new AttachedAssociationType(model, dms);
+        // put in type cache
+        put(assocType);
+        //
+        return assocType;
     }
 
     // ---

@@ -49,6 +49,8 @@ class ObjectFactoryImpl implements ObjectFactory {
     private Storage topicStorage;
     private Storage assocStorage;
 
+    private Map<String, TypeModel> typeCache = new HashMap();
+
     // ### TODO: proper layering.
     // This class should depend solely on the (low-level) storage layer but not on the application service (dms).
     private EmbeddedService dms;
@@ -67,11 +69,31 @@ class ObjectFactoryImpl implements ObjectFactory {
 
 
 
+    // === Type Cache ===
+
+    TopicTypeModel getTopicType(String topicTypeUri) {
+        TopicTypeModel topicType = (TopicTypeModel) typeCache.get(topicTypeUri);
+        return topicType != null ? topicType : fetchTopicType(topicTypeUri);
+    }
+
+    AssociationTypeModel getAssociationType(String assocTypeUri) {
+        AssociationTypeModel assocType = (AssociationTypeModel) typeCache.get(assocTypeUri);
+        return assocType != null ? assocType : fetchAssociationType(assocTypeUri);
+    }
+
+    // ---
+
+    private void putInTypeCache(TypeModel type) {
+        typeCache.put(type.getUri(), type);
+    }
+
+
+
     // === Types ===
 
     // --- Fetch ---
 
-    TopicTypeModel fetchTopicType(String topicTypeUri) {
+    private TopicTypeModel fetchTopicType(String topicTypeUri) {
         TopicModel typeTopic = dms.storage.getTopic("uri", new SimpleValue(topicTypeUri));
         checkTopicType(topicTypeUri, typeTopic);
         //
@@ -84,10 +106,16 @@ class ObjectFactoryImpl implements ObjectFactory {
         ViewConfigurationModel viewConfig = fetchViewConfig(typeTopic.getId());
         //
         // 2) build type model
-        return new TopicTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
+        TopicTypeModel topicType = new TopicTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs,
+            labelConfig, viewConfig);
+        //
+        // 3) put in type cache
+        putInTypeCache(topicType);
+        //
+        return topicType;
     }
 
-    AssociationTypeModel fetchAssociationType(String assocTypeUri) {
+    private AssociationTypeModel fetchAssociationType(String assocTypeUri) {
         TopicModel typeTopic = dms.storage.getTopic("uri", new SimpleValue(assocTypeUri));
         checkAssociationType(assocTypeUri, typeTopic);
         //
@@ -100,7 +128,13 @@ class ObjectFactoryImpl implements ObjectFactory {
         ViewConfigurationModel viewConfig = fetchViewConfig(typeTopic.getId());
         //
         // 2) build type model
-        return new AssociationTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
+        AssociationTypeModel assocType = new AssociationTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs,
+            labelConfig, viewConfig);
+        //
+        // 3) put in type cache
+        putInTypeCache(assocType);
+        //
+        return assocType;
     }
 
     // ---
@@ -128,17 +162,22 @@ class ObjectFactoryImpl implements ObjectFactory {
     // --- Store ---
 
     void storeType(TypeModel type) {
-        // 1) store the base-topic parts ### FIXME: call super.store() instead?
-        // Note: if no URI is set a default URI is generated
+        // Note: if no URI is set a default URI is generated ### FIXME: must be done *after* storing the topic
         if (type.getUri().equals("")) {
             type.setUri(DEFAULT_URI_PREFIX + type.getId());
         }
         //
+        // 1) store the base-topic parts ### FIXME: call super.store() instead?
         dms.storage.createTopic(type);
         dms.associateWithTopicType(type);
         topicStorage.storeAndIndexValue(type.getId(), type.getTypeUri(), type.getSimpleValue());
         //
-        // 2) store the type-specific parts
+        // 2) put in type cache
+        // Note: an association type must be put in type cache *before* storing its association definitions.
+        // Consider creation of association type "Composition Definition": it has a composition definition itself.
+        putInTypeCache(type);
+        //
+        // 3) store the type-specific parts
         associateDataType(type.getUri(), type.getDataTypeUri());
         storeIndexModes(type.getUri(), type.getIndexModes());
         storeAssocDefs(type.getUri(), type.getAssocDefs().values());
@@ -599,11 +638,13 @@ class ObjectFactoryImpl implements ObjectFactory {
     // ---
 
     private RelatedTopicModel fetchViewConfigTopic(long typeId, String configTypeUri) {
+        // Note: the composite is not fetched as it is not needed
         return dms.storage.getTopicRelatedTopic(typeId, "dm4.core.aggregation",
             "dm4.core.type", "dm4.core.view_config", configTypeUri);
     }
 
     private RelatedTopicModel fetchAssocDefViewConfigTopic(long assocDefId, String configTypeUri) {
+        // Note: the composite is not fetched as it is not needed
         return dms.storage.getAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.view_config", configTypeUri);
     }
@@ -647,12 +688,18 @@ class ObjectFactoryImpl implements ObjectFactory {
     // ---
 
     void storeViewConfigSetting(RoleModel configurable, String configTypeUri, String settingUri, Object value) {
-        TopicModel configTopic = fetchViewConfigTopic(configurable, configTypeUri);
-        if (configTopic == null) {
-            configTopic = new TopicModel(configTypeUri);
-            storeConfigTopic(configurable, configTopic);
+        try {
+            TopicModel configTopic = fetchViewConfigTopic(configurable, configTypeUri);
+            if (configTopic == null) {
+                configTopic = new TopicModel(configTypeUri);
+                storeConfigTopic(configurable, configTopic);
+            }
+            new AttachedTopic(configTopic, dms).setChildTopicValue(settingUri, new SimpleValue(value));
+        } catch (Exception e) {
+            throw new RuntimeException("Storing view configuration setting failed (configurable=" + configurable +
+                ", configTypeUri=\"" + configTypeUri + "\", settingUri=\"" + settingUri + "\", value=\"" + value +
+                "\")", e);
         }
-        new AttachedTopic(configTopic, dms).setChildTopicValue(settingUri, new SimpleValue(value));
     }
 
     // --- Helper ---
