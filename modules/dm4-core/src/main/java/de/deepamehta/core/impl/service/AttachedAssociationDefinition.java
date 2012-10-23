@@ -119,6 +119,8 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         dms.objectFactory.storePartCardinalityUri(getId(), partCardinalityUri);
     }
 
+
+
     // === Updating ===
 
     @Override
@@ -131,6 +133,8 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
 
     // === Update ===
 
@@ -175,10 +179,12 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         }
     }
 
-    // === Helper ===
+
+
+    // === Attached Object Cache ===
 
     private void initViewConfig() {
-        RoleModel configurable = new AssociationRoleModel(getId(), "dm4.core.assoc_def");
+        RoleModel configurable = dms.objectFactory.createConfigurableAssocDef(getId());   // ### ID is uninitialized
         this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
     }
 }

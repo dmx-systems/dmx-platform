@@ -152,7 +152,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // update memory
         getModel().setLabelConfig(labelConfig);
         // update DB
-        storeLabelConfig();
+        dms.objectFactory.storeLabelConfig(labelConfig, getModel().getAssocDefs().values());
     }
 
     // === View Configuration ===
@@ -181,53 +181,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         return (TypeModel) super.getModel();
     }
 
-
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    // ### to be dropped
-    void store(ClientState clientState) {
-        // 1) store the base-topic parts ### FIXME: call super.store() instead?
-        dms.storage.createTopic(getModel());
-        dms.associateWithTopicType(getModel());
-        setSimpleValue(getSimpleValue());
-        // Note: if no URI is set a default URI is generated
-        if (getUri().equals("")) {
-            setUri(DEFAULT_URI_PREFIX + getId());
-        }
-        // Note: the attached object cache must be initialized *after* storing the base-topic parts because
-        // initViewConfig() relies on the type's ID (unknown before stored) or URI (possibly unknown before stored).
-        // ### FIXME: this requirment must be dropped. Storage must be performed outside of this object.
-        //
-        // init attached object cache ### FIXME: to be dropped
-        initAssocDefs();
-        initViewConfig();
-        //
-        // Note: the attached object cache must be initialized *before* storing the type-specific parts because
-        // storeAssocDefs() relies on the association definitions.
-        // ### FIXME: this requirment must be dropped. Storage must rely solely on the model.
-        //
-        // 2) store the type-specific parts
-        // ### associateDataType();
-        // ### storeIndexModes();
-        // ### storeAssocDefs();
-        storeLabelConfig();
-        getViewConfig().store(clientState);
-    }
-
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-
-
-    // === Store ===
-
-    private void storeLabelConfig() {
-        List<String> labelConfig = getLabelConfig();
-        for (AssociationDefinition assocDef : getAssocDefs().values()) {
-            boolean includeInLabel = labelConfig.contains(assocDef.getUri());
-            assocDef.setChildTopicValue("dm4.core.include_in_label", new SimpleValue(includeInLabel));
-        }
-    }
 
 
 
@@ -277,7 +231,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // ---
 
     private void initViewConfig() {
-        RoleModel configurable = new TopicRoleModel(getId(), "dm4.core.type");
+        RoleModel configurable = dms.objectFactory.createConfigurableType(getId());   // ### type ID is uninitialized
         this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
     }
 }

@@ -39,6 +39,7 @@ public class ViewConfigurationModel {
 
     /**
      * @param   configurable    A topic type, an association type, or an association definition.
+     *                          ### FIXME: the sole JSONArray should be passed
      */
     public ViewConfigurationModel(JSONObject configurable) {
         try {
@@ -85,19 +86,15 @@ public class ViewConfigurationModel {
         viewConfig.put(configTypeUri, configTopic);
     }
 
-    public boolean addSetting(String configTypeUri, String settingUri, Object value) {
-        boolean configTopicCreated = false;
+    public void addSetting(String configTypeUri, String settingUri, Object value) {
         // create config topic if not exists
         TopicModel configTopic = getConfigTopic(configTypeUri);
         if (configTopic == null) {
             configTopic = new TopicModel(configTypeUri);
             addConfigTopic(configTopic);
-            configTopicCreated = true;
         }
         // make setting
         configTopic.getCompositeValue().put(settingUri, value);
-        //
-        return configTopicCreated;
     }
 
     // ---
@@ -125,6 +122,7 @@ public class ViewConfigurationModel {
 
     // ---
 
+    // ### FIXME: drop parameter, implement JSONEnabled
     public void toJSON(JSONObject configurable) {
         try {
             List viewConfigTopics = new ArrayList();
@@ -141,6 +139,4 @@ public class ViewConfigurationModel {
     public String toString() {
         return "view configuration " + viewConfig;
     }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
 }
