@@ -750,13 +750,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    // ### to be dropped
-    private void storeAndIndexValue(SimpleValue value) {
+    void storeAndIndexValue(SimpleValue value) {
         SimpleValue oldValue = storeValue(value);               // abstract
         indexValue(value, oldValue);
     }
 
-    // ### to be dropped
     private void indexValue(SimpleValue value, SimpleValue oldValue) {
         Type type = getType();                                  // abstract
         String indexKey = type.getUri();

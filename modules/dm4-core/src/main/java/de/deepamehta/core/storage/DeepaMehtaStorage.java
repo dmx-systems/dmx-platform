@@ -25,6 +25,10 @@ public interface DeepaMehtaStorage {
 
     // === Topics ===
 
+    /**
+     * @return  The fetched topic.
+     *          Note: its composite value is not initialized.
+     */
     TopicModel getTopic(long topicId);
 
     /**
@@ -37,14 +41,25 @@ public interface DeepaMehtaStorage {
      * (for statically declared data field, typically in <code>types.json</code>) or
      * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
      * (for dynamically created data fields, typically in migration classes).
+     *
+     * @return  The fetched topic.
+     *          Note: its composite value is not initialized.
      */
     TopicModel getTopic(String key, SimpleValue value);
 
     // ---
 
+    /**
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
+     */
     RelatedTopicModel getTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                        String othersRoleTypeUri, String othersTopicTypeUri);
 
+    /**
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
+     */
     ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                        String othersRoleTypeUri, String othersTopicTypeUri,
                                                        int maxResultSize);
@@ -54,6 +69,9 @@ public interface DeepaMehtaStorage {
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
+     *
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
      */
     ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, List assocTypeUris, String myRoleTypeUri,
                                                        String othersRoleTypeUri, String othersTopicTypeUri,
@@ -63,11 +81,18 @@ public interface DeepaMehtaStorage {
 
     /**
      * @param   myRoleTypeUri       may be null
+     *
+     * @return  The fetched associations.
+     *          Note: their composite values are not initialized.
      */
     Set<AssociationModel> getTopicAssociations(long topicId, String myRoleTypeUri);
 
     // ---
 
+    /**
+     * @return  The fetched association.
+     *          Note: its composite value is not initialized.
+     */
     RelatedAssociationModel getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                        String othersRoleTypeUri, String othersAssocTypeUri);
 
@@ -77,12 +102,19 @@ public interface DeepaMehtaStorage {
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersAssocTypeUri  may be null
+     *
+     * @return  The fetched associations.
+     *          Note: their composite values are not initialized.
      */
     Set<RelatedAssociationModel> getTopicRelatedAssociations(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                              String othersRoleTypeUri, String othersAssocTypeUri);
 
     // ---
 
+    /**
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
+     */
     Set<TopicModel> searchTopics(String searchTerm, String fieldUri);
 
     // ---

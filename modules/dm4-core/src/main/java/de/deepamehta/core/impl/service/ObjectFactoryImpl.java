@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 
 
 /**
- * The high-level storage layer.
+ * Helper for storing and fetching type models.
  * ### TODO: rename class.
  */
 class ObjectFactoryImpl implements ObjectFactory {
@@ -46,13 +46,8 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Storage topicStorage;
-    private Storage assocStorage;
-
     private Map<String, TypeModel> typeCache = new HashMap();
 
-    // ### TODO: proper layering.
-    // This class should depend solely on the (low-level) storage layer but not on the application service (dms).
     private EmbeddedService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -60,8 +55,6 @@ class ObjectFactoryImpl implements ObjectFactory {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     ObjectFactoryImpl(EmbeddedService dms) {
-        this.topicStorage = new TopicStorage(dms);
-        this.assocStorage = new AssociationStorage(dms);
         this.dms = dms;
     }
 
@@ -71,20 +64,24 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // === Type Cache ===
 
-    TopicTypeModel getTopicType(String topicTypeUri) {
-        TopicTypeModel topicType = (TopicTypeModel) typeCache.get(topicTypeUri);
-        return topicType != null ? topicType : fetchTopicType(topicTypeUri);
+    private TypeModel getType(String typeUri) {
+        return typeCache.get(typeUri);
     }
 
-    AssociationTypeModel getAssociationType(String assocTypeUri) {
-        AssociationTypeModel assocType = (AssociationTypeModel) typeCache.get(assocTypeUri);
-        return assocType != null ? assocType : fetchAssociationType(assocTypeUri);
+    private void putInTypeCache(TypeModel type) {
+        typeCache.put(type.getUri(), type);
     }
 
     // ---
 
-    private void putInTypeCache(TypeModel type) {
-        typeCache.put(type.getUri(), type);
+    TopicTypeModel getTopicType(String topicTypeUri) {
+        TopicTypeModel topicType = (TopicTypeModel) getType(topicTypeUri);
+        return topicType != null ? topicType : fetchTopicType(topicTypeUri);
+    }
+
+    AssociationTypeModel getAssociationType(String assocTypeUri) {
+        AssociationTypeModel assocType = (AssociationTypeModel) getType(assocTypeUri);
+        return assocType != null ? assocType : fetchAssociationType(assocTypeUri);
     }
 
 
@@ -94,7 +91,7 @@ class ObjectFactoryImpl implements ObjectFactory {
     // --- Fetch ---
 
     private TopicTypeModel fetchTopicType(String topicTypeUri) {
-        TopicModel typeTopic = dms.storage.getTopic("uri", new SimpleValue(topicTypeUri));
+        Topic typeTopic = dms.getTopic("uri", new SimpleValue(topicTypeUri), false, null);
         checkTopicType(topicTypeUri, typeTopic);
         //
         // 1) fetch type components
@@ -103,11 +100,11 @@ class ObjectFactoryImpl implements ObjectFactory {
         List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic.getId(), topicTypeUri,
             "topic type");
         List<String> labelConfig = fetchLabelConfig(assocDefs);
-        ViewConfigurationModel viewConfig = fetchViewConfig(typeTopic.getId());
+        ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
         //
         // 2) build type model
-        TopicTypeModel topicType = new TopicTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs,
-            labelConfig, viewConfig);
+        TopicTypeModel topicType = new TopicTypeModel(typeTopic.getModel(), dataTypeUri, indexModes,
+            assocDefs, labelConfig, viewConfig);
         //
         // 3) put in type cache
         putInTypeCache(topicType);
@@ -116,7 +113,7 @@ class ObjectFactoryImpl implements ObjectFactory {
     }
 
     private AssociationTypeModel fetchAssociationType(String assocTypeUri) {
-        TopicModel typeTopic = dms.storage.getTopic("uri", new SimpleValue(assocTypeUri));
+        Topic typeTopic = dms.getTopic("uri", new SimpleValue(assocTypeUri), false, null);
         checkAssociationType(assocTypeUri, typeTopic);
         //
         // 1) fetch type components
@@ -125,11 +122,11 @@ class ObjectFactoryImpl implements ObjectFactory {
         List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic.getId(), assocTypeUri,
             "association type");
         List<String> labelConfig = fetchLabelConfig(assocDefs);
-        ViewConfigurationModel viewConfig = fetchViewConfig(typeTopic.getId());
+        ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
         //
         // 2) build type model
-        AssociationTypeModel assocType = new AssociationTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs,
-            labelConfig, viewConfig);
+        AssociationTypeModel assocType = new AssociationTypeModel(typeTopic.getModel(), dataTypeUri, indexModes,
+            assocDefs, labelConfig, viewConfig);
         //
         // 3) put in type cache
         putInTypeCache(assocType);
@@ -139,7 +136,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // ---
 
-    private void checkTopicType(String topicTypeUri, TopicModel typeTopic) {
+    private void checkTopicType(String topicTypeUri, Topic typeTopic) {
         if (typeTopic == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
         } else if (!typeTopic.getTypeUri().equals("dm4.core.topic_type") &&
@@ -150,7 +147,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         }
     }
 
-    private void checkAssociationType(String assocTypeUri, TopicModel typeTopic) {
+    private void checkAssociationType(String assocTypeUri, Topic typeTopic) {
         if (typeTopic == null) {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found");
         } else if (!typeTopic.getTypeUri().equals("dm4.core.assoc_type")) {
@@ -170,7 +167,8 @@ class ObjectFactoryImpl implements ObjectFactory {
         // 1) store the base-topic parts ### FIXME: call super.store() instead?
         dms.storage.createTopic(type);
         dms.associateWithTopicType(type);
-        topicStorage.storeAndIndexValue(type.getId(), type.getTypeUri(), type.getSimpleValue());
+        AttachedTopic typeTopic = new AttachedTopic(type, dms);
+        typeTopic.storeAndIndexValue(type.getSimpleValue());
         //
         // 2) put in type cache
         // Note: an association type must be put in type cache *before* storing its association definitions.
@@ -610,15 +608,14 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // --- Fetch ---
 
-    private ViewConfigurationModel fetchViewConfig(long typeId) {
+    private ViewConfigurationModel fetchTypeViewConfig(Topic typeTopic) {
         try {
-            ResultSet<RelatedTopicModel> topics = dms.storage.getTopicRelatedTopics(typeId,
-                "dm4.core.aggregation", "dm4.core.type", "dm4.core.view_config", null, 0);
+            ResultSet<RelatedTopic> configTopics = typeTopic.getRelatedTopics("dm4.core.aggregation",
+                "dm4.core.type", "dm4.core.view_config", null, true, false, 0, null);
             // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
-            // ### FIXME: the composites must be fetched
-            return new ViewConfigurationModel(topics.getItems());
+            return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics.getItems()));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching view configuration for type " + typeId + " failed", e);
+            throw new RuntimeException("Fetching view configuration for type \"" + typeTopic.getUri() + "\" failed", e);
         }
     }
 
@@ -637,7 +634,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // ---
 
-    private RelatedTopicModel fetchViewConfigTopic(long typeId, String configTypeUri) {
+    private RelatedTopicModel fetchTypeViewConfigTopic(long typeId, String configTypeUri) {
         // Note: the composite is not fetched as it is not needed
         return dms.storage.getTopicRelatedTopic(typeId, "dm4.core.aggregation",
             "dm4.core.type", "dm4.core.view_config", configTypeUri);
@@ -654,7 +651,7 @@ class ObjectFactoryImpl implements ObjectFactory {
     private TopicModel fetchViewConfigTopic(RoleModel configurable, String configTypeUri) {
         if (configurable instanceof TopicRoleModel) {
             long typeId = ((TopicRoleModel) configurable).getTopicId();
-            return fetchViewConfigTopic(typeId, configTypeUri);
+            return fetchTypeViewConfigTopic(typeId, configTypeUri);
         } else if (configurable instanceof AssociationRoleModel) {
             long assocDefId = ((AssociationRoleModel) configurable).getAssociationId();
             return fetchAssocDefViewConfigTopic(assocDefId, configTypeUri);

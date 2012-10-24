@@ -90,9 +90,8 @@ public class DeepaMehtaUtils {
         return new ResultSet(relTopics.getTotalCount(), topics);
     }
 
-    // ### FIXME: drop this method? It is not used.
-    public static List<TopicModel> toTopicModels(ResultSet<RelatedTopic> relTopics) {
-        List<TopicModel> topicModels = new ArrayList();
+    public static Set<TopicModel> toTopicModels(Set<RelatedTopic> relTopics) {
+        Set<TopicModel> topicModels = new LinkedHashSet();
         for (Topic topic : relTopics) {
             topicModels.add(topic.getModel());
         }

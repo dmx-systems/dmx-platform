@@ -80,7 +80,7 @@ class TypeCache {
         endlessRecursionProtection.check(topicTypeUri);
         //
         TopicTypeModel model = dms.objectFactory.getTopicType(topicTypeUri);
-        AttachedTopicType topicType = new AttachedTopicType(model, dms);
+        TopicType topicType = new AttachedTopicType(model, dms);
         // put in type cache
         put(topicType);
         //
@@ -92,7 +92,7 @@ class TypeCache {
         endlessRecursionProtection.check(assocTypeUri);
         //
         AssociationTypeModel model = dms.objectFactory.getAssociationType(assocTypeUri);
-        AttachedAssociationType assocType = new AttachedAssociationType(model, dms);
+        AssociationType assocType = new AttachedAssociationType(model, dms);
         // put in type cache
         put(assocType);
         //

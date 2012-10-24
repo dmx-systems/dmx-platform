@@ -175,14 +175,12 @@ class MigrationManager {
                 //
                 if (migrationType.equals("core")) {
                     migrationInfo = "core migration " + migrationNr;
-                    logger.info("Preparing " + migrationInfo + " ...");
                     configIn     = getClass().getResourceAsStream(configFile);
                     migrationIn  = getClass().getResourceAsStream(migrationFile);
                     migrationClassName = coreMigrationClassName(migrationNr);
                     migrationClass = loadClass(migrationClassName);
                 } else {
                     migrationInfo = "migration " + migrationNr + " of " + plugin;
-                    logger.info("Preparing " + migrationInfo + " ...");
                     configIn     = plugin.getResourceAsStream(configFile);
                     migrationIn  = plugin.getResourceAsStream(migrationFile);
                     migrationClassName = plugin.getMigrationClassName(migrationNr);
