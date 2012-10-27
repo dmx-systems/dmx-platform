@@ -47,19 +47,8 @@ class AttachedTopicType extends AttachedType implements TopicType {
         return (TopicTypeModel) super.getModel();
     }
 
-    // ----------------------------------------------------------------------------------------------- Protected Methods
-
-    // === AttachedTopic Overrides ===
-
     @Override
-    protected String className() {
-        return "topic type";
-    }
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    // ### FIXME: add to interface?
-    void update(TopicTypeModel model, ClientState clientState, Directives directives) {
+    public void update(TopicTypeModel model, ClientState clientState, Directives directives) {
         logger.info("Updating topic type \"" + getUri() + "\" (new " + model + ")");
         // Note: the UPDATE_TOPIC_TYPE directive must be added *before* a possible UPDATE_TOPIC directive (added
         // by super.update()). In case of a changed type URI the webclient's type cache must be updated *before*
@@ -82,6 +71,15 @@ class AttachedTopicType extends AttachedType implements TopicType {
         updateAssocDefs(model.getAssocDefs().values(), clientState, directives);
         updateSequence(model.getAssocDefs().values());
         updateLabelConfig(model.getLabelConfig());
+    }
+
+    // ----------------------------------------------------------------------------------------------- Protected Methods
+
+    // === AttachedTopic Overrides ===
+
+    @Override
+    protected String className() {
+        return "topic type";
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

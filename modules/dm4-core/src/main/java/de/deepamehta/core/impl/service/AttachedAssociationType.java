@@ -2,6 +2,9 @@ package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.model.AssociationTypeModel;
+import de.deepamehta.core.service.ChangeReport;
+import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directives;
 
 
 
@@ -24,6 +27,12 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
     public AssociationTypeModel getModel() {
         return (AssociationTypeModel) super.getModel();
     }
+
+    /* ### TODO
+    @Override
+    public void update(AssociationTypeModel model, ClientState clientState, Directives directives) {
+        super.update(model, clientState, directives);
+    } */
 
     // ----------------------------------------------------------------------------------------------- Protected Methods
 

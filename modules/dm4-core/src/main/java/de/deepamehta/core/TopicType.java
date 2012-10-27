@@ -1,5 +1,9 @@
 package de.deepamehta.core;
 
+import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directives;
+
 
 
 /**
@@ -8,4 +12,8 @@ package de.deepamehta.core;
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
 public interface TopicType extends Type {
+
+    // === Updating ===
+
+    void update(TopicTypeModel model, ClientState clientState, Directives directives);
 }

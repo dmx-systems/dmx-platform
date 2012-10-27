@@ -16,11 +16,19 @@ import java.util.Set;
  */
 public interface Topic extends DeepaMehtaObject {
 
+
+
+    // === Model ===
+
     TopicModel getModel();
+
+
 
     // === Updating ===
 
     ChangeReport update(TopicModel model, ClientState clientState, Directives directives);
+
+
 
     // === Traversal ===
 

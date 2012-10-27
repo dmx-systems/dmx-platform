@@ -2,6 +2,9 @@ package de.deepamehta.core;
 
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.TypeModel;
+import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directives;
 
 import java.util.List;
 import java.util.Map;
@@ -11,19 +14,23 @@ import java.util.Set;
 
 public interface Type extends Topic {
 
-    // === Data Type ===
+
+
+    // === Model ===
+
+    // --- Data Type ---
 
     String getDataTypeUri();
 
     void setDataTypeUri(String dataTypeUri);
 
-    // === Index Modes ===
+    // --- Index Modes ---
 
     Set<IndexMode> getIndexModes();
 
     void setIndexModes(Set<IndexMode> indexModes);
 
-    // === Association Definitions ===
+    // --- Association Definitions ---
 
     Map<String, AssociationDefinition> getAssocDefs();
 
@@ -53,16 +60,23 @@ public interface Type extends Topic {
 
     void removeAssocDef(String assocDefUri);
 
-    // === Label Configuration ===
+    // --- Label Configuration ---
 
     List<String> getLabelConfig();
 
     void setLabelConfig(List<String> labelConfig);
 
-    // === View Configuration ===
+    // --- View Configuration ---
 
     ViewConfiguration getViewConfig();
 
     // FIXME: to be dropped
     Object getViewConfig(String typeUri, String settingUri);
+
+
+
+    // === Updating ===
+
+    // ### TODO: common update logic for topic types and association types
+    // ### void update(TypeModel model, ClientState clientState, Directives directives);
 }
