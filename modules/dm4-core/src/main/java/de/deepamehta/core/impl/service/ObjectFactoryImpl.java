@@ -159,15 +159,18 @@ class ObjectFactoryImpl implements ObjectFactory {
     // --- Store ---
 
     void storeType(TypeModel type) {
-        // Note: if no URI is set a default URI is generated ### FIXME: must be done *after* storing the topic
-        if (type.getUri().equals("")) {
-            type.setUri(DEFAULT_URI_PREFIX + type.getId());
-        }
-        //
         // 1) store the base-topic parts ### FIXME: call super.store() instead?
         dms.storage.createTopic(type);
         dms.associateWithTopicType(type);
+        // Note: the created AttachedTopic is just a temporary vehicle to
+        // let us call its setUri() and storeAndIndexValue() methods.
         AttachedTopic typeTopic = new AttachedTopic(type, dms);
+        // If no URI is set the type gets a default URI based on its ID.
+        // Note: this must be done *after* the topic is created. The ID is not known before.
+        if (typeTopic.getUri().equals("")) {
+            typeTopic.setUri(DEFAULT_URI_PREFIX + type.getId());
+        }
+        //
         typeTopic.storeAndIndexValue(type.getSimpleValue());
         //
         // 2) put in type cache
