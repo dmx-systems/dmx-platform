@@ -136,6 +136,6 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     private AssociationDefinition getAssocDef(String facetTypeUri) {
         // Note: a facet type has exactly *one* association definition
-        return dms.getTopicType(facetTypeUri, null).getAssocDefs().values().iterator().next();
+        return dms.getTopicType(facetTypeUri, null).getAssocDefs().iterator().next();
     }
 }

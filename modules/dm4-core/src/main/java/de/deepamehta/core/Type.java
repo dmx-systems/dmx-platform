@@ -6,8 +6,8 @@ import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -32,7 +32,7 @@ public interface Type extends Topic {
 
     // --- Association Definitions ---
 
-    Map<String, AssociationDefinition> getAssocDefs();
+    Collection<AssociationDefinition> getAssocDefs();
 
     AssociationDefinition getAssocDef(String assocDefUri);
 

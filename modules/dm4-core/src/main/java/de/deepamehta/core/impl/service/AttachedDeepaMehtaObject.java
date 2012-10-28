@@ -464,7 +464,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     private void updateCompositeValue(CompositeValue newComp, ClientState clientState, Directives directives) {
         try {
-            for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
+            for (AssociationDefinition assocDef : getType().getAssocDefs()) {
                 String assocDefUri    = assocDef.getUri();
                 String cardinalityUri = assocDef.getPartCardinalityUri();
                 TopicModel newChildTopic        = null;     // only used for "one"
@@ -652,7 +652,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     private CompositeValue fetchComposite() {
         try {
             CompositeValue comp = new CompositeValue();
-            for (AssociationDefinition assocDef : getType().getAssocDefs().values()) {
+            for (AssociationDefinition assocDef : getType().getAssocDefs()) {
                 String cardinalityUri = assocDef.getPartCardinalityUri();
                 if (cardinalityUri.equals("dm4.core.one")) {
                     Topic childTopic = fetchChildTopic(assocDef, true);             // fetchComposite=true
@@ -821,7 +821,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     private String buildDefaultLabel() {
         Type type = getType();
         if (type.getDataTypeUri().equals("dm4.core.composite")) {
-            Iterator<AssociationDefinition> i = type.getAssocDefs().values().iterator();
+            Iterator<AssociationDefinition> i = type.getAssocDefs().iterator();
             // Note: types just created might have no child types yet
             if (i.hasNext()) {
                 AssociationDefinition assocDef = i.next();

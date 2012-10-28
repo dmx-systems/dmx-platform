@@ -35,10 +35,6 @@ public class TopicTypeModel extends TypeModel {
         super(topic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
     }
 
-    public TopicTypeModel(TopicTypeModel topicType) {
-        super(topicType);
-    }
-
     public TopicTypeModel(JSONObject topicType) {
         super(topicType, "dm4.core.topic_type");
     }

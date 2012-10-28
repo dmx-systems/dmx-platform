@@ -6,7 +6,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,15 +53,6 @@ public abstract class TypeModel extends TopicModel {
         this.viewConfig = viewConfig;
     }
 
-    public TypeModel(TypeModel type) {
-        super(type);
-        this.dataTypeUri = type.getDataTypeUri();
-        this.indexModes = type.getIndexModes();
-        this.assocDefs = type.getAssocDefs();
-        this.labelConfig = type.getLabelConfig();
-        this.viewConfig = type.getViewConfigModel();
-    }
-
     public TypeModel(JSONObject typeModel, String typeUri) {
         super(typeModel, typeUri);
         try {
@@ -100,12 +91,8 @@ public abstract class TypeModel extends TopicModel {
 
     // === Association Definitions ===
 
-    public Map<String, AssociationDefinitionModel> getAssocDefs() {
-        return assocDefs;
-    }
-
-    public void setAssocDefs(Map<String, AssociationDefinitionModel> assocDefs) {
-        this.assocDefs = assocDefs;
+    public Collection<AssociationDefinitionModel> getAssocDefs() {
+        return assocDefs.values();
     }
 
     public AssociationDefinitionModel getAssocDef(String assocDefUri) {
@@ -143,6 +130,10 @@ public abstract class TypeModel extends TopicModel {
         getAssocDef(assocDefUri);
         //
         return assocDefs.remove(assocDefUri);
+    }
+
+    public void removeAllAssocDefs() {
+        assocDefs.clear();
     }
 
     // === Label Configuration ===

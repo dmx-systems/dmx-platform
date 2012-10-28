@@ -181,8 +181,8 @@ class ObjectFactoryImpl implements ObjectFactory {
         // 3) store the type-specific parts
         associateDataType(type.getUri(), type.getDataTypeUri());
         storeIndexModes(type.getUri(), type.getIndexModes());
-        storeAssocDefs(type.getUri(), type.getAssocDefs().values());
-        storeLabelConfig(type.getLabelConfig(), type.getAssocDefs().values());
+        storeAssocDefs(type.getUri(), type.getAssocDefs());
+        storeLabelConfig(type.getLabelConfig(), type.getAssocDefs());
         storeViewConfig(createConfigurableType(type.getId()), type.getViewConfigModel());
     }
 

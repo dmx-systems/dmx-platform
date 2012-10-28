@@ -1,28 +1,13 @@
 package de.deepamehta.core.impl.service;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
-import de.deepamehta.core.RelatedAssociation;
-import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.ResultSet;
-import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationDefinitionModel;
-import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.IndexMode;
-import de.deepamehta.core.model.RelatedAssociationModel;
-import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
-import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TypeModel;
-import de.deepamehta.core.model.ViewConfigurationModel;
-import de.deepamehta.core.service.ClientState;
-import de.deepamehta.core.util.DeepaMehtaUtils;
 
-import java.util.ArrayList;
-import static java.util.Arrays.asList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +17,6 @@ import java.util.logging.Logger;
 
 
 abstract class AttachedType extends AttachedTopic implements Type {
-
-    // ### to be dropped
-    private static final String DEFAULT_URI_PREFIX = "domain.project.topic_type_";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -95,8 +77,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // === Association Definitions ===
 
     @Override
-    public Map<String, AssociationDefinition> getAssocDefs() {
-        return assocDefs;
+    public Collection<AssociationDefinition> getAssocDefs() {
+        return assocDefs.values();
     }
 
     @Override
@@ -137,7 +119,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         getModel().removeAssocDef(assocDefUri);                                 // update model
         AttachedAssociationDefinition assocDef = _removeAssocDef(assocDefUri);  // update attached object cache
         // update DB
-        dms.objectFactory.rebuildSequence(getId(), getUri(), className(), getModel().getAssocDefs().values());
+        dms.objectFactory.rebuildSequence(getId(), getUri(), className(), getModel().getAssocDefs());
     }
 
     // === Label Configuration ===
@@ -152,7 +134,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // update memory
         getModel().setLabelConfig(labelConfig);
         // update DB
-        dms.objectFactory.storeLabelConfig(labelConfig, getModel().getAssocDefs().values());
+        dms.objectFactory.storeLabelConfig(labelConfig, getModel().getAssocDefs());
     }
 
     // === View Configuration ===
@@ -195,7 +177,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
      */
     private AssociationDefinitionModel lastAssocDef() {
         AssociationDefinitionModel lastAssocDef = null;
-        for (AssociationDefinitionModel assocDef : getModel().getAssocDefs().values()) {
+        for (AssociationDefinitionModel assocDef : getModel().getAssocDefs()) {
             lastAssocDef = assocDef;
         }
         return lastAssocDef;
@@ -205,9 +187,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // === Attached Object Cache ===
 
-    private void initAssocDefs() {
+    // ### FIXME: make it private
+    protected void initAssocDefs() {
         this.assocDefs = new LinkedHashMap();
-        for (AssociationDefinitionModel model : getModel().getAssocDefs().values()) {
+        for (AssociationDefinitionModel model : getModel().getAssocDefs()) {
             _addAssocDef(model);
         }
     }

@@ -68,8 +68,8 @@ class AttachedTopicType extends AttachedType implements TopicType {
         }
         //
         updateDataTypeUri(model.getDataTypeUri());
-        updateAssocDefs(model.getAssocDefs().values(), clientState, directives);
-        updateSequence(model.getAssocDefs().values());
+        updateAssocDefs(model.getAssocDefs(), clientState, directives);
+        updateSequence(model.getAssocDefs());
         updateLabelConfig(model.getLabelConfig());
     }
 
@@ -119,18 +119,17 @@ class AttachedTopicType extends AttachedType implements TopicType {
         }
         logger.info("### Changing assoc def sequence");
         // update memory
-        getModel().setAssocDefs(new LinkedHashMap());   // ### TODO: TypeModel should provide removeAllAssocDefs()
+        getModel().removeAllAssocDefs();
         for (AssociationDefinitionModel assocDef : newAssocDefs) {
             getModel().addAssocDef(assocDef);
         }
-        // ### FIXME: must update attached object cache? Is order important? Serialized is the model.
-        // ### addAssocDefsSorted(hashAssocDefsById(), DeepaMehtaUtils.idList(newAssocDefs));
+        initAssocDefs();    // attached object cache
         // update DB
-        dms.objectFactory.rebuildSequence(getId(), getUri(), className(), getModel().getAssocDefs().values());
+        dms.objectFactory.rebuildSequence(getId(), getUri(), className(), getModel().getAssocDefs());
     }
 
     private boolean hasSequenceChanged(Collection<AssociationDefinitionModel> newAssocDefs) {
-        Collection<AssociationDefinition> assocDefs = getAssocDefs().values();
+        Collection<AssociationDefinition> assocDefs = getAssocDefs();
         if (assocDefs.size() != newAssocDefs.size()) {
             throw new RuntimeException("adding/removing of assoc defs not yet supported via updateTopicType() call");
         }
@@ -148,7 +147,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     private Map<Long, AssociationDefinition> hashAssocDefsById() {
         Map assocDefs = new HashMap();
-        for (AssociationDefinition assocDef : getAssocDefs().values()) {
+        for (AssociationDefinition assocDef : getAssocDefs()) {
             assocDefs.put(assocDef.getId(), assocDef);
         }
         return assocDefs;
