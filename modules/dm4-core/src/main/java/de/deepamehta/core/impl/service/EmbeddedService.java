@@ -151,14 +151,13 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public AttachedTopic createTopic(TopicModel model, ClientState clientState) {
+    public Topic createTopic(TopicModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             fireEvent(CoreEvent.PRE_CREATE_TOPIC, model, clientState);
             //
-            AttachedTopic topic = new AttachedTopic(model, this);
             Directives directives = new Directives();   // ### FIXME: directives are ignored
-            topic.store(clientState, directives);
+            Topic topic = objectFactory.storeTopic(model, clientState, directives);
             //
             fireEvent(CoreEvent.POST_CREATE_TOPIC, topic, clientState, directives);
             //
@@ -329,9 +328,8 @@ public class EmbeddedService implements DeepaMehtaService {
         try {
             fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model, clientState);
             //
-            AttachedAssociation assoc = new AttachedAssociation(model, this);
             Directives directives = new Directives();   // ### FIXME: directives are ignored
-            assoc.store(clientState, directives);
+            Association assoc = objectFactory.storeAssociation(model, clientState, directives);
             //
             fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc, clientState, directives);
             //
@@ -855,43 +853,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
-    // === Topic/Association Storage ===
-
-    void associateWithTopicType(TopicModel topic) {
-        try {
-            // check argument
-            if (topic.getTypeUri() == null) {
-                throw new IllegalArgumentException("The type of topic " + topic.getId() + " is unknown (null)");
-            }
-            //
-            AssociationModel model = new AssociationModel("dm4.core.instantiation",
-                new TopicRoleModel(topic.getTypeUri(), "dm4.core.type"),
-                new TopicRoleModel(topic.getId(), "dm4.core.instance"));
-            storage.createAssociation(model);
-            storage.setAssociationValue(model.getId(), model.getSimpleValue());
-            associateWithAssociationType(model);
-            // low-level (storage) call used here ### explain
-        } catch (Exception e) {
-            throw new RuntimeException("Associating topic with topic type \"" +
-                topic.getTypeUri() + "\" failed (" + topic + ")", e);
-        }
-    }
-
-    void associateWithAssociationType(AssociationModel assoc) {
-        try {
-            AssociationModel model = new AssociationModel("dm4.core.instantiation",
-                new TopicRoleModel(assoc.getTypeUri(), "dm4.core.type"),
-                new AssociationRoleModel(assoc.getId(), "dm4.core.instance"));
-            storage.createAssociation(model);  // low-level (storage) call used here ### explain
-            storage.setAssociationValue(model.getId(), model.getSimpleValue());
-        } catch (Exception e) {
-            throw new RuntimeException("Associating association with association type \"" +
-                assoc.getTypeUri() + "\" failed (" + assoc + ")", e);
-        }
-    }
-
-
-
     // === Bootstrap ===
 
     private void setupBootstrapContent() {
@@ -930,16 +891,16 @@ public class EmbeddedService implements DeepaMehtaService {
         // Note: associateWithTopicType() creates the associations by *low-level* (storage) calls.
         // That's why the associations can be created *before* their type (here: "dm4.core.instantiation")
         // is fully constructed (the type's data type is not yet associated => step 2).
-        associateWithTopicType(t);
-        associateWithTopicType(a);
-        associateWithTopicType(dataType);
-        associateWithTopicType(roleType);
-        associateWithTopicType(text);
-        associateWithTopicType(deflt);
-        associateWithTopicType(type);
-        associateWithTopicType(instance);
-        associateWithTopicType(aggregation);
-        associateWithTopicType(instantiation);
+        objectFactory.associateWithTopicType(t.getId(), t.getTypeUri());
+        objectFactory.associateWithTopicType(a.getId(), a.getTypeUri());
+        objectFactory.associateWithTopicType(dataType.getId(), dataType.getTypeUri());
+        objectFactory.associateWithTopicType(roleType.getId(), roleType.getTypeUri());
+        objectFactory.associateWithTopicType(text.getId(), text.getTypeUri());
+        objectFactory.associateWithTopicType(deflt.getId(), deflt.getTypeUri());
+        objectFactory.associateWithTopicType(type.getId(), type.getTypeUri());
+        objectFactory.associateWithTopicType(instance.getId(), instance.getTypeUri());
+        objectFactory.associateWithTopicType(aggregation.getId(), aggregation.getTypeUri());
+        objectFactory.associateWithTopicType(instantiation.getId(), instantiation.getTypeUri());
         //
         // 2) Postponed data type association
         //
@@ -985,7 +946,7 @@ public class EmbeddedService implements DeepaMehtaService {
             new TopicRoleModel(dataTypeUri, "dm4.core.default"));
         storage.createAssociation(model);
         storage.setAssociationValue(model.getId(), model.getSimpleValue());
-        associateWithAssociationType(model);
+        objectFactory.associateWithAssociationType(model.getId(), model.getTypeUri());
     }
 
     private void bootstrapTypeCache() {

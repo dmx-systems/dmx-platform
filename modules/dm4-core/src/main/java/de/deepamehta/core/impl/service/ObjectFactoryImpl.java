@@ -12,6 +12,7 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.AssociationTypeModel;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -22,6 +23,8 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ObjectFactory;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -59,6 +62,88 @@ class ObjectFactoryImpl implements ObjectFactory {
     }
 
     // --------------------------------------------------------------------------------------------------------- Methods
+
+
+
+    // === DeepaMehta Objects (Topics and Associations) ===
+
+    // --- Fetch ---
+
+    RelatedTopicModel fetchTopicTypeTopic(long topicId) {
+        return dms.storage.getTopicRelatedTopic(topicId, "dm4.core.instantiation",
+            "dm4.core.instance", "dm4.core.type", "dm4.core.topic_type");
+    }
+
+    RelatedTopicModel fetchAssociationTypeTopic(long assocId) {
+        // assocTypeUri=null (supposed to be "dm4.core.instantiation" but not possible ### explain)
+        return dms.storage.getAssociationRelatedTopic(assocId, null,
+            "dm4.core.instance", "dm4.core.type", "dm4.core.assoc_type");
+    }
+
+    // --- Store ---
+
+    Topic storeTopic(TopicModel model, ClientState clientState, Directives directives) {
+        setDefaults(model);
+        dms.storage.createTopic(model);
+        associateWithTopicType(model.getId(), model.getTypeUri());
+        //
+        AttachedTopic topic = new AttachedTopic(model, dms);
+        topic.storeValue(clientState, directives);
+        //
+        return topic;
+    }
+
+    Association storeAssociation(AssociationModel model, ClientState clientState, Directives directives) {
+        setDefaults(model);
+        dms.storage.createAssociation(model);
+        associateWithAssociationType(model.getId(), model.getTypeUri());
+        //
+        AttachedAssociation assoc = new AttachedAssociation(model, dms);
+        assoc.storeValue(clientState, directives);
+        //
+        return assoc;
+    }
+
+    // ---
+
+    private void setDefaults(DeepaMehtaObjectModel model) {
+        if (model.getUri() == null) {
+            model.setUri("");
+        }
+        if (model.getSimpleValue() == null) {
+            model.setSimpleValue("");
+        }
+    }
+
+    // ---
+
+    void associateWithTopicType(long topicId, String topicTypeUri) {
+        try {
+            AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
+                new TopicRoleModel(topicTypeUri, "dm4.core.type"),
+                new TopicRoleModel(topicId, "dm4.core.instance"));
+            dms.storage.createAssociation(assoc);
+            dms.storage.setAssociationValue(assoc.getId(), assoc.getSimpleValue());
+            associateWithAssociationType(assoc.getId(), assoc.getTypeUri());
+            // low-level (storage) call used here ### explain
+        } catch (Exception e) {
+            throw new RuntimeException("Associating topic " + topicId +
+                " with topic type \"" + topicTypeUri + "\" failed", e);
+        }
+    }
+
+    void associateWithAssociationType(long assocId, String assocTypeUri) {
+        try {
+            AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
+                new TopicRoleModel(assocTypeUri, "dm4.core.type"),
+                new AssociationRoleModel(assocId, "dm4.core.instance"));
+            dms.storage.createAssociation(assoc);  // low-level (storage) call used here ### explain
+            dms.storage.setAssociationValue(assoc.getId(), assoc.getSimpleValue());
+        } catch (Exception e) {
+            throw new RuntimeException("Associating association " + assocId +
+                " with association type \"" + assocTypeUri + "\" failed", e);
+        }
+    }
 
 
 
@@ -161,7 +246,7 @@ class ObjectFactoryImpl implements ObjectFactory {
     void storeType(TypeModel type) {
         // 1) store the base-topic parts ### FIXME: call super.store() instead?
         dms.storage.createTopic(type);
-        dms.associateWithTopicType(type);
+        associateWithTopicType(type.getId(), type.getTypeUri());
         // Note: the created AttachedTopic is just a temporary vehicle to
         // let us call its setUri() and storeAndIndexValue() methods.
         AttachedTopic typeTopic = new AttachedTopic(type, dms);

@@ -77,10 +77,10 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     @Override
     protected void storeTypeUri() {
         // remove current assignment
-        long assocId = fetchTypeTopic().getAssociation().getId();
+        long assocId = dms.objectFactory.fetchAssociationTypeTopic(getId()).getAssociationModel().getId();
         dms.deleteAssociation(assocId, null);  // clientState=null
         // create new assignment
-        dms.associateWithAssociationType(getModel());
+        dms.objectFactory.associateWithAssociationType(getId(), getTypeUri());
     }    
 
     // ### to be dropped
@@ -283,13 +283,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    @Override
-    void store(ClientState clientState, Directives directives) {
-        dms.storage.createAssociation(getModel());
-        dms.associateWithAssociationType(getModel());
-        super.store(clientState, directives);
-    }
-
     /**
      * Convenience method.
      */
@@ -337,11 +330,5 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         if (role instanceof TopicRole && role.getRoleTypeUri().equals(roleTypeUri)) {
             topics.add(((TopicRole) role).getTopic());
         }
-    }
-
-    private RelatedTopic fetchTypeTopic() {
-        // assocTypeUri=null (supposed to be "dm4.core.instantiation" but not possible ### explain)
-        return getRelatedTopic(null, "dm4.core.instance", "dm4.core.type", "dm4.core.assoc_type",
-            false, false, null);    // fetchComposite=false
     }
 }

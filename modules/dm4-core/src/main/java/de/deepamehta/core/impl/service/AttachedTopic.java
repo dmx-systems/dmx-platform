@@ -67,25 +67,22 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     @Override
     protected void storeTypeUri() {
         // remove current assignment
-        long assocId = fetchTypeTopic().getAssociation().getId();
+        long assocId = dms.objectFactory.fetchTopicTypeTopic(getId()).getAssociationModel().getId();
         dms.deleteAssociation(assocId, null);  // clientState=null
         // create new assignment
-        dms.associateWithTopicType(getModel());
-    }    
+        dms.objectFactory.associateWithTopicType(getId(), getTypeUri());
+    }
 
-    // ### to be dropped
     @Override
     protected SimpleValue storeValue(SimpleValue value) {
         return dms.storage.setTopicValue(getId(), value);
     }
 
-    // ### to be dropped
     @Override
     protected void indexValue(IndexMode indexMode, String indexKey, SimpleValue value, SimpleValue oldValue) {
         dms.storage.indexTopicValue(getId(), indexMode, indexKey, value, oldValue);
     }
 
-    // ### to be dropped
     @Override
     protected Type getType() {
         return dms.getTopicType(getTypeUri(), null);    // FIXME: clientState=null
@@ -229,26 +226,10 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    @Override
-    void store(ClientState clientState, Directives directives) {
-        dms.storage.createTopic(getModel());
-        dms.associateWithTopicType(getModel());
-        super.store(clientState, directives);
-    }
-
     /**
      * Convenience method.
      */
     TopicType getTopicType() {
         return (TopicType) getType();
-    }
-
-
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private RelatedTopic fetchTypeTopic() {
-        return getRelatedTopic("dm4.core.instantiation", "dm4.core.instance", "dm4.core.type", "dm4.core.topic_type",
-            false, false, null);     // fetchComposite=false
     }
 }

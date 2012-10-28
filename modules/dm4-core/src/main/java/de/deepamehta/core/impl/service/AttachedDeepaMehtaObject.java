@@ -65,14 +65,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedDeepaMehtaObject(DeepaMehtaObjectModel model, EmbeddedService dms) {
-        // set default values
-        if (model.getUri() == null) {
-            model.setUri("");
-        }
-        if (model.getSimpleValue() == null) {
-            model.setSimpleValue("");
-        }
-        //
         this.model = model;
         this.dms = dms;
     }
@@ -388,7 +380,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void store(ClientState clientState, Directives directives) {
+    void storeValue(ClientState clientState, Directives directives) {
         try {
             if (getType().getDataTypeUri().equals("dm4.core.composite")) {
                 CompositeValue comp = getCompositeValue();
