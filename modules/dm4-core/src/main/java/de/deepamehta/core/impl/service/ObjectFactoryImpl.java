@@ -292,33 +292,22 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // ---
 
+    @Override
+    public AssociationDefinitionModel fetchAssociationDefinition(Association assoc) {
+        return fetchAssociationDefinition(assoc.getModel(), fetchWholeTopicType(assoc).getUri(),
+                                                            fetchPartTopicType(assoc).getUri());
+    }
+
     private AssociationDefinitionModel fetchAssociationDefinition(AssociationModel assoc, String wholeTopicTypeUri,
                                                                                           String partTopicTypeUri) {
         try {
-            Cardinality cardinality = fetchCardinality(assoc.getId());
-            return new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
-                wholeTopicTypeUri, partTopicTypeUri,
-                cardinality.wholeCardinalityUri, cardinality.partCardinalityUri,
-                fetchAssocDefViewConfig(assoc.getId()));
+            long assocId = assoc.getId();
+            return new AssociationDefinitionModel(assocId, assoc.getTypeUri(), wholeTopicTypeUri, partTopicTypeUri,
+                fetchWholeCardinality(assocId).getUri(), fetchPartCardinality(assocId).getUri(),
+                fetchAssocDefViewConfig(assocId));
         } catch (Exception e) {
             throw new RuntimeException("Fetching association definition failed (wholeTopicTypeUri=\"" +
                 wholeTopicTypeUri + "\", partTopicTypeUri=" + partTopicTypeUri + ", " + assoc + ")", e);
-        }
-    }
-
-    @Override
-    public AssociationDefinition fetchAssociationDefinition(Association assoc) {
-        try {
-            TopicTypes topicTypes = fetchTopicTypes(assoc);
-            Cardinality cardinality = fetchCardinality(assoc.getId());
-            AssociationDefinitionModel model = new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
-                topicTypes.wholeTopicTypeUri, topicTypes.partTopicTypeUri,
-                cardinality.wholeCardinalityUri, cardinality.partCardinalityUri,
-                fetchAssocDefViewConfig(assoc.getId()));
-            //
-            return new AttachedAssociationDefinition(model, dms);
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching association definition failed (" + assoc + ")", e);
         }
     }
 
@@ -377,14 +366,6 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // --- Fetch ---
 
-    private TopicTypes fetchTopicTypes(Association assoc) {
-        Topic wholeTopicType = fetchWholeTopicType(assoc);
-        Topic partTopicType  = fetchPartTopicType(assoc);
-        return new TopicTypes(wholeTopicType.getUri(), partTopicType.getUri());
-    }
-
-    // ---
-
     @Override
     public Topic fetchWholeTopicType(Association assoc) {
         Topic wholeTypeTopic = assoc.getTopic("dm4.core.whole_type");
@@ -431,16 +412,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // --- Fetch ---
 
-    private Cardinality fetchCardinality(long assocDefId) {
-        TopicModel wholeCardinality = fetchWholeCardinality(assocDefId);
-        TopicModel partCardinality  = fetchPartCardinality(assocDefId);
-        return new Cardinality(wholeCardinality.getUri(), partCardinality.getUri());
-    }
-
-    // ---
-
-    @Override
-    public RelatedTopicModel fetchWholeCardinality(long assocDefId) {
+    private RelatedTopicModel fetchWholeCardinality(long assocDefId) {
         RelatedTopicModel wholeCard = dms.storage.getAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.whole_cardinality", "dm4.core.cardinality");
         // error check
@@ -452,8 +424,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         return wholeCard;
     }
 
-    @Override
-    public RelatedTopicModel fetchPartCardinality(long assocDefId) {
+    private RelatedTopicModel fetchPartCardinality(long assocDefId) {
         RelatedTopicModel partCard = dms.storage.getAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.part_cardinality", "dm4.core.cardinality");
         // error check
@@ -710,31 +681,5 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     RoleModel createConfigurableAssocDef(long assocDefId) {
         return new AssociationRoleModel(assocDefId, "dm4.core.assoc_def");
-    }
-
-
-
-    // ------------------------------------------------------------------------------------------------- Private Classes
-
-    private class TopicTypes {
-
-        private String wholeTopicTypeUri;
-        private String partTopicTypeUri;
-
-        private TopicTypes(String wholeTopicTypeUri, String partTopicTypeUri) {
-            this.wholeTopicTypeUri = wholeTopicTypeUri;
-            this.partTopicTypeUri = partTopicTypeUri;
-        }
-    }
-
-    private class Cardinality {
-
-        private String wholeCardinalityUri;
-        private String partCardinalityUri;
-
-        private Cardinality(String wholeCardinalityUri, String partCardinalityUri) {
-            this.wholeCardinalityUri = wholeCardinalityUri;
-            this.partCardinalityUri = partCardinalityUri;
-        }
     }
 }

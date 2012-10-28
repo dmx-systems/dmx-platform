@@ -2,6 +2,7 @@ package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.Type;
+import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;
@@ -21,7 +22,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Map<String, AssociationDefinition> assocDefs;   // Attached object cache
-    private AttachedViewConfiguration viewConfig;           // Attached object cache
+    private ViewConfiguration viewConfig;                   // Attached object cache
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -44,7 +45,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
 
 
-    // === Data Type ===
+    // --- Data Type ---
 
     @Override
     public String getDataTypeUri() {
@@ -59,7 +60,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         dms.objectFactory.storeDataTypeUri(getId(), getUri(), className(), dataTypeUri);
     }
 
-    // === Index Modes ===
+    // --- Index Modes ---
 
     @Override
     public Set<IndexMode> getIndexModes() {
@@ -74,7 +75,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         dms.objectFactory.storeIndexModes(getUri(), indexModes);
     }
 
-    // === Association Definitions ===
+    // --- Association Definitions ---
 
     @Override
     public Collection<AssociationDefinition> getAssocDefs() {
@@ -122,7 +123,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         dms.objectFactory.rebuildSequence(getId(), getUri(), className(), getModel().getAssocDefs());
     }
 
-    // === Label Configuration ===
+    // --- Label Configuration ---
 
     @Override
     public List<String> getLabelConfig() {
@@ -137,10 +138,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
         dms.objectFactory.storeLabelConfig(labelConfig, getModel().getAssocDefs());
     }
 
-    // === View Configuration ===
+    // --- View Configuration ---
 
     @Override
-    public AttachedViewConfiguration getViewConfig() {
+    public ViewConfiguration getViewConfig() {
         return viewConfig;
     }
 

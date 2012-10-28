@@ -38,10 +38,6 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedTopic(EmbeddedService dms) {
-        super(dms);
-    }
-
     AttachedTopic(TopicModel model, EmbeddedService dms) {
         super(model, dms);
     }

@@ -39,7 +39,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostRetypeAssoc
             String topicTypeUri;
             TopicType topicType;
             if (isAssocDef(oldTypeUri)) {
-                assocDef = dms.getObjectFactory().fetchAssociationDefinition(assoc).getModel();
+                assocDef = dms.getObjectFactory().fetchAssociationDefinition(assoc);
                 topicTypeUri = assocDef.getWholeTopicTypeUri();
                 topicType = dms.getTopicType(topicTypeUri, null);
                 logger.info("### Updating association definition \"" + assocDef.getUri() +

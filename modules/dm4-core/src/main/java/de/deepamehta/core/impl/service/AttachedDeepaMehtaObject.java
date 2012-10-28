@@ -64,11 +64,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedDeepaMehtaObject(EmbeddedService dms) {
-        this.model = null;      // ### initialized through fetch().
-        this.dms = dms;
-    }
-
     AttachedDeepaMehtaObject(DeepaMehtaObjectModel model, EmbeddedService dms) {
         // set default values
         if (model.getUri() == null) {

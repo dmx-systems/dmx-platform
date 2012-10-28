@@ -193,12 +193,6 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         // 1) update DB
         MehtaNode node = mg.createMehtaNode();
         storeAndIndexUri(node, uri);
-        // Note: for the moment an initial topic value is needed.
-        // Consider this case: in the POST_CREATE_ASSOCIATION listener a plugin fetches both of the associated
-        // topics (the Access Control plugin does). If that association is created in the course of storing the
-        // topic's composite value, that very topic doesn't have a simple value yet (it is known only once storing
-        // the composite value is complete). Fetching the topic would fail. ### TODO: remove set value
-        node.setString("value", "");
         // 2) update model
         topicModel.setId(node.getId());
     }
