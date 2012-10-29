@@ -60,7 +60,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     @Override
     public void addFacetTypeToTopic(long topicId, String facetTypeUri) {
-        dms.createAssociation(new AssociationModel("dm4.core.instantiation", 
+        dms.createAssociation(new AssociationModel("dm4.core.instantiation",
             new TopicRoleModel(topicId,      "dm4.core.instance"),
             new TopicRoleModel(facetTypeUri, "dm4.facets.facet")), null);   // clientState=null
     }

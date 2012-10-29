@@ -81,21 +81,18 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         dms.deleteAssociation(assocId, null);  // clientState=null
         // create new assignment
         dms.objectFactory.associateWithAssociationType(getId(), getTypeUri());
-    }    
+    }
 
-    // ### to be dropped
     @Override
     protected SimpleValue storeValue(SimpleValue value) {
         return dms.storage.setAssociationValue(getId(), value);
     }
 
-    // ### to be dropped
     @Override
     protected void indexValue(IndexMode indexMode, String indexKey, SimpleValue value, SimpleValue oldValue) {
         dms.storage.indexAssociationValue(getId(), indexMode, indexKey, value, oldValue);
     }
 
-    // ### to be dropped
     @Override
     protected Type getType() {
         return dms.getAssociationType(getTypeUri(), null);    // FIXME: clientState=null

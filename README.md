@@ -218,12 +218,12 @@ Version History
 **4.0.5** -- Oct 20, 2011
 
 * New features:
-	* Custom topicmap backgrounds.
-	* Functional browser back/forward buttons.
-	* Permalinks.
+    * Custom topicmap backgrounds.
+    * Functional browser back/forward buttons.
+    * Permalinks.
 * Fixes:
-	* The file related features work on Windows.
-	* The file related features work if DeepaMehta runs behind an Apache reverse proxy.
+    * The file related features work on Windows.
+    * The file related features work if DeepaMehta runs behind an Apache reverse proxy.
 * See details in the release notes:
   <https://trac.deepamehta.de/wiki/ReleaseNotes>
 

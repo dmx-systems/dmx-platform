@@ -18,7 +18,7 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Logger logger = Logger.getLogger(getClass().getName());
-    
+
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedTopicRole(TopicRoleModel model, Association assoc, EmbeddedService dms) {
@@ -86,5 +86,5 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
 
     private void storeRoleTypeUri(String roleTypeUri) {
         dms.storage.setRoleTypeUri(getAssociation().getId(), getTopicId(), roleTypeUri);
-    }    
+    }
 }

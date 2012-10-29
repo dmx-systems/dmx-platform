@@ -15,20 +15,22 @@ import java.util.Set;
 
 
 
+// ### TODO: differentiate between a model and an update model.
+// ### The latter's constructor must set no default values (see #311).
 public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled, Cloneable {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected long id;                  // is -1 in models used for a create operation.
+    protected long id;                  // is -1 in models used for a create operation. ### FIXDOC
                                         // is never -1 in models used for an update operation.
-    protected String uri;               // is never null in models used for a create operation, may be empty.
+    protected String uri;               // is never null in models used for a create operation, may be empty. ### FIXDOC
                                         // may be null in models used for an update operation.
-    protected String typeUri;           // is never null in models used for a create operation.
+    protected String typeUri;           // is never null in models used for a create operation. ### FIXDOC
                                         // may be null in models used for an update operation.
     protected SimpleValue value;        // is never null in models used for a create operation, may be constructed
-                                        //                                                      on empty string.
+                                        //                                                   on empty string. ### FIXDOC
                                         // may be null in models used for an update operation.
-    protected CompositeValue composite; // is never null, may be empty.
+    protected CompositeValue composite; // is never null, may be empty. ### FIXDOC
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -73,10 +75,10 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
     }
 
     /**
-     * @param   uri         If <code>null</code> an empty string is set. This is OK.
-     * @param   typeUri     Mandatory. Note: only the internal meta type topic (ID 0) has no type URI (null).
-     * @param   value       If <code>null</code> an empty string value is set. This is OK.
-     * @param   composite   If <code>null</code> an empty composite is set. This is OK.
+     * @param   uri         If <code>null</code> an empty string is set. This is OK. ### FIXDOC
+     * @param   typeUri     Mandatory. Note: only the internal meta type topic (ID 0) has no type URI (null). ### FIXDOC
+     * @param   value       If <code>null</code> an empty string value is set. This is OK. ### FIXDOC
+     * @param   composite   If <code>null</code> an empty composite is set. This is OK. ### FIXDOC
      */
     public DeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value, CompositeValue composite) {
         this.id = id;
@@ -95,19 +97,12 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
      */
     public DeepaMehtaObjectModel(JSONObject model) {
         try {
-            this.id = model.optLong("id", -1);
-            this.uri = model.optString("uri", null);
-            this.typeUri = model.optString("type_uri", null);
-            if (model.has("value")) {
-                this.value = new SimpleValue(model.get("value"));
-            } else {
-                this.value = null;
-            }
-            if (model.has("composite")) {
-                this.composite = new CompositeValue(model.getJSONObject("composite"));
-            } else {
-                this.composite = new CompositeValue();
-            }
+            this.id        = model.optLong("id", -1);
+            this.uri       = model.optString("uri", null);
+            this.typeUri   = model.optString("type_uri", null);
+            this.value     = model.has("value") ? new SimpleValue(model.get("value")) : null;
+            this.composite = model.has("composite") ? new CompositeValue(model.getJSONObject("composite"))
+                                                    : new CompositeValue();
         } catch (Exception e) {
             throw new RuntimeException("Parsing DeepaMehtaObjectModel failed (JSONObject=" + model + ")", e);
         }

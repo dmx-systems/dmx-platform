@@ -69,7 +69,8 @@ public class JSONEnabledCollectionProvider implements MessageBodyWriter<Collecti
             DeepaMehtaUtils.objectsToJSON(objects).write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing message body failed (" + objects + ")", e);
+            throw new WebApplicationException(new RuntimeException("Writing message body failed (" +
+                objects.size() + " objects)", e));
         }
     }
 }

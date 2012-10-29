@@ -859,32 +859,32 @@ public class EmbeddedService implements DeepaMehtaService {
         // Before topic types and asscociation types can be created the meta types must be created
         TopicModel t = new TopicModel("dm4.core.topic_type", "dm4.core.meta_type", new SimpleValue("Topic Type"));
         TopicModel a = new TopicModel("dm4.core.assoc_type", "dm4.core.meta_type", new SimpleValue("Association Type"));
-        _createTopic(t);
-        _createTopic(a);
+        objectFactory._createTopic(t);
+        objectFactory._createTopic(a);
         // Create topic type "Data Type"
         // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
         // depends on the topic type "Data Type". To resolve this circle we use a low-level (storage) call here
         // and postpone the data type association.
         TopicModel dataType = new TopicTypeModel("dm4.core.data_type", "Data Type", "dm4.core.text");
         TopicModel roleType = new TopicTypeModel("dm4.core.role_type", "Role Type", "dm4.core.text");
-        _createTopic(dataType);
-        _createTopic(roleType);
+        objectFactory._createTopic(dataType);
+        objectFactory._createTopic(roleType);
         // Create data type "Text"
         TopicModel text = new TopicModel("dm4.core.text", "dm4.core.data_type", new SimpleValue("Text"));
-        _createTopic(text);
+        objectFactory._createTopic(text);
         // Create role types "Default", "Type", and "Instance"
-        TopicModel deflt =    new TopicModel("dm4.core.default",  "dm4.core.role_type", new SimpleValue("Default"));
-        TopicModel type =     new TopicModel("dm4.core.type",     "dm4.core.role_type", new SimpleValue("Type"));
+        TopicModel deflt    = new TopicModel("dm4.core.default",  "dm4.core.role_type", new SimpleValue("Default"));
+        TopicModel type     = new TopicModel("dm4.core.type",     "dm4.core.role_type", new SimpleValue("Type"));
         TopicModel instance = new TopicModel("dm4.core.instance", "dm4.core.role_type", new SimpleValue("Instance"));
-        _createTopic(deflt);
-        _createTopic(type);
-        _createTopic(instance);
+        objectFactory._createTopic(deflt);
+        objectFactory._createTopic(type);
+        objectFactory._createTopic(instance);
         // Create association type "Aggregation" -- needed to associate topic/association types with data types
         TopicModel aggregation = new AssociationTypeModel("dm4.core.aggregation", "Aggregation", "dm4.core.text");
-        _createTopic(aggregation);
+        objectFactory._createTopic(aggregation);
         // Create association type "Instantiation" -- needed to associate topics with topic types
         TopicModel instantiation = new AssociationTypeModel("dm4.core.instantiation", "Instantiation", "dm4.core.text");
-        _createTopic(instantiation);
+        objectFactory._createTopic(instantiation);
         //
         // 1) Postponed topic type association
         //
@@ -924,29 +924,14 @@ public class EmbeddedService implements DeepaMehtaService {
         // would fail (not because the association is missed -- it's created meanwhile, but)
         // because this involves fetching the association including its value. The value doesn't exist yet,
         // because its setting forms the begin of this vicious circle.
-        _associateDataType("dm4.core.meta_type",  "dm4.core.text");
-        _associateDataType("dm4.core.topic_type", "dm4.core.text");
-        _associateDataType("dm4.core.assoc_type", "dm4.core.text");
-        _associateDataType("dm4.core.data_type",  "dm4.core.text");
-        _associateDataType("dm4.core.role_type",  "dm4.core.text");
+        objectFactory._associateDataType("dm4.core.meta_type",  "dm4.core.text");
+        objectFactory._associateDataType("dm4.core.topic_type", "dm4.core.text");
+        objectFactory._associateDataType("dm4.core.assoc_type", "dm4.core.text");
+        objectFactory._associateDataType("dm4.core.data_type",  "dm4.core.text");
+        objectFactory._associateDataType("dm4.core.role_type",  "dm4.core.text");
         //
-        _associateDataType("dm4.core.aggregation",   "dm4.core.text");
-        _associateDataType("dm4.core.instantiation", "dm4.core.text");
-    }
-
-    private void _createTopic(TopicModel model) {
-        // Note: low-level (storage) call used here ### explain
-        storage.createTopic(model);
-        storage.setTopicValue(model.getId(), model.getSimpleValue());
-    }
-
-    void _associateDataType(String typeUri, String dataTypeUri) {
-        AssociationModel model = new AssociationModel("dm4.core.aggregation",
-            new TopicRoleModel(typeUri,     "dm4.core.type"),
-            new TopicRoleModel(dataTypeUri, "dm4.core.default"));
-        storage.createAssociation(model);
-        storage.setAssociationValue(model.getId(), model.getSimpleValue());
-        objectFactory.associateWithAssociationType(model.getId(), model.getTypeUri());
+        objectFactory._associateDataType("dm4.core.aggregation",   "dm4.core.text");
+        objectFactory._associateDataType("dm4.core.instantiation", "dm4.core.text");
     }
 
     private void bootstrapTypeCache() {

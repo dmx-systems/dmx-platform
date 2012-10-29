@@ -234,7 +234,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void checkRequest(HttpServletRequest request) throws AccessControlException {
         logger.fine("##### " + request.getMethod() + " " + request.getRequestURL() +
-            "\n      ##### \"Authorization\"=\"" + request.getHeader("Authorization") + "\"" + 
+            "\n      ##### \"Authorization\"=\"" + request.getHeader("Authorization") + "\"" +
             "\n      ##### " + info(request.getSession(false)));    // create=false
         //
         checkRequestOrigin(request);

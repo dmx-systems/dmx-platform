@@ -12,6 +12,7 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.AssociationTypeModel;
+import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
@@ -82,6 +83,17 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // --- Store ---
 
+    /**
+     * Low-level method. Used for bootstrapping.
+     */
+    void _createTopic(TopicModel model) {
+        // Note: low-level (storage) call used here ### explain
+        dms.storage.createTopic(model);
+        dms.storage.setTopicValue(model.getId(), model.getSimpleValue());
+    }
+
+    // ---
+
     Topic storeTopic(TopicModel model, ClientState clientState, Directives directives) {
         setDefaults(model);
         dms.storage.createTopic(model);
@@ -106,6 +118,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // ---
 
+    // ### TODO: differentiate between a model and an update model and then drop this method
     private void setDefaults(DeepaMehtaObjectModel model) {
         if (model.getUri() == null) {
             model.setUri("");
@@ -244,7 +257,7 @@ class ObjectFactoryImpl implements ObjectFactory {
     // --- Store ---
 
     void storeType(TypeModel type) {
-        // 1) store the base-topic parts ### FIXME: call super.store() instead?
+        // 1) store the base-topic parts ### FIXME: call storeTopic() instead?
         dms.storage.createTopic(type);
         associateWithTopicType(type.getId(), type.getTypeUri());
         // Note: the created AttachedTopic is just a temporary vehicle to
@@ -310,6 +323,20 @@ class ObjectFactoryImpl implements ObjectFactory {
             throw new RuntimeException("Associating type \"" + typeUri + "\" with data type \"" +
                 dataTypeUri + "\" failed", e);
         }
+    }
+
+    // ---
+
+    /**
+     * Low-level method. Used for bootstrapping.
+     */
+    void _associateDataType(String typeUri, String dataTypeUri) {
+        AssociationModel assoc = new AssociationModel("dm4.core.aggregation",
+            new TopicRoleModel(typeUri,     "dm4.core.type"),
+            new TopicRoleModel(dataTypeUri, "dm4.core.default"));
+        dms.storage.createAssociation(assoc);
+        dms.storage.setAssociationValue(assoc.getId(), assoc.getSimpleValue());
+        associateWithAssociationType(assoc.getId(), assoc.getTypeUri());
     }
 
 
@@ -529,7 +556,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         dms.deleteAssociation(assocId, null);   // clientState=null
         // create new assignment
         associateWholeCardinality(assocDefId, wholeCardinalityUri);
-    }    
+    }
 
     void storePartCardinalityUri(long assocDefId, String partCardinalityUri) {
         // remove current assignment
@@ -537,7 +564,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         dms.deleteAssociation(assocId, null);   // clientState=null
         // create new assignment
         associatePartCardinality(assocDefId, partCardinalityUri);
-    }    
+    }
 
     // ---
 

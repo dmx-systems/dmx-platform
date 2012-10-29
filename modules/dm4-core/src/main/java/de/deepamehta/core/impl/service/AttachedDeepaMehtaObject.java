@@ -417,33 +417,42 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Update ===
 
     private void updateUri(String newUri) {
-        if (newUri != null) {
-            String uri = getUri();
-            if (!uri.equals(newUri)) {
-                logger.info("### Changing URI from \"" + uri + "\" -> \"" + newUri + "\"");
-                setUri(newUri);
-            }
+        // abort if no update is requested
+        if (newUri == null) {
+            return;
+        }
+        //
+        String uri = getUri();
+        if (!uri.equals(newUri)) {
+            logger.info("### Changing URI from \"" + uri + "\" -> \"" + newUri + "\"");
+            setUri(newUri);
         }
     }
 
     private void updateTypeUri(String newTypeUri, ChangeReport report) {
-        if (newTypeUri != null) {
-            String typeUri = getTypeUri();
-            if (!typeUri.equals(newTypeUri)) {
-                logger.info("### Changing type URI from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
-                report.typeUriChanged(typeUri, newTypeUri);
-                setTypeUri(newTypeUri);
-            }
+        // abort if no update is requested
+        if (newTypeUri == null) {
+            return;
+        }
+        //
+        String typeUri = getTypeUri();
+        if (!typeUri.equals(newTypeUri)) {
+            logger.info("### Changing type URI from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
+            report.typeUriChanged(typeUri, newTypeUri);
+            setTypeUri(newTypeUri);
         }
     }
 
     private void updateSimpleValue(SimpleValue newValue) {
-        if (newValue != null) {
-            SimpleValue value = getSimpleValue();
-            if (!value.equals(newValue)) {
-                logger.info("### Changing simple value from \"" + value + "\" -> \"" + newValue + "\"");
-                setSimpleValue(newValue);
-            }
+        // abort if no update is requested
+        if (newValue == null) {
+            return;
+        }
+        //
+        SimpleValue value = getSimpleValue();
+        if (!value.equals(newValue)) {
+            logger.info("### Changing simple value from \"" + value + "\" -> \"" + newValue + "\"");
+            setSimpleValue(newValue);
         }
     }
 
@@ -888,7 +897,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     private boolean isReferenceByUri(TopicModel childTopic) {
-        return !childTopic.getUri().equals("");
+        return !childTopic.getUri().equals("");     // ### FIXME: in an update topic model the URI might be null
     }
 
     // ---

@@ -8,7 +8,7 @@ function SplitPanel() {
 
     var left_panel
     var right_panel
-    
+
     var panel_height
     var left_panel_width
 

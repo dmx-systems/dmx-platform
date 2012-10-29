@@ -83,7 +83,7 @@ function TypeCache() {
             })
             if (dm4c.LOG_TYPE_LOADING) dm4c.log("Loading topic type icons complete")
             //
-            tracker.track()            
+            tracker.track()
         })
     }
 

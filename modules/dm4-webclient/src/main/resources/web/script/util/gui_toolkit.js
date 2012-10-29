@@ -193,7 +193,7 @@ function GUIToolkit(config) {
      *                      reasonable in case of stateful select-like menus.
      * @param   menu_title  Optional: The menu title (string).
      *                      If specified (even if empty string) a stateless action-trigger menu with a static menu title
-     *                      is created. If not specified (undefined or null) a stateful select-like menu is created 
+     *                      is created. If not specified (undefined or null) a stateful select-like menu is created
      *                      with the selected item as "menu title".
      *
      * @return              The created menu (a Menu object). The caller can add the menu to the page by accessing the
