@@ -116,13 +116,13 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public ResultSet<Topic> getTopics(String typeUri, boolean fetchComposite, int maxResultSize,
-                                                                              ClientState clientState) {
+    public ResultSet<RelatedTopic> getTopics(String typeUri, boolean fetchComposite, int maxResultSize,
+                                                                                     ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            ResultSet<Topic> topics = DeepaMehtaUtils.toTopicSet(getTopicType(typeUri, clientState).getRelatedTopics(
+            ResultSet<RelatedTopic> topics = getTopicType(typeUri, clientState).getRelatedTopics(
                 "dm4.core.instantiation", "dm4.core.type", "dm4.core.instance", null, fetchComposite, false,
-                maxResultSize, clientState));   // othersTopicTypeUri=null
+                maxResultSize, clientState);    // othersTopicTypeUri=null
             tx.success();
             return topics;
         } catch (Exception e) {

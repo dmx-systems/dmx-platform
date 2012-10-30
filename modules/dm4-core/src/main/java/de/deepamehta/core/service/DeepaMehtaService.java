@@ -4,6 +4,7 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.RelatedAssociation;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -51,7 +52,8 @@ public interface DeepaMehtaService {
      */
     Topic getTopic(String key, SimpleValue value, boolean fetchComposite, ClientState clientState);
 
-    ResultSet<Topic> getTopics(String typeUri, boolean fetchComposite, int maxResultSize, ClientState clientState);
+    ResultSet<RelatedTopic> getTopics(String typeUri, boolean fetchComposite, int maxResultSize,
+                                                                              ClientState clientState);
 
     /**
      * Performs a fulltext search.

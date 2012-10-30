@@ -76,7 +76,7 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/topic/by_type/{type_uri}")
-    public ResultSet<Topic> getTopics(@PathParam("type_uri") String typeUri,
+    public ResultSet<RelatedTopic> getTopics(@PathParam("type_uri") String typeUri,
                                       @QueryParam("fetch_composite") @DefaultValue("false") boolean fetchComposite,
                                       @QueryParam("max_result_size") int maxResultSize,
                                       @HeaderParam("Cookie") ClientState clientState) {

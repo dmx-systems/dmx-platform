@@ -3,6 +3,8 @@
  */
 function RenderHelper() {
 
+    var self = this
+
     /**
      * @param   page_model      a TopicRenderer.PageModel object or a string.
      * @param   parent_element  Optional: the parent element the label is rendered to.
@@ -179,17 +181,55 @@ function RenderHelper() {
     this.topic_associations = function(topic_id) {
         var result = dm4c.restc.get_topic_related_topics(topic_id, undefined, true, dm4c.MAX_RESULT_SIZE)
                                                                 // traversal_filter=undefined, sort=true
-        this.field_label("Associations", undefined, result)     // parent_element=undefined
-        this.page(this.topic_list(result.items))
+        group_topics(result.items, function(title, group) {
+            self.field_label(title)
+            self.page(self.topic_list(group))
+        })
     }
 
     this.association_associations = function(assoc_id) {
         var result = dm4c.restc.get_association_related_topics(assoc_id, undefined, true, dm4c.MAX_RESULT_SIZE)
                                                                 // traversal_filter=undefined, sort=true
-        this.field_label("Associations", undefined, result)     // parent_element=undefined
-        this.page(this.topic_list(result.items, function(topic) {
-            dm4c.show_topic(dm4c.fetch_topic(topic.id), "show", undefined, true)    // coordinates=undefined,
-        }))                                                                         // do_center=true
+        group_topics(result.items, function(title, group) {
+            self.field_label(title)
+            self.page(self.topic_list(group, function(topic) {
+                // Note: for associations we need a custom click handler because the default
+                // one (do_reveal_related_topic()) assumes a topic as the source.
+                dm4c.show_topic(dm4c.fetch_topic(topic.id), "show", undefined, true)    // coordinates=undefined,
+            }))                                                                         // do_center=true
+        })
+    }
+
+    // ---
+
+    function group_topics(topics, callback) {
+        var assoc_type_uri      // assoc type URI of current group  - initialized by begin_new_group()
+        var assoc_type_name     // assoc type name of current group - initialized by begin_new_group()
+        var begin               // begin index of current group     - initialized by begin_new_group()
+        //
+        begin_new_group(topics[0], 0)
+        for (var i = 0, topic; topic = topics[i]; i++) {
+            if (topic.assoc.type_uri == assoc_type_uri) {
+                continue
+            }
+            process_group()
+            begin_new_group(topic, i)
+        }
+        // process last group
+        process_group()
+
+        function process_group() {
+            var group = topics.slice(begin, i)
+            var title = assoc_type_name + " (" + group.length + ")"
+            callback(title, group)
+        }
+
+        function begin_new_group(topic, pos) {
+            assoc_type_uri  = topic.assoc.type_uri
+            assoc_type_name = assoc_type_uri ? dm4c.get_association_type(assoc_type_uri).value
+                                             : "Instantiation"  // ### FIXME: for "Instantiation" type URI is ""
+            begin = pos
+        }
     }
 
     // ---

@@ -3,6 +3,7 @@ package de.deepamehta.plugins.webclient;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.ResultSet;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
@@ -78,9 +79,10 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         try {
             logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\", clientState=" + clientState);
             Set<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri, clientState);
-            Set<Topic> searchableUnits = findSearchableUnits(singleTopics, clientState);
-            logger.info(singleTopics.size() + " single topics found, " + searchableUnits.size() + " searchable units");
-            Topic searchTopic = createSearchTopic("\"" + searchTerm + "\"", searchableUnits, clientState);
+            Set<Topic> topics = findSearchableUnits(singleTopics, clientState);
+            logger.info(singleTopics.size() + " single topics found, " + topics.size() + " searchable units");
+            //
+            Topic searchTopic = createSearchTopic(searchTerm, topics, clientState);
             tx.success();
             return searchTopic;
         } catch (Exception e) {
@@ -107,8 +109,10 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         try {
             logger.info("typeUri=\"" + typeUri + "\", maxResultSize=" + maxResultSize);
             String searchTerm = dms.getTopicType(typeUri, clientState).getSimpleValue() + "(s)";
-            ResultSet<Topic> result = dms.getTopics(typeUri, false, maxResultSize, clientState); // fetchComposite=false
-            Topic searchTopic = createSearchTopic(searchTerm, result.getItems(), clientState);
+            Set<RelatedTopic> topics = dms.getTopics(typeUri, false, maxResultSize, clientState).getItems();
+            // fetchComposite=false
+            //
+            Topic searchTopic = createSearchTopic(searchTerm, topics, clientState);
             tx.success();
             return searchTopic;
         } catch (Exception e) {
@@ -174,14 +178,14 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // === Search ===
 
-    private Set<Topic> findSearchableUnits(Set<Topic> topics, ClientState clientState) {
+    private Set<Topic> findSearchableUnits(Set<? extends Topic> topics, ClientState clientState) {
         Set<Topic> searchableUnits = new LinkedHashSet();
         for (Topic topic : topics) {
             if (isSearchableUnit(topic)) {
                 searchableUnits.add(topic);
             } else {
-                Set<Topic> parentTopics = DeepaMehtaUtils.toTopicSet(topic.getRelatedTopics((List) null,
-                    "dm4.core.part", "dm4.core.whole", null, false, false, 0, clientState)).getItems();
+                Set<RelatedTopic> parentTopics = topic.getRelatedTopics((List) null, "dm4.core.part", "dm4.core.whole",
+                    null, false, false, 0, clientState).getItems();
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
                 } else {
@@ -195,7 +199,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     /**
      * Creates a "Search" topic (a bucket).
      */
-    private Topic createSearchTopic(String searchTerm, Set<Topic> resultItems, ClientState clientState) {
+    private Topic createSearchTopic(String searchTerm, Set<? extends Topic> resultItems, ClientState clientState) {
         Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new CompositeValue()
             .put("dm4.webclient.search_term", searchTerm)
         ), clientState);

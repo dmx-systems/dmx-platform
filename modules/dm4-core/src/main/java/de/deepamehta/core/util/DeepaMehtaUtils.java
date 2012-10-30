@@ -81,15 +81,6 @@ public class DeepaMehtaUtils {
         return ids;
     }
 
-    // ### FIXME: can we drop this method? Work with "? extends Topic" instead?
-    public static ResultSet<Topic> toTopicSet(ResultSet<RelatedTopic> relTopics) {
-        Set<Topic> topics = new LinkedHashSet();
-        for (Topic topic : relTopics) {
-            topics.add(topic);
-        }
-        return new ResultSet(relTopics.getTotalCount(), topics);
-    }
-
     public static Set<TopicModel> toTopicModels(Set<RelatedTopic> relTopics) {
         Set<TopicModel> topicModels = new LinkedHashSet();
         for (Topic topic : relTopics) {
