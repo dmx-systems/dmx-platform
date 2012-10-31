@@ -43,6 +43,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     dm4c.restc.remove_association_from_topicmap = function(topicmap_id, assoc_id) {
         this.request("DELETE", "/topicmap/" + topicmap_id + "/association/" + assoc_id)
     }
+    dm4c.restc.move_cluster = function(topicmap_id, cluster_coords) {
+        this.request("PUT", "/topicmap/" + topicmap_id, cluster_coords)
+    }
     dm4c.restc.set_topicmap_translation = function(topicmap_id, trans_x, trans_y) {
         this.request("PUT", "/topicmap/" + topicmap_id + "/translation/" + trans_x + "/" + trans_y)
     }
@@ -296,6 +299,10 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             dm4c.do_reset_selection(true)                       // no_history_update=true
             return false
         }
+    })
+
+    dm4c.add_listener("post_move_cluster", function(cluster) {
+        topicmap.move_cluster(cluster)
     })
 
     dm4c.add_listener("post_move_canvas", function(trans_x, trans_y) {

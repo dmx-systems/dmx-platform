@@ -49,16 +49,21 @@ function Topicmap(topicmap_id, config) {
         var topic = topics[id]
         if (!topic) {
             if (LOG_TOPICMAPS) dm4c.log("Adding topic " + id + " (\"" + label + "\") to topicmap " + topicmap_id)
+            // update memory
+            topics[id] = new TopicmapTopic(id, type_uri, label, x, y, true)     // visibility=true
             // update DB
             if (is_writable()) {
                 dm4c.restc.add_topic_to_topicmap(topicmap_id, id, x, y)
             }
-            // update memory
-            topics[id] = new TopicmapTopic(id, type_uri, label, x, y, true)     // visibility=true
         } else if (!topic.visibility) {
             if (LOG_TOPICMAPS)
                 dm4c.log("Showing topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id)
+            // update memory
             topic.show()
+            // update DB
+            if (is_writable()) {
+                dm4c.restc.set_topic_visibility(topicmap_id, id, true)
+            }
         } else {
             if (LOG_TOPICMAPS)
                 dm4c.log("Topic " + id + " (\"" + label + "\") already visible in topicmap " + topicmap_id)
@@ -68,12 +73,12 @@ function Topicmap(topicmap_id, config) {
     this.add_association = function(id, type_uri, topic_id_1, topic_id_2) {
         if (!assocs[id]) {
             if (LOG_TOPICMAPS) dm4c.log("Adding association " + id + " to topicmap " + topicmap_id)
+            // update memory
+            assocs[id] = new TopicmapAssociation(id, type_uri, topic_id_1, topic_id_2)
             // update DB
             if (is_writable()) {
                 dm4c.restc.add_association_to_topicmap(topicmap_id, id)
             }
-            // update memory
-            assocs[id] = new TopicmapAssociation(id, type_uri, topic_id_1, topic_id_2)
         } else {
             if (LOG_TOPICMAPS) dm4c.log("Association " + id + " already in topicmap " + topicmap_id)
         }
@@ -83,19 +88,34 @@ function Topicmap(topicmap_id, config) {
         var topic = topics[id]
         if (LOG_TOPICMAPS) dm4c.log("Moving topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id
             + " to x=" + x + ", y=" + y)
+        // update memory
         topic.move_to(x, y)
+        // update DB
+        if (is_writable()) {
+            dm4c.restc.move_topic(topicmap_id, id, x, y)
+        }
     }
 
     this.hide_topic = function(id) {
         var topic = topics[id]
         if (LOG_TOPICMAPS) dm4c.log("Hiding topic " + id + " (\"" + topic.label + "\") from topicmap " + topicmap_id)
+        // update memory
         topic.hide()
+        // update DB
+        if (is_writable()) {
+            dm4c.restc.set_topic_visibility(topicmap_id, id, false)
+        }
     }
 
     this.hide_association = function(id) {
         var assoc = assocs[id]
         if (LOG_TOPICMAPS) dm4c.log("Hiding association " + id + " from topicmap " + topicmap_id)
+        // update memory
         assoc.hide()
+        // update DB
+        if (is_writable()) {
+            dm4c.restc.remove_association_from_topicmap(topicmap_id, id)
+        }
     }
 
     /**
@@ -158,6 +178,29 @@ function Topicmap(topicmap_id, config) {
         if (t && !t.visibility) {
             topic.x = t.x
             topic.y = t.y
+        }
+    }
+
+    this.move_cluster = function(cluster) {
+        // update memory
+        cluster.iterate_topics(function(ct) {
+            topics[ct.id].move_to(ct.x, ct.y)
+        })
+        // update DB
+        if (is_writable()) {
+            dm4c.restc.move_cluster(topicmap_id, cluster_coords())
+        }
+
+        function cluster_coords() {
+            var coord = []
+            cluster.iterate_topics(function(ct) {
+                coord.push({
+                    topic_id: ct.id,
+                    x: ct.x,
+                    y: ct.y
+                })
+            })
+            return coord
         }
     }
 
@@ -267,23 +310,16 @@ function Topicmap(topicmap_id, config) {
         this.y = y
         this.visibility = visibility
 
-        var _self = this        // Note: "self" is already defined in context
-
         this.show = function() {
-            set_visibility(true)
+            this.visibility = true
         }
 
         this.hide = function() {
-            set_visibility(false)
+            this.visibility = false
             reset_selection()
         }
 
         this.move_to = function(x, y) {
-            // update DB
-            if (is_writable()) {
-                dm4c.restc.move_topic(topicmap_id, id, x, y)
-            }
-            // update memory
             this.x = x
             this.y = y
         }
@@ -303,15 +339,6 @@ function Topicmap(topicmap_id, config) {
 
         // ---
 
-        function set_visibility(visibility) {
-            // update DB
-            if (is_writable()) {
-                dm4c.restc.set_topic_visibility(topicmap_id, id, visibility)
-            }
-            // update memory
-            _self.visibility = visibility
-        }
-
         function reset_selection() {
             if (self.is_topic_selected && self.selected_object_id == id) {
                 self.selected_object_id = -1
@@ -327,11 +354,6 @@ function Topicmap(topicmap_id, config) {
         this.topic_id_2 = topic_id_2
 
         this.hide = function() {
-            // update DB
-            if (is_writable()) {
-                dm4c.restc.remove_association_from_topicmap(topicmap_id, id)
-            }
-            // update memory
             delete assocs[id]
             reset_selection()
         }

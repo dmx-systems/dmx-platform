@@ -32,8 +32,8 @@ function DefaultTopicmapRenderer() {
 
     // Short-term interaction state
     var topic_move_in_progress      // true while topic move is in progress (boolean)
-    var canvas_move_in_progress     // true while canvas translation is in progress (boolean)
     var cluster_move_in_progress    // true while cluster move is in progress (boolean)
+    var canvas_move_in_progress     // true while canvas translation is in progress (boolean)
     var association_in_progress     // true while new association is pulled (boolean)
     var action_topic                // the topic being selected/moved/associated (CanvasTopic)
     var action_assoc                // the association being selected/cluster-moved (CanvasAssoc)
@@ -450,10 +450,10 @@ function DefaultTopicmapRenderer() {
         //
         if (topic_move_in_progress) {
             end_topic_move()
-        } else if (canvas_move_in_progress) {
-            end_canvas_move()
         } else if (cluster_move_in_progress) {
             end_cluster_move()
+        } else if (canvas_move_in_progress) {
+            end_canvas_move()
         } else if (association_in_progress) {
             end_association_in_progress()
             draw()
@@ -467,10 +467,10 @@ function DefaultTopicmapRenderer() {
         //
         if (topic_move_in_progress) {
             end_topic_move()
-        } else if (canvas_move_in_progress) {
-            end_canvas_move()
         } else if (cluster_move_in_progress) {
             end_cluster_move()
+        } else if (canvas_move_in_progress) {
+            end_canvas_move()
         } else if (association_in_progress) {
             var ct = find_topic(event)
             if (ct && ct.id != action_topic.id) {
@@ -558,13 +558,6 @@ function DefaultTopicmapRenderer() {
         action_topic = null
     }
 
-    function end_canvas_move() {
-        // fire event
-        dm4c.fire_event("post_move_canvas", trans_x, trans_y)
-        //
-        canvas_move_in_progress = false
-    }
-
     function end_cluster_move() {
         // fire event
         dm4c.fire_event("post_move_cluster", cluster)
@@ -572,6 +565,13 @@ function DefaultTopicmapRenderer() {
         cluster_move_in_progress = false
         action_assoc = null
         cluster = null
+    }
+
+    function end_canvas_move() {
+        // fire event
+        dm4c.fire_event("post_move_canvas", trans_x, trans_y)
+        //
+        canvas_move_in_progress = false
     }
 
     function end_association_in_progress() {
@@ -1106,8 +1106,14 @@ function DefaultTopicmapRenderer() {
         add_to_cluster(ca.get_topic_1())
 
         this.move_by = function(dx, dy) {
-            for (var i = 0, ct; ct = cts[i]; i++) {
+            this.iterate_topics(function(ct) {
                 ct.move_by(dx, dy)
+            })
+        }
+
+        this.iterate_topics = function(visitor_func) {
+            for (var i = 0, ct; ct = cts[i]; i++) {
+                visitor_func(ct)
             }
         }
 

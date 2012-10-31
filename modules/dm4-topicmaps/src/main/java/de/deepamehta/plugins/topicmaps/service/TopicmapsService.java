@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.topicmaps.service;
 
 import de.deepamehta.plugins.topicmaps.TopicmapRenderer;
+import de.deepamehta.plugins.topicmaps.model.ClusterCoords;
 import de.deepamehta.plugins.topicmaps.model.Topicmap;
 
 import de.deepamehta.core.Topic;
@@ -29,6 +30,8 @@ public interface TopicmapsService extends PluginService {
     void setTopicVisibility(long topicmapId, long topicId, boolean visibility);
 
     void removeAssociationFromTopicmap(long topicmapId, long assocId);
+
+    void moveCluster(long topicmapId, ClusterCoords coords);
 
     void setTopicmapTranslation(long topicmapId, int trans_x, int trans_y);
 

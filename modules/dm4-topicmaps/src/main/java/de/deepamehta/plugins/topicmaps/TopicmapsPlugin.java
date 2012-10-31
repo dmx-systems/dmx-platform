@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.topicmaps;
 
+import de.deepamehta.plugins.topicmaps.model.ClusterCoords;
 import de.deepamehta.plugins.topicmaps.model.Topicmap;
 import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
@@ -26,8 +27,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 
+import java.awt.Point;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -154,6 +157,15 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
         fetchAssociationRefAssociation(topicmapId, assocId).delete(new Directives());
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Override
+    public void moveCluster(@PathParam("id") long topicmapId, ClusterCoords coords) {
+        for (ClusterCoords.Entry entry : coords) {
+            moveTopic(topicmapId, entry.topicId, entry.x, entry.y);
+        }
     }
 
     @PUT
