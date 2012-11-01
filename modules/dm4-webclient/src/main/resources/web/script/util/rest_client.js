@@ -64,12 +64,26 @@ function RESTClient(core_service_uri) {
      *              "items"       - array of topics, possibly empty.
      *              "total_count" - result set size before limitation.
      */
-    this.get_topic_related_topics = function(topic_id, traversal_filter, sort, max_result_size) {
+    this.get_topic_related_topics = function(topic_id, traversal_filter, sort, max_result_size, callback) {
         var params = new RequestParameter(traversal_filter)
         params.add("max_result_size", max_result_size)
-        var result = request("GET", "/topic/" + topic_id + "/related_topics?" + params.to_query_string())
-        sort_topics(result.items, sort)
-        return result
+        var uri = "/topic/" + topic_id + "/related_topics?" + params.to_query_string()
+        return request_and_sort_result("GET", uri, sort, callback)
+    }
+
+    // ###
+    function request_and_sort_result(method, uri, sort, callback) {
+        var _callback = callback ? process : undefined
+        var result = request("GET", uri, undefined, _callback)
+        if (!_callback) {
+            sort_topics(result.items, sort)
+            return result
+        }
+
+        function process(result) {
+            sort_topics(result.items, sort)
+            callback(result)
+        }
     }
 
     this.search_topics = function(text, field_uri) {

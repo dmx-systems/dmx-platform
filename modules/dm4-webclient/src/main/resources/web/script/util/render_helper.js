@@ -179,11 +179,12 @@ function RenderHelper() {
     // === Direct-to-page Rendering ===
 
     this.topic_associations = function(topic_id) {
-        var result = dm4c.restc.get_topic_related_topics(topic_id, undefined, true, dm4c.MAX_RESULT_SIZE)
-                                                                // traversal_filter=undefined, sort=true
-        group_topics(result.items, function(title, group) {
-            self.field_label(title)
-            self.page(self.topic_list(group))
+        // traversal_filter=undefined, sort=true
+        dm4c.restc.get_topic_related_topics(topic_id, undefined, true, dm4c.MAX_RESULT_SIZE, function(result) {
+            group_topics(result.items, function(title, group) {
+                self.field_label(title)
+                self.page(self.topic_list(group))
+            })
         })
     }
 
