@@ -6,73 +6,95 @@
     <name>3rd Party Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>3rd-party-bundles</artifactId>
-    <version>4.0.1</version>
+    <version>4.0.13-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-provision</artifactId>
-        <version>4.0.1</version>
+        <version>4.0.13-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <!-- All 3rd party bundles to be provisioned in the OSGi runtime. -->
     <dependencies>
+
         <!-- Jersey -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>
+            <version>1.14</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
+            <version>1.14</version>
         </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-servlet</artifactId>
+            <version>1.14</version>
+        </dependency>
+
         <!-- Jettison -->
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
+            <version>1.3.2</version>
         </dependency>
-        <!-- Commons FileUpload -->
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-        </dependency>
-        <!-- Neo4j -->
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-kernel</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-index</artifactId>
-        </dependency>
-        <!-- Neo4j Metagraph -->
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>neo4j-mehtagraph</artifactId>
-        </dependency>
-        <!-- JTA for neo4j-kernel -->
+
+        <!-- geronimo-jta_1.1_spec (required by neo4j-kernel) -->
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jta_1.1_spec</artifactId>
             <version>1.1.1</version>
         </dependency>
-        <!-- Lucene for neo4j-index -->
+
+        <!-- Neo4j -->
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-kernel</artifactId>
+            <version>1.2-1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-index</artifactId>
+            <version>1.2-1.2</version>
+        </dependency>
+
+        <!-- Neo4j Metagraph -->
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>neo4j-mehtagraph</artifactId>
+            <version>1.1-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Commons FileUpload -->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+
+        <!-- ASM (required by jersey-server) -->
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.asm</artifactId>
+            <version>3.1_3</version>
+        </dependency>
+
+        <!-- Commons IO (required by commons-fileupload) -->
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.commons-io</artifactId>
+            <version>1.3.2_5</version>
+        </dependency>
+
+        <!-- Lucene (required by neo4j-index) -->
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.lucene</artifactId>
             <version>3.0.1_2</version>
-        </dependency>
-        <!-- asm for jersey-core -->
-        <dependency>
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.asm</artifactId>
-            <version>3.1_1</version>
-        </dependency>
-        <!-- Commons IO for Commons FileUpload -->
-        <dependency>
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.commons-io</artifactId>
-            <version>1.4_1</version>
         </dependency>
     </dependencies>
 </project>

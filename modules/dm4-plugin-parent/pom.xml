@@ -12,70 +12,121 @@
 
     <parent>
         <groupId>de.deepamehta</groupId>
-        <artifactId>deepamehta-parent</artifactId>
-        <version>4</version>
-        <relativePath>../dm4-parent/pom.xml</relativePath>
+        <artifactId>deepamehta-global</artifactId>
+        <version>4.0.13-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <properties>
-        <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
-        <org.osgi.service.http.port>8080</org.osgi.service.http.port>
-        <file.encoding>UTF-8</file.encoding>
-        <felix.log.level>1</felix.log.level>
-        <felix.fileinstall.dir>${project.basedir}/target</felix.fileinstall.dir>
-        <felix.fileinstall.filter>.*\\.jar</felix.fileinstall.filter>
-        <felix.fileinstall.noInitialDelay>false</felix.fileinstall.noInitialDelay>
-        <felix.fileinstall.log.level>0</felix.fileinstall.log.level>
+        <dm4.filerepo.path>${project.basedir}</dm4.filerepo.path>
+        <java.util.logging.config.file>
+            ${project.basedir}/src/main/resources/logging.properties
+        </java.util.logging.config.file>
+        <felix.log.level>2</felix.log.level>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- JAX-RS API -->
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>jsr311-api</artifactId>
+                <version>1.1.1</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
+
+            <!-- Servlet API -->
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>2.5</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>1.3.2</version>
+                <scope>provided</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
 
+        <!-- Testing -->
         <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-core</artifactId>
-            <version>4.0.13-SNAPSHOT</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <version>3.1</version>
+            <scope>test</scope>
         </dependency>
 
-        <!-- OSGi integration test -->
-        <dependency>
-            <groupId>org.ops4j.pax.exam</groupId>
-            <artifactId>pax-exam</artifactId>
-            <version>1.2.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.ops4j.pax.exam</groupId>
-            <artifactId>pax-exam-container-default</artifactId>
-            <version>1.2.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.ops4j.pax.exam</groupId>
-            <artifactId>pax-exam-junit</artifactId>
-            <version>1.2.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.log</artifactId>
-            <version>1.0.0</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.3.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-Activator>
+                            de.deepamehta.core.osgi.PluginActivator
+                        </Bundle-Activator>
+                    </instructions>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.ops4j</groupId>
                 <artifactId>maven-pax-plugin</artifactId>
+                <version>1.4</version>
                 <configuration>
+                    <runner>1.7.4</runner>
+                    <widenScope>true</widenScope>
                     <deployURLs>
-                        mvn:de.deepamehta/3rd-party-bundles/4.0.1/pom,
-                        mvn:de.deepamehta/felix-bundles/4.0.1/pom,
+                        mvn:de.deepamehta/3rd-party-bundles/4.0.13-SNAPSHOT/pom,
+                        mvn:de.deepamehta/felix-bundles/4.0.13-SNAPSHOT/pom,
                         mvn:de.deepamehta/deepamehta-bundles/4.0.13-SNAPSHOT/pom
                     </deployURLs>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.8.1</version>
+                <configuration>
+                    <show>private</show>
+                    <linksource>true</linksource>
+                    <links>
+                        <link>http://www.deepamehta.de/apidocs/deepamehta/${project.version}</link>
+                    </links>
+                    <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+                    <docletArtifact>
+                        <groupId>org.umlgraph</groupId>
+                        <artifactId>umlgraph</artifactId>
+                        <version>5.6</version>
+                    </docletArtifact>
+                    <additionalparam>-collapsible -hide java.* -hide
+                        org.* -inferdepvis public -inferrel</additionalparam>
+                    <useStandardDocletOptions>true</useStandardDocletOptions>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
 </project>
