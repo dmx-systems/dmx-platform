@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+
+    <id>${karaf.name}</id>
+
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+
+
+    <files>
+        <!-- copy README to / -->
+        <file>
+            <source>../../../../README.md</source>
+            <destName>README.txt</destName>
+        </file>
+    </files>
+
+    <fileSets>
+
+        <!-- copy LICENSE and COPYRIGHT -->
+        <fileSet>
+            <directory>../../../..</directory>
+            <fileMode>0444</fileMode>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>COPYRIGHT.txt</include>
+                <include>LICENSE.txt</include>
+            </includes>
+        </fileSet>
+
+        <!-- Karaf runtime -->
+        <fileSet>
+            <directory>target/dependencies/apache-karaf-${karaf.version}
+            </directory>
+            <outputDirectory>/</outputDirectory>
+            <excludes>
+                <exclude>**/demos/**</exclude>
+                <exclude>bin/**</exclude>
+                <exclude>etc/org.apache.karaf.features.cfg</exclude>
+                <exclude>etc/org.ops4j.pax.logging.cfg</exclude>
+                <exclude>etc/system.properties</exclude>
+                <exclude>karaf-manual*.*</exclude>
+                <exclude>LICENSE</exclude>
+                <exclude>NOTICE</exclude>
+                <exclude>README</exclude>
+                <exclude>RELEASE-NOTES</exclude>
+            </excludes>
+        </fileSet>
+
+        <!-- Karaf binaries with correct file mode -->
+        <fileSet>
+            <directory>target/dependencies/apache-karaf-${karaf.version}
+            </directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>bin/admin</include>
+                <include>bin/karaf</include>
+                <include>bin/start</include>
+                <include>bin/stop</include>
+            </includes>
+            <fileMode>0755</fileMode>
+        </fileSet>
+
+        <!-- branding -->
+        <fileSet>
+            <directory>target/dependencies</directory>
+            <includes>
+                <include>dm4shell.jar</include>
+            </includes>
+            <outputDirectory>/lib/</outputDirectory>
+        </fileSet>
+
+        <!-- configurations -->
+        <fileSet>
+            <directory>src/main/distribution</directory>
+            <outputDirectory>/</outputDirectory>
+            <fileMode>0644</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>target/classes/etc</directory>
+            <outputDirectory>/etc/</outputDirectory>
+            <lineEnding>unix</lineEnding>
+            <fileMode>0644</fileMode>
+        </fileSet>
+
+        <!-- offline repository -->
+        <fileSet>
+            <directory>target/features-repo</directory>
+            <outputDirectory>/system</outputDirectory>
+        </fileSet>
+
+    </fileSets>
+</assembly>

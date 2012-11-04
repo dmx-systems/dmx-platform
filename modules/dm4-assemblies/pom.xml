@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>de.deepamehta.assemblies</groupId>
+    <artifactId>deepamehta-assemblies</artifactId>
+    <version>4.0.13-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>DeepaMehta 4 Assemblies</name>
+
+    <parent>
+        <groupId>de.deepamehta</groupId>
+        <artifactId>deepamehta-global</artifactId>
+        <version>4.0.13-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <modules>
+        <module>features</module>
+        <module>dm4-server</module>
+    </modules>
+</project>
