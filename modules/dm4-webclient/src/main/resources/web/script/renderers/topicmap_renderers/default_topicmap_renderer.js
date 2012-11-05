@@ -94,17 +94,17 @@ function DefaultTopicmapRenderer() {
     }
 
     /**
-     * @param   assoc               an object with "id", "type_uri", "role_1", "role_2" properties.
-     * @param   refresh_canvas      Optional: if true, the canvas is refreshed.
+     * @param   assoc       an object with "id", "type_uri", "role_1", "role_2" properties.
+     * @param   do_select   Optional: if true, the association is selected.
      */
-    this.add_association = function(assoc, refresh_canvas) {
+    this.add_association = function(assoc, do_select) {
         // update model
         if (!model.association_exists(assoc.id)) {
             model.add_association(assoc)
         }
-        // update GUI
-        if (refresh_canvas) {
-            this.refresh()
+        //
+        if (do_select) {
+            model.set_highlight_association(assoc.id)
         }
     }
 
@@ -360,12 +360,12 @@ function DefaultTopicmapRenderer() {
 
     // ---
 
-    function draw_object(topic_or_assoc, drawing_func) {
+    function draw_object(topic_or_association, drawing_func) {
         // highlight
-        var highlight = model.has_highlight(topic_or_assoc.id)
+        var highlight = model.has_highlight(topic_or_association.id)
         set_highlight_style(highlight)
         //
-        drawing_func(topic_or_assoc)
+        drawing_func(topic_or_association)
         //
         reset_highlight_style(highlight)
     }

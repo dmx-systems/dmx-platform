@@ -216,8 +216,7 @@ function Webclient() {
             {topic_id: topic.id,                role_type_uri: "dm4.core.default"}
         )
         // update client model and view
-        dm4c.show_association(assoc, true)                      // refresh_canvas=true
-        dm4c.page_panel.display(dm4c.selected_object)
+        dm4c.show_association(assoc, "edit")
     }
 
     this.do_create_topic_type = function(topic_type_model) {
@@ -364,28 +363,38 @@ function Webclient() {
             }
         }
         // update view (page panel)
-        update_page_panel()
-
-        function update_page_panel() {
-            switch (action) {
-            case "none":
-                break
-            case "show":
-                dm4c.page_panel.display(topic)
-                break
-            case "edit":
-                dm4c.begin_editing(topic)
-                break
-            default:
-                throw "WebclientError: \"" + action + "\" is an unexpected page panel action"
-            }
-        }
+        update_page_panel(topic, action)
     }
 
-    this.show_association = function(assoc, refresh_canvas) {
+    this.show_association = function(assoc, action) {
+        action = action || "none"   // set default
+        var do_select = action != "none"
         // update view (canvas)
-        dm4c.canvas.add_association(assoc, refresh_canvas)
+        dm4c.canvas.add_association(assoc, do_select)
+        dm4c.canvas.refresh()
+        // update client model
+        if (do_select) {
+            set_selected_association(assoc)
+        }
+        //
         dm4c.fire_event("post_show_association", assoc)    // fire event
+        // update view (page panel)
+        update_page_panel(assoc, action)
+    }
+
+    function update_page_panel(topic_or_association, action) {
+        switch (action) {
+        case "none":
+            break
+        case "show":
+            dm4c.page_panel.display(topic_or_association)
+            break
+        case "edit":
+            dm4c.begin_editing(topic_or_association)
+            break
+        default:
+            throw "WebclientError: \"" + action + "\" is an unexpected page panel action"
+        }
     }
 
     // ---
@@ -1058,9 +1067,9 @@ function Webclient() {
 
     // ---
 
-    this.begin_editing = function(object) {
+    this.begin_editing = function(topic_or_association) {
         // update view
-        dm4c.page_panel.edit(object)
+        dm4c.page_panel.edit(topic_or_association)
     }
 
     // ---

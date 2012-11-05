@@ -33,7 +33,7 @@ function TopicmapRenderer() {
      */
     this.add_topic = function(topic, do_select) {}
 
-    this.add_association = function(assoc, refresh_canvas) {}
+    this.add_association = function(assoc, do_select) {}
 
     this.update_topic = function(topic, refresh_canvas) {}
 
