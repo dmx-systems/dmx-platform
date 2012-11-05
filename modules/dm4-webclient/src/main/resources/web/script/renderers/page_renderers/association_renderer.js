@@ -4,8 +4,8 @@
         // === Page Renderer Implementation ===
 
         render_page: function(assoc) {
-            topic_1 = assoc.get_topic_1()
-            topic_2 = assoc.get_topic_2()
+            var topic_1 = assoc.get_topic_1()
+            var topic_2 = assoc.get_topic_2()
             var role_type_1 = assoc.get_role_type_1()
             var role_type_2 = assoc.get_role_type_2()
             // association type
@@ -26,6 +26,8 @@
         },
 
         render_form: function(assoc) {
+            var topic_1 = assoc.get_topic_1()
+            var topic_2 = assoc.get_topic_2()
             var role_type_menu_1 = dm4c.render.topic_menu("dm4.core.role_type", assoc.role_1.role_type_uri)
             var role_type_menu_2 = dm4c.render.topic_menu("dm4.core.role_type", assoc.role_2.role_type_uri)
             // association type
@@ -63,8 +65,6 @@
     })
 
     // ----------------------------------------------------------------------------------------------- Private Functions
-
-    var topic_1, topic_2
 
     function render_assoc_role(topic, role_type) {
         _render_assoc_role(topic, role_type.value)
