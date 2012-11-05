@@ -3,7 +3,6 @@
  * The abstraction comprises:
  *     - A model of the topics and association that are currently displayed.
  *     - A model for the current selection.
- *     - A model for the current translation.
  *     - The view element (the "dom" property).
  *
  * The Webclient and the Topicmaps modules, as well as the SplitPanel are coded to this interface.
@@ -51,7 +50,11 @@ function TopicmapRenderer() {
     this.remove_association = function(assoc_id, refresh_canvas) {}
 
     /**
-     * Clears the model: removes all topics and associations. Resets the selection and translation.
+     * Clears the model: removes all topics and associations and resets the selection.
+     *
+     * Note: if the underlying view element handles translation relatively (by distance) the renderer must
+     * reset the translation. This applies to the HTML5 canvas (default topicmap renderer) but not to an
+     * OpenLayers map (geomaps renderer).
      */
     this.clear = function() {}
 
@@ -75,8 +78,6 @@ function TopicmapRenderer() {
     this.scroll_topic_to_center = function(topic_id) {}
 
     this.begin_association = function(topic_id, x, y) {}
-
-    // ### FIXME: get_associations()?
 
     this.refresh = function() {}
 

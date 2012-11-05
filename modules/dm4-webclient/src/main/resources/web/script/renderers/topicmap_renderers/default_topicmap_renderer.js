@@ -7,8 +7,6 @@ function DefaultTopicmapRenderer() {
 
     // Settings
     this.DEFAULT_ASSOC_COLOR = "#b2b2b2"
-    var ASSOC_WIDTH = 4
-    var ASSOC_CLICK_TOLERANCE = 0.3
     var HIGHLIGHT_COLOR = "#0000ff"
     var HIGHLIGHT_BLUR = 16
     var ANIMATION_STEPS = 30
@@ -16,19 +14,14 @@ function DefaultTopicmapRenderer() {
     var LABEL_FONT = "1em 'Lucida Grande', Verdana, Arial, Helvetica, sans-serif"   // copied from webclient.css
     var LABEL_COLOR = "black"
     var LABEL_DIST_Y = 4            // in pixel
-    var MAX_LABEL_WIDTH = 200       // in pixel
 
     // Model
-    var canvas_topics               // topics displayed on canvas (Object, key: topic ID, value: CanvasTopic)
-    var canvas_assocs               // associations displayed on canvas (Object, key: assoc ID, value: CanvasAssoc)
-    var width, height               // canvas size (in pixel)
-    var trans_x, trans_y            // canvas translation (in pixel)
-    var highlight_mode = "none"     // "none", "topic", "assoc"
-    var highlight_id                // ID of the highlighted topic/association. Ignored if highlight mode is "none".
-    var grid_positioning            // while grid positioning is in progress: a GridPositioning object, null otherwise
+    var model = new DefaultTopicmapRenderer.Model()
 
     // View (HTML5 Canvas)
-    var ctx                         // the canvas drawing context
+    var ctx                         // canvas drawing context
+    var width, height               // canvas size (in pixel)
+    var grid_positioning            // while grid positioning is in progress: a GridPositioning object, null otherwise
 
     // Short-term interaction state
     var topic_move_in_progress      // true while topic move is in progress (boolean)
@@ -48,9 +41,9 @@ function DefaultTopicmapRenderer() {
         CANVAS_SPACE: 3     // canvas space (involves canvas translation)
     }
 
-    init_model()
-
     // ------------------------------------------------------------------------------------------------------ Public API
+
+
 
     // === TopicmapRenderer Implementation ===
 
@@ -71,14 +64,14 @@ function DefaultTopicmapRenderer() {
      * @param   do_select   Optional: if true, the topic is selected.
      */
     this.add_topic = function(topic, do_select) {
-        if (!topic_exists(topic.id)) {
-            // update model
+        // update model
+        if (!model.topic_exists(topic.id)) {
             init_position()
-            add_topic(new CanvasTopic(topic))
+            model.add_topic(topic)
         }
         //
         if (do_select) {
-            set_highlight_topic(topic.id)
+            model.set_highlight_topic(topic.id)
         }
         //
         return topic
@@ -87,8 +80,8 @@ function DefaultTopicmapRenderer() {
             if (topic.x == undefined || topic.y == undefined) {
                 if (grid_positioning) {
                     var pos = grid_positioning.next_position()
-                } else if (highlight()) {
-                    var pos = find_free_position(highlight_pos())
+                } else if (model.highlight()) {
+                    var pos = find_free_position(model.highlight_pos())
                 } else {
                     var pos = random_position()
                 }
@@ -101,17 +94,15 @@ function DefaultTopicmapRenderer() {
     }
 
     /**
-     * @param   assoc               An Associatin object
-     *                              ### FIXDOC: a plain JavaScript object with "id", "type_uri", "role_1", and "role_2"
-     *                              ### properties is sufficient
+     * @param   assoc               an object with "id", "type_uri", "role_1", "role_2" properties.
      * @param   refresh_canvas      Optional: if true, the canvas is refreshed.
      */
     this.add_association = function(assoc, refresh_canvas) {
-        if (!association_exists(assoc.id)) {
-            // update model
-            add_association(new CanvasAssoc(assoc))
+        // update model
+        if (!model.association_exists(assoc.id)) {
+            model.add_association(assoc)
         }
-        // refresh GUI
+        // update GUI
         if (refresh_canvas) {
             this.refresh()
         }
@@ -123,13 +114,13 @@ function DefaultTopicmapRenderer() {
      * Updates a topic. If the topic is not on the canvas nothing is performed.
      */
     this.update_topic = function(topic, refresh_canvas) {
-        var ct = get_topic(topic.id)
+        var ct = model.get_topic(topic.id)
         if (!ct) {
             return
         }
         // update model
         ct.update(topic)
-        // refresh GUI
+        // update GUI
         if (refresh_canvas) {
             this.refresh()
         }
@@ -139,13 +130,13 @@ function DefaultTopicmapRenderer() {
      * Updates an association. If the association is not on the canvas nothing is performed.
      */
     this.update_association = function(assoc, refresh_canvas) {
-        var ca = get_association(assoc.id)
+        var ca = model.get_association(assoc.id)
         if (!ca) {
             return
         }
         // update model
         ca.update(assoc)
-        // refresh GUI
+        // update GUI
         if (refresh_canvas) {
             this.refresh()
         }
@@ -161,12 +152,12 @@ function DefaultTopicmapRenderer() {
      */
     this.remove_topic = function(id, refresh_canvas) {
         // 1) update model
-        var ct = remove_topic(id)
+        var ct = model.remove_topic(id)
         if (!ct) {
             return
         }
-        reset_highlight_conditionally(id)
-        // 2) refresh GUI
+        model.reset_highlight_conditionally(id)
+        // 2) update GUI
         if (refresh_canvas) {
             this.refresh()
         }
@@ -180,12 +171,12 @@ function DefaultTopicmapRenderer() {
      */
     this.remove_association = function(id, refresh_canvas) {
         // 1) update model
-        var ca = remove_association(id)
+        var ca = model.remove_association(id)
         if (!ca) {
             return
         }
-        reset_highlight_conditionally(id)
-        // 2) refresh GUI
+        model.reset_highlight_conditionally(id)
+        // 2) update GUI
         if (refresh_canvas) {
             this.refresh()
         }
@@ -194,10 +185,11 @@ function DefaultTopicmapRenderer() {
     // ---
 
     this.clear = function() {
-        // refresh GUI
-        translate(-trans_x, -trans_y)       // reset translation
-        // update model
-        init_model()
+        // Must reset canvas translation.
+        // See TopicmapRenderer contract.
+        translate_by(-model.trans_x, -model.trans_y)
+        //
+        model.clear()
     }
 
     // ---
@@ -206,7 +198,7 @@ function DefaultTopicmapRenderer() {
         // 1) fetch from DB
         var topic = dm4c.fetch_topic(topic_id)
         // 2) update model
-        set_highlight_topic(topic_id)
+        model.set_highlight_topic(topic_id)
         //
         return {select: topic, display: topic}
     }
@@ -215,15 +207,15 @@ function DefaultTopicmapRenderer() {
         // 1) fetch from DB
         var assoc = dm4c.fetch_association(assoc_id)
         // 2) update model
-        set_highlight_association(assoc_id)
+        model.set_highlight_association(assoc_id)
         //
         return assoc
     }
 
     this.reset_selection = function(refresh_canvas) {
         // update model
-        reset_highlight()
-        // refresh GUI
+        model.reset_highlight()
+        // update GUI
         if (refresh_canvas) {
             this.refresh()
         }
@@ -231,34 +223,18 @@ function DefaultTopicmapRenderer() {
 
     // ---
 
-    // ### FIXME: not in interface
-    this.translate = function(trans_x, trans_y) {
-        translate(trans_x, trans_y)
-    }
-
     this.scroll_topic_to_center = function(topic_id) {
-        var ct = get_topic(topic_id)
-        scroll_to_center(ct.x + trans_x, ct.y + trans_y)
+        var ct = model.get_topic(topic_id)
+        scroll_to_center(ct.x + model.trans_x, ct.y + model.trans_y)
     }
 
     this.begin_association = function(topic_id, x, y) {
         association_in_progress = true
-        action_topic = get_topic(topic_id)
+        action_topic = model.get_topic(topic_id)
         //
         tmp_x = x
         tmp_y = y
         draw()
-    }
-
-    // ### FIXME: not in interface
-    this.get_associations = function(topic_id) {
-        var assocs = []
-        iterate_associations(function(ca) {
-            if (ca.is_player_topic(topic_id)) {
-                assocs.push(ca)
-            }
-        })
-        return assocs
     }
 
     this.refresh = function() {
@@ -279,6 +255,8 @@ function DefaultTopicmapRenderer() {
         grid_positioning = null
     }
 
+
+
     // === Left SplitPanel Component Implementation ===
 
     /**
@@ -289,6 +267,21 @@ function DefaultTopicmapRenderer() {
     this.resize = function(size) {
         resize_canvas(size)
     }
+
+
+
+    // === End of interface implementations ===
+
+    // Called from Topicmap Renderer Extension (Topicmaps plugin).
+    this.translate_by = function(dx, dy) {
+        translate_by(dx, dy)
+    }
+
+    this.get_associations = function(topic_id) {
+        return model.get_associations(topic_id)
+    }
+
+
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
@@ -301,41 +294,78 @@ function DefaultTopicmapRenderer() {
 
 
     function draw() {
-        ctx.clearRect(-trans_x, -trans_y, width, height)
+        ctx.clearRect(-model.trans_x, -model.trans_y, width, height)
         // fire event
         dm4c.fire_event("pre_draw_canvas", ctx)
         //
         draw_associations()
         //
         if (association_in_progress) {
-            draw_line(action_topic.x, action_topic.y, tmp_x - trans_x, tmp_y - trans_y,
-                ASSOC_WIDTH, self.DEFAULT_ASSOC_COLOR)
+            draw_line(action_topic.x, action_topic.y, tmp_x - model.trans_x, tmp_y - model.trans_y,
+                dm4c.ASSOC_WIDTH, self.DEFAULT_ASSOC_COLOR)
         }
         //
+        ctx.fillStyle = LABEL_COLOR     // set label style
         draw_topics()
     }
 
+    // ---
+
     function draw_topics() {
-        // set label style
-        ctx.fillStyle = LABEL_COLOR
-        //
-        iterate_topics(function(topic) {
-            draw_object(topic)
+        model.iterate_topics(function(topic) {
+            draw_object(topic, draw_topic)
         })
     }
 
     function draw_associations() {
-        iterate_associations(function(assoc) {
-            draw_object(assoc)
+        model.iterate_associations(function(assoc) {
+            draw_object(assoc, draw_association)
         })
     }
 
-    function draw_object(topic_or_assoc) {
+    // ---
+
+    function draw_topic(ct) {
+        try {
+            // icon
+            var icon = dm4c.get_type_icon(ct.type_uri)
+            var x = ct.x - ct.width / 2
+            var y = ct.y - ct.height / 2
+            ctx.drawImage(icon, x, y)
+            // label
+            ct.label_wrapper.draw(x, y + ct.height + LABEL_DIST_Y + 16, ctx)    // 16px = 1em
+            // Note: the context must be passed to every draw() call.
+            // The context changes when the canvas is resized.
+        } catch (e) {
+            dm4c.log("### ERROR at CanvasTopic.draw:\nicon.src=" + icon.src + "\nicon.width=" + icon.width +
+                "\nicon.height=" + icon.height  + "\nicon.complete=" + icon.complete
+                /* + "\n" + JSON.stringify(e) */)
+        }
+    }
+
+    function draw_association(ca) {
+        var ct1 = ca.get_topic_1()
+        var ct2 = ca.get_topic_2()
+        // error check
+        if (!ct1 || !ct2) {
+            // TODO: deleted associations must be removed from all topicmaps.
+            // ### alert("ERROR in draw_associations: association " + this.id + " is missing a topic")
+            // ### delete canvas_assocs[i]
+            return
+        }
+        //
+        var color = dm4c.get_type_color(ca.type_uri)
+        draw_line(ct1.x, ct1.y, ct2.x, ct2.y, dm4c.ASSOC_WIDTH, color)
+    }
+
+    // ---
+
+    function draw_object(topic_or_assoc, drawing_func) {
         // highlight
-        var highlight = has_highlight(topic_or_assoc.id)
+        var highlight = model.has_highlight(topic_or_assoc.id)
         set_highlight_style(highlight)
         //
-        topic_or_assoc.draw()
+        drawing_func(topic_or_assoc)
         //
         reset_highlight_style(highlight)
     }
@@ -348,6 +378,8 @@ function DefaultTopicmapRenderer() {
         ctx.lineTo(x2, y2)
         ctx.stroke()
     }
+
+    // ---
 
     function set_highlight_style(is_highlight) {
         if (is_highlight) {
@@ -384,6 +416,8 @@ function DefaultTopicmapRenderer() {
         self.dom.bind("dragover",    do_dragover)
         self.dom.bind("drop",        do_drop)
     }
+
+
 
     // === Mouse Events ===
 
@@ -430,10 +464,10 @@ function DefaultTopicmapRenderer() {
             var dx = p.x - tmp_x
             var dy = p.y - tmp_y
             if (canvas_move_in_progress) {
-                translate(dx, dy)
+                translate_by(dx, dy)
             } else if (action_assoc) {
                 cluster_move_in_progress = true
-                cluster = cluster || new Cluster(action_assoc)
+                cluster = cluster || model.create_cluster(action_assoc)
                 cluster.move_by(dx, dy)
             } else if (!association_in_progress) {
                 topic_move_in_progress = true
@@ -500,56 +534,6 @@ function DefaultTopicmapRenderer() {
 
     // ---
 
-    function find_topic(event) {
-        var p = pos(event, Coord.CANVAS_SPACE)
-        return iterate_topics(function(ct) {
-            if (p.x >= ct.x - ct.width  / 2 && p.x < ct.x + ct.width  / 2 &&
-                p.y >= ct.y - ct.height / 2 && p.y < ct.y + ct.height / 2) {
-                //
-                return ct
-            }
-        })
-    }
-
-    function find_association(event) {
-        var p = pos(event, Coord.CANVAS_SPACE)
-        var x = p.x
-        var y = p.y
-        return iterate_associations(function(ca) {
-            var ct1 = ca.get_topic_1()
-            var ct2 = ca.get_topic_2()
-            // bounding rectangle
-            var aw2 = ASSOC_WIDTH / 2   // buffer to make orthogonal associations selectable
-            var bx1 = Math.min(ct1.x, ct2.x) - aw2
-            var bx2 = Math.max(ct1.x, ct2.x) + aw2
-            var by1 = Math.min(ct1.y, ct2.y) - aw2
-            var by2 = Math.max(ct1.y, ct2.y) + aw2
-            var in_bounding = x > bx1 && x < bx2 && y > by1 && y < by2
-            if (!in_bounding) {
-                return
-            }
-            // gradient
-            var dx1 = x - ct1.x
-            var dx2 = x - ct2.x
-            var dy1 = y - ct1.y
-            var dy2 = y - ct2.y
-            if (bx2 - bx1 > by2 - by1) {
-                var g1 = dy1 / dx1
-                var g2 = dy2 / dx2
-            } else {
-                var g1 = dx1 / dy1
-                var g2 = dx2 / dy2
-            }
-            // dm4c.log(g1 + " " + g2 + " -> " + Math.abs(g1 - g2))
-            //
-            if (Math.abs(g1 - g2) < ASSOC_CLICK_TOLERANCE) {
-                return ca
-            }
-        })
-    }
-
-    // ---
-
     function end_topic_move() {
         // fire event
         dm4c.fire_event("post_move_topic", action_topic)
@@ -569,7 +553,7 @@ function DefaultTopicmapRenderer() {
 
     function end_canvas_move() {
         // fire event
-        dm4c.fire_event("post_move_canvas", trans_x, trans_y)
+        dm4c.fire_event("post_move_canvas", model.trans_x, model.trans_y)
         //
         canvas_move_in_progress = false
     }
@@ -578,6 +562,8 @@ function DefaultTopicmapRenderer() {
         association_in_progress = false
         action_topic = null
     }
+
+
 
     // === Context Menu Events ===
 
@@ -663,6 +649,8 @@ function DefaultTopicmapRenderer() {
         $("#canvas-panel .menu").remove()
     }
 
+
+
     // === Drag and Drop Events ===
 
     // Required. Otherwise we don't receive a drop.
@@ -675,121 +663,6 @@ function DefaultTopicmapRenderer() {
         // e.preventDefault();  // Useful for debugging when exception is thrown before false is returned.
         dm4c.fire_event("process_drop", event.originalEvent.dataTransfer)
         return false
-    }
-
-
-
-    // *************
-    // *** Model ***
-    // *************
-
-
-
-    function init_model() {
-        canvas_topics = {}
-        canvas_assocs = {}
-        reset_highlight()
-        trans_x = 0, trans_y = 0
-    }
-
-    // ---
-
-    function get_topic(id) {
-        return canvas_topics[id]
-    }
-
-    function add_topic(ct) {
-        canvas_topics[ct.id] = ct
-    }
-
-    function remove_topic(id) {
-        var ct = get_topic(id)
-        delete canvas_topics[id]
-        return ct
-    }
-
-    function topic_exists(id) {
-        return get_topic(id) != undefined
-    }
-
-    function get_highlight_topic() {
-        return get_topic(highlight_id)
-    }
-
-    function iterate_topics(func) {
-        for (var id in canvas_topics) {
-            var ret = func(get_topic(id))
-            if (ret) {
-                return ret
-            }
-        }
-    }
-
-    // ---
-
-    function get_association(id) {
-        return canvas_assocs[id]
-    }
-
-    function add_association(ca) {
-        canvas_assocs[ca.id] = ca
-    }
-
-    function remove_association(id) {
-        var ca = get_association(id)
-        delete canvas_assocs[id]
-        return ca
-    }
-
-    function association_exists(id) {
-        return get_association(id) != undefined
-    }
-
-    function get_highlight_association() {
-        return get_association(highlight_id)
-    }
-
-    function iterate_associations(func) {
-        for (var id in canvas_assocs) {
-            var ret = func(get_association(id))
-            if (ret) {
-                return ret
-            }
-        }
-    }
-
-    // === Highlighting ===
-
-    function set_highlight_topic(topic_id) {
-        highlight_mode = "topic"
-        highlight_id = topic_id
-    }
-
-    function set_highlight_association(assoc_id) {
-        highlight_mode = "assoc"
-        highlight_id = assoc_id
-    }
-
-    // ---
-
-    function reset_highlight() {
-        highlight_mode = "none"
-    }
-
-    function reset_highlight_conditionally(id) {
-        if (has_highlight(id)) {
-            reset_highlight()
-        }
-    }
-
-    // ---
-
-    function highlight() {
-        return highlight_mode != "none"
-    }
-
-    function has_highlight(id) {
-        return highlight() && highlight_id == id
     }
 
 
@@ -823,16 +696,18 @@ function DefaultTopicmapRenderer() {
         // Note: the canvas element must be already on the page
         ctx = self.dom.get(0).getContext("2d")
         ctx.font = LABEL_FONT   // the canvas font must be set early. Label measurement takes place *before* drawing.
-        ctx.translate(trans_x, trans_y)
+        ctx.translate(model.trans_x, model.trans_y)
+        model.setContext(ctx)   // ### FIXME: remove context from model
         //
         bind_event_handlers()
         draw()
     }
 
-    function translate(tx, ty) {
-        ctx.translate(tx, ty)
-        trans_x += tx
-        trans_y += ty
+    function translate_by(dx, dy) {
+        // update GUI
+        ctx.translate(dx, dy)
+        // update model
+        model.translate_by(dx, dy)
     }
 
     function scroll_to_center(x, y) {
@@ -844,21 +719,35 @@ function DefaultTopicmapRenderer() {
         }
 
         function animation_step() {
-            translate(dx, dy)
+            translate_by(dx, dy)
             draw()
             if (++step_count == ANIMATION_STEPS) {
                 clearInterval(animation)
                 // Note: the Topicmaps module's setTopicmapTranslation()
                 // resource method expects integers (otherwise 404)
-                trans_x = Math.floor(trans_x)
-                trans_y = Math.floor(trans_y)
+                model.trans_x = Math.floor(model.trans_x)
+                model.trans_y = Math.floor(model.trans_y)
                 //
                 end_canvas_move()
             }
         }
     }
 
+
+
     // === Geometry ===
+
+    function find_topic(event) {
+        var p = pos(event, Coord.CANVAS_SPACE)
+        return model.find_topic(p)
+    }
+
+    function find_association(event) {
+        var p = pos(event, Coord.CANVAS_SPACE)
+        return model.find_association(p)
+    }
+
+    // ---
 
     /**
      * Interprets a mouse event according to a coordinate system.
@@ -884,27 +773,8 @@ function DefaultTopicmapRenderer() {
             }
         case Coord.CANVAS_SPACE:
             return {
-                x: event.originalEvent.layerX - trans_x,
-                y: event.originalEvent.layerY - trans_y
-            }
-        }
-    }
-
-    /**
-     * @return  an object with "x" and "y" properties.
-     */
-    function highlight_pos() {
-        switch (highlight_mode) {
-        case "topic":
-            var ct = get_highlight_topic()
-            return {x: ct.x, y: ct.y}
-        case "assoc":
-            var ca = get_highlight_association()
-            var ct1 = ca.get_topic_1()
-            var ct2 = ca.get_topic_2()
-            return {
-                x: (ct1.x + ct2.x) / 2,
-                y: (ct1.y + ct2.y) / 2
+                x: event.originalEvent.layerX - model.trans_x,
+                y: event.originalEvent.layerY - model.trans_y
             }
         }
     }
@@ -941,8 +811,8 @@ function DefaultTopicmapRenderer() {
      */
     function random_position() {
         return {
-            x: width  * Math.random() - trans_x,
-            y: height * Math.random() - trans_y
+            x: width  * Math.random() - model.trans_x,
+            y: height * Math.random() - model.trans_y
         }
     }
 
@@ -950,200 +820,12 @@ function DefaultTopicmapRenderer() {
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
-    /**
-     * Properties:
-     *  id, type_uri, label
-     *  x, y                    Topic position. Represents the center of the topic's icon.
-     *  width, height           Icon size.
-     *
-     * @param   topic   an object with "id", "type_uri", "value", "x", "y" properties.
-     */
-    function CanvasTopic(topic) {
-
-        var self = this
-        var label_wrapper
-
-        this.id = topic.id
-        this.x = topic.x
-        this.y = topic.y
-
-        init(topic);
-
-        // ---
-
-        this.draw = function() {
-            try {
-                // icon
-                var icon = dm4c.get_type_icon(this.type_uri)
-                var x = this.x - this.width / 2
-                var y = this.y - this.height / 2
-                ctx.drawImage(icon, x, y)
-                // label
-                label_wrapper.draw(x, y + this.height + LABEL_DIST_Y + 16, ctx)    // 16px = 1em
-                // Note: the context must be passed to every draw() call.
-                // The context changes when the canvas is resized.
-            } catch (e) {
-                dm4c.log("### ERROR at CanvasTopic.draw:\nicon.src=" + icon.src + "\nicon.width=" + icon.width +
-                    "\nicon.height=" + icon.height  + "\nicon.complete=" + icon.complete
-                    /* + "\n" + JSON.stringify(e) */)
-            }
-        }
-
-        this.move_to = function(x, y) {
-            this.x = x
-            this.y = y
-        }
-
-        this.move_by = function(dx, dy) {
-            this.x += dx
-            this.y += dy
-        }
-
-        this.update = function(topic) {
-            init(topic)
-        }
-
-        // ---
-
-        function init(topic) {
-            self.type_uri = topic.type_uri
-            self.label    = topic.value
-            //
-            var icon = dm4c.get_type_icon(topic.type_uri)
-            self.width  = icon.width
-            self.height = icon.height
-            //
-            var label = js.truncate(self.label, dm4c.MAX_TOPIC_LABEL_CHARS)
-            label_wrapper = new js.TextWrapper(label, MAX_LABEL_WIDTH, 19, ctx)    // line height 19px = 1.2em
-        }
-    }
-
-    /**
-     * Properties:
-     *  id, type_uri
-     *  role_1, role_2
-     */
-    function CanvasAssoc(assoc) {
-
-        var self = this
-
-        this.id = assoc.id
-        this.role_1 = assoc.role_1
-        this.role_2 = assoc.role_2
-
-        init(assoc)
-
-        // ---
-
-        this.get_topic_1 = function() {
-            return get_topic(id1())
-        }
-
-        this.get_topic_2 = function() {
-            return get_topic(id2())
-        }
-
-        // ---
-
-        this.is_player_topic = function(topic_id) {
-            return id1() == topic_id || id2() == topic_id
-        }
-
-        this.get_other_topic = function(topic_id) {
-            if (id1() == topic_id) {
-                return this.get_topic_2()
-            } else if (id2() == topic_id) {
-                return this.get_topic_1()
-            } else {
-                throw "CanvasAssocError: topic " + topic_id + " is not a player in " + JSON.stringify(this)
-            }
-        }
-
-        // ---
-
-        this.draw = function() {
-            var ct1 = this.get_topic_1()
-            var ct2 = this.get_topic_2()
-            // error check
-            if (!ct1 || !ct2) {
-                // TODO: deleted associations must be removed from all topicmaps.
-                // ### alert("ERROR in draw_associations: association " + this.id + " is missing a topic")
-                // ### delete canvas_assocs[i]
-                return
-            }
-            //
-            var color = dm4c.get_type_color(this.type_uri)
-            draw_line(ct1.x, ct1.y, ct2.x, ct2.y, ASSOC_WIDTH, color)
-        }
-
-        this.update = function(assoc) {
-            init(assoc)
-        }
-
-        // ---
-
-        function id1() {
-            return self.role_1.topic_id
-        }
-
-        function id2() {
-            return self.role_2.topic_id
-        }
-
-        // ---
-
-        function init(assoc) {
-            self.type_uri = assoc.type_uri
-        }
-    }
-
-    // ---
-
-    function Cluster(ca) {
-
-        var cts = []    // array of CanvasTopic
-
-        add_to_cluster(ca.get_topic_1())
-
-        this.move_by = function(dx, dy) {
-            this.iterate_topics(function(ct) {
-                ct.move_by(dx, dy)
-            })
-        }
-
-        this.iterate_topics = function(visitor_func) {
-            for (var i = 0, ct; ct = cts[i]; i++) {
-                visitor_func(ct)
-            }
-        }
-
-        function add_to_cluster(ct) {
-            if (is_in_cluster(ct)) {
-                return
-            }
-            //
-            cts.push(ct)
-            var cas = self.get_associations(ct.id)
-            for (var i = 0, ca; ca = cas[i]; i++) {
-                add_to_cluster(ca.get_other_topic(ct.id))
-            }
-        }
-
-        function is_in_cluster(ct) {
-            return js.includes(cts, function(cat) {
-                return cat.id == ct.id
-            })
-        }
-    }
-
-    // ---
-
     function GridPositioning() {
 
         // Settings
-        var GRID_DIST_X = 220   // MAX_LABEL_WIDTH + 20 pixel padding
+        var GRID_DIST_X = 220   // MAX_TOPIC_LABEL_WIDTH + 20 pixel padding
         var GRID_DIST_Y = 80
-        var START_X = 50 - trans_x
+        var START_X = 50 - model.trans_x
         var START_Y = 50
         var MIN_Y = -9999
 
@@ -1155,7 +837,7 @@ function DefaultTopicmapRenderer() {
         this.next_position = function() {
             var pos = {x: grid_x, y: grid_y}
             if (item_count == 0) {
-                scroll_to_center(width / 2, pos.y + trans_y)
+                scroll_to_center(width / 2, pos.y + model.trans_y)
             }
             //
             advance_position()
@@ -1166,7 +848,7 @@ function DefaultTopicmapRenderer() {
 
         function find_start_postition() {
             var max_y = MIN_Y
-            iterate_topics(function(ct) {
+            model.iterate_topics(function(ct) {
                 if (ct.y > max_y) {
                     max_y = ct.y
                 }
@@ -1177,7 +859,7 @@ function DefaultTopicmapRenderer() {
         }
 
         function advance_position() {
-            if (grid_x + GRID_DIST_X + trans_x > width) {
+            if (grid_x + GRID_DIST_X + model.trans_x > width) {
                 grid_x = START_X
                 grid_y += GRID_DIST_Y
             } else {

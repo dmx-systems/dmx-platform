@@ -38,7 +38,7 @@ function TopicmapRendererExtension() {
         function display_topicmap() {
 
             dm4c.canvas.clear()
-            dm4c.canvas.translate(topicmap.trans_x, topicmap.trans_y)
+            dm4c.canvas.translate_by(topicmap.trans_x, topicmap.trans_y)
             display_topics()
             display_associations()
             restore_selection()     // includes canvas refreshing
