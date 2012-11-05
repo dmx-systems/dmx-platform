@@ -103,6 +103,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         return new AssociationRoleModel(getId(), roleTypeUri);
     }
 
+
+
     // === Deletion ===
 
     @Override
@@ -161,6 +163,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         return (AssociationModel) super.getModel();
     }
 
+
+
     // === Updating ===
 
     /**
@@ -185,6 +189,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         //
         return report;
     }
+
+
 
     // === Traversal ===
 
@@ -291,7 +297,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    // === Update ===
+    // --- Update ---
 
     /**
      * @param   nr      used only for logging
@@ -311,7 +317,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         }
     }
 
-    // === Helper ===
+    // --- Helper ---
 
     private Role createAttachedRole(RoleModel model) {
         if (model instanceof TopicRoleModel) {

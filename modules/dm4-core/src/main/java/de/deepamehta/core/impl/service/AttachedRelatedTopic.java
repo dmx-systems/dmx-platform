@@ -13,7 +13,7 @@ class AttachedRelatedTopic extends AttachedTopic implements RelatedTopic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Association assoc;
+    private Association assoc;      // Attached object cache
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -27,5 +27,10 @@ class AttachedRelatedTopic extends AttachedTopic implements RelatedTopic {
     @Override
     public Association getAssociation() {
         return assoc;
+    }
+
+    @Override
+    public RelatedTopicModel getModel() {
+        return (RelatedTopicModel) super.getModel();
     }
 }

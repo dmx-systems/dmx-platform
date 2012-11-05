@@ -1,5 +1,7 @@
 package de.deepamehta.core;
 
+import de.deepamehta.core.model.RelatedTopicModel;
+
 
 
 /**
@@ -8,4 +10,6 @@ package de.deepamehta.core;
 public interface RelatedTopic extends Topic {
 
     Association getAssociation();
+
+    RelatedTopicModel getModel();
 }

@@ -128,6 +128,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         return (TopicModel) super.getModel();
     }
 
+
+
     // === Updating ===
 
     @Override
@@ -145,6 +147,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         //
         return report;
     }
+
+
 
     // === Traversal ===
 

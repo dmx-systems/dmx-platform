@@ -13,7 +13,7 @@ class AttachedRelatedAssociation extends AttachedAssociation implements RelatedA
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Association relatingAssoc;
+    private Association relatingAssoc;      // Attached object cache
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -27,5 +27,10 @@ class AttachedRelatedAssociation extends AttachedAssociation implements RelatedA
     @Override
     public Association getRelatingAssociation() {
         return relatingAssoc;
+    }
+
+    @Override
+    public RelatedAssociationModel getModel() {
+        return (RelatedAssociationModel) super.getModel();
     }
 }

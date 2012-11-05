@@ -8,6 +8,7 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
@@ -188,6 +189,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // --- Fetch ---
 
+    // ### TODO: unify with next method
     private TopicTypeModel fetchTopicType(String topicTypeUri) {
         Topic typeTopic = dms.getTopic("uri", new SimpleValue(topicTypeUri), false, null);
         checkTopicType(topicTypeUri, typeTopic);
@@ -195,8 +197,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         // 1) fetch type components
         String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), topicTypeUri, "topic type").getUri();
         Set<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
-        List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic.getId(), topicTypeUri,
-            "topic type");
+        List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
         List<String> labelConfig = fetchLabelConfig(assocDefs);
         ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
         //
@@ -210,6 +211,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         return topicType;
     }
 
+    // ### TODO: unify with previous method
     private AssociationTypeModel fetchAssociationType(String assocTypeUri) {
         Topic typeTopic = dms.getTopic("uri", new SimpleValue(assocTypeUri), false, null);
         checkAssociationType(assocTypeUri, typeTopic);
@@ -217,8 +219,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         // 1) fetch type components
         String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), assocTypeUri, "association type").getUri();
         Set<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
-        List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic.getId(), assocTypeUri,
-            "association type");
+        List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
         List<String> labelConfig = fetchLabelConfig(assocDefs);
         ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
         //
@@ -367,36 +368,35 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // --- Fetch ---
 
-    private List<AssociationDefinitionModel> fetchAssociationDefinitions(long typeId, String typeUri,
-                                                                                      String className) {
-        Map<Long, AssociationDefinitionModel> assocDefs = fetchAssociationDefinitionsUnsorted(typeId, typeUri);
-        List<RelatedAssociationModel> sequence = fetchSequence(typeId, typeUri, className);
+    private List<AssociationDefinitionModel> fetchAssociationDefinitions(Topic typeTopic) {
+        Map<Long, AssociationDefinitionModel> assocDefs = fetchAssociationDefinitionsUnsorted(typeTopic);
+        List<RelatedAssociationModel> sequence = fetchSequence(typeTopic);
         // error check
         if (assocDefs.size() != sequence.size()) {
-            throw new RuntimeException("DB inconsistency: for " + className + " \"" + typeUri + "\" there are " +
-                assocDefs.size() + " association definitions but sequence has " + sequence.size());
+            throw new RuntimeException("DB inconsistency: type \"" + typeTopic.getUri() + "\" has " +
+                assocDefs.size() + " association definitions but in sequence are " + sequence.size());
         }
         //
         return sortAssocDefs(assocDefs, DeepaMehtaUtils.idList(sequence));
     }
 
-    private Map<Long, AssociationDefinitionModel> fetchAssociationDefinitionsUnsorted(long typeId, String typeUri) {
+    private Map<Long, AssociationDefinitionModel> fetchAssociationDefinitionsUnsorted(Topic typeTopic) {
         Map<Long, AssociationDefinitionModel> assocDefs = new HashMap();
         //
         // 1) fetch part topic types
         // Note: we must set fetchRelatingComposite to false here. Fetching the composite of association type
         // Composition Definition would cause an endless recursion. Composition Definition is defined through
-        // Composition Definition itself (child types "Include in Label", "Ordered"). ### FIXDOC
-        ResultSet<RelatedTopicModel> partTopicTypes = dms.storage.getTopicRelatedTopics(typeId,
-            asList("dm4.core.aggregation_def", "dm4.core.composition_def"), "dm4.core.whole_type", "dm4.core.part_type",
-            "dm4.core.topic_type", 0);
+        // Composition Definition itself (child types "Include in Label", "Ordered").
+        ResultSet<RelatedTopic> partTopicTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
+            "dm4.core.composition_def"), "dm4.core.whole_type", "dm4.core.part_type", "dm4.core.topic_type",
+            false, false, 0, null);     // fetchComposite=false, fetchRelatingComposite=false
         //
         // 2) create association definitions
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
         // subsequently build from it by sorting the assoc def's according to the sequence IDs.
-        for (RelatedTopicModel partTopicType : partTopicTypes) {
-            AssociationDefinitionModel assocDef = fetchAssociationDefinition(
-                partTopicType.getAssociationModel(), typeUri, partTopicType.getUri());
+        for (RelatedTopic partTopicType : partTopicTypes) {
+            AssociationDefinitionModel assocDef = fetchAssociationDefinition(partTopicType.getAssociation(),
+                typeTopic.getUri(), partTopicType.getUri());
             assocDefs.put(assocDef.getId(), assocDef);
         }
         return assocDefs;
@@ -406,17 +406,17 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public AssociationDefinitionModel fetchAssociationDefinition(Association assoc) {
-        return fetchAssociationDefinition(assoc.getModel(), fetchWholeTopicType(assoc).getUri(),
-                                                            fetchPartTopicType(assoc).getUri());
+        return fetchAssociationDefinition(assoc, fetchWholeTopicType(assoc).getUri(),
+                                                 fetchPartTopicType(assoc).getUri());
     }
 
-    private AssociationDefinitionModel fetchAssociationDefinition(AssociationModel assoc, String wholeTopicTypeUri,
-                                                                                          String partTopicTypeUri) {
+    private AssociationDefinitionModel fetchAssociationDefinition(Association assoc, String wholeTopicTypeUri,
+                                                                                     String partTopicTypeUri) {
         try {
             long assocId = assoc.getId();
             return new AssociationDefinitionModel(assocId, assoc.getTypeUri(), wholeTopicTypeUri, partTopicTypeUri,
                 fetchWholeCardinality(assocId).getUri(), fetchPartCardinality(assocId).getUri(),
-                fetchAssocDefViewConfig(assocId));
+                fetchAssocDefViewConfig(assoc));
         } catch (Exception e) {
             throw new RuntimeException("Fetching association definition failed (wholeTopicTypeUri=\"" +
                 wholeTopicTypeUri + "\", partTopicTypeUri=" + partTopicTypeUri + ", " + assoc + ")", e);
@@ -524,6 +524,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // --- Fetch ---
 
+    // ### TODO: pass Association instead ID?
     private RelatedTopicModel fetchWholeCardinality(long assocDefId) {
         RelatedTopicModel wholeCard = dms.storage.getAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.whole_cardinality", "dm4.core.cardinality");
@@ -536,6 +537,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         return wholeCard;
     }
 
+    // ### TODO: pass Association instead ID?
     private RelatedTopicModel fetchPartCardinality(long assocDefId) {
         RelatedTopicModel partCard = dms.storage.getAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.part_cardinality", "dm4.core.cardinality");
@@ -586,25 +588,25 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // --- Fetch ---
 
-    List<RelatedAssociationModel> fetchSequence(long typeId, String typeUri, String className) {
+    List<RelatedAssociationModel> fetchSequence(Topic typeTopic) {
         try {
             List<RelatedAssociationModel> sequence = new ArrayList();
             // find sequence start
-            RelatedAssociationModel assocDef = dms.storage.getTopicRelatedAssociation(typeId, "dm4.core.aggregation",
-                "dm4.core.type", "dm4.core.sequence_start", null);      // othersAssocTypeUri=null
+            RelatedAssociation assocDef = typeTopic.getRelatedAssociation("dm4.core.aggregation", "dm4.core.type",
+                "dm4.core.sequence_start", null, false, false);     // othersAssocTypeUri=null
             // fetch sequence segments
             if (assocDef != null) {
-                sequence.add(assocDef);
-                while ((assocDef = dms.storage.getAssociationRelatedAssociation(assocDef.getId(), "dm4.core.sequence",
-                    "dm4.core.predecessor", "dm4.core.successor")) != null) {
+                sequence.add(assocDef.getModel());
+                while ((assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor",
+                    "dm4.core.successor")) != null) {
                     //
-                    sequence.add(assocDef);
+                    sequence.add(assocDef.getModel());
                 }
             }
             //
             return sequence;
         } catch (Exception e) {
-            throw new RuntimeException("Fetching sequence for " + className + " \"" + typeUri + "\" failed", e);
+            throw new RuntimeException("Fetching sequence for type \"" + typeTopic.getUri() + "\" failed", e);
         }
     }
 
@@ -641,15 +643,14 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // ---
 
-    void rebuildSequence(long typeId, String typeUri, String className,
-                         Collection<AssociationDefinitionModel> assocDefs) {
-        deleteSequence(typeId, typeUri, className);
-        storeSequence(typeUri, assocDefs);
+    void rebuildSequence(Type type) {
+        deleteSequence(type);
+        storeSequence(type.getUri(), type.getModel().getAssocDefs());
     }
 
-    private void deleteSequence(long typeId, String typeUri, String className) {
-        List<RelatedAssociationModel> sequence = fetchSequence(typeId, typeUri, className);
-        logger.info("### Deleting " + sequence.size() + " sequence segments of " + className + " \"" + typeUri + "\"");
+    private void deleteSequence(Topic typeTopic) {
+        List<RelatedAssociationModel> sequence = fetchSequence(typeTopic);
+        logger.info("### Deleting " + sequence.size() + " sequence segments of type \"" + typeTopic.getUri() + "\"");
         for (RelatedAssociationModel assoc : sequence) {
             long assocId = assoc.getRelatingAssociationModel().getId();
             dms.deleteAssociation(assocId, null);   // clientState=null
@@ -696,24 +697,24 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     private ViewConfigurationModel fetchTypeViewConfig(Topic typeTopic) {
         try {
+            // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
             ResultSet<RelatedTopic> configTopics = typeTopic.getRelatedTopics("dm4.core.aggregation",
                 "dm4.core.type", "dm4.core.view_config", null, true, false, 0, null);
-            // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
             return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics.getItems()));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching view configuration for type \"" + typeTopic.getUri() + "\" failed", e);
+            throw new RuntimeException("Fetching view configuration for type \"" + typeTopic.getUri() +
+                "\" failed", e);
         }
     }
 
-    private ViewConfigurationModel fetchAssocDefViewConfig(long assocDefId) {
+    private ViewConfigurationModel fetchAssocDefViewConfig(Association assocDef) {
         try {
-            ResultSet<RelatedTopicModel> topics = dms.storage.getAssociationRelatedTopics(assocDefId,
-                "dm4.core.aggregation", "dm4.core.assoc_def", "dm4.core.view_config", null, 0);
-            // Note: the view config's topic type is unknown (it is client-specific), othersTopicTypeUri=null
-            // ### FIXME: the composites must be fetched
-            return new ViewConfigurationModel(topics.getItems());
+            // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
+            ResultSet<RelatedTopic> configTopics = assocDef.getRelatedTopics("dm4.core.aggregation",
+                "dm4.core.assoc_def", "dm4.core.view_config", null, true, false, 0, null);
+            return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics.getItems()));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching view configuration for association definition " + assocDefId +
+            throw new RuntimeException("Fetching view configuration for association definition " + assocDef.getId() +
                 " failed", e);
         }
     }

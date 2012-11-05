@@ -125,7 +125,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
         }
         initAssocDefs();    // attached object cache
         // update DB
-        dms.objectFactory.rebuildSequence(getId(), getUri(), className(), getModel().getAssocDefs());
+        dms.objectFactory.rebuildSequence(this);
     }
 
     private boolean hasSequenceChanged(Collection<AssociationDefinitionModel> newAssocDefs) {

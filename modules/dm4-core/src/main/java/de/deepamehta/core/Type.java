@@ -73,6 +73,10 @@ public interface Type extends Topic {
     // FIXME: to be dropped
     Object getViewConfig(String typeUri, String settingUri);
 
+    // ---
+
+    TypeModel getModel();
+
 
 
     // === Updating ===

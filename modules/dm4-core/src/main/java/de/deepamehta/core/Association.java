@@ -17,6 +17,10 @@ import java.util.Set;
  */
 public interface Association extends DeepaMehtaObject {
 
+
+
+    // === Model ===
+
     Role getRole1();
 
     Role getRole2();
@@ -29,9 +33,13 @@ public interface Association extends DeepaMehtaObject {
 
     AssociationModel getModel();
 
+
+
     // === Updating ===
 
     ChangeReport update(AssociationModel model, ClientState clientState, Directives directives);
+
+
 
     // === Traversal ===
 

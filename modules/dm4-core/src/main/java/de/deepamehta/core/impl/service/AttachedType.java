@@ -120,7 +120,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         getModel().removeAssocDef(assocDefUri);                                 // update model
         AttachedAssociationDefinition assocDef = _removeAssocDef(assocDefUri);  // update attached object cache
         // update DB
-        dms.objectFactory.rebuildSequence(getId(), getUri(), className(), getModel().getAssocDefs());
+        dms.objectFactory.rebuildSequence(this);
     }
 
     // --- Label Configuration ---
@@ -151,13 +151,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         return getModel().getViewConfig(typeUri, settingUri);
     }
 
-
-
-    // *******************************
-    // *** AttachedTopic Overrides ***
-    // *******************************
-
-
+    // ---
 
     @Override
     public TypeModel getModel() {
@@ -166,9 +160,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-
-
-    // === Helper ===
+    // --- Helper ---
 
     /**
      * Returns the last association definition of this type or
@@ -184,9 +176,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         return lastAssocDef;
     }
 
-
-
-    // === Attached Object Cache ===
+    // --- Attached Object Cache ---
 
     // ### FIXME: make it private
     protected void initAssocDefs() {
