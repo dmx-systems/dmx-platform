@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import static java.util.Arrays.asList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -61,7 +62,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private Bundle      pluginBundle;
     private String      pluginUri;          // This bundle's symbolic name, e.g. "de.deepamehta.webclient"
     private String      pluginName;         // This bundle's name = POM project name, e.g. "DeepaMehta 4 Webclient"
-    private String      pluginClass;
+    private String      pluginClass;        // ### not used
 
     private Properties  pluginProperties;   // Read from file "plugin.properties"
     private String      pluginPackage;
@@ -69,10 +70,15 @@ public class PluginImpl implements Plugin, EventHandler {
     private Set<String> pluginDependencies; // plugin URIs as read from "importModels" property
     private Topic       pluginTopic;        // Represents this plugin in DB. Holds plugin migration number.
 
-    // Consumed services
+    // Consumed services (DeepaMehta Core and OSGi)
     private EmbeddedService dms;
     private WebPublishingService webPublishingService;
     private EventAdmin eventService;        // needed to post the PLUGIN_ACTIVATED OSGi event
+
+    // Consumed plugin services
+    //      key: service interface name,
+    //      value: service object. Is null if the service is not yet available.
+    private Map<String, Object> pluginServices = new HashMap();
 
     // Provided OSGi service
     private ServiceRegistration registration;
@@ -112,8 +118,6 @@ public class PluginImpl implements Plugin, EventHandler {
         if (pluginDependencies.size() > 0) {
             registerEventListener();
         }
-        //
-        registerPluginService();
         //
         createCoreServiceTrackers();    // ### FIXME: move to constructor?
         createPluginServiceTrackers();  // ### FIXME: move to constructor?
@@ -272,12 +276,16 @@ public class PluginImpl implements Plugin, EventHandler {
     private void createPluginServiceTrackers() {
         String consumedServiceInterfaces = getConfigProperty("consumedServiceInterfaces");
         if (consumedServiceInterfaces == null) {
+            logger.info("Tracking plugin services for " + this + " ABORTED -- no consumed services declared");
             return;
         }
         //
         String[] serviceInterfaces = consumedServiceInterfaces.split(", *");
-        for (int i = 0; i < serviceInterfaces.length; i++) {
-            pluginServiceTrackers.add(createServiceTracker(serviceInterfaces[i]));
+        logger.info("Tracking " + serviceInterfaces.length + " plugin services for " + this + " " +
+            asList(serviceInterfaces));
+        for (String serviceInterface : serviceInterfaces) {
+            pluginServices.put(serviceInterface, null);
+            pluginServiceTrackers.add(createServiceTracker(serviceInterface));
         }
     }
 
@@ -377,7 +385,9 @@ public class PluginImpl implements Plugin, EventHandler {
             checkRequirementsForActivation();
         } else if (service instanceof PluginService) {
             logger.info("Adding \"" + serviceInterface + "\" to " + this);
+            pluginServices.put(serviceInterface, service);
             deliverEvent(CoreEvent.PLUGIN_SERVICE_ARRIVED, (PluginService) service);
+            checkRequirementsForActivation();
         }
     }
 
@@ -398,11 +408,21 @@ public class PluginImpl implements Plugin, EventHandler {
             eventService = null;
         } else if (service instanceof PluginService) {
             logger.info("Removing plugin service \"" + serviceInterface + "\" from " + this);
+            pluginServices.put(serviceInterface, null);
             deliverEvent(CoreEvent.PLUGIN_SERVICE_GONE, (PluginService) service);
         }
     }
 
     // ---
+
+    private boolean pluginServicesAvailable() {
+        for (String serviceInterface : pluginServices.keySet()) {
+            if (pluginServices.get(serviceInterface) == null) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     private void setCoreService(EmbeddedService dms) {
         this.dms = dms;
@@ -425,16 +445,24 @@ public class PluginImpl implements Plugin, EventHandler {
     private void checkRequirementsForActivation() {
         // Note: The Web Publishing service is not strictly required for activation, but we must ensure
         // ALL_PLUGINS_ACTIVE is not fired before the Web Publishing service becomes available.
-        if (dms == null || webPublishingService == null || eventService == null || !dependenciesAvailable()) {
+        if (dms == null || webPublishingService == null || eventService == null || !dependenciesAvailable()
+                                                                                || !pluginServicesAvailable()) {
             return;
         }
         //
-        if (dms.pluginManager.activatePlugin(this)) {
-            postPluginActivatedEvent();
-            if (dms.pluginManager.checkAllPluginsActivated()) {
-                logger.info("########## All Plugins Activated ##########");
-                dms.fireEvent(CoreEvent.ALL_PLUGINS_ACTIVE);
-            }
+        boolean activated = dms.pluginManager.activatePlugin(this);
+        if (!activated) {
+            return;
+        }
+        //
+        registerPluginService();
+        //
+        postPluginActivatedEvent();
+        // ### FIXME: it happens that ALL_PLUGINS_ACTIVE is fired more than once.
+        // ### The all-active check possibly belongs to the plugin manager's critical section (activatePlugin()).
+        if (dms.pluginManager.checkAllPluginsActivated()) {
+            logger.info("########## All Plugins Activated ##########");
+            dms.fireEvent(CoreEvent.ALL_PLUGINS_ACTIVE);
         }
     }
 
