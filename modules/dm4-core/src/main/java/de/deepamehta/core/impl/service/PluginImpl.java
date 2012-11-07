@@ -436,33 +436,16 @@ public class PluginImpl implements Plugin, EventHandler {
      *
      * The requirements:
      *   - the 3 core services are available (DeepaMehtaService, WebPublishingService, EventAdmin).
-     *   - the plugin dependencies (according to this plugin's "importModels" property) are active.
+     *   - the plugin services (according to the "consumedServiceInterfaces" config property) are available.
+     *   - the plugin dependencies (according to the "importModels" config property) are active.
      *
-     * After activation:
-     *   - posts the PLUGIN_ACTIVATED OSGi event.
-     *   - checks if all plugins are active, and if so, fires the {@link CoreEvent.ALL_PLUGINS_ACTIVE} event.
+     * Note: The Web Publishing service is not strictly required for activation, but we must ensure
+     * ALL_PLUGINS_ACTIVE is not fired before the Web Publishing service becomes available.
      */
     private void checkRequirementsForActivation() {
-        // Note: The Web Publishing service is not strictly required for activation, but we must ensure
-        // ALL_PLUGINS_ACTIVE is not fired before the Web Publishing service becomes available.
-        if (dms == null || webPublishingService == null || eventService == null || !dependenciesAvailable()
-                                                                                || !pluginServicesAvailable()) {
-            return;
-        }
-        //
-        boolean activated = dms.pluginManager.activatePlugin(this);
-        if (!activated) {
-            return;
-        }
-        //
-        registerPluginService();
-        //
-        postPluginActivatedEvent();
-        // ### FIXME: it happens that ALL_PLUGINS_ACTIVE is fired more than once.
-        // ### The all-active check possibly belongs to the plugin manager's critical section (activatePlugin()).
-        if (dms.pluginManager.checkAllPluginsActivated()) {
-            logger.info("########## All Plugins Activated ##########");
-            dms.fireEvent(CoreEvent.ALL_PLUGINS_ACTIVE);
+        if (dms != null && webPublishingService != null && eventService != null && pluginServicesAvailable()
+                                                                                && dependenciesAvailable()) {
+            dms.pluginManager.activatePlugin(this);
         }
     }
 
@@ -472,10 +455,10 @@ public class PluginImpl implements Plugin, EventHandler {
 
     /**
      * Installs the plugin in the database. This comprises:
-     * - create topic of type "Plugin"
-     * - run migrations
-     * - fires the {@link CoreEvent.POST_INSTALL_PLUGIN} event
-     * - fires the {@link CoreEvent.INTRODUCE_TOPIC_TYPE} event (multiple times)
+     *   1) create topic of type "Plugin"
+     *   2) run migrations
+     *   3) fire the {@link CoreEvent.POST_INSTALL_PLUGIN} event
+     *   4) fire the {@link CoreEvent.INTRODUCE_TOPIC_TYPE} event (multiple times)
      */
     void installPluginInDB() {
         DeepaMehtaTransaction tx = dms.beginTx();
@@ -493,9 +476,11 @@ public class PluginImpl implements Plugin, EventHandler {
             }
             // 2) run migrations
             dms.migrationManager.runPluginMigrations(this, isCleanInstall);
-            // 3) post install
+            //
             if (isCleanInstall) {
+                // 3) post install
                 deliverEvent(CoreEvent.POST_INSTALL_PLUGIN);
+                // 4) type introduction
                 introduceTypesToPlugin();
             }
             //
@@ -644,7 +629,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * Registers this plugin's OSGi service at the OSGi framework.
      * If the plugin doesn't provide an OSGi service nothing is performed.
      */
-    private void registerPluginService() {
+    void registerPluginService() {
         String serviceInterface = null;
         try {
             serviceInterface = getConfigProperty("providedServiceInterface");
@@ -836,7 +821,7 @@ public class PluginImpl implements Plugin, EventHandler {
         bundleContext.registerService(EventHandler.class.getName(), this, properties);
     }
 
-    private void postPluginActivatedEvent() {
+    void postPluginActivatedEvent() {
         Properties properties = new Properties();
         properties.put(EventConstants.BUNDLE_SYMBOLICNAME, pluginUri);
         eventService.postEvent(new Event(PLUGIN_ACTIVATED, properties));

@@ -47,12 +47,13 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    PluginManager pluginManager;
-    ListenerRegistry listenerRegistry;
     DeepaMehtaStorage storage;
     MigrationManager migrationManager;
-    ObjectFactoryImpl objectFactory;
+    PluginManager pluginManager;
+    ListenerRegistry listenerRegistry;
     TypeCache typeCache;
+    ObjectFactoryImpl objectFactory;
+    BundleContext bundleContext;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -63,8 +64,9 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     public EmbeddedService(DeepaMehtaStorage storage, BundleContext bundleContext) {
         this.storage = storage;
+        this.bundleContext = bundleContext;
         this.migrationManager = new MigrationManager(this);
-        this.pluginManager = new PluginManager(bundleContext);
+        this.pluginManager = new PluginManager(this);
         this.listenerRegistry = new ListenerRegistry();
         this.typeCache = new TypeCache(this);
         this.objectFactory = new ObjectFactoryImpl(this);
@@ -712,16 +714,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
     // === Helper ===
-
-    Set<TopicModel> getTopicModels(Set<RelatedTopic> topics) {
-        Set<TopicModel> models = new HashSet();
-        for (Topic topic : topics) {
-            models.add(((AttachedTopic) topic).getModel());
-        }
-        return models;
-    }
-
-    // ---
 
     /**
      * Convenience method.
