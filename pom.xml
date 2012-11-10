@@ -92,6 +92,14 @@
                                 modules/dm4-provision/3rd-party-bundles/pom.xml,
                                 modules/dm4-provision/felix-bundles/pom.xml
                             </deployPoms>
+                            <provision>
+                                <!-- Note: geronimo-jta-1.1-spec must appear *before* neo4j-kernel in bundle list. -->
+                                <param>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</param>
+                                <param>--autoWrap</param>
+                                <param>mvn:org.neo4j/neo4j-kernel/1.8</param>
+                                <param>mvn:org.neo4j/neo4j-lucene-index/1.8</param>
+                                <!--param>mvn:org.apache.lucene/lucene-core/3.5.0</param-->
+                            </provision>
                         </configuration>
                     </plugin>
                     <!-- Deletes OSGi container configuration as created by Pax Runner -->
@@ -148,7 +156,7 @@
                             <show>private</show>
                             <linksource>true</linksource>
                             <links>
-                                <link>http://www.deepamehta.de/apidocs/neo4j-mehtagraph/1.1-SNAPSHOT/</link>
+                                <link>http://www.deepamehta.de/apidocs/neo4j-mehtagraph/1.1/</link>
                                 <link>http://jersey.java.net/nonav/apidocs/1.8/jersey/</link>
                                 <link>http://jettison.codehaus.org/apidocs/</link> <!-- version 1.2 -->
                                 <link>http://www.osgi.org/javadoc/r4v401/</link>
@@ -203,12 +211,12 @@
                 <dependency>
                     <groupId>org.neo4j</groupId>
                     <artifactId>neo4j-shell</artifactId>
-                    <version>1.2-1.2</version>
+                    <version>1.8</version>
                 </dependency>
                 <dependency>
                     <groupId>org.neo4j</groupId>
                     <artifactId>neo4j-kernel</artifactId>
-                    <version>1.2-1.2</version>
+                    <version>1.8</version>
                 </dependency>
             </dependencies>
         </profile>
