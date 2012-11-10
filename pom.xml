@@ -92,14 +92,6 @@
                                 modules/dm4-provision/3rd-party-bundles/pom.xml,
                                 modules/dm4-provision/felix-bundles/pom.xml
                             </deployPoms>
-                            <provision>
-                                <!-- Note: geronimo-jta-1.1-spec must appear *before* neo4j-kernel in bundle list. -->
-                                <param>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</param>
-                                <param>--autoWrap</param>
-                                <param>mvn:org.neo4j/neo4j-kernel/1.8</param>
-                                <param>mvn:org.neo4j/neo4j-lucene-index/1.8</param>
-                                <!--param>mvn:org.apache.lucene/lucene-core/3.5.0</param-->
-                            </provision>
                         </configuration>
                     </plugin>
                     <!-- Deletes OSGi container configuration as created by Pax Runner -->

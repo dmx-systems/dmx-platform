@@ -27,10 +27,8 @@
                 <include>org.apache.felix:org.apache.felix.http.jetty</include>
                 <include>org.apache.felix:org.apache.felix.configadmin</include>
                 <include>org.apache.felix:org.apache.felix.eventadmin</include>
-                <include>org.apache.geronimo.specs:*</include>
                 <include>org.apache.servicemix.bundles:*</include>
                 <include>org.codehaus.jettison:*</include>
-                <include>org.neo4j:*</include>
             </includes>
             <fileMode>0444</fileMode>
             <outputDirectory>bundle</outputDirectory>
