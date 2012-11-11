@@ -387,9 +387,12 @@ class ObjectFactoryImpl implements ObjectFactory {
         // Note: we must set fetchRelatingComposite to false here. Fetching the composite of association type
         // Composition Definition would cause an endless recursion. Composition Definition is defined through
         // Composition Definition itself (child types "Include in Label", "Ordered").
+        // Note: "othersTopicTypeUri" is set to null. We want consider "dm4.core.topic_type" and "dm4.core.meta_type"
+        // as well (the latter required e.g. by dm4-mail) ### TODO: add a getRelatedTopics() method that takes a list
+        // of topic types.
         ResultSet<RelatedTopic> partTopicTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
-            "dm4.core.composition_def"), "dm4.core.whole_type", "dm4.core.part_type", "dm4.core.topic_type",
-            false, false, 0, null);     // fetchComposite=false, fetchRelatingComposite=false
+            "dm4.core.composition_def"), "dm4.core.whole_type", "dm4.core.part_type", null, false, false, 0, null);
+            // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=false, clientState=null
         //
         // 2) create association definitions
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
