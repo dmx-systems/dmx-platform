@@ -57,13 +57,6 @@
             <version>1.2.2</version>
         </dependency>
 
-        <!-- ASM (required by jersey-server) -->
-        <dependency>
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.asm</artifactId>
-            <version>3.1_3</version>
-        </dependency>
-
         <!-- Commons IO (required by commons-fileupload) -->
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
