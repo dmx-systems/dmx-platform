@@ -25,6 +25,8 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
 
+import javax.servlet.Servlet;
+
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -145,6 +147,10 @@ public class PluginImpl implements Plugin, EventHandler {
             throw new RuntimeException("Publishing directory \"" + directoryPath + "\" at URI namespace \"" +
                 uriNamespace + "\" failed", e);
         }
+    }
+
+    public void registerServlet(Servlet servlet) {
+        webPublishingService.registerServlet(servlet, bundleContext);
     }
 
     // ---

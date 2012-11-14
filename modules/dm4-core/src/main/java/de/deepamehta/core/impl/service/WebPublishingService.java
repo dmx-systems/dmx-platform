@@ -8,9 +8,13 @@ import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 
+import org.apache.felix.http.api.ExtHttpService;
+
+import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,6 +22,7 @@ import javax.ws.rs.Path;
 
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -40,7 +45,7 @@ public class WebPublishingService {
     private ServletContainer jerseyServlet;
     private boolean isJerseyServletRegistered = false;
 
-    private HttpService httpService;
+    private ExtHttpService httpService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -52,14 +57,18 @@ public class WebPublishingService {
             //
             // create web application
             this.rootApplication = new DefaultResourceConfig();
+            Map<String, Object> properties = rootApplication.getProperties();
             //
             // setup response filter
-            rootApplication.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
-                new JerseyResponseFilter(dms));
+            properties.put(ServletContainer.PROPERTY_WEB_PAGE_CONTENT_REGEX, "/.*\\.(html|jsp|css|js|png)");
+            // properties.put(ServletContainer.JSP_TEMPLATES_BASE_PATH, "/WEB-INF/jsp");
+            properties.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new JerseyResponseFilter(dms));
+            // properties.put(ServletContainer.FEATURE_FILTER_FORWARD_ON_404, true);
             //
             // deploy web application in container
             this.jerseyServlet = new ServletContainer(rootApplication);
-            this.httpService = httpService;
+            this.httpService = (ExtHttpService) httpService;
+            //
         } catch (Exception e) {
             // unregister...();     // ### TODO?
             throw new RuntimeException("Setting up the Web Publishing service failed", e);
@@ -149,6 +158,20 @@ public class WebPublishingService {
         return path != null ? path.value() : null;
     }
 
+    // === Servlet ===
+
+     void registerServlet(Servlet servlet, BundleContext bundleContext) {
+        try {
+            logger.info("### Registering servlet " + servlet);
+            ServiceReference sRef = bundleContext.getServiceReference(ExtHttpService.class.getName());
+            ExtHttpService service = (ExtHttpService) bundleContext.getService(sRef);
+            service.registerServlet("/", servlet, null, null);
+                // Dictionary initparams = null, HttpContext context = null
+        } catch (Exception e) {
+            throw new RuntimeException("Registering servlet " + servlet + " failed", e);
+        }
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Set<Class<?>> getClasses() {
@@ -202,7 +225,9 @@ public class WebPublishingService {
             logger.fine("########## Registering Jersey servlet at HTTP service (URI namespace=\"" +
                 ROOT_APPLICATION_PATH + "\")");
             // Note: registerServlet() throws javax.servlet.ServletException
-            httpService.registerServlet(ROOT_APPLICATION_PATH, jerseyServlet, null, null);
+            // ### httpService.registerServlet(ROOT_APPLICATION_PATH, jerseyServlet, null, null);
+            //
+            httpService.registerFilter(jerseyServlet, "/.*", null, 0, null);
             isJerseyServletRegistered = true;
         } catch (Exception e) {
             // unregister...();     // ### TODO?
@@ -213,7 +238,8 @@ public class WebPublishingService {
     private void unregisterJerseyServlet() {
         logger.fine("########## Unregistering Jersey servlet at HTTP service (URI namespace=\"" +
             ROOT_APPLICATION_PATH + "\")");
-        httpService.unregister(ROOT_APPLICATION_PATH);
+        // ### httpService.unregister(ROOT_APPLICATION_PATH);
+        httpService.unregisterFilter(jerseyServlet);
         isJerseyServletRegistered = false;
     }
 

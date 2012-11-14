@@ -68,7 +68,8 @@
                         ${project.basedir}/modules/dm4-filemanager/target,
                         ${project.basedir}/modules/dm4-help/target,
                         ${project.basedir}/modules/dm4-accesscontrol/target,
-                        ${project.basedir}/modules/dm4-facets/target
+                        ${project.basedir}/modules/dm4-facets/target,
+                        ${project.basedir}/modules-external/dm4-test-jsp/target
                     ]]>
                 </felix.fileinstall.dir>
                 <!-- Watching only for jar files suppresses deployment of exploded bundles (which often fails).    -->
