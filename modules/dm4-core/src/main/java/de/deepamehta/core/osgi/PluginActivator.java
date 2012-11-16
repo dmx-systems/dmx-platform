@@ -4,6 +4,7 @@ import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.SecurityHandler;
 import de.deepamehta.core.impl.service.PluginImpl;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -23,11 +24,11 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    protected DeepaMehtaService dms;
+    protected Bundle bundle;
+
     private BundleContext bundleContext;
     private PluginImpl plugin;
-
-    // Consumed service
-    protected DeepaMehtaService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -44,6 +45,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
     @Override
     public void start(BundleContext context) {
         this.bundleContext = context;
+        this.bundle = context.getBundle();
         this.plugin = new PluginImpl(this);
         //
         try {
