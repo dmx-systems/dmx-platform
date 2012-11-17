@@ -723,20 +723,29 @@ public class PluginImpl implements Plugin, EventHandler {
      * If the plugin doesn't provide REST resources nothing is performed.
      */
     private void registerRestResources() {
-        String uriNamespace = null;
         try {
-            uriNamespace = webPublishingService.getUriNamespace(pluginContext);
-            if (uriNamespace == null) {
+            // root resources
+            Set<Object> rootResources = getRootResources();
+            if (rootResources.size() != 0) {
+                String uriNamespace = webPublishingService.getUriNamespace(pluginContext);
+                logger.info("Registering REST resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
+            } else {
                 logger.info("Registering REST resources of " + this + " ABORTED -- no REST resources provided");
-                return;
+            }
+            // provider classes
+            Set<Class<?>> providerClasses = getProviderClasses();
+            if (providerClasses.size() != 0) {
+                logger.info("Registering " + providerClasses.size() + " provider classes of " + this);
+            } else {
+                logger.info("Registering provider classes of " + this + " ABORTED -- no provider classes provided");
             }
             //
-            logger.info("Registering REST resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
-            restResource = webPublishingService.addRestResource(pluginContext, getProviderClasses());
+            if (rootResources.size() != 0 || providerClasses.size() != 0) {
+                restResource = webPublishingService.addRestResource(rootResources, providerClasses);
+            }
         } catch (Exception e) {
             unregisterWebResources();
-            throw new RuntimeException("Registering REST resources of " + this + " failed " +
-                "(uriNamespace=\"" + uriNamespace + "\")", e);
+            throw new RuntimeException("Registering REST resources of " + this + " failed", e);
         }
     }
 
@@ -748,6 +757,14 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     // ---
+
+    private Set<Object> getRootResources() {
+        Set<Object> rootResources = new HashSet();
+        if (webPublishingService.isRootResource(pluginContext)) {
+            rootResources.add(pluginContext);
+        }
+        return rootResources;
+    }
 
     private Set<Class<?>> getProviderClasses() throws IOException {
         Set<Class<?>> providerClasses = new HashSet();
@@ -767,13 +784,6 @@ public class PluginImpl implements Plugin, EventHandler {
                 providerClasses.add(providerClass);
             }
         }
-        //
-        if (providerClasses.size() == 0) {
-            logger.info("Registering provider classes of " + this + " ABORTED -- no provider classes provided");
-        } else {
-            logger.info("Registering " + providerClasses.size() + " provider classes of " + this);
-        }
-        //
         return providerClasses;
     }
 

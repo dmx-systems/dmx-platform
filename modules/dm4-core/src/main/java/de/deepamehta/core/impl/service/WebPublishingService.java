@@ -106,8 +106,8 @@ public class WebPublishingService {
 
     // Note: synchronizing this method prevents creation of multiple Jersey servlet instances due to parallel plugin
     // initialization.
-    synchronized RestResource addRestResource(Object resource, Set<Class<?>> providerClasses) {
-        addSingleton(resource);
+    synchronized RestResource addRestResource(Set<Object> resources, Set<Class<?>> providerClasses) {
+        addSingletons(resources);
         addClasses(providerClasses);
         logResourceInfo();
         //
@@ -120,11 +120,11 @@ public class WebPublishingService {
             reloadJerseyServlet();
         }
         //
-        return new RestResource(resource, providerClasses);
+        return new RestResource(resources, providerClasses);
     }
 
     synchronized void removeRestResource(RestResource restResource) {
-        removeSingleton(restResource.resource);
+        removeSingletons(restResource.resources);
         removeClasses(restResource.providerClasses);
         logResourceInfo();
         //
@@ -140,7 +140,7 @@ public class WebPublishingService {
 
     // ---
 
-    boolean isRestResource(Object object) {
+    boolean isRootResource(Object object) {
         return getUriNamespace(object) != null;
     }
 
@@ -166,9 +166,9 @@ public class WebPublishingService {
         classCount += classes.size();
     }
 
-    private void addSingleton(Object singleton) {
-        getSingletons().add(singleton);
-        singletonCount++;
+    private void addSingletons(Set<Object> singletons) {
+        getSingletons().addAll(singletons);
+        singletonCount += singletons.size();
     }
 
     // ---
@@ -178,9 +178,9 @@ public class WebPublishingService {
         classCount -= classes.size();
     }
 
-    private void removeSingleton(Object singleton) {
-        getSingletons().remove(singleton);
-        singletonCount--;
+    private void removeSingletons(Set<Object> singletons) {
+        getSingletons().removeAll(singletons);
+        singletonCount -= singletons.size();
     }
 
     // ---

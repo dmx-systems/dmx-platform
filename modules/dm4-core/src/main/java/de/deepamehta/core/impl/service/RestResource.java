@@ -8,13 +8,13 @@ class RestResource {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    Object resource;
+    Set<Object> resources;
     Set<Class<?>> providerClasses;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RestResource(Object resource, Set<Class<?>> providerClasses) {
-        this.resource = resource;
+    RestResource(Set<Object> resources, Set<Class<?>> providerClasses) {
+        this.resources = resources;
         this.providerClasses = providerClasses;
     }
 }
