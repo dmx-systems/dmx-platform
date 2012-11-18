@@ -310,7 +310,7 @@ public class PluginImpl implements Plugin, EventHandler {
                     "annotation");
             }
             //
-            return consumedServiceInterfaces.value().split(", *");
+            return consumedServiceInterfaces.value();
         } catch (NoSuchMethodException e) {
             return null;
         }

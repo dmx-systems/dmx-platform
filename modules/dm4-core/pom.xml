@@ -67,6 +67,7 @@
                             de.deepamehta.core.osgi,
                             de.deepamehta.core.service,
                             de.deepamehta.core.service.accesscontrol,
+                            de.deepamehta.core.service.annotation,
                             de.deepamehta.core.service.event,
                             de.deepamehta.core.util,
                             org.osgi.service.log        <!-- required when running without Gogo Shell -->

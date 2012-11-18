@@ -15,6 +15,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
@@ -111,19 +112,14 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     @Override
+    @ConsumesService("de.deepamehta.plugins.facets.service.FacetsService")
     public void serviceArrived(PluginService service) {
-        logger.info("########## Service arrived: " + service);
-        if (service instanceof FacetsService) {
-            facetsService = (FacetsService) service;
-        }
+        facetsService = (FacetsService) service;
     }
 
     @Override
     public void serviceGone(PluginService service) {
-        logger.info("########## Service gone: " + service);
-        if (service == facetsService) {
-            facetsService = null;
-        }
+        facetsService = null;
     }
 
 
