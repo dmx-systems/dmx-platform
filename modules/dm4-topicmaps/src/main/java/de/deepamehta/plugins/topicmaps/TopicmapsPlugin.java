@@ -14,7 +14,6 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.event.PostInstallPluginListener;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -40,7 +39,7 @@ import java.util.logging.Logger;
 @Path("/topicmap")
 @Consumes("application/json")
 @Produces("application/json")
-public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, PostInstallPluginListener {
+public class TopicmapsPlugin extends PluginActivator implements TopicmapsService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -212,14 +211,14 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
 
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
+    // ****************************
+    // *** Hook Implementations ***
+    // ****************************
 
 
 
     @Override
-    public void postInstallPlugin() {
+    public void postInstall() {
         createTopicmap(DEFAULT_TOPICMAP_NAME, DEFAULT_TOPICMAP_URI, DEFAULT_TOPICMAP_RENDERER, null);
         // Note: null is passed as clientState. On post-install we have no clientState.
         // The workspace assignment is made by the Access Control plugin on all-plugins-active.

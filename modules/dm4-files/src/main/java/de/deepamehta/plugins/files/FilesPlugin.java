@@ -11,7 +11,6 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.SecurityHandler;
-import de.deepamehta.core.service.event.InitializePluginListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
 
@@ -37,7 +36,7 @@ import java.util.logging.Logger;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends PluginActivator implements FilesService, SecurityHandler, InitializePluginListener {
+public class FilesPlugin extends PluginActivator implements FilesService, SecurityHandler {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -344,14 +343,14 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
 
 
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
+    // ****************************
+    // *** Hook Implementations ***
+    // ****************************
 
 
 
     @Override
-    public void initializePlugin() {
+    public void init() {
         publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI, this);      // securityHandler=this
     }
 

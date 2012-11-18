@@ -16,11 +16,8 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
-import de.deepamehta.core.service.event.PluginServiceArrivedListener;
-import de.deepamehta.core.service.event.PluginServiceGoneListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
-import de.deepamehta.core.service.event.PostInstallPluginListener;
 
 import static java.util.Arrays.asList;
 import java.util.Set;
@@ -28,12 +25,9 @@ import java.util.logging.Logger;
 
 
 
-public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, PostInstallPluginListener,
-                                                                                    IntroduceTopicTypeListener,
+public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, IntroduceTopicTypeListener,
                                                                                     PostCreateTopicListener,
-                                                                                    PostCreateAssociationListener,
-                                                                                    PluginServiceArrivedListener,
-                                                                                    PluginServiceGoneListener {
+                                                                                    PostCreateAssociationListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -100,9 +94,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
 
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
+    // ****************************
+    // *** Hook Implementations ***
+    // ****************************
 
 
 
@@ -110,9 +104,35 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Creates the "Default" workspace.
      */
     @Override
-    public void postInstallPlugin() {
+    public void postInstall() {
         createWorkspace(DEFAULT_WORKSPACE_NAME, DEFAULT_WORKSPACE_URI);
     }
+
+    // ---
+
+    @Override
+    public void serviceArrived(PluginService service) {
+        logger.info("########## Service arrived: " + service);
+        if (service instanceof FacetsService) {
+            facetsService = (FacetsService) service;
+        }
+    }
+
+    @Override
+    public void serviceGone(PluginService service) {
+        logger.info("########## Service gone: " + service);
+        if (service == facetsService) {
+            facetsService = null;
+        }
+    }
+
+
+
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
+
+
 
     @Override
     public void introduceTopicType(TopicType topicType, ClientState clientState) {
@@ -192,24 +212,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         } catch (Exception e) {
             throw new RuntimeException("Assigning association " + assoc.getId() + " to workspace " + workspaceId +
                 " failed", e);
-        }
-    }
-
-    // ---
-
-    @Override
-    public void pluginServiceArrived(PluginService service) {
-        logger.info("########## Service arrived: " + service);
-        if (service instanceof FacetsService) {
-            facetsService = (FacetsService) service;
-        }
-    }
-
-    @Override
-    public void pluginServiceGone(PluginService service) {
-        logger.info("########## Service gone: " + service);
-        if (service == facetsService) {
-            facetsService = null;
         }
     }
 
