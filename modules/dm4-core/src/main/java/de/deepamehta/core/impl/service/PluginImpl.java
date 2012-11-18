@@ -14,6 +14,7 @@ import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.SecurityHandler;
+import de.deepamehta.core.service.annotation.ConsumesService;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -27,6 +28,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -62,7 +64,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private Bundle      pluginBundle;
     private String      pluginUri;          // This bundle's symbolic name, e.g. "de.deepamehta.webclient"
     private String      pluginName;         // This bundle's name = POM project name, e.g. "DeepaMehta 4 Webclient"
-    private String      pluginClass;        // ### not used
+    private String      pluginClass;
 
     private Properties  pluginProperties;   // Read from file "plugin.properties"
     private String      pluginPackage;
@@ -276,19 +278,55 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private void createPluginServiceTrackers() {
-        String consumedServiceInterfaces = getConfigProperty("consumedServiceInterfaces");
-        if (consumedServiceInterfaces == null) {
+        String[] serviceInterfaces = consumedServiceInterfaces();
+        //
+        if (serviceInterfaces == null) {
             logger.info("Tracking plugin services for " + this + " ABORTED -- no consumed services declared");
             return;
         }
         //
-        String[] serviceInterfaces = consumedServiceInterfaces.split(", *");
         logger.info("Tracking " + serviceInterfaces.length + " plugin services for " + this + " " +
             asList(serviceInterfaces));
         for (String serviceInterface : serviceInterfaces) {
             pluginServices.put(serviceInterface, null);
             pluginServiceTrackers.add(createServiceTracker(serviceInterface));
         }
+    }
+
+    // ---
+
+    private String[] consumedServiceInterfaces() {
+        try {
+            // Note: the generic PluginActivator *has* a serviceArrived() method but no ConsumesService annotation
+            if (isGenericPlugin()) {
+                return null;
+            }
+            // Note: we use getDeclaredMethod() (instead of getMethod()) to *not* search the super classes
+            Method hook = pluginContext.getClass().getDeclaredMethod("serviceArrived", PluginService.class);
+            ConsumesService consumedServiceInterfaces = hook.getAnnotation(ConsumesService.class);
+            //
+            if (consumedServiceInterfaces == null) {
+                throw new RuntimeException("The serviceArrived() hook of " + this + " lacks a ConsumesService " +
+                    "annotation");
+            }
+            //
+            return consumedServiceInterfaces.value().split(", *");
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+    private boolean pluginServicesAvailable() {
+        for (String serviceInterface : pluginServices.keySet()) {
+            if (pluginServices.get(serviceInterface) == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isGenericPlugin() {
+        return pluginClass.equals("de.deepamehta.core.osgi.PluginActivator");
     }
 
     // ---
@@ -411,15 +449,6 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     // ---
-
-    private boolean pluginServicesAvailable() {
-        for (String serviceInterface : pluginServices.keySet()) {
-            if (pluginServices.get(serviceInterface) == null) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     private void setCoreService(EmbeddedService dms) {
         this.dms = dms;
