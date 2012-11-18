@@ -17,17 +17,8 @@ import java.util.Map;
 
 
 /**
- * Events fired by the DeepaMehta core.
+ * Events fired by the DeepaMehta core service.
  * Plugins can listen to these events by implementing the respective listener interfaces.
- *
- * There are 2 types of events:
- *   - regular events: are fired (usually) by the core and then delivered to all registered listeners (plugins).
- *   - internal plugin events: are fired by a plugin and then delivered only to itself. There are 5 internal events:
- *     - POST_INSTALL_PLUGIN
- *     - INTRODUCE_TOPIC_TYPE (has a double nature)
- *     - INITIALIZE_PLUGIN
- *     - PLUGIN_SERVICE_ARRIVED
- *     - PLUGIN_SERVICE_GONE
  *
  * @see de.deepamehta.core.service.event
  */
@@ -69,22 +60,11 @@ enum CoreEvent {
     ALL_PLUGINS_ACTIVE(AllPluginsActiveListener.class,
         "allPluginsActive"),
 
-    // === Internal plugin events ===
-
-    // ### TODO: remove this event. Use migration 1 instead.
-    POST_INSTALL_PLUGIN(PostInstallPluginListener.class,
-        "postInstallPlugin"),
-
+    // This event has a double nature:
+    //   a) it is fired regularily (see EmbeddedService.createTopicType()).
+    //   b) it is fired locally (see PluginImpl.introduceTypesToPlugin()).
     INTRODUCE_TOPIC_TYPE(IntroduceTopicTypeListener.class,
-        "introduceTopicType", TopicType.class, ClientState.class),
-
-    INITIALIZE_PLUGIN(InitializePluginListener.class,
-        "initializePlugin"),
-
-    PLUGIN_SERVICE_ARRIVED(PluginServiceArrivedListener.class,
-        "pluginServiceArrived", PluginService.class),
-    PLUGIN_SERVICE_GONE(PluginServiceGoneListener.class,
-        "pluginServiceGone", PluginService.class);
+        "introduceTopicType", TopicType.class, ClientState.class);
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 
