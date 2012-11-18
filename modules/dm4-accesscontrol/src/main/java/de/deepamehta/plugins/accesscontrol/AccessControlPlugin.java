@@ -28,13 +28,9 @@ import de.deepamehta.core.service.accesscontrol.ACLEntry;
 import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.accesscontrol.UserRole;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
-import de.deepamehta.core.service.event.InitializePluginListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
-import de.deepamehta.core.service.event.PluginServiceArrivedListener;
-import de.deepamehta.core.service.event.PluginServiceGoneListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
-import de.deepamehta.core.service.event.PostInstallPluginListener;
 import de.deepamehta.core.service.event.PreSendAssociationListener;
 import de.deepamehta.core.service.event.PreSendTopicListener;
 import de.deepamehta.core.service.event.PreSendTopicTypeListener;
@@ -67,17 +63,13 @@ import java.util.logging.Logger;
 @Path("/accesscontrol")
 @Consumes("application/json")
 @Produces("application/json")
-public class AccessControlPlugin extends PluginActivator implements AccessControlService, PostInstallPluginListener,
-                                                                    SecurityContext,      InitializePluginListener,
-                                                                                          AllPluginsActiveListener,
-                                                                                          PostCreateTopicListener,
+public class AccessControlPlugin extends PluginActivator implements AccessControlService, AllPluginsActiveListener,
+                                                                    SecurityContext,      PostCreateTopicListener,
                                                                                           PostCreateAssociationListener,
                                                                                           IntroduceTopicTypeListener,
                                                                                           PreSendTopicListener,
                                                                                           PreSendAssociationListener,
-                                                                                          PreSendTopicTypeListener,
-                                                                                          PluginServiceArrivedListener,
-                                                                                          PluginServiceGoneListener {
+                                                                                          PreSendTopicTypeListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -358,20 +350,20 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
+    // ****************************
+    // *** Hook Implementations ***
+    // ****************************
 
 
 
     @Override
-    public void postInstallPlugin() {
+    public void postInstall() {
         Topic userAccount = createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
         logger.info("Creating \"admin\" user account => ID=" + userAccount.getId());
     }
 
     @Override
-    public void initializePlugin() {
+    public void init() {
         try {
             logger.info("Security settings:" +
                 "\n    dm4.security.read_requires_login=" + READ_REQUIRES_LOGIN +
@@ -383,6 +375,32 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             throw new RuntimeException("Registering the request filter failed", e);
         }
     }
+
+    // ---
+
+    @Override
+    public void serviceArrived(PluginService service) {
+        logger.info("########## Service arrived: " + service);
+        if (service instanceof WorkspacesService) {
+            wsService = (WorkspacesService) service;
+        }
+    }
+
+    @Override
+    public void serviceGone(PluginService service) {
+        logger.info("########## Service gone: " + service);
+        if (service == wsService) {
+            wsService = null;
+        }
+    }
+
+
+
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
+
+
 
     @Override
     public void allPluginsActive() {
@@ -462,24 +480,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         enrichWithPermissions(topicType,
             hasPermission(username, Operation.WRITE, topicType),
             hasPermission(username, Operation.CREATE, topicType));
-    }
-
-    // ---
-
-    @Override
-    public void pluginServiceArrived(PluginService service) {
-        logger.info("########## Service arrived: " + service);
-        if (service instanceof WorkspacesService) {
-            wsService = (WorkspacesService) service;
-        }
-    }
-
-    @Override
-    public void pluginServiceGone(PluginService service) {
-        logger.info("########## Service gone: " + service);
-        if (service == wsService) {
-            wsService = null;
-        }
     }
 
 

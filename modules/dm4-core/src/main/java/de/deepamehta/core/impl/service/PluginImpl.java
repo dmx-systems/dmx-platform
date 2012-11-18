@@ -88,6 +88,8 @@ public class PluginImpl implements Plugin, EventHandler {
     private WebResources directoryResource;
     private RestResource restResource;
 
+    // ### TODO: rethink service tracking. Is the distinction between core services and plugin services still required?
+    // ### The core service is not required anymore to deliver the PLUGIN_SERVICE_GONE event. It's a hook now.
     private List<ServiceTracker> coreServiceTrackers = new ArrayList();
     private List<ServiceTracker> pluginServiceTrackers = new ArrayList();
 
@@ -353,12 +355,6 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private void closeServiceTrackers(List<ServiceTracker> serviceTrackers) {
-        // Note: we close the service trackers in reverse creation order. Consider this case: when a consumed plugin
-        // service goes away the core service is still needed to deliver the PLUGIN_SERVICE_GONE event. ### STILL TRUE?
-        /* ListIterator<ServiceTracker> i = serviceTrackers.listIterator(serviceTrackers.size());
-        while (i.hasPrevious()) {
-            i.previous().close();
-        } */
         for (ServiceTracker serviceTracker : serviceTrackers) {
             serviceTracker.close();
         }
@@ -386,7 +382,7 @@ public class PluginImpl implements Plugin, EventHandler {
         } else if (service instanceof PluginService) {
             logger.info("Adding \"" + serviceInterface + "\" to " + this);
             pluginServices.put(serviceInterface, service);
-            deliverEvent(CoreEvent.PLUGIN_SERVICE_ARRIVED, (PluginService) service);
+            pluginContext.serviceArrived((PluginService) service);
             checkRequirementsForActivation();
         }
     }
@@ -395,6 +391,7 @@ public class PluginImpl implements Plugin, EventHandler {
         if (service == dms) {
             logger.info("Removing DeepaMehta 4 core service from " + this);
             closePluginServiceTrackers();   // core service is needed to deliver the PLUGIN_SERVICE_GONE events
+                                            // ### TODO: not true anymore. See comment at coreServiceTrackers.
             dms.pluginManager.deactivatePlugin(this);
             setCoreService(null);
         } else if (service == webPublishingService) {
@@ -409,7 +406,7 @@ public class PluginImpl implements Plugin, EventHandler {
         } else if (service instanceof PluginService) {
             logger.info("Removing plugin service \"" + serviceInterface + "\" from " + this);
             pluginServices.put(serviceInterface, null);
-            deliverEvent(CoreEvent.PLUGIN_SERVICE_GONE, (PluginService) service);
+            pluginContext.serviceGone((PluginService) service);
         }
     }
 
@@ -457,7 +454,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * Installs the plugin in the database. This comprises:
      *   1) create topic of type "Plugin"
      *   2) run migrations
-     *   3) fire the {@link CoreEvent.POST_INSTALL_PLUGIN} event
+     *   3) trigger the plugin's postInstall() hook
      *   4) fire the {@link CoreEvent.INTRODUCE_TOPIC_TYPE} event (multiple times)
      */
     void installPluginInDB() {
@@ -479,7 +476,7 @@ public class PluginImpl implements Plugin, EventHandler {
             //
             if (isCleanInstall) {
                 // 3) post install
-                deliverEvent(CoreEvent.POST_INSTALL_PLUGIN);
+                pluginContext.postInstall();
                 // 4) type introduction
                 introduceTypesToPlugin();
             }
@@ -519,7 +516,7 @@ public class PluginImpl implements Plugin, EventHandler {
                 }
                 //
                 TopicType topicType = dms.getTopicType(topicTypeUri, null);     // clientState=null
-                deliverEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);  // clientState=null
+                fireEventLocally(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);  // clientState=null
             }
         } catch (Exception e) {
             throw new RuntimeException("Introducing topic types to " + this + " failed", e);
@@ -531,7 +528,7 @@ public class PluginImpl implements Plugin, EventHandler {
     // === Initialization ===
 
     void initializePlugin() {
-        deliverEvent(CoreEvent.INITIALIZE_PLUGIN);
+        pluginContext.init();
     }
 
 
@@ -583,24 +580,17 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     /**
-     * Delivers an event to this plugin, provided this plugin is a listener for that event.
+     * Fires an event locally, that is it is delivered only to this plugin itself.
+     * If this plugin is not a listener for that event nothing is performed.
      * <p>
-     * By this method this plugin delivers an "internal" event to itself. An internal event is bound
-     * to a particular plugin, in contrast to being fired and delivered to all activated plugins.
-     * <p>
-     * There are 5 internal events:
-     *   - POST_INSTALL_PLUGIN
-     *   - INTRODUCE_TOPIC_TYPE (has a double nature)
-     *   - INITIALIZE_PLUGIN
-     *   - PLUGIN_SERVICE_ARRIVED
-     *   - PLUGIN_SERVICE_GONE
+     * Called internally to fire the INTRODUCE_TOPIC_TYPE event.
      */
-    private Object deliverEvent(CoreEvent event, Object... params) {
+    private Object fireEventLocally(CoreEvent event, Object... params) {
         if (!isListener(event)) {
             return null;
         }
         //
-        logger.fine("### Delivering internal plugin event " + event + " from/to " + this);
+        logger.fine("### Firing " + event + " locally from/to " + this);
         return dms.listenerRegistry.deliverEvent((Listener) pluginContext, event, params);
     }
 
@@ -739,7 +729,7 @@ public class PluginImpl implements Plugin, EventHandler {
             } else {
                 logger.info("Registering provider classes of " + this + " ABORTED -- no provider classes provided");
             }
-            //
+            // register
             if (rootResources.size() != 0 || providerClasses.size() != 0) {
                 restResource = webPublishingService.addRestResource(rootResources, providerClasses);
             }
