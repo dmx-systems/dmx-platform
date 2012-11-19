@@ -27,6 +27,7 @@ import de.deepamehta.core.service.accesscontrol.AccessControlList;
 import de.deepamehta.core.service.accesscontrol.ACLEntry;
 import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.accesscontrol.UserRole;
+import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
@@ -379,19 +380,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
+    @ConsumesService("de.deepamehta.plugins.workspaces.service.WorkspacesService")
     public void serviceArrived(PluginService service) {
-        logger.info("########## Service arrived: " + service);
-        if (service instanceof WorkspacesService) {
-            wsService = (WorkspacesService) service;
-        }
+        wsService = (WorkspacesService) service;
     }
 
     @Override
     public void serviceGone(PluginService service) {
-        logger.info("########## Service gone: " + service);
-        if (service == wsService) {
-            wsService = null;
-        }
+        wsService = null;
     }
 
 
