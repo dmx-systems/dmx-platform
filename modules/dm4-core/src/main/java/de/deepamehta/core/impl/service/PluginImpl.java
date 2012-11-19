@@ -649,9 +649,9 @@ public class PluginImpl implements Plugin, EventHandler {
      * If the plugin doesn't provide an OSGi service nothing is performed.
      */
     void registerPluginService() {
-        String serviceInterface = null;
         try {
-            serviceInterface = getConfigProperty("providedServiceInterface");
+            String serviceInterface = providedServiceInterface();
+            //
             if (serviceInterface == null) {
                 logger.info("Registering OSGi service of " + this + " ABORTED -- no OSGi service provided");
                 return;
@@ -660,27 +660,21 @@ public class PluginImpl implements Plugin, EventHandler {
             logger.info("Registering service \"" + serviceInterface + "\" at OSGi framework");
             registration = bundleContext.registerService(serviceInterface, pluginContext, null);
         } catch (Exception e) {
-            throw new RuntimeException("Registering service of " + this + " at OSGi framework failed " +
-                "(serviceInterface=\"" + serviceInterface + "\")", e);
+            throw new RuntimeException("Registering service of " + this + " at OSGi framework failed", e);
         }
     }
 
-    /* ### FIXME: needed?
-    private void unregisterPluginService() {
-        String serviceInterface = null;
-        try {
-            serviceInterface = getConfigProperty("providedServiceInterface");
-            if (serviceInterface == null) {
-                return;
-            }
-            //
-            logger.info("Unregistering service \"" + serviceInterface + "\" at OSGi framework");
-            registration.unregister();
-        } catch (Exception e) {
-            throw new RuntimeException("Unregistering service of " + this + " at OSGi framework failed " +
-                "(serviceInterface=\"" + serviceInterface + "\")", e);
+    private String providedServiceInterface() {
+        List<String> serviceInterfaces = scanPackage("/service");
+        switch (serviceInterfaces.size()) {
+        case 0:
+            return null;
+        case 1:
+            return serviceInterfaces.get(0);
+        default:
+            throw new RuntimeException("Only one service interface per plugin is supported");
         }
-    } */
+    }
 
 
 
@@ -787,21 +781,12 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private Set<Class<?>> getProviderClasses() throws IOException {
         Set<Class<?>> providerClasses = new HashSet();
-        String providerPackage = ("/" + pluginPackage + ".provider").replace('.', '/');
-        Enumeration<String> e = pluginBundle.getEntryPaths(providerPackage);
-        logger.fine("### Scanning package " + pluginPackage + ".provider");
-        if (e != null) {
-            while (e.hasMoreElements()) {
-                String entryPath = e.nextElement();
-                entryPath = entryPath.substring(0, entryPath.length() - 6);     // cut ".class"
-                String className = entryPath.replace('/', '.');
-                logger.fine("  # Found provider class: " + className);
-                Class providerClass = loadClass(className);
-                if (providerClass == null) {
-                    throw new RuntimeException("Loading provider class \"" + className + "\" failed");
-                }
-                providerClasses.add(providerClass);
+        for (String className : scanPackage("/provider")) {
+            Class providerClass = loadClass(className);
+            if (providerClass == null) {
+                throw new RuntimeException("Loading provider class \"" + className + "\" failed");
             }
+            providerClasses.add(providerClass);
         }
         return providerClasses;
     }
@@ -878,5 +863,34 @@ public class PluginImpl implements Plugin, EventHandler {
             e.printStackTrace();
             // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
         }
+    }
+
+
+
+    // === Helper ===
+
+    private List<String> scanPackage(String relativePath) {
+        List<String> classNames = new ArrayList();
+        Enumeration<String> e = getPluginPaths(relativePath);
+        if (e != null) {
+            while (e.hasMoreElements()) {
+                String entryPath = e.nextElement();
+                String className = entryPathToClassName(entryPath);
+                logger.fine("  # Found class: " + className);
+                classNames.add(className);
+            }
+        }
+        return classNames;
+    }
+
+    private Enumeration<String> getPluginPaths(String relativePath) {
+        String path = "/" + pluginPackage.replace('.', '/') + relativePath;
+        logger.fine("### Scanning path \"" + path + "\"");
+        return pluginBundle.getEntryPaths(path);
+    }
+
+    private String entryPathToClassName(String entryPath) {
+        entryPath = entryPath.substring(0, entryPath.length() - 6);     // strip ".class"
+        return entryPath.replace('/', '.');        
     }
 }
