@@ -150,10 +150,13 @@ function RenderHelper() {
      * @param   selected_id_or_uri  The ID or the URI of the initially selected item.
      *                              If an ID (number) is specified the menu item values are the respective topic IDs.
      *                              If an URI (string) is specified the menu item values are the respective topic URIs.
+     * @param   handler             Optional: The callback function. Called every time the user selects a menu item.
+     *                              One argument is passed: the selected menu item (an object with "value" and "label"
+     *                              properties).
      *
      * @return  a GUIToolkit Menu object
      */
-    this.topic_menu = function(topic_type_uri, selected_id_or_uri) {
+    this.topic_menu = function(topic_type_uri, selected_id_or_uri, handler) {
         // determine item value type
         if (typeof selected_id_or_uri == "number") {
             var value_attr = "id"
@@ -165,7 +168,7 @@ function RenderHelper() {
         // fetch all instances
         var topics = dm4c.restc.get_topics(topic_type_uri, false, true).items   // fetch_composite=false, sort=true
         // build menu
-        var menu = dm4c.ui.menu()
+        var menu = dm4c.ui.menu(handler)
         for (var i = 0, topic; topic = topics[i]; i++) {
             menu.add_item({label: topic.value, value: topic[value_attr]})
         }

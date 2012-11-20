@@ -31,7 +31,8 @@
             var role_type_menu_1 = dm4c.render.topic_menu("dm4.core.role_type", assoc.role_1.role_type_uri)
             var role_type_menu_2 = dm4c.render.topic_menu("dm4.core.role_type", assoc.role_2.role_type_uri)
             // association type
-            var assoc_type_menu = dm4c.render.topic_menu("dm4.core.assoc_type", assoc.type_uri) // a GUIToolkit Menu obj
+            var assoc_type_menu = dm4c.render.topic_menu("dm4.core.assoc_type", assoc.type_uri,
+                from_processing_function(true))     // returns a GUIToolkit Menu object, stay_in_edit_mode=true
             dm4c.render.field_label("Association Type")
             dm4c.render.page(assoc_type_menu.dom)
             // 2 topics
@@ -44,22 +45,26 @@
             // dm4c.fire_event("pre_render_form", topic, page_model)    // ### TODO
             render_page_model(page_model, render_mode)
             //
-            return function() {
-                // values
-                var assoc_model = dm4c.render.page_model.build_object_model(page_model)
-                // association type
-                assoc_model.type_uri = assoc_type_menu.get_selection().value
-                // 2 role types
-                assoc_model.role_1 = {
-                    topic_id: assoc.role_1.topic_id,
-                    role_type_uri: role_type_menu_1.get_selection().value
+            return from_processing_function()
+            
+            function from_processing_function(stay_in_edit_mode) {
+                return function() {
+                    // values
+                    var assoc_model = dm4c.render.page_model.build_object_model(page_model)
+                    // association type
+                    assoc_model.type_uri = assoc_type_menu.get_selection().value
+                    // 2 role types
+                    assoc_model.role_1 = {
+                        topic_id: assoc.role_1.topic_id,
+                        role_type_uri: role_type_menu_1.get_selection().value
+                    }
+                    assoc_model.role_2 = {
+                        topic_id: assoc.role_2.topic_id,
+                        role_type_uri: role_type_menu_2.get_selection().value
+                    }
+                    //
+                    dm4c.do_update_association(assoc_model, stay_in_edit_mode)
                 }
-                assoc_model.role_2 = {
-                    topic_id: assoc.role_2.topic_id,
-                    role_type_uri: role_type_menu_2.get_selection().value
-                }
-                //
-                dm4c.do_update_association(assoc_model)
             }
         }
     })

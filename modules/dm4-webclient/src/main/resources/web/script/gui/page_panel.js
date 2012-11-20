@@ -27,28 +27,24 @@ function PagePanel() {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    this.display = function(topic_or_association) {
+    this.render_page = function(topic_or_association) {
         // update model
         set_displayed_object(topic_or_association)
         // update view
-        clear_page(PageState.PAGE)
         render_page()
-        render_buttons("detail-panel-show")
     }
 
-    this.display_conditionally = function(topic_or_association) {
-        if (displayed_object && displayed_object.id == topic_or_association.id) {
-            this.display(topic_or_association)
-        }
+    this.render_page_if_selected = function(topic_or_association) {
+        render_if_selected(topic_or_association, this.render_page)
     }
 
-    this.edit = function(topic_or_association) {
+    // ---
+
+    this.render_form = function(topic_or_association) {
         // update model
         set_displayed_object(topic_or_association)
         // update view
-        clear_page(PageState.FORM)
         render_form()
-        render_buttons("detail-panel-edit")
         // set focus
         $("#page-content input, #page-content iframe").eq(0).focus()
         // FIXME: "iframe" is TinyMCE specific. Another WYSIWYG editor plugin might be in use.
@@ -56,6 +52,12 @@ function PagePanel() {
         // moment because a TinyMCE's textarea is hidden ("display: none") and can't be focused.
         // ### Update: TinyMCE is replaced by CKEditor meanwhile.
     }
+
+    this.render_form_if_selected = function(topic_or_association) {
+        render_if_selected(topic_or_association, this.render_form)
+    }
+
+    // ---
 
     this.clear = function() {
         // update model
@@ -70,9 +72,7 @@ function PagePanel() {
             return
         }
         // update view
-        clear_page(PageState.PAGE)
         render_page()
-        render_buttons("detail-panel-show")
     }
 
     this.show_splash = function() {
@@ -94,22 +94,6 @@ function PagePanel() {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    // === Event Handler ===
-
-    /**
-     * Return key triggers submit button.
-     */
-    function do_process_key(event) {
-        // dm4c.log("Key up " + event.which)
-        if (event.which == 13 && event.target.nodeName == "INPUT" && event.target.type == "text") {
-            var submit_button = $("#page-toolbar button[type=submit]")
-            // alert("do_process_key:\nsubmit button=\"" + submit_button.text() +
-            //    "\"\ntarget.type=" + js.inspect(event.target.type))
-            submit_button.click()
-        }
-        return false
-    }
-
     // === Model ===
 
     /**
@@ -126,13 +110,18 @@ function PagePanel() {
     // === View ===
 
     function render_page() {
+        clear_page(PageState.PAGE)
         prepare_page()
         page_renderer.render_page(displayed_object)
+        render_buttons("detail-panel-show")
     }
 
     function render_form() {
+        clear_page(PageState.FORM)
         prepare_page()
         from_processing_function = page_renderer.render_form(displayed_object)
+        render_buttons("detail-panel-edit")
+        //
         from_processing_called = false
     }
 
@@ -141,6 +130,12 @@ function PagePanel() {
         for (var i = 0, cmd; cmd = commands[i]; i++) {
             var button = dm4c.ui.button(cmd.handler, cmd.label, cmd.ui_icon, cmd.is_submit)
             $("#page-toolbar").append(button)
+        }
+    }
+
+    function render_if_selected(topic_or_association, render_func) {
+        if (displayed_object && displayed_object.id == topic_or_association.id) {
+            render_func(topic_or_association)
         }
     }
 
@@ -172,5 +167,21 @@ function PagePanel() {
 
     function hide_splash() {
         $("#page-content").removeClass("splash")
+    }
+
+    // === Events ===
+
+    /**
+     * Return key triggers submit button.
+     */
+    function do_process_key(event) {
+        // dm4c.log("Key up " + event.which)
+        if (event.which == 13 && event.target.nodeName == "INPUT" && event.target.type == "text") {
+            var submit_button = $("#page-toolbar button[type=submit]")
+            // alert("do_process_key:\nsubmit button=\"" + submit_button.text() +
+            //    "\"\ntarget.type=" + js.inspect(event.target.type))
+            submit_button.click()
+        }
+        return false
     }
 }

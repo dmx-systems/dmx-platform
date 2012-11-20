@@ -81,7 +81,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         }
 
         function do_edit() {
-            dm4c.begin_editing(topic)
+            dm4c.enter_edit_mode(topic)
         }
 
         function do_retype() {
@@ -125,7 +125,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         } */
 
         function do_edit() {
-            dm4c.begin_editing(assoc)
+            dm4c.enter_edit_mode(assoc)
         }
 
         function do_confirm() {
