@@ -91,7 +91,7 @@ function Webclient() {
         set_selected_topic(topics.select, no_history_update)
         // update view
         dm4c.canvas.refresh()
-        dm4c.page_panel.display(topics.display)
+        dm4c.page_panel.render_page(topics.display)
     }
 
     /**
@@ -110,7 +110,7 @@ function Webclient() {
         set_selected_association(assoc, no_history_update)
         // update view
         dm4c.canvas.refresh()
-        dm4c.page_panel.display(assoc)
+        dm4c.page_panel.render_page(assoc)
     }
 
     /**
@@ -253,11 +253,11 @@ function Webclient() {
      *
      * @param   assoc_model     an association model containing the data to be udpated.
      */
-    this.do_update_association = function(assoc_model) {
+    this.do_update_association = function(assoc_model, stay_in_edit_mode) {
         // update DB
         var directives = dm4c.restc.update_association(assoc_model)
         // update GUI (client model and view)
-        process_directives(directives)
+        process_directives(directives, stay_in_edit_mode)
     }
 
     /**
@@ -387,13 +387,13 @@ function Webclient() {
         case "none":
             break
         case "show":
-            dm4c.page_panel.display(topic_or_association)
+            dm4c.page_panel.render_page(topic_or_association)
             break
         case "edit":
-            dm4c.begin_editing(topic_or_association)
+            dm4c.enter_edit_mode(topic_or_association)
             break
         default:
-            throw "WebclientError: \"" + action + "\" is an unexpected page panel action"
+            throw "WebclientError: \"" + action + "\" is an unsupported page panel action"
         }
     }
 
@@ -413,7 +413,7 @@ function Webclient() {
      * Updates the client model and view according to a set of directives received from server.
      * Precondition: the DB is already up-to-date.
      */
-    function process_directives(directives) {
+    function process_directives(directives, stay_in_edit_mode) {
         // alert("process_directives: " + JSON.stringify(directives))
         for (var i = 0, directive; directive = directives[i]; i++) {
             switch (directive.type) {
@@ -424,7 +424,7 @@ function Webclient() {
                 remove_topic(build_topic(directive.arg), "post_delete_topic")
                 break
             case "UPDATE_ASSOCIATION":
-                update_association(build_association(directive.arg))
+                update_association(build_association(directive.arg), stay_in_edit_mode)
                 break
             case "DELETE_ASSOCIATION":
                 remove_association(build_association(directive.arg), "post_delete_association")
@@ -439,7 +439,7 @@ function Webclient() {
                 update_association_type(build_association_type(directive.arg))
                 break
             default:
-                throw "WebclientError: \"" + directive.type + "\" is an unknown directive"
+                throw "WebclientError: \"" + directive.type + "\" is an unsupported directive"
             }
         }
     }
@@ -457,7 +457,7 @@ function Webclient() {
     function update_topic(topic) {
         // update view
         dm4c.canvas.update_topic(topic, true)           // refresh_canvas=true
-        dm4c.page_panel.display_conditionally(topic)
+        dm4c.page_panel.render_page_if_selected(topic)
         // fire event
         dm4c.fire_event("post_update_topic", topic)
     }
@@ -470,10 +470,11 @@ function Webclient() {
      *
      * @param   an Association object
      */
-    function update_association(assoc) {
+    function update_association(assoc, stay_in_edit_mode) {
         // update view
         dm4c.canvas.update_association(assoc, true)     // refresh_canvas=true
-        dm4c.page_panel.display_conditionally(assoc)
+        stay_in_edit_mode ? dm4c.page_panel.render_form_if_selected(assoc) :
+                            dm4c.page_panel.render_page_if_selected(assoc)
         // fire event
         dm4c.fire_event("post_update_association", assoc)
     }
@@ -932,7 +933,7 @@ function Webclient() {
             case "rows":
                 return DEFAULT_FIELD_ROWS
             default:
-                throw("WebclientError: \"" + setting + "\" is an unknown view configuration setting")
+                throw("WebclientError: \"" + setting + "\" is an unsupported view configuration setting")
             }
 
             function default_page_renderer_uri() {
@@ -955,7 +956,7 @@ function Webclient() {
                 case "dm4.core.boolean":
                     return "dm4.webclient.boolean_renderer"
                 default:
-                    throw("WebclientError: \"" + configurable.data_type_uri + "\" is an unknown data type URI")
+                    throw("WebclientError: \"" + configurable.data_type_uri + "\" is an unsupported data type URI")
                 }
             }
         }
@@ -1067,9 +1068,14 @@ function Webclient() {
 
     // ---
 
-    this.begin_editing = function(topic_or_association) {
+    // Note: because of the Webclient's intrinsic UI logic -- the page panel displays nothing but the selected
+    // object -- no argument should be required here (it should always be dm4c.selected_object). However, custom
+    // topicmap renderers may break this principle.
+    // In fact the Geomaps renderer does: the selection model contains the sole "Geo Coordinate" topic while
+    // the page panel displays the geo-aware topic, e.g. a Person.
+    this.enter_edit_mode = function(topic_or_association) {
         // update view
-        dm4c.page_panel.edit(topic_or_association)
+        dm4c.page_panel.render_form(topic_or_association)
     }
 
     // ---
