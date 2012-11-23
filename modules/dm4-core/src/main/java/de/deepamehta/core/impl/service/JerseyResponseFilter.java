@@ -52,6 +52,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                     firePreSend((Directives) entity);
                 } else if (isIterable(response, TopicType.class)) {
                     firePreSendTopicTypes((Iterable<TopicType>) entity);
+                } else if (isIterable(response, AssociationType.class)) {
+                    firePreSendAssociationTypes((Iterable<AssociationType>) entity);
                 } else if (isIterable(response, Topic.class)) {
                     firePreSendTopics((Iterable<Topic>) entity);
                 }
@@ -108,6 +110,12 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     private void firePreSendTopicTypes(Iterable<TopicType> topicTypes) {
         for (TopicType topicType : topicTypes) {
             firePreSend(topicType);
+        }
+    }
+
+    private void firePreSendAssociationTypes(Iterable<AssociationType> assocTypes) {
+        for (AssociationType assocType : assocTypes) {
+            firePreSend(assocType);
         }
     }
 

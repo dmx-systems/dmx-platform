@@ -7,6 +7,7 @@ import de.deepamehta.plugins.facets.service.FacetsService;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
@@ -14,6 +15,7 @@ import de.deepamehta.core.Role;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicRole;
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
@@ -30,9 +32,11 @@ import de.deepamehta.core.service.accesscontrol.UserRole;
 import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
+import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PreSendAssociationListener;
+import de.deepamehta.core.service.event.PreSendAssociationTypeListener;
 import de.deepamehta.core.service.event.PreSendTopicListener;
 import de.deepamehta.core.service.event.PreSendTopicTypeListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
@@ -65,12 +69,14 @@ import java.util.logging.Logger;
 @Consumes("application/json")
 @Produces("application/json")
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, AllPluginsActiveListener,
-                                                                    SecurityContext,      PostCreateTopicListener,
-                                                                                          PostCreateAssociationListener,
-                                                                                          IntroduceTopicTypeListener,
-                                                                                          PreSendTopicListener,
-                                                                                          PreSendAssociationListener,
-                                                                                          PreSendTopicTypeListener {
+                                                                    SecurityContext,   PostCreateTopicListener,
+                                                                                       PostCreateAssociationListener,
+                                                                                       IntroduceTopicTypeListener,
+                                                                                       IntroduceAssociationTypeListener,
+                                                                                       PreSendTopicListener,
+                                                                                       PreSendAssociationListener,
+                                                                                       PreSendTopicTypeListener,
+                                                                                       PreSendAssociationTypeListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -83,10 +89,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final String DEFAULT_PASSWORD = "";
 
     // default ACLs
-    private static final AccessControlList DEFAULT_TOPIC_ACL = new AccessControlList(
-        new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER, UserRole.MEMBER)
-    );
-    private static final AccessControlList DEFAULT_ASSOCIATION_ACL = new AccessControlList(
+    private static final AccessControlList DEFAULT_OBJECT_ACL = new AccessControlList(
         new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER, UserRole.MEMBER)
     );
     private static final AccessControlList DEFAULT_TYPE_ACL = new AccessControlList(
@@ -398,25 +401,24 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
+    /**
+     * Setup access control for the default user and the default topicmap.
+     *   1) assign default user     to default workspace
+     *   2) assign default topicmap to default workspace
+     *   3) setup access control for default topicmap
+     */
     @Override
     public void allPluginsActive() {
-        //
+        // 1) assign default user to default workspace
         Topic defaultUser = fetchDefaultUser();
         assignToDefaultWorkspace(defaultUser, "default user (\"admin\")");
         //
-        // Note: the Access Control plugin does not DEPEND on the Topicmaps plugin but is designed to work TOGETHER
-        // with the Topicmaps plugin.
-        // Currently the Access Control plugin needs to know some Topicmaps internals e.g. the URI of the default
-        // topicmap. ### TODO: make "optional plugin dependencies" an explicit concept. Plugins must be able to ask
-        // the core weather a certain plugin is installed (regardles weather it is activated already) and would wait
-        // for its service only if installed.
-        //
         Topic defaultTopicmap = fetchDefaultTopicmap();
         if (defaultTopicmap != null) {
+            // 2) assign default topicmap to default workspace
             assignToDefaultWorkspace(defaultTopicmap, "default topicmap (\"untitled\")");
-            //
-            String username = defaultUser.getSimpleValue().toString();
-            setupAccessControlForDefaultTopicmap(defaultTopicmap, username);
+            // 3) setup access control for default topicmap
+            setupAccessControlForDefaultTopicmap(defaultTopicmap, defaultUser);
         }
     }
 
@@ -424,42 +426,39 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
-        setupDefaultAccessControl(topic, DEFAULT_TOPIC_ACL);
+        setupDefaultAccessControl(topic);
         //
         // when a workspace is created its creator joins automatically
-        if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
-            String username = getUsername();
-            // Note: when the default workspace is created there is no user logged in yet.
-            // The default user is assigned to the default workspace later on (see allPluginsActive()).
-            if (username != null) {
-                joinWorkspace(username, topic.getId());
-            }
-        }
+        joinIfWorkspace(topic);
     }
 
     @Override
     public void postCreateAssociation(Association assoc, ClientState clientState, Directives directives) {
-        setupDefaultAccessControl(assoc, DEFAULT_ASSOCIATION_ACL);
+        setupDefaultAccessControl(assoc);
     }
+
+    // ---
 
     @Override
     public void introduceTopicType(TopicType topicType, ClientState clientState) {
-        String username = fetchDefaultUser().getSimpleValue().toString();
-        setupDefaultAccessControl(topicType, DEFAULT_TYPE_ACL, username);
+        setupDefaultAccessControl(topicType);
+    }
+
+    @Override
+    public void introduceAssociationType(AssociationType assocType, ClientState clientState) {
+        setupDefaultAccessControl(assocType);
     }
 
     // ---
 
     @Override
     public void preSendTopic(Topic topic, ClientState clientState) {
-        logger.fine("### Enriching " + info(topic) + " with its permissions (clientState=" + clientState + ")");
-        enrichWithPermissions(topic, hasPermission(getUsername(), Operation.WRITE, topic));
+        enrichWithPermissions(topic, clientState);
     }
 
     @Override
     public void preSendAssociation(Association assoc, ClientState clientState) {
-        logger.fine("### Enriching " + info(assoc) + " with its permissions (clientState=" + clientState + ")");
-        enrichWithPermissions(assoc, hasPermission(getUsername(), Operation.WRITE, assoc));
+        enrichWithPermissions(assoc, clientState);
     }
 
     @Override
@@ -471,11 +470,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return;
         }
         //
-        logger.fine("### Enriching topic type \"" + topicType.getUri() + "\" with its permissions");
-        String username = getUsername();
-        enrichWithPermissions(topicType,
-            hasPermission(username, Operation.WRITE, topicType),
-            hasPermission(username, Operation.CREATE, topicType));
+        enrichWithPermissions(topicType, clientState);
+    }
+
+    @Override
+    public void preSendAssociationType(AssociationType assocType, ClientState clientState) {
+        enrichWithPermissions(assocType, clientState);
     }
 
 
@@ -503,6 +503,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return username;
     }
 
+    private void joinIfWorkspace(Topic topic) {
+        if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
+            String username = getUsername();
+            // Note: when the default workspace is created there is no user logged in yet.
+            // The default user is assigned to the default workspace later on (see allPluginsActive()).
+            if (username != null) {
+                joinWorkspace(username, topic.getId());
+            }
+        }
+    }
+
 
 
     // === All Plugins Activated ===
@@ -526,25 +537,31 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
-    private void setupAccessControlForDefaultTopicmap(Topic defaultTopicmap, String defaultUser) {
+    private void setupAccessControlForDefaultTopicmap(Topic defaultTopicmap, Topic defaultUser) {
         String operation = "### Setup access control for the default topicmap (\"untitled\")";
         try {
             // Note: we only check for creator assignment.
             // If an object has a creator assignment it is expected to have an ACL entry as well.
-            String username = getCreator(defaultTopicmap.getId());
-            if (username != null) {
+            if (getCreator(defaultTopicmap.getId()) != null) {
                 logger.info(operation + " ABORTED -- already setup");
                 return;
             }
             //
             logger.info(operation);
-            setupDefaultAccessControl(defaultTopicmap, DEFAULT_TOPIC_ACL, defaultUser);
+            String username = defaultUser.getSimpleValue().toString();
+            setupAccessControl(defaultTopicmap, DEFAULT_OBJECT_ACL, username);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
     }
 
     private Topic fetchDefaultTopicmap() {
+        // Note: the Access Control plugin does not DEPEND on the Topicmaps plugin but is designed to work TOGETHER
+        // with the Topicmaps plugin.
+        // Currently the Access Control plugin needs to know some Topicmaps internals e.g. the URI of the default
+        // topicmap. ### TODO: make "optional plugin dependencies" an explicit concept. Plugins must be able to ask
+        // the core weather a certain plugin is installed (regardles weather it is activated already) and would wait
+        // for its service only if installed.
         return dms.getTopic("uri", new SimpleValue("dm4.topicmaps.default_topicmap"), false, null);
     }
 
@@ -558,7 +575,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      *
      * If no user is logged in, nothing is performed.
      */
-    private void setupDefaultAccessControl(DeepaMehtaObject object, AccessControlList acl) {
+    private void setupDefaultAccessControl(DeepaMehtaObject object) {
         String username = getUsername();
         //
         if (username == null) {
@@ -567,10 +584,22 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return;
         }
         //
-        setupDefaultAccessControl(object, acl, username);
+        setupAccessControl(object, DEFAULT_OBJECT_ACL, username);
     }
 
-    private void setupDefaultAccessControl(DeepaMehtaObject object, AccessControlList acl, String username) {
+    private void setupDefaultAccessControl(Type type) {
+        String username = getUsername();
+        //
+        if (username == null) {
+            username = fetchDefaultUser().getSimpleValue().toString();
+        }
+        //
+        setupAccessControl(type, DEFAULT_TYPE_ACL, username);
+    }
+
+    // ---
+
+    private void setupAccessControl(DeepaMehtaObject object, AccessControlList acl, String username) {
         setCreator(object.getId(), username);
         setOwner(object.getId(), username);
         createACL(object.getId(), acl);
@@ -683,6 +712,20 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
+    public void enrichWithPermissions(DeepaMehtaObject object, ClientState clientState) {
+        logger.fine("### Enriching " + info(object) + " with its permissions (clientState=" + clientState + ")");
+        enrichWithPermissions(object, hasPermission(getUsername(), Operation.WRITE, object));
+    }
+
+    public void enrichWithPermissions(Type type, ClientState clientState) {
+        logger.fine("### Enriching type \"" + type.getUri() + "\" with its permissions");
+        String username = getUsername();
+        enrichWithPermissions(type, hasPermission(username, Operation.WRITE, type),
+                                    hasPermission(username, Operation.CREATE, type));
+    }
+    
+    // ---
+
     private void enrichWithPermissions(DeepaMehtaObject object, boolean write) {
         // Note: we must extend/override possibly existing permissions.
         // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
@@ -690,10 +733,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         permissions.put(Operation.WRITE.uri, write);
     }
 
-    private void enrichWithPermissions(TopicType topicType, boolean write, boolean create) {
+    private void enrichWithPermissions(Type type, boolean write, boolean create) {
         // Note: we must extend/override possibly existing permissions.
         // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
-        CompositeValue permissions = permissions(topicType);
+        CompositeValue permissions = permissions(type);
         permissions.put(Operation.WRITE.uri, write);
         permissions.put(Operation.CREATE.uri, create);
     }
