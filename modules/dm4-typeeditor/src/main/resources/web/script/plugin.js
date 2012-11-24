@@ -15,6 +15,21 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
         ]
     }
 
+    // Note: no "uri" is set here. A new association type gets its default URI at server-side.
+    var DEFAULT_ASSOC_TYPE = {
+        value: "Association Type Name",
+        data_type_uri: "dm4.core.text",
+        index_mode_uris: ["dm4.core.fulltext"],
+        view_config_topics: [
+            {
+                type_uri: "dm4.webclient.view_config",
+                composite: {
+                    "dm4.webclient.add_to_create_menu": true    // ### FIXME
+                }
+            }
+        ]
+    }
+
     // === Webclient Listeners ===
 
     /**
@@ -39,13 +54,22 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
     })
 
     dm4c.add_listener("post_refresh_create_menu", function(type_menu) {
-        if (!dm4c.has_create_permission("dm4.core.topic_type")) {
-            return
+        var tt = dm4c.has_create_permission("dm4.core.topic_type")
+        var at = dm4c.has_create_permission("dm4.core.assoc_type")
+        //
+        if (tt || at) {
+            type_menu.add_separator()
         }
         //
-        type_menu.add_separator()
-        type_menu.add_item({label: "New Topic Type", handler: function() {
-            dm4c.do_create_topic_type(DEFAULT_TOPIC_TYPE)
-        }})
+        if (tt) {
+            type_menu.add_item({label: "New Topic Type", handler: function() {
+                dm4c.do_create_topic_type(DEFAULT_TOPIC_TYPE)
+            }})
+        }
+        if (at) {
+            type_menu.add_item({label: "New Association Type", handler: function() {
+                dm4c.do_create_association_type(DEFAULT_ASSOC_TYPE)
+            }})
+        }
     })
 })

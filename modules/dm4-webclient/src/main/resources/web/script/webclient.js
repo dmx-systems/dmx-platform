@@ -226,6 +226,13 @@ function Webclient() {
         dm4c.show_topic(topic_type, "edit", undefined, true)    // coordinates=undefined, do_center=true
     }
 
+    this.do_create_association_type = function(assoc_type_model) {
+        // update DB
+        var assoc_type = dm4c.create_association_type(assoc_type_model)
+        // update client model and view
+        dm4c.show_topic(assoc_type, "edit", undefined, true)    // coordinates=undefined, do_center=true
+    }
+
     // ---
 
     /**
@@ -664,6 +671,19 @@ function Webclient() {
         dm4c.fire_event("post_create_topic", topic_type)
         //
         return topic_type
+    }
+
+    this.create_association_type = function(assoc_type_model) {
+        // 1) update DB
+        var assoc_type = build_association_type(dm4c.restc.create_association_type(assoc_type_model))
+        // 2) update client model (type cache)
+        // Note: the type cache must be updated *before* the "post_create_topic" event is fired.
+        // Other plugins might rely on an up-to-date type cache (e.g. the Type Search plugin does). ### FIXDOC
+        type_cache.put_association_type(assoc_type)
+        // 3) fire event
+        dm4c.fire_event("post_create_topic", assoc_type)
+        //
+        return assoc_type
     }
 
 
