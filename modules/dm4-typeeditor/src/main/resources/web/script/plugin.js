@@ -1,3 +1,6 @@
+// ### FIXME: must load *before* the 2 renderers
+dm4c.load_script("/de.deepamehta.typeeditor/script/renderers/page_renderers/helper/type_renderer.js")
+
 dm4c.add_plugin("de.deepamehta.typeeditor", function() {
 
     // Note: no "uri" is set here. A new topic type gets its default URI at server-side.
