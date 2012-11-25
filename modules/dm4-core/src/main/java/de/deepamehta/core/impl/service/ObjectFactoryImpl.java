@@ -47,8 +47,6 @@ import java.util.logging.Logger;
  */
 class ObjectFactoryImpl implements ObjectFactory {
 
-    private static final String DEFAULT_URI_PREFIX = "domain.project.topic_type_";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Map<String, TypeModel> typeCache = new HashMap();
@@ -257,8 +255,8 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // --- Store ---
 
-    void storeType(TypeModel type) {
-        // 1) store the base-topic parts ### FIXME: call storeTopic() instead?
+    void storeType(TypeModel type, String defaultUriPrefix) {
+        // 1) store the base-topic parts ### TODO: call storeTopic() instead?
         dms.storage.createTopic(type);
         associateWithTopicType(type.getId(), type.getTypeUri());
         // Note: the created AttachedTopic is just a temporary vehicle to
@@ -267,7 +265,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         // If no URI is set the type gets a default URI based on its ID.
         // Note: this must be done *after* the topic is created. The ID is not known before.
         if (typeTopic.getUri().equals("")) {
-            typeTopic.setUri(DEFAULT_URI_PREFIX + type.getId());
+            typeTopic.setUri(defaultUriPrefix + type.getId());
         }
         //
         typeTopic.storeAndIndexValue(type.getSimpleValue());

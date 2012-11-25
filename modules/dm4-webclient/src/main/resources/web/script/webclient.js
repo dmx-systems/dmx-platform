@@ -280,6 +280,19 @@ function Webclient() {
         process_directives(directives)
     }
 
+    /**
+     * Updates an association type in the DB and on the GUI.
+     * Fires the "post_update_topic" event (indirectly).
+     *
+     * @param   assoc_type_model    an association type model containing the data to be udpated.
+     */
+    this.do_update_association_type = function(assoc_type_model) {
+        // update DB
+        var directives = dm4c.restc.update_association_type(assoc_type_model)
+        // update GUI (client model and view)
+        process_directives(directives)
+    }
+
     // ---
 
     this.do_retype_topic = function(topic, type_uri) {
@@ -445,6 +458,9 @@ function Webclient() {
             case "UPDATE_ASSOCIATION_TYPE":
                 update_association_type(build_association_type(directive.arg))
                 break
+            case "DELETE_ASSOCIATION_TYPE":
+                remove_association_type(directive.arg.uri)
+                break
             default:
                 throw "WebclientError: \"" + directive.type + "\" is an unsupported directive"
             }
@@ -551,9 +567,17 @@ function Webclient() {
     /**
      * Processes a DELETE_TOPIC_TYPE directive.
      */
-    function remove_topic_type(type_uri) {
+    function remove_topic_type(topic_type_uri) {
         // update client model (type cache)
-        type_cache.remove(type_uri)
+        type_cache.remove_topic_type(topic_type_uri)
+    }
+
+    /**
+     * Processes a DELETE_ASSOCIATION_TYPE directive.
+     */
+    function remove_association_type(assoc_type_uri) {
+        // update client model (type cache)
+        type_cache.remove_association_type(assoc_type_uri)
     }
 
     // ---

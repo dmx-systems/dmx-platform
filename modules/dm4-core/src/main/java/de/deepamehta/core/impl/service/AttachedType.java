@@ -1,14 +1,20 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.AssociationDefinition;
+import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TypeModel;
+import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directives;
+
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +50,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // ***************************
 
 
+
+    // === Model ===
 
     // --- Data Type ---
 
@@ -158,9 +166,119 @@ abstract class AttachedType extends AttachedTopic implements Type {
         return (TypeModel) super.getModel();
     }
 
+
+
+    // === Updating ===
+
+    @Override
+    public void update(TypeModel model, ClientState clientState, Directives directives) {
+        boolean uriChanged = hasUriChanged(model.getUri());
+        if (uriChanged) {
+            removeFromTypeCache();                                                  // abstract
+            addDeleteTypeDirective(directives, new JSONWrapper("uri", getUri()));   // abstract
+        }
+        //
+        super.update(model, clientState, directives);
+        //
+        if (uriChanged) {
+            putInTypeCache();   // abstract
+        }
+        //
+        updateDataTypeUri(model.getDataTypeUri());
+        updateAssocDefs(model.getAssocDefs(), clientState, directives);
+        updateSequence(model.getAssocDefs());
+        updateLabelConfig(model.getLabelConfig());
+    }
+
+
+
+    // ----------------------------------------------------------------------------------------------- Protected Methods
+
+    protected abstract void putInTypeCache();
+
+    protected abstract void removeFromTypeCache();
+
+    // ---
+
+    protected abstract void addDeleteTypeDirective(Directives directives, JSONEnabled arg);
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    // --- Helper ---
+
+
+    // === Update ===
+
+    private boolean hasUriChanged(String newUri) {
+        return newUri != null && !getUri().equals(newUri);
+    }
+
+    // ---
+
+    private void updateDataTypeUri(String newDataTypeUri) {
+        if (newDataTypeUri != null) {
+            String dataTypeUri = getDataTypeUri();
+            if (!dataTypeUri.equals(newDataTypeUri)) {
+                logger.info("### Changing data type URI from \"" + dataTypeUri + "\" -> \"" + newDataTypeUri + "\"");
+                setDataTypeUri(newDataTypeUri);
+            }
+        }
+    }
+
+    // ---
+
+    private void updateAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs, ClientState clientState,
+                                                                                      Directives directives) {
+        for (AssociationDefinitionModel assocDef : newAssocDefs) {
+            getAssocDef(assocDef.getUri()).update(assocDef, clientState, directives);
+        }
+    }
+
+    // ---
+
+    private void updateSequence(Collection<AssociationDefinitionModel> newAssocDefs) {
+        if (!hasSequenceChanged(newAssocDefs)) {
+            return;
+        }
+        logger.info("### Changing assoc def sequence");
+        // update memory
+        getModel().removeAllAssocDefs();
+        for (AssociationDefinitionModel assocDef : newAssocDefs) {
+            getModel().addAssocDef(assocDef);
+        }
+        initAssocDefs();    // attached object cache
+        // update DB
+        dms.objectFactory.rebuildSequence(this);
+    }
+
+    private boolean hasSequenceChanged(Collection<AssociationDefinitionModel> newAssocDefs) {
+        Collection<AssociationDefinition> assocDefs = getAssocDefs();
+        if (assocDefs.size() != newAssocDefs.size()) {
+            throw new RuntimeException("adding/removing of assoc defs not yet supported via updateTopicType() call");
+        }
+        //
+        Iterator<AssociationDefinitionModel> i = newAssocDefs.iterator();
+        for (AssociationDefinition assocDef : assocDefs) {
+            AssociationDefinitionModel newAssocDef = i.next();
+            if (!assocDef.getUri().equals(newAssocDef.getUri())) {
+                return true;
+            }
+        }
+        //
+        return false;
+    }
+
+    // ---
+
+    private void updateLabelConfig(List<String> newLabelConfig) {
+        if (!getLabelConfig().equals(newLabelConfig)) {
+            logger.info("### Changing label configuration");
+            setLabelConfig(newLabelConfig);
+        }
+    }
+
+
+
+    // === Helper ===
 
     /**
      * Returns the last association definition of this type or
@@ -207,5 +325,28 @@ abstract class AttachedType extends AttachedTopic implements Type {
     private void initViewConfig() {
         RoleModel configurable = dms.objectFactory.createConfigurableType(getId());   // ### type ID is uninitialized
         this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Classes
+
+    private class JSONWrapper implements JSONEnabled {
+
+        private JSONObject wrapped;
+
+        private JSONWrapper(String key, Object value) {
+            try {
+                wrapped = new JSONObject();
+                wrapped.put(key, value);
+            } catch (Exception e) {
+                throw new RuntimeException("Constructing a JSONWrapper failed", e);
+            }
+        }
+
+        @Override
+        public JSONObject toJSON() {
+            return wrapped;
+        }
     }
 }

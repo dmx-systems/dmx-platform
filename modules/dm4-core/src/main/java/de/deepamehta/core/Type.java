@@ -81,6 +81,5 @@ public interface Type extends Topic {
 
     // === Updating ===
 
-    // ### TODO: common update logic for topic types and association types
-    // ### void update(TypeModel model, ClientState clientState, Directives directives);
+    void update(TypeModel model, ClientState clientState, Directives directives);
 }

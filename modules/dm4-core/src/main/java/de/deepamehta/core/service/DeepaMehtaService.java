@@ -31,10 +31,10 @@ import java.util.Set;
  * <p>
  * The DeepaMehta core service is a realization of the <i>Inversion of Control</i> pattern.
  * <p>
- * The DeepaMehta core service provides methods to deal with topics, relations, types, commands, and plugins.
+ * The DeepaMehta core service provides methods to deal with topics, associations, types, and plugins.
  * <p>
- * Plugin developer notes: Inside the {@link Plugin} and {@link Migration} classes an instance of the DeepaMehta
- * core service is available through the <code>dms</code> object.
+ * Plugin developer notes: Inside the {@link PluginActivator} and {@link Migration} classes an instance of the
+ * DeepaMehta core service is available through the <code>dms</code> object.
  */
 public interface DeepaMehtaService {
 
@@ -141,6 +141,8 @@ public interface DeepaMehtaService {
     Set<AssociationType> getAllAssociationTypes(ClientState clientState);
 
     AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState);
+
+    Directives updateAssociationType(AssociationTypeModel model, ClientState clientState);
 
 
 
