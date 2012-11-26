@@ -106,13 +106,13 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      */
     private RelatedTopic fetchChildTopic(DeepaMehtaObject object, AssociationDefinition assocDef,
                                                                   boolean fetchComposite) {
-        String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri      = assocDef.getWholeRoleTypeUri();
-        String othersRoleTypeUri  = assocDef.getPartRoleTypeUri();
-        String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
+        String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
+        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();
+        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();
+        String othersTypeUri     = assocDef.getPartTypeUri();
         //
-        return object.getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-            fetchComposite, false, null);
+        return object.getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTypeUri, fetchComposite,
+            false, null);
     }
 
     /**
@@ -123,13 +123,13 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      */
     private Set<RelatedTopic> fetchChildTopics(DeepaMehtaObject object, AssociationDefinition assocDef,
                                                                         boolean fetchComposite) {
-        String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri      = assocDef.getWholeRoleTypeUri();
-        String othersRoleTypeUri  = assocDef.getPartRoleTypeUri();
-        String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
+        String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
+        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();
+        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();
+        String othersTypeUri     = assocDef.getPartTypeUri();
         //
-        return object.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-            fetchComposite, false, 0, null).getItems();
+        return object.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTypeUri, fetchComposite,
+            false, 0, null).getItems();
     }
 
     // ---

@@ -3,7 +3,7 @@
  */
 dm4c.add_plugin("de.deepamehta.webclient.fulltext", function() {
 
-    var SEARCH_FIELD_WIDTH = 20    // in chars
+    var SEARCH_FIELD_WIDTH = 25    // in chars
     var search_field
 
     // === Webclient Listeners ===

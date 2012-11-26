@@ -16,12 +16,12 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.topicmaps.translation_x",
+                    part_type_uri:        "dm4.topicmaps.translation_x",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.topicmaps.translation_y",
+                    part_type_uri:        "dm4.topicmaps.translation_y",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
@@ -42,12 +42,12 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.topicmaps.translation",
+                    part_type_uri:        "dm4.topicmaps.translation",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.topicmaps.zoom_level",
+                    part_type_uri:        "dm4.topicmaps.zoom_level",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }

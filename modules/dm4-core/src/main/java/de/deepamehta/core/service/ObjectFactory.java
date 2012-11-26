@@ -13,7 +13,7 @@ public interface ObjectFactory {
 
     // ---
 
-    Topic fetchWholeTopicType(Association assoc);
+    Topic fetchWholeType(Association assoc);
 
-    Topic fetchPartTopicType(Association assoc);
+    Topic fetchPartType(Association assoc);
 }
