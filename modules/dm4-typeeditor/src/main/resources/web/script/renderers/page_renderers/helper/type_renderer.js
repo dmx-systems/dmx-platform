@@ -50,7 +50,7 @@ function TypeRenderer() {
         function AssociationDefEditor(assoc_def, label_state) {
             var whole_type_label = $("<span>").addClass("label").text(type.value)
             var part_type_label = $("<span>").addClass("label").addClass("part-type-label")
-                .text(dm4c.type_label(assoc_def.part_topic_type_uri))
+                .text(dm4c.type_label(assoc_def.part_type_uri))
             var whole_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.whole_cardinality_uri)
             var part_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.part_cardinality_uri)
             var assoc_type_label = $("<span>").addClass("label").addClass("field-label").text("Association Type")
@@ -92,7 +92,7 @@ function TypeRenderer() {
                 return {
                     assoc_def: {
                         id:                    assoc_def.id,
-                        part_topic_type_uri:   assoc_def.part_topic_type_uri,
+                        part_type_uri:         assoc_def.part_type_uri,
                         part_cardinality_uri:  part_card_menu.get_selection().value,
                         whole_cardinality_uri: whole_card_menu.get_selection().value,
                         assoc_type_uri:        assoc_type_menu.get_selection().value
@@ -131,7 +131,7 @@ function TypeRenderer() {
                     var assoc_def = editor_model.assoc_def
                     assoc_defs.push(assoc_def)
                     if (editor_model.label_state) {
-                        label_config.push(assoc_def.part_topic_type_uri)
+                        label_config.push(assoc_def.part_type_uri)
                     }
                 })
                 return {

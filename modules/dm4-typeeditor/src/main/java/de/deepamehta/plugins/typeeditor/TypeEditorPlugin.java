@@ -2,7 +2,7 @@ package de.deepamehta.plugins.typeeditor;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.TopicType;
+import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Directive;
@@ -34,37 +34,20 @@ public class TypeEditorPlugin extends PluginActivator implements PostRetypeAssoc
     @Override
     public void postRetypeAssociation(Association assoc, String oldTypeUri, Directives directives) {
         if (isAssocDef(assoc.getTypeUri())) {
-            // update/create assoc def
-            AssociationDefinitionModel assocDef;
-            String topicTypeUri;
-            TopicType topicType;
             if (isAssocDef(oldTypeUri)) {
-                assocDef = dms.getObjectFactory().fetchAssociationDefinition(assoc);
-                topicTypeUri = assocDef.getWholeTypeUri();
-                topicType = dms.getTopicType(topicTypeUri, null);
-                logger.info("### Updating association definition \"" + assocDef.getUri() +
-                    "\" of topic type \"" + topicTypeUri + "\" (" + assocDef + ")");
-                topicType.updateAssocDef(assocDef);
+                updateAssocDef(assoc, directives);
             } else {
-                assocDef = buildAssocDefModel(assoc);
-                topicTypeUri = assocDef.getWholeTypeUri();
-                topicType = dms.getTopicType(topicTypeUri, null);
-                logger.info("### Adding association definition \"" + assocDef.getUri() +
-                    "\" to topic type \"" + topicTypeUri + "\" (" + assocDef + ")");
-                topicType.addAssocDef(assocDef);
+                createAssocDef(assoc, directives);
             }
-            directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
         } else if (isAssocDef(oldTypeUri)) {
-            TopicType topicType = removeAssocDef(assoc);
-            directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
+            removeAssocDef(assoc, directives);
         }
     }
 
     @Override
     public void postDeleteAssociation(Association assoc, Directives directives) {
         if (isAssocDef(assoc.getTypeUri())) {
-            TopicType topicType = removeAssocDef(assoc);
-            directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
+            removeAssocDef(assoc, directives);
         }
     }
 
@@ -72,34 +55,74 @@ public class TypeEditorPlugin extends PluginActivator implements PostRetypeAssoc
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private AssociationDefinitionModel buildAssocDefModel(Association assoc) {
-        String wholeTypeUri = fetchWholeType(assoc).getUri();
-        String partTypeUri  = fetchPartType(assoc).getUri();
+    private void createAssocDef(Association assoc, Directives directives) {
+        Type wholeType = fetchWholeType(assoc);
+        String partTypeUri = fetchPartType(assoc).getUri();
         // Note: the assoc def's ID is already known. Setting it explicitely
         // prevents the core from creating the underlying association.
-        return new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(), wholeTypeUri, partTypeUri,
-            "dm4.core.one", "dm4.core.one", null);  // viewConfigModel=null
+        AssociationDefinitionModel assocDef = new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
+            wholeType.getUri(), partTypeUri, "dm4.core.one", "dm4.core.one", null);  // viewConfigModel=null;
+        logger.info("### Adding association definition \"" + partTypeUri + "\" to type \"" + wholeType.getUri() +
+            "\" (" + assocDef + ")");
+        //
+        wholeType.addAssocDef(assocDef);
+        //
+        addUpdateTypeDirective(wholeType, directives);
     }
 
-    private TopicType removeAssocDef(Association assoc) {
-        String wholeTypeUri = fetchWholeType(assoc).getUri();
-        String partTypeUri  = fetchPartType(assoc).getUri();
-        TopicType topicType = dms.getTopicType(wholeTypeUri, null);
-        logger.info("### Removing association definition \"" + partTypeUri +
-            "\" from topic type \"" + wholeTypeUri + "\"");
-        topicType.removeAssocDef(partTypeUri);
-        return topicType;
+    private void updateAssocDef(Association assoc, Directives directives) {
+        Type wholeType = fetchWholeType(assoc);
+        AssociationDefinitionModel assocDef = dms.getObjectFactory().fetchAssociationDefinition(assoc);
+        logger.info("### Updating association definition \"" + assocDef.getUri() + "\" of type \"" +
+            wholeType.getUri() + "\" (" + assocDef + ")");
+        //
+        wholeType.updateAssocDef(assocDef);
+        //
+        addUpdateTypeDirective(wholeType, directives);
     }
+
+    private void removeAssocDef(Association assoc, Directives directives) {
+        Type wholeType = fetchWholeType(assoc);
+        String partTypeUri = fetchPartType(assoc).getUri();
+        logger.info("### Removing association definition \"" + partTypeUri + "\" from type \"" + wholeType.getUri() +
+            "\"");
+        //
+        wholeType.removeAssocDef(partTypeUri);
+        //
+        addUpdateTypeDirective(wholeType, directives);
+    }
+
+
+
+    // === Helper ===
 
     private boolean isAssocDef(String assocTypeUri) {
         return assocTypeUri.equals("dm4.core.aggregation_def") ||
                assocTypeUri.equals("dm4.core.composition_def");
     }
 
+    private void addUpdateTypeDirective(Type type, Directives directives) {
+        if (type.getTypeUri().equals("dm4.core.topic_type")) {
+            directives.add(Directive.UPDATE_TOPIC_TYPE, type);
+        } else if (type.getTypeUri().equals("dm4.core.assoc_type")) {
+            directives.add(Directive.UPDATE_ASSOCIATION_TYPE, type);
+        }
+        // Note: no else here as error check already performed in fetchWholeType()
+    }
+
     // ---
 
-    private Topic fetchWholeType(Association assoc) {
-        return dms.getObjectFactory().fetchWholeType(assoc);
+    private Type fetchWholeType(Association assoc) {
+        Topic type = dms.getObjectFactory().fetchWholeType(assoc);
+        String typeUri = type.getTypeUri();
+        if (typeUri.equals("dm4.core.topic_type")) {
+            return dms.getTopicType(type.getUri(), null);
+        } else if (typeUri.equals("dm4.core.assoc_type")) {
+            return dms.getAssociationType(type.getUri(), null);
+        } else {
+            throw new RuntimeException("Invalid association definition: the dm4.core.whole_type " +
+                "player is not a type but of type \"" + typeUri + "\" (" + assoc + ")");
+        }
     }
 
     private Topic fetchPartType(Association assoc) {
