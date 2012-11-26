@@ -45,16 +45,14 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         return getModel().getInstanceLevelAssocTypeUri();
     }
 
-    // ### FIXME: wording should be "getWholeTypeUri".
-    // Also association types have association definitions
     @Override
-    public String getWholeTopicTypeUri() {
-        return getModel().getWholeTopicTypeUri();
+    public String getWholeTypeUri() {
+        return getModel().getWholeTypeUri();
     }
 
     @Override
-    public String getPartTopicTypeUri() {
-        return getModel().getPartTopicTypeUri();
+    public String getPartTypeUri() {
+        return getModel().getPartTypeUri();
     }
 
     @Override

@@ -21,17 +21,17 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.core.plugin_name",
+                    part_type_uri:        "dm4.core.plugin_name",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.core.plugin_symbolic_name",
+                    part_type_uri:        "dm4.core.plugin_symbolic_name",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.core.plugin_migration_nr",
+                    part_type_uri:        "dm4.core.plugin_migration_nr",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }

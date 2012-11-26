@@ -6,7 +6,7 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:   "dm4.webbrowser.url",
+                    part_type_uri:         "dm4.webbrowser.url",
                     part_cardinality_uri:  "dm4.core.one",
                     whole_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:        "dm4.core.aggregation_def"

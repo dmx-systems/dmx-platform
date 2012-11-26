@@ -16,7 +16,7 @@ dm4c.add_plugin("de.deepamehta.facets", function() {
             var facet_type = dm4c.get_topic_type(facet_types[i].uri)
             // compare to TopicRenderer.create_page_model
             var assoc_def = facet_type.assoc_defs[0]
-            var child_topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
+            var child_topic_type = dm4c.get_topic_type(assoc_def.part_type_uri)
             var child_field_uri = dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
             // ### TODO: cardinality many
             var child_topic = topic.composite[assoc_def.uri] || dm4c.empty_topic(child_topic_type.uri)

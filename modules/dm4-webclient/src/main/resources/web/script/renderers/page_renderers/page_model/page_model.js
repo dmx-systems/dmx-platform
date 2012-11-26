@@ -179,7 +179,7 @@ dm4c.render.page_model = (function() {
             } else {
                 var page_model = new PageModel(PageModel.COMPOSITE, object, assoc_def, field_uri, toplevel_object)
                 for (var i = 0, assoc_def; assoc_def = object_type.assoc_defs[i]; i++) {
-                    var child_topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
+                    var child_topic_type = dm4c.get_topic_type(assoc_def.part_type_uri)
                     //
                     if (!dm4c.get_view_config(child_topic_type, render_mode.render_setting, assoc_def)) {
                         continue

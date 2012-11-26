@@ -682,25 +682,25 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
     private RelatedTopic fetchChildTopic(AssociationDefinition assocDef, boolean fetchComposite) {
-        String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri      = assocDef.getWholeRoleTypeUri();
-        String othersRoleTypeUri  = assocDef.getPartRoleTypeUri();
-        String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
+        String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
+        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();
+        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();
+        String othersTypeUri     = assocDef.getPartTypeUri();
         //
-        return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, fetchComposite,
+        return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTypeUri, fetchComposite,
             false, null);
     }
 
     // ---
 
     private ResultSet<RelatedTopic> fetchChildTopics(AssociationDefinition assocDef, boolean fetchComposite) {
-        String assocTypeUri       = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri      = assocDef.getWholeRoleTypeUri();
-        String othersRoleTypeUri  = assocDef.getPartRoleTypeUri();
-        String othersTopicTypeUri = assocDef.getPartTopicTypeUri();
+        String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
+        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();
+        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();
+        String othersTypeUri     = assocDef.getPartTypeUri();
         //
-        return getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-            fetchComposite, false, 0, null);
+        return getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTypeUri, fetchComposite,
+            false, 0, null);
     }
 
     // ---
@@ -734,7 +734,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 }
             } else {
                 // create child topic
-                String topicTypeUri = assocDef.getPartTopicTypeUri();
+                String topicTypeUri = assocDef.getPartTypeUri();
                 childTopic = dms.createTopic(new TopicModel(topicTypeUri, value), null);  // ### FIXME: clientState=null
                 // associate child topic
                 associateChildTopic(assocDef, childTopic.getId(), null);                  // ### FIXME: clientState=null

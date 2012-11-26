@@ -40,14 +40,14 @@ public class TypeEditorPlugin extends PluginActivator implements PostRetypeAssoc
             TopicType topicType;
             if (isAssocDef(oldTypeUri)) {
                 assocDef = dms.getObjectFactory().fetchAssociationDefinition(assoc);
-                topicTypeUri = assocDef.getWholeTopicTypeUri();
+                topicTypeUri = assocDef.getWholeTypeUri();
                 topicType = dms.getTopicType(topicTypeUri, null);
                 logger.info("### Updating association definition \"" + assocDef.getUri() +
                     "\" of topic type \"" + topicTypeUri + "\" (" + assocDef + ")");
                 topicType.updateAssocDef(assocDef);
             } else {
                 assocDef = buildAssocDefModel(assoc);
-                topicTypeUri = assocDef.getWholeTopicTypeUri();
+                topicTypeUri = assocDef.getWholeTypeUri();
                 topicType = dms.getTopicType(topicTypeUri, null);
                 logger.info("### Adding association definition \"" + assocDef.getUri() +
                     "\" to topic type \"" + topicTypeUri + "\" (" + assocDef + ")");
@@ -73,21 +73,21 @@ public class TypeEditorPlugin extends PluginActivator implements PostRetypeAssoc
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private AssociationDefinitionModel buildAssocDefModel(Association assoc) {
-        String wholeTopicTypeUri = fetchWholeTopicType(assoc).getUri();
-        String partTopicTypeUri  = fetchPartTopicType(assoc).getUri();
+        String wholeTypeUri = fetchWholeType(assoc).getUri();
+        String partTypeUri  = fetchPartType(assoc).getUri();
         // Note: the assoc def's ID is already known. Setting it explicitely
         // prevents the core from creating the underlying association.
-        return new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(), wholeTopicTypeUri, partTopicTypeUri,
+        return new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(), wholeTypeUri, partTypeUri,
             "dm4.core.one", "dm4.core.one", null);  // viewConfigModel=null
     }
 
     private TopicType removeAssocDef(Association assoc) {
-        String wholeTopicTypeUri = fetchWholeTopicType(assoc).getUri();
-        String partTopicTypeUri  = fetchPartTopicType(assoc).getUri();
-        TopicType topicType = dms.getTopicType(wholeTopicTypeUri, null);
-        logger.info("### Removing association definition \"" + partTopicTypeUri +
-            "\" from topic type \"" + wholeTopicTypeUri + "\"");
-        topicType.removeAssocDef(partTopicTypeUri);
+        String wholeTypeUri = fetchWholeType(assoc).getUri();
+        String partTypeUri  = fetchPartType(assoc).getUri();
+        TopicType topicType = dms.getTopicType(wholeTypeUri, null);
+        logger.info("### Removing association definition \"" + partTypeUri +
+            "\" from topic type \"" + wholeTypeUri + "\"");
+        topicType.removeAssocDef(partTypeUri);
         return topicType;
     }
 
@@ -98,11 +98,11 @@ public class TypeEditorPlugin extends PluginActivator implements PostRetypeAssoc
 
     // ---
 
-    private Topic fetchWholeTopicType(Association assoc) {
-        return dms.getObjectFactory().fetchWholeTopicType(assoc);
+    private Topic fetchWholeType(Association assoc) {
+        return dms.getObjectFactory().fetchWholeType(assoc);
     }
 
-    private Topic fetchPartTopicType(Association assoc) {
-        return dms.getObjectFactory().fetchPartTopicType(assoc);
+    private Topic fetchPartType(Association assoc) {
+        return dms.getObjectFactory().fetchPartType(assoc);
     }
 }
