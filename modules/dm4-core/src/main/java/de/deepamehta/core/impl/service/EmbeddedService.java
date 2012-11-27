@@ -550,6 +550,8 @@ public class EmbeddedService implements DeepaMehtaService {
             AttachedAssociationType assocType = new AttachedAssociationType(model, this);
             typeCache.put(assocType);
             //
+            fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType, clientState);
+            //
             tx.success();
             return assocType;
         } catch (Exception e) {

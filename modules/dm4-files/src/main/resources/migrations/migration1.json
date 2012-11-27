@@ -46,27 +46,27 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.files.file_content",
+                    part_type_uri:        "dm4.files.file_content",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.files.file_name",
+                    part_type_uri:        "dm4.files.file_name",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.files.path",
+                    part_type_uri:        "dm4.files.path",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.files.media_type",
+                    part_type_uri:        "dm4.files.media_type",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.files.size",
+                    part_type_uri:        "dm4.files.size",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
@@ -113,17 +113,17 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.files.folder_name",
+                    part_type_uri:        "dm4.files.folder_name",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.files.path",
+                    part_type_uri:        "dm4.files.path",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.files.folder_content",
+                    part_type_uri:        "dm4.files.folder_content",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }

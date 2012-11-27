@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -29,18 +30,14 @@ import org.osgi.util.tracker.ServiceTracker;
 import java.io.InputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
-import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -481,33 +478,26 @@ public class PluginImpl implements Plugin, EventHandler {
 
     /**
      * Installs the plugin in the database. This comprises:
-     *   1) create topic of type "Plugin"
+     *   1) create "Plugin" topic
      *   2) run migrations
-     *   3) trigger the plugin's postInstall() hook
-     *   4) fire the {@link CoreEvent.INTRODUCE_TOPIC_TYPE} event (multiple times)
+     *   3) post installation (triggers the plugin's postInstall() hook)
+     *   4) type introduction (fires the {@link CoreEvent.INTRODUCE_TOPIC_TYPE} and
+     *                                   {@link CoreEvent.INTRODUCE_ASSOCIATION_TYPE} events)
      */
     void installPluginInDB() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            boolean isCleanInstall;
             // 1) create "Plugin" topic
-            pluginTopic = fetchPluginTopic();
-            if (pluginTopic != null) {
-                logger.info("Installing " + this + " in the database ABORTED -- already installed");
-                isCleanInstall = false;
-            } else {
-                logger.info("Installing " + this + " in the database");
-                createPluginTopic();
-                isCleanInstall = true;
-            }
+            boolean isCleanInstall = createPluginTopicIfNotExists();
             // 2) run migrations
             dms.migrationManager.runPluginMigrations(this, isCleanInstall);
             //
             if (isCleanInstall) {
-                // 3) post install
+                // 3) post installation
                 pluginContext.postInstall();
                 // 4) type introduction
-                introduceTypesToPlugin();
+                introduceTopicTypesToPlugin();
+                introduceAssociationTypesToPlugin();
             }
             //
             tx.success();
@@ -519,13 +509,26 @@ public class PluginImpl implements Plugin, EventHandler {
         }
     }
 
+    private boolean createPluginTopicIfNotExists() {
+        pluginTopic = fetchPluginTopic();
+        //
+        if (pluginTopic != null) {
+            logger.info("Installing " + this + " in the database ABORTED -- already installed");
+            return false;
+        }
+        //
+        logger.info("Installing " + this + " in the database");
+        pluginTopic = createPluginTopic();
+        return true;
+    }
+
     /**
      * Creates a Plugin topic in the DB.
      * <p>
      * A Plugin topic represents an installed plugin and is used to track its version.
      */
-    private void createPluginTopic() {
-        pluginTopic = dms.createTopic(new TopicModel(pluginUri, "dm4.core.plugin", new CompositeValue()
+    private Topic createPluginTopic() {
+        return dms.createTopic(new TopicModel(pluginUri, "dm4.core.plugin", new CompositeValue()
             .put("dm4.core.plugin_name", pluginName)
             .put("dm4.core.plugin_symbolic_name", pluginUri)
             .put("dm4.core.plugin_migration_nr", 0)
@@ -536,7 +539,9 @@ public class PluginImpl implements Plugin, EventHandler {
         return dms.getTopic("uri", new SimpleValue(pluginUri), false, null);        // fetchComposite=false
     }
 
-    private void introduceTypesToPlugin() {
+    // ---
+
+    private void introduceTopicTypesToPlugin() {
         try {
             for (String topicTypeUri : dms.getTopicTypeUris()) {
                 // ### TODO: explain
@@ -544,11 +549,22 @@ public class PluginImpl implements Plugin, EventHandler {
                     continue;
                 }
                 //
-                TopicType topicType = dms.getTopicType(topicTypeUri, null);     // clientState=null
-                fireEventLocally(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);  // clientState=null
+                TopicType topicType = dms.getTopicType(topicTypeUri, null);                 // clientState=null
+                fireEventLocally(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);          // clientState=null
             }
         } catch (Exception e) {
             throw new RuntimeException("Introducing topic types to " + this + " failed", e);
+        }
+    }
+
+    private void introduceAssociationTypesToPlugin() {
+        try {
+            for (String assocTypeUri : dms.getAssociationTypeUris()) {
+                AssociationType assocType = dms.getAssociationType(assocTypeUri, null);     // clientState=null
+                fireEventLocally(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType, null);    // clientState=null
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Introducing association types to " + this + " failed", e);
         }
     }
 

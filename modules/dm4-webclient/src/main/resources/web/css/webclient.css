@@ -12,7 +12,8 @@ body {
 
 #main-toolbar input[type=text] {
     margin: 0;
-    height: 1.3em;
+    height: 1.4em;
+    font-size: 75%;
 }
 
 #search-widget {

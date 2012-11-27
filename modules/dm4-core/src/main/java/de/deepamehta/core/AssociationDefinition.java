@@ -16,9 +16,9 @@ public interface AssociationDefinition extends Association {
 
     String getInstanceLevelAssocTypeUri();
 
-    String getWholeTopicTypeUri();
+    String getWholeTypeUri();
 
-    String getPartTopicTypeUri();
+    String getPartTypeUri();
 
     String getWholeRoleTypeUri();
 

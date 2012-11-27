@@ -390,16 +390,16 @@ class ObjectFactoryImpl implements ObjectFactory {
         // Note: "othersTopicTypeUri" is set to null. We want consider "dm4.core.topic_type" and "dm4.core.meta_type"
         // as well (the latter required e.g. by dm4-mail) ### TODO: add a getRelatedTopics() method that takes a list
         // of topic types.
-        ResultSet<RelatedTopic> partTopicTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
+        ResultSet<RelatedTopic> partTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
             "dm4.core.composition_def"), "dm4.core.whole_type", "dm4.core.part_type", null, false, false, 0, null);
             // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=false, clientState=null
         //
         // 2) create association definitions
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
         // subsequently build from it by sorting the assoc def's according to the sequence IDs.
-        for (RelatedTopic partTopicType : partTopicTypes) {
-            AssociationDefinitionModel assocDef = fetchAssociationDefinition(partTopicType.getAssociation(),
-                typeTopic.getUri(), partTopicType.getUri());
+        for (RelatedTopic partType : partTypes) {
+            AssociationDefinitionModel assocDef = fetchAssociationDefinition(partType.getAssociation(),
+                typeTopic.getUri(), partType.getUri());
             assocDefs.put(assocDef.getId(), assocDef);
         }
         return assocDefs;
@@ -409,20 +409,19 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     @Override
     public AssociationDefinitionModel fetchAssociationDefinition(Association assoc) {
-        return fetchAssociationDefinition(assoc, fetchWholeTopicType(assoc).getUri(),
-                                                 fetchPartTopicType(assoc).getUri());
+        return fetchAssociationDefinition(assoc, fetchWholeType(assoc).getUri(), fetchPartType(assoc).getUri());
     }
 
-    private AssociationDefinitionModel fetchAssociationDefinition(Association assoc, String wholeTopicTypeUri,
-                                                                                     String partTopicTypeUri) {
+    private AssociationDefinitionModel fetchAssociationDefinition(Association assoc, String wholeTypeUri,
+                                                                                     String partTypeUri) {
         try {
             long assocId = assoc.getId();
-            return new AssociationDefinitionModel(assocId, assoc.getTypeUri(), wholeTopicTypeUri, partTopicTypeUri,
+            return new AssociationDefinitionModel(assocId, assoc.getTypeUri(), wholeTypeUri, partTypeUri,
                 fetchWholeCardinality(assocId).getUri(), fetchPartCardinality(assocId).getUri(),
                 fetchAssocDefViewConfig(assoc));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching association definition failed (wholeTopicTypeUri=\"" +
-                wholeTopicTypeUri + "\", partTopicTypeUri=" + partTopicTypeUri + ", " + assoc + ")", e);
+            throw new RuntimeException("Fetching association definition failed (wholeTypeUri=\"" + wholeTypeUri +
+                "\", partTypeUri=" + partTypeUri + ", " + assoc + ")", e);
         }
     }
 
@@ -471,7 +470,7 @@ class ObjectFactoryImpl implements ObjectFactory {
             storeViewConfig(createConfigurableAssocDef(assocDefId), assocDef.getViewConfigModel());
         } catch (Exception e) {
             throw new RuntimeException("Storing association definition \"" + assocDef.getUri() +
-                "\" of type \"" + assocDef.getWholeTopicTypeUri() + "\" failed", e);
+                "\" of type \"" + assocDef.getWholeTypeUri() + "\" failed", e);
         }
     }
 
@@ -482,7 +481,7 @@ class ObjectFactoryImpl implements ObjectFactory {
     // --- Fetch ---
 
     @Override
-    public Topic fetchWholeTopicType(Association assoc) {
+    public Topic fetchWholeType(Association assoc) {
         Topic wholeTypeTopic = assoc.getTopic("dm4.core.whole_type");
         // error check
         if (wholeTypeTopic == null) {
@@ -494,7 +493,7 @@ class ObjectFactoryImpl implements ObjectFactory {
     }
 
     @Override
-    public Topic fetchPartTopicType(Association assoc) {
+    public Topic fetchPartType(Association assoc) {
         Topic partTypeTopic = assoc.getTopic("dm4.core.part_type");
         // error check
         if (partTypeTopic == null) {

@@ -18,12 +18,12 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:   "dm4.webbrowser.url",
-                    part_cardinality_uri:  "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    part_type_uri:        "dm4.webbrowser.url",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webbrowser.web_resource_description",
+                    part_type_uri:        "dm4.webbrowser.web_resource_description",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }

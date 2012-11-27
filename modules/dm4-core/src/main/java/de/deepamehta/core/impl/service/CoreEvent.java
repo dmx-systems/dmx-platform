@@ -62,9 +62,15 @@ enum CoreEvent {
 
     // This event has a double nature:
     //   a) it is fired regularily (see EmbeddedService.createTopicType()).
-    //   b) it is fired locally (see PluginImpl.introduceTypesToPlugin()).
+    //   b) it is fired locally (see PluginImpl.introduceTopicTypesToPlugin()).
     INTRODUCE_TOPIC_TYPE(IntroduceTopicTypeListener.class,
-        "introduceTopicType", TopicType.class, ClientState.class);
+        "introduceTopicType", TopicType.class, ClientState.class),
+    // This event has a double nature:
+    //   a) it is fired regularily (see EmbeddedService.createAssociationType()).
+    //   b) it is fired locally (see PluginImpl.introduceAssociationTypesToPlugin()).
+    INTRODUCE_ASSOCIATION_TYPE(IntroduceAssociationTypeListener.class,
+        "introduceAssociationType", AssociationType.class, ClientState.class);
+
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 

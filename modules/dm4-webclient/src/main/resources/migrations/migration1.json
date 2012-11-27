@@ -59,53 +59,53 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:   "dm4.webclient.icon",
+                    part_type_uri:         "dm4.webclient.icon",
                     part_cardinality_uri:  "dm4.core.one",
                     whole_cardinality_uri: "dm4.core.many",
                     assoc_type_uri:        "dm4.core.aggregation_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webclient.color",
+                    part_type_uri:        "dm4.webclient.color",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webclient.add_to_create_menu",
+                    part_type_uri:        "dm4.webclient.add_to_create_menu",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webclient.is_searchable_unit",
+                    part_type_uri:        "dm4.webclient.is_searchable_unit",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webclient.editable",
+                    part_type_uri:        "dm4.webclient.editable",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webclient.viewable",
+                    part_type_uri:        "dm4.webclient.viewable",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webclient.page_renderer_uri",
+                    part_type_uri:        "dm4.webclient.page_renderer_uri",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webclient.simple_renderer_uri",
+                    part_type_uri:        "dm4.webclient.simple_renderer_uri",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webclient.multi_renderer_uri",
+                    part_type_uri:        "dm4.webclient.multi_renderer_uri",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webclient.rows",
+                    part_type_uri:        "dm4.webclient.rows",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
@@ -141,12 +141,12 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.webclient.search_term",
+                    part_type_uri:        "dm4.webclient.search_term",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.webclient.search_result",
+                    part_type_uri:        "dm4.webclient.search_result",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }

@@ -28,8 +28,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertEquals("dm4.core.composite",  topicType.getDataTypeUri());
         assertEquals(3,                     topicType.getAssocDefs().size());
         AssociationDefinition assocDef =    topicType.getAssocDef("dm4.core.plugin_migration_nr");
-        assertEquals("dm4.core.plugin",              assocDef.getWholeTopicTypeUri());
-        assertEquals("dm4.core.plugin_migration_nr", assocDef.getPartTopicTypeUri());
+        assertEquals("dm4.core.plugin",              assocDef.getWholeTypeUri());
+        assertEquals("dm4.core.plugin_migration_nr", assocDef.getPartTypeUri());
         assertEquals("dm4.core.plugin_migration_nr", assocDef.getUri());
         assertEquals("dm4.core.one",                 assocDef.getWholeCardinalityUri());
         assertEquals("dm4.core.one",                 assocDef.getPartCardinalityUri());

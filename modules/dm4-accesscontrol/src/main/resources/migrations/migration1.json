@@ -20,12 +20,12 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.accesscontrol.username",
+                    part_type_uri:        "dm4.accesscontrol.username",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.accesscontrol.password",
+                    part_type_uri:        "dm4.accesscontrol.password",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
