@@ -2,14 +2,11 @@ package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.AssociationTypeModel;
-import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicTypeModel;
 
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -56,20 +53,27 @@ class TypeCache {
 
     // ---
 
-    void put(TopicType topicType) {
+    void putTopicType(TopicType topicType) {
         topicTypes.put(topicType.getUri(), topicType);
     }
 
-    void put(AssociationType assocType) {
+    void putAssociationType(AssociationType assocType) {
         assocTypes.put(assocType.getUri(), assocType);
     }
 
     // ---
 
-    void invalidate(String topicTypeUri) {
-        logger.info("### Invalidating topic type \"" + topicTypeUri + "\"");
+    void removeTopicType(String topicTypeUri) {
+        logger.info("### Removing topic type \"" + topicTypeUri + "\" from type cache");
         if (topicTypes.remove(topicTypeUri) == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found in type cache");
+        }
+    }
+
+    void removeAssociationType(String assocTypeUri) {
+        logger.info("### Removing association type \"" + assocTypeUri + "\" from type cache");
+        if (assocTypes.remove(assocTypeUri) == null) {
+            throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found in type cache");
         }
     }
 
@@ -82,7 +86,7 @@ class TypeCache {
         TopicTypeModel model = dms.objectFactory.getTopicType(topicTypeUri);
         TopicType topicType = new AttachedTopicType(model, dms);
         // put in type cache
-        put(topicType);
+        putTopicType(topicType);
         //
         return topicType;
     }
@@ -94,7 +98,7 @@ class TypeCache {
         AssociationTypeModel model = dms.objectFactory.getAssociationType(assocTypeUri);
         AssociationType assocType = new AttachedAssociationType(model, dms);
         // put in type cache
-        put(assocType);
+        putAssociationType(assocType);
         //
         return assocType;
     }

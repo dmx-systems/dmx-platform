@@ -10,5 +10,5 @@ public interface AssociationType extends Type {
 
     // === Updating ===
 
-    // ### TODO: void update(AssociationTypeModel model, ClientState clientState, Directives directives);
+    void update(AssociationTypeModel model, ClientState clientState, Directives directives);
 }

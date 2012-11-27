@@ -203,6 +203,14 @@ function RESTClient(core_service_uri) {
         request("GET", "/assoctype/all", undefined, callback)
     }
 
+    this.create_association_type = function(assoc_type_model) {
+        return request("POST", "/assoctype", assoc_type_model)
+    }
+
+    this.update_association_type = function(assoc_type_model) {
+        return request("PUT", "/assoctype", assoc_type_model)
+    }
+
 
 
     // === Plugins ===

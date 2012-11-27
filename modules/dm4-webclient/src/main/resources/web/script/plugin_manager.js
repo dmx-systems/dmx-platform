@@ -183,6 +183,10 @@ function PluginManager(config) {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
+    /**
+     * Counts the items which are loaded asynchronously and which are subject of load tracking.
+     * Note: the helper files are not taken into account here.
+     */
     function count_items_to_load(plugin_list) {
         var count = 0
         for (var i = 0, plugin; plugin = plugin_list[i]; i++) {
@@ -222,26 +226,42 @@ function PluginManager(config) {
     }
 
     function load_plugin(plugin) {
-        // 1) load plugin file
-        if (plugin.has_plugin_file) {
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_uri +
-                "\" -- has plugin file")
-            var plugin_file = "/" + plugin.plugin_uri + "/script/plugin.js"
+        var plugin_uri = plugin.plugin_uri
+        //
+        load_helper_files(plugin_uri, plugin.helper)
+        //
+        load_plugin_file_if_exists(plugin_uri, plugin.has_plugin_file)
+        //
+        load_renderers(plugin_uri, "page_renderers",   plugin.renderers.page_renderers)
+        load_renderers(plugin_uri, "simple_renderers", plugin.renderers.simple_renderers)
+        load_renderers(plugin_uri, "multi_renderers",  plugin.renderers.multi_renderers)
+        // ### load_renderers(plugin_uri, "topicmap_renderers", plugin.renderers.topicmap_renderers)
+        //
+        load_stylesheets(plugin_uri, plugin.stylesheets)
+    }
+
+    function load_helper_files(plugin_uri, helper_files) {
+        for (var i = 0, helper_file; helper_file = helper_files[i]; i++) {
+            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... Loading helper file " + helper_file)
+            helper_file = "/" + plugin_uri + "/script/helper/" + helper_file
+            // Note: helper files are loaded synchronously
+            dm4c.load_script(helper_file)
+        }
+    }
+
+    function load_plugin_file_if_exists(plugin_uri, has_plugin_file) {
+        if (has_plugin_file) {
+            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin_uri + "\" -- has plugin file")
+            var plugin_file = "/" + plugin_uri + "/script/plugin.js"
             if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + plugin_file)
             load_plugin_file(plugin_file)
         } else {
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin.plugin_uri +
-                "\" -- no plugin file to be loaded")
+            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin_uri + "\" -- no plugin file to be loaded")
         }
-        //
-        // 2) load renderers
-        load_renderers(plugin.plugin_uri, "page_renderers",   plugin.renderers.page_renderers)
-        load_renderers(plugin.plugin_uri, "simple_renderers", plugin.renderers.simple_renderers)
-        load_renderers(plugin.plugin_uri, "multi_renderers",  plugin.renderers.multi_renderers)
-        // ### load_renderers(plugin.plugin_uri, "topicmap_renderers", plugin.renderers.topicmap_renderers)
-        //
-        // 3) load stylesheets
-        load_stylesheets(plugin.plugin_uri, plugin.stylesheets)
+    }
+
+    function load_plugin_file(plugin_file) {
+        dm4c.load_script(plugin_file, true)         // async=true
     }
 
     function load_renderers(plugin_uri, renderer_type, renderer_files) {
@@ -251,12 +271,6 @@ function PluginManager(config) {
             dm4c.load_script(renderer_file, true)   // async=true
         }
     }
-
-    function load_plugin_file(plugin_file) {
-        dm4c.load_script(plugin_file, true)         // async=true
-    }
-
-    // ---
 
     function load_stylesheets(plugin_uri, stylesheets) {
         for (var i = 0, stylesheet; stylesheet = stylesheets[i]; i++) {

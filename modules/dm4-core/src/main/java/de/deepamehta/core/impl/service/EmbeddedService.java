@@ -45,6 +45,11 @@ import java.util.logging.Logger;
  */
 public class EmbeddedService implements DeepaMehtaService {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String DEFAULT_TOPIC_TYPE_URI = "domain.project.topic_type_";
+    private static final String DEFAULT_ASSOCIATION_TYPE_URI = "domain.project.assoc_type_";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     DeepaMehtaStorage storage;
@@ -451,9 +456,9 @@ public class EmbeddedService implements DeepaMehtaService {
     public TopicType createTopicType(TopicTypeModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            objectFactory.storeType(model);
+            objectFactory.storeType(model, DEFAULT_TOPIC_TYPE_URI);
             AttachedTopicType topicType = new AttachedTopicType(model, this);
-            typeCache.put(topicType);
+            typeCache.putTopicType(topicType);
             //
             fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, clientState);
             //
@@ -546,9 +551,9 @@ public class EmbeddedService implements DeepaMehtaService {
     public AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            objectFactory.storeType(model);
+            objectFactory.storeType(model, DEFAULT_ASSOCIATION_TYPE_URI);
             AttachedAssociationType assocType = new AttachedAssociationType(model, this);
-            typeCache.put(assocType);
+            typeCache.putAssociationType(assocType);
             //
             fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType, clientState);
             //
@@ -558,6 +563,27 @@ public class EmbeddedService implements DeepaMehtaService {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Creating association type \"" + model.getUri() + "\" failed (" + model + ")",
                 e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Override
+    public Directives updateAssociationType(AssociationTypeModel model, ClientState clientState) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            // Note: type lookup is by ID. The URI might have changed, the ID does not.
+            String assocTypeUri = getTopic(model.getId(), false, clientState).getUri();     // fetchComposite=false
+            AssociationType assocType = getAssociationType(assocTypeUri, clientState);
+            Directives directives = new Directives();
+            //
+            assocType.update(model, clientState, directives);
+            //
+            tx.success();
+            return directives;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Updating association type failed (" + model + ")", e);
         } finally {
             tx.finish();
         }
@@ -929,7 +955,7 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     private void bootstrapTypeCache() {
-        typeCache.put(new AttachedTopicType(new TopicTypeModel("dm4.core.meta_meta_type",
+        typeCache.putTopicType(new AttachedTopicType(new TopicTypeModel("dm4.core.meta_meta_type",
             "dm4.core.meta_meta_meta_type", "Meta Meta Type", "dm4.core.text"), this));
     }
 }

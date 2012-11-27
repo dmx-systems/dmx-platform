@@ -19,9 +19,10 @@ class PluginInfoImpl implements PluginInfo {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String PLUGIN_FILE            = "/web/script/plugin.js";
-    private static final String PLUGIN_RENDERERS_PATH  = "/web/script/renderers/";
-    private static final String PLUGIN_STYLE_PATH      = "/web/style/";
+    private static final String PLUGIN_FILE           = "/web/script/plugin.js";
+    private static final String PLUGIN_RENDERERS_PATH = "/web/script/renderers/";
+    private static final String PLUGIN_HELPER_PATH    = "/web/script/helper/";
+    private static final String PLUGIN_STYLE_PATH     = "/web/style/";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -39,6 +40,7 @@ class PluginInfoImpl implements PluginInfo {
             pluginInfo.put("has_plugin_file", hasPluginFile());
             pluginInfo.put("stylesheets", getStylesheets());
             pluginInfo.put("renderers", getRenderers());
+            pluginInfo.put("helper", getHelper());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -61,10 +63,6 @@ class PluginInfoImpl implements PluginInfo {
         return getFilenames(PLUGIN_STYLE_PATH);
     }
 
-    private List<String> getRenderers(String renderersDir) {
-        return getFilenames(PLUGIN_RENDERERS_PATH + renderersDir);
-    }
-
     private JSONObject getRenderers() throws JSONException {
         JSONObject renderers = new JSONObject();
         renderers.put("page_renderers",   getRenderers("page_renderers"));
@@ -74,7 +72,15 @@ class PluginInfoImpl implements PluginInfo {
         return renderers;
     }
 
+    private List<String> getHelper() {
+        return getFilenames(PLUGIN_HELPER_PATH);
+    }
+
     // ---
+
+    private List<String> getRenderers(String renderersDir) {
+        return getFilenames(PLUGIN_RENDERERS_PATH + renderersDir);
+    }
 
     private List<String> getFilenames(String path) {
         List<String> filenames = new ArrayList();
@@ -82,7 +88,7 @@ class PluginInfoImpl implements PluginInfo {
         if (e != null) {
             while (e.hasMoreElements()) {
                 String entryPath = e.nextElement();
-                // ignore directories
+                // ignore directories ### TODO: to be dropped? Use helper/ instead? See Webclient page_renderers
                 if (entryPath.endsWith("/")) {
                     continue;
                 }

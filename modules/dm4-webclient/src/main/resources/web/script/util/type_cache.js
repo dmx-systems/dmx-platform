@@ -7,25 +7,18 @@ function TypeCache() {
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
-    this.load_types = function(tracker) {
-        load_topic_types(tracker)
-        load_association_types(tracker)
-    }
-
-    // ---
-
-    this.get_topic_type = function(type_uri) {
-        var topic_type = topic_types[type_uri]
+    this.get_topic_type = function(topic_type_uri) {
+        var topic_type = topic_types[topic_type_uri]
         if (!topic_type) {
-            throw "TypeCacheError: topic type \"" + type_uri + "\" not found"
+            throw "TypeCacheError: topic type \"" + topic_type_uri + "\" not found"
         }
         return topic_type
     }
 
-    this.get_association_type = function(type_uri) {
-        var assoc_type = assoc_types[type_uri]
+    this.get_association_type = function(assoc_type_uri) {
+        var assoc_type = assoc_types[assoc_type_uri]
         if (!assoc_type) {
-            throw "TypeCacheError: association type \"" + type_uri + "\" not found"
+            throw "TypeCacheError: association type \"" + assoc_type_uri + "\" not found"
         }
         return assoc_type
     }
@@ -33,19 +26,28 @@ function TypeCache() {
     // ---
 
     this.put_topic_type = function(topic_type) {
-        var type_uri = topic_type.uri
-        topic_types[type_uri] = topic_type
+        topic_types[topic_type.uri] = topic_type
     }
 
     this.put_association_type = function(assoc_type) {
-        var type_uri = assoc_type.uri
-        assoc_types[type_uri] = assoc_type
+        assoc_types[assoc_type.uri] = assoc_type
     }
 
     // ---
 
-    this.remove = function(type_uri) {
-        delete topic_types[type_uri]
+    this.remove_topic_type = function(topic_type_uri) {
+        delete topic_types[topic_type_uri]
+    }
+
+    this.remove_association_type = function(assoc_type_uri) {
+        delete assoc_types[assoc_type_uri]
+    }
+
+    // ---
+
+    this.load_types = function(tracker) {
+        load_topic_types(tracker)
+        load_association_types(tracker)
     }
 
     this.clear = function() {

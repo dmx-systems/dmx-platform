@@ -317,6 +317,17 @@ public class WebservicePlugin extends PluginActivator {
         }
     }
 
+    @PUT
+    @Path("/assoctype")
+    public Directives updateAssociationType(AssociationTypeModel model,
+                                            @HeaderParam("Cookie") ClientState clientState) {
+        try {
+            return dms.updateAssociationType(model, clientState);
+        } catch (Exception e) {
+            throw new WebApplicationException(e);
+        }
+    }
+
 
 
     // === Plugins ===

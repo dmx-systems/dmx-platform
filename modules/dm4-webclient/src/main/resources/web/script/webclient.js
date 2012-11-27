@@ -226,6 +226,13 @@ function Webclient() {
         dm4c.show_topic(topic_type, "edit", undefined, true)    // coordinates=undefined, do_center=true
     }
 
+    this.do_create_association_type = function(assoc_type_model) {
+        // update DB
+        var assoc_type = dm4c.create_association_type(assoc_type_model)
+        // update client model and view
+        dm4c.show_topic(assoc_type, "edit", undefined, true)    // coordinates=undefined, do_center=true
+    }
+
     // ---
 
     /**
@@ -269,6 +276,19 @@ function Webclient() {
     this.do_update_topic_type = function(topic_type_model) {
         // update DB
         var directives = dm4c.restc.update_topic_type(topic_type_model)
+        // update GUI (client model and view)
+        process_directives(directives)
+    }
+
+    /**
+     * Updates an association type in the DB and on the GUI.
+     * Fires the "post_update_topic" event (indirectly).
+     *
+     * @param   assoc_type_model    an association type model containing the data to be udpated.
+     */
+    this.do_update_association_type = function(assoc_type_model) {
+        // update DB
+        var directives = dm4c.restc.update_association_type(assoc_type_model)
         // update GUI (client model and view)
         process_directives(directives)
     }
@@ -438,6 +458,9 @@ function Webclient() {
             case "UPDATE_ASSOCIATION_TYPE":
                 update_association_type(build_association_type(directive.arg))
                 break
+            case "DELETE_ASSOCIATION_TYPE":
+                remove_association_type(directive.arg.uri)
+                break
             default:
                 throw "WebclientError: \"" + directive.type + "\" is an unsupported directive"
             }
@@ -544,9 +567,17 @@ function Webclient() {
     /**
      * Processes a DELETE_TOPIC_TYPE directive.
      */
-    function remove_topic_type(type_uri) {
+    function remove_topic_type(topic_type_uri) {
         // update client model (type cache)
-        type_cache.remove(type_uri)
+        type_cache.remove_topic_type(topic_type_uri)
+    }
+
+    /**
+     * Processes a DELETE_ASSOCIATION_TYPE directive.
+     */
+    function remove_association_type(assoc_type_uri) {
+        // update client model (type cache)
+        type_cache.remove_association_type(assoc_type_uri)
     }
 
     // ---
@@ -664,6 +695,19 @@ function Webclient() {
         dm4c.fire_event("post_create_topic", topic_type)
         //
         return topic_type
+    }
+
+    this.create_association_type = function(assoc_type_model) {
+        // 1) update DB
+        var assoc_type = build_association_type(dm4c.restc.create_association_type(assoc_type_model))
+        // 2) update client model (type cache)
+        // Note: the type cache must be updated *before* the "post_create_topic" event is fired.
+        // Other plugins might rely on an up-to-date type cache (e.g. the Type Search plugin does). ### FIXDOC
+        type_cache.put_association_type(assoc_type)
+        // 3) fire event
+        dm4c.fire_event("post_create_topic", assoc_type)
+        //
+        return assoc_type
     }
 
 
