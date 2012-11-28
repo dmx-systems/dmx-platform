@@ -3,18 +3,20 @@ package de.deepamehta.plugins.typeeditor;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.osgi.PluginActivator;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.event.PostDeleteAssociationListener;
-import de.deepamehta.core.service.event.PostRetypeAssociationListener;
+import de.deepamehta.core.service.event.PostUpdateAssociationListener;
 
 import java.util.logging.Logger;
 
 
 
-public class TypeEditorPlugin extends PluginActivator implements PostRetypeAssociationListener,
+public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssociationListener,
                                                                  PostDeleteAssociationListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -32,21 +34,22 @@ public class TypeEditorPlugin extends PluginActivator implements PostRetypeAssoc
 
 
     @Override
-    public void postRetypeAssociation(Association assoc, String oldTypeUri, Directives directives) {
-        if (isAssocDef(assoc.getTypeUri())) {
-            if (isAssocDef(oldTypeUri)) {
+    public void postUpdateAssociation(Association assoc, AssociationModel oldModel, ClientState clientState,
+                                                                                    Directives directives) {
+        if (isAssocDef(assoc.getModel())) {
+            if (isAssocDef(oldModel)) {
                 updateAssocDef(assoc, directives);
             } else {
                 createAssocDef(assoc, directives);
             }
-        } else if (isAssocDef(oldTypeUri)) {
+        } else if (isAssocDef(oldModel)) {
             removeAssocDef(assoc, directives);
         }
     }
 
     @Override
     public void postDeleteAssociation(Association assoc, Directives directives) {
-        if (isAssocDef(assoc.getTypeUri())) {
+        if (isAssocDef(assoc.getModel())) {
             removeAssocDef(assoc, directives);
         }
     }
@@ -96,9 +99,23 @@ public class TypeEditorPlugin extends PluginActivator implements PostRetypeAssoc
 
     // === Helper ===
 
-    private boolean isAssocDef(String assocTypeUri) {
-        return assocTypeUri.equals("dm4.core.aggregation_def") ||
-               assocTypeUri.equals("dm4.core.composition_def");
+    private boolean isAssocDef(AssociationModel assoc) {
+        String typeUri = assoc.getTypeUri();
+        if (!typeUri.equals("dm4.core.aggregation_def") &&
+            !typeUri.equals("dm4.core.composition_def")) {
+            return false;
+        }
+        //
+        if (assoc.hasSameRoleTypeUris()) {
+            return false;
+        }
+        //
+        if (assoc.getRoleModel("dm4.core.whole_type") == null ||
+            assoc.getRoleModel("dm4.core.part_type") == null)  {
+            return false;
+        }
+        //
+        return true;
     }
 
     private void addUpdateTypeDirective(Type type, Directives directives) {

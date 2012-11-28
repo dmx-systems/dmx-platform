@@ -90,6 +90,26 @@ public class AssociationModel extends DeepaMehtaObjectModel {
         this.roleModel2 = roleModel;
     }
 
+    // --- Convenience Methods ---
+
+    public RoleModel getRoleModel(String roleTypeUri) {
+        boolean rm1 = roleModel1.getRoleTypeUri().equals(roleTypeUri);
+        boolean rm2 = roleModel2.getRoleTypeUri().equals(roleTypeUri);
+        if (rm1 && rm2) {
+            throw new RuntimeException("Ambiguous getRoleModel() call: both players occupy role \"" +
+                roleTypeUri + "\" in association (" + this + ")");
+        } else if (rm1) {
+            return roleModel1;
+        } else if (rm2) {
+            return roleModel2;
+        }
+        return null;
+    }
+
+    public boolean hasSameRoleTypeUris() {
+        return roleModel1.getRoleTypeUri().equals(roleModel2.getRoleTypeUri());
+    }
+
 
 
     // === Serialization ===
@@ -108,6 +128,18 @@ public class AssociationModel extends DeepaMehtaObjectModel {
 
 
     // === Java API ===
+
+    @Override
+    public AssociationModel clone() {
+        try {
+            AssociationModel model = (AssociationModel) super.clone();
+            model.roleModel1 = roleModel1.clone();
+            model.roleModel2 = roleModel2.clone();
+            return model;
+        } catch (Exception e) {
+            throw new RuntimeException("Cloning an AssociationModel failed", e);
+        }
+    }
 
     @Override
     public String toString() {

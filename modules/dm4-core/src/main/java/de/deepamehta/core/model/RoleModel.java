@@ -4,7 +4,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 
-public abstract class RoleModel {
+public abstract class RoleModel implements Cloneable {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -38,4 +38,15 @@ public abstract class RoleModel {
     public abstract boolean refsSameObject(RoleModel model);
 
     public abstract JSONObject toJSON();
+
+    // === Java API ===
+
+    @Override
+    public RoleModel clone() {
+        try {
+            return (RoleModel) super.clone();
+        } catch (Exception e) {
+            throw new RuntimeException("Cloning a RoleModel failed", e);
+        }
+    }
 }

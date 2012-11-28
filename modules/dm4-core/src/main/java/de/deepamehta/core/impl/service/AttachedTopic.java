@@ -16,7 +16,6 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
@@ -133,19 +132,17 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // === Updating ===
 
     @Override
-    public ChangeReport update(TopicModel model, ClientState clientState, Directives directives) {
+    public void update(TopicModel model, ClientState clientState, Directives directives) {
         logger.info("Updating topic " + getId() + " (new " + model + ")");
         //
         dms.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model, directives);
         //
-        TopicModel oldModel = (TopicModel) getModel().clone();
-        ChangeReport report = super.update(model, clientState, directives);
+        TopicModel oldModel = getModel().clone();
+        super.update(model, clientState, directives);
         //
         directives.add(Directive.UPDATE_TOPIC, this);
         //
         dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel, clientState, directives);
-        //
-        return report;
     }
 
 

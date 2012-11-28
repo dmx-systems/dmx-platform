@@ -2,7 +2,6 @@ package de.deepamehta.core;
 
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.RoleModel;
-import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
@@ -37,7 +36,7 @@ public interface Association extends DeepaMehtaObject {
 
     // === Updating ===
 
-    ChangeReport update(AssociationModel model, ClientState clientState, Directives directives);
+    void update(AssociationModel model, ClientState clientState, Directives directives);
 
 
 
