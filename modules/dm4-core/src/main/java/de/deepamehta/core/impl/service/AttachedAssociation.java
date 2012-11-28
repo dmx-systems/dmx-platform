@@ -18,7 +18,6 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
@@ -174,20 +173,19 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
      *                  If role 2 is <code>null</code> it is not updated.
      */
     @Override
-    public ChangeReport update(AssociationModel model, ClientState clientState, Directives directives) {
+    public void update(AssociationModel model, ClientState clientState, Directives directives) {
         logger.info("Updating association " + getId() + " (new " + model + ")");
         //
-        ChangeReport report = super.update(model, clientState, directives);
+        dms.fireEvent(CoreEvent.PRE_UPDATE_ASSOCIATION, this, model, directives);
+        //
+        AssociationModel oldModel = getModel().clone();
+        super.update(model, clientState, directives);
         updateRole(model.getRoleModel1(), 1);
         updateRole(model.getRoleModel2(), 2);
         //
         directives.add(Directive.UPDATE_ASSOCIATION, this);
         //
-        if (report.typeUriChanged) {
-            dms.fireEvent(CoreEvent.POST_RETYPE_ASSOCIATION, this, report.oldTypeUri, directives);
-        }
-        //
-        return report;
+        dms.fireEvent(CoreEvent.POST_UPDATE_ASSOCIATION, this, oldModel, clientState, directives);
     }
 
 

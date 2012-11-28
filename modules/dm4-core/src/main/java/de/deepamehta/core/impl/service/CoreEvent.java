@@ -36,17 +36,18 @@ enum CoreEvent {
 
     PRE_UPDATE_TOPIC(PreUpdateTopicListener.class,
         "preUpdateTopic", Topic.class, TopicModel.class, Directives.class),
+    PRE_UPDATE_ASSOCIATION(PreUpdateAssociationListener.class,
+        "preUpdateAssociation", Association.class, AssociationModel.class, Directives.class),
+
     POST_UPDATE_TOPIC(PostUpdateTopicListener.class,
         "postUpdateTopic", Topic.class, TopicModel.class, TopicModel.class, ClientState.class, Directives.class),
+    POST_UPDATE_ASSOCIATION(PostUpdateAssociationListener.class,
+        "postUpdateAssociation", Association.class, AssociationModel.class, ClientState.class, Directives.class),
 
     PRE_DELETE_ASSOCIATION(PreDeleteAssociationListener.class,
         "preDeleteAssociation", Association.class, Directives.class),
     POST_DELETE_ASSOCIATION(PostDeleteAssociationListener.class,
         "postDeleteAssociation", Association.class, Directives.class),
-
-    // ### TODO: remove this event. Retype is special case of update
-    POST_RETYPE_ASSOCIATION(PostRetypeAssociationListener.class,
-        "postRetypeAssociation", Association.class, String.class, Directives.class),
 
     PRE_SEND_TOPIC(PreSendTopicListener.class,
         "preSendTopic", Topic.class, ClientState.class),

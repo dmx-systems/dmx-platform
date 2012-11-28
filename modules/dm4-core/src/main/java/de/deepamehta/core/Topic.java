@@ -1,7 +1,6 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
@@ -26,7 +25,7 @@ public interface Topic extends DeepaMehtaObject {
 
     // === Updating ===
 
-    ChangeReport update(TopicModel model, ClientState clientState, Directives directives);
+    void update(TopicModel model, ClientState clientState, Directives directives);
 
 
 

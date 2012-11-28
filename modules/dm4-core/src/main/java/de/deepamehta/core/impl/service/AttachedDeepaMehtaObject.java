@@ -18,7 +18,6 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.util.DeepaMehtaUtils;
@@ -185,10 +184,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Updating ===
 
     @Override
-    public ChangeReport update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives) {
-        ChangeReport report = new ChangeReport();
+    public void update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives) {
         updateUri(model.getUri());
-        updateTypeUri(model.getTypeUri(), report);
+        updateTypeUri(model.getTypeUri());
         // ### TODO: compare new model with current one and update only if changed.
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
             updateCompositeValue(model.getCompositeValue(), clientState, directives);
@@ -196,8 +194,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         } else {
             updateSimpleValue(model.getSimpleValue());
         }
-        //
-        return report;
     }
 
     // ---
@@ -429,7 +425,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    private void updateTypeUri(String newTypeUri, ChangeReport report) {
+    private void updateTypeUri(String newTypeUri) {
         // abort if no update is requested
         if (newTypeUri == null) {
             return;
@@ -438,7 +434,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         String typeUri = getTypeUri();
         if (!typeUri.equals(newTypeUri)) {
             logger.info("### Changing type URI from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
-            report.typeUriChanged(typeUri, newTypeUri);
             setTypeUri(newTypeUri);
         }
     }

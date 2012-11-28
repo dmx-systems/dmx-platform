@@ -4,7 +4,6 @@ import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.ChangeReport;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
@@ -55,7 +54,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // === Updating ===
 
-    ChangeReport update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives);
+    void update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives);
 
     // ---
 
