@@ -172,9 +172,9 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         }
     }
 
-
-
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
 
     // === Search ===
 
@@ -238,32 +238,53 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         return topicType.getViewConfig("dm4.webclient.view_config", "dm4.webclient." + setting);
     }
 
+
+
     // === View Configuration ===
 
     private void updateType(Topic viewConfig, Directives directives) {
-        Topic typeTopic = viewConfig.getRelatedTopic("dm4.core.aggregation",
-            "dm4.core.view_config", "dm4.core.type", null, false, false, null);
-        if (typeTopic != null) {
-            if (typeTopic.getTypeUri().equals("dm4.core.topic_type")) {
-                TopicType topicType = dms.getTopicType(typeTopic.getUri(), null);
-                logger.info("### Updating view configuration for topic type \"" + topicType.getUri() +
-                    "\" (viewConfig=" + viewConfig + ")");
-                topicType.getViewConfig().getModel().updateConfigTopic(viewConfig.getModel());
-                directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
-            } else if (typeTopic.getTypeUri().equals("dm4.core.assoc_type")) {
-                AssociationType assocType = dms.getAssociationType(typeTopic.getUri(), null);
-                logger.info("### Updating view configuration for association type \"" + assocType.getUri() +
-                    "\" (viewConfig=" + viewConfig + ")");
-                assocType.getViewConfig().getModel().updateConfigTopic(viewConfig.getModel());
-                directives.add(Directive.UPDATE_ASSOCIATION_TYPE, assocType);
+        Topic type = viewConfig.getRelatedTopic("dm4.core.aggregation", "dm4.core.view_config", "dm4.core.type", null,
+            false, false, null);
+        if (type != null) {
+            String typeUri = type.getTypeUri();
+            if (typeUri.equals("dm4.core.topic_type") || typeUri.equals("dm4.core.meta_type")) {
+                updateTopicType(type, viewConfig, directives);
+            } else if (typeUri.equals("dm4.core.assoc_type")) {
+                updateAssociationType(type, viewConfig, directives);
             } else {
-                throw new RuntimeException("View Configuration is associated to an unexpected topic (typeTopic=" +
-                    typeTopic + "\nviewConfig=" + viewConfig + ")");
+                throw new RuntimeException("View Configuration " + viewConfig.getId() + " is associated to an " +
+                    "unexpected topic (type=" + type + "\nviewConfig=" + viewConfig + ")");
             }
         } else {
             // ### TODO: association definitions
         }
     }
+
+    // ---
+
+    private void updateTopicType(Topic type, Topic viewConfig, Directives directives) {
+        logger.info("### Updating view configuration of topic type \"" + type.getUri() + "\" (viewConfig=" +
+            viewConfig + ")");
+        TopicType topicType = dms.getTopicType(type.getUri(), null);
+        updateViewConfig(topicType, viewConfig);
+        directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
+    }
+
+    private void updateAssociationType(Topic type, Topic viewConfig, Directives directives) {
+        logger.info("### Updating view configuration of association type \"" + type.getUri() + "\" (viewConfig=" +
+            viewConfig + ")");
+        AssociationType assocType = dms.getAssociationType(type.getUri(), null);
+        updateViewConfig(assocType, viewConfig);
+        directives.add(Directive.UPDATE_ASSOCIATION_TYPE, assocType);
+    }
+
+    // ---
+
+    private void updateViewConfig(Type type, Topic viewConfig) {
+        type.getViewConfig().getModel().updateConfigTopic(viewConfig.getModel());
+    }
+
+
 
     // === Webclient Start ===
 
