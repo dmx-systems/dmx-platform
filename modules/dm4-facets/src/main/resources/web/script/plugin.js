@@ -9,9 +9,10 @@ dm4c.add_plugin("de.deepamehta.facets", function() {
      * @param   topic           The facetted topic the page/form is rendered for. Usually that is the selected topic.
      * @param   facet_types     The facet types to add to the page model (array of topic objects of type "Topic Type").
      * @param   page_model      The page model to extend.
-     * @param   setting         "viewable" or "editable" (string).
+     * @param   render_mode     dm4c.render.page_model.mode.INFO or
+     *                          dm4c.render.page_model.mode.FORM
      */
-    this.add_facets_to_page_model = function(topic, facet_types, page_model, setting) {
+    this.add_facets_to_page_model = function(topic, facet_types, page_model, render_mode) {
         for (var i = 0; i < facet_types.length; i++) {
             var facet_type = dm4c.get_topic_type(facet_types[i].uri)
             // compare to TopicRenderer.create_page_model
@@ -20,10 +21,10 @@ dm4c.add_plugin("de.deepamehta.facets", function() {
             var child_field_uri = dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
             // ### TODO: cardinality many
             var child_topic = topic.composite[assoc_def.uri] || dm4c.empty_topic(child_topic_type.uri)
-            // ### TODO: adapt to new page renderer format
-            var child_model = TopicRenderer.create_page_model(child_topic, assoc_def, child_field_uri, topic, setting)
+            var child_model = dm4c.render.page_model.create_page_model(child_topic, assoc_def, child_field_uri, topic,
+                render_mode)
             // ### FIXME: child_model may be undefined
-            page_model.add_child(assoc_def.uri, child_model)
+            page_model.childs[assoc_def.uri] = child_model
         }
     }
 })
