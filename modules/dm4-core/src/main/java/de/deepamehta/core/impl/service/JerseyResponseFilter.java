@@ -4,6 +4,7 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -14,7 +15,7 @@ import javax.ws.rs.WebApplicationException;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.ParameterizedType;
-import java.util.Set;
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -40,22 +41,23 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         try {
             Object entity = response.getEntity();
             if (entity != null) {
-                if (entity instanceof TopicType) {          // Note: type matches both, must take precedence over topic
-                    firePreSend((TopicType) entity);
+                ClientState clientState = clientState(request);
+                if (entity instanceof TopicType) {                      // Note: must take precedence over topic
+                    firePreSend((TopicType) entity, clientState);
                 } else if (entity instanceof AssociationType) {
-                    firePreSend((AssociationType) entity);  // Note: type matches both, must take precedence over topic
+                    firePreSend((AssociationType) entity, clientState); // Note: must take precedence over topic
                 } else if (entity instanceof Topic) {
-                    firePreSend((Topic) entity);
+                    firePreSend((Topic) entity, clientState);
                 } else if (entity instanceof Association) {
-                    firePreSend((Association) entity);
+                    firePreSend((Association) entity, clientState);
                 } else if (entity instanceof Directives) {
-                    firePreSend((Directives) entity);
+                    firePreSend((Directives) entity, clientState);
                 } else if (isIterable(response, TopicType.class)) {
-                    firePreSendTopicTypes((Iterable<TopicType>) entity);
+                    firePreSendTopicTypes((Iterable<TopicType>) entity, clientState);
                 } else if (isIterable(response, AssociationType.class)) {
-                    firePreSendAssociationTypes((Iterable<AssociationType>) entity);
+                    firePreSendAssociationTypes((Iterable<AssociationType>) entity, clientState);
                 } else if (isIterable(response, Topic.class)) {
-                    firePreSendTopics((Iterable<Topic>) entity);
+                    firePreSendTopics((Iterable<Topic>) entity, clientState);
                 }
             }
             return response;
@@ -66,56 +68,56 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void firePreSend(Topic topic) {
-        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, topic, null);                   // clientState=null
+    private void firePreSend(Topic topic, ClientState clientState) {
+        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, topic, clientState);
     }
 
-    private void firePreSend(Association assoc) {
-        dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION, assoc, null);             // clientState=null
+    private void firePreSend(Association assoc, ClientState clientState) {
+        dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION, assoc, clientState);
     }
 
-    private void firePreSend(TopicType topicType) {
-        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC_TYPE, topicType, null);          // clientState=null
+    private void firePreSend(TopicType topicType, ClientState clientState) {
+        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC_TYPE, topicType, clientState);
     }
 
-    private void firePreSend(AssociationType assocType) {
-        dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION_TYPE, assocType, null);    // clientState=null
+    private void firePreSend(AssociationType assocType, ClientState clientState) {
+        dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION_TYPE, assocType, clientState);
     }
 
-    private void firePreSend(Directives directives) {
+    private void firePreSend(Directives directives, ClientState clientState) {
         for (Directives.Entry entry : directives) {
             switch (entry.dir) {
             case UPDATE_TOPIC:
-                firePreSend((Topic) entry.arg);
+                firePreSend((Topic) entry.arg, clientState);
                 break;
             case UPDATE_ASSOCIATION:
-                firePreSend((Association) entry.arg);
+                firePreSend((Association) entry.arg, clientState);
                 break;
             case UPDATE_TOPIC_TYPE:
-                firePreSend((TopicType) entry.arg);
+                firePreSend((TopicType) entry.arg, clientState);
                 break;
             case UPDATE_ASSOCIATION_TYPE:
-                firePreSend((AssociationType) entry.arg);
+                firePreSend((AssociationType) entry.arg, clientState);
                 break;
             }
         }
     }
 
-    private void firePreSendTopics(Iterable<Topic> topics) {
+    private void firePreSendTopics(Iterable<Topic> topics, ClientState clientState) {
         for (Topic topic : topics) {
-            firePreSend(topic);
+            firePreSend(topic, clientState);
         }
     }
 
-    private void firePreSendTopicTypes(Iterable<TopicType> topicTypes) {
+    private void firePreSendTopicTypes(Iterable<TopicType> topicTypes, ClientState clientState) {
         for (TopicType topicType : topicTypes) {
-            firePreSend(topicType);
+            firePreSend(topicType, clientState);
         }
     }
 
-    private void firePreSendAssociationTypes(Iterable<AssociationType> assocTypes) {
+    private void firePreSendAssociationTypes(Iterable<AssociationType> assocTypes, ClientState clientState) {
         for (AssociationType assocType : assocTypes) {
-            firePreSend(assocType);
+            firePreSend(assocType, clientState);
         }
     }
 
@@ -132,5 +134,18 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             }
         }
         return false;
+    }
+
+    private ClientState clientState(ContainerRequest request) {
+        List<String> cookies = request.getRequestHeader("Cookie");
+        if (cookies == null) {
+            return new ClientState(null);
+        }
+        // ### FIXME: does this happen?
+        if (cookies.size() > 1) {
+            throw new RuntimeException("Request contains more than one Cookie header");
+        }
+        //
+        return new ClientState(cookies.get(0));
     }
 }
