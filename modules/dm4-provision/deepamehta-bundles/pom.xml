@@ -98,5 +98,10 @@
             <artifactId>deepamehta-facets</artifactId>
             <version>4.0.13-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-geomaps</artifactId>
+            <version>4.0.13-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

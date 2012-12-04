@@ -47,5 +47,6 @@
     <bundle start-level="76">mvn:de.deepamehta/deepamehta-iconpicker/4.0.13-SNAPSHOT</bundle>
     <bundle start-level="76">mvn:de.deepamehta/deepamehta-notes/4.0.13-SNAPSHOT</bundle>
     <bundle start-level="76">mvn:de.deepamehta/deepamehta-webbrowser/4.0.13-SNAPSHOT</bundle>
+    <bundle start-level="76">mvn:de.deepamehta/deepamehta-geomaps/4.0.13-SNAPSHOT</bundle>
   </feature>
 </features>
