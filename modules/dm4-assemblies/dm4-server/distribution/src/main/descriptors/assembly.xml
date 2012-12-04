@@ -89,6 +89,5 @@
             <directory>target/features-repo</directory>
             <outputDirectory>/system</outputDirectory>
         </fileSet>
-
     </fileSets>
 </assembly>
