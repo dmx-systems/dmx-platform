@@ -179,42 +179,57 @@ dm4c.render.page_model = (function() {
             } else {
                 var page_model = new PageModel(PageModel.COMPOSITE, object, assoc_def, field_uri, toplevel_object)
                 for (var i = 0, assoc_def; assoc_def = object_type.assoc_defs[i]; i++) {
-                    var child_topic_type = dm4c.get_topic_type(assoc_def.part_type_uri)
-                    //
-                    if (!dm4c.get_view_config(child_topic_type, render_mode.render_setting, assoc_def)) {
-                        continue
-                    }
-                    //
-                    var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
-                    var cardinality_uri = assoc_def.part_cardinality_uri
-                    if (cardinality_uri == "dm4.core.one") {
-                        var child_topic = object.composite[assoc_def.uri] || dm4c.empty_topic(child_topic_type.uri)
-                        var child_model = this.create_page_model(child_topic, assoc_def, child_field_uri,
-                            toplevel_object, render_mode)
-                        page_model.childs[assoc_def.uri] = child_model
-                    } else if (cardinality_uri == "dm4.core.many") {
-                        // ### TODO: server: don't send empty arrays
-                        var child_topics = object.composite[assoc_def.uri] || []
-                        if (!js.is_array(child_topics)) {
-                            throw "TopicRendererError: field \"" + assoc_def.uri + "\" is defined as multi-value but " +
-                                "appears as single-value in " + JSON.stringify(object)
-                        }
-                        if (child_topics.length == 0) {
-                            child_topics.push(dm4c.empty_topic(child_topic_type.uri))
-                        }
-                        var child_model = new PageModel(PageModel.MULTI, child_topics[0], assoc_def, field_uri,
-                            toplevel_object)
-                        for (var j = 0, child_topic; child_topic = child_topics[j]; j++) {
-                            var child_field = this.create_page_model(child_topic, assoc_def, child_field_uri,
-                                toplevel_object, render_mode)
-                            child_model.values.push(child_field)
-                        }
-                        page_model.childs[assoc_def.uri] = child_model
-                    } else {
-                        throw "TopicRendererError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
-                    }
+                    this.extend_composite_page_model(object, assoc_def, field_uri, toplevel_object, render_mode,
+                        page_model)
                 }
                 return page_model;
+            }
+        },
+
+        /**
+         * Extends the page model of a composite object by one child entry. The child relationship is described
+         * by the specified association definition. Note: that association definition is *not* required to be
+         * part of the object's type definition. It may be part of a facet definition as well.
+         *
+         * @param   object          A composite object.
+         * @param   assoc_def       The association definition that leads to the object's child(s).
+         * @param   page_model      The page model of the composite object as constructed so far.
+         *                          This page model is extended by this method.
+         */
+        extend_composite_page_model: function(object, assoc_def, field_uri, toplevel_object, render_mode, page_model) {
+            var child_topic_type = dm4c.get_topic_type(assoc_def.part_type_uri)
+            //
+            if (!dm4c.get_view_config(child_topic_type, render_mode.render_setting, assoc_def)) {
+                return
+            }
+            //
+            var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
+            var cardinality_uri = assoc_def.part_cardinality_uri
+            if (cardinality_uri == "dm4.core.one") {
+                var child_topic = object.composite[assoc_def.uri] || dm4c.empty_topic(child_topic_type.uri)
+                var child_model = this.create_page_model(child_topic, assoc_def, child_field_uri, toplevel_object,
+                    render_mode)
+                page_model.childs[assoc_def.uri] = child_model
+            } else if (cardinality_uri == "dm4.core.many") {
+                // ### TODO: server: don't send empty arrays
+                var child_topics = object.composite[assoc_def.uri] || []
+                if (!js.is_array(child_topics)) {
+                    throw "TopicRendererError: field \"" + assoc_def.uri + "\" is defined as multi-value but " +
+                        "appears as single-value in " + JSON.stringify(object)
+                }
+                if (child_topics.length == 0) {
+                    child_topics.push(dm4c.empty_topic(child_topic_type.uri))
+                }
+                var child_model = new PageModel(PageModel.MULTI, child_topics[0], assoc_def, field_uri,
+                    toplevel_object)
+                for (var j = 0, child_topic; child_topic = child_topics[j]; j++) {
+                    var child_field = this.create_page_model(child_topic, assoc_def, child_field_uri,
+                        toplevel_object, render_mode)
+                    child_model.values.push(child_field)
+                }
+                page_model.childs[assoc_def.uri] = child_model
+            } else {
+                throw "TopicRendererError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
             }
         },
 
