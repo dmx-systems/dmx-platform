@@ -1,31 +1,23 @@
 package de.deepamehta.plugins.geomaps.model;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.JSONEnabled;
-import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.awt.Point;
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
 
 /**
- * A topicmap model: a collection of topics and associations plus their visualization information.
+ * A geomap model: a collection of Geo Coordinate topics.
  * <p>
  * Features:
  * - load from DB (by constructor).
@@ -36,7 +28,7 @@ public class Geomap implements JSONEnabled {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     protected Topic geomapTopic;
-    protected Map<Long, GeomapTopic> topics = new HashMap();
+    protected Map<Long, TopicModel> topics = new HashMap();
 
     protected DeepaMehtaService dms;
 
@@ -96,8 +88,7 @@ public class Geomap implements JSONEnabled {
     private void loadTopics() {
         ResultSet<RelatedTopic> mapTopics = fetchGeomapTopics(geomapTopic, true);     // fetchComposite=true
         for (RelatedTopic mapTopic : mapTopics) {
-            Association refAssoc = mapTopic.getAssociation();
-            addTopic(new GeomapTopic(mapTopic.getModel(), refAssoc.getId()));
+            addTopic(mapTopic.getModel());
         }
     }
 
@@ -107,7 +98,7 @@ public class Geomap implements JSONEnabled {
             // fetchRelatingComposite=false, maxResultSize=0, clientContext=null
     }
 
-    private void addTopic(GeomapTopic topic) {
+    private void addTopic(TopicModel topic) {
         topics.put(topic.getId(), topic);
     }
 }
