@@ -19,9 +19,9 @@ function Geomap(topicmap_id, config) {
 
     load()
 
-
-
     // ------------------------------------------------------------------------------------------------------ Public API
+
+
 
     // === Topicmap Implementation ===
 

@@ -17,6 +17,8 @@ function GeomapRenderer() {
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
+
+
     // === TopicmapRenderer Implementation ===
 
     this.get_info = function() {
@@ -69,6 +71,8 @@ function GeomapRenderer() {
         }
     }
 
+
+
     // === TopicmapRenderer Topicmaps Extension ===
 
     this.load_topicmap = function(topicmap_id, config) {
@@ -97,6 +101,8 @@ function GeomapRenderer() {
         }
     }
 
+
+
     // === Left SplitPanel Component Implementation ===
 
     this.init = function() {
@@ -112,6 +118,8 @@ function GeomapRenderer() {
         ol_view.update_size()
     }
 
+
+
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function get_geomap() {
@@ -124,6 +132,8 @@ function GeomapRenderer() {
         get_geomap().set_state(center, zoom)
     }
 }
+
+
 
 // ------------------------------------------------------------------------------------------------------ Static Methods
 
