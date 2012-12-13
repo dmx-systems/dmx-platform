@@ -17,6 +17,9 @@
 
     <properties>
         <karaf.name>dm4server</karaf.name>
+        <dm4.security.read_requires_login>true</dm4.security.read_requires_login>
+        <dm4.security.write_requires_login>true</dm4.security.write_requires_login>
+        <dm4.security.subnet_filter>0.0.0.0/0</dm4.security.subnet_filter>
     </properties>
 
     <dependencies>
@@ -81,6 +84,7 @@
                                 <feature>ssh</feature>
                                 <feature>eventadmin</feature>
                                 <feature>dm4-standard</feature>
+                                <feature>dm4-webconsole</feature>
                             </features>
                         </configuration>
                     </execution>
