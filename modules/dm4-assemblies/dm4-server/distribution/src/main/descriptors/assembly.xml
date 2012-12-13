@@ -39,6 +39,7 @@
                 <exclude>bin/**</exclude>
                 <exclude>etc/org.apache.karaf.features.cfg</exclude>
                 <exclude>etc/org.ops4j.pax.logging.cfg</exclude>
+                <exclude>etc/org.apache.felix.fileinstall-deploy.cfg</exclude>
                 <exclude>etc/system.properties</exclude>
                 <exclude>karaf-manual*.*</exclude>
                 <exclude>LICENSE</exclude>

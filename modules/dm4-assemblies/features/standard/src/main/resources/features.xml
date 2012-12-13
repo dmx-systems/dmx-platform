@@ -45,4 +45,20 @@
         <bundle>mvn:de.deepamehta/deepamehta-webbrowser/4.0.13-SNAPSHOT</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-geomaps/4.0.13-SNAPSHOT</bundle>
     </feature>
+
+    <feature name="dm4-webconsole" description="Karaf WebConsole for administration and monitoring" version="2.2.9">
+        <config name="org.apache.karaf.webconsole">
+            realm=karaf
+            role=${karaf.admin.role}
+        </config>
+        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/1.0.4</bundle>
+        <bundle>mvn:org.apache.karaf.webconsole/org.apache.karaf.webconsole.branding/2.2.9</bundle>
+        <bundle>mvn:org.apache.karaf.webconsole/org.apache.karaf.webconsole.console/2.2.9</bundle>
+
+        <bundle>mvn:org.apache.karaf.webconsole/org.apache.karaf.webconsole.admin/2.2.9</bundle>
+        <bundle>mvn:org.apache.karaf.webconsole/org.apache.karaf.webconsole.features/2.2.9</bundle>
+        <bundle>mvn:org.apache.karaf.webconsole/org.apache.karaf.webconsole.gogo/2.2.9</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.webconsole.plugins.event/1.0.2</bundle>
+    </feature>
+
 </features>
