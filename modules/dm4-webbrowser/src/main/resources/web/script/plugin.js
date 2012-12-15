@@ -28,12 +28,13 @@ dm4c.add_plugin("de.deepamehta.webbrowser", function() {
         function do_open_url() {
             var webpage = get_webpage(topic)
             if (!webpage) {
-                // Note: a Webpage *aggregates* an URL (see migration2.json)
+                // Note: a Webpage *aggregates* an URL (see migration2.json),
+                // so we must use the REF_PREFIX notation here
                 webpage = dm4c.create_topic("dm4.webbrowser.webpage", {
                     "dm4.webbrowser.url": dm4c.REF_PREFIX + topic.id
                 })
             }
-            dm4c.do_reveal_related_topic(webpage.id)
+            dm4c.do_reveal_related_topic(webpage.id, "show")
         }
 
         function do_open_url_external() {
