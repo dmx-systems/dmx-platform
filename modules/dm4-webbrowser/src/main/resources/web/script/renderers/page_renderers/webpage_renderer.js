@@ -1,7 +1,7 @@
 (function() {
 
     var TRAILBLAZER_FEATURE = false                 // trailblazer is switched off
-    var PROXY_URL = "http://localhost:8080/proxy/"  // used by trailblazer ### FIXME
+    var PROXY_URL = "http://localhost:8080/proxy/"  // used by trailblazer ### FIXME: /proxy is obsolete
 
     dm4c.add_page_renderer("dm4.webbrowser.webpage_renderer", {
 
@@ -38,7 +38,7 @@
                         {topic_id: topic.id, role_type_uri: "dm4.core.default"},
                         {topic_id: webpage.id, role_type_uri: "dm4.core.default"}
                     )
-                    dm4c.do_reveal_related_topic(webpage.id)
+                    dm4c.do_reveal_related_topic(webpage.id, "show")
                 }
             }
         },

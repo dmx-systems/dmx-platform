@@ -31,13 +31,21 @@ function RenderHelper() {
     // ---
 
     /**
-     * @param   topics          Topics to render (array of Topic objects).
+     * Renders a clickable list of topics, one topic per row.
+     * Each row renders the topic's icon and the topic's label.
      *
-     * @param   click_handler   Optional: by supplying a click handler the caller can customize the behavoir performed
-     *                          when the user clicks a topic link. The click handler is a function which receives a
-     *                          topic argument.
+     * @param   topics          Topics to render (array of Topic objects).
+     *                          Note: actually the array can contain any kind of objects as long as each object
+     *                          has these properties:
+     *                              "type_uri" -- required to render the icon and tooltip
+     *                              "value"    -- required to render the topic link
+     *                              "id"       -- only required by the default click handler
+     *
+     * @param   click_handler   Optional: the handler called when a topic is clicked. 2 arguments are passed:
+     *                              1) the clicked topic (an object)
+     *                              2) the spot where the topic has been clicked: "icon" or "label" (a string).
      *                          If no click handler is specified the default handler is used. The default handler
-     *                          reveals the clicked topic (by calling dm4c.do_reveal_related_topic())
+     *                          reveals the clicked topic by calling dm4c.do_reveal_related_topic().
      *
      * @return  The rendered topic list (a jQuery object)
      */
@@ -50,20 +58,22 @@ function RenderHelper() {
                 var supplement = $("<div>").addClass("supplement-text").append(supplement_text)
             }
             // render topic
-            var handler = create_click_handler(topic)
+            var icon_click_handler = create_click_handler(topic, "icon")
+            var topic_click_handler = create_click_handler(topic, "label")
             table.append($("<tr>")
-                .append($("<td>").append(this.icon_link(topic, handler)))
-                .append($("<td>").append(this.topic_link(topic, handler)).append(supplement))
+                .append($("<td>").append(this.icon_link(topic, icon_click_handler)))
+                .append($("<td>").append(this.topic_link(topic, topic_click_handler)).append(supplement))
             )
         }
         return table
 
-        function create_click_handler(topic) {
+        function create_click_handler(topic, spot) {
             return function() {
                 if (click_handler) {
-                    click_handler(topic)
+                    click_handler(topic, spot)
                 } else {
-                    dm4c.do_reveal_related_topic(topic.id)
+                    var action = spot == "label" && "show"
+                    dm4c.do_reveal_related_topic(topic.id, action)
                 }
                 return false    // suppress browser's own link-click behavoir
             }
@@ -195,10 +205,11 @@ function RenderHelper() {
                                                                 // traversal_filter=undefined, sort=true
         group_topics(result.items, function(title, group) {
             self.field_label(title)
-            self.page(self.topic_list(group, function(topic) {
+            self.page(self.topic_list(group, function(topic, spot) {
                 // Note: for associations we need a custom click handler because the default
                 // one (do_reveal_related_topic()) assumes a topic as the source.
-                dm4c.show_topic(dm4c.fetch_topic(topic.id), "show", undefined, true)    // coordinates=undefined,
+                var action = spot == "label" && "show"
+                dm4c.show_topic(dm4c.fetch_topic(topic.id), action, undefined, true)    // coordinates=undefined,
             }))                                                                         // do_center=true
         })
     }

@@ -154,16 +154,21 @@ function Webclient() {
      * Fires the "pre_show_topic" and "post_show_topic" events (indirectly).
      * Fires the "post_show_association" event (for each association).
      *
-     * @param   topic_id    ID of the related topic.
+     * @param   topic_id    ID of the topic to reveal.
+     * @param   action      Optional: the action to perform on the revealed topic, 3 possible values:
+     *                          "none" - do not select the topic (page panel doesn't change) -- the default.
+     *                          "show" - select the topic and show its info in the page panel.
+     *                          "edit" - select the topic and show its form in the page panel.
+     *                      If not specified (that is any falsish value) "none" is assumed.
      */
-    this.do_reveal_related_topic = function(topic_id) {
+    this.do_reveal_related_topic = function(topic_id, action) {
         // fetch from DB
         var assocs = dm4c.restc.get_associations(dm4c.selected_object.id, topic_id)
         // update client model and view
         for (var i = 0, assoc; assoc = assocs[i]; i++) {
             dm4c.show_association(assoc)
         }
-        dm4c.show_topic(dm4c.fetch_topic(topic_id), "show", undefined, true)    // coordinates=undefined, do_center=true
+        dm4c.show_topic(dm4c.fetch_topic(topic_id), action, undefined, true)    // coordinates=undefined, do_center=true
     }
 
     // ---
@@ -346,10 +351,11 @@ function Webclient() {
      *     - the topic has no gemetry yet
      *
      * @param   topic           Topic to add (a Topic object).
-     * @param   action          Optional: action to perform, 3 possible values:
+     * @param   action          Optional: the action to perform on the topic, 3 possible values:
      *                              "none" - do not select the topic (page panel doesn't change) -- the default.
      *                              "show" - select the topic and show its info in the page panel.
      *                              "edit" - select the topic and show its form in the page panel.
+     *                          If not specified (that is any falsish value) "none" is assumed.
      * @param   coordinates     Optional: the coordinates for placing the topic on the canvas (an object with
      *                          "x" and "y" properties). If not specified, placement is up to the canvas.
      * @param   do_center       Optional: if evaluates to true the topic is centered on the canvas.
