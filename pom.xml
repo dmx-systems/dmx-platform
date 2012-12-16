@@ -25,6 +25,9 @@
         <dm4.security.write_requires_login>true</dm4.security.write_requires_login>
         <dm4.security.subnet_filter>127.0.0.1/32</dm4.security.subnet_filter>
 
+        <!-- Host -->
+        <dm4.host.url>http://localhost:${org.osgi.service.http.port}/</dm4.host.url>
+
         <!-- Database -->
         <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
 

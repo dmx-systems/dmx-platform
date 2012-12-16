@@ -34,6 +34,11 @@ public class DeepaMehtaUtils {
 
     private static Logger logger = Logger.getLogger("de.deepamehta.core.util.DeepaMehtaUtils");
 
+    private static final String DM4_HOST_URL = System.getProperty("dm4.host.url");
+    static {
+        logger.info("Host setting:\n    dm4.host.url=\""+ DM4_HOST_URL + "\"");
+    }
+
 
 
     // ************
@@ -43,23 +48,12 @@ public class DeepaMehtaUtils {
 
 
     /**
-     * Checks if the given URL's host and port refers to this DeepaMehta installation.
+     * Checks if an URL refers to this DeepaMehta installation.
+     * The check relies on the "dm4.host.url" system property.
      */
     public static boolean isDeepaMehtaURL(URL url) {
         try {
-            // check host
-            InetAddress dmAddress = InetAddress.getLocalHost();             // throws UnknownHostException
-            InetAddress urlAddress = InetAddress.getByName(url.getHost());  // throws UnknownHostException
-            if (!dmAddress.equals(urlAddress)) {
-                return false;
-            }
-            // check port
-            int dmPort = Integer.parseInt(System.getProperty("org.osgi.service.http.port"));
-            int urlPort = url.getPort();
-            if (urlPort == -1) {
-                urlPort = url.getDefaultPort();
-            }
-            return dmPort == urlPort;
+            return url.toString().startsWith(DM4_HOST_URL);
         } catch (Exception e) {
             throw new RuntimeException("Checking for DeepaMehta URL failed (url=\"" + url + "\")", e);
         }
