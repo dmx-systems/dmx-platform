@@ -184,6 +184,10 @@ function DefaultTopicmapRenderer() {
 
     // ---
 
+    this.topic_exists = function(topic_id) {
+        return model.topic_exists(topic_id)
+    }
+
     this.clear = function() {
         // Must reset canvas translation.
         // See TopicmapRenderer contract.

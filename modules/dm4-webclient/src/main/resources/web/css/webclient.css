@@ -197,11 +197,17 @@ body {
     padding-left: 1em;
     padding-right: 0.75em;
     width: 24px;
+    cursor: pointer;
 }
 
 .topic-list .supplement-text {
     font-size: 75%;
     line-height: 1.5em;
+}
+
+.topic-list .disabled {
+    opacity: 0.4;
+    cursor: default;
 }
 
 /*** Association Page ***/
