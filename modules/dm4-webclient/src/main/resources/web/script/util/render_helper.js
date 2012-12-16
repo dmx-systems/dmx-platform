@@ -60,9 +60,12 @@ function RenderHelper() {
             // render topic
             var icon_click_handler = create_click_handler(topic, "icon")
             var topic_click_handler = create_click_handler(topic, "label")
+            var icon_link_title = "A " + dm4c.type_label(topic.type_uri) + "\nClick to reveal on topicmap"
+            var topic_link_title = icon_link_title + " and focus"
             table.append($("<tr>")
-                .append($("<td>").append(this.icon_link(topic, icon_click_handler)))
-                .append($("<td>").append(this.topic_link(topic, topic_click_handler)).append(supplement))
+                .append($("<td>").append(this.icon_link(topic, icon_click_handler, icon_link_title)))
+                .append($("<td>").append(this.topic_link(topic, topic_click_handler, topic_link_title))
+                                 .append(supplement))
             )
         }
         return table
@@ -81,16 +84,25 @@ function RenderHelper() {
     }
 
     /**
-     * @param   topic       Topic to render (a Topic object).
+     * Renders a topic label as a link.
+     *
+     * @param   title       Optional: the tooltip title.
+     *                      If not specified the topic's type name is used.
      */
-    this.topic_link = function(topic, handler) {
-        var title = dm4c.type_label(topic.type_uri)
+    this.topic_link = function(topic, handler, title) {
         var text = this.link_text(topic)
+        title = title || dm4c.type_label(topic.type_uri)
         return $("<a>").attr({href: "#", title: title}).append(text).click(handler)
     }
 
-    this.icon_link = function(topic, handler) {
-        return this.type_icon(topic.type_uri).click(handler)
+    /**
+     * Renders a topic icon and attaches a click handler to it.
+     *
+     * @param   title       Optional: the tooltip title.
+     *                      If not specified the topic's type name is used.
+     */
+    this.icon_link = function(topic, handler, title) {
+        return this.type_icon(topic.type_uri, title).click(handler)
     }
 
     this.link_text = function(topic) {
@@ -103,11 +115,17 @@ function RenderHelper() {
     }
 
     /**
-     * @return  The <img> element (jQuery object).
+     * Renders a topic type icon.
+     *
+     * @param   type_uri    The topic type URI.
+     * @param   title       Optional: the tooltip title.
+     *                      If not specified the topic type name is used.
+     *
+     * @return  An <img> element of CSS class "type-icon" (jQuery object).
      */
-    this.type_icon = function(type_uri) {
+    this.type_icon = function(type_uri, title) {
         var src   = dm4c.get_icon_src(type_uri)
-        var title = dm4c.type_label(type_uri)
+        title = title || dm4c.type_label(type_uri)
         return this.icon(src, title)
     }
 
