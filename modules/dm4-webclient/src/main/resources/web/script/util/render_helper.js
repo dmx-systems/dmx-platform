@@ -58,19 +58,22 @@ function RenderHelper() {
                 var supplement = $("<div>").addClass("supplement-text").append(supplement_text)
             }
             // render topic
-            var icon_click_handler = create_click_handler(topic, "icon")
-            var topic_click_handler = create_click_handler(topic, "label")
-            var icon_link_title = "A " + dm4c.type_label(topic.type_uri) + "\nClick to reveal on topicmap"
-            var topic_link_title = icon_link_title + " and focus"
+            var icon_handler = click_handler_for(topic, "icon")
+            var label_handler = click_handler_for(topic, "label")
+            var title = tooltips(icon_handler == undefined)
             table.append($("<tr>")
-                .append($("<td>").append(this.icon_link(topic, icon_click_handler, icon_link_title)))
-                .append($("<td>").append(this.topic_link(topic, topic_click_handler, topic_link_title))
-                                 .append(supplement))
+                .append($("<td>").append(this.icon_link(topic, icon_handler, title.icon)))
+                .append($("<td>").append(this.topic_link(topic, label_handler, title.label)).append(supplement))
             )
         }
         return table
 
-        function create_click_handler(topic, spot) {
+        function click_handler_for(topic, spot) {
+            // create no handler for the "icon" spot if the topic is already visible on canvas
+            if (spot == "icon" && dm4c.canvas.topic_exists(topic.id)) {
+                return
+            }
+            //
             return function() {
                 if (click_handler) {
                     click_handler(topic, spot)
@@ -78,7 +81,27 @@ function RenderHelper() {
                     var action = spot == "label" && "show"
                     dm4c.do_reveal_related_topic(topic.id, action)
                 }
-                return false    // suppress browser's own link-click behavoir
+                // reflect "visible on canvas" status in page panel
+                if (spot == "icon") {
+                    dm4c.page_panel.refresh()
+                }
+                // suppress browser's own link-click behavoir
+                return false
+            }
+        }
+
+        function tooltips(is_visible_on_canvas) {
+            var type_label = dm4c.type_label(topic.type_uri)
+            if (is_visible_on_canvas) {
+                return {
+                    icon:  "A " + type_label + "\nAlready visible on topicmap",
+                    label: "A " + type_label + "\nClick to focus on topicmap"
+                }
+            } else {
+                return {
+                    icon:  "A " + type_label + "\nClick to reveal on topicmap",
+                    label: "A " + type_label + "\nClick to reveal on topicmap and focus"
+                }
             }
         }
     }
@@ -96,13 +119,21 @@ function RenderHelper() {
     }
 
     /**
-     * Renders a topic icon and attaches a click handler to it.
+     * Renders a topic icon and optionally attaches a click handler to it.
      *
+     * @param   handler     Optional: the click handler.
+     *                      If not specified the icon is rendered as disabled and doesn't respond to clicks.
      * @param   title       Optional: the tooltip title.
      *                      If not specified the topic's type name is used.
      */
     this.icon_link = function(topic, handler, title) {
-        return this.type_icon(topic.type_uri, title).click(handler)
+        var type_icon = this.type_icon(topic.type_uri, title)
+        if (handler) {
+            type_icon.click(handler)
+        } else {
+            type_icon.addClass("disabled")
+        }
+        return type_icon
     }
 
     this.link_text = function(topic) {
@@ -124,7 +155,7 @@ function RenderHelper() {
      * @return  An <img> element of CSS class "type-icon" (jQuery object).
      */
     this.type_icon = function(type_uri, title) {
-        var src   = dm4c.get_icon_src(type_uri)
+        var src = dm4c.get_icon_src(type_uri)
         title = title || dm4c.type_label(type_uri)
         return this.icon(src, title)
     }

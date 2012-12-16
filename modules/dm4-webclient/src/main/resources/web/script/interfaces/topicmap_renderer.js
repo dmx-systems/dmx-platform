@@ -50,6 +50,13 @@ function TopicmapRenderer() {
     this.remove_association = function(assoc_id, refresh_canvas) {}
 
     /**
+     * Checks if a topic is visible on the canvas.
+     *
+     * @return  a boolean
+     */
+    this.topic_exists = function(topic_id) {}
+
+    /**
      * Clears the model: removes all topics and associations and resets the selection.
      *
      * Note: if the underlying view element handles translation relatively (by distance) the renderer must
