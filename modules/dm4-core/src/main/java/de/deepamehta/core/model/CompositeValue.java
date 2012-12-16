@@ -205,7 +205,7 @@ public class CompositeValue {
      * Puts a single-valued child. An existing value is overwritten.
      */
     public CompositeValue put(String key, TopicModel value) {
-        // ### FIXME: drop "key" argument? It is supposed to be equal to value.getTypeUri().
+        // ### TODO: drop "key" argument? It is supposed to be equal to value.getTypeUri().
         try {
             // check argument
             if (value == null) {
@@ -259,11 +259,23 @@ public class CompositeValue {
 
     // ---
 
+    /**
+     * Puts a by-ID topic reference for a single-valued child. An existing reference is overwritten.
+     *
+     * Used to maintain the assigment of an *aggregated* child.
+     * Not applicable for a *compositioned* child.
+     */
     public CompositeValue putRef(String key, long refTopicId) {
         put(key, new TopicModel(refTopicId, key));
         return this;
     }
 
+    /**
+     * Puts a by-URI topic reference for a single-valued child. An existing reference is overwritten.
+     *
+     * Used to maintain the assigment of an *aggregated* child.
+     * Not applicable for a *compositioned* child.
+     */
     public CompositeValue putRef(String key, String refTopicUri) {
         put(key, new TopicModel(refTopicUri, key));
         return this;
@@ -275,7 +287,7 @@ public class CompositeValue {
      * Adds a value to a multiple-valued child.
      */
     public CompositeValue add(String key, TopicModel value) {
-        // ### FIXME: drop "key" argument? It is supposed to be equal to value.getTypeUri().
+        // ### TODO: drop "key" argument? It is supposed to be equal to value.getTypeUri().
         List<TopicModel> topics = getTopics(key, null);     // defaultValue=null
         // Note: topics just created have no child topics yet
         if (topics == null) {
@@ -294,6 +306,30 @@ public class CompositeValue {
         if (topics != null) {
             topics.remove(value);
         }
+        return this;
+    }
+
+    // ---
+
+    /**
+     * Adds a by-ID topic reference to a multiple-valued child.
+     *
+     * Used to maintain the assigments of *aggregated* childs.
+     * Not applicable for *compositioned* childs.
+     */
+    public CompositeValue addRef(String key, long refTopicId) {
+        add(key, new TopicModel(refTopicId, key));
+        return this;
+    }
+
+    /**
+     * Adds a by-URI topic reference to a multiple-valued child.
+     *
+     * Used to maintain the assigments of *aggregated* childs.
+     * Not applicable for *compositioned* childs.
+     */
+    public CompositeValue addRef(String key, String refTopicUri) {
+        add(key, new TopicModel(refTopicUri, key));
         return this;
     }
 
