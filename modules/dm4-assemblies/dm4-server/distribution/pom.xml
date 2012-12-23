@@ -16,7 +16,7 @@
     </parent>
 
     <properties>
-        <karaf.name>dm4server</karaf.name>
+        <karaf.name>deepamehta</karaf.name>
         <dm4.security.read_requires_login>true</dm4.security.read_requires_login>
         <dm4.security.write_requires_login>true</dm4.security.write_requires_login>
         <dm4.security.subnet_filter>0.0.0.0/0</dm4.security.subnet_filter>
@@ -147,7 +147,7 @@
                             <descriptors>
                                 <descriptor>src/main/descriptors/assembly.xml</descriptor>
                             </descriptors>
-                            <finalName>${karaf.name}-${project.version}</finalName>
+                            <finalName>${karaf.name}-${project.version}-karaf</finalName>
                             <tarLongFileMode>gnu</tarLongFileMode>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
