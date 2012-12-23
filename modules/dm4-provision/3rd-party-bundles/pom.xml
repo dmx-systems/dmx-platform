@@ -6,13 +6,13 @@
     <name>3rd Party Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>3rd-party-bundles</artifactId>
-    <version>4.0.13-SNAPSHOT</version>
+    <version>4.0.13</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-provision</artifactId>
-        <version>4.0.13-SNAPSHOT</version>
+        <version>4.0.13</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>neo4j-mehtagraph</artifactId>
-            <version>1.8-SNAPSHOT</version>
+            <version>1.8</version>
         </dependency>
 
         <!-- Commons FileUpload -->
