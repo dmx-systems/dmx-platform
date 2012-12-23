@@ -33,7 +33,7 @@ public class WebPublishingService {
 
     private ResourceConfig rootApplication;
     private int classCount = 0;         // counts DM root resource and provider classes
-    private int singletonCount = 0;     // counts DM root resource and provider instances
+    private int singletonCount = 0;     // counts DM root resource and provider singletons
     // Note: we count DM resources separately as Jersey adds its own ones to the application.
     // Once the total DM resource count reaches 0 the Jersey servlet is unregistered.
 
@@ -104,18 +104,27 @@ public class WebPublishingService {
 
     // === REST Resources ===
 
-    // Note: synchronizing this method prevents creation of multiple Jersey servlet instances due to parallel plugin
-    // initialization.
+    /**
+     * Note: synchronizing this method prevents creation of multiple Jersey servlet instances due to parallel plugin
+     * initialization.
+     *
+     * @param   resources           the set of root resource and provider singletons, may be empty.
+     * @param   providerClasses     the set of root resource and provider classes, may be empty.
+     */
     synchronized RestResource addRestResource(Set<Object> resources, Set<Class<?>> providerClasses) {
         addSingletons(resources);
         addClasses(providerClasses);
         logResourceInfo();
         //
-        // Note: we must register the Jersey servlet lazily, that is not before any resources or providers
-        // are added. An "empty" application would fail (com.sun.jersey.api.container.ContainerException:
+        // Note: we must register the Jersey servlet lazily, that is not before any root resources are added.
+        // An "empty" application would fail (com.sun.jersey.api.container.ContainerException:
         // The ResourceConfig instance does not contain any root resource classes).
         if (!isJerseyServletRegistered) {
-            registerJerseyServlet();
+            // Note: we must not register the servlet as long as no root resources are added yet.
+            // A plugin may contain just provider classes.
+            if (hasRootResources()) {
+                registerJerseyServlet();
+            }
         } else {
             reloadJerseyServlet();
         }
@@ -128,10 +137,10 @@ public class WebPublishingService {
         removeClasses(restResource.providerClasses);
         logResourceInfo();
         //
-        // Note: once all resources and providers are removed we must unregister the Jersey servlet.
+        // Note: once all root resources are removed we must unregister the Jersey servlet.
         // Reloading it with an "empty" application would fail (com.sun.jersey.api.container.ContainerException:
         // The ResourceConfig instance does not contain any root resource classes).
-        if (!hasResources()) {
+        if (!hasRootResources()) {
             unregisterJerseyServlet();
         } else {
             reloadJerseyServlet();
@@ -185,8 +194,8 @@ public class WebPublishingService {
 
     // ---
 
-    private boolean hasResources() {
-        return classCount + singletonCount > 0;
+    private boolean hasRootResources() {
+        return singletonCount > 0;
     }
 
     private void logResourceInfo() {

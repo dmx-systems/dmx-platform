@@ -774,13 +774,13 @@ public class PluginImpl implements Plugin, EventHandler {
             }
         } catch (Exception e) {
             unregisterWebResources();
-            throw new RuntimeException("Registering REST resources of " + this + " failed", e);
+            throw new RuntimeException("Registering REST resources and/or provider classes of " + this + " failed", e);
         }
     }
 
     private void unregisterRestResources() {
         if (restResource != null) {
-            logger.info("Unregistering REST resources of " + this);
+            logger.info("Unregistering REST resources and/or provider classes of " + this);
             webPublishingService.removeRestResource(restResource);
         }
     }
