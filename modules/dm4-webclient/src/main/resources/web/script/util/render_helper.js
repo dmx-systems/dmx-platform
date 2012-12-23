@@ -95,7 +95,7 @@ function RenderHelper() {
             if (is_visible_on_canvas) {
                 return {
                     icon:  "A " + type_label + "\nAlready visible on topicmap",
-                    label: "A " + type_label + "\nClick to focus on topicmap"
+                    label: "A " + type_label + "\nClick to focus"
                 }
             } else {
                 return {
