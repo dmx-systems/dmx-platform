@@ -5,8 +5,8 @@ DeepaMehta 4
 DeepaMehta 4 is a platform for collaboration and knowledge management. The vision of DeepaMehta is a Post-Desktop Metaphor user interface that abolishes applications, windows, files, and folders in favor of stable personal views of contextual content. The goal of DeepaMehta is to provide knowledge workers of all kind a cognitive adequate work environment, right after booting.
 
 Technically DeepaMehta 4 is made of  
-Java, Neo4j, Apache Lucene, Apache Felix, Jetty, Jersey (server-side),  
-Javascript/AJAX, jQuery, jQuery-UI, HTML5 Canvas, and CKEditor (client-side).
+Server-side: Java, Neo4j, Felix (OSGi), Jetty, Lucene, Jersey, Thymeleaf (optional), Karaf (optional).  
+Client-side: Javascript, jQuery, jQuery-UI, HTML5 Canvas, CKEditor, OpenLayers (optional).
 
 DeepaMehta 4 is a rewrite of DeepaMehta 2.  
 (DeepaMehta 3 was a research & development effort.)
@@ -14,15 +14,22 @@ DeepaMehta 4 is a rewrite of DeepaMehta 2.
 Project website:  
 <https://www.deepamehta.de/>
 
-Download, source code:  
-<https://github.com/jri/deepamehta>
+Live demo, nightly builds:  
+<http://demo.deepamehta.de/>
+
+Download:  
+<http://demo.deepamehta.de/download/>
 
 Documentation, release notes, issue tracker:  
 <https://trac.deepamehta.de/>
 
+Source code:  
+<https://github.com/jri/deepamehta>
+
 Mailing lists:  
 <https://lists.berlios.de/mailman/listinfo/deepamehta-users>  
-<https://lists.berlios.de/mailman/listinfo/deepamehta-devel>
+<https://lists.berlios.de/mailman/listinfo/deepamehta-devel>  
+<https://lists.berlios.de/mailman/listinfo/deepamehta-german>
 
 Licensed under GNU General Public License, version 3.
 
@@ -42,27 +49,43 @@ Works fine with Firefox 3.6 (or newer) and Safari 5. Works mostly fine with Goog
 Doesn't work with IE8. Potentially works with IE9 or IE10.
 
 
+Download a distribution
+-----------------------
+
+There are 2 DeepaMehta distributions to suit different needs:
+
+* The **Standard Distribution** focuses on small download size and easy setup for single users.  
+  The distribution file is `deepamehta-4.0.13.zip` (6.3 MB)
+
+* The **Karaf Distribution** is aimed to client-server setups and supports remote administration.  
+  The distribution file is `deepamehta-4.0.13-karaf.tar.gz` (13.3 MB)
+
+Download the distribution that suits your needs:  
+<http://demo.deepamehta.de/download/>
+
+Note: the remainder of this README applies to the Standard Distribution.  
+For setting up the Karaf Distribution refer to <https://trac.deepamehta.de/wiki/KarafDistribution>.
+
+
 Install
 -------
 
-1. Download the latest release from here:  
-   <https://github.com/jri/deepamehta/downloads/>
-2. Unzip the file.  
-   A folder `deepamehta-4.0.12` is created.
+Unzip the distribution file.  
+A folder `deepamehta-4.0.13` is created.
 
 
 Update
 ------
 
 Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is not supported.  
-Even updating from 4.0.x to 4.0.12 is not supported.  
+Even updating from 4.0.x to 4.0.13 is not supported.  
 Please see the note at the top.
 
 
 Start
 -----
 
-Open the `deepamehta-4.0.12` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.0.13` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -112,7 +135,7 @@ Uninstall
 To remove DeepaMehta completely from your computer, including the database:
 
 1. Stop DeepaMehta.
-2. Delete the entire `deepamehta-4.0.12` folder.
+2. Delete the entire `deepamehta-4.0.13` folder.
 
 
 Build from Source
@@ -123,6 +146,30 @@ Build from Source
 
 Version History
 ---------------
+
+**4.0.13** -- Dec 24, 2012
+
+* New features:
+    * The Geomaps plugin is included: display geo-related topics on an OpenStreetMap.
+    * Apache Karaf-based distribution for easy client-server setup and maintenance.
+    * Association Type Editor: allows the user to create custom association types.
+    * For developers: server-side HTML generation with Thymeleaf templates.
+* GUI improvements:
+    * Cluster move: moving an association on the canvas moves the visually connected subnetwork.
+    * More informative Page Panel: topics which are already visible on the canvas are displayed distinctively.
+    * Differentiated gestures for revealing topics via the Page Panel: "reveal" vs. "reveals and focus".
+    * More clearly arranged association listings in the Page Panel: associations are grouped by type.
+    * Keyboard shortcut: create associations via shift-drag.
+* Other improvements:
+    * Performance: revoke the performance loss introduced in version 4.0.12 in conjunction with Access Control.
+    * Updated 3rd-party components, most notably Neo4j 1.2 -> 1.8
+* Plugin development framework:
+    * Consume services by Java annotations.
+    * A plugin's provided service is automatically picked up.
+    * More efficient aggregation update logic and idempotent operations.
+    * Client-side load mechanism for auxiliary scripts.
+* See more changes and details in the release notes:  
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.12** -- Sep 18, 2012
 
@@ -144,7 +191,7 @@ Version History
     * For handling core events plugins implement listener interfaces instead of overriding methods.
     * A plugin's client-side main file and the custom renderer implementations are namespaced per URI.
     * New renderer type: Multi Renderer.
-* See details in the release notes:
+* See more changes and details in the release notes:  
   <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.11** -- May 19, 2012
@@ -162,7 +209,7 @@ Version History
     * The core service accepts update requests in 2 formats: canonic and simplified.
 * Compatibility with 3 updated plugins:
     * DM4 Kiezatlas 2.0.1, DM4 Geomaps 0.3, DM4 Facets 0.3
-* See details in the release notes:
+* See more changes and details in the release notes:  
   <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.10** -- Mar 24, 2012
@@ -170,21 +217,21 @@ Version History
 * Fixes:
     * The Back button works cross-topicmap again (#231).
     * A build from scratch with a pristine maven repo works again (#234).
-* See details in the release notes:
+* See details in the release notes:  
   <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.9** -- Feb 3, 2012
 
 * Fix:
     * CKEditor works in non-english environments.
-* See details in the release notes:
+* See details in the release notes:  
   <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.8** -- Feb 2, 2012
 
 * Improvement:
     * CKEditor as the new WYSIWYG editor. Compared to the formerly used TinyMCE it provides a much better look&feel.
-* See details in the release notes:
+* See details in the release notes:  
   <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.7** -- Jan 19, 2012
@@ -199,7 +246,7 @@ Version History
 * Fixes:
     * The topicmap state (translation) is persistent after auto scroll.
     * Deleted associations resulting from combobox value changes are removed from the canvas.
-* See details in the release notes:
+* See details in the release notes:  
   <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.6** -- Nov 27, 2011
@@ -212,7 +259,7 @@ Version History
 * Compatible with 2 new plugins (optional install):
     * DM4 Geomaps: displays topics on a geographical map.
     * DM4 Facets: introduces multi-typing to the DM data model.
-* See details in the release notes:
+* See details in the release notes:  
   <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.5** -- Oct 20, 2011
@@ -224,7 +271,7 @@ Version History
 * Fixes:
     * The file related features work on Windows.
     * The file related features work if DeepaMehta runs behind an Apache reverse proxy.
-* See details in the release notes:
+* See details in the release notes:  
   <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.4** -- Sep 27, 2011
@@ -235,7 +282,7 @@ Version History
     * Daemon support.
 * Improvements:
     * First support for larger topic amounts
-* See details in the release notes:
+* See details in the release notes:  
   <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.3** -- Aug 22, 2011
@@ -246,7 +293,7 @@ Version History
 * Improvements:
     * More intuitive Create menu
     * Create topics via keyboard
-* See details in the release notes:
+* See details in the release notes:  
   <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.2** -- Aug 2, 2011
@@ -359,4 +406,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Sep 18, 2012
+Dec 24, 2012
