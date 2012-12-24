@@ -2,7 +2,8 @@
 
 <features name="deepamehta-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
 
-    <feature name="dm4-3rd-party" description="DeepaMehta 3rd Party" version="${project.version}" resolver="(obr)">
+    <feature name="dm4-standard" description="DeepaMehta Standard Distribution" version="${project.version}">
+        <!-- DeepaMehta 3rd-party libraries -->
         <bundle>mvn:com.sun.jersey/jersey-core/1.14</bundle>
         <bundle>mvn:com.sun.jersey/jersey-server/1.14</bundle>
         <bundle>mvn:com.sun.jersey/jersey-servlet/1.14</bundle>
@@ -10,15 +11,8 @@
         <bundle>mvn:de.deepamehta/neo4j-mehtagraph/1.8</bundle>
         <bundle>mvn:commons-fileupload/commons-fileupload/1.2.2</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-io/1.3.2_5</bundle>
-    </feature>
-
-    <feature name="dm4-felix" description="DeepaMehta Felix HTTP" version="${project.version}" resolver="(obr)">
         <bundle>mvn:org.apache.felix/org.apache.felix.http.jetty/2.2.0</bundle>
-    </feature>
-
-    <feature name="dm4-standard" description="DeepaMehta Standard Plugins" version="${project.version}" resolver="(obr)">
-        <feature version="${project.version}">dm4-3rd-party</feature>
-        <feature version="${project.version}">dm4-felix</feature>
+        <!-- DeepaMehta Standard Distribution -->
         <bundle>mvn:de.deepamehta/deepamehta-core/4.0.13</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-webservice/4.0.13</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-webclient/4.0.13</bundle>
@@ -38,7 +32,7 @@
         <bundle>mvn:de.deepamehta/deepamehta-geomaps/4.0.13</bundle>
     </feature>
 
-    <feature name="dm4-webconsole" description="Karaf Web Console for administration and monitoring" version="2.2.9">
+    <feature name="dm4-webconsole" description="Karaf WebConsole for administration and monitoring" version="2.2.9">
         <config name="org.apache.karaf.webconsole">
             realm=karaf
             role=${karaf.admin.role}
