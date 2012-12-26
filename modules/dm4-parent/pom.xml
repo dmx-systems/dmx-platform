@@ -16,12 +16,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Neo4j Metagraph -->
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>neo4j-mehtagraph</artifactId>
-                <version>1.8</version>
-            </dependency>
             <!-- OSGi -->
             <dependency>
                 <groupId>org.osgi</groupId>
@@ -173,6 +167,7 @@
         <repository>
             <id>deepamehta-public-repository</id>
             <url>scpexe://deepamehta.newthinking.net/var/lib/tomcat-6/webapps/ROOT/maven2</url>
+            <!--url>scpexe://www.deepamehta.de/incoming/public_html/maven2</url-->
         </repository>
     </distributionManagement>
 </project>

@@ -43,13 +43,6 @@
             <version>1.3.2</version>
         </dependency>
 
-        <!-- Neo4j Metagraph -->
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>neo4j-mehtagraph</artifactId>
-            <version>1.8</version>
-        </dependency>
-
         <!-- Commons FileUpload -->
         <dependency>
             <groupId>commons-fileupload</groupId>

@@ -2,11 +2,9 @@ package de.deepamehta.core.osgi;
 
 import de.deepamehta.core.impl.service.EmbeddedService;
 import de.deepamehta.core.impl.service.WebPublishingService;
-import de.deepamehta.core.impl.storage.MGStorageBridge;
+import de.deepamehta.core.impl.storage.neo4j.Neo4jStorage;
 import de.deepamehta.core.service.DeepaMehtaService;
-
-import de.deepamehta.mehtagraph.MehtaGraph;
-import de.deepamehta.mehtagraph.MehtaGraphFactory;
+import de.deepamehta.core.storage.DeepaMehtaStorage;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -45,7 +43,7 @@ public class CoreActivator implements BundleActivator {
     public void start(BundleContext context) {
         try {
             logger.info("========== Starting \"DeepaMehta 4 Core\" ==========");
-            dms = new EmbeddedService(new MGStorageBridge(openDB()), context);
+            dms = new EmbeddedService(createStorage(), context);
             dms.setupDB();
             //
             logger.info("Registering DeepaMehta 4 core service at OSGi framework");
@@ -78,10 +76,10 @@ public class CoreActivator implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private MehtaGraph openDB() {
+    private DeepaMehtaStorage createStorage() {
         try {
             logger.info("Creating database and indexing services (path=" + DATABASE_PATH + ")");
-            return MehtaGraphFactory.createInstance(DATABASE_PATH);
+            return new Neo4jStorage(DATABASE_PATH);
         } catch (Exception e) {
             throw new RuntimeException("Opening database failed (path=" + DATABASE_PATH + ")", e);
         }

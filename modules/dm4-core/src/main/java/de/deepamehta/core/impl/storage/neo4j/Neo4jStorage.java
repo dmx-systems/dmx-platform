@@ -1,4 +1,4 @@
-package de.deepamehta.core.impl.storage;
+package de.deepamehta.core.impl.storage.neo4j;
 
 import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.ResultSet;
@@ -14,14 +14,8 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.accesscontrol.AccessControlList;
 import de.deepamehta.core.storage.DeepaMehtaStorage;
 
-import de.deepamehta.mehtagraph.ConnectedMehtaEdge;
-import de.deepamehta.mehtagraph.ConnectedMehtaNode;
-import de.deepamehta.mehtagraph.MehtaEdge;
-import de.deepamehta.mehtagraph.MehtaGraph;
-import de.deepamehta.mehtagraph.MehtaGraphIndexMode;
-import de.deepamehta.mehtagraph.MehtaNode;
-import de.deepamehta.mehtagraph.MehtaObject;
-import de.deepamehta.mehtagraph.MehtaObjectRole;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -37,23 +31,27 @@ import java.util.logging.Logger;
 
 
 /**
- * A DeepaMehta storage implementation by the means of a MehtaGraph implementation.
+ * A DeepaMehta storage implementation by the means of a MehtaGraph implementation. ### FIXDOC
  * <p>
  * The DeepaMehta service knows nothing about a MehtaGraph and a MehtaGraph knows nothing about DeepaMehta.
- * This class bridges between them.
+ * This class bridges between them. ### FIXDOC
  */
-public class MGStorageBridge implements DeepaMehtaStorage {
+public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private MehtaGraph mg;
+    private GraphDatabaseService neo4j = null;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public MGStorageBridge(MehtaGraph mg) {
-        this.mg = mg;
+    public Neo4jStorage(String databasePath) {
+        try {
+            this.neo4j = new GraphDatabaseFactory().newEmbeddedDatabase(databasePath);
+        } catch (Exception e) {
+            throw new RuntimeException("Creating a Neo4j GraphDatabaseService instance failed", e);
+        }
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

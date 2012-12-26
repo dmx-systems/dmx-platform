@@ -1,4 +1,4 @@
-package de.deepamehta.core.impl.storage;
+package de.deepamehta.core.impl.storage.neo4j;
 
 import de.deepamehta.core.DeepaMehtaTransaction;
 

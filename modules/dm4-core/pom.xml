@@ -18,11 +18,6 @@
     </parent>
 
     <dependencies>
-        <!-- Neo4j Metagraph -->
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>neo4j-mehtagraph</artifactId>
-        </dependency>
         <!-- OSGi -->
         <dependency>
             <groupId>org.osgi</groupId>
