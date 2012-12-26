@@ -6,13 +6,13 @@
     <name>Felix Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>felix-bundles</artifactId>
-    <version>4.0.13</version>
+    <version>4.0.14-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-provision</artifactId>
-        <version>4.0.13</version>
+        <version>4.0.14-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <!-- All Apache Felix bundles that belong to the DeepaMehta 4 standard distribution.
