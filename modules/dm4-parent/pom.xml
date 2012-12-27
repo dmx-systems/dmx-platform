@@ -16,11 +16,16 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Neo4j Metagraph -->
+            <!-- MehtaGraph -->
             <dependency>
                 <groupId>de.deepamehta</groupId>
-                <artifactId>neo4j-mehtagraph</artifactId>
-                <version>1.8</version>
+                <artifactId>deepamehta-mehtagraph</artifactId>
+                <version>4.0.14-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>de.deepamehta</groupId>
+                <artifactId>deepamehta-mehtagraph-neo4j</artifactId>
+                <version>4.0.14-SNAPSHOT</version>
             </dependency>
             <!-- OSGi -->
             <dependency>

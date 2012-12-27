@@ -30,6 +30,7 @@
 
         <!-- Database -->
         <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
+        <dm4.database.factory>de.deepamehta.mehtagraph.neo4j.Neo4jMehtaGraphFactory</dm4.database.factory>
 
         <!-- File Repository -->
         <dm4.filerepo.path></dm4.filerepo.path>
@@ -57,6 +58,8 @@
                 <felix.fileinstall.dir>
                     <![CDATA[
                         ${project.basedir}/modules/dm4-core/target,
+                        ${project.basedir}/modules/dm4-mehtagraph/target,
+                        ${project.basedir}/modules/dm4-mehtagraph-neo4j/target,
                         ${project.basedir}/modules/dm4-webservice/target,
                         ${project.basedir}/modules/dm4-webclient/target,
                         ${project.basedir}/modules/dm4-webbrowser/target,
@@ -119,6 +122,8 @@
             <id>all</id>
             <modules>
                 <module>modules/dm4-core</module>
+                <module>modules/dm4-mehtagraph</module>
+                <module>modules/dm4-mehtagraph-neo4j</module>
                 <module>modules/dm4-webservice</module>
                 <module>modules/dm4-webclient</module>
                 <module>modules/dm4-webbrowser</module>
@@ -153,7 +158,6 @@
                             <show>private</show>
                             <linksource>true</linksource>
                             <links>
-                                <link>http://www.deepamehta.de/apidocs/neo4j-mehtagraph/1.1/</link>
                                 <link>http://jersey.java.net/nonav/apidocs/1.8/jersey/</link>
                                 <link>http://jettison.codehaus.org/apidocs/</link> <!-- version 1.2 -->
                                 <link>http://www.osgi.org/javadoc/r4v401/</link>

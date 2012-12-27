@@ -16,7 +16,11 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <!-- All 3rd party bundles to be provisioned in the OSGi runtime. -->
+    <!--
+        All 3rd-party (= non-DeepaMehta) libraries to be provisioned in the OSGi runtime when
+            1) Running Pax Runner (development environment)
+            2) Building the Standard Distribution
+    -->
     <dependencies>
 
         <!-- Jersey -->
@@ -41,13 +45,6 @@
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <version>1.3.2</version>
-        </dependency>
-
-        <!-- Neo4j Metagraph -->
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>neo4j-mehtagraph</artifactId>
-            <version>1.8</version>
         </dependency>
 
         <!-- Commons FileUpload -->

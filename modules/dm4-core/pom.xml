@@ -18,10 +18,14 @@
     </parent>
 
     <dependencies>
-        <!-- Neo4j Metagraph -->
+        <!-- MehtaGraph -->
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>neo4j-mehtagraph</artifactId>
+            <artifactId>deepamehta-mehtagraph</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-mehtagraph-neo4j</artifactId>
         </dependency>
         <!-- OSGi -->
         <dependency>

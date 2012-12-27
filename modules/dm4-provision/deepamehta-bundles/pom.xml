@@ -16,7 +16,11 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <!-- All DeepaMehta bundles that belong to the DeepaMehta 4 standard distribution. -->
+    <!--
+        All DeepaMehta bundles that belong to the DeepaMehta 4 standard distribution.
+        ### TODO: add the dm4-mehtagraph and dm4-mehtagraph-neo4j artifacts here?
+        ### Apparently not required for building distribution but might required for deepamehta-plugin-parent
+    -->
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
