@@ -12,7 +12,6 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.accesscontrol.AccessControlList;
-import de.deepamehta.core.storage.DeepaMehtaStorage;
 
 import de.deepamehta.mehtagraph.ConnectedMehtaEdge;
 import de.deepamehta.mehtagraph.ConnectedMehtaNode;
@@ -42,7 +41,7 @@ import java.util.logging.Logger;
  * The DeepaMehta service knows nothing about a MehtaGraph and a MehtaGraph knows nothing about DeepaMehta.
  * This class bridges between them. ### FIXDOC
  */
-public class MGStorageBridge implements DeepaMehtaStorage {
+public class MGStorageBridge {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -62,12 +61,28 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     // === Topics ===
 
-    @Override
+    /**
+     * @return  The fetched topic.
+     *          Note: its composite value is not initialized.
+     */
     public TopicModel getTopic(long topicId) {
         return buildTopic(mg.getMehtaNode(topicId));
     }
 
-    @Override
+    /**
+     * Looks up a single topic by exact property value.
+     * If no such topic exists <code>null</code> is returned.
+     * If more than one topic were found a runtime exception is thrown.
+     * <p>
+     * IMPORTANT: Looking up a topic this way requires the property to be indexed with indexing mode <code>KEY</code>.
+     * This is achieved by declaring the respective data field with <code>indexing_mode: "KEY"</code>
+     * (for statically declared data field, typically in <code>types.json</code>) or
+     * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
+     * (for dynamically created data fields, typically in migration classes).
+     *
+     * @return  The fetched topic.
+     *          Note: its composite value is not initialized.
+     */
     public TopicModel getTopic(String key, SimpleValue value) {
         MehtaNode node = mg.getMehtaNode(key, value.value());
         return node != null ? buildTopic(node) : null;
@@ -75,7 +90,10 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
-    @Override
+    /**
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
+     */
     public RelatedTopicModel getTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                               String othersRoleTypeUri, String othersTopicTypeUri) {
         ResultSet<RelatedTopicModel> topics = getTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
@@ -92,7 +110,10 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         }
     }
 
-    @Override
+    /**
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
+     */
     public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                               String othersRoleTypeUri, String othersTopicTypeUri,
                                                               int maxResultSize) {
@@ -101,7 +122,15 @@ public class MGStorageBridge implements DeepaMehtaStorage {
             maxResultSize);
     }
 
-    @Override
+    /**
+     * @param   assocTypeUris       may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     *
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
+     */
     public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, List assocTypeUris, String myRoleTypeUri,
                                                               String othersRoleTypeUri, String othersTopicTypeUri,
                                                               int maxResultSize) {
@@ -118,14 +147,22 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
-    @Override
+    /**
+     * @param   myRoleTypeUri       may be null
+     *
+     * @return  The fetched associations.
+     *          Note: their composite values are not initialized.
+     */
     public Set<AssociationModel> getTopicAssociations(long topicId, String myRoleTypeUri) {
         return buildAssociations(mg.getMehtaNode(topicId).getMehtaEdges(myRoleTypeUri));
     }
 
     // ---
 
-    @Override
+    /**
+     * @return  The fetched association.
+     *          Note: its composite value is not initialized.
+     */
     public RelatedAssociationModel getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                               String othersRoleTypeUri, String othersAssocTypeUri) {
         Set<RelatedAssociationModel> assocs = getTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri,
@@ -142,7 +179,15 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         }
     }
 
-    @Override
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersAssocTypeUri  may be null
+     *
+     * @return  The fetched associations.
+     *          Note: their composite values are not initialized.
+     */
     public Set<RelatedAssociationModel> getTopicRelatedAssociations(long topicId, String assocTypeUri,
                                                                     String myRoleTypeUri, String othersRoleTypeUri,
                                                                     String othersAssocTypeUri) {
@@ -160,25 +205,38 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
-    @Override
+    /**
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
+     */
     public Set<TopicModel> searchTopics(String searchTerm, String fieldUri) {
         return buildTopics(mg.queryMehtaNodes(fieldUri, searchTerm));
     }
 
     // ---
 
-    @Override
+    /**
+     * Stores and indexes the topic's URI.
+     */
     public void setTopicUri(long topicId, String uri) {
         storeAndIndexUri(mg.getMehtaNode(topicId), uri);
     }
 
-    @Override
+    /**
+     * Stores the topic's value.
+     * <p>
+     * Note: the value is not indexed automatically. Use the {@link indexTopicValue} method.
+     *
+     * @return  The previous value, or <code>null</code> if no value was stored before.
+     */
     public SimpleValue setTopicValue(long topicId, SimpleValue value) {
         Object oldValue = mg.getMehtaNode(topicId).setObject("value", value.value());
         return oldValue != null ? new SimpleValue(oldValue) : null;
     }
 
-    @Override
+    /**
+     * @param   oldValue    may be null
+     */
     public void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, SimpleValue value,
                                                                                     SimpleValue oldValue) {
         MehtaGraphIndexMode mgIndexMode = fromIndexMode(indexMode);
@@ -186,7 +244,16 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         mg.getMehtaNode(topicId).indexAttribute(mgIndexMode, indexKey, value.value(), oldVal);
     }
 
-    @Override
+    /**
+     * Creates a topic.
+     * <p>
+     * The topic's URI is stored and indexed.
+     *
+     * @return  FIXME ### the created topic. Note:
+     *          - the topic URI   is initialzed and     persisted.
+     *          - the topic value is initialzed but not persisted.
+     *          - the type URI    is initialzed but not persisted.
+     */
     public void createTopic(TopicModel topicModel) {
         String uri = topicModel.getUri();
         checkUniqueness(uri);
@@ -197,7 +264,11 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         topicModel.setId(node.getId());
     }
 
-    @Override
+    /**
+     * Deletes the topic.
+     * <p>
+     * Prerequisite: the topic has no relations.
+     */
     public void deleteTopic(long topicId) {
         mg.getMehtaNode(topicId).delete();
     }
@@ -206,12 +277,18 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     // === Associations ===
 
-    @Override
     public AssociationModel getAssociation(long assocId) {
         return buildAssociation(mg.getMehtaEdge(assocId));
     }
 
-    @Override
+    /**
+     * Returns the association between two topics, qualified by association type and both role types.
+     * If no such association exists <code>null</code> is returned.
+     * If more than one association exist, a runtime exception is thrown.
+     *
+     * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
+     *                          ### FIXME: for methods with a singular return value all filters should be mandatory
+     */
     public AssociationModel getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
                                                                                               String roleTypeUri2) {
         Set<MehtaEdge> edges = mg.getMehtaEdges(topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
@@ -233,7 +310,6 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         }
     }
 
-    @Override
     public AssociationModel getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
                                                                      String topicRoleTypeUri, String assocRoleTypeUri) {
         Set<MehtaEdge> edges = mg.getMehtaEdgesBetweenNodeAndEdge(topicId, assocId, topicRoleTypeUri, assocRoleTypeUri);
@@ -255,7 +331,11 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         }
     }
 
-    @Override
+    /**
+     * Returns the associations between two topics. If no such association exists an empty set is returned.
+     *
+     * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
+     */
     public Set<AssociationModel> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
         Set<MehtaEdge> edges = mg.getMehtaEdges(topic1Id, topic2Id);
         // apply type filter
@@ -268,7 +348,6 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
-    @Override
     public RelatedTopicModel getAssociationRelatedTopic(long assocId, String assocTypeUri,
                                                                     String myRoleTypeUri, String othersRoleTypeUri,
                                                                     String othersTopicTypeUri) {
@@ -286,7 +365,6 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         }
     }
 
-    @Override
     public ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri,
                                                                     String myRoleTypeUri, String othersRoleTypeUri,
                                                                     String othersTopicTypeUri, int maxResultSize) {
@@ -295,7 +373,12 @@ public class MGStorageBridge implements DeepaMehtaStorage {
             maxResultSize);
     }
 
-    @Override
+    /**
+     * @param   assocTypeUris       may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
     public ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, List assocTypeUris,
                                                                     String myRoleTypeUri, String othersRoleTypeUri,
                                                                     String othersTopicTypeUri, int maxResultSize) {
@@ -312,12 +395,13 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
-    @Override
+    /**
+     * @param   myRoleTypeUri       may be null
+     */
     public Set<AssociationModel> getAssociationAssociations(long assocId, String myRoleTypeUri) {
         return buildAssociations(mg.getMehtaEdge(assocId).getMehtaEdges(myRoleTypeUri));
     }
 
-    @Override
     public RelatedAssociationModel getAssociationRelatedAssociation(long assocId, String assocTypeUri,
                                                                     String myRoleTypeUri, String othersRoleTypeUri) {
         // FIXME: assocTypeUri not respected
@@ -327,25 +411,34 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
-    @Override
     public void setRoleTypeUri(long assocId, long objectId, String roleTypeUri) {
         mg.getMehtaEdge(assocId).getMehtaObject(objectId).setRoleType(roleTypeUri);
     }
 
     // ---
 
-    @Override
+    /**
+     * Stores and indexes the association's URI.
+     */
     public void setAssociationUri(long assocId, String uri) {
         storeAndIndexUri(mg.getMehtaEdge(assocId), uri);
     }
 
-    @Override
+    /**
+     * Stores the association's value.
+     * <p>
+     * Note: the value is not indexed automatically. Use the {@link indexAssociationValue} method.
+     *
+     * @return  The previous value, or <code>null</code> if no value was stored before.
+     */
     public SimpleValue setAssociationValue(long assocId, SimpleValue value) {
         Object oldValue = mg.getMehtaEdge(assocId).setObject("value", value.value());
         return oldValue != null ? new SimpleValue(oldValue) : null;
     }
 
-    @Override
+    /**
+     * @param   oldValue    may be null
+     */
     public void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, SimpleValue value,
                                                                                           SimpleValue oldValue) {
         MehtaGraphIndexMode mgIndexMode = fromIndexMode(indexMode);
@@ -355,7 +448,6 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     // ---
 
-    @Override
     public void createAssociation(AssociationModel assocModel) {
         MehtaEdge edge = mg.createMehtaEdge(
             getMehtaObjectRole(assocModel.getRoleModel1()),
@@ -363,7 +455,6 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         assocModel.setId(edge.getId());
     }
 
-    @Override
     public void deleteAssociation(long assocId) {
         mg.getMehtaEdge(assocId).delete();
     }
@@ -372,7 +463,10 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     // === Access Control ===
 
-    @Override
+    /**
+     * Fetches the Access Control List for the specified topic or association.
+     * If no one is stored an empty Access Control List is returned.
+     */
     public AccessControlList getACL(long objectId) {
         try {
             return new AccessControlList(new JSONObject(getProperty(objectId, "acl", "{}")));
@@ -381,31 +475,29 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         }
     }
 
-    @Override
+    /**
+     * Creates the Access Control List for the specified topic or association.
+     */
     public void createACL(long objectId, AccessControlList acl) {
         setProperty(objectId, "acl", acl.toJSON().toString());
     }
 
     // ---
 
-    @Override
     public String getCreator(long objectId) {
         return getProperty(objectId, "creator", null);
     }
 
-    @Override
     public void setCreator(long objectId, String username) {
         setProperty(objectId, "creator", username);
     }
 
     // ---
 
-    @Override
     public String getOwner(long objectId) {
         return getProperty(objectId, "owner", null);
     }
 
-    @Override
     public void setOwner(long objectId, String username) {
         setProperty(objectId, "owner", username);
     }
@@ -414,12 +506,16 @@ public class MGStorageBridge implements DeepaMehtaStorage {
 
     // === DB ===
 
-    @Override
     public DeepaMehtaTransaction beginTx() {
         return new MGTransactionAdapter(mg);
     }
 
-    @Override
+    /**
+     * Initializes the database.
+     * Prerequisite: there is an open transaction.
+     *
+     * @return  <code>true</code> if a clean install is detected, <code>false</code> otherwise.
+     */
     public boolean init() {
         // init core migration number
         boolean isCleanInstall = false;
@@ -432,17 +528,14 @@ public class MGStorageBridge implements DeepaMehtaStorage {
         return isCleanInstall;
     }
 
-    @Override
     public void shutdown() {
         mg.shutdown();
     }
 
-    @Override
     public int getMigrationNr() {
         return mg.getMehtaNode(0).getInteger("core_migration_nr");
     }
 
-    @Override
     public void setMigrationNr(int migrationNr) {
         mg.getMehtaNode(0).setInteger("core_migration_nr", migrationNr);
     }

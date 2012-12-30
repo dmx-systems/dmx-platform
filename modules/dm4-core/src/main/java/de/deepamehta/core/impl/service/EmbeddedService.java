@@ -8,6 +8,7 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.impl.storage.MGStorageBridge;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.AssociationTypeModel;
@@ -26,7 +27,6 @@ import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.accesscontrol.AccessControlList;
-import de.deepamehta.core.storage.DeepaMehtaStorage;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.osgi.framework.BundleContext;
@@ -52,7 +52,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    DeepaMehtaStorage storage;
+    MGStorageBridge storage;
     MigrationManager migrationManager;
     PluginManager pluginManager;
     ListenerRegistry listenerRegistry;
@@ -67,7 +67,7 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * @param   bundleContext   The context of the DeepaMehta 4 Core bundle.
      */
-    public EmbeddedService(DeepaMehtaStorage storage, BundleContext bundleContext) {
+    public EmbeddedService(MGStorageBridge storage, BundleContext bundleContext) {
         this.storage = storage;
         this.bundleContext = bundleContext;
         this.migrationManager = new MigrationManager(this);
