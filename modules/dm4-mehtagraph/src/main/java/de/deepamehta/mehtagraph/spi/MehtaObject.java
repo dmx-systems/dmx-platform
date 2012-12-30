@@ -20,9 +20,7 @@ public interface MehtaObject {
 
     long getId();
 
-
-
-    // === Get Attributes ===
+    // --- Get Attributes ---
 
     /**
      * @throws  Exception    if node has no attribute with that key
@@ -54,9 +52,7 @@ public interface MehtaObject {
 
     boolean hasAttribute(String key);
 
-
-
-    // === Set Attributes ===
+    // --- Set Attributes ---
 
     /**
      * @throws  IllegalArgumentException    if value is null
@@ -72,9 +68,7 @@ public interface MehtaObject {
      */
     Object setObject(String key, Object value);
 
-
-
-    // === Indexing ===
+    // --- Indexing ---
 
     /**
      * This method must only be called for index modes OFF and FULLTEXT.
@@ -89,9 +83,7 @@ public interface MehtaObject {
      */
     void indexAttribute(MehtaGraphIndexMode indexMode, String indexKey, Object value, Object oldValue);
 
-
-
-    // === Traversal ===
+    // --- Traversal ---
 
     /**
      * @param   myRoleType      Pass <code>null</code> to switch role type filter off.
@@ -126,9 +118,7 @@ public interface MehtaObject {
      */
     Set<ConnectedMehtaEdge> getConnectedMehtaEdges(String myRoleType, String othersRoleType);
 
-
-
-    // === Deletion ===
+    // --- Deletion ---
 
     /**
      * Deletes this mehta object.

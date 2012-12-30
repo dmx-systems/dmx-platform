@@ -154,7 +154,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         // update memory
         model.setSimpleValue(value);
         // update DB
-        storeAndIndexValue(value);
+        storeAndIndexSimpleValue();
     }
 
     // --- Composite Value ---
@@ -364,7 +364,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     protected abstract void storeTypeUri();
 
-    protected abstract SimpleValue storeValue(SimpleValue value);
+    protected abstract SimpleValue storeSimpleValue();
 
     protected abstract void indexValue(IndexMode indexMode, String indexKey, SimpleValue value, SimpleValue oldValue);
 
@@ -376,6 +376,15 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    /**
+     * Takes the simple or composite value from this object's model and stores and indexes it.
+     *
+     * This method encapsulates the logic that is common to topics and associations.
+     * To handle the differences abstract methods are called.
+     *
+     * Called from {@link ObjectFactoryImpl#storeTopic}
+     * Called from {@link ObjectFactoryImpl#storeAssociation}
+     */
     void storeValue(ClientState clientState, Directives directives) {
         try {
             if (getType().getDataTypeUri().equals("dm4.core.composite")) {
@@ -388,7 +397,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 updateCompositeValue(comp, clientState, directives);
                 refreshLabel();
             } else {
-                storeAndIndexValue(getSimpleValue());
+                storeAndIndexSimpleValue();
             }
         } catch (Exception e) {
             throw new RuntimeException("Storing the simple/composite value of " + className() + " " + getId() +
@@ -741,11 +750,15 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    void storeAndIndexValue(SimpleValue value) {
-        SimpleValue oldValue = storeValue(value);               // abstract
-        indexValue(value, oldValue);
+    // ### TODO: should be private
+    void storeAndIndexSimpleValue() {
+        SimpleValue oldValue = storeSimpleValue();              // abstract
+        indexValue(getSimpleValue(), oldValue);
     }
 
+    /**
+     * Determines this object's index key and index modes and updates the index according to the specified values.
+     */
     private void indexValue(SimpleValue value, SimpleValue oldValue) {
         Type type = getType();                                  // abstract
         String indexKey = type.getUri();

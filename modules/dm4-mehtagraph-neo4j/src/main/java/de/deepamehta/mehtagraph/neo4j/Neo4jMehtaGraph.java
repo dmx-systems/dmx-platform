@@ -7,15 +7,10 @@ import de.deepamehta.mehtagraph.spi.MehtaGraphTransaction;
 import de.deepamehta.mehtagraph.spi.MehtaNode;
 import de.deepamehta.mehtagraph.spi.MehtaObject;
 
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexManager;
-import static org.neo4j.helpers.collection.MapUtil.stringMap;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -29,22 +24,8 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public Neo4jMehtaGraph(GraphDatabaseService neo4j) {
-        super(neo4j);
-        this.relTypeCache = new Neo4jRelationtypeCache(neo4j);
-        try {
-            // access/create exact-value index
-            this.exactIndex = neo4j.index().forNodes("exact");
-            // access/create fulltext index
-            if (neo4j.index().existsForNodes("fulltext")) {
-                this.fulltextIndex = neo4j.index().forNodes("fulltext");
-            } else {
-                Map<String, String> configuration = stringMap(IndexManager.PROVIDER, "lucene", "type", "fulltext");
-                this.fulltextIndex = neo4j.index().forNodes("fulltext", configuration);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Creating database indexes failed", e);
-        }
+    public Neo4jMehtaGraph(String databasePath) {
+        super(databasePath);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -78,7 +59,7 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
                 key + "\")");
         }
         //
-        Node node = exactIndex.get(key, value).getSingle();
+        Node node = exactNodeIndex.get(key, value).getSingle();
         return node != null ? buildMehtaNode(node) : null;
     }
 
@@ -87,7 +68,7 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
     @Override
     public List<MehtaNode> getMehtaNodes(String key, Object value) {
         List nodes = new ArrayList();
-        for (Node node : exactIndex.query(key, value)) {
+        for (Node node : exactNodeIndex.query(key, value)) {
             nodes.add(buildMehtaNode(node));
         }
         return nodes;
@@ -111,13 +92,13 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
         }
         //
         List nodes = new ArrayList();
-        for (Node node : fulltextIndex.query(key, value)) {
-            // ### FIXME
+        for (Node node : fulltextNodeIndex.query(key, value)) {
+            /* ### FIXME
             if (isAuxiliaryNode(node)) {
                 logger.warning("### Ignoring invalid search result (ID " + node.getId() + " refers to a MehtaEdge)");
                 continue;
             }
-            //
+            */
             nodes.add(buildMehtaNode(node));
         }
         return nodes;

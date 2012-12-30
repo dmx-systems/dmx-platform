@@ -1,5 +1,6 @@
 package de.deepamehta.mehtagraph.neo4j;
 
+import de.deepamehta.mehtagraph.MehtaGraphIndexMode;
 import de.deepamehta.mehtagraph.MehtaObjectRole;
 import de.deepamehta.mehtagraph.spi.MehtaEdge;
 import de.deepamehta.mehtagraph.spi.MehtaObject;
@@ -80,7 +81,21 @@ class Neo4jMehtaEdge extends Neo4jMehtaObject implements MehtaEdge {
 
 
 
-    // === MehtaObject Overrides ===
+    // === MehtaObject Implementation ===
+
+    @Override
+    public void indexAttribute(MehtaGraphIndexMode indexMode, Object value, Object oldValue) {
+        throw new RuntimeException("MehtaEdge attribute indexing not implemented");
+    }
+
+    @Override
+    public void indexAttribute(MehtaGraphIndexMode indexMode, String indexKey, Object value, Object oldValue) {
+        throw new RuntimeException("MehtaEdge attribute indexing not implemented");
+    }
+
+
+
+    // === Neo4jMehtaObject Overrides ===
 
     @Override
     public void delete() {

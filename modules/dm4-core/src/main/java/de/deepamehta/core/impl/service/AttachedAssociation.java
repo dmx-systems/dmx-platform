@@ -83,13 +83,14 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     }
 
     @Override
-    protected SimpleValue storeValue(SimpleValue value) {
-        return dms.storage.setAssociationValue(getId(), value);
+    protected SimpleValue storeSimpleValue() {
+        return dms.storage.setAssociationValue(getId(), getSimpleValue());
     }
 
     @Override
     protected void indexValue(IndexMode indexMode, String indexKey, SimpleValue value, SimpleValue oldValue) {
-        dms.storage.indexAssociationValue(getId(), indexMode, indexKey, value, oldValue);
+        // Note: we do not index association values
+        // dms.storage.indexAssociationValue(getId(), indexMode, indexKey, value, oldValue);
     }
 
     @Override

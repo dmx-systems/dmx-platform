@@ -7,15 +7,19 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.TraversalDescription;
-import org.neo4j.graphdb.index.Index;
+import static org.neo4j.helpers.collection.MapUtil.stringMap;
 //
 import org.neo4j.kernel.Traversal;
 import org.neo4j.kernel.Uniqueness;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -30,24 +34,36 @@ class Neo4jBase {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private final Logger logger = Logger.getLogger(getClass().getName());
-
-    protected final GraphDatabaseService neo4j;
+    protected GraphDatabaseService neo4j = null;
     protected Neo4jRelationtypeCache relTypeCache;
-    protected Index<Node> exactIndex;
-    protected Index<Node> fulltextIndex;
+    protected Index<Node> exactNodeIndex;
+    protected Index<Node> fulltextNodeIndex;
+
+    private final Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    protected Neo4jBase(GraphDatabaseService neo4j) {
-        this.neo4j = neo4j;
+    protected Neo4jBase(String databasePath) {
+        try {
+            this.neo4j = new GraphDatabaseFactory().newEmbeddedDatabase(databasePath);
+            this.relTypeCache = new Neo4jRelationtypeCache(neo4j);
+            // indexes
+            this.exactNodeIndex    = createExactIndex("exact-node-index");
+            this.fulltextNodeIndex = createFulltextIndex("fulltext-node-index");
+        } catch (Exception e) {
+            if (neo4j != null) {
+                logger.info("Shutdown Neo4j");
+                neo4j.shutdown();
+            }
+            throw new RuntimeException("Creating the Neo4j instance and indexes failed", e);
+        }
     }
 
     protected Neo4jBase(Neo4jBase base) {
         this.neo4j = base.neo4j;
         this.relTypeCache = base.relTypeCache;
-        this.exactIndex = base.exactIndex;
-        this.fulltextIndex = base.fulltextIndex;
+        this.exactNodeIndex = base.exactNodeIndex;
+        this.fulltextNodeIndex = base.fulltextNodeIndex;
     }
 
     // ----------------------------------------------------------------------------------------------- Protected Methods
@@ -197,6 +213,23 @@ class Neo4jBase {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
+
+    // === Indexing ===
+
+    private Index<Node> createExactIndex(String name) {
+        return neo4j.index().forNodes(name);
+    }
+
+    private Index<Node> createFulltextIndex(String name) {
+        if (neo4j.index().existsForNodes(name)) {
+            return neo4j.index().forNodes(name);
+        } else {
+            Map<String, String> configuration = stringMap(IndexManager.PROVIDER, "lucene", "type", "fulltext");
+            return neo4j.index().forNodes(name, configuration);
+        }
+    }
 
 
 

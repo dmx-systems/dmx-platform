@@ -73,8 +73,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     }
 
     @Override
-    protected SimpleValue storeValue(SimpleValue value) {
-        return dms.storage.setTopicValue(getId(), value);
+    protected SimpleValue storeSimpleValue() {
+        return dms.storage.setTopicValue(getId(), getSimpleValue());
     }
 
     @Override

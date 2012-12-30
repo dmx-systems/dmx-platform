@@ -260,7 +260,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         dms.storage.createTopic(type);
         associateWithTopicType(type.getId(), type.getTypeUri());
         // Note: the created AttachedTopic is just a temporary vehicle to
-        // let us call its setUri() and storeAndIndexValue() methods.
+        // let us call its setUri() and storeAndIndexSimpleValue() methods.
         AttachedTopic typeTopic = new AttachedTopic(type, dms);
         // If no URI is set the type gets a default URI based on its ID.
         // Note: this must be done *after* the topic is created. The ID is not known before.
@@ -268,7 +268,7 @@ class ObjectFactoryImpl implements ObjectFactory {
             typeTopic.setUri(defaultUriPrefix + type.getId());
         }
         //
-        typeTopic.storeAndIndexValue(type.getSimpleValue());
+        typeTopic.storeAndIndexSimpleValue();
         //
         // 2) put in type cache
         // Note: an association type must be put in type cache *before* storing its association definitions.
