@@ -7,8 +7,8 @@ import de.deepamehta.core.service.DeepaMehtaService;
 
 import de.deepamehta.mehtagraph.spi.MehtaGraph;
 import de.deepamehta.mehtagraph.spi.MehtaGraphFactory;
-import de.deepamehta.mehtagraph.neo4j.Neo4jMehtaGraphFactory;   // ### TODO: remove dependency
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -24,11 +24,13 @@ public class CoreActivator implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String DATABASE_PATH  = System.getProperty("dm4.database.path");
-    private static final String DATABASE_FACTORY = System.getProperty("dm4.database.factory");  // ### FIXME: not used
+    private static final String DATABASE_PATH    = System.getProperty("dm4.database.path");
+    private static final String DATABASE_BUNDLE  = System.getProperty("dm4.database.bundle");
+    private static final String DATABASE_FACTORY = System.getProperty("dm4.database.factory");
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private BundleContext context;
     private EmbeddedService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -47,7 +49,8 @@ public class CoreActivator implements BundleActivator {
     public void start(BundleContext context) {
         try {
             logger.info("========== Starting \"DeepaMehta 4 Core\" ==========");
-            dms = new EmbeddedService(new MGStorageBridge(openDB(DATABASE_PATH)), context);
+            this.context = context;
+            dms = new EmbeddedService(new MGStorageBridge(openDB()), context);
             dms.setupDB();
             //
             logger.info("Registering DeepaMehta 4 core service at OSGi framework");
@@ -81,18 +84,28 @@ public class CoreActivator implements BundleActivator {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // ### TODO: copy exists in CoreServiceTestEnvironment
-    private MehtaGraph openDB(String databasePath) {
+    private MehtaGraph openDB() {
         try {
-            logger.info("Instantiating the MehtaGraph storage engine\n    databasePath=\"" + databasePath +
-                "\"\n    databaseFactory=\"" + DATABASE_FACTORY + "\"");
-            // ### TODO: use factory's bundle class loader or register factory as a service
-            //
-            // ### MehtaGraphFactory factory = (MehtaGraphFactory) Class.forName(DATABASE_FACTORY).newInstance();
-            // ### return factory.createInstance(databasePath);
-            return new Neo4jMehtaGraphFactory().createInstance(databasePath);
+            logger.info("Instantiating the MehtaGraph storage engine\n    " +
+                "dm4.database.path=\"" + DATABASE_PATH + "\"\n    " +
+                "dm4.database.bundle=\"" + DATABASE_BUNDLE + "\"\n    " +
+                "dm4.database.factory=\"" + DATABASE_FACTORY + "\"");
+            // Note: we must load the factory class through the storage provider bundle's class loader
+            Class factoryClass = getBundle(DATABASE_BUNDLE).loadClass(DATABASE_FACTORY);
+            MehtaGraphFactory factory = (MehtaGraphFactory) factoryClass.newInstance();
+            return factory.createInstance(DATABASE_PATH);
         } catch (Exception e) {
             throw new RuntimeException("Instantiating the MehtaGraph storage engine failed", e);
         }
+    }
+
+    private Bundle getBundle(String symbolicName) {
+        for (Bundle bundle : context.getBundles()) {
+            if (bundle.getSymbolicName().equals(symbolicName)) {
+                return bundle;
+            }
+        }
+        throw new RuntimeException("Bundle not found (symbolicName=\"" + symbolicName + "\")");
     }
 
 

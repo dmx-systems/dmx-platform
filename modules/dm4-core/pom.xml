@@ -26,6 +26,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-mehtagraph-neo4j</artifactId>
+            <scope>test</scope>
         </dependency>
         <!-- OSGi -->
         <dependency>

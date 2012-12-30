@@ -30,6 +30,7 @@
 
         <!-- Database -->
         <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
+        <dm4.database.bundle>de.deepamehta.mehtagraph-neo4j</dm4.database.bundle>
         <dm4.database.factory>de.deepamehta.mehtagraph.neo4j.Neo4jMehtaGraphFactory</dm4.database.factory>
 
         <!-- File Repository -->
