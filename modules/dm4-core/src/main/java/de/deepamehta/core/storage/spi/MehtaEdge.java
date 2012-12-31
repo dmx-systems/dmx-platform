@@ -1,6 +1,6 @@
-package de.deepamehta.mehtagraph.spi;
+package de.deepamehta.core.storage.spi;
 
-import de.deepamehta.mehtagraph.MehtaObjectRole;
+import de.deepamehta.core.storage.MehtaObjectRole;
 
 import java.util.List;
 
@@ -23,4 +23,8 @@ public interface MehtaEdge extends MehtaObject {
      * If more than one such mehta object exists, an exception is thrown.
      */
     MehtaObject getMehtaObject(String roleType);
+
+    // --- Indexing ---
+
+    void index();
 }

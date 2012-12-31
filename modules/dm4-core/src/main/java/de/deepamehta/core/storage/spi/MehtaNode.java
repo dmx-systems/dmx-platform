@@ -1,4 +1,4 @@
-package de.deepamehta.mehtagraph.spi;
+package de.deepamehta.core.storage.spi;
 
 
 

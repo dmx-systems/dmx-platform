@@ -3,8 +3,8 @@ package de.deepamehta.core.impl.service;
 import de.deepamehta.core.impl.storage.MGStorageBridge;
 import de.deepamehta.core.util.JavaUtils;
 
-import de.deepamehta.mehtagraph.spi.MehtaGraph;
-import de.deepamehta.mehtagraph.spi.MehtaGraphFactory;
+import de.deepamehta.core.storage.spi.MehtaGraph;
+import de.deepamehta.core.storage.spi.MehtaGraphFactory;
 
 import org.junit.After;
 import org.junit.Before;

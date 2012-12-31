@@ -18,7 +18,7 @@
 
     <!--
         All DeepaMehta bundles that belong to the DeepaMehta 4 standard distribution.
-        ### TODO: add the dm4-mehtagraph and dm4-mehtagraph-neo4j artifacts here?
+        ### TODO: add the dm4-mehtagraph-neo4j artifact here?
         ### Apparently not required for building distribution but might required for deepamehta-plugin-parent
     -->
     <dependencies>

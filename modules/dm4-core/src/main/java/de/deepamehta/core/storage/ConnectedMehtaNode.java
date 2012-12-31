@@ -1,7 +1,7 @@
-package de.deepamehta.mehtagraph;
+package de.deepamehta.core.storage;
 
-import de.deepamehta.mehtagraph.spi.MehtaEdge;
-import de.deepamehta.mehtagraph.spi.MehtaNode;
+import de.deepamehta.core.storage.spi.MehtaEdge;
+import de.deepamehta.core.storage.spi.MehtaNode;
 
 
 

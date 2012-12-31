@@ -13,7 +13,6 @@
         <bundle>mvn:org.apache.felix/org.apache.felix.http.jetty/2.2.0</bundle>
         <!-- DeepaMehta Standard Distribution -->
         <bundle>mvn:de.deepamehta/deepamehta-core/4.0.14-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-mehtagraph/4.0.14-SNAPSHOT</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-mehtagraph-neo4j/4.0.14-SNAPSHOT</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-webservice/4.0.14-SNAPSHOT</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-webclient/4.0.14-SNAPSHOT</bundle>

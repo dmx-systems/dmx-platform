@@ -59,7 +59,6 @@
                 <felix.fileinstall.dir>
                     <![CDATA[
                         ${project.basedir}/modules/dm4-core/target,
-                        ${project.basedir}/modules/dm4-mehtagraph/target,
                         ${project.basedir}/modules/dm4-mehtagraph-neo4j/target,
                         ${project.basedir}/modules/dm4-webservice/target,
                         ${project.basedir}/modules/dm4-webclient/target,
@@ -123,7 +122,6 @@
             <id>all</id>
             <modules>
                 <module>modules/dm4-core</module>
-                <module>modules/dm4-mehtagraph</module>
                 <module>modules/dm4-mehtagraph-neo4j</module>
                 <module>modules/dm4-webservice</module>
                 <module>modules/dm4-webclient</module>

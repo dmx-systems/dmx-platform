@@ -2,8 +2,8 @@ package de.deepamehta.core.impl.storage;
 
 import de.deepamehta.core.DeepaMehtaTransaction;
 
-import de.deepamehta.mehtagraph.spi.MehtaGraph;
-import de.deepamehta.mehtagraph.spi.MehtaGraphTransaction;
+import de.deepamehta.core.storage.spi.MehtaGraph;
+import de.deepamehta.core.storage.spi.MehtaGraphTransaction;
 
 
 

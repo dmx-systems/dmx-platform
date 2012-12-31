@@ -1,6 +1,6 @@
 package de.deepamehta.mehtagraph.neo4j;
 
-import de.deepamehta.mehtagraph.spi.MehtaGraphTransaction;
+import de.deepamehta.core.storage.spi.MehtaGraphTransaction;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;

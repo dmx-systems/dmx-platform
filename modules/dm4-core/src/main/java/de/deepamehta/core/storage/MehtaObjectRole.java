@@ -1,6 +1,6 @@
-package de.deepamehta.mehtagraph;
+package de.deepamehta.core.storage;
 
-import de.deepamehta.mehtagraph.spi.MehtaObject;
+import de.deepamehta.core.storage.spi.MehtaObject;
 
 
 

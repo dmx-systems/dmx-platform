@@ -1,9 +1,9 @@
 package de.deepamehta.mehtagraph.neo4j;
 
-import de.deepamehta.mehtagraph.MehtaGraphIndexMode;
-import de.deepamehta.mehtagraph.MehtaObjectRole;
-import de.deepamehta.mehtagraph.spi.MehtaEdge;
-import de.deepamehta.mehtagraph.spi.MehtaObject;
+import de.deepamehta.core.storage.MehtaGraphIndexMode;
+import de.deepamehta.core.storage.MehtaObjectRole;
+import de.deepamehta.core.storage.spi.MehtaEdge;
+import de.deepamehta.core.storage.spi.MehtaObject;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
@@ -77,6 +77,13 @@ class Neo4jMehtaEdge extends Neo4jMehtaObject implements MehtaEdge {
         Relationship rel = node.getSingleRelationship(getRelationshipType(roleType), Direction.OUTGOING);
         if (rel == null) return null;
         return buildMehtaObject(rel.getEndNode());
+    }
+
+    // --- Indexing ---
+
+    @Override
+    public void index() {
+        // ### TODO
     }
 
 

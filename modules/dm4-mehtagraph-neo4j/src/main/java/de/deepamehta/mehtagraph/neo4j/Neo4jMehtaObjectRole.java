@@ -1,7 +1,7 @@
 package de.deepamehta.mehtagraph.neo4j;
 
-import de.deepamehta.mehtagraph.MehtaObjectRole;
-import de.deepamehta.mehtagraph.spi.MehtaObject;
+import de.deepamehta.core.storage.MehtaObjectRole;
+import de.deepamehta.core.storage.spi.MehtaObject;
 
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;

@@ -1,6 +1,6 @@
-package de.deepamehta.mehtagraph.spi;
+package de.deepamehta.core.storage.spi;
 
-import de.deepamehta.mehtagraph.MehtaObjectRole;
+import de.deepamehta.core.storage.MehtaObjectRole;
 
 import java.util.List;
 import java.util.Set;

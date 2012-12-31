@@ -5,8 +5,8 @@ import de.deepamehta.core.impl.service.WebPublishingService;
 import de.deepamehta.core.impl.storage.MGStorageBridge;
 import de.deepamehta.core.service.DeepaMehtaService;
 
-import de.deepamehta.mehtagraph.spi.MehtaGraph;
-import de.deepamehta.mehtagraph.spi.MehtaGraphFactory;
+import de.deepamehta.core.storage.spi.MehtaGraph;
+import de.deepamehta.core.storage.spi.MehtaGraphFactory;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;

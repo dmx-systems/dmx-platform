@@ -1,4 +1,4 @@
-package de.deepamehta.mehtagraph;
+package de.deepamehta.core.storage;
 
 
 

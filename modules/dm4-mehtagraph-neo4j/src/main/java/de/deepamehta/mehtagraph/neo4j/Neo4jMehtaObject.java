@@ -1,9 +1,9 @@
 package de.deepamehta.mehtagraph.neo4j;
 
-import de.deepamehta.mehtagraph.ConnectedMehtaEdge;
-import de.deepamehta.mehtagraph.ConnectedMehtaNode;
-import de.deepamehta.mehtagraph.spi.MehtaEdge;
-import de.deepamehta.mehtagraph.spi.MehtaObject;
+import de.deepamehta.core.storage.ConnectedMehtaEdge;
+import de.deepamehta.core.storage.ConnectedMehtaNode;
+import de.deepamehta.core.storage.spi.MehtaEdge;
+import de.deepamehta.core.storage.spi.MehtaObject;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;

@@ -1,7 +1,7 @@
 package de.deepamehta.mehtagraph.neo4j;
 
-import de.deepamehta.mehtagraph.MehtaGraphIndexMode;
-import de.deepamehta.mehtagraph.spi.MehtaNode;
+import de.deepamehta.core.storage.MehtaGraphIndexMode;
+import de.deepamehta.core.storage.spi.MehtaNode;
 
 import org.neo4j.graphdb.Node;
 

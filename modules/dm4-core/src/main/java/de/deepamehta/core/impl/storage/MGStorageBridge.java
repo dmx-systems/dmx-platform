@@ -13,14 +13,14 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.accesscontrol.AccessControlList;
 
-import de.deepamehta.mehtagraph.ConnectedMehtaEdge;
-import de.deepamehta.mehtagraph.ConnectedMehtaNode;
-import de.deepamehta.mehtagraph.MehtaGraphIndexMode;
-import de.deepamehta.mehtagraph.MehtaObjectRole;
-import de.deepamehta.mehtagraph.spi.MehtaEdge;
-import de.deepamehta.mehtagraph.spi.MehtaGraph;
-import de.deepamehta.mehtagraph.spi.MehtaNode;
-import de.deepamehta.mehtagraph.spi.MehtaObject;
+import de.deepamehta.core.storage.ConnectedMehtaEdge;
+import de.deepamehta.core.storage.ConnectedMehtaNode;
+import de.deepamehta.core.storage.MehtaGraphIndexMode;
+import de.deepamehta.core.storage.MehtaObjectRole;
+import de.deepamehta.core.storage.spi.MehtaEdge;
+import de.deepamehta.core.storage.spi.MehtaGraph;
+import de.deepamehta.core.storage.spi.MehtaNode;
+import de.deepamehta.core.storage.spi.MehtaObject;
 
 import org.codehaus.jettison.json.JSONObject;
 

@@ -1,8 +1,8 @@
-package de.deepamehta.mehtagraph.spi;
+package de.deepamehta.core.storage.spi;
 
-import de.deepamehta.mehtagraph.ConnectedMehtaEdge;
-import de.deepamehta.mehtagraph.ConnectedMehtaNode;
-import de.deepamehta.mehtagraph.MehtaGraphIndexMode;
+import de.deepamehta.core.storage.ConnectedMehtaEdge;
+import de.deepamehta.core.storage.ConnectedMehtaNode;
+import de.deepamehta.core.storage.MehtaGraphIndexMode;
 
 import java.util.Set;
 

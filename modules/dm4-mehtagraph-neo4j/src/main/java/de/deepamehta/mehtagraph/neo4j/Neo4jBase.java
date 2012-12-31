@@ -1,6 +1,6 @@
 package de.deepamehta.mehtagraph.neo4j;
 
-import de.deepamehta.mehtagraph.spi.MehtaObject;
+import de.deepamehta.core.storage.spi.MehtaObject;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -38,6 +38,7 @@ class Neo4jBase {
     protected Neo4jRelationtypeCache relTypeCache;
     protected Index<Node> exactNodeIndex;
     protected Index<Node> fulltextNodeIndex;
+    protected Index<Node> edgeIndex;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -48,8 +49,9 @@ class Neo4jBase {
             this.neo4j = new GraphDatabaseFactory().newEmbeddedDatabase(databasePath);
             this.relTypeCache = new Neo4jRelationtypeCache(neo4j);
             // indexes
-            this.exactNodeIndex    = createExactIndex("exact-node-index");
-            this.fulltextNodeIndex = createFulltextIndex("fulltext-node-index");
+            this.exactNodeIndex    = createExactIndex("exact-node-attr");
+            this.fulltextNodeIndex = createFulltextIndex("fulltext-node-attr");
+            this.edgeIndex = createExactIndex("edge-metadata");
         } catch (Exception e) {
             if (neo4j != null) {
                 logger.info("Shutdown Neo4j");

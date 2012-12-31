@@ -1,13 +1,13 @@
 package de.deepamehta.mehtagraph.neo4j;
 
-import de.deepamehta.mehtagraph.ConnectedMehtaNode;
-import de.deepamehta.mehtagraph.MehtaGraphIndexMode;
-import de.deepamehta.mehtagraph.MehtaObjectRole;
-import de.deepamehta.mehtagraph.spi.MehtaEdge;
-import de.deepamehta.mehtagraph.spi.MehtaGraph;
-import de.deepamehta.mehtagraph.spi.MehtaGraphTransaction;
-import de.deepamehta.mehtagraph.spi.MehtaNode;
-import de.deepamehta.mehtagraph.spi.MehtaObject;
+import de.deepamehta.core.storage.ConnectedMehtaNode;
+import de.deepamehta.core.storage.MehtaGraphIndexMode;
+import de.deepamehta.core.storage.MehtaObjectRole;
+import de.deepamehta.core.storage.spi.MehtaEdge;
+import de.deepamehta.core.storage.spi.MehtaGraph;
+import de.deepamehta.core.storage.spi.MehtaGraphTransaction;
+import de.deepamehta.core.storage.spi.MehtaNode;
+import de.deepamehta.core.storage.spi.MehtaObject;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

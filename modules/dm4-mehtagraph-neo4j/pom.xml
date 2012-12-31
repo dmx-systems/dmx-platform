@@ -18,10 +18,10 @@
     </parent>
 
     <dependencies>
-        <!-- MehtaGraph API -->
+        <!-- DeepaMehta Core -->
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-mehtagraph</artifactId>
+            <artifactId>deepamehta-core</artifactId>
             <version>4.0.14-SNAPSHOT</version>
         </dependency>
         <!-- Neo4j -->
