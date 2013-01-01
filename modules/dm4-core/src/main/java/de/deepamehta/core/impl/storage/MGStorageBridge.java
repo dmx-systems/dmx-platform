@@ -66,7 +66,7 @@ public class MGStorageBridge {
      *          Note: its composite value is not initialized.
      */
     public TopicModel getTopic(long topicId) {
-        return buildTopic(mg.getMehtaNode(topicId));
+        return mg.getMehtaNode(topicId);
     }
 
     /**
@@ -84,8 +84,7 @@ public class MGStorageBridge {
      *          Note: its composite value is not initialized.
      */
     public TopicModel getTopic(String key, SimpleValue value) {
-        MehtaNode node = mg.getMehtaNode(key, value.value());
-        return node != null ? buildTopic(node) : null;
+        return mg.getMehtaNode(key, value.value());
     }
 
     // ---
@@ -255,13 +254,7 @@ public class MGStorageBridge {
      *          - the type URI    is initialzed but not persisted.
      */
     public void createTopic(TopicModel topicModel) {
-        String uri = topicModel.getUri();
-        checkUniqueness(uri);
-        // 1) update DB
-        MehtaNode node = mg.createMehtaNode();
-        storeAndIndexUri(node, uri);
-        // 2) update model
-        topicModel.setId(node.getId());
+        mg.createMehtaNode(topicModel);
     }
 
     /**

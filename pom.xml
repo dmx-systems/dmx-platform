@@ -122,7 +122,7 @@
             <id>all</id>
             <modules>
                 <module>modules/dm4-core</module>
-                <module>modules/dm4-mehtagraph-neo4j</module>
+                <!--module>modules/dm4-mehtagraph-neo4j</module-->
                 <module>modules/dm4-webservice</module>
                 <module>modules/dm4-webclient</module>
                 <module>modules/dm4-webbrowser</module>

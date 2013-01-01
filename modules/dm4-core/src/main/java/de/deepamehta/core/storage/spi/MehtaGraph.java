@@ -1,5 +1,6 @@
 package de.deepamehta.core.storage.spi;
 
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.storage.MehtaObjectRole;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Set;
 
 
 /**
- * The MehtaGraph service.
+ * The MehtaGraph service. ### FIXDOC
  * It provides methods for creation and retrieval of {@link MehtaNode}s and {@link MehtaEdge}s.
  * <p>
  * To obtain a MehtaGraph service instance call {@link MehtaGraphFactory#createInstance}.
@@ -17,16 +18,15 @@ public interface MehtaGraph {
 
     // === Mehta Nodes ===
 
-    MehtaNode createMehtaNode();
+    void createMehtaNode(TopicModel topicModel);
 
-    MehtaNode getMehtaNode(long id);
-    MehtaNode getMehtaNode(String key, Object value);
+    TopicModel getMehtaNode(long id);
+    TopicModel getMehtaNode(String key, Object value);
 
-    // ###
-    List<MehtaNode> getMehtaNodes(String key, Object value);
+    List<TopicModel> getMehtaNodes(String key, Object value);
 
-    List<MehtaNode> queryMehtaNodes(Object value);
-    List<MehtaNode> queryMehtaNodes(String key, Object value);
+    List<TopicModel> queryMehtaNodes(Object value);
+    List<TopicModel> queryMehtaNodes(String key, Object value);
 
     // === Mehta Edges ===
 

@@ -1,5 +1,7 @@
 package de.deepamehta.mehtagraph.neo4j;
 
+import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.storage.MehtaObjectRole;
 import de.deepamehta.core.storage.spi.MehtaEdge;
 import de.deepamehta.core.storage.spi.MehtaGraph;
@@ -41,35 +43,40 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
     // === Mehta Nodes ===
 
     @Override
-    public MehtaNode createMehtaNode() {
-        return buildMehtaNode(neo4j.createNode());
+    public void createMehtaNode(TopicModel topicModel) {
+        String uri = topicModel.getUri();
+        checkTopicUniqueness(uri);
+        // 1) update DB
+        Node node = neo4j.createNode();
+        node.setProperty("node_type", "topic");
+        storeAndIndexUri(node, uri);
+        storeAndIndexTypeUri(node, topicModel.getTypeUri());
+        // 2) update model
+        topicModel.setId(node.getId());
     }
 
     // ---
 
     @Override
-    public Neo4jMehtaNode getMehtaNode(long id) {
-        return buildMehtaNode(neo4j.getNodeById(id));
+    public TopicModel getMehtaNode(long id) {
+        Node node = neo4j.getNodeById(id);
+        checkTopicRef(node);
+        return buildTopic(node);
     }
 
     @Override
-    public MehtaNode getMehtaNode(String key, Object value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Tried to call getMehtaNode() with a null value Object (key=\"" +
-                key + "\")");
-        }
-        //
+    public TopicModel getMehtaNode(String key, Object value) {
         Node node = exactNodeIndex.get(key, value).getSingle();
-        return node != null ? buildMehtaNode(node) : null;
+        return node != null ? buildTopic(node) : null;
     }
 
-    // ###
+    // ---
 
     @Override
-    public List<MehtaNode> getMehtaNodes(String key, Object value) {
-        List nodes = new ArrayList();
+    public List<TopicModel> getMehtaNodes(String key, Object value) {
+        List<TopicModel> nodes = new ArrayList();
         for (Node node : exactNodeIndex.query(key, value)) {
-            nodes.add(buildMehtaNode(node));
+            nodes.add(buildTopic(node));
         }
         return nodes;
     }
@@ -77,12 +84,12 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
     // ---
 
     @Override
-    public List<MehtaNode> queryMehtaNodes(Object value) {
+    public List<TopicModel> queryMehtaNodes(Object value) {
         return queryMehtaNodes(null, value);
     }
 
     @Override
-    public List<MehtaNode> queryMehtaNodes(String key, Object value) {
+    public List<TopicModel> queryMehtaNodes(String key, Object value) {
         if (key == null) {
             key = KEY_FULLTEXT;
         }
@@ -91,15 +98,9 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
                 key + "\")");
         }
         //
-        List nodes = new ArrayList();
+        List<TopicModel> nodes = new ArrayList();
         for (Node node : fulltextNodeIndex.query(key, value)) {
-            /* ### FIXME
-            if (isAuxiliaryNode(node)) {
-                logger.warning("### Ignoring invalid search result (ID " + node.getId() + " refers to a MehtaEdge)");
-                continue;
-            }
-            */
-            nodes.add(buildMehtaNode(node));
+            nodes.add(buildTopic(node));
         }
         return nodes;
     }
@@ -183,5 +184,86 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
     public void shutdown() {
         logger.info("Shutdown DB");
         neo4j.shutdown();
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private TopicModel buildTopic(Node node) {
+        long id = node.getId();
+        String uri = node.getProperty("uri");
+        String typeUri = node.getProperty("type_uri");
+        SimpleValue value = new SimpleValue(node.getProperty("value"));
+        return new TopicModel(id, uri, typeUri, value, null);   // composite=null
+    }
+
+    // ---
+
+    /**
+     * Checks if a topic with the given URI exists in the database, and if so, throws an exception.
+     * If an empty string is given no check is performed.
+     *
+     * @param   uri     The URI to check. Must not be null.
+     */
+    private void checkTopicUniqueness(String uri) {
+        if (!uri.equals("") && lookupMehtaNode(uri) != null) {
+            throw new RuntimeException("Topic URI \"" + uri + "\" is not unique");
+        }
+    }
+
+    private MehtaNode lookupMehtaNode(String uri) {
+        return getMehtaNode("uri", uri);
+    }
+
+    // ---
+
+    private void checkTopicRef(Node node) {
+        if (!node.getProperty("node_type").equals("topic")) {
+            throw new IllegalArgumentException("Reference error: ID " + node.getId() +
+                " refers to an Association when the caller expects a Topic");
+        }
+    }
+
+    private void checkAssociationRef(Node node) {
+        if (!node.getProperty("node_type").equals("assoc")) {
+            throw new IllegalArgumentException("Reference error: ID " + node.getId() +
+                " refers to a Topic when the caller expects an Association");
+        }
+    }
+
+    // ---
+
+    private void storeAndIndexUri(Node node, String uri) {
+        node.setProperty("uri", uri);
+        indexAttribute(node, uri, IndexMode.KEY, "uri");
+    }
+
+    private void storeAndIndexTypeUri(Node node, String typeUri) {
+        node.setProperty("type_uri", typeUri);
+        indexAttribute(node, typeUri, IndexMode.KEY, "type_uri");
+    }
+
+    // ---
+
+    public void indexAttribute(Node node, Object value, IndexMode indexMode) {
+        indexAttribute(node, value, indexMode, null);
+    }
+
+    public void indexAttribute(Node node, Object value, IndexMode indexMode, String indexKey) {
+        if (indexMode == IndexMode.OFF) {
+            return;
+        } else if (indexMode == IndexMode.KEY) {
+            exactNodeIndex.remove(node, indexKey);              // remove old
+            exactNodeIndex.add(node, indexKey, value);          // index new
+        } else if (indexMode == IndexMode.FULLTEXT) {
+            fulltextNodeIndex.remove(node, KEY_FULLTEXT);       // remove old
+            fulltextNodeIndex.add(node, KEY_FULLTEXT, value);   // index new
+        } else if (indexMode == IndexMode.FULLTEXT_KEY) {
+            fulltextNodeIndex.remove(node, indexKey);           // remove old
+            fulltextNodeIndex.add(node, indexKey, value);       // index new
+        } else {
+            throw new RuntimeException("Index mode \"" + indexMode + "\" not implemented");
+        }
     }
 }
