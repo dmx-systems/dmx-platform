@@ -178,6 +178,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // === Search ===
 
+    // ### TODO: use Collection instead of Set
     private Set<Topic> findSearchableUnits(Set<? extends Topic> topics, ClientState clientState) {
         Set<Topic> searchableUnits = new LinkedHashSet();
         for (Topic topic : topics) {

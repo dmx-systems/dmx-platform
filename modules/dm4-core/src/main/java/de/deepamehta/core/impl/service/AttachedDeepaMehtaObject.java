@@ -243,14 +243,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // --- Association Retrieval ---
 
-    @Override
-    public Set<Association> getAssociations() {
-        return getAssociations(null);
-    }
-
     // Note: these methods are implemented in the subclasses (this is an abstract class):
     //     getAssociation(...);
-    //     getAssociations(String myRoleTypeUri);
+    //     getAssociations();
 
 
 

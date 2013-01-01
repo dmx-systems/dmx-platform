@@ -215,12 +215,12 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
                                                                                    long othersTopicId) {
         AssociationModel assoc = dms.storage.getAssociation(assocTypeUri, getId(), othersTopicId, myRoleTypeUri,
                                                                                                   othersRoleTypeUri);
-        return assoc != null ? dms.attach(assoc, false) : null;                             // fetchComposite=false
+        return assoc != null ? dms.attach(assoc, false) : null;                 // fetchComposite=false
     }
 
     @Override
-    public Set<Association> getAssociations(String myRoleTypeUri) {
-        return dms.attach(dms.storage.getTopicAssociations(getId(), myRoleTypeUri), false); // fetchComposite=false
+    public Set<Association> getAssociations() {
+        return dms.attach(dms.storage.getTopicAssociations(getId()), false);    // fetchComposite=false
     }
 
 

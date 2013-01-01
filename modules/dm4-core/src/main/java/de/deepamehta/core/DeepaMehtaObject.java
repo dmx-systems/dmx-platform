@@ -122,8 +122,6 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
      Set<Association> getAssociations();
 
-     Set<Association> getAssociations(String myRoleTypeUri);
-
 
 
     // === Deletion ===

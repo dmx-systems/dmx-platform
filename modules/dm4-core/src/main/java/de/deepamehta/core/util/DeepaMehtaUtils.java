@@ -83,6 +83,15 @@ public class DeepaMehtaUtils {
         return topicModels;
     }
 
+    // ### TODO: remove this method
+    public static Set<TopicModel> toTopicSet(List<TopicModel> topics) {
+        Set<TopicModel> set = new LinkedHashSet();
+        for (TopicModel topic : topics) {
+            set.add(topic);
+        }
+        return set;
+    }
+
     public static String topicNames(Collection<? extends Topic> topics) {
         StringBuilder names = new StringBuilder();
         Iterator<? extends Topic> i = topics.iterator();

@@ -172,16 +172,42 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
                                             String othersRoleTypeUri, String othersTopicTypeUri, int maxResultSize) {
         // ### TODO: respect maxResultSize
         Set<RelatedTopicModel> relTopics = new HashSet();
-        // ### TODO: wildcards
-        String indexValue = topicId + "," + assocTypeUri + "," + myRoleTypeUri + "," + othersRoleTypeUri + "," +
-            othersTopicTypeUri;
+        String indexValue = indexValue(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
         for (Node middleNode : associationIndex.get("related_topic", indexValue)) {
             AssociationModel assoc = buildAssociation(middleNode);
-            long relTopicId = assoc.getOtherRoleModel(topicId).getPlayerId();
-            TopicModel relTopic = getMehtaNode(relTopicId);
-            relTopics.add(new RelatedTopicModel(relTopic, assoc));
+            long relatedTopicId = assoc.getOtherRoleModel(topicId).getPlayerId();
+            TopicModel relatedTopic = getMehtaNode(relatedTopicId);
+            relTopics.add(new RelatedTopicModel(relatedTopic, assoc));
         }
         return new ResultSet(relTopics.size(), relTopics);
+    }
+
+    @Override
+    public Set<RelatedAssociationModel> getTopicRelatedAssociations(long topicId, String assocTypeUri,
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+        // ### TODO: respect maxResultSize
+        Set<RelatedAssociationModel> relAssocs = new HashSet();
+        String indexValue = indexValue(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+        for (Node middleNode : associationIndex.get("related_assoc", indexValue)) {
+            AssociationModel assoc = buildAssociation(middleNode);
+            long relatedAssocId = assoc.getOtherRoleModel(topicId).getPlayerId();
+            AssociationModel relatedAssoc = getMehtaEdge(relatedAssocId);
+            relAssocs.add(new RelatedAssociationModel(relatedAssoc, assoc));
+        }
+        return new ResultSet(relAssocs.size(), relAssocs);
+    }
+
+    // ---
+
+    @Override
+    public Set<AssociationModel> getTopicAssociations(long topicId) {
+        Set<AssociationModel> assocs = new HashSet();
+        Node node = neo4j.getNodeById(id);  // ### TODO: check node type
+        for (Relationship rel : node.getRelationships(Direction.INCOMING)) {
+            Node middleNode = rel.getStartNode();
+            assocs.add(buildAssociation(middleNode));
+        }
+        return assocs;
     }
 
 
@@ -309,11 +335,11 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
 
     // ---
 
-    public void indexAttribute(Node node, Object value, IndexMode indexMode) {
+    private void indexAttribute(Node node, Object value, IndexMode indexMode) {
         indexAttribute(node, value, indexMode, null);
     }
 
-    public void indexAttribute(Node node, Object value, IndexMode indexMode, String indexKey) {
+    private void indexAttribute(Node node, Object value, IndexMode indexMode, String indexKey) {
         if (indexMode == IndexMode.OFF) {
             return;
         } else if (indexMode == IndexMode.KEY) {
@@ -328,5 +354,15 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
         } else {
             throw new RuntimeException("Index mode \"" + indexMode + "\" not implemented");
         }
+    }
+
+    //
+
+    private String indexValue(long id, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                  String othersTypeUri) {
+        // ### TODO: wildcards
+        String indexValue = id + "," + assocTypeUri + "," + myRoleTypeUri + "," + othersRoleTypeUri + "," +
+            othersTypeUri;
+        return indexValue;
     }
 }

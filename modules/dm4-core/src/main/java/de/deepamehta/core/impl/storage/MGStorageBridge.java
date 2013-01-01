@@ -12,7 +12,6 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.accesscontrol.AccessControlList;
-
 import de.deepamehta.core.storage.ConnectedMehtaEdge;
 import de.deepamehta.core.storage.ConnectedMehtaNode;
 import de.deepamehta.core.storage.MehtaGraphIndexMode;
@@ -21,6 +20,7 @@ import de.deepamehta.core.storage.spi.MehtaEdge;
 import de.deepamehta.core.storage.spi.MehtaGraph;
 import de.deepamehta.core.storage.spi.MehtaNode;
 import de.deepamehta.core.storage.spi.MehtaObject;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -148,13 +148,11 @@ public class MGStorageBridge {
     // ---
 
     /**
-     * @param   myRoleTypeUri       may be null
-     *
      * @return  The fetched associations.
      *          Note: their composite values are not initialized.
      */
-    public Set<AssociationModel> getTopicAssociations(long topicId, String myRoleTypeUri) {
-        return buildAssociations(mg.getMehtaNode(topicId).getMehtaEdges(myRoleTypeUri));
+    public Set<AssociationModel> getTopicAssociations(long topicId) {
+        return mg.getTopicAssociations(topicId);
     }
 
     // ---
@@ -189,18 +187,9 @@ public class MGStorageBridge {
      *          Note: their composite values are not initialized.
      */
     public Set<RelatedAssociationModel> getTopicRelatedAssociations(long topicId, String assocTypeUri,
-                                                                    String myRoleTypeUri, String othersRoleTypeUri,
-                                                                    String othersAssocTypeUri) {
-        Set<ConnectedMehtaEdge> edges = mg.getMehtaNode(topicId).getConnectedMehtaEdges(myRoleTypeUri,
-                                                                                        othersRoleTypeUri);
-        if (othersAssocTypeUri != null) {
-            // TODO
-            throw new RuntimeException("not yet implemented");
-        }
-        if (assocTypeUri != null) {
-            filterConnectedEdgesByAssociationType(edges, assocTypeUri);
-        }
-        return buildRelatedAssociations(edges);
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+        return mg.getTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersAssocTypeUri);
     }
 
     // ---
@@ -210,7 +199,7 @@ public class MGStorageBridge {
      *          Note: their composite values are not initialized.
      */
     public Set<TopicModel> searchTopics(String searchTerm, String fieldUri) {
-        return buildTopics(mg.queryMehtaNodes(fieldUri, searchTerm));
+        return DeepaMehtaUtils.toTopicSet(mg.queryMehtaNodes(fieldUri, searchTerm));
     }
 
     // ---
@@ -389,10 +378,7 @@ public class MGStorageBridge {
 
     // ---
 
-    /**
-     * @param   myRoleTypeUri       may be null
-     */
-    public Set<AssociationModel> getAssociationAssociations(long assocId, String myRoleTypeUri) {
+    public Set<AssociationModel> getAssociationAssociations(long assocId) {
         return buildAssociations(mg.getMehtaEdge(assocId).getMehtaEdges(myRoleTypeUri));
     }
 
