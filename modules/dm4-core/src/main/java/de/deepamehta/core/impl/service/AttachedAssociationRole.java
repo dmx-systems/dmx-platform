@@ -11,8 +11,6 @@ import de.deepamehta.core.model.AssociationRoleModel;
  */
 class AttachedAssociationRole extends AttachedRole implements AssociationRole {
 
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedAssociationRole(AssociationRoleModel model, Association assoc, EmbeddedService dms) {
@@ -22,13 +20,6 @@ class AttachedAssociationRole extends AttachedRole implements AssociationRole {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
 
-
-    // === AssociationRole Implementation ===
-
-    @Override
-    public long getAssociationId() {
-        return getModel().getAssociationId();
-    }
 
     // === AttachedRole Overrides ===
 

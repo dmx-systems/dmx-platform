@@ -90,11 +90,13 @@ public class MGStorageBridge {
     // ---
 
     /**
+     * Convenience method.
+     *
      * @return  The fetched topics.
      *          Note: their composite values are not initialized.
      */
     public RelatedTopicModel getTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                              String othersRoleTypeUri, String othersTopicTypeUri) {
+                                                  String othersRoleTypeUri, String othersTopicTypeUri) {
         ResultSet<RelatedTopicModel> topics = getTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri, 0);
         switch (topics.getSize()) {
@@ -116,12 +118,13 @@ public class MGStorageBridge {
     public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                               String othersRoleTypeUri, String othersTopicTypeUri,
                                                               int maxResultSize) {
-        List assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
-        return getTopicRelatedTopics(topicId, assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
+        return mg.getTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
             maxResultSize);
     }
 
     /**
+     * Convenience method.
+     *
      * @param   assocTypeUris       may be null
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
@@ -130,18 +133,16 @@ public class MGStorageBridge {
      * @return  The fetched topics.
      *          Note: their composite values are not initialized.
      */
-    public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, List assocTypeUris, String myRoleTypeUri,
-                                                              String othersRoleTypeUri, String othersTopicTypeUri,
-                                                              int maxResultSize) {
-        Set<ConnectedMehtaNode> nodes = mg.getMehtaNode(topicId).getConnectedMehtaNodes(myRoleTypeUri,
-                                                                                        othersRoleTypeUri);
-        if (othersTopicTypeUri != null) {
-            filterNodesByTopicType(nodes, othersTopicTypeUri);
+    public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, List<String> assocTypeUris,
+                                                              String myRoleTypeUri, String othersRoleTypeUri,
+                                                              String othersTopicTypeUri, int maxResultSize) {
+        ResultSet<RelatedTopicModel> result = new ResultSet();
+        for (String assocTypeUri : assocTypeUris) {
+            ResultSet<RelatedTopicModel> res = getTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
+                othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
+            result.addAll(res);
         }
-        if (assocTypeUris != null) {
-            filterNodesByAssociationType(nodes, assocTypeUris);
-        }
-        return buildRelatedTopics(nodes, maxResultSize);
+        return result;
     }
 
     // ---

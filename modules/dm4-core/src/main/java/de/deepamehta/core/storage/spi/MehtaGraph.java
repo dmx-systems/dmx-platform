@@ -1,5 +1,7 @@
 package de.deepamehta.core.storage.spi;
 
+import de.deepamehta.core.ResultSet;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.storage.MehtaObjectRole;
 
@@ -41,6 +43,11 @@ public interface MehtaGraph {
     // === Mehta Objects ===
 
     MehtaObject getMehtaObject(long id);
+
+    // === Traversal ===
+
+    ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                            String othersRoleTypeUri, String othersTopicTypeUri, int maxResultSize);
 
     // === Misc ===
 

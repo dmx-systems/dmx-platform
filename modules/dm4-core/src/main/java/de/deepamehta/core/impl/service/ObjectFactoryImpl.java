@@ -737,10 +737,10 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     private TopicModel fetchViewConfigTopic(RoleModel configurable, String configTypeUri) {
         if (configurable instanceof TopicRoleModel) {
-            long typeId = ((TopicRoleModel) configurable).getTopicId();
+            long typeId = configurable.getPlayerId();
             return fetchTypeViewConfigTopic(typeId, configTypeUri);
         } else if (configurable instanceof AssociationRoleModel) {
-            long assocDefId = ((AssociationRoleModel) configurable).getAssociationId();
+            long assocDefId = configurable.getPlayerId();
             return fetchAssocDefViewConfigTopic(assocDefId, configTypeUri);
         } else {
             throw new RuntimeException("Unexpected configurable: " + configurable);

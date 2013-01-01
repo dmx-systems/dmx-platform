@@ -24,38 +24,34 @@ public class TopicRoleModel extends RoleModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private long   topicId;
     private String topicUri;
-
     private boolean topicIdentifiedByUri;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public TopicRoleModel(long topicId, String roleTypeUri) {
-        super(roleTypeUri);
-        this.topicId = topicId;
+        super(topicId, roleTypeUri);
         this.topicUri = null;
         this.topicIdentifiedByUri = false;
     }
 
     public TopicRoleModel(String topicUri, String roleTypeUri) {
-        super(roleTypeUri);
-        this.topicId = -1;
+        super(-1, roleTypeUri);
         this.topicUri = topicUri;
         this.topicIdentifiedByUri = true;
     }
 
     public TopicRoleModel(JSONObject topicRoleModel) {
         try {
-            this.topicId = topicRoleModel.optLong("topic_id", -1);
+            this.playerId = topicRoleModel.optLong("topic_id", -1);
             this.topicUri = topicRoleModel.optString("topic_uri", null);
             this.roleTypeUri = topicRoleModel.getString("role_type_uri");
             this.topicIdentifiedByUri = topicUri != null;
             //
-            if (topicId == -1 && topicUri == null) {
+            if (playerId == -1 && topicUri == null) {
                 throw new IllegalArgumentException("Neiter \"topic_id\" nor \"topic_uri\" is set");
             }
-            if (topicId != -1 && topicUri != null) {
+            if (playerId != -1 && topicUri != null) {
                 throw new IllegalArgumentException("\"topic_id\" and \"topic_uri\" must not be set at the same time");
             }
         } catch (Exception e) {
@@ -65,11 +61,12 @@ public class TopicRoleModel extends RoleModel {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public long getTopicId() {
+    @Override
+    public long getPlayerId() {
         if (topicIdentifiedByUri) {
             throw new IllegalStateException("The topic is not identified by ID but by URI (" + this + ")");
         }
-        return topicId;
+        return super.getPlayerId();
     }
 
     public String getTopicUri() {
@@ -93,7 +90,7 @@ public class TopicRoleModel extends RoleModel {
                 if (topicIdentifiedByUri) {
                     return topicRole.topicUri.equals(topicUri);
                 } else {
-                    return topicRole.topicId == topicId;
+                    return topicRole.playerId == playerId;
                 }
             }
         }
@@ -107,7 +104,7 @@ public class TopicRoleModel extends RoleModel {
             if (topicIdentifiedByUri) {
                 o.put("topic_uri", topicUri);
             } else {
-                o.put("topic_id", topicId);
+                o.put("topic_id", playerId);
             }
             o.put("role_type_uri", roleTypeUri);
             return o;
@@ -120,7 +117,7 @@ public class TopicRoleModel extends RoleModel {
 
     @Override
     public String toString() {
-        return "\n        topic role (roleTypeUri=\"" + roleTypeUri + "\", topicId=" + topicId +
+        return "\n        topic role (roleTypeUri=\"" + roleTypeUri + "\", playerId=" + playerId +
             ", topicUri=\"" + topicUri + "\", topicIdentifiedByUri=" + topicIdentifiedByUri + ")";
     }
 }

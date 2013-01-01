@@ -49,9 +49,9 @@ class Neo4jBase {
             this.neo4j = new GraphDatabaseFactory().newEmbeddedDatabase(databasePath);
             this.relTypeCache = new Neo4jRelationtypeCache(neo4j);
             // indexes
-            this.exactNodeIndex    = createExactIndex("exact-node-attr");
-            this.fulltextNodeIndex = createFulltextIndex("fulltext-node-attr");
-            this.edgeIndex = createExactIndex("edge-metadata");
+            this.exactNodeIndex    = createExactIndex("exact-node-index");
+            this.fulltextNodeIndex = createFulltextIndex("fulltext-node-index");
+            this.associationIndex = createExactIndex("association-index");
         } catch (Exception e) {
             if (neo4j != null) {
                 logger.info("Shutdown Neo4j");

@@ -20,20 +20,15 @@ import java.util.Map;
  */
 public class AssociationRoleModel extends RoleModel {
 
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private long assocId;
-
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public AssociationRoleModel(long assocId, String roleTypeUri) {
-        super(roleTypeUri);
-        this.assocId = assocId;
+        super(assocId, roleTypeUri);
     }
 
     public AssociationRoleModel(JSONObject assocRoleModel) {
         try {
-            this.assocId = assocRoleModel.getLong("assoc_id");
+            this.playerId = assocRoleModel.getLong("assoc_id");
             this.roleTypeUri = assocRoleModel.getString("role_type_uri");
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationRoleModel failed (JSONObject=" + assocRoleModel + ")", e);
@@ -42,17 +37,13 @@ public class AssociationRoleModel extends RoleModel {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public long getAssociationId() {
-        return assocId;
-    }
-
     // === Implementation of abstract RoleModel methods ===
 
     @Override
     public boolean refsSameObject(RoleModel model) {
         if (model instanceof AssociationRoleModel) {
             AssociationRoleModel assocRole = (AssociationRoleModel) model;
-            return assocRole.assocId == assocId;
+            return assocRole.playerId == playerId;
         }
         return false;
     }
@@ -61,7 +52,7 @@ public class AssociationRoleModel extends RoleModel {
     public JSONObject toJSON() {
         try {
             JSONObject o = new JSONObject();
-            o.put("assoc_id", assocId);
+            o.put("assoc_id", playerId);
             o.put("role_type_uri", roleTypeUri);
             return o;
         } catch (Exception e) {
@@ -73,6 +64,6 @@ public class AssociationRoleModel extends RoleModel {
 
     @Override
     public String toString() {
-        return "\n        association role (roleTypeUri=\"" + roleTypeUri + "\", assocId=" + assocId + ")";
+        return "\n        association role (roleTypeUri=\"" + roleTypeUri + "\", playerId=" + playerId + ")";
     }
 }

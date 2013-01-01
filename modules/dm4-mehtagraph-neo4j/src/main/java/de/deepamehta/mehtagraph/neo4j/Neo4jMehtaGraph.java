@@ -74,11 +74,7 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
 
     @Override
     public List<TopicModel> getMehtaNodes(String key, Object value) {
-        List<TopicModel> nodes = new ArrayList();
-        for (Node node : exactNodeIndex.query(key, value)) {
-            nodes.add(buildTopic(node));
-        }
-        return nodes;
+        return buildTopics(exactNodeIndex.query(key, value));
     }
 
     // ---
@@ -98,11 +94,7 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
                 key + "\")");
         }
         //
-        List<TopicModel> nodes = new ArrayList();
-        for (Node node : fulltextNodeIndex.query(key, value)) {
-            nodes.add(buildTopic(node));
-        }
-        return nodes;
+        return buildTopics(fulltextNodeIndex.query(key, value));
     }
 
 
@@ -173,6 +165,27 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
 
 
 
+    // === Traversal ===
+
+    @Override
+    public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                            String othersRoleTypeUri, String othersTopicTypeUri, int maxResultSize) {
+        // ### TODO: respect maxResultSize
+        Set<RelatedTopicModel> relTopics = new HashSet();
+        // ### TODO: wildcards
+        String indexValue = topicId + "," + assocTypeUri + "," + myRoleTypeUri + "," + othersRoleTypeUri + "," +
+            othersTopicTypeUri;
+        for (Node middleNode : associationIndex.get("related_topic", indexValue)) {
+            AssociationModel assoc = buildAssociation(middleNode);
+            long relTopicId = assoc.getOtherRoleModel(topicId).getPlayerId();
+            TopicModel relTopic = getMehtaNode(relTopicId);
+            relTopics.add(new RelatedTopicModel(relTopic, assoc));
+        }
+        return new ResultSet(relTopics.size(), relTopics);
+    }
+
+
+
     // === Misc ===
 
     @Override
@@ -198,6 +211,49 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
         return new TopicModel(id, uri, typeUri, value, null);   // composite=null
     }
 
+    private List<TopicModel> buildTopics(Iterable<Node> nodes) {
+        List<TopicModel> topics = new ArrayList();
+        for (Node node : nodes) {
+            topics.add(buildTopic(node));
+        }
+        return topics;
+    }
+
+    // ---
+
+    private AssociationModel buildAssociation(Node middleNode) {
+        long id = middleNode.getId();
+        String uri = middleNode.getProperty("uri");
+        String typeUri = middleNode.getProperty("type_uri");;
+        SimpleValue value = new SimpleValue(middleNode.getProperty("value"));
+        List<RoleModel> roleModels = roleModels(middleNode);
+        return new AssociationModel(id, uri, typeUri, roleModels.get(0), roleModels.get(1), value, null);
+    }
+
+    private List<RoleModel> roleModels(Node middleNode) {
+        List<RoleModel> roleModels = new ArrayList();
+        for (Relationship rel : middleNode.getRelationships(Direction.OUTGOING)) {
+            Node node = rel.getEndNode();
+            long nodeId = node.getId();
+            String roleTypeUri = rel.getType().name();
+            RoleModel roleModel;
+            // ### TODO: move behavior to enum class
+            if (nodeType(node).equals("topic")) {
+                roleModel = new TopicRoleModel(nodeId, roleTypeUri);
+            } else {
+                roleModel = new AssociationRoleModel(nodeId, roleTypeUri);
+            }
+            roleModels.add(roleModel);
+        }
+        // sanity check
+        if (roleModels.size() != 2) {
+            throw new RuntimeException("Data inconsistency: mehta edge " + middleNode.getId() +
+                " connects " + roleModels.size() + " mehta objects instead of 2");
+        }
+        //
+        return roleModels;
+    }
+
     // ---
 
     /**
@@ -218,15 +274,22 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
 
     // ---
 
+    // ### TODO: return enum constant
+    private String nodeType(Node node) {
+        return node.getProperty("node_type");
+    }
+
+    // ---
+
     private void checkTopicRef(Node node) {
-        if (!node.getProperty("node_type").equals("topic")) {
+        if (!nodeType(node).equals("topic")) {
             throw new IllegalArgumentException("Reference error: ID " + node.getId() +
                 " refers to an Association when the caller expects a Topic");
         }
     }
 
     private void checkAssociationRef(Node node) {
-        if (!node.getProperty("node_type").equals("assoc")) {
+        if (!nodeType(node).equals("assoc")) {
             throw new IllegalArgumentException("Reference error: ID " + node.getId() +
                 " refers to a Topic when the caller expects an Association");
         }

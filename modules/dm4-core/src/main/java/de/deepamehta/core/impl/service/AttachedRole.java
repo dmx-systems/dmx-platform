@@ -32,9 +32,16 @@ class AttachedRole implements Role {
     // === Role Implementation ===
 
     @Override
+    public long getPlayerId() {
+        return model.getPlayerId();
+    }
+
+    @Override
     public String getRoleTypeUri() {
         return model.getRoleTypeUri();
     }
+
+    // ---
 
     @Override
     public void setRoleTypeUri(String roleTypeUri) {

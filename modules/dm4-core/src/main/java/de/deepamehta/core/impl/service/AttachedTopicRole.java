@@ -32,11 +32,6 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
     // === TopicRole Implementation ===
 
     @Override
-    public long getTopicId() {
-        return getModel().getTopicId();
-    }
-
-    @Override
     public String getTopicUri() {
         return getModel().getTopicUri();
     }
@@ -53,7 +48,7 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
         if (topicIdentifiedByUri()) {
             return dms.getTopic("uri", new SimpleValue(getTopicUri()), false, null);    // fetchComposite=false
         } else {
-            return dms.getTopic(getTopicId(), false, null);     // fetchComposite=false, clientState=null
+            return dms.getTopic(getPlayerId(), false, null);    // fetchComposite=false, clientState=null
         }
     }
 
@@ -85,6 +80,6 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
     // === Store ===
 
     private void storeRoleTypeUri(String roleTypeUri) {
-        dms.storage.setRoleTypeUri(getAssociation().getId(), getTopicId(), roleTypeUri);
+        dms.storage.setRoleTypeUri(getAssociation().getId(), getPlayerId(), roleTypeUri);
     }
 }

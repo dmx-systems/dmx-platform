@@ -8,22 +8,31 @@ public abstract class RoleModel implements Cloneable {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    protected long playerId;        // id of the player (a topic, or an association)
     protected String roleTypeUri;   // is never null
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    // ### TODO: drop this?
     protected RoleModel() {
     }
 
-    protected RoleModel(String roleTypeUri) {
+    protected RoleModel(long playerId, String roleTypeUri) {
+        this.playerId = playerId;
         setRoleTypeUri(roleTypeUri);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    public long getPlayerId() {
+        return playerId;
+    }
+
     public final String getRoleTypeUri() {
         return roleTypeUri;
     }
+
+    // ---
 
     public final void setRoleTypeUri(String roleTypeUri) {
         if (roleTypeUri == null) {
