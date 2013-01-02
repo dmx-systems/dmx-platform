@@ -155,6 +155,23 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
     // ---
 
     @Override
+    public Object getTopicProperty(long topicId, String key) {
+        return fetchTopicNode(topicId).getProperty(key);
+    }
+
+    @Override
+    public void setTopicProperty(long topicId, String key, Object value) {
+        fetchTopicNode(topicId).setProperty(key, value);
+    }
+
+    @Override
+    public boolean hasTopicProperty(long topicId, String key) {
+        return fetchTopicNode(topicId).hasProperty(key);
+    }
+
+    // ---
+
+    @Override
     public void deleteTopic(long topicId) {
         fetchTopicNode(topicId).delete();
     }

@@ -39,6 +39,10 @@ public interface MehtaGraph {
     void setTopicUri(long topicId, String uri);
     void setTopicValue(long topicId, SimpleValue value, IndexMode indexMode, String indexKey);
 
+    Object getTopicProperty(long topicId, String key);
+    void setTopicProperty(long topicId, String key, Object value);
+    boolean hasTopicProperty(long topicId, String key);
+
     void deleteTopic(long topicId);
 
 

@@ -88,7 +88,7 @@ class ObjectFactoryImpl implements ObjectFactory {
     void _createTopic(TopicModel model) {
         // Note: low-level (storage) call used here ### explain
         dms.storage.createTopic(model);
-        dms.storage.setTopicValue(model.getId(), model.getSimpleValue());
+        dms.storage.setTopicValue(model.getId(), model.getSimpleValue(), IndexMode.OFF, null);  // indexKey=null
     }
 
     // ---
