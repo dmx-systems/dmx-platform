@@ -2,8 +2,10 @@ package de.deepamehta.core.storage.spi;
 
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.storage.MehtaObjectRole;
 
@@ -20,7 +22,9 @@ import java.util.Set;
  */
 public interface MehtaGraph {
 
-    // === Mehta Nodes ===
+
+
+    // === Topics ===
 
     void createMehtaNode(TopicModel topicModel);
 
@@ -32,7 +36,14 @@ public interface MehtaGraph {
     List<TopicModel> queryMehtaNodes(Object value);
     List<TopicModel> queryMehtaNodes(String key, Object value);
 
-    // === Mehta Edges ===
+    void setTopicUri(long topicId, String uri);
+    void setTopicValue(long topicId, SimpleValue value, IndexMode indexMode, String indexKey);
+
+    void deleteTopic(long topicId);
+
+
+
+    // === Associations ===
 
     MehtaEdge createMehtaEdge(MehtaObjectRole object1, MehtaObjectRole object2);
 
@@ -42,9 +53,13 @@ public interface MehtaGraph {
     Set<MehtaEdge> getMehtaEdges(long node1Id, long node2Id, String roleType1, String roleType2);
     Set<MehtaEdge> getMehtaEdgesBetweenNodeAndEdge(long nodeId, long edgeId, String nodeRoleType, String edgeRoleType);
 
-    // === Mehta Objects ===
+
+
+    // === Mehta Objects ### TODO ===
 
     MehtaObject getMehtaObject(long id);
+
+
 
     // === Traversal ===
 
@@ -57,6 +72,10 @@ public interface MehtaGraph {
     // ---
 
     Set<AssociationModel> getTopicAssociations(long topicId);
+
+    Set<AssociationModel> getAssociationAssociations(long assocId);
+
+
 
     // === Misc ===
 

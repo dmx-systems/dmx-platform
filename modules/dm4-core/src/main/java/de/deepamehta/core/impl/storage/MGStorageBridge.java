@@ -208,29 +208,18 @@ public class MGStorageBridge {
      * Stores and indexes the topic's URI.
      */
     public void setTopicUri(long topicId, String uri) {
-        storeAndIndexUri(mg.getMehtaNode(topicId), uri);
+        mg.setTopicUri(topicId, uri);
     }
 
     /**
      * Stores the topic's value.
      * <p>
-     * Note: the value is not indexed automatically. Use the {@link indexTopicValue} method.
+     * Note: the value is not indexed automatically. Use the {@link indexTopicValue} method. ### FIXDOC
      *
-     * @return  The previous value, or <code>null</code> if no value was stored before.
+     * @return  The previous value, or <code>null</code> if no value was stored before. ### FIXDOC
      */
-    public SimpleValue setTopicValue(long topicId, SimpleValue value) {
-        Object oldValue = mg.getMehtaNode(topicId).setObject("value", value.value());
-        return oldValue != null ? new SimpleValue(oldValue) : null;
-    }
-
-    /**
-     * @param   oldValue    may be null
-     */
-    public void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, SimpleValue value,
-                                                                                    SimpleValue oldValue) {
-        MehtaGraphIndexMode mgIndexMode = fromIndexMode(indexMode);
-        Object oldVal = oldValue != null ? oldValue.value() : null;
-        mg.getMehtaNode(topicId).indexAttribute(mgIndexMode, indexKey, value.value(), oldVal);
+    public void setTopicValue(long topicId, SimpleValue value, IndexMode indexMode, String indexKey) {
+        mg.setTopicValue(topicId, value, indexMode, indexKey);
     }
 
     /**
@@ -253,7 +242,7 @@ public class MGStorageBridge {
      * Prerequisite: the topic has no relations.
      */
     public void deleteTopic(long topicId) {
-        mg.getMehtaNode(topicId).delete();
+        mg.deleteTopic(topicId);
     }
 
 
@@ -379,7 +368,7 @@ public class MGStorageBridge {
     // ---
 
     public Set<AssociationModel> getAssociationAssociations(long assocId) {
-        return buildAssociations(mg.getMehtaEdge(assocId).getMehtaEdges(myRoleTypeUri));
+        return mg.getAssociationAssociations(assocId);
     }
 
     public RelatedAssociationModel getAssociationRelatedAssociation(long assocId, String assocTypeUri,

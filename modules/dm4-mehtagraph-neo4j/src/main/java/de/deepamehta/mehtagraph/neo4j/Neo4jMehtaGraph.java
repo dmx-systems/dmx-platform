@@ -1,7 +1,15 @@
 package de.deepamehta.mehtagraph.neo4j;
 
+import de.deepamehta.core.ResultSet;
+import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedAssociationModel;
+import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.storage.MehtaObjectRole;
 import de.deepamehta.core.storage.spi.MehtaEdge;
 import de.deepamehta.core.storage.spi.MehtaGraph;
@@ -19,6 +27,43 @@ import java.util.logging.Logger;
 
 
 public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
+
+    private enum NodeType {
+
+        TOPIC {
+            @Override
+            RoleModel createRoleModel(Node node, String roleTypeUri) {
+                return new TopicRoleModel(node.getId(), roleTypeUri);
+            }
+
+            @Override
+            String error(Node node) {
+                return "ID " + node.getId() + " refers to an Association when the caller expects a Topic";
+            }
+        },
+        ASSOCIATION {
+            @Override
+            RoleModel createRoleModel(Node node, String roleTypeUri) {
+                return new AssociationRoleModel(node.getId(), roleTypeUri);
+            }
+
+            @Override
+            String error(Node node) {
+                return "ID " + node.getId() + " refers to a Topic when the caller expects an Association";
+            }
+        };
+
+        private static NodeType of(Node node) {
+            String type = node.getProperty("node_type");
+            return valueOf(type.toUpperCase());
+        }
+
+        // ---
+
+        abstract RoleModel createRoleModel(long nodeId, String roleTypeUri);
+
+        abstract String error();
+    }
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -40,7 +85,7 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
 
 
 
-    // === Mehta Nodes ===
+    // === Topics ===
 
     @Override
     public void createMehtaNode(TopicModel topicModel) {
@@ -59,9 +104,7 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
 
     @Override
     public TopicModel getMehtaNode(long id) {
-        Node node = neo4j.getNodeById(id);
-        checkTopicRef(node);
-        return buildTopic(node);
+        return buildTopic(fetchTopicNode(topicId));
     }
 
     @Override
@@ -97,9 +140,28 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
         return buildTopics(fulltextNodeIndex.query(key, value));
     }
 
+    // ---
+
+    @Override
+    public void setTopicUri(long topicId, String uri) {
+        storeAndIndexUri(fetchTopicNode(topicId), uri);
+    }
+
+    @Override
+    public void setTopicValue(long topicId, SimpleValue value, IndexMode indexMode, String indexKey) {
+        storeAndIndexValue(fetchTopicNode(topicId), value.value(), indexMode, indexKey);
+    }
+
+    // ---
+
+    @Override
+    public void deleteTopic(long topicId) {
+        fetchTopicNode(topicId).delete();
+    }
 
 
-    // === Mehta Edges ===
+
+    // === Associations ===
 
     @Override
     public MehtaEdge createMehtaEdge(MehtaObjectRole object1, MehtaObjectRole object2) {
@@ -156,7 +218,7 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
 
 
 
-    // === Mehta Objects ===
+    // === Mehta Objects ### TODO ===
 
     @Override
     public MehtaObject getMehtaObject(long id) {
@@ -201,13 +263,12 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
 
     @Override
     public Set<AssociationModel> getTopicAssociations(long topicId) {
-        Set<AssociationModel> assocs = new HashSet();
-        Node node = neo4j.getNodeById(id);  // ### TODO: check node type
-        for (Relationship rel : node.getRelationships(Direction.INCOMING)) {
-            Node middleNode = rel.getStartNode();
-            assocs.add(buildAssociation(middleNode));
-        }
-        return assocs;
+        return fetchAssociations(fetchTopicNode(topicId));
+    }
+
+    @Override
+    public Set<AssociationModel> getAssociationAssociations(long assocId) {
+        return fetchAssociations(fetchAssociationNode(assocId));
     }
 
 
@@ -260,15 +321,8 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
         List<RoleModel> roleModels = new ArrayList();
         for (Relationship rel : middleNode.getRelationships(Direction.OUTGOING)) {
             Node node = rel.getEndNode();
-            long nodeId = node.getId();
             String roleTypeUri = rel.getType().name();
-            RoleModel roleModel;
-            // ### TODO: move behavior to enum class
-            if (nodeType(node).equals("topic")) {
-                roleModel = new TopicRoleModel(nodeId, roleTypeUri);
-            } else {
-                roleModel = new AssociationRoleModel(nodeId, roleTypeUri);
-            }
+            RoleModel roleModel = NodeType.of(node).createRoleModel(node, roleTypeUri);
             roleModels.add(roleModel);
         }
         // sanity check
@@ -300,24 +354,34 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
 
     // ---
 
-    // ### TODO: return enum constant
-    private String nodeType(Node node) {
-        return node.getProperty("node_type");
+    private Node fetchTopicNode(long topicId) {
+        Node node = neo4j.getNodeById(topicId);
+        checkType(node, NodeType.TOPIC);
+        return node;
+    }
+
+    private Node fetchAssociationNode(long assocId) {
+        Node node = neo4j.getNodeById(assocId);
+        checkType(node, NodeType.ASSOCIATION);
+        return node;
     }
 
     // ---
 
-    private void checkTopicRef(Node node) {
-        if (!nodeType(node).equals("topic")) {
-            throw new IllegalArgumentException("Reference error: ID " + node.getId() +
-                " refers to an Association when the caller expects a Topic");
+    private Set<AssociationModel> fetchAssociations(Node node) {
+        Set<AssociationModel> assocs = new HashSet();
+        for (Relationship rel : node.getRelationships(Direction.INCOMING)) {
+            Node middleNode = rel.getStartNode();
+            assocs.add(buildAssociation(middleNode));
         }
+        return assocs;
     }
 
-    private void checkAssociationRef(Node node) {
-        if (!nodeType(node).equals("assoc")) {
-            throw new IllegalArgumentException("Reference error: ID " + node.getId() +
-                " refers to a Topic when the caller expects an Association");
+    // ---
+
+    private void checkType(Node node, NodeType type) {
+        if (NodeType.of(node) != type) {
+            throw new IllegalArgumentException(type.error(node));
         }
     }
 
@@ -331,6 +395,11 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
     private void storeAndIndexTypeUri(Node node, String typeUri) {
         node.setProperty("type_uri", typeUri);
         indexAttribute(node, typeUri, IndexMode.KEY, "type_uri");
+    }
+
+    private void storeAndIndexValue(Node node, Object value, IndexMode indexMode, String indexKey) {
+        node.setProperty("value", value);
+        indexAttribute(node, value, indexMode, indexKey);
     }
 
     // ---

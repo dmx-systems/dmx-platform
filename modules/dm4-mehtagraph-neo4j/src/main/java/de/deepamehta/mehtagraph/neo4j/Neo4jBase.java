@@ -38,7 +38,7 @@ class Neo4jBase {
     protected Neo4jRelationtypeCache relTypeCache;
     protected Index<Node> exactNodeIndex;
     protected Index<Node> fulltextNodeIndex;
-    protected Index<Node> edgeIndex;
+    protected Index<Node> associationIndex;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
