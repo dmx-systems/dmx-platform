@@ -90,7 +90,7 @@ public class MGStorageBridge {
     // ---
 
     /**
-     * Convenience method.
+     * Convenience method (checks singularity).
      *
      * @return  The fetched topics.
      *          Note: their composite values are not initialized.
@@ -115,15 +115,17 @@ public class MGStorageBridge {
      * @return  The fetched topics.
      *          Note: their composite values are not initialized.
      */
-    public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                              String othersRoleTypeUri, String othersTopicTypeUri,
-                                                              int maxResultSize) {
-        return mg.getTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-            maxResultSize);
+    public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri,
+                                                              String myRoleTypeUri, String othersRoleTypeUri,
+                                                              String othersTopicTypeUri, int maxResultSize) {
+        Set<RelatedTopicModel> relTopics = mg.getTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
+        // ### TODO: respect maxResultSize
+        return new ResultSet(relTopics.size(), relTopics);
     }
 
     /**
-     * Convenience method.
+     * Convenience method (receives *list* of association types).
      *
      * @param   assocTypeUris       may be null
      * @param   myRoleTypeUri       may be null
@@ -158,6 +160,8 @@ public class MGStorageBridge {
     // ---
 
     /**
+     * Convenience method.
+     *
      * @return  The fetched association.
      *          Note: its composite value is not initialized.
      */
@@ -250,10 +254,14 @@ public class MGStorageBridge {
     // === Associations ===
 
     public AssociationModel getAssociation(long assocId) {
-        return buildAssociation(mg.getMehtaEdge(assocId));
+        return mg.getMehtaEdge(assocId);
     }
 
+    // ---
+
     /**
+     * Convenience method.
+     *
      * Returns the association between two topics, qualified by association type and both role types.
      * If no such association exists <code>null</code> is returned.
      * If more than one association exist, a runtime exception is thrown.
@@ -261,45 +269,18 @@ public class MGStorageBridge {
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      *                          ### FIXME: for methods with a singular return value all filters should be mandatory
      */
-    public AssociationModel getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+    public AssociationModel getAssociation(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
                                                                                               String roleTypeUri2) {
-        Set<MehtaEdge> edges = mg.getMehtaEdges(topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
-        // apply type filter
-        if (assocTypeUri != null) {
-            filterEdgesByAssociationType(edges, assocTypeUri);
-        }
-        // error check
-        if (edges.size() > 1) {
-            throw new RuntimeException("Ambiguity: there are " + edges.size() + " \"" + assocTypeUri +
-                "\" associations (topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", " +
+        Set<AssociationModel> assocs = getAssociations(assocTypeUri, topicId1, topicId2, roleTypeUri1, roleTypeUri2);
+        switch (assocs.size()) {
+        case 0:
+            return null;
+        case 1:
+            return assocs.iterator().next();
+        default:
+            throw new RuntimeException("Ambiguity: there are " + assocs.size() + " \"" + assocTypeUri +
+                "\" associations (topicId1=" + topicId1 + ", topicId2=" + topicId2 + ", " +
                 "roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\")");
-        }
-        //
-        if (edges.size() == 0) {
-            return null;
-        } else {
-            return buildAssociation(edges.iterator().next());
-        }
-    }
-
-    public AssociationModel getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                                     String topicRoleTypeUri, String assocRoleTypeUri) {
-        Set<MehtaEdge> edges = mg.getMehtaEdgesBetweenNodeAndEdge(topicId, assocId, topicRoleTypeUri, assocRoleTypeUri);
-        // apply type filter
-        if (assocTypeUri != null) {
-            filterEdgesByAssociationType(edges, assocTypeUri);
-        }
-        // error check
-        if (edges.size() > 1) {
-            throw new RuntimeException("Ambiguity: there are " + edges.size() + " \"" + assocTypeUri +
-                "\" associations (topicId=" + topicId + ", assocId=" + assocId + ", " +
-                "topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri + "\")");
-        }
-        //
-        if (edges.size() == 0) {
-            return null;
-        } else {
-            return buildAssociation(edges.iterator().next());
         }
     }
 
@@ -308,21 +289,47 @@ public class MGStorageBridge {
      *
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      */
-    public Set<AssociationModel> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
-        Set<MehtaEdge> edges = mg.getMehtaEdges(topic1Id, topic2Id);
-        // apply type filter
-        if (assocTypeUri != null) {
-            filterEdgesByAssociationType(edges, assocTypeUri);
-        }
-        //
-        return buildAssociations(edges);
+    public Set<AssociationModel> getAssociations(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
+                                                                                                  String roleTypeUri2) {
+        return mg.getMehtaEdges(assocTypeUri, topicId1, topicId2, roleTypeUri1, roleTypeUri2);
     }
 
     // ---
 
-    public RelatedTopicModel getAssociationRelatedTopic(long assocId, String assocTypeUri,
-                                                                    String myRoleTypeUri, String othersRoleTypeUri,
-                                                                    String othersTopicTypeUri) {
+    /**
+     * Convenience method.
+     */
+    public AssociationModel getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
+                                                                     String topicRoleTypeUri, String assocRoleTypeUri) {
+        Set<AssociationModel> assocs = getAssociationsBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
+            topicRoleTypeUri, assocRoleTypeUri);
+        switch (assocs.size()) {
+        case 0:
+            return null;
+        case 1:
+            return assocs.iterator().next();
+        default:
+            throw new RuntimeException("Ambiguity: there are " + assocs.size() + " \"" + assocTypeUri +
+                "\" associations (topicId=" + topicId + ", assocId=" + assocId + ", " +
+                "topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri + "\")");
+        }
+    }
+
+    public Set<AssociationModel> getAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
+                                                       long assocId, String topicRoleTypeUri, String assocRoleTypeUri) {
+        return mg.getMehtaEdgesBetweenNodeAndEdge(assocTypeUri, topicId, assocId, topicRoleTypeUri, assocRoleTypeUri);
+    }
+
+    // ---
+
+    /**
+     * Convenience method (checks singularity).
+     *
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
+     */
+    public RelatedTopicModel getAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                        String othersRoleTypeUri, String othersTopicTypeUri) {
         ResultSet<RelatedTopicModel> topics = getAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri, 0);
         switch (topics.getSize()) {
@@ -337,32 +344,40 @@ public class MGStorageBridge {
         }
     }
 
+    /**
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
+     */
     public ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri,
                                                                     String myRoleTypeUri, String othersRoleTypeUri,
                                                                     String othersTopicTypeUri, int maxResultSize) {
-        List assocTypeUris = assocTypeUri != null ? Arrays.asList(assocTypeUri) : null;
-        return getAssociationRelatedTopics(assocId, assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-            maxResultSize);
+        Set<RelatedTopicModel> relTopics = mg.getAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
+        // ### TODO: respect maxResultSize
+        return new ResultSet(relTopics.size(), relTopics);
     }
 
     /**
+     * Convenience method (receives *list* of association types).
+     *
      * @param   assocTypeUris       may be null
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
+     *
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
      */
     public ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, List assocTypeUris,
                                                                     String myRoleTypeUri, String othersRoleTypeUri,
                                                                     String othersTopicTypeUri, int maxResultSize) {
-        Set<ConnectedMehtaNode> nodes = mg.getMehtaEdge(assocId).getConnectedMehtaNodes(myRoleTypeUri,
-                                                                                        othersRoleTypeUri);
-        if (othersTopicTypeUri != null) {
-            filterNodesByTopicType(nodes, othersTopicTypeUri);
+        ResultSet<RelatedTopicModel> result = new ResultSet();
+        for (String assocTypeUri : assocTypeUris) {
+            ResultSet<RelatedTopicModel> res = getAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
+                othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
+            result.addAll(res);
         }
-        if (assocTypeUris != null) {
-            filterNodesByAssociationType(nodes, assocTypeUris);
-        }
-        return buildRelatedTopics(nodes, maxResultSize);
+        return result;
     }
 
     // ---

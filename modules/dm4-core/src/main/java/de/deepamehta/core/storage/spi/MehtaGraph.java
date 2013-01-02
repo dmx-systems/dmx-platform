@@ -1,6 +1,5 @@
 package de.deepamehta.core.storage.spi;
 
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
@@ -51,11 +50,13 @@ public interface MehtaGraph {
 
     MehtaEdge createMehtaEdge(MehtaObjectRole object1, MehtaObjectRole object2);
 
-    MehtaEdge getMehtaEdge(long id);
+    AssociationModel getMehtaEdge(long id);
 
-    Set<MehtaEdge> getMehtaEdges(long node1Id, long node2Id);
-    Set<MehtaEdge> getMehtaEdges(long node1Id, long node2Id, String roleType1, String roleType2);
-    Set<MehtaEdge> getMehtaEdgesBetweenNodeAndEdge(long nodeId, long edgeId, String nodeRoleType, String edgeRoleType);
+    Set<AssociationModel> getMehtaEdges(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
+                                                                                           String roleTypeUri2);
+
+    Set<AssociationModel> getMehtaEdgesBetweenNodeAndEdge(String assocTypeUri, long topicId, long assocId,
+                                                          String topicRoleTypeUri, String assocRoleTypeUri);
 
 
 
@@ -67,11 +68,19 @@ public interface MehtaGraph {
 
     // === Traversal ===
 
-    ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                            String othersRoleTypeUri, String othersTopicTypeUri, int maxResultSize);
+    Set<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri,
+                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
 
-    Set<RelatedAssociationModel> getTopicRelatedAssociations(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                            String othersRoleTypeUri, String othersAssocTypeUri);
+    Set<RelatedAssociationModel> getTopicRelatedAssociations(long topicId, String assocTypeUri,
+                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
+
+    // ---
+
+    Set<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri,
+                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
+
+    Set<RelatedAssociationModel> getAssociationRelatedAssociations(long assocId, String assocTypeUri,
+                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
     // ---
 

@@ -1,6 +1,5 @@
 package de.deepamehta.mehtagraph.neo4j;
 
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.IndexMode;
@@ -19,6 +18,12 @@ import de.deepamehta.core.storage.spi.MehtaObject;
 
 import org.neo4j.graphdb.Node;
 
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -27,43 +32,6 @@ import java.util.logging.Logger;
 
 
 public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
-
-    private enum NodeType {
-
-        TOPIC {
-            @Override
-            RoleModel createRoleModel(Node node, String roleTypeUri) {
-                return new TopicRoleModel(node.getId(), roleTypeUri);
-            }
-
-            @Override
-            String error(Node node) {
-                return "ID " + node.getId() + " refers to an Association when the caller expects a Topic";
-            }
-        },
-        ASSOCIATION {
-            @Override
-            RoleModel createRoleModel(Node node, String roleTypeUri) {
-                return new AssociationRoleModel(node.getId(), roleTypeUri);
-            }
-
-            @Override
-            String error(Node node) {
-                return "ID " + node.getId() + " refers to a Topic when the caller expects an Association";
-            }
-        };
-
-        private static NodeType of(Node node) {
-            String type = node.getProperty("node_type");
-            return valueOf(type.toUpperCase());
-        }
-
-        // ---
-
-        abstract RoleModel createRoleModel(long nodeId, String roleTypeUri);
-
-        abstract String error();
-    }
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -194,43 +162,36 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
     // ---
 
     @Override
-    public MehtaEdge getMehtaEdge(long id) {
-        return buildMehtaEdge(neo4j.getNodeById(id));
+    public AssociationModel getMehtaEdge(long assocId) {
+        return buildAssociation(fetchAssociationNode(assocId));
     }
 
     // ---
 
     @Override
-    public Set<MehtaEdge> getMehtaEdges(long node1Id, long node2Id) {
-        return new TraveralResultBuilder(getMehtaNode(node1Id), traverseToMehtaNode(node2Id)) {
-            @Override
-            Object buildResult(Node connectedNode, Node auxiliaryNode) {
-                return buildMehtaEdge(auxiliaryNode);
-            }
-        }.getResult();
+    public Set<AssociationModel> getMehtaEdges(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
+                                                                                                  String roleTypeUri2) {
+        Set<AssociationModel> assocs = new HashSet();
+        Query query = buildAssociationQuery(assocTypeUri,
+            roleTypeUri1, NodeType.TOPIC, topicId1, null,
+            roleTypeUri2, NodeType.TOPIC, topicId2, null);
+        for (Node middleNode : associationIndex.query(query)) {
+            assocs.add(buildAssociation(middleNode));
+        }
+        return assocs;
     }
 
     @Override
-    public Set<MehtaEdge> getMehtaEdges(long node1Id, long node2Id, String roleType1, String roleType2) {
-        return new TraveralResultBuilder(getMehtaNode(node1Id), traverseToMehtaNode(node2Id, roleType1,
-                                                                                             roleType2)) {
-            @Override
-            Object buildResult(Node connectedNode, Node auxiliaryNode) {
-                return buildMehtaEdge(auxiliaryNode);
-            }
-        }.getResult();
-    }
-
-    @Override
-    public Set<MehtaEdge> getMehtaEdgesBetweenNodeAndEdge(long nodeId, long edgeId, String nodeRoleType,
-                                                                                    String edgeRoleType) {
-        return new TraveralResultBuilder(getMehtaNode(nodeId), traverseToMehtaEdge(edgeId, nodeRoleType,
-                                                                                           edgeRoleType)) {
-            @Override
-            Object buildResult(Node connectedNode, Node auxiliaryNode) {
-                return buildMehtaEdge(auxiliaryNode);
-            }
-        }.getResult();
+    public Set<AssociationModel> getMehtaEdgesBetweenNodeAndEdge(String assocTypeUri, long topicId, long assocId,
+                                                                 String topicRoleTypeUri, String assocRoleTypeUri) {
+        Set<AssociationModel> assocs = new HashSet();
+        Query query = buildAssociationQuery(assocTypeUri,
+            topicRoleTypeUri, NodeType.TOPIC, topicId, null,
+            assocRoleTypeUri, NodeType.ASSOC, assocId, null);
+        for (Node middleNode : associationIndex.query(query)) {
+            assocs.add(buildAssociation(middleNode));
+        }
+        return assocs;
     }
 
 
@@ -247,33 +208,42 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
     // === Traversal ===
 
     @Override
-    public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                            String othersRoleTypeUri, String othersTopicTypeUri, int maxResultSize) {
-        // ### TODO: respect maxResultSize
-        Set<RelatedTopicModel> relTopics = new HashSet();
-        String indexValue = indexValue(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
-        for (Node middleNode : associationIndex.get("related_topic", indexValue)) {
-            AssociationModel assoc = buildAssociation(middleNode);
-            long relatedTopicId = assoc.getOtherRoleModel(topicId).getPlayerId();
-            TopicModel relatedTopic = getMehtaNode(relatedTopicId);
-            relTopics.add(new RelatedTopicModel(relatedTopic, assoc));
-        }
-        return new ResultSet(relTopics.size(), relTopics);
+    public Set<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                        String othersRoleTypeUri, String othersTopicTypeUri) {
+        Query query = buildAssociationQuery(assocTypeUri,
+            myRoleTypeUri,     NodeType.TOPIC, topicId1, null,
+            othersRoleTypeUri, NodeType.TOPIC, -1, othersTopicTypeUri);
+        return buildRelatedTopics(queryAssociations(query));
     }
 
     @Override
     public Set<RelatedAssociationModel> getTopicRelatedAssociations(long topicId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+        Query query = buildAssociationQuery(assocTypeUri,
+            myRoleTypeUri,     NodeType.TOPIC, topicId1, null,
+            othersRoleTypeUri, NodeType.ASSOC, -1, othersAssocTypeUri);
+        return buildRelatedAssociations(queryAssociations(query));
+    }
+
+    // ---
+
+    @Override
+    public Set<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                              String othersRoleTypeUri, String othersTopicTypeUri) {
+        Query query = buildAssociationQuery(assocTypeUri,
+            myRoleTypeUri,     NodeType.ASSOC, assocId, null,
+            othersRoleTypeUri, NodeType.TOPIC, -1, othersTopicTypeUri);
+        return buildRelatedTopics(queryAssociations(query));
+    }
+
+    @Override
+    public Set<RelatedAssociationModel> getAssociationRelatedAssociations(long assocId, String assocTypeUri,
+                         String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
         // ### TODO: respect maxResultSize
-        Set<RelatedAssociationModel> relAssocs = new HashSet();
-        String indexValue = indexValue(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
-        for (Node middleNode : associationIndex.get("related_assoc", indexValue)) {
-            AssociationModel assoc = buildAssociation(middleNode);
-            long relatedAssocId = assoc.getOtherRoleModel(topicId).getPlayerId();
-            AssociationModel relatedAssoc = getMehtaEdge(relatedAssocId);
-            relAssocs.add(new RelatedAssociationModel(relatedAssoc, assoc));
-        }
-        return new ResultSet(relAssocs.size(), relAssocs);
+        Query query = buildAssociationQuery(assocTypeUri,
+            myRoleTypeUri,     NodeType.ASSOC, assocId, null,
+            othersRoleTypeUri, NodeType.ASSOC, -1, othersAssocTypeUri);
+        return buildRelatedAssociations(queryAssociations(query));
     }
 
     // ---
@@ -330,11 +300,11 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
         String uri = middleNode.getProperty("uri");
         String typeUri = middleNode.getProperty("type_uri");;
         SimpleValue value = new SimpleValue(middleNode.getProperty("value"));
-        List<RoleModel> roleModels = roleModels(middleNode);
+        List<RoleModel> roleModels = buildRoleModels(middleNode);
         return new AssociationModel(id, uri, typeUri, roleModels.get(0), roleModels.get(1), value, null);
     }
 
-    private List<RoleModel> roleModels(Node middleNode) {
+    private List<RoleModel> buildRoleModels(Node middleNode) {
         List<RoleModel> roleModels = new ArrayList();
         for (Relationship rel : middleNode.getRelationships(Direction.OUTGOING)) {
             Node node = rel.getEndNode();
@@ -349,6 +319,28 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
         }
         //
         return roleModels;
+    }
+
+    // ---
+
+    private Set<RelatedTopicModel> buildRelatedTopics(Collection<AssociationModel> assocs, long playerId) {
+        Set<RelatedTopicModel> relTopics = new HashSet();
+        for (AssociationModel assoc : assocs) {
+            long relatedTopicId = assoc.getOtherRoleModel(playerId).getPlayerId();
+            TopicModel relatedTopic = getMehtaNode(relatedTopicId);
+            relTopics.add(new RelatedTopicModel(relatedTopic, assoc));
+        }
+        return relTopics;
+    }
+
+    private Set<RelatedAssociationModel> buildRelatedAssociations(Collection<AssociationModel> assocs, long playerId) {
+        Set<RelatedAssociationModel> relAssocs = new HashSet();
+        for (AssociationModel assoc : assocs) {
+            long relatedAssocId = assoc.getOtherRoleModel(playerId).getPlayerId();
+            AssociationModel relatedAssoc = getMehtaEdge(relatedAssocId);
+            relAssocs.add(new RelatedAssociationModel(relatedAssoc, assoc));
+        }
+        return relAssocs;
     }
 
     // ---
@@ -442,13 +434,22 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
         }
     }
 
-    //
+    // ---
 
-    private String indexValue(long id, String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                  String othersTypeUri) {
-        // ### TODO: wildcards
-        String indexValue = id + "," + assocTypeUri + "," + myRoleTypeUri + "," + othersRoleTypeUri + "," +
-            othersTypeUri;
-        return indexValue;
+    private Query buildAssociationQuery(String assocTypeUri,
+                                    String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
+                                    String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
+        Query query = new BooleanQuery();
+        query.add(new TermQuery(new Term("assoc_type_uri", assocTypeUri)), Occur.MUST);
+        // ### TODO
+        return query;
+    }
+
+    private List<AssociationModel> queryAssociations(Query query) {
+        List<AssociationModel> assocs = new ArrayList();
+        for (Node middleNode : associationIndex.query(query)) {
+            assocs.add(buildAssociation(middleNode));
+        }
+        return assocs;
     }
 }

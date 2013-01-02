@@ -315,7 +315,8 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             // ### FIXME: fetchComposite=false, parameterize it
-            Set<Association> assocs = attach(storage.getAssociations(topic1Id, topic2Id, assocTypeUri), false);
+            Set<Association> assocs = attach(storage.getAssociations(assocTypeUri, topic1Id, topic2Id, null, null),
+                false);     // roleTypeUri1=null, roleTypeUri2=null
             tx.success();
             return assocs;
         } catch (Exception e) {
