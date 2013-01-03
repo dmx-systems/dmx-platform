@@ -359,9 +359,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     protected abstract void storeTypeUri();
 
-    protected abstract SimpleValue storeSimpleValue();
-
-    protected abstract void indexValue(IndexMode indexMode, String indexKey, SimpleValue value, SimpleValue oldValue);
+    protected abstract void storeSimpleValue(Set<IndexMode> indexModes, String indexKey);
 
     protected abstract Type getType();
 
@@ -746,28 +744,16 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     // ### TODO: should be private
-    void storeAndIndexSimpleValue() {
-        SimpleValue oldValue = storeSimpleValue();              // abstract
-        indexValue(getSimpleValue(), oldValue);
-    }
-
     /**
-     * Determines this object's index key and index modes and updates the index according to the specified values.
+     * Stores and indexes the simple value of this object's model.
+     * Determines this object's index key and index modes.
      */
-    private void indexValue(SimpleValue value, SimpleValue oldValue) {
-        Type type = getType();                                  // abstract
+    void storeAndIndexSimpleValue() {
+        Type type = getType();                      // abstract
+        Set<IndexMode> indexModes = type.getIndexModes();
         String indexKey = type.getUri();
-        // strip HTML tags before indexing
-        if (type.getDataTypeUri().equals("dm4.core.html")) {
-            value = new SimpleValue(JavaUtils.stripHTML(value.toString()));
-            if (oldValue != null) {
-                oldValue = new SimpleValue(JavaUtils.stripHTML(oldValue.toString()));
-            }
-        }
         //
-        for (IndexMode indexMode : type.getIndexModes()) {
-            indexValue(indexMode, indexKey, value, oldValue);   // abstract
-        }
+        storeSimpleValue(indexModes, indexKey);     // abstract
     }
 
     // === Label ===

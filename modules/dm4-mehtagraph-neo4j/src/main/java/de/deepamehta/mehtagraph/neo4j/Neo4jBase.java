@@ -36,9 +36,11 @@ class Neo4jBase {
 
     protected GraphDatabaseService neo4j = null;
     protected Neo4jRelationtypeCache relTypeCache;
-    protected Index<Node> exactNodeIndex;
-    protected Index<Node> fulltextNodeIndex;
-    protected Index<Node> associationIndex;
+    protected Index<Node> topicContentExact;
+    protected Index<Node> topicContentFulltext;
+    protected Index<Node> assocContentExact;
+    protected Index<Node> assocContentFulltext;
+    protected Index<Node> assocMetadata;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -49,9 +51,11 @@ class Neo4jBase {
             this.neo4j = new GraphDatabaseFactory().newEmbeddedDatabase(databasePath);
             this.relTypeCache = new Neo4jRelationtypeCache(neo4j);
             // indexes
-            this.exactNodeIndex    = createExactIndex("exact-node-index");
-            this.fulltextNodeIndex = createFulltextIndex("fulltext-node-index");
-            this.associationIndex = createExactIndex("association-index");
+            this.topicContentExact    = createExactIndex("topic-content-exact");
+            this.topicContentFulltext = createFulltextIndex("topic-content-fulltext");
+            this.assocContentExact    = createExactIndex("assoc-content-exact");
+            this.assocContentFulltext = createFulltextIndex("assoc-content-fulltext");
+            this.assocMetadata = createExactIndex("assoc-metadata");
         } catch (Exception e) {
             if (neo4j != null) {
                 logger.info("Shutdown Neo4j");
@@ -64,8 +68,8 @@ class Neo4jBase {
     protected Neo4jBase(Neo4jBase base) {
         this.neo4j = base.neo4j;
         this.relTypeCache = base.relTypeCache;
-        this.exactNodeIndex = base.exactNodeIndex;
-        this.fulltextNodeIndex = base.fulltextNodeIndex;
+        this.topicContentExact = base.topicContentExact;
+        this.topicContentFulltext = base.topicContentFulltext;
     }
 
     // ----------------------------------------------------------------------------------------------- Protected Methods

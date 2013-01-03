@@ -73,13 +73,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     }
 
     @Override
-    protected SimpleValue storeSimpleValue() {
-        return dms.storage.setTopicValue(getId(), getSimpleValue());
-    }
-
-    @Override
-    protected void indexValue(IndexMode indexMode, String indexKey, SimpleValue value, SimpleValue oldValue) {
-        dms.storage.indexTopicValue(getId(), indexMode, indexKey, value, oldValue);
+    protected void storeSimpleValue(Set<IndexMode> indexModes, String indexKey) {
+        dms.storage.setTopicValue(getId(), getSimpleValue(), indexModes, indexKey);
     }
 
     @Override

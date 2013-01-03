@@ -36,7 +36,7 @@ public interface MehtaGraph {
     List<TopicModel> queryMehtaNodes(String key, Object value);
 
     void setTopicUri(long topicId, String uri);
-    void setTopicValue(long topicId, SimpleValue value, IndexMode indexMode, String indexKey);
+    void setTopicValue(long topicId, SimpleValue value, Set<IndexMode> indexModes, String indexKey);
 
     Object getTopicProperty(long topicId, String key);
     void setTopicProperty(long topicId, String key, Object value);
@@ -59,6 +59,9 @@ public interface MehtaGraph {
                                                           String topicRoleTypeUri, String assocRoleTypeUri);
 
     // ---
+
+    void storeAssociationUri(long assocId, String uri);
+    void storeAssociationValue(long assocId, SimpleValue value, Set<IndexMode> indexModes, String indexKey);
 
     void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri);
 

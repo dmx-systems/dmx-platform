@@ -25,7 +25,7 @@ import de.deepamehta.core.util.DeepaMehtaUtils;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -106,6 +106,15 @@ public class MGStorageBridge {
         mg.setTopicUri(topicId, uri);
     }
 
+    // ---
+
+    /**
+     * Convenience method.
+     */
+    public void setTopicValue(long assocId, SimpleValue value) {
+        setTopicValue(assocId, value, new HashSet(asList(IndexMode.OFF)), null);
+    }
+
     /**
      * Stores the topic's value.
      * <p>
@@ -113,9 +122,11 @@ public class MGStorageBridge {
      *
      * @return  The previous value, or <code>null</code> if no value was stored before. ### FIXDOC
      */
-    public void setTopicValue(long topicId, SimpleValue value, IndexMode indexMode, String indexKey) {
-        mg.setTopicValue(topicId, value, indexMode, indexKey);
+    public void setTopicValue(long topicId, SimpleValue value, Set<IndexMode> indexModes, String indexKey) {
+        mg.setTopicValue(topicId, value, indexModes, indexKey);
     }
+
+    // ---
 
     /**
      * Creates a topic.
@@ -334,29 +345,27 @@ public class MGStorageBridge {
      * Stores and indexes the association's URI.
      */
     public void setAssociationUri(long assocId, String uri) {
-        storeAndIndexUri(mg.getMehtaEdge(assocId), uri);
+        mg.storeAssociationUri(assocId, uri);
+    }
+
+    // ---
+
+    /**
+     * Convenience method.
+     */
+    public void setAssociationValue(long assocId, SimpleValue value) {
+        setAssociationValue(assocId, value, new HashSet(asList(IndexMode.OFF)), null);
     }
 
     /**
      * Stores the association's value.
      * <p>
-     * Note: the value is not indexed automatically. Use the {@link indexAssociationValue} method.
+     * Note: the value is not indexed automatically. Use the {@link indexAssociationValue} method. ### FIXDOC
      *
-     * @return  The previous value, or <code>null</code> if no value was stored before.
+     * @return  The previous value, or <code>null</code> if no value was stored before. ### FIXDOC
      */
-    public SimpleValue setAssociationValue(long assocId, SimpleValue value) {
-        Object oldValue = mg.getMehtaEdge(assocId).setObject("value", value.value());
-        return oldValue != null ? new SimpleValue(oldValue) : null;
-    }
-
-    /**
-     * @param   oldValue    may be null
-     */
-    public void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, SimpleValue value,
-                                                                                          SimpleValue oldValue) {
-        MehtaGraphIndexMode mgIndexMode = fromIndexMode(indexMode);
-        Object oldVal = oldValue != null ? oldValue.value() : null;
-        mg.getMehtaEdge(assocId).indexAttribute(mgIndexMode, indexKey, value.value(), oldVal);
+    public void setAssociationValue(long assocId, SimpleValue value, Set<IndexMode> indexModes, String indexKey) {
+        mg.storeAssociationValue(assocId, value, indexModes, indexKey);
     }
 
     // ---
