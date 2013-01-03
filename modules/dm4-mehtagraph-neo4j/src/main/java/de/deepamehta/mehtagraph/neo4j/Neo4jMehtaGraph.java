@@ -194,6 +194,15 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
         return assocs;
     }
 
+    // ---
+
+    @Override
+    public void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri) {
+        Node middleNode = fetchAssociationNode(assocId);
+        fetchRelationship(middleNode, playerId).delete();
+        middleNode.createRelationshipTo(playerId, getRelationshipType(roleTypeUri));
+    }
+
 
 
     // === Mehta Objects ### TODO ===
@@ -206,6 +215,18 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
 
 
     // === Traversal ===
+
+    @Override
+    public Set<AssociationModel> getTopicAssociations(long topicId) {
+        return fetchAssociations(fetchTopicNode(topicId));
+    }
+
+    @Override
+    public Set<AssociationModel> getAssociationAssociations(long assocId) {
+        return fetchAssociations(fetchAssociationNode(assocId));
+    }
+
+    // ---
 
     @Override
     public Set<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
@@ -244,18 +265,6 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
             myRoleTypeUri,     NodeType.ASSOC, assocId, null,
             othersRoleTypeUri, NodeType.ASSOC, -1, othersAssocTypeUri);
         return buildRelatedAssociations(queryAssociations(query));
-    }
-
-    // ---
-
-    @Override
-    public Set<AssociationModel> getTopicAssociations(long topicId) {
-        return fetchAssociations(fetchTopicNode(topicId));
-    }
-
-    @Override
-    public Set<AssociationModel> getAssociationAssociations(long assocId) {
-        return fetchAssociations(fetchAssociationNode(assocId));
     }
 
 
@@ -306,18 +315,12 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
 
     private List<RoleModel> buildRoleModels(Node middleNode) {
         List<RoleModel> roleModels = new ArrayList();
-        for (Relationship rel : middleNode.getRelationships(Direction.OUTGOING)) {
+        for (Relationship rel : fetchRelationships(middleNode)) {
             Node node = rel.getEndNode();
             String roleTypeUri = rel.getType().name();
             RoleModel roleModel = NodeType.of(node).createRoleModel(node, roleTypeUri);
             roleModels.add(roleModel);
         }
-        // sanity check
-        if (roleModels.size() != 2) {
-            throw new RuntimeException("Data inconsistency: mehta edge " + middleNode.getId() +
-                " connects " + roleModels.size() + " mehta objects instead of 2");
-        }
-        //
         return roleModels;
     }
 
@@ -384,6 +387,37 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
             assocs.add(buildAssociation(middleNode));
         }
         return assocs;
+    }
+
+    private List<Relationship> fetchRelationships(Node middleNode) {
+        List<Relationship> rels = new ArrayList();
+        for (Relationship rel : middleNode.getRelationships(Direction.OUTGOING)) {
+            rels.add(rel);
+        }
+        // sanity check
+        if (rels.size() != 2) {
+            throw new RuntimeException("Data inconsistency: association " + middleNode.getId() +
+                " connects " + rels.size() + " player instead of 2");
+        }
+        //
+        return rels;
+    }
+
+    private Relationship fetchRelationship(Node middleNode, long playerId) {
+        List<Relationship> rels = fetchRelationships(middleNode);
+        boolean match1 = rels.get(0).getEndNode().getId() == playerId;
+        boolean match2 = rels.get(1).getEndNode().getId() == playerId;
+        if (match1 && match2) {
+            throw new RuntimeException("Ambiguity: both players have ID " + playerId + " in association " +
+                middleNode.getId());
+        } else if (match1) {
+            return rels.get(0);
+        } else if (match2) {
+            return rels.get(1);
+        } else {
+            throw new IllegalArgumentException("ID " + playerId + " is not a player in association " +
+                middleNode.getId());
+        }
     }
 
     // ---

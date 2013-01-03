@@ -21,6 +21,15 @@ class AttachedAssociationRole extends AttachedRole implements AssociationRole {
 
 
 
+    // === Implementation of the abstract methods ===
+
+    @Override
+    void storeRoleTypeUri() {
+        dms.storage.storeRoleTypeUri(getAssociation().getId(), getPlayerId(), getRoleTypeUri());
+    }
+
+
+
     // === AttachedRole Overrides ===
 
     @Override

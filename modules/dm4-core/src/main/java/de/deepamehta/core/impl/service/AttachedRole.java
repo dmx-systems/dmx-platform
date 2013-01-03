@@ -8,7 +8,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 
-class AttachedRole implements Role {
+abstract class AttachedRole implements Role {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -45,7 +45,10 @@ class AttachedRole implements Role {
 
     @Override
     public void setRoleTypeUri(String roleTypeUri) {
+        // update memory
         model.setRoleTypeUri(roleTypeUri);
+        // update DB
+        storeRoleTypeUri();     // abstract
     }
 
     // ---
@@ -68,4 +71,8 @@ class AttachedRole implements Role {
     public JSONObject toJSON() {
         return getModel().toJSON();
     }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    abstract void storeRoleTypeUri();
 }

@@ -219,9 +219,9 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
-                                                    String othersRoleTypeUri) {
+                                                                         String othersRoleTypeUri) {
         RelatedAssociationModel assoc = dms.storage.getAssociationRelatedAssociation(getId(),
-            assocTypeUri, myRoleTypeUri, othersRoleTypeUri);
+            assocTypeUri, myRoleTypeUri, othersRoleTypeUri, null);      // othersAssocTypeUri=null
         return assoc != null ? dms.attach(assoc, false, false) : null;  // fetchComposite=false,
                                                                         // fetchRelatingComposite=false
     }

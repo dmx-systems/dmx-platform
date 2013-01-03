@@ -90,6 +90,71 @@ public class MGStorageBridge {
     // ---
 
     /**
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
+     */
+    public Set<TopicModel> searchTopics(String searchTerm, String fieldUri) {
+        return DeepaMehtaUtils.toTopicSet(mg.queryMehtaNodes(fieldUri, searchTerm));
+    }
+
+    // ---
+
+    /**
+     * Stores and indexes the topic's URI.
+     */
+    public void setTopicUri(long topicId, String uri) {
+        mg.setTopicUri(topicId, uri);
+    }
+
+    /**
+     * Stores the topic's value.
+     * <p>
+     * Note: the value is not indexed automatically. Use the {@link indexTopicValue} method. ### FIXDOC
+     *
+     * @return  The previous value, or <code>null</code> if no value was stored before. ### FIXDOC
+     */
+    public void setTopicValue(long topicId, SimpleValue value, IndexMode indexMode, String indexKey) {
+        mg.setTopicValue(topicId, value, indexMode, indexKey);
+    }
+
+    /**
+     * Creates a topic.
+     * <p>
+     * The topic's URI is stored and indexed.
+     *
+     * @return  FIXME ### the created topic. Note:
+     *          - the topic URI   is initialzed and     persisted.
+     *          - the topic value is initialzed but not persisted.
+     *          - the type URI    is initialzed but not persisted.
+     */
+    public void createTopic(TopicModel topicModel) {
+        mg.createMehtaNode(topicModel);
+    }
+
+    /**
+     * Deletes the topic.
+     * <p>
+     * Prerequisite: the topic has no relations.
+     */
+    public void deleteTopic(long topicId) {
+        mg.deleteTopic(topicId);
+    }
+
+
+
+    // --- Traversal ---
+
+    /**
+     * @return  The fetched associations.
+     *          Note: their composite values are not initialized.
+     */
+    public Set<AssociationModel> getTopicAssociations(long topicId) {
+        return mg.getTopicAssociations(topicId);
+    }
+
+    // ---
+
+    /**
      * Convenience method (checks singularity).
      *
      * @return  The fetched topics.
@@ -150,17 +215,7 @@ public class MGStorageBridge {
     // ---
 
     /**
-     * @return  The fetched associations.
-     *          Note: their composite values are not initialized.
-     */
-    public Set<AssociationModel> getTopicAssociations(long topicId) {
-        return mg.getTopicAssociations(topicId);
-    }
-
-    // ---
-
-    /**
-     * Convenience method.
+     * Convenience method (checks singularity).
      *
      * @return  The fetched association.
      *          Note: its composite value is not initialized.
@@ -196,59 +251,6 @@ public class MGStorageBridge {
             othersAssocTypeUri);
     }
 
-    // ---
-
-    /**
-     * @return  The fetched topics.
-     *          Note: their composite values are not initialized.
-     */
-    public Set<TopicModel> searchTopics(String searchTerm, String fieldUri) {
-        return DeepaMehtaUtils.toTopicSet(mg.queryMehtaNodes(fieldUri, searchTerm));
-    }
-
-    // ---
-
-    /**
-     * Stores and indexes the topic's URI.
-     */
-    public void setTopicUri(long topicId, String uri) {
-        mg.setTopicUri(topicId, uri);
-    }
-
-    /**
-     * Stores the topic's value.
-     * <p>
-     * Note: the value is not indexed automatically. Use the {@link indexTopicValue} method. ### FIXDOC
-     *
-     * @return  The previous value, or <code>null</code> if no value was stored before. ### FIXDOC
-     */
-    public void setTopicValue(long topicId, SimpleValue value, IndexMode indexMode, String indexKey) {
-        mg.setTopicValue(topicId, value, indexMode, indexKey);
-    }
-
-    /**
-     * Creates a topic.
-     * <p>
-     * The topic's URI is stored and indexed.
-     *
-     * @return  FIXME ### the created topic. Note:
-     *          - the topic URI   is initialzed and     persisted.
-     *          - the topic value is initialzed but not persisted.
-     *          - the type URI    is initialzed but not persisted.
-     */
-    public void createTopic(TopicModel topicModel) {
-        mg.createMehtaNode(topicModel);
-    }
-
-    /**
-     * Deletes the topic.
-     * <p>
-     * Prerequisite: the topic has no relations.
-     */
-    public void deleteTopic(long topicId) {
-        mg.deleteTopic(topicId);
-    }
-
 
 
     // === Associations ===
@@ -260,7 +262,7 @@ public class MGStorageBridge {
     // ---
 
     /**
-     * Convenience method.
+     * Convenience method (checks singularity).
      *
      * Returns the association between two topics, qualified by association type and both role types.
      * If no such association exists <code>null</code> is returned.
@@ -297,7 +299,7 @@ public class MGStorageBridge {
     // ---
 
     /**
-     * Convenience method.
+     * Convenience method (checks singularity).
      */
     public AssociationModel getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
                                                                      String topicRoleTypeUri, String assocRoleTypeUri) {
@@ -318,6 +320,64 @@ public class MGStorageBridge {
     public Set<AssociationModel> getAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
                                                        long assocId, String topicRoleTypeUri, String assocRoleTypeUri) {
         return mg.getMehtaEdgesBetweenNodeAndEdge(assocTypeUri, topicId, assocId, topicRoleTypeUri, assocRoleTypeUri);
+    }
+
+    // ---
+
+    public void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri) {
+        mg.storeRoleTypeUri(assocId, playerId, roleTypeUri);
+    }
+
+    // ---
+
+    /**
+     * Stores and indexes the association's URI.
+     */
+    public void setAssociationUri(long assocId, String uri) {
+        storeAndIndexUri(mg.getMehtaEdge(assocId), uri);
+    }
+
+    /**
+     * Stores the association's value.
+     * <p>
+     * Note: the value is not indexed automatically. Use the {@link indexAssociationValue} method.
+     *
+     * @return  The previous value, or <code>null</code> if no value was stored before.
+     */
+    public SimpleValue setAssociationValue(long assocId, SimpleValue value) {
+        Object oldValue = mg.getMehtaEdge(assocId).setObject("value", value.value());
+        return oldValue != null ? new SimpleValue(oldValue) : null;
+    }
+
+    /**
+     * @param   oldValue    may be null
+     */
+    public void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, SimpleValue value,
+                                                                                          SimpleValue oldValue) {
+        MehtaGraphIndexMode mgIndexMode = fromIndexMode(indexMode);
+        Object oldVal = oldValue != null ? oldValue.value() : null;
+        mg.getMehtaEdge(assocId).indexAttribute(mgIndexMode, indexKey, value.value(), oldVal);
+    }
+
+    // ---
+
+    public void createAssociation(AssociationModel assocModel) {
+        MehtaEdge edge = mg.createMehtaEdge(
+            getMehtaObjectRole(assocModel.getRoleModel1()),
+            getMehtaObjectRole(assocModel.getRoleModel2()));
+        assocModel.setId(edge.getId());
+    }
+
+    public void deleteAssociation(long assocId) {
+        mg.getMehtaEdge(assocId).delete();
+    }
+
+
+
+    // --- Traversal ---
+
+    public Set<AssociationModel> getAssociationAssociations(long assocId) {
+        return mg.getAssociationAssociations(assocId);
     }
 
     // ---
@@ -368,7 +428,7 @@ public class MGStorageBridge {
      * @return  The fetched topics.
      *          Note: their composite values are not initialized.
      */
-    public ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, List assocTypeUris,
+    public ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, List<String> assocTypeUris,
                                                                     String myRoleTypeUri, String othersRoleTypeUri,
                                                                     String othersTopicTypeUri, int maxResultSize) {
         ResultSet<RelatedTopicModel> result = new ResultSet();
@@ -382,65 +442,41 @@ public class MGStorageBridge {
 
     // ---
 
-    public Set<AssociationModel> getAssociationAssociations(long assocId) {
-        return mg.getAssociationAssociations(assocId);
-    }
-
-    public RelatedAssociationModel getAssociationRelatedAssociation(long assocId, String assocTypeUri,
-                                                                    String myRoleTypeUri, String othersRoleTypeUri) {
-        // FIXME: assocTypeUri not respected
-        ConnectedMehtaEdge edge = mg.getMehtaEdge(assocId).getConnectedMehtaEdge(myRoleTypeUri, othersRoleTypeUri);
-        return edge != null ? buildRelatedAssociation(edge) : null;
-    }
-
-    // ---
-
-    public void setRoleTypeUri(long assocId, long objectId, String roleTypeUri) {
-        mg.getMehtaEdge(assocId).getMehtaObject(objectId).setRoleType(roleTypeUri);
-    }
-
-    // ---
-
     /**
-     * Stores and indexes the association's URI.
-     */
-    public void setAssociationUri(long assocId, String uri) {
-        storeAndIndexUri(mg.getMehtaEdge(assocId), uri);
-    }
-
-    /**
-     * Stores the association's value.
-     * <p>
-     * Note: the value is not indexed automatically. Use the {@link indexAssociationValue} method.
+     * Convenience method (checks singularity).
      *
-     * @return  The previous value, or <code>null</code> if no value was stored before.
+     * @return  The fetched association.
+     *          Note: its composite value is not initialized.
      */
-    public SimpleValue setAssociationValue(long assocId, SimpleValue value) {
-        Object oldValue = mg.getMehtaEdge(assocId).setObject("value", value.value());
-        return oldValue != null ? new SimpleValue(oldValue) : null;
+    public RelatedAssociationModel getAssociationRelatedAssociation(long assocId, String assocTypeUri,
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+        Set<RelatedAssociationModel> assocs = getAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersAssocTypeUri);
+        switch (assocs.size()) {
+        case 0:
+            return null;
+        case 1:
+            return assocs.iterator().next();
+        default:
+            throw new RuntimeException("Ambiguity: there are " + assocs.size() + " related associations (assocId=" +
+                assocId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
+                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")");
+        }
     }
 
     /**
-     * @param   oldValue    may be null
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersAssocTypeUri  may be null
+     *
+     * @return  The fetched associations.
+     *          Note: their composite values are not initialized.
      */
-    public void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, SimpleValue value,
-                                                                                          SimpleValue oldValue) {
-        MehtaGraphIndexMode mgIndexMode = fromIndexMode(indexMode);
-        Object oldVal = oldValue != null ? oldValue.value() : null;
-        mg.getMehtaEdge(assocId).indexAttribute(mgIndexMode, indexKey, value.value(), oldVal);
-    }
-
-    // ---
-
-    public void createAssociation(AssociationModel assocModel) {
-        MehtaEdge edge = mg.createMehtaEdge(
-            getMehtaObjectRole(assocModel.getRoleModel1()),
-            getMehtaObjectRole(assocModel.getRoleModel2()));
-        assocModel.setId(edge.getId());
-    }
-
-    public void deleteAssociation(long assocId) {
-        mg.getMehtaEdge(assocId).delete();
+    public Set<RelatedAssociationModel> getAssociationRelatedAssociations(long assocId, String assocTypeUri,
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+        return mg.getAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersAssocTypeUri);
     }
 
 

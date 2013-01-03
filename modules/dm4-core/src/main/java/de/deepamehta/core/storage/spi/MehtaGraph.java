@@ -58,6 +58,10 @@ public interface MehtaGraph {
     Set<AssociationModel> getMehtaEdgesBetweenNodeAndEdge(String assocTypeUri, long topicId, long assocId,
                                                           String topicRoleTypeUri, String assocRoleTypeUri);
 
+    // ---
+
+    void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri);
+
 
 
     // === Mehta Objects ### TODO ===
@@ -67,6 +71,12 @@ public interface MehtaGraph {
 
 
     // === Traversal ===
+
+    Set<AssociationModel> getTopicAssociations(long topicId);
+
+    Set<AssociationModel> getAssociationAssociations(long assocId);
+
+    // ---
 
     Set<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
@@ -81,12 +91,6 @@ public interface MehtaGraph {
 
     Set<RelatedAssociationModel> getAssociationRelatedAssociations(long assocId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
-
-    // ---
-
-    Set<AssociationModel> getTopicAssociations(long topicId);
-
-    Set<AssociationModel> getAssociationAssociations(long assocId);
 
 
 

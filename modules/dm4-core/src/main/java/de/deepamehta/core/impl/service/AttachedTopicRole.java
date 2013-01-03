@@ -54,14 +54,11 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
 
 
 
-    // === Role Overrides ===
+    // === Implementation of the abstract methods ===
 
     @Override
-    public void setRoleTypeUri(String roleTypeUri) {
-        // 1) update memory
-        super.setRoleTypeUri(roleTypeUri);
-        // 2) update DB
-        storeRoleTypeUri(roleTypeUri);
+    void storeRoleTypeUri() {
+        dms.storage.storeRoleTypeUri(getAssociation().getId(), getPlayerId(), getRoleTypeUri());
     }
 
 
@@ -71,15 +68,5 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
     @Override
     public TopicRoleModel getModel() {
         return (TopicRoleModel) super.getModel();
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-
-
-    // === Store ===
-
-    private void storeRoleTypeUri(String roleTypeUri) {
-        dms.storage.setRoleTypeUri(getAssociation().getId(), getPlayerId(), roleTypeUri);
     }
 }
