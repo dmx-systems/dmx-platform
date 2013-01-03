@@ -371,14 +371,11 @@ public class MGStorageBridge {
     // ---
 
     public void createAssociation(AssociationModel assocModel) {
-        MehtaEdge edge = mg.createMehtaEdge(
-            getMehtaObjectRole(assocModel.getRoleModel1()),
-            getMehtaObjectRole(assocModel.getRoleModel2()));
-        assocModel.setId(edge.getId());
+        mg.createMehtaEdge(assocModel);
     }
 
     public void deleteAssociation(long assocId) {
-        mg.getMehtaEdge(assocId).delete();
+        mg.deleteAssociation(assocId);
     }
 
 
@@ -498,7 +495,9 @@ public class MGStorageBridge {
      */
     public AccessControlList getACL(long objectId) {
         try {
-            return new AccessControlList(new JSONObject(getProperty(objectId, "acl", "{}")));
+            boolean hasACL = mg.hasProperty(objectId, "acl");
+            JSONObject acl = hasACL ? new JSONObject((String) mg.getProperty(objectId, "acl")) : new JSONObject();
+            return new AccessControlList(acl);
         } catch (Exception e) {
             throw new RuntimeException("Fetching access control list for object " + objectId + " failed", e);
         }
@@ -508,27 +507,27 @@ public class MGStorageBridge {
      * Creates the Access Control List for the specified topic or association.
      */
     public void createACL(long objectId, AccessControlList acl) {
-        setProperty(objectId, "acl", acl.toJSON().toString());
+        mg.setProperty(objectId, "acl", acl.toJSON().toString());
     }
 
     // ---
 
     public String getCreator(long objectId) {
-        return getProperty(objectId, "creator", null);
+        return mg.hasProperty(objectId, "creator") ? (String) mg.getProperty(objectId, "creator") : null;
     }
 
     public void setCreator(long objectId, String username) {
-        setProperty(objectId, "creator", username);
+        mg.setProperty(objectId, "creator", username);
     }
 
     // ---
 
     public String getOwner(long objectId) {
-        return getProperty(objectId, "owner", null);
+        return mg.hasProperty(objectId, "owner") ? (String) mg.getProperty(objectId, "owner") : null;
     }
 
     public void setOwner(long objectId, String username) {
-        setProperty(objectId, "owner", username);
+        mg.setProperty(objectId, "owner", username);
     }
 
 
@@ -546,13 +545,10 @@ public class MGStorageBridge {
      * @return  <code>true</code> if a clean install is detected, <code>false</code> otherwise.
      */
     public boolean init() {
-        // init core migration number
-        boolean isCleanInstall = false;
-        if (!mg.hasTopicProperty(0, "core_migration_nr")) {
+        boolean isCleanInstall = mg.setupRootNode();
+        if (isCleanInstall) {
             logger.info("Starting with a fresh DB -- Setting migration number to 0");
             setMigrationNr(0);
-            setupMetaTypeNode();
-            isCleanInstall = true;
         }
         return isCleanInstall;
     }
@@ -562,25 +558,10 @@ public class MGStorageBridge {
     }
 
     public int getMigrationNr() {
-        return (Integer) mg.getTopicProperty(0, "core_migration_nr");
+        return (Integer) mg.getProperty(0, "core_migration_nr");
     }
 
     public void setMigrationNr(int migrationNr) {
-        mg.setTopicProperty(0, "core_migration_nr", migrationNr);
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-
-
-    // === DB ===
-
-    private void setupMetaTypeNode() {
-        MehtaNode refNode = mg.getMehtaNode(0);
-        String uri = "dm4.core.meta_type";
-        refNode.setString("uri", uri);
-        refNode.setString("value", "Meta Type");
-        //
-        refNode.indexAttribute(MehtaGraphIndexMode.KEY, "uri", uri, null);     // oldValue=null
+        mg.setProperty(0, "core_migration_nr", migrationNr);
     }
 }

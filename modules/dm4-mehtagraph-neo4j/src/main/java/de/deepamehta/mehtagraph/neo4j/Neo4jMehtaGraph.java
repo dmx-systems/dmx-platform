@@ -58,14 +58,17 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
     @Override
     public void createMehtaNode(TopicModel topicModel) {
         String uri = topicModel.getUri();
-        checkTopicUniqueness(uri);
+        checkUriUniqueness(uri);
+        //
         // 1) update DB
-        Node node = neo4j.createNode();
-        node.setProperty("node_type", "topic");
-        storeAndIndexTopicUri(node, uri);
-        storeAndIndexTopicTypeUri(node, topicModel.getTypeUri());
+        Node topicNode = neo4j.createNode();
+        topicNode.setProperty("node_type", "topic");
+        //
+        storeAndIndexTopicUri(topicNode, uri);
+        storeAndIndexTopicTypeUri(topicNode, topicModel.getTypeUri());
+        //
         // 2) update model
-        topicModel.setId(node.getId());
+        topicModel.setId(topicNode.getId());
     }
 
     // ---
@@ -123,23 +126,6 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
     // ---
 
     @Override
-    public Object getTopicProperty(long topicId, String key) {
-        return fetchTopicNode(topicId).getProperty(key);
-    }
-
-    @Override
-    public void setTopicProperty(long topicId, String key, Object value) {
-        fetchTopicNode(topicId).setProperty(key, value);
-    }
-
-    @Override
-    public boolean hasTopicProperty(long topicId, String key) {
-        return fetchTopicNode(topicId).hasProperty(key);
-    }
-
-    // ---
-
-    @Override
     public void deleteTopic(long topicId) {
         fetchTopicNode(topicId).delete();
     }
@@ -149,14 +135,22 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
     // === Associations ===
 
     @Override
-    public MehtaEdge createMehtaEdge(MehtaObjectRole object1, MehtaObjectRole object2) {
-        Node auxiliaryNode = neo4j.createNode();
-        auxiliaryNode.setProperty(KEY_IS_MEHTA_EDGE, true);
-        Neo4jMehtaEdge mehtaEdge = buildMehtaEdge(auxiliaryNode);
+    public void createMehtaEdge(AssociationModel assocModel) {
+        String uri = assocModel.getUri();
+        checkUriUniqueness(uri);
         //
-        mehtaEdge.addMehtaObject(object1);
-        mehtaEdge.addMehtaObject(object2);
-        return mehtaEdge;
+        // 1) update DB
+        Node assocNode = neo4j.createNode();
+        assocNode.setProperty("node_type", "assoc");
+        //
+        storeAndIndexAssociationUri(assocNode, uri);
+        storeAndIndexAssociationTypeUri(assocNode, assocModel.getTypeUri());
+        //
+        createRelationship(assocNode, assocModel.getRoleModel1());
+        createRelationship(assocNode, assocModel.getRoleModel2());
+        //
+        // 2) update model
+        assocModel.setId(assocNode.getId());
     }
 
     // ---
@@ -213,13 +207,17 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
         assocNode.createRelationshipTo(playerId, getRelationshipType(roleTypeUri));
     }
 
-
-
-    // === Mehta Objects ### TODO ===
+    // ---
 
     @Override
-    public MehtaObject getMehtaObject(long id) {
-        return buildMehtaObject(neo4j.getNodeById(id));
+    public void deleteAssociation(long assocId) {
+        Node assocNode = fetchAssociationNode(assocId);
+        // delete the 2 player relationships
+        for (Relationship rel : fetchRelationships(assocNode)) {
+            rel.delete();
+        }
+        //
+        assocNode.delete();
     }
 
 
@@ -279,11 +277,46 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
 
 
 
-    // === Misc ===
+    // === Properties ===
+
+    @Override
+    public Object getProperty(long id, String key) {
+        return fetchNode(id).getProperty(key);
+    }
+
+    @Override
+    public void setProperty(long id, String key, Object value) {
+        fetchNode(id).setProperty(key, value);
+    }
+
+    @Override
+    public boolean hasProperty(long id, String key) {
+        return fetchNode(id).hasProperty(key);
+    }
+
+
+
+    // === DB ===
 
     @Override
     public MehtaGraphTransaction beginTx() {
         return new Neo4jTransactionAdapter(neo4j);
+    }
+
+    @Override
+    public boolean setupRootNode() {
+        Node rootNode = fetchNode(0);
+        //
+        if (rootNode.getProperty("node_type") != null) {
+            return false;
+        }
+        //
+        rootNode.setProperty("node_type", "topic");
+        storeAndIndexTopicUri(rootNode, "dm4.core.meta_type");
+        // ### TODO: set type URI?
+        rootNode.setProperty("value", "Meta Type");
+        //
+        return true;
     }
 
     @Override
@@ -292,9 +325,11 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
         neo4j.shutdown();
     }
 
-
-
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
+
+    // === Neo4j -> DeepaMehta Bridge ===
 
     private TopicModel buildTopic(Node node) {
         long id = node.getId();
@@ -334,7 +369,102 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
         return roleModels;
     }
 
+
+
+    // === DeepaMehta -> Neo4j Bridge ===
+
+    private Node fetchPlayerNode(RoleModel roleModel) {
+        long playerId = roleModel.getPlayerId();
+        if (RoleModel instanceof TopicRoleModel) {
+            return fetchTopicNode(playerId);
+        } else if (RoleModel instanceof AssociationRoleModel) {
+            return fetchAssociationNode(playerId);
+        } else {
+            throw new RuntimeException("Unexpected role model: " + roleModel);
+        }
+    }
+
+    private void createRelationship(Node assocNode, RoleModel roleModel) {
+        Node playerNode = fetchPlayerNode(roleModel);
+        String roleTypeUri = roleModel.getRoleTypeUri();
+        assocNode.createRelationshipTo(playerNode, getRelationshipType(roleTypeUri));
+    }
+
+
+
+    // === Neo4j Helper ===
+
+    private Relationship fetchRelationship(Node assocNode, long playerId) {
+        List<Relationship> rels = fetchRelationships(assocNode);
+        boolean match1 = rels.get(0).getEndNode().getId() == playerId;
+        boolean match2 = rels.get(1).getEndNode().getId() == playerId;
+        if (match1 && match2) {
+            throw new RuntimeException("Ambiguity: both players have ID " + playerId + " in association " +
+                assocNode.getId());
+        } else if (match1) {
+            return rels.get(0);
+        } else if (match2) {
+            return rels.get(1);
+        } else {
+            throw new IllegalArgumentException("ID " + playerId + " is not a player in association " +
+                assocNode.getId());
+        }
+    }
+
+    private List<Relationship> fetchRelationships(Node assocNode) {
+        List<Relationship> rels = new ArrayList();
+        for (Relationship rel : assocNode.getRelationships(Direction.OUTGOING)) {
+            rels.add(rel);
+        }
+        // sanity check
+        if (rels.size() != 2) {
+            throw new RuntimeException("Data inconsistency: association " + assocNode.getId() +
+                " connects " + rels.size() + " player instead of 2");
+        }
+        //
+        return rels;
+    }
+
     // ---
+
+    private Set<AssociationModel> fetchAssociations(Node node) {
+        Set<AssociationModel> assocs = new HashSet();
+        for (Relationship rel : node.getRelationships(Direction.INCOMING)) {
+            Node assocNode = rel.getStartNode();
+            assocs.add(buildAssociation(assocNode));
+        }
+        return assocs;
+    }
+
+    // ---
+
+    private Node fetchTopicNode(long topicId) {
+        Node node = fetchNode(topicId);
+        checkType(node, NodeType.TOPIC);
+        return node;
+    }
+
+    private Node fetchAssociationNode(long assocId) {
+        Node node = fetchNode(assocId);
+        checkType(node, NodeType.ASSOCIATION);
+        return node;
+    }
+
+    // ---
+
+    private Node fetchNode(long Id) {
+        return neo4j.getNodeById(assocId);
+    }
+
+    private void checkType(Node node, NodeType type) {
+        if (NodeType.of(node) != type) {
+            throw new IllegalArgumentException(type.error(node));
+        }
+    }
+
+
+
+    // === DeepaMehta Helper ===
 
     private Set<RelatedTopicModel> buildRelatedTopics(Collection<AssociationModel> assocs, long playerId) {
         Set<RelatedTopicModel> relTopics = new HashSet();
@@ -364,83 +494,39 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
      *
      * @param   uri     The URI to check. Must not be null.
      */
-    private void checkTopicUniqueness(String uri) {
-        // ### TODO: check both, topic index and assoc index. URI must be unique globally.
-        // ### TODO: just query index, don't build topic model
-        if (!uri.equals("") && lookupMehtaNode(uri) != null) {
-            throw new RuntimeException("Topic URI \"" + uri + "\" is not unique");
+    private void checkUriUniqueness(String uri) {
+        if (uri.equals("")) {
+            return;
+        }
+        Node n1 = topicContentExact.get("uri", uri).getSingle();
+        Node n2 = assocContentExact.get("uri", uri).getSingle();
+        if (n1 != null || n2 != null) {
+            throw new RuntimeException("URI \"" + uri + "\" is not unique");
         }
     }
 
-    private MehtaNode lookupMehtaNode(String uri) {
-        return getMehtaNode("uri", uri);
-    }
-
     // ---
 
-    private Node fetchTopicNode(long topicId) {
-        Node node = neo4j.getNodeById(topicId);
-        checkType(node, NodeType.TOPIC);
-        return node;
+    private Query buildAssociationQuery(String assocTypeUri,
+                                    String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
+                                    String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
+        Query query = new BooleanQuery();
+        query.add(new TermQuery(new Term("assoc_type_uri", assocTypeUri)), Occur.MUST);
+        // ### TODO
+        return query;
     }
 
-    private Node fetchAssociationNode(long assocId) {
-        Node node = neo4j.getNodeById(assocId);
-        checkType(node, NodeType.ASSOCIATION);
-        return node;
-    }
-
-    // ---
-
-    private Set<AssociationModel> fetchAssociations(Node node) {
-        Set<AssociationModel> assocs = new HashSet();
-        for (Relationship rel : node.getRelationships(Direction.INCOMING)) {
-            Node assocNode = rel.getStartNode();
+    private List<AssociationModel> queryAssociations(Query query) {
+        List<AssociationModel> assocs = new ArrayList();
+        for (Node assocNode : assocMetadata.query(query)) {
             assocs.add(buildAssociation(assocNode));
         }
         return assocs;
     }
 
-    private List<Relationship> fetchRelationships(Node assocNode) {
-        List<Relationship> rels = new ArrayList();
-        for (Relationship rel : assocNode.getRelationships(Direction.OUTGOING)) {
-            rels.add(rel);
-        }
-        // sanity check
-        if (rels.size() != 2) {
-            throw new RuntimeException("Data inconsistency: association " + assocNode.getId() +
-                " connects " + rels.size() + " player instead of 2");
-        }
-        //
-        return rels;
-    }
 
-    private Relationship fetchRelationship(Node assocNode, long playerId) {
-        List<Relationship> rels = fetchRelationships(assocNode);
-        boolean match1 = rels.get(0).getEndNode().getId() == playerId;
-        boolean match2 = rels.get(1).getEndNode().getId() == playerId;
-        if (match1 && match2) {
-            throw new RuntimeException("Ambiguity: both players have ID " + playerId + " in association " +
-                assocNode.getId());
-        } else if (match1) {
-            return rels.get(0);
-        } else if (match2) {
-            return rels.get(1);
-        } else {
-            throw new IllegalArgumentException("ID " + playerId + " is not a player in association " +
-                assocNode.getId());
-        }
-    }
 
-    // ---
-
-    private void checkType(Node node, NodeType type) {
-        if (NodeType.of(node) != type) {
-            throw new IllegalArgumentException(type.error(node));
-        }
-    }
-
-    // ---
+    // === Value Storage & Index ===
 
     private void storeAndIndexTopicUri(Node topicNode, String uri) {
         topicNode.setProperty("uri", uri);
@@ -503,24 +589,5 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
                 throw new RuntimeException("Index mode \"" + indexMode + "\" not implemented");
             }
         }
-    }
-
-    // ---
-
-    private Query buildAssociationQuery(String assocTypeUri,
-                                    String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
-                                    String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
-        Query query = new BooleanQuery();
-        query.add(new TermQuery(new Term("assoc_type_uri", assocTypeUri)), Occur.MUST);
-        // ### TODO
-        return query;
-    }
-
-    private List<AssociationModel> queryAssociations(Query query) {
-        List<AssociationModel> assocs = new ArrayList();
-        for (Node assocNode : assocMetadata.query(query)) {
-            assocs.add(buildAssociation(assocNode));
-        }
-        return assocs;
     }
 }

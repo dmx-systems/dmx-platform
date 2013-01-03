@@ -38,17 +38,13 @@ public interface MehtaGraph {
     void setTopicUri(long topicId, String uri);
     void setTopicValue(long topicId, SimpleValue value, Set<IndexMode> indexModes, String indexKey);
 
-    Object getTopicProperty(long topicId, String key);
-    void setTopicProperty(long topicId, String key, Object value);
-    boolean hasTopicProperty(long topicId, String key);
-
     void deleteTopic(long topicId);
 
 
 
     // === Associations ===
 
-    MehtaEdge createMehtaEdge(MehtaObjectRole object1, MehtaObjectRole object2);
+    void createMehtaEdge(AssociationModel assocModel);
 
     AssociationModel getMehtaEdge(long id);
 
@@ -65,11 +61,7 @@ public interface MehtaGraph {
 
     void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri);
 
-
-
-    // === Mehta Objects ### TODO ===
-
-    MehtaObject getMehtaObject(long id);
+    void deleteAssociation(long assocId);
 
 
 
@@ -97,8 +89,21 @@ public interface MehtaGraph {
 
 
 
-    // === Misc ===
+    // === Properties ===
+
+    Object getProperty(long id, String key);
+
+    void setProperty(long id, String key, Object value);
+
+    boolean hasProperty(long id, String key);
+
+
+
+    // === DB ===
 
     MehtaGraphTransaction beginTx();
+
+    boolean setupRootNode();
+
     void shutdown();
 }
