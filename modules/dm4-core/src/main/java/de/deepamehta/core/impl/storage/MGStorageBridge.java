@@ -1,6 +1,5 @@
 package de.deepamehta.core.impl.storage;
 
-import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.IndexMode;
@@ -9,6 +8,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.accesscontrol.AccessControlList;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.storage.spi.MehtaGraph;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -522,7 +522,7 @@ public class MGStorageBridge {
     // === DB ===
 
     public DeepaMehtaTransaction beginTx() {
-        return new MGTransactionAdapter(mg);
+        return mg.beginTx();
     }
 
     /**

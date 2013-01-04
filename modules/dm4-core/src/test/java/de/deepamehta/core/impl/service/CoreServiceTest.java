@@ -1,12 +1,12 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.AssociationDefinition;
-import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

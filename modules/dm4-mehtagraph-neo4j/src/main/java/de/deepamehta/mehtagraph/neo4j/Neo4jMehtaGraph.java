@@ -9,17 +9,18 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.storage.MehtaObjectRole;
-import de.deepamehta.core.storage.spi.MehtaEdge;
 import de.deepamehta.core.storage.spi.MehtaGraph;
-import de.deepamehta.core.storage.spi.MehtaGraphTransaction;
-import de.deepamehta.core.storage.spi.MehtaNode;
-import de.deepamehta.core.storage.spi.MehtaObject;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import static org.neo4j.helpers.collection.MapUtil.stringMap;
 import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexManager;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -32,21 +33,52 @@ import static java.util.Arrays.asList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
 
 
-public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
+public class Neo4jMehtaGraph implements MehtaGraph {
+
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    // ### TODO: define further string constants for key names etc.
+    protected static final String KEY_IS_MEHTA_EDGE = "_is_mehta_edge";     // ### TODO: no used
+    protected static final String KEY_FULLTEXT = "_fulltext";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    protected GraphDatabaseService neo4j = null;
+    protected Neo4jRelationtypeCache relTypeCache;
+    
+    protected Index<Node> topicContentExact;
+    protected Index<Node> topicContentFulltext;
+    protected Index<Node> assocContentExact;
+    protected Index<Node> assocContentFulltext;
+    protected Index<Node> assocMetadata;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public Neo4jMehtaGraph(String databasePath) {
-        super(databasePath);
+        try {
+            this.neo4j = new GraphDatabaseFactory().newEmbeddedDatabase(databasePath);
+            this.relTypeCache = new Neo4jRelationtypeCache(neo4j);
+            // indexes
+            this.topicContentExact    = createExactIndex("topic-content-exact");
+            this.topicContentFulltext = createFulltextIndex("topic-content-fulltext");
+            this.assocContentExact    = createExactIndex("assoc-content-exact");
+            this.assocContentFulltext = createFulltextIndex("assoc-content-fulltext");
+            this.assocMetadata = createExactIndex("assoc-metadata");
+        } catch (Exception e) {
+            if (neo4j != null) {
+                logger.info("Shutdown Neo4j");
+                neo4j.shutdown();
+            }
+            throw new RuntimeException("Creating the Neo4j instance and indexes failed", e);
+        }
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -305,7 +337,7 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
     // === DB ===
 
     @Override
-    public MehtaGraphTransaction beginTx() {
+    public DeepaMehtaTransaction beginTx() {
         return new Neo4jTransactionAdapter(neo4j);
     }
 
@@ -468,6 +500,12 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
         }
     }
 
+    // ---
+
+    private RelationshipType getRelationshipType(String typeName) {
+        return relTypeCache.get(typeName);
+    }
+
 
 
     // === DeepaMehta Helper ===
@@ -533,6 +571,21 @@ public class Neo4jMehtaGraph extends Neo4jBase implements MehtaGraph {
 
 
     // === Value Storage & Index ===
+
+    private Index<Node> createExactIndex(String name) {
+        return neo4j.index().forNodes(name);
+    }
+
+    private Index<Node> createFulltextIndex(String name) {
+        if (neo4j.index().existsForNodes(name)) {
+            return neo4j.index().forNodes(name);
+        } else {
+            Map<String, String> configuration = stringMap(IndexManager.PROVIDER, "lucene", "type", "fulltext");
+            return neo4j.index().forNodes(name, configuration);
+        }
+    }
+
+    // ---
 
     private void storeAndIndexTopicUri(Node topicNode, String uri) {
         storeAndIndexExactValue(topicNode, "uri", uri, topicContentExact);

@@ -1,7 +1,6 @@
 package de.deepamehta.plugins.webclient;
 
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -9,7 +8,6 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
-import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
@@ -19,6 +17,7 @@ import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
 import de.deepamehta.core.service.event.PreUpdateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import javax.ws.rs.Consumes;

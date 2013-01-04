@@ -2,7 +2,6 @@ package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.CompositeValue;
@@ -16,6 +15,7 @@ import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.SecurityHandler;
 import de.deepamehta.core.service.annotation.ConsumesService;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;

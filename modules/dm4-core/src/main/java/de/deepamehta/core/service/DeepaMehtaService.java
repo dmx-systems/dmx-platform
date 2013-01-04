@@ -2,7 +2,6 @@ package de.deepamehta.core.service;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
@@ -14,6 +13,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.accesscontrol.AccessControlList;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import java.util.Collection;
 import java.util.List;

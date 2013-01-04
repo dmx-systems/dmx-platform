@@ -1,6 +1,6 @@
 package de.deepamehta.mehtagraph.neo4j;
 
-import de.deepamehta.core.storage.spi.MehtaGraphTransaction;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
@@ -8,9 +8,9 @@ import org.neo4j.graphdb.Transaction;
 
 
 /**
- * Adapts a Neo4j transaction to a MehtaGraph transaction.
+ * Adapts a Neo4j transaction to a DeepaMehta transaction.
  */
-class Neo4jTransactionAdapter implements MehtaGraphTransaction {
+class Neo4jTransactionAdapter implements DeepaMehtaTransaction {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

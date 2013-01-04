@@ -2,7 +2,7 @@ package de.deepamehta.core.storage.spi;
 
 
 
-public interface MehtaGraphTransaction {
+public interface DeepaMehtaTransaction {
 
     void success();
 

@@ -6,7 +6,6 @@ import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.storage.MehtaObjectRole;
 
 import java.util.List;
 import java.util.Set;
@@ -101,7 +100,7 @@ public interface MehtaGraph {
 
     // === DB ===
 
-    MehtaGraphTransaction beginTx();
+    DeepaMehtaTransaction beginTx();
 
     boolean setupRootNode();
 

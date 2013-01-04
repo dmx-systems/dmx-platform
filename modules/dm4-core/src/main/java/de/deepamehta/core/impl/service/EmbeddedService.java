@@ -2,7 +2,6 @@ package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
@@ -27,6 +26,7 @@ import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.accesscontrol.AccessControlList;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.osgi.framework.BundleContext;

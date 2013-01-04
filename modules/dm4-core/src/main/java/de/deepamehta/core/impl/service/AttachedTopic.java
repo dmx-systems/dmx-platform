@@ -1,7 +1,6 @@
 package de.deepamehta.core.impl.service;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
@@ -19,6 +18,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import java.util.List;
 import java.util.Set;
