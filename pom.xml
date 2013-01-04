@@ -30,6 +30,7 @@
 
         <!-- Database -->
         <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
+        <!-- ### TODO: drop these two. Register as OSGi service instead -->
         <dm4.database.bundle>de.deepamehta.mehtagraph-neo4j</dm4.database.bundle>
         <dm4.database.factory>de.deepamehta.mehtagraph.neo4j.Neo4jMehtaGraphFactory</dm4.database.factory>
 
@@ -59,7 +60,7 @@
                 <felix.fileinstall.dir>
                     <![CDATA[
                         ${project.basedir}/modules/dm4-core/target,
-                        ${project.basedir}/modules/dm4-mehtagraph-neo4j/target,
+                        ${project.basedir}/modules/dm4-storage-neo4j/target,
                         ${project.basedir}/modules/dm4-webservice/target,
                         ${project.basedir}/modules/dm4-webclient/target,
                         ${project.basedir}/modules/dm4-webbrowser/target,
@@ -122,7 +123,7 @@
             <id>all</id>
             <modules>
                 <module>modules/dm4-core</module>
-                <!--module>modules/dm4-mehtagraph-neo4j</module-->
+                <!--module>modules/dm4-storage-neo4j</module-->
                 <module>modules/dm4-webservice</module>
                 <module>modules/dm4-webclient</module>
                 <module>modules/dm4-webbrowser</module>

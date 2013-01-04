@@ -1,11 +1,11 @@
 package de.deepamehta.core.osgi;
 
-import de.deepamehta.core.impl.service.EmbeddedService;
-import de.deepamehta.core.impl.service.WebPublishingService;
-import de.deepamehta.core.impl.storage.MGStorageBridge;
+import de.deepamehta.core.impl.EmbeddedService;
+import de.deepamehta.core.impl.StorageDecorator;
+import de.deepamehta.core.impl.WebPublishingService;
 import de.deepamehta.core.service.DeepaMehtaService;
 
-import de.deepamehta.core.storage.spi.MehtaGraph;
+import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 import de.deepamehta.core.storage.spi.MehtaGraphFactory;
 
 import org.osgi.framework.Bundle;
@@ -50,7 +50,7 @@ public class CoreActivator implements BundleActivator {
         try {
             logger.info("========== Starting \"DeepaMehta 4 Core\" ==========");
             this.context = context;
-            dms = new EmbeddedService(new MGStorageBridge(openDB()), context);
+            dms = new EmbeddedService(new StorageDecorator(openDB()), context);
             dms.setupDB();
             //
             logger.info("Registering DeepaMehta 4 core service at OSGi framework");
@@ -84,8 +84,9 @@ public class CoreActivator implements BundleActivator {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // ### TODO: copy exists in CoreServiceTestEnvironment
-    private MehtaGraph openDB() {
+    private DeepaMehtaStorage openDB() {
         try {
+            // ### TODO: wording
             logger.info("Instantiating the MehtaGraph storage engine\n    " +
                 "dm4.database.path=\"" + DATABASE_PATH + "\"\n    " +
                 "dm4.database.bundle=\"" + DATABASE_BUNDLE + "\"\n    " +

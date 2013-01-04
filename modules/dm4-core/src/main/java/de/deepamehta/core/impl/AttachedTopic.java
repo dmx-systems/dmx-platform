@@ -1,0 +1,231 @@
+package de.deepamehta.core.impl;
+
+import de.deepamehta.core.Association;
+import de.deepamehta.core.RelatedAssociation;
+import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.ResultSet;
+import de.deepamehta.core.Topic;
+import de.deepamehta.core.TopicType;
+import de.deepamehta.core.Type;
+import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedAssociationModel;
+import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directive;
+import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
+
+
+
+/**
+ * A topic that is attached to the {@link DeepaMehtaService}.
+ */
+class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
+
+    // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    private Logger logger = Logger.getLogger(getClass().getName());
+
+    // ---------------------------------------------------------------------------------------------------- Constructors
+
+    AttachedTopic(TopicModel model, EmbeddedService dms) {
+        super(model, dms);
+    }
+
+    // -------------------------------------------------------------------------------------------------- Public Methods
+
+
+
+    // ******************************************
+    // *** AttachedDeepaMehtaObject Overrides ***
+    // ******************************************
+
+
+
+    // === Implementation of the abstract methods ===
+
+    @Override
+    protected String className() {
+        return "topic";
+    }
+
+    @Override
+    protected void storeUri() {
+        dms.storage.setTopicUri(getId(), getUri());
+    }
+
+    @Override
+    protected void storeTypeUri() {
+        // remove current assignment
+        long assocId = dms.objectFactory.fetchTopicTypeTopic(getId()).getAssociationModel().getId();
+        dms.deleteAssociation(assocId, null);  // clientState=null
+        // create new assignment
+        dms.objectFactory.associateWithTopicType(getId(), getTypeUri());
+    }
+
+    @Override
+    protected void storeSimpleValue(Set<IndexMode> indexModes, String indexKey) {
+        dms.storage.setTopicValue(getId(), getSimpleValue(), indexModes, indexKey);
+    }
+
+    @Override
+    protected Type getType() {
+        return dms.getTopicType(getTypeUri(), null);    // FIXME: clientState=null
+    }
+
+    @Override
+    protected RoleModel createRoleModel(String roleTypeUri) {
+        return new TopicRoleModel(getId(), roleTypeUri);
+    }
+
+    // === Deletion ===
+
+    @Override
+    public void delete(Directives directives) {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            // delete sub-topics and associations
+            super.delete(directives);
+            // delete topic itself
+            logger.info("Deleting " + this);
+            dms.storage.deleteTopic(getId());
+            directives.add(Directive.DELETE_TOPIC, this);
+            //
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Deleting topic failed (" + this + ")", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+
+
+    // ****************************
+    // *** Topic Implementation ***
+    // ****************************
+
+
+
+    @Override
+    public TopicModel getModel() {
+        return (TopicModel) super.getModel();
+    }
+
+
+
+    // === Updating ===
+
+    @Override
+    public void update(TopicModel model, ClientState clientState, Directives directives) {
+        logger.info("Updating topic " + getId() + " (new " + model + ")");
+        //
+        dms.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model, directives);
+        //
+        TopicModel oldModel = getModel().clone();
+        super.update(model, clientState, directives);
+        //
+        directives.add(Directive.UPDATE_TOPIC, this);
+        //
+        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel, clientState, directives);
+    }
+
+
+
+    // === Traversal ===
+
+    // --- Association Retrieval ---
+
+    @Override
+    public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
+                                                    String othersRoleTypeUri, String othersAssocTypeUri,
+                                                    boolean fetchComposite, boolean fetchRelatingComposite) {
+        RelatedAssociationModel assoc = dms.storage.getTopicRelatedAssociation(getId(), assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersAssocTypeUri);
+        return assoc != null ? dms.attach(assoc, fetchComposite, fetchRelatingComposite) : null;
+    }
+
+    @Override
+    public Set<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
+                                                          String othersRoleTypeUri, String othersAssocTypeUri,
+                                                          boolean fetchComposite, boolean fetchRelatingComposite) {
+        Set<RelatedAssociationModel> assocs = dms.storage.getTopicRelatedAssociations(getId(), assocTypeUri,
+            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+        return dms.attach(assocs, fetchComposite, fetchRelatingComposite);
+    }
+
+
+
+    // ***************************************
+    // *** DeepaMehtaObject Implementation ***
+    // ***************************************
+
+
+
+    // === Traversal ===
+
+    // --- Topic Retrieval ---
+
+    @Override
+    public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                String othersTopicTypeUri, boolean fetchComposite,
+                                                boolean fetchRelatingComposite, ClientState clientState) {
+        RelatedTopicModel topic = dms.storage.getTopicRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
+        return topic != null ? dms.attach(topic, fetchComposite, fetchRelatingComposite, clientState) : null;
+    }
+
+    @Override
+    public ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+                                    int maxResultSize, ClientState clientState) {
+        ResultSet<RelatedTopicModel> topics = dms.storage.getTopicRelatedTopics(getId(), assocTypeUri,
+            myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
+        return dms.attach(topics, fetchComposite, fetchRelatingComposite, clientState);
+    }
+
+    @Override
+    public ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+                                    int maxResultSize, ClientState clientState) {
+        ResultSet<RelatedTopicModel> topics = dms.storage.getTopicRelatedTopics(getId(), assocTypeUris,
+            myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
+        return dms.attach(topics, fetchComposite, fetchRelatingComposite, clientState);
+    }
+
+    // --- Association Retrieval ---
+
+    @Override
+    public Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                   long othersTopicId) {
+        AssociationModel assoc = dms.storage.getAssociation(assocTypeUri, getId(), othersTopicId, myRoleTypeUri,
+                                                                                                  othersRoleTypeUri);
+        return assoc != null ? dms.attach(assoc, false) : null;                 // fetchComposite=false
+    }
+
+    @Override
+    public Set<Association> getAssociations() {
+        return dms.attach(dms.storage.getTopicAssociations(getId()), false);    // fetchComposite=false
+    }
+
+
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    /**
+     * Convenience method.
+     */
+    TopicType getTopicType() {
+        return (TopicType) getType();
+    }
+}

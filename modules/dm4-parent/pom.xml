@@ -16,10 +16,10 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- MehtaGraph -->
+            <!-- DeepaMehta Storage -->
             <dependency>
                 <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta-mehtagraph-neo4j</artifactId>
+                <artifactId>deepamehta-storage-neo4j</artifactId>
                 <version>4.0.14-SNAPSHOT</version>
             </dependency>
             <!-- OSGi -->

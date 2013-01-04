@@ -3,7 +3,7 @@ package de.deepamehta.core.osgi;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.SecurityHandler;
-import de.deepamehta.core.impl.service.PluginImpl;
+import de.deepamehta.core.impl.PluginImpl;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
