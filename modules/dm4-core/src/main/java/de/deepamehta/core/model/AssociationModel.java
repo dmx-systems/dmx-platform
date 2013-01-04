@@ -33,7 +33,7 @@ public class AssociationModel extends DeepaMehtaObjectModel {
     }
 
     public AssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2, CompositeValue composite) {
-        this(-1, typeUri, roleModel1, roleModel2, null, composite);
+        this(-1, null, typeUri, roleModel1, roleModel2, null, composite);
     }
 
     // ### TODO: drop this
@@ -42,12 +42,12 @@ public class AssociationModel extends DeepaMehtaObjectModel {
     }
 
     public AssociationModel(long id, String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
-        this(id, typeUri, roleModel1, roleModel2, null, null);
+        this(id, null, typeUri, roleModel1, roleModel2, null, null);
     }
 
-    public AssociationModel(long id, String typeUri, RoleModel roleModel1, RoleModel roleModel2, SimpleValue value,
-                                                                                             CompositeValue composite) {
-        super(id, null, typeUri, value, composite);     // uri=null
+    public AssociationModel(long id, String uri, String typeUri, RoleModel roleModel1, RoleModel roleModel2,
+                                                                     SimpleValue value, CompositeValue composite) {
+        super(id, uri, typeUri, value, composite);
         this.roleModel1 = roleModel1;
         this.roleModel2 = roleModel2;
     }

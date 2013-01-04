@@ -1,5 +1,11 @@
 package de.deepamehta.mehtagraph.neo4j;
 
+import de.deepamehta.core.model.AssociationRoleModel;
+import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.TopicRoleModel;
+
+import org.neo4j.graphdb.Node;
+
 
 
 enum NodeType {
@@ -27,14 +33,14 @@ enum NodeType {
         }
     };
 
-    private static NodeType of(Node node) {
-        String type = node.getProperty("node_type");
+    static NodeType of(Node node) {
+        String type = (String) node.getProperty("node_type");
         return valueOf(type.toUpperCase());
     }
 
     // ---
 
-    abstract RoleModel createRoleModel(long nodeId, String roleTypeUri);
+    abstract RoleModel createRoleModel(Node node, String roleTypeUri);
 
-    abstract String error();
+    abstract String error(Node node);
 }
