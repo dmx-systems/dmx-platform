@@ -24,18 +24,18 @@ public interface DeepaMehtaStorage {
 
     // === Topics ===
 
-    void createMehtaNode(TopicModel topicModel);
+    void storeTopic(TopicModel topicModel);
 
-    TopicModel getMehtaNode(long id);
-    TopicModel getMehtaNode(String key, Object value);
+    TopicModel fetchTopic(long id);
+    TopicModel fetchTopic(String key, Object value);
 
-    List<TopicModel> getMehtaNodes(String key, Object value);
+    List<TopicModel> fetchTopics(String key, Object value);
 
-    List<TopicModel> queryMehtaNodes(Object value);
-    List<TopicModel> queryMehtaNodes(String key, Object value);
+    List<TopicModel> queryTopics(Object value);
+    List<TopicModel> queryTopics(String key, Object value);
 
-    void setTopicUri(long topicId, String uri);
-    void setTopicValue(long topicId, SimpleValue value, Set<IndexMode> indexModes, String indexKey);
+    void storeTopicUri(long topicId, String uri);
+    void storeTopicValue(long topicId, SimpleValue value, Set<IndexMode> indexModes, String indexKey);
 
     void deleteTopic(long topicId);
 
@@ -43,15 +43,15 @@ public interface DeepaMehtaStorage {
 
     // === Associations ===
 
-    void createMehtaEdge(AssociationModel assocModel);
+    void storeAssociation(AssociationModel assocModel);
 
-    AssociationModel getMehtaEdge(long id);
+    AssociationModel fetchAssociation(long id);
 
-    Set<AssociationModel> getMehtaEdges(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
-                                                                                           String roleTypeUri2);
+    Set<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
+                                                                                               String roleTypeUri2);
 
-    Set<AssociationModel> getMehtaEdgesBetweenNodeAndEdge(String assocTypeUri, long topicId, long assocId,
-                                                          String topicRoleTypeUri, String assocRoleTypeUri);
+    Set<AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
+                                                                      String topicRoleTypeUri, String assocRoleTypeUri);
 
     // ---
 
@@ -66,33 +66,33 @@ public interface DeepaMehtaStorage {
 
     // === Traversal ===
 
-    Set<AssociationModel> getTopicAssociations(long topicId);
+    Set<AssociationModel> fetchTopicAssociations(long topicId);
 
-    Set<AssociationModel> getAssociationAssociations(long assocId);
+    Set<AssociationModel> fetchAssociationAssociations(long assocId);
 
     // ---
 
-    Set<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri,
+    Set<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
 
-    Set<RelatedAssociationModel> getTopicRelatedAssociations(long topicId, String assocTypeUri,
+    Set<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
     // ---
 
-    Set<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri,
+    Set<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
 
-    Set<RelatedAssociationModel> getAssociationRelatedAssociations(long assocId, String assocTypeUri,
+    Set<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
 
 
     // === Properties ===
 
-    Object getProperty(long id, String key);
+    Object fetchProperty(long id, String key);
 
-    void setProperty(long id, String key, Object value);
+    void storeProperty(long id, String key, Object value);
 
     boolean hasProperty(long id, String key);
 

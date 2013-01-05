@@ -60,7 +60,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     protected void storeUri() {
-        dms.storage.setTopicUri(getId(), getUri());
+        dms.storage.storeTopicUri(getId(), getUri());
     }
 
     @Override
@@ -74,7 +74,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     protected void storeSimpleValue(Set<IndexMode> indexModes, String indexKey) {
-        dms.storage.setTopicValue(getId(), getSimpleValue(), indexModes, indexKey);
+        dms.storage.storeTopicValue(getId(), getSimpleValue(), indexModes, indexKey);
     }
 
     @Override
@@ -150,7 +150,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
                                                     String othersRoleTypeUri, String othersAssocTypeUri,
                                                     boolean fetchComposite, boolean fetchRelatingComposite) {
-        RelatedAssociationModel assoc = dms.storage.getTopicRelatedAssociation(getId(), assocTypeUri, myRoleTypeUri,
+        RelatedAssociationModel assoc = dms.storage.fetchTopicRelatedAssociation(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
         return assoc != null ? dms.attach(assoc, fetchComposite, fetchRelatingComposite) : null;
     }
@@ -159,7 +159,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     public Set<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
                                                           String othersRoleTypeUri, String othersAssocTypeUri,
                                                           boolean fetchComposite, boolean fetchRelatingComposite) {
-        Set<RelatedAssociationModel> assocs = dms.storage.getTopicRelatedAssociations(getId(), assocTypeUri,
+        Set<RelatedAssociationModel> assocs = dms.storage.fetchTopicRelatedAssociations(getId(), assocTypeUri,
             myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
         return dms.attach(assocs, fetchComposite, fetchRelatingComposite);
     }
@@ -180,7 +180,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                 String othersTopicTypeUri, boolean fetchComposite,
                                                 boolean fetchRelatingComposite, ClientState clientState) {
-        RelatedTopicModel topic = dms.storage.getTopicRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
+        RelatedTopicModel topic = dms.storage.fetchTopicRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
         return topic != null ? dms.attach(topic, fetchComposite, fetchRelatingComposite, clientState) : null;
     }
@@ -189,7 +189,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     public ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
                                     int maxResultSize, ClientState clientState) {
-        ResultSet<RelatedTopicModel> topics = dms.storage.getTopicRelatedTopics(getId(), assocTypeUri,
+        ResultSet<RelatedTopicModel> topics = dms.storage.fetchTopicRelatedTopics(getId(), assocTypeUri,
             myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
         return dms.attach(topics, fetchComposite, fetchRelatingComposite, clientState);
     }
@@ -198,7 +198,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     public ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
                                     int maxResultSize, ClientState clientState) {
-        ResultSet<RelatedTopicModel> topics = dms.storage.getTopicRelatedTopics(getId(), assocTypeUris,
+        ResultSet<RelatedTopicModel> topics = dms.storage.fetchTopicRelatedTopics(getId(), assocTypeUris,
             myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
         return dms.attach(topics, fetchComposite, fetchRelatingComposite, clientState);
     }
@@ -208,14 +208,14 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     @Override
     public Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                    long othersTopicId) {
-        AssociationModel assoc = dms.storage.getAssociation(assocTypeUri, getId(), othersTopicId, myRoleTypeUri,
-                                                                                                  othersRoleTypeUri);
+        AssociationModel assoc = dms.storage.fetchAssociation(assocTypeUri, getId(), othersTopicId, myRoleTypeUri,
+                                                                                                    othersRoleTypeUri);
         return assoc != null ? dms.attach(assoc, false) : null;                 // fetchComposite=false
     }
 
     @Override
     public Set<Association> getAssociations() {
-        return dms.attach(dms.storage.getTopicAssociations(getId()), false);    // fetchComposite=false
+        return dms.attach(dms.storage.fetchTopicAssociations(getId()), false);  // fetchComposite=false
     }
 
 

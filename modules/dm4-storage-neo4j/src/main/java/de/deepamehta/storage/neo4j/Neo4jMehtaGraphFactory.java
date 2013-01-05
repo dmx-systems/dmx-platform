@@ -5,6 +5,7 @@ import de.deepamehta.core.storage.spi.MehtaGraphFactory;
 
 
 
+// ### TODO: drop this. Register as OSGi service instead.
 public class Neo4jMehtaGraphFactory implements MehtaGraphFactory {
 
     // -------------------------------------------------------------------------------------------------- Public Methods

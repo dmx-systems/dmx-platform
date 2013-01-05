@@ -70,13 +70,13 @@ class ObjectFactoryImpl implements ObjectFactory {
     // --- Fetch ---
 
     RelatedTopicModel fetchTopicTypeTopic(long topicId) {
-        return dms.storage.getTopicRelatedTopic(topicId, "dm4.core.instantiation",
+        return dms.storage.fetchTopicRelatedTopic(topicId, "dm4.core.instantiation",
             "dm4.core.instance", "dm4.core.type", "dm4.core.topic_type");
     }
 
     RelatedTopicModel fetchAssociationTypeTopic(long assocId) {
         // assocTypeUri=null (supposed to be "dm4.core.instantiation" but not possible ### explain)
-        return dms.storage.getAssociationRelatedTopic(assocId, null,
+        return dms.storage.fetchAssociationRelatedTopic(assocId, null,
             "dm4.core.instance", "dm4.core.type", "dm4.core.assoc_type");
     }
 
@@ -87,15 +87,15 @@ class ObjectFactoryImpl implements ObjectFactory {
      */
     void _createTopic(TopicModel model) {
         // Note: low-level (storage) call used here ### explain
-        dms.storage.createTopic(model);
-        dms.storage.setTopicValue(model.getId(), model.getSimpleValue());
+        dms.storage.storeTopic(model);
+        dms.storage.storeTopicValue(model.getId(), model.getSimpleValue());
     }
 
     // ---
 
     Topic storeTopic(TopicModel model, ClientState clientState, Directives directives) {
         setDefaults(model);
-        dms.storage.createTopic(model);
+        dms.storage.storeTopic(model);
         associateWithTopicType(model.getId(), model.getTypeUri());
         //
         AttachedTopic topic = new AttachedTopic(model, dms);
@@ -106,7 +106,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     Association storeAssociation(AssociationModel model, ClientState clientState, Directives directives) {
         setDefaults(model);
-        dms.storage.createAssociation(model);
+        dms.storage.storeAssociation(model);
         associateWithAssociationType(model.getId(), model.getTypeUri());
         //
         AttachedAssociation assoc = new AttachedAssociation(model, dms);
@@ -134,8 +134,8 @@ class ObjectFactoryImpl implements ObjectFactory {
             AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
                 new TopicRoleModel(topicTypeUri, "dm4.core.type"),
                 new TopicRoleModel(topicId, "dm4.core.instance"));
-            dms.storage.createAssociation(assoc);
-            dms.storage.setAssociationValue(assoc.getId(), assoc.getSimpleValue());
+            dms.storage.storeAssociation(assoc);
+            dms.storage.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
             associateWithAssociationType(assoc.getId(), assoc.getTypeUri());
             // low-level (storage) call used here ### explain
         } catch (Exception e) {
@@ -149,8 +149,8 @@ class ObjectFactoryImpl implements ObjectFactory {
             AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
                 new TopicRoleModel(assocTypeUri, "dm4.core.type"),
                 new AssociationRoleModel(assocId, "dm4.core.instance"));
-            dms.storage.createAssociation(assoc);  // low-level (storage) call used here ### explain
-            dms.storage.setAssociationValue(assoc.getId(), assoc.getSimpleValue());
+            dms.storage.storeAssociation(assoc);  // low-level (storage) call used here ### explain
+            dms.storage.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
         } catch (Exception e) {
             throw new RuntimeException("Associating association " + assocId +
                 " with association type \"" + assocTypeUri + "\" failed", e);
@@ -257,7 +257,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     void storeType(TypeModel type, String defaultUriPrefix) {
         // 1) store the base-topic parts ### TODO: call storeTopic() instead?
-        dms.storage.createTopic(type);
+        dms.storage.storeTopic(type);
         associateWithTopicType(type.getId(), type.getTypeUri());
         // Note: the created AttachedTopic is just a temporary vehicle to
         // let us call its setUri() and storeAndIndexSimpleValue() methods.
@@ -291,7 +291,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     private RelatedTopicModel fetchDataTypeTopic(long typeId, String typeUri, String className) {
         try {
-            RelatedTopicModel dataType = dms.storage.getTopicRelatedTopic(typeId, "dm4.core.aggregation",
+            RelatedTopicModel dataType = dms.storage.fetchTopicRelatedTopic(typeId, "dm4.core.aggregation",
                 "dm4.core.type", null, "dm4.core.data_type");   // ### FIXME: null
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to " + className + " \"" + typeUri + "\"");
@@ -333,8 +333,8 @@ class ObjectFactoryImpl implements ObjectFactory {
         AssociationModel assoc = new AssociationModel("dm4.core.aggregation",
             new TopicRoleModel(typeUri,     "dm4.core.type"),
             new TopicRoleModel(dataTypeUri, "dm4.core.default"));
-        dms.storage.createAssociation(assoc);
-        dms.storage.setAssociationValue(assoc.getId(), assoc.getSimpleValue());
+        dms.storage.storeAssociation(assoc);
+        dms.storage.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
         associateWithAssociationType(assoc.getId(), assoc.getTypeUri());
     }
 
@@ -345,7 +345,7 @@ class ObjectFactoryImpl implements ObjectFactory {
     // --- Fetch ---
 
     private Set<IndexMode> fetchIndexModes(long typeId) {
-        ResultSet<RelatedTopicModel> indexModes = dms.storage.getTopicRelatedTopics(typeId, "dm4.core.aggregation",
+        ResultSet<RelatedTopicModel> indexModes = dms.storage.fetchTopicRelatedTopics(typeId, "dm4.core.aggregation",
             "dm4.core.type", null, "dm4.core.index_mode", 0);   // ### FIXME: null
         return IndexMode.fromTopics(indexModes.getItems());
     }
@@ -526,7 +526,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // ### TODO: pass Association instead ID?
     private RelatedTopicModel fetchWholeCardinality(long assocDefId) {
-        RelatedTopicModel wholeCard = dms.storage.getAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
+        RelatedTopicModel wholeCard = dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.whole_cardinality", "dm4.core.cardinality");
         // error check
         if (wholeCard == null) {
@@ -539,7 +539,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // ### TODO: pass Association instead ID?
     private RelatedTopicModel fetchPartCardinality(long assocDefId) {
-        RelatedTopicModel partCard = dms.storage.getAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
+        RelatedTopicModel partCard = dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.part_cardinality", "dm4.core.cardinality");
         // error check
         if (partCard == null) {
@@ -675,7 +675,7 @@ class ObjectFactoryImpl implements ObjectFactory {
     }
 
     private RelatedTopicModel fetchLabelConfigTopic(long assocDefId) {
-        return dms.storage.getAssociationRelatedTopic(assocDefId, "dm4.core.composition",
+        return dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.composition",
             "dm4.core.whole", "dm4.core.part", "dm4.core.include_in_label");
     }
 
@@ -723,13 +723,13 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     private RelatedTopicModel fetchTypeViewConfigTopic(long typeId, String configTypeUri) {
         // Note: the composite is not fetched as it is not needed
-        return dms.storage.getTopicRelatedTopic(typeId, "dm4.core.aggregation",
+        return dms.storage.fetchTopicRelatedTopic(typeId, "dm4.core.aggregation",
             "dm4.core.type", "dm4.core.view_config", configTypeUri);
     }
 
     private RelatedTopicModel fetchAssocDefViewConfigTopic(long assocDefId, String configTypeUri) {
         // Note: the composite is not fetched as it is not needed
-        return dms.storage.getAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
+        return dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.view_config", configTypeUri);
     }
 

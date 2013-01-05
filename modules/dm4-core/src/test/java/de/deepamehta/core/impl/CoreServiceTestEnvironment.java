@@ -17,7 +17,8 @@ public class CoreServiceTestEnvironment {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String DATABASE_FACTORY = "de.deepamehta.mehtagraph.neo4j.Neo4jMehtaGraphFactory";
+    // ### TODO: drop this. Register as OSGi service instead.
+    private static final String DATABASE_FACTORY = "de.deepamehta.storage.neo4j.Neo4jMehtaGraphFactory";
     // ### TODO: enable property access
     // System.getProperty("dm4.database.factory");
 
@@ -31,7 +32,7 @@ public class CoreServiceTestEnvironment {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Before
-    public void setup() {
+    public void setUp() {
         try {
             logger.info("Setting up test DB");
             dbPath = JavaUtils.createTempDirectory("dm4-");

@@ -94,7 +94,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // === Topics ===
 
     @Override
-    public void createMehtaNode(TopicModel topicModel) {
+    public void storeTopic(TopicModel topicModel) {
         String uri = topicModel.getUri();
         checkUriUniqueness(uri);
         //
@@ -112,12 +112,12 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public TopicModel getMehtaNode(long topicId) {
+    public TopicModel fetchTopic(long topicId) {
         return buildTopic(fetchTopicNode(topicId));
     }
 
     @Override
-    public TopicModel getMehtaNode(String key, Object value) {
+    public TopicModel fetchTopic(String key, Object value) {
         Node node = topicContentExact.get(key, value).getSingle();
         return node != null ? buildTopic(node) : null;
     }
@@ -125,25 +125,25 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public List<TopicModel> getMehtaNodes(String key, Object value) {
+    public List<TopicModel> fetchTopics(String key, Object value) {
         return buildTopics(topicContentExact.query(key, value));
     }
 
     // ---
 
     @Override
-    public List<TopicModel> queryMehtaNodes(Object value) {
-        return queryMehtaNodes(null, value);
+    public List<TopicModel> queryTopics(Object value) {
+        return queryTopics(null, value);
     }
 
     @Override
-    public List<TopicModel> queryMehtaNodes(String key, Object value) {
+    public List<TopicModel> queryTopics(String key, Object value) {
         if (key == null) {
             key = KEY_FULLTEXT;
         }
         if (value == null) {
-            throw new IllegalArgumentException("Tried to call queryMehtaNodes() with a null value Object (key=\"" +
-                key + "\")");
+            throw new IllegalArgumentException("Tried to call queryTopics() with a null value Object (key=\"" + key +
+                "\")");
         }
         //
         return buildTopics(topicContentFulltext.query(key, value));
@@ -152,12 +152,12 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public void setTopicUri(long topicId, String uri) {
+    public void storeTopicUri(long topicId, String uri) {
         storeAndIndexTopicUri(fetchTopicNode(topicId), uri);
     }
 
     @Override
-    public void setTopicValue(long topicId, SimpleValue value, Set<IndexMode> indexModes, String indexKey) {
+    public void storeTopicValue(long topicId, SimpleValue value, Set<IndexMode> indexModes, String indexKey) {
         storeAndIndexTopicValue(fetchTopicNode(topicId), value.value(), indexModes, indexKey);
     }
 
@@ -173,7 +173,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // === Associations ===
 
     @Override
-    public void createMehtaEdge(AssociationModel assocModel) {
+    public void storeAssociation(AssociationModel assocModel) {
         String uri = assocModel.getUri();
         checkUriUniqueness(uri);
         //
@@ -194,15 +194,15 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public AssociationModel getMehtaEdge(long assocId) {
+    public AssociationModel fetchAssociation(long assocId) {
         return buildAssociation(fetchAssociationNode(assocId));
     }
 
     // ---
 
     @Override
-    public Set<AssociationModel> getMehtaEdges(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
-                                                                                                  String roleTypeUri2) {
+    public Set<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
+                                                                        String roleTypeUri1, String roleTypeUri2) {
         Set<AssociationModel> assocs = new HashSet();
         Query query = buildAssociationQuery(assocTypeUri,
             roleTypeUri1, NodeType.TOPIC, topicId1, null,
@@ -214,8 +214,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public Set<AssociationModel> getMehtaEdgesBetweenNodeAndEdge(String assocTypeUri, long topicId, long assocId,
-                                                                 String topicRoleTypeUri, String assocRoleTypeUri) {
+    public Set<AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
+                                                       long assocId, String topicRoleTypeUri, String assocRoleTypeUri) {
         Set<AssociationModel> assocs = new HashSet();
         Query query = buildAssociationQuery(assocTypeUri,
             topicRoleTypeUri, NodeType.TOPIC, topicId, null,
@@ -263,20 +263,20 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // === Traversal ===
 
     @Override
-    public Set<AssociationModel> getTopicAssociations(long topicId) {
+    public Set<AssociationModel> fetchTopicAssociations(long topicId) {
         return fetchAssociations(fetchTopicNode(topicId));
     }
 
     @Override
-    public Set<AssociationModel> getAssociationAssociations(long assocId) {
+    public Set<AssociationModel> fetchAssociationAssociations(long assocId) {
         return fetchAssociations(fetchAssociationNode(assocId));
     }
 
     // ---
 
     @Override
-    public Set<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                        String othersRoleTypeUri, String othersTopicTypeUri) {
+    public Set<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                          String othersRoleTypeUri, String othersTopicTypeUri) {
         Query query = buildAssociationQuery(assocTypeUri,
             myRoleTypeUri,     NodeType.TOPIC, topicId, null,
             othersRoleTypeUri, NodeType.TOPIC, -1, othersTopicTypeUri);
@@ -284,7 +284,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public Set<RelatedAssociationModel> getTopicRelatedAssociations(long topicId, String assocTypeUri,
+    public Set<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
         Query query = buildAssociationQuery(assocTypeUri,
             myRoleTypeUri,     NodeType.TOPIC, topicId, null,
@@ -295,8 +295,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public Set<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                              String othersRoleTypeUri, String othersTopicTypeUri) {
+    public Set<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                                String othersRoleTypeUri, String othersTopicTypeUri) {
         Query query = buildAssociationQuery(assocTypeUri,
             myRoleTypeUri,     NodeType.ASSOC, assocId, null,
             othersRoleTypeUri, NodeType.TOPIC, -1, othersTopicTypeUri);
@@ -304,8 +304,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public Set<RelatedAssociationModel> getAssociationRelatedAssociations(long assocId, String assocTypeUri,
-                         String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+    public Set<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
         // ### TODO: respect maxResultSize
         Query query = buildAssociationQuery(assocTypeUri,
             myRoleTypeUri,     NodeType.ASSOC, assocId, null,
@@ -318,12 +318,12 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // === Properties ===
 
     @Override
-    public Object getProperty(long id, String key) {
+    public Object fetchProperty(long id, String key) {
         return fetchNode(id).getProperty(key);
     }
 
     @Override
-    public void setProperty(long id, String key, Object value) {
+    public void storeProperty(long id, String key, Object value) {
         fetchNode(id).setProperty(key, value);
     }
 
@@ -345,7 +345,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     public boolean setupRootNode() {
         Node rootNode = fetchNode(0);
         //
-        if (rootNode.getProperty("node_type") != null) {
+        if (rootNode.getProperty("node_type", null) != null) {
             return false;
         }
         //
@@ -514,7 +514,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         Set<RelatedTopicModel> relTopics = new HashSet();
         for (AssociationModel assoc : assocs) {
             long relatedTopicId = assoc.getOtherRoleModel(playerId).getPlayerId();
-            TopicModel relatedTopic = getMehtaNode(relatedTopicId);
+            TopicModel relatedTopic = fetchTopic(relatedTopicId);
             relTopics.add(new RelatedTopicModel(relatedTopic, assoc));
         }
         return relTopics;
@@ -524,7 +524,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         Set<RelatedAssociationModel> relAssocs = new HashSet();
         for (AssociationModel assoc : assocs) {
             long relatedAssocId = assoc.getOtherRoleModel(playerId).getPlayerId();
-            AssociationModel relatedAssoc = getMehtaEdge(relatedAssocId);
+            AssociationModel relatedAssoc = fetchAssociation(relatedAssocId);
             relAssocs.add(new RelatedAssociationModel(relatedAssoc, assoc));
         }
         return relAssocs;
@@ -552,8 +552,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     private Query buildAssociationQuery(String assocTypeUri,
-                                    String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
-                                    String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
+                                     String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
+                                     String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
         BooleanQuery query = new BooleanQuery();
         query.add(new TermQuery(new Term("assoc_type_uri", assocTypeUri)), Occur.MUST);
         // ### TODO

@@ -32,14 +32,14 @@ public class StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DeepaMehtaStorage mg;
+    private DeepaMehtaStorage storage;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public StorageDecorator(DeepaMehtaStorage mg) {
-        this.mg = mg;
+    public StorageDecorator(DeepaMehtaStorage storage) {
+        this.storage = storage;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -52,8 +52,8 @@ public class StorageDecorator {
      * @return  The fetched topic.
      *          Note: its composite value is not initialized.
      */
-    public TopicModel getTopic(long topicId) {
-        return mg.getMehtaNode(topicId);
+    public TopicModel fetchTopic(long topicId) {
+        return storage.fetchTopic(topicId);
     }
 
     /**
@@ -70,8 +70,8 @@ public class StorageDecorator {
      * @return  The fetched topic.
      *          Note: its composite value is not initialized.
      */
-    public TopicModel getTopic(String key, SimpleValue value) {
-        return mg.getMehtaNode(key, value.value());
+    public TopicModel fetchTopic(String key, SimpleValue value) {
+        return storage.fetchTopic(key, value.value());
     }
 
     // ---
@@ -80,8 +80,8 @@ public class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their composite values are not initialized.
      */
-    public Set<TopicModel> searchTopics(String searchTerm, String fieldUri) {
-        return DeepaMehtaUtils.toTopicSet(mg.queryMehtaNodes(fieldUri, searchTerm));
+    public Set<TopicModel> queryTopics(String searchTerm, String fieldUri) {
+        return DeepaMehtaUtils.toTopicSet(storage.queryTopics(fieldUri, searchTerm));
     }
 
     // ---
@@ -89,8 +89,8 @@ public class StorageDecorator {
     /**
      * Stores and indexes the topic's URI.
      */
-    public void setTopicUri(long topicId, String uri) {
-        mg.setTopicUri(topicId, uri);
+    public void storeTopicUri(long topicId, String uri) {
+        storage.storeTopicUri(topicId, uri);
     }
 
     // ---
@@ -98,8 +98,8 @@ public class StorageDecorator {
     /**
      * Convenience method.
      */
-    public void setTopicValue(long assocId, SimpleValue value) {
-        setTopicValue(assocId, value, new HashSet(asList(IndexMode.OFF)), null);
+    public void storeTopicValue(long assocId, SimpleValue value) {
+        storeTopicValue(assocId, value, new HashSet(asList(IndexMode.OFF)), null);
     }
 
     /**
@@ -109,8 +109,8 @@ public class StorageDecorator {
      *
      * @return  The previous value, or <code>null</code> if no value was stored before. ### FIXDOC
      */
-    public void setTopicValue(long topicId, SimpleValue value, Set<IndexMode> indexModes, String indexKey) {
-        mg.setTopicValue(topicId, value, indexModes, indexKey);
+    public void storeTopicValue(long topicId, SimpleValue value, Set<IndexMode> indexModes, String indexKey) {
+        storage.storeTopicValue(topicId, value, indexModes, indexKey);
     }
 
     // ---
@@ -125,8 +125,8 @@ public class StorageDecorator {
      *          - the topic value is initialzed but not persisted.
      *          - the type URI    is initialzed but not persisted.
      */
-    public void createTopic(TopicModel topicModel) {
-        mg.createMehtaNode(topicModel);
+    public void storeTopic(TopicModel topicModel) {
+        storage.storeTopic(topicModel);
     }
 
     /**
@@ -135,7 +135,7 @@ public class StorageDecorator {
      * Prerequisite: the topic has no relations.
      */
     public void deleteTopic(long topicId) {
-        mg.deleteTopic(topicId);
+        storage.deleteTopic(topicId);
     }
 
 
@@ -146,8 +146,8 @@ public class StorageDecorator {
      * @return  The fetched associations.
      *          Note: their composite values are not initialized.
      */
-    public Set<AssociationModel> getTopicAssociations(long topicId) {
-        return mg.getTopicAssociations(topicId);
+    public Set<AssociationModel> fetchTopicAssociations(long topicId) {
+        return storage.fetchTopicAssociations(topicId);
     }
 
     // ---
@@ -158,9 +158,9 @@ public class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their composite values are not initialized.
      */
-    public RelatedTopicModel getTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                  String othersRoleTypeUri, String othersTopicTypeUri) {
-        ResultSet<RelatedTopicModel> topics = getTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
+    public RelatedTopicModel fetchTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                    String othersRoleTypeUri, String othersTopicTypeUri) {
+        ResultSet<RelatedTopicModel> topics = fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri, 0);
         switch (topics.getSize()) {
         case 0:
@@ -178,10 +178,10 @@ public class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their composite values are not initialized.
      */
-    public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, String assocTypeUri,
-                                                              String myRoleTypeUri, String othersRoleTypeUri,
-                                                              String othersTopicTypeUri, int maxResultSize) {
-        Set<RelatedTopicModel> relTopics = mg.getTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
+    public ResultSet<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
+                                                                String myRoleTypeUri, String othersRoleTypeUri,
+                                                                String othersTopicTypeUri, int maxResultSize) {
+        Set<RelatedTopicModel> relTopics = storage.fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
         // ### TODO: respect maxResultSize
         return new ResultSet(relTopics.size(), relTopics);
@@ -198,12 +198,12 @@ public class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their composite values are not initialized.
      */
-    public ResultSet<RelatedTopicModel> getTopicRelatedTopics(long topicId, List<String> assocTypeUris,
-                                                              String myRoleTypeUri, String othersRoleTypeUri,
-                                                              String othersTopicTypeUri, int maxResultSize) {
+    public ResultSet<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, List<String> assocTypeUris,
+                                                                String myRoleTypeUri, String othersRoleTypeUri,
+                                                                String othersTopicTypeUri, int maxResultSize) {
         ResultSet<RelatedTopicModel> result = new ResultSet();
         for (String assocTypeUri : assocTypeUris) {
-            ResultSet<RelatedTopicModel> res = getTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
+            ResultSet<RelatedTopicModel> res = fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
                 othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
             result.addAll(res);
         }
@@ -218,9 +218,9 @@ public class StorageDecorator {
      * @return  The fetched association.
      *          Note: its composite value is not initialized.
      */
-    public RelatedAssociationModel getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                              String othersRoleTypeUri, String othersAssocTypeUri) {
-        Set<RelatedAssociationModel> assocs = getTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri,
+    public RelatedAssociationModel fetchTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                String othersRoleTypeUri, String othersAssocTypeUri) {
+        Set<RelatedAssociationModel> assocs = fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
         switch (assocs.size()) {
         case 0:
@@ -243,9 +243,9 @@ public class StorageDecorator {
      * @return  The fetched associations.
      *          Note: their composite values are not initialized.
      */
-    public Set<RelatedAssociationModel> getTopicRelatedAssociations(long topicId, String assocTypeUri,
+    public Set<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        return mg.getTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return storage.fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
     }
 
@@ -253,8 +253,8 @@ public class StorageDecorator {
 
     // === Associations ===
 
-    public AssociationModel getAssociation(long assocId) {
-        return mg.getMehtaEdge(assocId);
+    public AssociationModel fetchAssociation(long assocId) {
+        return storage.fetchAssociation(assocId);
     }
 
     // ---
@@ -269,9 +269,9 @@ public class StorageDecorator {
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      *                          ### FIXME: for methods with a singular return value all filters should be mandatory
      */
-    public AssociationModel getAssociation(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
-                                                                                              String roleTypeUri2) {
-        Set<AssociationModel> assocs = getAssociations(assocTypeUri, topicId1, topicId2, roleTypeUri1, roleTypeUri2);
+    public AssociationModel fetchAssociation(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
+                                                                                                String roleTypeUri2) {
+        Set<AssociationModel> assocs = fetchAssociations(assocTypeUri, topicId1, topicId2, roleTypeUri1, roleTypeUri2);
         switch (assocs.size()) {
         case 0:
             return null;
@@ -289,9 +289,9 @@ public class StorageDecorator {
      *
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      */
-    public Set<AssociationModel> getAssociations(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
-                                                                                                  String roleTypeUri2) {
-        return mg.getMehtaEdges(assocTypeUri, topicId1, topicId2, roleTypeUri1, roleTypeUri2);
+    public Set<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
+                                                                        String roleTypeUri1, String roleTypeUri2) {
+        return storage.fetchAssociations(assocTypeUri, topicId1, topicId2, roleTypeUri1, roleTypeUri2);
     }
 
     // ---
@@ -299,9 +299,9 @@ public class StorageDecorator {
     /**
      * Convenience method (checks singularity).
      */
-    public AssociationModel getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
+    public AssociationModel fetchAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
                                                                      String topicRoleTypeUri, String assocRoleTypeUri) {
-        Set<AssociationModel> assocs = getAssociationsBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
+        Set<AssociationModel> assocs = fetchAssociationsBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
             topicRoleTypeUri, assocRoleTypeUri);
         switch (assocs.size()) {
         case 0:
@@ -315,15 +315,16 @@ public class StorageDecorator {
         }
     }
 
-    public Set<AssociationModel> getAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
+    public Set<AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
                                                        long assocId, String topicRoleTypeUri, String assocRoleTypeUri) {
-        return mg.getMehtaEdgesBetweenNodeAndEdge(assocTypeUri, topicId, assocId, topicRoleTypeUri, assocRoleTypeUri);
+        return storage.fetchAssociationsBetweenTopicAndAssociation(assocTypeUri, topicId, assocId, topicRoleTypeUri,
+            assocRoleTypeUri);
     }
 
     // ---
 
     public void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri) {
-        mg.storeRoleTypeUri(assocId, playerId, roleTypeUri);
+        storage.storeRoleTypeUri(assocId, playerId, roleTypeUri);
     }
 
     // ---
@@ -331,8 +332,8 @@ public class StorageDecorator {
     /**
      * Stores and indexes the association's URI.
      */
-    public void setAssociationUri(long assocId, String uri) {
-        mg.storeAssociationUri(assocId, uri);
+    public void storeAssociationUri(long assocId, String uri) {
+        storage.storeAssociationUri(assocId, uri);
     }
 
     // ---
@@ -340,8 +341,8 @@ public class StorageDecorator {
     /**
      * Convenience method.
      */
-    public void setAssociationValue(long assocId, SimpleValue value) {
-        setAssociationValue(assocId, value, new HashSet(asList(IndexMode.OFF)), null);
+    public void storeAssociationValue(long assocId, SimpleValue value) {
+        storeAssociationValue(assocId, value, new HashSet(asList(IndexMode.OFF)), null);
     }
 
     /**
@@ -351,26 +352,26 @@ public class StorageDecorator {
      *
      * @return  The previous value, or <code>null</code> if no value was stored before. ### FIXDOC
      */
-    public void setAssociationValue(long assocId, SimpleValue value, Set<IndexMode> indexModes, String indexKey) {
-        mg.storeAssociationValue(assocId, value, indexModes, indexKey);
+    public void storeAssociationValue(long assocId, SimpleValue value, Set<IndexMode> indexModes, String indexKey) {
+        storage.storeAssociationValue(assocId, value, indexModes, indexKey);
     }
 
     // ---
 
-    public void createAssociation(AssociationModel assocModel) {
-        mg.createMehtaEdge(assocModel);
+    public void storeAssociation(AssociationModel assocModel) {
+        storage.storeAssociation(assocModel);
     }
 
     public void deleteAssociation(long assocId) {
-        mg.deleteAssociation(assocId);
+        storage.deleteAssociation(assocId);
     }
 
 
 
     // --- Traversal ---
 
-    public Set<AssociationModel> getAssociationAssociations(long assocId) {
-        return mg.getAssociationAssociations(assocId);
+    public Set<AssociationModel> fetchAssociationAssociations(long assocId) {
+        return storage.fetchAssociationAssociations(assocId);
     }
 
     // ---
@@ -381,9 +382,9 @@ public class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their composite values are not initialized.
      */
-    public RelatedTopicModel getAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                        String othersRoleTypeUri, String othersTopicTypeUri) {
-        ResultSet<RelatedTopicModel> topics = getAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
+    public RelatedTopicModel fetchAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                          String othersRoleTypeUri, String othersTopicTypeUri) {
+        ResultSet<RelatedTopicModel> topics = fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri, 0);
         switch (topics.getSize()) {
         case 0:
@@ -401,10 +402,10 @@ public class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their composite values are not initialized.
      */
-    public ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, String assocTypeUri,
-                                                                    String myRoleTypeUri, String othersRoleTypeUri,
-                                                                    String othersTopicTypeUri, int maxResultSize) {
-        Set<RelatedTopicModel> relTopics = mg.getAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
+    public ResultSet<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
+                                                                      String myRoleTypeUri, String othersRoleTypeUri,
+                                                                      String othersTopicTypeUri, int maxResultSize) {
+        Set<RelatedTopicModel> relTopics = storage.fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
         // ### TODO: respect maxResultSize
         return new ResultSet(relTopics.size(), relTopics);
@@ -421,12 +422,12 @@ public class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their composite values are not initialized.
      */
-    public ResultSet<RelatedTopicModel> getAssociationRelatedTopics(long assocId, List<String> assocTypeUris,
-                                                                    String myRoleTypeUri, String othersRoleTypeUri,
-                                                                    String othersTopicTypeUri, int maxResultSize) {
+    public ResultSet<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, List<String> assocTypeUris,
+                                                                      String myRoleTypeUri, String othersRoleTypeUri,
+                                                                      String othersTopicTypeUri, int maxResultSize) {
         ResultSet<RelatedTopicModel> result = new ResultSet();
         for (String assocTypeUri : assocTypeUris) {
-            ResultSet<RelatedTopicModel> res = getAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
+            ResultSet<RelatedTopicModel> res = fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
                 othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
             result.addAll(res);
         }
@@ -441,9 +442,9 @@ public class StorageDecorator {
      * @return  The fetched association.
      *          Note: its composite value is not initialized.
      */
-    public RelatedAssociationModel getAssociationRelatedAssociation(long assocId, String assocTypeUri,
+    public RelatedAssociationModel fetchAssociationRelatedAssociation(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        Set<RelatedAssociationModel> assocs = getAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri,
+        Set<RelatedAssociationModel> assocs = fetchAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
         switch (assocs.size()) {
         case 0:
@@ -466,9 +467,9 @@ public class StorageDecorator {
      * @return  The fetched associations.
      *          Note: their composite values are not initialized.
      */
-    public Set<RelatedAssociationModel> getAssociationRelatedAssociations(long assocId, String assocTypeUri,
+    public Set<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        return mg.getAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return storage.fetchAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
     }
 
@@ -480,10 +481,11 @@ public class StorageDecorator {
      * Fetches the Access Control List for the specified topic or association.
      * If no one is stored an empty Access Control List is returned.
      */
-    public AccessControlList getACL(long objectId) {
+    public AccessControlList fetchACL(long objectId) {
         try {
-            boolean hasACL = mg.hasProperty(objectId, "acl");
-            JSONObject acl = hasACL ? new JSONObject((String) mg.getProperty(objectId, "acl")) : new JSONObject();
+            boolean hasACL = storage.hasProperty(objectId, "acl");
+            JSONObject acl = hasACL ? new JSONObject((String) storage.fetchProperty(objectId, "acl"))
+                                    : new JSONObject();
             return new AccessControlList(acl);
         } catch (Exception e) {
             throw new RuntimeException("Fetching access control list for object " + objectId + " failed", e);
@@ -493,28 +495,28 @@ public class StorageDecorator {
     /**
      * Creates the Access Control List for the specified topic or association.
      */
-    public void createACL(long objectId, AccessControlList acl) {
-        mg.setProperty(objectId, "acl", acl.toJSON().toString());
+    public void storeACL(long objectId, AccessControlList acl) {
+        storage.storeProperty(objectId, "acl", acl.toJSON().toString());
     }
 
     // ---
 
-    public String getCreator(long objectId) {
-        return mg.hasProperty(objectId, "creator") ? (String) mg.getProperty(objectId, "creator") : null;
+    public String fetchCreator(long objectId) {
+        return storage.hasProperty(objectId, "creator") ? (String) storage.fetchProperty(objectId, "creator") : null;
     }
 
-    public void setCreator(long objectId, String username) {
-        mg.setProperty(objectId, "creator", username);
+    public void storeCreator(long objectId, String username) {
+        storage.storeProperty(objectId, "creator", username);
     }
 
     // ---
 
-    public String getOwner(long objectId) {
-        return mg.hasProperty(objectId, "owner") ? (String) mg.getProperty(objectId, "owner") : null;
+    public String fetchOwner(long objectId) {
+        return storage.hasProperty(objectId, "owner") ? (String) storage.fetchProperty(objectId, "owner") : null;
     }
 
-    public void setOwner(long objectId, String username) {
-        mg.setProperty(objectId, "owner", username);
+    public void storeOwner(long objectId, String username) {
+        storage.storeProperty(objectId, "owner", username);
     }
 
 
@@ -522,7 +524,7 @@ public class StorageDecorator {
     // === DB ===
 
     public DeepaMehtaTransaction beginTx() {
-        return mg.beginTx();
+        return storage.beginTx();
     }
 
     /**
@@ -532,23 +534,23 @@ public class StorageDecorator {
      * @return  <code>true</code> if a clean install is detected, <code>false</code> otherwise.
      */
     public boolean init() {
-        boolean isCleanInstall = mg.setupRootNode();
+        boolean isCleanInstall = storage.setupRootNode();
         if (isCleanInstall) {
             logger.info("Starting with a fresh DB -- Setting migration number to 0");
-            setMigrationNr(0);
+            storeMigrationNr(0);
         }
         return isCleanInstall;
     }
 
     public void shutdown() {
-        mg.shutdown();
+        storage.shutdown();
     }
 
-    public int getMigrationNr() {
-        return (Integer) mg.getProperty(0, "core_migration_nr");
+    public int fetchMigrationNr() {
+        return (Integer) storage.fetchProperty(0, "core_migration_nr");
     }
 
-    public void setMigrationNr(int migrationNr) {
-        mg.setProperty(0, "core_migration_nr", migrationNr);
+    public void storeMigrationNr(int migrationNr) {
+        storage.storeProperty(0, "core_migration_nr", migrationNr);
     }
 }

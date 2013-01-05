@@ -94,7 +94,7 @@ public class EmbeddedService implements DeepaMehtaService {
         // logger.info("topicId=" + topicId + ", fetchComposite=" + fetchComposite + ", clientState=" + clientState);
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopic topic = attach(storage.getTopic(topicId), fetchComposite, clientState);
+            AttachedTopic topic = attach(storage.fetchTopic(topicId), fetchComposite, clientState);
             tx.success();
             return topic;
         } catch (Exception e) {
@@ -109,7 +109,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public AttachedTopic getTopic(String key, SimpleValue value, boolean fetchComposite, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            TopicModel model = storage.getTopic(key, value);
+            TopicModel model = storage.fetchTopic(key, value);
             AttachedTopic topic = model != null ? attach(model, fetchComposite, clientState) : null;
             tx.success();
             return topic;
@@ -144,7 +144,7 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             // ### FIXME: fetchComposite=false, parameterize it
-            Set<Topic> topics = attach(storage.searchTopics(searchTerm, fieldUri), false, clientState);
+            Set<Topic> topics = attach(storage.queryTopics(searchTerm, fieldUri), false, clientState);
             tx.success();
             return topics;
         } catch (Exception e) {
@@ -226,7 +226,7 @@ public class EmbeddedService implements DeepaMehtaService {
         logger.info("assocId=" + assocId + ", fetchComposite=" + fetchComposite + ", clientState=" + clientState);
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Association assoc = attach(storage.getAssociation(assocId), fetchComposite);
+            Association assoc = attach(storage.fetchAssociation(assocId), fetchComposite);
             tx.success();
             return assoc;
         } catch (Exception e) {
@@ -246,7 +246,7 @@ public class EmbeddedService implements DeepaMehtaService {
         // logger.info(info);   ### TODO: the Access Control plugin calls getAssociation() very often. It should cache.
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AssociationModel model = storage.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1,
+            AssociationModel model = storage.fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1,
                 roleTypeUri2);
             Association assoc = model != null ? attach(model, fetchComposite) : null;
             tx.success();
@@ -269,7 +269,7 @@ public class EmbeddedService implements DeepaMehtaService {
         logger.info(info);
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AssociationModel model = storage.getAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
+            AssociationModel model = storage.fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
                 topicRoleTypeUri, assocRoleTypeUri);
             Association assoc = model != null ? attach(model, fetchComposite) : null;
             tx.success();
@@ -314,7 +314,7 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             // ### FIXME: fetchComposite=false, parameterize it
-            Set<Association> assocs = attach(storage.getAssociations(assocTypeUri, topic1Id, topic2Id, null, null),
+            Set<Association> assocs = attach(storage.fetchAssociations(assocTypeUri, topic1Id, topic2Id, null, null),
                 false);     // roleTypeUri1=null, roleTypeUri2=null
             tx.success();
             return assocs;
@@ -399,7 +399,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Set<String> getTopicTypeUris() {
         try {
-            Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm4.core.topic_type")), false, null);
+            Topic metaType = attach(storage.fetchTopic("uri", new SimpleValue("dm4.core.topic_type")), false, null);
             ResultSet<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.topic_type", false, false, 0, null);
             Set<String> topicTypeUris = new HashSet();
@@ -500,7 +500,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Set<String> getAssociationTypeUris() {
         try {
-            Topic metaType = attach(storage.getTopic("uri", new SimpleValue("dm4.core.assoc_type")), false, null);
+            Topic metaType = attach(storage.fetchTopic("uri", new SimpleValue("dm4.core.assoc_type")), false, null);
             ResultSet<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.assoc_type", false, false, 0, null);
             Set<String> assocTypeUris = new HashSet();
@@ -609,14 +609,14 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public AccessControlList getACL(long objectId) {
-        return storage.getACL(objectId);
+        return storage.fetchACL(objectId);
     }
 
     @Override
     public void createACL(long objectId, AccessControlList acl) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.createACL(objectId, acl);
+            storage.storeACL(objectId, acl);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -630,14 +630,14 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public String getCreator(long objectId) {
-        return storage.getCreator(objectId);
+        return storage.fetchCreator(objectId);
     }
 
     @Override
     public void setCreator(long objectId, String username) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.setCreator(objectId, username);
+            storage.storeCreator(objectId, username);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -652,14 +652,14 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public String getOwner(long objectId) {
-        return storage.getOwner(objectId);
+        return storage.fetchOwner(objectId);
     }
 
     @Override
     public void setOwner(long objectId, String username) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.setOwner(objectId, username);
+            storage.storeOwner(objectId, username);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -932,7 +932,7 @@ public class EmbeddedService implements DeepaMehtaService {
         // Note: at time of the first associateDataType() call the required association type (dm4.core.aggregation)
         // is *not* fully constructed yet! (it gets constructed through this very call). This works anyway because
         // the data type assigning association is created *before* the association type is fetched.
-        // (see AttachedAssociation.store(): storage.createAssociation() is called before getType()
+        // (see AttachedAssociation.store(): storage.storeAssociation() is called before getType()
         // in AttachedDeepaMehtaObject.store().)
         // ### FIXDOC: not true anymore
         //
