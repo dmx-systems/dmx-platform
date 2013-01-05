@@ -33,14 +33,20 @@ enum NodeType {
         }
     };
 
-    static NodeType of(Node node) {
-        String type = (String) node.getProperty("node_type");
-        return valueOf(type.toUpperCase());
-    }
-
     // ---
 
     abstract RoleModel createRoleModel(Node node, String roleTypeUri);
 
     abstract String error(Node node);
+
+    // ---
+
+    static NodeType of(Node node) {
+        String type = (String) node.getProperty("node_type");
+        return valueOf(type.toUpperCase());
+    }
+
+    String stringify() {
+        return name().toLowerCase();
+    }
 }

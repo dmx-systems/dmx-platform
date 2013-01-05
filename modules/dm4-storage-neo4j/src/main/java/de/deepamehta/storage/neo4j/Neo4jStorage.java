@@ -44,19 +44,31 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // ### TODO: define further string constants for key names etc.
-    protected static final String KEY_IS_MEHTA_EDGE = "_is_mehta_edge";     // ### TODO: no used
-    protected static final String KEY_FULLTEXT = "_fulltext";
+    private static final String KEY_FULLTEXT = "_fulltext";
+
+    // association metadata
+    private static final String KEY_ASSOC_TPYE_URI = "assoc_type_uri";
+    // role 1
+    private static final String KEY_ROLE_TPYE_URI_1   = "role_type_uri_1";
+    private static final String KEY_PLAYER_TPYE_1     = "player_type_1";
+    private static final String KEY_PLAYER_ID_1       = "player_id_1";
+    private static final String KEY_PLAYER_TYPE_URI_1 = "player_type_uri_1";
+    // role 2
+    private static final String KEY_ROLE_TPYE_URI_2   = "role_type_uri_2";
+    private static final String KEY_PLAYER_TPYE_2     = "player_type_2";
+    private static final String KEY_PLAYER_ID_2       = "player_id_2";
+    private static final String KEY_PLAYER_TYPE_URI_2 = "player_type_uri_2";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected GraphDatabaseService neo4j = null;
-    protected Neo4jRelationtypeCache relTypeCache;
+    private GraphDatabaseService neo4j = null;
+    private Neo4jRelationtypeCache relTypeCache;
     
-    protected Index<Node> topicContentExact;
-    protected Index<Node> topicContentFulltext;
-    protected Index<Node> assocContentExact;
-    protected Index<Node> assocContentFulltext;
-    protected Index<Node> assocMetadata;
+    private Index<Node> topicContentExact;
+    private Index<Node> topicContentFulltext;
+    private Index<Node> assocContentExact;
+    private Index<Node> assocContentFulltext;
+    private Index<Node> assocMetadata;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -184,8 +196,12 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         storeAndIndexAssociationUri(assocNode, uri);
         storeAndIndexAssociationTypeUri(assocNode, assocModel.getTypeUri());
         //
-        createRelationship(assocNode, assocModel.getRoleModel1());
-        createRelationship(assocNode, assocModel.getRoleModel2());
+        RoleModel role1 = assocModel.getRoleModel1();
+        RoleModel role2 = assocModel.getRoleModel2();
+        Node playerNode1 = storePlayerRelationship(assocNode, role1);
+        Node playerNode2 = storePlayerRelationship(assocNode, role2);
+        //
+        indexAssociation(assocNode, role1.getRoleTypeUri(), playerNode1, role2.getRoleTypeUri(), playerNode2);
         //
         // 2) update model
         assocModel.setId(assocNode.getId());
@@ -343,18 +359,22 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     @Override
     public boolean setupRootNode() {
-        Node rootNode = fetchNode(0);
-        //
-        if (rootNode.getProperty("node_type", null) != null) {
-            return false;
+        try {
+            Node rootNode = fetchNode(0);
+            //
+            if (rootNode.getProperty("node_type", null) != null) {
+                return false;
+            }
+            //
+            rootNode.setProperty("node_type", "topic");
+            storeAndIndexTopicUri(rootNode, "dm4.core.meta_type");
+            storeAndIndexTopicTypeUri(rootNode, "dm4.core.meta_meta_type");
+            rootNode.setProperty("value", "Meta Type");
+            //
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Setting up the root node (0) failed", e);
         }
-        //
-        rootNode.setProperty("node_type", "topic");
-        storeAndIndexTopicUri(rootNode, "dm4.core.meta_type");
-        // ### TODO: set type URI?
-        rootNode.setProperty("value", "Meta Type");
-        //
-        return true;
     }
 
     @Override
@@ -370,11 +390,13 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // === Neo4j -> DeepaMehta Bridge ===
 
     private TopicModel buildTopic(Node node) {
-        long id = node.getId();
-        String uri = (String) node.getProperty("uri");
-        String typeUri = (String) node.getProperty("type_uri");
-        SimpleValue value = new SimpleValue(node.getProperty("value"));
-        return new TopicModel(id, uri, typeUri, value, null);   // composite=null
+        return new TopicModel(
+            node.getId(),
+            uri(node),
+            typeUri(node),
+            simpleValue(node),
+            null    // composite=null
+        );
     }
 
     private List<TopicModel> buildTopics(Iterable<Node> nodes) {
@@ -388,12 +410,15 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     private AssociationModel buildAssociation(Node assocNode) {
-        long id = assocNode.getId();
-        String uri = (String) assocNode.getProperty("uri");
-        String typeUri = (String) assocNode.getProperty("type_uri");;
-        SimpleValue value = new SimpleValue(assocNode.getProperty("value"));
         List<RoleModel> roleModels = buildRoleModels(assocNode);
-        return new AssociationModel(id, uri, typeUri, roleModels.get(0), roleModels.get(1), value, null);
+        return new AssociationModel(
+            assocNode.getId(),
+            uri(assocNode),
+            typeUri(assocNode),
+            roleModels.get(0), roleModels.get(1),
+            simpleValue(assocNode),
+            null    // composite=null
+        );
     }
 
     private List<RoleModel> buildRoleModels(Node assocNode) {
@@ -411,21 +436,31 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // === DeepaMehta -> Neo4j Bridge ===
 
+    private Node storePlayerRelationship(Node assocNode, RoleModel roleModel) {
+        Node playerNode = fetchPlayerNode(roleModel);
+        assocNode.createRelationshipTo(
+            playerNode,
+            getRelationshipType(roleModel.getRoleTypeUri())
+        );
+        return playerNode;
+    }
+
     private Node fetchPlayerNode(RoleModel roleModel) {
-        long playerId = roleModel.getPlayerId();
         if (roleModel instanceof TopicRoleModel) {
-            return fetchTopicNode(playerId);
+            return fetchTopicPlayerNode((TopicRoleModel) roleModel);
         } else if (roleModel instanceof AssociationRoleModel) {
-            return fetchAssociationNode(playerId);
+            return fetchAssociationNode(roleModel.getPlayerId());
         } else {
             throw new RuntimeException("Unexpected role model: " + roleModel);
         }
     }
 
-    private void createRelationship(Node assocNode, RoleModel roleModel) {
-        Node playerNode = fetchPlayerNode(roleModel);
-        String roleTypeUri = roleModel.getRoleTypeUri();
-        assocNode.createRelationshipTo(playerNode, getRelationshipType(roleTypeUri));
+    private Node fetchTopicPlayerNode(TopicRoleModel roleModel) {
+        if (roleModel.topicIdentifiedByUri()) {
+            return fetchTopicNodeByUri(roleModel.getTopicUri());
+        } else {
+            return fetchTopicNode(roleModel.getPlayerId());
+        }
     }
 
 
@@ -477,15 +512,15 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     private Node fetchTopicNode(long topicId) {
-        Node node = fetchNode(topicId);
-        checkType(node, NodeType.TOPIC);
-        return node;
+        return checkType(
+            fetchNode(topicId), NodeType.TOPIC
+        );
     }
 
     private Node fetchAssociationNode(long assocId) {
-        Node node = fetchNode(assocId);
-        checkType(node, NodeType.ASSOC);
-        return node;
+        return checkType(
+            fetchNode(assocId), NodeType.ASSOC
+        );
     }
 
     // ---
@@ -494,16 +529,37 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         return neo4j.getNodeById(id);
     }
 
-    private void checkType(Node node, NodeType type) {
+    private Node fetchTopicNodeByUri(String uri) {
+        return checkType(
+            topicContentExact.get("uri", uri).getSingle(), NodeType.TOPIC
+        );
+    }
+
+    private Node checkType(Node node, NodeType type) {
         if (NodeType.of(node) != type) {
             throw new IllegalArgumentException(type.error(node));
         }
+        return node;
     }
 
     // ---
 
     private RelationshipType getRelationshipType(String typeName) {
         return relTypeCache.get(typeName);
+    }
+
+    // ---
+
+    private String uri(Node node) {
+        return (String) node.getProperty("uri");
+    }
+
+    private String typeUri(Node node) {
+        return (String) node.getProperty("type_uri");
+    }
+
+    private SimpleValue simpleValue(Node node) {
+        return new SimpleValue(node.getProperty("value"));
     }
 
 
@@ -551,15 +607,6 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---
 
-    private Query buildAssociationQuery(String assocTypeUri,
-                                     String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
-                                     String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
-        BooleanQuery query = new BooleanQuery();
-        query.add(new TermQuery(new Term("assoc_type_uri", assocTypeUri)), Occur.MUST);
-        // ### TODO
-        return query;
-    }
-
     private List<AssociationModel> queryAssociations(Query query) {
         List<AssociationModel> assocs = new ArrayList();
         for (Node assocNode : assocMetadata.query(query)) {
@@ -570,22 +617,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
 
 
-    // === Value Storage & Index ===
-
-    private Index<Node> createExactIndex(String name) {
-        return neo4j.index().forNodes(name);
-    }
-
-    private Index<Node> createFulltextIndex(String name) {
-        if (neo4j.index().existsForNodes(name)) {
-            return neo4j.index().forNodes(name);
-        } else {
-            Map<String, String> configuration = stringMap(IndexManager.PROVIDER, "lucene", "type", "fulltext");
-            return neo4j.index().forNodes(name, configuration);
-        }
-    }
-
-    // ---
+    // === Value Storage ===
 
     private void storeAndIndexTopicUri(Node topicNode, String uri) {
         storeAndIndexExactValue(topicNode, "uri", uri, topicContentExact);
@@ -626,7 +658,9 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         indexNodeValue(assocNode, value, indexModes, indexKey, assocContentExact, assocContentFulltext);
     }
 
-    // ---
+
+
+    // === Indexing ===
 
     private void indexNodeValue(Node node, Object value, Collection<IndexMode> indexModes, String indexKey,
                                                          Index<Node> exactIndex, Index<Node> fulltextIndex) {
@@ -648,8 +682,77 @@ public class Neo4jStorage implements DeepaMehtaStorage {
                 fulltextIndex.remove(node, indexKey);           // remove old
                 fulltextIndex.add(node, indexKey, value);       // index new
             } else {
-                throw new RuntimeException("Index mode \"" + indexMode + "\" not implemented");
+                throw new RuntimeException("Unexpected index mode: \"" + indexMode + "\"");
             }
+        }
+    }
+
+
+    private void indexAssociation(Node assocNode, String roleTypeUri1, Node playerNode1,
+                                                  String roleTypeUri2, Node playerNode2) {
+        assocMetadata.add(assocNode, KEY_ASSOC_TPYE_URI, typeUri(assocNode));
+        // role 1
+        assocMetadata.add(assocNode, KEY_ROLE_TPYE_URI_1, roleTypeUri1);
+        assocMetadata.add(assocNode, KEY_PLAYER_TPYE_1, NodeType.of(playerNode1).stringify());
+        assocMetadata.add(assocNode, KEY_PLAYER_ID_1, playerNode1.getId());
+        assocMetadata.add(assocNode, KEY_PLAYER_TYPE_URI_1, typeUri(playerNode1));
+        // role 2
+        assocMetadata.add(assocNode, KEY_ROLE_TPYE_URI_2, roleTypeUri2);
+        assocMetadata.add(assocNode, KEY_PLAYER_TPYE_2, NodeType.of(playerNode2).stringify());
+        assocMetadata.add(assocNode, KEY_PLAYER_ID_2, playerNode2.getId());
+        assocMetadata.add(assocNode, KEY_PLAYER_TYPE_URI_2, typeUri(playerNode2));
+    }
+
+    private Query buildAssociationQuery(String assocTypeUri,
+                                     String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
+                                     String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
+        BooleanQuery query = new BooleanQuery();
+        //
+        if (assocTypeUri != null) {
+            query.add(new TermQuery(new Term(KEY_ASSOC_TPYE_URI, assocTypeUri)), Occur.MUST);
+        }
+        // role 1
+        if (roleTypeUri1 != null) {
+            query.add(new TermQuery(new Term(KEY_ROLE_TPYE_URI_1, roleTypeUri1)), Occur.MUST);
+        }
+        if (playerType1 != null) {
+            query.add(new TermQuery(new Term(KEY_PLAYER_TPYE_1, playerType1.stringify())), Occur.MUST);
+        }
+        if (playerId1 != -1) {
+            query.add(new TermQuery(new Term(KEY_PLAYER_ID_1, Long.toString(playerId1))), Occur.MUST);
+        }
+        if (playerTypeUri1 != null) {
+            query.add(new TermQuery(new Term(KEY_PLAYER_TYPE_URI_1, playerTypeUri1)), Occur.MUST);
+        }
+        // role 2
+        if (roleTypeUri2 != null) {
+            query.add(new TermQuery(new Term(KEY_ROLE_TPYE_URI_2, roleTypeUri2)), Occur.MUST);
+        }
+        if (playerType2 != null) {
+            query.add(new TermQuery(new Term(KEY_PLAYER_TPYE_2, playerType2.stringify())), Occur.MUST);
+        }
+        if (playerId2 != -1) {
+            query.add(new TermQuery(new Term(KEY_PLAYER_ID_2, Long.toString(playerId2))), Occur.MUST);
+        }
+        if (playerTypeUri2 != null) {
+            query.add(new TermQuery(new Term(KEY_PLAYER_TYPE_URI_2, playerTypeUri2)), Occur.MUST);
+        }
+        //
+        return query;
+    }
+
+    // ---
+
+    private Index<Node> createExactIndex(String name) {
+        return neo4j.index().forNodes(name);
+    }
+
+    private Index<Node> createFulltextIndex(String name) {
+        if (neo4j.index().existsForNodes(name)) {
+            return neo4j.index().forNodes(name);
+        } else {
+            Map<String, String> configuration = stringMap(IndexManager.PROVIDER, "lucene", "type", "fulltext");
+            return neo4j.index().forNodes(name, configuration);
         }
     }
 }

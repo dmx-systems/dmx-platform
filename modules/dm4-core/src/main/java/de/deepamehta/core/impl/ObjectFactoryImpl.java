@@ -298,7 +298,7 @@ class ObjectFactoryImpl implements ObjectFactory {
             }
             return dataType;
         } catch (Exception e) {
-            throw new RuntimeException("Fetching the data type topic for " + className + " \"" + typeUri + "\" failed",
+            throw new RuntimeException("Fetching the data type topic of " + className + " \"" + typeUri + "\" failed",
                 e);
         }
     }

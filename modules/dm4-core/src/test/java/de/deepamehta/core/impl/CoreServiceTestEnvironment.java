@@ -33,35 +33,32 @@ public class CoreServiceTestEnvironment {
 
     @Before
     public void setUp() {
-        try {
-            logger.info("Setting up test DB");
-            dbPath = JavaUtils.createTempDirectory("dm4-");
-            DeepaMehtaStorage mehtaGraph = openDB(dbPath.getAbsolutePath());
-            dms = new EmbeddedService(new StorageDecorator(mehtaGraph), null);
-            dms.setupDB();
-        } catch (Exception e) {
-            throw new RuntimeException("Setting up test DB failed", e);
-        }
+        dbPath = JavaUtils.createTempDirectory("dm4-");
+        DeepaMehtaStorage storage = accessStorage(dbPath.getAbsolutePath());
+        dms = new EmbeddedService(new StorageDecorator(storage), null);
+        dms.setupDB();
     }
 
     @After
     public void tearDown() {
-        dms.shutdown();
+        if (dms != null) {
+            dms.shutdown();
+        }
         dbPath.delete();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // ### TODO: copied from CoreActivator
-    private DeepaMehtaStorage openDB(String databasePath) {
+    private DeepaMehtaStorage accessStorage(String databasePath) {
         try {
-            // ### TODO: wording
-            logger.info("Instantiating the MehtaGraph storage engine\n    databasePath=\"" + databasePath +
+            logger.info("Accessing the storage layer\n    databasePath=\"" + databasePath +
                 "\"\n    databaseFactory=\"" + DATABASE_FACTORY + "\"");
             MehtaGraphFactory factory = (MehtaGraphFactory) Class.forName(DATABASE_FACTORY).newInstance();
             return factory.createInstance(databasePath);
         } catch (Exception e) {
-            throw new RuntimeException("Instantiating the MehtaGraph storage engine failed", e);
+            throw new RuntimeException("Accessing the storage layer failed (databasePath=\"" + databasePath +
+                "\", databaseFactory=\"" + DATABASE_FACTORY + "\"", e);
         }
     }
 }
