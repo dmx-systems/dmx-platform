@@ -3,7 +3,7 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.util.JavaUtils;
 
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
-import de.deepamehta.core.storage.spi.MehtaGraphFactory;
+import de.deepamehta.core.storage.spi.DeepaMehtaStorageFactory;
 
 import org.junit.After;
 import org.junit.Before;
@@ -18,7 +18,7 @@ public class CoreServiceTestEnvironment {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // ### TODO: drop this. Register as OSGi service instead.
-    private static final String DATABASE_FACTORY = "de.deepamehta.storage.neo4j.Neo4jMehtaGraphFactory";
+    private static final String DATABASE_FACTORY = "de.deepamehta.storage.neo4j.Neo4jStorageFactory";
     // ### TODO: enable property access
     // System.getProperty("dm4.database.factory");
 
@@ -34,7 +34,7 @@ public class CoreServiceTestEnvironment {
     @Before
     public void setUp() {
         dbPath = JavaUtils.createTempDirectory("dm4-");
-        DeepaMehtaStorage storage = accessStorage(dbPath.getAbsolutePath());
+        DeepaMehtaStorage storage = openDB(dbPath.getAbsolutePath());
         dms = new EmbeddedService(new StorageDecorator(storage), null);
         dms.setupDB();
     }
@@ -50,14 +50,14 @@ public class CoreServiceTestEnvironment {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // ### TODO: copied from CoreActivator
-    private DeepaMehtaStorage accessStorage(String databasePath) {
+    private DeepaMehtaStorage openDB(String databasePath) {
         try {
-            logger.info("Accessing the storage layer\n    databasePath=\"" + databasePath +
+            logger.info("Instantiating the storage layer\n    databasePath=\"" + databasePath +
                 "\"\n    databaseFactory=\"" + DATABASE_FACTORY + "\"");
-            MehtaGraphFactory factory = (MehtaGraphFactory) Class.forName(DATABASE_FACTORY).newInstance();
+            DeepaMehtaStorageFactory factory = (DeepaMehtaStorageFactory) Class.forName(DATABASE_FACTORY).newInstance();
             return factory.createInstance(databasePath);
         } catch (Exception e) {
-            throw new RuntimeException("Accessing the storage layer failed (databasePath=\"" + databasePath +
+            throw new RuntimeException("Instantiating the storage layer failed (databasePath=\"" + databasePath +
                 "\", databaseFactory=\"" + DATABASE_FACTORY + "\"", e);
         }
     }

@@ -106,24 +106,6 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // === Topics ===
 
     @Override
-    public void storeTopic(TopicModel topicModel) {
-        String uri = topicModel.getUri();
-        checkUriUniqueness(uri);
-        //
-        // 1) update DB
-        Node topicNode = neo4j.createNode();
-        topicNode.setProperty("node_type", "topic");
-        //
-        storeAndIndexTopicUri(topicNode, uri);
-        storeAndIndexTopicTypeUri(topicNode, topicModel.getTypeUri());
-        //
-        // 2) update model
-        topicModel.setId(topicNode.getId());
-    }
-
-    // ---
-
-    @Override
     public TopicModel fetchTopic(long topicId) {
         return buildTopic(fetchTopicNode(topicId));
     }
@@ -169,11 +151,27 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public void storeTopicValue(long topicId, SimpleValue value, Set<IndexMode> indexModes, String indexKey) {
+    public void storeTopicValue(long topicId, SimpleValue value, Collection<IndexMode> indexModes, String indexKey) {
         storeAndIndexTopicValue(fetchTopicNode(topicId), value.value(), indexModes, indexKey);
     }
 
     // ---
+
+    @Override
+    public void storeTopic(TopicModel topicModel) {
+        String uri = topicModel.getUri();
+        checkUriUniqueness(uri);
+        //
+        // 1) update DB
+        Node topicNode = neo4j.createNode();
+        topicNode.setProperty("node_type", "topic");
+        //
+        storeAndIndexTopicUri(topicNode, uri);
+        storeAndIndexTopicTypeUri(topicNode, topicModel.getTypeUri());
+        //
+        // 2) update model
+        topicModel.setId(topicNode.getId());
+    }
 
     @Override
     public void deleteTopic(long topicId) {
@@ -183,31 +181,6 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
 
     // === Associations ===
-
-    @Override
-    public void storeAssociation(AssociationModel assocModel) {
-        String uri = assocModel.getUri();
-        checkUriUniqueness(uri);
-        //
-        // 1) update DB
-        Node assocNode = neo4j.createNode();
-        assocNode.setProperty("node_type", "assoc");
-        //
-        storeAndIndexAssociationUri(assocNode, uri);
-        storeAndIndexAssociationTypeUri(assocNode, assocModel.getTypeUri());
-        //
-        RoleModel role1 = assocModel.getRoleModel1();
-        RoleModel role2 = assocModel.getRoleModel2();
-        Node playerNode1 = storePlayerRelationship(assocNode, role1);
-        Node playerNode2 = storePlayerRelationship(assocNode, role2);
-        //
-        indexAssociation(assocNode, role1.getRoleTypeUri(), playerNode1, role2.getRoleTypeUri(), playerNode2);
-        //
-        // 2) update model
-        assocModel.setId(assocNode.getId());
-    }
-
-    // ---
 
     @Override
     public AssociationModel fetchAssociation(long assocId) {
@@ -250,7 +223,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public void storeAssociationValue(long assocId, SimpleValue value, Set<IndexMode> indexModes, String indexKey) {
+    public void storeAssociationValue(long assocId, SimpleValue value, Collection<IndexMode> indexModes,
+                                                                                      String indexKey) {
         storeAndIndexAssociationValue(fetchAssociationNode(assocId), value.value(), indexModes, indexKey);
     }
 
@@ -262,6 +236,33 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     // ---
+
+    @Override
+    public void storeAssociation(AssociationModel assocModel) {
+        String uri = assocModel.getUri();
+        checkUriUniqueness(uri);
+        //
+        // 1) update DB
+        Node assocNode = neo4j.createNode();
+        assocNode.setProperty("node_type", "assoc");
+        //
+        storeAndIndexAssociationUri(assocNode, uri);
+        storeAndIndexAssociationTypeUri(assocNode, assocModel.getTypeUri());
+        //
+        RoleModel role1 = assocModel.getRoleModel1();
+        RoleModel role2 = assocModel.getRoleModel2();
+        Node playerNode1 = storePlayerRelationship(assocNode, role1);
+        Node playerNode2 = storePlayerRelationship(assocNode, role2);
+        //
+        // index for bidirectional retrieval
+        String roleTypeUri1 = role1.getRoleTypeUri();
+        String roleTypeUri2 = role2.getRoleTypeUri();
+        indexAssociation(assocNode, roleTypeUri1, playerNode1, roleTypeUri2, playerNode2);
+        indexAssociation(assocNode, roleTypeUri2, playerNode2, roleTypeUri1, playerNode1);
+        //
+        // 2) update model
+        assocModel.setId(assocNode.getId());
+    }
 
     @Override
     public void deleteAssociation(long assocId) {
@@ -646,13 +647,13 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---
 
-    private void storeAndIndexTopicValue(Node topicNode, Object value, Set<IndexMode> indexModes,
+    private void storeAndIndexTopicValue(Node topicNode, Object value, Collection<IndexMode> indexModes,
                                                                        String indexKey) {
         topicNode.setProperty("value", value);
         indexNodeValue(topicNode, value, indexModes, indexKey, topicContentExact, topicContentFulltext);
     }
 
-    private void storeAndIndexAssociationValue(Node assocNode, Object value, Set<IndexMode> indexModes,
+    private void storeAndIndexAssociationValue(Node assocNode, Object value, Collection<IndexMode> indexModes,
                                                                              String indexKey) {
         assocNode.setProperty("value", value);
         indexNodeValue(assocNode, value, indexModes, indexKey, assocContentExact, assocContentFulltext);
@@ -708,37 +709,23 @@ public class Neo4jStorage implements DeepaMehtaStorage {
                                      String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
         BooleanQuery query = new BooleanQuery();
         //
-        if (assocTypeUri != null) {
-            query.add(new TermQuery(new Term(KEY_ASSOC_TPYE_URI, assocTypeUri)), Occur.MUST);
-        }
+        if (assocTypeUri != null)   addTermQuery(KEY_ASSOC_TPYE_URI,    assocTypeUri,             query);
         // role 1
-        if (roleTypeUri1 != null) {
-            query.add(new TermQuery(new Term(KEY_ROLE_TPYE_URI_1, roleTypeUri1)), Occur.MUST);
-        }
-        if (playerType1 != null) {
-            query.add(new TermQuery(new Term(KEY_PLAYER_TPYE_1, playerType1.stringify())), Occur.MUST);
-        }
-        if (playerId1 != -1) {
-            query.add(new TermQuery(new Term(KEY_PLAYER_ID_1, Long.toString(playerId1))), Occur.MUST);
-        }
-        if (playerTypeUri1 != null) {
-            query.add(new TermQuery(new Term(KEY_PLAYER_TYPE_URI_1, playerTypeUri1)), Occur.MUST);
-        }
+        if (roleTypeUri1 != null)   addTermQuery(KEY_ROLE_TPYE_URI_1,   roleTypeUri1,             query);
+        if (playerType1 != null)    addTermQuery(KEY_PLAYER_TPYE_1,     playerType1.stringify(),  query);
+        if (playerId1 != -1)        addTermQuery(KEY_PLAYER_ID_1,       Long.toString(playerId1), query);
+        if (playerTypeUri1 != null) addTermQuery(KEY_PLAYER_TYPE_URI_1, playerTypeUri1,           query);
         // role 2
-        if (roleTypeUri2 != null) {
-            query.add(new TermQuery(new Term(KEY_ROLE_TPYE_URI_2, roleTypeUri2)), Occur.MUST);
-        }
-        if (playerType2 != null) {
-            query.add(new TermQuery(new Term(KEY_PLAYER_TPYE_2, playerType2.stringify())), Occur.MUST);
-        }
-        if (playerId2 != -1) {
-            query.add(new TermQuery(new Term(KEY_PLAYER_ID_2, Long.toString(playerId2))), Occur.MUST);
-        }
-        if (playerTypeUri2 != null) {
-            query.add(new TermQuery(new Term(KEY_PLAYER_TYPE_URI_2, playerTypeUri2)), Occur.MUST);
-        }
+        if (roleTypeUri2 != null)   addTermQuery(KEY_ROLE_TPYE_URI_2,   roleTypeUri2,             query);
+        if (playerType2 != null)    addTermQuery(KEY_PLAYER_TPYE_2,     playerType2.stringify(),  query);
+        if (playerId2 != -1)        addTermQuery(KEY_PLAYER_ID_2,       Long.toString(playerId2), query);
+        if (playerTypeUri2 != null) addTermQuery(KEY_PLAYER_TYPE_URI_2, playerTypeUri2,           query);
         //
         return query;
+    }
+
+    private void addTermQuery(String key, String value, BooleanQuery query) {
+        query.add(new TermQuery(new Term(key, value)), Occur.MUST);
     }
 
     // ---
