@@ -199,8 +199,7 @@ public abstract class TypeModel extends TopicModel {
     public String toString() {
         return "id=" + id + ", uri=\"" + uri + "\", value=\"" + value + "\", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + getDataTypeUri() + "\", indexModes=" + getIndexModes() + ", assocDefs=" +
-            getAssocDefs() + ", labelConfig=" + getLabelConfig() + ",\n    topic type " + getViewConfigModel();
-        // ### FIXME: "topic type" is not generic wording
+            getAssocDefs() + ", labelConfig=" + getLabelConfig() + ", " + getViewConfigModel();
     }
 
 
@@ -218,7 +217,8 @@ public abstract class TypeModel extends TopicModel {
         JSONArray assocDefs = typeModel.optJSONArray("assoc_defs");
         if (assocDefs != null) {
             for (int i = 0; i < assocDefs.length(); i++) {
-                addAssocDef(new AssociationDefinitionModel(assocDefs.getJSONObject(i), this.uri));
+                JSONObject assocDef = assocDefs.getJSONObject(i);
+                addAssocDef(AssociationDefinitionModel.fromJSON(assocDef, this.uri));
             }
         }
     }

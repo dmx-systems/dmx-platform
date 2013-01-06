@@ -414,9 +414,12 @@ class ObjectFactoryImpl implements ObjectFactory {
                                                                                      String partTypeUri) {
         try {
             long assocId = assoc.getId();
-            return new AssociationDefinitionModel(assocId, assoc.getTypeUri(), wholeTypeUri, partTypeUri,
+            return new AssociationDefinitionModel(
+                assocId, assoc.getUri(), assoc.getTypeUri(),
+                wholeTypeUri, partTypeUri,
                 fetchWholeCardinality(assocId).getUri(), fetchPartCardinality(assocId).getUri(),
-                fetchAssocDefViewConfig(assoc));
+                fetchAssocDefViewConfig(assoc)
+            );
         } catch (Exception e) {
             throw new RuntimeException("Fetching association definition failed (wholeTypeUri=\"" + wholeTypeUri +
                 "\", partTypeUri=" + partTypeUri + ", " + assoc + ")", e);

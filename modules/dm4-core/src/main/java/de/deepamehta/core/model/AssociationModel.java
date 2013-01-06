@@ -36,13 +36,8 @@ public class AssociationModel extends DeepaMehtaObjectModel {
         this(-1, null, typeUri, roleModel1, roleModel2, null, composite);
     }
 
-    // ### TODO: drop this
-    public AssociationModel(long id, String typeUri) {
-        super(id, typeUri);
-    }
-
-    public AssociationModel(long id, String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
-        this(id, null, typeUri, roleModel1, roleModel2, null, null);
+    public AssociationModel(long id, String uri, String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
+        this(id, uri, typeUri, roleModel1, roleModel2, null, null);
     }
 
     public AssociationModel(long id, String uri, String typeUri, RoleModel roleModel1, RoleModel roleModel2,
@@ -53,7 +48,7 @@ public class AssociationModel extends DeepaMehtaObjectModel {
     }
 
     public AssociationModel(AssociationModel model) {
-        this(model.getId(), model.getTypeUri(), model.getRoleModel1(), model.getRoleModel2());
+        this(model.getId(), model.getUri(), model.getTypeUri(), model.getRoleModel1(), model.getRoleModel2());
     }
 
     public AssociationModel(JSONObject assocModel) {
@@ -78,16 +73,6 @@ public class AssociationModel extends DeepaMehtaObjectModel {
 
     public RoleModel getRoleModel2() {
         return roleModel2;
-    }
-
-    // ---
-
-    public void setRoleModel1(RoleModel roleModel) {
-        this.roleModel1 = roleModel;
-    }
-
-    public void setRoleModel2(RoleModel roleModel) {
-        this.roleModel2 = roleModel;
     }
 
     // --- Convenience Methods ---
@@ -158,7 +143,7 @@ public class AssociationModel extends DeepaMehtaObjectModel {
 
     @Override
     public String toString() {
-        return "association (" + super.toString() + ", roleModel1=" + roleModel1 + ", roleModel2=" + roleModel2 + ")";
+        return "association (" + super.toString() + "," + roleModel1 + "," + roleModel2 + ")";
     }
 
 

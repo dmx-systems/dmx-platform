@@ -738,8 +738,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             }
             return childTopic;
         } catch (Exception e) {
-            throw new RuntimeException("Storing child topic value failed (parentTopic=" + this +
-                ",\nassocDefUri=" + assocDefUri + ",\nvalue=\"" + value + "\")", e);
+            throw new RuntimeException("Storing child topic value failed (assocDefUri=\"" + assocDefUri +
+                "\", value=\"" + value + "\", parentTopic=" + this + ")", e);
         }
     }
 

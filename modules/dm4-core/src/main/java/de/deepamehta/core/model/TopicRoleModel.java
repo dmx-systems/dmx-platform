@@ -117,7 +117,7 @@ public class TopicRoleModel extends RoleModel {
 
     @Override
     public String toString() {
-        return "\n        topic role (roleTypeUri=\"" + roleTypeUri + "\", playerId=" + playerId +
-            ", topicUri=\"" + topicUri + "\", topicIdentifiedByUri=" + topicIdentifiedByUri + ")";
+        String player = topicIdentifiedByUri ? "topicUri=\"" + topicUri + "\"" : "playerId=" + playerId;
+        return "\n        topic role (roleTypeUri=\"" + roleTypeUri + "\", " + player + ")";
     }
 }
