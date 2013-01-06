@@ -6,7 +6,7 @@ import de.deepamehta.core.impl.WebPublishingService;
 import de.deepamehta.core.service.DeepaMehtaService;
 
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
-import de.deepamehta.core.storage.spi.MehtaGraphFactory;
+import de.deepamehta.core.storage.spi.DeepaMehtaStorageFactory;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
@@ -87,16 +87,16 @@ public class CoreActivator implements BundleActivator {
     private DeepaMehtaStorage openDB() {
         try {
             // ### TODO: wording
-            logger.info("Instantiating the MehtaGraph storage engine\n    " +
+            logger.info("Instantiating the storage layer\n    " +
                 "dm4.database.path=\"" + DATABASE_PATH + "\"\n    " +
                 "dm4.database.bundle=\"" + DATABASE_BUNDLE + "\"\n    " +
                 "dm4.database.factory=\"" + DATABASE_FACTORY + "\"");
             // Note: we must load the factory class through the storage provider bundle's class loader
             Class factoryClass = getBundle(DATABASE_BUNDLE).loadClass(DATABASE_FACTORY);
-            MehtaGraphFactory factory = (MehtaGraphFactory) factoryClass.newInstance();
+            DeepaMehtaStorageFactory factory = (DeepaMehtaStorageFactory) factoryClass.newInstance();
             return factory.createInstance(DATABASE_PATH);
         } catch (Exception e) {
-            throw new RuntimeException("Instantiating the MehtaGraph storage engine failed", e);
+            throw new RuntimeException("Instantiating the storage layer failed", e);
         }
     }
 

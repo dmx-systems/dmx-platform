@@ -1,12 +1,12 @@
 package de.deepamehta.storage.neo4j;
 
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
-import de.deepamehta.core.storage.spi.MehtaGraphFactory;
+import de.deepamehta.core.storage.spi.DeepaMehtaStorageFactory;
 
 
 
 // ### TODO: drop this. Register as OSGi service instead.
-public class Neo4jMehtaGraphFactory implements MehtaGraphFactory {
+public class Neo4jStorageFactory implements DeepaMehtaStorageFactory {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 

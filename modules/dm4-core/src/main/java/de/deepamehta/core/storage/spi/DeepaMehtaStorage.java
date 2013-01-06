@@ -7,6 +7,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -24,26 +25,31 @@ public interface DeepaMehtaStorage {
 
     // === Topics ===
 
-    void storeTopic(TopicModel topicModel);
-
     TopicModel fetchTopic(long id);
+
     TopicModel fetchTopic(String key, Object value);
 
     List<TopicModel> fetchTopics(String key, Object value);
 
     List<TopicModel> queryTopics(Object value);
+
     List<TopicModel> queryTopics(String key, Object value);
 
+    // ---
+
     void storeTopicUri(long topicId, String uri);
-    void storeTopicValue(long topicId, SimpleValue value, Set<IndexMode> indexModes, String indexKey);
+
+    void storeTopicValue(long topicId, SimpleValue value, Collection<IndexMode> indexModes, String indexKey);
+
+    // ---
+
+    void storeTopic(TopicModel topicModel);
 
     void deleteTopic(long topicId);
 
 
 
     // === Associations ===
-
-    void storeAssociation(AssociationModel assocModel);
 
     AssociationModel fetchAssociation(long id);
 
@@ -56,9 +62,13 @@ public interface DeepaMehtaStorage {
     // ---
 
     void storeAssociationUri(long assocId, String uri);
-    void storeAssociationValue(long assocId, SimpleValue value, Set<IndexMode> indexModes, String indexKey);
+    void storeAssociationValue(long assocId, SimpleValue value, Collection<IndexMode> indexModes, String indexKey);
 
     void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri);
+
+    // ---
+
+    void storeAssociation(AssociationModel assocModel);
 
     void deleteAssociation(long assocId);
 
