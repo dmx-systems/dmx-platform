@@ -458,7 +458,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     private void updateCompositeValue(CompositeValue newComp, ClientState clientState, Directives directives) {
         try {
             for (AssociationDefinition assocDef : getType().getAssocDefs()) {
-                String assocDefUri    = assocDef.getUri();
+                String assocDefUri    = assocDef.getPartTypeUri();
                 String cardinalityUri = assocDef.getPartCardinalityUri();
                 TopicModel newChildTopic        = null;     // only used for "one"
                 List<TopicModel> newChildTopics = null;     // only used for "many"
@@ -650,11 +650,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 if (cardinalityUri.equals("dm4.core.one")) {
                     Topic childTopic = fetchChildTopic(assocDef, true);             // fetchComposite=true
                     if (childTopic != null) {
-                        comp.put(assocDef.getUri(), childTopic.getModel());
+                        comp.put(assocDef.getPartTypeUri(), childTopic.getModel());
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
                     for (Topic childTopic : fetchChildTopics(assocDef, true)) {     // fetchComposite=true
-                        comp.add(assocDef.getUri(), childTopic.getModel());
+                        comp.add(assocDef.getPartTypeUri(), childTopic.getModel());
                     }
                 } else {
                     throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
@@ -923,21 +923,21 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      * For single-valued childs
      */
     private void putInCompositeModel(AssociationDefinition assocDef, Topic topic) {
-        getCompositeValue().put(assocDef.getUri(), topic.getModel());
+        getCompositeValue().put(assocDef.getPartTypeUri(), topic.getModel());
     }
 
     /**
      * For multiple-valued childs
      */
     private void addToCompositeModel(AssociationDefinition assocDef, Topic topic) {
-        getCompositeValue().add(assocDef.getUri(), topic.getModel());
+        getCompositeValue().add(assocDef.getPartTypeUri(), topic.getModel());
     }
 
     /**
      * For multiple-valued childs
      */
     private void removeFromCompositeModel(AssociationDefinition assocDef, Topic topic) {
-        getCompositeValue().remove(assocDef.getUri(), topic.getModel());
+        getCompositeValue().remove(assocDef.getPartTypeUri(), topic.getModel());
     }
 
     /**

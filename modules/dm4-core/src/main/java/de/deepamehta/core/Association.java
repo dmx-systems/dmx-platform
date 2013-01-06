@@ -48,5 +48,7 @@ public interface Association extends DeepaMehtaObject {
 
     // ---
 
+    // ### TODO: move to DeepaMehtaObject
+    // ### TODO: add "othersAssocTypeUri" argument
     RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri);
 }

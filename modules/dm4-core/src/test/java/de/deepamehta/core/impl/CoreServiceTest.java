@@ -1,8 +1,10 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.AssociationDefinition;
+import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.Type;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
@@ -10,10 +12,12 @@ import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -21,19 +25,18 @@ import org.junit.Test;
 public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
-    public void getTopicType() {
+    public void typeDefinition() {
         TopicType topicType = dms.getTopicType("dm4.core.plugin", null);  // clientState=null
         assertEquals("dm4.core.plugin",     topicType.getUri());
         assertEquals("dm4.core.topic_type", topicType.getTypeUri());
         assertEquals("dm4.core.composite",  topicType.getDataTypeUri());
         assertEquals(3,                     topicType.getAssocDefs().size());
         AssociationDefinition assocDef =    topicType.getAssocDef("dm4.core.plugin_migration_nr");
+        assertEquals("dm4.core.composition_def",     assocDef.getTypeUri());
         assertEquals("dm4.core.plugin",              assocDef.getWholeTypeUri());
         assertEquals("dm4.core.plugin_migration_nr", assocDef.getPartTypeUri());
-        assertEquals("dm4.core.plugin_migration_nr", assocDef.getUri());
         assertEquals("dm4.core.one",                 assocDef.getWholeCardinalityUri());
         assertEquals("dm4.core.one",                 assocDef.getPartCardinalityUri());
-        assertEquals("dm4.core.composition_def",     assocDef.getTypeUri());
         assertEquals("dm4.core.whole",               assocDef.getWholeRoleTypeUri());
         assertEquals("dm4.core.part",                assocDef.getPartRoleTypeUri());
         Topic t1 = assocDef.getTopic("dm4.core.whole_type");
@@ -95,4 +98,34 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             tx.finish();
         }
     }
+
+    @Test
+    public void assocDefSequence() {
+        Type type = dms.getTopicType("dm4.core.plugin", null);  // clientState=null
+        //
+        // find assoc def 1/3
+        RelatedAssociation assocDef = type.getRelatedAssociation("dm4.core.aggregation", "dm4.core.type",
+            "dm4.core.sequence_start", null, false, false);     // othersAssocTypeUri=null
+        logger.info("### assoc def ID 1/3 = " + assocDef.getId() +
+            ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
+        assertNotNull(assocDef);
+        //
+        // find assoc def 2/3
+        assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor");
+        logger.info("### assoc def ID 2/3 = " + assocDef.getId() +
+            ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
+        assertNotNull(assocDef);
+        //
+        // find assoc def 3/3
+        assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor");
+        logger.info("### assoc def ID 3/3 = " + assocDef.getId() +
+            ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
+        assertNotNull(assocDef);
+        //
+        // there is no other
+        assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor");
+        assertNull(assocDef);
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
 }

@@ -20,4 +20,11 @@ public class RelatedAssociationModel extends AssociationModel {
     public AssociationModel getRelatingAssociationModel() {
         return relatingAssoc;
     }
+
+    // === Java API ===
+
+    @Override
+    public String toString() {
+        return super.toString() + ", relating " + relatingAssoc;
+    }
 }

@@ -48,16 +48,11 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // association metadata
     private static final String KEY_ASSOC_TPYE_URI = "assoc_type_uri";
-    // role 1
-    private static final String KEY_ROLE_TPYE_URI_1   = "role_type_uri_1";
-    private static final String KEY_PLAYER_TPYE_1     = "player_type_1";
-    private static final String KEY_PLAYER_ID_1       = "player_id_1";
-    private static final String KEY_PLAYER_TYPE_URI_1 = "player_type_uri_1";
-    // role 2
-    private static final String KEY_ROLE_TPYE_URI_2   = "role_type_uri_2";
-    private static final String KEY_PLAYER_TPYE_2     = "player_type_2";
-    private static final String KEY_PLAYER_ID_2       = "player_id_2";
-    private static final String KEY_PLAYER_TYPE_URI_2 = "player_type_uri_2";
+    // role
+    private static final String KEY_ROLE_TPYE_URI   = "role_type_uri_";     // "1" or "2" is appended programatically
+    private static final String KEY_PLAYER_TPYE     = "player_type_";       // "1" or "2" is appended programatically
+    private static final String KEY_PLAYER_ID       = "player_id_";         // "1" or "2" is appended programatically
+    private static final String KEY_PLAYER_TYPE_URI = "player_type_uri_";   // "1" or "2" is appended programatically
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -254,12 +249,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         Node playerNode1 = storePlayerRelationship(assocNode, role1);
         Node playerNode2 = storePlayerRelationship(assocNode, role2);
         //
-        // index for bidirectional retrieval
-        String roleTypeUri1 = role1.getRoleTypeUri();
-        String roleTypeUri2 = role2.getRoleTypeUri();
-        indexAssociation(assocNode, roleTypeUri1, playerNode1, roleTypeUri2, playerNode2);
-        indexAssociation(assocNode, roleTypeUri2, playerNode2, roleTypeUri1, playerNode1);
-        //
+        indexAssociation(assocNode, role1.getRoleTypeUri(), playerNode1,
+                                    role2.getRoleTypeUri(), playerNode2);
         // 2) update model
         assocModel.setId(assocNode.getId());
     }
@@ -688,42 +679,57 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         }
     }
 
+    // ---
 
     private void indexAssociation(Node assocNode, String roleTypeUri1, Node playerNode1,
                                                   String roleTypeUri2, Node playerNode2) {
         assocMetadata.add(assocNode, KEY_ASSOC_TPYE_URI, typeUri(assocNode));
-        // role 1
-        assocMetadata.add(assocNode, KEY_ROLE_TPYE_URI_1, roleTypeUri1);
-        assocMetadata.add(assocNode, KEY_PLAYER_TPYE_1, NodeType.of(playerNode1).stringify());
-        assocMetadata.add(assocNode, KEY_PLAYER_ID_1, playerNode1.getId());
-        assocMetadata.add(assocNode, KEY_PLAYER_TYPE_URI_1, typeUri(playerNode1));
-        // role 2
-        assocMetadata.add(assocNode, KEY_ROLE_TPYE_URI_2, roleTypeUri2);
-        assocMetadata.add(assocNode, KEY_PLAYER_TPYE_2, NodeType.of(playerNode2).stringify());
-        assocMetadata.add(assocNode, KEY_PLAYER_ID_2, playerNode2.getId());
-        assocMetadata.add(assocNode, KEY_PLAYER_TYPE_URI_2, typeUri(playerNode2));
+        //
+        indexRole(assocNode, 1, roleTypeUri1, playerNode1);
+        indexRole(assocNode, 2, roleTypeUri2, playerNode2);
     }
+
+    private void indexRole(Node assocNode, int nr, String roleTypeUri, Node playerNode) {
+        assocMetadata.add(assocNode, KEY_ROLE_TPYE_URI + nr, roleTypeUri);
+        assocMetadata.add(assocNode, KEY_PLAYER_TPYE + nr, NodeType.of(playerNode).stringify());
+        assocMetadata.add(assocNode, KEY_PLAYER_ID + nr, playerNode.getId());
+        assocMetadata.add(assocNode, KEY_PLAYER_TYPE_URI + nr, typeUri(playerNode));
+    }
+
+    // ---
 
     private Query buildAssociationQuery(String assocTypeUri,
                                      String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
                                      String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
-        BooleanQuery query = new BooleanQuery();
+        // query bidirectional
+        BooleanQuery direction1 = new BooleanQuery();
+        addRole(direction1, 1, roleTypeUri1, playerType1, playerId1, playerTypeUri1);
+        addRole(direction1, 2, roleTypeUri2, playerType2, playerId2, playerTypeUri2);
+        BooleanQuery direction2 = new BooleanQuery();
+        addRole(direction2, 1, roleTypeUri2, playerType2, playerId2, playerTypeUri2);
+        addRole(direction2, 2, roleTypeUri1, playerType1, playerId1, playerTypeUri1);
         //
-        if (assocTypeUri != null)   addTermQuery(KEY_ASSOC_TPYE_URI,    assocTypeUri,             query);
-        // role 1
-        if (roleTypeUri1 != null)   addTermQuery(KEY_ROLE_TPYE_URI_1,   roleTypeUri1,             query);
-        if (playerType1 != null)    addTermQuery(KEY_PLAYER_TPYE_1,     playerType1.stringify(),  query);
-        if (playerId1 != -1)        addTermQuery(KEY_PLAYER_ID_1,       Long.toString(playerId1), query);
-        if (playerTypeUri1 != null) addTermQuery(KEY_PLAYER_TYPE_URI_1, playerTypeUri1,           query);
-        // role 2
-        if (roleTypeUri2 != null)   addTermQuery(KEY_ROLE_TPYE_URI_2,   roleTypeUri2,             query);
-        if (playerType2 != null)    addTermQuery(KEY_PLAYER_TPYE_2,     playerType2.stringify(),  query);
-        if (playerId2 != -1)        addTermQuery(KEY_PLAYER_ID_2,       Long.toString(playerId2), query);
-        if (playerTypeUri2 != null) addTermQuery(KEY_PLAYER_TYPE_URI_2, playerTypeUri2,           query);
+        BooleanQuery roleQuery = new BooleanQuery();
+        roleQuery.add(direction1, Occur.SHOULD);
+        roleQuery.add(direction2, Occur.SHOULD);
+        //
+        BooleanQuery query = new BooleanQuery();
+        if (assocTypeUri != null) {
+            addTermQuery(KEY_ASSOC_TPYE_URI, assocTypeUri, query);
+        }
+        query.add(roleQuery, Occur.MUST);
         //
         return query;
     }
 
+    private void addRole(BooleanQuery query, int nr, String roleTypeUri, NodeType playerType, long playerId,
+                                                                                              String playerTypeUri) {
+        if (roleTypeUri != null)   addTermQuery(KEY_ROLE_TPYE_URI + nr,   roleTypeUri,             query);
+        if (playerType != null)    addTermQuery(KEY_PLAYER_TPYE + nr,     playerType.stringify(),  query);
+        if (playerId != -1)        addTermQuery(KEY_PLAYER_ID + nr,       Long.toString(playerId), query);
+        if (playerTypeUri != null) addTermQuery(KEY_PLAYER_TYPE_URI + nr, playerTypeUri,           query);
+    }
+    
     private void addTermQuery(String key, String value, BooleanQuery query) {
         query.add(new TermQuery(new Term(key, value)), Occur.MUST);
     }

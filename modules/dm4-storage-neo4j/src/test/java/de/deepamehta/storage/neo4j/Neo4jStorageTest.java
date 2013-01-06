@@ -62,7 +62,7 @@ public class Neo4jStorageTest {
     }
 
     @Test
-    public void traversal() {
+    public void traverse() {
         TopicModel topic = storage.fetchTopic("uri", "dm4.core.data_type");
         assertNotNull(topic);
         //
@@ -76,7 +76,21 @@ public class Neo4jStorageTest {
     }
 
     @Test
-    public void traversalWithWideFilter() {
+    public void traverseBidirectional() {
+        TopicModel topic = storage.fetchTopic("uri", "dm4.core.topic_type");
+        assertNotNull(topic);
+        //
+        Set<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), "dm4.core.instantiation",
+            "dm4.core.type", "dm4.core.instance", "dm4.core.topic_type");
+        assertEquals(1, topics.size());
+        //
+        TopicModel type = topics.iterator().next();
+        assertEquals("dm4.core.data_type", type.getUri());
+        assertEquals("Data Type", type.getSimpleValue().toString());
+    }
+
+    @Test
+    public void traverseWithWideFilter() {
         TopicModel topic = storage.fetchTopic("uri", "dm4.core.data_type");
         assertNotNull(topic);
         //

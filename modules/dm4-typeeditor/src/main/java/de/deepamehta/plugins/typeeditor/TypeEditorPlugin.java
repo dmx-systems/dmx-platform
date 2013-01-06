@@ -63,8 +63,11 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         String partTypeUri = fetchPartType(assoc).getUri();
         // Note: the assoc def's ID is already known. Setting it explicitely
         // prevents the core from creating the underlying association.
-        AssociationDefinitionModel assocDef = new AssociationDefinitionModel(assoc.getId(), assoc.getTypeUri(),
-            wholeType.getUri(), partTypeUri, "dm4.core.one", "dm4.core.one", null);  // viewConfigModel=null;
+        AssociationDefinitionModel assocDef = new AssociationDefinitionModel(
+            assoc.getId(), assoc.getUri(), assoc.getTypeUri(),
+            wholeType.getUri(), partTypeUri, "dm4.core.one", "dm4.core.one",
+            null    // viewConfigModel=null
+        );
         logger.info("### Adding association definition \"" + partTypeUri + "\" to type \"" + wholeType.getUri() +
             "\" (" + assocDef + ")");
         //
@@ -76,7 +79,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
     private void updateAssocDef(Association assoc, Directives directives) {
         Type wholeType = fetchWholeType(assoc);
         AssociationDefinitionModel assocDef = dms.getObjectFactory().fetchAssociationDefinition(assoc);
-        logger.info("### Updating association definition \"" + assocDef.getUri() + "\" of type \"" +
+        logger.info("### Updating association definition \"" + assocDef.getPartTypeUri() + "\" of type \"" +
             wholeType.getUri() + "\" (" + assocDef + ")");
         //
         wholeType.updateAssocDef(assocDef);

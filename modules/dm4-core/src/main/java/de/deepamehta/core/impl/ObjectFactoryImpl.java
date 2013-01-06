@@ -470,7 +470,7 @@ class ObjectFactoryImpl implements ObjectFactory {
             //
             storeViewConfig(createConfigurableAssocDef(assocDefId), assocDef.getViewConfigModel());
         } catch (Exception e) {
-            throw new RuntimeException("Storing association definition \"" + assocDef.getUri() +
+            throw new RuntimeException("Storing association definition \"" + assocDef.getPartTypeUri() +
                 "\" of type \"" + assocDef.getWholeTypeUri() + "\" failed", e);
         }
     }
@@ -671,7 +671,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             RelatedTopicModel includeInLabel = fetchLabelConfigTopic(assocDef.getId());
             if (includeInLabel != null && includeInLabel.getSimpleValue().booleanValue()) {
-                labelConfig.add(assocDef.getUri());
+                labelConfig.add(assocDef.getPartTypeUri());
             }
         }
         return labelConfig;
@@ -686,7 +686,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
-            boolean includeInLabel = labelConfig.contains(assocDef.getUri());
+            boolean includeInLabel = labelConfig.contains(assocDef.getPartTypeUri());
             new AttachedAssociationDefinition(assocDef, dms).setChildTopicValue("dm4.core.include_in_label",
                 new SimpleValue(includeInLabel));
         }

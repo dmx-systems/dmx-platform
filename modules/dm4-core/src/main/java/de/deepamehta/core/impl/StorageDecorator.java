@@ -454,7 +454,8 @@ public class StorageDecorator {
         default:
             throw new RuntimeException("Ambiguity: there are " + assocs.size() + " related associations (assocId=" +
                 assocId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
-                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")");
+                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri +
+                "\"),\nresult=" + assocs);
         }
     }
 

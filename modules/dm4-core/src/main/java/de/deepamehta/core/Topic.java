@@ -33,8 +33,7 @@ public interface Topic extends DeepaMehtaObject {
 
     // --- Association Retrieval ---
 
-    // ### TODO: move this methods to DeepaMehtaObject.
-
+    // ### TODO: move to DeepaMehtaObject
     /**
      * @param   assocTypeUri        may be null
      * @param   myRoleTypeUri       may be null
@@ -44,6 +43,7 @@ public interface Topic extends DeepaMehtaObject {
     RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                      String othersAssocTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
 
+    // ### TODO: move to DeepaMehtaObject
     /**
      * @param   assocTypeUri        may be null
      * @param   myRoleTypeUri       may be null

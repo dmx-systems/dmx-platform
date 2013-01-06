@@ -105,13 +105,13 @@ public abstract class TypeModel extends TopicModel {
     }
 
     public void addAssocDef(AssociationDefinitionModel assocDef) {
-        String assocDefUri = assocDef.getUri();
         // error check ### FIXME: drop this check or provide proper feedback to the type editor user
         if (!getDataTypeUri().equals("dm4.core.composite")) {
             throw new RuntimeException("Association definitions can only be added to composite topic types. " +
                 "Topic type \"" + getUri() + "\" is of data type \"" + getDataTypeUri() + "\". (" + assocDef + ")");
         }
         // error check
+        String assocDefUri = assocDef.getPartTypeUri();
         AssociationDefinitionModel existing = assocDefs.get(assocDefUri);
         if (existing != null) {
             throw new RuntimeException("Schema ambiguity: topic type \"" + uri +
@@ -122,7 +122,7 @@ public abstract class TypeModel extends TopicModel {
     }
 
     public void updateAssocDef(AssociationDefinitionModel assocDef) {
-        assocDefs.put(assocDef.getUri(), assocDef);
+        assocDefs.put(assocDef.getPartTypeUri(), assocDef);
     }
 
     public AssociationDefinitionModel removeAssocDef(String assocDefUri) {

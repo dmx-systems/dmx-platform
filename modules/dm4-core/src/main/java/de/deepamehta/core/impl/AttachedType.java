@@ -229,7 +229,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     private void updateAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs, ClientState clientState,
                                                                                       Directives directives) {
         for (AssociationDefinitionModel assocDef : newAssocDefs) {
-            getAssocDef(assocDef.getUri()).update(assocDef, clientState, directives);
+            getAssocDef(assocDef.getPartTypeUri()).update(assocDef, clientState, directives);
         }
     }
 
@@ -259,7 +259,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         Iterator<AssociationDefinitionModel> i = newAssocDefs.iterator();
         for (AssociationDefinition assocDef : assocDefs) {
             AssociationDefinitionModel newAssocDef = i.next();
-            if (!assocDef.getUri().equals(newAssocDef.getUri())) {
+            if (!assocDef.getPartTypeUri().equals(newAssocDef.getPartTypeUri())) {
                 return true;
             }
         }
@@ -310,7 +310,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
      */
     private void _addAssocDef(AssociationDefinitionModel model) {
         AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(model, dms);
-        assocDefs.put(assocDef.getUri(), assocDef);
+        assocDefs.put(assocDef.getPartTypeUri(), assocDef);
     }
 
     private AttachedAssociationDefinition _removeAssocDef(String assocDefUri) {
