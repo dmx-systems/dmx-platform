@@ -680,8 +680,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      */
     private RelatedTopic fetchChildTopic(AssociationDefinition assocDef, boolean fetchComposite) {
         String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();
-        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();
+        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();  // ### TODO: use a constant
+        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();   // ### TODO: use a constant
         String othersTypeUri     = assocDef.getPartTypeUri();
         //
         return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTypeUri, fetchComposite,
@@ -692,8 +692,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     private ResultSet<RelatedTopic> fetchChildTopics(AssociationDefinition assocDef, boolean fetchComposite) {
         String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();
-        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();
+        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();  // ### TODO: use a constant
+        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();   // ### TODO: use a constant
         String othersTypeUri     = assocDef.getPartTypeUri();
         //
         return getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTypeUri, fetchComposite,
@@ -773,7 +773,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             //
             setSimpleValue(label);
         } catch (Exception e) {
-            throw new RuntimeException("Refreshing the " + className() + "'s label failed", e);
+            throw new RuntimeException("Refreshing the label of " + className() + " " + getId() + " failed", e);
         }
     }
 
@@ -905,15 +905,15 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     private void associateChildTopic(AssociationDefinition assocDef, long childTopicId, ClientState clientState) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
-            createRoleModel(assocDef.getWholeRoleTypeUri()),
-            new TopicRoleModel(childTopicId, assocDef.getPartRoleTypeUri()), clientState
+            createRoleModel(assocDef.getWholeRoleTypeUri()),                                // ### TODO: use a constant
+            new TopicRoleModel(childTopicId, assocDef.getPartRoleTypeUri()), clientState    // ### TODO: use a constant
         );
     }
 
     private void associateChildTopic(AssociationDefinition assocDef, String childTopicUri, ClientState clientState) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
-            createRoleModel(assocDef.getWholeRoleTypeUri()),
-            new TopicRoleModel(childTopicUri, assocDef.getPartRoleTypeUri()), clientState
+            createRoleModel(assocDef.getWholeRoleTypeUri()),                                // ### TODO: use a constant
+            new TopicRoleModel(childTopicUri, assocDef.getPartRoleTypeUri()), clientState   // ### TODO: use a constant
         );
     }
 

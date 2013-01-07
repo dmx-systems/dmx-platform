@@ -107,8 +107,8 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     private RelatedTopic fetchChildTopic(DeepaMehtaObject object, AssociationDefinition assocDef,
                                                                   boolean fetchComposite) {
         String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();
-        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();
+        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();  // ### TODO: use a constant
+        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();   // ### TODO: use a constant
         String othersTypeUri     = assocDef.getPartTypeUri();
         //
         return object.getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTypeUri, fetchComposite,
@@ -124,8 +124,8 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     private Set<RelatedTopic> fetchChildTopics(DeepaMehtaObject object, AssociationDefinition assocDef,
                                                                         boolean fetchComposite) {
         String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();
-        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();
+        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();  // ### TODO: use a constant
+        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();   // ### TODO: use a constant
         String othersTypeUri     = assocDef.getPartTypeUri();
         //
         return object.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTypeUri, fetchComposite,

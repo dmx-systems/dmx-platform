@@ -462,8 +462,8 @@ class ObjectFactoryImpl implements ObjectFactory {
             // Note: the assoc def ID is known only after creating the association
             long assocDefId = assocDef.getId();
             // role types
-            associateWholeRoleType(assocDefId, assocDef.getWholeRoleTypeUri());
-            associatePartRoleType(assocDefId, assocDef.getPartRoleTypeUri());
+            associateWholeRoleType(assocDefId, assocDef.getWholeRoleTypeUri()); // ### TODO: drop this
+            associatePartRoleType(assocDefId, assocDef.getPartRoleTypeUri());   // ### TODO: drop this
             // cardinality
             associateWholeCardinality(assocDefId, assocDef.getWholeCardinalityUri());
             associatePartCardinality(assocDefId, assocDef.getPartCardinalityUri());
@@ -509,12 +509,14 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // === Role Types ===
 
+    // ### TODO: drop this
     private void associateWholeRoleType(long assocDefId, String wholeRoleTypeUri) {
         dms.createAssociation("dm4.core.aggregation",
             new TopicRoleModel(wholeRoleTypeUri, "dm4.core.whole_role_type"),
             new AssociationRoleModel(assocDefId, "dm4.core.assoc_def"));
     }
 
+    // ### TODO: drop this
     private void associatePartRoleType(long assocDefId, String partRoleTypeUri) {
         dms.createAssociation("dm4.core.aggregation",
             new TopicRoleModel(partRoleTypeUri,  "dm4.core.part_role_type"),

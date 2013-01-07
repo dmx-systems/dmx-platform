@@ -38,7 +38,7 @@ function TypeRenderer() {
             editors_list = $("<ul>").attr("id", "assoc-def-editors")
             dm4c.render.page(editors_list)
             for (var i = 0, assoc_def; assoc_def = type.assoc_defs[i]; i++) {
-                var label_state = type.get_label_config(assoc_def.uri)
+                var label_state = type.get_label_config(assoc_def.part_type_uri)
                 editors_list.append(new AssociationDefEditor(assoc_def, label_state).dom)
             }
             editors_list.sortable()
@@ -54,7 +54,7 @@ function TypeRenderer() {
             var whole_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.whole_cardinality_uri)
             var part_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.part_cardinality_uri)
             var assoc_type_label = $("<span>").addClass("label").addClass("field-label").text("Association Type")
-            var assoc_type_menu = create_assoc_type_menu(assoc_def.assoc_type_uri)
+            var assoc_type_menu = create_assoc_type_menu(assoc_def.type_uri)
             var label_config_checkbox = dm4c.render.checkbox(label_state)
             var label_config_label = $("<span>").addClass("label").addClass("field-label").text("Include in Label")
             //

@@ -48,7 +48,14 @@ function Type() {
 
     function deserialize(assoc_defs) {
         for (var i = 0, assoc_def; assoc_def = assoc_defs[i]; i++) {
+            // 1) hash view config topics
             assoc_def.view_config_topics = dm4c.hash_by_type(dm4c.build_topics(assoc_def.view_config_topics))
+            // 2) add convenience properties
+            // Note: an intermediate Association is associated in order to use its get_role() method
+            // ### TODO: instantiate proper AssociationDefinition objects?
+            var assoc = new Association(assoc_def)
+            assoc_def.whole_type_uri = assoc.get_role("dm4.core.whole_type").topic_uri
+            assoc_def.part_type_uri  = assoc.get_role("dm4.core.part_type").topic_uri
         }
         return assoc_defs
     }

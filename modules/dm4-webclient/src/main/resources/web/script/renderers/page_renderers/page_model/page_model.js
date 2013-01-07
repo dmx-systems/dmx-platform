@@ -203,19 +203,19 @@ dm4c.render.page_model = (function() {
                 return
             }
             //
-            var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
+            var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.part_type_uri
             var cardinality_uri = assoc_def.part_cardinality_uri
             if (cardinality_uri == "dm4.core.one") {
-                var child_topic = object.composite[assoc_def.uri] || dm4c.empty_topic(child_topic_type.uri)
+                var child_topic = object.composite[assoc_def.part_type_uri] || dm4c.empty_topic(child_topic_type.uri)
                 var child_model = this.create_page_model(child_topic, assoc_def, child_field_uri, toplevel_object,
                     render_mode)
-                page_model.childs[assoc_def.uri] = child_model
+                page_model.childs[assoc_def.part_type_uri] = child_model
             } else if (cardinality_uri == "dm4.core.many") {
                 // ### TODO: server: don't send empty arrays
-                var child_topics = object.composite[assoc_def.uri] || []
+                var child_topics = object.composite[assoc_def.part_type_uri] || []
                 if (!js.is_array(child_topics)) {
-                    throw "TopicRendererError: field \"" + assoc_def.uri + "\" is defined as multi-value but " +
-                        "appears as single-value in " + JSON.stringify(object)
+                    throw "TopicRendererError: field \"" + assoc_def.part_type_uri + "\" is defined as multi-value " +
+                        "but appears as single-value in " + JSON.stringify(object)
                 }
                 if (child_topics.length == 0) {
                     child_topics.push(dm4c.empty_topic(child_topic_type.uri))
@@ -227,7 +227,7 @@ dm4c.render.page_model = (function() {
                         toplevel_object, render_mode)
                     child_model.values.push(child_field)
                 }
-                page_model.childs[assoc_def.uri] = child_model
+                page_model.childs[assoc_def.part_type_uri] = child_model
             } else {
                 throw "TopicRendererError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
             }
@@ -341,7 +341,7 @@ dm4c.render.page_model = (function() {
                     return null
                 }
                 // ### TODO: explain. Compare to TextRenderer.render_form()
-                switch (page_model.assoc_def && page_model.assoc_def.assoc_type_uri) {
+                switch (page_model.assoc_def && page_model.assoc_def.type_uri) {
                 case undefined:
                 case "dm4.core.composition_def":
                     page_model.object.value = value
@@ -349,7 +349,7 @@ dm4c.render.page_model = (function() {
                 case "dm4.core.aggregation_def":
                     return value
                 default:
-                    throw "TopicRendererError: \"" + page_model.assoc_def.assoc_type_uri +
+                    throw "TopicRendererError: \"" + page_model.assoc_def.type_uri +
                         "\" is an unexpected assoc type URI"
                 }
             } else if (page_model.type == PageModel.COMPOSITE) {

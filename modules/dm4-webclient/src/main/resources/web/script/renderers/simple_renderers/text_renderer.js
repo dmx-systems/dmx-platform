@@ -38,7 +38,7 @@ dm4c.add_simple_renderer("dm4.webclient.text_renderer", {
             }
             //
             if (page_model.rows == 1) {
-                switch (page_model.assoc_def && page_model.assoc_def.assoc_type_uri) {
+                switch (page_model.assoc_def && page_model.assoc_def.type_uri) {
                 case undefined:
                     // Note: for non-composite topics the field's assoc_def is undefined.
                     // We treat this like a composition here.
@@ -47,7 +47,7 @@ dm4c.add_simple_renderer("dm4.webclient.text_renderer", {
                 case "dm4.core.aggregation_def":
                     return render_combobox()
                 default:
-                    throw "TextRendererError: \"" + page_model.assoc_def.assoc_type_uri +
+                    throw "TextRendererError: \"" + page_model.assoc_def.type_uri +
                         "\" is an unexpected assoc type URI"
                 }
             } else {

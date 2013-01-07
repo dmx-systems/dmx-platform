@@ -33,7 +33,7 @@ dm4c.add_multi_renderer("dm4.webclient.checkbox_renderer", {
         }
         //
         return function() {
-            if (page_models[0].assoc_def.assoc_type_uri == "dm4.core.composition_def") {
+            if (page_models[0].assoc_def.type_uri == "dm4.core.composition_def") {
                 throw "CheckboxRendererError: the Checkbox Renderer can't be used with Composition Definition " +
                     "(but only with Aggregation Definition)"
             }

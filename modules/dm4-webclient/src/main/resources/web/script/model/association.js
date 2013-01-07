@@ -47,7 +47,17 @@ Association.prototype.get_topic_by_type = function(topic_type_uri) {
     var match_2 = topic_2.type_uri == topic_type_uri
     if (match_1 && match_2) {
         throw "AssociationError: ambiguity in association " + this.id +
-            " when looking for a \"" + topic_type_uri + "\" topic"
+            " when looking for the \"" + topic_type_uri + "\" topic"
     }
     return match_1 ? topic_1 : match_2 ? topic_2 : undefined
+}
+
+Association.prototype.get_role = function(role_type_uri) {
+    var match_1 = this.role_1.role_type_uri == role_type_uri
+    var match_2 = this.role_2.role_type_uri == role_type_uri
+    if (match_1 && match_2) {
+        throw "AssociationError: ambiguity in association " + this.id +
+            " when looking for the \"" + role_type_uri + "\" role"
+    }
+    return match_1 ? this.role_1 : match_2 ? this.role_2 : undefined
 }
