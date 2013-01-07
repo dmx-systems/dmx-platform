@@ -66,7 +66,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     @Override
     protected void storeTypeUri() {
         // remove current assignment
-        long assocId = dms.objectFactory.fetchTopicTypeTopic(getId()).getAssociationModel().getId();
+        long assocId = dms.objectFactory.fetchTopicTypeTopic(getId()).getRelatingAssociation().getId();
         dms.deleteAssociation(assocId, null);  // clientState=null
         // create new assignment
         dms.objectFactory.associateWithTopicType(getId(), getTypeUri());

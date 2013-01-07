@@ -8,19 +8,19 @@ public class RelatedTopicModel extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private AssociationModel assoc;
+    private AssociationModel relatingAssoc;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public RelatedTopicModel(TopicModel topic, AssociationModel assoc) {
+    public RelatedTopicModel(TopicModel topic, AssociationModel relatingAssoc) {
         super(topic);
-        this.assoc = assoc;
+        this.relatingAssoc = relatingAssoc;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public AssociationModel getAssociationModel() {
-        return assoc;
+    public AssociationModel getRelatingAssociation() {
+        return relatingAssoc;
     }
 
     // === Serialization ===
@@ -29,10 +29,17 @@ public class RelatedTopicModel extends TopicModel {
     public JSONObject toJSON() {
         try {
             JSONObject o = super.toJSON();
-            o.put("assoc", assoc.toJSON());
+            o.put("assoc", relatingAssoc.toJSON());
             return o;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
+    }
+
+    // === Java API ===
+
+    @Override
+    public String toString() {
+        return super.toString() + ", relating " + relatingAssoc;
     }
 }

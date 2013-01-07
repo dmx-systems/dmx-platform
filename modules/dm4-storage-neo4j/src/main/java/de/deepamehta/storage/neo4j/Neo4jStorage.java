@@ -249,14 +249,16 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         Node playerNode1 = storePlayerRelationship(assocNode, role1);
         Node playerNode2 = storePlayerRelationship(assocNode, role2);
         //
+        // 2) update index
         indexAssociation(assocNode, role1.getRoleTypeUri(), playerNode1,
                                     role2.getRoleTypeUri(), playerNode2);
-        // 2) update model
+        // 3) update model
         assocModel.setId(assocNode.getId());
     }
 
     @Override
     public void deleteAssociation(long assocId) {
+        // 1) update DB
         Node assocNode = fetchAssociationNode(assocId);
         // delete the 2 player relationships
         for (Relationship rel : fetchRelationships(assocNode)) {
@@ -264,6 +266,9 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         }
         //
         assocNode.delete();
+        //
+        // 2) update index
+        assocMetadata.remove(assocNode);
     }
 
 
@@ -483,8 +488,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         }
         // sanity check
         if (rels.size() != 2) {
-            throw new RuntimeException("Data inconsistency: association " + assocNode.getId() +
-                " connects " + rels.size() + " player instead of 2");
+            throw new RuntimeException("Association " + assocNode.getId() + " connects " + rels.size() +
+                " player instead of 2");
         }
         //
         return rels;

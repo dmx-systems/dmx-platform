@@ -307,7 +307,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     void storeDataTypeUri(long typeId, String typeUri, String className, String dataTypeUri) {
         // remove current assignment
-        long assocId = fetchDataTypeTopic(typeId, typeUri, className).getAssociationModel().getId();
+        long assocId = fetchDataTypeTopic(typeId, typeUri, className).getRelatingAssociation().getId();
         dms.deleteAssociation(assocId, null);   // clientState=null
         // create new assignment
         associateDataType(typeUri, dataTypeUri);
@@ -396,7 +396,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
         // subsequently build from it by sorting the assoc def's according to the sequence IDs.
         for (RelatedTopic partType : partTypes) {
-            AssociationDefinitionModel assocDef = fetchAssociationDefinition(partType.getAssociation(),
+            AssociationDefinitionModel assocDef = fetchAssociationDefinition(partType.getRelatingAssociation(),
                 typeTopic.getUri(), partType.getUri());
             assocDefs.put(assocDef.getId(), assocDef);
         }
@@ -559,7 +559,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     void storeWholeCardinalityUri(long assocDefId, String wholeCardinalityUri) {
         // remove current assignment
-        long assocId = fetchWholeCardinality(assocDefId).getAssociationModel().getId();
+        long assocId = fetchWholeCardinality(assocDefId).getRelatingAssociation().getId();
         dms.deleteAssociation(assocId, null);   // clientState=null
         // create new assignment
         associateWholeCardinality(assocDefId, wholeCardinalityUri);
@@ -567,7 +567,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     void storePartCardinalityUri(long assocDefId, String partCardinalityUri) {
         // remove current assignment
-        long assocId = fetchPartCardinality(assocDefId).getAssociationModel().getId();
+        long assocId = fetchPartCardinality(assocDefId).getRelatingAssociation().getId();
         dms.deleteAssociation(assocId, null);   // clientState=null
         // create new assignment
         associatePartCardinality(assocDefId, partCardinalityUri);
@@ -657,7 +657,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         List<RelatedAssociationModel> sequence = fetchSequence(typeTopic);
         logger.info("### Deleting " + sequence.size() + " sequence segments of type \"" + typeTopic.getUri() + "\"");
         for (RelatedAssociationModel assoc : sequence) {
-            long assocId = assoc.getRelatingAssociationModel().getId();
+            long assocId = assoc.getRelatingAssociation().getId();
             dms.deleteAssociation(assocId, null);   // clientState=null
         }
     }

@@ -854,7 +854,7 @@ public class EmbeddedService implements DeepaMehtaService {
             }
         }
         if (fetchRelatingComposite) {
-            AttachedAssociation assoc = (AttachedAssociation) relTopic.getAssociation();
+            AttachedAssociation assoc = (AttachedAssociation) relTopic.getRelatingAssociation();
             if (assoc.getAssociationType().getDataTypeUri().equals("dm4.core.composite")) {
                 assoc.loadComposite();
             }

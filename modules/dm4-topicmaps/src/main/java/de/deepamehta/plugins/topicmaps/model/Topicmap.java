@@ -160,7 +160,7 @@ public class Topicmap implements JSONEnabled {
             "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, false, true, 0, clientState);
             // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=true, maxResultSize=0
         for (RelatedTopic mapTopic : mapTopics) {
-            CompositeValue visualizationProperties = mapTopic.getAssociation().getCompositeValue();
+            CompositeValue visualizationProperties = mapTopic.getRelatingAssociation().getCompositeValue();
             addTopic(new TopicmapTopic(mapTopic.getModel(), visualizationProperties));
         }
     }

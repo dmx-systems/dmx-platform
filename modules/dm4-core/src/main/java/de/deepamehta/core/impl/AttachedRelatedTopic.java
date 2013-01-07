@@ -13,20 +13,20 @@ class AttachedRelatedTopic extends AttachedTopic implements RelatedTopic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Association assoc;      // Attached object cache
+    private Association relatingAssoc;      // Attached object cache
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedRelatedTopic(RelatedTopicModel model, EmbeddedService dms) {
         super(model, dms);
-        this.assoc = new AttachedAssociation(model.getAssociationModel(), dms);
+        this.relatingAssoc = new AttachedAssociation(model.getRelatingAssociation(), dms);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public Association getAssociation() {
-        return assoc;
+    public Association getRelatingAssociation() {
+        return relatingAssoc;
     }
 
     @Override

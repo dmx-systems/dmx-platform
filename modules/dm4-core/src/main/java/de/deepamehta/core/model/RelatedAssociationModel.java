@@ -17,7 +17,7 @@ public class RelatedAssociationModel extends AssociationModel {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public AssociationModel getRelatingAssociationModel() {
+    public AssociationModel getRelatingAssociation() {
         return relatingAssoc;
     }
 

@@ -50,7 +50,7 @@ public class Neo4jStorageTest {
 
 
     @Test
-    public void fetchEdge() {
+    public void fetchAssociation() {
         AssociationModel assoc = storage.fetchAssociation(assocId);
         assertNotNull(assoc);
         //
@@ -96,6 +96,48 @@ public class Neo4jStorageTest {
         //
         Set<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), null, null, null, null);
         assertEquals(1, topics.size());
+    }
+
+    @Test
+    public void deleteAssociation() {
+        DeepaMehtaTransaction tx = storage.beginTx();
+        try {
+            TopicModel topic = storage.fetchTopic("uri", "dm4.core.data_type");
+            assertNotNull(topic);
+            //
+            Set<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), "dm4.core.instantiation",
+                "dm4.core.instance", "dm4.core.type", "dm4.core.meta_type");
+            assertEquals(1, topics.size());
+            //
+            AssociationModel assoc = topics.iterator().next().getRelatingAssociation();
+            assertNotNull(assoc);
+            //
+            storage.deleteAssociation(assoc.getId());
+            //
+            topics = storage.fetchTopicRelatedTopics(topic.getId(), "dm4.core.instantiation",
+                "dm4.core.instance", "dm4.core.type", "dm4.core.meta_type");
+            assertEquals(0, topics.size());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void deleteAssociationAndFetchAgain() {
+        DeepaMehtaTransaction tx = storage.beginTx();
+        try {
+            AssociationModel assoc = storage.fetchAssociation(assocId);
+            assertNotNull(assoc);
+            //
+            storage.deleteAssociation(assoc.getId());
+            assoc = storage.fetchAssociation(assocId);  // throws IllegalStateException
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
     }
 
     /*@Test
@@ -158,9 +200,12 @@ public class Neo4jStorageTest {
                 new TopicRoleModel("dm4.core.topic_type", "dm4.core.type"),
                 new TopicRoleModel("dm4.core.data_type",  "dm4.core.instance"));
             assertTrue(assoc.getId() == -1);
+            //
             storage.storeAssociation(assoc);
             assocId = assoc.getId();
+            logger.info("### assocId=" + assocId);
             assertTrue(assocId != -1);
+            //
             storage.storeAssociationValue(assocId, new SimpleValue(""), asList(IndexMode.OFF), null);
             //
             /*String text1 = "DeepaMehta is a platform for collaboration and knowledge management";

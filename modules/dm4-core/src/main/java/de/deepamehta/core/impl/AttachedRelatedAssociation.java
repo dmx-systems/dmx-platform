@@ -19,7 +19,7 @@ class AttachedRelatedAssociation extends AttachedAssociation implements RelatedA
 
     AttachedRelatedAssociation(RelatedAssociationModel model, EmbeddedService dms) {
         super(model, dms);
-        this.relatingAssoc = new AttachedAssociation(model.getRelatingAssociationModel(), dms);
+        this.relatingAssoc = new AttachedAssociation(model.getRelatingAssociation(), dms);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

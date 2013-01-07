@@ -579,7 +579,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 if (!matches(newChildTopic, childTopic)) {
                     // == update assignment ==
                     // update DB
-                    childTopic.getAssociation().delete(directives);
+                    childTopic.getRelatingAssociation().delete(directives);
                     Topic topic = associateChildTopic(assocDef, newChildTopic, clientState);
                     // update memory
                     putInCompositeModel(assocDef, topic);
@@ -595,7 +595,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             // == create child ==
             // update DB
             if (childTopic != null) {
-                childTopic.getAssociation().delete(directives);
+                childTopic.getRelatingAssociation().delete(directives);
             }
             Topic topic = dms.createTopic(newChildTopic, clientState);
             associateChildTopic(assocDef, topic.getId(), clientState);
@@ -615,7 +615,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 if (childTopic != null) {
                     // == delete assignment ==
                     // update DB
-                    childTopic.getAssociation().delete(directives);
+                    childTopic.getRelatingAssociation().delete(directives);
                     // update memory
                     removeFromCompositeModel(assocDef, childTopic);
                 }

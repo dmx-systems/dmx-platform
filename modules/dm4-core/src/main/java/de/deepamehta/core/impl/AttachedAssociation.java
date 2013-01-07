@@ -76,7 +76,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     @Override
     protected void storeTypeUri() {
         // remove current assignment
-        long assocId = dms.objectFactory.fetchAssociationTypeTopic(getId()).getAssociationModel().getId();
+        long assocId = dms.objectFactory.fetchAssociationTypeTopic(getId()).getRelatingAssociation().getId();
         dms.deleteAssociation(assocId, null);  // clientState=null
         // create new assignment
         dms.objectFactory.associateWithAssociationType(getId(), getTypeUri());
