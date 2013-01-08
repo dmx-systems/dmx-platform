@@ -30,9 +30,6 @@
 
         <!-- Database -->
         <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
-        <!-- ### TODO: drop these two. Register as OSGi service instead -->
-        <dm4.database.bundle>de.deepamehta.storage-neo4j</dm4.database.bundle>
-        <dm4.database.factory>de.deepamehta.storage.neo4j.Neo4jStorageFactory</dm4.database.factory>
 
         <!-- File Repository -->
         <dm4.filerepo.path></dm4.filerepo.path>

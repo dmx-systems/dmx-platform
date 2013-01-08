@@ -17,14 +17,14 @@ public class CoreServiceTestEnvironment {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    // ### TODO: drop this. Register as OSGi service instead.
     private static final String DATABASE_FACTORY = "de.deepamehta.storage.neo4j.Neo4jStorageFactory";
-    // ### TODO: enable property access
-    // System.getProperty("dm4.database.factory");
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    // providing the test subclasses access to the core service
     protected EmbeddedService dms;
+
+    private DeepaMehtaStorage storage;
     private File dbPath;
 
     protected Logger logger = Logger.getLogger(getClass().getName());
@@ -32,24 +32,21 @@ public class CoreServiceTestEnvironment {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Before
-    public void setUp() {
-        dbPath = JavaUtils.createTempDirectory("dm4-");
-        DeepaMehtaStorage storage = openDB(dbPath.getAbsolutePath());
+    public void setup() {
+        dbPath = JavaUtils.createTempDirectory("dm4-test-");
+        storage = openDB(dbPath.getAbsolutePath());
         dms = new EmbeddedService(new StorageDecorator(storage), null);
-        dms.setupDB();
     }
 
     @After
-    public void tearDown() {
-        if (dms != null) {
-            dms.shutdown();
+    public void shutdown() {
+        if (storage != null) {
+            storage.shutdown();
         }
-        dbPath.delete();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    // ### TODO: copied from CoreActivator
     private DeepaMehtaStorage openDB(String databasePath) {
         try {
             logger.info("Instantiating the storage layer\n    databasePath=\"" + databasePath +

@@ -44,10 +44,18 @@ public class Neo4jStorageTest {
 
     @Before
     public void setup() {
-        storage = new Neo4jStorageFactory().createInstance(createTempDirectory("neo4j"));
+        storage = new Neo4jStorageFactory().createInstance(createTempDirectory("neo4j-test-"));
         setupContent();
     }
 
+    @After
+    public void shutdown() {
+        if (storage != null) {
+            storage.shutdown();
+        }
+    }
+
+    // ---
 
     @Test
     public void fetchAssociation() {
@@ -182,11 +190,6 @@ public class Neo4jStorageTest {
         //    That reflects the behavior of the underlying Neo4j Index's get() method.
     }*/
 
-    @After
-    public void shutdown() {
-        storage.shutdown();
-    }
-
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void setupContent() {
@@ -203,7 +206,6 @@ public class Neo4jStorageTest {
             //
             storage.storeAssociation(assoc);
             assocId = assoc.getId();
-            logger.info("### assocId=" + assocId);
             assertTrue(assocId != -1);
             //
             storage.storeAssociationValue(assocId, new SimpleValue(""), asList(IndexMode.OFF), null);

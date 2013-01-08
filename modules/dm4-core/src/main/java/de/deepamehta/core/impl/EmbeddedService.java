@@ -52,12 +52,12 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     StorageDecorator storage;
+    BundleContext bundleContext;
     MigrationManager migrationManager;
     PluginManager pluginManager;
     ListenerRegistry listenerRegistry;
     TypeCache typeCache;
     ObjectFactoryImpl objectFactory;
-    BundleContext bundleContext;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -75,6 +75,7 @@ public class EmbeddedService implements DeepaMehtaService {
         this.typeCache = new TypeCache(this);
         this.objectFactory = new ObjectFactoryImpl(this);
         bootstrapTypeCache();
+        setupDB();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -686,49 +687,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
-    // *** End of DeepaMehtaService Implementation ***
-
-
-
-    /**
-     * Setups the database:
-     *   1) initializes the database.
-     *   2) in case of a clean install: sets up the bootstrap content.
-     *   3) runs the core migrations.
-     * <p>
-     * Called from {@link CoreActivator#start}.
-     */
-    public void setupDB() {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            logger.info("----- Activating DeepaMehta 4 Core -----");
-            boolean isCleanInstall = storage.init();
-            if (isCleanInstall) {
-                setupBootstrapContent();
-            }
-            migrationManager.runCoreMigrations(isCleanInstall);
-            tx.success();
-            tx.finish();
-            logger.info("----- Activation of DeepaMehta 4 Core complete -----");
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            tx.finish();
-            shutdown();
-            throw new RuntimeException("Setting up the database failed", e);
-        }
-        // Note: we don't put finish() in a finally clause here because
-        // in case of error the core service has to be shut down.
-    }
-
-    /**
-     * Shuts down the database.
-     * <p>
-     * Called from {@link CoreActivator#stop}.
-     */
-    public void shutdown() {
-        storage.shutdown();
-    }
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
 
@@ -874,6 +832,36 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
     // === Bootstrap ===
+
+    /**
+     * Setups the database:
+     *   1) initializes the database.
+     *   2) in case of a clean install: sets up the bootstrap content.
+     *   3) runs the core migrations.
+     * <p>
+     * Called from {@link CoreActivator#start}.
+     */
+    private void setupDB() {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            logger.info("----- Setting up the database -----");
+            boolean isCleanInstall = storage.init();
+            if (isCleanInstall) {
+                setupBootstrapContent();
+            }
+            migrationManager.runCoreMigrations(isCleanInstall);
+            tx.success();
+            tx.finish();
+            logger.info("----- Setting up the database complete -----");
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            // Note: we don't put finish() in a finally clause here because
+            // in case of error the database has to be shut down.
+            tx.finish();
+            storage.shutdown();
+            throw new RuntimeException("Setting up the database failed", e);
+        }
+    }
 
     private void setupBootstrapContent() {
         // Before topic types and asscociation types can be created the meta types must be created

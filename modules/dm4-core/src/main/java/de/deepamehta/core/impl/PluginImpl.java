@@ -333,6 +333,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private ServiceTracker createServiceTracker(final String serviceInterface) {
+        //
         return new ServiceTracker(bundleContext, serviceInterface, null) {
 
             @Override

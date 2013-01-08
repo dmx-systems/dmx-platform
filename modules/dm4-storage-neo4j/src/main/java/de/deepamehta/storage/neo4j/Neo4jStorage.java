@@ -44,7 +44,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // ### TODO: define further string constants for key names etc.
-    private static final String KEY_FULLTEXT = "_fulltext";
+    private static final String KEY_FULLTEXT = "_fulltext_";
 
     // association metadata
     private static final String KEY_ASSOC_TPYE_URI = "assoc_type_uri";
@@ -69,7 +69,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public Neo4jStorage(String databasePath) {
+    Neo4jStorage(String databasePath) {
         try {
             this.neo4j = new GraphDatabaseFactory().newEmbeddedDatabase(databasePath);
             this.relTypeCache = new Neo4jRelationtypeCache(neo4j);
@@ -81,8 +81,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
             this.assocMetadata = createExactIndex("assoc-metadata");
         } catch (Exception e) {
             if (neo4j != null) {
-                logger.info("Shutdown Neo4j");
-                neo4j.shutdown();
+                shutdown();
             }
             throw new RuntimeException("Creating the Neo4j instance and indexes failed", e);
         }
@@ -376,7 +375,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     @Override
     public void shutdown() {
-        logger.info("Shutdown DB");
+        logger.info("Shutdown Neo4j");
         neo4j.shutdown();
     }
 
