@@ -17,9 +17,15 @@
     </parent>
 
     <!--
-        All DeepaMehta bundles that belong to the DeepaMehta 4 standard distribution.
-        ### TODO: add the deepamehta-storage-neo4j artifact here?
-        ### Apparently not required for building distribution but might required for deepamehta-plugin-parent
+        The folowing list includes all the DeepaMehta bundles that make up the DeepaMehta 4 Standard Distribution.
+        More precisely:
+        1) The dm4-distribution module includes these bundles when assembling the DeepaMehta 4 Standard Distribution.
+           ### This seems NOT be true! The assembly descriptor does NOT use its project artifacts but includes based
+           on group ID and artifact ID (using wildcards).
+        2) 3rd-party plugin development scenario: The dm4-plugin-parent Pax Runner does deploy these bundles statically
+           (not hot-deployed).
+        3) Core development scenario: The global Pax Runner does NOT deploy these bundles as they are expected to be
+           in the global POM's hot-deployment list (Felix File Install).
     -->
     <dependencies>
         <dependency>
@@ -105,6 +111,11 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-geomaps</artifactId>
+            <version>4.0.14-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-storage-neo4j</artifactId>
             <version>4.0.14-SNAPSHOT</version>
         </dependency>
     </dependencies>

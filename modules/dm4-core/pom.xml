@@ -18,12 +18,6 @@
     </parent>
 
     <dependencies>
-        <!-- DeepaMehta Storage -->
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-storage-neo4j</artifactId>
-            <scope>test</scope>
-        </dependency>
         <!-- OSGi -->
         <dependency>
             <groupId>org.osgi</groupId>

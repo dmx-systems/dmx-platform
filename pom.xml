@@ -57,7 +57,6 @@
                 <felix.fileinstall.dir>
                     <![CDATA[
                         ${project.basedir}/modules/dm4-core/target,
-                        ${project.basedir}/modules/dm4-storage-neo4j/target,
                         ${project.basedir}/modules/dm4-webservice/target,
                         ${project.basedir}/modules/dm4-webclient/target,
                         ${project.basedir}/modules/dm4-webbrowser/target,
@@ -73,8 +72,14 @@
                         ${project.basedir}/modules/dm4-help/target,
                         ${project.basedir}/modules/dm4-accesscontrol/target,
                         ${project.basedir}/modules/dm4-facets/target,
-                        ${project.basedir}/modules/dm4-geomaps/target
+                        ${project.basedir}/modules/dm4-geomaps/target,
+                        ${project.basedir}/modules/dm4-storage-neo4j/target,
                     ]]>
+                    <!-- Note: Although the dm4-storage-neo4j module can not be hot-REdeployed it must be          -->
+                    <!-- hot-deployed. It can not be statically deployed (via 3rd-party-bundles) because it        -->
+                    <!-- depends on Core and Core would be not yet available (as it is hot-deployed).              -->
+                    <!-- The reason why dm4-storage-neo4j module can not be hot-REdeployed is that the Core        -->
+                    <!-- would not stop (as it has no dependency on dm4-storage-neo4j).                            -->
                 </felix.fileinstall.dir>
                 <!-- Watching only for jar files suppresses deployment of exploded bundles (which often fails).    -->
                 <felix.fileinstall.filter>.*\\.jar</felix.fileinstall.filter>
@@ -120,7 +125,6 @@
             <id>all</id>
             <modules>
                 <module>modules/dm4-core</module>
-                <!--module>modules/dm4-storage-neo4j</module-->
                 <module>modules/dm4-webservice</module>
                 <module>modules/dm4-webclient</module>
                 <module>modules/dm4-webbrowser</module>
@@ -137,6 +141,8 @@
                 <module>modules/dm4-accesscontrol</module>
                 <module>modules/dm4-facets</module>
                 <module>modules/dm4-geomaps</module>
+                <module>modules/dm4-storage-neo4j</module>
+                <module>modules/dm4-test</module>
                 <!-- POM projects follow -->
                 <!-- Note: modules/dm4-assemblies and modules/dm4-distribution are not included here. -->
                 <!-- We don't want to build the assemblies and distribution with every reactor build. -->

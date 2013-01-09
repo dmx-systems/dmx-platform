@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>DeepaMehta 4 Test</name>
+    <groupId>de.deepamehta</groupId>
+    <artifactId>deepamehta-test</artifactId>
+    <version>4.0.14-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>de.deepamehta</groupId>
+        <artifactId>deepamehta-parent</artifactId>
+        <version>5</version>
+        <relativePath>../dm4-parent/pom.xml</relativePath>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-core</artifactId>
+            <version>4.0.14-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-storage-neo4j</artifactId>
+            <version>4.0.14-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+</project>

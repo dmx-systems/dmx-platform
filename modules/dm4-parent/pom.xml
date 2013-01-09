@@ -16,12 +16,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- DeepaMehta Storage -->
-            <dependency>
-                <groupId>de.deepamehta</groupId>
-                <artifactId>deepamehta-storage-neo4j</artifactId>
-                <version>4.0.14-SNAPSHOT</version>
-            </dependency>
             <!-- OSGi -->
             <dependency>
                 <groupId>org.osgi</groupId>
