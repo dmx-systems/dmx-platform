@@ -3,24 +3,18 @@ package de.deepamehta.plugins.accesscontrol;
 import de.deepamehta.plugins.accesscontrol.model.Credentials;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
-import de.deepamehta.plugins.facets.service.FacetsService;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.ResultSet;
-import de.deepamehta.core.Role;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.TopicRole;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
-import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
@@ -56,10 +50,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
-import static java.util.Arrays.asList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
