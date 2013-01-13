@@ -184,8 +184,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             if (isSearchableUnit(topic)) {
                 searchableUnits.add(topic);
             } else {
-                Set<RelatedTopic> parentTopics = topic.getRelatedTopics((List) null, "dm4.core.part", "dm4.core.whole",
-                    null, false, false, 0, clientState).getItems();
+                Set<RelatedTopic> parentTopics = topic.getRelatedTopics((String) null, "dm4.core.part",
+                    "dm4.core.whole", null, false, false, 0, clientState).getItems();
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
                 } else {

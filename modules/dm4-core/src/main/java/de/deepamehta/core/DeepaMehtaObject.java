@@ -106,7 +106,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
                                     int maxResultSize, ClientState clientState);
 
     /**
-     * @param   assocTypeUris       may be null
+     * @param   assocTypeUris       may *not* be null
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null

@@ -190,7 +190,7 @@ public class StorageDecorator {
     /**
      * Convenience method (receives *list* of association types).
      *
-     * @param   assocTypeUris       may be null
+     * @param   assocTypeUris       may *not* be null
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
