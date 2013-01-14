@@ -40,6 +40,8 @@ public class Neo4jStorageTest {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
+
+
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Before
@@ -148,47 +150,49 @@ public class Neo4jStorageTest {
         }
     }
 
-    /*@Test
+    @Test
     public void testFulltextIndex() {
         List<TopicModel> topics;
         // By default a Lucene index is case-insensitive:
-        topics = storage.queryMehtaNodes("DeepaMehta"); assertEquals(2, topics.size());
-        topics = storage.queryMehtaNodes("deepamehta"); assertEquals(2, topics.size());
-        topics = storage.queryMehtaNodes("DEEPAMEHTA"); assertEquals(2, topics.size());
+        topics = storage.queryTopics("DeepaMehta"); assertEquals(2, topics.size());
+        topics = storage.queryTopics("deepamehta"); assertEquals(2, topics.size());
+        topics = storage.queryTopics("DEEPAMEHTA"); assertEquals(2, topics.size());
         // Lucene's default operator is OR:
-        topics = storage.queryMehtaNodes("collaboration platform");         assertEquals(1, topics.size());
-        topics = storage.queryMehtaNodes("collaboration plaXXXform");       assertEquals(1, topics.size());
-        topics = storage.queryMehtaNodes("collaboration AND plaXXXform");   assertEquals(0, topics.size());
-        topics = storage.queryMehtaNodes("collaboration AND platform");     assertEquals(1, topics.size());
+        topics = storage.queryTopics("collaboration platform");         assertEquals(1, topics.size());
+        topics = storage.queryTopics("collaboration plaXXXform");       assertEquals(1, topics.size());
+        topics = storage.queryTopics("collaboration AND plaXXXform");   assertEquals(0, topics.size());
+        topics = storage.queryTopics("collaboration AND platform");     assertEquals(1, topics.size());
         // Phrases are set in ".."
-        topics = storage.queryMehtaNodes("\"collaboration platform\"");     assertEquals(0, topics.size());
-        topics = storage.queryMehtaNodes("\"platform for collaboration\""); assertEquals(1, topics.size());
+        topics = storage.queryTopics("\"collaboration platform\"");     assertEquals(0, topics.size());
+        topics = storage.queryTopics("\"platform for collaboration\""); assertEquals(1, topics.size());
         // Within phrases wildcards do not work:
-        topics = storage.queryMehtaNodes("\"platform * collaboration\"");   assertEquals(0, topics.size());
-    }*/
+        topics = storage.queryTopics("\"platform * collaboration\"");   assertEquals(0, topics.size());
+    }
 
-    /*@Test
+    @Test
     public void testExactIndexWithWildcards() {
         List<TopicModel> topics;
-        topics = storage.getMehtaNodes("uri", "dm?.core.topic_type"); assertEquals(1, topics.size());
-        topics = storage.getMehtaNodes("uri", "*.core.topic_type");   assertEquals(1, topics.size());
+        topics = storage.fetchTopics("uri", "dm?.core.topic_type"); assertEquals(1, topics.size());
+        topics = storage.fetchTopics("uri", "*.core.topic_type");   assertEquals(1, topics.size());
         // => in contrast to Lucene docs a wildcard can be used as the first character of a search
         // http://lucene.apache.org/core/old_versioned_docs/versions/3_5_0/queryparsersyntax.html
         //
-        topics = storage.getMehtaNodes("uri", "dm4.core.*");   assertEquals(2, topics.size());
-        topics = storage.getMehtaNodes("uri", "dm4.*.*");      assertEquals(2, topics.size());
-        topics = storage.getMehtaNodes("uri", "dm4.*.*_type"); assertEquals(2, topics.size());
+        topics = storage.fetchTopics("uri", "dm4.core.*");   assertEquals(2, topics.size());
+        topics = storage.fetchTopics("uri", "dm4.*.*");      assertEquals(2, topics.size());
+        topics = storage.fetchTopics("uri", "dm4.*.*_type"); assertEquals(2, topics.size());
         // => more than one wildcard can be used in a search
-    }*/
+    }
 
-    /*@Test
+    @Test
     public void testNegativeResults() {
         TopicModel topic;
-        topic = storage.getMehtaNode("uri", "dm4.core.data_type"); assertNotNull(topic);
-        topic = storage.getMehtaNode("uri", "dm4.core.*");         assertNull(topic);
+        topic = storage.fetchTopic("uri", "dm4.core.data_type"); assertNotNull(topic);
+        topic = storage.fetchTopic("uri", "dm4.core.*");         assertNull(topic);
         // => DeepaMehtaStorage's get-singular method supports no wildcards.
         //    That reflects the behavior of the underlying Neo4j Index's get() method.
-    }*/
+    }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
@@ -198,30 +202,17 @@ public class Neo4jStorageTest {
             createTopic("dm4.core.topic_type", "dm4.core.meta_type",  "Topic Type");
             createTopic("dm4.core.data_type",  "dm4.core.topic_type", "Data Type");
             //
-            AssociationModel assoc = new AssociationModel(
-                "dm4.core.instantiation",
-                new TopicRoleModel("dm4.core.topic_type", "dm4.core.type"),
-                new TopicRoleModel("dm4.core.data_type",  "dm4.core.instance"));
-            assertTrue(assoc.getId() == -1);
+            assocId = createAssociation("dm4.core.instantiation",
+                "dm4.core.topic_type", "dm4.core.type",
+                "dm4.core.data_type", "dm4.core.instance"
+            );
             //
-            storage.storeAssociation(assoc);
-            assocId = assoc.getId();
-            assertTrue(assocId != -1);
+            // Fulltext indexing
             //
-            storage.storeAssociationValue(assocId, new SimpleValue(""), asList(IndexMode.OFF), null);
-            //
-            /*String text1 = "DeepaMehta is a platform for collaboration and knowledge management";
-            String text2 = "Lead developer of DeepaMehta is Jörg Richter";
-            //
-            TopicModel topic3 = storage.storeTopic();
-            topic3.setString("uri", "note-1");
-            topic3.setString("value", text1);
-            topic3.indexAttribute(IndexMode.FULLTEXT, text1, null);
-            //
-            TopicModel topic4 = storage.storeTopic();
-            topic4.setString("uri", "note-2");
-            topic4.setString("value", text2);
-            topic4.indexAttribute(IndexMode.FULLTEXT, text2, null);*/
+            createTopic("note-1", "dm4.notes.note",
+                "DeepaMehta is a platform for collaboration and knowledge management", IndexMode.FULLTEXT);
+            createTopic("note-2", "dm4.notes.note",
+                "Lead developer of DeepaMehta is Jörg Richter", IndexMode.FULLTEXT);
             //
             tx.success();
         } finally {
@@ -229,7 +220,13 @@ public class Neo4jStorageTest {
         }
     }
 
+    // ---
+
     private void createTopic(String uri, String typeUri, String value) {
+        createTopic(uri, typeUri, value, IndexMode.OFF);
+    }
+
+    private void createTopic(String uri, String typeUri, String value, IndexMode indexMode) {
         TopicModel topic = new TopicModel(uri, typeUri, new SimpleValue(value));
         assertEquals(-1, topic.getId());
         //
@@ -238,7 +235,27 @@ public class Neo4jStorageTest {
         long topicId = topic.getId();
         assertTrue(topicId != -1);
         //
-        storage.storeTopicValue(topicId, topic.getSimpleValue(), asList(IndexMode.OFF), null);
+        storage.storeTopicValue(topicId, topic.getSimpleValue(), asList(indexMode), null);
+    }
+
+    // ---
+
+    private long createAssociation(String typeUri, String topicUri1, String roleTypeUri1,
+                                                   String topicUri2, String roleTypeUri2) {
+        AssociationModel assoc = new AssociationModel(typeUri,
+            new TopicRoleModel(topicUri1, roleTypeUri1),
+            new TopicRoleModel(topicUri2, roleTypeUri2)
+        );
+        assertEquals(-1, assoc.getId());
+        //
+        storage.storeAssociation(assoc);
+        //
+        long assocId = assoc.getId();
+        assertTrue(assocId != -1);
+        //
+        storage.storeAssociationValue(assocId, new SimpleValue(""), asList(IndexMode.OFF), null);
+        //
+        return assocId;
     }
 
     // ---
