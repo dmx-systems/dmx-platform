@@ -52,14 +52,14 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
         super.update(model, clientState, directives);
     } 
 
-    // ----------------------------------------------------------------------------------------------- Protected Methods
+    // ----------------------------------------------------------------------------------------- Package Private Methods
 
 
 
     // === AttachedTopic Overrides ===
 
     @Override
-    protected String className() {
+    final String className() {
         return "association type";
     }
 
@@ -68,19 +68,19 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
     // === Implementation of abstract AttachedType methods ===
 
     @Override
-    protected void putInTypeCache() {
+    final void putInTypeCache() {
         dms.typeCache.putAssociationType(this);
     }
 
     @Override
-    protected void removeFromTypeCache() {
+    final void removeFromTypeCache() {
         dms.typeCache.removeAssociationType(getUri());
     }
 
     // ---
 
     @Override
-    protected void addDeleteTypeDirective(Directives directives, JSONEnabled arg) {
+    final void addDeleteTypeDirective(Directives directives, JSONEnabled arg) {
         directives.add(Directive.DELETE_ASSOCIATION_TYPE, arg);
     }
 }

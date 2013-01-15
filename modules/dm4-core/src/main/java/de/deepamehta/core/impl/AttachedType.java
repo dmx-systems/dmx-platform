@@ -190,17 +190,15 @@ abstract class AttachedType extends AttachedTopic implements Type {
         updateLabelConfig(model.getLabelConfig());
     }
 
+    // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    abstract void putInTypeCache();
 
-    // ----------------------------------------------------------------------------------------------- Protected Methods
-
-    protected abstract void putInTypeCache();
-
-    protected abstract void removeFromTypeCache();
+    abstract void removeFromTypeCache();
 
     // ---
 
-    protected abstract void addDeleteTypeDirective(Directives directives, JSONEnabled arg);
+    abstract void addDeleteTypeDirective(Directives directives, JSONEnabled arg);
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

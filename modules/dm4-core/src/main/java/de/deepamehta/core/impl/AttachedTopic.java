@@ -51,44 +51,6 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
 
 
-    // === Implementation of the abstract methods ===
-
-    @Override
-    protected String className() {
-        return "topic";
-    }
-
-    @Override
-    protected void storeUri() {
-        dms.storage.storeTopicUri(getId(), getUri());
-    }
-
-    @Override
-    protected void storeTypeUri() {
-        // remove current assignment
-        long assocId = dms.objectFactory.fetchTopicTypeTopic(getId()).getRelatingAssociation().getId();
-        dms.deleteAssociation(assocId, null);  // clientState=null
-        // create new assignment
-        dms.objectFactory.associateWithTopicType(getId(), getTypeUri());
-    }
-
-    @Override
-    protected void storeSimpleValue(Set<IndexMode> indexModes, String indexKey) {
-        dms.storage.storeTopicValue(getId(), getSimpleValue(), indexModes, indexKey, getIndexValue());
-    }
-
-    @Override
-    protected Type getType() {
-        return dms.getTopicType(getTypeUri(), null);    // FIXME: clientState=null
-    }
-
-    @Override
-    protected RoleModel createRoleModel(String roleTypeUri) {
-        return new TopicRoleModel(getId(), roleTypeUri);
-    }
-
-
-
     // === Deletion ===
 
     @Override
@@ -229,5 +191,43 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
      */
     TopicType getTopicType() {
         return (TopicType) getType();
+    }
+
+
+
+    // === Implementation of the abstract methods ===
+
+    @Override
+    String className() {
+        return "topic";
+    }
+
+    @Override
+    final void storeUri() {
+        dms.storage.storeTopicUri(getId(), getUri());
+    }
+
+    @Override
+    final void storeTypeUri() {
+        // remove current assignment
+        long assocId = dms.objectFactory.fetchTopicTypeTopic(getId()).getRelatingAssociation().getId();
+        dms.deleteAssociation(assocId, null);  // clientState=null
+        // create new assignment
+        dms.objectFactory.associateWithTopicType(getId(), getTypeUri());
+    }
+
+    @Override
+    final void storeSimpleValue(Set<IndexMode> indexModes, String indexKey) {
+        dms.storage.storeTopicValue(getId(), getSimpleValue(), indexModes, indexKey, getIndexValue());
+    }
+
+    @Override
+    final Type getType() {
+        return dms.getTopicType(getTypeUri(), null);    // FIXME: clientState=null
+    }
+
+    @Override
+    final RoleModel createRoleModel(String roleTypeUri) {
+        return new TopicRoleModel(getId(), roleTypeUri);
     }
 }

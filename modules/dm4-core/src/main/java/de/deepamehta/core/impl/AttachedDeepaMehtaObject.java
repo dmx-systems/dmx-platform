@@ -351,23 +351,23 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         this.model = model;
     }
 
-    // ---
-
-    protected abstract String className();
-
-    protected abstract void storeUri();
-
-    protected abstract void storeTypeUri();
-
-    protected abstract void storeSimpleValue(Set<IndexMode> indexModes, String indexKey);
-
-    protected abstract Type getType();
-
-    protected abstract RoleModel createRoleModel(String roleTypeUri);
-
 
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    abstract String className();
+
+    abstract void storeUri();
+
+    abstract void storeTypeUri();
+
+    abstract void storeSimpleValue(Set<IndexMode> indexModes, String indexKey);
+
+    abstract Type getType();
+
+    abstract RoleModel createRoleModel(String roleTypeUri);
+
+    // ---
 
     /**
      * Takes the simple or composite value from this object's model and stores and indexes it.

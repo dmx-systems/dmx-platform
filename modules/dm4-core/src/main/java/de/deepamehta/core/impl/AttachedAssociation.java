@@ -61,44 +61,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
 
 
-    // === Implementation of the abstract methods ===
-
-    @Override
-    protected String className() {
-        return "association";
-    }
-
-    @Override
-    protected void storeUri() {
-        dms.storage.storeAssociationUri(getId(), getUri());
-    }
-
-    @Override
-    protected void storeTypeUri() {
-        // remove current assignment
-        long assocId = dms.objectFactory.fetchAssociationTypeTopic(getId()).getRelatingAssociation().getId();
-        dms.deleteAssociation(assocId, null);  // clientState=null
-        // create new assignment
-        dms.objectFactory.associateWithAssociationType(getId(), getTypeUri());
-    }
-
-    @Override
-    protected void storeSimpleValue(Set<IndexMode> indexModes, String indexKey) {
-        dms.storage.storeAssociationValue(getId(), getSimpleValue(), indexModes, indexKey, getIndexValue());
-    }
-
-    @Override
-    protected Type getType() {
-        return dms.getAssociationType(getTypeUri(), null);    // FIXME: clientState=null
-    }
-
-    @Override
-    protected RoleModel createRoleModel(String roleTypeUri) {
-        return new AssociationRoleModel(getId(), roleTypeUri);
-    }
-
-
-
     // === Deletion ===
 
     @Override
@@ -283,6 +245,44 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
      */
     AssociationType getAssociationType() {
         return (AssociationType) getType();
+    }
+
+
+
+    // === Implementation of the abstract methods ===
+
+    @Override
+    final String className() {
+        return "association";
+    }
+
+    @Override
+    final void storeUri() {
+        dms.storage.storeAssociationUri(getId(), getUri());
+    }
+
+    @Override
+    final void storeTypeUri() {
+        // remove current assignment
+        long assocId = dms.objectFactory.fetchAssociationTypeTopic(getId()).getRelatingAssociation().getId();
+        dms.deleteAssociation(assocId, null);  // clientState=null
+        // create new assignment
+        dms.objectFactory.associateWithAssociationType(getId(), getTypeUri());
+    }
+
+    @Override
+    final void storeSimpleValue(Set<IndexMode> indexModes, String indexKey) {
+        dms.storage.storeAssociationValue(getId(), getSimpleValue(), indexModes, indexKey, getIndexValue());
+    }
+
+    @Override
+    final Type getType() {
+        return dms.getAssociationType(getTypeUri(), null);    // FIXME: clientState=null
+    }
+
+    @Override
+    final RoleModel createRoleModel(String roleTypeUri) {
+        return new AssociationRoleModel(getId(), roleTypeUri);
     }
 
 

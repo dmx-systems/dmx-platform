@@ -52,14 +52,14 @@ class AttachedTopicType extends AttachedType implements TopicType {
         super.update(model, clientState, directives);
     }
 
-    // ----------------------------------------------------------------------------------------------- Protected Methods
+    // ----------------------------------------------------------------------------------------- Package Private Methods
 
 
 
     // === AttachedTopic Overrides ===
 
     @Override
-    protected String className() {
+    final String className() {
         return "topic type";
     }
 
@@ -68,19 +68,19 @@ class AttachedTopicType extends AttachedType implements TopicType {
     // === Implementation of abstract AttachedType methods ===
 
     @Override
-    protected void putInTypeCache() {
+    final void putInTypeCache() {
         dms.typeCache.putTopicType(this);
     }
 
     @Override
-    protected void removeFromTypeCache() {
+    final void removeFromTypeCache() {
         dms.typeCache.removeTopicType(getUri());
     }
 
     // ---
 
     @Override
-    protected void addDeleteTypeDirective(Directives directives, JSONEnabled arg) {
+    final void addDeleteTypeDirective(Directives directives, JSONEnabled arg) {
         directives.add(Directive.DELETE_TOPIC_TYPE, arg);
     }
 }
