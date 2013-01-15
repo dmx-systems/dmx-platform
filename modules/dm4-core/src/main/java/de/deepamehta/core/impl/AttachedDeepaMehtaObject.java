@@ -408,6 +408,20 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         model.setCompositeValue(comp);
     }
 
+    /**
+     * Calculates the simple value that is to be indexed for this object.
+     *
+     * HTML tags are stripped from HTML values. Non-HTML values are returned directly.
+     */
+    final SimpleValue getIndexValue() {
+        SimpleValue value = getSimpleValue();
+        if (getType().getDataTypeUri().equals("dm4.core.html")) {
+            return new SimpleValue(JavaUtils.stripHTML(value.toString()));
+        } else {
+            return value;
+        }
+    }
+
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods

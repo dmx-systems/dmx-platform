@@ -39,7 +39,11 @@ public interface DeepaMehtaStorage {
 
     void storeTopicUri(long topicId, String uri);
 
-    void storeTopicValue(long topicId, SimpleValue value, Collection<IndexMode> indexModes, String indexKey);
+    /**
+     * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used.
+     */
+    void storeTopicValue(long topicId, SimpleValue value, Collection<IndexMode> indexModes, String indexKey,
+                                                                                            SimpleValue indexValue);
 
     // ---
 
@@ -62,7 +66,12 @@ public interface DeepaMehtaStorage {
     // ---
 
     void storeAssociationUri(long assocId, String uri);
-    void storeAssociationValue(long assocId, SimpleValue value, Collection<IndexMode> indexModes, String indexKey);
+
+    /**
+     * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used.
+     */
+    void storeAssociationValue(long assocId, SimpleValue value, Collection<IndexMode> indexModes, String indexKey,
+                                                                                                SimpleValue indexValue);
 
     void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri);
 

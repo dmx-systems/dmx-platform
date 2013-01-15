@@ -10,6 +10,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+import de.deepamehta.core.util.JavaUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -170,7 +171,23 @@ public class Neo4jStorageTest {
     }
 
     @Test
-    public void testExactIndexWithWildcards() {
+    public void testFulltextIndexWithHTML() {
+        List<TopicModel> topics;
+        // Lucene's Whitespace Analyzer (default for a Neo4j "fulltext" index) regards HTML as belonging to the word
+        topics = storage.queryTopics("Haskell");        assertEquals(1, topics.size()); assertUri(topics, "note-4");
+        topics = storage.queryTopics("Haskell*");       assertEquals(1, topics.size()); assertUri(topics, "note-4");
+        topics = storage.queryTopics("*Haskell*");      assertEquals(2, topics.size());
+        topics = storage.queryTopics("<b>Haskell");     assertEquals(0, topics.size());
+        topics = storage.queryTopics("<b>Haskell*");    assertEquals(1, topics.size()); assertUri(topics, "note-3");
+        topics = storage.queryTopics("<b>Haskell</b>"); assertEquals(1, topics.size()); assertUri(topics, "note-3");
+    }
+
+    private void assertUri(List<TopicModel> singletonList, String topicUri) {
+        assertEquals(topicUri, singletonList.get(0).getUri());
+    }
+
+    @Test
+    public void testExactIndexWithQuery() {
         List<TopicModel> topics;
         topics = storage.fetchTopics("uri", "dm?.core.topic_type"); assertEquals(1, topics.size());
         topics = storage.fetchTopics("uri", "*.core.topic_type");   assertEquals(1, topics.size());
@@ -184,7 +201,7 @@ public class Neo4jStorageTest {
     }
 
     @Test
-    public void testNegativeResults() {
+    public void testExactIndexWithGet() {
         TopicModel topic;
         topic = storage.fetchTopic("uri", "dm4.core.data_type"); assertNotNull(topic);
         topic = storage.fetchTopic("uri", "dm4.core.*");         assertNull(topic);
@@ -210,9 +227,15 @@ public class Neo4jStorageTest {
             // Fulltext indexing
             //
             createTopic("note-1", "dm4.notes.note",
-                "DeepaMehta is a platform for collaboration and knowledge management", IndexMode.FULLTEXT);
+                "DeepaMehta is a platform for collaboration and knowledge management", IndexMode.FULLTEXT, null);
             createTopic("note-2", "dm4.notes.note",
-                "Lead developer of DeepaMehta is Jörg Richter", IndexMode.FULLTEXT);
+                "Lead developer of DeepaMehta is Jörg Richter", IndexMode.FULLTEXT, null);
+            //
+            // Fulltext HTML indexing
+            //
+            String htmlText = "Java and Oracle is no fun anymore. I'm learning <b>Haskell</b> now.";
+            createTopic("note-3", "dm4.notes.note", htmlText, IndexMode.FULLTEXT, null);
+            createTopic("note-4", "dm4.notes.note", htmlText, IndexMode.FULLTEXT, JavaUtils.stripHTML(htmlText));
             //
             tx.success();
         } finally {
@@ -223,10 +246,10 @@ public class Neo4jStorageTest {
     // ---
 
     private void createTopic(String uri, String typeUri, String value) {
-        createTopic(uri, typeUri, value, IndexMode.OFF);
+        createTopic(uri, typeUri, value, IndexMode.OFF, null);
     }
 
-    private void createTopic(String uri, String typeUri, String value, IndexMode indexMode) {
+    private void createTopic(String uri, String typeUri, String value, IndexMode indexMode, String indexValue) {
         TopicModel topic = new TopicModel(uri, typeUri, new SimpleValue(value));
         assertEquals(-1, topic.getId());
         //
@@ -235,7 +258,8 @@ public class Neo4jStorageTest {
         long topicId = topic.getId();
         assertTrue(topicId != -1);
         //
-        storage.storeTopicValue(topicId, topic.getSimpleValue(), asList(indexMode), null);
+        storage.storeTopicValue(topicId, topic.getSimpleValue(), asList(indexMode), null,
+            indexValue != null ? new SimpleValue(indexValue) : null);
     }
 
     // ---
@@ -253,7 +277,7 @@ public class Neo4jStorageTest {
         long assocId = assoc.getId();
         assertTrue(assocId != -1);
         //
-        storage.storeAssociationValue(assocId, new SimpleValue(""), asList(IndexMode.OFF), null);
+        storage.storeAssociationValue(assocId, new SimpleValue(""), asList(IndexMode.OFF), null, null);
         //
         return assocId;
     }

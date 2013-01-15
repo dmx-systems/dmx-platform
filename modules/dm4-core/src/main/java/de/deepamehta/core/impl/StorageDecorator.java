@@ -15,7 +15,7 @@ import de.deepamehta.core.util.DeepaMehtaUtils;
 import org.codehaus.jettison.json.JSONObject;
 
 import static java.util.Arrays.asList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -96,10 +96,10 @@ public class StorageDecorator {
     // ---
 
     /**
-     * Convenience method.
+     * Convenience method (no indexing).
      */
-    public void storeTopicValue(long assocId, SimpleValue value) {
-        storeTopicValue(assocId, value, new HashSet(asList(IndexMode.OFF)), null);
+    public void storeTopicValue(long topicId, SimpleValue value) {
+        storeTopicValue(topicId, value, asList(IndexMode.OFF), null, null);
     }
 
     /**
@@ -109,8 +109,9 @@ public class StorageDecorator {
      *
      * @return  The previous value, or <code>null</code> if no value was stored before. ### FIXDOC
      */
-    public void storeTopicValue(long topicId, SimpleValue value, Set<IndexMode> indexModes, String indexKey) {
-        storage.storeTopicValue(topicId, value, indexModes, indexKey);
+    public void storeTopicValue(long topicId, SimpleValue value, Collection<IndexMode> indexModes, String indexKey,
+                                                                                              SimpleValue indexValue) {
+        storage.storeTopicValue(topicId, value, indexModes, indexKey, indexValue);
     }
 
     // ---
@@ -339,10 +340,10 @@ public class StorageDecorator {
     // ---
 
     /**
-     * Convenience method.
+     * Convenience method (no indexing).
      */
     public void storeAssociationValue(long assocId, SimpleValue value) {
-        storeAssociationValue(assocId, value, new HashSet(asList(IndexMode.OFF)), null);
+        storeAssociationValue(assocId, value, asList(IndexMode.OFF), null, null);
     }
 
     /**
@@ -352,8 +353,9 @@ public class StorageDecorator {
      *
      * @return  The previous value, or <code>null</code> if no value was stored before. ### FIXDOC
      */
-    public void storeAssociationValue(long assocId, SimpleValue value, Set<IndexMode> indexModes, String indexKey) {
-        storage.storeAssociationValue(assocId, value, indexModes, indexKey);
+    public void storeAssociationValue(long assocId, SimpleValue value, Collection<IndexMode> indexModes,
+                                                                       String indexKey, SimpleValue indexValue) {
+        storage.storeAssociationValue(assocId, value, indexModes, indexKey, indexValue);
     }
 
     // ---

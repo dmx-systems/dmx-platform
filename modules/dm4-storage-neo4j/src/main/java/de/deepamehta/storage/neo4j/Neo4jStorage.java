@@ -145,8 +145,10 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public void storeTopicValue(long topicId, SimpleValue value, Collection<IndexMode> indexModes, String indexKey) {
-        storeAndIndexTopicValue(fetchTopicNode(topicId), value.value(), indexModes, indexKey);
+    public void storeTopicValue(long topicId, SimpleValue value, Collection<IndexMode> indexModes, String indexKey,
+                                                                                              SimpleValue indexValue) {
+        storeAndIndexTopicValue(fetchTopicNode(topicId), value.value(), indexModes, indexKey,
+            getIndexValue(value, indexValue));
     }
 
     // ---
@@ -218,8 +220,9 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     @Override
     public void storeAssociationValue(long assocId, SimpleValue value, Collection<IndexMode> indexModes,
-                                                                                      String indexKey) {
-        storeAndIndexAssociationValue(fetchAssociationNode(assocId), value.value(), indexModes, indexKey);
+                                                                       String indexKey, SimpleValue indexValue) {
+        storeAndIndexAssociationValue(fetchAssociationNode(assocId), value.value(), indexModes, indexKey,
+            getIndexValue(value, indexValue));
     }
 
     @Override
@@ -643,15 +646,25 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     private void storeAndIndexTopicValue(Node topicNode, Object value, Collection<IndexMode> indexModes,
-                                                                       String indexKey) {
+                                                                       String indexKey, Object indexValue) {
+        // store
         topicNode.setProperty("value", value);
-        indexNodeValue(topicNode, value, indexModes, indexKey, topicContentExact, topicContentFulltext);
+        // index
+        indexNodeValue(topicNode, indexValue, indexModes, indexKey, topicContentExact, topicContentFulltext);
     }
 
     private void storeAndIndexAssociationValue(Node assocNode, Object value, Collection<IndexMode> indexModes,
-                                                                             String indexKey) {
+                                                                             String indexKey, Object indexValue) {
+        // store
         assocNode.setProperty("value", value);
-        indexNodeValue(assocNode, value, indexModes, indexKey, assocContentExact, assocContentFulltext);
+        // index
+        indexNodeValue(assocNode, indexValue, indexModes, indexKey, assocContentExact, assocContentFulltext);
+    }
+
+    // ---
+
+    private Object getIndexValue(SimpleValue value, SimpleValue indexValue) {
+        return indexValue != null ? indexValue.value() : value.value();
     }
 
 
@@ -660,11 +673,6 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     private void indexNodeValue(Node node, Object value, Collection<IndexMode> indexModes, String indexKey,
                                                          Index<Node> exactIndex, Index<Node> fulltextIndex) {
-        // ### TODO: strip HTML tags before indexing
-        /*if (getType().getDataTypeUri().equals("dm4.core.html")) {
-            value = new SimpleValue(JavaUtils.stripHTML(value.toString()));
-        }*/
-        //
         for (IndexMode indexMode : indexModes) {
             if (indexMode == IndexMode.OFF) {
                 return;

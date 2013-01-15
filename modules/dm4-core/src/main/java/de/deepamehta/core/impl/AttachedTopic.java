@@ -74,7 +74,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     protected void storeSimpleValue(Set<IndexMode> indexModes, String indexKey) {
-        dms.storage.storeTopicValue(getId(), getSimpleValue(), indexModes, indexKey);
+        dms.storage.storeTopicValue(getId(), getSimpleValue(), indexModes, indexKey, getIndexValue());
     }
 
     @Override
@@ -86,6 +86,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     protected RoleModel createRoleModel(String roleTypeUri) {
         return new TopicRoleModel(getId(), roleTypeUri);
     }
+
+
 
     // === Deletion ===
 
