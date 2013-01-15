@@ -211,7 +211,8 @@ var js = {
     },
 
     truncate: function(text, max_length) {
-        if (text.length <= max_length) {
+        // do not truncate "text" if it's no text (but a number or a boolean) or if there's no need for truncation
+        if (!text.length || text.length <= max_length) {
             return text
         }
         var i = text.lastIndexOf(" ", max_length)
