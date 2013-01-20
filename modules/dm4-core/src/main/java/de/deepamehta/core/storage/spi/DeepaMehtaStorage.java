@@ -29,6 +29,7 @@ public interface DeepaMehtaStorage {
 
     TopicModel fetchTopic(String key, Object value);
 
+    // ### TODO: unify all List and Set results as Collection
     List<TopicModel> fetchTopics(String key, Object value);
 
     List<TopicModel> queryTopics(Object value);
@@ -91,17 +92,41 @@ public interface DeepaMehtaStorage {
 
     // ---
 
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
     Set<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
 
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
     Set<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
     // ---
 
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
     Set<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
 
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
     Set<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 

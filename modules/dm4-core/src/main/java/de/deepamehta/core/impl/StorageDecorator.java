@@ -156,6 +156,11 @@ public class StorageDecorator {
     /**
      * Convenience method (checks singularity).
      *
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     *
      * @return  The fetched topics.
      *          Note: their composite values are not initialized.
      */
@@ -176,6 +181,11 @@ public class StorageDecorator {
     }
 
     /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     *
      * @return  The fetched topics.
      *          Note: their composite values are not initialized.
      */

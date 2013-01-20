@@ -61,8 +61,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
             super.delete(directives);
             // delete topic itself
             logger.info("Deleting " + this);
-            dms.storage.deleteTopic(getId());
             directives.add(Directive.DELETE_TOPIC, this);
+            dms.storage.deleteTopic(getId());
             //
             tx.success();
         } catch (Exception e) {

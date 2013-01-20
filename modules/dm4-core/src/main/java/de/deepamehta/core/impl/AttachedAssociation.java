@@ -71,10 +71,32 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
             super.delete(directives);
             // delete association itself
             logger.info("Deleting " + this);
-            dms.storage.deleteAssociation(getId());
             directives.add(Directive.DELETE_ASSOCIATION, this);
+            dms.storage.deleteAssociation(getId());
             //
             tx.success();
+        } catch (IllegalStateException e) {
+            // Note: getAssociations() might throw IllegalStateException and is no problem.
+            // This can happen when this object is an association which is already deleted.
+            //
+            // Consider this particular situation: let A1 and A2 be associations of this object and let A2 point to A1.
+            // If A1 gets deleted first (the association set order is non-deterministic), A2 is implicitely deleted
+            // with it (because it is a direct association of A1 as well). Then when the loop comes to A2
+            // "IllegalStateException: Node[1327] has been deleted in this tx" is thrown because A2 has been deleted
+            // already. (The Node appearing in the exception is the middle node of A2.) If, on the other hand, A2
+            // gets deleted first no error would occur.
+            //
+            // This particular situation exists when e.g. a topicmap is deleted while one of its mapcontext
+            // associations is also a part of the topicmap itself. This originates e.g. when the user reveals
+            // a topicmap's mapcontext association and then deletes the topicmap.
+            //
+            if (e.getMessage().matches("Node\\[\\d+\\] has been deleted in this tx")) {
+                logger.info("### Association has already been deleted in this transaction. This can happen while " +
+                    "deleting a topic with direct associations A1 and A2 while A2 points to A1 (" + this + ")");
+                tx.success();
+            } else {
+                throw e;
+            }
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting association failed (" + this + ")", e);

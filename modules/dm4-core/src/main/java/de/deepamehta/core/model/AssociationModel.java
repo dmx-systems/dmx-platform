@@ -91,16 +91,13 @@ public class AssociationModel extends DeepaMehtaObjectModel {
         return null;
     }
 
-    public RoleModel getOtherRoleModel(long id) {
+    public long getOtherPlayerId(long id) {
         long id1 = roleModel1.getPlayerId();
         long id2 = roleModel2.getPlayerId();
-        if (id1 == id2) {
-            throw new RuntimeException("Ambiguous getOtherRoleModel() call: both players have ID " + id +
-                " in association (" + this + ")");
-        } else if (id1 == id) {
-            return roleModel2;
+        if (id1 == id) {
+            return id2;
         } else if (id2 == id) {
-            return roleModel1;
+            return id1;
         } else {
             throw new IllegalArgumentException("ID " + id + " doesn't refer to a player in " + this);
         }
