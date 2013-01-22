@@ -18,9 +18,9 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import static org.neo4j.helpers.collection.MapUtil.stringMap;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexManager;
+import static org.neo4j.helpers.collection.MapUtil.stringMap;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -43,12 +43,18 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    // ### TODO: define further string constants for key names etc.
+    // --- Property Keys ---
+    private static final String KEY_NODE_TYPE = "node_type";
+    private static final String KEY_VALUE     = "value";
+
+    // --- Content Indexes ---
+    private static final String KEY_URI      = "uri";                       // used as property key as well
+    private static final String KEY_TPYE_URI = "type_uri";                  // used as property key as well
     private static final String KEY_FULLTEXT = "_fulltext_";
 
-    // association metadata
+    // --- Association Metadata Index ---
     private static final String KEY_ASSOC_TPYE_URI = "assoc_type_uri";
-    // role
+    // role 1 & 2
     private static final String KEY_ROLE_TPYE_URI   = "role_type_uri_";     // "1" or "2" is appended programatically
     private static final String KEY_PLAYER_TPYE     = "player_type_";       // "1" or "2" is appended programatically
     private static final String KEY_PLAYER_ID       = "player_id_";         // "1" or "2" is appended programatically
@@ -165,7 +171,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         //
         // 1) update DB
         Node topicNode = neo4j.createNode();
-        topicNode.setProperty("node_type", "topic");
+        topicNode.setProperty(KEY_NODE_TYPE, "topic");
         //
         storeAndIndexTopicUri(topicNode, uri);
         storeAndIndexTopicTypeUri(topicNode, topicModel.getTypeUri());
@@ -193,7 +199,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     @Override
     public Set<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
                                                                         String roleTypeUri1, String roleTypeUri2) {
-        return queryAssociationMetadataIndex(
+        return queryAssociationIndex(
             assocTypeUri,
             roleTypeUri1, NodeType.TOPIC, topicId1, null,
             roleTypeUri2, NodeType.TOPIC, topicId2, null
@@ -203,7 +209,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     @Override
     public Set<AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
                                                        long assocId, String topicRoleTypeUri, String assocRoleTypeUri) {
-        return queryAssociationMetadataIndex(
+        return queryAssociationIndex(
             assocTypeUri,
             topicRoleTypeUri, NodeType.TOPIC, topicId, null,
             assocRoleTypeUri, NodeType.ASSOC, assocId, null
@@ -219,7 +225,10 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     @Override
     public void storeAssociationTypeUri(long assocId, String assocTypeUri) {
-        // ### TODO: index update
+        // Note: The "Instantiation" association is already reassigned by the caller.
+        Node assocNode = fetchAssociationNode(assocId);
+        storeAndIndexAssociationTypeUri(assocNode, assocTypeUri);   // updates DB and content index
+        indexAssociationType(assocNode, assocTypeUri);              // updates association metadata index
     }
 
     @Override
@@ -245,7 +254,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         //
         // 1) update DB
         Node assocNode = neo4j.createNode();
-        assocNode.setProperty("node_type", "assoc");
+        assocNode.setProperty(KEY_NODE_TYPE, "assoc");
         //
         storeAndIndexAssociationUri(assocNode, uri);
         storeAndIndexAssociationTypeUri(assocNode, assocModel.getTypeUri());
@@ -296,7 +305,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     @Override
     public Set<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                           String othersRoleTypeUri, String othersTopicTypeUri) {
-        return buildRelatedTopics(queryAssociationMetadataIndex(
+        return buildRelatedTopics(queryAssociationIndex(
             assocTypeUri,
             myRoleTypeUri,     NodeType.TOPIC, topicId, null,
             othersRoleTypeUri, NodeType.TOPIC, -1,      othersTopicTypeUri
@@ -306,7 +315,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     @Override
     public Set<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        return buildRelatedAssociations(queryAssociationMetadataIndex(
+        return buildRelatedAssociations(queryAssociationIndex(
             assocTypeUri,
             myRoleTypeUri,     NodeType.TOPIC, topicId, null,
             othersRoleTypeUri, NodeType.ASSOC, -1,      othersAssocTypeUri
@@ -318,7 +327,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     @Override
     public Set<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                                 String othersRoleTypeUri, String othersTopicTypeUri) {
-        return buildRelatedTopics(queryAssociationMetadataIndex(
+        return buildRelatedTopics(queryAssociationIndex(
             assocTypeUri,
             myRoleTypeUri,     NodeType.ASSOC, assocId, null,
             othersRoleTypeUri, NodeType.TOPIC, -1,      othersTopicTypeUri
@@ -328,7 +337,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     @Override
     public Set<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        return buildRelatedAssociations(queryAssociationMetadataIndex(
+        return buildRelatedAssociations(queryAssociationIndex(
             assocTypeUri,
             myRoleTypeUri,     NodeType.ASSOC, assocId, null,
             othersRoleTypeUri, NodeType.ASSOC, -1,      othersAssocTypeUri
@@ -368,14 +377,14 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         try {
             Node rootNode = fetchNode(0);
             //
-            if (rootNode.getProperty("node_type", null) != null) {
+            if (rootNode.getProperty(KEY_NODE_TYPE, null) != null) {
                 return false;
             }
             //
-            rootNode.setProperty("node_type", "topic");
+            rootNode.setProperty(KEY_NODE_TYPE, "topic");
+            rootNode.setProperty(KEY_VALUE, "Meta Type");
             storeAndIndexTopicUri(rootNode, "dm4.core.meta_type");
             storeAndIndexTopicTypeUri(rootNode, "dm4.core.meta_meta_type");
-            rootNode.setProperty("value", "Meta Type");
             //
             return true;
         } catch (Exception e) {
@@ -536,7 +545,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     private Node fetchTopicNodeByUri(String uri) {
-        Node node = topicContentExact.get("uri", uri).getSingle();
+        Node node = topicContentExact.get(KEY_URI, uri).getSingle();
         //
         if (node == null) {
             throw new RuntimeException("Topic with URI \"" + uri + "\" not found in database");
@@ -561,15 +570,15 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     private String uri(Node node) {
-        return (String) node.getProperty("uri");
+        return (String) node.getProperty(KEY_URI);
     }
 
     private String typeUri(Node node) {
-        return (String) node.getProperty("type_uri");
+        return (String) node.getProperty(KEY_TPYE_URI);
     }
 
     private SimpleValue simpleValue(Node node) {
-        return new SimpleValue(node.getProperty("value"));
+        return new SimpleValue(node.getProperty(KEY_VALUE));
     }
 
 
@@ -612,8 +621,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         if (uri.equals("")) {
             return;
         }
-        Node n1 = topicContentExact.get("uri", uri).getSingle();
-        Node n2 = assocContentExact.get("uri", uri).getSingle();
+        Node n1 = topicContentExact.get(KEY_URI, uri).getSingle();
+        Node n2 = assocContentExact.get(KEY_URI, uri).getSingle();
         if (n1 != null || n2 != null) {
             throw new RuntimeException("URI \"" + uri + "\" is not unique");
         }
@@ -624,27 +633,29 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // === Value Storage ===
 
     private void storeAndIndexTopicUri(Node topicNode, String uri) {
-        storeAndIndexExactValue(topicNode, "uri", uri, topicContentExact);
+        storeAndIndexExactValue(topicNode, KEY_URI, uri, topicContentExact);
     }
 
     private void storeAndIndexAssociationUri(Node assocNode, String uri) {
-        storeAndIndexExactValue(assocNode, "uri", uri, assocContentExact);
+        storeAndIndexExactValue(assocNode, KEY_URI, uri, assocContentExact);
     }
 
     // ---
 
-    private void storeAndIndexTopicTypeUri(Node topicNode, String typeUri) {
-        storeAndIndexExactValue(topicNode, "type_uri", typeUri, topicContentExact);
+    private void storeAndIndexTopicTypeUri(Node topicNode, String topicTypeUri) {
+        storeAndIndexExactValue(topicNode, KEY_TPYE_URI, topicTypeUri, topicContentExact);
     }
 
-    private void storeAndIndexAssociationTypeUri(Node assocNode, String typeUri) {
-        storeAndIndexExactValue(assocNode, "type_uri", typeUri, assocContentExact);
+    private void storeAndIndexAssociationTypeUri(Node assocNode, String assocTypeUri) {
+        storeAndIndexExactValue(assocNode, KEY_TPYE_URI, assocTypeUri, assocContentExact);
     }
 
     // ---
 
     private void storeAndIndexExactValue(Node node, String key, String value, Index<Node> index) {
+        // store
         node.setProperty(key, value);
+        // index
         indexNodeValue(node, value, asList(IndexMode.KEY), key, index, null);   // fulltextIndex=null
     }
 
@@ -653,7 +664,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     private void storeAndIndexTopicValue(Node topicNode, Object value, Collection<IndexMode> indexModes,
                                                                        String indexKey, Object indexValue) {
         // store
-        topicNode.setProperty("value", value);
+        topicNode.setProperty(KEY_VALUE, value);
         // index
         indexNodeValue(topicNode, indexValue, indexModes, indexKey, topicContentExact, topicContentFulltext);
     }
@@ -661,7 +672,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     private void storeAndIndexAssociationValue(Node assocNode, Object value, Collection<IndexMode> indexModes,
                                                                              String indexKey, Object indexValue) {
         // store
-        assocNode.setProperty("value", value);
+        assocNode.setProperty(KEY_VALUE, value);
         // index
         indexNodeValue(assocNode, indexValue, indexModes, indexKey, assocContentExact, assocContentFulltext);
     }
@@ -700,10 +711,15 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     private void indexAssociation(Node assocNode, String roleTypeUri1, Node playerNode1,
                                                   String roleTypeUri2, Node playerNode2) {
-        assocMetadata.add(assocNode, KEY_ASSOC_TPYE_URI, typeUri(assocNode));
+        indexAssociationType(assocNode, typeUri(assocNode));
         //
         indexRole(assocNode, 1, roleTypeUri1, playerNode1);
         indexRole(assocNode, 2, roleTypeUri2, playerNode2);
+    }
+
+    private void indexAssociationType(Node assocNode, String assocTypeUri) {
+        assocMetadata.remove(assocNode, KEY_ASSOC_TPYE_URI);
+        assocMetadata.add(assocNode, KEY_ASSOC_TPYE_URI, assocTypeUri);
     }
 
     private void indexRole(Node assocNode, int nr, String roleTypeUri, Node playerNode) {
@@ -715,7 +731,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---
 
-    private Set<AssociationModel> queryAssociationMetadataIndex(String assocTypeUri,
+    private Set<AssociationModel> queryAssociationIndex(String assocTypeUri,
                                      String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
                                      String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
         return executeAssociationQuery(buildAssociationQuery(assocTypeUri,

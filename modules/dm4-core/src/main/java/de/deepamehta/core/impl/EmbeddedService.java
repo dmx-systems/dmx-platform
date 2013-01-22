@@ -827,18 +827,28 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ---
 
+    /**
+     * Factory method.
+     */
     private Topic createTopic(TopicModel model, ClientState clientState, Directives directives) {
+        // 1) store in DB
         storage.storeTopic(model);
         //
+        // 2) create application object
         AttachedTopic topic = new AttachedTopic(model, this);
         topic.storeValue(clientState, directives);
         //
         return topic;
     }
 
+    /**
+     * Factory method.
+     */
     private Association createAssociation(AssociationModel model, ClientState clientState, Directives directives) {
+        // 1) store in DB
         storage.storeAssociation(model);
         //
+        // 2) create application object
         AttachedAssociation assoc = new AttachedAssociation(model, this);
         assoc.storeValue(clientState, directives);
         //
@@ -847,22 +857,30 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ---
 
+    /**
+     * Factory method.
+     */
     private TopicType createTopicType(TopicTypeModel model) {
-        // 1) store generic topic
-        createTypeTopic(model, DEFAULT_TOPIC_TYPE_URI);
-        // 2) store type-specific parts
-        objectFactory.storeType(model);
+        // 1) store in DB
+        createTypeTopic(model, DEFAULT_TOPIC_TYPE_URI);         // store generic topic
+        objectFactory.storeType(model);                         // store type-specific parts
+        //
+        // 2) create application object
         TopicType topicType = new AttachedTopicType(model, this);
         typeCache.putTopicType(topicType);
         //
         return topicType;
     }
 
+    /**
+     * Factory method.
+     */
     private AssociationType createAssociationType(AssociationTypeModel model) {
-        // 1) store generic topic
-        createTypeTopic(model, DEFAULT_ASSOCIATION_TYPE_URI);
-        // 2) store type-specific parts
-        objectFactory.storeType(model);
+        // 1) store in DB
+        createTypeTopic(model, DEFAULT_ASSOCIATION_TYPE_URI);   // store generic topic
+        objectFactory.storeType(model);                         // store type-specific parts
+        //
+        // 2) create application object
         AssociationType assocType = new AttachedAssociationType(model, this);
         typeCache.putAssociationType(assocType);
         //
@@ -872,7 +890,6 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     private void createTypeTopic(TopicModel model, String defaultUriPrefix) {
-        // 1) store the base-topic parts
         Topic typeTopic = createTopic(model, null, null);   // ### FIXME: clientState, directives
         // If no URI is set the type gets a default URI based on its ID.
         // Note: this must be done *after* the topic is created. The ID is not known before.
