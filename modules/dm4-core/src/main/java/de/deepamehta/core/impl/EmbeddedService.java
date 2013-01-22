@@ -164,7 +164,7 @@ public class EmbeddedService implements DeepaMehtaService {
             fireEvent(CoreEvent.PRE_CREATE_TOPIC, model, clientState);
             //
             Directives directives = new Directives();   // ### FIXME: directives are ignored
-            Topic topic = objectFactory.storeTopic(model, clientState, directives);
+            Topic topic = createTopic(model, clientState, directives);
             //
             fireEvent(CoreEvent.POST_CREATE_TOPIC, topic, clientState, directives);
             //
@@ -337,7 +337,7 @@ public class EmbeddedService implements DeepaMehtaService {
             fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model, clientState);
             //
             Directives directives = new Directives();   // ### FIXME: directives are ignored
-            Association assoc = objectFactory.storeAssociation(model, clientState, directives);
+            Association assoc = createAssociation(model, clientState, directives);
             //
             fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc, clientState, directives);
             //
@@ -457,9 +457,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public TopicType createTopicType(TopicTypeModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            objectFactory.storeType(model, DEFAULT_TOPIC_TYPE_URI);
-            AttachedTopicType topicType = new AttachedTopicType(model, this);
-            typeCache.putTopicType(topicType);
+            TopicType topicType = createTopicType(model);
             //
             fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, clientState);
             //
@@ -552,9 +550,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            objectFactory.storeType(model, DEFAULT_ASSOCIATION_TYPE_URI);
-            AttachedAssociationType assocType = new AttachedAssociationType(model, this);
-            typeCache.putAssociationType(assocType);
+            AssociationType assocType = createAssociationType(model);
             //
             fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType, clientState);
             //
@@ -829,6 +825,62 @@ public class EmbeddedService implements DeepaMehtaService {
         }
     }
 
+    // ---
+
+    private Topic createTopic(TopicModel model, ClientState clientState, Directives directives) {
+        storage.storeTopic(model);
+        //
+        AttachedTopic topic = new AttachedTopic(model, this);
+        topic.storeValue(clientState, directives);
+        //
+        return topic;
+    }
+
+    private Association createAssociation(AssociationModel model, ClientState clientState, Directives directives) {
+        storage.storeAssociation(model);
+        //
+        AttachedAssociation assoc = new AttachedAssociation(model, this);
+        assoc.storeValue(clientState, directives);
+        //
+        return assoc;
+    }
+
+    // ---
+
+    private TopicType createTopicType(TopicTypeModel model) {
+        // 1) store generic topic
+        createTypeTopic(model, DEFAULT_TOPIC_TYPE_URI);
+        // 2) store type-specific parts
+        objectFactory.storeType(model);
+        TopicType topicType = new AttachedTopicType(model, this);
+        typeCache.putTopicType(topicType);
+        //
+        return topicType;
+    }
+
+    private AssociationType createAssociationType(AssociationTypeModel model) {
+        // 1) store generic topic
+        createTypeTopic(model, DEFAULT_ASSOCIATION_TYPE_URI);
+        // 2) store type-specific parts
+        objectFactory.storeType(model);
+        AssociationType assocType = new AttachedAssociationType(model, this);
+        typeCache.putAssociationType(assocType);
+        //
+        return assocType;
+    }
+
+    // ---
+
+    private void createTypeTopic(TopicModel model, String defaultUriPrefix) {
+        // 1) store the base-topic parts
+        Topic typeTopic = createTopic(model, null, null);   // ### FIXME: clientState, directives
+        // If no URI is set the type gets a default URI based on its ID.
+        // Note: this must be done *after* the topic is created. The ID is not known before.
+        if (typeTopic.getUri().equals("")) {
+            typeTopic.setUri(defaultUriPrefix + typeTopic.getId());
+        }
+    }
+
 
 
     // === Bootstrap ===
@@ -864,82 +916,97 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     private void setupBootstrapContent() {
-        // Before topic types and asscociation types can be created the meta types must be created
-        TopicModel t = new TopicModel("dm4.core.topic_type", "dm4.core.meta_type", new SimpleValue("Topic Type"));
-        TopicModel a = new TopicModel("dm4.core.assoc_type", "dm4.core.meta_type", new SimpleValue("Association Type"));
-        objectFactory._createTopic(t);
-        objectFactory._createTopic(a);
-        // Create topic type "Data Type"
-        // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
-        // depends on the topic type "Data Type". To resolve this circle we use a low-level (storage) call here
-        // and postpone the data type association.
-        TopicModel dataType = new TopicTypeModel("dm4.core.data_type", "Data Type", "dm4.core.text");
-        TopicModel roleType = new TopicTypeModel("dm4.core.role_type", "Role Type", "dm4.core.text");
-        objectFactory._createTopic(dataType);
-        objectFactory._createTopic(roleType);
-        // Create data type "Text"
-        TopicModel text = new TopicModel("dm4.core.text", "dm4.core.data_type", new SimpleValue("Text"));
-        objectFactory._createTopic(text);
-        // Create role types "Default", "Type", and "Instance"
-        TopicModel deflt    = new TopicModel("dm4.core.default",  "dm4.core.role_type", new SimpleValue("Default"));
-        TopicModel type     = new TopicModel("dm4.core.type",     "dm4.core.role_type", new SimpleValue("Type"));
-        TopicModel instance = new TopicModel("dm4.core.instance", "dm4.core.role_type", new SimpleValue("Instance"));
-        objectFactory._createTopic(deflt);
-        objectFactory._createTopic(type);
-        objectFactory._createTopic(instance);
-        // Create association type "Aggregation" -- needed to associate topic/association types with data types
-        TopicModel aggregation = new AssociationTypeModel("dm4.core.aggregation", "Aggregation", "dm4.core.text");
-        objectFactory._createTopic(aggregation);
-        // Create association type "Instantiation" -- needed to associate topics with topic types
-        TopicModel instantiation = new AssociationTypeModel("dm4.core.instantiation", "Instantiation", "dm4.core.text");
-        objectFactory._createTopic(instantiation);
-        //
-        // 1) Postponed topic type association
-        //
-        // Note: associateWithTopicType() creates the associations by *low-level* (storage) calls.
-        // That's why the associations can be created *before* their type (here: "dm4.core.instantiation")
-        // is fully constructed (the type's data type is not yet associated => step 2).
-        objectFactory.associateWithTopicType(t.getId(), t.getTypeUri());
-        objectFactory.associateWithTopicType(a.getId(), a.getTypeUri());
-        objectFactory.associateWithTopicType(dataType.getId(), dataType.getTypeUri());
-        objectFactory.associateWithTopicType(roleType.getId(), roleType.getTypeUri());
-        objectFactory.associateWithTopicType(text.getId(), text.getTypeUri());
-        objectFactory.associateWithTopicType(deflt.getId(), deflt.getTypeUri());
-        objectFactory.associateWithTopicType(type.getId(), type.getTypeUri());
-        objectFactory.associateWithTopicType(instance.getId(), instance.getTypeUri());
-        objectFactory.associateWithTopicType(aggregation.getId(), aggregation.getTypeUri());
-        objectFactory.associateWithTopicType(instantiation.getId(), instantiation.getTypeUri());
-        //
-        // 2) Postponed data type association
-        //
-        // Note: associateDataType() creates the association by a *high-level* (service) call.
-        // This requires the association type (here: dm4.core.aggregation) to be fully constructed already.
-        // That's why the topic type associations (step 1) must be performed *before* the data type associations.
-        // ### FIXDOC: not true anymore
-        //
-        // Note: at time of the first associateDataType() call the required association type (dm4.core.aggregation)
-        // is *not* fully constructed yet! (it gets constructed through this very call). This works anyway because
-        // the data type assigning association is created *before* the association type is fetched.
-        // (see AttachedAssociation.store(): storage.storeAssociation() is called before getType()
-        // in AttachedDeepaMehtaObject.store().)
-        // ### FIXDOC: not true anymore
-        //
-        // Important is that associateDataType("dm4.core.aggregation") is the first call here.
-        // ### FIXDOC: not true anymore
-        //
-        // Note: _associateDataType() creates the data type assigning association by a *low-level* (storage) call.
-        // A high-level (service) call would fail while setting the association's value. The involved getType()
-        // would fail (not because the association is missed -- it's created meanwhile, but)
-        // because this involves fetching the association including its value. The value doesn't exist yet,
-        // because its setting forms the begin of this vicious circle.
-        objectFactory._associateDataType("dm4.core.meta_type",  "dm4.core.text");
-        objectFactory._associateDataType("dm4.core.topic_type", "dm4.core.text");
-        objectFactory._associateDataType("dm4.core.assoc_type", "dm4.core.text");
-        objectFactory._associateDataType("dm4.core.data_type",  "dm4.core.text");
-        objectFactory._associateDataType("dm4.core.role_type",  "dm4.core.text");
-        //
-        objectFactory._associateDataType("dm4.core.aggregation",   "dm4.core.text");
-        objectFactory._associateDataType("dm4.core.instantiation", "dm4.core.text");
+        try {
+            // Before topic types and asscociation types can be created the meta types must be created
+            TopicModel t = new TopicModel("dm4.core.topic_type", "dm4.core.meta_type",
+                new SimpleValue("Topic Type"));
+            TopicModel a = new TopicModel("dm4.core.assoc_type", "dm4.core.meta_type",
+                new SimpleValue("Association Type"));
+            _createTopic(t);
+            _createTopic(a);
+            // Create topic type "Data Type"
+            // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
+            // depends on the topic type "Data Type". To resolve this circle we use a low-level (storage) call here
+            // and postpone the data type association.
+            TopicModel dataType = new TopicTypeModel("dm4.core.data_type", "Data Type", "dm4.core.text");
+            TopicModel roleType = new TopicTypeModel("dm4.core.role_type", "Role Type", "dm4.core.text");
+            _createTopic(dataType);
+            _createTopic(roleType);
+            // Create data type "Text"
+            TopicModel text = new TopicModel("dm4.core.text", "dm4.core.data_type", new SimpleValue("Text"));
+            _createTopic(text);
+            // Create role types "Default", "Type", and "Instance"
+            TopicModel deflt = new TopicModel("dm4.core.default",  "dm4.core.role_type", new SimpleValue("Default"));
+            TopicModel type  = new TopicModel("dm4.core.type",     "dm4.core.role_type", new SimpleValue("Type"));
+            TopicModel inst  = new TopicModel("dm4.core.instance", "dm4.core.role_type", new SimpleValue("Instance"));
+            _createTopic(deflt);
+            _createTopic(type);
+            _createTopic(inst);
+            // Create association type "Aggregation" -- needed to associate topic/association types with data types
+            TopicModel aggregation = new AssociationTypeModel("dm4.core.aggregation", "Aggregation", "dm4.core.text");
+            _createTopic(aggregation);
+            // Create association type "Instantiation" -- needed to associate topics with topic types
+            TopicModel instn = new AssociationTypeModel("dm4.core.instantiation", "Instantiation", "dm4.core.text");
+            _createTopic(instn);
+            //
+            // 1) Postponed topic type association
+            //
+            // Note: associateWithTopicType() creates the associations by *low-level* (storage) calls.
+            // That's why the associations can be created *before* their type (here: "dm4.core.instantiation")
+            // is fully constructed (the type's data type is not yet associated => step 2).
+            storage.associateWithTopicType(t.getId(), t.getTypeUri());
+            storage.associateWithTopicType(a.getId(), a.getTypeUri());
+            storage.associateWithTopicType(dataType.getId(), dataType.getTypeUri());
+            storage.associateWithTopicType(roleType.getId(), roleType.getTypeUri());
+            storage.associateWithTopicType(text.getId(), text.getTypeUri());
+            storage.associateWithTopicType(deflt.getId(), deflt.getTypeUri());
+            storage.associateWithTopicType(type.getId(), type.getTypeUri());
+            storage.associateWithTopicType(inst.getId(), inst.getTypeUri());
+            storage.associateWithTopicType(aggregation.getId(), aggregation.getTypeUri());
+            storage.associateWithTopicType(instn.getId(), instn.getTypeUri());
+            //
+            // 2) Postponed data type association
+            //
+            // Note: associateDataType() creates the association by a *high-level* (service) call.
+            // This requires the association type (here: dm4.core.aggregation) to be fully constructed already.
+            // That's why the topic type associations (step 1) must be performed *before* the data type associations.
+            // ### FIXDOC: not true anymore
+            //
+            // Note: at time of the first associateDataType() call the required association type (dm4.core.aggregation)
+            // is *not* fully constructed yet! (it gets constructed through this very call). This works anyway because
+            // the data type assigning association is created *before* the association type is fetched.
+            // (see AttachedAssociation.store(): storage.storeAssociation() is called before getType()
+            // in AttachedDeepaMehtaObject.store().)
+            // ### FIXDOC: not true anymore
+            //
+            // Important is that associateDataType("dm4.core.aggregation") is the first call here.
+            // ### FIXDOC: not true anymore
+            //
+            // Note: _associateDataType() creates the data type assigning association by a *low-level* (storage) call.
+            // A high-level (service) call would fail while setting the association's value. The involved getType()
+            // would fail (not because the association is missed -- it's created meanwhile, but)
+            // because this involves fetching the association including its value. The value doesn't exist yet,
+            // because its setting forms the begin of this vicious circle.
+            objectFactory._associateDataType("dm4.core.meta_type",  "dm4.core.text");
+            objectFactory._associateDataType("dm4.core.topic_type", "dm4.core.text");
+            objectFactory._associateDataType("dm4.core.assoc_type", "dm4.core.text");
+            objectFactory._associateDataType("dm4.core.data_type",  "dm4.core.text");
+            objectFactory._associateDataType("dm4.core.role_type",  "dm4.core.text");
+            //
+            objectFactory._associateDataType("dm4.core.aggregation",   "dm4.core.text");
+            objectFactory._associateDataType("dm4.core.instantiation", "dm4.core.text");
+        } catch (Exception e) {
+            throw new RuntimeException("Setting up the bootstrap content failed", e);
+        }
+    }
+
+    /**
+     * A low-level call that stores a topic without its "Instantiation" association.
+     * Used for bootstrapping.
+     */
+    private void _createTopic(TopicModel model) {
+        storage._storeTopic(model);
+        storage.storeTopicValue(model.getId(), model.getSimpleValue());
     }
 
     private void bootstrapTypeCache() {

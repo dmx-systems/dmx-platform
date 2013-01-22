@@ -209,11 +209,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     final void storeTypeUri() {
-        // remove current assignment
-        long assocId = dms.objectFactory.fetchTopicTypeTopic(getId()).getRelatingAssociation().getId();
-        dms.deleteAssociation(assocId, null);  // clientState=null
-        // create new assignment
-        dms.objectFactory.associateWithTopicType(getId(), getTypeUri());
+        dms.storage.storeTopicTypeUri(getId(), getTypeUri());
     }
 
     @Override

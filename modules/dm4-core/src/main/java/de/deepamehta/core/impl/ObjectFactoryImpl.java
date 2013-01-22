@@ -65,100 +65,6 @@ class ObjectFactoryImpl implements ObjectFactory {
 
 
 
-    // === DeepaMehta Objects (Topics and Associations) ===
-
-    // --- Fetch ---
-
-    RelatedTopicModel fetchTopicTypeTopic(long topicId) {
-        return dms.storage.fetchTopicRelatedTopic(topicId, "dm4.core.instantiation",
-            "dm4.core.instance", "dm4.core.type", "dm4.core.topic_type");
-    }
-
-    RelatedTopicModel fetchAssociationTypeTopic(long assocId) {
-        // assocTypeUri=null (supposed to be "dm4.core.instantiation" but not possible ### explain)
-        return dms.storage.fetchAssociationRelatedTopic(assocId, null,
-            "dm4.core.instance", "dm4.core.type", "dm4.core.assoc_type");
-    }
-
-    // --- Store ---
-
-    /**
-     * Low-level method. Used for bootstrapping.
-     */
-    void _createTopic(TopicModel model) {
-        // Note: low-level (storage) call used here ### explain
-        dms.storage.storeTopic(model);
-        dms.storage.storeTopicValue(model.getId(), model.getSimpleValue());
-    }
-
-    // ---
-
-    Topic storeTopic(TopicModel model, ClientState clientState, Directives directives) {
-        setDefaults(model);
-        dms.storage.storeTopic(model);
-        associateWithTopicType(model.getId(), model.getTypeUri());
-        //
-        AttachedTopic topic = new AttachedTopic(model, dms);
-        topic.storeValue(clientState, directives);
-        //
-        return topic;
-    }
-
-    Association storeAssociation(AssociationModel model, ClientState clientState, Directives directives) {
-        setDefaults(model);
-        dms.storage.storeAssociation(model);
-        associateWithAssociationType(model.getId(), model.getTypeUri());
-        //
-        AttachedAssociation assoc = new AttachedAssociation(model, dms);
-        assoc.storeValue(clientState, directives);
-        //
-        return assoc;
-    }
-
-    // ---
-
-    // ### TODO: differentiate between a model and an update model and then drop this method
-    private void setDefaults(DeepaMehtaObjectModel model) {
-        if (model.getUri() == null) {
-            model.setUri("");
-        }
-        if (model.getSimpleValue() == null) {
-            model.setSimpleValue("");
-        }
-    }
-
-    // ---
-
-    void associateWithTopicType(long topicId, String topicTypeUri) {
-        try {
-            AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
-                new TopicRoleModel(topicTypeUri, "dm4.core.type"),
-                new TopicRoleModel(topicId, "dm4.core.instance"));
-            dms.storage.storeAssociation(assoc);
-            dms.storage.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
-            associateWithAssociationType(assoc.getId(), assoc.getTypeUri());
-            // low-level (storage) call used here ### explain
-        } catch (Exception e) {
-            throw new RuntimeException("Associating topic " + topicId +
-                " with topic type \"" + topicTypeUri + "\" failed", e);
-        }
-    }
-
-    void associateWithAssociationType(long assocId, String assocTypeUri) {
-        try {
-            AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
-                new TopicRoleModel(assocTypeUri, "dm4.core.type"),
-                new AssociationRoleModel(assocId, "dm4.core.instance"));
-            dms.storage.storeAssociation(assoc);  // low-level (storage) call used here ### explain
-            dms.storage.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
-        } catch (Exception e) {
-            throw new RuntimeException("Associating association " + assocId +
-                " with association type \"" + assocTypeUri + "\" failed", e);
-        }
-    }
-
-
-
     // === Type Cache ===
 
     private TypeModel getType(String typeUri) {
@@ -255,27 +161,13 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // --- Store ---
 
-    void storeType(TypeModel type, String defaultUriPrefix) {
-        // 1) store the base-topic parts ### TODO: call storeTopic() instead?
-        dms.storage.storeTopic(type);
-        associateWithTopicType(type.getId(), type.getTypeUri());
-        // Note: the created AttachedTopic is just a temporary vehicle to
-        // let us call its setUri() and storeAndIndexSimpleValue() methods.
-        AttachedTopic typeTopic = new AttachedTopic(type, dms);
-        // If no URI is set the type gets a default URI based on its ID.
-        // Note: this must be done *after* the topic is created. The ID is not known before.
-        if (typeTopic.getUri().equals("")) {
-            typeTopic.setUri(defaultUriPrefix + type.getId());
-        }
-        //
-        typeTopic.storeAndIndexSimpleValue();
-        //
-        // 2) put in type cache
+    void storeType(TypeModel type) {
+        // 1) put in type cache
         // Note: an association type must be put in type cache *before* storing its association definitions.
         // Consider creation of association type "Composition Definition": it has a composition definition itself.
         putInTypeCache(type);
         //
-        // 3) store the type-specific parts
+        // 2) store type-specific parts
         associateDataType(type.getUri(), type.getDataTypeUri());
         storeIndexModes(type.getUri(), type.getIndexModes());
         storeAssocDefs(type.getUri(), type.getAssocDefs());
@@ -313,6 +205,7 @@ class ObjectFactoryImpl implements ObjectFactory {
         associateDataType(typeUri, dataTypeUri);
     }
 
+    // ### TODO: drop in favor of _associateDataType() below?
     private void associateDataType(String typeUri, String dataTypeUri) {
         try {
             dms.createAssociation("dm4.core.aggregation",
@@ -335,7 +228,6 @@ class ObjectFactoryImpl implements ObjectFactory {
             new TopicRoleModel(dataTypeUri, "dm4.core.default"));
         dms.storage.storeAssociation(assoc);
         dms.storage.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
-        associateWithAssociationType(assoc.getId(), assoc.getTypeUri());
     }
 
 

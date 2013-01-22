@@ -2,11 +2,14 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.AssociationRoleModel;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.accesscontrol.AccessControlList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
@@ -93,6 +96,15 @@ public class StorageDecorator {
         storage.storeTopicUri(topicId, uri);
     }
 
+    public void storeTopicTypeUri(long topicId, String topicTypeUri) {
+        // remove current assignment
+        storage.deleteAssociation(fetchTopicTypeTopic(topicId).getRelatingAssociation().getId());
+        // create new assignment
+        associateWithTopicType(topicId, topicTypeUri);
+        //
+        storage.storeTopicTypeUri(topicId, topicTypeUri);
+    }
+
     // ---
 
     /**
@@ -121,13 +133,15 @@ public class StorageDecorator {
      * <p>
      * The topic's URI is stored and indexed.
      *
-     * @return  FIXME ### the created topic. Note:
+     * @return  FIXDOC ### the created topic. Note:
      *          - the topic URI   is initialzed and     persisted.
      *          - the topic value is initialzed but not persisted.
      *          - the type URI    is initialzed but not persisted.
      */
-    public void storeTopic(TopicModel topicModel) {
-        storage.storeTopic(topicModel);
+    public void storeTopic(TopicModel model) {
+        setDefaults(model);
+        _storeTopic(model);
+        associateWithTopicType(model.getId(), model.getTypeUri());
     }
 
     /**
@@ -334,17 +348,24 @@ public class StorageDecorator {
 
     // ---
 
-    public void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri) {
-        storage.storeRoleTypeUri(assocId, playerId, roleTypeUri);
-    }
-
-    // ---
-
     /**
      * Stores and indexes the association's URI.
      */
     public void storeAssociationUri(long assocId, String uri) {
         storage.storeAssociationUri(assocId, uri);
+    }
+
+    public void storeAssociationTypeUri(long assocId, String assocTypeUri) {
+        // remove current assignment
+        storage.deleteAssociation(fetchAssociationTypeTopic(assocId).getRelatingAssociation().getId());
+        // create new assignment
+        associateWithAssociationType(assocId, assocTypeUri);
+        //
+        storage.storeAssociationTypeUri(assocId, assocTypeUri);
+    }
+
+    public void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri) {
+        storage.storeRoleTypeUri(assocId, playerId, roleTypeUri);
     }
 
     // ---
@@ -370,8 +391,10 @@ public class StorageDecorator {
 
     // ---
 
-    public void storeAssociation(AssociationModel assocModel) {
-        storage.storeAssociation(assocModel);
+    public void storeAssociation(AssociationModel model) {
+        setDefaults(model);
+        storage.storeAssociation(model);
+        associateWithAssociationType(model.getId(), model.getTypeUri());
     }
 
     public void deleteAssociation(long assocId) {
@@ -565,5 +588,70 @@ public class StorageDecorator {
 
     public void storeMigrationNr(int migrationNr) {
         storage.storeProperty(0, "core_migration_nr", migrationNr);
+    }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    /**
+     * A low-level call that stores a topic without its "Instantiation" association.
+     * Called by EmbeddedService.setupBootstrapContent().
+     */
+    void _storeTopic(TopicModel model) {
+        storage.storeTopic(model);
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private RelatedTopicModel fetchTopicTypeTopic(long topicId) {
+        return fetchTopicRelatedTopic(topicId, "dm4.core.instantiation", "dm4.core.instance", "dm4.core.type",
+            "dm4.core.topic_type");
+    }
+
+    private RelatedTopicModel fetchAssociationTypeTopic(long assocId) {
+        // assocTypeUri=null (supposed to be "dm4.core.instantiation" but not possible ### FIXME)
+        return fetchAssociationRelatedTopic(assocId, null, "dm4.core.instance", "dm4.core.type",
+            "dm4.core.assoc_type");
+    }
+
+    // ---
+
+    void associateWithTopicType(long topicId, String topicTypeUri) {
+        try {
+            AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
+                new TopicRoleModel(topicTypeUri, "dm4.core.type"),
+                new TopicRoleModel(topicId, "dm4.core.instance"));
+            storage.storeAssociation(assoc);
+            storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
+            associateWithAssociationType(assoc.getId(), assoc.getTypeUri());
+            // low-level (storage) call used here ### explain
+        } catch (Exception e) {
+            throw new RuntimeException("Associating topic " + topicId +
+                " with topic type \"" + topicTypeUri + "\" failed", e);
+        }
+    }
+
+    private void associateWithAssociationType(long assocId, String assocTypeUri) {
+        try {
+            AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
+                new TopicRoleModel(assocTypeUri, "dm4.core.type"),
+                new AssociationRoleModel(assocId, "dm4.core.instance"));
+            storage.storeAssociation(assoc);  // low-level (storage) call used here ### explain
+            storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
+        } catch (Exception e) {
+            throw new RuntimeException("Associating association " + assocId +
+                " with association type \"" + assocTypeUri + "\" failed", e);
+        }
+    }
+
+    // ---
+
+    // ### TODO: differentiate between a model and an update model and then drop this method
+    private void setDefaults(DeepaMehtaObjectModel model) {
+        if (model.getUri() == null) {
+            model.setUri("");
+        }
+        if (model.getSimpleValue() == null) {
+            model.setSimpleValue("");
+        }
     }
 }

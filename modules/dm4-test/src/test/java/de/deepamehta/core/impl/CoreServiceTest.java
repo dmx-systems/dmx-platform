@@ -1,7 +1,10 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedAssociation;
+import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
@@ -19,6 +22,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Ignore;
 import org.junit.Test;
+
+import static java.util.Arrays.asList;
 
 
 
@@ -127,5 +132,29 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertNull(assocDef);
     }
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
+    @Test
+    @Ignore     // ### TODO
+    public void retypeAssociation() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic type = dms.getTopic("uri", new SimpleValue("dm4.core.plugin"), false, null);
+            ResultSet<RelatedTopic> partTypes = type.getRelatedTopics(asList("dm4.core.aggregation_def",
+                "dm4.core.composition_def"), "dm4.core.whole_type", "dm4.core.part_type", null, false, false, 0, null);
+            assertEquals(3, partTypes.getSize());
+            //
+            // invalidate assoc
+            Association assoc = partTypes.getIterator().next().getRelatingAssociation();
+            assoc.setTypeUri("dm4.core.association");
+            //
+            // re-execute query
+            partTypes = type.getRelatedTopics(asList("dm4.core.aggregation_def",
+                "dm4.core.composition_def"), "dm4.core.whole_type", "dm4.core.part_type", null, false, false, 0, null);
+            assertEquals(2, partTypes.getSize());
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Test retypeAssociation() failed", e);
+        } finally {
+            tx.finish();
+        }
+    }
 }

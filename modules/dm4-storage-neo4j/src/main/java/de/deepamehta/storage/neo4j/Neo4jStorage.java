@@ -145,6 +145,11 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
+    public void storeTopicTypeUri(long topicId, String topicTypeUri) {
+        // ### TODO: index update
+    }
+
+    @Override
     public void storeTopicValue(long topicId, SimpleValue value, Collection<IndexMode> indexModes, String indexKey,
                                                                                               SimpleValue indexValue) {
         storeAndIndexTopicValue(fetchTopicNode(topicId), value.value(), indexModes, indexKey,
@@ -210,6 +215,11 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     @Override
     public void storeAssociationUri(long assocId, String uri) {
         storeAndIndexAssociationUri(fetchAssociationNode(assocId), uri);
+    }
+
+    @Override
+    public void storeAssociationTypeUri(long assocId, String assocTypeUri) {
+        // ### TODO: index update
     }
 
     @Override
@@ -526,9 +536,13 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     private Node fetchTopicNodeByUri(String uri) {
-        return checkType(
-            topicContentExact.get("uri", uri).getSingle(), NodeType.TOPIC
-        );
+        Node node = topicContentExact.get("uri", uri).getSingle();
+        //
+        if (node == null) {
+            throw new RuntimeException("Topic with URI \"" + uri + "\" not found in database");
+        }
+        //
+        return checkType(node, NodeType.TOPIC);
     }
 
     private Node checkType(Node node, NodeType type) {

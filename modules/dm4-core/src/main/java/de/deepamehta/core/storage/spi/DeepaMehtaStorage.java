@@ -40,6 +40,8 @@ public interface DeepaMehtaStorage {
 
     void storeTopicUri(long topicId, String uri);
 
+    void storeTopicTypeUri(long topicId, String topicTypeUri);
+
     /**
      * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used.
      */
@@ -67,6 +69,8 @@ public interface DeepaMehtaStorage {
     // ---
 
     void storeAssociationUri(long assocId, String uri);
+
+    void storeAssociationTypeUri(long assocId, String assocTypeUri);
 
     /**
      * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used.
