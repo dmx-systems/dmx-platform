@@ -170,4 +170,44 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         // ### That's contradictory to the Neo4j documentation!
         // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
     }
+
+    @Test
+    public void retypeAssociationRoles() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        Topic type;
+        ResultSet<RelatedTopic> partTypes;
+        try {
+            type = dms.getTopic("uri", new SimpleValue("dm4.core.plugin"), false, null);
+            partTypes = type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
+                "dm4.core.whole_type", "dm4.core.part_type", null, false, false, 0, null);
+            assertEquals(3, partTypes.getSize());
+            //
+            // retype assoc roles
+            Association assoc = partTypes.getIterator().next().getRelatingAssociation();
+            assoc.getRole1().setRoleTypeUri("dm4.core.default");
+            assoc.getRole2().setRoleTypeUri("dm4.core.default");
+            //
+            // re-execute query
+            partTypes = type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
+                "dm4.core.whole_type", "dm4.core.part_type", null, false, false, 0, null);
+            assertEquals(3, partTypes.getSize());
+            // ### Note: the Lucene index update is not visible within the transaction!
+            // ### That's contradictory to the Neo4j documentation!
+            // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+            //
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Test retypeAssociationRoles() failed", e);
+        } finally {
+            tx.finish();
+        }
+        // re-execute query
+        partTypes = type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
+            "dm4.core.whole_type", "dm4.core.part_type", null, false, false, 0, null);
+        assertEquals(2, partTypes.getSize());
+        // ### Note: the Lucene index update is only visible once the transaction is committed!
+        // ### That's contradictory to the Neo4j documentation!
+        // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+    }
 }

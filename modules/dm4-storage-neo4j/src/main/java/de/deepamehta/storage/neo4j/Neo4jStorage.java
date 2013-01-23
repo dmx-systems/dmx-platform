@@ -53,6 +53,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     private static final String KEY_FULLTEXT = "_fulltext_";
 
     // --- Association Metadata Index ---
+    private static final String KEY_ASSOC_ID       = "assoc_id";
     private static final String KEY_ASSOC_TPYE_URI = "assoc_type_uri";
     // role 1 & 2
     private static final String KEY_ROLE_TPYE_URI   = "role_type_uri_";     // "1" or "2" is appended programatically
@@ -228,6 +229,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         // Note: The "Instantiation" association is already reassigned by the caller.
         Node assocNode = fetchAssociationNode(assocId);
         storeAndIndexAssociationTypeUri(assocNode, assocTypeUri);   // updates DB and content index
+        //
         indexAssociationType(assocNode, assocTypeUri);              // updates association metadata index
     }
 
@@ -243,6 +245,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         Node assocNode = fetchAssociationNode(assocId);
         fetchRelationship(assocNode, playerId).delete();
         assocNode.createRelationshipTo(fetchNode(playerId), getRelationshipType(roleTypeUri));
+        //
+        indexAssociationRoleType(assocNode, playerId, roleTypeUri); // updates association metadata index
     }
 
     // ---
@@ -585,6 +589,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // === DeepaMehta Helper ===
 
+    // ### TODO: this is a DB agnostic helper method. It could be moved e.g. to a common base class.
     private Set<RelatedTopicModel> buildRelatedTopics(Collection<AssociationModel> assocs, long playerId) {
         Set<RelatedTopicModel> relTopics = new HashSet();
         for (AssociationModel assoc : assocs) {
@@ -597,6 +602,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         return relTopics;
     }
 
+    // ### TODO: this is a DB agnostic helper method. It could be moved e.g. to a common base class.
     private Set<RelatedAssociationModel> buildRelatedAssociations(Collection<AssociationModel> assocs, long playerId) {
         Set<RelatedAssociationModel> relAssocs = new HashSet();
         for (AssociationModel assoc : assocs) {
@@ -711,10 +717,15 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     private void indexAssociation(Node assocNode, String roleTypeUri1, Node playerNode1,
                                                   String roleTypeUri2, Node playerNode2) {
+        indexAssociationId(assocNode);
         indexAssociationType(assocNode, typeUri(assocNode));
         //
-        indexRole(assocNode, 1, roleTypeUri1, playerNode1);
-        indexRole(assocNode, 2, roleTypeUri2, playerNode2);
+        indexAssociationRole(assocNode, 1, roleTypeUri1, playerNode1);
+        indexAssociationRole(assocNode, 2, roleTypeUri2, playerNode2);
+    }
+
+    private void indexAssociationId(Node assocNode) {
+        assocMetadata.add(assocNode, KEY_ASSOC_ID, assocNode.getId());
     }
 
     private void indexAssociationType(Node assocNode, String assocTypeUri) {
@@ -722,11 +733,40 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         assocMetadata.add(assocNode, KEY_ASSOC_TPYE_URI, assocTypeUri);
     }
 
-    private void indexRole(Node assocNode, int nr, String roleTypeUri, Node playerNode) {
+    private void indexAssociationRole(Node assocNode, int nr, String roleTypeUri, Node playerNode) {
         assocMetadata.add(assocNode, KEY_ROLE_TPYE_URI + nr, roleTypeUri);
         assocMetadata.add(assocNode, KEY_PLAYER_TPYE + nr, NodeType.of(playerNode).stringify());
         assocMetadata.add(assocNode, KEY_PLAYER_ID + nr, playerNode.getId());
         assocMetadata.add(assocNode, KEY_PLAYER_TYPE_URI + nr, typeUri(playerNode));
+    }
+
+    // ---
+
+    private void indexAssociationRoleType(Node assocNode, long playerId, String roleTypeUri) {
+        int nr = lookupPlayerPosition(assocNode.getId(), playerId);
+        assocMetadata.remove(assocNode, KEY_ROLE_TPYE_URI + nr);
+        assocMetadata.add(assocNode, KEY_ROLE_TPYE_URI + nr, roleTypeUri);
+    }
+
+    private int lookupPlayerPosition(long assocId, long playerId) {
+        boolean pos1 = isPlayerAtPosition(1, assocId, playerId);
+        boolean pos2 = isPlayerAtPosition(2, assocId, playerId);
+        if (pos1 && pos2) {
+            throw new RuntimeException("Ambiguity: both players have ID " + playerId + " in association " + assocId);
+        } else if (pos1) {
+            return 1;
+        } else if (pos2) {
+            return 2;
+        } else {
+            throw new IllegalArgumentException("ID " + playerId + " is not a player in association " + assocId);
+        }
+    }
+
+    private boolean isPlayerAtPosition(int nr, long assocId, long playerId) {
+        BooleanQuery query = new BooleanQuery();
+        addTermQuery(KEY_ASSOC_ID, assocId, query);
+        addTermQuery(KEY_PLAYER_ID + nr, playerId, query);
+        return assocMetadata.query(query).getSingle() != null;
     }
 
     // ---
@@ -768,12 +808,18 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     private void addRole(BooleanQuery query, int nr, String roleTypeUri, NodeType playerType, long playerId,
                                                                                               String playerTypeUri) {
-        if (roleTypeUri != null)   addTermQuery(KEY_ROLE_TPYE_URI + nr,   roleTypeUri,             query);
-        if (playerType != null)    addTermQuery(KEY_PLAYER_TPYE + nr,     playerType.stringify(),  query);
-        if (playerId != -1)        addTermQuery(KEY_PLAYER_ID + nr,       Long.toString(playerId), query);
-        if (playerTypeUri != null) addTermQuery(KEY_PLAYER_TYPE_URI + nr, playerTypeUri,           query);
+        if (roleTypeUri != null)   addTermQuery(KEY_ROLE_TPYE_URI + nr,   roleTypeUri,            query);
+        if (playerType != null)    addTermQuery(KEY_PLAYER_TPYE + nr,     playerType.stringify(), query);
+        if (playerId != -1)        addTermQuery(KEY_PLAYER_ID + nr,       playerId,               query);
+        if (playerTypeUri != null) addTermQuery(KEY_PLAYER_TYPE_URI + nr, playerTypeUri,          query);
     }
-    
+
+    // ---
+
+    private void addTermQuery(String key, long value, BooleanQuery query) {
+        addTermQuery(key, Long.toString(value), query);
+    }
+
     private void addTermQuery(String key, String value, BooleanQuery query) {
         query.add(new TermQuery(new Term(key, value)), Occur.MUST);
     }
