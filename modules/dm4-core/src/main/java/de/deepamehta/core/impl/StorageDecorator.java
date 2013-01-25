@@ -602,15 +602,29 @@ public class StorageDecorator {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    // Note: this method works only for instances, not for types.
+    // This is because a type is not of type "dm4.core.topic_type" but of type "dm4.core.meta_type".
     private RelatedTopicModel fetchTopicTypeTopic(long topicId) {
-        return fetchTopicRelatedTopic(topicId, "dm4.core.instantiation", "dm4.core.instance", "dm4.core.type",
-            "dm4.core.topic_type");
+        RelatedTopicModel topicType = fetchTopicRelatedTopic(topicId, "dm4.core.instantiation",
+            "dm4.core.instance", "dm4.core.type", "dm4.core.topic_type");
+        //
+        if (topicType == null) {
+            throw new RuntimeException("Topic " + topicId + " is not associated to a topic type");
+        }
+        //
+        return topicType;
     }
 
     private RelatedTopicModel fetchAssociationTypeTopic(long assocId) {
-        // assocTypeUri=null (supposed to be "dm4.core.instantiation" but not possible ### FIXME)
-        return fetchAssociationRelatedTopic(assocId, null, "dm4.core.instance", "dm4.core.type",
-            "dm4.core.assoc_type");
+        // ### FIXME: assocTypeUri=null (supposed to be "dm4.core.instantiation" but not possible - not true anymore)
+        RelatedTopicModel assocType = fetchAssociationRelatedTopic(assocId, null,
+            "dm4.core.instance", "dm4.core.type", "dm4.core.assoc_type");
+        //
+        if (assocType == null) {
+            throw new RuntimeException("Association " + assocId + " is not associated to an association type");
+        }
+        //
+        return assocType;
     }
 
     // ---

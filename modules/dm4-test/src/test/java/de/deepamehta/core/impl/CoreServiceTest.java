@@ -70,9 +70,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(42, nr);
             //
             tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Test createWithoutComposite() failed", e);
         } finally {
             tx.finish();
         }
@@ -96,9 +93,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(42, nr);
             //
             tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Test createWithComposite() failed", e);
         } finally {
             tx.finish();
         }
@@ -138,33 +132,31 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic type;
         ResultSet<RelatedTopic> partTypes;
         try {
-            type = dms.getTopic("uri", new SimpleValue("dm4.core.plugin"), false, null);
-            partTypes = type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
-                "dm4.core.whole_type", "dm4.core.part_type", null, false, false, 0, null);
+            type = getType("dm4.core.plugin");
+            partTypes = getPartTypes(type);
             assertEquals(3, partTypes.getSize());
             //
             // retype assoc
             Association assoc = partTypes.getIterator().next().getRelatingAssociation();
+            assertEquals("dm4.core.composition_def", assoc.getTypeUri());
             assoc.setTypeUri("dm4.core.association");
+            assertEquals("dm4.core.association", assoc.getTypeUri());
+            assoc = dms.getAssociation(assoc.getId(), false, null);
+            assertEquals("dm4.core.association", assoc.getTypeUri());
             //
             // re-execute query
-            partTypes = type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
-                "dm4.core.whole_type", "dm4.core.part_type", null, false, false, 0, null);
+            partTypes = getPartTypes(type);
             assertEquals(3, partTypes.getSize());
             // ### Note: the Lucene index update is not visible within the transaction!
             // ### That's contradictory to the Neo4j documentation!
             // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
             //
             tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Test retypeAssociation() failed", e);
         } finally {
             tx.finish();
         }
         // re-execute query
-        partTypes = type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
-            "dm4.core.whole_type", "dm4.core.part_type", null, false, false, 0, null);
+        partTypes = getPartTypes(type);
         assertEquals(2, partTypes.getSize());
         // ### Note: the Lucene index update is only visible once the transaction is committed!
         // ### That's contradictory to the Neo4j documentation!
@@ -177,9 +169,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic type;
         ResultSet<RelatedTopic> partTypes;
         try {
-            type = dms.getTopic("uri", new SimpleValue("dm4.core.plugin"), false, null);
-            partTypes = type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
-                "dm4.core.whole_type", "dm4.core.part_type", null, false, false, 0, null);
+            type = getType("dm4.core.plugin");
+            partTypes = getPartTypes(type);
             assertEquals(3, partTypes.getSize());
             //
             // retype assoc roles
@@ -188,26 +179,76 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assoc.getRole2().setRoleTypeUri("dm4.core.default");
             //
             // re-execute query
-            partTypes = type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
-                "dm4.core.whole_type", "dm4.core.part_type", null, false, false, 0, null);
+            partTypes = getPartTypes(type);
             assertEquals(3, partTypes.getSize());
             // ### Note: the Lucene index update is not visible within the transaction!
             // ### That's contradictory to the Neo4j documentation!
             // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
             //
             tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Test retypeAssociationRoles() failed", e);
         } finally {
             tx.finish();
         }
         // re-execute query
-        partTypes = type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
-            "dm4.core.whole_type", "dm4.core.part_type", null, false, false, 0, null);
+        partTypes = getPartTypes(type);
         assertEquals(2, partTypes.getSize());
         // ### Note: the Lucene index update is only visible once the transaction is committed!
         // ### That's contradictory to the Neo4j documentation!
         // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+    }
+
+    @Test
+    @Ignore
+    public void retypeTopic() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        Topic type;
+        ResultSet<RelatedTopic> topics;
+        try {
+            type = getType("dm4.core.data_type");
+            topics = getInstances(type);
+            assertEquals(5, topics.getSize());
+            //
+            logger.info("####### Association 71=" + dms.getAssociation(71, false, null));
+            // retype topic
+            Topic topic = topics.getIterator().next();
+            assertEquals("dm4.core.data_type", topic.getTypeUri());
+            topic.setTypeUri("dm4.core.index_mode");
+            assertEquals("dm4.core.index_mode", topic.getTypeUri());
+            topic = dms.getTopic(topic.getId(), false, null);
+            assertEquals("dm4.core.index_mode", topic.getTypeUri());
+            //
+            // re-execute query
+            topics = getInstances(type);
+            assertEquals(4, topics.getSize());
+            // ### Note: in contrast to the above 2 tests this time the Lucene index update *is* visible
+            // ### within the transaction! This suggests the following hypothesis:
+            // ###     index.remove(entity) operation *is* visible within the transaction
+            // ###     index.remove(entity, key) operation is *not* visible within the transaction
+            // ### For the moment this seems to be a Neo4j oddity. Needs to be confirmed.
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+        // re-execute query
+        topics = getInstances(type);
+        assertEquals(4, topics.getSize());
+        // ### Note: the Lucene index update was already visible within the transaction!
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private Topic getType(String typeUri) {
+        return dms.getTopic("uri", new SimpleValue(typeUri), false, null);
+    }
+
+    private ResultSet<RelatedTopic> getPartTypes(Topic type) {
+        return type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
+            "dm4.core.whole_type", "dm4.core.part_type", "dm4.core.topic_type", false, false, 0, null);
+    }
+
+    private ResultSet<RelatedTopic> getInstances(Topic type) {
+        return type.getRelatedTopics("dm4.core.instantiation",
+            "dm4.core.type", "dm4.core.instance", type.getUri(), false, false, 0, null);
     }
 }

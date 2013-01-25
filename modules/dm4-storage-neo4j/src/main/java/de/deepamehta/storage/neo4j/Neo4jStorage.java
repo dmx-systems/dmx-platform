@@ -153,7 +153,11 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     @Override
     public void storeTopicTypeUri(long topicId, String topicTypeUri) {
-        // ### TODO: index update
+        // Note: The "Instantiation" association is already reassigned by the caller.
+        Node topicNode = fetchTopicNode(topicId);
+        storeAndIndexTopicTypeUri(topicNode, topicTypeUri);   // updates DB and content index
+        //
+        indexTopicType(topicNode, topicTypeUri);              // updates association metadata index
     }
 
     @Override
@@ -767,6 +771,12 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         addTermQuery(KEY_ASSOC_ID, assocId, query);
         addTermQuery(KEY_PLAYER_ID + nr, playerId, query);
         return assocMetadata.query(query).getSingle() != null;
+    }
+
+    // ---
+
+    private void indexTopicType(Node topicNode, String topicTypeUri) {
+        // ### TODO
     }
 
     // ---

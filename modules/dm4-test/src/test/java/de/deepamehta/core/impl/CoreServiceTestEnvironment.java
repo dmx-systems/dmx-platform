@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.util.JavaUtils;
 
+import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorageFactory;
 
@@ -22,7 +23,7 @@ public class CoreServiceTestEnvironment {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     // providing the test subclasses access to the core service
-    protected EmbeddedService dms;
+    protected DeepaMehtaService dms;
 
     private DeepaMehtaStorage storage;
     private File dbPath;
