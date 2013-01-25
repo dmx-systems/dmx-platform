@@ -10,6 +10,7 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.AssociationTypeModel;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
@@ -697,15 +698,44 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // === Helper ===
 
+    void createTopicInstantiation(long topicId, String topicTypeUri) {
+        try {
+            AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
+                new TopicRoleModel(topicTypeUri, "dm4.core.type"),
+                new TopicRoleModel(topicId, "dm4.core.instance"));
+            storage.storeAssociation(assoc);    // direct storage calls used here ### explain
+            storage.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
+            createAssociationInstantiation(assoc.getId(), assoc.getTypeUri());
+        } catch (Exception e) {
+            throw new RuntimeException("Associating topic " + topicId +
+                " with topic type \"" + topicTypeUri + "\" failed", e);
+        }
+    }
+
+    void createAssociationInstantiation(long assocId, String assocTypeUri) {
+        try {
+            AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
+                new TopicRoleModel(assocTypeUri, "dm4.core.type"),
+                new AssociationRoleModel(assocId, "dm4.core.instance"));
+            storage.storeAssociation(assoc);    // direct storage calls used here ### explain
+            storage.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
+        } catch (Exception e) {
+            throw new RuntimeException("Associating association " + assocId +
+                " with association type \"" + assocTypeUri + "\" failed", e);
+        }
+    }
+
+    // ---
+
     /**
-     * Convenience method.
+     * Convenience method. ### to be dropped?
      */
     Association createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
         return createAssociation(typeUri, roleModel1, roleModel2, null);    // ### FIXME: clientState=null
     }
 
     /**
-     * Convenience method.
+     * Convenience method. ### to be dropped?
      */
     Association createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2, ClientState clientState) {
         return createAssociation(new AssociationModel(typeUri, roleModel1, roleModel2), clientState);
@@ -832,7 +862,9 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     private Topic createTopic(TopicModel model, ClientState clientState, Directives directives) {
         // 1) store in DB
+        setDefaults(model);
         storage.storeTopic(model);
+        createTopicInstantiation(model.getId(), model.getTypeUri());
         //
         // 2) create application object
         AttachedTopic topic = new AttachedTopic(model, this);
@@ -846,7 +878,9 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     private Association createAssociation(AssociationModel model, ClientState clientState, Directives directives) {
         // 1) store in DB
+        setDefaults(model);
         storage.storeAssociation(model);
+        createAssociationInstantiation(model.getId(), model.getTypeUri());
         //
         // 2) create application object
         AttachedAssociation assoc = new AttachedAssociation(model, this);
@@ -888,6 +922,16 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     // ---
+
+    // ### TODO: differentiate between a model and an update model and then drop this method
+    private void setDefaults(DeepaMehtaObjectModel model) {
+        if (model.getUri() == null) {
+            model.setUri("");
+        }
+        if (model.getSimpleValue() == null) {
+            model.setSimpleValue("");
+        }
+    }
 
     private void createTypeTopic(TopicModel model, String defaultUriPrefix) {
         Topic typeTopic = createTopic(model, null, null);   // ### FIXME: clientState, directives
@@ -968,19 +1012,19 @@ public class EmbeddedService implements DeepaMehtaService {
             //
             // 1) Postponed topic type association
             //
-            // Note: associateWithTopicType() creates the associations by *low-level* (storage) calls.
+            // Note: createTopicInstantiation() creates the associations by *low-level* (storage) calls.
             // That's why the associations can be created *before* their type (here: "dm4.core.instantiation")
             // is fully constructed (the type's data type is not yet associated => step 2).
-            storage.associateWithTopicType(t.getId(), t.getTypeUri());
-            storage.associateWithTopicType(a.getId(), a.getTypeUri());
-            storage.associateWithTopicType(dataType.getId(), dataType.getTypeUri());
-            storage.associateWithTopicType(roleType.getId(), roleType.getTypeUri());
-            storage.associateWithTopicType(text.getId(), text.getTypeUri());
-            storage.associateWithTopicType(deflt.getId(), deflt.getTypeUri());
-            storage.associateWithTopicType(type.getId(), type.getTypeUri());
-            storage.associateWithTopicType(inst.getId(), inst.getTypeUri());
-            storage.associateWithTopicType(aggregation.getId(), aggregation.getTypeUri());
-            storage.associateWithTopicType(instn.getId(), instn.getTypeUri());
+            createTopicInstantiation(t.getId(), t.getTypeUri());
+            createTopicInstantiation(a.getId(), a.getTypeUri());
+            createTopicInstantiation(dataType.getId(), dataType.getTypeUri());
+            createTopicInstantiation(roleType.getId(), roleType.getTypeUri());
+            createTopicInstantiation(text.getId(), text.getTypeUri());
+            createTopicInstantiation(deflt.getId(), deflt.getTypeUri());
+            createTopicInstantiation(type.getId(), type.getTypeUri());
+            createTopicInstantiation(inst.getId(), inst.getTypeUri());
+            createTopicInstantiation(aggregation.getId(), aggregation.getTypeUri());
+            createTopicInstantiation(instn.getId(), instn.getTypeUri());
             //
             // 2) Postponed data type association
             //
@@ -1022,7 +1066,7 @@ public class EmbeddedService implements DeepaMehtaService {
      * Used for bootstrapping.
      */
     private void _createTopic(TopicModel model) {
-        storage._storeTopic(model);
+        storage.storeTopic(model);
         storage.storeTopicValue(model.getId(), model.getSimpleValue());
     }
 

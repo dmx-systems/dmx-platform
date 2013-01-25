@@ -208,7 +208,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             topics = getInstances(type);
             assertEquals(5, topics.getSize());
             //
-            logger.info("####### Association 71=" + dms.getAssociation(71, false, null));
             // retype topic
             Topic topic = topics.getIterator().next();
             assertEquals("dm4.core.data_type", topic.getTypeUri());

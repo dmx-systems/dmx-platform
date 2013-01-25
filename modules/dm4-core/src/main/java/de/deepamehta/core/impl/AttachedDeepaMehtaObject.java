@@ -20,16 +20,11 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
-import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;

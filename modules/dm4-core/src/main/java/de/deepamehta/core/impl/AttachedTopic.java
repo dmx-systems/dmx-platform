@@ -209,6 +209,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     final void storeTypeUri() {
+        reassignInstantiation();
         dms.storage.storeTopicTypeUri(getId(), getTypeUri());
     }
 
@@ -225,5 +226,27 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     @Override
     final RoleModel createRoleModel(String roleTypeUri) {
         return new TopicRoleModel(getId(), roleTypeUri);
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void reassignInstantiation() {
+        // remove current assignment
+        fetchInstantiation().delete(new Directives());      // ### FIXME: receive directives as argument
+        // create new assignment
+        dms.createTopicInstantiation(getId(), getTypeUri());
+    }
+
+    // Note: this method works only for instances, not for types.
+    // This is because a type is not of type "dm4.core.topic_type" but of type "dm4.core.meta_type".
+    private Association fetchInstantiation() {
+        RelatedTopic topicType = getRelatedTopic("dm4.core.instantiation",
+            "dm4.core.instance", "dm4.core.type", "dm4.core.topic_type", false, false, null);
+        //
+        if (topicType == null) {
+            throw new RuntimeException("Topic " + getId() + " is not associated to a topic type");
+        }
+        //
+        return topicType.getRelatingAssociation();
     }
 }

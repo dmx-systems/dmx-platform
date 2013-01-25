@@ -2,14 +2,11 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationRoleModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.accesscontrol.AccessControlList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
@@ -97,11 +94,6 @@ public class StorageDecorator {
     }
 
     public void storeTopicTypeUri(long topicId, String topicTypeUri) {
-        // remove current assignment
-        storage.deleteAssociation(fetchTopicTypeTopic(topicId).getRelatingAssociation().getId());
-        // create new assignment
-        associateWithTopicType(topicId, topicTypeUri);
-        //
         storage.storeTopicTypeUri(topicId, topicTypeUri);
     }
 
@@ -139,9 +131,7 @@ public class StorageDecorator {
      *          - the type URI    is initialzed but not persisted.
      */
     public void storeTopic(TopicModel model) {
-        setDefaults(model);
-        _storeTopic(model);
-        associateWithTopicType(model.getId(), model.getTypeUri());
+        storage.storeTopic(model);
     }
 
     /**
@@ -356,11 +346,6 @@ public class StorageDecorator {
     }
 
     public void storeAssociationTypeUri(long assocId, String assocTypeUri) {
-        // remove current assignment
-        storage.deleteAssociation(fetchAssociationTypeTopic(assocId).getRelatingAssociation().getId());
-        // create new assignment
-        associateWithAssociationType(assocId, assocTypeUri);
-        //
         storage.storeAssociationTypeUri(assocId, assocTypeUri);
     }
 
@@ -392,9 +377,7 @@ public class StorageDecorator {
     // ---
 
     public void storeAssociation(AssociationModel model) {
-        setDefaults(model);
         storage.storeAssociation(model);
-        associateWithAssociationType(model.getId(), model.getTypeUri());
     }
 
     public void deleteAssociation(long assocId) {
@@ -588,84 +571,5 @@ public class StorageDecorator {
 
     public void storeMigrationNr(int migrationNr) {
         storage.storeProperty(0, "core_migration_nr", migrationNr);
-    }
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    /**
-     * A low-level call that stores a topic without its "Instantiation" association.
-     * Called by EmbeddedService.setupBootstrapContent().
-     */
-    void _storeTopic(TopicModel model) {
-        storage.storeTopic(model);
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    // Note: this method works only for instances, not for types.
-    // This is because a type is not of type "dm4.core.topic_type" but of type "dm4.core.meta_type".
-    private RelatedTopicModel fetchTopicTypeTopic(long topicId) {
-        RelatedTopicModel topicType = fetchTopicRelatedTopic(topicId, "dm4.core.instantiation",
-            "dm4.core.instance", "dm4.core.type", "dm4.core.topic_type");
-        //
-        if (topicType == null) {
-            throw new RuntimeException("Topic " + topicId + " is not associated to a topic type");
-        }
-        //
-        return topicType;
-    }
-
-    private RelatedTopicModel fetchAssociationTypeTopic(long assocId) {
-        // ### FIXME: assocTypeUri=null (supposed to be "dm4.core.instantiation" but not possible - not true anymore)
-        RelatedTopicModel assocType = fetchAssociationRelatedTopic(assocId, null,
-            "dm4.core.instance", "dm4.core.type", "dm4.core.assoc_type");
-        //
-        if (assocType == null) {
-            throw new RuntimeException("Association " + assocId + " is not associated to an association type");
-        }
-        //
-        return assocType;
-    }
-
-    // ---
-
-    void associateWithTopicType(long topicId, String topicTypeUri) {
-        try {
-            AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
-                new TopicRoleModel(topicTypeUri, "dm4.core.type"),
-                new TopicRoleModel(topicId, "dm4.core.instance"));
-            storage.storeAssociation(assoc);
-            storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
-            associateWithAssociationType(assoc.getId(), assoc.getTypeUri());
-            // low-level (storage) call used here ### explain
-        } catch (Exception e) {
-            throw new RuntimeException("Associating topic " + topicId +
-                " with topic type \"" + topicTypeUri + "\" failed", e);
-        }
-    }
-
-    private void associateWithAssociationType(long assocId, String assocTypeUri) {
-        try {
-            AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
-                new TopicRoleModel(assocTypeUri, "dm4.core.type"),
-                new AssociationRoleModel(assocId, "dm4.core.instance"));
-            storage.storeAssociation(assoc);  // low-level (storage) call used here ### explain
-            storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
-        } catch (Exception e) {
-            throw new RuntimeException("Associating association " + assocId +
-                " with association type \"" + assocTypeUri + "\" failed", e);
-        }
-    }
-
-    // ---
-
-    // ### TODO: differentiate between a model and an update model and then drop this method
-    private void setDefaults(DeepaMehtaObjectModel model) {
-        if (model.getUri() == null) {
-            model.setUri("");
-        }
-        if (model.getSimpleValue() == null) {
-            model.setSimpleValue("");
-        }
     }
 }

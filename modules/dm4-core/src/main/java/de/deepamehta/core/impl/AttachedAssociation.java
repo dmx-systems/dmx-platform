@@ -285,6 +285,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     final void storeTypeUri() {
+        reassignInstantiation();
         dms.storage.storeAssociationTypeUri(getId(), getTypeUri());
     }
 
@@ -343,5 +344,25 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         if (role instanceof TopicRole && role.getRoleTypeUri().equals(roleTypeUri)) {
             topics.add(((TopicRole) role).getTopic());
         }
+    }
+
+    // ---
+
+    private void reassignInstantiation() {
+        // remove current assignment
+        fetchInstantiation().delete(new Directives());      // ### FIXME: receive directives as argument
+        // create new assignment
+        dms.createAssociationInstantiation(getId(), getTypeUri());
+    }
+
+    private Association fetchInstantiation() {
+        RelatedTopic assocType = getRelatedTopic("dm4.core.instantiation",
+            "dm4.core.instance", "dm4.core.type", "dm4.core.assoc_type", false, false, null);
+        //
+        if (assocType == null) {
+            throw new RuntimeException("Association " + getId() + " is not associated to an association type");
+        }
+        //
+        return assocType.getRelatingAssociation();
     }
 }
