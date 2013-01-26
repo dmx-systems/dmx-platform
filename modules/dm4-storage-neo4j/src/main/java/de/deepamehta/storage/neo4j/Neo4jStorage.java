@@ -19,6 +19,7 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.IndexManager;
 import static org.neo4j.helpers.collection.MapUtil.stringMap;
 
@@ -733,8 +734,9 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     private void indexAssociationType(Node assocNode, String assocTypeUri) {
-        assocMetadata.remove(assocNode, KEY_ASSOC_TPYE_URI);
-        assocMetadata.add(assocNode, KEY_ASSOC_TPYE_URI, assocTypeUri);
+        reindex(assocNode, KEY_ASSOC_TPYE_URI, assocTypeUri);
+        //
+        // ### TODO: reindex associations in which this assoc is a player
     }
 
     private void indexAssociationRole(Node assocNode, int nr, String roleTypeUri, Node playerNode) {
@@ -748,8 +750,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     private void indexAssociationRoleType(Node assocNode, long playerId, String roleTypeUri) {
         int nr = lookupPlayerPosition(assocNode.getId(), playerId);
-        assocMetadata.remove(assocNode, KEY_ROLE_TPYE_URI + nr);
-        assocMetadata.add(assocNode, KEY_ROLE_TPYE_URI + nr, roleTypeUri);
+        reindex(assocNode, KEY_ROLE_TPYE_URI, nr, roleTypeUri);
     }
 
     private int lookupPlayerPosition(long assocId, long playerId) {
@@ -776,7 +777,29 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     private void indexTopicType(Node topicNode, String topicTypeUri) {
-        // ### TODO
+        indexTopicType(1, topicNode, topicTypeUri);
+        indexTopicType(2, topicNode, topicTypeUri);
+    }
+
+    private void indexTopicType(int nr, Node topicNode, String topicTypeUri) {
+        for (Node assocNode : lookupAssociations(nr, topicNode)) {
+            reindex(assocNode, KEY_PLAYER_TYPE_URI, nr, topicTypeUri);
+        }
+    }
+
+    private IndexHits<Node> lookupAssociations(int nr, Node node) {
+        return assocMetadata.get(KEY_PLAYER_ID + nr, node.getId());
+    }
+
+    // ---
+
+    private void reindex(Node assocNode, String key, int nr, String value) {
+        reindex(assocNode, key + nr, value);
+    }
+
+    private void reindex(Node assocNode, String key, String value) {
+        assocMetadata.remove(assocNode, key);
+        assocMetadata.add(assocNode, key, value);
     }
 
     // ---

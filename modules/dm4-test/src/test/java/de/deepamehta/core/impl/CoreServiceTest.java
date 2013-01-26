@@ -8,9 +8,11 @@ import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -132,7 +134,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic type;
         ResultSet<RelatedTopic> partTypes;
         try {
-            type = getType("dm4.core.plugin");
+            type = getTopicByUri("dm4.core.plugin");
             partTypes = getPartTypes(type);
             assertEquals(3, partTypes.getSize());
             //
@@ -169,7 +171,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic type;
         ResultSet<RelatedTopic> partTypes;
         try {
-            type = getType("dm4.core.plugin");
+            type = getTopicByUri("dm4.core.plugin");
             partTypes = getPartTypes(type);
             assertEquals(3, partTypes.getSize());
             //
@@ -198,13 +200,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    @Ignore
-    public void retypeTopic() {
+    public void retypeTopicAndTraverseInstantiations() {
         DeepaMehtaTransaction tx = dms.beginTx();
         Topic type;
         ResultSet<RelatedTopic> topics;
         try {
-            type = getType("dm4.core.data_type");
+            type = getTopicByUri("dm4.core.data_type");
             topics = getInstances(type);
             assertEquals(5, topics.getSize());
             //
@@ -235,10 +236,49 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         // ### Note: the Lucene index update was already visible within the transaction!
     }
 
+    @Test
+    public void retypeTopicAndTraverse() {
+        setupTestTopics();
+        //
+        DeepaMehtaTransaction tx = dms.beginTx();
+        Topic t0;
+        ResultSet<RelatedTopic> topics;
+        try {
+            t0 = getTopicByUri("dm4.test.t0");
+            topics = getTestTopics(t0);
+            assertEquals(3, topics.getSize());
+            //
+            // retype topic
+            Topic topic = topics.getIterator().next();
+            assertEquals("dm4.core.plugin", topic.getTypeUri());
+            topic.setTypeUri("dm4.core.data_type");
+            assertEquals("dm4.core.data_type", topic.getTypeUri());
+            topic = dms.getTopic(topic.getId(), false, null);
+            assertEquals("dm4.core.data_type", topic.getTypeUri());
+            //
+            // re-execute query
+            topics = getTestTopics(t0);
+            assertEquals(3, topics.getSize());
+            // ### Note: the Lucene index update is not visible within the transaction!
+            // ### That's contradictory to the Neo4j documentation!
+            // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+        // re-execute query
+        topics = getTestTopics(t0);
+        assertEquals(2, topics.getSize());
+        // ### Note: the Lucene index update is only visible once the transaction is committed!
+        // ### That's contradictory to the Neo4j documentation!
+        // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private Topic getType(String typeUri) {
-        return dms.getTopic("uri", new SimpleValue(typeUri), false, null);
+    private Topic getTopicByUri(String uri) {
+        return dms.getTopic("uri", new SimpleValue(uri), false, null);
     }
 
     private ResultSet<RelatedTopic> getPartTypes(Topic type) {
@@ -249,5 +289,28 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     private ResultSet<RelatedTopic> getInstances(Topic type) {
         return type.getRelatedTopics("dm4.core.instantiation",
             "dm4.core.type", "dm4.core.instance", type.getUri(), false, false, 0, null);
+    }
+
+    // ---
+
+    private void setupTestTopics() {
+        Topic t0 = dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"), null);
+        Topic t1 = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
+        Topic t2 = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
+        Topic t3 = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
+        createAssociation(t0, t1);
+        createAssociation(t0, t2);
+        createAssociation(t0, t3);
+    }
+
+    private void createAssociation(Topic topic1, Topic topic2) {
+        dms.createAssociation(new AssociationModel("dm4.core.association",
+            new TopicRoleModel(topic1.getId(), "dm4.core.default"),
+            new TopicRoleModel(topic2.getId(), "dm4.core.default")), null);
+    }
+
+    private ResultSet<RelatedTopic> getTestTopics(Topic topic) {
+        return topic.getRelatedTopics("dm4.core.association",
+            "dm4.core.default", "dm4.core.default", "dm4.core.plugin", false, false, 0, null);
     }
 }

@@ -22,13 +22,12 @@ public class CoreServiceTestEnvironment {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    // providing the test subclasses access to the core service
+    // providing the test subclasses access to the core service and logger
     protected DeepaMehtaService dms;
+    protected Logger logger = Logger.getLogger(getClass().getName());
 
     private DeepaMehtaStorage storage;
     private File dbPath;
-
-    protected Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
