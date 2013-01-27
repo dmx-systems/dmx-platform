@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 
 
-class Neo4jRelationtypeCache {
+class RelationtypeCache {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -20,7 +20,7 @@ class Neo4jRelationtypeCache {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    Neo4jRelationtypeCache(GraphDatabaseService neo4j) {
+    RelationtypeCache(GraphDatabaseService neo4j) {
         this.relTypeCache = createRelTypeCache(neo4j);
     }
 

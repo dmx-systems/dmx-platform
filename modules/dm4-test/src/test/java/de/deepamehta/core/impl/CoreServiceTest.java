@@ -9,6 +9,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
@@ -26,6 +27,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
+import java.util.Set;
 
 
 
@@ -200,43 +202,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void retypeTopicAndTraverseInstantiations() {
-        DeepaMehtaTransaction tx = dms.beginTx();
-        Topic type;
-        ResultSet<RelatedTopic> topics;
-        try {
-            type = getTopicByUri("dm4.core.data_type");
-            topics = getInstances(type);
-            assertEquals(5, topics.getSize());
-            //
-            // retype topic
-            Topic topic = topics.getIterator().next();
-            assertEquals("dm4.core.data_type", topic.getTypeUri());
-            topic.setTypeUri("dm4.core.index_mode");
-            assertEquals("dm4.core.index_mode", topic.getTypeUri());
-            topic = dms.getTopic(topic.getId(), false, null);
-            assertEquals("dm4.core.index_mode", topic.getTypeUri());
-            //
-            // re-execute query
-            topics = getInstances(type);
-            assertEquals(4, topics.getSize());
-            // ### Note: in contrast to the above 2 tests this time the Lucene index update *is* visible
-            // ### within the transaction! This suggests the following hypothesis:
-            // ###     index.remove(entity) operation *is* visible within the transaction
-            // ###     index.remove(entity, key) operation is *not* visible within the transaction
-            // ### For the moment this seems to be a Neo4j oddity. Needs to be confirmed.
-            //
-            tx.success();
-        } finally {
-            tx.finish();
-        }
-        // re-execute query
-        topics = getInstances(type);
-        assertEquals(4, topics.getSize());
-        // ### Note: the Lucene index update was already visible within the transaction!
-    }
-
-    @Test
     public void retypeTopicAndTraverse() {
         setupTestTopics();
         //
@@ -275,6 +240,82 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
     }
 
+    @Test
+    public void retypeAssociationAndTraverse() {
+        setupTestAssociations();
+        //
+        DeepaMehtaTransaction tx = dms.beginTx();
+        Topic t0;
+        Set<RelatedAssociation> assocs;
+        try {
+            t0 = getTopicByUri("dm4.test.t0");
+            assocs = getTestAssociations(t0);
+            assertEquals(3, assocs.size());
+            //
+            // retype topic
+            Association assoc = assocs.iterator().next();
+            assertEquals("dm4.core.association", assoc.getTypeUri());
+            assoc.setTypeUri("dm4.core.composition");
+            assertEquals("dm4.core.composition", assoc.getTypeUri());
+            assoc = dms.getAssociation(assoc.getId(), false, null);
+            assertEquals("dm4.core.composition", assoc.getTypeUri());
+            //
+            // re-execute query
+            assocs = getTestAssociations(t0);
+            assertEquals(3, assocs.size());
+            // ### Note: the Lucene index update is not visible within the transaction!
+            // ### That's contradictory to the Neo4j documentation!
+            // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+        // re-execute query
+        assocs = getTestAssociations(t0);
+        assertEquals(2, assocs.size());
+        // ### Note: the Lucene index update is only visible once the transaction is committed!
+        // ### That's contradictory to the Neo4j documentation!
+        // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+    }
+
+    @Test
+    public void retypeTopicAndTraverseInstantiations() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        Topic type;
+        ResultSet<RelatedTopic> topics;
+        try {
+            type = getTopicByUri("dm4.core.data_type");
+            topics = getInstances(type);
+            assertEquals(5, topics.getSize());
+            //
+            // retype topic
+            Topic topic = topics.getIterator().next();
+            assertEquals("dm4.core.data_type", topic.getTypeUri());
+            topic.setTypeUri("dm4.core.index_mode");
+            assertEquals("dm4.core.index_mode", topic.getTypeUri());
+            topic = dms.getTopic(topic.getId(), false, null);
+            assertEquals("dm4.core.index_mode", topic.getTypeUri());
+            //
+            // re-execute query
+            topics = getInstances(type);
+            assertEquals(4, topics.getSize());
+            // ### Note: in contrast to the above 3 tests this time the Lucene index update *is* visible
+            // ### within the transaction! This suggests the following hypothesis:
+            // ###     index.remove(entity) operation *is* visible within the transaction
+            // ###     index.remove(entity, key) operation is *not* visible within the transaction
+            // ### For the moment this seems to be a Neo4j oddity. Needs to be confirmed.
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+        // re-execute query
+        topics = getInstances(type);
+        assertEquals(4, topics.getSize());
+        // ### Note: the Lucene index update was already visible within the transaction!
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Topic getTopicByUri(String uri) {
@@ -303,14 +344,43 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         createAssociation(t0, t3);
     }
 
-    private void createAssociation(Topic topic1, Topic topic2) {
-        dms.createAssociation(new AssociationModel("dm4.core.association",
+    private void setupTestAssociations() {
+        Topic t0 = dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"), null);
+        Topic t1 = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
+        Topic t2 = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
+        Topic t3 = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
+        Topic t4 = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
+        Association a1 = createAssociation(t1, t2);
+        Association a2 = createAssociation(t2, t3);
+        Association a3 = createAssociation(t3, t4);
+        createAssociation(t0, a1);
+        createAssociation(t0, a2);
+        createAssociation(t0, a3);
+    }
+
+    // ---
+
+    private Association createAssociation(Topic topic1, Topic topic2) {
+        return dms.createAssociation(new AssociationModel("dm4.core.association",
             new TopicRoleModel(topic1.getId(), "dm4.core.default"),
             new TopicRoleModel(topic2.getId(), "dm4.core.default")), null);
     }
 
+    private Association createAssociation(Topic topic, Association assoc) {
+        return dms.createAssociation(new AssociationModel("dm4.core.association",
+            new TopicRoleModel(topic.getId(), "dm4.core.default"),
+            new AssociationRoleModel(assoc.getId(), "dm4.core.default")), null);
+    }
+
+    // ---
+
     private ResultSet<RelatedTopic> getTestTopics(Topic topic) {
         return topic.getRelatedTopics("dm4.core.association",
             "dm4.core.default", "dm4.core.default", "dm4.core.plugin", false, false, 0, null);
+    }
+
+    private Set<RelatedAssociation> getTestAssociations(Topic topic) {
+        return topic.getRelatedAssociations("dm4.core.association",
+            "dm4.core.default", "dm4.core.default", "dm4.core.association", false, false);
     }
 }
