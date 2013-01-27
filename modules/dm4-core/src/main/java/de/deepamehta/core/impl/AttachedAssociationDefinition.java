@@ -55,18 +55,6 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         return getModel().getPartTypeUri();
     }
 
-    // ### TODO: drop this
-    @Override
-    public String getWholeRoleTypeUri() {
-        return getModel().getWholeRoleTypeUri();
-    }
-
-    // ### TODO: drop this
-    @Override
-    public String getPartRoleTypeUri() {
-        return getModel().getPartRoleTypeUri();
-    }
-
     @Override
     public String getWholeCardinalityUri() {
         return getModel().getWholeCardinalityUri();

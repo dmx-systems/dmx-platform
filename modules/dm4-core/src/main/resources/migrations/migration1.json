@@ -141,16 +141,6 @@
             type_uri: "dm4.core.role_type"
         },
         {
-            value:    "Whole Role Type",
-            uri:      "dm4.core.whole_role_type",
-            type_uri: "dm4.core.role_type"
-        },
-        {
-            value:    "Part Role Type",
-            uri:      "dm4.core.part_role_type",
-            type_uri: "dm4.core.role_type"
-        },
-        {
             value:    "Whole Cardinality",
             uri:      "dm4.core.whole_cardinality",
             type_uri: "dm4.core.role_type"

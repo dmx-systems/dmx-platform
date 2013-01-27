@@ -47,8 +47,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertEquals("dm4.core.plugin_migration_nr", assocDef.getPartTypeUri());
         assertEquals("dm4.core.one",                 assocDef.getWholeCardinalityUri());
         assertEquals("dm4.core.one",                 assocDef.getPartCardinalityUri());
-        assertEquals("dm4.core.whole",               assocDef.getWholeRoleTypeUri());   // ### TODO: drop this
-        assertEquals("dm4.core.part",                assocDef.getPartRoleTypeUri());    // ### TODO: drop this
         Topic t1 = assocDef.getTopic("dm4.core.whole_type");
         Topic t2 = assocDef.getTopic("dm4.core.part_type");
         assertEquals("dm4.core.plugin",              t1.getUri());

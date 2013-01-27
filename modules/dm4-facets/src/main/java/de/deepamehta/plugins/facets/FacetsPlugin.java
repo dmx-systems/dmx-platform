@@ -106,12 +106,9 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      */
     private RelatedTopic fetchChildTopic(DeepaMehtaObject object, AssociationDefinition assocDef,
                                                                   boolean fetchComposite) {
-        String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();  // ### TODO: use a constant
-        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();   // ### TODO: use a constant
-        String othersTypeUri     = assocDef.getPartTypeUri();
-        //
-        return object.getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTypeUri, fetchComposite,
+        String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
+        String othersTypeUri = assocDef.getPartTypeUri();
+        return object.getRelatedTopic(assocTypeUri, "dm4.core.whole", "dm4.core.part", othersTypeUri, fetchComposite,
             false, null);
     }
 
@@ -123,12 +120,9 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      */
     private Set<RelatedTopic> fetchChildTopics(DeepaMehtaObject object, AssociationDefinition assocDef,
                                                                         boolean fetchComposite) {
-        String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();  // ### TODO: use a constant
-        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();   // ### TODO: use a constant
-        String othersTypeUri     = assocDef.getPartTypeUri();
-        //
-        return object.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTypeUri, fetchComposite,
+        String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
+        String othersTypeUri = assocDef.getPartTypeUri();
+        return object.getRelatedTopics(assocTypeUri, "dm4.core.whole", "dm4.core.part", othersTypeUri, fetchComposite,
             false, 0, null).getItems();
     }
 

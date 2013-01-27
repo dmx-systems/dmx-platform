@@ -664,24 +664,18 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
     private RelatedTopic fetchChildTopic(AssociationDefinition assocDef, boolean fetchComposite) {
-        String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();  // ### TODO: use a constant
-        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();   // ### TODO: use a constant
-        String othersTypeUri     = assocDef.getPartTypeUri();
-        //
-        return getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTypeUri, fetchComposite,
+        String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
+        String othersTypeUri = assocDef.getPartTypeUri();
+        return getRelatedTopic(assocTypeUri, "dm4.core.whole", "dm4.core.part", othersTypeUri, fetchComposite,
             false, null);
     }
 
     // ---
 
     private ResultSet<RelatedTopic> fetchChildTopics(AssociationDefinition assocDef, boolean fetchComposite) {
-        String assocTypeUri      = assocDef.getInstanceLevelAssocTypeUri();
-        String myRoleTypeUri     = assocDef.getWholeRoleTypeUri();  // ### TODO: use a constant
-        String othersRoleTypeUri = assocDef.getPartRoleTypeUri();   // ### TODO: use a constant
-        String othersTypeUri     = assocDef.getPartTypeUri();
-        //
-        return getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTypeUri, fetchComposite,
+        String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
+        String othersTypeUri = assocDef.getPartTypeUri();
+        return getRelatedTopics(assocTypeUri, "dm4.core.whole", "dm4.core.part", othersTypeUri, fetchComposite,
             false, 0, null);
     }
 
@@ -890,15 +884,15 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     private void associateChildTopic(AssociationDefinition assocDef, long childTopicId, ClientState clientState) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
-            createRoleModel(assocDef.getWholeRoleTypeUri()),                                // ### TODO: use a constant
-            new TopicRoleModel(childTopicId, assocDef.getPartRoleTypeUri()), clientState    // ### TODO: use a constant
+            createRoleModel("dm4.core.whole"),
+            new TopicRoleModel(childTopicId, "dm4.core.part"), clientState
         );
     }
 
     private void associateChildTopic(AssociationDefinition assocDef, String childTopicUri, ClientState clientState) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
-            createRoleModel(assocDef.getWholeRoleTypeUri()),                                // ### TODO: use a constant
-            new TopicRoleModel(childTopicUri, assocDef.getPartRoleTypeUri()), clientState   // ### TODO: use a constant
+            createRoleModel("dm4.core.whole"),
+            new TopicRoleModel(childTopicUri, "dm4.core.part"), clientState
         );
     }
 

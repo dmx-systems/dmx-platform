@@ -20,12 +20,6 @@ public interface AssociationDefinition extends Association {
 
     String getPartTypeUri();
 
-    // ### TODO: drop this
-    String getWholeRoleTypeUri();
-
-    // ### TODO: drop this
-    String getPartRoleTypeUri();
-
     String getWholeCardinalityUri();
 
     String getPartCardinalityUri();

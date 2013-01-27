@@ -73,16 +73,6 @@ public class AssociationDefinitionModel extends AssociationModel {
         return partTypeUri;
     }
 
-    // ### TODO: drop this
-    public String getWholeRoleTypeUri() {
-        return "dm4.core.whole";    // *Instance level* role type. Not the role type of the underlying association.
-    }
-
-    // ### TODO: drop this
-    public String getPartRoleTypeUri() {
-        return "dm4.core.part";     // *Instance level* role type. Not the role type of the underlying association.
-    }
-
     public String getWholeCardinalityUri() {
         return wholeCardinalityUri;
     }
