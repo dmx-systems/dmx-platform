@@ -14,6 +14,7 @@ import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -300,7 +301,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // re-execute query
             topics = getInstances(type);
             assertEquals(4, topics.getSize());
-            // ### Note: in contrast to the above 3 tests this time the Lucene index update *is* visible
+            // ### Note: in contrast to the above 4 tests this time the Lucene index update *is* visible
             // ### within the transaction! This suggests the following hypothesis:
             // ###     index.remove(entity) operation *is* visible within the transaction
             // ###     index.remove(entity, key) operation is *not* visible within the transaction
@@ -314,6 +315,28 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         topics = getInstances(type);
         assertEquals(4, topics.getSize());
         // ### Note: the Lucene index update was already visible within the transaction!
+    }
+
+    // ---
+
+    @Test
+    public void deleteTopic() {
+        dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"), null);
+        //
+        DeepaMehtaTransaction tx = dms.beginTx();
+        Topic t0;
+        try {
+            t0 = getTopicByUri("dm4.test.t0");
+            assertNotNull(t0);
+            //
+            t0.delete(new Directives());
+            t0 = getTopicByUri("dm4.test.t0");
+            assertNull(t0);
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

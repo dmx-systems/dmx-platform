@@ -44,7 +44,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    // --- Property Keys ---
+    // --- DB Property Keys ---
     private static final String KEY_NODE_TYPE = "node_type";
     private static final String KEY_VALUE     = "value";
 
@@ -192,7 +192,12 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     @Override
     public void deleteTopic(long topicId) {
-        fetchTopicNode(topicId).delete();
+        // 1) update DB
+        Node topicNode = fetchTopicNode(topicId);
+        topicNode.delete();
+        //
+        // 2) update index
+        removeTopicFromIndex(topicNode);
     }
 
 
@@ -304,7 +309,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         assocNode.delete();
         //
         // 2) update index
-        assocMetadata.remove(assocNode);
+        removeAssociationFromIndex(assocNode);  // content index
+        assocMetadata.remove(assocNode);        // metadata index
     }
 
 
@@ -698,6 +704,18 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         assocNode.setProperty(KEY_VALUE, value);
         // index
         indexNodeValue(assocNode, indexValue, indexModes, indexKey, assocContentExact, assocContentFulltext);
+    }
+
+    // ---
+
+    private void removeTopicFromIndex(Node topicNode) {
+        topicContentExact.remove(topicNode);
+        topicContentFulltext.remove(topicNode);
+    }
+
+    private void removeAssociationFromIndex(Node assocNode) {
+        assocContentExact.remove(assocNode);
+        assocContentFulltext.remove(assocNode);
     }
 
     // ---
