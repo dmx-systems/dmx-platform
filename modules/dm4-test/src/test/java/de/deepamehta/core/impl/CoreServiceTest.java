@@ -324,9 +324,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"), null);
         //
         DeepaMehtaTransaction tx = dms.beginTx();
-        Topic t0;
         try {
-            t0 = getTopicByUri("dm4.test.t0");
+            Topic t0 = getTopicByUri("dm4.test.t0");
             assertNotNull(t0);
             //
             t0.delete(new Directives());
