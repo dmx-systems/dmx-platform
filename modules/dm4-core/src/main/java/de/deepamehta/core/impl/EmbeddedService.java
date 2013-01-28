@@ -56,7 +56,7 @@ public class EmbeddedService implements DeepaMehtaService {
     BundleContext bundleContext;
     MigrationManager migrationManager;
     PluginManager pluginManager;
-    ListenerRegistry listenerRegistry;
+    EventManager eventManager;
     TypeCache typeCache;
     ObjectFactoryImpl objectFactory;
 
@@ -72,7 +72,7 @@ public class EmbeddedService implements DeepaMehtaService {
         this.bundleContext = bundleContext;
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
-        this.listenerRegistry = new ListenerRegistry();
+        this.eventManager = new EventManager();
         this.typeCache = new TypeCache(this);
         this.objectFactory = new ObjectFactoryImpl(this);
         bootstrapTypeCache();
@@ -690,8 +690,8 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // === Events ===
 
-    List<Object> fireEvent(CoreEvent event, Object... params) {
-        return listenerRegistry.fireEvent(event, params);
+    void fireEvent(CoreEvent event, Object... params) {
+        eventManager.fireEvent(event, params);
     }
 
 

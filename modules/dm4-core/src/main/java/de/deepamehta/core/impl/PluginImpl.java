@@ -592,7 +592,7 @@ public class PluginImpl implements Plugin, EventHandler {
         //
         logger.info("Registering " + events.size() + " listeners of " + this + " at DeepaMehta 4 core service");
         for (CoreEvent event : events) {
-            dms.listenerRegistry.addListener(event, (Listener) pluginContext);
+            dms.eventManager.addListener(event, (Listener) pluginContext);
         }
     }
 
@@ -604,7 +604,7 @@ public class PluginImpl implements Plugin, EventHandler {
         //
         logger.info("Unregistering listeners of " + this + " at DeepaMehta 4 core service");
         for (CoreEvent event : events) {
-            dms.listenerRegistry.removeListener(event, (Listener) pluginContext);
+            dms.eventManager.removeListener(event, (Listener) pluginContext);
         }
     }
 
@@ -631,13 +631,13 @@ public class PluginImpl implements Plugin, EventHandler {
      * <p>
      * Called internally to fire the INTRODUCE_TOPIC_TYPE event.
      */
-    private Object fireEventLocally(CoreEvent event, Object... params) {
+    private void fireEventLocally(CoreEvent event, Object... params) {
         if (!isListener(event)) {
-            return null;
+            return;
         }
         //
         logger.fine("### Firing " + event + " locally from/to " + this);
-        return dms.listenerRegistry.deliverEvent((Listener) pluginContext, event, params);
+        dms.eventManager.deliverEvent((Listener) pluginContext, event, params);
     }
 
     // ---

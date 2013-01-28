@@ -8,7 +8,7 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.event.*;
 
 import java.util.HashMap;
@@ -24,53 +24,154 @@ import java.util.Map;
  */
 enum CoreEvent {
 
-    PRE_CREATE_TOPIC(PreCreateTopicListener.class,
-        "preCreateTopic", TopicModel.class, ClientState.class),
-    PRE_CREATE_ASSOCIATION(PreCreateAssociationListener.class,
-        "preCreateAssociation", AssociationModel.class, ClientState.class),
+    PRE_CREATE_TOPIC(PreCreateTopicListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PreCreateTopicListener) listener).preCreateTopic(
+                (TopicModel) params[0], (ClientState) params[1]
+            );
+        }
+    },
+    PRE_CREATE_ASSOCIATION(PreCreateAssociationListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PreCreateAssociationListener) listener).preCreateAssociation(
+                (AssociationModel) params[0], (ClientState) params[1]
+            );
+        }
+    },
 
-    POST_CREATE_TOPIC(PostCreateTopicListener.class,
-        "postCreateTopic", Topic.class, ClientState.class, Directives.class),
-    POST_CREATE_ASSOCIATION(PostCreateAssociationListener.class,
-        "postCreateAssociation", Association.class, ClientState.class, Directives.class),
+    POST_CREATE_TOPIC(PostCreateTopicListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PostCreateTopicListener) listener).postCreateTopic(
+                (Topic) params[0], (ClientState) params[1], (Directives) params[2]
+            );
+        }
+    },
+    POST_CREATE_ASSOCIATION(PostCreateAssociationListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PostCreateAssociationListener) listener).postCreateAssociation(
+                (Association) params[0], (ClientState) params[1], (Directives) params[2]
+            );
+        }
+    },
 
-    PRE_UPDATE_TOPIC(PreUpdateTopicListener.class,
-        "preUpdateTopic", Topic.class, TopicModel.class, Directives.class),
-    PRE_UPDATE_ASSOCIATION(PreUpdateAssociationListener.class,
-        "preUpdateAssociation", Association.class, AssociationModel.class, Directives.class),
+    PRE_UPDATE_TOPIC(PreUpdateTopicListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PreUpdateTopicListener) listener).preUpdateTopic(
+                (Topic) params[0], (TopicModel) params[1], (Directives) params[2]
+            );
+        }
+    },
+    PRE_UPDATE_ASSOCIATION(PreUpdateAssociationListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PreUpdateAssociationListener) listener).preUpdateAssociation(
+                (Association) params[0], (AssociationModel) params[1], (Directives) params[2]
+            );
+        }
+    },
 
-    POST_UPDATE_TOPIC(PostUpdateTopicListener.class,
-        "postUpdateTopic", Topic.class, TopicModel.class, TopicModel.class, ClientState.class, Directives.class),
-    POST_UPDATE_ASSOCIATION(PostUpdateAssociationListener.class,
-        "postUpdateAssociation", Association.class, AssociationModel.class, ClientState.class, Directives.class),
+    POST_UPDATE_TOPIC(PostUpdateTopicListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PostUpdateTopicListener) listener).postUpdateTopic(
+                (Topic) params[0], (TopicModel) params[1], (TopicModel) params[2], (ClientState) params[3],
+                (Directives) params[4]
+            );
+        }
+    },
+    POST_UPDATE_ASSOCIATION(PostUpdateAssociationListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PostUpdateAssociationListener) listener).postUpdateAssociation(
+                (Association) params[0], (AssociationModel) params[1], (ClientState) params[2], (Directives) params[3]
+            );
+        }
+    },
 
-    PRE_DELETE_ASSOCIATION(PreDeleteAssociationListener.class,
-        "preDeleteAssociation", Association.class, Directives.class),
-    POST_DELETE_ASSOCIATION(PostDeleteAssociationListener.class,
-        "postDeleteAssociation", Association.class, Directives.class),
+    PRE_DELETE_ASSOCIATION(PreDeleteAssociationListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PreDeleteAssociationListener) listener).preDeleteAssociation(
+                (Association) params[0], (Directives) params[1]
+            );
+        }
+    },
+    POST_DELETE_ASSOCIATION(PostDeleteAssociationListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PostDeleteAssociationListener) listener).postDeleteAssociation(
+                (Association) params[0], (Directives) params[1]
+            );
+        }
+    },
 
-    PRE_SEND_TOPIC(PreSendTopicListener.class,
-        "preSendTopic", Topic.class, ClientState.class),
-    PRE_SEND_ASSOCIATION(PreSendAssociationListener.class,
-        "preSendAssociation", Association.class, ClientState.class),
-    PRE_SEND_TOPIC_TYPE(PreSendTopicTypeListener.class,
-        "preSendTopicType", TopicType.class, ClientState.class),
-    PRE_SEND_ASSOCIATION_TYPE(PreSendAssociationTypeListener.class,
-        "preSendAssociationType", AssociationType.class, ClientState.class),
+    PRE_SEND_TOPIC(PreSendTopicListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PreSendTopicListener) listener).preSendTopic(
+                (Topic) params[0], (ClientState) params[1]
+            );
+        }
+    },
+    PRE_SEND_ASSOCIATION(PreSendAssociationListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PreSendAssociationListener) listener).preSendAssociation(
+                (Association) params[0], (ClientState) params[1]
+            );
+        }
+    },
+    PRE_SEND_TOPIC_TYPE(PreSendTopicTypeListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PreSendTopicTypeListener) listener).preSendTopicType(
+                (TopicType) params[0], (ClientState) params[1]
+            );
+        }
+    },
+    PRE_SEND_ASSOCIATION_TYPE(PreSendAssociationTypeListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PreSendAssociationTypeListener) listener).preSendAssociationType(
+                (AssociationType) params[0], (ClientState) params[1]
+            );
+        }
+    },
 
-    ALL_PLUGINS_ACTIVE(AllPluginsActiveListener.class,
-        "allPluginsActive"),
+    ALL_PLUGINS_ACTIVE(AllPluginsActiveListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((AllPluginsActiveListener) listener).allPluginsActive();
+        }
+    },
 
     // This event has a double nature:
     //   a) it is fired regularily (see EmbeddedService.createTopicType()).
     //   b) it is fired locally (see PluginImpl.introduceTopicTypesToPlugin()).
-    INTRODUCE_TOPIC_TYPE(IntroduceTopicTypeListener.class,
-        "introduceTopicType", TopicType.class, ClientState.class),
+    INTRODUCE_TOPIC_TYPE(IntroduceTopicTypeListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((IntroduceTopicTypeListener) listener).introduceTopicType(
+                (TopicType) params[0], (ClientState) params[1]
+            );
+        }
+    },
     // This event has a double nature:
     //   a) it is fired regularily (see EmbeddedService.createAssociationType()).
     //   b) it is fired locally (see PluginImpl.introduceAssociationTypesToPlugin()).
-    INTRODUCE_ASSOCIATION_TYPE(IntroduceAssociationTypeListener.class,
-        "introduceAssociationType", AssociationType.class, ClientState.class);
+    INTRODUCE_ASSOCIATION_TYPE(IntroduceAssociationTypeListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((IntroduceAssociationTypeListener) listener).introduceAssociationType(
+                (AssociationType) params[0], (ClientState) params[1]
+            );
+        }
+    };
 
 
     // ------------------------------------------------------------------------------------------------- Class Variables
@@ -80,21 +181,19 @@ enum CoreEvent {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     final Class listenerInterface;
-    final String handlerMethodName;
-    final Class[] paramClasses;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    private CoreEvent(Class listenerInterface, String handlerMethodName, Class... paramClasses) {
+    private CoreEvent(Class listenerInterface) {
         this.listenerInterface = listenerInterface;
-        this.handlerMethodName = handlerMethodName;
-        this.paramClasses = paramClasses;
         // events.put(..);      // ### Doesn't compile: "illegal reference to static field from initializer".
                                 // ### Enum constants are initialzed before other static fields.
         put(this);              // ### Lazy initialization outside the constructor solves it.
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    abstract void deliver(Listener listener, Object... params);
 
     static CoreEvent fromListenerInterface(Class listenerInterface) {
         return events.get(listenerInterface.getSimpleName());

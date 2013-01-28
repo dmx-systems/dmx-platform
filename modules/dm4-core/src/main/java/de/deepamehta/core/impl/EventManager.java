@@ -10,7 +10,7 @@ import java.util.Map;
 
 
 
-class ListenerRegistry {
+class EventManager {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -40,30 +40,24 @@ class ListenerRegistry {
 
     // ---
 
-    List<Object> fireEvent(CoreEvent event, Object... params) {
+    void fireEvent(CoreEvent event, Object... params) {
         try {
-            List results = new ArrayList();
             List<Listener> listeners = getListeners(event);
             if (listeners == null) {
-                return results;
+                return;
             }
             // ### FIXME: ConcurrentModificationException might occur
             for (Listener listener : listeners) {
-                Object result = deliverEvent(listener, event, params);
-                if (result != null) {
-                    results.add(result);
-                }
+                deliverEvent(listener, event, params);
             }
-            return results;
         } catch (Exception e) {
             throw new RuntimeException("Firing event " + event + " failed (params=" + params + ")", e);
         }
     }
 
-    Object deliverEvent(Listener listener, CoreEvent event, Object... params) {
+    void deliverEvent(Listener listener, CoreEvent event, Object... params) {
         try {
-            Method listenerMethod = listener.getClass().getMethod(event.handlerMethodName, event.paramClasses);
-            return listenerMethod.invoke(listener, params);
+            event.deliver(listener, params);
         } catch (Exception e) {     // NoSuchMethodException, IllegalAccessException, InvocationTargetException
             throw new RuntimeException("Delivering event " + event + " to " + listener + " failed", e);
         }
