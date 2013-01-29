@@ -84,7 +84,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         // update memory
         getModel().setWholeCardinalityUri(wholeCardinalityUri);
         // update DB
-        dms.objectFactory.storeWholeCardinalityUri(getId(), wholeCardinalityUri);
+        dms.typeStorage.storeWholeCardinalityUri(getId(), wholeCardinalityUri);
     }
 
     @Override
@@ -92,7 +92,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         // update memory
         getModel().setPartCardinalityUri(partCardinalityUri);
         // update DB
-        dms.objectFactory.storePartCardinalityUri(getId(), partCardinalityUri);
+        dms.typeStorage.storePartCardinalityUri(getId(), partCardinalityUri);
     }
 
 
@@ -160,7 +160,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     // === Attached Object Cache ===
 
     private void initViewConfig() {
-        RoleModel configurable = dms.objectFactory.createConfigurableAssocDef(getId());   // ### ID is uninitialized
+        RoleModel configurable = dms.typeStorage.createConfigurableAssocDef(getId());   // ### ID is uninitialized
         this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
     }
 }

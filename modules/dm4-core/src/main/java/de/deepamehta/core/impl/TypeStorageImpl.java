@@ -13,8 +13,6 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.AssociationTypeModel;
-import de.deepamehta.core.model.CompositeValue;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -25,9 +23,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
-import de.deepamehta.core.service.ClientState;
-import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.ObjectFactory;
+import de.deepamehta.core.service.TypeStorage;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import static java.util.Arrays.asList;
@@ -45,7 +41,7 @@ import java.util.logging.Logger;
  * Helper for storing and fetching type models.
  * ### TODO: rename class.
  */
-class ObjectFactoryImpl implements ObjectFactory {
+class TypeStorageImpl implements TypeStorage {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -57,7 +53,7 @@ class ObjectFactoryImpl implements ObjectFactory {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ObjectFactoryImpl(EmbeddedService dms) {
+    TypeStorageImpl(EmbeddedService dms) {
         this.dms = dms;
     }
 

@@ -346,8 +346,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      * This method encapsulates the logic that is common to topics and associations.
      * To handle the differences abstract methods are called.
      *
-     * Called from {@link ObjectFactoryImpl#storeTopic}
-     * Called from {@link ObjectFactoryImpl#storeAssociation}
+     * Called from {@link EmbeddedService#createTopic}
+     * Called from {@link EmbeddedService#createAssociation}
      */
     void storeValue(ClientState clientState, Directives directives) {
         try {

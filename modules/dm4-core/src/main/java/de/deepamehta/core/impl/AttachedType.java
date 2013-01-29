@@ -65,7 +65,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // update memory
         getModel().setDataTypeUri(dataTypeUri);
         // update DB
-        dms.objectFactory.storeDataTypeUri(getId(), getUri(), className(), dataTypeUri);
+        dms.typeStorage.storeDataTypeUri(getId(), getUri(), className(), dataTypeUri);
     }
 
     // --- Index Modes ---
@@ -80,7 +80,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // update memory
         getModel().setIndexModes(indexModes);
         // update DB
-        dms.objectFactory.storeIndexModes(getUri(), indexModes);
+        dms.typeStorage.storeIndexModes(getUri(), indexModes);
     }
 
     // --- Association Definitions ---
@@ -108,8 +108,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
         getModel().addAssocDef(model);                                          // update model
         _addAssocDef(model);                                                    // update attached object cache
         // update DB
-        dms.objectFactory.storeAssociationDefinition(model);
-        dms.objectFactory.appendToSequence(getUri(), model, predecessor);
+        dms.typeStorage.storeAssociationDefinition(model);
+        dms.typeStorage.appendToSequence(getUri(), model, predecessor);
     }
 
     @Override
@@ -128,7 +128,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         getModel().removeAssocDef(assocDefUri);                                 // update model
         AttachedAssociationDefinition assocDef = _removeAssocDef(assocDefUri);  // update attached object cache
         // update DB
-        dms.objectFactory.rebuildSequence(this);
+        dms.typeStorage.rebuildSequence(this);
     }
 
     // --- Label Configuration ---
@@ -143,7 +143,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // update memory
         getModel().setLabelConfig(labelConfig);
         // update DB
-        dms.objectFactory.storeLabelConfig(labelConfig, getModel().getAssocDefs());
+        dms.typeStorage.storeLabelConfig(labelConfig, getModel().getAssocDefs());
     }
 
     // --- View Configuration ---
@@ -245,7 +245,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         }
         initAssocDefs();    // attached object cache
         // update DB
-        dms.objectFactory.rebuildSequence(this);
+        dms.typeStorage.rebuildSequence(this);
     }
 
     private boolean hasSequenceChanged(Collection<AssociationDefinitionModel> newAssocDefs) {
@@ -321,7 +321,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // ---
 
     private void initViewConfig() {
-        RoleModel configurable = dms.objectFactory.createConfigurableType(getId());   // ### type ID is uninitialized
+        RoleModel configurable = dms.typeStorage.createConfigurableType(getId());   // ### type ID is uninitialized
         this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
     }
 

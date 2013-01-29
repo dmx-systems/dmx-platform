@@ -78,7 +78,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
     private void updateAssocDef(Association assoc, Directives directives) {
         Type wholeType = fetchWholeType(assoc);
-        AssociationDefinitionModel assocDef = dms.getObjectFactory().fetchAssociationDefinition(assoc);
+        AssociationDefinitionModel assocDef = dms.getTypeStorage().fetchAssociationDefinition(assoc);
         logger.info("### Updating association definition \"" + assocDef.getPartTypeUri() + "\" of type \"" +
             wholeType.getUri() + "\" (" + assocDef + ")");
         //
@@ -133,7 +133,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
     // ---
 
     private Type fetchWholeType(Association assoc) {
-        Topic type = dms.getObjectFactory().fetchWholeType(assoc);
+        Topic type = dms.getTypeStorage().fetchWholeType(assoc);
         String typeUri = type.getTypeUri();
         if (typeUri.equals("dm4.core.topic_type")) {
             return dms.getTopicType(type.getUri(), null);
@@ -146,6 +146,6 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
     }
 
     private Topic fetchPartType(Association assoc) {
-        return dms.getObjectFactory().fetchPartType(assoc);
+        return dms.getTypeStorage().fetchPartType(assoc);
     }
 }

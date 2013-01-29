@@ -7,7 +7,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
 
 
 
-public interface ObjectFactory {
+public interface TypeStorage {
 
     AssociationDefinitionModel fetchAssociationDefinition(Association assoc);
 

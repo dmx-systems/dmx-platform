@@ -187,5 +187,5 @@ public interface DeepaMehtaService {
 
     DeepaMehtaTransaction beginTx();
 
-    ObjectFactory getObjectFactory();
+    TypeStorage getTypeStorage();
 }

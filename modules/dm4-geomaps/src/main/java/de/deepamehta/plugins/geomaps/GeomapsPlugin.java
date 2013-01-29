@@ -306,6 +306,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         // ---
 
         Address(CompositeValue address) {
+            // ### FIXME: if one of these child topics is missing "Invalid access to CompositeValue" is thrown
             street     = address.getString("dm4.contacts.street");
             postalCode = address.getString("dm4.contacts.postal_code");
             city       = address.getString("dm4.contacts.city");

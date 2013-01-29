@@ -83,7 +83,7 @@ class TypeCache {
         logger.info("Loading topic type \"" + topicTypeUri + "\"");
         endlessRecursionProtection.check(topicTypeUri);
         //
-        TopicTypeModel model = dms.objectFactory.getTopicType(topicTypeUri);
+        TopicTypeModel model = dms.typeStorage.getTopicType(topicTypeUri);
         TopicType topicType = new AttachedTopicType(model, dms);
         // put in type cache
         putTopicType(topicType);
@@ -95,7 +95,7 @@ class TypeCache {
         logger.info("Loading association type \"" + assocTypeUri + "\"");
         endlessRecursionProtection.check(assocTypeUri);
         //
-        AssociationTypeModel model = dms.objectFactory.getAssociationType(assocTypeUri);
+        AssociationTypeModel model = dms.typeStorage.getAssociationType(assocTypeUri);
         AssociationType assocType = new AttachedAssociationType(model, dms);
         // put in type cache
         putAssociationType(assocType);

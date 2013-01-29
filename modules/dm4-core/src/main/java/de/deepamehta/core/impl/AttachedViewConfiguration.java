@@ -58,7 +58,7 @@ class AttachedViewConfiguration implements ViewConfiguration {
         // update memory
         model.addSetting(configTypeUri, settingUri, value);
         // update DB
-        dms.objectFactory.storeViewConfigSetting(configurable, configTypeUri, settingUri, value);
+        dms.typeStorage.storeViewConfigSetting(configurable, configTypeUri, settingUri, value);
     }
 
     // ---

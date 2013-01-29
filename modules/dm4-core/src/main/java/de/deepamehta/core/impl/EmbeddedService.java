@@ -21,13 +21,12 @@ import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.ObjectFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.TypeStorage;
 import de.deepamehta.core.service.accesscontrol.AccessControlList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
-import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.osgi.framework.BundleContext;
 
@@ -58,7 +57,7 @@ public class EmbeddedService implements DeepaMehtaService {
     PluginManager pluginManager;
     EventManager eventManager;
     TypeCache typeCache;
-    ObjectFactoryImpl objectFactory;
+    TypeStorageImpl typeStorage;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -74,7 +73,7 @@ public class EmbeddedService implements DeepaMehtaService {
         this.pluginManager = new PluginManager(this);
         this.eventManager = new EventManager();
         this.typeCache = new TypeCache(this);
-        this.objectFactory = new ObjectFactoryImpl(this);
+        this.typeStorage = new TypeStorageImpl(this);
         bootstrapTypeCache();
         setupDB();
     }
@@ -602,8 +601,8 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public ObjectFactory getObjectFactory() {
-        return objectFactory;
+    public TypeStorage getTypeStorage() {
+        return typeStorage;
     }
 
 
@@ -821,7 +820,7 @@ public class EmbeddedService implements DeepaMehtaService {
     private TopicType createTopicType(TopicTypeModel model) {
         // 1) store in DB
         createTypeTopic(model, DEFAULT_TOPIC_TYPE_URI);         // store generic topic
-        objectFactory.storeType(model);                         // store type-specific parts
+        typeStorage.storeType(model);                           // store type-specific parts
         //
         // 2) create application object
         TopicType topicType = new AttachedTopicType(model, this);
@@ -836,7 +835,7 @@ public class EmbeddedService implements DeepaMehtaService {
     private AssociationType createAssociationType(AssociationTypeModel model) {
         // 1) store in DB
         createTypeTopic(model, DEFAULT_ASSOCIATION_TYPE_URI);   // store generic topic
-        objectFactory.storeType(model);                         // store type-specific parts
+        typeStorage.storeType(model);                           // store type-specific parts
         //
         // 2) create application object
         AssociationType assocType = new AttachedAssociationType(model, this);
@@ -972,14 +971,14 @@ public class EmbeddedService implements DeepaMehtaService {
             // would fail (not because the association is missed -- it's created meanwhile, but)
             // because this involves fetching the association including its value. The value doesn't exist yet,
             // because its setting forms the begin of this vicious circle.
-            objectFactory._associateDataType("dm4.core.meta_type",  "dm4.core.text");
-            objectFactory._associateDataType("dm4.core.topic_type", "dm4.core.text");
-            objectFactory._associateDataType("dm4.core.assoc_type", "dm4.core.text");
-            objectFactory._associateDataType("dm4.core.data_type",  "dm4.core.text");
-            objectFactory._associateDataType("dm4.core.role_type",  "dm4.core.text");
+            typeStorage._associateDataType("dm4.core.meta_type",  "dm4.core.text");
+            typeStorage._associateDataType("dm4.core.topic_type", "dm4.core.text");
+            typeStorage._associateDataType("dm4.core.assoc_type", "dm4.core.text");
+            typeStorage._associateDataType("dm4.core.data_type",  "dm4.core.text");
+            typeStorage._associateDataType("dm4.core.role_type",  "dm4.core.text");
             //
-            objectFactory._associateDataType("dm4.core.aggregation",   "dm4.core.text");
-            objectFactory._associateDataType("dm4.core.instantiation", "dm4.core.text");
+            typeStorage._associateDataType("dm4.core.aggregation",   "dm4.core.text");
+            typeStorage._associateDataType("dm4.core.instantiation", "dm4.core.text");
         } catch (Exception e) {
             throw new RuntimeException("Setting up the bootstrap content failed", e);
         }
