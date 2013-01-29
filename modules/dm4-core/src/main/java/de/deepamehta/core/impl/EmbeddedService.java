@@ -92,69 +92,45 @@ public class EmbeddedService implements DeepaMehtaService {
     // === Topics ===
 
     @Override
-    public AttachedTopic getTopic(long topicId, boolean fetchComposite, ClientState clientState) {
+    public Topic getTopic(long topicId, boolean fetchComposite, ClientState clientState) {
         // logger.info("topicId=" + topicId + ", fetchComposite=" + fetchComposite + ", clientState=" + clientState);
-        DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopic topic = attach(storage.fetchTopic(topicId), fetchComposite, clientState);
-            tx.success();
-            return topic;
+            return attach(storage.fetchTopic(topicId), fetchComposite, clientState);
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Fetching topic " + topicId + " failed", e);
-        } finally {
-            tx.finish();
         }
     }
 
     @Override
-    public AttachedTopic getTopic(String key, SimpleValue value, boolean fetchComposite, ClientState clientState) {
-        DeepaMehtaTransaction tx = beginTx();
+    public Topic getTopic(String key, SimpleValue value, boolean fetchComposite, ClientState clientState) {
         try {
-            TopicModel model = storage.fetchTopic(key, value);
-            AttachedTopic topic = model != null ? attach(model, fetchComposite, clientState) : null;
-            tx.success();
-            return topic;
+            TopicModel topic = storage.fetchTopic(key, value);
+            return topic != null ? attach(topic, fetchComposite, clientState) : null;
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Fetching topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
-        } finally {
-            tx.finish();
         }
     }
 
     @Override
     public ResultSet<RelatedTopic> getTopics(String typeUri, boolean fetchComposite, int maxResultSize,
                                                                                      ClientState clientState) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
-            ResultSet<RelatedTopic> topics = getTopicType(typeUri, clientState).getRelatedTopics(
-                "dm4.core.instantiation", "dm4.core.type", "dm4.core.instance", null, fetchComposite, false,
-                maxResultSize, clientState);    // othersTopicTypeUri=null
-            tx.success();
-            return topics;
+            return getTopicType(typeUri, clientState).getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
+                "dm4.core.instance", null, fetchComposite, false, maxResultSize, clientState);
+                // othersTopicTypeUri=null
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Fetching topics by type failed (typeUri=\"" + typeUri + "\")", e);
-        } finally {
-            tx.finish();
         }
     }
 
     @Override
     public Set<Topic> searchTopics(String searchTerm, String fieldUri, ClientState clientState) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             // ### FIXME: fetchComposite=false, parameterize it
-            Set<Topic> topics = attach(storage.queryTopics(searchTerm, fieldUri), false, clientState);
-            tx.success();
-            return topics;
+            return attach(storage.queryTopics(searchTerm, fieldUri), false, clientState);
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Searching topics failed (searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
                 fieldUri + "\", clientState=" + clientState + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -183,7 +159,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public Directives updateTopic(TopicModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AttachedTopic topic = getTopic(model.getId(), true, clientState);   // fetchComposite=true
+            Topic topic = getTopic(model.getId(), true, clientState);   // fetchComposite=true
             Directives directives = new Directives();
             //
             topic.update(model, clientState, directives);
@@ -226,16 +202,10 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Association getAssociation(long assocId, boolean fetchComposite, ClientState clientState) {
         logger.info("assocId=" + assocId + ", fetchComposite=" + fetchComposite + ", clientState=" + clientState);
-        DeepaMehtaTransaction tx = beginTx();
         try {
-            Association assoc = attach(storage.fetchAssociation(assocId), fetchComposite);
-            tx.success();
-            return assoc;
+            return attach(storage.fetchAssociation(assocId), fetchComposite);
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Fetching association " + assocId + " failed", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -246,18 +216,12 @@ public class EmbeddedService implements DeepaMehtaService {
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\", fetchComposite=" +
             fetchComposite + ", clientState=" + clientState;
         // logger.info(info);   ### TODO: the Access Control plugin calls getAssociation() very often. It should cache.
-        DeepaMehtaTransaction tx = beginTx();
         try {
-            AssociationModel model = storage.fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1,
+            AssociationModel assoc = storage.fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1,
                 roleTypeUri2);
-            Association assoc = model != null ? attach(model, fetchComposite) : null;
-            tx.success();
-            return assoc;
+            return assoc != null ? attach(assoc, fetchComposite) : null;
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -269,18 +233,12 @@ public class EmbeddedService implements DeepaMehtaService {
             ", topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri +
             "\", fetchComposite=" + fetchComposite + ", clientState=" + clientState;
         logger.info(info);
-        DeepaMehtaTransaction tx = beginTx();
         try {
-            AssociationModel model = storage.fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
+            AssociationModel assoc = storage.fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
                 topicRoleTypeUri, assocRoleTypeUri);
-            Association assoc = model != null ? attach(model, fetchComposite) : null;
-            tx.success();
-            return assoc;
+            return assoc != null ? attach(assoc, fetchComposite) : null;
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -288,20 +246,14 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public Set<RelatedAssociation> getAssociations(String assocTypeUri) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
-            Set<RelatedAssociation> assocs = getAssociationType(assocTypeUri, null).getRelatedAssociations(
-                null, "dm4.core.type", "dm4.core.instance", null, false, false);
+            return getAssociationType(assocTypeUri, null).getRelatedAssociations(null, "dm4.core.type",
+                "dm4.core.instance", null, false, false);
                 // ### FIXME: assocTypeUri=null but should be "dm4.core.instantiation", but not stored for assocs.
                 // othersAssocTypeUri=null, fetchComposite=false, fetchRelatingComposite=false
-            tx.success();
-            return assocs;
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Fetching associations by type failed (assocTypeUri=\"" + assocTypeUri + "\")",
                 e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -313,19 +265,13 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
         logger.info("topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", assocTypeUri=\"" + assocTypeUri + "\"");
-        DeepaMehtaTransaction tx = beginTx();
         try {
             // ### FIXME: fetchComposite=false, parameterize it
-            Set<Association> assocs = attach(storage.fetchAssociations(assocTypeUri, topic1Id, topic2Id, null, null),
-                false);     // roleTypeUri1=null, roleTypeUri2=null
-            tx.success();
-            return assocs;
+            return attach(storage.fetchAssociations(assocTypeUri, topic1Id, topic2Id, null, null), false);
+            // roleTypeUri1=null, roleTypeUri2=null
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Fetching associations between topics " + topic1Id + " and " + topic2Id +
                 " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -422,35 +368,24 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public TopicType getTopicType(String uri, ClientState clientState) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
-            TopicType topicType = typeCache.getTopicType(uri);
-            tx.success();
-            return topicType;
+            return typeCache.getTopicType(uri);
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Fetching topic type \"" + uri + "\" failed", e);
-        } finally {
-            tx.finish();
         }
     }
 
     @Override
     public Set<TopicType> getAllTopicTypes(ClientState clientState) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             Set<TopicType> topicTypes = new HashSet();
             for (String uri : getTopicTypeUris()) {
                 TopicType topicType = getTopicType(uri, clientState);
                 topicTypes.add(topicType);
             }
-            tx.success();
             return topicTypes;
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Fetching all topic types failed", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -515,35 +450,24 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public AssociationType getAssociationType(String uri, ClientState clientState) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
-            AssociationType assocType = typeCache.getAssociationType(uri);
-            tx.success();
-            return assocType;
+            return typeCache.getAssociationType(uri);
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Fetching association type \"" + uri + "\" failed", e);
-        } finally {
-            tx.finish();
         }
     }
 
     @Override
     public Set<AssociationType> getAllAssociationTypes(ClientState clientState) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             Set<AssociationType> assocTypes = new HashSet();
             for (String uri : getAssociationTypeUris()) {
                 AssociationType assocType = getAssociationType(uri, clientState);
                 assocTypes.add(assocType);
             }
-            tx.success();
             return assocTypes;
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Fetching all association types failed", e);
-        } finally {
-            tx.finish();
         }
     }
 
