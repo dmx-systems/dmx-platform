@@ -55,10 +55,10 @@ Download a distribution
 There are 2 DeepaMehta distributions to suit different needs:
 
 * The **Standard Distribution** focuses on small download size and easy setup for single users.  
-  The distribution file is `deepamehta-4.0.13.zip` (6.3 MB)
+  The distribution file is `deepamehta-4.0.14.zip` (6.3 MB)
 
 * The **Karaf Distribution** is aimed to client-server setups and supports remote administration.  
-  The distribution file is `deepamehta-4.0.13-karaf.tar.gz` (13.3 MB)
+  The distribution file is `deepamehta-4.0.14-karaf.tar.gz` (13.3 MB)
 
 Download the distribution that suits your needs:  
 <http://demo.deepamehta.de/download/>
@@ -71,21 +71,21 @@ Install
 -------
 
 Unzip the distribution file.  
-A folder `deepamehta-4.0.13` is created.
+A folder `deepamehta-4.0.14` is created.
 
 
 Update
 ------
 
 Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is not supported.  
-Even updating from 4.0.x to 4.0.13 is not supported.  
+Even updating from 4.0.x to 4.0.14 is not supported.  
 Please see the note at the top.
 
 
 Start
 -----
 
-Open the `deepamehta-4.0.13` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.0.14` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -135,7 +135,7 @@ Uninstall
 To remove DeepaMehta completely from your computer, including the database:
 
 1. Stop DeepaMehta.
-2. Delete the entire `deepamehta-4.0.13` folder.
+2. Delete the entire `deepamehta-4.0.14` folder.
 
 
 Build from Source
@@ -146,6 +146,19 @@ Build from Source
 
 Version History
 ---------------
+
+**4.0.14** -- Jan 30, 2013
+
+* Rewritten storage layer:
+    * High-speed traversal: Traversal is significantly speed up by the means of a Lucene index for association metadata.
+    * Compact architecture: DM-independant MehtaGraph abstraction. The additional bridging layer is dropped.
+    * Modular storage layer: 3rd-party developers can implement alternate storage layers.
+    * 1st-class associations: Association user data is indexed as well (just like topic user data).
+* Additional performance measures:
+    * For DB read operations no transactions are created.
+    * Delivering core events involves no runtime reflection.
+* See more changes and details in the release notes:  
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.13** -- Dec 24, 2012
 
@@ -406,4 +419,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Dec 24, 2012
+Jan 30, 2013

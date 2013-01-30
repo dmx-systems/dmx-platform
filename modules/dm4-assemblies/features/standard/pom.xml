@@ -5,14 +5,14 @@
 
     <groupId>de.deepamehta.assemblies.features</groupId>
     <artifactId>deepamehta-standard</artifactId>
-    <version>4.0.14-SNAPSHOT</version>
+    <version>4.0.14</version>
     <packaging>pom</packaging>
     <name>DeepaMehta 4 Assemblies :: Features :: Standard</name>
 
     <parent>
         <groupId>de.deepamehta.assemblies</groupId>
         <artifactId>deepamehta-features</artifactId>
-        <version>4.0.14-SNAPSHOT</version>
+        <version>4.0.14</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
