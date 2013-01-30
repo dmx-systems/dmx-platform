@@ -52,8 +52,16 @@ public interface DeepaMehtaService {
      */
     Topic getTopic(String key, SimpleValue value, boolean fetchComposite, ClientState clientState);
 
-    ResultSet<RelatedTopic> getTopics(String typeUri, boolean fetchComposite, int maxResultSize,
-                                                                              ClientState clientState);
+    /**
+     * Looks up topics by key and value. String values can contain wildcards like "*".
+     * <p>
+     * IMPORTANT: Looking up topics this way requires the corresponding type to be indexed with indexing mode
+     * <code>dm4.core.key</code>.
+     */
+    Set<Topic> getTopics(String key, SimpleValue value, boolean fetchComposite, ClientState clientState);
+
+    ResultSet<RelatedTopic> getTopics(String topicTypeUri, boolean fetchComposite, int maxResultSize,
+                                                                                   ClientState clientState);
 
     /**
      * Performs a fulltext search.

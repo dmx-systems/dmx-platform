@@ -74,6 +74,10 @@ public class StorageDecorator {
         return storage.fetchTopic(key, value.value());
     }
 
+    public Set<TopicModel> fetchTopics(String key, SimpleValue value) {
+        return DeepaMehtaUtils.toTopicSet(storage.fetchTopics(key, value.value()));
+    }
+
     // ---
 
     /**

@@ -129,6 +129,33 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertNull(assocDef);
     }
 
+    // ---
+
+    @Test
+    public void getTopicsByType() { 
+        Topic type = getTopicByUri("dm4.core.data_type");
+        ResultSet<RelatedTopic> topics1 = getTopicInstancesByTraversal(type);
+        assertEquals(5, topics1.getSize());
+        Set<Topic> topics2 = getTopicInstances("dm4.core.data_type");
+        assertEquals(5, topics2.size());
+    }
+
+    @Test
+    public void getAssociationsByType() { 
+        Set<RelatedAssociation> assocs;
+        //
+        assocs = getAssociationInstancesByTraversal("dm4.core.instantiation");
+        assertEquals(48, assocs.size());
+        //
+        assocs = getAssociationInstancesByTraversal("dm4.core.composition_def");
+        assertEquals(5, assocs.size());
+        //
+        assocs = getAssociationInstancesByTraversal("dm4.core.aggregation_def");
+        assertEquals(0, assocs.size());
+    }
+
+    // ---
+
     @Test
     public void retypeAssociation() {
         DeepaMehtaTransaction tx = dms.beginTx();
@@ -285,7 +312,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         ResultSet<RelatedTopic> topics;
         try {
             type = getTopicByUri("dm4.core.data_type");
-            topics = getInstances(type);
+            topics = getTopicInstancesByTraversal(type);
             assertEquals(5, topics.getSize());
             //
             // retype topic
@@ -297,7 +324,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dm4.core.index_mode", topic.getTypeUri());
             //
             // re-execute query
-            topics = getInstances(type);
+            topics = getTopicInstancesByTraversal(type);
             assertEquals(4, topics.getSize());
             // ### Note: in contrast to the above 4 tests this time the Lucene index update *is* visible
             // ### within the transaction! This suggests the following hypothesis:
@@ -310,7 +337,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             tx.finish();
         }
         // re-execute query
-        topics = getInstances(type);
+        topics = getTopicInstancesByTraversal(type);
         assertEquals(4, topics.getSize());
         // ### Note: the Lucene index update was already visible within the transaction!
     }
@@ -342,14 +369,23 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         return dms.getTopic("uri", new SimpleValue(uri), false, null);
     }
 
+    private Set<Topic> getTopicInstances(String topicTypeUri) {
+        return dms.getTopics("type_uri", new SimpleValue(topicTypeUri), false, null);
+    }
+
+    private ResultSet<RelatedTopic> getTopicInstancesByTraversal(Topic type) {
+        return type.getRelatedTopics("dm4.core.instantiation",
+            "dm4.core.type", "dm4.core.instance", type.getUri(), false, false, 0, null);
+    }
+
+    private Set<RelatedAssociation> getAssociationInstancesByTraversal(String assocTypeUri) {
+        return getTopicByUri(assocTypeUri).getRelatedAssociations("dm4.core.instantiation",
+            "dm4.core.type", "dm4.core.instance", assocTypeUri, false, false);
+    }
+
     private ResultSet<RelatedTopic> getPartTypes(Topic type) {
         return type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
             "dm4.core.whole_type", "dm4.core.part_type", "dm4.core.topic_type", false, false, 0, null);
-    }
-
-    private ResultSet<RelatedTopic> getInstances(Topic type) {
-        return type.getRelatedTopics("dm4.core.instantiation",
-            "dm4.core.type", "dm4.core.instance", type.getUri(), false, false, 0, null);
     }
 
     // ---

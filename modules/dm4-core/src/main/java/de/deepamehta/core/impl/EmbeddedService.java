@@ -111,14 +111,22 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public ResultSet<RelatedTopic> getTopics(String typeUri, boolean fetchComposite, int maxResultSize,
-                                                                                     ClientState clientState) {
+    public Set<Topic> getTopics(String key, SimpleValue value, boolean fetchComposite, ClientState clientState) {
         try {
-            return getTopicType(typeUri, clientState).getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-                "dm4.core.instance", null, fetchComposite, false, maxResultSize, clientState);
-                // othersTopicTypeUri=null
+            return attach(storage.fetchTopics(key, value), fetchComposite, clientState);
         } catch (Exception e) {
-            throw new RuntimeException("Fetching topics by type failed (typeUri=\"" + typeUri + "\")", e);
+            throw new RuntimeException("Fetching topics failed (key=\"" + key + "\", value=\"" + value + "\")", e);
+        }
+    }
+
+    @Override
+    public ResultSet<RelatedTopic> getTopics(String topicTypeUri, boolean fetchComposite, int maxResultSize,
+                                                                                          ClientState clientState) {
+        try {
+            return getTopicType(topicTypeUri, clientState).getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
+                "dm4.core.instance", topicTypeUri, fetchComposite, false, maxResultSize, clientState);
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topics by type failed (topicTypeUri=\"" + topicTypeUri + "\")", e);
         }
     }
 
@@ -246,10 +254,9 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Set<RelatedAssociation> getAssociations(String assocTypeUri) {
         try {
-            return getAssociationType(assocTypeUri, null).getRelatedAssociations(null, "dm4.core.type",
-                "dm4.core.instance", null, false, false);
-                // ### FIXME: assocTypeUri=null but should be "dm4.core.instantiation", but not stored for assocs.
-                // othersAssocTypeUri=null, fetchComposite=false, fetchRelatingComposite=false
+            return getAssociationType(assocTypeUri, null).getRelatedAssociations("dm4.core.instantiation",
+                "dm4.core.type", "dm4.core.instance", assocTypeUri, false, false);
+                // fetchComposite=false, fetchRelatingComposite=false
         } catch (Exception e) {
             throw new RuntimeException("Fetching associations by type failed (assocTypeUri=\"" + assocTypeUri + "\")",
                 e);
