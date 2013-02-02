@@ -4,7 +4,7 @@ import de.deepamehta.plugins.files.service.FilesService;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
@@ -385,7 +385,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     private Topic createFileTopic(File file, ClientState clientState) {
         String mediaType = JavaUtils.getFileType(file.getName());
         //
-        CompositeValue comp = new CompositeValue();
+        ChildTopicsModel comp = new ChildTopicsModel();
         comp.put("dm4.files.file_name", file.getName());
         comp.put("dm4.files.path",      repoPath(file));
         if (mediaType != null) {
@@ -405,7 +405,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             folderName = "";
         }
         //
-        CompositeValue comp = new CompositeValue();
+        ChildTopicsModel comp = new ChildTopicsModel();
         comp.put("dm4.files.folder_name", folderName);
         comp.put("dm4.files.path",        path);
         //

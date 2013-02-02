@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.topicmaps;
 
-import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.ChildTopicsModel;
 
 
 
@@ -8,5 +8,5 @@ public interface TopicmapRenderer {
 
     String getUri();
 
-    CompositeValue initialTopicmapState();
+    ChildTopicsModel initialTopicmapState();
 }

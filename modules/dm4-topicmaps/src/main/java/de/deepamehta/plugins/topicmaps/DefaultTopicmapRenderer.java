@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.topicmaps;
 
-import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.ChildTopicsModel;
 
 
 
@@ -12,9 +12,9 @@ class DefaultTopicmapRenderer implements TopicmapRenderer {
     }
 
     @Override
-    public CompositeValue initialTopicmapState() {
-        return new CompositeValue()
-            .put("dm4.topicmaps.translation", new CompositeValue()
+    public ChildTopicsModel initialTopicmapState() {
+        return new ChildTopicsModel()
+            .put("dm4.topicmaps.translation", new ChildTopicsModel()
                 .put("dm4.topicmaps.translation_x", 0)
                 .put("dm4.topicmaps.translation_y", 0)
             );

@@ -9,7 +9,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;
@@ -155,12 +155,12 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // --- Composite Value ---
 
     @Override
-    public CompositeValue getCompositeValue() {
+    public ChildTopicsModel getCompositeValue() {
         return model.getCompositeValue();
     }
 
     @Override
-    public void setCompositeValue(CompositeValue comp, ClientState clientState, Directives directives) {
+    public void setCompositeValue(ChildTopicsModel comp, ClientState clientState, Directives directives) {
         DeepaMehtaTransaction tx = dms.beginTx();   // ### FIXME: all other writing API methods need transaction as well
         try {
             updateCompositeValue(comp, clientState, directives);
@@ -352,12 +352,12 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     void storeValue(ClientState clientState, Directives directives) {
         try {
             if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-                CompositeValue comp = getCompositeValue();
+                ChildTopicsModel comp = getCompositeValue();
                 // Note: we build the composite value memory representation from scratch.
                 // Uninitialized IDs, URIs, and values in the TopicModels must be replaced with the real ones.
                 // In case of many-relationships the TopicModel arrays can not be updated incrementally because
                 // they can't be looked up by ID (because topics to be created have no ID yet.)
-                model.setCompositeValue(new CompositeValue());
+                model.setCompositeValue(new ChildTopicsModel());
                 updateCompositeValue(comp, clientState, directives);
                 refreshLabel();
             } else {
@@ -374,7 +374,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      */
     void loadComposite() {
         // fetch from DB
-        CompositeValue comp = fetchComposite();
+        ChildTopicsModel comp = fetchComposite();
         // update memory
         model.setCompositeValue(comp);
     }
@@ -440,7 +440,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---
 
-    private void updateCompositeValue(CompositeValue newComp, ClientState clientState, Directives directives) {
+    private void updateCompositeValue(ChildTopicsModel newComp, ClientState clientState, Directives directives) {
         try {
             for (AssociationDefinition assocDef : getType().getAssocDefs()) {
                 String assocDefUri    = assocDef.getPartTypeUri();
@@ -627,9 +627,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // === Fetch ===
 
-    private CompositeValue fetchComposite() {
+    private ChildTopicsModel fetchComposite() {
         try {
-            CompositeValue comp = new CompositeValue();
+            ChildTopicsModel comp = new ChildTopicsModel();
             for (AssociationDefinition assocDef : getType().getAssocDefs()) {
                 String cardinalityUri = assocDef.getPartCardinalityUri();
                 if (cardinalityUri.equals("dm4.core.one")) {

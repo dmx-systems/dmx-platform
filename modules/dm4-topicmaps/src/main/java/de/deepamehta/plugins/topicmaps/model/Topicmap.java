@@ -5,7 +5,7 @@ import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.util.DeepaMehtaUtils;
@@ -160,7 +160,7 @@ public class Topicmap implements JSONEnabled {
             "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, false, true, 0, clientState);
             // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=true, maxResultSize=0
         for (RelatedTopic mapTopic : mapTopics) {
-            CompositeValue visualizationProperties = mapTopic.getRelatingAssociation().getCompositeValue();
+            ChildTopicsModel visualizationProperties = mapTopic.getRelatingAssociation().getCompositeValue();
             addTopic(new TopicmapTopic(mapTopic.getModel(), visualizationProperties));
         }
     }

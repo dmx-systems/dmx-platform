@@ -1,6 +1,6 @@
 package de.deepamehta.core;
 
-import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
@@ -46,9 +46,9 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // --- Composite Value ---
 
-    CompositeValue getCompositeValue();
+    ChildTopicsModel getCompositeValue();
 
-    void setCompositeValue(CompositeValue comp, ClientState clientState, Directives directives);
+    void setCompositeValue(ChildTopicsModel comp, ClientState clientState, Directives directives);
 
 
 

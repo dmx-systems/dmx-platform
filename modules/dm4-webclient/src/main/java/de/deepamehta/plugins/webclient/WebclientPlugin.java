@@ -7,7 +7,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
@@ -200,7 +200,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * Creates a "Search" topic (a bucket).
      */
     private Topic createSearchTopic(String searchTerm, Set<? extends Topic> resultItems, ClientState clientState) {
-        Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new CompositeValue()
+        Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new ChildTopicsModel()
             .put("dm4.webclient.search_term", searchTerm)
         ), clientState);
         //

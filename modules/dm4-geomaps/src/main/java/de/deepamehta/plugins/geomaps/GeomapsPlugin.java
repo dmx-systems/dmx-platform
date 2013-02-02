@@ -12,7 +12,7 @@ import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
@@ -119,8 +119,8 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @Override
     public void setGeomapState(@PathParam("id") long geomapId, @PathParam("lon") double lon,
                                @PathParam("lat") double lat, @PathParam("zoom") int zoom) {
-        CompositeValue geomapState = new CompositeValue().put("dm4.topicmaps.state", new CompositeValue()
-           .put("dm4.topicmaps.translation", new CompositeValue()
+        ChildTopicsModel geomapState = new ChildTopicsModel().put("dm4.topicmaps.state", new ChildTopicsModel()
+           .put("dm4.topicmaps.translation", new ChildTopicsModel()
                .put("dm4.topicmaps.translation_x", lon)
                .put("dm4.topicmaps.translation_y", lat))
            .put("dm4.topicmaps.zoom_level", zoom));
@@ -237,7 +237,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     private void storeGeoFacet(Topic address, LonLat geoCoordinate, ClientState clientState, Directives directives) {
         try {
             logger.info("Storing geo facet (" + geoCoordinate + ") of address " + address);
-            TopicModel geoFacet = new TopicModel("dm4.geomaps.geo_coordinate", new CompositeValue()
+            TopicModel geoFacet = new TopicModel("dm4.geomaps.geo_coordinate", new ChildTopicsModel()
                 .put("dm4.geomaps.longitude", geoCoordinate.lon)
                 .put("dm4.geomaps.latitude",  geoCoordinate.lat)
             );
@@ -269,7 +269,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         if (typeUri.equals(topicTypeUri)) {
             return topic;
         }
-        CompositeValue comp = topic.getCompositeValue();
+        ChildTopicsModel comp = topic.getCompositeValue();
         TopicType topicType = dms.getTopicType(typeUri, null);      // clientState=null
         for (AssociationDefinition assocDef : topicType.getAssocDefs()) {
             String childTypeUri   = assocDef.getPartTypeUri();
@@ -305,8 +305,8 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
         // ---
 
-        Address(CompositeValue address) {
-            // ### FIXME: if one of these child topics is missing "Invalid access to CompositeValue" is thrown
+        Address(ChildTopicsModel address) {
+            // ### FIXME: if one of these child topics is missing "Invalid access to ChildTopicsModel" is thrown
             street     = address.getString("dm4.contacts.street");
             postalCode = address.getString("dm4.contacts.postal_code");
             city       = address.getString("dm4.contacts.city");

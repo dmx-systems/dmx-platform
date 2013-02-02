@@ -12,7 +12,7 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
-import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
@@ -473,7 +473,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Topic createUserAccount(Credentials cred) {
-        return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new CompositeValue()
+        return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new ChildTopicsModel()
             .put("dm4.accesscontrol.username", cred.username)
             .put("dm4.accesscontrol.password", cred.password)), null);  // clientState=null
     }
@@ -719,29 +719,29 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private void enrichWithPermissions(DeepaMehtaObject object, boolean write) {
         // Note: we must extend/override possibly existing permissions.
         // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
-        CompositeValue permissions = permissions(object);
+        ChildTopicsModel permissions = permissions(object);
         permissions.put(Operation.WRITE.uri, write);
     }
 
     private void enrichWithPermissions(Type type, boolean write, boolean create) {
         // Note: we must extend/override possibly existing permissions.
         // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
-        CompositeValue permissions = permissions(type);
+        ChildTopicsModel permissions = permissions(type);
         permissions.put(Operation.WRITE.uri, write);
         permissions.put(Operation.CREATE.uri, create);
     }
 
     // ---
 
-    private CompositeValue permissions(DeepaMehtaObject object) {
+    private ChildTopicsModel permissions(DeepaMehtaObject object) {
         // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
         // Permissions are transient data, not stored in DB, recalculated for each request.
         TopicModel permissionsTopic = object.getCompositeValue().getTopic("dm4.accesscontrol.permissions", null);
-        CompositeValue permissions;
+        ChildTopicsModel permissions;
         if (permissionsTopic != null) {
             permissions = permissionsTopic.getCompositeValue();
         } else {
-            permissions = new CompositeValue();
+            permissions = new ChildTopicsModel();
             object.getCompositeValue().put("dm4.accesscontrol.permissions", permissions);
         }
         return permissions;
