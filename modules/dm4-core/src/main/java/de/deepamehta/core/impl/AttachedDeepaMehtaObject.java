@@ -12,6 +12,7 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
@@ -52,6 +53,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private DeepaMehtaObjectModel model;
+
     protected final EmbeddedService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -227,13 +229,29 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // --- Topic Retrieval ---
 
     @Override
+    public RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                String othersTopicTypeUri, boolean fetchComposite,
+                                                boolean fetchRelatingComposite, ClientState clientState) {
+        RelatedTopicModel topic = fetchRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+        // fetchRelatedTopic() is abstract
+        return topic != null ? dms.attach(topic, fetchComposite, fetchRelatingComposite, clientState) : null;
+    }
+
+    @Override
     public ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize, ClientState clientState) {
         return getRelatedTopics(assocTypeUri, null, null, null, false, false, maxResultSize, clientState);
     }
 
-    // Note: these methods are implemented in the subclasses (this is an abstract class):
-    //     getRelatedTopic(String assocTypeUri, ...)
-    //     getRelatedTopics(String assocTypeUri, ...)
+    @Override
+    public ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
+                                    int maxResultSize, ClientState clientState) {
+        ResultSet<RelatedTopicModel> topics = fetchRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri, maxResultSize);     // fetchRelatedTopics() is abstract
+        return dms.attach(topics, fetchComposite, fetchRelatingComposite, clientState);
+    }
+
+    // Note: this method is implemented in the subclasses (this is an abstract class):
     //     getRelatedTopics(List assocTypeUris, ...)
 
     // --- Association Retrieval ---
@@ -340,6 +358,14 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---
 
+    abstract RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
+        String othersRoleTypeUri, String othersTopicTypeUri);
+
+    abstract ResultSet<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
+        String othersRoleTypeUri, String othersTopicTypeUri, int maxResultSize);
+
+    // ---
+
     /**
      * Takes the simple or composite value from this object's model and stores and indexes it.
      *
@@ -367,16 +393,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             throw new RuntimeException("Storing the simple/composite value of " + className() + " " + getId() +
                 " failed", e);
         }
-    }
-
-    /**
-     * Called from {@link EmbeddedService#attach} (indirectly)
-     */
-    void loadComposite() {
-        // fetch from DB
-        ChildTopicsModel comp = fetchComposite();
-        // update memory
-        model.setCompositeValue(comp);
     }
 
     /**
@@ -627,33 +643,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // === Fetch ===
 
-    private ChildTopicsModel fetchComposite() {
-        try {
-            ChildTopicsModel comp = new ChildTopicsModel();
-            for (AssociationDefinition assocDef : getType().getAssocDefs()) {
-                String cardinalityUri = assocDef.getPartCardinalityUri();
-                if (cardinalityUri.equals("dm4.core.one")) {
-                    Topic childTopic = fetchChildTopic(assocDef, true);             // fetchComposite=true
-                    if (childTopic != null) {
-                        comp.put(assocDef.getPartTypeUri(), childTopic.getModel());
-                    }
-                } else if (cardinalityUri.equals("dm4.core.many")) {
-                    for (Topic childTopic : fetchChildTopics(assocDef, true)) {     // fetchComposite=true
-                        comp.add(assocDef.getPartTypeUri(), childTopic.getModel());
-                    }
-                } else {
-                    throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
-                }
-            }
-            return comp;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching the " + className() + "'s composite failed (" + this + ")", e);
-        }
-    }
-
-    // ---
-
     /**
+     * ### TODO: drop?
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
     private RelatedTopic fetchChildTopic(String assocDefUri, boolean fetchComposite) {
@@ -661,6 +652,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     /**
+     * ### TODO: drop?
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
     private RelatedTopic fetchChildTopic(AssociationDefinition assocDef, boolean fetchComposite) {
@@ -672,6 +664,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---
 
+    // ### TODO: drop?
     private ResultSet<RelatedTopic> fetchChildTopics(AssociationDefinition assocDef, boolean fetchComposite) {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = assocDef.getPartTypeUri();
@@ -681,6 +674,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---
 
+    // ### TODO: drop?
     private SimpleValue fetchChildTopicValue(AssociationDefinition assocDef) {
         Topic childTopic = fetchChildTopic(assocDef, false);                    // fetchComposite=false
         if (childTopic != null) {
@@ -692,6 +686,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Store ===
 
     /**
+     * ### TODO: drop?
      * Stores a child's topic value in the database. If the child topic does not exist it is created.
      *
      * @param   assocDefUri     The "axis" that leads to the child: the URI of an {@link AssociationDefinition}.

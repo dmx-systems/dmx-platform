@@ -371,6 +371,28 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         ), assocId);
     }
 
+    // ---
+
+    @Override
+    public Set<RelatedTopicModel> fetchRelatedTopics(long id, String assocTypeUri, String myRoleTypeUri,
+                                                     String othersRoleTypeUri, String othersTopicTypeUri) {
+        return buildRelatedTopics(queryAssociationIndex(
+            assocTypeUri,
+            myRoleTypeUri,     null,           id, null,
+            othersRoleTypeUri, NodeType.TOPIC, -1, othersTopicTypeUri
+        ), id);
+    }
+
+    @Override
+    public Set<RelatedAssociationModel> fetchRelatedAssociations(long id, String assocTypeUri, String myRoleTypeUri,
+                                                                 String othersRoleTypeUri, String othersAssocTypeUri) {
+        return buildRelatedAssociations(queryAssociationIndex(
+            assocTypeUri,
+            myRoleTypeUri,     null,           id, null,
+            othersRoleTypeUri, NodeType.ASSOC, -1, othersAssocTypeUri
+        ), id);
+    }
+
 
 
     // === Properties ===

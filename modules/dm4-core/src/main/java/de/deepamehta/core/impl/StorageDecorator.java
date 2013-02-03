@@ -149,127 +149,6 @@ public class StorageDecorator {
 
 
 
-    // --- Traversal ---
-
-    /**
-     * @return  The fetched associations.
-     *          Note: their composite values are not initialized.
-     */
-    public Set<AssociationModel> fetchTopicAssociations(long topicId) {
-        return storage.fetchTopicAssociations(topicId);
-    }
-
-    // ---
-
-    /**
-     * Convenience method (checks singularity).
-     *
-     * @param   assocTypeUri        may be null
-     * @param   myRoleTypeUri       may be null
-     * @param   othersRoleTypeUri   may be null
-     * @param   othersTopicTypeUri  may be null
-     *
-     * @return  The fetched topics.
-     *          Note: their composite values are not initialized.
-     */
-    public RelatedTopicModel fetchTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                    String othersRoleTypeUri, String othersTopicTypeUri) {
-        ResultSet<RelatedTopicModel> topics = fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri, 0);
-        switch (topics.getSize()) {
-        case 0:
-            return null;
-        case 1:
-            return topics.getIterator().next();
-        default:
-            throw new RuntimeException("Ambiguity: there are " + topics.getSize() + " related topics (topicId=" +
-                topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
-                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
-        }
-    }
-
-    /**
-     * @param   assocTypeUri        may be null
-     * @param   myRoleTypeUri       may be null
-     * @param   othersRoleTypeUri   may be null
-     * @param   othersTopicTypeUri  may be null
-     *
-     * @return  The fetched topics.
-     *          Note: their composite values are not initialized.
-     */
-    public ResultSet<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
-                                                                String myRoleTypeUri, String othersRoleTypeUri,
-                                                                String othersTopicTypeUri, int maxResultSize) {
-        Set<RelatedTopicModel> relTopics = storage.fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri);
-        // ### TODO: respect maxResultSize
-        return new ResultSet(relTopics.size(), relTopics);
-    }
-
-    /**
-     * Convenience method (receives *list* of association types).
-     *
-     * @param   assocTypeUris       may *not* be null
-     * @param   myRoleTypeUri       may be null
-     * @param   othersRoleTypeUri   may be null
-     * @param   othersTopicTypeUri  may be null
-     *
-     * @return  The fetched topics.
-     *          Note: their composite values are not initialized.
-     */
-    public ResultSet<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, List<String> assocTypeUris,
-                                                                String myRoleTypeUri, String othersRoleTypeUri,
-                                                                String othersTopicTypeUri, int maxResultSize) {
-        ResultSet<RelatedTopicModel> result = new ResultSet();
-        for (String assocTypeUri : assocTypeUris) {
-            ResultSet<RelatedTopicModel> res = fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
-                othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
-            result.addAll(res);
-        }
-        return result;
-    }
-
-    // ---
-
-    /**
-     * Convenience method (checks singularity).
-     *
-     * @return  The fetched association.
-     *          Note: its composite value is not initialized.
-     */
-    public RelatedAssociationModel fetchTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                String othersRoleTypeUri, String othersAssocTypeUri) {
-        Set<RelatedAssociationModel> assocs = fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersAssocTypeUri);
-        switch (assocs.size()) {
-        case 0:
-            return null;
-        case 1:
-            return assocs.iterator().next();
-        default:
-            throw new RuntimeException("Ambiguity: there are " + assocs.size() + " related associations (topicId=" +
-                topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
-                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")");
-        }
-    }
-
-    /**
-     * @param   assocTypeUri        may be null
-     * @param   myRoleTypeUri       may be null
-     * @param   othersRoleTypeUri   may be null
-     * @param   othersAssocTypeUri  may be null
-     *
-     * @return  The fetched associations.
-     *          Note: their composite values are not initialized.
-     */
-    public Set<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        return storage.fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersAssocTypeUri);
-    }
-
-
-
     // === Associations ===
 
     public AssociationModel fetchAssociation(long assocId) {
@@ -390,10 +269,127 @@ public class StorageDecorator {
 
 
 
-    // --- Traversal ---
+    // === Traversal ===
+
+    /**
+     * @return  The fetched associations.
+     *          Note: their composite values are not initialized.
+     */
+    public Set<AssociationModel> fetchTopicAssociations(long topicId) {
+        return storage.fetchTopicAssociations(topicId);
+    }
 
     public Set<AssociationModel> fetchAssociationAssociations(long assocId) {
         return storage.fetchAssociationAssociations(assocId);
+    }
+
+    // ---
+
+    /**
+     * Convenience method (checks singularity).
+     *
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     *
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
+     */
+    public RelatedTopicModel fetchTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                    String othersRoleTypeUri, String othersTopicTypeUri) {
+        ResultSet<RelatedTopicModel> topics = fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri, 0);
+        switch (topics.getSize()) {
+        case 0:
+            return null;
+        case 1:
+            return topics.getIterator().next();
+        default:
+            throw new RuntimeException("Ambiguity: there are " + topics.getSize() + " related topics (topicId=" +
+                topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
+                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
+        }
+    }
+
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     *
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
+     */
+    public ResultSet<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
+                                                                String myRoleTypeUri, String othersRoleTypeUri,
+                                                                String othersTopicTypeUri, int maxResultSize) {
+        Set<RelatedTopicModel> relTopics = storage.fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
+        // ### TODO: respect maxResultSize
+        return new ResultSet(relTopics.size(), relTopics);
+    }
+
+    /**
+     * Convenience method (receives *list* of association types).
+     *
+     * @param   assocTypeUris       may *not* be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     *
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
+     */
+    public ResultSet<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, List<String> assocTypeUris,
+                                                                String myRoleTypeUri, String othersRoleTypeUri,
+                                                                String othersTopicTypeUri, int maxResultSize) {
+        ResultSet<RelatedTopicModel> result = new ResultSet();
+        for (String assocTypeUri : assocTypeUris) {
+            ResultSet<RelatedTopicModel> res = fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
+                othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
+            result.addAll(res);
+        }
+        return result;
+    }
+
+    // ---
+
+    /**
+     * Convenience method (checks singularity).
+     *
+     * @return  The fetched association.
+     *          Note: its composite value is not initialized.
+     */
+    public RelatedAssociationModel fetchTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                String othersRoleTypeUri, String othersAssocTypeUri) {
+        Set<RelatedAssociationModel> assocs = fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersAssocTypeUri);
+        switch (assocs.size()) {
+        case 0:
+            return null;
+        case 1:
+            return assocs.iterator().next();
+        default:
+            throw new RuntimeException("Ambiguity: there are " + assocs.size() + " related associations (topicId=" +
+                topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
+                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")");
+        }
+    }
+
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersAssocTypeUri  may be null
+     *
+     * @return  The fetched associations.
+     *          Note: their composite values are not initialized.
+     */
+    public Set<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+        return storage.fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersAssocTypeUri);
     }
 
     // ---
@@ -495,6 +491,55 @@ public class StorageDecorator {
         return storage.fetchAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
     }
+
+    // ---
+
+    /**
+     * Convenience method (checks singularity).
+     *
+     * @param   id                  id of a topic or an association
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     *
+     * @return  The fetched topic.
+     *          Note: its composite value is not initialized.
+     */
+    public RelatedTopicModel fetchRelatedTopic(long id, String assocTypeUri, String myRoleTypeUri,
+                                               String othersRoleTypeUri, String othersTopicTypeUri) {
+        ResultSet<RelatedTopicModel> topics = fetchRelatedTopics(id, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
+        switch (topics.getSize()) {
+        case 0:
+            return null;
+        case 1:
+            return topics.getIterator().next();
+        default:
+            throw new RuntimeException("Ambiguity: there are " + topics.getSize() + " related topics (id=" + id +
+                ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
+                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
+        }
+    }
+
+    /**
+     * @param   id                  id of a topic or an association
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     *
+     * @return  The fetched topics.
+     *          Note: their composite values are not initialized.
+     */
+    public ResultSet<RelatedTopicModel> fetchRelatedTopics(long id, String assocTypeUri, String myRoleTypeUri,
+                                                           String othersRoleTypeUri, String othersTopicTypeUri) {
+        Set<RelatedTopicModel> relTopics = storage.fetchRelatedTopics(id, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
+        return new ResultSet(relTopics.size(), relTopics);
+    }
+
+    // ### TODO: decorator for fetchRelatedAssociations()
 
 
 

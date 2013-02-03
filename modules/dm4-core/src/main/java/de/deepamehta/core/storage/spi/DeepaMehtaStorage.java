@@ -134,6 +134,28 @@ public interface DeepaMehtaStorage {
     Set<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
+    // ---
+
+    /**
+     * @param   id                  id of a topic or an association
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
+    Set<RelatedTopicModel> fetchRelatedTopics(long id, String assocTypeUri,
+                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
+
+    /**
+     * @param   id                  id of a topic or an association
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     */
+    Set<RelatedAssociationModel> fetchRelatedAssociations(long id, String assocTypeUri,
+                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
+
 
 
     // === Properties ===

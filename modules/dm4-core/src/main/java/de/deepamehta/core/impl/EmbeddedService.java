@@ -1,15 +1,18 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.AssociationTypeModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -679,10 +682,9 @@ public class EmbeddedService implements DeepaMehtaService {
      * Attaches this core service to a topic model fetched from storage layer.
      * Optionally fetches the topic's composite value from storage layer.
      */
-    AttachedTopic attach(TopicModel model, boolean fetchComposite, ClientState clientState) {
-        AttachedTopic topic = new AttachedTopic(model, this);
-        fetchComposite(topic, fetchComposite);
-        return topic;
+    Topic attach(TopicModel model, boolean fetchComposite, ClientState clientState) {
+        fetchComposite(model, fetchComposite);
+        return new AttachedTopic(model, this);
     }
 
     private Set<Topic> attach(Set<TopicModel> models, boolean fetchComposite, ClientState clientState) {
@@ -695,11 +697,10 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ---
 
-    AttachedRelatedTopic attach(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite,
-                                                                                 ClientState clientState) {
-        AttachedRelatedTopic relTopic = new AttachedRelatedTopic(model, this);
-        fetchComposite(relTopic, fetchComposite, fetchRelatingComposite);
-        return relTopic;
+    RelatedTopic attach(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite,
+                                                                         ClientState clientState) {
+        fetchComposite(model, fetchComposite, fetchRelatingComposite);
+        return new AttachedRelatedTopic(model, this);
     }
 
     ResultSet<RelatedTopic> attach(ResultSet<RelatedTopicModel> models, boolean fetchComposite,
@@ -717,10 +718,9 @@ public class EmbeddedService implements DeepaMehtaService {
      * Attaches this core service to an association fetched from storage layer.
      * Optionally fetches the topic's composite value from storage layer.
      */
-    AttachedAssociation attach(AssociationModel model, boolean fetchComposite) {
-        AttachedAssociation assoc = new AttachedAssociation(model, this);
-        fetchComposite(assoc, fetchComposite);
-        return assoc;
+    Association attach(AssociationModel model, boolean fetchComposite) {
+        fetchComposite(model, fetchComposite);
+        return new AttachedAssociation(model, this);
     }
 
     Set<Association> attach(Set<AssociationModel> models, boolean fetchComposite) {
@@ -733,8 +733,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ---
 
-    AttachedRelatedAssociation attach(RelatedAssociationModel model, boolean fetchComposite,
-                                                                     boolean fetchRelatingComposite) {
+    RelatedAssociation attach(RelatedAssociationModel model, boolean fetchComposite, boolean fetchRelatingComposite) {
         if (fetchComposite || fetchRelatingComposite) {
             // ### TODO
             throw new RuntimeException("not yet implemented");
@@ -742,8 +741,8 @@ public class EmbeddedService implements DeepaMehtaService {
         return new AttachedRelatedAssociation(model, this);
     }
 
-    Set<RelatedAssociation> attach(Iterable<RelatedAssociationModel> models,
-                                   boolean fetchComposite, boolean fetchRelatingComposite) {
+    Set<RelatedAssociation> attach(Iterable<RelatedAssociationModel> models, boolean fetchComposite,
+                                                                             boolean fetchRelatingComposite) {
         Set<RelatedAssociation> relAssocs = new LinkedHashSet();
         for (RelatedAssociationModel model : models) {
             relAssocs.add(attach(model, fetchComposite, fetchRelatingComposite));
@@ -753,36 +752,75 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ===
 
-    private void fetchComposite(AttachedTopic topic, boolean fetchComposite) {
+    private void fetchComposite(DeepaMehtaObjectModel model, boolean fetchComposite) {
         if (fetchComposite) {
-            if (topic.getTopicType().getDataTypeUri().equals("dm4.core.composite")) {
-                topic.loadComposite();
-            }
+            fetchComposite(model);
         }
     }
 
-    private void fetchComposite(AttachedRelatedTopic relTopic, boolean fetchComposite, boolean fetchRelatingComposite) {
-        if (fetchComposite) {
-            if (relTopic.getTopicType().getDataTypeUri().equals("dm4.core.composite")) {
-                relTopic.loadComposite();
-            }
-        }
+    private void fetchComposite(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite) {
+        fetchComposite(model, fetchComposite);
         if (fetchRelatingComposite) {
-            AttachedAssociation assoc = (AttachedAssociation) relTopic.getRelatingAssociation();
-            if (assoc.getAssociationType().getDataTypeUri().equals("dm4.core.composite")) {
-                assoc.loadComposite();
-            }
+            fetchComposite(model.getRelatingAssociation());
         }
     }
 
     // ---
 
-    private void fetchComposite(AttachedAssociation assoc, boolean fetchComposite) {
-        if (fetchComposite) {
-            if (assoc.getAssociationType().getDataTypeUri().equals("dm4.core.composite")) {
-                assoc.loadComposite();
+    private void fetchComposite(DeepaMehtaObjectModel model) {
+        try {
+            Type type = getType(model);
+            if (!type.getDataTypeUri().equals("dm4.core.composite")) {
+                return;
             }
+            //
+            ChildTopicsModel comp = model.getCompositeValue();
+            for (AssociationDefinition assocDef : type.getAssocDefs()) {
+                String cardinalityUri = assocDef.getPartCardinalityUri();
+                String childTypeUri   = assocDef.getPartTypeUri();
+                if (cardinalityUri.equals("dm4.core.one")) {
+                    TopicModel childTopic = fetchChildTopic(model.getId(), assocDef);
+                    if (childTopic != null) {
+                        comp.put(childTypeUri, childTopic);
+                        fetchComposite(childTopic);
+                    }
+                } else if (cardinalityUri.equals("dm4.core.many")) {
+                    for (TopicModel childTopic : fetchChildTopics(model.getId(), assocDef)) {
+                        comp.add(childTypeUri, childTopic);
+                        fetchComposite(childTopic);
+                    }
+                } else {
+                    throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching child topics of object " + model.getId() + " failed (" + model + ")",
+                e);
         }
+    }
+
+    private Type getType(DeepaMehtaObjectModel model) {
+        if (model instanceof TopicModel) {
+            return getTopicType(model.getTypeUri(), null);
+        } else if (model instanceof AssociationModel) {
+            return getAssociationType(model.getTypeUri(), null);
+        }
+        throw new RuntimeException("Unexpected model: " + model);
+    }
+
+    /**
+     * Fetches and returns a child topic or <code>null</code> if no such topic extists.
+     */
+    private RelatedTopicModel fetchChildTopic(long id, AssociationDefinition assocDef) {
+        String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
+        String othersTypeUri = assocDef.getPartTypeUri();
+        return storage.fetchRelatedTopic(id, assocTypeUri, "dm4.core.whole", "dm4.core.part", othersTypeUri);
+    }
+
+    private ResultSet<RelatedTopicModel> fetchChildTopics(long id, AssociationDefinition assocDef) {
+        String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
+        String othersTypeUri = assocDef.getPartTypeUri();
+        return storage.fetchRelatedTopics(id, assocTypeUri, "dm4.core.whole", "dm4.core.part", othersTypeUri);
     }
 
     // ---

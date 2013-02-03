@@ -217,24 +217,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // --- Topic Retrieval ---
 
     @Override
-    public AttachedRelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                String othersTopicTypeUri, boolean fetchComposite,
-                                                boolean fetchRelatingComposite, ClientState clientState) {
-        RelatedTopicModel topic = dms.storage.fetchAssociationRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri);
-        return topic != null ? dms.attach(topic, fetchComposite, fetchRelatingComposite, clientState) : null;
-    }
-
-    @Override
-    public ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                    String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
-                                    int maxResultSize, ClientState clientState) {
-        ResultSet<RelatedTopicModel> topics = dms.storage.fetchAssociationRelatedTopics(getId(), assocTypeUri,
-            myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
-        return dms.attach(topics, fetchComposite, fetchRelatingComposite, clientState);
-    }
-
-    @Override
     public ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
                                     int maxResultSize, ClientState clientState) {
@@ -302,6 +284,23 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     @Override
     final RoleModel createRoleModel(String roleTypeUri) {
         return new AssociationRoleModel(getId(), roleTypeUri);
+    }
+
+    // ---
+
+    @Override
+    final RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
+                                              String othersRoleTypeUri, String othersTopicTypeUri) {
+        return dms.storage.fetchAssociationRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri);
+    }
+
+    @Override
+    final ResultSet<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
+                                                          String othersRoleTypeUri, String othersTopicTypeUri,
+                                                          int maxResultSize) {
+        return dms.storage.fetchAssociationRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri, maxResultSize);
     }
 
 
