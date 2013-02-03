@@ -45,14 +45,14 @@ public class TopicmapTopic extends TopicModel {
     public int getX() {
         // Note: coordinates can have both formats: double (through JavaScript) and integer (programmatically placed).
         // ### TODO: store coordinates always as integers
-        Object x = visualizationProperties.get("x");
+        Object x = visualizationProperties.getObject("x");
         return x instanceof Double ? ((Double) x).intValue() : (Integer) x;
     }
 
     public int getY() {
         // Note: coordinates can have both formats: double (through JavaScript) and integer (programmatically placed).
         // ### TODO: store coordinates always as integers
-        Object y = visualizationProperties.get("y");
+        Object y = visualizationProperties.getObject("y");
         return y instanceof Double ? ((Double) y).intValue() : (Integer) y;
     }
 }

@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
+import de.deepamehta.core.ChildTopics;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
@@ -41,8 +42,8 @@ import java.util.logging.Logger;
  *  - updateXX(arg)     Compares arg with current value (model) and calls setXX() method(s) if required.
  *                      Can be called with arg=null which indicates no update is requested.
  *                      Typically returns nothing.
- *  - fetchXX()         Fetches value from DB.
- *  - storeXX()         Stores current value (model) to DB.
+ *  - fetchXX()         Fetches value from DB.              ### FIXDOC
+ *  - storeXX()         Stores current value (model) to DB. ### FIXDOC
  */
 abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
@@ -53,8 +54,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private DeepaMehtaObjectModel model;
-
     protected final EmbeddedService dms;
+
+    private ChildTopics childTopics;    // Attached object cache
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -63,6 +65,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     AttachedDeepaMehtaObject(DeepaMehtaObjectModel model, EmbeddedService dms) {
         this.model = model;
         this.dms = dms;
+        this.childTopics = new AttachedChildTopics(model.getCompositeValue(), dms);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

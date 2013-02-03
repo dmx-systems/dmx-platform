@@ -174,7 +174,7 @@ public class ChildTopicsModel {
     /**
      * Convenience method for accessing the *simple* value of a single-valued child.
      */
-    public Object get(String key) {
+    public Object getObject(String key) {
         return getTopic(key).getSimpleValue().value();
     }
 
@@ -190,6 +190,10 @@ public class ChildTopicsModel {
     // Note: there are no convenience accessors for a multiple-valued child.
 
     // ---
+
+    public Object get(String key) {
+        return values.get(key);
+    }
 
     public Iterable<String> keys() {
         return values.keySet();

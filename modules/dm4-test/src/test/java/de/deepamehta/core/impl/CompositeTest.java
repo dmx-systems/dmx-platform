@@ -31,7 +31,7 @@ public class CompositeTest {
         ChildTopicsModel address = person.getComposite("dm4.contacts.home_address");
         assertEquals("Berlin", address.getString("dm4.contacts.city"));
         //
-        Object code = address.get("dm4.contacts.postal_code");
+        Object code = address.getObject("dm4.contacts.postal_code");
         assertSame(Integer.class, code.getClass());
         assertEquals(13206, code);  // autoboxing
     }

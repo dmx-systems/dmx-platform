@@ -117,7 +117,7 @@ public class ViewConfigurationModel {
             return null;
         }
         ChildTopicsModel comp = configTopic.getCompositeValue();
-        return comp.has(settingUri) ? comp.get(settingUri) : null;
+        return comp.has(settingUri) ? comp.getObject(settingUri) : null;
     }
 
     // ---
