@@ -85,7 +85,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Topic topic = dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 new ChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)), null);
             //
-            assertTrue(topic.getCompositeValue().has("dm4.core.plugin_migration_nr"));
+            assertTrue(topic.getChildTopics().has("dm4.core.plugin_migration_nr"));
             //
             int nr = topic.getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
             assertEquals(23, nr);

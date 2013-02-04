@@ -475,7 +475,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     private String repoPath(long fileTopicId) {
         Topic fileTopic = dms.getTopic(fileTopicId, true, null);    // fetchComposite=true, clientState=null
-        return fileTopic.getCompositeValue().getString("dm4.files.path");
+        return fileTopic.getChildTopics().getString("dm4.files.path");
     }
 
 

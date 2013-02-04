@@ -65,7 +65,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     AttachedDeepaMehtaObject(DeepaMehtaObjectModel model, EmbeddedService dms) {
         this.model = model;
         this.dms = dms;
-        this.childTopics = new AttachedChildTopics(model.getCompositeValue(), dms);
+        this.childTopics = new AttachedChildTopics(model.getChildTopicsModel(), dms);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -157,11 +157,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         storeAndIndexSimpleValue();
     }
 
-    // --- Composite Value ---
+    // --- Child Topics ---
 
     @Override
-    public ChildTopicsModel getCompositeValue() {
-        return model.getCompositeValue();
+    public ChildTopics getChildTopics() {
+        return childTopics;
     }
 
     @Override
@@ -179,6 +179,13 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
+    // ---
+
+    @Override
+    public DeepaMehtaObjectModel getModel() {
+        return model;
+    }
+
 
 
     // === Updating ===
@@ -189,7 +196,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         updateTypeUri(model.getTypeUri());
         // ### TODO: compare new model with current one and update only if changed.
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            updateCompositeValue(model.getCompositeValue(), clientState, directives);
+            updateCompositeValue(model.getChildTopicsModel(), clientState, directives);
             refreshLabel();
         } else {
             updateSimpleValue(model.getSimpleValue());
@@ -219,10 +226,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         return fetchChildTopicValue(getAssocDef(assocDefUri));
     }
 
+    // ### TODO: drop?
     @Override
     public void setChildTopicValue(String assocDefUri, SimpleValue value) {
         // update memory
-        getCompositeValue().put(assocDefUri, value.value());
+        getModel().getChildTopicsModel().put(assocDefUri, value.value());
         // update DB
         storeChildTopicValue(assocDefUri, value);
         //
@@ -330,21 +338,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
 
 
-    // ----------------------------------------------------------------------------------------------- Protected Methods
-
-    // ### This is supposed to be protected, but doesn't compile! ### FIXME: re-check
-    // ### It is called from the subclasses constructors, but on a differnt TopicBase instance.
-    // ### See de.deepamehta.core.impl.MGTopic and de.deepamehta.core.impl.AttachedTopic.
-    public DeepaMehtaObjectModel getModel() {
-        return model;
-    }
-
-    protected final void setModel(DeepaMehtaObjectModel model) {
-        this.model = model;
-    }
-
-
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     abstract String className();
@@ -381,11 +374,13 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     void storeValue(ClientState clientState, Directives directives) {
         try {
             if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-                ChildTopicsModel comp = getCompositeValue();
+                ChildTopicsModel comp = getModel().getChildTopicsModel();
                 // Note: we build the composite value memory representation from scratch.
                 // Uninitialized IDs, URIs, and values in the TopicModels must be replaced with the real ones.
                 // In case of many-relationships the TopicModel arrays can not be updated incrementally because
                 // they can't be looked up by ID (because topics to be created have no ID yet.)
+                // ### FIXME: setCompositeValue() must not be used as it invalidates the reference hold by an
+                // ### AttachedChildTopics object.
                 model.setCompositeValue(new ChildTopicsModel());
                 updateCompositeValue(comp, clientState, directives);
                 refreshLabel();
@@ -900,21 +895,21 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      * For single-valued childs
      */
     private void putInCompositeModel(AssociationDefinition assocDef, Topic topic) {
-        getCompositeValue().put(assocDef.getPartTypeUri(), topic.getModel());
+        getModel().getChildTopicsModel().put(assocDef.getPartTypeUri(), topic.getModel());
     }
 
     /**
      * For multiple-valued childs
      */
     private void addToCompositeModel(AssociationDefinition assocDef, Topic topic) {
-        getCompositeValue().add(assocDef.getPartTypeUri(), topic.getModel());
+        getModel().getChildTopicsModel().add(assocDef.getPartTypeUri(), topic.getModel());
     }
 
     /**
      * For multiple-valued childs
      */
     private void removeFromCompositeModel(AssociationDefinition assocDef, Topic topic) {
-        getCompositeValue().remove(assocDef.getPartTypeUri(), topic.getModel());
+        getModel().getChildTopicsModel().remove(assocDef.getPartTypeUri(), topic.getModel());
     }
 
     /**

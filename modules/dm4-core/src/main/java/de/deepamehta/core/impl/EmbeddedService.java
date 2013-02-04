@@ -774,7 +774,7 @@ public class EmbeddedService implements DeepaMehtaService {
                 return;
             }
             //
-            ChildTopicsModel comp = model.getCompositeValue();
+            ChildTopicsModel comp = model.getChildTopicsModel();
             for (AssociationDefinition assocDef : type.getAssocDefs()) {
                 String cardinalityUri = assocDef.getPartCardinalityUri();
                 String childTypeUri   = assocDef.getPartTypeUri();

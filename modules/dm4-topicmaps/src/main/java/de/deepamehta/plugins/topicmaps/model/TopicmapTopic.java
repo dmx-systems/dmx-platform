@@ -18,13 +18,13 @@ public class TopicmapTopic extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private ChildTopicsModel visualizationProperties;
+    private ChildTopicsModel visualizationProps;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicmapTopic(TopicModel topic, ChildTopicsModel visualizationProperties) {
+    TopicmapTopic(TopicModel topic, ChildTopicsModel visualizationProps) {
         super(topic);
-        this.visualizationProperties = visualizationProperties;
+        this.visualizationProps = visualizationProps;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -33,7 +33,7 @@ public class TopicmapTopic extends TopicModel {
     public JSONObject toJSON() {
         try {
             JSONObject o = super.toJSON();
-            o.put("visualization", visualizationProperties.toJSON());
+            o.put("visualization", visualizationProps.toJSON());
             return o;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
@@ -45,14 +45,14 @@ public class TopicmapTopic extends TopicModel {
     public int getX() {
         // Note: coordinates can have both formats: double (through JavaScript) and integer (programmatically placed).
         // ### TODO: store coordinates always as integers
-        Object x = visualizationProperties.getObject("x");
+        Object x = visualizationProps.getObject("x");
         return x instanceof Double ? ((Double) x).intValue() : (Integer) x;
     }
 
     public int getY() {
         // Note: coordinates can have both formats: double (through JavaScript) and integer (programmatically placed).
         // ### TODO: store coordinates always as integers
-        Object y = visualizationProperties.getObject("y");
+        Object y = visualizationProps.getObject("y");
         return y instanceof Double ? ((Double) y).intValue() : (Integer) y;
     }
 }

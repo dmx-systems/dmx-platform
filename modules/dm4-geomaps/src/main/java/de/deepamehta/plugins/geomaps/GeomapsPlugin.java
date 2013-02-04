@@ -178,7 +178,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             //
             facetsService.addFacetTypeToTopic(topic.getId(), "dm4.geomaps.geo_coordinate_facet");
             //
-            Address address = new Address(topic.getCompositeValue());
+            Address address = new Address(topic.getModel().getChildTopicsModel());
             if (!address.isEmpty()) {
                 logger.info("### New " + address);
                 LonLat geoCoordinate = address.geocode();
@@ -193,8 +193,8 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
                                                                                        Directives directives) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
-            Address address    = new Address(topic.getCompositeValue());
-            Address oldAddress = new Address(oldModel.getCompositeValue());
+            Address address    = new Address(topic.getModel().getChildTopicsModel());
+            Address oldAddress = new Address(oldModel.getChildTopicsModel());
             if (!address.equals(oldAddress)) {
                 logger.info("### Address changed:" + address.changeReport(oldAddress));
                 LonLat geoCoordinate = address.geocode();
@@ -220,7 +220,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         Topic geoFacet = facetsService.getFacet(address.getId(), "dm4.geomaps.geo_coordinate_facet");
         if (geoFacet != null) {
             logger.info("### Enriching address " + address.getId() + " with its geo facet");
-            address.getCompositeValue().put("dm4.geomaps.geo_coordinate", geoFacet.getModel());
+            address.getChildTopicsModel().put("dm4.geomaps.geo_coordinate", geoFacet.getModel());
         } else {
             logger.info("### Enriching address " + address.getId() + " with its geo facet ABORTED " +
                 "-- no geo facet in DB");
@@ -269,7 +269,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         if (typeUri.equals(topicTypeUri)) {
             return topic;
         }
-        ChildTopicsModel comp = topic.getCompositeValue();
+        ChildTopicsModel comp = topic.getChildTopicsModel();
         TopicType topicType = dms.getTopicType(typeUri, null);      // clientState=null
         for (AssociationDefinition assocDef : topicType.getAssocDefs()) {
             String childTypeUri   = assocDef.getPartTypeUri();

@@ -154,7 +154,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     @Override
     public void preUpdateTopic(Topic topic, TopicModel newModel, Directives directives) {
         if (topic.getTypeUri().equals("dm4.files.file") && newModel.getTypeUri().equals("dm4.webclient.icon")) {
-            String iconUrl = "/filerepo/" + topic.getCompositeValue().getString("dm4.files.path");
+            String iconUrl = "/filerepo/" + topic.getChildTopics().getString("dm4.files.path");
             logger.info("### Retyping a file to an icon (iconUrl=" + iconUrl + ")");
             newModel.setSimpleValue(iconUrl);
         }

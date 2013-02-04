@@ -185,9 +185,9 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
         this.value = value;
     }
 
-    // --- Composite Value ---
+    // --- Child Topics ---
 
-    public ChildTopicsModel getCompositeValue() {
+    public ChildTopicsModel getChildTopicsModel() {
         return composite;
     }
 

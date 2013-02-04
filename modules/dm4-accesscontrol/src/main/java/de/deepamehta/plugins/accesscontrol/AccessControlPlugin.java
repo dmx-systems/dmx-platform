@@ -339,7 +339,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @return  The encryted password of the specified User Account.
      */
     private String password(Topic userAccount) {
-        return userAccount.getCompositeValue().getString("dm4.accesscontrol.password");
+        return userAccount.getChildTopics().getString("dm4.accesscontrol.password");
     }
 
 
@@ -736,13 +736,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private ChildTopicsModel permissions(DeepaMehtaObject object) {
         // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
         // Permissions are transient data, not stored in DB, recalculated for each request.
-        TopicModel permissionsTopic = object.getCompositeValue().getTopic("dm4.accesscontrol.permissions", null);
+        TopicModel permissionsTopic = object.getModel().getChildTopicsModel().getTopic("dm4.accesscontrol.permissions",
+            null);
         ChildTopicsModel permissions;
         if (permissionsTopic != null) {
-            permissions = permissionsTopic.getCompositeValue();
+            permissions = permissionsTopic.getChildTopicsModel();
         } else {
             permissions = new ChildTopicsModel();
-            object.getCompositeValue().put("dm4.accesscontrol.permissions", permissions);
+            object.getModel().getChildTopicsModel().put("dm4.accesscontrol.permissions", permissions);
+            // ### FIXME: object.getChildTopics().getModel() should work as well but does not!
+            // ### The ChildTopicModel reference is broken through re-assignment.
+            // ### See AttachedDeepaMehtaObject.storeValue().
         }
         return permissions;
     }

@@ -44,11 +44,15 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
     void setSimpleValue(boolean value);
     void setSimpleValue(SimpleValue value);
 
-    // --- Composite Value ---
+    // --- Child Topics ---
 
-    ChildTopicsModel getCompositeValue();
+    ChildTopics getChildTopics();
 
     void setCompositeValue(ChildTopicsModel comp, ClientState clientState, Directives directives);
+
+    // ---
+
+    DeepaMehtaObjectModel getModel();
 
 
 

@@ -184,7 +184,7 @@ public class ChildTopicsModel {
      * Convenience method for accessing the *composite* value of a single-valued child.
      */
     public ChildTopicsModel getComposite(String key) {
-        return getTopic(key).getCompositeValue();
+        return getTopic(key).getChildTopicsModel();
     }
 
     // Note: there are no convenience accessors for a multiple-valued child.
