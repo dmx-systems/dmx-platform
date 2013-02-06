@@ -46,10 +46,6 @@ import java.util.logging.Logger;
  */
 abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static final String LABEL_SEPARATOR = " ";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private DeepaMehtaObjectModel model;
@@ -147,13 +143,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public void setSimpleValue(SimpleValue value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Tried to set a null SimpleValue (" + this + ")");
-        }
-        // update memory
-        model.setSimpleValue(value);
-        // update DB
-        dms.valueStorage.storeSimpleValue(getModel());
+        dms.valueStorage.setSimpleValue(getModel(), value);
     }
 
     // --- Child Topics ---
@@ -168,7 +158,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         DeepaMehtaTransaction tx = dms.beginTx();   // ### FIXME: all other writing API methods need transaction as well
         try {
             updateCompositeValue(comp, clientState, directives);
-            refreshLabel();
+            dms.valueStorage.refreshLabel(getModel());
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -190,15 +180,15 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Updating ===
 
     @Override
-    public void update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives) {
-        updateUri(model.getUri());
-        updateTypeUri(model.getTypeUri());
+    public void update(DeepaMehtaObjectModel newModel, ClientState clientState, Directives directives) {
+        updateUri(newModel.getUri());
+        updateTypeUri(newModel.getTypeUri());
         // ### TODO: compare new model with current one and update only if changed.
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            updateCompositeValue(model.getChildTopicsModel(), clientState, directives);
-            refreshLabel();
+            updateCompositeValue(newModel.getChildTopicsModel(), clientState, directives);
+            dms.valueStorage.refreshLabel(getModel());
         } else {
-            updateSimpleValue(model.getSimpleValue());
+            updateSimpleValue(newModel.getSimpleValue());
         }
     }
 
@@ -230,11 +220,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     @Override
     public void setChildTopicValue(String assocDefUri, SimpleValue value) {
         // update memory
-        getModel().getChildTopicsModel().put(assocDefUri, value.value());
+        getChildTopics().getModel().put(assocDefUri, value.value());
         // update DB
         storeChildTopicValue(assocDefUri, value);
         //
-        refreshLabel();
+        dms.valueStorage.refreshLabel(getModel());
     }
 
     // --- Topic Retrieval ---
@@ -436,7 +426,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 updateChildTopics(assocDef, one, newChildTopic, newChildTopics, clientState, directives);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Updating the composite value of " + className() + " " + getId() +
+            throw new RuntimeException("Updating composite value of " + className() + " " + getId() +
                 " failed (newComp=" + newComp + ")", e);
         }
     }
@@ -672,71 +662,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    // === Label ===
 
-    /**
-     * Prerequisite: this is a composite object.
-     */
-    private void refreshLabel() {
-        try {
-            String label;
-            // does the type have a label configuration?
-            if (getType().getLabelConfig().size() > 0) {
-                label = buildLabel();
-            } else {
-                label = buildDefaultLabel();
-            }
-            //
-            setSimpleValue(label);
-        } catch (Exception e) {
-            throw new RuntimeException("Refreshing the label of " + className() + " " + getId() + " failed", e);
-        }
-    }
-
-    /**
-     * Builds this object's label according to its type's label configuration.
-     */
-    private String buildLabel() {
-        Type type = getType();
-        if (type.getDataTypeUri().equals("dm4.core.composite")) {
-            StringBuilder label = new StringBuilder();
-            for (String assocDefUri : type.getLabelConfig()) {
-                Topic childTopic = fetchChildTopic(assocDefUri, false);     // fetchComposite=false
-                // Note: topics just created have no child topics yet
-                if (childTopic != null) {
-                    String l = ((AttachedDeepaMehtaObject) childTopic).buildLabel();
-                    // add separator
-                    if (label.length() > 0 && l.length() > 0) {
-                        label.append(LABEL_SEPARATOR);
-                    }
-                    //
-                    label.append(l);
-                }
-            }
-            return label.toString();
-        } else {
-            return getSimpleValue().toString();
-        }
-    }
-
-    private String buildDefaultLabel() {
-        Type type = getType();
-        if (type.getDataTypeUri().equals("dm4.core.composite")) {
-            Iterator<AssociationDefinition> i = type.getAssocDefs().iterator();
-            // Note: types just created might have no child types yet
-            if (i.hasNext()) {
-                AssociationDefinition assocDef = i.next();
-                Topic childTopic = fetchChildTopic(assocDef, false);        // fetchComposite=false
-                // Note: topics just created have no child topics yet
-                if (childTopic != null) {
-                    return ((AttachedDeepaMehtaObject) childTopic).buildDefaultLabel();
-                }
-            }
-            return "";
-        } else {
-            return getSimpleValue().toString();
-        }
-    }
 
     // === Helper ===
 
@@ -794,21 +720,21 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      * For single-valued childs
      */
     private void putInCompositeModel(AssociationDefinition assocDef, Topic topic) {
-        getModel().getChildTopicsModel().put(assocDef.getPartTypeUri(), topic.getModel());
+        getChildTopics().getModel().put(assocDef.getPartTypeUri(), topic.getModel());
     }
 
     /**
      * For multiple-valued childs
      */
     private void addToCompositeModel(AssociationDefinition assocDef, Topic topic) {
-        getModel().getChildTopicsModel().add(assocDef.getPartTypeUri(), topic.getModel());
+        getChildTopics().getModel().add(assocDef.getPartTypeUri(), topic.getModel());
     }
 
     /**
      * For multiple-valued childs
      */
     private void removeFromCompositeModel(AssociationDefinition assocDef, Topic topic) {
-        getModel().getChildTopicsModel().remove(assocDef.getPartTypeUri(), topic.getModel());
+        getChildTopics().getModel().remove(assocDef.getPartTypeUri(), topic.getModel());
     }
 
     /**

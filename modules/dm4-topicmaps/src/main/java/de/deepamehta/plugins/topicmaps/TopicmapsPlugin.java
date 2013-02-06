@@ -170,15 +170,20 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @PUT
     @Path("/{id}/translation/{x}/{y}")
     @Override
-    public void setTopicmapTranslation(@PathParam("id") long topicmapId, @PathParam("x") int trans_x,
-                                                                         @PathParam("y") int trans_y) {
-        ChildTopicsModel topicmapState = new ChildTopicsModel().put("dm4.topicmaps.state", new ChildTopicsModel()
-            .put("dm4.topicmaps.translation", new ChildTopicsModel()
-                .put("dm4.topicmaps.translation_x", trans_x)
-                .put("dm4.topicmaps.translation_y", trans_y)
-            )
-        );
-        dms.updateTopic(new TopicModel(topicmapId, topicmapState), null);
+    public void setTopicmapTranslation(@PathParam("id") long topicmapId, @PathParam("x") int transX,
+                                                                         @PathParam("y") int transY) {
+        try {
+            ChildTopicsModel topicmapState = new ChildTopicsModel().put("dm4.topicmaps.state", new ChildTopicsModel()
+                .put("dm4.topicmaps.translation", new ChildTopicsModel()
+                    .put("dm4.topicmaps.translation_x", transX)
+                    .put("dm4.topicmaps.translation_y", transY)
+                )
+            );
+            dms.updateTopic(new TopicModel(topicmapId, topicmapState), null);
+        } catch (Exception e) {
+            throw new WebApplicationException(new RuntimeException("Setting translation of topicmap " + topicmapId +
+                " failed (transX=" + transX + ", transY=" + transY + ")", e));
+        }
     }
 
     // ---

@@ -756,14 +756,14 @@ public class EmbeddedService implements DeepaMehtaService {
 
     private void fetchComposite(DeepaMehtaObjectModel model, boolean fetchComposite) {
         if (fetchComposite) {
-            valueStorage.fetchComposite(model);
+            valueStorage.fetchCompositeValue(model);
         }
     }
 
     private void fetchComposite(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite) {
         fetchComposite(model, fetchComposite);
         if (fetchRelatingComposite) {
-            valueStorage.fetchComposite(model.getRelatingAssociation());
+            valueStorage.fetchCompositeValue(model.getRelatingAssociation());
         }
     }
 

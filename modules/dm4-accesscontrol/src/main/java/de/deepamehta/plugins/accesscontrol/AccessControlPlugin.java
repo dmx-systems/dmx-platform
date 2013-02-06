@@ -736,17 +736,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private ChildTopicsModel permissions(DeepaMehtaObject object) {
         // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
         // Permissions are transient data, not stored in DB, recalculated for each request.
-        TopicModel permissionsTopic = object.getModel().getChildTopicsModel().getTopic("dm4.accesscontrol.permissions",
-            null);
+        Topic permissionsTopic = object.getChildTopics().getTopic("dm4.accesscontrol.permissions", null);
         ChildTopicsModel permissions;
         if (permissionsTopic != null) {
-            permissions = permissionsTopic.getChildTopicsModel();
+            permissions = permissionsTopic.getChildTopics().getModel();
         } else {
             permissions = new ChildTopicsModel();
-            object.getModel().getChildTopicsModel().put("dm4.accesscontrol.permissions", permissions);
-            // ### FIXME: object.getChildTopics().getModel() should work as well but does not!
-            // ### The ChildTopicModel reference is broken through re-assignment.
-            // ### See AttachedDeepaMehtaObject.storeValue().
+            object.getChildTopics().getModel().put("dm4.accesscontrol.permissions", permissions);
         }
         return permissions;
     }

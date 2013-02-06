@@ -178,7 +178,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             //
             facetsService.addFacetTypeToTopic(topic.getId(), "dm4.geomaps.geo_coordinate_facet");
             //
-            Address address = new Address(topic.getModel().getChildTopicsModel());
+            Address address = new Address(topic.getChildTopics().getModel());
             if (!address.isEmpty()) {
                 logger.info("### New " + address);
                 LonLat geoCoordinate = address.geocode();
