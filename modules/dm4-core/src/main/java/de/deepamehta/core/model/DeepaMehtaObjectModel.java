@@ -195,6 +195,10 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
         this.composite = comp;
     }
 
+    // ---
+
+    public abstract RoleModel createRoleModel(String roleTypeUri);
+
 
 
     // === Serialization ===

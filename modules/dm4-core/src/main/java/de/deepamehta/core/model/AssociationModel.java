@@ -109,6 +109,15 @@ public class AssociationModel extends DeepaMehtaObjectModel {
 
 
 
+    // === Implementation of the abstract methods ===
+
+    @Override
+    public RoleModel createRoleModel(String roleTypeUri) {
+        return new AssociationRoleModel(getId(), roleTypeUri);
+    }
+
+
+
     // === Serialization ===
 
     public JSONObject toJSON() {

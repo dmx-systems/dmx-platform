@@ -68,6 +68,17 @@ public class TopicModel extends DeepaMehtaObjectModel {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+
+
+    // === Implementation of the abstract methods ===
+
+    @Override
+    public RoleModel createRoleModel(String roleTypeUri) {
+        return new TopicRoleModel(getId(), roleTypeUri);
+    }
+
+
+
     // === Java API ===
 
     @Override

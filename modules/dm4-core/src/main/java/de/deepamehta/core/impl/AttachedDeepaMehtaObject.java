@@ -22,7 +22,6 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
-import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -56,7 +55,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     private DeepaMehtaObjectModel model;
     protected final EmbeddedService dms;
 
-    private ChildTopics childTopics;    // Attached object cache
+    private AttachedChildTopics childTopics;    // Attached object cache
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -65,7 +64,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     AttachedDeepaMehtaObject(DeepaMehtaObjectModel model, EmbeddedService dms) {
         this.model = model;
         this.dms = dms;
-        this.childTopics = new AttachedChildTopics(model.getChildTopicsModel(), dms);
+        this.childTopics = new AttachedChildTopics(model.getChildTopicsModel(), this, dms);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -154,13 +153,13 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         // update memory
         model.setSimpleValue(value);
         // update DB
-        storeAndIndexSimpleValue();
+        dms.valueStorage.storeSimpleValue(getModel());
     }
 
     // --- Child Topics ---
 
     @Override
-    public ChildTopics getChildTopics() {
+    public AttachedChildTopics getChildTopics() {
         return childTopics;
     }
 
@@ -221,6 +220,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // === Traversal ===
 
+    // ### TODO: drop?
     @Override
     public SimpleValue getChildTopicValue(String assocDefUri) {
         return fetchChildTopicValue(getAssocDef(assocDefUri));
@@ -346,65 +346,18 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     abstract void storeTypeUri();
 
-    abstract void storeSimpleValue(Set<IndexMode> indexModes, String indexKey);
-
-    abstract Type getType();
-
-    abstract RoleModel createRoleModel(String roleTypeUri);
-
     // ---
 
     abstract RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
-        String othersRoleTypeUri, String othersTopicTypeUri);
+                                                String othersRoleTypeUri, String othersTopicTypeUri);
 
     abstract ResultSet<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-        String othersRoleTypeUri, String othersTopicTypeUri, int maxResultSize);
+                                                String othersRoleTypeUri, String othersTopicTypeUri, int maxResultSize);
 
     // ---
 
-    /**
-     * Takes the simple or composite value from this object's model and stores and indexes it.
-     *
-     * This method encapsulates the logic that is common to topics and associations.
-     * To handle the differences abstract methods are called.
-     *
-     * Called from {@link EmbeddedService#createTopic}
-     * Called from {@link EmbeddedService#createAssociation}
-     */
-    void storeValue(ClientState clientState, Directives directives) {
-        try {
-            if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-                ChildTopicsModel comp = getModel().getChildTopicsModel();
-                // Note: we build the composite value memory representation from scratch.
-                // Uninitialized IDs, URIs, and values in the TopicModels must be replaced with the real ones.
-                // In case of many-relationships the TopicModel arrays can not be updated incrementally because
-                // they can't be looked up by ID (because topics to be created have no ID yet.)
-                // ### FIXME: setCompositeValue() must not be used as it invalidates the reference hold by an
-                // ### AttachedChildTopics object.
-                model.setCompositeValue(new ChildTopicsModel());
-                updateCompositeValue(comp, clientState, directives);
-                refreshLabel();
-            } else {
-                storeAndIndexSimpleValue();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Storing the simple/composite value of " + className() + " " + getId() +
-                " failed", e);
-        }
-    }
-
-    /**
-     * Calculates the simple value that is to be indexed for this object.
-     *
-     * HTML tags are stripped from HTML values. Non-HTML values are returned directly.
-     */
-    final SimpleValue getIndexValue() {
-        SimpleValue value = getSimpleValue();
-        if (getType().getDataTypeUri().equals("dm4.core.html")) {
-            return new SimpleValue(JavaUtils.stripHTML(value.toString()));
-        } else {
-            return value;
-        }
+    Type getType() {
+        return dms.valueStorage.getType(getModel());
     }
 
 
@@ -491,8 +444,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     private void updateChildTopics(AssociationDefinition assocDef, boolean one, TopicModel newChildTopic,
                                    List<TopicModel> newChildTopics, ClientState clientState, Directives directives) {
         String assocTypeUri = assocDef.getTypeUri();
+        String childTypeUri = assocDef.getPartTypeUri();
         if (assocTypeUri.equals("dm4.core.composition_def")) {
             if (one) {
+                // ### getChildTopics().updateComposition(childTypeUri, newChildTopic, clientState, directives);
                 updateCompositionOne(assocDef, newChildTopic, clientState, directives);
             } else {
                 updateCompositionMany(assocDef, newChildTopics, clientState, directives);
@@ -527,7 +482,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             // == create child ==
             // update DB
             childTopic = dms.createTopic(newChildTopic, clientState);
-            associateChildTopic(assocDef, childTopic.getId(), clientState);
+            dms.valueStorage.associateChildTopic(childTopic.getId(), getModel(), assocDef, clientState);
             // update memory
             putInCompositeModel(assocDef, childTopic);
         }
@@ -561,7 +516,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 // == create child ==
                 // update DB
                 Topic childTopic = dms.createTopic(newChildTopic, clientState);
-                associateChildTopic(assocDef, childTopic.getId(), clientState);
+                dms.valueStorage.associateChildTopic(childTopic.getId(), getModel(), assocDef, clientState);
                 // update memory
                 addToCompositeModel(assocDef, childTopic);
             }
@@ -573,20 +528,21 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     private void updateAggregationOne(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
                                                                                                 Directives directives) {
         RelatedTopic childTopic = fetchChildTopic(assocDef, false);     // fetchComposite=false
-        if (isReference(newChildTopic)) {
+        if (dms.valueStorage.isReference(newChildTopic)) {
             if (childTopic != null) {
                 if (!matches(newChildTopic, childTopic)) {
                     // == update assignment ==
                     // update DB
                     childTopic.getRelatingAssociation().delete(directives);
-                    Topic topic = associateChildTopic(assocDef, newChildTopic, clientState);
+                    Topic topic = dms.valueStorage.associateChildTopic(newChildTopic, getModel(), assocDef,
+                        clientState);
                     // update memory
                     putInCompositeModel(assocDef, topic);
                 }
             } else {
                 // == create assignment ==
                 // update DB
-                Topic topic = associateChildTopic(assocDef, newChildTopic, clientState);
+                Topic topic = dms.valueStorage.associateChildTopic(newChildTopic, getModel(), assocDef, clientState);
                 // update memory
                 putInCompositeModel(assocDef, topic);
             }
@@ -597,7 +553,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 childTopic.getRelatingAssociation().delete(directives);
             }
             Topic topic = dms.createTopic(newChildTopic, clientState);
-            associateChildTopic(assocDef, topic.getId(), clientState);
+            dms.valueStorage.associateChildTopic(topic.getId(), getModel(), assocDef, clientState);
             // update memory
             putInCompositeModel(assocDef, topic);
         }
@@ -618,13 +574,14 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                     // update memory
                     removeFromCompositeModel(assocDef, childTopic);
                 }
-            } else if (isReference(newChildTopic)) {
+            } else if (dms.valueStorage.isReference(newChildTopic)) {
                 // Note: "create assignment" is an idempotent operation. A create request for an assignment which
                 // exists already is not an error. Instead, nothing is performed.
                 if (matches(newChildTopic, childTopics) == null) {
                     // == create assignment ==
                     // update DB
-                    Topic topic = associateChildTopic(assocDef, newChildTopic, clientState);
+                    Topic topic = dms.valueStorage.associateChildTopic(newChildTopic, getModel(), assocDef,
+                        clientState);
                     // update memory
                     addToCompositeModel(assocDef, topic);
                 }
@@ -632,7 +589,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 // == create child ==
                 // update DB
                 Topic topic = dms.createTopic(newChildTopic, clientState);
-                associateChildTopic(assocDef, topic.getId(), clientState);
+                dms.valueStorage.associateChildTopic(topic.getId(), getModel(), assocDef, clientState);
                 // update memory
                 addToCompositeModel(assocDef, topic);
             }
@@ -706,26 +663,13 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 String topicTypeUri = assocDef.getPartTypeUri();
                 childTopic = dms.createTopic(new TopicModel(topicTypeUri, value), null);  // ### FIXME: clientState=null
                 // associate child topic
-                associateChildTopic(assocDef, childTopic.getId(), null);                  // ### FIXME: clientState=null
+                dms.valueStorage.associateChildTopic(childTopic.getId(), getModel(), assocDef, null); // ### FIXME: clie
             }
             return childTopic;
         } catch (Exception e) {
             throw new RuntimeException("Storing child topic value failed (assocDefUri=\"" + assocDefUri +
                 "\", value=\"" + value + "\", parentTopic=" + this + ")", e);
         }
-    }
-
-    // ### TODO: should be private
-    /**
-     * Stores and indexes the simple value of this object's model.
-     * Determines this object's index key and index modes.
-     */
-    void storeAndIndexSimpleValue() {
-        Type type = getType();                      // abstract
-        Set<IndexMode> indexModes = type.getIndexModes();
-        String indexKey = type.getUri();
-        //
-        storeSimpleValue(indexModes, indexKey);     // abstract
     }
 
     // === Label ===
@@ -800,9 +744,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      * Checks weather the specified update topic model matches the specified topic.
      */
     private boolean matches(TopicModel childTopic, Topic topic) {
-        if (isReferenceById(childTopic)) {
+        if (dms.valueStorage.isReferenceById(childTopic)) {
             return childTopic.getId() == topic.getId();
-        } else if (isReferenceByUri(childTopic)) {
+        } else if (dms.valueStorage.isReferenceByUri(childTopic)) {
             return childTopic.getUri().equals(topic.getUri());
         } else {
             throw new RuntimeException("Not a topic reference model (childTopic=" + childTopic + ")");
@@ -842,51 +786,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             }
         }
         return null;
-    }
-
-    // ---
-
-    /**
-     * Checks weather an update topic model represents a reference.
-     */
-    private boolean isReference(TopicModel childTopic) {
-        return isReferenceById(childTopic) || isReferenceByUri(childTopic);
-    }
-
-    private boolean isReferenceById(TopicModel childTopic) {
-        return childTopic.getId() != -1;
-    }
-
-    private boolean isReferenceByUri(TopicModel childTopic) {
-        return !childTopic.getUri().equals("");     // ### FIXME: in an update topic model the URI might be null
-    }
-
-    // ---
-
-    private Topic associateChildTopic(AssociationDefinition assocDef, TopicModel childTopic, ClientState clientState) {
-        if (isReferenceById(childTopic)) {
-            associateChildTopic(assocDef, childTopic.getId(), clientState);
-            return dms.getTopic(childTopic.getId(), false, null);       // fetchComposite=false, clientState=null
-        } else if (isReferenceByUri(childTopic)) {
-            associateChildTopic(assocDef, childTopic.getUri(), clientState);
-            return dms.getTopic("uri", new SimpleValue(childTopic.getUri()), false, null);
-        } else {
-            throw new RuntimeException("Not a topic reference model (childTopic=" + childTopic + ")");
-        }
-    }
-
-    private void associateChildTopic(AssociationDefinition assocDef, long childTopicId, ClientState clientState) {
-        dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
-            createRoleModel("dm4.core.whole"),
-            new TopicRoleModel(childTopicId, "dm4.core.part"), clientState
-        );
-    }
-
-    private void associateChildTopic(AssociationDefinition assocDef, String childTopicUri, ClientState clientState) {
-        dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
-            createRoleModel("dm4.core.whole"),
-            new TopicRoleModel(childTopicUri, "dm4.core.part"), clientState
-        );
     }
 
     // ---

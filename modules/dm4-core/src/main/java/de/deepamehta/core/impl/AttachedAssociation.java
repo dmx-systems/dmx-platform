@@ -271,21 +271,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         dms.storage.storeAssociationTypeUri(getId(), getTypeUri());
     }
 
-    @Override
-    final void storeSimpleValue(Set<IndexMode> indexModes, String indexKey) {
-        dms.storage.storeAssociationValue(getId(), getSimpleValue(), indexModes, indexKey, getIndexValue());
-    }
-
-    @Override
-    final Type getType() {
-        return dms.getAssociationType(getTypeUri(), null);    // FIXME: clientState=null
-    }
-
-    @Override
-    final RoleModel createRoleModel(String roleTypeUri) {
-        return new AssociationRoleModel(getId(), roleTypeUri);
-    }
-
     // ---
 
     @Override

@@ -195,21 +195,6 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         dms.storage.storeTopicTypeUri(getId(), getTypeUri());
     }
 
-    @Override
-    final void storeSimpleValue(Set<IndexMode> indexModes, String indexKey) {
-        dms.storage.storeTopicValue(getId(), getSimpleValue(), indexModes, indexKey, getIndexValue());
-    }
-
-    @Override
-    final Type getType() {
-        return dms.getTopicType(getTypeUri(), null);    // FIXME: clientState=null
-    }
-
-    @Override
-    final RoleModel createRoleModel(String roleTypeUri) {
-        return new TopicRoleModel(getId(), roleTypeUri);
-    }
-
     // ---
 
     @Override

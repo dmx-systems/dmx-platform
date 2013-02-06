@@ -1,9 +1,13 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.ChildTopics;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directives;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,12 +27,14 @@ class AttachedChildTopics implements ChildTopics {
     private Map<String, Object> childTopics = new HashMap();
 
     private ChildTopicsModel model;
+    private AttachedDeepaMehtaObject parent;
     private EmbeddedService dms;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedChildTopics(ChildTopicsModel model, EmbeddedService dms) {
+    AttachedChildTopics(ChildTopicsModel model, AttachedDeepaMehtaObject parent, EmbeddedService dms) {
         this.model = model;
+        this.parent = parent;
         this.dms = dms;
         initChildTopics(model);
     }
@@ -79,6 +85,8 @@ class AttachedChildTopics implements ChildTopics {
         return model;
     }
 
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void initChildTopics(ChildTopicsModel model) {
@@ -99,5 +107,11 @@ class AttachedChildTopics implements ChildTopics {
                 throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
             }
         }
+    }
+
+    // ---
+
+    private void put(String childTypeUri, Topic topic) {
+        childTopics.put(childTypeUri, topic);
     }
 }

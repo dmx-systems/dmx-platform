@@ -61,6 +61,7 @@ public class EmbeddedService implements DeepaMehtaService {
     EventManager eventManager;
     TypeCache typeCache;
     TypeStorageImpl typeStorage;
+    ValueStorage valueStorage;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -77,6 +78,7 @@ public class EmbeddedService implements DeepaMehtaService {
         this.eventManager = new EventManager();
         this.typeCache = new TypeCache(this);
         this.typeStorage = new TypeStorageImpl(this);
+        this.valueStorage = new ValueStorage(this);
         bootstrapTypeCache();
         setupDB();
     }
@@ -754,73 +756,15 @@ public class EmbeddedService implements DeepaMehtaService {
 
     private void fetchComposite(DeepaMehtaObjectModel model, boolean fetchComposite) {
         if (fetchComposite) {
-            fetchComposite(model);
+            valueStorage.fetchComposite(model);
         }
     }
 
     private void fetchComposite(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite) {
         fetchComposite(model, fetchComposite);
         if (fetchRelatingComposite) {
-            fetchComposite(model.getRelatingAssociation());
+            valueStorage.fetchComposite(model.getRelatingAssociation());
         }
-    }
-
-    // ---
-
-    private void fetchComposite(DeepaMehtaObjectModel model) {
-        try {
-            Type type = getType(model);
-            if (!type.getDataTypeUri().equals("dm4.core.composite")) {
-                return;
-            }
-            //
-            ChildTopicsModel comp = model.getChildTopicsModel();
-            for (AssociationDefinition assocDef : type.getAssocDefs()) {
-                String cardinalityUri = assocDef.getPartCardinalityUri();
-                String childTypeUri   = assocDef.getPartTypeUri();
-                if (cardinalityUri.equals("dm4.core.one")) {
-                    TopicModel childTopic = fetchChildTopic(model.getId(), assocDef);
-                    if (childTopic != null) {
-                        comp.put(childTypeUri, childTopic);
-                        fetchComposite(childTopic);
-                    }
-                } else if (cardinalityUri.equals("dm4.core.many")) {
-                    for (TopicModel childTopic : fetchChildTopics(model.getId(), assocDef)) {
-                        comp.add(childTypeUri, childTopic);
-                        fetchComposite(childTopic);
-                    }
-                } else {
-                    throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching child topics of object " + model.getId() + " failed (" + model + ")",
-                e);
-        }
-    }
-
-    private Type getType(DeepaMehtaObjectModel model) {
-        if (model instanceof TopicModel) {
-            return getTopicType(model.getTypeUri(), null);
-        } else if (model instanceof AssociationModel) {
-            return getAssociationType(model.getTypeUri(), null);
-        }
-        throw new RuntimeException("Unexpected model: " + model);
-    }
-
-    /**
-     * Fetches and returns a child topic or <code>null</code> if no such topic extists.
-     */
-    private RelatedTopicModel fetchChildTopic(long id, AssociationDefinition assocDef) {
-        String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
-        String othersTypeUri = assocDef.getPartTypeUri();
-        return storage.fetchRelatedTopic(id, assocTypeUri, "dm4.core.whole", "dm4.core.part", othersTypeUri);
-    }
-
-    private ResultSet<RelatedTopicModel> fetchChildTopics(long id, AssociationDefinition assocDef) {
-        String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
-        String othersTypeUri = assocDef.getPartTypeUri();
-        return storage.fetchRelatedTopics(id, assocTypeUri, "dm4.core.whole", "dm4.core.part", othersTypeUri);
     }
 
     // ---
@@ -832,13 +776,11 @@ public class EmbeddedService implements DeepaMehtaService {
         // 1) store in DB
         setDefaults(model);
         storage.storeTopic(model);
+        valueStorage.storeValue(model, clientState, directives);
         createTopicInstantiation(model.getId(), model.getTypeUri());
         //
         // 2) create application object
-        AttachedTopic topic = new AttachedTopic(model, this);
-        topic.storeValue(clientState, directives);
-        //
-        return topic;
+        return new AttachedTopic(model, this);
     }
 
     /**
@@ -848,13 +790,11 @@ public class EmbeddedService implements DeepaMehtaService {
         // 1) store in DB
         setDefaults(model);
         storage.storeAssociation(model);
+        valueStorage.storeValue(model, clientState, directives);
         createAssociationInstantiation(model.getId(), model.getTypeUri());
         //
         // 2) create application object
-        AttachedAssociation assoc = new AttachedAssociation(model, this);
-        assoc.storeValue(clientState, directives);
-        //
-        return assoc;
+        return new AttachedAssociation(model, this);
     }
 
     // ---
