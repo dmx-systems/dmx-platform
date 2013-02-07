@@ -7,7 +7,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
@@ -154,7 +154,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     @Override
     public void preUpdateTopic(Topic topic, TopicModel newModel, Directives directives) {
         if (topic.getTypeUri().equals("dm4.files.file") && newModel.getTypeUri().equals("dm4.webclient.icon")) {
-            String iconUrl = "/filerepo/" + topic.getChildTopics().getString("dm4.files.path");
+            String iconUrl = "/filerepo/" + topic.getCompositeValue().getString("dm4.files.path");
             logger.info("### Retyping a file to an icon (iconUrl=" + iconUrl + ")");
             newModel.setSimpleValue(iconUrl);
         }
@@ -200,7 +200,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * Creates a "Search" topic (a bucket).
      */
     private Topic createSearchTopic(String searchTerm, Set<? extends Topic> resultItems, ClientState clientState) {
-        Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new ChildTopicsModel()
+        Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new CompositeValueModel()
             .put("dm4.webclient.search_term", searchTerm)
         ), clientState);
         //

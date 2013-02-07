@@ -10,7 +10,7 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
-import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
@@ -83,9 +83,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             Topic topic = dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-                new ChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)), null);
+                new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)), null);
             //
-            assertTrue(topic.getChildTopics().has("dm4.core.plugin_migration_nr"));
+            assertTrue(topic.getCompositeValue().has("dm4.core.plugin_migration_nr"));
             //
             int nr = topic.getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
             assertEquals(23, nr);

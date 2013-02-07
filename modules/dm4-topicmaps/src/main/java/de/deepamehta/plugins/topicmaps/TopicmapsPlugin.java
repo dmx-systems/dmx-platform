@@ -8,7 +8,7 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
-import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
@@ -89,11 +89,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @Override
     public Topic createTopicmap(String name, String uri, String topicmapRendererUri, ClientState clientState) {
-        ChildTopicsModel topicmapState = getTopicmapRenderer(topicmapRendererUri).initialTopicmapState();
-        return dms.createTopic(new TopicModel(uri, "dm4.topicmaps.topicmap", new ChildTopicsModel()
-            .put("dm4.topicmaps.name", name)
-            .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
-            .put("dm4.topicmaps.state", topicmapState)
+        CompositeValueModel topicmapState = getTopicmapRenderer(topicmapRendererUri).initialTopicmapState();
+        return dms.createTopic(new TopicModel(uri, "dm4.topicmaps.topicmap", new CompositeValueModel().put(
+            "dm4.topicmaps.name", name).put(
+            "dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri).put(
+            "dm4.topicmaps.state", topicmapState)
         ), clientState);
     }
 
@@ -115,10 +115,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                    @PathParam("x") int x, @PathParam("y") int y) {
         dms.createAssociation(new AssociationModel(TOPIC_MAPCONTEXT,
             new TopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
-            new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC), new ChildTopicsModel()
-                .put("dm4.topicmaps.x", x)
-                .put("dm4.topicmaps.y", y)
-                .put("dm4.topicmaps.visibility", true)
+            new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC), new CompositeValueModel().put(
+                "dm4.topicmaps.x", x).put(
+                "dm4.topicmaps.y", y).put(
+                "dm4.topicmaps.visibility", true)
         ), null);   // FIXME: clientState=null
     }
 
@@ -137,9 +137,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void moveTopic(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId, @PathParam("x") int x,
                                                                                                 @PathParam("y") int y) {
-        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(new ChildTopicsModel()
-            .put("dm4.topicmaps.x", x)
-            .put("dm4.topicmaps.y", y), null, new Directives());    // clientState=null
+        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(new CompositeValueModel().put(
+            "dm4.topicmaps.x", x).put(
+            "dm4.topicmaps.y", y
+        ), null, new Directives());    // clientState=null
     }
 
     @PUT
@@ -147,8 +148,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
-        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(new ChildTopicsModel()
-            .put("dm4.topicmaps.visibility", visibility), null, new Directives());  // clientState=null
+        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(new CompositeValueModel().put(
+            "dm4.topicmaps.visibility", visibility
+        ), null, new Directives());  // clientState=null
     }
 
     @DELETE
@@ -173,12 +175,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void setTopicmapTranslation(@PathParam("id") long topicmapId, @PathParam("x") int transX,
                                                                          @PathParam("y") int transY) {
         try {
-            ChildTopicsModel topicmapState = new ChildTopicsModel().put("dm4.topicmaps.state", new ChildTopicsModel()
-                .put("dm4.topicmaps.translation", new ChildTopicsModel()
-                    .put("dm4.topicmaps.translation_x", transX)
-                    .put("dm4.topicmaps.translation_y", transY)
-                )
-            );
+            CompositeValueModel topicmapState = new CompositeValueModel().put(
+                "dm4.topicmaps.state", new CompositeValueModel().put(
+                    "dm4.topicmaps.translation", new CompositeValueModel().put(
+                        "dm4.topicmaps.translation_x", transX).put(
+                        "dm4.topicmaps.translation_y", transY)
+            ));
             dms.updateTopic(new TopicModel(topicmapId, topicmapState), null);
         } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException("Setting translation of topicmap " + topicmapId +

@@ -1,9 +1,9 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.ChildTopics;
+import de.deepamehta.core.CompositeValue;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientState;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 
 
-class AttachedChildTopics implements ChildTopics {
+class AttachedCompositeValue implements CompositeValue {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -26,13 +26,13 @@ class AttachedChildTopics implements ChildTopics {
      */
     private Map<String, Object> childTopics = new HashMap();
 
-    private ChildTopicsModel model;
+    private CompositeValueModel model;
     private AttachedDeepaMehtaObject parent;
     private EmbeddedService dms;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedChildTopics(ChildTopicsModel model, AttachedDeepaMehtaObject parent, EmbeddedService dms) {
+    AttachedCompositeValue(CompositeValueModel model, AttachedDeepaMehtaObject parent, EmbeddedService dms) {
         this.model = model;
         this.parent = parent;
         this.dms = dms;
@@ -43,9 +43,9 @@ class AttachedChildTopics implements ChildTopics {
 
 
 
-    // **********************************
-    // *** ChildTopics Implementation ***
-    // **********************************
+    // *************************************
+    // *** CompositeValue Implementation ***
+    // *************************************
 
 
 
@@ -81,7 +81,7 @@ class AttachedChildTopics implements ChildTopics {
     // ---
 
     @Override
-    public ChildTopicsModel getModel() {
+    public CompositeValueModel getModel() {
         return model;
     }
 
@@ -89,22 +89,22 @@ class AttachedChildTopics implements ChildTopics {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void initChildTopics(ChildTopicsModel model) {
+    private void initChildTopics(CompositeValueModel model) {
         for (String childTypeUri : model.keys()) {
             Object value = model.get(childTypeUri);
             if (value instanceof TopicModel) {
                 TopicModel childTopic = (TopicModel) value;
                 childTopics.put(childTypeUri, new AttachedTopic(childTopic, dms));
-                initChildTopics(childTopic.getChildTopicsModel());
+                initChildTopics(childTopic.getCompositeValueModel());
             } else if (value instanceof List) {
                 List<Topic> topics = new ArrayList();
                 childTopics.put(childTypeUri, topics);
                 for (TopicModel childTopic : (List<TopicModel>) value) {
                     topics.add(new AttachedTopic(childTopic, dms));
-                    initChildTopics(childTopic.getChildTopicsModel());
+                    initChildTopics(childTopic.getCompositeValueModel());
                 }
             } else {
-                throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
+                throw new RuntimeException("Unexpected value in a CompositeValueModel: " + value);
             }
         }
     }

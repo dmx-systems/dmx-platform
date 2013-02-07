@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.topicmaps.model;
 
-import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -18,11 +18,11 @@ public class TopicmapTopic extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private ChildTopicsModel visualizationProps;
+    private CompositeValueModel visualizationProps;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicmapTopic(TopicModel topic, ChildTopicsModel visualizationProps) {
+    TopicmapTopic(TopicModel topic, CompositeValueModel visualizationProps) {
         super(topic);
         this.visualizationProps = visualizationProps;
     }

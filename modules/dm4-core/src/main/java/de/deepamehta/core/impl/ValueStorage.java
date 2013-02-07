@@ -5,7 +5,7 @@ import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
@@ -39,7 +39,7 @@ class ValueStorage {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
-     * Fetches the composite value (child topic models) of the specified object model and stores it within the model.
+     * Fetches the composite value (child topic models) of the specified object model and updates the model.
      */
     void fetchCompositeValue(DeepaMehtaObjectModel model) {
         try {
@@ -48,7 +48,7 @@ class ValueStorage {
                 return;
             }
             //
-            ChildTopicsModel comp = model.getChildTopicsModel();
+            CompositeValueModel comp = model.getCompositeValueModel();
             for (AssociationDefinition assocDef : type.getAssocDefs()) {
                 String cardinalityUri = assocDef.getPartCardinalityUri();
                 String childTypeUri   = assocDef.getPartTypeUri();
@@ -201,9 +201,9 @@ class ValueStorage {
     }
 
     private void storeCompositeValue(DeepaMehtaObjectModel parent, ClientState clientState, Directives directives) {
-        ChildTopicsModel model = null;
+        CompositeValueModel model = null;
         try {
-            model = parent.getChildTopicsModel();
+            model = parent.getCompositeValueModel();
             for (AssociationDefinition assocDef : getType(parent).getAssocDefs()) {
                 String childTypeUri   = assocDef.getPartTypeUri();
                 String cardinalityUri = assocDef.getPartCardinalityUri();
@@ -344,7 +344,7 @@ class ValueStorage {
     private String buildLabelFromConfig(List<String> labelConfig, DeepaMehtaObjectModel model) {
         StringBuilder label = new StringBuilder();
         for (String childTypeUri : labelConfig) {
-            TopicModel childTopic = model.getChildTopicsModel().getTopic(childTypeUri, null);
+            TopicModel childTopic = model.getCompositeValueModel().getTopic(childTypeUri, null);
             // Note: topics just created have no child topics yet
             if (childTopic != null) {
                 String l = buildLabel(childTopic);
@@ -364,7 +364,7 @@ class ValueStorage {
         // Note: types just created might have no child types yet
         if (i.hasNext()) {
             String childTypeUri = i.next().getPartTypeUri();
-            TopicModel childTopic = model.getChildTopicsModel().getTopic(childTypeUri, null);
+            TopicModel childTopic = model.getCompositeValueModel().getTopic(childTypeUri, null);
             // Note: topics just created have no child topics yet
             if (childTopic != null) {
                 return buildLabel(childTopic);

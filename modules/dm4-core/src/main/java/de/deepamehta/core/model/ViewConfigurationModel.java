@@ -94,7 +94,7 @@ public class ViewConfigurationModel {
             addConfigTopic(configTopic);
         }
         // make setting
-        configTopic.getChildTopicsModel().put(settingUri, value);
+        configTopic.getCompositeValueModel().put(settingUri, value);
     }
 
     // ---
@@ -116,7 +116,7 @@ public class ViewConfigurationModel {
         if (configTopic == null) {
             return null;
         }
-        ChildTopicsModel comp = configTopic.getChildTopicsModel();
+        CompositeValueModel comp = configTopic.getCompositeValueModel();
         return comp.has(settingUri) ? comp.getObject(settingUri) : null;
     }
 

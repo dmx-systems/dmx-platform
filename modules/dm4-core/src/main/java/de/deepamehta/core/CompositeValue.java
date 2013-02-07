@@ -1,10 +1,10 @@
 package de.deepamehta.core;
 
-import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.CompositeValueModel;
 
 
 
-public interface ChildTopics {
+public interface CompositeValue {
 
     Topic getTopic(String childTypeUri);
 
@@ -20,5 +20,5 @@ public interface ChildTopics {
 
     // ---
 
-    ChildTopicsModel getModel();
+    CompositeValueModel getModel();
 }

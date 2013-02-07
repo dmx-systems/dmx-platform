@@ -12,7 +12,7 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
-import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
@@ -339,7 +339,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @return  The encryted password of the specified User Account.
      */
     private String password(Topic userAccount) {
-        return userAccount.getChildTopics().getString("dm4.accesscontrol.password");
+        return userAccount.getCompositeValue().getString("dm4.accesscontrol.password");
     }
 
 
@@ -473,7 +473,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Topic createUserAccount(Credentials cred) {
-        return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new ChildTopicsModel()
+        return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new CompositeValueModel()
             .put("dm4.accesscontrol.username", cred.username)
             .put("dm4.accesscontrol.password", cred.password)), null);  // clientState=null
     }
@@ -719,30 +719,30 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private void enrichWithPermissions(DeepaMehtaObject object, boolean write) {
         // Note: we must extend/override possibly existing permissions.
         // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
-        ChildTopicsModel permissions = permissions(object);
+        CompositeValueModel permissions = permissions(object);
         permissions.put(Operation.WRITE.uri, write);
     }
 
     private void enrichWithPermissions(Type type, boolean write, boolean create) {
         // Note: we must extend/override possibly existing permissions.
         // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
-        ChildTopicsModel permissions = permissions(type);
+        CompositeValueModel permissions = permissions(type);
         permissions.put(Operation.WRITE.uri, write);
         permissions.put(Operation.CREATE.uri, create);
     }
 
     // ---
 
-    private ChildTopicsModel permissions(DeepaMehtaObject object) {
+    private CompositeValueModel permissions(DeepaMehtaObject object) {
         // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
         // Permissions are transient data, not stored in DB, recalculated for each request.
-        Topic permissionsTopic = object.getChildTopics().getTopic("dm4.accesscontrol.permissions", null);
-        ChildTopicsModel permissions;
+        Topic permissionsTopic = object.getCompositeValue().getTopic("dm4.accesscontrol.permissions", null);
+        CompositeValueModel permissions;
         if (permissionsTopic != null) {
-            permissions = permissionsTopic.getChildTopics().getModel();
+            permissions = permissionsTopic.getCompositeValue().getModel();
         } else {
-            permissions = new ChildTopicsModel();
-            object.getChildTopics().getModel().put("dm4.accesscontrol.permissions", permissions);
+            permissions = new CompositeValueModel();
+            object.getCompositeValue().getModel().put("dm4.accesscontrol.permissions", permissions);
         }
         return permissions;
     }
