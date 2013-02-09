@@ -734,14 +734,21 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     private CompositeValueModel permissions(DeepaMehtaObject object) {
-        // Note: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
-        // Permissions are transient data, not stored in DB, recalculated for each request.
-        Topic permissionsTopic = object.getCompositeValue().getTopic("dm4.accesscontrol.permissions", null);
+        // Note 1: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
+        // Permissions are for transfer only, recalculated for each request, not stored in DB.
+        // Note 2: The permissions topic exists only in the object's model (see note below).
+        // There is no corresponding topic in the attached composite value. So we must query the model here.
+        // (object.getCompositeValue().getTopic(...) would not work)
+        TopicModel permissionsTopic = object.getCompositeValue().getModel()
+            .getTopic("dm4.accesscontrol.permissions", null);
         CompositeValueModel permissions;
         if (permissionsTopic != null) {
-            permissions = permissionsTopic.getCompositeValue().getModel();
+            permissions = permissionsTopic.getCompositeValueModel();
         } else {
             permissions = new CompositeValueModel();
+            // Note: we put the permissions topic directly in the model here (instead of the attached composite value).
+            // The "permissions" topic is for transfer only. It must not be stored in the DB (as it would when putting
+            // it in the attached composite value).
             object.getCompositeValue().getModel().put("dm4.accesscontrol.permissions", permissions);
         }
         return permissions;
