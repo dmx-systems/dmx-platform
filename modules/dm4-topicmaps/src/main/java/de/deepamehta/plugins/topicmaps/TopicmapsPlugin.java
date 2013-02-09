@@ -103,7 +103,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Path("/{id}")
     @Override
     public Topicmap getTopicmap(@PathParam("id") long topicmapId, @HeaderParam("Cookie") ClientState clientState) {
-        return new Topicmap(topicmapId, dms, clientState);
+        try {
+            return new Topicmap(topicmapId, dms, clientState);
+        } catch (Exception e) {
+            throw new WebApplicationException(new RuntimeException("Fetching topicmap " + topicmapId + " failed", e));
+        }
     }
 
     // ---

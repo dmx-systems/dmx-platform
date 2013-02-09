@@ -198,6 +198,10 @@ public class CompositeValueModel {
         return values.containsKey(key);
     }
 
+    public int size() {
+        return values.size();
+    }
+
     // ---
 
     /**

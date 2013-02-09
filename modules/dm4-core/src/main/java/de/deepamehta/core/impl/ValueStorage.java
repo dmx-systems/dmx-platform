@@ -39,39 +39,49 @@ class ValueStorage {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
-     * Fetches the composite value (child topic models) of the specified object model and updates the model.
+     * Fetches the composite value (child topic models) of the specified parent object model and updates the parent
+     * object model.
      */
-    void fetchCompositeValue(DeepaMehtaObjectModel model) {
+    void fetchCompositeValue(DeepaMehtaObjectModel parent) {
         try {
-            Type type = getType(model);
+            Type type = getType(parent);
             if (!type.getDataTypeUri().equals("dm4.core.composite")) {
                 return;
             }
             //
-            CompositeValueModel comp = model.getCompositeValueModel();
             for (AssociationDefinition assocDef : type.getAssocDefs()) {
-                String cardinalityUri = assocDef.getPartCardinalityUri();
-                String childTypeUri   = assocDef.getPartTypeUri();
-                if (cardinalityUri.equals("dm4.core.one")) {
-                    TopicModel childTopic = fetchChildTopic(model.getId(), assocDef);
-                    if (childTopic != null) {
-                        comp.put(childTypeUri, childTopic);
-                        fetchCompositeValue(childTopic);    // recursive call
-                    }
-                } else if (cardinalityUri.equals("dm4.core.many")) {
-                    for (TopicModel childTopic : fetchChildTopics(model.getId(), assocDef)) {
-                        comp.add(childTypeUri, childTopic);
-                        fetchCompositeValue(childTopic);    // recursive call
-                    }
-                } else {
-                    throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
-                }
+                fetchChildTopics(parent, assocDef);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Fetching composite value of object " + model.getId() + " failed (" +
-                model + ")", e);
+            throw new RuntimeException("Fetching composite value of object " + parent.getId() + " failed (" +
+                parent + ")", e);
         }
     }
+
+    void fetchChildTopics(DeepaMehtaObjectModel parent, AssociationDefinition assocDef) {
+        CompositeValueModel comp = parent.getCompositeValueModel();
+        String cardinalityUri = assocDef.getPartCardinalityUri();
+        String childTypeUri   = assocDef.getPartTypeUri();
+        if (cardinalityUri.equals("dm4.core.one")) {
+            TopicModel childTopic = fetchChildTopic(parent.getId(), assocDef);
+            // Note: topics just created have no child topics yet
+            if (childTopic != null) {
+                comp.put(childTypeUri, childTopic);
+                // recursion
+                fetchCompositeValue(childTopic);
+            }
+        } else if (cardinalityUri.equals("dm4.core.many")) {
+            for (TopicModel childTopic : fetchChildTopics(parent.getId(), assocDef)) {
+                comp.add(childTypeUri, childTopic);
+                // recursion
+                fetchCompositeValue(childTopic);
+            }
+        } else {
+            throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
+        }
+    }
+
+    // ---
 
     /**
      * Stores and indexes the specified model's value, either a simple value or a composite value (child topics).
@@ -114,6 +124,19 @@ class ValueStorage {
 
     // === Helper ===
 
+    Topic associateChildTopic(TopicModel childModel, DeepaMehtaObjectModel parent, AssociationDefinition assocDef,
+                                                                                   ClientState clientState) {
+        if (isReferenceById(childModel)) {
+            associateChildTopic(childModel.getId(), parent, assocDef, clientState);
+            return dms.getTopic(childModel.getId(), false, null);       // fetchComposite=false, clientState=null
+        } else if (isReferenceByUri(childModel)) {
+            associateChildTopic(childModel.getUri(), parent, assocDef, clientState);
+            return dms.getTopic("uri", new SimpleValue(childModel.getUri()), false, null);
+        } else {
+            throw new RuntimeException("Topic model is not a reference (" + childModel + ")");
+        }
+    }
+
     void associateChildTopic(long childTopicId, DeepaMehtaObjectModel parent, AssociationDefinition assocDef,
                                                                               ClientState clientState) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
@@ -128,19 +151,6 @@ class ValueStorage {
             parent.createRoleModel("dm4.core.whole"),
             new TopicRoleModel(childTopicUri, "dm4.core.part"), clientState
         );
-    }
-
-    Topic associateChildTopic(TopicModel childModel, DeepaMehtaObjectModel parent, AssociationDefinition assocDef,
-                                                                                   ClientState clientState) {
-        if (isReferenceById(childModel)) {
-            associateChildTopic(childModel.getId(), parent, assocDef, clientState);
-            return dms.getTopic(childModel.getId(), false, null);       // fetchComposite=false, clientState=null
-        } else if (isReferenceByUri(childModel)) {
-            associateChildTopic(childModel.getUri(), parent, assocDef, clientState);
-            return dms.getTopic("uri", new SimpleValue(childModel.getUri()), false, null);
-        } else {
-            throw new RuntimeException("Topic model is not a reference (" + childModel + ")");
-        }
     }
 
     // ---
@@ -380,16 +390,22 @@ class ValueStorage {
     /**
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
-    private RelatedTopicModel fetchChildTopic(long id, AssociationDefinition assocDef) {
-        String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
-        String othersTypeUri = assocDef.getPartTypeUri();
-        return dms.storage.fetchRelatedTopic(id, assocTypeUri, "dm4.core.whole", "dm4.core.part", othersTypeUri);
+    private RelatedTopicModel fetchChildTopic(long parentId, AssociationDefinition assocDef) {
+        return dms.storage.fetchRelatedTopic(
+            parentId,
+            assocDef.getInstanceLevelAssocTypeUri(),
+            "dm4.core.whole", "dm4.core.part",
+            assocDef.getPartTypeUri()
+        );
     }
 
-    private ResultSet<RelatedTopicModel> fetchChildTopics(long id, AssociationDefinition assocDef) {
-        String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
-        String othersTypeUri = assocDef.getPartTypeUri();
-        return dms.storage.fetchRelatedTopics(id, assocTypeUri, "dm4.core.whole", "dm4.core.part", othersTypeUri);
+    private ResultSet<RelatedTopicModel> fetchChildTopics(long parentId, AssociationDefinition assocDef) {
+        return dms.storage.fetchRelatedTopics(
+            parentId,
+            assocDef.getInstanceLevelAssocTypeUri(),
+            "dm4.core.whole", "dm4.core.part",
+            assocDef.getPartTypeUri()
+        );
     }
 
     // ---

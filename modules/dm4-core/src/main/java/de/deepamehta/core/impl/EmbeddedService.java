@@ -190,7 +190,7 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         Topic topic = null;
         try {
-            topic = getTopic(topicId, true, clientState);   // fetchComposite=true ### false?
+            topic = getTopic(topicId, true, clientState);   // fetchComposite=true ### FIXME: false?
             //
             Directives directives = new Directives();
             //
@@ -684,7 +684,7 @@ public class EmbeddedService implements DeepaMehtaService {
      * Optionally fetches the topic's composite value from storage layer.
      */
     Topic attach(TopicModel model, boolean fetchComposite, ClientState clientState) {
-        fetchComposite(model, fetchComposite);
+        fetchCompositeValue(model, fetchComposite);
         return new AttachedTopic(model, this);
     }
 
@@ -700,7 +700,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     RelatedTopic attach(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite,
                                                                          ClientState clientState) {
-        fetchComposite(model, fetchComposite, fetchRelatingComposite);
+        fetchCompositeValue(model, fetchComposite, fetchRelatingComposite);
         return new AttachedRelatedTopic(model, this);
     }
 
@@ -720,7 +720,7 @@ public class EmbeddedService implements DeepaMehtaService {
      * Optionally fetches the topic's composite value from storage layer.
      */
     Association attach(AssociationModel model, boolean fetchComposite) {
-        fetchComposite(model, fetchComposite);
+        fetchCompositeValue(model, fetchComposite);
         return new AttachedAssociation(model, this);
     }
 
@@ -753,14 +753,14 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ===
 
-    private void fetchComposite(DeepaMehtaObjectModel model, boolean fetchComposite) {
+    private void fetchCompositeValue(DeepaMehtaObjectModel model, boolean fetchComposite) {
         if (fetchComposite) {
             valueStorage.fetchCompositeValue(model);
         }
     }
 
-    private void fetchComposite(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite) {
-        fetchComposite(model, fetchComposite);
+    private void fetchCompositeValue(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite) {
+        fetchCompositeValue(model, fetchComposite);
         if (fetchRelatingComposite) {
             valueStorage.fetchCompositeValue(model.getRelatingAssociation());
         }

@@ -51,7 +51,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     private DeepaMehtaObjectModel model;
     protected final EmbeddedService dms;
 
-    private AttachedCompositeValue childTopics;    // Attached object cache
+    private AttachedCompositeValue childTopics;     // attached object cache
+    private boolean isCompositeFetched;             // tracks lazy loading
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -60,6 +61,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     AttachedDeepaMehtaObject(DeepaMehtaObjectModel model, EmbeddedService dms) {
         this.model = model;
         this.dms = dms;
+        this.isCompositeFetched = model.getCompositeValueModel().size() > 0;    // ### FIXME: respect data type
         this.childTopics = new AttachedCompositeValue(model.getCompositeValueModel(), this, dms);
     }
 
@@ -183,7 +185,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     public void update(DeepaMehtaObjectModel newModel, ClientState clientState, Directives directives) {
         updateUri(newModel.getUri());
         updateTypeUri(newModel.getTypeUri());
-        // ### TODO: compare new model with current one and update only if changed.
+        //
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
             updateCompositeValue(newModel.getCompositeValueModel(), clientState, directives);
             dms.valueStorage.refreshLabel(getModel());
@@ -195,15 +197,21 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ---
 
     @Override
-    public void updateChildTopic(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
-                                                                                           Directives directives) {
-        updateChildTopics(assocDef, true, newChildTopic, null, clientState, directives);    // one=true
+    public void updateChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef,
+                                                           ClientState clientState, Directives directives) {
+        // Note: updating the child topics requires them to be loaded
+        requireChildTopics(assocDef);
+        //
+        updateChildTopics(newChildTopic, null, assocDef, clientState, directives);
     }
 
     @Override
-    public void updateChildTopics(AssociationDefinition assocDef, List<TopicModel> newChildTopics,
-                                                                  ClientState clientState, Directives directives) {
-        updateChildTopics(assocDef, false, null, newChildTopics, clientState, directives);  // one=false
+    public void updateChildTopics(List<TopicModel> newChildTopics, AssociationDefinition assocDef,
+                                                                   ClientState clientState, Directives directives) {
+        // Note: updating the child topics requires them to be loaded
+        requireChildTopics(assocDef);
+        //
+        updateChildTopics(null, newChildTopics, assocDef, clientState, directives);
     }
 
 
@@ -399,22 +407,22 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     private void updateCompositeValue(CompositeValueModel newComp, ClientState clientState, Directives directives) {
         try {
+            // Note: updating the composite value requires it to be loaded
+            requireCompositeValue();
+            //
             for (AssociationDefinition assocDef : getType().getAssocDefs()) {
-                String assocDefUri    = assocDef.getPartTypeUri();
+                String childTypeUri   = assocDef.getPartTypeUri();
                 String cardinalityUri = assocDef.getPartCardinalityUri();
                 TopicModel newChildTopic        = null;     // only used for "one"
                 List<TopicModel> newChildTopics = null;     // only used for "many"
-                boolean one = false;
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    newChildTopic = newComp.getTopic(assocDefUri, null);        // defaultValue=null
+                    newChildTopic = newComp.getTopic(childTypeUri, null);        // defaultValue=null
                     // skip if not contained in update request
                     if (newChildTopic == null) {
                         continue;
                     }
-                    //
-                    one = true;
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    newChildTopics = newComp.getTopics(assocDefUri, null);      // defaultValue=null
+                    newChildTopics = newComp.getTopics(childTypeUri, null);      // defaultValue=null
                     // skip if not contained in update request
                     if (newChildTopics == null) {
                         continue;
@@ -423,7 +431,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                     throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
                 }
                 //
-                updateChildTopics(assocDef, one, newChildTopic, newChildTopics, clientState, directives);
+                updateChildTopics(newChildTopic, newChildTopics, assocDef, clientState, directives);
             }
         } catch (Exception e) {
             throw new RuntimeException("Updating composite value of " + className() + " " + getId() +
@@ -431,14 +439,14 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    private void updateChildTopics(AssociationDefinition assocDef, boolean one, TopicModel newChildTopic,
-                                   List<TopicModel> newChildTopics, ClientState clientState, Directives directives) {
+    private void updateChildTopics(TopicModel newChildTopic, List<TopicModel> newChildTopics,
+                                   AssociationDefinition assocDef, ClientState clientState, Directives directives) {
         String assocTypeUri = assocDef.getTypeUri();
-        String childTypeUri = assocDef.getPartTypeUri();
+        boolean one = newChildTopic != null;
         if (assocTypeUri.equals("dm4.core.composition_def")) {
             if (one) {
-                // ### getCompositeValue().updateComposition(childTypeUri, newChildTopic, clientState, directives);
-                updateCompositionOne(assocDef, newChildTopic, clientState, directives);
+                getCompositeValue().updateCompositionOne(newChildTopic, assocDef, clientState, directives);
+                // ### updateCompositionOne(assocDef, newChildTopic, clientState, directives);
             } else {
                 updateCompositionMany(assocDef, newChildTopics, clientState, directives);
             }
@@ -455,6 +463,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // --- Composition ---
 
+    // ### TODO: drop
     private void updateCompositionOne(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
                                                                                                 Directives directives) {
         // Note: the child topic's composite must be fetched. It needs to be passed to the
@@ -712,6 +721,35 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             }
         }
         return null;
+    }
+
+    // ---
+    
+    /**
+     * Lazy-loads the composite value (model) of this object and updates the attached object cache accordingly.
+     */
+    private void requireCompositeValue() {
+        if (!isCompositeFetched) {
+            logger.info("### Lazy-loading composite value of " + className() + " " + getId());
+            dms.valueStorage.fetchCompositeValue(getModel());
+            childTopics.reinit();
+            isCompositeFetched = true;
+        }
+    }
+
+    /**
+     * Lazy-loads certain child topics (model) of this object and updates the attached object cache accordingly.
+     * Used for facet update.
+     *
+     * @param   assocDef    the child topics according to this association definition are loaded.
+     *                      Note: the association definition must not necessarily originate from this object's
+     *                      type definition.
+     */
+    private void requireChildTopics(AssociationDefinition assocDef) {
+        String childTypeUri = assocDef.getPartTypeUri();
+        logger.info("### Lazy-loading \"" + childTypeUri + "\" child topic(s) of " + className() + " " + getId());
+        dms.valueStorage.fetchChildTopics(getModel(), assocDef);
+        childTopics.reinit(childTypeUri);
     }
 
     // ---

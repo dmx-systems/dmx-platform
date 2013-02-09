@@ -71,14 +71,14 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     public void updateFacet(DeepaMehtaObject object, String facetTypeUri, TopicModel facetValue,
                                                      ClientState clientState, Directives directives) {
         // ### TODO: incorporate the Facets module into the DeepaMehta core?
-        object.updateChildTopic(getAssocDef(facetTypeUri), facetValue, clientState, directives);
+        object.updateChildTopic(facetValue, getAssocDef(facetTypeUri), clientState, directives);
     }
 
     @Override
     public void updateFacets(DeepaMehtaObject object, String facetTypeUri, List<TopicModel> facetValues,
                                                       ClientState clientState, Directives directives) {
         // ### TODO: incorporate the Facets module into the DeepaMehta core?
-        object.updateChildTopics(getAssocDef(facetTypeUri), facetValues, clientState, directives);
+        object.updateChildTopics(facetValues, getAssocDef(facetTypeUri), clientState, directives);
     }
 
     // ---
@@ -101,8 +101,9 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     /**
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      * <p>
-     * ### Note: There is a principal copy in AttachedDeepaMehtaObject but here the precondition is different:
-     * The given AssociationDefinition is not necessarily part of the given topic's type.
+     * Note: There is a principal copy in AttachedDeepaMehtaObject but here the precondition is different:
+     * The given association definition must not necessarily originate from the given object's type definition.
+     * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */
     private RelatedTopic fetchChildTopic(DeepaMehtaObject object, AssociationDefinition assocDef,
                                                                   boolean fetchComposite) {
@@ -115,8 +116,9 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     /**
      * Fetches and returns child topics.
      * <p>
-     * ### Note: There is a principal copy in AttachedDeepaMehtaObject but here the precondition is different:
-     * The given AssociationDefinition is not necessarily part of the given topic's type.
+     * Note: There is a principal copy in AttachedDeepaMehtaObject but here the precondition is different:
+     * The given association definition must not necessarily originate from the given object's type definition.
+     * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */
     private Set<RelatedTopic> fetchChildTopics(DeepaMehtaObject object, AssociationDefinition assocDef,
                                                                         boolean fetchComposite) {
