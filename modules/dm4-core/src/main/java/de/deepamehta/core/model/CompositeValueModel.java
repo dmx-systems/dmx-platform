@@ -445,7 +445,10 @@ public class CompositeValueModel {
 
     // ---
 
-    private void throwInvalidAccess(String key, ClassCastException e) {
+    /**
+     * ### TODO: should not be public. Specify interfaces also for model classes?
+     */
+    public void throwInvalidAccess(String key, ClassCastException e) {
         if (e.getMessage().endsWith("cannot be cast to java.util.List")) {
             throw new RuntimeException("Invalid access to CompositeValueModel entry \"" + key + "\": " +
                 "the caller assumes it to be multiple-value but it is single-value in\n" + this, e);

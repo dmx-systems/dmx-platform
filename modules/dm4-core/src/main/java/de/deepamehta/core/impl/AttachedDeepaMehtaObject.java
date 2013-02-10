@@ -448,7 +448,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                 getCompositeValue().updateCompositionOne(newChildTopic, assocDef, clientState, directives);
                 // ### updateCompositionOne(assocDef, newChildTopic, clientState, directives);
             } else {
-                updateCompositionMany(assocDef, newChildTopics, clientState, directives);
+                getCompositeValue().updateCompositionMany(newChildTopics, assocDef, clientState, directives);
+                // ### updateCompositionMany(assocDef, newChildTopics, clientState, directives);
             }
         } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
             if (one) {
@@ -487,6 +488,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
+    // ### TODO: drop
     private void updateCompositionMany(AssociationDefinition assocDef, List<TopicModel> newChildTopics,
                                                                        ClientState clientState, Directives directives) {
         // Note: the child topic's composite must be fetched. It needs to be passed to the
@@ -704,6 +706,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---
 
+    // ### TODO: drop
     private Topic findChildTopic(long topicId, Iterable<? extends Topic> childTopics, AssociationDefinition assocDef,
                                                                                       boolean throwsIfNotFound) {
         Topic childTopic = findTopic(topicId, childTopics);
@@ -714,6 +717,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         return childTopic;
     }
 
+    // ### TODO: drop
     private Topic findTopic(long topicId, Iterable<? extends Topic> topics) {
         for (Topic topic : topics) {
             if (topic.getId() == topicId) {
@@ -756,6 +760,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     /**
      * For single-valued childs
+     * ### TODO: drop
      */
     private void putInCompositeModel(AssociationDefinition assocDef, Topic topic) {
         getCompositeValue().getModel().put(assocDef.getPartTypeUri(), topic.getModel());
@@ -763,6 +768,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     /**
      * For multiple-valued childs
+     * ### TODO: drop
      */
     private void addToCompositeModel(AssociationDefinition assocDef, Topic topic) {
         getCompositeValue().getModel().add(assocDef.getPartTypeUri(), topic.getModel());
@@ -770,6 +776,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     /**
      * For multiple-valued childs
+     * ### TODO: drop
      */
     private void removeFromCompositeModel(AssociationDefinition assocDef, Topic topic) {
         getCompositeValue().getModel().remove(assocDef.getPartTypeUri(), topic.getModel());
@@ -777,6 +784,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     /**
      * For multiple-valued childs
+     * ### TODO: drop
      */
     private void replaceInCompositeModel(AssociationDefinition assocDef, Topic topic) {
         removeFromCompositeModel(assocDef, topic);
