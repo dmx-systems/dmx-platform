@@ -63,7 +63,7 @@ class ValueStorage {
         String cardinalityUri = assocDef.getPartCardinalityUri();
         String childTypeUri   = assocDef.getPartTypeUri();
         if (cardinalityUri.equals("dm4.core.one")) {
-            TopicModel childTopic = fetchChildTopic(parent.getId(), assocDef);
+            RelatedTopicModel childTopic = fetchChildTopic(parent.getId(), assocDef);
             // Note: topics just created have no child topics yet
             if (childTopic != null) {
                 comp.put(childTypeUri, childTopic);
@@ -71,7 +71,7 @@ class ValueStorage {
                 fetchCompositeValue(childTopic);
             }
         } else if (cardinalityUri.equals("dm4.core.many")) {
-            for (TopicModel childTopic : fetchChildTopics(parent.getId(), assocDef)) {
+            for (RelatedTopicModel childTopic : fetchChildTopics(parent.getId(), assocDef)) {
                 comp.add(childTypeUri, childTopic);
                 // recursion
                 fetchCompositeValue(childTopic);
@@ -269,65 +269,72 @@ class ValueStorage {
     // --- Composition ---
 
     private void storeCompositionOne(TopicModel model, DeepaMehtaObjectModel parent,
-                                       AssociationDefinition assocDef, ClientState clientState, Directives directives) {
+                                     AssociationDefinition assocDef, ClientState clientState, Directives directives) {
         // == create child ==
         // update DB
         Topic childTopic = dms.createTopic(model, clientState);
         associateChildTopic(childTopic.getId(), parent, assocDef, clientState);
-        // update memory
-        // ### putInCompositeModel(assocDef, childTopic);   // ### TODO?
+        // Note: memory is already up-to-date. The child topic ID is updated in-place.
     }
 
     private void storeCompositionMany(List<TopicModel> models, DeepaMehtaObjectModel parent,
-                                       AssociationDefinition assocDef, ClientState clientState, Directives directives) {
+                                      AssociationDefinition assocDef, ClientState clientState, Directives directives) {
         for (TopicModel model : models) {
             // == create child ==
             // update DB
             Topic childTopic = dms.createTopic(model, clientState);
             associateChildTopic(childTopic.getId(), parent, assocDef, clientState);
-            // update memory
-            // ### addToCompositeModel(assocDef, childTopic);   // ### TODO?
+            // Note: memory is already up-to-date. The child topic ID is updated in-place.
         }
     }
 
     // --- Aggregation ---
 
     private void storeAggregationOne(TopicModel model, DeepaMehtaObjectModel parent,
-                                       AssociationDefinition assocDef, ClientState clientState, Directives directives) {
+                                     AssociationDefinition assocDef, ClientState clientState, Directives directives) {
         if (isReference(model)) {
             // == create assignment ==
             // update DB
-            Topic topic = associateChildTopic(model, parent, assocDef, clientState);
+            Topic childTopic = associateChildTopic(model, parent, assocDef, clientState);
             // update memory
-            // ### putInCompositeModel(assocDef, topic);    // ### TODO?
+            putInCompositeValue(childTopic, parent, assocDef);
         } else {
             // == create child ==
             // update DB
-            Topic topic = dms.createTopic(model, clientState);
-            associateChildTopic(topic.getId(), parent, assocDef, clientState);
-            // update memory
-            // ### putInCompositeModel(assocDef, topic);    // ### TODO?
+            Topic childTopic = dms.createTopic(model, clientState);
+            associateChildTopic(childTopic.getId(), parent, assocDef, clientState);
+            // Note: memory is already up-to-date. The child topic ID is updated in-place.
         }
     }
 
     private void storeAggregationMany(List<TopicModel> models, DeepaMehtaObjectModel parent,
-                                       AssociationDefinition assocDef, ClientState clientState, Directives directives) {
+                                      AssociationDefinition assocDef, ClientState clientState, Directives directives) {
         for (TopicModel model : models) {
             if (isReference(model)) {
                 // == create assignment ==
                 // update DB
-                Topic topic = associateChildTopic(model, parent, assocDef, clientState);
+                Topic childTopic = associateChildTopic(model, parent, assocDef, clientState);
                 // update memory
-                // ### addToCompositeModel(assocDef, topic);    // ### TODO?
+                // ### addToCompositeModel(assocDef, childTopic);    // ### TODO?
             } else {
                 // == create child ==
                 // update DB
-                Topic topic = dms.createTopic(model, clientState);
-                associateChildTopic(topic.getId(), parent, assocDef, clientState);
+                Topic childTopic = dms.createTopic(model, clientState);
+                associateChildTopic(childTopic.getId(), parent, assocDef, clientState);
                 // update memory
-                // ### addToCompositeModel(assocDef, topic);    // ### TODO?
+                // ### addToCompositeModel(assocDef, childTopic);    // ### TODO?
             }
         }
+    }
+
+    // ---
+
+    /**
+     * For single-valued childs
+     */
+    private void putInCompositeValue(Topic childTopic, DeepaMehtaObjectModel parent, AssociationDefinition assocDef) {
+        String childTypeUri = assocDef.getPartTypeUri();
+        parent.getCompositeValueModel().put(childTypeUri, childTopic.getModel());
     }
 
 

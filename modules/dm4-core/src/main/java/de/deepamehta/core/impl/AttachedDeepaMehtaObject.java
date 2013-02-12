@@ -453,7 +453,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             }
         } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
             if (one) {
-                updateAggregationOne(assocDef, newChildTopic, clientState, directives);
+                getCompositeValue().updateAggregationOne(newChildTopic, assocDef, clientState, directives);
+                // ### updateAggregationOne(assocDef, newChildTopic, clientState, directives);
             } else {
                 updateAggregationMany(assocDef, newChildTopics, clientState, directives);
             }
@@ -526,6 +527,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // --- Aggregation ---
 
+    // ### TODO: drop
     private void updateAggregationOne(AssociationDefinition assocDef, TopicModel newChildTopic, ClientState clientState,
                                                                                                 Directives directives) {
         RelatedTopic childTopic = fetchChildTopic(assocDef, false);     // fetchComposite=false
@@ -678,6 +680,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Helper ===
 
     /**
+     * ### TODO: drop
      * Checks weather the specified update topic model matches the specified topic.
      */
     private boolean matches(TopicModel childTopic, Topic topic) {
@@ -691,6 +694,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     /**
+     * ### TODO: drop
      * Checks weather the specified update topic model matches one of the specified topics.
      *
      * @return  The matched topic, or <code>null</code> if there is no match.

@@ -3,8 +3,10 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.CompositeValue;
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.ClientState;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 
@@ -30,6 +33,8 @@ class AttachedCompositeValue implements CompositeValue {
     private CompositeValueModel model;
     private AttachedDeepaMehtaObject parent;
     private EmbeddedService dms;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -174,6 +179,44 @@ class AttachedCompositeValue implements CompositeValue {
         }
     }
 
+    // --- Aggregation ---
+
+    void updateAggregationOne(TopicModel newChildTopic, AssociationDefinition assocDef, ClientState clientState,
+                                                                                        Directives directives) {
+        RelatedTopic childTopic = (RelatedTopic) getTopic(assocDef.getPartTypeUri(), null);
+        if (dms.valueStorage.isReference(newChildTopic)) {
+            if (childTopic != null) {
+                if (matches(newChildTopic, childTopic)) {
+                    return;
+                }
+                // == update assignment ==
+                // update DB
+                childTopic.getRelatingAssociation().delete(directives);
+                Topic topic = dms.valueStorage.associateChildTopic(newChildTopic, parent.getModel(), assocDef,
+                    clientState);
+                // update memory
+                putInCompositeValue(topic, assocDef);
+            } else {
+                // == create assignment ==
+                // update DB
+                Topic topic = dms.valueStorage.associateChildTopic(newChildTopic, parent.getModel(), assocDef,
+                    clientState);
+                // update memory
+                putInCompositeValue(topic, assocDef);
+            }
+        } else {
+            // == create child ==
+            // update DB
+            if (childTopic != null) {
+                childTopic.getRelatingAssociation().delete(directives);
+            }
+            Topic topic = dms.createTopic(newChildTopic, clientState);
+            dms.valueStorage.associateChildTopic(topic.getId(), parent.getModel(), assocDef, clientState);
+            // update memory
+            putInCompositeValue(topic, assocDef);
+        }
+    }
+
     // ---
 
     void reinit() {
@@ -201,19 +244,31 @@ class AttachedCompositeValue implements CompositeValue {
         //
         if (value instanceof TopicModel) {
             TopicModel childTopic = (TopicModel) value;
-            childTopics.put(childTypeUri, new AttachedTopic(childTopic, dms));
+            childTopics.put(childTypeUri, createTopic(childTopic));
             // recursion
             initChildTopics(childTopic.getCompositeValueModel());
         } else if (value instanceof List) {
             List<Topic> topics = new ArrayList();
             childTopics.put(childTypeUri, topics);
             for (TopicModel childTopic : (List<TopicModel>) value) {
-                topics.add(new AttachedTopic(childTopic, dms));
+                topics.add(createTopic(childTopic));
                 // recursion
                 initChildTopics(childTopic.getCompositeValueModel());
             }
         } else {
             throw new RuntimeException("Unexpected value in a CompositeValueModel: " + value);
+        }
+    }
+
+    private Topic createTopic(TopicModel model) {
+        if (model instanceof RelatedTopicModel) {
+            // Note: composite value models obtained through *fetching* contain *related topic models*.
+            // We exploit the related topics when updating assignments (in conjunction with aggregations).
+            // See updateAggregationOne() and updateAggregationMany().
+            return new AttachedRelatedTopic((RelatedTopicModel) model, dms);
+        } else {
+            // Note: composite value models for *new topics* to be created contain sole *topic models*.
+            return new AttachedTopic(model, dms);
         }
     }
 
@@ -297,6 +352,35 @@ class AttachedCompositeValue implements CompositeValue {
     private Topic findTopic(long topicId, Iterable<? extends Topic> topics) {
         for (Topic topic : topics) {
             if (topic.getId() == topicId) {
+                return topic;
+            }
+        }
+        return null;
+    }
+
+    // ---
+
+    /**
+     * Checks weather the specified update topic model matches the specified topic.
+     */
+    private boolean matches(TopicModel childTopic, Topic topic) {
+        if (dms.valueStorage.isReferenceById(childTopic)) {
+            return childTopic.getId() == topic.getId();
+        } else if (dms.valueStorage.isReferenceByUri(childTopic)) {
+            return childTopic.getUri().equals(topic.getUri());
+        } else {
+            throw new RuntimeException("Not a topic reference model (childTopic=" + childTopic + ")");
+        }
+    }
+
+    /**
+     * Checks weather the specified update topic model matches one of the specified topics.
+     *
+     * @return  The matched topic, or <code>null</code> if there is no match.
+     */
+    private RelatedTopic matches(TopicModel childTopic, Iterable<RelatedTopic> topics) {
+        for (RelatedTopic topic : topics) {
+            if (matches(childTopic, topic)) {
                 return topic;
             }
         }
