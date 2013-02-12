@@ -18,7 +18,7 @@ Live demo, nightly builds:
 <http://demo.deepamehta.de/>
 
 Download:  
-<http://demo.deepamehta.de/download/>
+<http://download.deepamehta.de/>
 
 Documentation, release notes, issue tracker:  
 <https://trac.deepamehta.de/>
@@ -61,7 +61,7 @@ There are 2 DeepaMehta distributions to suit different needs:
   The distribution file is `deepamehta-4.0.14-karaf.tar.gz` (13.3 MB)
 
 Download the distribution that suits your needs:  
-<http://demo.deepamehta.de/download/>
+<http://download.deepamehta.de/>
 
 Note: the remainder of this README applies to the Standard Distribution.  
 For setting up the Karaf Distribution refer to <https://trac.deepamehta.de/wiki/KarafDistribution>.
