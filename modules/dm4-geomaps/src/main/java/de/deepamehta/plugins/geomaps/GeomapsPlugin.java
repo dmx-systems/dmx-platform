@@ -269,6 +269,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         if (typeUri.equals(topicTypeUri)) {
             return topic;
         }
+        //
         CompositeValue comp = topic.getCompositeValue();
         TopicType topicType = dms.getTopicType(typeUri, null);      // clientState=null
         for (AssociationDefinition assocDef : topicType.getAssocDefs()) {
@@ -279,8 +280,8 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                 childTopic = comp.getTopic(childTypeUri, null);
             } else if (cardinalityUri.equals("dm4.core.many")) {
                 List<TopicModel> childTopics = comp.getTopics(childTypeUri, null);
-                if (childTopics != null) {
-                    childTopic = childTopics.get(0);     // ### FIXME: must check empty?
+                if (childTopics != null && !childTopics.isEmpty()) {
+                    childTopic = childTopics.get(0);
                 }
             } else {
                 throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
@@ -289,6 +290,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             if (childTopic == null) {
                 continue;
             }
+            // recursion
             childTopic = findChildTopic(childTopic, topicTypeUri);
             if (childTopic != null) {
                 return childTopic;
