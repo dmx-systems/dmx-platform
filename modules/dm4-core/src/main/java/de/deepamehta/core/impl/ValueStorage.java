@@ -25,7 +25,8 @@ class ValueStorage {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String LABEL_SEPARATOR = " ";
+    private static final String LABEL_CHILD_SEPARATOR = " ";
+    private static final String LABEL_TOPIC_SEPARATOR = ", ";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -366,7 +367,7 @@ class ValueStorage {
         if (type.getDataTypeUri().equals("dm4.core.composite")) {
             List<String> labelConfig = type.getLabelConfig();
             if (labelConfig.size() > 0) {
-                return buildLabelFromConfig(labelConfig, model);
+                return buildLabelFromConfig(model, labelConfig);
             } else {
                 return buildDefaultLabel(model);
             }
@@ -378,36 +379,55 @@ class ValueStorage {
     /**
      * Builds the specified object model's label according to a label configuration.
      */
-    private String buildLabelFromConfig(List<String> labelConfig, DeepaMehtaObjectModel model) {
-        StringBuilder label = new StringBuilder();
+    private String buildLabelFromConfig(DeepaMehtaObjectModel model, List<String> labelConfig) {
+        StringBuilder builder = new StringBuilder();
         for (String childTypeUri : labelConfig) {
-            TopicModel childTopic = model.getCompositeValueModel().getTopic(childTypeUri, null);
-            // Note: topics just created have no child topics yet
-            if (childTopic != null) {
-                String l = buildLabel(childTopic);
-                // add separator
-                if (label.length() > 0 && l.length() > 0) {
-                    label.append(LABEL_SEPARATOR);
-                }
-                //
-                label.append(l);
-            }
+            appendLabel(buildChildLabel(model, childTypeUri), builder, LABEL_CHILD_SEPARATOR);
         }
-        return label.toString();
+        return builder.toString();
     }
 
     private String buildDefaultLabel(DeepaMehtaObjectModel model) {
         Iterator<AssociationDefinition> i = getType(model).getAssocDefs().iterator();
         // Note: types just created might have no child types yet
-        if (i.hasNext()) {
-            String childTypeUri = i.next().getPartTypeUri();
-            TopicModel childTopic = model.getCompositeValueModel().getTopic(childTypeUri, null);
-            // Note: topics just created have no child topics yet
-            if (childTopic != null) {
-                return buildLabel(childTopic);
-            }
+        if (!i.hasNext()) {
+            return "";
         }
-        return "";
+        //
+        String childTypeUri = i.next().getPartTypeUri();
+        return buildChildLabel(model, childTypeUri);
+    }
+
+    // ---
+
+    private String buildChildLabel(DeepaMehtaObjectModel parent, String childTypeUri) {
+        Object value = parent.getCompositeValueModel().get(childTypeUri);
+        // Note: topics just created have no child topics yet
+        if (value == null) {
+            return "";
+        }
+        //
+        if (value instanceof TopicModel) {
+            TopicModel childTopic = (TopicModel) value;
+            return buildLabel(childTopic);                                          // recursion
+        } else if (value instanceof List) {
+            StringBuilder builder = new StringBuilder();
+            for (TopicModel childTopic : (List<TopicModel>) value) {
+                appendLabel(buildLabel(childTopic), builder, LABEL_TOPIC_SEPARATOR);  // recursion
+            }
+            return builder.toString();
+        } else {
+            throw new RuntimeException("Unexpected value in a CompositeValueModel: " + value);
+        }
+    }
+
+    private void appendLabel(String label, StringBuilder builder, String separator) {
+        // add separator
+        if (builder.length() > 0 && label.length() > 0) {
+            builder.append(separator);
+        }
+        //
+        builder.append(label);
     }
 
 
