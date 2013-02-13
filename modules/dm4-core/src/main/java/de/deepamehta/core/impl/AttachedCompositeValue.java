@@ -151,11 +151,11 @@ class AttachedCompositeValue implements CompositeValue {
         for (TopicModel newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {
-                Topic childTopic = findChildTopic(childTopicId, assocDef, false);   // throwsIfNotFound=false
+                Topic childTopic = findChildTopic(childTopicId, assocDef);
                 if (childTopic == null) {
                     // Note: "delete child" is an idempotent operation. A delete request for an child which has been
                     // deleted already (resp. is non-existing) is not an error. Instead, nothing is performed.
-                    return;
+                    continue;
                 }
                 // == delete child ==
                 // update DB
@@ -163,9 +163,13 @@ class AttachedCompositeValue implements CompositeValue {
                 // update memory
                 removeFromCompositeValue(childTopic, assocDef);
             } else if (childTopicId != -1) {
+                Topic childTopic = findChildTopic(childTopicId, assocDef);
+                if (childTopic == null) {
+                    throw new RuntimeException("Topic " + childTopicId + " is not a child of " +
+                        parent.className() + " " + parent.getId() + " according to " + assocDef);
+                }
                 // == update child ==
                 // update DB
-                Topic childTopic = findChildTopic(childTopicId, assocDef, true);    // throwsIfNotFound=true
                 childTopic.update(newChildTopic, clientState, directives);
                 // Note: memory is already up-to-date. The child topic is updated in-place of parent.
             } else {
@@ -186,7 +190,7 @@ class AttachedCompositeValue implements CompositeValue {
         RelatedTopic childTopic = (RelatedTopic) getTopic(assocDef.getPartTypeUri(), null);
         if (dms.valueStorage.isReference(newChildTopic)) {
             if (childTopic != null) {
-                if (matches(newChildTopic, childTopic)) {
+                if (isReferingTo(newChildTopic, childTopic)) {
                     return;
                 }
                 // == update assignment ==
@@ -214,6 +218,45 @@ class AttachedCompositeValue implements CompositeValue {
             dms.valueStorage.associateChildTopic(topic.getId(), parent.getModel(), assocDef, clientState);
             // update memory
             putInCompositeValue(topic, assocDef);
+        }
+    }
+
+    void updateAggregationMany(List<TopicModel> newChildTopics, AssociationDefinition assocDef, ClientState clientState,
+                                                                                                Directives directives) {
+        for (TopicModel newChildTopic : newChildTopics) {
+            long childTopicId = newChildTopic.getId();
+            if (newChildTopic instanceof TopicDeletionModel) {
+                RelatedTopic childTopic = findChildTopic(childTopicId, assocDef);
+                if (childTopic == null) {
+                    // Note: "delete assignment" is an idempotent operation. A delete request for an assignment which
+                    // has been deleted already (resp. is non-existing) is not an error. Instead, nothing is performed.
+                    continue;
+                }
+                // == delete assignment ==
+                // update DB
+                childTopic.getRelatingAssociation().delete(directives);
+                // update memory
+                removeFromCompositeValue(childTopic, assocDef);
+            } else if (dms.valueStorage.isReference(newChildTopic)) {
+                if (isReferingTo(newChildTopic, assocDef)) {
+                    // Note: "create assignment" is an idempotent operation. A create request for an assignment which
+                    // exists already is not an error. Instead, nothing is performed.
+                    continue;
+                }
+                // == create assignment ==
+                // update DB
+                Topic topic = dms.valueStorage.associateChildTopic(newChildTopic, parent.getModel(), assocDef,
+                    clientState);
+                // update memory
+                addToCompositeValue(topic, assocDef);
+            } else {
+                // == create child ==
+                // update DB
+                Topic topic = dms.createTopic(newChildTopic, clientState);
+                dms.valueStorage.associateChildTopic(topic.getId(), parent.getModel(), assocDef, clientState);
+                // update memory
+                addToCompositeValue(topic, assocDef);
+            }
         }
     }
 
@@ -271,6 +314,8 @@ class AttachedCompositeValue implements CompositeValue {
             return new AttachedTopic(model, dms);
         }
     }
+
+
 
     // === Update ===
 
@@ -339,20 +384,11 @@ class AttachedCompositeValue implements CompositeValue {
 
     // === Helper ===
 
-    private Topic findChildTopic(long childTopicId, AssociationDefinition assocDef, boolean throwsIfNotFound) {
+    private RelatedTopic findChildTopic(long childTopicId, AssociationDefinition assocDef) {
         List<Topic> childTopics = getTopics(assocDef.getPartTypeUri(), new ArrayList());
-        Topic childTopic = findTopic(childTopicId, childTopics);
-        if (childTopic == null && throwsIfNotFound) {
-            throw new RuntimeException("Topic " + childTopicId + " is not a child of " + parent.className() + " " +
-                parent.getId() + " according to " + assocDef);
-        }
-        return childTopic;
-    }
-
-    private Topic findTopic(long topicId, Iterable<? extends Topic> topics) {
-        for (Topic topic : topics) {
-            if (topic.getId() == topicId) {
-                return topic;
+        for (Topic childTopic : childTopics) {
+            if (childTopic.getId() == childTopicId) {
+                return (RelatedTopic) childTopic;
             }
         }
         return null;
@@ -361,29 +397,30 @@ class AttachedCompositeValue implements CompositeValue {
     // ---
 
     /**
-     * Checks weather the specified update topic model matches the specified topic.
+     * Checks weather the specified topic reference refers to any of the child topics.
+     *
+     * @param   assocDef    the child topics according to this association definition are considered.
      */
-    private boolean matches(TopicModel childTopic, Topic topic) {
-        if (dms.valueStorage.isReferenceById(childTopic)) {
-            return childTopic.getId() == topic.getId();
-        } else if (dms.valueStorage.isReferenceByUri(childTopic)) {
-            return childTopic.getUri().equals(topic.getUri());
-        } else {
-            throw new RuntimeException("Not a topic reference model (childTopic=" + childTopic + ")");
+    private boolean isReferingTo(TopicModel topicRef, AssociationDefinition assocDef) {
+        List<Topic> childTopics = getTopics(assocDef.getPartTypeUri(), new ArrayList());
+        for (Topic childTopic : childTopics) {
+            if (isReferingTo(topicRef, childTopic)) {
+                return true;
+            }
         }
+        return false;
     }
 
     /**
-     * Checks weather the specified update topic model matches one of the specified topics.
-     *
-     * @return  The matched topic, or <code>null</code> if there is no match.
+     * Checks weather the specified topic reference refers the specified topic.
      */
-    private RelatedTopic matches(TopicModel childTopic, Iterable<RelatedTopic> topics) {
-        for (RelatedTopic topic : topics) {
-            if (matches(childTopic, topic)) {
-                return topic;
-            }
+    private boolean isReferingTo(TopicModel topicRef, Topic topic) {
+        if (dms.valueStorage.isReferenceById(topicRef)) {
+            return topicRef.getId() == topic.getId();
+        } else if (dms.valueStorage.isReferenceByUri(topicRef)) {
+            return topicRef.getUri().equals(topic.getUri());
+        } else {
+            throw new RuntimeException("Not a topic reference (" + topicRef + ")");
         }
-        return null;
     }
 }

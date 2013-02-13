@@ -17,6 +17,7 @@ import de.deepamehta.core.util.JavaUtils;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 
 
@@ -29,6 +30,8 @@ class ValueStorage {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private EmbeddedService dms;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -124,16 +127,18 @@ class ValueStorage {
 
     // === Helper ===
 
-    Topic associateChildTopic(TopicModel childModel, DeepaMehtaObjectModel parent, AssociationDefinition assocDef,
-                                                                                   ClientState clientState) {
-        if (isReferenceById(childModel)) {
-            associateChildTopic(childModel.getId(), parent, assocDef, clientState);
-            return dms.getTopic(childModel.getId(), false, null);       // fetchComposite=false, clientState=null
-        } else if (isReferenceByUri(childModel)) {
-            associateChildTopic(childModel.getUri(), parent, assocDef, clientState);
-            return dms.getTopic("uri", new SimpleValue(childModel.getUri()), false, null);
+    Topic associateChildTopic(TopicModel topicRef, DeepaMehtaObjectModel parent, AssociationDefinition assocDef,
+                                                                                 ClientState clientState) {
+        if (isReferenceById(topicRef)) {
+            associateChildTopic(topicRef.getId(), parent, assocDef, clientState);
+            return dms.getTopic(topicRef.getId(), false, null);       // fetchComposite=false, clientState=null
+            // ### FIXME: fetchComposite?
+        } else if (isReferenceByUri(topicRef)) {
+            associateChildTopic(topicRef.getUri(), parent, assocDef, clientState);
+            return dms.getTopic("uri", new SimpleValue(topicRef.getUri()), false, null);
+            // ### FIXME: fetchComposite?
         } else {
-            throw new RuntimeException("Topic model is not a reference (" + childModel + ")");
+            throw new RuntimeException("Not a topic reference (" + topicRef + ")");
         }
     }
 
@@ -315,14 +320,13 @@ class ValueStorage {
                 // update DB
                 Topic childTopic = associateChildTopic(model, parent, assocDef, clientState);
                 // update memory
-                // ### addToCompositeModel(assocDef, childTopic);    // ### TODO?
+                replaceReference(model, childTopic);
             } else {
                 // == create child ==
                 // update DB
                 Topic childTopic = dms.createTopic(model, clientState);
                 associateChildTopic(childTopic.getId(), parent, assocDef, clientState);
-                // update memory
-                // ### addToCompositeModel(assocDef, childTopic);    // ### TODO?
+                // Note: memory is already up-to-date. The child topic ID is updated in-place.
             }
         }
     }
@@ -335,6 +339,22 @@ class ValueStorage {
     private void putInCompositeValue(Topic childTopic, DeepaMehtaObjectModel parent, AssociationDefinition assocDef) {
         String childTypeUri = assocDef.getPartTypeUri();
         parent.getCompositeValueModel().put(childTypeUri, childTopic.getModel());
+    }
+
+    /**
+     * Replaces a topic reference with the real thing.
+     *
+     * Used for multiple-valued childs.
+     */
+    private void replaceReference(TopicModel topicRef, Topic topic) {
+        TopicModel model = topic.getModel();
+        // Note: we must update the topic reference in-place.
+        // Replacing the entire topic in the list of child topics would cause ConcurrentModificationException.
+        topicRef.setId(model.getId());
+        topicRef.setUri(model.getUri());
+        topicRef.setTypeUri(model.getTypeUri());
+        topicRef.setSimpleValue(model.getSimpleValue());
+        topicRef.setCompositeValue(model.getCompositeValueModel());
     }
 
 
