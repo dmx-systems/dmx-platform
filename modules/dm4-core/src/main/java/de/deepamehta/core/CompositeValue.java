@@ -76,13 +76,19 @@ public interface CompositeValue {
 
     // Note: there are no convenience accessors for a multiple-valued child.
 
-    // ---
+    // ===
 
-    void set(String childTypeUri, SimpleValue value, ClientState clientState, Directives directives);
-
-    // ---
+    Object get(String childTypeUri);
 
     boolean has(String childTypeUri);
+
+    Iterable<String> childTypeUris();
+
+    int size();
+
+    // ===
+
+    void set(String childTypeUri, SimpleValue value, ClientState clientState, Directives directives);
 
     // ---
 

@@ -123,20 +123,35 @@ class AttachedCompositeValue implements CompositeValue {
 
     // Note: there are no convenience accessors for a multiple-valued child.
 
-    // ---
+    // ===
+
+    @Override
+    public Object get(String childTypeUri) {
+        return childTopics.get(childTypeUri);
+    }
+
+    @Override
+    public boolean has(String childTypeUri) {
+        return childTopics.containsKey(childTypeUri);
+    }
+
+    @Override
+    public Iterable<String> childTypeUris() {
+        return childTopics.keySet();
+    }
+
+    @Override
+    public int size() {
+        return childTopics.size();
+    }
+
+    // ===
 
     @Override
     public void set(String childTypeUri, SimpleValue value, ClientState clientState, Directives directives) {
         update(new CompositeValueModel().put(
             childTypeUri, new TopicModel(childTypeUri, value)
         ), clientState, directives);
-    }
-
-    // ---
-
-    @Override
-    public boolean has(String childTypeUri) {
-        return model.has(childTypeUri);
     }
 
     // ---
