@@ -23,6 +23,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.TypeStorage;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -556,8 +557,8 @@ class TypeStorageImpl implements TypeStorage {
     void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             boolean includeInLabel = labelConfig.contains(assocDef.getPartTypeUri());
-            new AttachedAssociationDefinition(assocDef, dms).setChildTopicValue("dm4.core.include_in_label",
-                new SimpleValue(includeInLabel));
+            new AttachedAssociationDefinition(assocDef, dms).getCompositeValue().set("dm4.core.include_in_label",
+                new SimpleValue(includeInLabel), null, new Directives());
         }
     }
 
@@ -650,7 +651,8 @@ class TypeStorageImpl implements TypeStorage {
                 configTopic = new TopicModel(configTypeUri);
                 storeConfigTopic(configurable, configTopic);
             }
-            new AttachedTopic(configTopic, dms).setChildTopicValue(settingUri, new SimpleValue(value));
+            new AttachedTopic(configTopic, dms).getCompositeValue().set(settingUri, new SimpleValue(value), null,
+                new Directives());
         } catch (Exception e) {
             throw new RuntimeException("Storing view configuration setting failed (configurable=" + configurable +
                 ", configTypeUri=\"" + configTypeUri + "\", settingUri=\"" + settingUri + "\", value=\"" + value +

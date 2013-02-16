@@ -71,14 +71,12 @@ class ValueStorage {
             // Note: topics just created have no child topics yet
             if (childTopic != null) {
                 comp.put(childTypeUri, childTopic);
-                // recursion
-                fetchCompositeValue(childTopic);
+                fetchCompositeValue(childTopic);    // recursion
             }
         } else if (cardinalityUri.equals("dm4.core.many")) {
             for (RelatedTopicModel childTopic : fetchChildTopics(parent.getId(), assocDef)) {
                 comp.add(childTypeUri, childTopic);
-                // recursion
-                fetchCompositeValue(childTopic);
+                fetchCompositeValue(childTopic);    // recursion
             }
         } else {
             throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");

@@ -8,7 +8,9 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginContext;
+import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
@@ -223,7 +225,9 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     void setMigrationNr(int migrationNr) {
-        pluginTopic.setChildTopicValue("dm4.core.plugin_migration_nr", new SimpleValue(migrationNr));
+        pluginTopic.getCompositeValue().set("dm4.core.plugin_migration_nr", new SimpleValue(migrationNr),
+            null, new Directives()
+        );
     }
 
     // ---
@@ -533,7 +537,7 @@ public class PluginImpl implements Plugin, EventHandler {
             .put("dm4.core.plugin_name", pluginName)
             .put("dm4.core.plugin_symbolic_name", pluginUri)
             .put("dm4.core.plugin_migration_nr", 0)
-        ), null);   // FIXME: clientState=null
+        ), null);   // clientState=null
     }
 
     private Topic fetchPluginTopic() {

@@ -71,15 +71,6 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // === Traversal ===
 
-    /**
-     * Returns a child topic's value or <code>null</code> if the child topic doesn't exist.
-     * ### FIXME: to be dropped?
-     */
-    SimpleValue getChildTopicValue(String assocDefUri);
-
-    // ### FIXME: to be dropped?
-    void setChildTopicValue(String assocDefUri, SimpleValue value);
-
     // --- Topic Retrieval ---
 
     /**

@@ -62,14 +62,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Topic topic = dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 new SimpleValue("DeepaMehta 4 Notes")), null);  // clientState=null
             //
-            topic.setChildTopicValue("dm4.core.plugin_migration_nr", new SimpleValue(23));
+            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", new SimpleValue(23), null, new Directives());
             //
-            int nr = topic.getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
+            int nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(23, nr);
             //
-            topic.setChildTopicValue("dm4.core.plugin_migration_nr", new SimpleValue(42));
+            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", new SimpleValue(42), null, new Directives());
             //
-            nr = topic.getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
+            nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(42, nr);
             //
             tx.success();
@@ -87,12 +87,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             assertTrue(topic.getCompositeValue().has("dm4.core.plugin_migration_nr"));
             //
-            int nr = topic.getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
+            int nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(23, nr);
             //
-            topic.setChildTopicValue("dm4.core.plugin_migration_nr", new SimpleValue(42));
+            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", new SimpleValue(42), null, new Directives());
             //
-            nr = topic.getChildTopicValue("dm4.core.plugin_migration_nr").intValue();
+            nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(42, nr);
             //
             tx.success();
