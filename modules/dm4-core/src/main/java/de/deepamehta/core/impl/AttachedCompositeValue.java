@@ -82,6 +82,47 @@ class AttachedCompositeValue implements CompositeValue {
         return _getTopics(childTypeUri, defaultValue);
     }
 
+    // === Convenience methods ===
+
+    @Override
+    public String getString(String childTypeUri) {
+        return getTopic(childTypeUri).getSimpleValue().toString();
+    }
+
+    @Override
+    public int getInt(String childTypeUri) {
+        return getTopic(childTypeUri).getSimpleValue().intValue();
+    }
+
+    @Override
+    public long getLong(String childTypeUri) {
+        return getTopic(childTypeUri).getSimpleValue().longValue();
+    }
+
+    @Override
+    public double getDouble(String childTypeUri) {
+        return getTopic(childTypeUri).getSimpleValue().doubleValue();
+    }
+
+    @Override
+    public boolean getBoolean(String childTypeUri) {
+        return getTopic(childTypeUri).getSimpleValue().booleanValue();
+    }
+
+    @Override
+    public Object getObject(String childTypeUri) {
+        return getTopic(childTypeUri).getSimpleValue().value();
+    }
+
+    // ---
+
+    @Override
+    public CompositeValue getComposite(String childTypeUri) {
+        return getTopic(childTypeUri).getCompositeValue();
+    }
+
+    // Note: there are no convenience accessors for a multiple-valued child.
+
     // ---
 
     @Override
@@ -97,15 +138,6 @@ class AttachedCompositeValue implements CompositeValue {
     public boolean has(String childTypeUri) {
         return model.has(childTypeUri);
     }
-
-    // --- Convenience methods ---
-
-    @Override
-    public String getString(String childTypeUri) {
-        return model.getString(childTypeUri);
-    }
-
-    // ### TODO: add accessors for other types
 
     // ---
 
@@ -354,7 +386,7 @@ class AttachedCompositeValue implements CompositeValue {
     // ---
 
     /**
-     * Lazy-loads child topics (model) of this object and updates the attached object cache accordingly.
+     * Lazy-loads child topics (model) and updates this attached object cache accordingly.
      *
      * @param   assocDef    the child topics according to this association definition are loaded.
      *                      Note: the association definition must not necessarily originate from this object's

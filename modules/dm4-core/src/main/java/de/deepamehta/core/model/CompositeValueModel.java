@@ -129,7 +129,7 @@ public class CompositeValueModel {
         }
     }
 
-    // ---
+    // === Convenience methods ===
 
     /**
      * Convenience method for accessing the *simple* value of a single-valued child.
