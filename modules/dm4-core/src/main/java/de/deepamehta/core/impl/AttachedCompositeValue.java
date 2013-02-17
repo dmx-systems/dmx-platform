@@ -82,6 +82,8 @@ class AttachedCompositeValue implements CompositeValue {
         return _getTopics(childTypeUri, defaultValue);
     }
 
+
+
     // === Convenience methods ===
 
     @Override
@@ -123,6 +125,8 @@ class AttachedCompositeValue implements CompositeValue {
 
     // Note: there are no convenience accessors for a multiple-valued child.
 
+
+
     // ===
 
     @Override
@@ -145,21 +149,49 @@ class AttachedCompositeValue implements CompositeValue {
         return childTopics.size();
     }
 
-    // ===
+
+
+    // === Manipulators ===
 
     @Override
-    public void set(String childTypeUri, SimpleValue value, ClientState clientState, Directives directives) {
-        update(new CompositeValueModel().put(
-            childTypeUri, new TopicModel(childTypeUri, value)
-        ), clientState, directives);
+    public CompositeValue set(String childTypeUri, TopicModel value, ClientState clientState, Directives directives) {
+        return _update(value, childTypeUri, clientState, directives);
+    }
+
+    @Override
+    public CompositeValue set(String childTypeUri, Object value, ClientState clientState, Directives directives) {
+        return _update(new TopicModel(childTypeUri, new SimpleValue(value)), childTypeUri, clientState, directives);
+    }
+
+    @Override
+    public CompositeValue set(String childTypeUri, CompositeValueModel value, ClientState clientState,
+                                                                              Directives directives) {
+        return _update(new TopicModel(childTypeUri, value), childTypeUri, clientState, directives);
     }
 
     // ---
 
     @Override
+    public CompositeValue setRef(String childTypeUri, long refTopicId, ClientState clientState, Directives directives) {
+        return _update(new TopicModel(refTopicId, childTypeUri), childTypeUri, clientState, directives);
+    }
+
+    @Override
+    public CompositeValue setRef(String childTypeUri, String refTopicUri, ClientState clientState,
+                                                                          Directives directives) {
+        return _update(new TopicModel(refTopicUri, childTypeUri), childTypeUri, clientState, directives);
+    }
+
+
+
+    // ===
+
+    @Override
     public CompositeValueModel getModel() {
         return model;
     }
+
+
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
@@ -260,6 +292,14 @@ class AttachedCompositeValue implements CompositeValue {
             getModel().throwInvalidAccess(childTypeUri, e);
             return null;    // never reached
         }
+    }
+
+    // ---
+
+    private CompositeValue _update(TopicModel topic, String childTypeUri, ClientState clientState,
+                                                                          Directives directives) {
+        update(new CompositeValueModel().put(childTypeUri, topic), clientState, directives);
+        return this;
     }
 
     // --- Composition ---

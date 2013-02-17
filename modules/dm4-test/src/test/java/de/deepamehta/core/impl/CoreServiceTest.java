@@ -62,12 +62,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Topic topic = dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 new SimpleValue("DeepaMehta 4 Notes")), null);  // clientState=null
             //
-            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", new SimpleValue(23), null, new Directives());
+            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", 23, null, new Directives());
             //
             int nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(23, nr);
             //
-            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", new SimpleValue(42), null, new Directives());
+            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", 42, null, new Directives());
             //
             nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(42, nr);
@@ -90,7 +90,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             int nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(23, nr);
             //
-            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", new SimpleValue(42), null, new Directives());
+            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", 42, null, new Directives());
             //
             nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(42, nr);

@@ -2,6 +2,7 @@ package de.deepamehta.core;
 
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
@@ -34,6 +35,8 @@ public interface CompositeValue {
      * Returns a default value if there is no such child.
      */
     List<Topic> getTopics(String childTypeUri, List<Topic> defaultValue);
+
+
 
     // === Convenience methods ===
 
@@ -76,6 +79,8 @@ public interface CompositeValue {
 
     // Note: there are no convenience accessors for a multiple-valued child.
 
+
+
     // ===
 
     Object get(String childTypeUri);
@@ -86,11 +91,25 @@ public interface CompositeValue {
 
     int size();
 
-    // ===
 
-    void set(String childTypeUri, SimpleValue value, ClientState clientState, Directives directives);
+
+    // === Manipulators ===
+
+    CompositeValue set(String childTypeUri, TopicModel value,          ClientState clientState, Directives directives);
+
+    CompositeValue set(String childTypeUri, Object value,              ClientState clientState, Directives directives);
+
+    CompositeValue set(String childTypeUri, CompositeValueModel value, ClientState clientState, Directives directives);
 
     // ---
+
+    CompositeValue setRef(String childTypeUri, long refTopicId,        ClientState clientState, Directives directives);
+
+    CompositeValue setRef(String childTypeUri, String refTopicUri,     ClientState clientState, Directives directives);
+
+
+
+    // ===
 
     CompositeValueModel getModel();
 }

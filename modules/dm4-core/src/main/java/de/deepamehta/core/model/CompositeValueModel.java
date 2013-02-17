@@ -214,9 +214,8 @@ public class CompositeValueModel {
             if (value == null) {
                 throw new IllegalArgumentException("Tried to put null in a CompositeValueModel");
             }
-            // put value
-            values.put(key, value);
             //
+            values.put(key, value);
             return this;
         } catch (Exception e) {
             throw new RuntimeException("Putting a value in a CompositeValueModel failed (key=\"" + key +
@@ -227,38 +226,28 @@ public class CompositeValueModel {
     /**
      * Convenience method to put a single-valued child. An existing value is overwritten.
      *
-     * @param   value   a String, Integer, Long, Double, Boolean, or a CompositeValueModel.
+     * @param   value   a String, Integer, Long, Double, or a Boolean.
      *
      * @return  this CompositeValueModel.
      */
     public CompositeValueModel put(String key, Object value) {
         try {
-            // check argument
-            if (value == null) {
-                throw new IllegalArgumentException("Tried to put null in a CompositeValueModel");
-            } else if (value instanceof Iterable) {
-                throw new IllegalArgumentException("Tried to put a " + value.getClass().getName() + " in a " +
-                    "CompositeValueModel => for multiple values use add() instead of put()");
-            } else if (!(value instanceof String || value instanceof Integer || value instanceof Long ||
-                  value instanceof Double || value instanceof Boolean || value instanceof CompositeValueModel)) {
-                throw new IllegalArgumentException("Tried to put a " + value.getClass().getName() + " in a " +
-                    "CompositeValueModel (expected are String, Integer, Long, Double, Boolean, or " +
-                    "CompositeValueModel)");
-            }
-            // put value
-            TopicModel model;
-            if (value instanceof CompositeValueModel) {
-                model = new TopicModel(key, (CompositeValueModel) value);
-            } else {
-                model = new TopicModel(key, new SimpleValue(value));
-            }
-            put(key, model);
-            //
+            values.put(key, new TopicModel(key, new SimpleValue(value)));
             return this;
         } catch (Exception e) {
             throw new RuntimeException("Putting a value in a CompositeValueModel failed (key=\"" + key +
                 "\", value=" + value + ", composite=" + this + ")", e);
         }
+    }
+
+    /**
+     * Convenience method to put a single-valued child. An existing value is overwritten.
+     *
+     * @return  this CompositeValueModel.
+     */
+    public CompositeValueModel put(String key, CompositeValueModel value) {
+        values.put(key, new TopicModel(key, value));
+        return this;
     }
 
     // ---

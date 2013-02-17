@@ -225,9 +225,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     void setMigrationNr(int migrationNr) {
-        pluginTopic.getCompositeValue().set("dm4.core.plugin_migration_nr", new SimpleValue(migrationNr),
-            null, new Directives()
-        );
+        pluginTopic.getCompositeValue().set("dm4.core.plugin_migration_nr", migrationNr, null, new Directives());
     }
 
     // ---

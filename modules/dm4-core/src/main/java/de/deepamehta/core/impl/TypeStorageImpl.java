@@ -557,8 +557,8 @@ class TypeStorageImpl implements TypeStorage {
     void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             boolean includeInLabel = labelConfig.contains(assocDef.getPartTypeUri());
-            new AttachedAssociationDefinition(assocDef, dms).getCompositeValue().set("dm4.core.include_in_label",
-                new SimpleValue(includeInLabel), null, new Directives());
+            new AttachedAssociationDefinition(assocDef, dms).getCompositeValue()
+                .set("dm4.core.include_in_label", includeInLabel, null, new Directives());
         }
     }
 
@@ -651,8 +651,7 @@ class TypeStorageImpl implements TypeStorage {
                 configTopic = new TopicModel(configTypeUri);
                 storeConfigTopic(configurable, configTopic);
             }
-            new AttachedTopic(configTopic, dms).getCompositeValue().set(settingUri, new SimpleValue(value), null,
-                new Directives());
+            new AttachedTopic(configTopic, dms).getCompositeValue().set(settingUri, value, null, new Directives());
         } catch (Exception e) {
             throw new RuntimeException("Storing view configuration setting failed (configurable=" + configurable +
                 ", configTypeUri=\"" + configTypeUri + "\", settingUri=\"" + settingUri + "\", value=\"" + value +
