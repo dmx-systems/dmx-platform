@@ -101,6 +101,45 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         }
     }
 
+    // ---
+
+    @Test
+    public void changeLabelWithSetCompositeValue() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic topic = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
+            assertEquals("", topic.getSimpleValue().toString());
+            //
+            topic.setCompositeValue(new CompositeValueModel().put("dm4.core.plugin_name", "My Plugin"),
+                null, new Directives());
+            assertEquals("My Plugin", topic.getCompositeValue().getString("dm4.core.plugin_name"));
+            assertEquals("My Plugin", topic.getSimpleValue().toString());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void changeLabelWithCompositeValueSet() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic topic = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
+            assertEquals("", topic.getSimpleValue().toString());
+            //
+            topic.getCompositeValue().set("dm4.core.plugin_name", "My Plugin", null, new Directives());
+            assertEquals("My Plugin", topic.getCompositeValue().getString("dm4.core.plugin_name"));
+            assertEquals("My Plugin", topic.getSimpleValue().toString());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    // ---
+
     @Test
     public void assocDefSequence() {
         Type type = dms.getTopicType("dm4.core.plugin", null);  // clientState=null

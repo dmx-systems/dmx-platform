@@ -158,7 +158,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         DeepaMehtaTransaction tx = dms.beginTx();   // ### FIXME: all other writing API methods need transaction as well
         try {
             getCompositeValue().update(comp, clientState, directives);
-            dms.valueStorage.refreshLabel(getModel());
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -186,7 +185,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         //
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
             getCompositeValue().update(newModel.getCompositeValueModel(), clientState, directives);
-            dms.valueStorage.refreshLabel(getModel());
         } else {
             updateSimpleValue(newModel.getSimpleValue());
         }

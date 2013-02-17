@@ -220,6 +220,9 @@ class AttachedCompositeValue implements CompositeValue {
                 //
                 updateChildTopics(newChildTopic, newChildTopics, assocDef, clientState, directives);
             }
+            //
+            dms.valueStorage.refreshLabel(parent.getModel());
+            //
         } catch (Exception e) {
             throw new RuntimeException("Updating composite value of " + parent.className() + " " + parent.getId() +
                 " failed (newComp=" + newComp + ")", e);
@@ -296,9 +299,10 @@ class AttachedCompositeValue implements CompositeValue {
 
     // ---
 
-    private CompositeValue _update(TopicModel topic, String childTypeUri, ClientState clientState,
-                                                                          Directives directives) {
-        update(new CompositeValueModel().put(childTypeUri, topic), clientState, directives);
+    private CompositeValue _update(TopicModel newChildTopic, String childTypeUri, ClientState clientState,
+                                                                                  Directives directives) {
+        updateChildTopics(newChildTopic, null, getAssocDef(childTypeUri), clientState, directives);
+        dms.valueStorage.refreshLabel(parent.getModel());
         return this;
     }
 
