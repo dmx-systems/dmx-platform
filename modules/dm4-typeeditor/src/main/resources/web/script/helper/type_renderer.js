@@ -38,7 +38,7 @@ function TypeRenderer() {
             editors_list = $("<ul>").attr("id", "assoc-def-editors")
             dm4c.render.page(editors_list)
             for (var i = 0, assoc_def; assoc_def = type.assoc_defs[i]; i++) {
-                var label_state = type.get_label_config(assoc_def.part_type_uri)
+                var label_state = type.get_label_config(assoc_def.child_type_uri)
                 editors_list.append(new AssociationDefEditor(assoc_def, label_state).dom)
             }
             editors_list.sortable()
@@ -50,9 +50,9 @@ function TypeRenderer() {
         function AssociationDefEditor(assoc_def, label_state) {
             var whole_type_label = $("<span>").addClass("label").text(type.value)
             var part_type_label = $("<span>").addClass("label").addClass("part-type-label")
-                .text(dm4c.type_label(assoc_def.part_type_uri))
-            var whole_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.whole_cardinality_uri)
-            var part_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.part_cardinality_uri)
+                .text(dm4c.type_label(assoc_def.child_type_uri))
+            var whole_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.parent_cardinality_uri)
+            var part_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.child_cardinality_uri)
             var assoc_type_label = $("<span>").addClass("label").addClass("field-label").text("Association Type")
             var assoc_type_menu = create_assoc_type_menu(assoc_def.type_uri)
             var label_config_checkbox = dm4c.render.checkbox(label_state)
@@ -91,11 +91,11 @@ function TypeRenderer() {
             function get_model() {
                 return {
                     assoc_def: {
-                        id:                    assoc_def.id,
-                        part_type_uri:         assoc_def.part_type_uri,
-                        part_cardinality_uri:  part_card_menu.get_selection().value,
-                        whole_cardinality_uri: whole_card_menu.get_selection().value,
-                        assoc_type_uri:        assoc_type_menu.get_selection().value
+                        id:                     assoc_def.id,
+                        child_type_uri:         assoc_def.child_type_uri,
+                        child_cardinality_uri:  part_card_menu.get_selection().value,
+                        parent_cardinality_uri: whole_card_menu.get_selection().value,
+                        assoc_type_uri:         assoc_type_menu.get_selection().value
                     },
                     label_state: label_config_checkbox.get(0).checked
                 }
@@ -131,7 +131,7 @@ function TypeRenderer() {
                     var assoc_def = editor_model.assoc_def
                     assoc_defs.push(assoc_def)
                     if (editor_model.label_state) {
-                        label_config.push(assoc_def.part_type_uri)
+                        label_config.push(assoc_def.child_type_uri)
                     }
                 })
                 return {

@@ -110,8 +110,8 @@ public class AssociationDefinitionModel extends AssociationModel {
     public JSONObject toJSON() {
         try {
             JSONObject o = super.toJSON();
-            o.put("whole_cardinality_uri", wholeCardinalityUri);
-            o.put("part_cardinality_uri", partCardinalityUri);
+            o.put("parent_cardinality_uri", wholeCardinalityUri);
+            o.put("child_cardinality_uri", partCardinalityUri);
             viewConfigModel.toJSON(o);
             return o;
         } catch (Exception e) {
@@ -136,13 +136,13 @@ public class AssociationDefinitionModel extends AssociationModel {
             long id            = assocDef.optLong("id", -1);
             String uri         = null;
             String typeUri     = assocDef.getString("assoc_type_uri");
-            String partTypeUri = assocDef.getString("part_type_uri");
+            String partTypeUri = assocDef.getString("child_type_uri");
             //
-            if (!assocDef.has("whole_cardinality_uri") && !typeUri.equals("dm4.core.composition_def")) {
-                throw new RuntimeException("\"whole_cardinality_uri\" is missing");
+            if (!assocDef.has("parent_cardinality_uri") && !typeUri.equals("dm4.core.composition_def")) {
+                throw new RuntimeException("\"parent_cardinality_uri\" is missing");
             }
-            String wholeCardinalityUri = assocDef.optString("whole_cardinality_uri", "dm4.core.one");
-            String partCardinalityUri  = assocDef.getString("part_cardinality_uri");
+            String wholeCardinalityUri = assocDef.optString("parent_cardinality_uri", "dm4.core.one");
+            String partCardinalityUri  = assocDef.getString("child_cardinality_uri");
             //
             ViewConfigurationModel viewConfigModel = new ViewConfigurationModel(assocDef);
             //

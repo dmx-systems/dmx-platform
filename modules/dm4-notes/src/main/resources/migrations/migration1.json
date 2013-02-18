@@ -18,9 +18,9 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_type_uri:        "dm4.notes.title",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def",
+                    child_type_uri:        "dm4.notes.title",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def",
                     view_config_topics: [
                         {
                             type_uri: "dm4.webclient.view_config",
@@ -31,9 +31,9 @@
                     ]
                 },
                 {
-                    part_type_uri:        "dm4.notes.text",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def",
+                    child_type_uri:        "dm4.notes.text",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def",
                     view_config_topics: [
                         {
                             type_uri: "dm4.webclient.view_config",

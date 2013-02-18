@@ -54,8 +54,8 @@ function Type() {
             // Note: an intermediate Association is instantiated in order to use its get_role() method
             // ### TODO: instantiate proper AssociationDefinition objects?
             var assoc = new Association(assoc_def)
-            assoc_def.whole_type_uri = assoc.get_role("dm4.core.parent_type").topic_uri
-            assoc_def.part_type_uri  = assoc.get_role("dm4.core.child_type").topic_uri
+            assoc_def.parent_type_uri = assoc.get_role("dm4.core.parent_type").topic_uri
+            assoc_def.child_type_uri  = assoc.get_role("dm4.core.child_type").topic_uri
         }
         return assoc_defs
     }

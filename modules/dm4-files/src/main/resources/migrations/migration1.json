@@ -46,29 +46,29 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_type_uri:        "dm4.files.file_content",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.files.file_content",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.files.file_name",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.files.file_name",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.files.path",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.files.path",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.files.media_type",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.files.media_type",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.files.size",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.files.size",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
             ],
             label_config: [
@@ -113,19 +113,19 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_type_uri:        "dm4.files.folder_name",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.files.folder_name",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.files.path",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.files.path",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.files.folder_content",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.files.folder_content",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 }
             ],
             view_config_topics: [

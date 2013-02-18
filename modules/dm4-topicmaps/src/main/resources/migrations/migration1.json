@@ -32,25 +32,25 @@
             data_type_uri:   "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_type_uri:        "dm4.topicmaps.name",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.topicmaps.name",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.topicmaps.description",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.topicmaps.description",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.topicmaps.topicmap_renderer_uri",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.topicmaps.topicmap_renderer_uri",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:         "dm4.files.file",
-                    part_cardinality_uri:  "dm4.core.one",
-                    whole_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.aggregation_def",
+                    child_type_uri:         "dm4.files.file",
+                    child_cardinality_uri:  "dm4.core.one",
+                    parent_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:         "dm4.core.aggregation_def",
                     view_config_topics: [
                         {
                             type_uri: "dm4.webclient.view_config",
@@ -95,19 +95,19 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_type_uri:        "dm4.topicmaps.x",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.topicmaps.x",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.topicmaps.y",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.topicmaps.y",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.topicmaps.visibility",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.topicmaps.visibility",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 }
             ]
         },

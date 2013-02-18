@@ -16,14 +16,14 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_type_uri:        "dm4.topicmaps.translation_x",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.topicmaps.translation_x",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.topicmaps.translation_y",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.topicmaps.translation_y",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 }
             ],
             label_config: [
@@ -42,14 +42,14 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_type_uri:        "dm4.topicmaps.translation",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.topicmaps.translation",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.topicmaps.zoom_level",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.topicmaps.zoom_level",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 }
             ],
             label_config: [

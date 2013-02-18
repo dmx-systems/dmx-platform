@@ -21,14 +21,14 @@
             data_type_uri:   "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_type_uri:        "dm4.workspaces.name",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.workspaces.name",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.workspaces.description",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.workspaces.description",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 }
             ],
             view_config_topics: [
@@ -47,10 +47,10 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_type_uri:         "dm4.workspaces.workspace",
-                    part_cardinality_uri:  "dm4.core.many",
-                    whole_cardinality_uri: "dm4.core.many",
-                    assoc_type_uri:        "dm4.core.aggregation_def"
+                    child_type_uri:         "dm4.workspaces.workspace",
+                    child_cardinality_uri:  "dm4.core.many",
+                    parent_cardinality_uri: "dm4.core.many",
+                    assoc_type_uri:         "dm4.core.aggregation_def"
                 }
             ]
         }

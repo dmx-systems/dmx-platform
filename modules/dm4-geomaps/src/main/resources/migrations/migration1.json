@@ -16,14 +16,14 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_type_uri:        "dm4.geomaps.longitude",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.geomaps.longitude",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.geomaps.latitude",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.geomaps.latitude",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 }
             ],
             label_config: [
@@ -37,9 +37,9 @@
             data_type_uri: "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_type_uri:        "dm4.geomaps.geo_coordinate",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.geomaps.geo_coordinate",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 }
             ]
         }

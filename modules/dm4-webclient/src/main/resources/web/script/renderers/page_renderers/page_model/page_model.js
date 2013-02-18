@@ -197,24 +197,24 @@ dm4c.render.page_model = (function() {
          *                          This page model is extended by this method.
          */
         extend_composite_page_model: function(object, assoc_def, field_uri, toplevel_object, render_mode, page_model) {
-            var child_topic_type = dm4c.get_topic_type(assoc_def.part_type_uri)
+            var child_topic_type = dm4c.get_topic_type(assoc_def.child_type_uri)
             //
             if (!dm4c.get_view_config(child_topic_type, render_mode.render_setting, assoc_def)) {
                 return
             }
             //
-            var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.part_type_uri
-            var cardinality_uri = assoc_def.part_cardinality_uri
+            var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.child_type_uri
+            var cardinality_uri = assoc_def.child_cardinality_uri
             if (cardinality_uri == "dm4.core.one") {
-                var child_topic = object.composite[assoc_def.part_type_uri] || dm4c.empty_topic(child_topic_type.uri)
+                var child_topic = object.composite[assoc_def.child_type_uri] || dm4c.empty_topic(child_topic_type.uri)
                 var child_model = this.create_page_model(child_topic, assoc_def, child_field_uri, toplevel_object,
                     render_mode)
-                page_model.childs[assoc_def.part_type_uri] = child_model
+                page_model.childs[assoc_def.child_type_uri] = child_model
             } else if (cardinality_uri == "dm4.core.many") {
                 // ### TODO: server: don't send empty arrays
-                var child_topics = object.composite[assoc_def.part_type_uri] || []
+                var child_topics = object.composite[assoc_def.child_type_uri] || []
                 if (!js.is_array(child_topics)) {
-                    throw "TopicRendererError: field \"" + assoc_def.part_type_uri + "\" is defined as multi-value " +
+                    throw "TopicRendererError: field \"" + assoc_def.child_type_uri + "\" is defined as multi-value " +
                         "but appears as single-value in " + JSON.stringify(object)
                 }
                 if (child_topics.length == 0) {
@@ -227,7 +227,7 @@ dm4c.render.page_model = (function() {
                         toplevel_object, render_mode)
                     child_model.values.push(child_field)
                 }
-                page_model.childs[assoc_def.part_type_uri] = child_model
+                page_model.childs[assoc_def.child_type_uri] = child_model
             } else {
                 throw "TopicRendererError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
             }
@@ -297,7 +297,7 @@ dm4c.render.page_model = (function() {
             function remove_button_page_model() {
                 return render_mode == dm4c.render.page_model.mode.FORM &&
                     page_model.assoc_def &&  // Note: the top-level page model has no assoc_def
-                    page_model.assoc_def.part_cardinality_uri == "dm4.core.many" &&
+                    page_model.assoc_def.child_cardinality_uri == "dm4.core.many" &&
                     page_model
             }
 
