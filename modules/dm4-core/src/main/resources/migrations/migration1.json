@@ -121,33 +121,33 @@
         },
 
         {
-            value:    "Whole",
-            uri:      "dm4.core.whole",
+            value:    "Parent",
+            uri:      "dm4.core.parent",
             type_uri: "dm4.core.role_type"
         },
         {
-            value:    "Part",
-            uri:      "dm4.core.part",
+            value:    "Child",
+            uri:      "dm4.core.child",
             type_uri: "dm4.core.role_type"
         },
         {
-            value:    "Whole Type",
-            uri:      "dm4.core.whole_type",
+            value:    "Parent Type",
+            uri:      "dm4.core.parent_type",
             type_uri: "dm4.core.role_type"
         },
         {
-            value:    "Part Type",
-            uri:      "dm4.core.part_type",
+            value:    "Child Type",
+            uri:      "dm4.core.child_type",
             type_uri: "dm4.core.role_type"
         },
         {
-            value:    "Whole Cardinality",
-            uri:      "dm4.core.whole_cardinality",
+            value:    "Parent Cardinality",
+            uri:      "dm4.core.parent_cardinality",
             type_uri: "dm4.core.role_type"
         },
         {
-            value:    "Part Cardinality",
-            uri:      "dm4.core.part_cardinality",
+            value:    "Child Cardinality",
+            uri:      "dm4.core.child_cardinality",
             type_uri: "dm4.core.role_type"
         },
 

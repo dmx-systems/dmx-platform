@@ -51,8 +51,8 @@ dm4c.add_plugin("de.deepamehta.webbrowser", function() {
     function get_webpage(url_topic) {
         var webpages = dm4c.restc.get_topic_related_topics(url_topic.id, {
             assoc_type_uri: "dm4.core.aggregation",
-            my_role_type_uri: "dm4.core.part",
-            others_role_type_uri: "dm4.core.whole",
+            my_role_type_uri: "dm4.core.child",
+            others_role_type_uri: "dm4.core.parent",
             others_topic_type_uri: "dm4.webbrowser.webpage"
         }).items
         //

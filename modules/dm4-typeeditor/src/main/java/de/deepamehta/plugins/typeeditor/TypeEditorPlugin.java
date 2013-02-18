@@ -113,8 +113,8 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
             return false;
         }
         //
-        if (assoc.getRoleModel("dm4.core.whole_type") == null ||
-            assoc.getRoleModel("dm4.core.part_type") == null)  {
+        if (assoc.getRoleModel("dm4.core.parent_type") == null ||
+            assoc.getRoleModel("dm4.core.child_type") == null)  {
             return false;
         }
         //
@@ -140,7 +140,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         } else if (typeUri.equals("dm4.core.assoc_type")) {
             return dms.getAssociationType(type.getUri(), null);
         } else {
-            throw new RuntimeException("Invalid association definition: the dm4.core.whole_type " +
+            throw new RuntimeException("Invalid association definition: the dm4.core.parent_type " +
                 "player is not a type but of type \"" + typeUri + "\" (" + assoc + ")");
         }
     }

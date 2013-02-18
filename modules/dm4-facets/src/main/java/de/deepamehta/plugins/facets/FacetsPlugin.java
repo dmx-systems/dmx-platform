@@ -89,7 +89,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public boolean hasFacet(long topicId, String facetTypeUri, long facetTopicId) {
         String assocTypeUri = getAssocDef(facetTypeUri).getInstanceLevelAssocTypeUri();
-        Association assoc = dms.getAssociation(assocTypeUri, topicId, facetTopicId, "dm4.core.whole", "dm4.core.part",
+        Association assoc = dms.getAssociation(assocTypeUri, topicId, facetTopicId, "dm4.core.parent", "dm4.core.child",
             false, null);   // fetchComposite=false, clientState=null
         return assoc != null;
     }
@@ -109,7 +109,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
                                                                   boolean fetchComposite) {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = assocDef.getPartTypeUri();
-        return object.getRelatedTopic(assocTypeUri, "dm4.core.whole", "dm4.core.part", othersTypeUri, fetchComposite,
+        return object.getRelatedTopic(assocTypeUri, "dm4.core.parent", "dm4.core.child", othersTypeUri, fetchComposite,
             false, null);
     }
 
@@ -124,7 +124,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
                                                                         boolean fetchComposite) {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = assocDef.getPartTypeUri();
-        return object.getRelatedTopics(assocTypeUri, "dm4.core.whole", "dm4.core.part", othersTypeUri, fetchComposite,
+        return object.getRelatedTopics(assocTypeUri, "dm4.core.parent", "dm4.core.child", othersTypeUri, fetchComposite,
             false, 0, null).getItems();
     }
 

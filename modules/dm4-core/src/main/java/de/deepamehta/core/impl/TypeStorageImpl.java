@@ -278,7 +278,7 @@ class TypeStorageImpl implements TypeStorage {
         // as well (the latter required e.g. by dm4-mail) ### TODO: add a getRelatedTopics() method that takes a list
         // of topic types.
         ResultSet<RelatedTopic> partTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
-            "dm4.core.composition_def"), "dm4.core.whole_type", "dm4.core.part_type", null, false, false, 0, null);
+            "dm4.core.composition_def"), "dm4.core.parent_type", "dm4.core.child_type", null, false, false, 0, null);
             // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=false, clientState=null
         //
         // 2) create association definitions
@@ -369,10 +369,10 @@ class TypeStorageImpl implements TypeStorage {
 
     @Override
     public Topic fetchWholeType(Association assoc) {
-        Topic wholeTypeTopic = assoc.getTopic("dm4.core.whole_type");
+        Topic wholeTypeTopic = assoc.getTopic("dm4.core.parent_type");
         // error check
         if (wholeTypeTopic == null) {
-            throw new RuntimeException("Invalid association definition: topic role dm4.core.whole_type " +
+            throw new RuntimeException("Invalid association definition: topic role dm4.core.parent_type " +
                 "is missing in " + assoc);
         }
         //
@@ -381,10 +381,10 @@ class TypeStorageImpl implements TypeStorage {
 
     @Override
     public Topic fetchPartType(Association assoc) {
-        Topic partTypeTopic = assoc.getTopic("dm4.core.part_type");
+        Topic partTypeTopic = assoc.getTopic("dm4.core.child_type");
         // error check
         if (partTypeTopic == null) {
-            throw new RuntimeException("Invalid association definition: topic role dm4.core.part_type " +
+            throw new RuntimeException("Invalid association definition: topic role dm4.core.child_type " +
                 "is missing in " + assoc);
         }
         //
@@ -400,7 +400,7 @@ class TypeStorageImpl implements TypeStorage {
     // ### TODO: pass Association instead ID?
     private RelatedTopicModel fetchWholeCardinality(long assocDefId) {
         RelatedTopicModel wholeCard = dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
-            "dm4.core.assoc_def", "dm4.core.whole_cardinality", "dm4.core.cardinality");
+            "dm4.core.assoc_def", "dm4.core.parent_cardinality", "dm4.core.cardinality");
         // error check
         if (wholeCard == null) {
             throw new RuntimeException("Invalid association definition: whole cardinality is missing (assocDefId=" +
@@ -413,7 +413,7 @@ class TypeStorageImpl implements TypeStorage {
     // ### TODO: pass Association instead ID?
     private RelatedTopicModel fetchPartCardinality(long assocDefId) {
         RelatedTopicModel partCard = dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
-            "dm4.core.assoc_def", "dm4.core.part_cardinality", "dm4.core.cardinality");
+            "dm4.core.assoc_def", "dm4.core.child_cardinality", "dm4.core.cardinality");
         // error check
         if (partCard == null) {
             throw new RuntimeException("Invalid association definition: part cardinality is missing (assocDefId=" +
@@ -445,13 +445,13 @@ class TypeStorageImpl implements TypeStorage {
 
     private void associateWholeCardinality(long assocDefId, String wholeCardinalityUri) {
         dms.createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(wholeCardinalityUri, "dm4.core.whole_cardinality"),
+            new TopicRoleModel(wholeCardinalityUri, "dm4.core.parent_cardinality"),
             new AssociationRoleModel(assocDefId, "dm4.core.assoc_def"));
     }
 
     private void associatePartCardinality(long assocDefId, String partCardinalityUri) {
         dms.createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(partCardinalityUri, "dm4.core.part_cardinality"),
+            new TopicRoleModel(partCardinalityUri, "dm4.core.child_cardinality"),
             new AssociationRoleModel(assocDefId, "dm4.core.assoc_def"));
     }
 
@@ -549,7 +549,7 @@ class TypeStorageImpl implements TypeStorage {
 
     private RelatedTopicModel fetchLabelConfigTopic(long assocDefId) {
         return dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.composition",
-            "dm4.core.whole", "dm4.core.part", "dm4.core.include_in_label");
+            "dm4.core.parent", "dm4.core.child", "dm4.core.include_in_label");
     }
 
     // --- Store ---

@@ -47,8 +47,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertEquals("dm4.core.plugin_migration_nr", assocDef.getPartTypeUri());
         assertEquals("dm4.core.one",                 assocDef.getWholeCardinalityUri());
         assertEquals("dm4.core.one",                 assocDef.getPartCardinalityUri());
-        Topic t1 = assocDef.getTopic("dm4.core.whole_type");
-        Topic t2 = assocDef.getTopic("dm4.core.part_type");
+        Topic t1 = assocDef.getTopic("dm4.core.parent_type");
+        Topic t2 = assocDef.getTopic("dm4.core.child_type");
         assertEquals("dm4.core.plugin",              t1.getUri());
         assertEquals("dm4.core.topic_type",          t1.getTypeUri());
         assertEquals("dm4.core.plugin_migration_nr", t2.getUri());
@@ -424,7 +424,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     private ResultSet<RelatedTopic> getPartTypes(Topic type) {
         return type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
-            "dm4.core.whole_type", "dm4.core.part_type", "dm4.core.topic_type", false, false, 0, null);
+            "dm4.core.parent_type", "dm4.core.child_type", "dm4.core.topic_type", false, false, 0, null);
     }
 
     // ---

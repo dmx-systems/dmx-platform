@@ -316,7 +316,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * Prerequisite: username is not <code>null</code>.
      */
     private Topic fetchUserAccount(Topic username) {
-        Topic userAccount = username.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole",
+        Topic userAccount = username.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
             "dm4.accesscontrol.user_account", true, false, null);  // fetchComposite=true, fetchRelatingComposite=false
         if (userAccount == null) {
             throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +

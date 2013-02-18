@@ -260,7 +260,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
         // 1) recursively delete sub-topics
         ResultSet<RelatedTopic> partTopics = getRelatedTopics("dm4.core.composition",
-            "dm4.core.whole", "dm4.core.part", null, false, false, 0, null);
+            "dm4.core.parent", "dm4.core.child", null, false, false, 0, null);
         for (Topic partTopic : partTopics) {
             partTopic.delete(directives);
         }

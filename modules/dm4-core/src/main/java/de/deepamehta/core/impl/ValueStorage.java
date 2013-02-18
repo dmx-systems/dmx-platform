@@ -144,16 +144,16 @@ class ValueStorage {
     void associateChildTopic(long childTopicId, DeepaMehtaObjectModel parent, AssociationDefinition assocDef,
                                                                               ClientState clientState) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
-            parent.createRoleModel("dm4.core.whole"),
-            new TopicRoleModel(childTopicId, "dm4.core.part"), clientState
+            parent.createRoleModel("dm4.core.parent"),
+            new TopicRoleModel(childTopicId, "dm4.core.child"), clientState
         );
     }
 
     void associateChildTopic(String childTopicUri, DeepaMehtaObjectModel parent, AssociationDefinition assocDef,
                                                                                  ClientState clientState) {
         dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
-            parent.createRoleModel("dm4.core.whole"),
-            new TopicRoleModel(childTopicUri, "dm4.core.part"), clientState
+            parent.createRoleModel("dm4.core.parent"),
+            new TopicRoleModel(childTopicUri, "dm4.core.child"), clientState
         );
     }
 
@@ -439,7 +439,7 @@ class ValueStorage {
         return dms.storage.fetchRelatedTopic(
             parentId,
             assocDef.getInstanceLevelAssocTypeUri(),
-            "dm4.core.whole", "dm4.core.part",
+            "dm4.core.parent", "dm4.core.child",
             assocDef.getPartTypeUri()
         );
     }
@@ -448,7 +448,7 @@ class ValueStorage {
         return dms.storage.fetchRelatedTopics(
             parentId,
             assocDef.getInstanceLevelAssocTypeUri(),
-            "dm4.core.whole", "dm4.core.part",
+            "dm4.core.parent", "dm4.core.child",
             assocDef.getPartTypeUri()
         );
     }

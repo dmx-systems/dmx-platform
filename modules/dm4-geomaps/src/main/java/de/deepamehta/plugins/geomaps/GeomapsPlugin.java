@@ -83,7 +83,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         try {
             Topic topic = dms.getTopic(topicId, true, clientState);
             RelatedTopic parentTopic;
-            while ((parentTopic = topic.getRelatedTopic(null, "dm4.core.part", "dm4.core.whole", null,
+            while ((parentTopic = topic.getRelatedTopic(null, "dm4.core.child", "dm4.core.parent", null,
                     true, false, clientState)) != null) {
                 topic = parentTopic;
             }

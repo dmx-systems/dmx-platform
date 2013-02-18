@@ -364,8 +364,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         String path = repoPath(file);
         Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false, null);   // fetchComposite=false
         if (topic != null) {
-            return topic.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole", "dm4.files.file",
-                true, false, null);
+            return topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
+                "dm4.files.file", true, false, null);
         }
         return null;
     }
@@ -374,8 +374,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         String path = repoPath(file);
         Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false, null);   // fetchComposite=false
         if (topic != null) {
-            return topic.getRelatedTopic("dm4.core.composition", "dm4.core.part", "dm4.core.whole", "dm4.files.folder",
-                true, false, null);
+            return topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
+                "dm4.files.folder", true, false, null);
         }
         return null;
     }
@@ -417,8 +417,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     private void associateChildTopic(long folderTopicId, long childTopicId) {
         if (!childAssociationExists(folderTopicId, childTopicId)) {
             dms.createAssociation(new AssociationModel("dm4.core.aggregation",
-                new TopicRoleModel(folderTopicId, "dm4.core.whole"),
-                new TopicRoleModel(childTopicId,  "dm4.core.part")), null);    // clientState=null
+                new TopicRoleModel(folderTopicId, "dm4.core.parent"),
+                new TopicRoleModel(childTopicId,  "dm4.core.child")), null);    // clientState=null
         }
     }
 

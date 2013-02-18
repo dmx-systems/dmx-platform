@@ -164,11 +164,11 @@ public class AssociationDefinitionModel extends AssociationModel {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private static TopicRoleModel wholeRoleModel(String wholeTypeUri) {
-        return new TopicRoleModel(wholeTypeUri, "dm4.core.whole_type");
+        return new TopicRoleModel(wholeTypeUri, "dm4.core.parent_type");
     }
 
     private static TopicRoleModel partRoleModel(String partTypeUri) {
-        return new TopicRoleModel(partTypeUri,  "dm4.core.part_type");
+        return new TopicRoleModel(partTypeUri,  "dm4.core.child_type");
     }
 
     // ---
