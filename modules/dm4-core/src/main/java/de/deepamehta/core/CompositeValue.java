@@ -107,6 +107,10 @@ public interface CompositeValue {
 
     CompositeValue setRef(String childTypeUri, String refTopicUri,     ClientState clientState, Directives directives);
 
+    // ---
+
+    CompositeValue remove(String childTypeUri, long topicId,           ClientState clientState, Directives directives);
+
 
 
     // ===

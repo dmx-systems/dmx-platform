@@ -155,31 +155,38 @@ class AttachedCompositeValue implements CompositeValue {
 
     @Override
     public CompositeValue set(String childTypeUri, TopicModel value, ClientState clientState, Directives directives) {
-        return _update(value, childTypeUri, clientState, directives);
+        return _update(childTypeUri, value, clientState, directives);
     }
 
     @Override
     public CompositeValue set(String childTypeUri, Object value, ClientState clientState, Directives directives) {
-        return _update(new TopicModel(childTypeUri, new SimpleValue(value)), childTypeUri, clientState, directives);
+        return _update(childTypeUri, new TopicModel(childTypeUri, new SimpleValue(value)), clientState, directives);
     }
 
     @Override
     public CompositeValue set(String childTypeUri, CompositeValueModel value, ClientState clientState,
                                                                               Directives directives) {
-        return _update(new TopicModel(childTypeUri, value), childTypeUri, clientState, directives);
+        return _update(childTypeUri, new TopicModel(childTypeUri, value), clientState, directives);
     }
 
     // ---
 
     @Override
     public CompositeValue setRef(String childTypeUri, long refTopicId, ClientState clientState, Directives directives) {
-        return _update(new TopicModel(refTopicId, childTypeUri), childTypeUri, clientState, directives);
+        return _update(childTypeUri, new TopicModel(refTopicId, childTypeUri), clientState, directives);
     }
 
     @Override
     public CompositeValue setRef(String childTypeUri, String refTopicUri, ClientState clientState,
                                                                           Directives directives) {
-        return _update(new TopicModel(refTopicUri, childTypeUri), childTypeUri, clientState, directives);
+        return _update(childTypeUri, new TopicModel(refTopicUri, childTypeUri), clientState, directives);
+    }
+
+    // ---
+
+    @Override
+    public CompositeValue remove(String childTypeUri, long topicId, ClientState clientState, Directives directives) {
+        return _update(childTypeUri, new TopicDeletionModel(topicId), clientState, directives);
     }
 
 
@@ -299,7 +306,7 @@ class AttachedCompositeValue implements CompositeValue {
 
     // ---
 
-    private CompositeValue _update(TopicModel newChildTopic, String childTypeUri, ClientState clientState,
+    private CompositeValue _update(String childTypeUri, TopicModel newChildTopic, ClientState clientState,
                                                                                   Directives directives) {
         updateChildTopics(newChildTopic, null, getAssocDef(childTypeUri), clientState, directives);
         dms.valueStorage.refreshLabel(parent.getModel());

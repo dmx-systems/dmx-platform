@@ -6,7 +6,7 @@ public class TopicDeletionModel extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicDeletionModel(long topicId) {
+    public TopicDeletionModel(long topicId) {
         super(topicId);
     }
 }
