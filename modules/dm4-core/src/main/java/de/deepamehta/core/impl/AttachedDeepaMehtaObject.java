@@ -259,10 +259,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             throw new IllegalArgumentException("directives is null");
         }
         // 1) recursively delete sub-topics
-        ResultSet<RelatedTopic> partTopics = getRelatedTopics("dm4.core.composition",
+        ResultSet<RelatedTopic> childTopics = getRelatedTopics("dm4.core.composition",
             "dm4.core.parent", "dm4.core.child", null, false, false, 0, null);
-        for (Topic partTopic : partTopics) {
-            partTopic.delete(directives);
+        for (Topic childTopic : childTopics) {
+            childTopic.delete(directives);
         }
         // 2) delete direct associations
         for (Association assoc : getAssociations()) {       // getAssociations() is abstract

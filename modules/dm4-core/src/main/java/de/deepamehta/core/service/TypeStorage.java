@@ -13,7 +13,7 @@ public interface TypeStorage {
 
     // ---
 
-    Topic fetchWholeType(Association assoc);
+    Topic fetchParentType(Association assoc);
 
-    Topic fetchPartType(Association assoc);
+    Topic fetchChildType(Association assoc);
 }

@@ -277,16 +277,16 @@ class TypeStorageImpl implements TypeStorage {
         // Note: "othersTopicTypeUri" is set to null. We want consider "dm4.core.topic_type" and "dm4.core.meta_type"
         // as well (the latter required e.g. by dm4-mail) ### TODO: add a getRelatedTopics() method that takes a list
         // of topic types.
-        ResultSet<RelatedTopic> partTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
+        ResultSet<RelatedTopic> childTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
             "dm4.core.composition_def"), "dm4.core.parent_type", "dm4.core.child_type", null, false, false, 0, null);
             // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=false, clientState=null
         //
         // 2) create association definitions
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
         // subsequently build from it by sorting the assoc def's according to the sequence IDs.
-        for (RelatedTopic partType : partTypes) {
-            AssociationDefinitionModel assocDef = fetchAssociationDefinition(partType.getRelatingAssociation(),
-                typeTopic.getUri(), partType.getUri());
+        for (RelatedTopic childType : childTypes) {
+            AssociationDefinitionModel assocDef = fetchAssociationDefinition(childType.getRelatingAssociation(),
+                typeTopic.getUri(), childType.getUri());
             assocDefs.put(assocDef.getId(), assocDef);
         }
         return assocDefs;
@@ -296,22 +296,22 @@ class TypeStorageImpl implements TypeStorage {
 
     @Override
     public AssociationDefinitionModel fetchAssociationDefinition(Association assoc) {
-        return fetchAssociationDefinition(assoc, fetchWholeType(assoc).getUri(), fetchPartType(assoc).getUri());
+        return fetchAssociationDefinition(assoc, fetchParentType(assoc).getUri(), fetchChildType(assoc).getUri());
     }
 
-    private AssociationDefinitionModel fetchAssociationDefinition(Association assoc, String wholeTypeUri,
-                                                                                     String partTypeUri) {
+    private AssociationDefinitionModel fetchAssociationDefinition(Association assoc, String parentTypeUri,
+                                                                                     String childTypeUri) {
         try {
             long assocId = assoc.getId();
             return new AssociationDefinitionModel(
                 assocId, assoc.getUri(), assoc.getTypeUri(),
-                wholeTypeUri, partTypeUri,
-                fetchWholeCardinality(assocId).getUri(), fetchPartCardinality(assocId).getUri(),
+                parentTypeUri, childTypeUri,
+                fetchParentCardinality(assocId).getUri(), fetchChildCardinality(assocId).getUri(),
                 fetchAssocDefViewConfig(assoc)
             );
         } catch (Exception e) {
-            throw new RuntimeException("Fetching association definition failed (wholeTypeUri=\"" + wholeTypeUri +
-                "\", partTypeUri=" + partTypeUri + ", " + assoc + ")", e);
+            throw new RuntimeException("Fetching association definition failed (parentTypeUri=\"" + parentTypeUri +
+                "\", childTypeUri=" + childTypeUri + ", " + assoc + ")", e);
         }
     }
 
@@ -351,8 +351,8 @@ class TypeStorageImpl implements TypeStorage {
             // Note: the assoc def ID is known only after creating the association
             long assocDefId = assocDef.getId();
             // cardinality
-            associateWholeCardinality(assocDefId, assocDef.getParentCardinalityUri());
-            associatePartCardinality(assocDefId, assocDef.getChildCardinalityUri());
+            associateParentCardinality(assocDefId, assocDef.getParentCardinalityUri());
+            associateChildCardinality(assocDefId, assocDef.getChildCardinalityUri());
             //
             storeViewConfig(createConfigurableAssocDef(assocDefId), assocDef.getViewConfigModel());
         } catch (Exception e) {
@@ -363,32 +363,32 @@ class TypeStorageImpl implements TypeStorage {
 
 
 
-    // === Whole Type / Part Type ===
+    // === Parent Type / Child Type ===
 
     // --- Fetch ---
 
     @Override
-    public Topic fetchWholeType(Association assoc) {
-        Topic wholeTypeTopic = assoc.getTopic("dm4.core.parent_type");
+    public Topic fetchParentType(Association assoc) {
+        Topic parentTypeTopic = assoc.getTopic("dm4.core.parent_type");
         // error check
-        if (wholeTypeTopic == null) {
+        if (parentTypeTopic == null) {
             throw new RuntimeException("Invalid association definition: topic role dm4.core.parent_type " +
                 "is missing in " + assoc);
         }
         //
-        return wholeTypeTopic;
+        return parentTypeTopic;
     }
 
     @Override
-    public Topic fetchPartType(Association assoc) {
-        Topic partTypeTopic = assoc.getTopic("dm4.core.child_type");
+    public Topic fetchChildType(Association assoc) {
+        Topic childTypeTopic = assoc.getTopic("dm4.core.child_type");
         // error check
-        if (partTypeTopic == null) {
+        if (childTypeTopic == null) {
             throw new RuntimeException("Invalid association definition: topic role dm4.core.child_type " +
                 "is missing in " + assoc);
         }
         //
-        return partTypeTopic;
+        return childTypeTopic;
     }
 
 
@@ -398,60 +398,60 @@ class TypeStorageImpl implements TypeStorage {
     // --- Fetch ---
 
     // ### TODO: pass Association instead ID?
-    private RelatedTopicModel fetchWholeCardinality(long assocDefId) {
-        RelatedTopicModel wholeCard = dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
+    private RelatedTopicModel fetchParentCardinality(long assocDefId) {
+        RelatedTopicModel parentCard = dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.parent_cardinality", "dm4.core.cardinality");
         // error check
-        if (wholeCard == null) {
-            throw new RuntimeException("Invalid association definition: whole cardinality is missing (assocDefId=" +
+        if (parentCard == null) {
+            throw new RuntimeException("Invalid association definition: parent cardinality is missing (assocDefId=" +
                 assocDefId + ")");
         }
         //
-        return wholeCard;
+        return parentCard;
     }
 
     // ### TODO: pass Association instead ID?
-    private RelatedTopicModel fetchPartCardinality(long assocDefId) {
-        RelatedTopicModel partCard = dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
+    private RelatedTopicModel fetchChildCardinality(long assocDefId) {
+        RelatedTopicModel childCard = dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.child_cardinality", "dm4.core.cardinality");
         // error check
-        if (partCard == null) {
-            throw new RuntimeException("Invalid association definition: part cardinality is missing (assocDefId=" +
+        if (childCard == null) {
+            throw new RuntimeException("Invalid association definition: child cardinality is missing (assocDefId=" +
                 assocDefId + ")");
         }
         //
-        return partCard;
+        return childCard;
     }
 
     // --- Store ---
 
-    void storeWholeCardinalityUri(long assocDefId, String wholeCardinalityUri) {
+    void storeParentCardinalityUri(long assocDefId, String parentCardinalityUri) {
         // remove current assignment
-        long assocId = fetchWholeCardinality(assocDefId).getRelatingAssociation().getId();
+        long assocId = fetchParentCardinality(assocDefId).getRelatingAssociation().getId();
         dms.deleteAssociation(assocId, null);   // clientState=null
         // create new assignment
-        associateWholeCardinality(assocDefId, wholeCardinalityUri);
+        associateParentCardinality(assocDefId, parentCardinalityUri);
     }
 
-    void storePartCardinalityUri(long assocDefId, String partCardinalityUri) {
+    void storeChildCardinalityUri(long assocDefId, String childCardinalityUri) {
         // remove current assignment
-        long assocId = fetchPartCardinality(assocDefId).getRelatingAssociation().getId();
+        long assocId = fetchChildCardinality(assocDefId).getRelatingAssociation().getId();
         dms.deleteAssociation(assocId, null);   // clientState=null
         // create new assignment
-        associatePartCardinality(assocDefId, partCardinalityUri);
+        associateChildCardinality(assocDefId, childCardinalityUri);
     }
 
     // ---
 
-    private void associateWholeCardinality(long assocDefId, String wholeCardinalityUri) {
+    private void associateParentCardinality(long assocDefId, String parentCardinalityUri) {
         dms.createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(wholeCardinalityUri, "dm4.core.parent_cardinality"),
+            new TopicRoleModel(parentCardinalityUri, "dm4.core.parent_cardinality"),
             new AssociationRoleModel(assocDefId, "dm4.core.assoc_def"));
     }
 
-    private void associatePartCardinality(long assocDefId, String partCardinalityUri) {
+    private void associateChildCardinality(long assocDefId, String childCardinalityUri) {
         dms.createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(partCardinalityUri, "dm4.core.child_cardinality"),
+            new TopicRoleModel(childCardinalityUri, "dm4.core.child_cardinality"),
             new AssociationRoleModel(assocDefId, "dm4.core.assoc_def"));
     }
 

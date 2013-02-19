@@ -32,9 +32,9 @@ public interface AssociationDefinition extends Association {
 
     // ---
 
-    void setParentCardinalityUri(String wholeCardinalityUri, ClientState clientState, Directives directives);
+    void setParentCardinalityUri(String parentCardinalityUri, ClientState clientState, Directives directives);
 
-    void setChildCardinalityUri(String partCardinalityUri, ClientState clientState, Directives directives);
+    void setChildCardinalityUri(String childCardinalityUri, ClientState clientState, Directives directives);
 
     // === Updating ===
 

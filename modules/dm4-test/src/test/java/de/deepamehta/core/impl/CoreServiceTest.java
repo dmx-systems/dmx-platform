@@ -199,14 +199,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void retypeAssociation() {
         DeepaMehtaTransaction tx = dms.beginTx();
         Topic type;
-        ResultSet<RelatedTopic> partTypes;
+        ResultSet<RelatedTopic> childTypes;
         try {
             type = getTopicByUri("dm4.core.plugin");
-            partTypes = getPartTypes(type);
-            assertEquals(3, partTypes.getSize());
+            childTypes = getChildTypes(type);
+            assertEquals(3, childTypes.getSize());
             //
             // retype assoc
-            Association assoc = partTypes.getIterator().next().getRelatingAssociation();
+            Association assoc = childTypes.getIterator().next().getRelatingAssociation();
             assertEquals("dm4.core.composition_def", assoc.getTypeUri());
             assoc.setTypeUri("dm4.core.association");
             assertEquals("dm4.core.association", assoc.getTypeUri());
@@ -214,8 +214,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dm4.core.association", assoc.getTypeUri());
             //
             // re-execute query
-            partTypes = getPartTypes(type);
-            assertEquals(3, partTypes.getSize());
+            childTypes = getChildTypes(type);
+            assertEquals(3, childTypes.getSize());
             // ### Note: the Lucene index update is not visible within the transaction!
             // ### That's contradictory to the Neo4j documentation!
             // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
@@ -225,8 +225,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             tx.finish();
         }
         // re-execute query
-        partTypes = getPartTypes(type);
-        assertEquals(2, partTypes.getSize());
+        childTypes = getChildTypes(type);
+        assertEquals(2, childTypes.getSize());
         // ### Note: the Lucene index update is only visible once the transaction is committed!
         // ### That's contradictory to the Neo4j documentation!
         // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
@@ -236,20 +236,20 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void retypeAssociationRoles() {
         DeepaMehtaTransaction tx = dms.beginTx();
         Topic type;
-        ResultSet<RelatedTopic> partTypes;
+        ResultSet<RelatedTopic> childTypes;
         try {
             type = getTopicByUri("dm4.core.plugin");
-            partTypes = getPartTypes(type);
-            assertEquals(3, partTypes.getSize());
+            childTypes = getChildTypes(type);
+            assertEquals(3, childTypes.getSize());
             //
             // retype assoc roles
-            Association assoc = partTypes.getIterator().next().getRelatingAssociation();
+            Association assoc = childTypes.getIterator().next().getRelatingAssociation();
             assoc.getRole1().setRoleTypeUri("dm4.core.default");
             assoc.getRole2().setRoleTypeUri("dm4.core.default");
             //
             // re-execute query
-            partTypes = getPartTypes(type);
-            assertEquals(3, partTypes.getSize());
+            childTypes = getChildTypes(type);
+            assertEquals(3, childTypes.getSize());
             // ### Note: the Lucene index update is not visible within the transaction!
             // ### That's contradictory to the Neo4j documentation!
             // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
@@ -259,8 +259,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             tx.finish();
         }
         // re-execute query
-        partTypes = getPartTypes(type);
-        assertEquals(2, partTypes.getSize());
+        childTypes = getChildTypes(type);
+        assertEquals(2, childTypes.getSize());
         // ### Note: the Lucene index update is only visible once the transaction is committed!
         // ### That's contradictory to the Neo4j documentation!
         // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
@@ -422,7 +422,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             "dm4.core.type", "dm4.core.instance", assocTypeUri, false, false);
     }
 
-    private ResultSet<RelatedTopic> getPartTypes(Topic type) {
+    private ResultSet<RelatedTopic> getChildTypes(Topic type) {
         return type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
             "dm4.core.parent_type", "dm4.core.child_type", "dm4.core.topic_type", false, false, 0, null);
     }

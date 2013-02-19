@@ -59,43 +59,43 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void createAssocDef(Association assoc, Directives directives) {
-        Type wholeType = fetchWholeType(assoc);
-        String partTypeUri = fetchPartType(assoc).getUri();
+        Type parentType = fetchParentType(assoc);
+        String childTypeUri = fetchChildType(assoc).getUri();
         // Note: the assoc def's ID is already known. Setting it explicitely
         // prevents the core from creating the underlying association.
         AssociationDefinitionModel assocDef = new AssociationDefinitionModel(
             assoc.getId(), assoc.getUri(), assoc.getTypeUri(),
-            wholeType.getUri(), partTypeUri, "dm4.core.one", "dm4.core.one",
+            parentType.getUri(), childTypeUri, "dm4.core.one", "dm4.core.one",
             null    // viewConfigModel=null
         );
-        logger.info("### Adding association definition \"" + partTypeUri + "\" to type \"" + wholeType.getUri() +
+        logger.info("### Adding association definition \"" + childTypeUri + "\" to type \"" + parentType.getUri() +
             "\" (" + assocDef + ")");
         //
-        wholeType.addAssocDef(assocDef);
+        parentType.addAssocDef(assocDef);
         //
-        addUpdateTypeDirective(wholeType, directives);
+        addUpdateTypeDirective(parentType, directives);
     }
 
     private void updateAssocDef(Association assoc, Directives directives) {
-        Type wholeType = fetchWholeType(assoc);
+        Type parentType = fetchParentType(assoc);
         AssociationDefinitionModel assocDef = dms.getTypeStorage().fetchAssociationDefinition(assoc);
         logger.info("### Updating association definition \"" + assocDef.getChildTypeUri() + "\" of type \"" +
-            wholeType.getUri() + "\" (" + assocDef + ")");
+            parentType.getUri() + "\" (" + assocDef + ")");
         //
-        wholeType.updateAssocDef(assocDef);
+        parentType.updateAssocDef(assocDef);
         //
-        addUpdateTypeDirective(wholeType, directives);
+        addUpdateTypeDirective(parentType, directives);
     }
 
     private void removeAssocDef(Association assoc, Directives directives) {
-        Type wholeType = fetchWholeType(assoc);
-        String partTypeUri = fetchPartType(assoc).getUri();
-        logger.info("### Removing association definition \"" + partTypeUri + "\" from type \"" + wholeType.getUri() +
+        Type parentType = fetchParentType(assoc);
+        String childTypeUri = fetchChildType(assoc).getUri();
+        logger.info("### Removing association definition \"" + childTypeUri + "\" from type \"" + parentType.getUri() +
             "\"");
         //
-        wholeType.removeAssocDef(partTypeUri);
+        parentType.removeAssocDef(childTypeUri);
         //
-        addUpdateTypeDirective(wholeType, directives);
+        addUpdateTypeDirective(parentType, directives);
     }
 
 
@@ -127,13 +127,13 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         } else if (type.getTypeUri().equals("dm4.core.assoc_type")) {
             directives.add(Directive.UPDATE_ASSOCIATION_TYPE, type);
         }
-        // Note: no else here as error check already performed in fetchWholeType()
+        // Note: no else here as error check already performed in fetchParentType()
     }
 
     // ---
 
-    private Type fetchWholeType(Association assoc) {
-        Topic type = dms.getTypeStorage().fetchWholeType(assoc);
+    private Type fetchParentType(Association assoc) {
+        Topic type = dms.getTypeStorage().fetchParentType(assoc);
         String typeUri = type.getTypeUri();
         if (typeUri.equals("dm4.core.topic_type")) {
             return dms.getTopicType(type.getUri(), null);
@@ -145,7 +145,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         }
     }
 
-    private Topic fetchPartType(Association assoc) {
-        return dms.getTypeStorage().fetchPartType(assoc);
+    private Topic fetchChildType(Association assoc) {
+        return dms.getTypeStorage().fetchChildType(assoc);
     }
 }

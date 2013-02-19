@@ -48,21 +48,21 @@ function TypeRenderer() {
          * @param   label_state     a boolean
          */
         function AssociationDefEditor(assoc_def, label_state) {
-            var whole_type_label = $("<span>").addClass("label").text(type.value)
-            var part_type_label = $("<span>").addClass("label").addClass("part-type-label")
+            var parent_type_label = $("<span>").addClass("label").text(type.value)
+            var child_type_label = $("<span>").addClass("label").addClass("child-type-label")
                 .text(dm4c.type_label(assoc_def.child_type_uri))
-            var whole_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.parent_cardinality_uri)
-            var part_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.child_cardinality_uri)
+            var parent_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.parent_cardinality_uri)
+            var child_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.child_cardinality_uri)
             var assoc_type_label = $("<span>").addClass("label").addClass("field-label").text("Association Type")
             var assoc_type_menu = create_assoc_type_menu(assoc_def.type_uri)
             var label_config_checkbox = dm4c.render.checkbox(label_state)
             var label_config_label = $("<span>").addClass("label").addClass("field-label").text("Include in Label")
             //
-            var optional_card_div = $("<div>").append(whole_type_label).append(whole_card_menu.dom)
+            var optional_card_div = $("<div>").append(parent_type_label).append(parent_card_menu.dom)
             optional_card_div.toggle(is_aggregation_selected())
             //
             this.dom = $("<li>").addClass("assoc-def-editor").addClass("ui-state-default")
-                .append($("<div>").append(part_type_label).append(part_card_menu.dom)
+                .append($("<div>").append(child_type_label).append(child_card_menu.dom)
                                   .append(label_config_checkbox).append(label_config_label))
                 .append(optional_card_div)
                 .append($("<div>").append(assoc_type_label).append(assoc_type_menu.dom))
@@ -93,8 +93,8 @@ function TypeRenderer() {
                     assoc_def: {
                         id:                     assoc_def.id,
                         child_type_uri:         assoc_def.child_type_uri,
-                        child_cardinality_uri:  part_card_menu.get_selection().value,
-                        parent_cardinality_uri: whole_card_menu.get_selection().value,
+                        child_cardinality_uri:  child_card_menu.get_selection().value,
+                        parent_cardinality_uri: parent_card_menu.get_selection().value,
                         assoc_type_uri:         assoc_type_menu.get_selection().value
                     },
                     label_state: label_config_checkbox.get(0).checked
