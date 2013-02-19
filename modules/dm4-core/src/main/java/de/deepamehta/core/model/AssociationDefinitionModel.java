@@ -65,19 +65,19 @@ public class AssociationDefinitionModel extends AssociationModel {
         return instanceLevelAssocTypeUri;
     }
 
-    public String getWholeTypeUri() {
+    public String getParentTypeUri() {
         return wholeTypeUri;
     }
 
-    public String getPartTypeUri() {
+    public String getChildTypeUri() {
         return partTypeUri;
     }
 
-    public String getWholeCardinalityUri() {
+    public String getParentCardinalityUri() {
         return wholeCardinalityUri;
     }
 
-    public String getPartCardinalityUri() {
+    public String getChildCardinalityUri() {
         return partCardinalityUri;
     }
 
@@ -93,11 +93,11 @@ public class AssociationDefinitionModel extends AssociationModel {
         this.instanceLevelAssocTypeUri = instanceLevelAssocTypeUri(typeUri);
     }
 
-    public void setWholeCardinalityUri(String wholeCardinalityUri) {
+    public void setParentCardinalityUri(String wholeCardinalityUri) {
         this.wholeCardinalityUri = wholeCardinalityUri;
     }
 
-    public void setPartCardinalityUri(String partCardinalityUri) {
+    public void setChildCardinalityUri(String partCardinalityUri) {
         this.partCardinalityUri = partCardinalityUri;
     }
 

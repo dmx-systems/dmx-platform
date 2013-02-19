@@ -111,7 +111,7 @@ public abstract class TypeModel extends TopicModel {
                 "Topic type \"" + getUri() + "\" is of data type \"" + getDataTypeUri() + "\". (" + assocDef + ")");
         }
         // error check
-        String assocDefUri = assocDef.getPartTypeUri();
+        String assocDefUri = assocDef.getChildTypeUri();
         AssociationDefinitionModel existing = assocDefs.get(assocDefUri);
         if (existing != null) {
             throw new RuntimeException("Schema ambiguity: topic type \"" + uri +
@@ -122,7 +122,7 @@ public abstract class TypeModel extends TopicModel {
     }
 
     public void updateAssocDef(AssociationDefinitionModel assocDef) {
-        assocDefs.put(assocDef.getPartTypeUri(), assocDef);
+        assocDefs.put(assocDef.getChildTypeUri(), assocDef);
     }
 
     public AssociationDefinitionModel removeAssocDef(String assocDefUri) {

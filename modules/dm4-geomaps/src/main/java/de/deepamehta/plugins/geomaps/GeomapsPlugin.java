@@ -275,8 +275,8 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         CompositeValueModel comp = topic.getCompositeValueModel();
         TopicType topicType = dms.getTopicType(typeUri, null);      // clientState=null
         for (AssociationDefinition assocDef : topicType.getAssocDefs()) {
-            String childTypeUri   = assocDef.getPartTypeUri();
-            String cardinalityUri = assocDef.getPartCardinalityUri();
+            String childTypeUri   = assocDef.getChildTypeUri();
+            String cardinalityUri = assocDef.getChildCardinalityUri();
             TopicModel childTopic = null;
             if (cardinalityUri.equals("dm4.core.one")) {
                 childTopic = comp.getTopic(childTypeUri, null);

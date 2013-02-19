@@ -46,23 +46,23 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     }
 
     @Override
-    public String getWholeTypeUri() {
-        return getModel().getWholeTypeUri();
+    public String getParentTypeUri() {
+        return getModel().getParentTypeUri();
     }
 
     @Override
-    public String getPartTypeUri() {
-        return getModel().getPartTypeUri();
+    public String getChildTypeUri() {
+        return getModel().getChildTypeUri();
     }
 
     @Override
-    public String getWholeCardinalityUri() {
-        return getModel().getWholeCardinalityUri();
+    public String getParentCardinalityUri() {
+        return getModel().getParentCardinalityUri();
     }
 
     @Override
-    public String getPartCardinalityUri() {
-        return getModel().getPartCardinalityUri();
+    public String getChildCardinalityUri() {
+        return getModel().getChildCardinalityUri();
     }
 
     @Override
@@ -80,17 +80,17 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     // ---
 
     @Override
-    public void setWholeCardinalityUri(String wholeCardinalityUri, ClientState clientState, Directives directives) {
+    public void setParentCardinalityUri(String wholeCardinalityUri, ClientState clientState, Directives directives) {
         // update memory
-        getModel().setWholeCardinalityUri(wholeCardinalityUri);
+        getModel().setParentCardinalityUri(wholeCardinalityUri);
         // update DB
         dms.typeStorage.storeWholeCardinalityUri(getId(), wholeCardinalityUri);
     }
 
     @Override
-    public void setPartCardinalityUri(String partCardinalityUri, ClientState clientState, Directives directives) {
+    public void setChildCardinalityUri(String partCardinalityUri, ClientState clientState, Directives directives) {
         // update memory
-        getModel().setPartCardinalityUri(partCardinalityUri);
+        getModel().setChildCardinalityUri(partCardinalityUri);
         // update DB
         dms.typeStorage.storePartCardinalityUri(getId(), partCardinalityUri);
     }
@@ -104,8 +104,8 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         // assoc type
         updateAssocTypeUri(newModel, clientState, directives);
         // cardinality
-        updateWholeCardinality(newModel.getWholeCardinalityUri(), clientState, directives);
-        updatePartCardinality(newModel.getPartCardinalityUri(), clientState, directives);
+        updateWholeCardinality(newModel.getParentCardinalityUri(), clientState, directives);
+        updatePartCardinality(newModel.getChildCardinalityUri(), clientState, directives);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -134,11 +134,11 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
             return;
         }
         //
-        String wholeCardinalityUri = getWholeCardinalityUri();
+        String wholeCardinalityUri = getParentCardinalityUri();
         if (!wholeCardinalityUri.equals(newWholeCardinalityUri)) {
             logger.info("### Changing whole cardinality URI from \"" + wholeCardinalityUri + "\" -> \"" +
                 newWholeCardinalityUri + "\"");
-            setWholeCardinalityUri(newWholeCardinalityUri, clientState, directives);
+            setParentCardinalityUri(newWholeCardinalityUri, clientState, directives);
         }
     }
 
@@ -147,11 +147,11 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
             return;
         }
         //
-        String partCardinalityUri = getPartCardinalityUri();
+        String partCardinalityUri = getChildCardinalityUri();
         if (!partCardinalityUri.equals(newPartCardinalityUri)) {
             logger.info("### Changing part cardinality URI from \"" + partCardinalityUri + "\" -> \"" +
                 newPartCardinalityUri + "\"");
-            setPartCardinalityUri(newPartCardinalityUri, clientState, directives);
+            setChildCardinalityUri(newPartCardinalityUri, clientState, directives);
         }
     }
 

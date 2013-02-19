@@ -108,7 +108,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     private RelatedTopic fetchChildTopic(DeepaMehtaObject object, AssociationDefinition assocDef,
                                                                   boolean fetchComposite) {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
-        String othersTypeUri = assocDef.getPartTypeUri();
+        String othersTypeUri = assocDef.getChildTypeUri();
         return object.getRelatedTopic(assocTypeUri, "dm4.core.parent", "dm4.core.child", othersTypeUri, fetchComposite,
             false, null);
     }
@@ -123,7 +123,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     private Set<RelatedTopic> fetchChildTopics(DeepaMehtaObject object, AssociationDefinition assocDef,
                                                                         boolean fetchComposite) {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
-        String othersTypeUri = assocDef.getPartTypeUri();
+        String othersTypeUri = assocDef.getChildTypeUri();
         return object.getRelatedTopics(assocTypeUri, "dm4.core.parent", "dm4.core.child", othersTypeUri, fetchComposite,
             false, 0, null).getItems();
     }

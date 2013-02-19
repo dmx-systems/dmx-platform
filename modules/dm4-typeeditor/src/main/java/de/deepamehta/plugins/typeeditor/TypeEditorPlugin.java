@@ -79,7 +79,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
     private void updateAssocDef(Association assoc, Directives directives) {
         Type wholeType = fetchWholeType(assoc);
         AssociationDefinitionModel assocDef = dms.getTypeStorage().fetchAssociationDefinition(assoc);
-        logger.info("### Updating association definition \"" + assocDef.getPartTypeUri() + "\" of type \"" +
+        logger.info("### Updating association definition \"" + assocDef.getChildTypeUri() + "\" of type \"" +
             wholeType.getUri() + "\" (" + assocDef + ")");
         //
         wholeType.updateAssocDef(assocDef);

@@ -64,8 +64,8 @@ class ValueStorage {
 
     void fetchChildTopics(DeepaMehtaObjectModel parent, AssociationDefinition assocDef) {
         CompositeValueModel comp = parent.getCompositeValueModel();
-        String cardinalityUri = assocDef.getPartCardinalityUri();
-        String childTypeUri   = assocDef.getPartTypeUri();
+        String cardinalityUri = assocDef.getChildCardinalityUri();
+        String childTypeUri   = assocDef.getChildTypeUri();
         if (cardinalityUri.equals("dm4.core.one")) {
             RelatedTopicModel childTopic = fetchChildTopic(parent.getId(), assocDef);
             // Note: topics just created have no child topics yet
@@ -219,8 +219,8 @@ class ValueStorage {
         try {
             model = parent.getCompositeValueModel();
             for (AssociationDefinition assocDef : getType(parent).getAssocDefs()) {
-                String childTypeUri   = assocDef.getPartTypeUri();
-                String cardinalityUri = assocDef.getPartCardinalityUri();
+                String childTypeUri   = assocDef.getChildTypeUri();
+                String cardinalityUri = assocDef.getChildCardinalityUri();
                 TopicModel childTopic        = null;     // only used for "one"
                 List<TopicModel> childTopics = null;     // only used for "many"
                 if (cardinalityUri.equals("dm4.core.one")) {
@@ -336,7 +336,7 @@ class ValueStorage {
      * For single-valued childs
      */
     private void putInCompositeValue(Topic childTopic, DeepaMehtaObjectModel parent, AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getPartTypeUri();
+        String childTypeUri = assocDef.getChildTypeUri();
         parent.getCompositeValueModel().put(childTypeUri, childTopic.getModel());
     }
 
@@ -392,7 +392,7 @@ class ValueStorage {
             return "";
         }
         //
-        String childTypeUri = i.next().getPartTypeUri();
+        String childTypeUri = i.next().getChildTypeUri();
         return buildChildLabel(model, childTypeUri);
     }
 
@@ -440,7 +440,7 @@ class ValueStorage {
             parentId,
             assocDef.getInstanceLevelAssocTypeUri(),
             "dm4.core.parent", "dm4.core.child",
-            assocDef.getPartTypeUri()
+            assocDef.getChildTypeUri()
         );
     }
 
@@ -449,7 +449,7 @@ class ValueStorage {
             parentId,
             assocDef.getInstanceLevelAssocTypeUri(),
             "dm4.core.parent", "dm4.core.child",
-            assocDef.getPartTypeUri()
+            assocDef.getChildTypeUri()
         );
     }
 

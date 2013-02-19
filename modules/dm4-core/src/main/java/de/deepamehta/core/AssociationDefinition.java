@@ -16,13 +16,13 @@ public interface AssociationDefinition extends Association {
 
     String getInstanceLevelAssocTypeUri();
 
-    String getWholeTypeUri();
+    String getParentTypeUri();
 
-    String getPartTypeUri();
+    String getChildTypeUri();
 
-    String getWholeCardinalityUri();
+    String getParentCardinalityUri();
 
-    String getPartCardinalityUri();
+    String getChildCardinalityUri();
 
     ViewConfiguration getViewConfig();
 
@@ -32,9 +32,9 @@ public interface AssociationDefinition extends Association {
 
     // ---
 
-    void setWholeCardinalityUri(String wholeCardinalityUri, ClientState clientState, Directives directives);
+    void setParentCardinalityUri(String wholeCardinalityUri, ClientState clientState, Directives directives);
 
-    void setPartCardinalityUri(String partCardinalityUri, ClientState clientState, Directives directives);
+    void setChildCardinalityUri(String partCardinalityUri, ClientState clientState, Directives directives);
 
     // === Updating ===
 

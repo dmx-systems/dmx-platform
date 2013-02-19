@@ -205,8 +205,8 @@ class AttachedCompositeValue implements CompositeValue {
     void update(CompositeValueModel newComp, ClientState clientState, Directives directives) {
         try {
             for (AssociationDefinition assocDef : parent.getType().getAssocDefs()) {
-                String childTypeUri   = assocDef.getPartTypeUri();
-                String cardinalityUri = assocDef.getPartCardinalityUri();
+                String childTypeUri   = assocDef.getChildTypeUri();
+                String cardinalityUri = assocDef.getChildCardinalityUri();
                 TopicModel newChildTopic        = null;     // only used for "one"
                 List<TopicModel> newChildTopics = null;     // only used for "many"
                 if (cardinalityUri.equals("dm4.core.one")) {
@@ -317,7 +317,7 @@ class AttachedCompositeValue implements CompositeValue {
 
     private void updateCompositionOne(TopicModel newChildTopic, AssociationDefinition assocDef,
                                                                 ClientState clientState, Directives directives) {
-        Topic childTopic = _getTopic(assocDef.getPartTypeUri(), null);
+        Topic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
         // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (childTopic != null) {
@@ -376,7 +376,7 @@ class AttachedCompositeValue implements CompositeValue {
 
     private void updateAggregationOne(TopicModel newChildTopic, AssociationDefinition assocDef,
                                                                 ClientState clientState, Directives directives) {
-        RelatedTopic childTopic = (RelatedTopic) _getTopic(assocDef.getPartTypeUri(), null);
+        RelatedTopic childTopic = (RelatedTopic) _getTopic(assocDef.getChildTypeUri(), null);
         if (dms.valueStorage.isReference(newChildTopic)) {
             if (childTopic != null) {
                 if (isReferingTo(newChildTopic, childTopic)) {
@@ -459,7 +459,7 @@ class AttachedCompositeValue implements CompositeValue {
      *                      type definition. It may originate from a facet definition as well.
      */
     private void requireChildTopics(AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getPartTypeUri();
+        String childTypeUri = assocDef.getChildTypeUri();
         if (!has(childTypeUri)) {
             logger.fine("### Lazy-loading \"" + childTypeUri + "\" child topic(s) of " + parent.className() + " " +
                 parent.getId());
@@ -561,7 +561,7 @@ class AttachedCompositeValue implements CompositeValue {
      * For single-valued childs
      */
     private void putInCompositeValue(Topic childTopic, AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getPartTypeUri();
+        String childTypeUri = assocDef.getChildTypeUri();
         put(childTypeUri, childTopic);                              // attached object cache
         getModel().put(childTypeUri, childTopic.getModel());        // underlying model
     }
@@ -570,7 +570,7 @@ class AttachedCompositeValue implements CompositeValue {
      * For multiple-valued childs
      */
     private void addToCompositeValue(Topic childTopic, AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getPartTypeUri();
+        String childTypeUri = assocDef.getChildTypeUri();
         add(childTypeUri, childTopic);                              // attached object cache
         getModel().add(childTypeUri, childTopic.getModel());        // underlying model
     }
@@ -579,7 +579,7 @@ class AttachedCompositeValue implements CompositeValue {
      * For multiple-valued childs
      */
     private void removeFromCompositeValue(Topic childTopic, AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getPartTypeUri();
+        String childTypeUri = assocDef.getChildTypeUri();
         remove(childTypeUri, childTopic);                           // attached object cache
         getModel().remove(childTypeUri, childTopic.getModel());     // underlying model
     }
@@ -589,7 +589,7 @@ class AttachedCompositeValue implements CompositeValue {
     // === Helper ===
 
     private RelatedTopic findChildTopic(long childTopicId, AssociationDefinition assocDef) {
-        List<Topic> childTopics = _getTopics(assocDef.getPartTypeUri(), new ArrayList());
+        List<Topic> childTopics = _getTopics(assocDef.getChildTypeUri(), new ArrayList());
         for (Topic childTopic : childTopics) {
             if (childTopic.getId() == childTopicId) {
                 return (RelatedTopic) childTopic;
@@ -606,7 +606,7 @@ class AttachedCompositeValue implements CompositeValue {
      * @param   assocDef    the child topics according to this association definition are considered.
      */
     private boolean isReferingTo(TopicModel topicRef, AssociationDefinition assocDef) {
-        List<Topic> childTopics = _getTopics(assocDef.getPartTypeUri(), new ArrayList());
+        List<Topic> childTopics = _getTopics(assocDef.getChildTypeUri(), new ArrayList());
         for (Topic childTopic : childTopics) {
             if (isReferingTo(topicRef, childTopic)) {
                 return true;

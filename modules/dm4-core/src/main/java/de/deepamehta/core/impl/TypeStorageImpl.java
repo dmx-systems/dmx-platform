@@ -351,13 +351,13 @@ class TypeStorageImpl implements TypeStorage {
             // Note: the assoc def ID is known only after creating the association
             long assocDefId = assocDef.getId();
             // cardinality
-            associateWholeCardinality(assocDefId, assocDef.getWholeCardinalityUri());
-            associatePartCardinality(assocDefId, assocDef.getPartCardinalityUri());
+            associateWholeCardinality(assocDefId, assocDef.getParentCardinalityUri());
+            associatePartCardinality(assocDefId, assocDef.getChildCardinalityUri());
             //
             storeViewConfig(createConfigurableAssocDef(assocDefId), assocDef.getViewConfigModel());
         } catch (Exception e) {
-            throw new RuntimeException("Storing association definition \"" + assocDef.getPartTypeUri() +
-                "\" of type \"" + assocDef.getWholeTypeUri() + "\" failed", e);
+            throw new RuntimeException("Storing association definition \"" + assocDef.getChildTypeUri() +
+                "\" of type \"" + assocDef.getParentTypeUri() + "\" failed", e);
         }
     }
 
@@ -541,7 +541,7 @@ class TypeStorageImpl implements TypeStorage {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             RelatedTopicModel includeInLabel = fetchLabelConfigTopic(assocDef.getId());
             if (includeInLabel != null && includeInLabel.getSimpleValue().booleanValue()) {
-                labelConfig.add(assocDef.getPartTypeUri());
+                labelConfig.add(assocDef.getChildTypeUri());
             }
         }
         return labelConfig;
@@ -556,7 +556,7 @@ class TypeStorageImpl implements TypeStorage {
 
     void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
-            boolean includeInLabel = labelConfig.contains(assocDef.getPartTypeUri());
+            boolean includeInLabel = labelConfig.contains(assocDef.getChildTypeUri());
             new AttachedAssociationDefinition(assocDef, dms).getCompositeValue()
                 .set("dm4.core.include_in_label", includeInLabel, null, new Directives());
         }
