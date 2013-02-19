@@ -270,7 +270,7 @@ class TypeStorageImpl implements TypeStorage {
     private Map<Long, AssociationDefinitionModel> fetchAssociationDefinitionsUnsorted(Topic typeTopic) {
         Map<Long, AssociationDefinitionModel> assocDefs = new HashMap();
         //
-        // 1) fetch part topic types
+        // 1) fetch child topic types
         // Note: we must set fetchRelatingComposite to false here. Fetching the composite of association type
         // Composition Definition would cause an endless recursion. Composition Definition is defined through
         // Composition Definition itself (child types "Include in Label", "Ordered").
