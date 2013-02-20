@@ -344,7 +344,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         //
         String uri = getUri();
         if (!uri.equals(newUri)) {
-            logger.info("### Changing URI from \"" + uri + "\" -> \"" + newUri + "\"");
+            logger.info("### Changing URI of " + className() + " " + getId() +
+                " from \"" + uri + "\" -> \"" + newUri + "\"");
             setUri(newUri);
         }
     }
@@ -357,7 +358,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         //
         String typeUri = getTypeUri();
         if (!typeUri.equals(newTypeUri)) {
-            logger.info("### Changing type URI from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
+            logger.info("### Changing type URI of " + className() + " " + getId() +
+                " from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
             setTypeUri(newTypeUri);
         }
     }
@@ -370,7 +372,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         //
         SimpleValue value = getSimpleValue();
         if (!value.equals(newValue)) {
-            logger.info("### Changing simple value from \"" + value + "\" -> \"" + newValue + "\"");
+            logger.info("### Changing simple value of " + className() + " " + getId() +
+                " from \"" + value + "\" -> \"" + newValue + "\"");
             setSimpleValue(newValue);
         }
     }

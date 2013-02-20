@@ -486,15 +486,11 @@ class AttachedCompositeValue implements CompositeValue {
         if (value instanceof TopicModel) {
             TopicModel childTopic = (TopicModel) value;
             childTopics.put(childTypeUri, createTopic(childTopic));
-            // recursion
-            initChildTopics(childTopic.getCompositeValueModel());
         } else if (value instanceof List) {
             List<Topic> topics = new ArrayList();
             childTopics.put(childTypeUri, topics);
             for (TopicModel childTopic : (List<TopicModel>) value) {
                 topics.add(createTopic(childTopic));
-                // recursion
-                initChildTopics(childTopic.getCompositeValueModel());
             }
         } else {
             throw new RuntimeException("Unexpected value in a CompositeValueModel: " + value);
