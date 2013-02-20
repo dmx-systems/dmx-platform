@@ -39,6 +39,6 @@ TopicType.prototype.get_menu_config = function(menu_id) {
     }
 }
 
-TopicType.prototype.is_editable = function() {
-    return dm4c.get_view_config(this, "editable")
+TopicType.prototype.is_locked = function() {
+    return dm4c.get_view_config(this, "locked")
 }

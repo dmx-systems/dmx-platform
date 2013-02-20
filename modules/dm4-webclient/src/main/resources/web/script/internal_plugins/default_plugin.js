@@ -56,7 +56,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         commands.push({label: "Associate",    handler: do_associate, context: "context-menu"})
         //
         if (dm4c.has_write_permission_for_topic(topic)) {
-            if (topic.get_type().is_editable()) {
+            if (!topic.get_type().is_locked()) {
                 commands.push({label: "Edit", handler: do_edit,      context: "detail-panel-show", ui_icon: "pencil"})
             }
             commands.push({is_separator: true,                       context: "context-menu"})

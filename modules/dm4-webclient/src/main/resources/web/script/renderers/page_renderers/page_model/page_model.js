@@ -131,12 +131,12 @@ dm4c.render.page_model = (function() {
 
         mode: {
             INFO: {
-                render_setting: "viewable",
+                render_setting: "hidden",
                 render_func_name_simple: "render_info_simple",
                 render_func_name_multi:  "render_info_multi"
             },
             FORM: {
-                render_setting: "editable",
+                render_setting: "locked",
                 render_func_name_simple: "render_form_simple",
                 render_func_name_multi:  "render_form_multi"
             }
@@ -164,14 +164,14 @@ dm4c.render.page_model = (function() {
          *                          Note: for the top-level call "toplevel_object" and "object" are usually the same.
          * @param   render_mode     this.mode.INFO or this.mode.FORM (object).
          *
-         * @return  The created page model, or undefined. Undefined is returned if the object is a simple one and is not
-         *          viewable/editable.
+         * @return  The created page model, or undefined. Undefined is returned if the object is a simple one and is
+         *          hidden/locked.
          */
         create_page_model: function(object, assoc_def, field_uri, toplevel_object, render_mode) {
             var object_type = object.get_type()
             if (object_type.is_simple()) {
                 //
-                if (!dm4c.get_view_config(object_type, render_mode.render_setting, assoc_def)) {
+                if (dm4c.get_view_config(object_type, render_mode.render_setting, assoc_def)) {
                     return
                 }
                 //
@@ -199,7 +199,7 @@ dm4c.render.page_model = (function() {
         extend_composite_page_model: function(object, assoc_def, field_uri, toplevel_object, render_mode, page_model) {
             var child_topic_type = dm4c.get_topic_type(assoc_def.child_type_uri)
             //
-            if (!dm4c.get_view_config(child_topic_type, render_mode.render_setting, assoc_def)) {
+            if (dm4c.get_view_config(child_topic_type, render_mode.render_setting, assoc_def)) {
                 return
             }
             //
@@ -244,7 +244,7 @@ dm4c.render.page_model = (function() {
          * @param   incremental     (boolean).
          */
         render_page_model: function(page_model, render_mode, level, ref_element, incremental) {
-            // Note: if the topic is not viewable/editable the page model is undefined
+            // Note: if the topic is hidden/locked the page model is undefined
             if (!page_model) {
                 return
             }

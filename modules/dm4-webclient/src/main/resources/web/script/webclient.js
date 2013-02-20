@@ -970,10 +970,10 @@ function Webclient() {
                 return false;
             case "is_searchable_unit":
                 return false;
-            case "editable":
-                return true
-            case "viewable":
-                return true
+            case "hidden":
+                return false
+            case "locked":
+                return false
             case "page_renderer_uri":
                 return default_page_renderer_uri()
             case "simple_renderer_uri":

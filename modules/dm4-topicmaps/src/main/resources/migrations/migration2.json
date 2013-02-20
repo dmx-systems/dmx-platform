@@ -60,8 +60,8 @@
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm4.webclient.viewable: false,
-                        dm4.webclient.editable: false
+                        dm4.webclient.hidden: true,
+                        dm4.webclient.locked: true
                     }
                 }
             ]
