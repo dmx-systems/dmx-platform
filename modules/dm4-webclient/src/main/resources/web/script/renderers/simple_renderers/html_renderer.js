@@ -7,7 +7,7 @@ dm4c.add_simple_renderer("dm4.webclient.html_renderer", {
 
     render_form: function(page_model, parent_element) {
         parent_element.append($("<textarea>")
-            .attr({id: "field_" + page_model.uri, rows: page_model.rows})
+            .attr({id: "field_" + page_model.uri, rows: page_model.input_field_rows})
             .text(page_model.value)
         )
         CKEDITOR.replace("field_" + page_model.uri, {

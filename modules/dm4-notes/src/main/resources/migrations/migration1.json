@@ -38,8 +38,8 @@
                         {
                             type_uri: "dm4.webclient.view_config",
                             composite: {
-                                dm4.webclient.simple_renderer_uri: "dm4.webclient.body_text_renderer",
-                                dm4.webclient.rows: 15
+                                dm4.webclient.input_field_rows: 15,
+                                dm4.webclient.simple_renderer_uri: "dm4.webclient.body_text_renderer"
                             }
                         }
                     ]

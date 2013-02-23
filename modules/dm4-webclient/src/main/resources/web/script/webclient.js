@@ -19,7 +19,7 @@ function Webclient() {
     this.ASSOC_WIDTH = 4
     this.ASSOC_CLICK_TOLERANCE = 0.3
     this.DEFAULT_TOPIC_ICON = "/de.deepamehta.webclient/images/ball-gray.png"
-    var DEFAULT_FIELD_ROWS = 1
+    var DEFAULT_INPUT_FIELD_ROWS = 1
 
     var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
@@ -940,11 +940,17 @@ function Webclient() {
         return get_view_config_default(configurable, setting)
 
         function is_set(value) {
+            // Note: since DM 4.1 assoc def overriding with falsish values (0, "", false) is not supported anymore.
+            // This is not needed anymore because since DM 4.1 the semantics of the former "Viewable" and "Editable"
+            // settings is inverted ("Hidden" resp. "Locked"). All boolean settings default to false.
+            return value
+            //
+            // ### DM 4.0.14:
             // Note 1: we explicitely compare to undefined to let assoc defs override with falsish (0 or false) values.
             //         != is sufficient as these are false: 0 == undefined, false == undefined
             // Note 2: we must regard an empty string as "not set" to get the default renderer URIs.
             //         !== is required as these are true: 0 == "", false == ""
-            return value != undefined && value !== ""
+            // return value != undefined && value !== ""
         }
 
         function get_view_config(configurable) {
@@ -968,8 +974,8 @@ function Webclient() {
                 return dm4c.canvas.DEFAULT_ASSOC_COLOR
             case "add_to_create_menu":
                 return false;
-            case "is_searchable_unit":
-                return false;
+            case "input_field_rows":
+                return DEFAULT_INPUT_FIELD_ROWS
             case "hidden":
                 return false
             case "locked":
@@ -980,10 +986,10 @@ function Webclient() {
                 return default_simple_renderer_uri()
             case "multi_renderer_uri":
                 return "dm4.webclient.default_multi_renderer"
-            case "rows":
-                return DEFAULT_FIELD_ROWS
+            case "is_searchable_unit":
+                return false;
             default:
-                throw("WebclientError: \"" + setting + "\" is an unsupported view configuration setting")
+                throw "WebclientError: \"" + setting + "\" is an unsupported view configuration setting"
             }
 
             function default_page_renderer_uri() {
@@ -1006,7 +1012,7 @@ function Webclient() {
                 case "dm4.core.boolean":
                     return "dm4.webclient.boolean_renderer"
                 default:
-                    throw("WebclientError: \"" + configurable.data_type_uri + "\" is an unsupported data type URI")
+                    throw "WebclientError: \"" + configurable.data_type_uri + "\" is an unsupported data type URI"
                 }
             }
         }

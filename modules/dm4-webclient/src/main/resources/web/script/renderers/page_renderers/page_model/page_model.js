@@ -42,7 +42,7 @@ dm4c.render.page_model = (function() {
         this.uri = field_uri
         this.toplevel_object = toplevel_object
         this.label = this.object_type.value
-        this.rows = dm4c.get_view_config(self.object_type, "rows", assoc_def)
+        this.input_field_rows = dm4c.get_view_config(self.object_type, "input_field_rows", assoc_def)
         var renderer_uri
         var renderer = lookup_renderer()
         var form_reading_function

@@ -24,7 +24,7 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
             {
                 type_uri: "dm4.webclient.view_config",
                 composite: {
-                    "dm4.webclient.add_to_create_menu": true    // ### FIXME
+                    "dm4.webclient.add_to_create_menu": true    // ### TODO
                 }
             }
         ]

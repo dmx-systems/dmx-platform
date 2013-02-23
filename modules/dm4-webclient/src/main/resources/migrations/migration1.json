@@ -19,9 +19,9 @@
             data_type_uri: "dm4.core.boolean"
         },
         {
-            value: "Is Searchable Unit",
-            uri: "dm4.webclient.is_searchable_unit",
-            data_type_uri: "dm4.core.boolean"
+            value: "Input Field Rows",
+            uri: "dm4.webclient.input_field_rows",
+            data_type_uri: "dm4.core.number"
         },
         {
             value: "Hidden",
@@ -49,9 +49,9 @@
             data_type_uri: "dm4.core.text"
         },
         {
-            value: "Rows",
-            uri: "dm4.webclient.rows",
-            data_type_uri: "dm4.core.number"
+            value: "Is Searchable Unit",
+            uri: "dm4.webclient.is_searchable_unit",
+            data_type_uri: "dm4.core.boolean"
         },
         {
             value: "View Configuration",
@@ -75,7 +75,7 @@
                     assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.webclient.is_searchable_unit",
+                    child_type_uri:        "dm4.webclient.input_field_rows",
                     child_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:        "dm4.core.composition_def"
                 },
@@ -105,7 +105,7 @@
                     assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.webclient.rows",
+                    child_type_uri:        "dm4.webclient.is_searchable_unit",
                     child_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:        "dm4.core.composition_def"
                 }

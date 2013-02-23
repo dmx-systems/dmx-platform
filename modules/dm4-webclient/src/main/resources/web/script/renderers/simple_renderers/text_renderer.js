@@ -3,7 +3,7 @@ dm4c.add_simple_renderer("dm4.webclient.text_renderer", {
     render_info: function(page_model, parent_element) {
         dm4c.render.field_label(page_model, parent_element)
         var text = js.render_text(page_model.value)
-        if (page_model.rows > 1) {
+        if (page_model.input_field_rows > 1) {
             text = $("<p>").append(text)
         }
         parent_element.append(text)
@@ -33,11 +33,12 @@ dm4c.add_simple_renderer("dm4.webclient.text_renderer", {
 
         function render_form_element() {
             // error check
-            if (!page_model.rows) {
-                throw "TextRendererError: field \"" + page_model.label + "\" has no \"rows\" setting"
+            // ### TODO: drop check. Meanwhile it's always set (default is 1). See dm4c.get_view_config()
+            if (!page_model.input_field_rows) {
+                throw "TextRendererError: field \"" + page_model.label + "\" has no \"input_field_rows\" setting"
             }
             //
-            if (page_model.rows == 1) {
+            if (page_model.input_field_rows == 1) {
                 switch (page_model.assoc_def && page_model.assoc_def.type_uri) {
                 case undefined:
                     // Note: for non-composite topics the field's assoc_def is undefined.
@@ -61,7 +62,7 @@ dm4c.add_simple_renderer("dm4.webclient.text_renderer", {
             }
 
             function render_textarea() {
-                var textarea = $("<textarea>").attr("rows", page_model.rows).text(page_model.value)
+                var textarea = $("<textarea>").attr("rows", page_model.input_field_rows).text(page_model.value)
                 render(textarea)
                 return textarea
             }
