@@ -204,7 +204,9 @@
                             <includePluginDependencies>true</includePluginDependencies>
                             <mainClass>org.neo4j.shell.StartClient</mainClass>
                             <arguments>
-                                <argument>-path=${dm4.database.path}</argument>
+                                <argument>-path</argument>
+                                <argument>${dm4.database.path}</argument>
+                                <argument>-readonly</argument>
                                 <argument>-v</argument>
                             </arguments>
                         </configuration>
