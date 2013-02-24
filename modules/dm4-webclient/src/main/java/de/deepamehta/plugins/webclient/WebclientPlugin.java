@@ -15,8 +15,9 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
-import de.deepamehta.core.service.event.PreUpdateTopicListener;
+import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
+import de.deepamehta.core.service.event.PreUpdateTopicListener;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -45,8 +46,13 @@ import java.util.logging.Logger;
 @Consumes("application/json")
 @Produces("application/json")
 public class WebclientPlugin extends PluginActivator implements AllPluginsActiveListener,
+                                                                PostCreateTopicListener,
                                                                 PreUpdateTopicListener,
                                                                 PostUpdateTopicListener {
+
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String VIEW_CONFIG_LABEL = "View Configuration";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -168,6 +174,16 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
                                                                                        Directives directives) {
         if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
             updateType(topic, directives);
+            updateLabel(topic);
+        }
+    }
+
+    // ---
+
+    @Override
+    public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
+        if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
+            updateLabel(topic);
         }
     }
 
@@ -282,6 +298,12 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     private void updateViewConfig(Type type, Topic viewConfig) {
         type.getViewConfig().getModel().updateConfigTopic(viewConfig.getModel());
+    }
+
+    // --- Label ---
+
+    private void updateLabel(Topic viewConfig) {
+        viewConfig.setSimpleValue(VIEW_CONFIG_LABEL);
     }
 
 
