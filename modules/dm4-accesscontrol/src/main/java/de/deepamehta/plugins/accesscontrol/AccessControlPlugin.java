@@ -29,6 +29,7 @@ import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
+import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreSendAssociationListener;
 import de.deepamehta.core.service.event.PreSendAssociationTypeListener;
 import de.deepamehta.core.service.event.PreSendTopicListener;
@@ -61,6 +62,7 @@ import java.util.logging.Logger;
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, AllPluginsActiveListener,
                                                                     SecurityContext,   PostCreateTopicListener,
                                                                                        PostCreateAssociationListener,
+                                                                                       PostUpdateTopicListener,
                                                                                        IntroduceTopicTypeListener,
                                                                                        IntroduceAssociationTypeListener,
                                                                                        PreSendTopicListener,
@@ -85,6 +87,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final AccessControlList DEFAULT_TYPE_ACL = new AccessControlList(
         new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER, UserRole.MEMBER),
         new ACLEntry(Operation.CREATE, UserRole.CREATOR, UserRole.OWNER, UserRole.MEMBER)
+    );
+    //
+    private static final AccessControlList DEFAULT_USER_ACCOUNT_ACL = new AccessControlList(
+        new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER)
     );
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -416,7 +422,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
-        setupDefaultAccessControl(topic);
+        if (isUserAccount(topic)) {
+            setupUserAccountAccessControl(topic);
+        } else {
+            setupDefaultAccessControl(topic);
+        }
         //
         // when a workspace is created its creator joins automatically
         joinIfWorkspace(topic);
@@ -425,6 +435,37 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void postCreateAssociation(Association assoc, ClientState clientState, Directives directives) {
         setupDefaultAccessControl(assoc);
+    }
+
+    // ---
+
+    @Override
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
+                                                                                       Directives directives) {
+        if (topic.getTypeUri().equals("dm4.accesscontrol.user_account")) {
+            Topic usernameTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.username");
+            Topic passwordTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.password");
+            String newUsername = usernameTopic.getSimpleValue().toString();
+            TopicModel oldUsernameTopic = oldModel.getCompositeValueModel().getTopic("dm4.accesscontrol.username",
+                null);
+            String oldUsername = oldUsernameTopic != null ? oldUsernameTopic.getSimpleValue().toString() : "";
+            if (!newUsername.equals(oldUsername)) {
+                //
+                if (!oldUsername.equals("")) {
+                    throw new RuntimeException("Changing a Username is not supported (tried \"" + oldUsername +
+                        "\" -> \"" + newUsername + "\")");
+                }
+                //
+                logger.info("### Username has changed from \"" + oldUsername + "\" -> \"" + newUsername +
+                    "\". Setting \"" + newUsername + "\" as the new owner of 3 topics:\n" +
+                      "          - User Account topic (ID " + topic.getId() + ")\n" + 
+                      "          - Username topic (ID " + usernameTopic.getId() + ")\n" + 
+                      "          - Password topic (ID " + passwordTopic.getId() + ")");
+                setOwner(topic.getId(), newUsername);
+                setOwner(usernameTopic.getId(), newUsername);
+                setOwner(passwordTopic.getId(), newUsername);
+            }
+        }
     }
 
     // ---
@@ -478,6 +519,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             .put("dm4.accesscontrol.password", cred.password)), null);  // clientState=null
     }
 
+    private boolean isUserAccount(Topic topic) {
+        String typeUri = topic.getTypeUri();
+        return typeUri.equals("dm4.accesscontrol.user_account")
+            || typeUri.equals("dm4.accesscontrol.username")
+            || typeUri.equals("dm4.accesscontrol.password");
+    }
+
     /**
      * Fetches the default user ("admin").
      *
@@ -486,11 +534,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @return  The default user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>).
      */
     private Topic fetchDefaultUser() {
-        Topic username = getUsername(DEFAULT_USERNAME);
-        if (username == null) {
-            throw new RuntimeException("The default user (\"" + DEFAULT_USERNAME + "\") doesn't exist");
+        return getUsernameOrThrow(DEFAULT_USERNAME);
+    }
+
+    private Topic getUsernameOrThrow(String username) {
+        Topic usernameTopic = getUsername(username);
+        if (usernameTopic == null) {
+            throw new RuntimeException("User \"" + username + "\" does not exist");
         }
-        return username;
+        return usernameTopic;
     }
 
     private void joinIfWorkspace(Topic topic) {
@@ -558,6 +610,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     // === ACL Entries ===
+
+    private void setupUserAccountAccessControl(Topic topic) {
+        setupAccessControl(topic, DEFAULT_USER_ACCOUNT_ACL, getUsername());
+    }
+
+    // ---
 
     /**
      * Sets the logged in user as the creator and the owner of the specified object
@@ -659,10 +717,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @param   object      the object in question.
      */
     private boolean userIsMember(String username, DeepaMehtaObject object) {
+        Topic usernameTopic = getUsernameOrThrow(username);
         Set<RelatedTopic> workspaces = wsService.getWorkspaces(object);
         logger.fine(info(object) + " is assigned to " + workspaces.size() + " workspaces");
         for (RelatedTopic workspace : workspaces) {
-            if (wsService.isAssignedToWorkspace(getUsername(username), workspace.getId())) {
+            if (wsService.isAssignedToWorkspace(usernameTopic, workspace.getId())) {
                 logger.fine(userInfo(username) + " IS member of workspace " + workspace);
                 return true;
             } else {
