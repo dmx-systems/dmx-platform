@@ -7,12 +7,28 @@
             value: "Username",
             uri: "dm4.accesscontrol.username",
             data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.key", "dm4.core.fulltext"]
+            index_mode_uris: ["dm4.core.key", "dm4.core.fulltext"],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.locked: true
+                    }
+                }
+            ]
         },
         {
             value: "Password",
             uri: "dm4.accesscontrol.password",
-            data_type_uri: "dm4.core.text"
+            data_type_uri: "dm4.core.text",
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.locked: true
+                    }
+                }
+            ]
         },
         {
             value: "User Account",
@@ -22,12 +38,28 @@
                 {
                     child_type_uri:        "dm4.accesscontrol.username",
                     child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    assoc_type_uri:        "dm4.core.composition_def",
+                    view_config_topics: [
+                        {
+                            type_uri: "dm4.webclient.view_config",
+                            composite: {
+                                dm4.webclient.locked: false
+                            }
+                        }
+                    ]
                 },
                 {
                     child_type_uri:        "dm4.accesscontrol.password",
                     child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    assoc_type_uri:        "dm4.core.composition_def",
+                    view_config_topics: [
+                        {
+                            type_uri: "dm4.webclient.view_config",
+                            composite: {
+                                dm4.webclient.locked: false
+                            }
+                        }
+                    ]
                 }
             ],
             view_config_topics: [

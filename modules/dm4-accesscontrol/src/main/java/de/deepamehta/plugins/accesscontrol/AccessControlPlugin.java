@@ -458,9 +458,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 //
                 logger.info("### Username has changed from \"" + oldUsername + "\" -> \"" + newUsername +
                     "\". Setting \"" + newUsername + "\" as the new owner of 3 topics:\n" +
-                      "          - User Account topic (ID " + topic.getId() + ")\n" + 
-                      "          - Username topic (ID " + usernameTopic.getId() + ")\n" + 
-                      "          - Password topic (ID " + passwordTopic.getId() + ")");
+                    "          - User Account topic (ID " + topic.getId() + ")\n" + 
+                    "          - Username topic (ID " + usernameTopic.getId() + ")\n" + 
+                    "          - Password topic (ID " + passwordTopic.getId() + ")");
                 setOwner(topic.getId(), newUsername);
                 setOwner(usernameTopic.getId(), newUsername);
                 setOwner(passwordTopic.getId(), newUsername);
