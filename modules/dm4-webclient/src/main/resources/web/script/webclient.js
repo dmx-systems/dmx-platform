@@ -940,17 +940,11 @@ function Webclient() {
         return get_view_config_default(configurable, setting)
 
         function is_set(value) {
-            // Note: since DM 4.1 assoc def overriding with falsish values (0, "", false) is not supported anymore.
-            // This is not needed anymore because since DM 4.1 the semantics of the former "Viewable" and "Editable"
-            // settings is inverted ("Hidden" resp. "Locked"). All boolean settings default to false.
-            return value
-            //
-            // ### DM 4.0.14:
             // Note 1: we explicitely compare to undefined to let assoc defs override with falsish (0 or false) values.
             //         != is sufficient as these are false: 0 == undefined, false == undefined
             // Note 2: we must regard an empty string as "not set" to get the default renderer URIs.
             //         !== is required as these are true: 0 == "", false == ""
-            // return value != undefined && value !== ""
+            return value != undefined && value !== ""
         }
 
         function get_view_config(configurable) {
