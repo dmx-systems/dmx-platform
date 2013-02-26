@@ -10,8 +10,6 @@ import de.deepamehta.core.service.accesscontrol.AccessControlList;
 
 public interface AccessControlService extends PluginService {
 
-    static final String DEFAULT_USERNAME = "admin";
-
     /**
      * Checks weather the credentials in the authorization string match an existing User Account,
      * and if so, creates an HTTP session. ### FIXDOC

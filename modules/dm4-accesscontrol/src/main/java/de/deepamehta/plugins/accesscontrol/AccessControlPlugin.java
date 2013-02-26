@@ -78,6 +78,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final String SUBNET_FILTER         = System.getProperty("dm4.security.subnet_filter");
 
     // default user
+    private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
 
     // default ACLs
@@ -358,8 +359,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postInstall() {
-        Topic userAccount = createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
-        logger.info("Creating \"admin\" user account => ID=" + userAccount.getId());
+        logger.info("Creating \"admin\" user account");
+        Topic adminAccount = createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
+        // Note 1: the admin account needs to be setup for access control itself.
+        // At post-install time our listeners are not yet registered. So we must setup manually here.
+        // Note 2: at post-install time there is no user session. So we call setupAccessControl() directly
+        // instead of (the higher-level) setupUserAccountAccessControl().
+        setupAccessControl(adminAccount, DEFAULT_USER_ACCOUNT_ACL, DEFAULT_USERNAME);
+        // ### TODO: setup access control for the admin account's Username and Password topics.
+        // However, they are not strictly required for the moment.
     }
 
     @Override
