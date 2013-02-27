@@ -3,11 +3,11 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.RoleModel;
-import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
-import de.deepamehta.core.service.ClientState;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 
@@ -22,12 +22,15 @@ class AttachedViewConfiguration implements ViewConfiguration {
     private final ViewConfigurationModel model;
     private final EmbeddedService dms;
 
+    private Map<String, Topic> configTopics = new HashMap();    // attached object cache
+
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AttachedViewConfiguration(RoleModel configurable, ViewConfigurationModel model, EmbeddedService dms) {
         this.configurable = configurable;
         this.model = model;
         this.dms = dms;
+        initConfigTopics();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -35,13 +38,8 @@ class AttachedViewConfiguration implements ViewConfiguration {
     // === ViewConfiguration Implementation ===
 
     @Override
-    public Iterable<TopicModel> getConfigTopics() {
-        return model.getConfigTopics();
-    }
-
-    @Override
-    public TopicModel getConfigTopic(String configTypeUri) {
-        return model.getConfigTopic(configTypeUri);
+    public Iterable<Topic> getConfigTopics() {
+        return configTopics.values();
     }
 
     @Override
@@ -50,6 +48,8 @@ class AttachedViewConfiguration implements ViewConfiguration {
         TopicModel createdTopicModel = model.addSetting(configTypeUri, settingUri, value);
         // update DB
         if (createdTopicModel != null) {
+            // attached object cache
+            addConfigTopic(createdTopicModel);
             // Note: a new created view config topic model needs an ID (required for setting up access control).
             // So, the storage layer must operate on that very topic model (instead of creating another one).
             dms.typeStorage.storeViewConfigTopic(configurable, createdTopicModel);
@@ -58,10 +58,27 @@ class AttachedViewConfiguration implements ViewConfiguration {
         }
     }
 
+    @Override
+    public void updateConfigTopic(TopicModel configTopic) {
+        model.updateConfigTopic(configTopic);
+    }
+
     // ---
 
     @Override
     public ViewConfigurationModel getModel() {
         return model;
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void initConfigTopics() {
+        for (TopicModel configTopic : model.getConfigTopics()) {
+            addConfigTopic(configTopic);
+        }
+    }
+
+    private void addConfigTopic(TopicModel configTopic) {
+            configTopics.put(configTopic.getTypeUri(), new AttachedTopic(configTopic, dms));
     }
 }

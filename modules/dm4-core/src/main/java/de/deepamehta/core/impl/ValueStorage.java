@@ -346,14 +346,9 @@ class ValueStorage {
      * Used for multiple-valued childs.
      */
     private void replaceReference(TopicModel topicRef, Topic topic) {
-        TopicModel model = topic.getModel();
         // Note: we must update the topic reference in-place.
         // Replacing the entire topic in the list of child topics would cause ConcurrentModificationException.
-        topicRef.setId(model.getId());
-        topicRef.setUri(model.getUri());
-        topicRef.setTypeUri(model.getTypeUri());
-        topicRef.setSimpleValue(model.getSimpleValue());
-        topicRef.setCompositeValue(model.getCompositeValueModel());
+        topicRef.set(topic.getModel());
     }
 
 

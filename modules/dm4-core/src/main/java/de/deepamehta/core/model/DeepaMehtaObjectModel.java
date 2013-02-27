@@ -198,6 +198,16 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
 
     // ---
 
+    public void set(DeepaMehtaObjectModel model) {
+        setId(model.getId());
+        setUri(model.getUri());
+        setTypeUri(model.getTypeUri());
+        setSimpleValue(model.getSimpleValue());
+        setCompositeValue(model.getCompositeValueModel());
+    }
+
+    // ---
+
     public abstract RoleModel createRoleModel(String roleTypeUri);
 
 

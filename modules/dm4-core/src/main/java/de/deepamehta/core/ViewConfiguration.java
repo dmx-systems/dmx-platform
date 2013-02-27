@@ -10,15 +10,11 @@ import de.deepamehta.core.model.ViewConfigurationModel;
  */
 public interface ViewConfiguration {
 
-    // ### to be dropped from public interface
-    Iterable<TopicModel> getConfigTopics();
-
-    // ### to be dropped from public interface
-    TopicModel getConfigTopic(String configTypeUri);
-
-    // ### TODO: add a getSetting() method
+    Iterable<Topic> getConfigTopics();
 
     void addSetting(String configTypeUri, String settingUri, Object value);
+
+    void updateConfigTopic(TopicModel configTopic);
 
     // ---
 

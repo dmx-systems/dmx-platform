@@ -481,22 +481,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void introduceTopicType(TopicType topicType, ClientState clientState) {
-        try {
-            setupDefaultAccessControl(topicType);
-        } catch (Exception e) {
-            throw new RuntimeException("Setting up access control for topic type \"" + topicType.getUri() +
-                "\" failed (" + topicType + ")", e);
-        }
+        setupDefaultAccessControl(topicType);
     }
 
     @Override
     public void introduceAssociationType(AssociationType assocType, ClientState clientState) {
-        try {
-            setupDefaultAccessControl(assocType);
-        } catch (Exception e) {
-            throw new RuntimeException("Setting up access control for association type \"" + assocType.getUri() +
-                "\" failed (" + assocType + ")", e);
-        }
+        setupDefaultAccessControl(assocType);
     }
 
     // ---
@@ -636,25 +626,33 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * If no user is logged in, nothing is performed.
      */
     private void setupDefaultAccessControl(DeepaMehtaObject object) {
-        String username = getUsername();
-        //
-        if (username == null) {
-            logger.fine("Setting up access control for " + info(object) + " ABORTED -- no user is logged in");
-            return;
+        try {
+            String username = getUsername();
+            //
+            if (username == null) {
+                logger.fine("Setting up access control for " + info(object) + " ABORTED -- no user is logged in");
+                return;
+            }
+            //
+            setupAccessControl(object, DEFAULT_INSTANCE_ACL, username);
+        } catch (Exception e) {
+            throw new RuntimeException("Setting up access control for " + info(object) + " failed (" + object + ")", e);
         }
-        //
-        setupAccessControl(object, DEFAULT_INSTANCE_ACL, username);
     }
 
     private void setupDefaultAccessControl(Type type) {
-        String username = getUsername();
-        //
-        if (username == null) {
-            username = DEFAULT_USERNAME;
-            setupViewConfigAccessControl(type.getViewConfig());
+        try {
+            String username = getUsername();
+            //
+            if (username == null) {
+                username = DEFAULT_USERNAME;
+                setupViewConfigAccessControl(type.getViewConfig());
+            }
+            //
+            setupAccessControl(type, DEFAULT_TYPE_ACL, username);
+        } catch (Exception e) {
+            throw new RuntimeException("Setting up access control for " + info(type) + " failed (" + type + ")", e);
         }
-        //
-        setupAccessControl(type, DEFAULT_TYPE_ACL, username);
     }
 
     // ---
@@ -664,18 +662,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     private void setupViewConfigAccessControl(ViewConfiguration viewConfig) {
-        for (TopicModel configTopic : viewConfig.getConfigTopics()) {
-            setupAccessControl(configTopic.getId(), DEFAULT_INSTANCE_ACL, DEFAULT_USERNAME);
+        for (Topic configTopic : viewConfig.getConfigTopics()) {
+            setupAccessControl(configTopic, DEFAULT_INSTANCE_ACL, DEFAULT_USERNAME);
         }
     }
 
     // ---
 
     private void setupAccessControl(DeepaMehtaObject object, AccessControlList acl, String username) {
-        setupAccessControl(object.getId(), acl, username);
-    }
-
-    private void setupAccessControl(long objectId, AccessControlList acl, String username) {
+        long objectId = object.getId();
         setCreator(objectId, username);
         setOwner(objectId, username);
         createACL(objectId, acl);
@@ -858,6 +853,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private String info(DeepaMehtaObject object) {
         if (object instanceof TopicType) {
             return "topic type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
+        } else if (object instanceof AssociationType) {
+            return "association type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
         } else if (object instanceof Topic) {
             return "topic " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\", uri=\"" + object.getUri() +
                 "\")";

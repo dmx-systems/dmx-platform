@@ -60,18 +60,15 @@ public class ViewConfigurationModel {
         return viewConfig.values();
     }
 
-    public TopicModel getConfigTopic(String configTypeUri) {
-        return viewConfig.get(configTypeUri);
-    }
-
     public void updateConfigTopic(TopicModel configTopic) {
         String configTypeUri = configTopic.getTypeUri();
+        TopicModel confTopic = getConfigTopic(configTypeUri);
         // error check
-        if (getConfigTopic(configTypeUri) == null) {
+        if (confTopic == null) {
             throw new RuntimeException("There is no view configuration topic of type \"" + configTypeUri + "\"");
         }
         //
-        viewConfig.put(configTypeUri, configTopic);
+        confTopic.set(configTopic);
     }
 
     public TopicModel addSetting(String configTypeUri, String settingUri, Object value) {
@@ -133,6 +130,10 @@ public class ViewConfigurationModel {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private TopicModel getConfigTopic(String configTypeUri) {
+        return viewConfig.get(configTypeUri);
+    }
 
     private void addConfigTopic(TopicModel configTopic) {
         String configTypeUri = configTopic.getTypeUri();

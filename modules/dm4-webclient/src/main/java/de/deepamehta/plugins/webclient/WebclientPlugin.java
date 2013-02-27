@@ -297,7 +297,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // ---
 
     private void updateViewConfig(Type type, Topic viewConfig) {
-        type.getViewConfig().getModel().updateConfigTopic(viewConfig.getModel());
+        type.getViewConfig().updateConfigTopic(viewConfig.getModel());
     }
 
     // --- Label ---

@@ -648,7 +648,7 @@ class TypeStorageImpl implements TypeStorage {
     void storeViewConfigSetting(RoleModel configurable, String configTypeUri, String settingUri, Object value) {
         try {
             TopicModel configTopic = fetchViewConfigTopic(configurable, configTypeUri);
-            // ### TODO: do not create attached topic here. Can we use the value storage?
+            // ### TODO: do not create an attached topic here. Can we use the value storage?
             new AttachedTopic(configTopic, dms).getCompositeValue().set(settingUri, value, null, new Directives());
         } catch (Exception e) {
             throw new RuntimeException("Storing view configuration setting failed (configurable=" + configurable +
