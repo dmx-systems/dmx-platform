@@ -45,20 +45,17 @@ class AttachedViewConfiguration implements ViewConfiguration {
     }
 
     @Override
-    public void addConfigTopic(TopicModel configTopic) {
-        // update memory
-        model.addConfigTopic(configTopic);
-        // update DB
-        // ### storeConfigTopic(..., configTopic);          // ### FIXME: a view config doesn't know its parent
-        throw new RuntimeException("not yet implemented");  // addConfigTopic() is currently not used
-    }
-
-    @Override
     public void addSetting(String configTypeUri, String settingUri, Object value) {
         // update memory
-        model.addSetting(configTypeUri, settingUri, value);
+        TopicModel createdTopicModel = model.addSetting(configTypeUri, settingUri, value);
         // update DB
-        dms.typeStorage.storeViewConfigSetting(configurable, configTypeUri, settingUri, value);
+        if (createdTopicModel != null) {
+            // Note: a new created view config topic model needs an ID (required for setting up access control).
+            // So, the storage layer must operate on that very topic model (instead of creating another one).
+            dms.typeStorage.storeViewConfigTopic(configurable, createdTopicModel);
+        } else {
+            dms.typeStorage.storeViewConfigSetting(configurable, configTypeUri, settingUri, value);
+        }
     }
 
     // ---

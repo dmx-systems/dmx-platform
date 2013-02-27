@@ -625,16 +625,14 @@ class TypeStorageImpl implements TypeStorage {
     private void storeViewConfig(RoleModel configurable, ViewConfigurationModel viewConfig) {
         try {
             for (TopicModel configTopic : viewConfig.getConfigTopics()) {
-                storeConfigTopic(configurable, configTopic);
+                storeViewConfigTopic(configurable, configTopic);
             }
         } catch (Exception e) {
             throw new RuntimeException("Storing view configuration failed (configurable=" + configurable + ")", e);
         }
     }
 
-    // ---
-
-    private void storeConfigTopic(RoleModel configurable, TopicModel configTopic) {
+    void storeViewConfigTopic(RoleModel configurable, TopicModel configTopic) {
         // Note: null is passed as clientState. Called only (indirectly) from a migration ### FIXME: is this true?
         // and in a migration we have no clientState anyway.
         Topic topic = dms.createTopic(configTopic, null);   // clientState=null
@@ -644,13 +642,13 @@ class TypeStorageImpl implements TypeStorage {
 
     // ---
 
+    /**
+     * Prerequisite: for the configurable a config topic of type configTypeUri exists in the DB.
+     */
     void storeViewConfigSetting(RoleModel configurable, String configTypeUri, String settingUri, Object value) {
         try {
             TopicModel configTopic = fetchViewConfigTopic(configurable, configTypeUri);
-            if (configTopic == null) {
-                configTopic = new TopicModel(configTypeUri);
-                storeConfigTopic(configurable, configTopic);
-            }
+            // ### TODO: do not create attached topic here. Can we use the value storage?
             new AttachedTopic(configTopic, dms).getCompositeValue().set(settingUri, value, null, new Directives());
         } catch (Exception e) {
             throw new RuntimeException("Storing view configuration setting failed (configurable=" + configurable +

@@ -16,9 +16,6 @@ public interface ViewConfiguration {
     // ### to be dropped from public interface
     TopicModel getConfigTopic(String configTypeUri);
 
-    // ### to be dropped from public interface
-    void addConfigTopic(TopicModel configTopic);
-
     // ### TODO: add a getSetting() method
 
     void addSetting(String configTypeUri, String settingUri, Object value);

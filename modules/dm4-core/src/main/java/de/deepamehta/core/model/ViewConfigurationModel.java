@@ -64,37 +64,29 @@ public class ViewConfigurationModel {
         return viewConfig.get(configTypeUri);
     }
 
-    public void addConfigTopic(TopicModel configTopic) {
-        String configTypeUri = configTopic.getTypeUri();
-        // error check
-        TopicModel existing = getConfigTopic(configTypeUri);
-        if (existing != null) {
-            throw new RuntimeException("There is already a configuration topic of type \"" + configTypeUri + "\"");
-        }
-        //
-        viewConfig.put(configTypeUri, configTopic);
-    }
-
     public void updateConfigTopic(TopicModel configTopic) {
         String configTypeUri = configTopic.getTypeUri();
         // error check
-        TopicModel existing = getConfigTopic(configTypeUri);
-        if (existing == null) {
-            throw new RuntimeException("There is no configuration topic of type \"" + configTypeUri + "\"");
+        if (getConfigTopic(configTypeUri) == null) {
+            throw new RuntimeException("There is no view configuration topic of type \"" + configTypeUri + "\"");
         }
         //
         viewConfig.put(configTypeUri, configTopic);
     }
 
-    public void addSetting(String configTypeUri, String settingUri, Object value) {
+    public TopicModel addSetting(String configTypeUri, String settingUri, Object value) {
         // create config topic if not exists
+        boolean created = false;
         TopicModel configTopic = getConfigTopic(configTypeUri);
         if (configTopic == null) {
             configTopic = new TopicModel(configTypeUri);
             addConfigTopic(configTopic);
+            created = true;
         }
         // make setting
         configTopic.getCompositeValueModel().put(settingUri, value);
+        //
+        return created ? configTopic : null;
     }
 
     // ---
@@ -138,5 +130,17 @@ public class ViewConfigurationModel {
     @Override
     public String toString() {
         return "view configuration " + viewConfig;
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void addConfigTopic(TopicModel configTopic) {
+        String configTypeUri = configTopic.getTypeUri();
+        // error check
+        if (getConfigTopic(configTypeUri) != null) {
+            throw new RuntimeException("There is already a view configuration topic of type \"" + configTypeUri + "\"");
+        }
+        //
+        viewConfig.put(configTypeUri, configTopic);
     }
 }

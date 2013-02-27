@@ -12,6 +12,7 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
+import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
@@ -82,7 +83,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final String DEFAULT_PASSWORD = "";
 
     // default ACLs
-    private static final AccessControlList DEFAULT_OBJECT_ACL = new AccessControlList(
+    private static final AccessControlList DEFAULT_INSTANCE_ACL = new AccessControlList(
         new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER, UserRole.MEMBER)
     );
     private static final AccessControlList DEFAULT_TYPE_ACL = new AccessControlList(
@@ -422,7 +423,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // 2) assign default topicmap to default workspace
             assignToDefaultWorkspace(defaultTopicmap, "default topicmap (\"untitled\")");
             // 3) setup access control for default topicmap
-            setupAccessControlForDefaultTopicmap(defaultTopicmap, defaultUser);
+            setupAccessControlForDefaultTopicmap(defaultTopicmap);
         }
     }
 
@@ -480,12 +481,22 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void introduceTopicType(TopicType topicType, ClientState clientState) {
-        setupDefaultAccessControl(topicType);
+        try {
+            setupDefaultAccessControl(topicType);
+        } catch (Exception e) {
+            throw new RuntimeException("Setting up access control for topic type \"" + topicType.getUri() +
+                "\" failed (" + topicType + ")", e);
+        }
     }
 
     @Override
     public void introduceAssociationType(AssociationType assocType, ClientState clientState) {
-        setupDefaultAccessControl(assocType);
+        try {
+            setupDefaultAccessControl(assocType);
+        } catch (Exception e) {
+            throw new RuntimeException("Setting up access control for association type \"" + assocType.getUri() +
+                "\" failed (" + assocType + ")", e);
+        }
     }
 
     // ---
@@ -587,7 +598,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
-    private void setupAccessControlForDefaultTopicmap(Topic defaultTopicmap, Topic defaultUser) {
+    private void setupAccessControlForDefaultTopicmap(Topic defaultTopicmap) {
         String operation = "### Setup access control for the default topicmap (\"untitled\")";
         try {
             // Note: we only check for creator assignment.
@@ -598,8 +609,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             }
             //
             logger.info(operation);
-            String username = defaultUser.getSimpleValue().toString();
-            setupAccessControl(defaultTopicmap, DEFAULT_OBJECT_ACL, username);
+            setupAccessControl(defaultTopicmap, DEFAULT_INSTANCE_ACL, DEFAULT_USERNAME);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
@@ -619,12 +629,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === ACL Entries ===
 
-    private void setupUserAccountAccessControl(Topic topic) {
-        setupAccessControl(topic, DEFAULT_USER_ACCOUNT_ACL, getUsername());
-    }
-
-    // ---
-
     /**
      * Sets the logged in user as the creator and the owner of the specified object
      * and creates a default access control entry for it.
@@ -635,19 +639,19 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         String username = getUsername();
         //
         if (username == null) {
-            logger.fine("Assigning a creator and default access control entry to " +
-                info(object) + " ABORTED -- no user is logged in");
+            logger.fine("Setting up access control for " + info(object) + " ABORTED -- no user is logged in");
             return;
         }
         //
-        setupAccessControl(object, DEFAULT_OBJECT_ACL, username);
+        setupAccessControl(object, DEFAULT_INSTANCE_ACL, username);
     }
 
     private void setupDefaultAccessControl(Type type) {
         String username = getUsername();
         //
         if (username == null) {
-            username = fetchDefaultUser().getSimpleValue().toString();
+            username = DEFAULT_USERNAME;
+            setupViewConfigAccessControl(type.getViewConfig());
         }
         //
         setupAccessControl(type, DEFAULT_TYPE_ACL, username);
@@ -655,10 +659,26 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
+    private void setupUserAccountAccessControl(Topic topic) {
+        setupAccessControl(topic, DEFAULT_USER_ACCOUNT_ACL, getUsername());
+    }
+
+    private void setupViewConfigAccessControl(ViewConfiguration viewConfig) {
+        for (TopicModel configTopic : viewConfig.getConfigTopics()) {
+            setupAccessControl(configTopic.getId(), DEFAULT_INSTANCE_ACL, DEFAULT_USERNAME);
+        }
+    }
+
+    // ---
+
     private void setupAccessControl(DeepaMehtaObject object, AccessControlList acl, String username) {
-        setCreator(object.getId(), username);
-        setOwner(object.getId(), username);
-        createACL(object.getId(), acl);
+        setupAccessControl(object.getId(), acl, username);
+    }
+
+    private void setupAccessControl(long objectId, AccessControlList acl, String username) {
+        setCreator(objectId, username);
+        setOwner(objectId, username);
+        createACL(objectId, acl);
     }
 
     // ---
