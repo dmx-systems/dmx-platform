@@ -924,27 +924,28 @@ function Webclient() {
      * @return  The configuration setting.
      */
     this.get_view_config = function(configurable, setting, assoc_def) {
-        // assoc def setting (has precedence)
+        // assoc def overrides child type
         if (assoc_def) {
             var value = get_view_config(assoc_def)
             if (is_set(value)) {
                 return value
             }
         }
-        // type setting
+        // return child type setting
         value = get_view_config(configurable)
         if (is_set(value)) {
             return value
         }
-        // default setting
+        // return default setting
         return get_view_config_default(configurable, setting)
 
         function is_set(value) {
-            // Note 1: we explicitely compare to undefined to let assoc defs override with falsish (0 or false) values.
-            //         != is sufficient as these are false: 0 == undefined, false == undefined
-            // Note 2: we must regard an empty string as "not set" to get the default renderer URIs.
-            //         !== is required as these are true: 0 == "", false == ""
-            return value != undefined && value !== ""
+            // Note: assoc defs can't override with 0, "", or undefined. But can override with false.
+            //    0         -> false
+            //    ""        -> false
+            //    undefined -> false
+            //    false     -> true    allows assoc def to override with false
+            return value || value === false
         }
 
         function get_view_config(configurable) {
