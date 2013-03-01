@@ -628,7 +628,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private void setupDefaultAccessControl(DeepaMehtaObject object) {
         try {
             String username = getUsername();
-            //
+            // Note: when no user is logged in we do NOT fallback to the default user for the access control setup.
+            // This would not help in gaining data consistency because the topics/associations created so far
+            // (BEFORE the Access Control plugin is activated) would still have no access control setup.
+            // Note: for types the situation is different. The type-introduction mechanism (see introduceTopicType()
+            // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
+            // the other hand we don't have such a mechanism (and don't want one either).
             if (username == null) {
                 logger.fine("Setting up access control for " + info(object) + " ABORTED -- no user is logged in");
                 return;

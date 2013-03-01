@@ -8,6 +8,7 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.Type;
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
@@ -136,7 +137,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         try {
             workspaceId = workspaceId(clientState);
             if (workspaceId != -1) {
-                assignToWorkspace(topicType, workspaceId);
+                assignTypeToWorkspace(topicType, workspaceId);
             } else {
                 // assign types of the DeepaMehta standard distribution to the default workspace
                 if (isDeepaMehtaStandardType(topicType)) {
@@ -144,7 +145,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                     // Note: the default workspace is NOT required to exist ### TODO: think about it
                     if (defaultWorkspace != null) {
                         workspaceId = defaultWorkspace.getId();
-                        assignToWorkspace(topicType, workspaceId);
+                        assignTypeToWorkspace(topicType, workspaceId);
                     }
                 }
             }
@@ -221,6 +222,13 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     private boolean isDeepaMehtaStandardType(TopicType topicType) {
         return topicType.getUri().startsWith("dm4.");
+    }
+
+    private void assignTypeToWorkspace(Type type, long workspaceId) {
+        assignToWorkspace(type, workspaceId);
+        for (Topic configTopic : type.getViewConfig().getConfigTopics()) {
+            assignToWorkspace(configTopic, workspaceId);
+        }
     }
 
     private long workspaceId(ClientState clientState) {

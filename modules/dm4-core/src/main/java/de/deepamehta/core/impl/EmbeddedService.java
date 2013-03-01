@@ -152,7 +152,7 @@ public class EmbeddedService implements DeepaMehtaService {
             fireEvent(CoreEvent.PRE_CREATE_TOPIC, model, clientState);
             //
             Directives directives = new Directives();   // ### FIXME: directives are ignored
-            Topic topic = createTopic(model, clientState, directives);
+            Topic topic = topicFactory(model, clientState, directives);
             //
             fireEvent(CoreEvent.POST_CREATE_TOPIC, topic, clientState, directives);
             //
@@ -294,7 +294,7 @@ public class EmbeddedService implements DeepaMehtaService {
             fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model, clientState);
             //
             Directives directives = new Directives();   // ### FIXME: directives are ignored
-            Association assoc = createAssociation(model, clientState, directives);
+            Association assoc = associationFactory(model, clientState, directives);
             //
             fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc, clientState, directives);
             //
@@ -403,7 +403,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public TopicType createTopicType(TopicTypeModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            TopicType topicType = createTopicType(model);
+            TopicType topicType = topicTypeFactory(model);
             //
             fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, clientState);
             //
@@ -485,7 +485,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AssociationType assocType = createAssociationType(model);
+            AssociationType assocType = associationTypeFactory(model);
             //
             fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType, clientState);
             //
@@ -771,7 +771,7 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * Factory method.
      */
-    private Topic createTopic(TopicModel model, ClientState clientState, Directives directives) {
+    private Topic topicFactory(TopicModel model, ClientState clientState, Directives directives) {
         // 1) store in DB
         setDefaults(model);
         storage.storeTopic(model);
@@ -785,7 +785,7 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * Factory method.
      */
-    private Association createAssociation(AssociationModel model, ClientState clientState, Directives directives) {
+    private Association associationFactory(AssociationModel model, ClientState clientState, Directives directives) {
         // 1) store in DB
         setDefaults(model);
         storage.storeAssociation(model);
@@ -801,7 +801,7 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * Factory method.
      */
-    private TopicType createTopicType(TopicTypeModel model) {
+    private TopicType topicTypeFactory(TopicTypeModel model) {
         // 1) store in DB
         createTypeTopic(model, DEFAULT_TOPIC_TYPE_URI);         // store generic topic
         typeStorage.storeType(model);                           // store type-specific parts
@@ -816,7 +816,7 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * Factory method.
      */
-    private AssociationType createAssociationType(AssociationTypeModel model) {
+    private AssociationType associationTypeFactory(AssociationTypeModel model) {
         // 1) store in DB
         createTypeTopic(model, DEFAULT_ASSOCIATION_TYPE_URI);   // store generic topic
         typeStorage.storeType(model);                           // store type-specific parts
@@ -841,7 +841,7 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     private void createTypeTopic(TopicModel model, String defaultUriPrefix) {
-        Topic typeTopic = createTopic(model, null, null);   // ### FIXME: clientState, directives
+        Topic typeTopic = topicFactory(model, null, null);   // ### FIXME: clientState, directives
         // If no URI is set the type gets a default URI based on its ID.
         // Note: this must be done *after* the topic is created. The ID is not known before.
         if (typeTopic.getUri().equals("")) {
