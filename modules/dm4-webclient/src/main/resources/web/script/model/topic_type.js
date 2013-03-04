@@ -31,7 +31,7 @@ TopicType.prototype.get_icon_src = function() {
 TopicType.prototype.get_menu_config = function(menu_id) {
     switch (menu_id) {
     case "create-type-menu":
-        return dm4c.get_view_config(this, "add_to_create_menu")
+        return dm4c.get_view_config(this, "show_in_create_menu")
     case "search-type-menu":
         return true
     default:

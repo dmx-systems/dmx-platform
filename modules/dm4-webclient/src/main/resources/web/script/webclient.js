@@ -967,7 +967,7 @@ function Webclient() {
                 return dm4c.DEFAULT_TOPIC_ICON
             case "color":
                 return dm4c.canvas.DEFAULT_ASSOC_COLOR
-            case "add_to_create_menu":
+            case "show_in_create_menu":
                 return false;
             case "input_field_rows":
                 return DEFAULT_INPUT_FIELD_ROWS
@@ -981,7 +981,7 @@ function Webclient() {
                 return default_simple_renderer_uri()
             case "multi_renderer_uri":
                 return "dm4.webclient.default_multi_renderer"
-            case "is_searchable_unit":
+            case "searchable_as_unit":
                 return false;
             default:
                 throw "WebclientError: \"" + setting + "\" is an unsupported view configuration setting"

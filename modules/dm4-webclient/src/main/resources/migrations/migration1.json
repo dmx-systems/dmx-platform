@@ -14,8 +14,8 @@
             data_type_uri: "dm4.core.text"
         },
         {
-            value: "Add To Create Menu",
-            uri: "dm4.webclient.add_to_create_menu",
+            value: "Show in Create Menu",
+            uri: "dm4.webclient.show_in_create_menu",
             data_type_uri: "dm4.core.boolean"
         },
         {
@@ -49,8 +49,8 @@
             data_type_uri: "dm4.core.text"
         },
         {
-            value: "Is Searchable Unit",
-            uri: "dm4.webclient.is_searchable_unit",
+            value: "Searchable as Unit",
+            uri: "dm4.webclient.searchable_as_unit",
             data_type_uri: "dm4.core.boolean"
         },
         {
@@ -70,7 +70,7 @@
                     assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.webclient.add_to_create_menu",
+                    child_type_uri:        "dm4.webclient.show_in_create_menu",
                     child_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:        "dm4.core.composition_def"
                 },
@@ -105,7 +105,7 @@
                     assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.webclient.is_searchable_unit",
+                    child_type_uri:        "dm4.webclient.searchable_as_unit",
                     child_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:        "dm4.core.composition_def"
                 }

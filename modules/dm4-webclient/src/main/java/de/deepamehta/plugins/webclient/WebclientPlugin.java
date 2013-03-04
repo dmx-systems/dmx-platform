@@ -197,7 +197,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     private Set<Topic> findSearchableUnits(Set<? extends Topic> topics, ClientState clientState) {
         Set<Topic> searchableUnits = new LinkedHashSet();
         for (Topic topic : topics) {
-            if (isSearchableUnit(topic)) {
+            if (searchableAsUnit(topic)) {
                 searchableUnits.add(topic);
             } else {
                 Set<RelatedTopic> parentTopics = topic.getRelatedTopics((String) null, "dm4.core.child",
@@ -234,10 +234,10 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // ---
 
-    private boolean isSearchableUnit(Topic topic) {
+    private boolean searchableAsUnit(Topic topic) {
         TopicType topicType = dms.getTopicType(topic.getTypeUri(), null);           // FIXME: clientState=null
-        Boolean isSearchableUnit = (Boolean) getViewConfig(topicType, "is_searchable_unit");
-        return isSearchableUnit != null ? isSearchableUnit.booleanValue() : false;  // default is false
+        Boolean searchableAsUnit = (Boolean) getViewConfig(topicType, "searchable_as_unit");
+        return searchableAsUnit != null ? searchableAsUnit.booleanValue() : false;  // default is false
     }
 
     /**
