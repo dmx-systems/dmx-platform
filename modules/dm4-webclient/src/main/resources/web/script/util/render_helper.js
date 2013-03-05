@@ -52,6 +52,10 @@ function RenderHelper() {
     this.topic_list = function(topics, click_handler, render_handler) {
         var table = $("<table>").addClass("topic-list")
         for (var i = 0, topic; topic = topics[i]; i++) {
+            // don't list hidden topics, e.g. passwords
+            if (dm4c.get_topic_type(topic.type_uri).is_hidden()) {
+                continue
+            }
             // render supplement text
             if (render_handler) {
                 var supplement_text = render_handler(topic)
