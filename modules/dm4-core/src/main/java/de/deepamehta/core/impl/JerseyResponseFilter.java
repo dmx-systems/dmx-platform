@@ -51,6 +51,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                 } else if (entity instanceof Association) {
                     firePreSend((Association) entity, clientState);
                 } else if (entity instanceof Directives) {
+                    // Note: some plugins rely on the PRE_SEND event in order to enrich updated objects, others don't.
+                    // E.g. the Access Control plugin must enrich updated objects with permission information.
                     firePreSend((Directives) entity, clientState);
                 } else if (isIterable(response, TopicType.class)) {
                     firePreSendTopicTypes((Iterable<TopicType>) entity, clientState);

@@ -56,6 +56,8 @@ class AttachedCompositeValue implements CompositeValue {
 
 
 
+    // === Accessors ===
+
     @Override
     public Topic getTopic(String childTypeUri) {
         requireChildTopics(getAssocDef(childTypeUri));  // lazy load
@@ -82,9 +84,38 @@ class AttachedCompositeValue implements CompositeValue {
         return _getTopics(childTypeUri, defaultValue);
     }
 
+    // ---
+
+    @Override
+    public Object get(String childTypeUri) {
+        return childTopics.get(childTypeUri);
+    }
+
+    @Override
+    public boolean has(String childTypeUri) {
+        return childTopics.containsKey(childTypeUri);
+    }
+
+    @Override
+    public Iterable<String> childTypeUris() {
+        return childTopics.keySet();
+    }
+
+    @Override
+    public int size() {
+        return childTopics.size();
+    }
+
+    // ---
+
+    @Override
+    public CompositeValueModel getModel() {
+        return model;
+    }
 
 
-    // === Convenience methods ===
+
+    // === Convenience Accessors ===
 
     @Override
     public String getString(String childTypeUri) {
@@ -127,30 +158,6 @@ class AttachedCompositeValue implements CompositeValue {
 
 
 
-    // ===
-
-    @Override
-    public Object get(String childTypeUri) {
-        return childTopics.get(childTypeUri);
-    }
-
-    @Override
-    public boolean has(String childTypeUri) {
-        return childTopics.containsKey(childTypeUri);
-    }
-
-    @Override
-    public Iterable<String> childTypeUris() {
-        return childTopics.keySet();
-    }
-
-    @Override
-    public int size() {
-        return childTopics.size();
-    }
-
-
-
     // === Manipulators ===
 
     @Override
@@ -187,15 +194,6 @@ class AttachedCompositeValue implements CompositeValue {
     @Override
     public CompositeValue remove(String childTypeUri, long topicId, ClientState clientState, Directives directives) {
         return _update(childTypeUri, new TopicDeletionModel(topicId), clientState, directives);
-    }
-
-
-
-    // ===
-
-    @Override
-    public CompositeValueModel getModel() {
-        return model;
     }
 
 

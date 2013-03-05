@@ -15,10 +15,10 @@ import java.util.logging.Logger;
 
 
 /**
- * A recursive composite of key/value pairs.
+ * A recursive composite of key/value pairs. ### FIXDOC
  * <p>
  * Keys are strings, values are non-null atomic (string, int, long, double, boolean)
- * or again a <code>CompositeValueModel</code>.
+ * or again a <code>CompositeValueModel</code>. ### FIXDOC
  */
 public class CompositeValueModel {
 
@@ -51,15 +51,15 @@ public class CompositeValueModel {
         try {
             Iterator<String> i = values.keys();
             while (i.hasNext()) {
-                String key = i.next();
-                Object value = values.get(key);
+                String childTypeUri = i.next();
+                Object value = values.get(childTypeUri);
                 if (value instanceof JSONArray) {
                     JSONArray valueArray = (JSONArray) value;
                     for (int j = 0; j < valueArray.length(); j++) {
-                        add(key, createTopicModel(key, valueArray.get(j)));
+                        add(childTypeUri, createTopicModel(childTypeUri, valueArray.get(j)));
                     }
                 } else {
-                    put(key, createTopicModel(key, value));
+                    put(childTypeUri, createTopicModel(childTypeUri, value));
                 }
             }
         } catch (Exception e) {
@@ -69,16 +69,20 @@ public class CompositeValueModel {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+
+
+    // === Accessors ===
+
     /**
      * Accesses a single-valued child.
      * Throws if there is no such child.
      */
-    public TopicModel getTopic(String key) {
-        TopicModel topic = (TopicModel) values.get(key);
+    public TopicModel getTopic(String childTypeUri) {
+        TopicModel topic = (TopicModel) values.get(childTypeUri);
         // error check
         if (topic == null) {
-            throw new RuntimeException("Invalid access to CompositeValueModel entry \"" + key + "\": " +
-                "no such entry in\n" + this);
+            throw new RuntimeException("Invalid access to CompositeValueModel entry \"" + childTypeUri +
+                "\": no such entry in\n" + this);
         }
         //
         return topic;
@@ -88,8 +92,8 @@ public class CompositeValueModel {
      * Accesses a single-valued child.
      * Returns a default value if there is no such child.
      */
-    public TopicModel getTopic(String key, TopicModel defaultValue) {
-        TopicModel topic = (TopicModel) values.get(key);
+    public TopicModel getTopic(String childTypeUri, TopicModel defaultValue) {
+        TopicModel topic = (TopicModel) values.get(childTypeUri);
         return topic != null ? topic : defaultValue;
     }
 
@@ -99,18 +103,18 @@ public class CompositeValueModel {
      * Accesses a multiple-valued child.
      * Throws if there is no such child.
      */
-    public List<TopicModel> getTopics(String key) {
+    public List<TopicModel> getTopics(String childTypeUri) {
         try {
-            List<TopicModel> topics = (List<TopicModel>) values.get(key);
+            List<TopicModel> topics = (List<TopicModel>) values.get(childTypeUri);
             // error check
             if (topics == null) {
-                throw new RuntimeException("Invalid access to CompositeValueModel entry \"" + key + "\": " +
-                    "no such entry in\n" + this);
+                throw new RuntimeException("Invalid access to CompositeValueModel entry \"" + childTypeUri +
+                    "\": no such entry in\n" + this);
             }
             //
             return topics;
         } catch (ClassCastException e) {
-            throwInvalidAccess(key, e);
+            throwInvalidAccess(childTypeUri, e);
             return null;    // never reached
         }
     }
@@ -119,58 +123,78 @@ public class CompositeValueModel {
      * Accesses a multiple-valued child.
      * Returns a default value if there is no such child.
      */
-    public List<TopicModel> getTopics(String key, List<TopicModel> defaultValue) {
+    public List<TopicModel> getTopics(String childTypeUri, List<TopicModel> defaultValue) {
         try {
-            List<TopicModel> topics = (List<TopicModel>) values.get(key);
+            List<TopicModel> topics = (List<TopicModel>) values.get(childTypeUri);
             return topics != null ? topics : defaultValue;
         } catch (ClassCastException e) {
-            throwInvalidAccess(key, e);
+            throwInvalidAccess(childTypeUri, e);
             return null;    // never reached
         }
     }
 
-    // === Convenience methods ===
+    // ---
+
+    public Object get(String childTypeUri) {
+        return values.get(childTypeUri);
+    }
+
+    public Iterable<String> keys() {
+        return values.keySet();
+    }
+
+    public boolean has(String childTypeUri) {
+        return values.containsKey(childTypeUri);
+    }
+
+    public int size() {
+        return values.size();
+    }
+
+
+
+    // === Convenience Accessors ===
 
     /**
      * Convenience method for accessing the *simple* value of a single-valued child.
      */
-    public String getString(String key) {
-        return getTopic(key).getSimpleValue().toString();
+    public String getString(String childTypeUri) {
+        return getTopic(childTypeUri).getSimpleValue().toString();
     }
 
     /**
      * Convenience method for accessing the *simple* value of a single-valued child.
      */
-    public int getInt(String key) {
-        return getTopic(key).getSimpleValue().intValue();
+    public int getInt(String childTypeUri) {
+        return getTopic(childTypeUri).getSimpleValue().intValue();
     }
 
     /**
      * Convenience method for accessing the *simple* value of a single-valued child.
      */
-    public long getLong(String key) {
-        return getTopic(key).getSimpleValue().longValue();
+    public long getLong(String childTypeUri) {
+        return getTopic(childTypeUri).getSimpleValue().longValue();
     }
 
     /**
      * Convenience method for accessing the *simple* value of a single-valued child.
      */
-    public double getDouble(String key) {
-        return getTopic(key).getSimpleValue().doubleValue();
+    public double getDouble(String childTypeUri) {
+        return getTopic(childTypeUri).getSimpleValue().doubleValue();
     }
 
     /**
      * Convenience method for accessing the *simple* value of a single-valued child.
      */
-    public boolean getBoolean(String key) {
-        return getTopic(key).getSimpleValue().booleanValue();
+    public boolean getBoolean(String childTypeUri) {
+        return getTopic(childTypeUri).getSimpleValue().booleanValue();
     }
 
     /**
      * Convenience method for accessing the *simple* value of a single-valued child.
      */
-    public Object getObject(String key) {
-        return getTopic(key).getSimpleValue().value();
+    public Object getObject(String childTypeUri) {
+        return getTopic(childTypeUri).getSimpleValue().value();
     }
 
     // ---
@@ -178,48 +202,31 @@ public class CompositeValueModel {
     /**
      * Convenience method for accessing the *composite* value of a single-valued child.
      */
-    public CompositeValueModel getComposite(String key) {
-        return getTopic(key).getCompositeValueModel();
+    public CompositeValueModel getComposite(String childTypeUri) {
+        return getTopic(childTypeUri).getCompositeValueModel();
     }
 
     // Note: there are no convenience accessors for a multiple-valued child.
 
-    // ---
 
-    public Object get(String key) {
-        return values.get(key);
-    }
 
-    public Iterable<String> keys() {
-        return values.keySet();
-    }
-
-    public boolean has(String key) {
-        return values.containsKey(key);
-    }
-
-    public int size() {
-        return values.size();
-    }
-
-    // ---
+    // === Manipulators ===
 
     /**
      * Puts a single-valued child. An existing value is overwritten.
      */
-    public CompositeValueModel put(String key, TopicModel value) {
-        // ### TODO: drop "key" argument? It is supposed to be equal to value.getTypeUri().
+    public CompositeValueModel put(String childTypeUri, TopicModel value) {
         try {
             // check argument
             if (value == null) {
                 throw new IllegalArgumentException("Tried to put null in a CompositeValueModel");
             }
             //
-            values.put(key, value);
+            values.put(childTypeUri, value);
             return this;
         } catch (Exception e) {
-            throw new RuntimeException("Putting a value in a CompositeValueModel failed (key=\"" + key +
-                "\", value=" + value + ", composite=" + this + ")", e);
+            throw new RuntimeException("Putting a value in a CompositeValueModel failed (childTypeUri=\"" +
+                childTypeUri + "\", value=" + value + ", composite=" + this + ")", e);
         }
     }
 
@@ -230,13 +237,13 @@ public class CompositeValueModel {
      *
      * @return  this CompositeValueModel.
      */
-    public CompositeValueModel put(String key, Object value) {
+    public CompositeValueModel put(String childTypeUri, Object value) {
         try {
-            values.put(key, new TopicModel(key, new SimpleValue(value)));
+            values.put(childTypeUri, new TopicModel(childTypeUri, new SimpleValue(value)));
             return this;
         } catch (Exception e) {
-            throw new RuntimeException("Putting a value in a CompositeValueModel failed (key=\"" + key +
-                "\", value=" + value + ", composite=" + this + ")", e);
+            throw new RuntimeException("Putting a value in a CompositeValueModel failed (childTypeUri=\"" +
+                childTypeUri + "\", value=" + value + ", composite=" + this + ")", e);
         }
     }
 
@@ -245,8 +252,8 @@ public class CompositeValueModel {
      *
      * @return  this CompositeValueModel.
      */
-    public CompositeValueModel put(String key, CompositeValueModel value) {
-        values.put(key, new TopicModel(key, value));
+    public CompositeValueModel put(String childTypeUri, CompositeValueModel value) {
+        values.put(childTypeUri, new TopicModel(childTypeUri, value));
         return this;
     }
 
@@ -258,8 +265,8 @@ public class CompositeValueModel {
      * Used to maintain the assigment of an *aggregated* child.
      * Not applicable for a *compositioned* child.
      */
-    public CompositeValueModel putRef(String key, long refTopicId) {
-        put(key, new TopicModel(refTopicId, key));
+    public CompositeValueModel putRef(String childTypeUri, long refTopicId) {
+        put(childTypeUri, new TopicModel(refTopicId, childTypeUri));
         return this;
     }
 
@@ -269,8 +276,8 @@ public class CompositeValueModel {
      * Used to maintain the assigment of an *aggregated* child.
      * Not applicable for a *compositioned* child.
      */
-    public CompositeValueModel putRef(String key, String refTopicUri) {
-        put(key, new TopicModel(refTopicUri, key));
+    public CompositeValueModel putRef(String childTypeUri, String refTopicUri) {
+        put(childTypeUri, new TopicModel(refTopicUri, childTypeUri));
         return this;
     }
 
@@ -279,23 +286,28 @@ public class CompositeValueModel {
     /**
      * Adds a value to a multiple-valued child.
      */
-    public CompositeValueModel add(String key, TopicModel value) {
-        // ### TODO: drop "key" argument? It is supposed to be equal to value.getTypeUri().
-        List<TopicModel> topics = getTopics(key, null);     // defaultValue=null
+    public CompositeValueModel add(String childTypeUri, TopicModel value) {
+        List<TopicModel> topics = getTopics(childTypeUri, null);     // defaultValue=null
         // Note: topics just created have no child topics yet
         if (topics == null) {
             topics = new ArrayList();
-            values.put(key, topics);
+            values.put(childTypeUri, topics);
         }
-        topics.add(value);
+        // Note: we must not add a topic twice.
+        // This would happen e.g. when updating multi-facets: the facet values are added while
+        // updating, and would be added again through the PRE_SEND event (Kiezatlas plugin).
+        if (!topics.contains(value)) {
+            topics.add(value);
+        }
+        //
         return this;
     }
 
     /**
      * Removes a value from a multiple-valued child.
      */
-    public CompositeValueModel remove(String key, TopicModel value) {
-        List<TopicModel> topics = getTopics(key, null);     // defaultValue=null
+    public CompositeValueModel remove(String childTypeUri, TopicModel value) {
+        List<TopicModel> topics = getTopics(childTypeUri, null);     // defaultValue=null
         if (topics != null) {
             topics.remove(value);
         }
@@ -310,8 +322,8 @@ public class CompositeValueModel {
      * Used to maintain the assigments of *aggregated* childs.
      * Not applicable for *compositioned* childs.
      */
-    public CompositeValueModel addRef(String key, long refTopicId) {
-        add(key, new TopicModel(refTopicId, key));
+    public CompositeValueModel addRef(String childTypeUri, long refTopicId) {
+        add(childTypeUri, new TopicModel(refTopicId, childTypeUri));
         return this;
     }
 
@@ -321,22 +333,24 @@ public class CompositeValueModel {
      * Used to maintain the assigments of *aggregated* childs.
      * Not applicable for *compositioned* childs.
      */
-    public CompositeValueModel addRef(String key, String refTopicUri) {
-        add(key, new TopicModel(refTopicUri, key));
+    public CompositeValueModel addRef(String childTypeUri, String refTopicUri) {
+        add(childTypeUri, new TopicModel(refTopicUri, childTypeUri));
         return this;
     }
 
-    // ---
+
+
+    // ===
 
     public JSONObject toJSON() {
         try {
             JSONObject json = new JSONObject();
-            for (String key : keys()) {
-                Object value = values.get(key);
+            for (String childTypeUri : keys()) {
+                Object value = values.get(childTypeUri);
                 if (value instanceof TopicModel) {
-                    json.put(key, ((TopicModel) value).toJSON());
+                    json.put(childTypeUri, ((TopicModel) value).toJSON());
                 } else if (value instanceof List) {
-                    json.put(key, DeepaMehtaUtils.objectsToJSON((List<TopicModel>) value));
+                    json.put(childTypeUri, DeepaMehtaUtils.objectsToJSON((List<TopicModel>) value));
                 } else {
                     throw new RuntimeException("Unexpected value in a CompositeValueModel: " + value);
                 }
@@ -358,14 +372,14 @@ public class CompositeValueModel {
     @Override
     public CompositeValueModel clone() {
         CompositeValueModel clone = new CompositeValueModel();
-        for (String key : keys()) {
-            Object value = values.get(key);
+        for (String childTypeUri : keys()) {
+            Object value = values.get(childTypeUri);
             if (value instanceof TopicModel) {
                 TopicModel model = (TopicModel) value;
-                clone.put(key, model.clone());
+                clone.put(childTypeUri, model.clone());
             } else if (value instanceof List) {
                 for (TopicModel model : (List<TopicModel>) value) {
-                    clone.add(key, model.clone());
+                    clone.add(childTypeUri, model.clone());
                 }
             } else {
                 throw new RuntimeException("Unexpected value in a CompositeValueModel: " + value);
@@ -390,7 +404,7 @@ public class CompositeValueModel {
      * 1) canonic format -- contains entire topic models.
      * 2) compact format -- contains the topic value only (simple or composite).
      */
-    private TopicModel createTopicModel(String key, Object value) {
+    private TopicModel createTopicModel(String childTypeUri, Object value) {
         if (value instanceof JSONObject) {
             JSONObject val = (JSONObject) value;
             // we detect the canonic format by checking for a mandatory topic property
@@ -399,22 +413,22 @@ public class CompositeValueModel {
                 return new TopicModel(val);
             } else {
                 // compact format (composite topic)
-                return new TopicModel(key, new CompositeValueModel(val));
+                return new TopicModel(childTypeUri, new CompositeValueModel(val));
             }
         } else {
             // compact format (simple topic or topic reference)
             if (value instanceof String) {
                 String val = (String) value;
                 if (val.startsWith(REF_ID_PREFIX)) {
-                    return new TopicModel(refTopicId(val), key);    // topic reference by-ID
+                    return new TopicModel(refTopicId(val), childTypeUri);   // topic reference by-ID
                 } else if (val.startsWith(REF_URI_PREFIX)) {
-                    return new TopicModel(refTopicUri(val), key);   // topic reference by-URI
+                    return new TopicModel(refTopicUri(val), childTypeUri);  // topic reference by-URI
                 } else if (val.startsWith(DEL_PREFIX)) {
-                    return new TopicDeletionModel(delTopicId(val)); // topic deletion reference
+                    return new TopicDeletionModel(delTopicId(val));         // topic deletion reference
                 }
             }
             // compact format (simple topic)
-            return new TopicModel(key, new SimpleValue(value));
+            return new TopicModel(childTypeUri, new SimpleValue(value));
         }
     }
 
@@ -437,12 +451,13 @@ public class CompositeValueModel {
     /**
      * ### TODO: should not be public. Specify interfaces also for model classes?
      */
-    public void throwInvalidAccess(String key, ClassCastException e) {
+    public void throwInvalidAccess(String childTypeUri, ClassCastException e) {
         if (e.getMessage().endsWith("cannot be cast to java.util.List")) {
-            throw new RuntimeException("Invalid access to CompositeValueModel entry \"" + key + "\": " +
+            throw new RuntimeException("Invalid access to CompositeValueModel entry \"" + childTypeUri + "\": " +
                 "the caller assumes it to be multiple-value but it is single-value in\n" + this, e);
         } else {
-            throw new RuntimeException("Invalid access to CompositeValueModel entry \"" + key + "\" in\n" + this, e);
+            throw new RuntimeException("Invalid access to CompositeValueModel entry \"" + childTypeUri + "\" in\n" +
+                this, e);
         }
     }
 }

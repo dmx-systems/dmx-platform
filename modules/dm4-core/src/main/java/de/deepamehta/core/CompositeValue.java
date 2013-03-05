@@ -12,6 +12,10 @@ import java.util.List;
 
 public interface CompositeValue {
 
+
+
+    // === Accessors ===
+
     /**
      * Accesses a single-valued child.
      * Throws if there is no such child.
@@ -23,6 +27,8 @@ public interface CompositeValue {
      * Returns a default value if there is no such child.
      */
     Topic getTopic(String childTypeUri, Topic defaultTopic);
+
+    // ---
 
     /**
      * Accesses a multiple-valued child.
@@ -36,9 +42,23 @@ public interface CompositeValue {
      */
     List<Topic> getTopics(String childTypeUri, List<Topic> defaultValue);
 
+    // ---
+
+    Object get(String childTypeUri);
+
+    boolean has(String childTypeUri);
+
+    Iterable<String> childTypeUris();
+
+    int size();
+
+    // ---
+
+    CompositeValueModel getModel();
 
 
-    // === Convenience methods ===
+
+    // === Convenience Accessors ===
 
     /**
      * Convenience method for accessing the *simple* value of a single-valued child.
@@ -81,18 +101,6 @@ public interface CompositeValue {
 
 
 
-    // ===
-
-    Object get(String childTypeUri);
-
-    boolean has(String childTypeUri);
-
-    Iterable<String> childTypeUris();
-
-    int size();
-
-
-
     // === Manipulators ===
 
     CompositeValue set(String childTypeUri, TopicModel value,          ClientState clientState, Directives directives);
@@ -110,10 +118,4 @@ public interface CompositeValue {
     // ---
 
     CompositeValue remove(String childTypeUri, long topicId,           ClientState clientState, Directives directives);
-
-
-
-    // ===
-
-    CompositeValueModel getModel();
 }
