@@ -293,10 +293,14 @@ public class CompositeValueModel {
             topics = new ArrayList();
             values.put(childTypeUri, topics);
         }
-        // Note: we must not add a topic twice.
-        // This would happen e.g. when updating multi-facets: the facet values are added while
-        // updating, and would be added again through the PRE_SEND event (Kiezatlas plugin).
-        if (!topics.contains(value)) {
+        // Note 1: we must not add a topic twice.
+        // This would happen e.g. when updating multi-facets: the facet values are added while updating, and
+        // would be added again through the PRE_SEND event (Kiezatlas plugin).
+        //
+        // Note 2: we must not add a topic twice *unless* its ID is -1.
+        // This happens when adding a couple of new child topics at once e.g. by pressing the "Add" button
+        // serveral times in a webclient form. These new topic models have no ID yet (-1).
+        if (value.getId() == -1 || !topics.contains(value)) {
             topics.add(value);
         }
         //
@@ -453,11 +457,11 @@ public class CompositeValueModel {
      */
     public void throwInvalidAccess(String childTypeUri, ClassCastException e) {
         if (e.getMessage().endsWith("cannot be cast to java.util.List")) {
-            throw new RuntimeException("Invalid access to CompositeValueModel entry \"" + childTypeUri + "\": " +
-                "the caller assumes it to be multiple-value but it is single-value in\n" + this, e);
+            throw new RuntimeException("Invalid access to CompositeValueModel entry \"" + childTypeUri +
+                "\": the caller assumes it to be multiple-value but it is single-value in\n" + this, e);
         } else {
-            throw new RuntimeException("Invalid access to CompositeValueModel entry \"" + childTypeUri + "\" in\n" +
-                this, e);
+            throw new RuntimeException("Invalid access to CompositeValueModel entry \"" + childTypeUri +
+                "\" in\n" + this, e);
         }
     }
 }
