@@ -573,7 +573,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         String operation = "### Assigning the " + info + " to the default workspace (\"DeepaMehta\")";
         try {
             // abort if already assigned
-            Set<RelatedTopic> workspaces = wsService.getWorkspaces(topic);
+            Set<RelatedTopic> workspaces = wsService.getAssignedWorkspaces(topic);
             if (workspaces.size() != 0) {
                 logger.info("### Assigning the " + info + " to a workspace ABORTED -- " +
                     "already assigned (" + DeepaMehtaUtils.topicNames(workspaces) + ")");
@@ -746,7 +746,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     private boolean userIsMember(String username, DeepaMehtaObject object) {
         Topic usernameTopic = getUsernameOrThrow(username);
-        Set<RelatedTopic> workspaces = wsService.getWorkspaces(object);
+        Set<RelatedTopic> workspaces = wsService.getAssignedWorkspaces(object);
         logger.fine(info(object) + " is assigned to " + workspaces.size() + " workspaces");
         for (RelatedTopic workspace : workspaces) {
             if (wsService.isAssignedToWorkspace(usernameTopic, workspace.getId())) {
