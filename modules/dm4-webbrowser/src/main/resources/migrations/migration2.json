@@ -16,6 +16,7 @@
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
+                        dm4.webclient.locked: true,
                         dm4.webclient.page_renderer_uri: "dm4.webbrowser.webpage_renderer"
                     }
                 }
