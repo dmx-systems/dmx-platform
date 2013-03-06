@@ -155,7 +155,8 @@
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm4.webclient.icon: "/de.deepamehta.webclient/images/balls.png"
+                        dm4.webclient.icon: "/de.deepamehta.webclient/images/balls.png",
+                        dm4.webclient.locked: true
                     }
                 }
             ]
