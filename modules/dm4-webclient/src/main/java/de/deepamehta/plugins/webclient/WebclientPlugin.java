@@ -6,6 +6,7 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
+import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
@@ -15,7 +16,8 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
-import de.deepamehta.core.service.event.PostCreateTopicListener;
+import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
+import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreUpdateTopicListener;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
@@ -46,7 +48,8 @@ import java.util.logging.Logger;
 @Consumes("application/json")
 @Produces("application/json")
 public class WebclientPlugin extends PluginActivator implements AllPluginsActiveListener,
-                                                                PostCreateTopicListener,
+                                                                IntroduceTopicTypeListener,
+                                                                IntroduceAssociationTypeListener,
                                                                 PreUpdateTopicListener,
                                                                 PostUpdateTopicListener {
 
@@ -174,17 +177,20 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
                                                                                        Directives directives) {
         if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
             updateType(topic, directives);
-            updateLabel(topic);
+            setConfigTopicLabel(topic);
         }
     }
 
     // ---
 
     @Override
-    public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
-        if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
-            updateLabel(topic);
-        }
+    public void introduceTopicType(TopicType topicType, ClientState clientState) {
+        setViewConfigLabel(topicType.getViewConfig());
+    }
+
+    @Override
+    public void introduceAssociationType(AssociationType assocType, ClientState clientState) {
+        setViewConfigLabel(assocType.getViewConfig());
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -302,7 +308,13 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // --- Label ---
 
-    private void updateLabel(Topic viewConfig) {
+    private void setViewConfigLabel(ViewConfiguration viewConfig) {
+        for (Topic configTopic : viewConfig.getConfigTopics()) {
+            setConfigTopicLabel(configTopic);
+        }
+    }
+
+    private void setConfigTopicLabel(Topic viewConfig) {
         viewConfig.setSimpleValue(VIEW_CONFIG_LABEL);
     }
 
