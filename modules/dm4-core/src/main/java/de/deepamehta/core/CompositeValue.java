@@ -61,41 +61,100 @@ public interface CompositeValue {
     // === Convenience Accessors ===
 
     /**
-     * Convenience method for accessing the *simple* value of a single-valued child.
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Throws if the child doesn't exist.
      */
     String getString(String childTypeUri);
 
     /**
-     * Convenience method for accessing the *simple* value of a single-valued child.
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Returns a default value if the child doesn't exist.
      */
-    int getInt(String childTypeUri);
-
-    /**
-     * Convenience method for accessing the *simple* value of a single-valued child.
-     */
-    long getLong(String childTypeUri);
-
-    /**
-     * Convenience method for accessing the *simple* value of a single-valued child.
-     */
-    double getDouble(String childTypeUri);
-
-    /**
-     * Convenience method for accessing the *simple* value of a single-valued child.
-     */
-    boolean getBoolean(String childTypeUri);
-
-    /**
-     * Convenience method for accessing the *simple* value of a single-valued child.
-     */
-    Object getObject(String childTypeUri);
+    String getString(String childTypeUri, String defaultValue);
 
     // ---
 
     /**
-     * Convenience method for accessing the *composite* value of a single-valued child.
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Throws if the child doesn't exist.
+     */
+    int getInt(String childTypeUri);
+
+    /**
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Returns a default value if the child doesn't exist.
+     */
+    int getInt(String childTypeUri, int defaultValue);
+
+    // ---
+
+    /**
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Throws if the child doesn't exist.
+     */
+    long getLong(String childTypeUri);
+
+    /**
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Returns a default value if the child doesn't exist.
+     */
+    long getLong(String childTypeUri, long defaultValue);
+
+    // ---
+
+    /**
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Throws if the child doesn't exist.
+     */
+    double getDouble(String childTypeUri);
+
+    /**
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Returns a default value if the child doesn't exist.
+     */
+    double getDouble(String childTypeUri, double defaultValue);
+
+    // ---
+
+    /**
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Throws if the child doesn't exist.
+     */
+    boolean getBoolean(String childTypeUri);
+
+    /**
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Returns a default value if the child doesn't exist.
+     */
+    boolean getBoolean(String childTypeUri, boolean defaultValue);
+
+    // ---
+
+    /**
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Throws if the child doesn't exist.
+     */
+    Object getObject(String childTypeUri);
+
+    /**
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Returns a default value if the child doesn't exist.
+     */
+    Object getObject(String childTypeUri, Object defaultValue);
+
+    // ---
+
+    /**
+     * Convenience accessor for the *composite* value of a single-valued child.
+     * Throws if the child doesn't exist.
      */
     CompositeValue getComposite(String childTypeUri);
+
+    /**
+     * Convenience accessor for the *composite* value of a single-valued child.
+     * Returns a default value if the child doesn't exist.
+     */
+    CompositeValue getComposite(String childTypeUri, CompositeValue defaultValue);
 
     // Note: there are no convenience accessors for a multiple-valued child.
 

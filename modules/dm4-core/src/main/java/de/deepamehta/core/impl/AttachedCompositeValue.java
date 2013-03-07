@@ -119,32 +119,72 @@ class AttachedCompositeValue implements CompositeValue {
 
     @Override
     public String getString(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().toString();
+        return getModel().getString(childTypeUri);
     }
+
+    @Override
+    public String getString(String childTypeUri, String defaultValue) {
+        return getModel().getString(childTypeUri, defaultValue);
+    }
+
+    // ---
 
     @Override
     public int getInt(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().intValue();
+        return getModel().getInt(childTypeUri);
     }
+
+    @Override
+    public int getInt(String childTypeUri, int defaultValue) {
+        return getModel().getInt(childTypeUri, defaultValue);
+    }
+
+    // ---
 
     @Override
     public long getLong(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().longValue();
+        return getModel().getLong(childTypeUri);
     }
+
+    @Override
+    public long getLong(String childTypeUri, long defaultValue) {
+        return getModel().getLong(childTypeUri, defaultValue);
+    }
+
+    // ---
 
     @Override
     public double getDouble(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().doubleValue();
+        return getModel().getDouble(childTypeUri);
     }
+
+    @Override
+    public double getDouble(String childTypeUri, double defaultValue) {
+        return getModel().getDouble(childTypeUri, defaultValue);
+    }
+
+    // ---
 
     @Override
     public boolean getBoolean(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().booleanValue();
+        return getModel().getBoolean(childTypeUri);
     }
 
     @Override
+    public boolean getBoolean(String childTypeUri, boolean defaultValue) {
+        return getModel().getBoolean(childTypeUri, defaultValue);
+    }
+
+    // ---
+
+    @Override
     public Object getObject(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().value();
+        return getModel().getObject(childTypeUri);
+    }
+
+    @Override
+    public Object getObject(String childTypeUri, Object defaultValue) {
+        return getModel().getObject(childTypeUri, defaultValue);
     }
 
     // ---
@@ -152,6 +192,12 @@ class AttachedCompositeValue implements CompositeValue {
     @Override
     public CompositeValue getComposite(String childTypeUri) {
         return getTopic(childTypeUri).getCompositeValue();
+    }
+
+    @Override
+    public CompositeValue getComposite(String childTypeUri, CompositeValue defaultValue) {
+        Topic topic = getTopic(childTypeUri, null);
+        return topic != null ? topic.getCompositeValue() : defaultValue;
     }
 
     // Note: there are no convenience accessors for a multiple-valued child.

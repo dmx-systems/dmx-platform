@@ -156,54 +156,134 @@ public class CompositeValueModel {
     // === Convenience Accessors ===
 
     /**
-     * Convenience method for accessing the *simple* value of a single-valued child.
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Throws if the child doesn't exist.
      */
     public String getString(String childTypeUri) {
         return getTopic(childTypeUri).getSimpleValue().toString();
     }
 
     /**
-     * Convenience method for accessing the *simple* value of a single-valued child.
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Returns a default value if the child doesn't exist.
+     */
+    public String getString(String childTypeUri, String defaultValue) {
+        TopicModel topic = getTopic(childTypeUri, null);
+        return topic != null ? topic.getSimpleValue().toString() : defaultValue;
+    }
+
+    // ---
+
+    /**
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Throws if the child doesn't exist.
      */
     public int getInt(String childTypeUri) {
         return getTopic(childTypeUri).getSimpleValue().intValue();
     }
 
     /**
-     * Convenience method for accessing the *simple* value of a single-valued child.
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Returns a default value if the child doesn't exist.
+     */
+    public int getInt(String childTypeUri, int defaultValue) {
+        TopicModel topic = getTopic(childTypeUri, null);
+        return topic != null ? topic.getSimpleValue().intValue() : defaultValue;
+    }
+
+    // ---
+
+    /**
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Throws if the child doesn't exist.
      */
     public long getLong(String childTypeUri) {
         return getTopic(childTypeUri).getSimpleValue().longValue();
     }
 
     /**
-     * Convenience method for accessing the *simple* value of a single-valued child.
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Returns a default value if the child doesn't exist.
+     */
+    public long getLong(String childTypeUri, long defaultValue) {
+        TopicModel topic = getTopic(childTypeUri, null);
+        return topic != null ? topic.getSimpleValue().longValue() : defaultValue;
+    }
+
+    // ---
+
+    /**
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Throws if the child doesn't exist.
      */
     public double getDouble(String childTypeUri) {
         return getTopic(childTypeUri).getSimpleValue().doubleValue();
     }
 
     /**
-     * Convenience method for accessing the *simple* value of a single-valued child.
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Returns a default value if the child doesn't exist.
+     */
+    public double getDouble(String childTypeUri, double defaultValue) {
+        TopicModel topic = getTopic(childTypeUri, null);
+        return topic != null ? topic.getSimpleValue().doubleValue() : defaultValue;
+    }
+
+    // ---
+
+    /**
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Throws if the child doesn't exist.
      */
     public boolean getBoolean(String childTypeUri) {
         return getTopic(childTypeUri).getSimpleValue().booleanValue();
     }
 
     /**
-     * Convenience method for accessing the *simple* value of a single-valued child.
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Returns a default value if the child doesn't exist.
      */
-    public Object getObject(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().value();
+    public boolean getBoolean(String childTypeUri, boolean defaultValue) {
+        TopicModel topic = getTopic(childTypeUri, null);
+        return topic != null ? topic.getSimpleValue().booleanValue() : defaultValue;
     }
 
     // ---
 
     /**
-     * Convenience method for accessing the *composite* value of a single-valued child.
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Throws if the child doesn't exist.
+     */
+    public Object getObject(String childTypeUri) {
+        return getTopic(childTypeUri).getSimpleValue().value();
+    }
+
+    /**
+     * Convenience accessor for the *simple* value of a single-valued child.
+     * Returns a default value if the child doesn't exist.
+     */
+    public Object getObject(String childTypeUri, Object defaultValue) {
+        TopicModel topic = getTopic(childTypeUri, null);
+        return topic != null ? topic.getSimpleValue().value() : defaultValue;
+    }
+
+    // ---
+
+    /**
+     * Convenience accessor for the *composite* value of a single-valued child.
+     * Throws if the child doesn't exist.
      */
     public CompositeValueModel getComposite(String childTypeUri) {
         return getTopic(childTypeUri).getCompositeValueModel();
+    }
+
+    /**
+     * Convenience accessor for the *composite* value of a single-valued child.
+     * Returns a default value if the child doesn't exist.
+     */
+    public CompositeValueModel getComposite(String childTypeUri, CompositeValueModel defaultValue) {
+        TopicModel topic = getTopic(childTypeUri, null);
+        return topic != null ? topic.getCompositeValueModel() : defaultValue;
     }
 
     // Note: there are no convenience accessors for a multiple-valued child.
