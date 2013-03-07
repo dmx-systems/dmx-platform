@@ -50,22 +50,56 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
 
     dm4c.add_listener("topic_commands", function(topic) {
         var commands = []
+        var is_writable = dm4c.has_write_permission_for_topic(topic)
         //
-        commands.push({label: "Hide",         handler: do_hide,      context: "context-menu"})
-        commands.push({is_separator: true,                           context: "context-menu"})
-        commands.push({label: "Associate",    handler: do_associate, context: "context-menu"})
+        commands.push({
+            label: "Hide",
+            handler: do_hide,
+            context: "context-menu"
+        })
         //
-        if (dm4c.has_write_permission_for_topic(topic)) {
+        if (is_writable) {
             if (!topic.get_type().is_locked()) {
-                commands.push({label: "Edit", handler: do_edit,      context: "detail-panel-show", ui_icon: "pencil"})
+                commands.push({is_separator: true, context: "context-menu"})
+                commands.push({
+                    label: "Edit",
+                    handler: do_edit,
+                    context: ["context-menu", "detail-panel-show"],
+                    ui_icon: "pencil"
+                })
             }
-            commands.push({is_separator: true,                       context: "context-menu"})
-            commands.push({label: "Retype",   handler: do_retype,    context: "context-menu", ui_icon: "transfer-e-w"})
-            commands.push({is_separator: true,                       context: "context-menu"})
-            commands.push({label: "Delete",   handler: do_confirm,   context: "context-menu", ui_icon: "trash"})
+        }
+        commands.push({is_separator: true, context: "context-menu"})
+        commands.push({
+            label: "Associate",
+            handler: do_associate,
+            context: "context-menu"
+        })
+        //
+        if (is_writable) {
+            commands.push({is_separator: true, context: "context-menu"})
+            commands.push({
+                label: "Retype",
+                handler: do_retype,
+                context: "context-menu",
+                ui_icon: "transfer-e-w"
+            })
+            //
+            commands.push({is_separator: true, context: "context-menu"})
+            commands.push({
+                label: "Delete",
+                handler: do_confirm,
+                context: "context-menu",
+                ui_icon: "trash"
+            })
         }
         //
-        commands.push({label: "OK",           handler: do_save,      context: "detail-panel-edit", is_submit: true})
+        commands.push({
+            label: "OK",
+            handler: do_save,
+            context: "detail-panel-edit",
+            is_submit: true
+        })
         //
         return commands
 
@@ -76,12 +110,12 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
             dm4c.do_hide_topic(topic)
         }
 
-        function do_associate(x, y) {
-            dm4c.canvas.begin_association(topic.id, x, y)
-        }
-
         function do_edit() {
             dm4c.enter_edit_mode(topic)
+        }
+
+        function do_associate(x, y) {
+            dm4c.canvas.begin_association(topic.id, x, y)
         }
 
         function do_retype() {
