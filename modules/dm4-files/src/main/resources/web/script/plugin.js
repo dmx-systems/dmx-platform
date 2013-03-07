@@ -139,10 +139,14 @@ dm4c.add_plugin("de.deepamehta.files", function() {
 
     dm4c.add_listener("topic_commands", function(topic) {
         if (topic.type_uri == "dm4.files.folder") {
-            return [
-                {label: "Create Folder", handler: do_create_folder,      context: "detail-panel-show"},
-                {label: "Upload File",   handler: do_open_upload_dialog, context: "detail-panel-show"}
-            ]
+            var commands = []
+            if (dm4c.has_create_permission("dm4.files.folder")) {
+                commands.push({label: "Create Folder", handler: do_create_folder,      context: "detail-panel-show"})
+            }
+            if (dm4c.has_create_permission("dm4.files.file")) {
+                commands.push({label: "Upload File",   handler: do_open_upload_dialog, context: "detail-panel-show"})
+            }
+            return commands
         }
 
         function do_create_folder() {
