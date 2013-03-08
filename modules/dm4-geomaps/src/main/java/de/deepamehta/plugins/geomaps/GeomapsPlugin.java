@@ -310,11 +310,12 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         // ---
 
         Address(CompositeValueModel address) {
-            // ### FIXME: if one of these child topics is missing "Invalid access to CompositeValueModel" is thrown
-            street     = address.getString("dm4.contacts.street");
-            postalCode = address.getString("dm4.contacts.postal_code");
-            city       = address.getString("dm4.contacts.city");
-            country    = address.getString("dm4.contacts.country");
+            // Note: some Address child topics might be deleted (resp. do not exist), so we use ""
+            // as defaults here. Otherwise "Invalid access to CompositeValueModel" would be thrown.
+            street     = address.getString("dm4.contacts.street", "");
+            postalCode = address.getString("dm4.contacts.postal_code", "");
+            city       = address.getString("dm4.contacts.city", "");
+            country    = address.getString("dm4.contacts.country", "");
         }
 
         // ---
@@ -325,7 +326,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                 // perform request
                 String address = street + ", " + postalCode + " " + city + ", " + country;
                 url = new URL(String.format(GEOCODER_URL, JavaUtils.encodeURIComponent(address)));
-                logger.info("Geocoding \"" + address + "\"\n        " + url);
+                logger.info("### Geocoding \"" + address + "\"\n    url=\"" + url + "\"");
                 JSONObject response = new JSONObject(JavaUtils.readTextURL(url));
                 // check response status
                 String status = response.getString("status");
@@ -339,7 +340,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                 double lat = location.getDouble("lat");
                 //
                 LonLat geoCoordinate = new LonLat(lng, lat);
-                logger.info("  => " + geoCoordinate);
+                logger.info("=> " + geoCoordinate);
                 return geoCoordinate;
             } catch (Exception e) {
                 throw new RuntimeException("Geocoding failed (url=\"" + url + "\")", e);
@@ -353,16 +354,16 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         String changeReport(Address oldAddr) {
             StringBuilder report = new StringBuilder();
             if (!street.equals(oldAddr.street)) {
-                report.append("\n        Street: \"" + oldAddr.street + "\" -> \"" + street + "\"");
+                report.append("\n    Street: \"" + oldAddr.street + "\" -> \"" + street + "\"");
             }
             if (!postalCode.equals(oldAddr.postalCode)) {
-                report.append("\n        Postal Code: \"" + oldAddr.postalCode + "\" -> \"" + postalCode + "\"");
+                report.append("\n    Postal Code: \"" + oldAddr.postalCode + "\" -> \"" + postalCode + "\"");
             }
             if (!city.equals(oldAddr.city)) {
-                report.append("\n        City: \"" + oldAddr.city + "\" -> \"" + city + "\"");
+                report.append("\n    City: \"" + oldAddr.city + "\" -> \"" + city + "\"");
             }
             if (!country.equals(oldAddr.country)) {
-                report.append("\n        Country: \"" + oldAddr.country + "\" -> \"" + country + "\"");
+                report.append("\n    Country: \"" + oldAddr.country + "\" -> \"" + country + "\"");
             }
             return report.toString();
         }
