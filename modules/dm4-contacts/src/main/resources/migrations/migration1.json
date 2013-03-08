@@ -19,7 +19,7 @@
             value: "Person Name",
             uri: "dm4.contacts.person_name",
             data_type_uri: "dm4.core.composite",
-            index_mode_uris: ["dm4.core.fulltext_key"],
+            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"],
             assoc_defs: [
                 {
                     child_type_uri:        "dm4.contacts.first_name",
@@ -118,7 +118,7 @@
             value: "Address",
             uri: "dm4.contacts.address",
             data_type_uri: "dm4.core.composite",
-            index_mode_uris: ["dm4.core.fulltext_key"],
+            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"],
             assoc_defs: [
                 {
                     child_type_uri:         "dm4.contacts.street",
@@ -144,6 +144,12 @@
                     parent_cardinality_uri: "dm4.core.many",
                     assoc_type_uri:         "dm4.core.aggregation_def"
                 }
+            ],
+            label_config: [
+                dm4.contacts.street,
+                dm4.contacts.postal_code,
+                dm4.contacts.city,
+                dm4.contacts.country
             ]
         },
 
@@ -217,9 +223,6 @@
                     child_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:        "dm4.core.composition_def"
                 }
-            ],
-            label_config: [
-                dm4.contacts.person_name
             ],
             view_config_topics: [
                 {
