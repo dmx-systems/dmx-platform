@@ -38,6 +38,16 @@ function Type() {
         return this.data_type_uri == "dm4.core.composite"
     }
 
+    // --- View Configuration ---
+
+    this.is_hidden = function() {
+        return dm4c.get_view_config(this, "hidden")
+    }
+
+    this.is_locked = function() {
+        return dm4c.get_view_config(this, "locked")
+    }
+
     // ---
 
     this.get_label_config = function(assoc_def_uri) {

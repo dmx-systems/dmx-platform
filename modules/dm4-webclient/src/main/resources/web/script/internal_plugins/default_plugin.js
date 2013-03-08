@@ -69,6 +69,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
                 })
             }
         }
+        //
         commands.push({is_separator: true, context: "context-menu"})
         commands.push({
             label: "Associate",
@@ -136,27 +137,44 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
     dm4c.add_listener("association_commands", function(assoc) {
         var commands = []
         //
-        commands.push({label: "Hide",       handler: do_hide,    context: "context-menu"})
-        // commands.push({is_separator: true,                         context: "context-menu"})
-        // commands.push({label: "Associate",  handler: do_associate, context: "context-menu"})     // TODO: implement
+        commands.push({
+            label: "Hide",
+            handler: do_hide,
+            context: "context-menu"
+        })
         //
         if (dm4c.has_write_permission_for_association(assoc)) {
-            commands.push({label: "Edit",   handler: do_edit,    context: "detail-panel-show", ui_icon: "pencil"})
-            commands.push({is_separator: true,                   context: "context-menu"})
-            commands.push({label: "Delete", handler: do_confirm, context: "context-menu",      ui_icon: "trash"})
+            if (!assoc.get_type().is_locked()) {
+                commands.push({is_separator: true, context: "context-menu"})
+                commands.push({
+                    label: "Edit",
+                    handler: do_edit,
+                    context: ["context-menu", "detail-panel-show"],
+                    ui_icon: "pencil"
+                })
+            }
+            //
+            commands.push({is_separator: true, context: "context-menu"})
+            commands.push({
+                label: "Delete",
+                handler: do_confirm,
+                context: "context-menu",
+                ui_icon: "trash"
+            })
         }
         //
-        commands.push({label: "OK",         handler: do_save,    context: "detail-panel-edit", is_submit: true})
+        commands.push({
+            label: "OK",
+            handler: do_save,
+            context: "detail-panel-edit",
+            is_submit: true
+        })
         //
         return commands
 
         function do_hide() {
             dm4c.do_hide_association(assoc)
         }
-
-        /* function do_associate(event) {   // TODO: implement
-            dm4c.canvas.begin_association(assoc.id, event)
-        } */
 
         function do_edit() {
             dm4c.enter_edit_mode(assoc)

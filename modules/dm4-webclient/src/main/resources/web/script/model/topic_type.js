@@ -38,11 +38,3 @@ TopicType.prototype.get_menu_config = function(menu_id) {
         throw "TopicTypeError: \"" + menu_id + "\" is an unsupported menu ID"
     }
 }
-
-TopicType.prototype.is_hidden = function() {
-    return dm4c.get_view_config(this, "hidden")
-}
-
-TopicType.prototype.is_locked = function() {
-    return dm4c.get_view_config(this, "locked")
-}
