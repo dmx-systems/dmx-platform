@@ -172,6 +172,22 @@ function RenderHelper() {
     // ---
 
     /**
+     * Renders a link.
+     *
+     * @param   text        The link text.
+     * @param   handler     The click handler.
+     *                      Must not care about its return value. This link's click handler always returns false.
+     * @param   title       Optional: the tooltip title.
+     *                      If not specified no tooltip is shown.
+     */
+    this.link = function(text, handler, title) {
+        return $("<a>").attr({href: "#", title: title}).append(text).click(function() {
+            handler()
+            return false
+        })
+    }
+
+    /**
      * @param   page_model      Optional: the initial value (a TopicRenderer.PageModel object or a non-object value).
      *                          If not specified the text field will be empty.
      *

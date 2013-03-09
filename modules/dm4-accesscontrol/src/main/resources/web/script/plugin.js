@@ -73,22 +73,31 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 }
 
                 function show_user(username) {
-                    dom.append("Logged in as \"" + username + "\"<br>")
-                    dom.append($("<a>").attr("href", "#").text("Logout").click(function() {
-                        var response = dm4c.restc.logout()
-                        if (response == "true") {
-                            shutdown_gui()
-                        } else {
-                            update_gui_logout()
-                        }
-                        return false
-                    }))
+                    dom.append("Logged in as ").append(username_link()).append("<br>")
+                    dom.append(logout_link())
+
+                    function username_link() {
+                        return dm4c.render.link(username, function() {
+                            var user_account = dm4c.restc.get_topic_by_value("dm4.accesscontrol.user_account", username)
+                            dm4c.show_topic(new Topic(user_account), "show")
+                        }, "Reveal the User Account topic")
+                    }
+
+                    function logout_link() {
+                        return dm4c.render.link("Logout", function() {
+                            var response = dm4c.restc.logout()
+                            if (response == "true") {
+                                shutdown_gui()
+                            } else {
+                                update_gui_logout()
+                            }
+                        })
+                    }
                 }
 
                 function show_login() {
-                    dom.append($("<a>").attr("href", "#").text("Login").click(function() {
+                    dom.append(dm4c.render.link("Login", function() {
                         login_dialog.open()
-                        return false
                     }))
                 }
             }
