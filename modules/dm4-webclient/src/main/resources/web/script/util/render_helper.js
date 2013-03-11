@@ -64,7 +64,7 @@ function RenderHelper() {
             // render topic
             var icon_handler = click_handler_for(topic, "icon")
             var label_handler = click_handler_for(topic, "label")
-            var title = tooltips(icon_handler == undefined)
+            var title = tooltips(topic, icon_handler == undefined)
             table.append($("<tr>")
                 .append($("<td>").append(this.icon_link(topic, icon_handler, title.icon)))
                 .append($("<td>").append(this.topic_link(topic, label_handler, title.label)).append(supplement))
@@ -94,18 +94,18 @@ function RenderHelper() {
             }
         }
 
-        function tooltips(is_visible_on_canvas) {
-            var type_label = dm4c.type_label(topic.type_uri)
-            if (is_visible_on_canvas) {
-                return {
-                    icon:  "A " + type_label + "\nAlready visible on topicmap",
-                    label: "A " + type_label + "\nClick to focus"
-                }
-            } else {
-                return {
-                    icon:  "A " + type_label + "\nClick to reveal on topicmap",
-                    label: "A " + type_label + "\nClick to reveal on topicmap and focus"
-                }
+        function tooltips(topic, is_visible_on_canvas) {
+            var type_info = type_info()
+            return is_visible_on_canvas ? {
+                icon:  type_info + "\n\nAlready revealed on topicmap",
+                label: type_info + "\n\nClick to focus"
+            } : {
+                icon:  type_info + "\n\nClick to reveal on topicmap",
+                label: type_info + "\n\nClick to reveal on topicmap and focus"
+            }
+
+            function type_info() {
+                return dm4c.type_label(topic.type_uri) + (topic.uri && " (" + topic.uri + ")")
             }
         }
     }
