@@ -34,10 +34,8 @@ Mailing lists:
 Licensed under GNU General Public License, version 3.
 
 
-**+++ DeepaMehta is still under heavy development! +++**  
-Do not use it in any productive and/or professional environment!  
-Currently we can not provide an update mechanism for your data. Data you put into the current version of DeepaMehta might not be usable in a later version of DeepaMehta. Please keep this in mind when using this software.  
-Thank you for your understanding!
+**+++DISCLAIMER+++**  
+DeepaMehta is under heavy development. While you can do productive work with it, DeepaMehta does not meet professional standards yet. At least there are lacks in a) security, b) robustness, and c) usability. Do not put sensitive data in DeepaMehta, in particular when you setup DeepaMehta for network access. Be aware that data loss may occur when you use DeepaMehta improperly. The DeepaMehta developers assume no liability for lost or compromised data. Please keep this in mind when using this software.
 
 
 Requirements
@@ -55,10 +53,10 @@ Download a distribution
 There are 2 DeepaMehta distributions to suit different needs:
 
 * The **Standard Distribution** focuses on small download size and easy setup for single users.  
-  The distribution file is `deepamehta-4.0.14.zip` (6.3 MB)
+  The distribution file is `deepamehta-4.1.zip` (6.3 MB)
 
 * The **Karaf Distribution** is aimed to client-server setups and supports remote administration.  
-  The distribution file is `deepamehta-4.0.14-karaf.tar.gz` (13.3 MB)
+  The distribution file is `deepamehta-4.1-karaf.tar.gz` (13.3 MB)
 
 Download the distribution that suits your needs:  
 <http://download.deepamehta.de/>
@@ -71,21 +69,23 @@ Install
 -------
 
 Unzip the distribution file.  
-A folder `deepamehta-4.0.14` is created.
+A folder `deepamehta-4.1` is created.
 
 
 Update
 ------
 
 Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is not supported.  
-Even updating from 4.0.x to 4.0.14 is not supported.  
-Please see the note at the top.
+Even updating from 4.0.x to 4.1 is not supported.
+
+DeepaMehta 4.1 is the first version that provides a data sustainability guarantee.  
+Data you enter in DM 4.1 is guaranteed to be transferred to all future DM4 releases automatically.
 
 
 Start
 -----
 
-Open the `deepamehta-4.0.14` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.1` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -135,7 +135,7 @@ Uninstall
 To remove DeepaMehta completely from your computer, including the database:
 
 1. Stop DeepaMehta.
-2. Delete the entire `deepamehta-4.0.14` folder.
+2. Delete the entire `deepamehta-4.1` folder.
 
 
 Build from Source
@@ -146,6 +146,17 @@ Build from Source
 
 Version History
 ---------------
+
+**4.1** -- Mar 11, 2013
+
+* The first version with a data sustainability guarantee.
+    * Data entered in DM 4.1 is guaranteed to be transferred to all future DM4 releases automatically.
+* Minor improvements in usability and functionality.
+* Crucial access control related bug fixes and other bug fixes.
+* Plugin development framework:
+    * The core class CompositeValue is attached to the DB.
+* See more changes and details in the release notes:  
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.0.14** -- Jan 30, 2013
 
@@ -419,4 +430,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Jan 30, 2013
+Mar 11, 2013
