@@ -273,7 +273,7 @@ public class CompositeValueModel {
      * Convenience accessor for the *composite* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    public CompositeValueModel getComposite(String childTypeUri) {
+    public CompositeValueModel getCompositeValueModel(String childTypeUri) {
         return getTopic(childTypeUri).getCompositeValueModel();
     }
 
@@ -281,7 +281,7 @@ public class CompositeValueModel {
      * Convenience accessor for the *composite* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    public CompositeValueModel getComposite(String childTypeUri, CompositeValueModel defaultValue) {
+    public CompositeValueModel getCompositeValueModel(String childTypeUri, CompositeValueModel defaultValue) {
         TopicModel topic = getTopic(childTypeUri, null);
         return topic != null ? topic.getCompositeValueModel() : defaultValue;
     }

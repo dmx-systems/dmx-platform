@@ -148,13 +148,13 @@ public interface CompositeValue {
      * Convenience accessor for the *composite* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    CompositeValue getComposite(String childTypeUri);
+    CompositeValue getCompositeValue(String childTypeUri);
 
     /**
      * Convenience accessor for the *composite* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    CompositeValue getComposite(String childTypeUri, CompositeValue defaultValue);
+    CompositeValue getCompositeValue(String childTypeUri, CompositeValue defaultValue);
 
     // Note: there are no convenience accessors for a multiple-valued child.
 

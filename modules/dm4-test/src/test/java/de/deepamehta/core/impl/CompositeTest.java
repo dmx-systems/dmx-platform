@@ -28,7 +28,7 @@ public class CompositeTest {
         //
         assertEquals("Karl Blum", person.getString("dm4.core.name"));
         //
-        CompositeValueModel address = person.getComposite("dm4.contacts.home_address");
+        CompositeValueModel address = person.getCompositeValueModel("dm4.contacts.home_address");
         assertEquals("Berlin", address.getString("dm4.contacts.city"));
         //
         Object code = address.getObject("dm4.contacts.postal_code");

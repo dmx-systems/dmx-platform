@@ -190,12 +190,12 @@ class AttachedCompositeValue implements CompositeValue {
     // ---
 
     @Override
-    public CompositeValue getComposite(String childTypeUri) {
+    public CompositeValue getCompositeValue(String childTypeUri) {
         return getTopic(childTypeUri).getCompositeValue();
     }
 
     @Override
-    public CompositeValue getComposite(String childTypeUri, CompositeValue defaultValue) {
+    public CompositeValue getCompositeValue(String childTypeUri, CompositeValue defaultValue) {
         Topic topic = getTopic(childTypeUri, null);
         return topic != null ? topic.getCompositeValue() : defaultValue;
     }
