@@ -192,8 +192,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
-    public void createACL(long objectId, AccessControlList acl) {
-        dms.createACL(objectId, acl);
+    public void setACL(long objectId, AccessControlList acl) {
+        dms.setACL(objectId, acl);
     }
 
     // ---
@@ -678,7 +678,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         long objectId = object.getId();
         setCreator(objectId, username);
         setOwner(objectId, username);
-        createACL(objectId, acl);
+        setACL(objectId, acl);
     }
 
     // ---

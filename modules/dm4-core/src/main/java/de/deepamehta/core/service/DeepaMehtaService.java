@@ -175,7 +175,7 @@ public interface DeepaMehtaService {
     /**
      * Creates the Access Control List for the specified topic or association.
      */
-    void createACL(long objectId, AccessControlList acl);
+    void setACL(long objectId, AccessControlList acl);
 
     // ---
 

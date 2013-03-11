@@ -545,7 +545,7 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public void createACL(long objectId, AccessControlList acl) {
+    public void setACL(long objectId, AccessControlList acl) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             storage.storeACL(objectId, acl);
