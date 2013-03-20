@@ -115,6 +115,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("My Plugin", topic.getCompositeValue().getString("dm4.core.plugin_name"));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
+            Topic fetchedTopic = dms.getTopic(topic.getId(), false, null);
+            assertEquals("My Plugin", fetchedTopic.getSimpleValue().toString());
+            //
             tx.success();
         } finally {
             tx.finish();
@@ -131,6 +134,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             topic.getCompositeValue().set("dm4.core.plugin_name", "My Plugin", null, new Directives());
             assertEquals("My Plugin", topic.getCompositeValue().getString("dm4.core.plugin_name"));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
+            //
+            Topic fetchedTopic = dms.getTopic(topic.getId(), false, null);
+            assertEquals("My Plugin", fetchedTopic.getSimpleValue().toString());
             //
             tx.success();
         } finally {
