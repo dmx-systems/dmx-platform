@@ -1,7 +1,7 @@
 DeepaMehta is a platform for collaboration and knowledge management.
 <http://www.deepamehta.de/>
 
-Copyright 2000-2011 Jörg Richter
+Copyright 2000-2013 Jörg Richter et al.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
