@@ -73,7 +73,7 @@ class RequestFilter implements Filter {
 
     private void unauthorized(HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setHeader("WWW-Authenticate", "Basic realm=\"DeepaMehta\"");
+        response.setHeader("WWW-Authenticate", "Basic realm=" + securityContext.getAuthenticationRealm());
         response.setHeader("Content-Type", "text/html");    // for text/plain (default) Safari provides no Web Console
         response.getWriter().println("You're not authorized. Sorry.");  // throws IOException
     }

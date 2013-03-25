@@ -24,13 +24,14 @@ public interface AccessControlService extends PluginService {
     void login();
 
     /**
-     * @return  A <code>true</code> value instructs the webclient to shutdown. That is, its GUI must no longer be
-     *          presented to the user.
-     *          This is used for "private" DM installations. The webclient of a "private" installation is only
-     *          accessible when logged in. A DM installation is made "private" by setting the config property
-     *          <code>dm4.security.read_requires_login</code> to <code>true</code> (in global <code>pom.xml</code>).
+     * Logs the user out. That is invalidating the session associated with the JSESSION ID cookie.
+     *
+     * For a "non-private" DM installation the response is 204 No Content.
+     * For a "private" DM installation the response is 401 Authorization Required. In this case the webclient is
+     * supposed to shutdown the DM GUI then. The webclient of a "private" DM installation must only be visible/usable
+     * when logged in.
      */
-    boolean logout();
+    void logout();
 
     // ---
 

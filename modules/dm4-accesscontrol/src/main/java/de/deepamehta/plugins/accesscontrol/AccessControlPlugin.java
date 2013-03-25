@@ -50,8 +50,11 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 
+import java.util.Enumeration;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -77,6 +80,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final boolean READ_REQUIRES_LOGIN  = Boolean.getBoolean("dm4.security.read_requires_login");
     private static final boolean WRITE_REQUIRES_LOGIN = Boolean.getBoolean("dm4.security.write_requires_login");
     private static final String SUBNET_FILTER         = System.getProperty("dm4.security.subnet_filter");
+
+    private static final String AUTHENTICATION_REALM = "DeepaMehta";
 
     // default user
     private static final String DEFAULT_USERNAME = "admin";
@@ -123,11 +128,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @POST
     @Path("/logout")
-    @Produces("text/plain")
     @Override
-    public boolean logout() {
-        request.getSession(false).invalidate();                 // create=false
-        return READ_REQUIRES_LOGIN;
+    public void logout() {
+        HttpSession session = request.getSession(false);        // create=false
+        logger.info("##### Logging out from " + info(session));
+        session.invalidate();
+        //
+        // For a "private" DeepaMehta installation: emulate a HTTP logout by forcing the webbrowser to bring up its
+        // login dialog and to forget the former Authorization information. The user is supposed to press "Cancel".
+        // The login dialog can't be used to login again.
+        if (READ_REQUIRES_LOGIN) {
+            throw401();
+        }
     }
 
     // ---
@@ -233,6 +245,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         //
         checkRequestOrigin(request);
         checkAuthorization(request);
+    }
+
+    @Override
+    public String getAuthenticationRealm() {
+        return AUTHENTICATION_REALM;
     }
 
     // ---
@@ -565,6 +582,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
+    // ---
+
+    private void throw401() {
+        throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED)
+            .header("WWW-Authenticate", "Basic realm=" + AUTHENTICATION_REALM).build());
+    }
+
 
 
     // === All Plugins Activated ===
@@ -877,5 +901,21 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private String info(HttpSession session) {
         return "session" + (session != null ? " " + session.getId() +
             " (username=" + username(session) + ")" : ": null");
+    }
+
+    private String info(HttpServletRequest request) {
+        StringBuilder info = new StringBuilder();
+        info.append("    " + request.getMethod() + " " + request.getRequestURI() + "\n");
+        Enumeration<String> e1 = request.getHeaderNames();
+        while (e1.hasMoreElements()) {
+            String name = e1.nextElement();
+            info.append("\n    " + name + ":");
+            Enumeration<String> e2 = request.getHeaders(name);
+            while (e2.hasMoreElements()) {
+                String header = e2.nextElement();
+                info.append(" " + header);
+            }
+        }
+        return info.toString();
     }
 }

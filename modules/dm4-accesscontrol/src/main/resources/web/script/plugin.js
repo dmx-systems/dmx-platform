@@ -85,11 +85,11 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
                     function logout_link() {
                         return dm4c.render.link("Logout", function() {
-                            var response = dm4c.restc.logout()
-                            if (response == "true") {
-                                shutdown_gui()
-                            } else {
+                            try {
+                                dm4c.restc.logout()
                                 update_gui_logout()
+                            } catch (e) {
+                                shutdown_gui()
                             }
                         })
                     }
