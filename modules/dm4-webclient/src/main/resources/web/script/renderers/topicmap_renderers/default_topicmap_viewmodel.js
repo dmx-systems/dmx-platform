@@ -1,4 +1,10 @@
-DefaultTopicmapRenderer.Model = function () {
+/**
+ * Default topicmap view model: the data needed to render a topicmap.
+ * 
+ * Note: the default topicmap view model is renderer agnostic. It is shared by e.g. the HTML5 Canvas based default
+ * renderer and the SVG based 3rd-party renderer.
+ */
+DefaultTopicmapViewmodel = function () {
 
     var canvas_topics = {}      // topics displayed on canvas (Object, key: topic ID, value: CanvasTopic)
     var canvas_assocs = {}      // associations displayed on canvas (Object, key: assoc ID, value: CanvasAssoc)
@@ -10,7 +16,6 @@ DefaultTopicmapRenderer.Model = function () {
     this.trans_y = 0            // canvas translation (in pixel)
 
     var self = this
-    var ctx                     // the 2D context ### FIXME: remove from model
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -40,14 +45,14 @@ DefaultTopicmapRenderer.Model = function () {
      * @param   topic   an object with "id", "type_uri", "value", "x", "y" properties.
      */
     this.add_topic = function(topic) {
-        canvas_topics[topic.id] = new CanvasTopic(topic)
+        return canvas_topics[topic.id] = new CanvasTopic(topic)
     }
 
     /**
      * @param   assoc   an object with "id", "type_uri", "role_1", "role_2" properties.
      */
     this.add_association = function(assoc) {
-        canvas_assocs[assoc.id] = new CanvasAssoc(assoc)
+        return canvas_assocs[assoc.id] = new CanvasAssoc(assoc)
     }
 
     // ---
@@ -235,11 +240,6 @@ DefaultTopicmapRenderer.Model = function () {
         return new Cluster(ca)
     }
 
-    // ### FIXME: remove context from model
-    this.setContext = function(_ctx) {
-        ctx = _ctx
-    }
-
 
 
     // ----------------------------------------------------------------------------------------------- Private Functions
@@ -264,10 +264,10 @@ DefaultTopicmapRenderer.Model = function () {
 
     /**
      * Properties:
-     *  id, type_uri, label
+     *  id, type_uri
+     *  label, truncated_label
      *  x, y                    Topic position. Represents the center of the topic's icon.
      *  width, height           Icon size.
-     *  label_wrapper
      *
      * @param   topic   an object with "id", "type_uri", "value", "x", "y" properties.
      */
@@ -302,14 +302,11 @@ DefaultTopicmapRenderer.Model = function () {
         function init(topic) {
             self.type_uri = topic.type_uri
             self.label    = topic.value
+            self.truncated_label = js.truncate(self.label, dm4c.MAX_TOPIC_LABEL_CHARS)
             //
             var icon = dm4c.get_type_icon(topic.type_uri)
             self.width  = icon.width
             self.height = icon.height
-            //
-            var label = js.truncate(self.label, dm4c.MAX_TOPIC_LABEL_CHARS)
-            self.label_wrapper = new js.TextWrapper(label, dm4c.MAX_TOPIC_LABEL_WIDTH, 19, ctx)
-                                                                    // line height 19px = 1.2em
         }
     }
 

@@ -16,7 +16,7 @@ function DefaultTopicmapRenderer() {
     var LABEL_DIST_Y = 4            // in pixel
 
     // Model
-    var model = new DefaultTopicmapRenderer.Model()
+    var model = new DefaultTopicmapViewmodel()
 
     // View (HTML5 Canvas)
     var ctx                         // canvas drawing context
@@ -67,7 +67,8 @@ function DefaultTopicmapRenderer() {
         // update model
         if (!model.topic_exists(topic.id)) {
             init_position()
-            model.add_topic(topic)
+            var ct = model.add_topic(topic)
+            update_view_model(ct)
         }
         //
         if (do_select) {
@@ -120,6 +121,7 @@ function DefaultTopicmapRenderer() {
         }
         // update model
         ct.update(topic)
+        update_view_model(ct)
         // update GUI
         if (refresh_canvas) {
             this.refresh()
@@ -285,15 +287,26 @@ function DefaultTopicmapRenderer() {
         return model.get_associations(topic_id)
     }
 
-
-
     // ----------------------------------------------------------------------------------------------- Private Functions
 
 
 
-    /***************/
-    /*** Drawing ***/
-    /***************/
+    // ******************
+    // *** View Model ***
+    // ******************
+
+
+
+    function update_view_model(ct) {
+        // line height 19px = 1.2em
+        ct.label_wrapper = new js.TextWrapper(ct.truncated_label, dm4c.MAX_TOPIC_LABEL_WIDTH, 19, ctx)
+    }
+
+
+
+    // ***************
+    // *** Drawing ***
+    // ***************
 
 
 
@@ -404,9 +417,9 @@ function DefaultTopicmapRenderer() {
 
 
 
-    /**********************/
-    /*** Event Handling ***/
-    /**********************/
+    // **********************
+    // *** Event Handling ***
+    // **********************
 
 
 
@@ -701,7 +714,6 @@ function DefaultTopicmapRenderer() {
         ctx = self.dom.get(0).getContext("2d")
         ctx.font = LABEL_FONT   // the canvas font must be set early. Label measurement takes place *before* drawing.
         ctx.translate(model.trans_x, model.trans_y)
-        model.setContext(ctx)   // ### FIXME: remove context from model
         //
         bind_event_handlers()
         draw()

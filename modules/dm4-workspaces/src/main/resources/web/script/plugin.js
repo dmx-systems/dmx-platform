@@ -106,9 +106,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      */
     function get_workspace_id_from_menu() {
         var item = workspace_menu.get_selection()
-        if (item) {
-            return item.value
-        }
+        return item && item.value
     }
 
     // ---

@@ -617,8 +617,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     function get_topicmap_id_from_menu() {
         var item = topicmap_menu.get_selection()
-        if (item) {
-            return item.value
-        }
+        return item && item.value
     }
 })
