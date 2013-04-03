@@ -297,6 +297,9 @@ function DefaultTopicmapRenderer() {
 
 
 
+    /**
+     * Updates the renderer-specific parts of a topic view model.
+     */
     function update_view_model(ct) {
         // line height 19px = 1.2em
         ct.label_wrapper = new js.TextWrapper(ct.truncated_label, dm4c.MAX_TOPIC_LABEL_WIDTH, 19, ctx)
