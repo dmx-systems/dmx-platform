@@ -1,17 +1,13 @@
 package de.deepamehta.plugins.webservice.provider;
 
-import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
-import java.io.BufferedWriter;
 import java.io.InputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.logging.Logger;
 
@@ -19,13 +15,12 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 
 
 @Provider
-public class TopicProvider implements MessageBodyReader<TopicModel> {
+public class ObjectProvider implements MessageBodyReader<Object> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -44,18 +39,28 @@ public class TopicProvider implements MessageBodyReader<TopicModel> {
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         // Note: unlike equals() isCompatible() ignores parameters like "charset" in "application/json;charset=UTF-8"
-        return type == TopicModel.class && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
+        return getJSONConstructor(type) != null && mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Override
-    public TopicModel readFrom(Class<TopicModel> type, Type genericType, Annotation[] annotations,
-            MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
-                                                                throws IOException, WebApplicationException {
+    public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+                           MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
+                                                                  throws IOException, WebApplicationException {
         try {
             String json = JavaUtils.readText(entityStream);
-            return new TopicModel(new JSONObject(json));
+            return getJSONConstructor(type).newInstance(new JSONObject(json));
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Creating TopicModel from message body failed", e));
+            throw new WebApplicationException(new RuntimeException("Creating object from JSON message body failed", e));
+        }
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private Constructor<?> getJSONConstructor(Class<?> type) {
+        try {
+            return type.getDeclaredConstructor(JSONObject.class);
+        } catch (NoSuchMethodException e) {
+            return null;
         }
     }
 }

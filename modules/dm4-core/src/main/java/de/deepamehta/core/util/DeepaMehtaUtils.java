@@ -158,17 +158,6 @@ public class DeepaMehtaUtils {
 
     // === DeepaMehta specific ===
 
-    // ### FIXME: could objectsToJSON() be used instead?
-    public static JSONArray relatedTopicsToJson(Iterable<RelatedTopic> relTopics) {
-        JSONArray array = new JSONArray();
-        for (RelatedTopic relTopic : relTopics) {
-            // FIXME: for the moment it is sufficient to serialize the topics only.
-            // The respective associations are omitted.
-            array.put(relTopic.toJSON());
-        }
-        return array;
-    }
-
     public static JSONArray objectsToJSON(Collection<? extends JSONEnabled> objects) {
         JSONArray array = new JSONArray();
         for (JSONEnabled object : objects) {

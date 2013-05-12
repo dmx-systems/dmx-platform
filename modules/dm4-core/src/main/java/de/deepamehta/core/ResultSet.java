@@ -10,7 +10,7 @@ import java.util.Set;
 
 
 
-public class ResultSet<T extends JSONEnabled> implements JSONEnabled, Iterable<T> {
+public class ResultSet<T extends JSONEnabled> implements Iterable<T>, JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -54,14 +54,14 @@ public class ResultSet<T extends JSONEnabled> implements JSONEnabled, Iterable<T
         items.addAll(result.getItems());
     }
 
-    // === Iterable Implementation ===
+    // *** Iterable Implementation ***
 
     @Override
     public Iterator<T> iterator() {
         return getIterator();
     }
 
-    // === JSONEnabled Implementation ===
+    // *** JSONEnabled Implementation ***
 
     @Override
     public JSONObject toJSON() {

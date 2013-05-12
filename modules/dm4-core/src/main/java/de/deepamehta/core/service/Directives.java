@@ -11,6 +11,7 @@ import java.util.List;
 
 
 
+// ### Note: we do not implement JSONEnabled as Directive are serialized to JSONArray, not to JSONObject.
 public class Directives implements Iterable<Directives.Entry> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -37,6 +38,8 @@ public class Directives implements Iterable<Directives.Entry> {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
+
+    // *** Iterable Implementation ***
 
     @Override
     public Iterator<Entry> iterator() {
