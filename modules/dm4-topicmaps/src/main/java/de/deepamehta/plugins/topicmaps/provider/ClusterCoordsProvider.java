@@ -21,13 +21,7 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class ClusterCoordsProvider implements MessageBodyReader<ClusterCoords> {
 
-
-
-    // ****************************************
     // *** MessageBodyReader Implementation ***
-    // ****************************************
-
-
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {

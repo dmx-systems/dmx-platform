@@ -36,13 +36,7 @@ public class StringCollectionProvider implements MessageBodyReader<List<String>>
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-
-
-    // ****************************************
     // *** MessageBodyReader Implementation ***
-    // ****************************************
-
-
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -67,17 +61,12 @@ public class StringCollectionProvider implements MessageBodyReader<List<String>>
             String json = JavaUtils.readText(entityStream);
             return DeepaMehtaUtils.toList(new JSONArray(json));
         } catch (Exception e) {
-            throw new IOException("Creating a list of strings from message body failed", e);
+            throw new WebApplicationException(new RuntimeException("Creating a List<String> from message body failed",
+                e));
         }
     }
 
-
-
-    // ****************************************
     // *** MessageBodyWriter Implementation ***
-    // ****************************************
-
-
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -109,7 +98,7 @@ public class StringCollectionProvider implements MessageBodyReader<List<String>>
             DeepaMehtaUtils.stringsToJson(strings).write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new IOException("Writing message body failed (" + strings + ")", e);
+            throw new WebApplicationException(new RuntimeException("Writing message body failed (" + strings + ")", e));
         }
     }
 }

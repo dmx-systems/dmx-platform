@@ -30,13 +30,7 @@ public class JSONEnabledCollectionProvider implements MessageBodyWriter<Collecti
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-
-
-    // ****************************************
     // *** MessageBodyWriter Implementation ***
-    // ****************************************
-
-
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {

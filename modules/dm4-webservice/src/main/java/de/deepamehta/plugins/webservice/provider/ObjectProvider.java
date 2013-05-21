@@ -28,13 +28,7 @@ public class ObjectProvider implements MessageBodyReader<Object> {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-
-
-    // ****************************************
     // *** MessageBodyReader Implementation ***
-    // ****************************************
-
-
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {

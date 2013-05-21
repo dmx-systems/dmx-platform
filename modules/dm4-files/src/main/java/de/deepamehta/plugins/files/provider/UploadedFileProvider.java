@@ -37,13 +37,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile> {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-
-
-    // ****************************************
     // *** MessageBodyReader Implementation ***
-    // ****************************************
-
-
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -62,8 +56,6 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile> {
                 "Creating UploadedFile from message body failed", e));
         }
     }
-
-
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
