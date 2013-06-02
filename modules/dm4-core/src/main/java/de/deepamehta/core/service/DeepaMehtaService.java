@@ -12,7 +12,6 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.service.accesscontrol.AccessControlList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import java.util.Collection;
@@ -162,32 +161,13 @@ public interface DeepaMehtaService {
 
 
 
-    // === Access Control ===
+    // === Properties ===
 
-    // Note: once the Access Control plugin is incorporated into the Core these methods will be dropped from public API
+    Object getProperty(long objectId, String key);
 
-    /**
-     * Fetches the Access Control List for the specified topic or association.
-     * If no one is stored an empty Access Control List is returned.
-     */
-    AccessControlList getACL(long objectId);
+    void setProperty(long objectId, String key, Object value);
 
-    /**
-     * Creates the Access Control List for the specified topic or association.
-     */
-    void setACL(long objectId, AccessControlList acl);
-
-    // ---
-
-    String getCreator(long objectId);
-
-    void setCreator(long objectId, String username);
-
-    // ---
-
-    String getOwner(long objectId);
-
-    void setOwner(long objectId, String username);
+    boolean hasProperty(long objectId, String key);
 
 
 

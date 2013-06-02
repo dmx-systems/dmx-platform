@@ -27,7 +27,6 @@ import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.TypeStorage;
-import de.deepamehta.core.service.accesscontrol.AccessControlList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.osgi.framework.BundleContext;
@@ -537,69 +536,31 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
-    // === Access Control ===
+    // === Properties ===
 
     @Override
-    public AccessControlList getACL(long objectId) {
-        return storage.fetchACL(objectId);
+    public Object getProperty(long objectId, String key) {
+        return storage.fetchProperty(objectId, key);
     }
 
     @Override
-    public void setACL(long objectId, AccessControlList acl) {
+    public void setProperty(long objectId, String key, Object value) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.storeACL(objectId, acl);
+            storage.storeProperty(objectId, key, value);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Creating access control list for object " + objectId + " failed", e);
+            throw new RuntimeException("Setting property \"" + key + "\" for object " + objectId + " failed (value=" +
+                value + ")", e);
         } finally {
             tx.finish();
         }
     }
 
-    // ---
-
     @Override
-    public String getCreator(long objectId) {
-        return storage.fetchCreator(objectId);
-    }
-
-    @Override
-    public void setCreator(long objectId, String username) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            storage.storeCreator(objectId, username);
-            tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Setting the creator of object " + objectId + " failed (username=\"" +
-                username + "\")", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
-    // ---
-
-    @Override
-    public String getOwner(long objectId) {
-        return storage.fetchOwner(objectId);
-    }
-
-    @Override
-    public void setOwner(long objectId, String username) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            storage.storeOwner(objectId, username);
-            tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Setting the owner of object " + objectId + " failed (username=\"" +
-                username + "\")", e);
-        } finally {
-            tx.finish();
-        }
+    public boolean hasProperty(long objectId, String key) {
+        return storage.hasProperty(objectId, key);
     }
 
 

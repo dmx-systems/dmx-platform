@@ -1,10 +1,9 @@
 package de.deepamehta.plugins.accesscontrol.service;
 
+import de.deepamehta.plugins.accesscontrol.model.AccessControlList;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
-import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.accesscontrol.AccessControlList;
 
 
 
@@ -87,6 +86,15 @@ public interface AccessControlService extends PluginService {
 
     // ---
 
+    /**
+     * Fetches the Access Control List for the specified topic or association.
+     * If no one is stored an empty Access Control List is returned.
+     */
+    AccessControlList getACL(long objectId);
+
+    /**
+     * Stores the Access Control List for the specified topic or association.
+     */
     void setACL(long objectId, AccessControlList acl);
 
     // ---

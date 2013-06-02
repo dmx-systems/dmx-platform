@@ -7,12 +7,9 @@ import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.accesscontrol.AccessControlList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 import de.deepamehta.core.util.DeepaMehtaUtils;
-
-import org.codehaus.jettison.json.JSONObject;
 
 import static java.util.Arrays.asList;
 import java.util.Collection;
@@ -543,48 +540,18 @@ public class StorageDecorator {
 
 
 
-    // === Access Control ===
+    // === Properties ===
 
-    /**
-     * Fetches the Access Control List for the specified topic or association.
-     * If no one is stored an empty Access Control List is returned.
-     */
-    public AccessControlList fetchACL(long objectId) {
-        try {
-            boolean hasACL = storage.hasProperty(objectId, "acl");
-            JSONObject acl = hasACL ? new JSONObject((String) storage.fetchProperty(objectId, "acl"))
-                                    : new JSONObject();
-            return new AccessControlList(acl);
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching access control list for object " + objectId + " failed", e);
-        }
+    public Object fetchProperty(long objectId, String key) {
+        return storage.fetchProperty(objectId, key);
     }
 
-    /**
-     * Creates the Access Control List for the specified topic or association.
-     */
-    public void storeACL(long objectId, AccessControlList acl) {
-        storage.storeProperty(objectId, "acl", acl.toJSON().toString());
+    public void storeProperty(long objectId, String key, Object value) {
+        storage.storeProperty(objectId, key, value);
     }
 
-    // ---
-
-    public String fetchCreator(long objectId) {
-        return storage.hasProperty(objectId, "creator") ? (String) storage.fetchProperty(objectId, "creator") : null;
-    }
-
-    public void storeCreator(long objectId, String username) {
-        storage.storeProperty(objectId, "creator", username);
-    }
-
-    // ---
-
-    public String fetchOwner(long objectId) {
-        return storage.hasProperty(objectId, "owner") ? (String) storage.fetchProperty(objectId, "owner") : null;
-    }
-
-    public void storeOwner(long objectId, String username) {
-        storage.storeProperty(objectId, "owner", username);
+    public boolean hasProperty(long objectId, String key) {
+        return storage.hasProperty(objectId, key);
     }
 
 

@@ -1,4 +1,4 @@
-package de.deepamehta.core.service.accesscontrol;
+package de.deepamehta.plugins.accesscontrol.model;
 
 
 

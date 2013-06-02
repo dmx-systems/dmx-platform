@@ -1,7 +1,11 @@
 package de.deepamehta.plugins.accesscontrol;
 
+import de.deepamehta.plugins.accesscontrol.model.AccessControlList;
+import de.deepamehta.plugins.accesscontrol.model.ACLEntry;
 import de.deepamehta.plugins.accesscontrol.model.Credentials;
+import de.deepamehta.plugins.accesscontrol.model.Operation;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
+import de.deepamehta.plugins.accesscontrol.model.UserRole;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
@@ -20,10 +24,6 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.accesscontrol.AccessControlList;
-import de.deepamehta.core.service.accesscontrol.ACLEntry;
-import de.deepamehta.core.service.accesscontrol.Operation;
-import de.deepamehta.core.service.accesscontrol.UserRole;
 import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
@@ -37,6 +37,8 @@ import de.deepamehta.core.service.event.PreSendTopicListener;
 import de.deepamehta.core.service.event.PreSendTopicTypeListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
+
+import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -181,31 +183,47 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public String getCreator(long objectId) {
-        return dms.getCreator(objectId);
+        return dms.hasProperty(objectId, "creator") ? (String) dms.getProperty(objectId, "creator") : null;
     }
 
     @Override
     public void setCreator(long objectId, String username) {
-        dms.setCreator(objectId, username);
+        dms.setProperty(objectId, "creator", username);
     }
 
     // ---
 
     @Override
     public String getOwner(long objectId) {
-        return dms.getOwner(objectId);
+        return dms.hasProperty(objectId, "owner") ? (String) dms.getProperty(objectId, "owner") : null;
     }
 
     @Override
     public void setOwner(long objectId, String username) {
-        dms.setOwner(objectId, username);
+        dms.setProperty(objectId, "owner", username);
     }
 
     // ---
 
     @Override
+    public AccessControlList getACL(long objectId) {
+        try {
+            boolean hasACL = dms.hasProperty(objectId, "acl");
+            JSONObject acl = hasACL ? new JSONObject((String) dms.getProperty(objectId, "acl"))
+                                    : new JSONObject();
+            return new AccessControlList(acl);
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching access control list for object " + objectId + " failed", e);
+        }
+    }
+
+    @Override
     public void setACL(long objectId, AccessControlList acl) {
-        dms.setACL(objectId, acl);
+        try {
+            dms.setProperty(objectId, "acl", acl.toJSON().toString());
+        } catch (Exception e) {
+            throw new RuntimeException("Storing access control list for object " + objectId + " failed", e);
+        }
     }
 
     // ---
@@ -717,7 +735,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private boolean hasPermission(String username, Operation operation, DeepaMehtaObject object) {
         try {
             logger.fine("Determining permission for " + userInfo(username) + " to " + operation + " " + info(object));
-            UserRole[] userRoles = dms.getACL(object.getId()).getUserRoles(operation);
+            UserRole[] userRoles = getACL(object.getId()).getUserRoles(operation);
             for (UserRole userRole : userRoles) {
                 logger.fine("There is an ACL entry for user role " + userRole);
                 if (userOccupiesRole(username, userRole, object)) {

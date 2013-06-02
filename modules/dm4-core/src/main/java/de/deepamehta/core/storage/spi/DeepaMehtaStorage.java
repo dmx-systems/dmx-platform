@@ -160,11 +160,11 @@ public interface DeepaMehtaStorage {
 
     // === Properties ===
 
-    Object fetchProperty(long id, String key);
+    Object fetchProperty(long objectId, String key);
 
-    void storeProperty(long id, String key, Object value);
+    void storeProperty(long objectId, String key, Object value);
 
-    boolean hasProperty(long id, String key);
+    boolean hasProperty(long objectId, String key);
 
 
 
