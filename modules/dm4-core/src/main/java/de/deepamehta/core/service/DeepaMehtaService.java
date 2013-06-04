@@ -37,6 +37,8 @@ import java.util.Set;
  */
 public interface DeepaMehtaService {
 
+
+
     // === Topics ===
 
     Topic getTopic(long id, boolean fetchComposite, ClientState clientState);

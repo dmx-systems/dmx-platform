@@ -73,6 +73,7 @@
                         ${project.basedir}/modules/dm4-accesscontrol/target,
                         ${project.basedir}/modules/dm4-facets/target,
                         ${project.basedir}/modules/dm4-geomaps/target,
+                        ${project.basedir}/modules/dm4-time/target,
                         ${project.basedir}/modules/dm4-storage-neo4j/target
                     ]]>
                     <!-- Note: Although the dm4-storage-neo4j module can not be hot-REdeployed it must be          -->
