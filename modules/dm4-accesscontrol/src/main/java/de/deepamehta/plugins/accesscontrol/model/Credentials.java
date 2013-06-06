@@ -30,7 +30,9 @@ public class Credentials {
     public Credentials(String authHeader) {
         authHeader = authHeader.substring("Basic ".length());
         String[] values = new String(Base64.base64Decode(authHeader)).split(":");
-        this.username = values[0];
+        // Note: values.length is 0 if neither a username nor a password is entered
+        //       values.length is 1 if no password is entered
+        this.username = values.length > 0 ? values[0] : "";
         this.password = encryptPassword(values.length > 1 ? values[1] : "");
         // Note: credentials obtained through Basic authorization are always plain text
     }
