@@ -1,8 +1,5 @@
 package de.deepamehta.plugins.accesscontrol;
 
-import de.deepamehta.plugins.accesscontrol.model.Credentials;
-import de.deepamehta.core.Topic;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -11,9 +8,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -33,6 +30,8 @@ class RequestFilter implements Filter {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    // *** Filter Implementation ***
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -58,8 +57,18 @@ class RequestFilter implements Filter {
                 forbidden(resp);
                 break;
             default:
+                // Note: when file logging is activated the ServletException does not appear in the log file but on the
+                // console. Apparently the servlet container does not log the ServletException via the Java Logging API.
+                // So we log it explicitly (and it appears twice on the console if file logging is not activated).
+                logger.log(Level.SEVERE, "Unexpected AccessControlException", e);
                 throw new ServletException("Unexpected AccessControlException", e);
             }
+        } catch (Exception e) {
+            // Note: when file logging is activated the ServletException does not appear in the log file but on the
+            // console. Apparently the servlet container does not log the ServletException via the Java Logging API.
+            // So we log it explicitly (and it appears twice on the console if file logging is not activated).
+            logger.log(Level.SEVERE, "Request filtering failed", e);
+            throw new ServletException("Request filtering failed", e);
         }
     }
 
