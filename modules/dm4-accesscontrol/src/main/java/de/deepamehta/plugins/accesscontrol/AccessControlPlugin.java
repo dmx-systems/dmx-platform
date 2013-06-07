@@ -270,7 +270,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return AUTHENTICATION_REALM;
     }
 
-    // ---
+    @Override
+    public boolean useBrowserLoginDialog() {
+        return READ_REQUIRES_LOGIN;
+    }
+
+    // ===
 
     private void checkRequestOrigin(HttpServletRequest request) throws AccessControlException {
         String remoteAddr = request.getRemoteAddr();

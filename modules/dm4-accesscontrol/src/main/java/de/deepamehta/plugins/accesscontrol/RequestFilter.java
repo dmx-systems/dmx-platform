@@ -81,8 +81,12 @@ class RequestFilter implements Filter {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void unauthorized(HttpServletResponse response) throws IOException {
+        // Note: "xBasic" is a contrived authentication scheme to suppress the browser's login dialog.
+        // http://loudvchar.blogspot.ca/2010/11/avoiding-browser-popup-for-401.html
+        String authScheme = securityContext.useBrowserLoginDialog() ? "Basic" : "xBasic";
+        String realm = securityContext.getAuthenticationRealm();
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setHeader("WWW-Authenticate", "Basic realm=" + securityContext.getAuthenticationRealm());
+        response.setHeader("WWW-Authenticate", authScheme + " realm=" + realm);
         response.setHeader("Content-Type", "text/html");    // for text/plain (default) Safari provides no Web Console
         response.getWriter().println("You're not authorized. Sorry.");  // throws IOException
     }

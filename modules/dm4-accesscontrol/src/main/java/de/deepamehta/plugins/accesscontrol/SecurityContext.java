@@ -9,4 +9,6 @@ interface SecurityContext {
     void checkRequest(HttpServletRequest request) throws AccessControlException;
 
     String getAuthenticationRealm();
+
+    boolean useBrowserLoginDialog();
 }
