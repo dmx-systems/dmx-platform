@@ -291,19 +291,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     private void checkAuthorization(HttpServletRequest request) throws AccessControlException {
-        boolean authorized = false;
-        if (isLoginRequired(request)) {
-            HttpSession session = request.getSession(false);    // create=false
-            if (session != null) {
-                authorized = true;
-            } else {
-                String authHeader = request.getHeader("Authorization");
-                if (authHeader != null) {
-                    authorized = login(new Credentials(authHeader), request);
-                }
-            }
-        } else {
+        boolean authorized;
+        if (request.getSession(false) != null) {    // create=false
             authorized = true;
+        } else {
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader != null) {
+                // Note: if login fails we are NOT authorized, even if no login is required
+                authorized = tryLogin(new Credentials(authHeader), request);
+            } else {
+                authorized = !isLoginRequired(request);
+            }
         }
         //
         if (!authorized) {
@@ -319,11 +317,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     /**
-     * Checks weather the credentials match an User Account.
+     * Checks weather the credentials are valid and if so creates a session.
      *
-     * @return  <code>true</code> if the credentials match an User Account.
+     * @return  true if the credentials are valid.
      */
-    private boolean login(Credentials cred, HttpServletRequest request) {
+    private boolean tryLogin(Credentials cred, HttpServletRequest request) {
         if (checkCredentials(cred)) {
             HttpSession session = createSession(cred.username, request);
             logger.info("##### Logging in as \"" + cred.username + "\" => SUCCESSFUL!" +
