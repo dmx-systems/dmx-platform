@@ -221,21 +221,23 @@ function RESTClient(core_service_uri) {
 
 
 
-    // === Utilities for plugin developers ===
+    // === Plugin Support ===
 
     /**
-     * Sends an AJAX request. The URI is interpreted as an absolute URI.
+     * Sends an AJAX request. The URI is interpreted as absolute.
      *
-     * This utility method is called by plugins who register additional REST resources at an individual
-     * namespace (server-side) and add corresponding service calls to the REST client instance.
-     * For example, see the DeepaMehta 4 Topicmaps plugin.
+     * A plugin uses this method to send a request to its REST service.
+     * As an example see the DeepaMehta 4 Topicmaps plugin.
      */
-    this.request = function(method, uri, data, headers, response_data_type) {
-        return request(method, uri, data, undefined, headers, response_data_type, true)     // callback=undefined
+    this.request = function(method, uri, data, callback, headers, response_data_type) {
+        return request(method, uri, data, callback, headers, response_data_type, true)
     }
 
     /**
-     * This utility method is called by plugins who register additional REST resources.
+     * Helps with construction of the URI's query string part.
+     *
+     * This helper method might be useful for plugins which provides a REST service.
+     * As an example see the DeepaMehta 4 Webclient plugin.
      */
     this.createRequestParameter = function(params) {
         return new RequestParameter(params)

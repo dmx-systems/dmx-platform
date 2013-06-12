@@ -10,13 +10,13 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     // === REST Client Extension ===
 
     dm4c.restc.login = function(authorization) {
-        this.request("POST", "/accesscontrol/login", undefined, {"Authorization": authorization})
+        this.request("POST", "/accesscontrol/login", undefined, undefined, {"Authorization": authorization})
     }
     dm4c.restc.logout = function() {
         this.request("POST", "/accesscontrol/logout")
     }
     dm4c.restc.get_username = function() {
-        return this.request("GET", "/accesscontrol/user", undefined, undefined, "text")
+        return this.request("GET", "/accesscontrol/user", undefined, undefined, undefined, "text")
         // Note: response 204 No Content yields to null result
     }
     // ### FIXME: adapt to server-side
