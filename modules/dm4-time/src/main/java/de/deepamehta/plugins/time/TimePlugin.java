@@ -1,12 +1,12 @@
 package de.deepamehta.plugins.time;
 
+import de.deepamehta.plugins.time.service.TimeService;
+
 import de.deepamehta.core.Association;
+import de.deepamehta.core.Identifiable;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationRoleModel;
-import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
@@ -14,6 +14,10 @@ import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateAssociationListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
+import de.deepamehta.core.service.event.PreSendResponseListener;
+
+// ### TODO: remove Jersey dependency. Move to JAX-RS 2.0.
+import com.sun.jersey.spi.container.ContainerResponse;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -25,6 +29,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MultivaluedMap;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -38,15 +43,18 @@ import java.util.logging.Logger;
 @Path("/time")
 @Consumes("application/json")
 @Produces("application/json")
-public class TimePlugin extends PluginActivator implements PostCreateTopicListener,
-                                                           PostCreateAssociationListener,
-                                                           PostUpdateTopicListener,
-                                                           PostUpdateAssociationListener {
+public class TimePlugin extends PluginActivator implements TimeService, PostCreateTopicListener,
+                                                                        PostCreateAssociationListener,
+                                                                        PostUpdateTopicListener,
+                                                                        PostUpdateAssociationListener,
+                                                                        PreSendResponseListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static String PROP_CREATED = "created";
     private static String PROP_MODIFIED = "modified";
+
+    private static String HEADER_LAST_MODIFIED = "Last-Modified";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -61,6 +69,18 @@ public class TimePlugin extends PluginActivator implements PostCreateTopicListen
     // **********************************
     // *** TimeService Implementation ***
     // **********************************
+
+
+
+    @Override
+    public String getTimeCreated(long objectId) {
+        return dms.hasProperty(objectId, PROP_CREATED) ? (String) dms.getProperty(objectId, PROP_CREATED) : null;
+    }
+
+    @Override
+    public String getTimeModified(long objectId) {
+        return dms.hasProperty(objectId, PROP_MODIFIED) ? (String) dms.getProperty(objectId, PROP_MODIFIED) : null;
+    }
 
 
 
@@ -109,34 +129,68 @@ public class TimePlugin extends PluginActivator implements PostCreateTopicListen
         storeTimestamp(assoc.getId());
     }
 
+    // ---
+
+    @Override
+    public void preSendResponse(ContainerResponse response) {
+        long objectId = objectId(response);
+        if (objectId != -1) {
+            String modified = getTimeModified(objectId);
+            if (modified != null) {
+                setLastModifiedHeader(response, modified);
+            }
+        }
+    }
+
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void storeTimestamps(long objectId) {
         Date time = new Date();
-        setCreationTime(objectId, time);
-        setModificationTime(objectId, time);
+        storeTimeCreated(objectId, time);
+        storeTimeModified(objectId, time);
     }
 
     private void storeTimestamp(long objectId) {
         Date time = new Date();
-        setModificationTime(objectId, time);
+        storeTimeModified(objectId, time);
     }
 
     // ---
 
-    private void setCreationTime(long objectId, Date time) {
-        setTime(objectId, PROP_CREATED, time);
+    private void storeTimeCreated(long objectId, Date time) {
+        storeTime(objectId, PROP_CREATED, time);
     }
 
-    private void setModificationTime(long objectId, Date time) {
-        setTime(objectId, PROP_MODIFIED, time);
+    private void storeTimeModified(long objectId, Date time) {
+        storeTime(objectId, PROP_MODIFIED, time);
     }
 
     // ---
 
-    private void setTime(long objectId, String propName, Date time) {
+    private void storeTime(long objectId, String propName, Date time) {
         dms.setProperty(objectId, propName, rfc2822.format(time));
+    }
+
+    // ===
+
+    private long objectId(ContainerResponse response) {
+        Object entity = response.getEntity();
+        if (entity instanceof Identifiable) {
+            return ((Identifiable) entity).getId();
+        } else {
+            return -1;
+        }
+    }
+
+    private void setLastModifiedHeader(ContainerResponse response, String modified) {
+        MultivaluedMap headers = response.getHttpHeaders();
+        //
+        if (headers.containsKey(HEADER_LAST_MODIFIED)) {
+            throw new RuntimeException("Response has a " + HEADER_LAST_MODIFIED + " header already");
+        }
+        //
+        headers.putSingle(HEADER_LAST_MODIFIED, modified);
     }
 }
