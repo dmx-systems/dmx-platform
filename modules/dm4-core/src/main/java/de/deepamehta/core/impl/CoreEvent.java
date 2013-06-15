@@ -11,6 +11,9 @@ import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.event.*;
 
+// ### TODO: remove Jersey dependency. Move to JAX-RS 2.0.
+import com.sun.jersey.spi.container.ContainerResponse;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -106,6 +109,15 @@ enum CoreEvent {
         void deliver(Listener listener, Object... params) {
             ((PostDeleteAssociationListener) listener).postDeleteAssociation(
                 (Association) params[0], (Directives) params[1]
+            );
+        }
+    },
+
+    PRE_SEND_RESPONSE(PreSendResponseListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PreSendResponseListener) listener).preSendResponse(
+                (ContainerResponse) params[0]
             );
         }
     },
