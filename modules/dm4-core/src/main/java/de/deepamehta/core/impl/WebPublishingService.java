@@ -18,6 +18,7 @@ import javax.ws.rs.Path;
 
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -53,9 +54,10 @@ public class WebPublishingService {
             // create web application
             this.rootApplication = new DefaultResourceConfig();
             //
-            // setup response filter
-            rootApplication.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
-                new JerseyResponseFilter(dms));
+            // setup container filters
+            Map<String, Object> properties = rootApplication.getProperties();
+            properties.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, new JerseyRequestFilter(dms));
+            properties.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new JerseyResponseFilter(dms));
             //
             // deploy web application in container
             this.jerseyServlet = new ServletContainer(rootApplication);

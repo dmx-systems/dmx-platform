@@ -12,6 +12,7 @@ import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.event.*;
 
 // ### TODO: remove Jersey dependency. Move to JAX-RS 2.0.
+import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 
 import java.util.HashMap;
@@ -113,6 +114,14 @@ enum CoreEvent {
         }
     },
 
+    PRE_PROCESS_REQUEST(PreProcessRequestListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PreProcessRequestListener) listener).preProcessRequest(
+                (ContainerRequest) params[0]
+            );
+        }
+    },
     PRE_SEND_RESPONSE(PreSendResponseListener.class) {
         @Override
         void deliver(Listener listener, Object... params) {
