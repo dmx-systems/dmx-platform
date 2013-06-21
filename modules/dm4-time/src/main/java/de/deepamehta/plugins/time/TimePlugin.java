@@ -73,13 +73,13 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
 
     @Override
-    public String getTimeCreated(long objectId) {
-        return dms.hasProperty(objectId, PROP_CREATED) ? (String) dms.getProperty(objectId, PROP_CREATED) : null;
+    public long getTimeCreated(long objectId) {
+        return dms.hasProperty(objectId, PROP_CREATED) ? (Long) dms.getProperty(objectId, PROP_CREATED) : -1;
     }
 
     @Override
-    public String getTimeModified(long objectId) {
-        return dms.hasProperty(objectId, PROP_MODIFIED) ? (String) dms.getProperty(objectId, PROP_MODIFIED) : null;
+    public long getTimeModified(long objectId) {
+        return dms.hasProperty(objectId, PROP_MODIFIED) ? (Long) dms.getProperty(objectId, PROP_MODIFIED) : -1;
     }
 
 
@@ -92,7 +92,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     @Override
     public void init() {
-        // this generates the format used in HTTP date/time headers, see:
+        // create the date format used in HTTP date/time headers, see:
         // http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.3
         rfc2822 = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.ENGLISH);
         rfc2822.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
@@ -135,8 +135,8 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     public void preSendResponse(ContainerResponse response) {
         long objectId = objectId(response);
         if (objectId != -1) {
-            String modified = getTimeModified(objectId);
-            if (modified != null) {
+            long modified = getTimeModified(objectId);
+            if (modified != -1) {
                 setLastModifiedHeader(response, modified);
             }
         }
@@ -147,30 +147,30 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void storeTimestamps(long objectId) {
-        Date time = new Date();
+        long time = System.currentTimeMillis();
         storeTimeCreated(objectId, time);
         storeTimeModified(objectId, time);
     }
 
     private void storeTimestamp(long objectId) {
-        Date time = new Date();
+        long time = System.currentTimeMillis();
         storeTimeModified(objectId, time);
     }
 
     // ---
 
-    private void storeTimeCreated(long objectId, Date time) {
+    private void storeTimeCreated(long objectId, long time) {
         storeTime(objectId, PROP_CREATED, time);
     }
 
-    private void storeTimeModified(long objectId, Date time) {
+    private void storeTimeModified(long objectId, long time) {
         storeTime(objectId, PROP_MODIFIED, time);
     }
 
     // ---
 
-    private void storeTime(long objectId, String propName, Date time) {
-        dms.setProperty(objectId, propName, rfc2822.format(time));
+    private void storeTime(long objectId, String propName, long time) {
+        dms.setProperty(objectId, propName, time);
     }
 
     // ===
@@ -184,13 +184,13 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
         }
     }
 
-    private void setLastModifiedHeader(ContainerResponse response, String modified) {
+    private void setLastModifiedHeader(ContainerResponse response, long time) {
         MultivaluedMap headers = response.getHttpHeaders();
         //
         if (headers.containsKey(HEADER_LAST_MODIFIED)) {
             throw new RuntimeException("Response has a " + HEADER_LAST_MODIFIED + " header already");
         }
         //
-        headers.putSingle(HEADER_LAST_MODIFIED, modified);
+        headers.putSingle(HEADER_LAST_MODIFIED, rfc2822.format(time));
     }
 }

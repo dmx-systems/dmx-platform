@@ -6,7 +6,7 @@ import de.deepamehta.core.service.PluginService;
 
 public interface TimeService extends PluginService {
 
-    String getTimeCreated(long objectId);
+    long getTimeCreated(long objectId);
 
-    String getTimeModified(long objectId);
+    long getTimeModified(long objectId);
 }
