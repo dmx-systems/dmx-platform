@@ -2,7 +2,8 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.service.Listener;
 
-import java.lang.reflect.Method;
+import javax.ws.rs.WebApplicationException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,24 +42,24 @@ class EventManager {
     // ---
 
     void fireEvent(CoreEvent event, Object... params) {
-        try {
-            List<Listener> listeners = getListeners(event);
-            if (listeners == null) {
-                return;
-            }
-            // ### FIXME: ConcurrentModificationException might occur
+        List<Listener> listeners = getListeners(event);
+        if (listeners != null) {
+            // ### FIXME: ConcurrentModificationException might occur. Still true?
             for (Listener listener : listeners) {
                 deliverEvent(listener, event, params);
             }
-        } catch (Exception e) {
-            throw new RuntimeException("Firing event " + event + " failed (params=" + params + ")", e);
         }
     }
 
     void deliverEvent(Listener listener, CoreEvent event, Object... params) {
         try {
             event.deliver(listener, params);
-        } catch (Exception e) {     // NoSuchMethodException, IllegalAccessException, InvocationTargetException
+        } catch (WebApplicationException e) {
+            // Note: a WebApplicationException thrown by a event listener must reach Jersey. So we re-throw here.
+            // This allow plugins to produce specific HTTP responses by throwing a WebApplicationException.
+            // Consider the Caching plugin: it produces a possible 304 (Not Modified) response this way.
+            throw e;
+        } catch (Exception e) {
             throw new RuntimeException("Delivering event " + event + " to " + listener + " failed", e);
         }
     }
