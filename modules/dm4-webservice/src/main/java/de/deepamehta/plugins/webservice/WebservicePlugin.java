@@ -111,9 +111,14 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     @PUT
-    @Path("/topic")
-    public Directives updateTopic(TopicModel model, @HeaderParam("Cookie") ClientState clientState) {
+    @Path("/topic/{id}")
+    public Directives updateTopic(@PathParam("id") long topicId, TopicModel model,
+                                  @HeaderParam("Cookie") ClientState clientState) {
         try {
+            if (model.getId() != -1 && topicId != model.getId()) {
+                throw new RuntimeException("ID mismatch in update request");
+            }
+            model.setId(topicId);
             return dms.updateTopic(model, clientState);
         } catch (Exception e) {
             throw new WebApplicationException(e);
@@ -199,9 +204,14 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     @PUT
-    @Path("/association")
-    public Directives updateAssociation(AssociationModel model, @HeaderParam("Cookie") ClientState clientState) {
+    @Path("/association/{id}")
+    public Directives updateAssociation(@PathParam("id") long assocId, AssociationModel model,
+                                        @HeaderParam("Cookie") ClientState clientState) {
         try {
+            if (model.getId() != -1 && assocId != model.getId()) {
+                throw new RuntimeException("ID mismatch in update request");
+            }
+            model.setId(assocId);
             return dms.updateAssociation(model, clientState);
         } catch (Exception e) {
             throw new WebApplicationException(e);

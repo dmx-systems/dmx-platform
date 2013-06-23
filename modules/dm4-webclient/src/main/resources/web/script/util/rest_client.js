@@ -82,7 +82,7 @@ function RESTClient(core_service_uri) {
     }
 
     this.update_topic = function(topic_model) {
-        return request("PUT", "/topic", topic_model)
+        return request("PUT", "/topic/" + topic_model.id, topic_model)
     }
 
     this.delete_topic = function(id) {
@@ -156,7 +156,7 @@ function RESTClient(core_service_uri) {
     }
 
     this.update_association = function(assoc_model) {
-        return request("PUT", "/association", assoc_model)
+        return request("PUT", "/association/" + assoc_model.id, assoc_model)
     }
 
     this.delete_association = function(id) {
