@@ -1369,14 +1369,14 @@ function Webclient() {
     function extend_rest_client() {
         dm4c.restc.search_topics_and_create_bucket = function(text, field_uri) {
             var params = this.createRequestParameter({search: text, field: field_uri})
-            return this.request("GET", "/webclient/search?" + params.to_query_string())
+            return this.request("GET", "/webclient/search" + params.to_query_string())
         }
         // Note: this method is actually part of the Type Search plugin.
         // TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
         // another namespace again) or make the Type Search plugin an integral part of the Client plugin.
         dm4c.restc.get_topics_and_create_bucket = function(type_uri, max_result_size) {
             var params = this.createRequestParameter({max_result_size: max_result_size})
-            return this.request("GET", "/webclient/search/by_type/" + type_uri + "?" + params.to_query_string())
+            return this.request("GET", "/webclient/search/by_type/" + type_uri + params.to_query_string())
         }
     }
 

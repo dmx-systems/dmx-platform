@@ -10,7 +10,7 @@ function RESTClient(core_service_uri) {
 
     this.get_topic_by_id = function(topic_id, fetch_composite) {
         var params = new RequestParameter({fetch_composite: fetch_composite})
-        return request("GET", "/topic/" + topic_id + "?" + params.to_query_string())
+        return request("GET", "/topic/" + topic_id + params.to_query_string())
     }
 
     /**
@@ -42,7 +42,7 @@ function RESTClient(core_service_uri) {
      */
     this.get_topics = function(type_uri, fetch_composite, sort, max_result_size) {
         var params = new RequestParameter({fetch_composite: fetch_composite, max_result_size: max_result_size})
-        var result = request("GET", "/topic/by_type/" + type_uri + "?" + params.to_query_string())
+        var result = request("GET", "/topic/by_type/" + type_uri + params.to_query_string())
         sort_topics(result.items, sort)
         return result
     }
@@ -67,14 +67,14 @@ function RESTClient(core_service_uri) {
     this.get_topic_related_topics = function(topic_id, traversal_filter, sort, max_result_size) {
         var params = new RequestParameter(traversal_filter)
         params.add("max_result_size", max_result_size)
-        var result = request("GET", "/topic/" + topic_id + "/related_topics?" + params.to_query_string())
+        var result = request("GET", "/topic/" + topic_id + "/related_topics" + params.to_query_string())
         sort_topics(result.items, sort)
         return result
     }
 
     this.search_topics = function(text, field_uri) {
         var params = new RequestParameter({search: text, field: field_uri})
-        return request("GET", "/topic?" + params.to_query_string())
+        return request("GET", "/topic" + params.to_query_string())
     }
 
     this.create_topic = function(topic_model) {
@@ -95,7 +95,7 @@ function RESTClient(core_service_uri) {
 
     this.get_association_by_id = function(assoc_id, fetch_composite) {
         var params = new RequestParameter({fetch_composite: fetch_composite})
-        return request("GET", "/association/" + assoc_id + "?" + params.to_query_string())
+        return request("GET", "/association/" + assoc_id + params.to_query_string())
     }
 
     /**
@@ -111,7 +111,7 @@ function RESTClient(core_service_uri) {
                                                                                           fetch_composite) {
         var params = new RequestParameter({fetch_composite: fetch_composite})
         return request("GET", "/association/" + assoc_type_uri + "/" +  topic1_id + "/" + topic2_id + "/" +
-            role_type1_uri + "/" + role_type2_uri + "?" + params.to_query_string())
+            role_type1_uri + "/" + role_type2_uri + params.to_query_string())
     }
 
     /**
@@ -146,7 +146,7 @@ function RESTClient(core_service_uri) {
     this.get_association_related_topics = function(assoc_id, traversal_filter, sort, max_result_size) {
         var params = new RequestParameter(traversal_filter)
         params.add("max_result_size", max_result_size)
-        var result = request("GET", "/association/" + assoc_id + "/related_topics?" + params.to_query_string())
+        var result = request("GET", "/association/" + assoc_id + "/related_topics" + params.to_query_string())
         sort_topics(result.items, sort)
         return result
     }
@@ -342,7 +342,11 @@ function RESTClient(core_service_uri) {
         }
 
         this.to_query_string = function() {
-            return encodeURI(param_array.join("&"))
+            var query_string = encodeURI(param_array.join("&"))
+            if (query_string) {
+                query_string = "?" + query_string
+            }
+            return query_string
         }
 
         function add(param_name, value) {
