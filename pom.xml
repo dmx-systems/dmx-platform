@@ -143,6 +143,8 @@
                 <module>modules/dm4-accesscontrol</module>
                 <module>modules/dm4-facets</module>
                 <module>modules/dm4-geomaps</module>
+                <module>modules/dm4-time</module>
+                <module>modules/dm4-caching</module>
                 <module>modules/dm4-storage-neo4j</module>
                 <module>modules/dm4-test</module>
                 <!-- POM projects follow -->
