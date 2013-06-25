@@ -3,7 +3,7 @@ package de.deepamehta.plugins.time;
 import de.deepamehta.plugins.time.service.TimeService;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.Identifiable;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.TopicModel;
@@ -54,6 +54,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     private static String PROP_CREATED = "created";
     private static String PROP_MODIFIED = "modified";
 
+    private static String URI_MODIFIED = "dm4.time.modified";
     private static String HEADER_LAST_MODIFIED = "Last-Modified";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -133,9 +134,10 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     @Override
     public void preSendResponse(ContainerResponse response) {
-        long objectId = objectId(response);
-        if (objectId != -1) {
-            long modified = getTimeModified(objectId);
+        DeepaMehtaObject object = responseObject(response);
+        if (object != null) {
+            long modified = getTimeModified(object.getId());
+            enrichWithTimestamp(object, modified);
             if (modified != -1) {
                 setLastModifiedHeader(response, modified);
             }
@@ -175,13 +177,13 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     // ===
 
-    private long objectId(ContainerResponse response) {
+    private DeepaMehtaObject responseObject(ContainerResponse response) {
         Object entity = response.getEntity();
-        if (entity instanceof Identifiable) {
-            return ((Identifiable) entity).getId();
-        } else {
-            return -1;
-        }
+        return entity instanceof DeepaMehtaObject ? (DeepaMehtaObject) entity : null;
+    }
+
+    private void enrichWithTimestamp(DeepaMehtaObject object, long time) {
+        object.getCompositeValue().getModel().put(URI_MODIFIED, time);
     }
 
     private void setLastModifiedHeader(ContainerResponse response, long time) {
