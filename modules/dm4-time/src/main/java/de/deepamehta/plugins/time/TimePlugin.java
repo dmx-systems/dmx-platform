@@ -51,10 +51,11 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
+    private static String URI_MODIFIED = "dm4.time.modified";
+
     private static String PROP_CREATED = "created";
     private static String PROP_MODIFIED = "modified";
 
-    private static String URI_MODIFIED = "dm4.time.modified";
     private static String HEADER_LAST_MODIFIED = "Last-Modified";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -177,6 +178,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     // ===
 
+    // ### FIXME: copy in CachingPlugin
     private DeepaMehtaObject responseObject(ContainerResponse response) {
         Object entity = response.getEntity();
         return entity instanceof DeepaMehtaObject ? (DeepaMehtaObject) entity : null;
@@ -186,13 +188,20 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
         object.getCompositeValue().getModel().put(URI_MODIFIED, time);
     }
 
+    // ---
+
     private void setLastModifiedHeader(ContainerResponse response, long time) {
+        setHeader(response, HEADER_LAST_MODIFIED, rfc2822.format(time));
+    }
+
+    // ### FIXME: copy in CachingPlugin
+    private void setHeader(ContainerResponse response, String header, String value) {
         MultivaluedMap headers = response.getHttpHeaders();
         //
-        if (headers.containsKey(HEADER_LAST_MODIFIED)) {
-            throw new RuntimeException("Response has a " + HEADER_LAST_MODIFIED + " header already");
+        if (headers.containsKey(header)) {
+            throw new RuntimeException("Response already has a \"" + header + "\" header");
         }
         //
-        headers.putSingle(HEADER_LAST_MODIFIED, rfc2822.format(time));
+        headers.putSingle(header, value);
     }
 }

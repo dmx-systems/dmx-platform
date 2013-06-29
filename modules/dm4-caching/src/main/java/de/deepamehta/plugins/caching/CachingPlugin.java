@@ -2,15 +2,19 @@ package de.deepamehta.plugins.caching;
 
 import de.deepamehta.plugins.time.service.TimeService;
 
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.core.service.event.PreProcessRequestListener;
+import de.deepamehta.core.service.event.PreSendResponseListener;
 
 // ### TODO: remove Jersey dependency. Move to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import java.util.Date;
@@ -20,11 +24,13 @@ import java.util.regex.Pattern;
 
 
 
-public class CachingPlugin extends PluginActivator implements PreProcessRequestListener {
+public class CachingPlugin extends PluginActivator implements PreProcessRequestListener, PreSendResponseListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static String CACHABLE_PATH = "core/(topic|association)/(\\d+)";
+
+    private static String HEADER_CACHE_CONTROL = "Cache-Control";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -77,10 +83,18 @@ public class CachingPlugin extends PluginActivator implements PreProcessRequestL
             if (time != -1) {
                 Response.ResponseBuilder response = request.evaluatePreconditions(new Date(time));
                 if (response != null) {
-                    logger.fine("### Precondition for object " + objectId + " not met");
+                    logger.info("### Precondition for object " + objectId + " not met");
                     throw new WebApplicationException(response.build());
                 }
             }
+        }
+    }
+
+    @Override
+    public void preSendResponse(ContainerResponse response) {
+        DeepaMehtaObject object = responseObject(response);
+        if (object != null) {
+            setCacheControlHeader(response, "max-age=0");
         }
     }
 
@@ -97,5 +111,28 @@ public class CachingPlugin extends PluginActivator implements PreProcessRequestL
         Matcher m = cachablePath.matcher(request.getPath());
         return m.matches() ? Long.parseLong(m.group(2)) : -1;
         // Note: content of group 1 is "topic" or "association"
+    }
+
+    // ---
+
+    // ### FIXME: copy in TimePlugin
+    private DeepaMehtaObject responseObject(ContainerResponse response) {
+        Object entity = response.getEntity();
+        return entity instanceof DeepaMehtaObject ? (DeepaMehtaObject) entity : null;
+    }
+
+    private void setCacheControlHeader(ContainerResponse response, String directives) {
+        setHeader(response, HEADER_CACHE_CONTROL, directives);
+    }
+
+    // ### FIXME: copy in TimePlugin
+    private void setHeader(ContainerResponse response, String header, String value) {
+        MultivaluedMap headers = response.getHttpHeaders();
+        //
+        if (headers.containsKey(header)) {
+            throw new RuntimeException("Response already has a \"" + header + "\" header");
+        }
+        //
+        headers.putSingle(header, value);
     }
 }
