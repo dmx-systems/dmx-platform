@@ -270,13 +270,21 @@ function RESTClient(core_service_uri) {
      * @return  For successful synchronous requests: the data returned from the server. Otherwise undefined.
      */
     function request(method, uri, data, callback, headers, response_data_type, is_absolute_uri) {
+        var request = {
+            method: method,
+            uri: is_absolute_uri ? uri : core_service_uri + uri,
+            headers: headers || {},
+            data: data
+        }
+        dm4c.fire_event("pre_send_request", request)
+        //
         var async = callback != undefined
         var status          // used only for synchronous request: "success" if request was successful
         var response_data   // used only for synchronous successful request: the response data (response body)
         //
-        if (LOG_AJAX_REQUESTS) dm4c.log(method + " " + uri + "\n..... " + JSON.stringify(data))
+        if (LOG_AJAX_REQUESTS) dm4c.log(method + " " + request.uri + "\n..... " + JSON.stringify(data))
         //
-        var content_type = headers && headers["Content-Type"] || "application/json"       // set default
+        var content_type = request.headers["Content-Type"] || "application/json"       // set default
         if (content_type == "application/json") {
             data = JSON.stringify(data)
         }
@@ -285,9 +293,9 @@ function RESTClient(core_service_uri) {
         //
         $.ajax({
             type: method,
-            url: is_absolute_uri ? uri : core_service_uri + uri,
+            url: request.uri,
             contentType: content_type,
-            headers: headers,
+            headers: request.headers,
             data: data,
             dataType: response_data_type,
             processData: false,
