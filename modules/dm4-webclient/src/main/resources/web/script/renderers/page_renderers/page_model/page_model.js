@@ -333,6 +333,11 @@ dm4c.render.page_model = (function() {
          *          on the other hand never represents a topic reference.
          */
         build_object_model: function(page_model) {
+            var object_model = {
+                id: page_model.object.id,
+                type_uri: page_model.object.type_uri    // ### TODO: setting type_uri should not be required
+                                                        // ### see CompositeValueModel.createTopicModel()
+            }
             if (page_model.type == PageModel.SIMPLE) {
                 var value = page_model.read_form_value()
                 // Note: undefined form value is an error (means: simple renderer returned no value).
@@ -344,8 +349,8 @@ dm4c.render.page_model = (function() {
                 switch (page_model.assoc_def && page_model.assoc_def.type_uri) {
                 case undefined:
                 case "dm4.core.composition_def":
-                    page_model.object.value = value
-                    return page_model.object
+                    object_model.value = value
+                    return object_model
                 case "dm4.core.aggregation_def":
                     return value
                 default:
@@ -353,23 +358,22 @@ dm4c.render.page_model = (function() {
                         "\" is an unexpected assoc type URI"
                 }
             } else if (page_model.type == PageModel.COMPOSITE) {
-                var composite = {}
+                object_model.composite = {}
                 for (var assoc_def_uri in page_model.childs) {
                     var child_model = page_model.childs[assoc_def_uri]
                     if (child_model.type == PageModel.MULTI) {
                         // cardinality "many"
                         var values = child_model.read_form_values()
-                        composite[assoc_def_uri] = values
+                        object_model.composite[assoc_def_uri] = values
                     } else {
                         // cardinality "one"
                         var value = this.build_object_model(child_model)
                         if (value != null) {
-                            composite[assoc_def_uri] = value
+                            object_model.composite[assoc_def_uri] = value
                         }
                     }
                 }
-                page_model.object.composite = composite
-                return page_model.object
+                return object_model
             } else {
                 throw "TopicRendererError: invalid page model"
             }
