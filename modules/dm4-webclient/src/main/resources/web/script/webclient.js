@@ -728,8 +728,8 @@ function Webclient() {
         pm.add_plugin(plugin_uri, plugin_func)
     }
 
-    this.get_plugin = function(plugin_class) {
-        return pm.get_plugin(plugin_class)
+    this.get_plugin = function(plugin_uri) {
+        return pm.get_plugin(plugin_uri)
     }
 
     // ---

@@ -60,6 +60,7 @@ Topic.prototype.get = function(child_type_uri) {
         if (js.is_array(child_topic)) {
             return child_topic
         }
+        // ### TODO: support non-model values (e.g. facets). Currently get_topic_type() fails.
         var topic_type = dm4c.get_topic_type(child_type_uri)
         if (topic_type.is_simple()) {
             return child_topic.value
