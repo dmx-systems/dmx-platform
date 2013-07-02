@@ -138,7 +138,7 @@ class TypeStorageImpl implements TypeStorage {
 
     private void checkTopicType(String topicTypeUri, Topic typeTopic) {
         if (typeTopic == null) {
-            throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found");
+            throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found in DB");
         } else if (!typeTopic.getTypeUri().equals("dm4.core.topic_type") &&
                    !typeTopic.getTypeUri().equals("dm4.core.meta_type") &&
                    !typeTopic.getTypeUri().equals("dm4.core.meta_meta_type")) {
@@ -149,7 +149,7 @@ class TypeStorageImpl implements TypeStorage {
 
     private void checkAssociationType(String assocTypeUri, Topic typeTopic) {
         if (typeTopic == null) {
-            throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found");
+            throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found in DB");
         } else if (!typeTopic.getTypeUri().equals("dm4.core.assoc_type")) {
             throw new RuntimeException("URI \"" + assocTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
                 "\" when the caller expects a \"dm4.core.assoc_type\"");
