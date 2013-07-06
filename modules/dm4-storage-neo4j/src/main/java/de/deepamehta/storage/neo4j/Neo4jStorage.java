@@ -597,7 +597,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         Node node = topicContentExact.get(KEY_URI, uri).getSingle();
         //
         if (node == null) {
-            throw new RuntimeException("Topic with URI \"" + uri + "\" not found in database");
+            throw new RuntimeException("Topic with URI \"" + uri + "\" not found in DB");
         }
         //
         return checkType(node, NodeType.TOPIC);
