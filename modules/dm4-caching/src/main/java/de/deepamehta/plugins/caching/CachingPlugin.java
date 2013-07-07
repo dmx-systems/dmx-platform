@@ -83,7 +83,8 @@ public class CachingPlugin extends PluginActivator implements PreProcessRequestL
             if (time != -1) {
                 Response.ResponseBuilder response = request.evaluatePreconditions(new Date(time));
                 if (response != null) {
-                    logger.info("### Precondition for object " + objectId + " not met");
+                    logger.info("### Precondition of " + request.getMethod() + " request failed (object " + objectId +
+                        ")");
                     throw new WebApplicationException(response.build());
                 }
             }

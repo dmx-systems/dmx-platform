@@ -58,7 +58,7 @@ public class WebservicePlugin extends PluginActivator {
         try {
             return dms.getTopic(topicId, fetchComposite, clientState);
         } catch (Exception e) {
-            // ### TODO: mapping all exceptions to a generic WebApplicationException is probably not a good idea.
+            // ### TODO: mapping all exceptions to a generic WebApplicationException is not a good idea (see #484).
             throw new WebApplicationException(e);
         }
     }

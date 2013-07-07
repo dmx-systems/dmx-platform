@@ -14,7 +14,9 @@ import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateAssociationListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
+import de.deepamehta.core.service.event.PreSendAssociationListener;
 import de.deepamehta.core.service.event.PreSendResponseListener;
+import de.deepamehta.core.service.event.PreSendTopicListener;
 
 // ### TODO: remove Jersey dependency. Move to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -47,6 +49,8 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
                                                                         PostCreateAssociationListener,
                                                                         PostUpdateTopicListener,
                                                                         PostUpdateAssociationListener,
+                                                                        PreSendTopicListener,
+                                                                        PreSendAssociationListener,
                                                                         PreSendResponseListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -134,11 +138,22 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     // ---
 
     @Override
+    public void preSendTopic(Topic topic, ClientState clientState) {
+        enrichWithTimestamp(topic);
+    }
+
+    @Override
+    public void preSendAssociation(Association assoc, ClientState clientState) {
+        enrichWithTimestamp(assoc);
+    }
+
+    // ---
+
+    @Override
     public void preSendResponse(ContainerResponse response) {
         DeepaMehtaObject object = responseObject(response);
         if (object != null) {
-            long modified = getTimeModified(object.getId());
-            enrichWithTimestamp(object, modified);
+            long modified = enrichWithTimestamp(object);
             if (modified != -1) {
                 setLastModifiedHeader(response, modified);
             }
@@ -184,8 +199,10 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
         return entity instanceof DeepaMehtaObject ? (DeepaMehtaObject) entity : null;
     }
 
-    private void enrichWithTimestamp(DeepaMehtaObject object, long time) {
-        object.getCompositeValue().getModel().put(URI_MODIFIED, time);
+    private long enrichWithTimestamp(DeepaMehtaObject object) {
+        long modified = getTimeModified(object.getId());
+        object.getCompositeValue().getModel().put(URI_MODIFIED, modified);
+        return modified;
     }
 
     // ---

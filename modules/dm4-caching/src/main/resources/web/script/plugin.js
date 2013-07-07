@@ -12,7 +12,7 @@ dm4c.add_plugin("de.deepamehta.caching", function() {
                 var modified = dm4c.selected_object.composite["dm4.time.modified"].value
                 // ### TODO: dm4c.selected_object.get("dm4.time.modified") would be more comfortable
                 // ### but is not supported for non-model values. See Topic.prototype.get()
-                console.log("PUT object " + object_id + ", ID=" + dm4c.selected_object.id +
+                console.log("PUT object " + object_id + ", selection ID=" + dm4c.selected_object.id +
                     ", modified=" + modified + " (" + new Date(modified).toUTCString() + ")")
                 request.headers["If-Unmodified-Since"] = new Date(modified).toUTCString()
             }
