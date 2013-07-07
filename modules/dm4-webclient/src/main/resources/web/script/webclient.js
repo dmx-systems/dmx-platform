@@ -38,14 +38,13 @@ function Webclient() {
 
     // client model
     this.selected_object = null     // a Topic or an Association object, or null if there is no selection
+    var type_cache = new TypeCache()
 
     // view
     this.split_panel = null         // a SplitPanel object
     this.toolbar = null             // the upper toolbar GUI component (a ToolbarPanel object)
     this.canvas = null              // the canvas GUI component that displays the topicmap (a TopicmapRenderer object)
     this.page_panel = null          // the page panel GUI component on the right hand side (a PagePanel object)
-
-    var type_cache = new TypeCache()
 
     var pm = new PluginManager({
         internal_plugins: ["default_plugin.js", "fulltext_plugin.js", "ckeditor_plugin.js"]
@@ -88,7 +87,7 @@ function Webclient() {
         //
         var topics = dm4c.canvas.select_topic(topic_id)
         // update client model
-        set_selected_topic(topics.select, no_history_update)
+        set_topic_selection(topics.select, no_history_update)
         // update view
         dm4c.canvas.refresh()
         dm4c.page_panel.render_page(topics.display)
@@ -107,7 +106,7 @@ function Webclient() {
         //
         var assoc = dm4c.canvas.select_association(assoc_id)
         // update client model
-        set_selected_association(assoc, no_history_update)
+        set_association_selection(assoc, no_history_update)
         // update view
         dm4c.canvas.refresh()
         dm4c.page_panel.render_page(assoc)
@@ -378,14 +377,14 @@ function Webclient() {
             dm4c.canvas.refresh()
             // update client model
             if (do_select) {
-                set_selected_topic(topic_shown)
+                set_topic_selection(topic_shown)
             }
             //
             dm4c.fire_event("post_show_topic", topic_shown)     // fire event
         } else {
             // update client model
             if (do_select) {
-                set_selected_topic(topic)
+                set_topic_selection(topic)
             }
         }
         // update view (page panel)
@@ -400,7 +399,7 @@ function Webclient() {
         dm4c.canvas.refresh()
         // update client model
         if (do_select) {
-            set_selected_association(assoc)
+            set_association_selection(assoc)
         }
         //
         dm4c.fire_event("post_show_association", assoc)    // fire event
@@ -484,6 +483,8 @@ function Webclient() {
      * @param   a Topic object
      */
     function update_topic(topic) {
+        // update client model
+        set_topic_selection_conditionally(topic)
         // update view
         dm4c.canvas.update_topic(topic, true)           // refresh_canvas=true
         dm4c.page_panel.render_page_if_selected(topic)
@@ -500,6 +501,8 @@ function Webclient() {
      * @param   an Association object
      */
     function update_association(assoc, stay_in_edit_mode) {
+        // update client model
+        set_association_selection_conditionally(assoc)
         // update view
         dm4c.canvas.update_association(assoc, true)     // refresh_canvas=true
         stay_in_edit_mode ? dm4c.page_panel.render_form_if_selected(assoc) :
@@ -588,6 +591,18 @@ function Webclient() {
 
     // ---
 
+    function set_topic_selection_conditionally(topic) {
+        if (topic.id == dm4c.selected_object.id) {
+            set_topic_selection(topic, true)            // no_history_update=true
+        }
+    }
+
+    function set_association_selection_conditionally(assoc) {
+        if (assoc.id == dm4c.selected_object.id) {
+            set_association_selection(assoc, true)      // no_history_update=true
+        }
+    }
+
     function reset_selection_conditionally(object_id) {
         if (object_id == dm4c.selected_object.id) {
             dm4c.do_reset_selection()
@@ -604,21 +619,21 @@ function Webclient() {
 
     // === Selection ===
 
-    function set_selected_topic(topic, no_history_update) {
+    function set_topic_selection(topic, no_history_update) {
         // update client model
         dm4c.selected_object = topic
         //
         if (!no_history_update) {
             push_history(topic)
         }
-        // fire event
+        // signal model change
         dm4c.fire_event("post_select_topic", topic)
     }
 
-    function set_selected_association(assoc, no_history_update) {
+    function set_association_selection(assoc, no_history_update) {
         // update client model
         dm4c.selected_object = assoc
-        // fire event
+        // signal model change
         dm4c.fire_event("post_select_association", assoc)
     }
 
@@ -629,7 +644,7 @@ function Webclient() {
         if (!no_history_update) {
             push_history()
         }
-        // fire event
+        // signal model change
         dm4c.fire_event("post_reset_selection")
     }
 
