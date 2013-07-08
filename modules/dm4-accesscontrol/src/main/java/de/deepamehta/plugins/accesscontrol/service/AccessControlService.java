@@ -54,6 +54,8 @@ public interface AccessControlService extends PluginService {
 
     Permissions getTopicPermissions(long topicId);
 
+    Permissions getAssociationPermissions(long assocId);
+
     // ---
 
     /**

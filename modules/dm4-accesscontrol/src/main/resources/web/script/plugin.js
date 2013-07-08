@@ -19,16 +19,21 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         return this.request("GET", "/accesscontrol/user", undefined, undefined, undefined, "text")
         // Note: response 204 No Content yields to null result
     }
-    // ### FIXME: adapt to server-side
     dm4c.restc.get_topic_permissions = function(topic_id) {
         return this.request("GET", "/accesscontrol/topic/" + topic_id)
     }
+    dm4c.restc.get_association_permissions = function(assoc_id) {
+        return this.request("GET", "/accesscontrol/association/" + assoc_id)
+    }
+    // ### FIXME: adapt to server-side
     dm4c.restc.get_owned_topic = function(user_id, type_uri) {
         return this.request("GET", "/accesscontrol/owner/" + user_id + "/" + type_uri)
     }
+    // ### FIXME: adapt to server-side
     dm4c.restc.set_owner = function(topic_id, user_id) {
         this.request("POST", "/accesscontrol/topic/" + topic_id + "/owner/" + user_id)
     }
+    // ### FIXME: adapt to server-side
     dm4c.restc.create_acl_entry = function(topic_id, user_role_uri, permissions) {
         this.request("POST", "/accesscontrol/topic/" + topic_id + "/userrole/" + user_role_uri, permissions)
     }
@@ -167,10 +172,12 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             // Note: the types must be reloaded *before* the logged_in event is fired.
             // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
             dm4c.reload_types(function() {
+                // update model
+                clear_permissions_cache()
                 // update view
                 login_widget.show_user(username)
                 dm4c.restore_selection()
-                // fire event
+                // signal login status change
                 dm4c.fire_event("logged_in", username)
             })
         }
@@ -179,10 +186,12 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             // Note: the types must be reloaded *before* the logged_out event is fired.
             // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
             dm4c.reload_types(function() {
+                // update model
+                clear_permissions_cache()
                 // update view
                 login_widget.show_login()
                 dm4c.restore_selection()
-                // fire event
+                // signal login status change
                 dm4c.fire_event("logged_out")
             })
         }
@@ -220,26 +229,15 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     // ---
 
     dm4c.add_listener("has_write_permission_for_topic", function(topic) {
-        var permissions = topic.composite["dm4.accesscontrol.permissions"]
-        // error check
-        if (!permissions) {
-            throw "AccessControlError: topic " + topic.id + " (type_uri=\"" + topic.type_uri +
-                "\") has no permissions info"
-        }
-        //
-        return permissions.composite["dm4.accesscontrol.operation.write"].value
+        return get_topic_permissions(topic)["dm4.accesscontrol.operation.write"]
     })
 
     dm4c.add_listener("has_write_permission_for_association", function(assoc) {
-        var permissions = assoc.composite["dm4.accesscontrol.permissions"]
-        // error check
-        if (!permissions) {
-            throw "AccessControlError: association " + assoc.id + " (type_uri=\"" + assoc.type_uri +
-                "\") has no permissions info"
-        }
-        //
-        return permissions.composite["dm4.accesscontrol.operation.write"].value
+        return get_association_permissions(assoc)["dm4.accesscontrol.operation.write"]
     })
+
+    // ### TODO: make the types cachable (like topics/associations). That is, don't deliver the permissions along
+    // with the types (in the composite value). Instead let the client request the permissions separately.
 
     dm4c.add_listener("has_create_permission", function(topic_type) {
         var permissions = topic_type.composite["dm4.accesscontrol.permissions"]
@@ -275,5 +273,43 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     function encrypt_password(password) {
         return ENCRYPTED_PASSWORD_PREFIX + SHA256(password)
+    }
+
+
+
+    // === Permissions Cache ===
+
+    var permissions_cache = {}
+
+    function get_topic_permissions(topic) {
+        var permissions = permissions_cache[topic.id]
+        if (!permissions) {
+            permissions = dm4c.restc.get_topic_permissions(topic.id)
+            // error check
+            if (!permissions || permissions["dm4.accesscontrol.operation.write"] == undefined) {
+                throw "AccessControlError: invalid permissions info for topic " + topic.id +
+                    " (type_uri=\"" + topic.type_uri + "\")"
+            }
+            permissions_cache[topic.id] = permissions
+        }
+        return permissions
+    }
+
+    function get_association_permissions(assoc) {
+        var permissions = permissions_cache[assoc.id]
+        if (!permissions) {
+            permissions = dm4c.restc.get_association_permissions(assoc.id)
+            // error check
+            if (!permissions || permissions["dm4.accesscontrol.operation.write"] == undefined) {
+                throw "AccessControlError: invalid permissions info for association " + assoc.id +
+                    " (type_uri=\"" + assoc.type_uri + "\")"
+            }
+            permissions_cache[assoc.id] = permissions
+        }
+        return permissions
+    }
+
+    function clear_permissions_cache() {
+        permissions_cache = {}
     }
 })

@@ -31,9 +31,7 @@ import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
-import de.deepamehta.core.service.event.PreSendAssociationListener;
 import de.deepamehta.core.service.event.PreSendAssociationTypeListener;
-import de.deepamehta.core.service.event.PreSendTopicListener;
 import de.deepamehta.core.service.event.PreSendTopicTypeListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
@@ -71,8 +69,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                                                                                        PostUpdateTopicListener,
                                                                                        IntroduceTopicTypeListener,
                                                                                        IntroduceAssociationTypeListener,
-                                                                                       PreSendTopicListener,
-                                                                                       PreSendAssociationListener,
                                                                                        PreSendTopicTypeListener,
                                                                                        PreSendAssociationTypeListener {
 
@@ -172,11 +168,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @GET
-    @Path("/topic/{topic_id}")
+    @Path("/topic/{id}")
     @Override
-    public Permissions getTopicPermissions(@PathParam("topic_id") long topicId) {
-        Topic topic = dms.getTopic(topicId, false, null);
-        return createPermissions(hasPermission(getUsername(), Operation.WRITE, topic));
+    public Permissions getTopicPermissions(@PathParam("id") long topicId) {
+        return getPermissions(dms.getTopic(topicId, false, null));
+    }
+
+    @GET
+    @Path("/association/{id}")
+    @Override
+    public Permissions getAssociationPermissions(@PathParam("id") long assocId) {
+        return getPermissions(dms.getAssociation(assocId, false, null));
     }
 
     // ---
@@ -529,31 +531,24 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    @Override
-    public void preSendTopic(Topic topic, ClientState clientState) {
-        enrichWithPermissions(topic, clientState);
-    }
-
-    @Override
-    public void preSendAssociation(Association assoc, ClientState clientState) {
-        enrichWithPermissions(assoc, clientState);
-    }
+    // ### TODO: make the types cachable (like topics/associations). That is, don't deliver the permissions along
+    // with the types (don't use the preSend{}Type hooks). Instead let the client request the permissions separately.
 
     @Override
     public void preSendTopicType(TopicType topicType, ClientState clientState) {
         // Note: the permissions for "Meta Meta Type" must be set manually.
         // This type doesn't exist in DB. Fetching its ACL entries would fail.
         if (topicType.getUri().equals("dm4.core.meta_meta_type")) {
-            enrichWithPermissions(topicType, false, false);     // write=false, create=false
+            enrichWithPermissions(topicType, createPermissions(false, false));  // write=false, create=false
             return;
         }
         //
-        enrichWithPermissions(topicType, clientState);
+        enrichWithPermissions(topicType, getPermissions(topicType));
     }
 
     @Override
     public void preSendAssociationType(AssociationType assocType, ClientState clientState) {
-        enrichWithPermissions(assocType, clientState);
+        enrichWithPermissions(assocType, getPermissions(assocType));
     }
 
 
@@ -662,7 +657,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // === ACL Entries ===
+    // === Create ACL Entries ===
 
     /**
      * Sets the logged in user as the creator and the owner of the specified object
@@ -724,6 +719,20 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         setCreator(objectId, username);
         setOwner(objectId, username);
         setACL(objectId, acl);
+    }
+
+
+
+    // === Determine Permissions ===
+
+    private Permissions getPermissions(DeepaMehtaObject object) {
+        return createPermissions(hasPermission(getUsername(), Operation.WRITE, object));
+    }
+
+    private Permissions getPermissions(Type type) {
+        String username = getUsername();
+        return createPermissions(hasPermission(username, Operation.WRITE, type),
+                                 hasPermission(username, Operation.CREATE, type));
     }
 
     // ---
@@ -834,36 +843,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    public void enrichWithPermissions(DeepaMehtaObject object, ClientState clientState) {
-        logger.fine("### Enriching " + info(object) + " with its permissions (clientState=" + clientState + ")");
-        enrichWithPermissions(object, hasPermission(getUsername(), Operation.WRITE, object));
-    }
-
-    public void enrichWithPermissions(Type type, ClientState clientState) {
-        logger.fine("### Enriching type \"" + type.getUri() + "\" with its permissions");
-        String username = getUsername();
-        enrichWithPermissions(type, hasPermission(username, Operation.WRITE, type),
-                                    hasPermission(username, Operation.CREATE, type));
-    }
-    
-    // ---
-
-    private void enrichWithPermissions(DeepaMehtaObject object, boolean write) {
+    private void enrichWithPermissions(Type type, Permissions permissions) {
         // Note: we must extend/override possibly existing permissions.
         // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
-        CompositeValueModel permissions = permissions(object);
-        permissions.put(Operation.WRITE.uri, write);
+        CompositeValueModel typePermissions = permissions(type);
+        typePermissions.put(Operation.WRITE.uri, permissions.get(Operation.WRITE.uri));
+        typePermissions.put(Operation.CREATE.uri, permissions.get(Operation.CREATE.uri));
     }
-
-    private void enrichWithPermissions(Type type, boolean write, boolean create) {
-        // Note: we must extend/override possibly existing permissions.
-        // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
-        CompositeValueModel permissions = permissions(type);
-        permissions.put(Operation.WRITE.uri, write);
-        permissions.put(Operation.CREATE.uri, create);
-    }
-
-    // ---
 
     private CompositeValueModel permissions(DeepaMehtaObject object) {
         // Note 1: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
