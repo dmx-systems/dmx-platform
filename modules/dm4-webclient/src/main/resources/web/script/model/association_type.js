@@ -1,5 +1,5 @@
 function AssociationType(assoc_type) {
-    this.init(assoc_type)
+    Type.call(this, assoc_type)
 }
 
 AssociationType.prototype = new Type()

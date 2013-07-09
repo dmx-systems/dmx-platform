@@ -1,6 +1,6 @@
-function Type() {
+function Type(type) {
 
-    this.init = function(type) {
+    if (type) {
         this.id        = type.id
         this.uri       = type.uri
         this.value     = type.value
@@ -13,48 +13,6 @@ function Type() {
         this.label_config       = type.label_config
         this.view_config_topics = dm4c.hash_by_type(dm4c.build_topics(type.view_config_topics))
     }
-
-    // === "Page Displayable" implementation ===
-
-    this.get_type = function() {
-        return dm4c.get_topic_type(this.type_uri)
-    }
-
-    this.get_commands = function(context) {
-        return dm4c.get_topic_commands(this, context)
-    }
-
-    this.get_page_renderer_uri = function() {
-        return dm4c.get_view_config(this, "page_renderer_uri")
-    }
-
-    // === Public API ===
-
-    this.is_simple = function() {
-        return !this.is_composite()
-    }
-
-    this.is_composite = function() {
-        return this.data_type_uri == "dm4.core.composite"
-    }
-
-    // --- View Configuration ---
-
-    this.is_hidden = function() {
-        return dm4c.get_view_config(this, "hidden")
-    }
-
-    this.is_locked = function() {
-        return dm4c.get_view_config(this, "locked")
-    }
-
-    // ---
-
-    this.get_label_config = function(assoc_def_uri) {
-        return js.contains(this.label_config, assoc_def_uri)
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
 
     function deserialize(assoc_defs) {
         for (var i = 0, assoc_def; assoc_def = assoc_defs[i]; i++) {
@@ -69,4 +27,45 @@ function Type() {
         }
         return assoc_defs
     }
+}
+
+// === "Page Displayable" implementation ===
+
+Type.prototype.get_type = function() {
+    // Note: a type's type URI is "dm4.core.meta_type" and meta type is regarded as a topic type
+    return dm4c.get_topic_type(this.type_uri)
+}
+
+Type.prototype.get_commands = function(context) {
+    return dm4c.get_topic_commands(this, context)
+}
+
+Type.prototype.get_page_renderer_uri = function() {
+    return dm4c.get_view_config(this, "page_renderer_uri")
+}
+
+// === Public API ===
+
+Type.prototype.is_simple = function() {
+    return !this.is_composite()
+}
+
+Type.prototype.is_composite = function() {
+    return this.data_type_uri == "dm4.core.composite"
+}
+
+// --- View Configuration ---
+
+Type.prototype.is_hidden = function() {
+    return dm4c.get_view_config(this, "hidden")
+}
+
+Type.prototype.is_locked = function() {
+    return dm4c.get_view_config(this, "locked")
+}
+
+// ---
+
+Type.prototype.get_label_config = function(assoc_def_uri) {
+    return js.contains(this.label_config, assoc_def_uri)
 }

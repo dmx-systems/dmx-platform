@@ -1,5 +1,5 @@
 function TopicType(topic_type) {
-    this.init(topic_type)
+    Type.call(this, topic_type)
     this.icon = null    // The topic type's icon (JavaScript Image object).
                         // Note: it must be loaded *after* loading the topic types (see Webclient's load_types()).
 }

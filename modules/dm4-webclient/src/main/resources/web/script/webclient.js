@@ -1,6 +1,4 @@
-(function() {
-
-function Webclient() {
+dm4c = new function() {
 
     // logger preferences
     var ENABLE_LOGGING = false
@@ -50,7 +48,19 @@ function Webclient() {
         internal_plugins: ["default_plugin.js", "fulltext_plugin.js", "ckeditor_plugin.js"]
     })
 
-    extend_rest_client()
+    // === REST Client Extension ===
+
+    this.restc.search_topics_and_create_bucket = function(text, field_uri) {
+        var params = this.createRequestParameter({search: text, field: field_uri})
+        return this.request("GET", "/webclient/search" + params.to_query_string())
+    }
+    // Note: this method is actually part of the Type Search plugin.
+    // TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
+    // another namespace again) or make the Type Search plugin an integral part of the Client plugin.
+    this.restc.get_topics_and_create_bucket = function(type_uri, max_result_size) {
+        var params = this.createRequestParameter({max_result_size: max_result_size})
+        return this.request("GET", "/webclient/search/by_type/" + type_uri + params.to_query_string())
+    }
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -1379,22 +1389,6 @@ function Webclient() {
         return new AssociationType(assoc_type)
     }
 
-    // === REST client ===
-
-    function extend_rest_client() {
-        dm4c.restc.search_topics_and_create_bucket = function(text, field_uri) {
-            var params = this.createRequestParameter({search: text, field: field_uri})
-            return this.request("GET", "/webclient/search" + params.to_query_string())
-        }
-        // Note: this method is actually part of the Type Search plugin.
-        // TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
-        // another namespace again) or make the Type Search plugin an integral part of the Client plugin.
-        dm4c.restc.get_topics_and_create_bucket = function(type_uri, max_result_size) {
-            var params = this.createRequestParameter({max_result_size: max_result_size})
-            return this.request("GET", "/webclient/search/by_type/" + type_uri + params.to_query_string())
-        }
-    }
-
     // ------------------------------------------------------------------------------------------------ Constructor Code
 
     $(function() {
@@ -1422,7 +1416,3 @@ function Webclient() {
         type_cache.load_types(tracker)
     })
 }
-
-dm4c = {}   // create global object
-Webclient.call(dm4c)
-})()
