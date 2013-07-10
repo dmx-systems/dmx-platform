@@ -85,7 +85,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
+            throw new RuntimeException(operation + " failed", e);
         }
     }
 
@@ -115,7 +115,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
+            throw new RuntimeException(operation + " failed", e);
         }
     }
 
@@ -167,7 +167,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
+            throw new RuntimeException(operation + " failed", e);
         }
     }
 
@@ -195,7 +195,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
+            throw new RuntimeException(operation + " failed", e);
         }
     }
 
@@ -215,7 +215,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
+            throw new RuntimeException(operation + " failed", e);
         }
     }
 
@@ -233,7 +233,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
+            throw new RuntimeException(operation + " failed", e);
         }
     }
 
@@ -311,7 +311,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(operation + " failed", e));
+            throw new RuntimeException(operation + " failed", e);
         }
     }
 

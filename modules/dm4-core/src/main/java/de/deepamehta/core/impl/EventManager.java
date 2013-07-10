@@ -60,7 +60,7 @@ class EventManager {
             // Consider the Caching plugin: it produces a possible 304 (Not Modified) response this way.
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Delivering event " + event + " to " + listener + " failed", e);
+            throw new RuntimeException("Processing event " + event + " by " + listener + " failed", e);
         }
     }
 

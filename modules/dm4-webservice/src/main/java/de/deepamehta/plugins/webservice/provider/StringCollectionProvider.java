@@ -61,8 +61,7 @@ public class StringCollectionProvider implements MessageBodyReader<List<String>>
             String json = JavaUtils.readText(entityStream);
             return DeepaMehtaUtils.toList(new JSONArray(json));
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Creating a List<String> from message body failed",
-                e));
+            throw new RuntimeException("Creating a List<String> from message body failed", e);
         }
     }
 
@@ -98,7 +97,7 @@ public class StringCollectionProvider implements MessageBodyReader<List<String>>
             DeepaMehtaUtils.stringsToJson(strings).write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Writing message body failed (" + strings + ")", e));
+            throw new RuntimeException("Writing message body failed (" + strings + ")", e);
         }
     }
 }

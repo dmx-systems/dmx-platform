@@ -30,7 +30,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 
 import java.awt.Desktop;
 import java.net.URI;
@@ -95,7 +94,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             return searchTopic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Searching topics failed", e));
+            throw new RuntimeException("Searching topics failed", e);
         } finally {
             tx.finish();
         }
@@ -125,7 +124,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             return searchTopic;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new WebApplicationException(new RuntimeException("Searching topics failed", e));
+            throw new RuntimeException("Searching topics failed", e);
         } finally {
             tx.finish();
         }

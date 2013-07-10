@@ -52,8 +52,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile> {
         try {
             return parseMultiPart();
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(
-                "Creating UploadedFile from message body failed", e));
+            throw new RuntimeException("Creating UploadedFile from message body failed", e);
         }
     }
 

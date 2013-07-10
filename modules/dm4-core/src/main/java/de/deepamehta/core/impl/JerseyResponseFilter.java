@@ -11,8 +11,6 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 
-import javax.ws.rs.WebApplicationException;
-
 import java.lang.reflect.Type;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
@@ -66,7 +64,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             }
             return response;
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Jersey response filtering failed", e));
+            throw new RuntimeException("Jersey response filtering failed", e);
         }
     }
 

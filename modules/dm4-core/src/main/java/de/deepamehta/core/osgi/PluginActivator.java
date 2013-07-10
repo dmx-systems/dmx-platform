@@ -50,6 +50,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
         this.plugin = new PluginImpl(this);
         //
         try {
+            // Note: logging "this" requires "plugin" to be initialzed already
             logger.info("========== Starting " + this + " ==========");
             plugin.start();
         } catch (Exception e) {

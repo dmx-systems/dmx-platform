@@ -24,7 +24,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.WebApplicationException;
 
 import java.awt.Point;
 import java.io.InputStream;
@@ -106,7 +105,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         try {
             return new Topicmap(topicmapId, dms, clientState);
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Fetching topicmap " + topicmapId + " failed", e));
+            throw new RuntimeException("Fetching topicmap " + topicmapId + " failed", e);
         }
     }
 
@@ -187,8 +186,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             ));
             dms.updateTopic(new TopicModel(topicmapId, topicmapState), null);
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Setting translation of topicmap " + topicmapId +
-                " failed (transX=" + transX + ", transY=" + transY + ")", e));
+            throw new RuntimeException("Setting translation of topicmap " + topicmapId + " failed (transX=" +
+                transX + ", transY=" + transY + ")", e);
         }
     }
 
@@ -267,7 +266,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         try {
             return dms.getPlugin("de.deepamehta.webclient").getResourceAsStream("web/index.html");
         } catch (Exception e) {
-            throw new WebApplicationException(e);
+            throw new RuntimeException("Invoking the webclient failed", e);
         }
     }
 }

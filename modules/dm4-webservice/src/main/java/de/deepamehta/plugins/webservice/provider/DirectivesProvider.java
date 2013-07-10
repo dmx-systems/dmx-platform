@@ -50,8 +50,7 @@ public class DirectivesProvider implements MessageBodyWriter<Directives> {
             directives.toJSON().write(writer);
             writer.flush();
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Writing message body failed (" + directives + ")",
-                e));
+            throw new RuntimeException("Writing message body failed (" + directives + ")", e);
         }
     }
 }
