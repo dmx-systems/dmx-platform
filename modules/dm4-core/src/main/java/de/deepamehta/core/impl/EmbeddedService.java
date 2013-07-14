@@ -539,28 +539,53 @@ public class EmbeddedService implements DeepaMehtaService {
     // === Properties ===
 
     @Override
-    public Object getProperty(long objectId, String key) {
-        return storage.fetchProperty(objectId, key);
+    public Object getTopicProperty(long topicId, String propName) {
+        return storage.fetchTopicProperty(topicId, propName);
     }
 
     @Override
-    public void setProperty(long objectId, String key, Object value) {
+    public Object getAssociationProperty(long assocId, String propName) {
+        return storage.fetchAssociationProperty(assocId, propName);
+    }
+
+    @Override
+    public void setTopicProperty(long topicId, String propName, Object value) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.storeProperty(objectId, key, value);
+            storage.storeTopicProperty(topicId, propName, value);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Setting property \"" + key + "\" for object " + objectId + " failed (value=" +
-                value + ")", e);
+            throw new RuntimeException("Setting property \"" + propName + "\" for topic " + topicId +
+                " failed (value=" + value + ")", e);
         } finally {
             tx.finish();
         }
     }
 
     @Override
-    public boolean hasProperty(long objectId, String key) {
-        return storage.hasProperty(objectId, key);
+    public void setAssociationProperty(long assocId, String propName, Object value) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            storage.storeAssociationProperty(assocId, propName, value);
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Setting property \"" + propName + "\" for association " + assocId +
+                " failed (value=" + value + ")", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Override
+    public boolean hasTopicProperty(long topicId, String propName) {
+        return storage.hasTopicProperty(topicId, propName);
+    }
+
+    @Override
+    public boolean hasAssociationProperty(long assocId, String propName) {
+        return storage.hasAssociationProperty(assocId, propName);
     }
 
 

@@ -9,6 +9,10 @@ import de.deepamehta.core.service.PluginService;
 
 public interface AccessControlService extends PluginService {
 
+
+
+    // === Session ===
+
     /**
      * Checks weather the credentials in the authorization string match an existing User Account,
      * and if so, creates an HTTP session. ### FIXDOC
@@ -32,74 +36,120 @@ public interface AccessControlService extends PluginService {
      */
     void logout();
 
-    // ---
+
+
+    // === User ===
 
     /**
      * Returns the username of the logged in user.
      *
-     * @return  The username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
-     *          or <code>null</code> if no user is logged in. ### FIXDOC
+     * @return  The username, or <code>null</code> if no user is logged in.
      */
     String getUsername();
 
     /**
-     * Fetches the "Username" topic for the specified username.
+     * Returns the "Username" topic for the specified username.
      *
-     * @return  The fetched Username (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
-     *          or <code>null</code> if no such user exists.
+     * @return  The "Username" topic (type <code>dm4.accesscontrol.username</code>),
+     *          or <code>null</code> if no such username exists.
      */
     Topic getUsername(String username);
 
-    // ---
+
+
+    // === Permissions ===
 
     Permissions getTopicPermissions(long topicId);
 
     Permissions getAssociationPermissions(long assocId);
 
-    // ---
+
+
+    // === Creator ===
 
     /**
-     * Fetches the creator of an object.
+     * Returns the creator of a topic.
      *
-     * @return  The creator (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
-     *          or <code>null</code> if no creator is set. ### FIXDOC
+     * @return  The username of the creator, or <code>null</code> if no creator is set.
      */
-    String getCreator(long objectId);
+    String getTopicCreator(long topicId);
 
     /**
-     * Assigns the specified user as the creator of the specified object.
-     */
-    void setCreator(long objectId, String username);
-
-    // ---
-
-    /**
-     * Fetches the owner of an object.
+     * Returns the creator of an association.
      *
-     * @return  The owner (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
-     *          or <code>null</code> if no owner is set. ### FIXDOC
+     * @return  The username of the creator, or <code>null</code> if no creator is set.
      */
-    String getOwner(long objectId);
+    String getAssociationCreator(long assocId);
 
     /**
-     * Assigns the specified user as the owner of the specified object.
+     * Sets the creator of a topic.
      */
-    void setOwner(long objectId, String username);
-
-    // ---
+    void setTopicCreator(long topicId, String username);
 
     /**
-     * Fetches the Access Control List for the specified topic or association.
-     * If no one is stored an empty Access Control List is returned.
+     * Sets the creator of an association.
      */
-    AccessControlList getACL(long objectId);
+    void setAssociationCreator(long assocId, String username);
+
+
+
+    // === Owner ===
 
     /**
-     * Stores the Access Control List for the specified topic or association.
+     * Returns the owner of a topic.
+     *
+     * @return  The username of the owner, or <code>null</code> if no owner is set.
      */
-    void setACL(long objectId, AccessControlList acl);
+    String getTopicOwner(long topicId);
 
-    // ---
+    /**
+     * Returns the owner of an association.
+     *
+     * @return  The username of the owner, or <code>null</code> if no owner is set.
+     */
+    String getAssociationOwner(long assocId);
+
+    /**
+     * Sets the owner of a topic.
+     */
+    void setTopicOwner(long topicId, String username);
+
+    /**
+     * Sets the owner of an association.
+     */
+    void setAssociationOwner(long assocId, String username);
+
+
+
+    // === Access Control List ===
+
+    /**
+     * Returns the Access Control List of a topic.
+     *
+     * @return  The Access Control List. If no one was set an empty Access Control List is returned.
+     */
+    AccessControlList getTopicACL(long topicId);
+
+    /**
+     * Returns the Access Control List of an association.
+     *
+     * @return  The Access Control List. If no one was set an empty Access Control List is returned.
+     */
+    AccessControlList getAssociationACL(long assocId);
+
+    /**
+     * Sets the Access Control List for a topic.
+     */
+    void setTopicACL(long topicId, AccessControlList acl);
+
+    /**
+     * Sets the Access Control List for an association.
+     */
+    void setAssociationACL(long assocId, AccessControlList acl);
+
+
+
+    // === Workspaces ===
 
     void joinWorkspace(String username, long workspaceId);
     void joinWorkspace(Topic  username, long workspaceId);

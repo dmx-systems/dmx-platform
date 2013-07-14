@@ -3,6 +3,9 @@ package de.deepamehta.plugins.caching;
 import de.deepamehta.plugins.time.service.TimeService;
 
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.annotation.ConsumesService;
@@ -77,14 +80,14 @@ public class CachingPlugin extends PluginActivator implements PreProcessRequestL
 
     @Override
     public void preProcessRequest(ContainerRequest request) {
-        long objectId = objectId(request);
-        if (objectId != -1) {
-            long time = timeService.getTimeModified(objectId);
+        DeepaMehtaObjectModel object = requestObject(request);
+        if (object != null) {
+            long time = getModificationTime(object);
             if (time != -1) {
                 Response.ResponseBuilder response = request.evaluatePreconditions(new Date(time));
                 if (response != null) {
-                    logger.info("### Precondition of " + request.getMethod() + " request failed (object " + objectId +
-                        ")");
+                    logger.info("### Precondition of " + request.getMethod() + " request failed (object " +
+                        object.getId() + ")");
                     throw new WebApplicationException(response.build());
                 }
             }
@@ -103,15 +106,36 @@ public class CachingPlugin extends PluginActivator implements PreProcessRequestL
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private long objectId(ContainerRequest request) {
+    private DeepaMehtaObjectModel requestObject(ContainerRequest request) {
         // Example URL: "http://localhost:8080/core/topic/2695?fetch_composite=false"
         //   request.getBaseUri()="http://localhost:8080/"
         //   request.getPath()="core/topic/2695"
         //   request.getAbsolutePath()="http://localhost:8080/core/topic/2695"
         //   request.getRequestUri()="http://localhost:8080/core/topic/2695?fetch_composite=false"
         Matcher m = cachablePath.matcher(request.getPath());
-        return m.matches() ? Long.parseLong(m.group(2)) : -1;
-        // Note: content of group 1 is "topic" or "association"
+        if (m.matches()) {
+            String objectType = m.group(1);     // group 1 is "topic" or "association"
+            long objectId = Long.parseLong(m.group(2));
+            if (objectType.equals("topic")) {
+                return new TopicModel(objectId);
+            } else if (objectType.equals("association")) {
+                return new AssociationModel(objectId);
+            } else {
+                throw new RuntimeException("Unexpected object type: \"" + objectType + "\"");
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private long getModificationTime(DeepaMehtaObjectModel object) {
+        if (object instanceof TopicModel) {
+            return timeService.getTopicModificationTime(object.getId());
+        } else if (object instanceof AssociationModel) {
+            return timeService.getAssociationModificationTime(object.getId());
+        } else {
+            throw new RuntimeException("Unexpected object: " + object);
+        }
     }
 
     // ---

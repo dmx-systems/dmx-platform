@@ -542,16 +542,28 @@ public class StorageDecorator {
 
     // === Properties ===
 
-    public Object fetchProperty(long objectId, String key) {
-        return storage.fetchProperty(objectId, key);
+    public Object fetchTopicProperty(long topicId, String propName) {
+        return storage.fetchTopicProperty(topicId, propName);
     }
 
-    public void storeProperty(long objectId, String key, Object value) {
-        storage.storeProperty(objectId, key, value);
+    public Object fetchAssociationProperty(long assocId, String propName) {
+        return storage.fetchAssociationProperty(assocId, propName);
     }
 
-    public boolean hasProperty(long objectId, String key) {
-        return storage.hasProperty(objectId, key);
+    public void storeTopicProperty(long topicId, String propName, Object value) {
+        storage.storeTopicProperty(topicId, propName, value);
+    }
+
+    public void storeAssociationProperty(long assocId, String propName, Object value) {
+        storage.storeAssociationProperty(assocId, propName, value);
+    }
+
+    public boolean hasTopicProperty(long topicId, String propName) {
+        return storage.hasTopicProperty(topicId, propName);
+    }
+
+    public boolean hasAssociationProperty(long assocId, String propName) {
+        return storage.hasAssociationProperty(assocId, propName);
     }
 
 
@@ -582,10 +594,10 @@ public class StorageDecorator {
     }
 
     public int fetchMigrationNr() {
-        return (Integer) storage.fetchProperty(0, "core_migration_nr");
+        return (Integer) storage.fetchTopicProperty(0, "core_migration_nr");
     }
 
     public void storeMigrationNr(int migrationNr) {
-        storage.storeProperty(0, "core_migration_nr", migrationNr);
+        storage.storeTopicProperty(0, "core_migration_nr", migrationNr);
     }
 }

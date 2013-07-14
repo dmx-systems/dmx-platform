@@ -67,10 +67,10 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     private GraphDatabaseService neo4j = null;
     private RelationtypeCache relTypeCache;
     
-    private Index<Node> topicContentExact;
-    private Index<Node> topicContentFulltext;
-    private Index<Node> assocContentExact;
-    private Index<Node> assocContentFulltext;
+    private Index<Node> topicContentExact;      // holds topic URI, topic type URI, topic value (index mode KEY)
+    private Index<Node> topicContentFulltext;   // holds topic value (index modes FULLTEXT or FULLTEXT_KEY)
+    private Index<Node> assocContentExact;      // holds assoc URI, assoc type URI, assoc value (index mode KEY)
+    private Index<Node> assocContentFulltext;   // holds assoc value (index modes FULLTEXT or FULLTEXT_KEY)
     private Index<Node> assocMetadata;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
@@ -398,18 +398,33 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // === Properties ===
 
     @Override
-    public Object fetchProperty(long id, String key) {
-        return fetchNode(id).getProperty(key);
+    public Object fetchTopicProperty(long topicId, String propName) {
+        return fetchTopicNode(topicId).getProperty(propName);
     }
 
     @Override
-    public void storeProperty(long id, String key, Object value) {
-        fetchNode(id).setProperty(key, value);
+    public Object fetchAssociationProperty(long assocId, String propName) {
+        return fetchAssociationNode(assocId).getProperty(propName);
     }
 
     @Override
-    public boolean hasProperty(long id, String key) {
-        return fetchNode(id).hasProperty(key);
+    public void storeTopicProperty(long topicId, String propName, Object value) {
+        fetchTopicNode(topicId).setProperty(propName, value);
+    }
+
+    @Override
+    public void storeAssociationProperty(long assocId, String propName, Object value) {
+        fetchAssociationNode(assocId).setProperty(propName, value);
+    }
+
+    @Override
+    public boolean hasTopicProperty(long topicId, String propName) {
+        return fetchTopicNode(topicId).hasProperty(propName);
+    }
+
+    @Override
+    public boolean hasAssociationProperty(long assocId, String propName) {
+        return fetchAssociationNode(assocId).hasProperty(propName);
     }
 
 

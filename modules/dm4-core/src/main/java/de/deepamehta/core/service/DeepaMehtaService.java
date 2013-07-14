@@ -165,11 +165,19 @@ public interface DeepaMehtaService {
 
     // === Properties ===
 
-    Object getProperty(long objectId, String key);
+    // ### TODO: make these polymorph and move to DeepaMehtaObject?
 
-    void setProperty(long objectId, String key, Object value);
+    Object getTopicProperty(long topicId, String propName);
 
-    boolean hasProperty(long objectId, String key);
+    Object getAssociationProperty(long assocId, String propName);
+
+    void setTopicProperty(long topicId, String propName, Object value);
+
+    void setAssociationProperty(long assocId, String propName, Object value);
+
+    boolean hasTopicProperty(long topicId, String propName);
+
+    boolean hasAssociationProperty(long assocId, String propName);
 
 
 

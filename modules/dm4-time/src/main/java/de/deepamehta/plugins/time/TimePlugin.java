@@ -78,13 +78,25 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
 
     @Override
-    public long getTimeCreated(long objectId) {
-        return dms.hasProperty(objectId, PROP_CREATED) ? (Long) dms.getProperty(objectId, PROP_CREATED) : -1;
+    public long getTopicCreationTime(long topicId) {
+        return dms.hasTopicProperty(topicId, PROP_CREATED) ? (Long) dms.getTopicProperty(topicId, PROP_CREATED) : -1;
     }
 
     @Override
-    public long getTimeModified(long objectId) {
-        return dms.hasProperty(objectId, PROP_MODIFIED) ? (Long) dms.getProperty(objectId, PROP_MODIFIED) : -1;
+    public long getAssociationCreationTime(long assocId) {
+        return dms.hasAssociationProperty(assocId, PROP_CREATED) ? (Long) dms.getAssociationProperty(assocId,
+            PROP_CREATED) : -1;
+    }
+
+    @Override
+    public long getTopicModificationTime(long topicId) {
+        return dms.hasTopicProperty(topicId, PROP_MODIFIED) ? (Long) dms.getTopicProperty(topicId, PROP_MODIFIED) : -1;
+    }
+
+    @Override
+    public long getAssociationModificationTime(long assocId) {
+        return dms.hasAssociationProperty(assocId, PROP_MODIFIED) ? (Long) dms.getAssociationProperty(assocId,
+            PROP_MODIFIED) : -1;
     }
 
 
@@ -114,24 +126,24 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     @Override
     public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
-        storeTimestamps(topic.getId());
+        storeTimestamps(topic);
     }
 
     @Override
     public void postCreateAssociation(Association assoc, ClientState clientState, Directives directives) {
-        storeTimestamps(assoc.getId());
+        storeTimestamps(assoc);
     }
 
     @Override
     public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
                                                                                        Directives directives) {
-        storeTimestamp(topic.getId());
+        storeTimestamp(topic);
     }
 
     @Override
     public void postUpdateAssociation(Association assoc, AssociationModel oldModel, ClientState clientState,
                                                                                     Directives directives) {
-        storeTimestamp(assoc.getId());
+        storeTimestamp(assoc);
     }
 
     // ---
@@ -163,31 +175,37 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void storeTimestamps(long objectId) {
+    private void storeTimestamps(DeepaMehtaObject object) {
         long time = System.currentTimeMillis();
-        storeTimeCreated(objectId, time);
-        storeTimeModified(objectId, time);
+        storeCreationTime(object, time);
+        storeModificationTime(object, time);
     }
 
-    private void storeTimestamp(long objectId) {
+    private void storeTimestamp(DeepaMehtaObject object) {
         long time = System.currentTimeMillis();
-        storeTimeModified(objectId, time);
+        storeModificationTime(object, time);
     }
 
     // ---
 
-    private void storeTimeCreated(long objectId, long time) {
-        storeTime(objectId, PROP_CREATED, time);
+    private void storeCreationTime(DeepaMehtaObject object, long time) {
+        storeTime(object, PROP_CREATED, time);
     }
 
-    private void storeTimeModified(long objectId, long time) {
-        storeTime(objectId, PROP_MODIFIED, time);
+    private void storeModificationTime(DeepaMehtaObject object, long time) {
+        storeTime(object, PROP_MODIFIED, time);
     }
 
     // ---
 
-    private void storeTime(long objectId, String propName, long time) {
-        dms.setProperty(objectId, propName, time);
+    private void storeTime(DeepaMehtaObject object, String propName, long time) {
+        if (object instanceof Topic) {
+            dms.setTopicProperty(object.getId(), propName, time);
+        } else if (object instanceof Association) {
+            dms.setAssociationProperty(object.getId(), propName, time);
+        } else {
+            throw new RuntimeException("Unexpected object: " + object);
+        }
     }
 
     // ===
@@ -199,9 +217,19 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     }
 
     private long enrichWithTimestamp(DeepaMehtaObject object) {
-        long modified = getTimeModified(object.getId());
+        long modified = getModificationTime(object);
         object.getCompositeValue().getModel().put(URI_MODIFIED, modified);
         return modified;
+    }
+
+    private long getModificationTime(DeepaMehtaObject object) {
+        if (object instanceof Topic) {
+            return getTopicModificationTime(object.getId());
+        } else if (object instanceof Association) {
+            return getAssociationModificationTime(object.getId());
+        } else {
+            throw new RuntimeException("Unexpected object: " + object);
+        }
     }
 
     // ---

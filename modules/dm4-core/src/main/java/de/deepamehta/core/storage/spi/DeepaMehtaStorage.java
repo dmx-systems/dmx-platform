@@ -160,11 +160,17 @@ public interface DeepaMehtaStorage {
 
     // === Properties ===
 
-    Object fetchProperty(long objectId, String key);
+    Object fetchTopicProperty(long topicId, String propName);
 
-    void storeProperty(long objectId, String key, Object value);
+    Object fetchAssociationProperty(long assocId, String propName);
 
-    boolean hasProperty(long objectId, String key);
+    void storeTopicProperty(long topicId, String propName, Object value);
+
+    void storeAssociationProperty(long assocId, String propName, Object value);
+
+    boolean hasTopicProperty(long topicId, String propName);
+
+    boolean hasAssociationProperty(long assocId, String propName);
 
 
 
