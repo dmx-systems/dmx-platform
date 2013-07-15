@@ -48,12 +48,12 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     private static final String KEY_NODE_TYPE = "node_type";
     private static final String KEY_VALUE     = "value";
 
-    // --- Content Indexes ---
+    // --- Content Index Keys ---
     private static final String KEY_URI      = "uri";                       // used as property key as well
     private static final String KEY_TPYE_URI = "type_uri";                  // used as property key as well
     private static final String KEY_FULLTEXT = "_fulltext_";
 
-    // --- Association Metadata Index ---
+    // --- Association Metadata Index Keys ---
     private static final String KEY_ASSOC_ID       = "assoc_id";
     private static final String KEY_ASSOC_TPYE_URI = "assoc_type_uri";
     // role 1 & 2
@@ -408,13 +408,15 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public void storeTopicProperty(long topicId, String propName, Object value) {
-        fetchTopicNode(topicId).setProperty(propName, value);
+    public void storeTopicProperty(long topicId, String propName, Object value, boolean addToIndex) {
+        Index<Node> exactIndex = addToIndex ? topicContentExact : null;
+        storeAndIndexExactValue(fetchTopicNode(topicId), propName, value, exactIndex);
     }
 
     @Override
-    public void storeAssociationProperty(long assocId, String propName, Object value) {
-        fetchAssociationNode(assocId).setProperty(propName, value);
+    public void storeAssociationProperty(long assocId, String propName, Object value, boolean addToIndex) {
+        Index<Node> exactIndex = addToIndex ? assocContentExact : null;
+        storeAndIndexExactValue(fetchAssociationNode(assocId), propName, value, exactIndex);
     }
 
     @Override
@@ -718,11 +720,21 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---
 
-    private void storeAndIndexExactValue(Node node, String key, String value, Index<Node> index) {
+    /**
+     * Stores a node value under the specified key and adds the value to the specified index (under the same key).
+     * <code>IndexMode.KEY</code> is used for indexing.
+     * <p>
+     * Used for URIs, type URIs, and properties.
+     *
+     * @param   exactIndex  the index to add the value to. If <code>null</code> no indexing is performed.
+     */
+    private void storeAndIndexExactValue(Node node, String key, Object value, Index<Node> exactIndex) {
         // store
         node.setProperty(key, value);
         // index
-        indexNodeValue(node, value, asList(IndexMode.KEY), key, index, null);   // fulltextIndex=null
+        if (exactIndex != null) {
+            indexNodeValue(node, value, asList(IndexMode.KEY), key, exactIndex, null);      // fulltextIndex=null
+        }
     }
 
     // ---

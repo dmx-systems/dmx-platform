@@ -549,10 +549,10 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public void setTopicProperty(long topicId, String propName, Object value) {
+    public void setTopicProperty(long topicId, String propName, Object value, boolean addToIndex) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.storeTopicProperty(topicId, propName, value);
+            storage.storeTopicProperty(topicId, propName, value, addToIndex);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -564,10 +564,10 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public void setAssociationProperty(long assocId, String propName, Object value) {
+    public void setAssociationProperty(long assocId, String propName, Object value, boolean addToIndex) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.storeAssociationProperty(assocId, propName, value);
+            storage.storeAssociationProperty(assocId, propName, value, addToIndex);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");

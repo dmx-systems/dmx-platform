@@ -74,18 +74,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    // security settings
+    // Security settings
     private static final boolean READ_REQUIRES_LOGIN  = Boolean.getBoolean("dm4.security.read_requires_login");
     private static final boolean WRITE_REQUIRES_LOGIN = Boolean.getBoolean("dm4.security.write_requires_login");
     private static final String SUBNET_FILTER         = System.getProperty("dm4.security.subnet_filter");
 
     private static final String AUTHENTICATION_REALM = "DeepaMehta";
 
-    // default user
+    // Default user account
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
 
-    // default ACLs
+    // Default ACLs
     private static final AccessControlList DEFAULT_INSTANCE_ACL = new AccessControlList(
         new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER, UserRole.MEMBER)
     );
@@ -97,6 +97,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final AccessControlList DEFAULT_USER_ACCOUNT_ACL = new AccessControlList(
         new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER)
     );
+
+    // Property names
+    private static String PROP_CREATOR = "creator";
+    private static String PROP_OWNER = "owner";
+    private static String PROP_ACL = "acl";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -193,23 +198,24 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public String getTopicCreator(long topicId) {
-        return dms.hasTopicProperty(topicId, "creator") ? (String) dms.getTopicProperty(topicId, "creator") : null;
+        return dms.hasTopicProperty(topicId, PROP_CREATOR) ? (String) dms.getTopicProperty(topicId, PROP_CREATOR) :
+            null;
     }
 
     @Override
     public String getAssociationCreator(long assocId) {
-        return dms.hasAssociationProperty(assocId, "creator") ? (String) dms.getAssociationProperty(assocId, "creator")
-            : null;
+        return dms.hasAssociationProperty(assocId, PROP_CREATOR) ? (String) dms.getAssociationProperty(assocId,
+            PROP_CREATOR) : null;
     }
 
     @Override
     public void setTopicCreator(long topicId, String username) {
-        dms.setTopicProperty(topicId, "creator", username);
+        dms.setTopicProperty(topicId, PROP_CREATOR, username, true);           // addToIndex=true
     }
 
     @Override
     public void setAssociationCreator(long assocId, String username) {
-        dms.setAssociationProperty(assocId, "creator", username);
+        dms.setAssociationProperty(assocId, PROP_CREATOR, username, true);     // addToIndex=true
     }
 
 
@@ -218,23 +224,23 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public String getTopicOwner(long topicId) {
-        return dms.hasTopicProperty(topicId, "owner") ? (String) dms.getTopicProperty(topicId, "owner") : null;
+        return dms.hasTopicProperty(topicId, PROP_OWNER) ? (String) dms.getTopicProperty(topicId, PROP_OWNER) : null;
     }
 
     @Override
     public String getAssociationOwner(long assocId) {
-        return dms.hasAssociationProperty(assocId, "owner") ? (String) dms.getAssociationProperty(assocId, "owner")
-            : null;
+        return dms.hasAssociationProperty(assocId, PROP_OWNER) ? (String) dms.getAssociationProperty(assocId,
+            PROP_OWNER) : null;
     }
 
     @Override
     public void setTopicOwner(long topicId, String username) {
-        dms.setTopicProperty(topicId, "owner", username);
+        dms.setTopicProperty(topicId, PROP_OWNER, username, true);             // addToIndex=true
     }
 
     @Override
     public void setAssociationOwner(long assocId, String username) {
-        dms.setAssociationProperty(assocId, "owner", username);
+        dms.setAssociationProperty(assocId, PROP_OWNER, username, true);       // addToIndex=true
     }
 
 
@@ -244,8 +250,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public AccessControlList getTopicACL(long topicId) {
         try {
-            if (dms.hasTopicProperty(topicId, "acl")) {
-                return new AccessControlList(new JSONObject((String) dms.getTopicProperty(topicId, "acl")));
+            if (dms.hasTopicProperty(topicId, PROP_ACL)) {
+                return new AccessControlList(new JSONObject((String) dms.getTopicProperty(topicId, PROP_ACL)));
             } else {
                 return new AccessControlList();
             }
@@ -257,8 +263,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public AccessControlList getAssociationACL(long assocId) {
         try {
-            if (dms.hasAssociationProperty(assocId, "acl")) {
-                return new AccessControlList(new JSONObject((String) dms.getAssociationProperty(assocId, "acl")));
+            if (dms.hasAssociationProperty(assocId, PROP_ACL)) {
+                return new AccessControlList(new JSONObject((String) dms.getAssociationProperty(assocId, PROP_ACL)));
             } else {
                 return new AccessControlList();
             }
@@ -270,7 +276,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void setTopicACL(long topicId, AccessControlList acl) {
         try {
-            dms.setTopicProperty(topicId, "acl", acl.toJSON().toString());
+            dms.setTopicProperty(topicId, PROP_ACL, acl.toJSON().toString(), false);        // addToIndex=false
         } catch (Exception e) {
             throw new RuntimeException("Storing access control list for topic " + topicId + " failed", e);
         }
@@ -279,7 +285,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void setAssociationACL(long assocId, AccessControlList acl) {
         try {
-            dms.setAssociationProperty(assocId, "acl", acl.toJSON().toString());
+            dms.setAssociationProperty(assocId, PROP_ACL, acl.toJSON().toString(), false);  // addToIndex=false
         } catch (Exception e) {
             throw new RuntimeException("Storing access control list for association " + assocId + " failed", e);
         }

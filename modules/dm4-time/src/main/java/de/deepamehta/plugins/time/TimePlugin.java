@@ -200,9 +200,9 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     private void storeTime(DeepaMehtaObject object, String propName, long time) {
         if (object instanceof Topic) {
-            dms.setTopicProperty(object.getId(), propName, time);
+            dms.setTopicProperty(object.getId(), propName, time, true);         // addToIndex=true
         } else if (object instanceof Association) {
-            dms.setAssociationProperty(object.getId(), propName, time);
+            dms.setAssociationProperty(object.getId(), propName, time, true);   // addToIndex=true
         } else {
             throw new RuntimeException("Unexpected object: " + object);
         }

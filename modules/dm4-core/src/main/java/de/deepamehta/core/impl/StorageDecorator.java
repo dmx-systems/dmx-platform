@@ -550,12 +550,12 @@ public class StorageDecorator {
         return storage.fetchAssociationProperty(assocId, propName);
     }
 
-    public void storeTopicProperty(long topicId, String propName, Object value) {
-        storage.storeTopicProperty(topicId, propName, value);
+    public void storeTopicProperty(long topicId, String propName, Object value, boolean addToIndex) {
+        storage.storeTopicProperty(topicId, propName, value, addToIndex);
     }
 
-    public void storeAssociationProperty(long assocId, String propName, Object value) {
-        storage.storeAssociationProperty(assocId, propName, value);
+    public void storeAssociationProperty(long assocId, String propName, Object value, boolean addToIndex) {
+        storage.storeAssociationProperty(assocId, propName, value, addToIndex);
     }
 
     public boolean hasTopicProperty(long topicId, String propName) {
@@ -598,6 +598,6 @@ public class StorageDecorator {
     }
 
     public void storeMigrationNr(int migrationNr) {
-        storage.storeTopicProperty(0, "core_migration_nr", migrationNr);
+        storage.storeTopicProperty(0, "core_migration_nr", migrationNr, false);     // addToIndex=false
     }
 }
