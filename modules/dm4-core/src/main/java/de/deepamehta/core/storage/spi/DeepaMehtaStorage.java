@@ -164,9 +164,23 @@ public interface DeepaMehtaStorage {
 
     Object fetchAssociationProperty(long assocId, String propName);
 
-    void storeTopicProperty(long topicId, String propName, Object value, boolean addToIndex);
+    // ---
 
-    void storeAssociationProperty(long assocId, String propName, Object value, boolean addToIndex);
+    Collection<TopicModel> fetchTopicsByProperty(String propName, Object propValue);
+
+    Collection<TopicModel> fetchTopicsByPropertyRange(String propName, Number from, Number to);
+
+    Collection<AssociationModel> fetchAssociationsByProperty(String propName, Object propValue);
+
+    Collection<AssociationModel> fetchAssociationsByPropertyRange(String propName, Number from, Number to);
+
+    // ---
+
+    void storeTopicProperty(long topicId, String propName, Object propValue, boolean addToIndex);
+
+    void storeAssociationProperty(long assocId, String propName, Object propValue, boolean addToIndex);
+
+    // ---
 
     boolean hasTopicProperty(long topicId, String propName);
 

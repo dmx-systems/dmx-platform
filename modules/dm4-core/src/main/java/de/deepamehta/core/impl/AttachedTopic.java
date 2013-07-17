@@ -116,7 +116,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
                                                     boolean fetchComposite, boolean fetchRelatingComposite) {
         RelatedAssociationModel assoc = dms.storage.fetchTopicRelatedAssociation(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
-        return assoc != null ? dms.attach(assoc, fetchComposite, fetchRelatingComposite) : null;
+        return assoc != null ? dms.instantiateRelatedAssociation(assoc, fetchComposite, fetchRelatingComposite) : null;
     }
 
     @Override
@@ -125,7 +125,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
                                                           boolean fetchComposite, boolean fetchRelatingComposite) {
         Set<RelatedAssociationModel> assocs = dms.storage.fetchTopicRelatedAssociations(getId(), assocTypeUri,
             myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return dms.attach(assocs, fetchComposite, fetchRelatingComposite);
+        return dms.instantiateRelatedAssociations(assocs, fetchComposite, fetchRelatingComposite);
     }
 
 
@@ -146,7 +146,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
                                     int maxResultSize, ClientState clientState) {
         ResultSet<RelatedTopicModel> topics = dms.storage.fetchTopicRelatedTopics(getId(), assocTypeUris,
             myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
-        return dms.attach(topics, fetchComposite, fetchRelatingComposite, clientState);
+        return dms.instantiateRelatedTopics(topics, fetchComposite, fetchRelatingComposite);
     }
 
     // --- Association Retrieval ---
@@ -156,12 +156,13 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
                                                                                    long othersTopicId) {
         AssociationModel assoc = dms.storage.fetchAssociation(assocTypeUri, getId(), othersTopicId, myRoleTypeUri,
             othersRoleTypeUri);
-        return assoc != null ? dms.attach(assoc, false) : null;                 // fetchComposite=false
+        return assoc != null ? dms.instantiateAssociation(assoc, false) : null;     // fetchComposite=false
     }
 
     @Override
     public Set<Association> getAssociations() {
-        return dms.attach(dms.storage.fetchTopicAssociations(getId()), false);  // fetchComposite=false
+        return dms.instantiateAssociations(dms.storage.fetchTopicAssociations(getId()), false);
+                                                                                    // fetchComposite=false
     }
 
 

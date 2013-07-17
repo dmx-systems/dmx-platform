@@ -215,7 +215,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                                                 boolean fetchRelatingComposite, ClientState clientState) {
         RelatedTopicModel topic = fetchRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
         // fetchRelatedTopic() is abstract
-        return topic != null ? dms.attach(topic, fetchComposite, fetchRelatingComposite, clientState) : null;
+        return topic != null ? dms.instantiateRelatedTopic(topic, fetchComposite, fetchRelatingComposite) : null;
     }
 
     @Override
@@ -229,7 +229,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                                     int maxResultSize, ClientState clientState) {
         ResultSet<RelatedTopicModel> topics = fetchRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri, maxResultSize);     // fetchRelatedTopics() is abstract
-        return dms.attach(topics, fetchComposite, fetchRelatingComposite, clientState);
+        return dms.instantiateRelatedTopics(topics, fetchComposite, fetchRelatingComposite);
     }
 
     // Note: this method is implemented in the subclasses (this is an abstract class):

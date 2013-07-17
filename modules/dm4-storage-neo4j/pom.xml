@@ -34,7 +34,6 @@
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-lucene-index</artifactId>
             <version>1.8.1</version>
-            <scope>runtime</scope>
         </dependency>
         <!-- JTA Specification (required by neo4j-kernel) -->
         <dependency>

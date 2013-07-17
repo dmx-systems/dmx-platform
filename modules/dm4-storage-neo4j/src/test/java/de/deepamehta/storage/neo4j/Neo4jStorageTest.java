@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -209,6 +210,26 @@ public class Neo4jStorageTest {
         //    That reflects the behavior of the underlying Neo4j Index's get() method.
     }
 
+    // --- Property Index ---
+
+    @Test
+    public void propertyIndex() {
+        Collection<TopicModel> topics;
+        // Note: The same type must be used for indexing and querying.
+        // That is, you can't index a value as a Long and then query the index using an Integer.
+        topics = storage.fetchTopicsByProperty("score", 12L);  assertEquals(0, topics.size());
+        topics = storage.fetchTopicsByProperty("score", 123L); assertEquals(1, topics.size());
+        topics = storage.fetchTopicsByProperty("score", 23L);  assertEquals(2, topics.size());
+    }
+
+    @Test
+    public void propertyIndexRange() {
+        Collection<TopicModel> topics;
+        topics = storage.fetchTopicsByPropertyRange("score", 1L, 1000L);  assertEquals(3, topics.size());
+        topics = storage.fetchTopicsByPropertyRange("score", 23L, 23L);   assertEquals(2, topics.size());
+        topics = storage.fetchTopicsByPropertyRange("score", 23L, 1234L); assertEquals(4, topics.size());
+    }
+
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -237,6 +258,13 @@ public class Neo4jStorageTest {
             createTopic("note-3", "dm4.notes.note", htmlText, IndexMode.FULLTEXT, null);
             createTopic("note-4", "dm4.notes.note", htmlText, IndexMode.FULLTEXT, JavaUtils.stripHTML(htmlText));
             //
+            // Property indexing
+            //
+            createTopic("score", 123L);
+            createTopic("score", 23L);
+            createTopic("score", 1234L);
+            createTopic("score", 23L);
+            //
             tx.success();
         } finally {
             tx.finish();
@@ -245,11 +273,11 @@ public class Neo4jStorageTest {
 
     // ---
 
-    private void createTopic(String uri, String typeUri, String value) {
-        createTopic(uri, typeUri, value, IndexMode.OFF, null);
+    private long createTopic(String uri, String typeUri, String value) {
+        return createTopic(uri, typeUri, value, IndexMode.OFF, null);
     }
 
-    private void createTopic(String uri, String typeUri, String value, IndexMode indexMode, String indexValue) {
+    private long createTopic(String uri, String typeUri, String value, IndexMode indexMode, String indexValue) {
         TopicModel topic = new TopicModel(uri, typeUri, new SimpleValue(value));
         assertEquals(-1, topic.getId());
         //
@@ -260,6 +288,13 @@ public class Neo4jStorageTest {
         //
         storage.storeTopicValue(topicId, topic.getSimpleValue(), asList(indexMode), null,
             indexValue != null ? new SimpleValue(indexValue) : null);
+        //
+        return topicId;
+    }
+
+    private void createTopic(String propName, Object propValue) {
+        long topicId = createTopic(null, "dm4.notes.note", "");
+        storage.storeTopicProperty(topicId, propName, propValue, true);     // addToIndex=true
     }
 
     // ---

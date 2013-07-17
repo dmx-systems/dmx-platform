@@ -171,9 +171,23 @@ public interface DeepaMehtaService {
 
     Object getAssociationProperty(long assocId, String propName);
 
-    void setTopicProperty(long topicId, String propName, Object value, boolean addToIndex);
+    // ---
 
-    void setAssociationProperty(long assocId, String propName, Object value, boolean addToIndex);
+    Collection<Topic> getTopicsByProperty(String propName, Object propValue);
+
+    Collection<Topic> getTopicsByPropertyRange(String propName, Number from, Number to);
+
+    Collection<Association> getAssociationsByProperty(String propName, Object propValue);
+
+    Collection<Association> getAssociationsByPropertyRange(String propName, Number from, Number to);
+
+    // ---
+
+    void setTopicProperty(long topicId, String propName, Object propValue, boolean addToIndex);
+
+    void setAssociationProperty(long assocId, String propName, Object propValue, boolean addToIndex);
+
+    // ---
 
     boolean hasTopicProperty(long topicId, String propName);
 

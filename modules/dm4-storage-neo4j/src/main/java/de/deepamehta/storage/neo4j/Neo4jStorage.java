@@ -22,6 +22,8 @@ import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.IndexManager;
 import static org.neo4j.helpers.collection.MapUtil.stringMap;
+import org.neo4j.index.lucene.QueryContext;
+import org.neo4j.index.lucene.ValueContext;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -407,17 +409,43 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         return fetchAssociationNode(assocId).getProperty(propName);
     }
 
+    // ---
+
     @Override
-    public void storeTopicProperty(long topicId, String propName, Object value, boolean addToIndex) {
-        Index<Node> exactIndex = addToIndex ? topicContentExact : null;
-        storeAndIndexExactValue(fetchTopicNode(topicId), propName, value, exactIndex);
+    public Collection<TopicModel> fetchTopicsByProperty(String propName, Object propValue) {
+        return buildTopics(queryIndexByProperty(topicContentExact, propName, propValue));
     }
 
     @Override
-    public void storeAssociationProperty(long assocId, String propName, Object value, boolean addToIndex) {
-        Index<Node> exactIndex = addToIndex ? assocContentExact : null;
-        storeAndIndexExactValue(fetchAssociationNode(assocId), propName, value, exactIndex);
+    public Collection<TopicModel> fetchTopicsByPropertyRange(String propName, Number from, Number to) {
+        return buildTopics(queryIndexByPropertyRange(topicContentExact, propName, from, to));
     }
+
+    @Override
+    public Collection<AssociationModel> fetchAssociationsByProperty(String propName, Object propValue) {
+        return buildAssociations(queryIndexByProperty(assocContentExact, propName, propValue));
+    }
+
+    @Override
+    public Collection<AssociationModel> fetchAssociationsByPropertyRange(String propName, Number from, Number to) {
+        return buildAssociations(queryIndexByPropertyRange(assocContentExact, propName, from, to));
+    }
+
+    // ---
+
+    @Override
+    public void storeTopicProperty(long topicId, String propName, Object propValue, boolean addToIndex) {
+        Index<Node> exactIndex = addToIndex ? topicContentExact : null;
+        storeAndIndexExactValue(fetchTopicNode(topicId), propName, propValue, exactIndex);
+    }
+
+    @Override
+    public void storeAssociationProperty(long assocId, String propName, Object propValue, boolean addToIndex) {
+        Index<Node> exactIndex = addToIndex ? assocContentExact : null;
+        storeAndIndexExactValue(fetchAssociationNode(assocId), propName, propValue, exactIndex);
+    }
+
+    // ---
 
     @Override
     public boolean hasTopicProperty(long topicId, String propName) {
@@ -470,20 +498,20 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // === Neo4j -> DeepaMehta Bridge ===
 
-    private TopicModel buildTopic(Node node) {
+    private TopicModel buildTopic(Node topicNode) {
         return new TopicModel(
-            node.getId(),
-            uri(node),
-            typeUri(node),
-            simpleValue(node),
+            topicNode.getId(),
+            uri(topicNode),
+            typeUri(topicNode),
+            simpleValue(topicNode),
             null    // composite=null
         );
     }
 
-    private List<TopicModel> buildTopics(Iterable<Node> nodes) {
+    private List<TopicModel> buildTopics(Iterable<Node> topicNodes) {
         List<TopicModel> topics = new ArrayList();
-        for (Node node : nodes) {
-            topics.add(buildTopic(node));
+        for (Node topicNode : topicNodes) {
+            topics.add(buildTopic(topicNode));
         }
         return topics;
     }
@@ -500,6 +528,14 @@ public class Neo4jStorage implements DeepaMehtaStorage {
             simpleValue(assocNode),
             null    // composite=null
         );
+    }
+
+    private Set<AssociationModel> buildAssociations(Iterable<Node> assocNodes) {
+        Set<AssociationModel> assocs = new HashSet();
+        for (Node assocNode : assocNodes) {
+            assocs.add(buildAssociation(assocNode));
+        }
+        return assocs;
     }
 
     private List<RoleModel> buildRoleModels(Node assocNode) {
@@ -726,6 +762,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
      * <p>
      * Used for URIs, type URIs, and properties.
      *
+     * @param   node        a topic node, or an association node.
      * @param   exactIndex  the index to add the value to. If <code>null</code> no indexing is performed.
      */
     private void storeAndIndexExactValue(Node node, String key, Object value, Index<Node> exactIndex) {
@@ -733,6 +770,10 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         node.setProperty(key, value);
         // index
         if (exactIndex != null) {
+            // Note: numbers are indexed numerically to allow range queries.
+            if (value instanceof Number) {
+                value = ValueContext.numeric((Number) value);
+            }
             indexNodeValue(node, value, asList(IndexMode.KEY), key, exactIndex, null);      // fulltextIndex=null
         }
     }
@@ -886,15 +927,35 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         assocMetadata.add(assocNode, key, value);
     }
 
+    // --- Query indexes ---
+
+    private IndexHits<Node> queryIndexByProperty(Index<Node> index, String propName, Object propValue) {
+        // Note: numbers must be queried as numeric value as they are indexed numerically.
+        if (propValue instanceof Number) {
+            propValue = ValueContext.numeric((Number) propValue);
+        }
+        return index.get(propName, propValue);
+    }
+
+    private IndexHits<Node> queryIndexByPropertyRange(Index<Node> index, String propName, Number from, Number to) {
+        return index.query(buildNumericRangeQuery(propName, from, to));
+    }
+
     // ---
 
     private Set<AssociationModel> queryAssociationIndex(String assocTypeUri,
                                      String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
                                      String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
-        return executeAssociationQuery(buildAssociationQuery(assocTypeUri,
+        return buildAssociations(assocMetadata.query(buildAssociationQuery(assocTypeUri,
             roleTypeUri1, playerType1, playerId1, playerTypeUri1,
             roleTypeUri2, playerType2, playerId2, playerTypeUri2
-        ));
+        )));
+    }
+
+    // --- Build index queries ---
+
+    private QueryContext buildNumericRangeQuery(String propName, Number from, Number to) {
+        return QueryContext.numericRange(propName, from, to);
     }
 
     // ---
@@ -945,17 +1006,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         query.add(new TermQuery(new Term(key, value)), Occur.MUST);
     }
 
-    // ---
-
-    private Set<AssociationModel> executeAssociationQuery(Query query) {
-        Set<AssociationModel> assocs = new HashSet();
-        for (Node assocNode : assocMetadata.query(query)) {
-            assocs.add(buildAssociation(assocNode));
-        }
-        return assocs;
-    }
-
-    // ---
+    // --- Create indexes ---
 
     private Index<Node> createExactIndex(String name) {
         return neo4j.index().forNodes(name);
