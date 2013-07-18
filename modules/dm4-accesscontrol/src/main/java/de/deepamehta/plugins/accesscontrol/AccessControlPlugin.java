@@ -54,6 +54,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -309,6 +310,38 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         } catch (Exception e) {
             throw new RuntimeException("Joining user " + username + " to workspace " + workspaceId + " failed", e);
         }
+    }
+
+
+
+    // === Retrieval ===
+
+    @GET
+    @Path("/creator/{username}/topics")
+    @Override
+    public Collection<Topic> getTopicsByCreator(@PathParam("username") String username) {
+        return dms.getTopicsByProperty(PROP_CREATOR, username);
+    }
+
+    @GET
+    @Path("/owner/{username}/topics")
+    @Override
+    public Collection<Topic> getTopicsByOwner(@PathParam("username") String username) {
+        return dms.getTopicsByProperty(PROP_OWNER, username);
+    }
+
+    @GET
+    @Path("/creator/{username}/assocs")
+    @Override
+    public Collection<Association> getAssociationsByCreator(@PathParam("username") String username) {
+        return dms.getAssociationsByProperty(PROP_CREATOR, username);
+    }
+
+    @GET
+    @Path("/owner/{username}/assocs")
+    @Override
+    public Collection<Association> getAssociationsByOwner(@PathParam("username") String username) {
+        return dms.getAssociationsByProperty(PROP_OWNER, username);
     }
 
 

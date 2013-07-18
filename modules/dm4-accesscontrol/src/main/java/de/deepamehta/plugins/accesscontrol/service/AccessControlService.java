@@ -2,8 +2,11 @@ package de.deepamehta.plugins.accesscontrol.service;
 
 import de.deepamehta.plugins.accesscontrol.model.AccessControlList;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
+import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.PluginService;
+
+import java.util.Collection;
 
 
 
@@ -153,4 +156,16 @@ public interface AccessControlService extends PluginService {
 
     void joinWorkspace(String username, long workspaceId);
     void joinWorkspace(Topic  username, long workspaceId);
+
+
+
+    // === Retrieval ===
+
+    Collection<Topic> getTopicsByCreator(String username);
+
+    Collection<Topic> getTopicsByOwner(String username);
+
+    Collection<Association> getAssociationsByCreator(String username);
+
+    Collection<Association> getAssociationsByOwner(String username);
 }

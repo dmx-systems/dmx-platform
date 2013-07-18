@@ -165,7 +165,7 @@ public interface DeepaMehtaService {
 
     // === Properties ===
 
-    // ### TODO: make these polymorph and move to DeepaMehtaObject?
+    // ### TODO: make getters/setters/has... polymorph and move to DeepaMehtaObject?
 
     Object getTopicProperty(long topicId, String propName);
 
