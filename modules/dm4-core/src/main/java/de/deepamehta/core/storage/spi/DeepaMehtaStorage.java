@@ -13,12 +13,6 @@ import java.util.Set;
 
 
 
-/**
- * The MehtaGraph service. ### FIXDOC
- * It provides methods for creation and retrieval of {@link MehtaNode}s and {@link MehtaEdge}s.
- * <p>
- * To obtain a MehtaGraph service instance call {@link MehtaGraphFactory#createInstance}. ### FIXDOC
- */
 public interface DeepaMehtaStorage {
 
 
@@ -38,6 +32,8 @@ public interface DeepaMehtaStorage {
 
     // ---
 
+    void storeTopic(TopicModel topicModel);
+
     void storeTopicUri(long topicId, String uri);
 
     void storeTopicTypeUri(long topicId, String topicTypeUri);
@@ -47,10 +43,7 @@ public interface DeepaMehtaStorage {
      */
     void storeTopicValue(long topicId, SimpleValue value, Collection<IndexMode> indexModes, String indexKey,
                                                                                             SimpleValue indexValue);
-
     // ---
-
-    void storeTopic(TopicModel topicModel);
 
     void deleteTopic(long topicId);
 
@@ -68,6 +61,8 @@ public interface DeepaMehtaStorage {
 
     // ---
 
+    void storeAssociation(AssociationModel assocModel);
+
     void storeAssociationUri(long assocId, String uri);
 
     void storeAssociationTypeUri(long assocId, String assocTypeUri);
@@ -81,8 +76,6 @@ public interface DeepaMehtaStorage {
     void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri);
 
     // ---
-
-    void storeAssociation(AssociationModel assocModel);
 
     void deleteAssociation(long assocId);
 

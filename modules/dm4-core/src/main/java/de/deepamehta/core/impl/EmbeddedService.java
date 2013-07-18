@@ -554,54 +554,54 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Collection<Topic> getTopicsByProperty(String propName, Object propValue) {
         return instantiateTopics(storage.fetchTopicsByProperty(propName, propValue), false);
-        // fetchComposite=false
+            // fetchComposite=false
     }
 
     @Override
     public Collection<Topic> getTopicsByPropertyRange(String propName, Number from, Number to) {
         return instantiateTopics(storage.fetchTopicsByPropertyRange(propName, from, to), false);
-        // fetchComposite=false
+            // fetchComposite=false
     }
 
     @Override
     public Collection<Association> getAssociationsByProperty(String propName, Object propValue) {
         return instantiateAssociations(storage.fetchAssociationsByProperty(propName, propValue), false);
-        // fetchComposite=false
+            // fetchComposite=false
     }
 
     @Override
     public Collection<Association> getAssociationsByPropertyRange(String propName, Number from, Number to) {
         return instantiateAssociations(storage.fetchAssociationsByPropertyRange(propName, from, to), false);
-        // fetchComposite=false
+            // fetchComposite=false
     }
 
     // ---
 
     @Override
-    public void setTopicProperty(long topicId, String propName, Object value, boolean addToIndex) {
+    public void setTopicProperty(long topicId, String propName, Object propValue, boolean addToIndex) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.storeTopicProperty(topicId, propName, value, addToIndex);
+            storage.storeTopicProperty(topicId, propName, propValue, addToIndex);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Setting property \"" + propName + "\" for topic " + topicId +
-                " failed (value=" + value + ")", e);
+                " failed (propValue=" + propValue + ")", e);
         } finally {
             tx.finish();
         }
     }
 
     @Override
-    public void setAssociationProperty(long assocId, String propName, Object value, boolean addToIndex) {
+    public void setAssociationProperty(long assocId, String propName, Object propValue, boolean addToIndex) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.storeAssociationProperty(assocId, propName, value, addToIndex);
+            storage.storeAssociationProperty(assocId, propName, propValue, addToIndex);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Setting property \"" + propName + "\" for association " + assocId +
-                " failed (value=" + value + ")", e);
+                " failed (propValue=" + propValue + ")", e);
         } finally {
             tx.finish();
         }
