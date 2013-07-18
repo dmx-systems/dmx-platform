@@ -1,16 +1,32 @@
 package de.deepamehta.plugins.time.service;
 
+import de.deepamehta.core.Association;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.PluginService;
+
+import java.util.Collection;
 
 
 
 public interface TimeService extends PluginService {
 
-    long getTopicCreationTime(long topicId);
+    // === Timestamps ===
 
-    long getAssociationCreationTime(long assocId);
+    long getTopicCreationTime(long topicId);
 
     long getTopicModificationTime(long topicId);
 
+    long getAssociationCreationTime(long assocId);
+
     long getAssociationModificationTime(long assocId);
+
+    // === Retrieval ===
+
+    Collection<Topic> getTopicsByCreationTime(long from, long to);
+
+    Collection<Topic> getTopicsByModificationTime(long from, long to);
+
+    Collection<Association> getAssociationsByCreationTime(long from, long to);
+
+    Collection<Association> getAssociationsByModificationTime(long from, long to);
 }

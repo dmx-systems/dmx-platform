@@ -34,6 +34,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -77,9 +78,16 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
 
 
+    // === Timestamps ===
+
     @Override
     public long getTopicCreationTime(long topicId) {
         return dms.hasTopicProperty(topicId, PROP_CREATED) ? (Long) dms.getTopicProperty(topicId, PROP_CREATED) : -1;
+    }
+
+    @Override
+    public long getTopicModificationTime(long topicId) {
+        return dms.hasTopicProperty(topicId, PROP_MODIFIED) ? (Long) dms.getTopicProperty(topicId, PROP_MODIFIED) : -1;
     }
 
     @Override
@@ -89,14 +97,43 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     }
 
     @Override
-    public long getTopicModificationTime(long topicId) {
-        return dms.hasTopicProperty(topicId, PROP_MODIFIED) ? (Long) dms.getTopicProperty(topicId, PROP_MODIFIED) : -1;
-    }
-
-    @Override
     public long getAssociationModificationTime(long assocId) {
         return dms.hasAssociationProperty(assocId, PROP_MODIFIED) ? (Long) dms.getAssociationProperty(assocId,
             PROP_MODIFIED) : -1;
+    }
+
+    // === Retrieval ===
+
+    @GET
+    @Path("/from/{from}/to/{to}/topics/created")
+    @Override
+    public Collection<Topic> getTopicsByCreationTime(@PathParam("from") long from,
+                                                     @PathParam("to") long to) {
+        return dms.getTopicsByPropertyRange(PROP_CREATED, from, to);
+    }
+
+    @GET
+    @Path("/from/{from}/to/{to}/topics/modified")
+    @Override
+    public Collection<Topic> getTopicsByModificationTime(@PathParam("from") long from,
+                                                         @PathParam("to") long to) {
+        return dms.getTopicsByPropertyRange(PROP_MODIFIED, from, to);
+    }
+
+    @GET
+    @Path("/from/{from}/to/{to}/assocs/created")
+    @Override
+    public Collection<Association> getAssociationsByCreationTime(@PathParam("from") long from,
+                                                                 @PathParam("to") long to) {
+        return dms.getAssociationsByPropertyRange(PROP_CREATED, from, to);
+    }
+
+    @GET
+    @Path("/from/{from}/to/{to}/assocs/modified")
+    @Override
+    public Collection<Association> getAssociationsByModificationTime(@PathParam("from") long from,
+                                                                     @PathParam("to") long to) {
+        return dms.getAssociationsByPropertyRange(PROP_MODIFIED, from, to);
     }
 
 
