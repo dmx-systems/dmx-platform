@@ -55,10 +55,8 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
+    private static String URI_CREATED  = "dm4.time.created";
     private static String URI_MODIFIED = "dm4.time.modified";
-
-    private static String PROP_CREATED = "created";
-    private static String PROP_MODIFIED = "modified";
 
     private static String HEADER_LAST_MODIFIED = "Last-Modified";
 
@@ -82,24 +80,24 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     @Override
     public long getTopicCreationTime(long topicId) {
-        return dms.hasTopicProperty(topicId, PROP_CREATED) ? (Long) dms.getTopicProperty(topicId, PROP_CREATED) : -1;
+        return dms.hasTopicProperty(topicId, URI_CREATED) ? (Long) dms.getTopicProperty(topicId, URI_CREATED) : -1;
     }
 
     @Override
     public long getTopicModificationTime(long topicId) {
-        return dms.hasTopicProperty(topicId, PROP_MODIFIED) ? (Long) dms.getTopicProperty(topicId, PROP_MODIFIED) : -1;
+        return dms.hasTopicProperty(topicId, URI_MODIFIED) ? (Long) dms.getTopicProperty(topicId, URI_MODIFIED) : -1;
     }
 
     @Override
     public long getAssociationCreationTime(long assocId) {
-        return dms.hasAssociationProperty(assocId, PROP_CREATED) ? (Long) dms.getAssociationProperty(assocId,
-            PROP_CREATED) : -1;
+        return dms.hasAssociationProperty(assocId, URI_CREATED) ? (Long) dms.getAssociationProperty(assocId,
+            URI_CREATED) : -1;
     }
 
     @Override
     public long getAssociationModificationTime(long assocId) {
-        return dms.hasAssociationProperty(assocId, PROP_MODIFIED) ? (Long) dms.getAssociationProperty(assocId,
-            PROP_MODIFIED) : -1;
+        return dms.hasAssociationProperty(assocId, URI_MODIFIED) ? (Long) dms.getAssociationProperty(assocId,
+            URI_MODIFIED) : -1;
     }
 
     // === Retrieval ===
@@ -109,7 +107,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Topic> getTopicsByCreationTime(@PathParam("from") long from,
                                                      @PathParam("to") long to) {
-        return dms.getTopicsByPropertyRange(PROP_CREATED, from, to);
+        return dms.getTopicsByPropertyRange(URI_CREATED, from, to);
     }
 
     @GET
@@ -117,7 +115,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Topic> getTopicsByModificationTime(@PathParam("from") long from,
                                                          @PathParam("to") long to) {
-        return dms.getTopicsByPropertyRange(PROP_MODIFIED, from, to);
+        return dms.getTopicsByPropertyRange(URI_MODIFIED, from, to);
     }
 
     @GET
@@ -125,7 +123,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Association> getAssociationsByCreationTime(@PathParam("from") long from,
                                                                  @PathParam("to") long to) {
-        return dms.getAssociationsByPropertyRange(PROP_CREATED, from, to);
+        return dms.getAssociationsByPropertyRange(URI_CREATED, from, to);
     }
 
     @GET
@@ -133,7 +131,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Association> getAssociationsByModificationTime(@PathParam("from") long from,
                                                                      @PathParam("to") long to) {
-        return dms.getAssociationsByPropertyRange(PROP_MODIFIED, from, to);
+        return dms.getAssociationsByPropertyRange(URI_MODIFIED, from, to);
     }
 
 
@@ -226,20 +224,20 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     // ---
 
     private void storeCreationTime(DeepaMehtaObject object, long time) {
-        storeTime(object, PROP_CREATED, time);
+        storeTime(object, URI_CREATED, time);
     }
 
     private void storeModificationTime(DeepaMehtaObject object, long time) {
-        storeTime(object, PROP_MODIFIED, time);
+        storeTime(object, URI_MODIFIED, time);
     }
 
     // ---
 
-    private void storeTime(DeepaMehtaObject object, String propName, long time) {
+    private void storeTime(DeepaMehtaObject object, String propUri, long time) {
         if (object instanceof Topic) {
-            dms.setTopicProperty(object.getId(), propName, time, true);         // addToIndex=true
+            dms.setTopicProperty(object.getId(), propUri, time, true);          // addToIndex=true
         } else if (object instanceof Association) {
-            dms.setAssociationProperty(object.getId(), propName, time, true);   // addToIndex=true
+            dms.setAssociationProperty(object.getId(), propUri, time, true);    // addToIndex=true
         } else {
             throw new RuntimeException("Unexpected object: " + object);
         }
