@@ -400,61 +400,61 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // === Properties ===
 
     @Override
-    public Object fetchTopicProperty(long topicId, String propName) {
-        return fetchTopicNode(topicId).getProperty(propName);
+    public Object fetchTopicProperty(long topicId, String propUri) {
+        return fetchTopicNode(topicId).getProperty(propUri);
     }
 
     @Override
-    public Object fetchAssociationProperty(long assocId, String propName) {
-        return fetchAssociationNode(assocId).getProperty(propName);
-    }
-
-    // ---
-
-    @Override
-    public Collection<TopicModel> fetchTopicsByProperty(String propName, Object propValue) {
-        return buildTopics(queryIndexByProperty(topicContentExact, propName, propValue));
-    }
-
-    @Override
-    public Collection<TopicModel> fetchTopicsByPropertyRange(String propName, Number from, Number to) {
-        return buildTopics(queryIndexByPropertyRange(topicContentExact, propName, from, to));
-    }
-
-    @Override
-    public Collection<AssociationModel> fetchAssociationsByProperty(String propName, Object propValue) {
-        return buildAssociations(queryIndexByProperty(assocContentExact, propName, propValue));
-    }
-
-    @Override
-    public Collection<AssociationModel> fetchAssociationsByPropertyRange(String propName, Number from, Number to) {
-        return buildAssociations(queryIndexByPropertyRange(assocContentExact, propName, from, to));
+    public Object fetchAssociationProperty(long assocId, String propUri) {
+        return fetchAssociationNode(assocId).getProperty(propUri);
     }
 
     // ---
 
     @Override
-    public void storeTopicProperty(long topicId, String propName, Object propValue, boolean addToIndex) {
+    public Collection<TopicModel> fetchTopicsByProperty(String propUri, Object propValue) {
+        return buildTopics(queryIndexByProperty(topicContentExact, propUri, propValue));
+    }
+
+    @Override
+    public Collection<TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to) {
+        return buildTopics(queryIndexByPropertyRange(topicContentExact, propUri, from, to));
+    }
+
+    @Override
+    public Collection<AssociationModel> fetchAssociationsByProperty(String propUri, Object propValue) {
+        return buildAssociations(queryIndexByProperty(assocContentExact, propUri, propValue));
+    }
+
+    @Override
+    public Collection<AssociationModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to) {
+        return buildAssociations(queryIndexByPropertyRange(assocContentExact, propUri, from, to));
+    }
+
+    // ---
+
+    @Override
+    public void storeTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex) {
         Index<Node> exactIndex = addToIndex ? topicContentExact : null;
-        storeAndIndexExactValue(fetchTopicNode(topicId), propName, propValue, exactIndex);
+        storeAndIndexExactValue(fetchTopicNode(topicId), propUri, propValue, exactIndex);
     }
 
     @Override
-    public void storeAssociationProperty(long assocId, String propName, Object propValue, boolean addToIndex) {
+    public void storeAssociationProperty(long assocId, String propUri, Object propValue, boolean addToIndex) {
         Index<Node> exactIndex = addToIndex ? assocContentExact : null;
-        storeAndIndexExactValue(fetchAssociationNode(assocId), propName, propValue, exactIndex);
+        storeAndIndexExactValue(fetchAssociationNode(assocId), propUri, propValue, exactIndex);
     }
 
     // ---
 
     @Override
-    public boolean hasTopicProperty(long topicId, String propName) {
-        return fetchTopicNode(topicId).hasProperty(propName);
+    public boolean hasTopicProperty(long topicId, String propUri) {
+        return fetchTopicNode(topicId).hasProperty(propUri);
     }
 
     @Override
-    public boolean hasAssociationProperty(long assocId, String propName) {
-        return fetchAssociationNode(assocId).hasProperty(propName);
+    public boolean hasAssociationProperty(long assocId, String propUri) {
+        return fetchAssociationNode(assocId).hasProperty(propUri);
     }
 
 
@@ -691,16 +691,16 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // --- Query indexes ---
 
-    private IndexHits<Node> queryIndexByProperty(Index<Node> index, String propName, Object propValue) {
+    private IndexHits<Node> queryIndexByProperty(Index<Node> index, String propUri, Object propValue) {
         // Note: numbers must be queried as numeric value as they are indexed numerically.
         if (propValue instanceof Number) {
             propValue = ValueContext.numeric((Number) propValue);
         }
-        return index.get(propName, propValue);
+        return index.get(propUri, propValue);
     }
 
-    private IndexHits<Node> queryIndexByPropertyRange(Index<Node> index, String propName, Number from, Number to) {
-        return index.query(buildNumericRangeQuery(propName, from, to));
+    private IndexHits<Node> queryIndexByPropertyRange(Index<Node> index, String propUri, Number from, Number to) {
+        return index.query(buildNumericRangeQuery(propUri, from, to));
     }
 
     // ---
@@ -716,8 +716,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // --- Build index queries ---
 
-    private QueryContext buildNumericRangeQuery(String propName, Number from, Number to) {
-        return QueryContext.numericRange(propName, from, to);
+    private QueryContext buildNumericRangeQuery(String propUri, Number from, Number to) {
+        return QueryContext.numericRange(propUri, from, to);
     }
 
     // ---

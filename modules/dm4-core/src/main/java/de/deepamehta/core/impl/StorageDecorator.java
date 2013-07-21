@@ -542,50 +542,50 @@ public class StorageDecorator {
 
     // === Properties ===
 
-    public Object fetchTopicProperty(long topicId, String propName) {
-        return storage.fetchTopicProperty(topicId, propName);
+    public Object fetchTopicProperty(long topicId, String propUri) {
+        return storage.fetchTopicProperty(topicId, propUri);
     }
 
-    public Object fetchAssociationProperty(long assocId, String propName) {
-        return storage.fetchAssociationProperty(assocId, propName);
-    }
-
-    // ---
-
-    public Collection<TopicModel> fetchTopicsByProperty(String propName, Object propValue) {
-        return storage.fetchTopicsByProperty(propName, propValue);
-    }
-
-    public Collection<TopicModel> fetchTopicsByPropertyRange(String propName, Number from, Number to) {
-        return storage.fetchTopicsByPropertyRange(propName, from, to);
-    }
-
-    public Collection<AssociationModel> fetchAssociationsByProperty(String propName, Object propValue) {
-        return storage.fetchAssociationsByProperty(propName, propValue);
-    }
-
-    public Collection<AssociationModel> fetchAssociationsByPropertyRange(String propName, Number from, Number to) {
-        return storage.fetchAssociationsByPropertyRange(propName, from, to);
+    public Object fetchAssociationProperty(long assocId, String propUri) {
+        return storage.fetchAssociationProperty(assocId, propUri);
     }
 
     // ---
 
-    public void storeTopicProperty(long topicId, String propName, Object propValue, boolean addToIndex) {
-        storage.storeTopicProperty(topicId, propName, propValue, addToIndex);
+    public Collection<TopicModel> fetchTopicsByProperty(String propUri, Object propValue) {
+        return storage.fetchTopicsByProperty(propUri, propValue);
     }
 
-    public void storeAssociationProperty(long assocId, String propName, Object propValue, boolean addToIndex) {
-        storage.storeAssociationProperty(assocId, propName, propValue, addToIndex);
+    public Collection<TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to) {
+        return storage.fetchTopicsByPropertyRange(propUri, from, to);
+    }
+
+    public Collection<AssociationModel> fetchAssociationsByProperty(String propUri, Object propValue) {
+        return storage.fetchAssociationsByProperty(propUri, propValue);
+    }
+
+    public Collection<AssociationModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to) {
+        return storage.fetchAssociationsByPropertyRange(propUri, from, to);
     }
 
     // ---
 
-    public boolean hasTopicProperty(long topicId, String propName) {
-        return storage.hasTopicProperty(topicId, propName);
+    public void storeTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex) {
+        storage.storeTopicProperty(topicId, propUri, propValue, addToIndex);
     }
 
-    public boolean hasAssociationProperty(long assocId, String propName) {
-        return storage.hasAssociationProperty(assocId, propName);
+    public void storeAssociationProperty(long assocId, String propUri, Object propValue, boolean addToIndex) {
+        storage.storeAssociationProperty(assocId, propUri, propValue, addToIndex);
+    }
+
+    // ---
+
+    public boolean hasTopicProperty(long topicId, String propUri) {
+        return storage.hasTopicProperty(topicId, propUri);
+    }
+
+    public boolean hasAssociationProperty(long assocId, String propUri) {
+        return storage.hasAssociationProperty(assocId, propUri);
     }
 
 

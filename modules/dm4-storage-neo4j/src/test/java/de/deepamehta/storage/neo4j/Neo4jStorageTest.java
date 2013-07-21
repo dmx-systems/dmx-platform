@@ -292,9 +292,9 @@ public class Neo4jStorageTest {
         return topicId;
     }
 
-    private void createTopic(String propName, Object propValue) {
+    private void createTopic(String propUri, Object propValue) {
         long topicId = createTopic(null, "dm4.notes.note", "");
-        storage.storeTopicProperty(topicId, propName, propValue, true);     // addToIndex=true
+        storage.storeTopicProperty(topicId, propUri, propValue, true);     // addToIndex=true
     }
 
     // ---

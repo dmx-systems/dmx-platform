@@ -540,52 +540,52 @@ public class EmbeddedService implements DeepaMehtaService {
     // === Properties ===
 
     @Override
-    public Object getTopicProperty(long topicId, String propName) {
-        return storage.fetchTopicProperty(topicId, propName);
+    public Object getTopicProperty(long topicId, String propUri) {
+        return storage.fetchTopicProperty(topicId, propUri);
     }
 
     @Override
-    public Object getAssociationProperty(long assocId, String propName) {
-        return storage.fetchAssociationProperty(assocId, propName);
-    }
-
-    // ---
-
-    @Override
-    public Collection<Topic> getTopicsByProperty(String propName, Object propValue) {
-        return instantiateTopics(storage.fetchTopicsByProperty(propName, propValue), false);
-            // fetchComposite=false
-    }
-
-    @Override
-    public Collection<Topic> getTopicsByPropertyRange(String propName, Number from, Number to) {
-        return instantiateTopics(storage.fetchTopicsByPropertyRange(propName, from, to), false);
-            // fetchComposite=false
-    }
-
-    @Override
-    public Collection<Association> getAssociationsByProperty(String propName, Object propValue) {
-        return instantiateAssociations(storage.fetchAssociationsByProperty(propName, propValue), false);
-            // fetchComposite=false
-    }
-
-    @Override
-    public Collection<Association> getAssociationsByPropertyRange(String propName, Number from, Number to) {
-        return instantiateAssociations(storage.fetchAssociationsByPropertyRange(propName, from, to), false);
-            // fetchComposite=false
+    public Object getAssociationProperty(long assocId, String propUri) {
+        return storage.fetchAssociationProperty(assocId, propUri);
     }
 
     // ---
 
     @Override
-    public void setTopicProperty(long topicId, String propName, Object propValue, boolean addToIndex) {
+    public Collection<Topic> getTopicsByProperty(String propUri, Object propValue) {
+        return instantiateTopics(storage.fetchTopicsByProperty(propUri, propValue), false);
+            // fetchComposite=false
+    }
+
+    @Override
+    public Collection<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to) {
+        return instantiateTopics(storage.fetchTopicsByPropertyRange(propUri, from, to), false);
+            // fetchComposite=false
+    }
+
+    @Override
+    public Collection<Association> getAssociationsByProperty(String propUri, Object propValue) {
+        return instantiateAssociations(storage.fetchAssociationsByProperty(propUri, propValue), false);
+            // fetchComposite=false
+    }
+
+    @Override
+    public Collection<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
+        return instantiateAssociations(storage.fetchAssociationsByPropertyRange(propUri, from, to), false);
+            // fetchComposite=false
+    }
+
+    // ---
+
+    @Override
+    public void setTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.storeTopicProperty(topicId, propName, propValue, addToIndex);
+            storage.storeTopicProperty(topicId, propUri, propValue, addToIndex);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Setting property \"" + propName + "\" for topic " + topicId +
+            throw new RuntimeException("Setting property \"" + propUri + "\" for topic " + topicId +
                 " failed (propValue=" + propValue + ")", e);
         } finally {
             tx.finish();
@@ -593,14 +593,14 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public void setAssociationProperty(long assocId, String propName, Object propValue, boolean addToIndex) {
+    public void setAssociationProperty(long assocId, String propUri, Object propValue, boolean addToIndex) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            storage.storeAssociationProperty(assocId, propName, propValue, addToIndex);
+            storage.storeAssociationProperty(assocId, propUri, propValue, addToIndex);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Setting property \"" + propName + "\" for association " + assocId +
+            throw new RuntimeException("Setting property \"" + propUri + "\" for association " + assocId +
                 " failed (propValue=" + propValue + ")", e);
         } finally {
             tx.finish();
@@ -610,13 +610,13 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     @Override
-    public boolean hasTopicProperty(long topicId, String propName) {
-        return storage.hasTopicProperty(topicId, propName);
+    public boolean hasTopicProperty(long topicId, String propUri) {
+        return storage.hasTopicProperty(topicId, propUri);
     }
 
     @Override
-    public boolean hasAssociationProperty(long assocId, String propName) {
-        return storage.hasAssociationProperty(assocId, propName);
+    public boolean hasAssociationProperty(long assocId, String propUri) {
+        return storage.hasAssociationProperty(assocId, propUri);
     }
 
 

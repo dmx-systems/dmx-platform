@@ -153,31 +153,31 @@ public interface DeepaMehtaStorage {
 
     // === Properties ===
 
-    Object fetchTopicProperty(long topicId, String propName);
+    Object fetchTopicProperty(long topicId, String propUri);
 
-    Object fetchAssociationProperty(long assocId, String propName);
-
-    // ---
-
-    Collection<TopicModel> fetchTopicsByProperty(String propName, Object propValue);
-
-    Collection<TopicModel> fetchTopicsByPropertyRange(String propName, Number from, Number to);
-
-    Collection<AssociationModel> fetchAssociationsByProperty(String propName, Object propValue);
-
-    Collection<AssociationModel> fetchAssociationsByPropertyRange(String propName, Number from, Number to);
+    Object fetchAssociationProperty(long assocId, String propUri);
 
     // ---
 
-    void storeTopicProperty(long topicId, String propName, Object propValue, boolean addToIndex);
+    Collection<TopicModel> fetchTopicsByProperty(String propUri, Object propValue);
 
-    void storeAssociationProperty(long assocId, String propName, Object propValue, boolean addToIndex);
+    Collection<TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to);
+
+    Collection<AssociationModel> fetchAssociationsByProperty(String propUri, Object propValue);
+
+    Collection<AssociationModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to);
 
     // ---
 
-    boolean hasTopicProperty(long topicId, String propName);
+    void storeTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex);
 
-    boolean hasAssociationProperty(long assocId, String propName);
+    void storeAssociationProperty(long assocId, String propUri, Object propValue, boolean addToIndex);
+
+    // ---
+
+    boolean hasTopicProperty(long topicId, String propUri);
+
+    boolean hasAssociationProperty(long assocId, String propUri);
 
 
 

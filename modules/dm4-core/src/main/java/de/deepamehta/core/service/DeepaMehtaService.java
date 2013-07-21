@@ -167,31 +167,31 @@ public interface DeepaMehtaService {
 
     // ### TODO: make getters/setters/has... polymorph and move to DeepaMehtaObject?
 
-    Object getTopicProperty(long topicId, String propName);
+    Object getTopicProperty(long topicId, String propUri);
 
-    Object getAssociationProperty(long assocId, String propName);
-
-    // ---
-
-    Collection<Topic> getTopicsByProperty(String propName, Object propValue);
-
-    Collection<Topic> getTopicsByPropertyRange(String propName, Number from, Number to);
-
-    Collection<Association> getAssociationsByProperty(String propName, Object propValue);
-
-    Collection<Association> getAssociationsByPropertyRange(String propName, Number from, Number to);
+    Object getAssociationProperty(long assocId, String propUri);
 
     // ---
 
-    void setTopicProperty(long topicId, String propName, Object propValue, boolean addToIndex);
+    Collection<Topic> getTopicsByProperty(String propUri, Object propValue);
 
-    void setAssociationProperty(long assocId, String propName, Object propValue, boolean addToIndex);
+    Collection<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to);
+
+    Collection<Association> getAssociationsByProperty(String propUri, Object propValue);
+
+    Collection<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to);
 
     // ---
 
-    boolean hasTopicProperty(long topicId, String propName);
+    void setTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex);
 
-    boolean hasAssociationProperty(long assocId, String propName);
+    void setAssociationProperty(long assocId, String propUri, Object propValue, boolean addToIndex);
+
+    // ---
+
+    boolean hasTopicProperty(long topicId, String propUri);
+
+    boolean hasAssociationProperty(long assocId, String propUri);
 
 
 
