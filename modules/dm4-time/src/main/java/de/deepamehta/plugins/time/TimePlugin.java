@@ -6,6 +6,7 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
@@ -78,26 +79,29 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     // === Timestamps ===
 
+    // Note: the timestamp getters must return 0 as default. Before we used -1 but Jersey's evaluatePreconditions()
+    // does not work as expected when called with a negative value which is not dividable by 1000.
+
     @Override
     public long getTopicCreationTime(long topicId) {
-        return dms.hasTopicProperty(topicId, URI_CREATED) ? (Long) dms.getTopicProperty(topicId, URI_CREATED) : -1;
+        return dms.hasTopicProperty(topicId, URI_CREATED) ? (Long) dms.getTopicProperty(topicId, URI_CREATED) : 0;
     }
 
     @Override
     public long getTopicModificationTime(long topicId) {
-        return dms.hasTopicProperty(topicId, URI_MODIFIED) ? (Long) dms.getTopicProperty(topicId, URI_MODIFIED) : -1;
+        return dms.hasTopicProperty(topicId, URI_MODIFIED) ? (Long) dms.getTopicProperty(topicId, URI_MODIFIED) : 0;
     }
 
     @Override
     public long getAssociationCreationTime(long assocId) {
         return dms.hasAssociationProperty(assocId, URI_CREATED) ? (Long) dms.getAssociationProperty(assocId,
-            URI_CREATED) : -1;
+            URI_CREATED) : 0;
     }
 
     @Override
     public long getAssociationModificationTime(long assocId) {
         return dms.hasAssociationProperty(assocId, URI_MODIFIED) ? (Long) dms.getAssociationProperty(assocId,
-            URI_MODIFIED) : -1;
+            URI_MODIFIED) : 0;
     }
 
     // === Retrieval ===
@@ -200,9 +204,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
         DeepaMehtaObject object = responseObject(response);
         if (object != null) {
             long modified = enrichWithTimestamp(object);
-            if (modified != -1) {
-                setLastModifiedHeader(response, modified);
-            }
+            setLastModifiedHeader(response, modified);
         }
     }
 
@@ -252,9 +254,24 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     }
 
     private long enrichWithTimestamp(DeepaMehtaObject object) {
+        long created = getCreationTime(object);
         long modified = getModificationTime(object);
-        object.getCompositeValue().getModel().put(URI_MODIFIED, modified);
+        CompositeValueModel comp = object.getCompositeValue().getModel();
+        comp.put(URI_CREATED, created);
+        comp.put(URI_MODIFIED, modified);
         return modified;
+    }
+
+    // ---
+
+    private long getCreationTime(DeepaMehtaObject object) {
+        if (object instanceof Topic) {
+            return getTopicCreationTime(object.getId());
+        } else if (object instanceof Association) {
+            return getAssociationCreationTime(object.getId());
+        } else {
+            throw new RuntimeException("Unexpected object: " + object);
+        }
     }
 
     private long getModificationTime(DeepaMehtaObject object) {

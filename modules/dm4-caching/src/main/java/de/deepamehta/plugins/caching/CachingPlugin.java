@@ -83,13 +83,11 @@ public class CachingPlugin extends PluginActivator implements PreProcessRequestL
         DeepaMehtaObjectModel object = requestObject(request);
         if (object != null) {
             long time = getModificationTime(object);
-            if (time != -1) {
-                Response.ResponseBuilder response = request.evaluatePreconditions(new Date(time));
-                if (response != null) {
-                    logger.info("### Precondition of " + request.getMethod() + " request failed (object " +
-                        object.getId() + ")");
-                    throw new WebApplicationException(response.build());
-                }
+            Response.ResponseBuilder response = request.evaluatePreconditions(new Date(time));
+            if (response != null) {
+                logger.info("### Precondition of " + request.getMethod() + " request failed (object " +
+                    object.getId() + ")");
+                throw new WebApplicationException(response.build());
             }
         }
     }
