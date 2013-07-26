@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import static java.util.Arrays.asList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,13 +67,13 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private GraphDatabaseService neo4j = null;
+            GraphDatabaseService neo4j = null;
     private RelationtypeCache relTypeCache;
     
-    private Index<Node> topicContentExact;      // holds topic URI, topic type URI, topic value (index mode KEY)
-    private Index<Node> topicContentFulltext;   // holds topic value (index modes FULLTEXT or FULLTEXT_KEY)
-    private Index<Node> assocContentExact;      // holds assoc URI, assoc type URI, assoc value (index mode KEY)
-    private Index<Node> assocContentFulltext;   // holds assoc value (index modes FULLTEXT or FULLTEXT_KEY)
+    private Index<Node> topicContentExact;      // topic URI, topic type URI, topic value (index mode KEY), properties
+    private Index<Node> topicContentFulltext;   // topic value (index modes FULLTEXT or FULLTEXT_KEY)
+    private Index<Node> assocContentExact;      // assoc URI, assoc type URI, assoc value (index mode KEY), properties
+    private Index<Node> assocContentFulltext;   // assoc value (index modes FULLTEXT or FULLTEXT_KEY)
     private Index<Node> assocMetadata;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
@@ -120,14 +121,10 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         return node != null ? buildTopic(node) : null;
     }
 
-    // ---
-
     @Override
     public List<TopicModel> fetchTopics(String key, Object value) {
         return buildTopics(topicContentExact.query(key, value));
     }
-
-    // ---
 
     @Override
     public List<TopicModel> queryTopics(Object value) {
@@ -145,6 +142,11 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         }
         //
         return buildTopics(topicContentFulltext.query(key, value));
+    }
+
+    @Override
+    public Iterator<TopicModel> fetchAllTopics() {
+        return new TopicModelIterator(this);
     }
 
     // ---
@@ -211,8 +213,6 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         return buildAssociation(fetchAssociationNode(assocId));
     }
 
-    // ---
-
     @Override
     public Set<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
                                                                         String roleTypeUri1, String roleTypeUri2) {
@@ -231,6 +231,11 @@ public class Neo4jStorage implements DeepaMehtaStorage {
             topicRoleTypeUri, NodeType.TOPIC, topicId, null,
             assocRoleTypeUri, NodeType.ASSOC, assocId, null
         );
+    }
+
+    @Override
+    public Iterator<AssociationModel> fetchAllAssociations() {
+        return new AssociationModelIterator(this);
     }
 
     // ---
@@ -311,8 +316,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         assocNode.delete();
         //
         // 2) update index
-        removeAssociationFromIndex(assocNode);  // content index
-        assocMetadata.remove(assocNode);        // metadata index
+        removeAssociationFromIndex(assocNode);  
     }
 
 
@@ -568,6 +572,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     private void removeAssociationFromIndex(Node assocNode) {
         assocContentExact.remove(assocNode);
         assocContentFulltext.remove(assocNode);
+        //
+        assocMetadata.remove(assocNode);
     }
 
     // ---
@@ -789,7 +795,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // --- Neo4j -> DeepaMehta Bridge ---
 
-    private TopicModel buildTopic(Node topicNode) {
+    TopicModel buildTopic(Node topicNode) {
         return new TopicModel(
             topicNode.getId(),
             uri(topicNode),
@@ -809,7 +815,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---
 
-    private AssociationModel buildAssociation(Node assocNode) {
+    AssociationModel buildAssociation(Node assocNode) {
         List<RoleModel> roleModels = buildRoleModels(assocNode);
         return new AssociationModel(
             assocNode.getId(),

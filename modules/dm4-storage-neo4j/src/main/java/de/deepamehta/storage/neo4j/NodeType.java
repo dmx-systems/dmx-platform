@@ -46,6 +46,10 @@ enum NodeType {
         return valueOf(type.toUpperCase());
     }
 
+    boolean isTypeOf(Node node) {
+        return node.getProperty("node_type").equals(stringify());
+    }
+
     String stringify() {
         return name().toLowerCase();
     }

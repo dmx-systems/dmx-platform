@@ -13,18 +13,13 @@ import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import static java.util.Arrays.asList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
 
 
-/**
- * A DeepaMehta storage implementation by the means of a MehtaGraph implementation. ### FIXDOC
- * <p>
- * The DeepaMehta service knows nothing about a MehtaGraph and a MehtaGraph knows nothing about DeepaMehta.
- * This class bridges between them. ### FIXDOC
- */
 public class StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -87,6 +82,26 @@ public class StorageDecorator {
 
     // ---
 
+    Iterator<TopicModel> fetchAllTopics() {
+        return storage.fetchAllTopics();
+    }
+
+    // ---
+
+    /**
+     * Creates a topic.
+     * <p>
+     * The topic's URI is stored and indexed.
+     *
+     * @return  FIXDOC ### the created topic. Note:
+     *          - the topic URI   is initialzed and     persisted.
+     *          - the topic value is initialzed but not persisted.
+     *          - the type URI    is initialzed but not persisted.
+     */
+    public void storeTopic(TopicModel model) {
+        storage.storeTopic(model);
+    }
+
     /**
      * Stores and indexes the topic's URI.
      */
@@ -120,20 +135,6 @@ public class StorageDecorator {
     }
 
     // ---
-
-    /**
-     * Creates a topic.
-     * <p>
-     * The topic's URI is stored and indexed.
-     *
-     * @return  FIXDOC ### the created topic. Note:
-     *          - the topic URI   is initialzed and     persisted.
-     *          - the topic value is initialzed but not persisted.
-     *          - the type URI    is initialzed but not persisted.
-     */
-    public void storeTopic(TopicModel model) {
-        storage.storeTopic(model);
-    }
 
     /**
      * Deletes the topic.
@@ -214,6 +215,12 @@ public class StorageDecorator {
                                                        long assocId, String topicRoleTypeUri, String assocRoleTypeUri) {
         return storage.fetchAssociationsBetweenTopicAndAssociation(assocTypeUri, topicId, assocId, topicRoleTypeUri,
             assocRoleTypeUri);
+    }
+
+    // ---
+
+    Iterator<AssociationModel> fetchAllAssociations() {
+        return storage.fetchAllAssociations();
     }
 
     // ---

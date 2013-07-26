@@ -146,6 +146,13 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
+    public Iterable<Topic> getAllTopics() {
+        return new TopicIterable(this);
+    }
+
+    // ---
+
+    @Override
     public Topic createTopic(TopicModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
@@ -283,6 +290,13 @@ public class EmbeddedService implements DeepaMehtaService {
             throw new RuntimeException("Fetching associations between topics " + topic1Id + " and " + topic2Id +
                 " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
         }
+    }
+
+    // ---
+
+    @Override
+    public Iterable<Association> getAllAssociations() {
+        return new AssociationIterable(this);
     }
 
     // ---

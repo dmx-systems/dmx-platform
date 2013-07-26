@@ -8,6 +8,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -29,6 +30,8 @@ public interface DeepaMehtaStorage {
     List<TopicModel> queryTopics(Object value);
 
     List<TopicModel> queryTopics(String key, Object value);
+
+    Iterator<TopicModel> fetchAllTopics();
 
     // ---
 
@@ -58,6 +61,8 @@ public interface DeepaMehtaStorage {
 
     Set<AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
                                                                       String topicRoleTypeUri, String assocRoleTypeUri);
+
+    Iterator<AssociationModel> fetchAllAssociations();
 
     // ---
 

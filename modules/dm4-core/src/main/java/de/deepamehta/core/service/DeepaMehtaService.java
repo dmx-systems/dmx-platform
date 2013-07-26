@@ -74,6 +74,10 @@ public interface DeepaMehtaService {
      */
     Set<Topic> searchTopics(String searchTerm, String fieldUri, ClientState clientState);
 
+    Iterable<Topic> getAllTopics();
+
+    // ---
+
     Topic createTopic(TopicModel model, ClientState clientState);
 
     Directives updateTopic(TopicModel model, ClientState clientState);
@@ -116,6 +120,10 @@ public interface DeepaMehtaService {
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      */
     Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
+
+    // ---
+
+    Iterable<Association> getAllAssociations();
 
     // ---
 
