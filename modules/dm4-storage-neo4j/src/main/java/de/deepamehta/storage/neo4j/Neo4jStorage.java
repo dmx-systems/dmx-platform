@@ -461,6 +461,22 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         return fetchAssociationNode(assocId).hasProperty(propUri);
     }
 
+    // ---
+
+    @Override
+    public void deleteTopicProperty(long topicId, String propUri) {
+        Node topicNode = fetchTopicNode(topicId);
+        topicNode.removeProperty(propUri);
+        removeTopicPropertyFromIndex(topicNode, propUri);
+    }
+
+    @Override
+    public void deleteAssociationProperty(long assocId, String propUri) {
+        Node assocNode = fetchAssociationNode(assocId);
+        assocNode.removeProperty(propUri);
+        removeAssociationPropertyFromIndex(assocNode, propUri);
+    }
+
 
 
     // === DB ===
@@ -560,20 +576,6 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         assocNode.setProperty(KEY_VALUE, value);
         // index
         indexNodeValue(assocNode, indexValue, indexModes, indexKey, assocContentExact, assocContentFulltext);
-    }
-
-    // ---
-
-    private void removeTopicFromIndex(Node topicNode) {
-        topicContentExact.remove(topicNode);
-        topicContentFulltext.remove(topicNode);
-    }
-
-    private void removeAssociationFromIndex(Node assocNode) {
-        assocContentExact.remove(assocNode);
-        assocContentFulltext.remove(assocNode);
-        //
-        assocMetadata.remove(assocNode);
     }
 
     // ---
@@ -772,6 +774,30 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     private void addTermQuery(String key, String value, BooleanQuery query) {
         query.add(new TermQuery(new Term(key, value)), Occur.MUST);
+    }
+
+    // --- Remove index entries ---
+
+    private void removeTopicFromIndex(Node topicNode) {
+        topicContentExact.remove(topicNode);
+        topicContentFulltext.remove(topicNode);
+    }
+
+    private void removeAssociationFromIndex(Node assocNode) {
+        assocContentExact.remove(assocNode);
+        assocContentFulltext.remove(assocNode);
+        //
+        assocMetadata.remove(assocNode);
+    }
+
+    // ---
+
+    private void removeTopicPropertyFromIndex(Node topicNode, String propUri) {
+        topicContentExact.remove(topicNode, propUri);
+    }
+
+    private void removeAssociationPropertyFromIndex(Node assocNode, String propUri) {
+        assocContentExact.remove(assocNode, propUri);
     }
 
     // --- Create indexes ---

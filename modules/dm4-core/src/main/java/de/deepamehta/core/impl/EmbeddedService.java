@@ -633,6 +633,18 @@ public class EmbeddedService implements DeepaMehtaService {
         return storage.hasAssociationProperty(assocId, propUri);
     }
 
+    // ---
+
+    @Override
+    public void removeTopicProperty(long topicId, String propUri) {
+        storage.removeTopicProperty(topicId, propUri);
+    }
+
+    @Override
+    public void removeAssociationProperty(long assocId, String propUri) {
+        storage.removeAssociationProperty(assocId, propUri);
+    }
+
 
 
     // === Misc ===

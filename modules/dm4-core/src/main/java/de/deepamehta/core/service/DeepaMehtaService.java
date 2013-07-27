@@ -201,6 +201,12 @@ public interface DeepaMehtaService {
 
     boolean hasAssociationProperty(long assocId, String propUri);
 
+    // ---
+
+    void removeTopicProperty(long topicId, String propUri);
+
+    void removeAssociationProperty(long assocId, String propUri);
+
 
 
     // === Misc ===

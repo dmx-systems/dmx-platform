@@ -595,6 +595,16 @@ public class StorageDecorator {
         return storage.hasAssociationProperty(assocId, propUri);
     }
 
+    // ---
+
+    void removeTopicProperty(long topicId, String propUri) {
+        storage.deleteTopicProperty(topicId, propUri);
+    }
+
+    void removeAssociationProperty(long assocId, String propUri) {
+        storage.deleteAssociationProperty(assocId, propUri);
+    }
+
 
 
     // === DB ===

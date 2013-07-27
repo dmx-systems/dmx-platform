@@ -184,6 +184,12 @@ public interface DeepaMehtaStorage {
 
     boolean hasAssociationProperty(long assocId, String propUri);
 
+    // ---
+
+    void deleteTopicProperty(long topicId, String propUri);
+
+    void deleteAssociationProperty(long assocId, String propUri);
+
 
 
     // === DB ===
