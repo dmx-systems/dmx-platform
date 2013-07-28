@@ -100,9 +100,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     );
 
     // Property names
-    private static String PROP_CREATOR = "creator";
-    private static String PROP_OWNER = "owner";
-    private static String PROP_ACL = "acl";
+    private static String URI_CREATOR = "dm4.accesscontrol.creator";
+    private static String URI_OWNER = "dm4.accesscontrol.owner";
+    private static String URI_ACL = "dm4.accesscontrol.acl";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -199,24 +199,24 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public String getTopicCreator(long topicId) {
-        return dms.hasTopicProperty(topicId, PROP_CREATOR) ? (String) dms.getTopicProperty(topicId, PROP_CREATOR) :
+        return dms.hasTopicProperty(topicId, URI_CREATOR) ? (String) dms.getTopicProperty(topicId, URI_CREATOR) :
             null;
     }
 
     @Override
     public String getAssociationCreator(long assocId) {
-        return dms.hasAssociationProperty(assocId, PROP_CREATOR) ? (String) dms.getAssociationProperty(assocId,
-            PROP_CREATOR) : null;
+        return dms.hasAssociationProperty(assocId, URI_CREATOR) ? (String) dms.getAssociationProperty(assocId,
+            URI_CREATOR) : null;
     }
 
     @Override
     public void setTopicCreator(long topicId, String username) {
-        dms.setTopicProperty(topicId, PROP_CREATOR, username, true);           // addToIndex=true
+        dms.setTopicProperty(topicId, URI_CREATOR, username, true);         // addToIndex=true
     }
 
     @Override
     public void setAssociationCreator(long assocId, String username) {
-        dms.setAssociationProperty(assocId, PROP_CREATOR, username, true);     // addToIndex=true
+        dms.setAssociationProperty(assocId, URI_CREATOR, username, true);   // addToIndex=true
     }
 
 
@@ -225,23 +225,23 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public String getTopicOwner(long topicId) {
-        return dms.hasTopicProperty(topicId, PROP_OWNER) ? (String) dms.getTopicProperty(topicId, PROP_OWNER) : null;
+        return dms.hasTopicProperty(topicId, URI_OWNER) ? (String) dms.getTopicProperty(topicId, URI_OWNER) : null;
     }
 
     @Override
     public String getAssociationOwner(long assocId) {
-        return dms.hasAssociationProperty(assocId, PROP_OWNER) ? (String) dms.getAssociationProperty(assocId,
-            PROP_OWNER) : null;
+        return dms.hasAssociationProperty(assocId, URI_OWNER) ? (String) dms.getAssociationProperty(assocId, URI_OWNER)
+            : null;
     }
 
     @Override
     public void setTopicOwner(long topicId, String username) {
-        dms.setTopicProperty(topicId, PROP_OWNER, username, true);             // addToIndex=true
+        dms.setTopicProperty(topicId, URI_OWNER, username, true);           // addToIndex=true
     }
 
     @Override
     public void setAssociationOwner(long assocId, String username) {
-        dms.setAssociationProperty(assocId, PROP_OWNER, username, true);       // addToIndex=true
+        dms.setAssociationProperty(assocId, URI_OWNER, username, true);     // addToIndex=true
     }
 
 
@@ -251,8 +251,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public AccessControlList getTopicACL(long topicId) {
         try {
-            if (dms.hasTopicProperty(topicId, PROP_ACL)) {
-                return new AccessControlList(new JSONObject((String) dms.getTopicProperty(topicId, PROP_ACL)));
+            if (dms.hasTopicProperty(topicId, URI_ACL)) {
+                return new AccessControlList(new JSONObject((String) dms.getTopicProperty(topicId, URI_ACL)));
             } else {
                 return new AccessControlList();
             }
@@ -264,8 +264,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public AccessControlList getAssociationACL(long assocId) {
         try {
-            if (dms.hasAssociationProperty(assocId, PROP_ACL)) {
-                return new AccessControlList(new JSONObject((String) dms.getAssociationProperty(assocId, PROP_ACL)));
+            if (dms.hasAssociationProperty(assocId, URI_ACL)) {
+                return new AccessControlList(new JSONObject((String) dms.getAssociationProperty(assocId, URI_ACL)));
             } else {
                 return new AccessControlList();
             }
@@ -277,7 +277,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void setTopicACL(long topicId, AccessControlList acl) {
         try {
-            dms.setTopicProperty(topicId, PROP_ACL, acl.toJSON().toString(), false);        // addToIndex=false
+            dms.setTopicProperty(topicId, URI_ACL, acl.toJSON().toString(), false);         // addToIndex=false
         } catch (Exception e) {
             throw new RuntimeException("Storing access control list for topic " + topicId + " failed", e);
         }
@@ -286,7 +286,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void setAssociationACL(long assocId, AccessControlList acl) {
         try {
-            dms.setAssociationProperty(assocId, PROP_ACL, acl.toJSON().toString(), false);  // addToIndex=false
+            dms.setAssociationProperty(assocId, URI_ACL, acl.toJSON().toString(), false);   // addToIndex=false
         } catch (Exception e) {
             throw new RuntimeException("Storing access control list for association " + assocId + " failed", e);
         }
@@ -320,28 +320,28 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/creator/{username}/topics")
     @Override
     public Collection<Topic> getTopicsByCreator(@PathParam("username") String username) {
-        return dms.getTopicsByProperty(PROP_CREATOR, username);
+        return dms.getTopicsByProperty(URI_CREATOR, username);
     }
 
     @GET
     @Path("/owner/{username}/topics")
     @Override
     public Collection<Topic> getTopicsByOwner(@PathParam("username") String username) {
-        return dms.getTopicsByProperty(PROP_OWNER, username);
+        return dms.getTopicsByProperty(URI_OWNER, username);
     }
 
     @GET
     @Path("/creator/{username}/assocs")
     @Override
     public Collection<Association> getAssociationsByCreator(@PathParam("username") String username) {
-        return dms.getAssociationsByProperty(PROP_CREATOR, username);
+        return dms.getAssociationsByProperty(URI_CREATOR, username);
     }
 
     @GET
     @Path("/owner/{username}/assocs")
     @Override
     public Collection<Association> getAssociationsByOwner(@PathParam("username") String username) {
-        return dms.getAssociationsByProperty(PROP_OWNER, username);
+        return dms.getAssociationsByProperty(URI_OWNER, username);
     }
 
 
