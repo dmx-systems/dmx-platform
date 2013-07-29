@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.time.service;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.PluginService;
 
@@ -12,13 +13,9 @@ public interface TimeService extends PluginService {
 
     // === Timestamps ===
 
-    long getTopicCreationTime(long topicId);
+    long getCreationTime(DeepaMehtaObject object);
 
-    long getTopicModificationTime(long topicId);
-
-    long getAssociationCreationTime(long assocId);
-
-    long getAssociationModificationTime(long assocId);
+    long getModificationTime(DeepaMehtaObject object);
 
     // === Retrieval ===
 

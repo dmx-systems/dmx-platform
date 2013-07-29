@@ -3,9 +3,6 @@ package de.deepamehta.plugins.caching;
 import de.deepamehta.plugins.time.service.TimeService;
 
 import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
-import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.annotation.ConsumesService;
@@ -38,7 +35,7 @@ public class CachingPlugin extends PluginActivator implements PreProcessRequestL
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private TimeService timeService;
-    private Pattern cachablePath;
+    private Pattern cachablePath = Pattern.compile(CACHABLE_PATH);
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -51,13 +48,6 @@ public class CachingPlugin extends PluginActivator implements PreProcessRequestL
     // ****************************
 
 
-
-    @Override
-    public void init() {
-        cachablePath = Pattern.compile(CACHABLE_PATH);
-    }
-
-    // ---
 
     @Override
     @ConsumesService("de.deepamehta.plugins.time.service.TimeService")
@@ -80,9 +70,12 @@ public class CachingPlugin extends PluginActivator implements PreProcessRequestL
 
     @Override
     public void preProcessRequest(ContainerRequest request) {
-        DeepaMehtaObjectModel object = requestObject(request);
+        // ### TODO: optimization. Retrieving and instantiating an entire DeepaMehtaObject just to query its timestamp
+        // might be inefficient. Knowing the sole object ID should be sufficient. However, this would require extending
+        // the Time API and in turn the Core Service API by ID-based property getter methods.
+        DeepaMehtaObject object = requestObject(request);
         if (object != null) {
-            long time = getModificationTime(object);
+            long time = timeService.getModificationTime(object);
             Response.ResponseBuilder response = request.evaluatePreconditions(new Date(time));
             if (response != null) {
                 logger.info("### Precondition of " + request.getMethod() + " request failed (object " +
@@ -104,7 +97,7 @@ public class CachingPlugin extends PluginActivator implements PreProcessRequestL
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private DeepaMehtaObjectModel requestObject(ContainerRequest request) {
+    private DeepaMehtaObject requestObject(ContainerRequest request) {
         // Example URL: "http://localhost:8080/core/topic/2695?fetch_composite=false"
         //   request.getBaseUri()="http://localhost:8080/"
         //   request.getPath()="core/topic/2695"
@@ -115,24 +108,14 @@ public class CachingPlugin extends PluginActivator implements PreProcessRequestL
             String objectType = m.group(1);     // group 1 is "topic" or "association"
             long objectId = Long.parseLong(m.group(2));
             if (objectType.equals("topic")) {
-                return new TopicModel(objectId);
+                return dms.getTopic(objectId, false, null);
             } else if (objectType.equals("association")) {
-                return new AssociationModel(objectId);
+                return dms.getAssociation(objectId, false, null);
             } else {
                 throw new RuntimeException("Unexpected object type: \"" + objectType + "\"");
             }
         } else {
             return null;
-        }
-    }
-
-    private long getModificationTime(DeepaMehtaObjectModel object) {
-        if (object instanceof TopicModel) {
-            return timeService.getTopicModificationTime(object.getId());
-        } else if (object instanceof AssociationModel) {
-            return timeService.getAssociationModificationTime(object.getId());
-        } else {
-            throw new RuntimeException("Unexpected object: " + object);
         }
     }
 

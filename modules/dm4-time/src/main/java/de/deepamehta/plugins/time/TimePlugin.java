@@ -83,26 +83,16 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     // does not work as expected when called with a negative value which is not dividable by 1000.
 
     @Override
-    public long getTopicCreationTime(long topicId) {
-        return dms.hasTopicProperty(topicId, URI_CREATED) ? (Long) dms.getTopicProperty(topicId, URI_CREATED) : 0;
+    public long getCreationTime(DeepaMehtaObject object) {
+        return object.hasProperty(URI_CREATED) ? (Long) object.getProperty(URI_CREATED) : 0;
     }
 
     @Override
-    public long getTopicModificationTime(long topicId) {
-        return dms.hasTopicProperty(topicId, URI_MODIFIED) ? (Long) dms.getTopicProperty(topicId, URI_MODIFIED) : 0;
+    public long getModificationTime(DeepaMehtaObject object) {
+        return object.hasProperty(URI_MODIFIED) ? (Long) object.getProperty(URI_MODIFIED) : 0;
     }
 
-    @Override
-    public long getAssociationCreationTime(long assocId) {
-        return dms.hasAssociationProperty(assocId, URI_CREATED) ? (Long) dms.getAssociationProperty(assocId,
-            URI_CREATED) : 0;
-    }
 
-    @Override
-    public long getAssociationModificationTime(long assocId) {
-        return dms.hasAssociationProperty(assocId, URI_MODIFIED) ? (Long) dms.getAssociationProperty(assocId,
-            URI_MODIFIED) : 0;
-    }
 
     // === Retrieval ===
 
@@ -236,13 +226,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     // ---
 
     private void storeTime(DeepaMehtaObject object, String propUri, long time) {
-        if (object instanceof Topic) {
-            dms.setTopicProperty(object.getId(), propUri, time, true);          // addToIndex=true
-        } else if (object instanceof Association) {
-            dms.setAssociationProperty(object.getId(), propUri, time, true);    // addToIndex=true
-        } else {
-            throw new RuntimeException("Unexpected object: " + object);
-        }
+        object.setProperty(propUri, time, true);    // addToIndex=true
     }
 
     // ===
@@ -260,28 +244,6 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
         comp.put(URI_CREATED, created);
         comp.put(URI_MODIFIED, modified);
         return modified;
-    }
-
-    // ---
-
-    private long getCreationTime(DeepaMehtaObject object) {
-        if (object instanceof Topic) {
-            return getTopicCreationTime(object.getId());
-        } else if (object instanceof Association) {
-            return getAssociationCreationTime(object.getId());
-        } else {
-            throw new RuntimeException("Unexpected object: " + object);
-        }
-    }
-
-    private long getModificationTime(DeepaMehtaObject object) {
-        if (object instanceof Topic) {
-            return getTopicModificationTime(object.getId());
-        } else if (object instanceof Association) {
-            return getAssociationModificationTime(object.getId());
-        } else {
-            throw new RuntimeException("Unexpected object: " + object);
-        }
     }
 
     // ---
