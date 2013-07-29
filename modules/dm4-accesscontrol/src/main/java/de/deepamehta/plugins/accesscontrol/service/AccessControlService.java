@@ -3,6 +3,7 @@ package de.deepamehta.plugins.accesscontrol.service;
 import de.deepamehta.plugins.accesscontrol.model.AccessControlList;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.core.Association;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.PluginService;
 
@@ -71,84 +72,48 @@ public interface AccessControlService extends PluginService {
     // === Creator ===
 
     /**
-     * Returns the creator of a topic.
+     * Returns the creator of a topic or an association.
      *
      * @return  The username of the creator, or <code>null</code> if no creator is set.
      */
-    String getTopicCreator(long topicId);
+    String getCreator(DeepaMehtaObject object);
 
     /**
-     * Returns the creator of an association.
-     *
-     * @return  The username of the creator, or <code>null</code> if no creator is set.
+     * Sets the creator of a topic or an association.
      */
-    String getAssociationCreator(long assocId);
-
-    /**
-     * Sets the creator of a topic.
-     */
-    void setTopicCreator(long topicId, String username);
-
-    /**
-     * Sets the creator of an association.
-     */
-    void setAssociationCreator(long assocId, String username);
+    void setCreator(DeepaMehtaObject object, String username);
 
 
 
     // === Owner ===
 
     /**
-     * Returns the owner of a topic.
+     * Returns the owner of a topic or an association.
      *
      * @return  The username of the owner, or <code>null</code> if no owner is set.
      */
-    String getTopicOwner(long topicId);
+    String getOwner(DeepaMehtaObject object);
 
     /**
-     * Returns the owner of an association.
-     *
-     * @return  The username of the owner, or <code>null</code> if no owner is set.
+     * Sets the owner of a topic or an association.
      */
-    String getAssociationOwner(long assocId);
-
-    /**
-     * Sets the owner of a topic.
-     */
-    void setTopicOwner(long topicId, String username);
-
-    /**
-     * Sets the owner of an association.
-     */
-    void setAssociationOwner(long assocId, String username);
+    void setOwner(DeepaMehtaObject object, String username);
 
 
 
     // === Access Control List ===
 
     /**
-     * Returns the Access Control List of a topic.
+     * Returns the Access Control List of a topic or an association.
      *
      * @return  The Access Control List. If no one was set an empty Access Control List is returned.
      */
-    AccessControlList getTopicACL(long topicId);
+    AccessControlList getACL(DeepaMehtaObject object);
 
     /**
-     * Returns the Access Control List of an association.
-     *
-     * @return  The Access Control List. If no one was set an empty Access Control List is returned.
+     * Sets the Access Control List for a topic or an association.
      */
-    AccessControlList getAssociationACL(long assocId);
-
-    /**
-     * Sets the Access Control List for a topic.
-     */
-    void setTopicACL(long topicId, AccessControlList acl);
-
-    /**
-     * Sets the Access Control List for an association.
-     */
-    void setAssociationACL(long assocId, AccessControlList acl);
+    void setACL(DeepaMehtaObject object, AccessControlList acl);
 
 
 

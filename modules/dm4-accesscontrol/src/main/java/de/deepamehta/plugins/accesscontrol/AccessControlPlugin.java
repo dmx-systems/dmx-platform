@@ -198,25 +198,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // === Creator ===
 
     @Override
-    public String getTopicCreator(long topicId) {
-        return dms.hasTopicProperty(topicId, URI_CREATOR) ? (String) dms.getTopicProperty(topicId, URI_CREATOR) :
-            null;
+    public String getCreator(DeepaMehtaObject object) {
+        return object.hasProperty(URI_CREATOR) ? (String) object.getProperty(URI_CREATOR) : null;
     }
 
     @Override
-    public String getAssociationCreator(long assocId) {
-        return dms.hasAssociationProperty(assocId, URI_CREATOR) ? (String) dms.getAssociationProperty(assocId,
-            URI_CREATOR) : null;
-    }
-
-    @Override
-    public void setTopicCreator(long topicId, String username) {
-        dms.setTopicProperty(topicId, URI_CREATOR, username, true);         // addToIndex=true
-    }
-
-    @Override
-    public void setAssociationCreator(long assocId, String username) {
-        dms.setAssociationProperty(assocId, URI_CREATOR, username, true);   // addToIndex=true
+    public void setCreator(DeepaMehtaObject object, String username) {
+        object.setProperty(URI_CREATOR, username, true);    // addToIndex=true
     }
 
 
@@ -224,24 +212,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // === Owner ===
 
     @Override
-    public String getTopicOwner(long topicId) {
-        return dms.hasTopicProperty(topicId, URI_OWNER) ? (String) dms.getTopicProperty(topicId, URI_OWNER) : null;
+    public String getOwner(DeepaMehtaObject object) {
+        return object.hasProperty(URI_OWNER) ? (String) object.getProperty(URI_OWNER) : null;
     }
 
     @Override
-    public String getAssociationOwner(long assocId) {
-        return dms.hasAssociationProperty(assocId, URI_OWNER) ? (String) dms.getAssociationProperty(assocId, URI_OWNER)
-            : null;
-    }
-
-    @Override
-    public void setTopicOwner(long topicId, String username) {
-        dms.setTopicProperty(topicId, URI_OWNER, username, true);           // addToIndex=true
-    }
-
-    @Override
-    public void setAssociationOwner(long assocId, String username) {
-        dms.setAssociationProperty(assocId, URI_OWNER, username, true);     // addToIndex=true
+    public void setOwner(DeepaMehtaObject object, String username) {
+        object.setProperty(URI_OWNER, username, true);      // addToIndex=true
     }
 
 
@@ -249,46 +226,24 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // === Access Control List ===
 
     @Override
-    public AccessControlList getTopicACL(long topicId) {
+    public AccessControlList getACL(DeepaMehtaObject object) {
         try {
-            if (dms.hasTopicProperty(topicId, URI_ACL)) {
-                return new AccessControlList(new JSONObject((String) dms.getTopicProperty(topicId, URI_ACL)));
+            if (object.hasProperty(URI_ACL)) {
+                return new AccessControlList(new JSONObject((String) object.getProperty(URI_ACL)));
             } else {
                 return new AccessControlList();
             }
         } catch (Exception e) {
-            throw new RuntimeException("Fetching access control list for topic " + topicId + " failed", e);
+            throw new RuntimeException("Fetching access control list for object " + object.getId() + " failed", e);
         }
     }
 
     @Override
-    public AccessControlList getAssociationACL(long assocId) {
+    public void setACL(DeepaMehtaObject object, AccessControlList acl) {
         try {
-            if (dms.hasAssociationProperty(assocId, URI_ACL)) {
-                return new AccessControlList(new JSONObject((String) dms.getAssociationProperty(assocId, URI_ACL)));
-            } else {
-                return new AccessControlList();
-            }
+            object.setProperty(URI_ACL, acl.toJSON().toString(), false);    // addToIndex=false
         } catch (Exception e) {
-            throw new RuntimeException("Fetching access control list for association " + assocId + " failed", e);
-        }
-    }
-
-    @Override
-    public void setTopicACL(long topicId, AccessControlList acl) {
-        try {
-            dms.setTopicProperty(topicId, URI_ACL, acl.toJSON().toString(), false);         // addToIndex=false
-        } catch (Exception e) {
-            throw new RuntimeException("Storing access control list for topic " + topicId + " failed", e);
-        }
-    }
-
-    @Override
-    public void setAssociationACL(long assocId, AccessControlList acl) {
-        try {
-            dms.setAssociationProperty(assocId, URI_ACL, acl.toJSON().toString(), false);   // addToIndex=false
-        } catch (Exception e) {
-            throw new RuntimeException("Storing access control list for association " + assocId + " failed", e);
+            throw new RuntimeException("Storing access control list for object " + object.getId() + " failed", e);
         }
     }
 
@@ -608,9 +563,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                     "    - User Account topic (ID " + topic.getId() + ")\n" + 
                     "    - Username topic (ID " + usernameTopic.getId() + ")\n" + 
                     "    - Password topic (ID " + passwordTopic.getId() + ")");
-                setTopicOwner(topic.getId(), newUsername);
-                setTopicOwner(usernameTopic.getId(), newUsername);
-                setTopicOwner(passwordTopic.getId(), newUsername);
+                setOwner(topic, newUsername);
+                setOwner(usernameTopic, newUsername);
+                setOwner(passwordTopic, newUsername);
             }
         }
     }
@@ -731,7 +686,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         try {
             // Note: we only check for creator assignment.
             // If an object has a creator assignment it is expected to have an ACL entry as well.
-            if (getTopicCreator(defaultTopicmap.getId()) != null) {
+            if (getCreator(defaultTopicmap) != null) {
                 logger.info(operation + " ABORTED -- already setup");
                 return;
             }
@@ -813,18 +768,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     private void setupAccessControl(DeepaMehtaObject object, AccessControlList acl, String username) {
-        long objectId = object.getId();
-        if (object instanceof Topic) {
-            setTopicCreator(objectId, username);
-            setTopicOwner(objectId, username);
-            setTopicACL(objectId, acl);
-        } else if (object instanceof Association) {
-            setAssociationCreator(objectId, username);
-            setAssociationOwner(objectId, username);
-            setAssociationACL(objectId, acl);
-        } else {
-            throw new RuntimeException("Unexpected object: " + object);
-        }
+        setCreator(object, username);
+        setOwner(object, username);
+        setACL(object, acl);
     }
 
 
@@ -986,40 +932,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private Permissions createPermissions(boolean write, boolean create) {
         return createPermissions(write).add(Operation.CREATE, create);
-    }
-
-
-
-    // === Helper ===
-
-    private String getCreator(DeepaMehtaObject object) {
-        if (object instanceof Topic) {
-            return getTopicCreator(object.getId());
-        } else if (object instanceof Association) {
-            return getAssociationCreator(object.getId());
-        } else {
-            throw new RuntimeException("Unexpected object: " + object);
-        }
-    }
-
-    private String getOwner(DeepaMehtaObject object) {
-        if (object instanceof Topic) {
-            return getTopicOwner(object.getId());
-        } else if (object instanceof Association) {
-            return getAssociationOwner(object.getId());
-        } else {
-            throw new RuntimeException("Unexpected object: " + object);
-        }
-    }
-
-    private AccessControlList getACL(DeepaMehtaObject object) {
-        if (object instanceof Topic) {
-            return getTopicACL(object.getId());
-        } else if (object instanceof Association) {
-            return getAssociationACL(object.getId());
-        } else {
-            throw new RuntimeException("Unexpected object: " + object);
-        }
     }
 
 

@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.accesscontrol.migrations;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.Migration;
 
@@ -12,8 +13,7 @@ public class Migration2 extends Migration {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private long topicCount = 0;
-    private long assocCount = 0;
+    private long count;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -21,63 +21,38 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
+        count = 0;
         for (Topic topic : dms.getAllTopics()) {
-            migrateTopic(topic);
+            migrateObject(topic, "topic");
         }
+        count = 0;
         for (Association assoc : dms.getAllAssociations()) {
-            migrateAssociation(assoc);
+            migrateObject(assoc, "association");
         }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void migrateTopic(Topic topic) {
+    private void migrateObject(DeepaMehtaObject object, String type) {
         try {
-            topicCount++;
-            long topicId = topic.getId();
-            String info = "### Migrating topic " + topicId + " (#" + topicCount + ")";
-            if (dms.hasTopicProperty(topicId, "creator")) {
+            count++;
+            String info = "### Migrating " + type + " " + object.getId() + " (#" + count + ")";
+            if (object.hasProperty("creator")) {
                 logger.info(info);
-                renameTopicProperty(topicId, "creator", "dm4.accesscontrol.creator", true);         // addToIndex=true
-                renameTopicProperty(topicId, "owner",   "dm4.accesscontrol.owner",   true);         // addToIndex=true
-                renameTopicProperty(topicId, "acl",     "dm4.accesscontrol.acl",     false);        // addToIndex=false
+                renameProperty(object, "creator", "dm4.accesscontrol.creator", true);   // addToIndex=true
+                renameProperty(object, "owner",   "dm4.accesscontrol.owner",   true);   // addToIndex=true
+                renameProperty(object, "acl",     "dm4.accesscontrol.acl",     false);  // addToIndex=false
             } else {
                 logger.info(info + " ABORTED -- Access control information not availble");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Migrating topic " + topic.getId() + " failed (" + topic + ")", e);
+            throw new RuntimeException("Migrating " + type + " " + object.getId() + " failed (" + object + ")", e);
         }
     }
 
-    private void migrateAssociation(Association assoc) {
-        try {
-            assocCount++;
-            long assocId = assoc.getId();
-            String info = "### Migrating association " + assocId + " (#" + assocCount + ")";
-            if (dms.hasAssociationProperty(assocId, "creator")) {
-                logger.info(info);
-                renameAssociationProperty(assocId, "creator", "dm4.accesscontrol.creator", true);   // addToIndex=true
-                renameAssociationProperty(assocId, "owner",   "dm4.accesscontrol.owner",   true);   // addToIndex=true
-                renameAssociationProperty(assocId, "acl",     "dm4.accesscontrol.acl",     false);  // addToIndex=false
-            } else {
-                logger.info(info + " ABORTED -- Access control information not availble");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Migrating association " + assoc.getId() + " failed (" + assoc + ")", e);
-        }
-    }
-
-    // ---
-
-    private void renameTopicProperty(long topicId, String oldPropUri, String newPropUri, boolean addToIndex) {
-        String propValue = (String) dms.getTopicProperty(topicId, oldPropUri);
-        dms.setTopicProperty(topicId, newPropUri, propValue, addToIndex);
-        dms.removeTopicProperty(topicId, oldPropUri);
-    }
-
-    private void renameAssociationProperty(long assocId, String oldPropUri, String newPropUri, boolean addToIndex) {
-        String propValue = (String) dms.getAssociationProperty(assocId, oldPropUri);
-        dms.setAssociationProperty(assocId, newPropUri, propValue, addToIndex);
-        dms.removeAssociationProperty(assocId, oldPropUri);
+    private void renameProperty(DeepaMehtaObject object, String oldPropUri, String newPropUri, boolean addToIndex) {
+        String propValue = (String) object.getProperty(oldPropUri);
+        object.setProperty(newPropUri, propValue, addToIndex);
+        object.removeProperty(oldPropUri);
     }
 }
