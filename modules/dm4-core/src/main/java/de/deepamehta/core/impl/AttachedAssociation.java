@@ -243,6 +243,30 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
 
 
+    // === Properties ===
+
+    @Override
+    public Object getProperty(String propUri) {
+        return dms.storage.fetchAssociationProperty(getId(), propUri);
+    }
+
+    @Override
+    public void setProperty(String propUri, Object propValue, boolean addToIndex) {
+        dms.storage.storeAssociationProperty(getId(), propUri, propValue, addToIndex);
+    }
+
+    @Override
+    public boolean hasProperty(String propUri) {
+        return dms.storage.hasAssociationProperty(getId(), propUri);
+    }
+
+    @Override
+    public void removeProperty(String propUri) {
+        dms.storage.removeAssociationProperty(getId(), propUri);
+    }
+
+
+
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**

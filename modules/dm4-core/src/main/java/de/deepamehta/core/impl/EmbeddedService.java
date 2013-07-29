@@ -554,18 +554,6 @@ public class EmbeddedService implements DeepaMehtaService {
     // === Properties ===
 
     @Override
-    public Object getTopicProperty(long topicId, String propUri) {
-        return storage.fetchTopicProperty(topicId, propUri);
-    }
-
-    @Override
-    public Object getAssociationProperty(long assocId, String propUri) {
-        return storage.fetchAssociationProperty(assocId, propUri);
-    }
-
-    // ---
-
-    @Override
     public Collection<Topic> getTopicsByProperty(String propUri, Object propValue) {
         return instantiateTopics(storage.fetchTopicsByProperty(propUri, propValue), false);
             // fetchComposite=false
@@ -587,62 +575,6 @@ public class EmbeddedService implements DeepaMehtaService {
     public Collection<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
         return instantiateAssociations(storage.fetchAssociationsByPropertyRange(propUri, from, to), false);
             // fetchComposite=false
-    }
-
-    // ---
-
-    @Override
-    public void setTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            storage.storeTopicProperty(topicId, propUri, propValue, addToIndex);
-            tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Setting property \"" + propUri + "\" for topic " + topicId +
-                " failed (propValue=" + propValue + ")", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
-    @Override
-    public void setAssociationProperty(long assocId, String propUri, Object propValue, boolean addToIndex) {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
-            storage.storeAssociationProperty(assocId, propUri, propValue, addToIndex);
-            tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK!");
-            throw new RuntimeException("Setting property \"" + propUri + "\" for association " + assocId +
-                " failed (propValue=" + propValue + ")", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
-    // ---
-
-    @Override
-    public boolean hasTopicProperty(long topicId, String propUri) {
-        return storage.hasTopicProperty(topicId, propUri);
-    }
-
-    @Override
-    public boolean hasAssociationProperty(long assocId, String propUri) {
-        return storage.hasAssociationProperty(assocId, propUri);
-    }
-
-    // ---
-
-    @Override
-    public void removeTopicProperty(long topicId, String propUri) {
-        storage.removeTopicProperty(topicId, propUri);
-    }
-
-    @Override
-    public void removeAssociationProperty(long assocId, String propUri) {
-        storage.removeAssociationProperty(assocId, propUri);
     }
 
 

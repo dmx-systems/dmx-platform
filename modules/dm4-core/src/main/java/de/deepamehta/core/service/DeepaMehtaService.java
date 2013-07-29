@@ -173,14 +173,6 @@ public interface DeepaMehtaService {
 
     // === Properties ===
 
-    // ### TODO: make getters/setters/has... polymorph and move to DeepaMehtaObject?
-
-    Object getTopicProperty(long topicId, String propUri);
-
-    Object getAssociationProperty(long assocId, String propUri);
-
-    // ---
-
     Collection<Topic> getTopicsByProperty(String propUri, Object propValue);
 
     Collection<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to);
@@ -188,24 +180,6 @@ public interface DeepaMehtaService {
     Collection<Association> getAssociationsByProperty(String propUri, Object propValue);
 
     Collection<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to);
-
-    // ---
-
-    void setTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex);
-
-    void setAssociationProperty(long assocId, String propUri, Object propValue, boolean addToIndex);
-
-    // ---
-
-    boolean hasTopicProperty(long topicId, String propUri);
-
-    boolean hasAssociationProperty(long assocId, String propUri);
-
-    // ---
-
-    void removeTopicProperty(long topicId, String propUri);
-
-    void removeAssociationProperty(long assocId, String propUri);
 
 
 

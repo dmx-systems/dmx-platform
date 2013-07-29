@@ -128,4 +128,16 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * - all the remaining direct associations, e.g. "dm4.core.instantiation"
      */
     void delete(Directives directives);
+
+
+
+    // === Properties ===
+
+    Object getProperty(String propUri);
+
+    void setProperty(String propUri, Object propValue, boolean addToIndex);
+
+    boolean hasProperty(String propUri);
+
+    void removeProperty(String propUri);
 }
