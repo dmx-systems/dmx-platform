@@ -52,34 +52,29 @@ public class WebservicePlugin extends PluginActivator {
     @GET
     @Path("/topic/{id}")
     public Topic getTopic(@PathParam("id") long topicId,
-                          @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite,
-                          @HeaderParam("Cookie") ClientState clientState) {
-        return dms.getTopic(topicId, fetchComposite, clientState);
+                          @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
+        return dms.getTopic(topicId, fetchComposite);
     }
 
     @GET
     @Path("/topic/by_value/{key}/{value}")
     public Topic getTopic(@PathParam("key") String key, @PathParam("value") SimpleValue value,
-                          @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite,
-                          @HeaderParam("Cookie") ClientState clientState) {
-        return dms.getTopic(key, value, fetchComposite, clientState);
+                          @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
+        return dms.getTopic(key, value, fetchComposite);
     }
 
     @GET
     @Path("/topic/by_type/{type_uri}")
     public ResultSet<RelatedTopic> getTopics(@PathParam("type_uri") String typeUri,
                                       @QueryParam("fetch_composite") @DefaultValue("false") boolean fetchComposite,
-                                      @QueryParam("max_result_size") int maxResultSize,
-                                      @HeaderParam("Cookie") ClientState clientState) {
-        return dms.getTopics(typeUri, fetchComposite, maxResultSize, clientState);
+                                      @QueryParam("max_result_size") int maxResultSize) {
+        return dms.getTopics(typeUri, fetchComposite, maxResultSize);
     }
 
     @GET
     @Path("/topic")
-    public Set<Topic> searchTopics(@QueryParam("search")    String searchTerm,
-                                   @QueryParam("field")     String fieldUri,
-                                   @HeaderParam("Cookie")   ClientState clientState) {
-        return dms.searchTopics(searchTerm, fieldUri, clientState);
+    public Set<Topic> searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field")  String fieldUri) {
+        return dms.searchTopics(searchTerm, fieldUri);
     }
 
     @POST
@@ -101,8 +96,8 @@ public class WebservicePlugin extends PluginActivator {
 
     @DELETE
     @Path("/topic/{id}")
-    public Directives deleteTopic(@PathParam("id") long topicId, @HeaderParam("Cookie") ClientState clientState) {
-        return dms.deleteTopic(topicId, clientState);
+    public Directives deleteTopic(@PathParam("id") long topicId) {
+        return dms.deleteTopic(topicId);
     }
 
 
@@ -112,9 +107,8 @@ public class WebservicePlugin extends PluginActivator {
     @GET
     @Path("/association/{id}")
     public Association getAssociation(@PathParam("id") long assocId,
-                                      @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite,
-                                      @HeaderParam("Cookie") ClientState clientState) {
-        return dms.getAssociation(assocId, fetchComposite, clientState);
+                                      @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
+        return dms.getAssociation(assocId, fetchComposite);
     }
 
     @GET
@@ -122,10 +116,8 @@ public class WebservicePlugin extends PluginActivator {
     public Association getAssociation(@PathParam("assoc_type_uri") String assocTypeUri,
                    @PathParam("topic1_id") long topic1Id, @PathParam("topic2_id") long topic2Id,
                    @PathParam("role_type1_uri") String roleTypeUri1, @PathParam("role_type2_uri") String roleTypeUri2,
-                   @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite,
-                   @HeaderParam("Cookie") ClientState clientState) {
-        return dms.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2, fetchComposite,
-            clientState);
+                   @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
+        return dms.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2, fetchComposite);
     }
 
     // ---
@@ -166,8 +158,8 @@ public class WebservicePlugin extends PluginActivator {
 
     @DELETE
     @Path("/association/{id}")
-    public Directives deleteAssociation(@PathParam("id") long assocId, @HeaderParam("Cookie") ClientState clientState) {
-        return dms.deleteAssociation(assocId, clientState);
+    public Directives deleteAssociation(@PathParam("id") long assocId) {
+        return dms.deleteAssociation(assocId);
     }
 
 
@@ -182,14 +174,14 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/topictype/{uri}")
-    public TopicType getTopicType(@PathParam("uri") String uri, @HeaderParam("Cookie") ClientState clientState) {
-        return dms.getTopicType(uri, clientState);
+    public TopicType getTopicType(@PathParam("uri") String uri) {
+        return dms.getTopicType(uri);
     }
 
     @GET
     @Path("/topictype/all")
-    public Set<TopicType> getAllTopicTypes(@HeaderParam("Cookie") ClientState clientState) {
-        return dms.getAllTopicTypes(clientState);
+    public Set<TopicType> getAllTopicTypes() {
+        return dms.getAllTopicTypes();
     }
 
     @POST
@@ -216,15 +208,14 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/assoctype/{uri}")
-    public AssociationType getAssociationType(@PathParam("uri") String uri,
-                                              @HeaderParam("Cookie") ClientState clientState) {
-        return dms.getAssociationType(uri, clientState);
+    public AssociationType getAssociationType(@PathParam("uri") String uri) {
+        return dms.getAssociationType(uri);
     }
 
     @GET
     @Path("/assoctype/all")
-    public Set<AssociationType> getAssociationAllTypes(@HeaderParam("Cookie") ClientState clientState) {
-        return dms.getAllAssociationTypes(clientState);
+    public Set<AssociationType> getAssociationAllTypes() {
+        return dms.getAllAssociationTypes();
     }
 
     @POST
@@ -266,11 +257,10 @@ public class WebservicePlugin extends PluginActivator {
                                                          @QueryParam("my_role_type_uri")      String myRoleTypeUri,
                                                          @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
                                                          @QueryParam("others_topic_type_uri") String othersTopicTypeUri,
-                                                         @QueryParam("max_result_size")       int maxResultSize,
-                                                         @HeaderParam("Cookie")               ClientState clientState) {
-        Topic topic = dms.getTopic(topicId, false, clientState);
+                                                         @QueryParam("max_result_size")       int maxResultSize) {
+        Topic topic = dms.getTopic(topicId, false);
         return getRelatedTopics(topic, "topic", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri, maxResultSize, clientState);
+            othersTopicTypeUri, maxResultSize);
     }
 
 
@@ -288,20 +278,19 @@ public class WebservicePlugin extends PluginActivator {
                                                          @QueryParam("my_role_type_uri")      String myRoleTypeUri,
                                                          @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
                                                          @QueryParam("others_topic_type_uri") String othersTopicTypeUri,
-                                                         @QueryParam("max_result_size")       int maxResultSize,
-                                                         @HeaderParam("Cookie")               ClientState clientState) {
-        Association assoc = dms.getAssociation(assocId, false, clientState);
+                                                         @QueryParam("max_result_size")       int maxResultSize) {
+        Association assoc = dms.getAssociation(assocId, false);
         return getRelatedTopics(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri, maxResultSize, clientState);
+            othersTopicTypeUri, maxResultSize);
     }
 
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private ResultSet<RelatedTopic> getRelatedTopics(DeepaMehtaObject object, String objectInfo,
-                        String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri,
-                        int maxResultSize, ClientState clientState) {
+    private ResultSet<RelatedTopic> getRelatedTopics(DeepaMehtaObject object, String objectInfo, String assocTypeUri,
+                                                     String myRoleTypeUri, String othersRoleTypeUri,
+                                                     String othersTopicTypeUri, int maxResultSize) {
         String operation = "Fetching related topics of " + objectInfo + " " + object.getId();
         String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
             "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri +
@@ -309,7 +298,7 @@ public class WebservicePlugin extends PluginActivator {
         try {
             logger.info(operation + " " + paramInfo);
             return object.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-                false, false, maxResultSize, clientState);
+                false, false, maxResultSize);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed " + paramInfo, e);
         }

@@ -219,7 +219,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     @Override
     public ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
-                                    int maxResultSize, ClientState clientState) {
+                                    int maxResultSize) {
         ResultSet<RelatedTopicModel> topics = dms.storage.fetchAssociationRelatedTopics(getId(), assocTypeUris,
             myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
         return dms.instantiateRelatedTopics(topics, fetchComposite, fetchRelatingComposite);
@@ -365,8 +365,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     }
 
     private Association fetchInstantiation() {
-        RelatedTopic assocType = getRelatedTopic("dm4.core.instantiation",
-            "dm4.core.instance", "dm4.core.type", "dm4.core.assoc_type", false, false, null);
+        RelatedTopic assocType = getRelatedTopic("dm4.core.instantiation", "dm4.core.instance", "dm4.core.type",
+            "dm4.core.assoc_type", false, false);
         //
         if (assocType == null) {
             throw new RuntimeException("Association " + getId() + " is not associated to an association type");

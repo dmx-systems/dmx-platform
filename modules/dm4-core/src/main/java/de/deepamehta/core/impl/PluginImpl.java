@@ -539,7 +539,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private Topic fetchPluginTopic() {
-        return dms.getTopic("uri", new SimpleValue(pluginUri), false, null);        // fetchComposite=false
+        return dms.getTopic("uri", new SimpleValue(pluginUri), false);      // fetchComposite=false
     }
 
     // ---
@@ -552,7 +552,7 @@ public class PluginImpl implements Plugin, EventHandler {
                     continue;
                 }
                 //
-                TopicType topicType = dms.getTopicType(topicTypeUri, null);                 // clientState=null
+                TopicType topicType = dms.getTopicType(topicTypeUri);
                 fireEventLocally(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);          // clientState=null
             }
         } catch (Exception e) {
@@ -563,7 +563,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private void introduceAssociationTypesToPlugin() {
         try {
             for (String assocTypeUri : dms.getAssociationTypeUris()) {
-                AssociationType assocType = dms.getAssociationType(assocTypeUri, null);     // clientState=null
+                AssociationType assocType = dms.getAssociationType(assocTypeUri);
                 fireEventLocally(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType, null);    // clientState=null
             }
         } catch (Exception e) {

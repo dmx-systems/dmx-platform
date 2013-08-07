@@ -143,7 +143,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     @Override
     public ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
-                                    int maxResultSize, ClientState clientState) {
+                                    int maxResultSize) {
         ResultSet<RelatedTopicModel> topics = dms.storage.fetchTopicRelatedTopics(getId(), assocTypeUris,
             myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
         return dms.instantiateRelatedTopics(topics, fetchComposite, fetchRelatingComposite);
@@ -249,8 +249,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // Note: this method works only for instances, not for types.
     // This is because a type is not of type "dm4.core.topic_type" but of type "dm4.core.meta_type".
     private Association fetchInstantiation() {
-        RelatedTopic topicType = getRelatedTopic("dm4.core.instantiation",
-            "dm4.core.instance", "dm4.core.type", "dm4.core.topic_type", false, false, null);
+        RelatedTopic topicType = getRelatedTopic("dm4.core.instantiation", "dm4.core.instance", "dm4.core.type",
+            "dm4.core.topic_type", false, false);
         //
         if (topicType == null) {
             throw new RuntimeException("Topic " + getId() + " is not associated to a topic type");

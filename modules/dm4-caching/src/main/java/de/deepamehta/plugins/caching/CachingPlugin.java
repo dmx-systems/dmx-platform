@@ -108,9 +108,9 @@ public class CachingPlugin extends PluginActivator implements PreProcessRequestL
             String objectType = m.group(1);     // group 1 is "topic" or "association"
             long objectId = Long.parseLong(m.group(2));
             if (objectType.equals("topic")) {
-                return dms.getTopic(objectId, false, null);
+                return dms.getTopic(objectId, false);
             } else if (objectType.equals("association")) {
-                return dms.getAssociation(objectId, false, null);
+                return dms.getAssociation(objectId, false);
             } else {
                 throw new RuntimeException("Unexpected object type: \"" + objectType + "\"");
             }

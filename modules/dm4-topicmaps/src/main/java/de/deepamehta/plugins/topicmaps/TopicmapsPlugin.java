@@ -101,9 +101,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @GET
     @Path("/{id}")
     @Override
-    public Topicmap getTopicmap(@PathParam("id") long topicmapId, @HeaderParam("Cookie") ClientState clientState) {
+    public Topicmap getTopicmap(@PathParam("id") long topicmapId) {
         try {
-            return new Topicmap(topicmapId, dms, clientState);
+            return new Topicmap(topicmapId, dms);
         } catch (Exception e) {
             throw new RuntimeException("Fetching topicmap " + topicmapId + " failed", e);
         }
@@ -240,12 +240,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Association fetchTopicRefAssociation(long topicmapId, long topicId) {
         return dms.getAssociation(TOPIC_MAPCONTEXT, topicmapId, topicId,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC, false, null);          // fetchComposite=false, clientState=null
+            ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC, false);          // fetchComposite=false
     }
 
     private Association fetchAssociationRefAssociation(long topicmapId, long assocId) {
         return dms.getAssociationBetweenTopicAndAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION, false, null);    // fetchComposite=false, clientState=null
+            ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION, false);    // fetchComposite=false
     }
 
     // ---

@@ -38,7 +38,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     @Override
     public Topic getFacet(long topicId, String facetTypeUri) {
-        Topic topic = dms.getTopic(topicId, false, null);                   // fetchComposite=false
+        Topic topic = dms.getTopic(topicId, false);                         // fetchComposite=false
         return getFacet(topic, facetTypeUri);
     }
 
@@ -90,7 +90,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     public boolean hasFacet(long topicId, String facetTypeUri, long facetTopicId) {
         String assocTypeUri = getAssocDef(facetTypeUri).getInstanceLevelAssocTypeUri();
         Association assoc = dms.getAssociation(assocTypeUri, topicId, facetTopicId, "dm4.core.parent", "dm4.core.child",
-            false, null);   // fetchComposite=false, clientState=null
+            false);     // fetchComposite=false
         return assoc != null;
     }
 
@@ -110,7 +110,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = assocDef.getChildTypeUri();
         return object.getRelatedTopic(assocTypeUri, "dm4.core.parent", "dm4.core.child", othersTypeUri, fetchComposite,
-            false, null);
+            false);
     }
 
     /**
@@ -125,13 +125,13 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = assocDef.getChildTypeUri();
         return object.getRelatedTopics(assocTypeUri, "dm4.core.parent", "dm4.core.child", othersTypeUri, fetchComposite,
-            false, 0, null).getItems();
+            false, 0).getItems();
     }
 
     // ---
 
     private AssociationDefinition getAssocDef(String facetTypeUri) {
         // Note: a facet type has exactly *one* association definition
-        return dms.getTopicType(facetTypeUri, null).getAssocDefs().iterator().next();
+        return dms.getTopicType(facetTypeUri).getAssocDefs().iterator().next();
     }
 }

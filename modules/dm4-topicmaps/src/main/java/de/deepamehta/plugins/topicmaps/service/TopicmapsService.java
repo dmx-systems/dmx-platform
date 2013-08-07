@@ -17,7 +17,7 @@ public interface TopicmapsService extends PluginService {
 
     // ---
 
-    Topicmap getTopicmap(long topicmapId, ClientState clientState);
+    Topicmap getTopicmap(long topicmapId);
 
     // ---
 

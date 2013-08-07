@@ -78,12 +78,12 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @GET
     @Path("/topic/{id}")
     @Override
-    public Topic getGeoTopic(@PathParam("id") long topicId, @HeaderParam("Cookie") ClientState clientState) {
+    public Topic getGeoTopic(@PathParam("id") long topicId) {
         try {
-            Topic topic = dms.getTopic(topicId, true, clientState);
+            Topic topic = dms.getTopic(topicId, true);
             RelatedTopic parentTopic;
             while ((parentTopic = topic.getRelatedTopic(null, "dm4.core.child", "dm4.core.parent", null,
-                    true, false, clientState)) != null) {
+                    true, false)) != null) {
                 topic = parentTopic;
             }
             return topic;
@@ -271,7 +271,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         }
         //
         CompositeValueModel comp = topic.getCompositeValueModel();
-        TopicType topicType = dms.getTopicType(typeUri, null);      // clientState=null
+        TopicType topicType = dms.getTopicType(typeUri);
         for (AssociationDefinition assocDef : topicType.getAssocDefs()) {
             String childTypeUri   = assocDef.getChildTypeUri();
             String cardinalityUri = assocDef.getChildCardinalityUri();

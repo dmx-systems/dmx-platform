@@ -277,7 +277,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // --- Helper ---
 
     private Topic fetchDefaultWorkspace() {
-        return dms.getTopic("uri", new SimpleValue(DEFAULT_WORKSPACE_URI), false, null);    // fetchComposite=false
+        return dms.getTopic("uri", new SimpleValue(DEFAULT_WORKSPACE_URI), false);      // fetchComposite=false
     }
 
     private boolean isDeepaMehtaStandardType(Type type) {
@@ -288,7 +288,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Checks if the topic with the specified ID exists and is a Workspace. If not, an exception is thrown.
      */
     private void checkArgument(long topicId) {
-        String typeUri = dms.getTopic(topicId, false, null).getTypeUri();   // fetchComposite=false
+        String typeUri = dms.getTopic(topicId, false).getTypeUri();     // fetchComposite=false
         if (!typeUri.equals("dm4.workspaces.workspace")) {
             throw new IllegalArgumentException("Topic " + topicId + " is not a workspace (but of type \"" + typeUri +
                 "\")");

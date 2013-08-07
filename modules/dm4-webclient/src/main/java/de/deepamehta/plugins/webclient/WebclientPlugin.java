@@ -85,8 +85,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\", clientState=" + clientState);
-            Set<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri, clientState);
-            Set<Topic> topics = findSearchableUnits(singleTopics, clientState);
+            Set<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri);
+            Set<Topic> topics = findSearchableUnits(singleTopics);
             logger.info(singleTopics.size() + " single topics found, " + topics.size() + " searchable units");
             //
             Topic searchTopic = createSearchTopic(searchTerm, topics, clientState);
@@ -115,8 +115,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             logger.info("typeUri=\"" + typeUri + "\", maxResultSize=" + maxResultSize);
-            String searchTerm = dms.getTopicType(typeUri, clientState).getSimpleValue() + "(s)";
-            Set<RelatedTopic> topics = dms.getTopics(typeUri, false, maxResultSize, clientState).getItems();
+            String searchTerm = dms.getTopicType(typeUri).getSimpleValue() + "(s)";
+            Set<RelatedTopic> topics = dms.getTopics(typeUri, false, maxResultSize).getItems();
             // fetchComposite=false
             //
             Topic searchTopic = createSearchTopic(searchTerm, topics, clientState);
@@ -199,18 +199,18 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // === Search ===
 
     // ### TODO: use Collection instead of Set
-    private Set<Topic> findSearchableUnits(Set<? extends Topic> topics, ClientState clientState) {
+    private Set<Topic> findSearchableUnits(Set<? extends Topic> topics) {
         Set<Topic> searchableUnits = new LinkedHashSet();
         for (Topic topic : topics) {
             if (searchableAsUnit(topic)) {
                 searchableUnits.add(topic);
             } else {
                 Set<RelatedTopic> parentTopics = topic.getRelatedTopics((String) null, "dm4.core.child",
-                    "dm4.core.parent", null, false, false, 0, clientState).getItems();
+                    "dm4.core.parent", null, false, false, 0).getItems();
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
                 } else {
-                    searchableUnits.addAll(findSearchableUnits(parentTopics, clientState));
+                    searchableUnits.addAll(findSearchableUnits(parentTopics));
                 }
             }
         }
@@ -240,7 +240,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // ---
 
     private boolean searchableAsUnit(Topic topic) {
-        TopicType topicType = dms.getTopicType(topic.getTypeUri(), null);           // FIXME: clientState=null
+        TopicType topicType = dms.getTopicType(topic.getTypeUri());
         Boolean searchableAsUnit = (Boolean) getViewConfig(topicType, "searchable_as_unit");
         return searchableAsUnit != null ? searchableAsUnit.booleanValue() : false;  // default is false
     }
@@ -265,7 +265,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     private void updateType(Topic viewConfig, Directives directives) {
         Topic type = viewConfig.getRelatedTopic("dm4.core.aggregation", "dm4.core.view_config", "dm4.core.type", null,
-            false, false, null);
+            false, false);
         if (type != null) {
             String typeUri = type.getTypeUri();
             if (typeUri.equals("dm4.core.topic_type") || typeUri.equals("dm4.core.meta_type")) {
@@ -286,7 +286,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     private void updateTopicType(Topic type, Topic viewConfig, Directives directives) {
         logger.info("### Updating view configuration of topic type \"" + type.getUri() + "\" (viewConfig=" +
             viewConfig + ")");
-        TopicType topicType = dms.getTopicType(type.getUri(), null);
+        TopicType topicType = dms.getTopicType(type.getUri());
         updateViewConfig(topicType, viewConfig);
         directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
     }
@@ -294,7 +294,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     private void updateAssociationType(Topic type, Topic viewConfig, Directives directives) {
         logger.info("### Updating view configuration of association type \"" + type.getUri() + "\" (viewConfig=" +
             viewConfig + ")");
-        AssociationType assocType = dms.getAssociationType(type.getUri(), null);
+        AssociationType assocType = dms.getAssociationType(type.getUri());
         updateViewConfig(assocType, viewConfig);
         directives.add(Directive.UPDATE_ASSOCIATION_TYPE, assocType);
     }

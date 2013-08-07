@@ -36,7 +36,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void typeDefinition() {
-        TopicType topicType = dms.getTopicType("dm4.core.plugin", null);  // clientState=null
+        TopicType topicType = dms.getTopicType("dm4.core.plugin");
         assertEquals("dm4.core.plugin",     topicType.getUri());
         assertEquals("dm4.core.topic_type", topicType.getTypeUri());
         assertEquals("dm4.core.composite",  topicType.getDataTypeUri());
@@ -115,7 +115,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("My Plugin", topic.getCompositeValue().getString("dm4.core.plugin_name"));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
-            Topic fetchedTopic = dms.getTopic(topic.getId(), false, null);
+            Topic fetchedTopic = dms.getTopic(topic.getId(), false);
             assertEquals("My Plugin", fetchedTopic.getSimpleValue().toString());
             //
             tx.success();
@@ -135,7 +135,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("My Plugin", topic.getCompositeValue().getString("dm4.core.plugin_name"));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
-            Topic fetchedTopic = dms.getTopic(topic.getId(), false, null);
+            Topic fetchedTopic = dms.getTopic(topic.getId(), false);
             assertEquals("My Plugin", fetchedTopic.getSimpleValue().toString());
             //
             tx.success();
@@ -148,7 +148,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void assocDefSequence() {
-        Type type = dms.getTopicType("dm4.core.plugin", null);  // clientState=null
+        Type type = dms.getTopicType("dm4.core.plugin");
         //
         // find assoc def 1/3
         RelatedAssociation assocDef = type.getRelatedAssociation("dm4.core.aggregation", "dm4.core.type",
@@ -216,7 +216,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dm4.core.composition_def", assoc.getTypeUri());
             assoc.setTypeUri("dm4.core.association");
             assertEquals("dm4.core.association", assoc.getTypeUri());
-            assoc = dms.getAssociation(assoc.getId(), false, null);
+            assoc = dms.getAssociation(assoc.getId(), false);
             assertEquals("dm4.core.association", assoc.getTypeUri());
             //
             // re-execute query
@@ -289,7 +289,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dm4.core.plugin", topic.getTypeUri());
             topic.setTypeUri("dm4.core.data_type");
             assertEquals("dm4.core.data_type", topic.getTypeUri());
-            topic = dms.getTopic(topic.getId(), false, null);
+            topic = dms.getTopic(topic.getId(), false);
             assertEquals("dm4.core.data_type", topic.getTypeUri());
             //
             // re-execute query
@@ -328,7 +328,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dm4.core.association", assoc.getTypeUri());
             assoc.setTypeUri("dm4.core.composition");
             assertEquals("dm4.core.composition", assoc.getTypeUri());
-            assoc = dms.getAssociation(assoc.getId(), false, null);
+            assoc = dms.getAssociation(assoc.getId(), false);
             assertEquals("dm4.core.composition", assoc.getTypeUri());
             //
             // re-execute query
@@ -365,7 +365,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dm4.core.data_type", topic.getTypeUri());
             topic.setTypeUri("dm4.core.index_mode");
             assertEquals("dm4.core.index_mode", topic.getTypeUri());
-            topic = dms.getTopic(topic.getId(), false, null);
+            topic = dms.getTopic(topic.getId(), false);
             assertEquals("dm4.core.index_mode", topic.getTypeUri());
             //
             // re-execute query
@@ -411,16 +411,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Topic getTopicByUri(String uri) {
-        return dms.getTopic("uri", new SimpleValue(uri), false, null);
+        return dms.getTopic("uri", new SimpleValue(uri), false);
     }
 
     private Set<Topic> getTopicInstances(String topicTypeUri) {
-        return dms.getTopics("type_uri", new SimpleValue(topicTypeUri), false, null);
+        return dms.getTopics("type_uri", new SimpleValue(topicTypeUri), false);
     }
 
     private ResultSet<RelatedTopic> getTopicInstancesByTraversal(Topic type) {
         return type.getRelatedTopics("dm4.core.instantiation",
-            "dm4.core.type", "dm4.core.instance", type.getUri(), false, false, 0, null);
+            "dm4.core.type", "dm4.core.instance", type.getUri(), false, false, 0);
     }
 
     private Set<RelatedAssociation> getAssociationInstancesByTraversal(String assocTypeUri) {
@@ -430,7 +430,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     private ResultSet<RelatedTopic> getChildTypes(Topic type) {
         return type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
-            "dm4.core.parent_type", "dm4.core.child_type", "dm4.core.topic_type", false, false, 0, null);
+            "dm4.core.parent_type", "dm4.core.child_type", "dm4.core.topic_type", false, false, 0);
     }
 
     // ---
@@ -477,7 +477,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     private ResultSet<RelatedTopic> getTestTopics(Topic topic) {
         return topic.getRelatedTopics("dm4.core.association",
-            "dm4.core.default", "dm4.core.default", "dm4.core.plugin", false, false, 0, null);
+            "dm4.core.default", "dm4.core.default", "dm4.core.plugin", false, false, 0);
     }
 
     private Set<RelatedAssociation> getTestAssociations(Topic topic) {

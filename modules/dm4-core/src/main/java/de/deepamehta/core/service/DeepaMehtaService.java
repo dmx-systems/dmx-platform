@@ -41,7 +41,7 @@ public interface DeepaMehtaService {
 
     // === Topics ===
 
-    Topic getTopic(long id, boolean fetchComposite, ClientState clientState);
+    Topic getTopic(long id, boolean fetchComposite);
 
     /**
      * Looks up a single topic by exact value.
@@ -51,7 +51,7 @@ public interface DeepaMehtaService {
      * IMPORTANT: Looking up a topic this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.
      */
-    Topic getTopic(String key, SimpleValue value, boolean fetchComposite, ClientState clientState);
+    Topic getTopic(String key, SimpleValue value, boolean fetchComposite);
 
     /**
      * Looks up topics by key and value. String values can contain wildcards like "*".
@@ -59,10 +59,9 @@ public interface DeepaMehtaService {
      * IMPORTANT: Looking up topics this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.
      */
-    Set<Topic> getTopics(String key, SimpleValue value, boolean fetchComposite, ClientState clientState);
+    Set<Topic> getTopics(String key, SimpleValue value, boolean fetchComposite);
 
-    ResultSet<RelatedTopic> getTopics(String topicTypeUri, boolean fetchComposite, int maxResultSize,
-                                                                                   ClientState clientState);
+    ResultSet<RelatedTopic> getTopics(String topicTypeUri, boolean fetchComposite, int maxResultSize);
 
     /**
      * Performs a fulltext search.
@@ -72,7 +71,7 @@ public interface DeepaMehtaService {
      *
      * @param   fieldUri    The URI of the data field to search. If null is provided all fields are searched. ### FIXDOC
      */
-    Set<Topic> searchTopics(String searchTerm, String fieldUri, ClientState clientState);
+    Set<Topic> searchTopics(String searchTerm, String fieldUri);
 
     Iterable<Topic> getAllTopics();
 
@@ -82,13 +81,13 @@ public interface DeepaMehtaService {
 
     Directives updateTopic(TopicModel model, ClientState clientState);
 
-    Directives deleteTopic(long topicId, ClientState clientState);
+    Directives deleteTopic(long topicId);
 
 
 
     // === Associations ===
 
-    Association getAssociation(long assocId, boolean fetchComposite, ClientState clientState);
+    Association getAssociation(long assocId, boolean fetchComposite);
 
     /**
      * Returns the association between two topics, qualified by association type and both role types.
@@ -99,11 +98,11 @@ public interface DeepaMehtaService {
      */
     Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
                                                     String roleTypeUri1, String roleTypeUri2,
-                                                    boolean fetchComposite, ClientState clientState);
+                                                    boolean fetchComposite);
 
     Association getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
                                                     String topicRoleTypeUri, String assocRoleTypeUri,
-                                                    boolean fetchComposite, ClientState clientState);
+                                                    boolean fetchComposite);
 
     // ---
 
@@ -131,7 +130,7 @@ public interface DeepaMehtaService {
 
     Directives updateAssociation(AssociationModel model, ClientState clientState);
 
-    Directives deleteAssociation(long assocId, ClientState clientState);
+    Directives deleteAssociation(long assocId);
 
 
 
@@ -139,9 +138,9 @@ public interface DeepaMehtaService {
 
     Set<String> getTopicTypeUris();
 
-    TopicType getTopicType(String topicTypeUri, ClientState clientState);
+    TopicType getTopicType(String topicTypeUri);
 
-    Set<TopicType> getAllTopicTypes(ClientState clientState);
+    Set<TopicType> getAllTopicTypes();
 
     TopicType createTopicType(TopicTypeModel model, ClientState clientState);
 
@@ -153,9 +152,9 @@ public interface DeepaMehtaService {
 
     Set<String> getAssociationTypeUris();
 
-    AssociationType getAssociationType(String assocTypeUri, ClientState clientState);
+    AssociationType getAssociationType(String assocTypeUri);
 
-    Set<AssociationType> getAllAssociationTypes(ClientState clientState);
+    Set<AssociationType> getAllAssociationTypes();
 
     AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState);
 

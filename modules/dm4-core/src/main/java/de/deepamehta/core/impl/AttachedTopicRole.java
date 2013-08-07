@@ -46,9 +46,9 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
     @Override
     public Topic getTopic() {
         if (topicIdentifiedByUri()) {
-            return dms.getTopic("uri", new SimpleValue(getTopicUri()), false, null);    // fetchComposite=false
+            return dms.getTopic("uri", new SimpleValue(getTopicUri()), false);  // fetchComposite=false
         } else {
-            return dms.getTopic(getPlayerId(), false, null);    // fetchComposite=false, clientState=null
+            return dms.getTopic(getPlayerId(), false);                          // fetchComposite=false
         }
     }
 

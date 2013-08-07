@@ -6,7 +6,6 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.CompositeValueModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -46,12 +45,12 @@ public class Topicmap implements JSONEnabled {
     /**
      * Loads a topicmap from the DB.
      */
-    public Topicmap(long topicmapId, DeepaMehtaService dms, ClientState clientState) {
-        this.topicmapTopic = dms.getTopic(topicmapId, true, clientState);   // fetchComposite=true
+    public Topicmap(long topicmapId, DeepaMehtaService dms) {
+        this.topicmapTopic = dms.getTopic(topicmapId, true);    // fetchComposite=true
         this.dms = dms;
         //
         logger.info("Loading topicmap " + getId());
-        loadTopics(clientState);
+        loadTopics();
         loadAssociations();
     }
 
@@ -155,9 +154,9 @@ public class Topicmap implements JSONEnabled {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void loadTopics(ClientState clientState) {
+    private void loadTopics() {
         ResultSet<RelatedTopic> mapTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
-            "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, false, true, 0, clientState);
+            "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, false, true, 0);
             // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=true, maxResultSize=0
         for (RelatedTopic mapTopic : mapTopics) {
             CompositeValueModel visualizationProps = mapTopic.getRelatingAssociation().getCompositeValue().getModel();

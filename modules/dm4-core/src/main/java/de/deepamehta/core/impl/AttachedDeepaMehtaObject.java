@@ -212,21 +212,21 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     @Override
     public RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                 String othersTopicTypeUri, boolean fetchComposite,
-                                                boolean fetchRelatingComposite, ClientState clientState) {
+                                                boolean fetchRelatingComposite) {
         RelatedTopicModel topic = fetchRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
         // fetchRelatedTopic() is abstract
         return topic != null ? dms.instantiateRelatedTopic(topic, fetchComposite, fetchRelatingComposite) : null;
     }
 
     @Override
-    public ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize, ClientState clientState) {
-        return getRelatedTopics(assocTypeUri, null, null, null, false, false, maxResultSize, clientState);
+    public ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize) {
+        return getRelatedTopics(assocTypeUri, null, null, null, false, false, maxResultSize);
     }
 
     @Override
     public ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
-                                    int maxResultSize, ClientState clientState) {
+                                    int maxResultSize) {
         ResultSet<RelatedTopicModel> topics = fetchRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri, maxResultSize);     // fetchRelatedTopics() is abstract
         return dms.instantiateRelatedTopics(topics, fetchComposite, fetchRelatingComposite);
@@ -260,7 +260,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
         // 1) recursively delete sub-topics
         ResultSet<RelatedTopic> childTopics = getRelatedTopics("dm4.core.composition",
-            "dm4.core.parent", "dm4.core.child", null, false, false, 0, null);
+            "dm4.core.parent", "dm4.core.child", null, false, false, 0);
         for (Topic childTopic : childTopics) {
             childTopic.delete(directives);
         }

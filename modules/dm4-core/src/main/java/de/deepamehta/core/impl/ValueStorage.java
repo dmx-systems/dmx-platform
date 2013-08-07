@@ -130,11 +130,11 @@ class ValueStorage {
                                                                                  ClientState clientState) {
         if (isReferenceById(topicRef)) {
             associateChildTopic(topicRef.getId(), parent, assocDef, clientState);
-            return dms.getTopic(topicRef.getId(), false, null);       // fetchComposite=false, clientState=null
+            return dms.getTopic(topicRef.getId(), false);                           // fetchComposite=false
             // ### FIXME: fetchComposite?
         } else if (isReferenceByUri(topicRef)) {
             associateChildTopic(topicRef.getUri(), parent, assocDef, clientState);
-            return dms.getTopic("uri", new SimpleValue(topicRef.getUri()), false, null);
+            return dms.getTopic("uri", new SimpleValue(topicRef.getUri()), false);  // fetchComposite=false
             // ### FIXME: fetchComposite?
         } else {
             throw new RuntimeException("Not a topic reference (" + topicRef + ")");
@@ -178,9 +178,9 @@ class ValueStorage {
 
     Type getType(DeepaMehtaObjectModel model) {
         if (model instanceof TopicModel) {
-            return dms.getTopicType(model.getTypeUri(), null);
+            return dms.getTopicType(model.getTypeUri());
         } else if (model instanceof AssociationModel) {
-            return dms.getAssociationType(model.getTypeUri(), null);
+            return dms.getAssociationType(model.getTypeUri());
         }
         throw new RuntimeException("Unexpected model: " + model);
     }

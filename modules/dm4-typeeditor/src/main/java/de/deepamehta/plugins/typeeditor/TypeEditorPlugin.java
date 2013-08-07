@@ -136,9 +136,9 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         Topic type = dms.getTypeStorage().fetchParentType(assoc);
         String typeUri = type.getTypeUri();
         if (typeUri.equals("dm4.core.topic_type")) {
-            return dms.getTopicType(type.getUri(), null);
+            return dms.getTopicType(type.getUri());
         } else if (typeUri.equals("dm4.core.assoc_type")) {
-            return dms.getAssociationType(type.getUri(), null);
+            return dms.getAssociationType(type.getUri());
         } else {
             throw new RuntimeException("Invalid association definition: the dm4.core.parent_type " +
                 "player is not a type but of type \"" + typeUri + "\" (" + assoc + ")");

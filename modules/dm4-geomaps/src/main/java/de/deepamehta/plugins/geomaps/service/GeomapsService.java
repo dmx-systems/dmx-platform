@@ -4,7 +4,6 @@ import de.deepamehta.plugins.geomaps.model.Geomap;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
 
 
@@ -17,7 +16,7 @@ public interface GeomapsService extends PluginService {
      * Retrieves the domain topic that corresponds to a Geo Coordinate topic.
      * ### TODO: rename method and argument
      */
-    Topic getGeoTopic(long topicId, ClientState clientState);
+    Topic getGeoTopic(long topicId);
 
     // ### TODO: drop this
     ResultSet<RelatedTopic> getGeomapTopics(long geomapId);
