@@ -31,12 +31,16 @@ import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
+import de.deepamehta.core.service.event.PreProcessRequestListener;
 import de.deepamehta.core.service.event.PreSendAssociationTypeListener;
 import de.deepamehta.core.service.event.PreSendTopicTypeListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
+
+// ### TODO: remove Jersey dependency. Move to JAX-RS 2.0.
+import com.sun.jersey.spi.container.ContainerRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,10 +57,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Set;
+import java.util.logging.Level;     // ###
 import java.util.logging.Logger;
 
 
@@ -65,11 +71,12 @@ import java.util.logging.Logger;
 @Consumes("application/json")
 @Produces("application/json")
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, AllPluginsActiveListener,
-                                                                    SecurityContext,   PostCreateTopicListener,
+                                                                                       PostCreateTopicListener,
                                                                                        PostCreateAssociationListener,
                                                                                        PostUpdateTopicListener,
                                                                                        IntroduceTopicTypeListener,
                                                                                        IntroduceAssociationTypeListener,
+                                                                                       PreProcessRequestListener,
                                                                                        PreSendTopicTypeListener,
                                                                                        PreSendAssociationTypeListener {
 
@@ -129,7 +136,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/login")
     @Override
     public void login() {
-        // Note: the actual login is triggered by the RequestFilter. See checkRequest() below.
+        // Note: the actual login is performed by the request filter. See checkRequest().
     }
 
     @POST
@@ -301,17 +308,294 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // **************************************
-    // *** SecurityContext Implementation ***
-    // **************************************
+    // ****************************
+    // *** Hook Implementations ***
+    // ****************************
+
+
+
+    @Override
+    public void postInstall() {
+        logger.info("Creating \"admin\" user account");
+        Topic adminAccount = createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
+        // Note 1: the admin account needs to be setup for access control itself.
+        // At post-install time our listeners are not yet registered. So we must setup manually here.
+        // Note 2: at post-install time there is no user session. So we call setupAccessControl() directly
+        // instead of (the higher-level) setupUserAccountAccessControl().
+        setupAccessControl(adminAccount, DEFAULT_USER_ACCOUNT_ACL, DEFAULT_USERNAME);
+        // ### TODO: setup access control for the admin account's Username and Password topics.
+        // However, they are not strictly required for the moment.
+    }
+
+    @Override
+    public void init() {
+        logger.info("Security settings:" +
+            "\n    dm4.security.read_requires_login=" + READ_REQUIRES_LOGIN +
+            "\n    dm4.security.write_requires_login=" + WRITE_REQUIRES_LOGIN +
+            "\n    dm4.security.subnet_filter=\""+ SUBNET_FILTER + "\"");
+    }
+
+    // ---
+
+    @Override
+    @ConsumesService("de.deepamehta.plugins.workspaces.service.WorkspacesService")
+    public void serviceArrived(PluginService service) {
+        wsService = (WorkspacesService) service;
+    }
+
+    @Override
+    public void serviceGone(PluginService service) {
+        wsService = null;
+    }
+
+
+
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
 
 
 
     /**
-     * Called from {@link RequestFilter#doFilter}.
+     * Setup access control for the default user and the default topicmap.
+     *   1) assign default user     to default workspace
+     *   2) assign default topicmap to default workspace
+     *   3) setup access control for default topicmap
      */
     @Override
-    public void checkRequest(HttpServletRequest request) throws AccessControlException {
+    public void allPluginsActive() {
+        // 1) assign default user to default workspace
+        Topic defaultUser = fetchDefaultUser();
+        assignToDefaultWorkspace(defaultUser, "default user (\"admin\")");
+        //
+        Topic defaultTopicmap = fetchDefaultTopicmap();
+        if (defaultTopicmap != null) {
+            // 2) assign default topicmap to default workspace
+            assignToDefaultWorkspace(defaultTopicmap, "default topicmap (\"untitled\")");
+            // 3) setup access control for default topicmap
+            setupAccessControlForDefaultTopicmap(defaultTopicmap);
+        }
+    }
+
+    // ---
+
+    @Override
+    public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
+        if (isUserAccount(topic)) {
+            setupUserAccountAccessControl(topic);
+        } else {
+            setupDefaultAccessControl(topic);
+        }
+        //
+        // when a workspace is created its creator joins automatically
+        joinIfWorkspace(topic);
+    }
+
+    @Override
+    public void postCreateAssociation(Association assoc, ClientState clientState, Directives directives) {
+        setupDefaultAccessControl(assoc);
+    }
+
+    // ---
+
+    @Override
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
+                                                                                       Directives directives) {
+        if (topic.getTypeUri().equals("dm4.accesscontrol.user_account")) {
+            Topic usernameTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.username");
+            Topic passwordTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.password");
+            String newUsername = usernameTopic.getSimpleValue().toString();
+            TopicModel oldUsernameTopic = oldModel.getCompositeValueModel().getTopic("dm4.accesscontrol.username",
+                null);
+            String oldUsername = oldUsernameTopic != null ? oldUsernameTopic.getSimpleValue().toString() : "";
+            if (!newUsername.equals(oldUsername)) {
+                //
+                if (!oldUsername.equals("")) {
+                    throw new RuntimeException("Changing a Username is not supported (tried \"" + oldUsername +
+                        "\" -> \"" + newUsername + "\")");
+                }
+                //
+                logger.info("### Username has changed from \"" + oldUsername + "\" -> \"" + newUsername +
+                    "\". Setting \"" + newUsername + "\" as the new owner of 3 topics:\n" +
+                    "    - User Account topic (ID " + topic.getId() + ")\n" + 
+                    "    - Username topic (ID " + usernameTopic.getId() + ")\n" + 
+                    "    - Password topic (ID " + passwordTopic.getId() + ")");
+                setOwner(topic, newUsername);
+                setOwner(usernameTopic, newUsername);
+                setOwner(passwordTopic, newUsername);
+            }
+        }
+    }
+
+    // ---
+
+    @Override
+    public void introduceTopicType(TopicType topicType, ClientState clientState) {
+        setupDefaultAccessControl(topicType);
+    }
+
+    @Override
+    public void introduceAssociationType(AssociationType assocType, ClientState clientState) {
+        setupDefaultAccessControl(assocType);
+    }
+
+    // ---
+
+    @Override
+    public void preProcessRequest(ContainerRequest req) {
+        try {
+            checkRequest(request);      // throws AccessControlException
+        } catch (AccessControlException e) {
+            switch (e.getStatusCode()) {
+            case HttpServletResponse.SC_UNAUTHORIZED:
+                unauthorized();
+                break;
+            case HttpServletResponse.SC_FORBIDDEN:
+                forbidden();
+                break;
+            default:
+                // Note: when file logging is activated the ServletException does not appear in the log file but on the
+                // console. Apparently the servlet container does not log the ServletException via the Java Logging API.
+                // So we log it explicitly (and it appears twice on the console if file logging is not activated). ###
+                logger.log(Level.SEVERE, "Unexpected AccessControlException", e);
+                throw new RuntimeException("Unexpected AccessControlException", e);
+            }
+        } catch (Exception e) {
+            // Note: when file logging is activated the ServletException does not appear in the log file but on the
+            // console. Apparently the servlet container does not log the ServletException via the Java Logging API.
+            // So we log it explicitly (and it appears twice on the console if file logging is not activated). ###
+            logger.log(Level.SEVERE, "Request filtering failed", e);
+            throw new RuntimeException("Request filtering failed", e);
+        }
+    }
+
+    // ---
+
+    // ### TODO: make the types cachable (like topics/associations). That is, don't deliver the permissions along
+    // with the types (don't use the preSend{}Type hooks). Instead let the client request the permissions separately.
+
+    @Override
+    public void preSendTopicType(TopicType topicType, ClientState clientState) {
+        // Note: the permissions for "Meta Meta Type" must be set manually.
+        // This type doesn't exist in DB. Fetching its ACL entries would fail.
+        if (topicType.getUri().equals("dm4.core.meta_meta_type")) {
+            enrichWithPermissions(topicType, createPermissions(false, false));  // write=false, create=false
+            return;
+        }
+        //
+        enrichWithPermissions(topicType, getPermissions(topicType));
+    }
+
+    @Override
+    public void preSendAssociationType(AssociationType assocType, ClientState clientState) {
+        enrichWithPermissions(assocType, getPermissions(assocType));
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private Topic createUserAccount(Credentials cred) {
+        return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new CompositeValueModel()
+            .put("dm4.accesscontrol.username", cred.username)
+            .put("dm4.accesscontrol.password", cred.password)), null);  // clientState=null
+    }
+
+    private boolean isUserAccount(Topic topic) {
+        String typeUri = topic.getTypeUri();
+        return typeUri.equals("dm4.accesscontrol.user_account")
+            || typeUri.equals("dm4.accesscontrol.username")
+            || typeUri.equals("dm4.accesscontrol.password");
+    }
+
+    /**
+     * Fetches the default user ("admin").
+     *
+     * @throws  RuntimeException    If the default user doesn't exist.
+     *
+     * @return  The default user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>).
+     */
+    private Topic fetchDefaultUser() {
+        return getUsernameOrThrow(DEFAULT_USERNAME);
+    }
+
+    private Topic getUsernameOrThrow(String username) {
+        Topic usernameTopic = getUsername(username);
+        if (usernameTopic == null) {
+            throw new RuntimeException("User \"" + username + "\" does not exist");
+        }
+        return usernameTopic;
+    }
+
+    private void joinIfWorkspace(Topic topic) {
+        if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
+            String username = getUsername();
+            // Note: when the default workspace is created there is no user logged in yet.
+            // The default user is assigned to the default workspace later on (see allPluginsActive()).
+            if (username != null) {
+                joinWorkspace(username, topic.getId());
+            }
+        }
+    }
+
+
+
+    // === All Plugins Activated ===
+
+    private void assignToDefaultWorkspace(Topic topic, String info) {
+        String operation = "### Assigning the " + info + " to the default workspace (\"DeepaMehta\")";
+        try {
+            // abort if already assigned
+            Set<RelatedTopic> workspaces = wsService.getAssignedWorkspaces(topic);
+            if (workspaces.size() != 0) {
+                logger.info("### Assigning the " + info + " to a workspace ABORTED -- " +
+                    "already assigned (" + DeepaMehtaUtils.topicNames(workspaces) + ")");
+                return;
+            }
+            //
+            logger.info(operation);
+            Topic defaultWorkspace = wsService.getDefaultWorkspace();
+            wsService.assignToWorkspace(topic, defaultWorkspace.getId());
+        } catch (Exception e) {
+            throw new RuntimeException(operation + " failed", e);
+        }
+    }
+
+    private void setupAccessControlForDefaultTopicmap(Topic defaultTopicmap) {
+        String operation = "### Setup access control for the default topicmap (\"untitled\")";
+        try {
+            // Note: we only check for creator assignment.
+            // If an object has a creator assignment it is expected to have an ACL entry as well.
+            if (getCreator(defaultTopicmap) != null) {
+                logger.info(operation + " ABORTED -- already setup");
+                return;
+            }
+            //
+            logger.info(operation);
+            setupAccessControl(defaultTopicmap, DEFAULT_INSTANCE_ACL, DEFAULT_USERNAME);
+        } catch (Exception e) {
+            throw new RuntimeException(operation + " failed", e);
+        }
+    }
+
+    private Topic fetchDefaultTopicmap() {
+        // Note: the Access Control plugin does not DEPEND on the Topicmaps plugin but is designed to work TOGETHER
+        // with the Topicmaps plugin.
+        // Currently the Access Control plugin needs to know some Topicmaps internals e.g. the URI of the default
+        // topicmap. ### TODO: make "optional plugin dependencies" an explicit concept. Plugins must be able to ask
+        // the core weather a certain plugin is installed (regardles weather it is activated already) and would wait
+        // for its service only if installed.
+        return dms.getTopic("uri", new SimpleValue("dm4.topicmaps.default_topicmap"), false);
+    }
+
+
+
+    // === Request Filtering ===
+
+    /**
+     * Called from {@link RequestFilter#doFilter}.
+     */
+    private void checkRequest(HttpServletRequest request) throws AccessControlException {
         logger.fine("##### " + request.getMethod() + " " + request.getRequestURL() +
             "\n      ##### \"Authorization\"=\"" + request.getHeader("Authorization") + "\"" +
             "\n      ##### " + info(request.getSession(false)));    // create=false
@@ -320,17 +604,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         checkAuthorization(request);
     }
 
-    @Override
-    public String getAuthenticationRealm() {
-        return AUTHENTICATION_REALM;
-    }
-
-    @Override
-    public boolean useBrowserLoginDialog() {
-        return READ_REQUIRES_LOGIN;
-    }
-
-    // ===
+    // ---
 
     private void checkRequestOrigin(HttpServletRequest request) throws AccessControlException {
         String remoteAddr = request.getRemoteAddr();
@@ -443,269 +717,30 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return userAccount.getCompositeValue().getString("dm4.accesscontrol.password");
     }
 
-
-
-    // ****************************
-    // *** Hook Implementations ***
-    // ****************************
-
-
-
-    @Override
-    public void postInstall() {
-        logger.info("Creating \"admin\" user account");
-        Topic adminAccount = createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
-        // Note 1: the admin account needs to be setup for access control itself.
-        // At post-install time our listeners are not yet registered. So we must setup manually here.
-        // Note 2: at post-install time there is no user session. So we call setupAccessControl() directly
-        // instead of (the higher-level) setupUserAccountAccessControl().
-        setupAccessControl(adminAccount, DEFAULT_USER_ACCOUNT_ACL, DEFAULT_USERNAME);
-        // ### TODO: setup access control for the admin account's Username and Password topics.
-        // However, they are not strictly required for the moment.
-    }
-
-    @Override
-    public void init() {
-        try {
-            logger.info("Security settings:" +
-                "\n    dm4.security.read_requires_login=" + READ_REQUIRES_LOGIN +
-                "\n    dm4.security.write_requires_login=" + WRITE_REQUIRES_LOGIN +
-                "\n    dm4.security.subnet_filter=\""+ SUBNET_FILTER + "\"");
-            //
-            registerFilter(new RequestFilter(this));
-        } catch (Exception e) {
-            throw new RuntimeException("Registering the request filter failed", e);
-        }
-    }
-
     // ---
 
-    @Override
-    @ConsumesService("de.deepamehta.plugins.workspaces.service.WorkspacesService")
-    public void serviceArrived(PluginService service) {
-        wsService = (WorkspacesService) service;
+    private void unauthorized() {
+        // Note: "xBasic" is a contrived authentication scheme to suppress the browser's login dialog.
+        // http://loudvchar.blogspot.ca/2010/11/avoiding-browser-popup-for-401.html
+        String authScheme = READ_REQUIRES_LOGIN ? "Basic" : "xBasic";
+        throw new WebApplicationException(Response.status(Status.UNAUTHORIZED)
+            .header("WWW-Authenticate", authScheme + " realm=" + AUTHENTICATION_REALM)
+            .header("Content-Type", "text/html")    // for text/plain (default) Safari provides no Web Console
+            .entity("You're not authorized. Sorry.")
+            .build());
     }
 
-    @Override
-    public void serviceGone(PluginService service) {
-        wsService = null;
-    }
-
-
-
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
-
-
-
-    /**
-     * Setup access control for the default user and the default topicmap.
-     *   1) assign default user     to default workspace
-     *   2) assign default topicmap to default workspace
-     *   3) setup access control for default topicmap
-     */
-    @Override
-    public void allPluginsActive() {
-        // 1) assign default user to default workspace
-        Topic defaultUser = fetchDefaultUser();
-        assignToDefaultWorkspace(defaultUser, "default user (\"admin\")");
-        //
-        Topic defaultTopicmap = fetchDefaultTopicmap();
-        if (defaultTopicmap != null) {
-            // 2) assign default topicmap to default workspace
-            assignToDefaultWorkspace(defaultTopicmap, "default topicmap (\"untitled\")");
-            // 3) setup access control for default topicmap
-            setupAccessControlForDefaultTopicmap(defaultTopicmap);
-        }
-    }
-
-    // ---
-
-    @Override
-    public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
-        if (isUserAccount(topic)) {
-            setupUserAccountAccessControl(topic);
-        } else {
-            setupDefaultAccessControl(topic);
-        }
-        //
-        // when a workspace is created its creator joins automatically
-        joinIfWorkspace(topic);
-    }
-
-    @Override
-    public void postCreateAssociation(Association assoc, ClientState clientState, Directives directives) {
-        setupDefaultAccessControl(assoc);
-    }
-
-    // ---
-
-    @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
-                                                                                       Directives directives) {
-        if (topic.getTypeUri().equals("dm4.accesscontrol.user_account")) {
-            Topic usernameTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.username");
-            Topic passwordTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.password");
-            String newUsername = usernameTopic.getSimpleValue().toString();
-            TopicModel oldUsernameTopic = oldModel.getCompositeValueModel().getTopic("dm4.accesscontrol.username",
-                null);
-            String oldUsername = oldUsernameTopic != null ? oldUsernameTopic.getSimpleValue().toString() : "";
-            if (!newUsername.equals(oldUsername)) {
-                //
-                if (!oldUsername.equals("")) {
-                    throw new RuntimeException("Changing a Username is not supported (tried \"" + oldUsername +
-                        "\" -> \"" + newUsername + "\")");
-                }
-                //
-                logger.info("### Username has changed from \"" + oldUsername + "\" -> \"" + newUsername +
-                    "\". Setting \"" + newUsername + "\" as the new owner of 3 topics:\n" +
-                    "    - User Account topic (ID " + topic.getId() + ")\n" + 
-                    "    - Username topic (ID " + usernameTopic.getId() + ")\n" + 
-                    "    - Password topic (ID " + passwordTopic.getId() + ")");
-                setOwner(topic, newUsername);
-                setOwner(usernameTopic, newUsername);
-                setOwner(passwordTopic, newUsername);
-            }
-        }
-    }
-
-    // ---
-
-    @Override
-    public void introduceTopicType(TopicType topicType, ClientState clientState) {
-        setupDefaultAccessControl(topicType);
-    }
-
-    @Override
-    public void introduceAssociationType(AssociationType assocType, ClientState clientState) {
-        setupDefaultAccessControl(assocType);
-    }
-
-    // ---
-
-    // ### TODO: make the types cachable (like topics/associations). That is, don't deliver the permissions along
-    // with the types (don't use the preSend{}Type hooks). Instead let the client request the permissions separately.
-
-    @Override
-    public void preSendTopicType(TopicType topicType, ClientState clientState) {
-        // Note: the permissions for "Meta Meta Type" must be set manually.
-        // This type doesn't exist in DB. Fetching its ACL entries would fail.
-        if (topicType.getUri().equals("dm4.core.meta_meta_type")) {
-            enrichWithPermissions(topicType, createPermissions(false, false));  // write=false, create=false
-            return;
-        }
-        //
-        enrichWithPermissions(topicType, getPermissions(topicType));
-    }
-
-    @Override
-    public void preSendAssociationType(AssociationType assocType, ClientState clientState) {
-        enrichWithPermissions(assocType, getPermissions(assocType));
-    }
-
-
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private Topic createUserAccount(Credentials cred) {
-        return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new CompositeValueModel()
-            .put("dm4.accesscontrol.username", cred.username)
-            .put("dm4.accesscontrol.password", cred.password)), null);  // clientState=null
-    }
-
-    private boolean isUserAccount(Topic topic) {
-        String typeUri = topic.getTypeUri();
-        return typeUri.equals("dm4.accesscontrol.user_account")
-            || typeUri.equals("dm4.accesscontrol.username")
-            || typeUri.equals("dm4.accesscontrol.password");
-    }
-
-    /**
-     * Fetches the default user ("admin").
-     *
-     * @throws  RuntimeException    If the default user doesn't exist.
-     *
-     * @return  The default user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>).
-     */
-    private Topic fetchDefaultUser() {
-        return getUsernameOrThrow(DEFAULT_USERNAME);
-    }
-
-    private Topic getUsernameOrThrow(String username) {
-        Topic usernameTopic = getUsername(username);
-        if (usernameTopic == null) {
-            throw new RuntimeException("User \"" + username + "\" does not exist");
-        }
-        return usernameTopic;
-    }
-
-    private void joinIfWorkspace(Topic topic) {
-        if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
-            String username = getUsername();
-            // Note: when the default workspace is created there is no user logged in yet.
-            // The default user is assigned to the default workspace later on (see allPluginsActive()).
-            if (username != null) {
-                joinWorkspace(username, topic.getId());
-            }
-        }
-    }
-
-    // ---
-
+    // ### unify with above
     private void throw401() {
-        throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED)
+        throw new WebApplicationException(Response.status(Status.UNAUTHORIZED)
             .header("WWW-Authenticate", "Basic realm=" + AUTHENTICATION_REALM).build());
     }
 
-
-
-    // === All Plugins Activated ===
-
-    private void assignToDefaultWorkspace(Topic topic, String info) {
-        String operation = "### Assigning the " + info + " to the default workspace (\"DeepaMehta\")";
-        try {
-            // abort if already assigned
-            Set<RelatedTopic> workspaces = wsService.getAssignedWorkspaces(topic);
-            if (workspaces.size() != 0) {
-                logger.info("### Assigning the " + info + " to a workspace ABORTED -- " +
-                    "already assigned (" + DeepaMehtaUtils.topicNames(workspaces) + ")");
-                return;
-            }
-            //
-            logger.info(operation);
-            Topic defaultWorkspace = wsService.getDefaultWorkspace();
-            wsService.assignToWorkspace(topic, defaultWorkspace.getId());
-        } catch (Exception e) {
-            throw new RuntimeException(operation + " failed", e);
-        }
-    }
-
-    private void setupAccessControlForDefaultTopicmap(Topic defaultTopicmap) {
-        String operation = "### Setup access control for the default topicmap (\"untitled\")";
-        try {
-            // Note: we only check for creator assignment.
-            // If an object has a creator assignment it is expected to have an ACL entry as well.
-            if (getCreator(defaultTopicmap) != null) {
-                logger.info(operation + " ABORTED -- already setup");
-                return;
-            }
-            //
-            logger.info(operation);
-            setupAccessControl(defaultTopicmap, DEFAULT_INSTANCE_ACL, DEFAULT_USERNAME);
-        } catch (Exception e) {
-            throw new RuntimeException(operation + " failed", e);
-        }
-    }
-
-    private Topic fetchDefaultTopicmap() {
-        // Note: the Access Control plugin does not DEPEND on the Topicmaps plugin but is designed to work TOGETHER
-        // with the Topicmaps plugin.
-        // Currently the Access Control plugin needs to know some Topicmaps internals e.g. the URI of the default
-        // topicmap. ### TODO: make "optional plugin dependencies" an explicit concept. Plugins must be able to ask
-        // the core weather a certain plugin is installed (regardles weather it is activated already) and would wait
-        // for its service only if installed.
-        return dms.getTopic("uri", new SimpleValue("dm4.topicmaps.default_topicmap"), false);
+    private void forbidden() {
+        throw new WebApplicationException(Response.status(Status.FORBIDDEN)
+            .header("Content-Type", "text/html")    // for text/plain (default) Safari provides no Web Console
+            .entity("Access is forbidden. Sorry.")
+            .build());
     }
 
 
