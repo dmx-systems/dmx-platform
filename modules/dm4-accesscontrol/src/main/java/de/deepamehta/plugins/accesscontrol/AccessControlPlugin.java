@@ -34,6 +34,7 @@ import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreProcessRequestListener;
 import de.deepamehta.core.service.event.PreSendAssociationTypeListener;
 import de.deepamehta.core.service.event.PreSendTopicTypeListener;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
 
@@ -211,7 +212,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void setCreator(DeepaMehtaObject object, String username) {
-        object.setProperty(URI_CREATOR, username, true);    // addToIndex=true
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            object.setProperty(URI_CREATOR, username, true);    // addToIndex=true
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Setting the creator of object " + object.getId() + " failed", e);
+        } finally {
+            tx.finish();
+        }
     }
 
 
@@ -225,7 +235,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void setOwner(DeepaMehtaObject object, String username) {
-        object.setProperty(URI_OWNER, username, true);      // addToIndex=true
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            object.setProperty(URI_OWNER, username, true);      // addToIndex=true
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Setting the owner of object " + object.getId() + " failed", e);
+        } finally {
+            tx.finish();
+        }
     }
 
 
@@ -241,16 +260,21 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 return new AccessControlList();
             }
         } catch (Exception e) {
-            throw new RuntimeException("Fetching access control list for object " + object.getId() + " failed", e);
+            throw new RuntimeException("Fetching the ACL of object " + object.getId() + " failed", e);
         }
     }
 
     @Override
     public void setACL(DeepaMehtaObject object, AccessControlList acl) {
+        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             object.setProperty(URI_ACL, acl.toJSON().toString(), false);    // addToIndex=false
+            tx.success();
         } catch (Exception e) {
-            throw new RuntimeException("Storing access control list for object " + object.getId() + " failed", e);
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Setting the ACL of object " + object.getId() + " failed", e);
+        } finally {
+            tx.finish();
         }
     }
 

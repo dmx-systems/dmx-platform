@@ -46,17 +46,11 @@ class PluginManager {
      * Activates a plugin. Called once the plugin's requirements are met
      * (see PluginImpl.checkRequirementsForActivation()).
      *
-     * Activation comprises:
-     *   - install the plugin in the database (includes migrations, post-install event, type introduction)
-     *   - initialize the plugin
-     *   - register the plugin's listeners
-     *   - register the plugin's OSGi service
-     *   - add the plugin to the pool of activated plugins
-     *   - post the PLUGIN_ACTIVATED OSGi event.
-     *   - check if all plugins are active, and if so, fire the {@link CoreEvent.ALL_PLUGINS_ACTIVE} event.
-     *
-     * If this plugin is already activated, nothing is performed.
+     * If the plugin is already activated, nothing is performed.
      * This happens e.g. when a dependent plugin is redeployed.
+     *
+     * After activation checks if all plugins are active, and if so, the {@link CoreEvent.ALL_PLUGINS_ACTIVE} event
+     * is fired.
      *
      * Note: this method is synchronized. While a plugin is activated no other plugin must be activated. Otherwise
      * the "type introduction" mechanism might miss some types. Consider this unsynchronized scenario: plugin B
@@ -64,32 +58,12 @@ class PluginManager {
      * Plugin A might miss some of the types created by plugin B.
      */
     synchronized void activatePlugin(PluginImpl plugin) {
-        try {
-            // Note: we must not activate a plugin twice.
-            if (_isPluginActivated(plugin.getUri())) {
-                logger.info("Activation of " + plugin + " ABORTED -- already activated");
-                return;
-            }
-            //
-            logger.info("----- Activating " + plugin + " -----");
-            plugin.installPluginInDB();
-            plugin.initializePlugin();
-            plugin.registerListeners();
-            plugin.registerPluginService();
-            // Note: the listeners must be registered *after* the plugin is installed in the database and its
-            // postInstall() hook is triggered (see PluginImpl.installPluginInDB()).
-            // Consider the Access Control plugin: it can't set a topic's creator before the "admin" user is created.
-            addToActivatedPlugins(plugin);
-            logger.info("----- Activation of " + plugin + " complete -----");
-            //
-            plugin.postPluginActivatedEvent();
-            //
-            if (checkAllPluginsActivated()) {
-                logger.info("########## All Plugins Activated ##########");
-                dms.fireEvent(CoreEvent.ALL_PLUGINS_ACTIVE);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Activation of " + plugin + " failed", e);
+        //
+        _activatePlugin(plugin);
+        //
+        if (checkAllPluginsActivated()) {
+            logger.info("########## All Plugins Activated ##########");
+            dms.fireEvent(CoreEvent.ALL_PLUGINS_ACTIVE);
         }
     }
 
@@ -125,6 +99,42 @@ class PluginManager {
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    /**
+     * Activates a plugin.
+     *
+     * Activation comprises:
+     *   - install the plugin in the database (includes migrations, post-install event, type introduction)
+     *   - initialize the plugin
+     *   - register the plugin's listeners
+     *   - register the plugin's OSGi service
+     *   - add the plugin to the pool of activated plugins
+     *   - post the PLUGIN_ACTIVATED OSGi event.
+     */
+    private void _activatePlugin(PluginImpl plugin) {
+        try {
+            // Note: we must not activate a plugin twice.
+            if (_isPluginActivated(plugin.getUri())) {
+                logger.info("Activation of " + plugin + " ABORTED -- already activated");
+                return;
+            }
+            //
+            logger.info("----- Activating " + plugin + " -----");
+            plugin.installPluginInDB();
+            plugin.initializePlugin();
+            plugin.registerListeners();
+            plugin.registerPluginService();
+            // Note: the listeners must be registered *after* the plugin is installed in the database and its
+            // postInstall() hook is triggered (see PluginImpl.installPluginInDB()).
+            // Consider the Access Control plugin: it can't set a topic's creator before the "admin" user is created.
+            addToActivatedPlugins(plugin);
+            logger.info("----- Activation of " + plugin + " complete -----");
+            //
+            plugin.postPluginActivatedEvent();
+        } catch (Exception e) {
+            throw new RuntimeException("Activation of " + plugin + " failed", e);
+        }
+    }
 
     /**
      * Checks if all plugins are activated.
