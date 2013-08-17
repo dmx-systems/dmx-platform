@@ -37,7 +37,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     @Override
     public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
         try {
-            dms.fireEvent(CoreEvent.PRE_SEND_RESPONSE, response);
+            dms.fireEvent(CoreEvent.SERVICE_RESPONSE_FILTER, response);
             //
             Object entity = response.getEntity();
             if (entity != null) {

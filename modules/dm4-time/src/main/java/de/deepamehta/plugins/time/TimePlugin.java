@@ -16,10 +16,10 @@ import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateAssociationListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreSendAssociationListener;
-import de.deepamehta.core.service.event.PreSendResponseListener;
 import de.deepamehta.core.service.event.PreSendTopicListener;
+import de.deepamehta.core.service.event.ServiceResponseFilterListener;
 
-// ### TODO: remove Jersey dependency. Move to JAX-RS 2.0.
+// ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerResponse;
 
 import javax.ws.rs.GET;
@@ -52,7 +52,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
                                                                         PostUpdateAssociationListener,
                                                                         PreSendTopicListener,
                                                                         PreSendAssociationListener,
-                                                                        PreSendResponseListener {
+                                                                        ServiceResponseFilterListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -190,7 +190,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     // ---
 
     @Override
-    public void preSendResponse(ContainerResponse response) {
+    public void serviceResponseFilter(ContainerResponse response) {
         DeepaMehtaObject object = responseObject(response);
         if (object != null) {
             long modified = enrichWithTimestamp(object);

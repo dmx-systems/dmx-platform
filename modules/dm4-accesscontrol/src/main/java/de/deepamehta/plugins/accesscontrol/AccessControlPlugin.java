@@ -31,16 +31,17 @@ import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
-import de.deepamehta.core.service.event.PreProcessRequestListener;
 import de.deepamehta.core.service.event.PreSendAssociationTypeListener;
 import de.deepamehta.core.service.event.PreSendTopicTypeListener;
+import de.deepamehta.core.service.event.ResourceRequestFilterListener;
+import de.deepamehta.core.service.event.ServiceRequestFilterListener;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
-// ### TODO: remove Jersey dependency. Move to JAX-RS 2.0.
+// ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -77,7 +78,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                                                                                        PostUpdateTopicListener,
                                                                                        IntroduceTopicTypeListener,
                                                                                        IntroduceAssociationTypeListener,
-                                                                                       PreProcessRequestListener,
+                                                                                       ServiceRequestFilterListener,
+                                                                                       ResourceRequestFilterListener,
                                                                                        PreSendTopicTypeListener,
                                                                                        PreSendAssociationTypeListener {
 
@@ -137,7 +139,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/login")
     @Override
     public void login() {
-        // Note: the actual login is performed by the request filter. See checkRequest().
+        // Note: the actual login is performed by the request filter. See requestFilter().
     }
 
     @POST
@@ -466,31 +468,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
-    public void preProcessRequest(ContainerRequest req) {
-        try {
-            checkRequest(request);      // throws AccessControlException
-        } catch (AccessControlException e) {
-            switch (e.getStatusCode()) {
-            case HttpServletResponse.SC_UNAUTHORIZED:
-                unauthorized();
-                break;
-            case HttpServletResponse.SC_FORBIDDEN:
-                forbidden();
-                break;
-            default:
-                // Note: when file logging is activated the ServletException does not appear in the log file but on the
-                // console. Apparently the servlet container does not log the ServletException via the Java Logging API.
-                // So we log it explicitly (and it appears twice on the console if file logging is not activated). ###
-                logger.log(Level.SEVERE, "Unexpected AccessControlException", e);
-                throw new RuntimeException("Unexpected AccessControlException", e);
-            }
-        } catch (Exception e) {
-            // Note: when file logging is activated the ServletException does not appear in the log file but on the
-            // console. Apparently the servlet container does not log the ServletException via the Java Logging API.
-            // So we log it explicitly (and it appears twice on the console if file logging is not activated). ###
-            logger.log(Level.SEVERE, "Request filtering failed", e);
-            throw new RuntimeException("Request filtering failed", e);
-        }
+    public void serviceRequestFilter(ContainerRequest containerRequest) {
+        // Note: we pass the injected HttpServletRequest
+        requestFilter(request);
+    }
+
+    @Override
+    public void resourceRequestFilter(HttpServletRequest servletRequest) {
+        // Note: for the resource filter no HttpServletRequest is injected
+        requestFilter(servletRequest);
     }
 
     // ---
@@ -614,18 +600,39 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // === Request Filtering ===
+    // === Request Filter ===
 
-    /**
-     * Called from {@link RequestFilter#doFilter}.
-     */
-    private void checkRequest(HttpServletRequest request) throws AccessControlException {
-        logger.fine("##### " + request.getMethod() + " " + request.getRequestURL() +
-            "\n      ##### \"Authorization\"=\"" + request.getHeader("Authorization") + "\"" +
-            "\n      ##### " + info(request.getSession(false)));    // create=false
-        //
-        checkRequestOrigin(request);
-        checkAuthorization(request);
+    private void requestFilter(HttpServletRequest request) {
+        try {
+            logger.fine("##### " + request.getMethod() + " " + request.getRequestURL() +
+                "\n      ##### \"Authorization\"=\"" + request.getHeader("Authorization") + "\"" +
+                "\n      ##### " + info(request.getSession(false)));    // create=false
+            //
+            checkRequestOrigin(request);    // throws AccessControlException
+            checkAuthorization(request);    // throws AccessControlException
+            //
+        } catch (AccessControlException e) {
+            switch (e.getStatusCode()) {
+            case HttpServletResponse.SC_UNAUTHORIZED:
+                unauthorized();
+                break;
+            case HttpServletResponse.SC_FORBIDDEN:
+                forbidden();
+                break;
+            default:
+                // Note: when file logging is activated the ServletException does not appear in the log file but on the
+                // console. Apparently the servlet container does not log the ServletException via the Java Logging API.
+                // So we log it explicitly (and it appears twice on the console if file logging is not activated). ###
+                logger.log(Level.SEVERE, "Unexpected AccessControlException", e);
+                throw new RuntimeException("Unexpected AccessControlException", e);
+            }
+        } catch (Exception e) {
+            // Note: when file logging is activated the ServletException does not appear in the log file but on the
+            // console. Apparently the servlet container does not log the ServletException via the Java Logging API.
+            // So we log it explicitly (and it appears twice on the console if file logging is not activated). ###
+            logger.log(Level.SEVERE, "Request filtering failed", e);
+            throw new RuntimeException("Request filtering failed", e);
+        }
     }
 
     // ---

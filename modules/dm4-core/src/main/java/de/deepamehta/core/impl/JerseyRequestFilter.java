@@ -21,7 +21,7 @@ class JerseyRequestFilter implements ContainerRequestFilter {
 
     @Override
     public ContainerRequest filter(ContainerRequest request) {
-        dms.fireEvent(CoreEvent.PRE_PROCESS_REQUEST, request);
+        dms.fireEvent(CoreEvent.SERVICE_REQUEST_FILTER, request);
         return request;
     }
 }

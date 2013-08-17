@@ -6,10 +6,10 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.annotation.ConsumesService;
-import de.deepamehta.core.service.event.PreProcessRequestListener;
-import de.deepamehta.core.service.event.PreSendResponseListener;
+import de.deepamehta.core.service.event.ServiceRequestFilterListener;
+import de.deepamehta.core.service.event.ServiceResponseFilterListener;
 
-// ### TODO: remove Jersey dependency. Move to JAX-RS 2.0.
+// ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 
@@ -24,7 +24,8 @@ import java.util.regex.Pattern;
 
 
 
-public class CachingPlugin extends PluginActivator implements PreProcessRequestListener, PreSendResponseListener {
+public class CachingPlugin extends PluginActivator implements ServiceRequestFilterListener,
+                                                              ServiceResponseFilterListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -69,7 +70,7 @@ public class CachingPlugin extends PluginActivator implements PreProcessRequestL
 
 
     @Override
-    public void preProcessRequest(ContainerRequest request) {
+    public void serviceRequestFilter(ContainerRequest request) {
         // ### TODO: optimization. Retrieving and instantiating an entire DeepaMehtaObject just to query its timestamp
         // might be inefficient. Knowing the sole object ID should be sufficient. However, this would require extending
         // the Time API and in turn the Core Service API by ID-based property getter methods.
@@ -86,7 +87,7 @@ public class CachingPlugin extends PluginActivator implements PreProcessRequestL
     }
 
     @Override
-    public void preSendResponse(ContainerResponse response) {
+    public void serviceResponseFilter(ContainerResponse response) {
         DeepaMehtaObject object = responseObject(response);
         if (object != null) {
             setCacheControlHeader(response, "max-age=0");

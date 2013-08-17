@@ -11,9 +11,11 @@ import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.event.*;
 
-// ### TODO: remove Jersey dependency. Move to JAX-RS 2.0.
+// ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
+
+import javax.servlet.http.HttpServletRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -114,19 +116,27 @@ enum CoreEvent {
         }
     },
 
-    PRE_PROCESS_REQUEST(PreProcessRequestListener.class) {
+    SERVICE_REQUEST_FILTER(ServiceRequestFilterListener.class) {
         @Override
         void deliver(Listener listener, Object... params) {
-            ((PreProcessRequestListener) listener).preProcessRequest(
+            ((ServiceRequestFilterListener) listener).serviceRequestFilter(
                 (ContainerRequest) params[0]
             );
         }
     },
-    PRE_SEND_RESPONSE(PreSendResponseListener.class) {
+    SERVICE_RESPONSE_FILTER(ServiceResponseFilterListener.class) {
         @Override
         void deliver(Listener listener, Object... params) {
-            ((PreSendResponseListener) listener).preSendResponse(
+            ((ServiceResponseFilterListener) listener).serviceResponseFilter(
                 (ContainerResponse) params[0]
+            );
+        }
+    },
+    RESOURCE_REQUEST_FILTER(ResourceRequestFilterListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((ResourceRequestFilterListener) listener).resourceRequestFilter(
+                (HttpServletRequest) params[0]
             );
         }
     },
