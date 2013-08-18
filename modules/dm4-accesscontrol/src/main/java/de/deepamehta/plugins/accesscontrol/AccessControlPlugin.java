@@ -64,7 +64,6 @@ import javax.ws.rs.core.Response.Status;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Set;
-import java.util.logging.Level;     // ###
 import java.util.logging.Logger;
 
 
@@ -154,7 +153,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         // login dialog and to forget the former Authorization information. The user is supposed to press "Cancel".
         // The login dialog can't be used to login again.
         if (READ_REQUIRES_LOGIN) {
-            throw401();
+            throw401Unauthorized();
         }
     }
 
@@ -603,54 +602,29 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // === Request Filter ===
 
     private void requestFilter(HttpServletRequest request) {
-        try {
-            logger.fine("##### " + request.getMethod() + " " + request.getRequestURL() +
-                "\n      ##### \"Authorization\"=\"" + request.getHeader("Authorization") + "\"" +
-                "\n      ##### " + info(request.getSession(false)));    // create=false
-            //
-            checkRequestOrigin(request);    // throws AccessControlException
-            checkAuthorization(request);    // throws AccessControlException
-            //
-        } catch (AccessControlException e) {
-            switch (e.getStatusCode()) {
-            case HttpServletResponse.SC_UNAUTHORIZED:
-                unauthorized();
-                break;
-            case HttpServletResponse.SC_FORBIDDEN:
-                forbidden();
-                break;
-            default:
-                // Note: when file logging is activated the ServletException does not appear in the log file but on the
-                // console. Apparently the servlet container does not log the ServletException via the Java Logging API.
-                // So we log it explicitly (and it appears twice on the console if file logging is not activated). ###
-                logger.log(Level.SEVERE, "Unexpected AccessControlException", e);
-                throw new RuntimeException("Unexpected AccessControlException", e);
-            }
-        } catch (Exception e) {
-            // Note: when file logging is activated the ServletException does not appear in the log file but on the
-            // console. Apparently the servlet container does not log the ServletException via the Java Logging API.
-            // So we log it explicitly (and it appears twice on the console if file logging is not activated). ###
-            logger.log(Level.SEVERE, "Request filtering failed", e);
-            throw new RuntimeException("Request filtering failed", e);
-        }
+        logger.fine("##### " + request.getMethod() + " " + request.getRequestURL() +
+            "\n      ##### \"Authorization\"=\"" + request.getHeader("Authorization") + "\"" +
+            "\n      ##### " + info(request.getSession(false)));    // create=false
+        //
+        checkRequestOrigin(request);    // throws WebApplicationException
+        checkAuthorization(request);    // throws WebApplicationException
     }
 
     // ---
 
-    private void checkRequestOrigin(HttpServletRequest request) throws AccessControlException {
+    private void checkRequestOrigin(HttpServletRequest request) {
         String remoteAddr = request.getRemoteAddr();
-        boolean isInRange = JavaUtils.isInRange(remoteAddr, SUBNET_FILTER);
+        boolean allowed = JavaUtils.isInRange(remoteAddr, SUBNET_FILTER);
         //
         logger.fine("Remote address=\"" + remoteAddr + "\", dm4.security.subnet_filter=\"" + SUBNET_FILTER +
-            "\" => " + (isInRange ? "ALLOWED" : "FORBIDDEN"));
+            "\" => " + (allowed ? "ALLOWED" : "FORBIDDEN"));
         //
-        if (!isInRange) {
-            throw new AccessControlException("Request from \"" + remoteAddr + "\" is not allowed " +
-                "(dm4.security.subnet_filter=\"" + SUBNET_FILTER + "\")", HttpServletResponse.SC_FORBIDDEN);
+        if (!allowed) {
+            throw403Forbidden();    // throws WebApplicationException
         }
     }
 
-    private void checkAuthorization(HttpServletRequest request) throws AccessControlException {
+    private void checkAuthorization(HttpServletRequest request) {
         boolean authorized;
         if (request.getSession(false) != null) {    // create=false
             authorized = true;
@@ -665,8 +639,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
         //
         if (!authorized) {
-            throw new AccessControlException("Request " + request + " is not authorized",
-                HttpServletResponse.SC_UNAUTHORIZED);
+            throw401Unauthorized(); // throws WebApplicationException
         }
     }
 
@@ -750,9 +723,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    private void unauthorized() {
-        // Note: "xBasic" is a contrived authentication scheme to suppress the browser's login dialog.
-        // http://loudvchar.blogspot.ca/2010/11/avoiding-browser-popup-for-401.html
+    private void throw401Unauthorized() {
+        // Note: a non-private DM installation (read_requires_login=false) utilizes DM's login dialog and must suppress
+        // the browser's login dialog. To suppress the browser's login dialog a contrived authentication scheme "xBasic"
+        // is used (see http://loudvchar.blogspot.ca/2010/11/avoiding-browser-popup-for-401.html)
         String authScheme = READ_REQUIRES_LOGIN ? "Basic" : "xBasic";
         throw new WebApplicationException(Response.status(Status.UNAUTHORIZED)
             .header("WWW-Authenticate", authScheme + " realm=" + AUTHENTICATION_REALM)
@@ -761,13 +735,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             .build());
     }
 
-    // ### unify with above
-    private void throw401() {
-        throw new WebApplicationException(Response.status(Status.UNAUTHORIZED)
-            .header("WWW-Authenticate", "Basic realm=" + AUTHENTICATION_REALM).build());
-    }
-
-    private void forbidden() {
+    private void throw403Forbidden() {
         throw new WebApplicationException(Response.status(Status.FORBIDDEN)
             .header("Content-Type", "text/html")    // for text/plain (default) Safari provides no Web Console
             .entity("Access is forbidden. Sorry.")

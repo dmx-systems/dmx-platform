@@ -255,7 +255,6 @@ public class WebPublishingService {
 
     private boolean resourceRequestFilter(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            logger.info("########## " + request.getRequestURI());
             dms.fireEvent(CoreEvent.RESOURCE_REQUEST_FILTER, request);
             return true;
         } catch (WebApplicationException e) {
