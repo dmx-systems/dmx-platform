@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.PluginInfo;
 
 import org.osgi.framework.Bundle;
@@ -157,14 +158,21 @@ class PluginManager {
     }
 
     /**
-     * Checks if an arbitrary bundle is a DeepaMehta plugin.
+     * Plugin detection: checks if an arbitrary bundle is a DeepaMehta plugin.
      */
     private boolean isDeepaMehtaPlugin(Bundle bundle) {
-        String packages = (String) bundle.getHeaders().get("Import-Package");
-        // Note 1: 3rd party bundles might not import any package. So, "packages" might be null.
-        // Note 2: all DeepaMehta plugin bundles depend on de.deepamehta.core.osgi.PluginActivator so we can
-        // use that package for detection. The core bundle on the other hand does not import that package.
-        return packages != null && packages.contains("de.deepamehta.core.osgi");
+        try {
+            String activatorClassName = (String) bundle.getHeaders().get("Bundle-Activator");
+            if (activatorClassName != null) {
+                Class activatorClass = bundle.loadClass(activatorClassName);    // throws ClassNotFoundException
+                return PluginActivator.class.isAssignableFrom(activatorClass);
+            } else {
+                // Note: 3rd party bundles may have no activator
+                return false;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Plugin detection failed for bundle " + bundle, e);
+        }
     }
 
     // ---

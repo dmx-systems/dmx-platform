@@ -14,7 +14,8 @@ import java.util.logging.Logger;
 
 
 /**
- * Base class for plugin developers to derive their plugins from.
+ * Base class for all DeepaMehta plugins.
+ * All DeepaMehta plugins are derived from this class, directly or indirectly.
  */
 public class PluginActivator implements BundleActivator, PluginContext {
 
