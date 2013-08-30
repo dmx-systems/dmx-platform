@@ -29,6 +29,8 @@
         <bundle>mvn:de.deepamehta/deepamehta-accesscontrol/4.1.1-SNAPSHOT</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-facets/4.1.1-SNAPSHOT</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-geomaps/4.1.1-SNAPSHOT</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-time/4.1.1-SNAPSHOT</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-caching/4.1.1-SNAPSHOT</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-storage-neo4j/4.1.1-SNAPSHOT</bundle>
     </feature>
 
