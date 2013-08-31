@@ -2,7 +2,7 @@
 DeepaMehta 4
 ============
 
-DeepaMehta 4 is a platform for collaboration and knowledge management. The vision of DeepaMehta is a Post-Desktop Metaphor user interface that abolishes applications, windows, files, and folders in favor of stable personal views of contextual content. The goal of DeepaMehta is to provide knowledge workers of all kind a cognitive adequate work environment, right after booting.
+DeepaMehta 4 is a platform for collaboration and knowledge management. The vision of DeepaMehta is a Post-Desktop Metaphor user interface that abolishes applications, windows, files, and folders in favor of stable personal views of contextual content. The goal of DeepaMehta is to provide knowledge workers of all kind a cognitive adequate work environment, right after your desktop computer or laptop has booted up.
 
 Technically DeepaMehta 4 is made of  
 Server-side: Java, Neo4j, Felix (OSGi), Jetty, Lucene, Jersey, Thymeleaf (optional), Karaf (optional).  
@@ -17,11 +17,11 @@ Project website:
 Live demo, nightly builds:  
 <http://demo.deepamehta.de/>
 
-Download:  
-<http://download.deepamehta.de/>
-
-Documentation, release notes, issue tracker:  
+Issue tracker, documentation, release notes:  
 <https://trac.deepamehta.de/>
+
+API documentation:  
+<http://api.deepamehta.de/>
 
 Source code:  
 <https://github.com/jri/deepamehta>
@@ -38,54 +38,53 @@ Licensed under GNU General Public License, version 3.
 DeepaMehta is under heavy development. While you can do productive work with it, DeepaMehta does not meet professional standards yet. At least there are lacks in a) security, b) robustness, and c) usability. Do not put sensitive data in DeepaMehta, in particular when you setup DeepaMehta for network access. Be aware that data loss may occur when you use DeepaMehta improperly. The DeepaMehta developers assume no liability for lost or compromised data. Please keep this in mind when using this software.
 
 
-Requirements
-------------
+---
 
-**Java 1.6** and a "modern" **webbrowser**.
-
-Works fine with Firefox 3.6 (or newer) and Safari 5. Works mostly fine with Google Chrome.  
-Doesn't work with IE8. Potentially works with IE9 or IE10.
+To install and use DeepaMehta follow 5 mandatory steps:
 
 
-Download a distribution
------------------------
+1. Check requirements
+---------------------
 
-There are 2 DeepaMehta distributions to suit different needs:
+* **Java 1.6** (or newer).
 
-* The **Standard Distribution** focuses on small download size and easy setup for single users.  
-  The distribution file is `deepamehta-4.1.zip` (6.3 MB)
+  If you don't know weather Java is already installed on your computer or what Java is at all go to
+  <http://www.java.com>.
 
-* The **Karaf Distribution** is aimed to client-server setups and supports remote administration.  
-  The distribution file is `deepamehta-4.1-karaf.tar.gz` (13.3 MB)
+* A "modern" **webbrowser**.
 
-Download the distribution that suits your needs:  
-<http://download.deepamehta.de/>
+  DeepaMehta works fine at least with Firefox 3.6 (or newer), Google Chrome, or Safari 5 (or newer).  
+  Doesn't work with IE8. Possibly works with IE9 or IE10 (not tested).
+
+
+2. Download DeepaMehta
+----------------------
+
+There are 2 distributions to suit different needs:
+
+* The **DeepaMehta Standard Distribution** focuses on small download size and easy setup for single users.  
+  <http://download.deepamehta.de/deepamehta-4.1.1.zip> (6.3 MB)
+
+* The **DeepaMehta Karaf Distribution** focuses on client-server setup and supports remote administration.  
+  <http://download.deepamehta.de/deepamehta-4.1.1-karaf.tar.gz> (13.3 MB)
 
 Note: the remainder of this README applies to the Standard Distribution.  
 For setting up the Karaf Distribution refer to <https://trac.deepamehta.de/wiki/KarafDistribution>.
 
 
-Install
--------
+3. Install DeepaMehta
+---------------------
 
-Unzip the distribution file.  
-A folder `deepamehta-4.1` is created.
+Unzip the downloaded file.  
+A folder `deepamehta-4.1.1` is created.
 
-
-Update
-------
-
-Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is not supported.  
-Even updating from 4.0.x to 4.1 is not supported.
-
-DeepaMehta 4.1 is the first version that provides a data sustainability guarantee.  
-Data you enter in DM 4.1 is guaranteed to be transferred to all future DM4 releases automatically.
+Update note: if you want update an existing DeepaMehta installation continue with "Updating DeepaMehta" now (see below).
 
 
-Start
------
+4. Start DeepaMehta
+-------------------
 
-Open the `deepamehta-4.1` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.1.1` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -94,33 +93,53 @@ Open the `deepamehta-4.1` folder and use the respective starter script for your 
 While DeepaMehta starts a terminal window opens and you see some information logged.  
 Then a browser window opens and DeepaMehta is ready to use.
 
-If no browser window appears open it manually:  
+To open the DeepaMehta browser window manually:  
 <http://localhost:8080/de.deepamehta.webclient/>
 
-Login with `admin` and an empty password.
+Login with `admin` and empty password. Now you're ready to create content.
 
 
-Stop
-----
+5. Stop DeepaMehta
+------------------
 
 Go to the terminal window that opened while startup and press:
 
     Ctrl-C
 
-This shuts down the webserver and puts the database in a consistent state.  
-You can close the terminal window now.
+This shuts down the web server and puts the database in a consistent state.  
+You can now close the terminal window.
 
 
-Install plugins
----------------
+---
 
-You can extend DeepaMehta's functionality by installing plugins.
+Auxiliary tasks follow:
+
+
+Updating DeepaMehta
+-------------------
+
+You can update from DeepaMehta 4.1 to 4.1.1 while keeping your data:
+
+1. Install DeepaMehta 4.1.1 (see steps 2. and 3. above).
+2. Stop DeepaMehta 4.1 if running. (Also stop DeepaMehta 4.1.1 if started already.)
+3. Copy the `deepamehta-db` folder from your DeepaMehta 4.1 installation into the `deepamehta-4.1.1` folder.
+   (Replace as necessary.)
+4. Proceed with "Start DeepaMehta" (see step 4. above).
+
+Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is not supported. Even updating from 4.0.x is not supported.  
+The first updatable DeepaMehta version is 4.1.
+
+
+Install DeepaMehta plugins
+--------------------------
+
+You can extend DeepaMehta's functionality by installing plugins.  
 See the list of available plugins:  
-<https://www.deepamehta.de/en/content/download>
+<https://www.deepamehta.de/content/download>
 
 
-Reset the database
-------------------
+Reset the DeepaMehta database
+-----------------------------
 
 Sometimes you might want to restart DeepaMehta with a fresh database:
 
@@ -128,24 +147,41 @@ Sometimes you might want to restart DeepaMehta with a fresh database:
 2. Delete the `deepamehta-db` folder.
 3. Start DeepaMehta.
 
+Caution: you will loose all your data.
 
-Uninstall
----------
 
-To remove DeepaMehta completely from your computer, including the database:
+Uninstall DeepaMehta
+--------------------
+
+To remove DeepaMehta completely from your computer, including all your data:
 
 1. Stop DeepaMehta.
-2. Delete the entire `deepamehta-4.1` folder.
+2. Delete the entire `deepamehta-4.1.1` folder.
 
 
-Build from Source
------------------
+Build DeepaMehta from Source
+----------------------------
 
 <https://trac.deepamehta.de/wiki/BuildFromSource>
 
 
+---
+
+
 Version History
 ---------------
+
+**4.1.1** -- Aug 31, 2013
+
+* Timestamps: topics and associations have creation and modification timestamps. Time API.
+* Exploiting the browser cache. Makes use of intrinsic HTTP features for reduced network traffic.
+* Edit conflict detection supports collaborative work. Fights the "lost update" problem.
+* Plugin development framework:
+    * Property API for topic/association metadata. Trie-indexing. Range queries.
+    * Flexible HTTP response generation in resource methods and event handlers.
+* Various bug fixes, in particular login/logout related issues.
+* See the full changelog in the release notes:  
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.1** -- Mar 11, 2013
 
@@ -162,7 +198,7 @@ Version History
 
 * Rewritten storage layer:
     * High-speed traversal: Traversal is significantly speed up by the means of a Lucene index for association metadata.
-    * Compact architecture: DM-independant MehtaGraph abstraction. The additional bridging layer is dropped.
+    * Compact architecture: DM-independent MehtaGraph abstraction. The additional bridging layer is dropped.
     * Modular storage layer: 3rd-party developers can implement alternate storage layers.
     * 1st-class associations: Association user data is indexed as well (just like topic user data).
 * Additional performance measures:
@@ -368,7 +404,7 @@ Version History
 
 **v0.4.3** -- Nov 25, 2010
 
-* Access Control (early state): configurable access privilegs for users and groups.
+* Access Control (early state): configurable access privileges for users and groups.
 * Client starts automatically.
 * GUI improvement: Create topics on-the-spot via canvas context menu.
 * Better search result rendering: Result topics are shown in a dedicated "Search Result" field.
@@ -392,7 +428,7 @@ Version History
 
 * Completely new backend architecture:
     * CouchDB is replaced by Neo4j. Storage layer abstraction.
-    * Application server in the middle-tier (Java), accessable via REST API.
+    * Application server in the middle-tier (Java), accessible via REST API.
     * All DeepaMehta modules are OSGi bundles.
     * Plugins can contain both, application logic (server-side Java) and presentation logic (client-side Javascript).
     * DB migration facility.
@@ -424,10 +460,10 @@ Version History
 ---
 
 Version history of **DeepaMehta 1** and **DeepaMehta 2**:  
-<http://www.deepamehta.de/docs/milestones.html>
+<http://deepamehta.newthinking.net/docs/milestones.html>
 
 
 
 ------------
 Jörg Richter  
-Mar 11, 2013
+Aug 31, 2013
