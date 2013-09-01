@@ -6,13 +6,13 @@
     <name>3rd Party Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>3rd-party-bundles</artifactId>
-    <version>4.1.1-SNAPSHOT</version>
+    <version>4.1.1</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-provision</artifactId>
-        <version>4.1.1-SNAPSHOT</version>
+        <version>4.1.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -28,7 +28,7 @@
         <!--dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-storage-neo4j</artifactId>
-            <version>4.1.1-SNAPSHOT</version>
+            <version>4.1.1</version>
         </dependency-->
         <!-- Jersey -->
         <dependency>

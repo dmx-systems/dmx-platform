@@ -66,7 +66,7 @@ There are 2 distributions to suit different needs:
   <http://download.deepamehta.de/deepamehta-4.1.1.zip> (6.3 MB)
 
 * The **DeepaMehta Karaf Distribution** focuses on client-server setup and supports remote administration.  
-  <http://download.deepamehta.de/deepamehta-4.1.1-karaf.tar.gz> (13.3 MB)
+  <http://download.deepamehta.de/deepamehta-4.1.1-karaf.tar.gz> (13.4 MB)
 
 Note: the remainder of this README applies to the Standard Distribution.  
 For setting up the Karaf Distribution refer to <https://trac.deepamehta.de/wiki/KarafDistribution>.
@@ -96,7 +96,8 @@ Then a browser window opens and DeepaMehta is ready to use.
 To open the DeepaMehta browser window manually:  
 <http://localhost:8080/de.deepamehta.webclient/>
 
-Login with `admin` and empty password. Now you're ready to create content.
+Login with `admin` and empty password.  
+Now you're ready to create content.
 
 
 5. Stop DeepaMehta
@@ -121,7 +122,7 @@ Updating DeepaMehta
 You can update from DeepaMehta 4.1 to 4.1.1 while keeping your data:
 
 1. Install DeepaMehta 4.1.1 (see steps 2. and 3. above).
-2. Stop DeepaMehta 4.1 if running. (Also stop DeepaMehta 4.1.1 if started already.)
+2. Stop DeepaMehta 4.1 if running. (Also stop DeepaMehta 4.1.1 if already started.)
 3. Copy the `deepamehta-db` folder from your DeepaMehta 4.1 installation into the `deepamehta-4.1.1` folder.
    (Replace as necessary.)
 4. Proceed with "Start DeepaMehta" (see step 4. above).
@@ -153,10 +154,10 @@ Caution: you will loose all your data.
 Uninstall DeepaMehta
 --------------------
 
-To remove DeepaMehta completely from your computer, including all your data:
-
 1. Stop DeepaMehta.
 2. Delete the entire `deepamehta-4.1.1` folder.
+
+This removes DeepaMehta completely from your computer, including all your data.
 
 
 Build DeepaMehta from Source
@@ -171,7 +172,7 @@ Build DeepaMehta from Source
 Version History
 ---------------
 
-**4.1.1** -- Aug 31, 2013
+**4.1.1** -- Sep 1, 2013
 
 * Timestamps: topics and associations have creation and modification timestamps. Time API.
 * Exploiting the browser cache. Makes use of intrinsic HTTP features for reduced network traffic.
@@ -466,4 +467,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Aug 31, 2013
+Sep 1, 2013
