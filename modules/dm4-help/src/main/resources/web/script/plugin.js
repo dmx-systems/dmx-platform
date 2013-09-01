@@ -26,6 +26,7 @@ dm4c.add_plugin("de.deepamehta.help", function() {
                         'Martin Delius<br>' +
                         'Andreas Gebhard<br>' +
                         'Danny Gräf<br>' +
+                        'Malte Kiesel<br>' +
                         'Rolf Kutz<br>' +
                         'Annette Leeb<br>' +
                         'Urs Lerch<br>' +
@@ -33,12 +34,12 @@ dm4c.add_plugin("de.deepamehta.help", function() {
                         'Silke Meyer<br>' +
                         'Christiane Müller<br>' +
                         'Jürgen Neumann<br>' +
-                        'Jurij Poelchau<br>' +
                     '</div>' +
                 '</td>' +
                 '<td>' +
                     '<div class="field-label" style="visibility: hidden">Contributors</div>' +
                     '<div class="contributors">' +
+                        'Jurij Poelchau<br>' +
                         'Ingo Rau<br>' +
                         'Malte Reißig<br>' +
                         'Jörg Richter<br>' +
