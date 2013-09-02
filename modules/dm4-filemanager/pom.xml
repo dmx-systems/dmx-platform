@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 File Manager</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-filemanager</artifactId>
-    <version>4.1.1</version>
+    <version>4.1.2-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
