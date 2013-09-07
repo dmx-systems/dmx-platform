@@ -63,10 +63,10 @@ To install and use DeepaMehta follow 5 mandatory steps:
 There are 2 distributions to suit different needs:
 
 * The **DeepaMehta Standard Distribution** focuses on small download size and easy setup for single users.  
-  <http://download.deepamehta.de/deepamehta-4.1.1.zip> (6.3 MB)
+  <http://download.deepamehta.de/deepamehta-4.1.2.zip> (6.3 MB)
 
 * The **DeepaMehta Karaf Distribution** focuses on client-server setup and supports remote administration.  
-  <http://download.deepamehta.de/deepamehta-4.1.1-karaf.tar.gz> (13.4 MB)
+  <http://download.deepamehta.de/deepamehta-4.1.2-karaf.tar.gz> (13.4 MB)
 
 Note: the remainder of this README applies to the Standard Distribution.  
 For setting up the Karaf Distribution refer to <https://trac.deepamehta.de/wiki/KarafDistribution>.
@@ -76,7 +76,7 @@ For setting up the Karaf Distribution refer to <https://trac.deepamehta.de/wiki/
 ---------------------
 
 Unzip the downloaded file.  
-A folder `deepamehta-4.1.1` is created.
+A folder `deepamehta-4.1.2` is created.
 
 Update note: if you want update an existing DeepaMehta installation continue with "Updating DeepaMehta" now (see below).
 
@@ -84,7 +84,7 @@ Update note: if you want update an existing DeepaMehta installation continue wit
 4. Start DeepaMehta
 -------------------
 
-Open the `deepamehta-4.1.1` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.1.2` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -96,8 +96,7 @@ Then a browser window opens and DeepaMehta is ready to use.
 To open the DeepaMehta browser window manually:  
 <http://localhost:8080/de.deepamehta.webclient/>
 
-Login with `admin` and empty password.  
-Now you're ready to create content.
+Login with `admin` and empty password. Now you're ready to create content.
 
 
 5. Stop DeepaMehta
@@ -119,15 +118,15 @@ Auxiliary tasks follow:
 Updating DeepaMehta
 -------------------
 
-You can update from DeepaMehta 4.1 to 4.1.1 while keeping your data:
+You can update from DeepaMehta 4.1.x to 4.1.2 while keeping your data:
 
-1. Install DeepaMehta 4.1.1 (see steps 2. and 3. above).
-2. Stop DeepaMehta 4.1 if running. (Also stop DeepaMehta 4.1.1 if already started.)
-3. Copy the `deepamehta-db` folder from your DeepaMehta 4.1 installation into the `deepamehta-4.1.1` folder.
+1. Install DeepaMehta 4.1.2 (see steps 2. and 3. above).
+2. Stop DeepaMehta 4.1.x if running. (Also stop DeepaMehta 4.1.2 if already started.)
+3. Copy the `deepamehta-db` folder from your DeepaMehta 4.1.x installation into the `deepamehta-4.1.2` folder.
    (Replace as necessary.)
 4. Proceed with "Start DeepaMehta" (see step 4. above).
 
-Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is not supported. Even updating from 4.0.x is not supported.  
+Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is not supported. Even updating from 4.0.x is not supported.
 The first updatable DeepaMehta version is 4.1.
 
 
@@ -155,7 +154,7 @@ Uninstall DeepaMehta
 --------------------
 
 1. Stop DeepaMehta.
-2. Delete the entire `deepamehta-4.1.1` folder.
+2. Delete the entire `deepamehta-4.1.2` folder.
 
 This removes DeepaMehta completely from your computer, including all your data.
 
@@ -171,6 +170,12 @@ Build DeepaMehta from Source
 
 Version History
 ---------------
+
+**4.1.2** -- Sep 7, 2013
+
+* Bug fix: editing a topic displayed in a geomap works again (was broken in previous release).
+* See the full changelog in the release notes:  
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.1.1** -- Sep 1, 2013
 
@@ -467,4 +472,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Sep 1, 2013
+Sep 7, 2013
