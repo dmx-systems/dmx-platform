@@ -137,10 +137,9 @@ function GUIToolkit(config) {
                 do_submit()
             }
         })
-        var content = $("<div>").addClass("field-label").text(input_label).after(input)
         var dialog = this.dialog({
             title: title,
-            content: content,
+            content: $("<div>").addClass("field-label").text(input_label).add(input),
             button_label: button_label,
             button_handler: do_submit
         })

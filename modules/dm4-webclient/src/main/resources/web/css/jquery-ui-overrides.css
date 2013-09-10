@@ -8,27 +8,10 @@
     margin: 0;
 }
 
-.dm-toolbar   .ui-button-text-icon-primary .ui-button-text,
-#page-content .ui-button-text-icon-primary .ui-button-text {
-    padding-top: 0.2em;
-    padding-bottom: 0.2em;
-}
-
-.dm-toolbar   .ui-button-text-only .ui-button-text,
-#page-content .ui-button-text-only .ui-button-text {
-    padding-top: 0.2em;
-    padding-bottom: 0.2em;
-}
-
 .dm-toolbar   .ui-button-icon-only .ui-button-text,
 #page-content .ui-button-icon-only .ui-button-text {
-    padding-top: 0.8em;
-    padding-bottom: 0.9em;
-}
-
-.dm-toolbar   .ui-button-icon-only,
-#page-content .ui-button-icon-only {
-    vertical-align: middle;
+    padding-top: 0.9em;
+    padding-bottom: 1.1em;
 }
 
 .ui-resizable-handle {

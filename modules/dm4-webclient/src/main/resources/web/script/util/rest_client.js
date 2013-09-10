@@ -299,23 +299,29 @@ function RESTClient(core_service_uri) {
             data: data,
             dataType: response_data_type,
             processData: false,
-            async: async,
-            success: function(data, text_status, jq_xhr) {
-                if (LOG_AJAX_REQUESTS) dm4c.log("..... " + jq_xhr.status + " " + jq_xhr.statusText +
-                    "\n..... " + JSON.stringify(data))
-                if (callback) {
-                    callback(data)
-                }
-                response_data = data
-            },
-            error: function(jq_xhr, text_status, error_thrown) {
-                if (LOG_AJAX_REQUESTS) dm4c.log("..... " + jq_xhr.status + " " + jq_xhr.statusText +
-                    "\n..... exception: " + JSON.stringify(error_thrown))
-                throw "RESTClientError: " + method + " request failed (" + text_status + ": " + error_thrown + ")"
-            },
-            complete: function(jq_xhr, text_status) {
-                status = text_status
+            async: async
+        })
+        .done(function(data, text_status, jq_xhr) {
+            if (LOG_AJAX_REQUESTS) dm4c.log("..... " + jq_xhr.status + " " + jq_xhr.statusText +
+                "\n..... " + JSON.stringify(data))
+            if (callback) {
+                callback(data)
             }
+            response_data = data
+        })
+        .fail(function(jq_xhr, text_status, error_thrown) {
+            if (LOG_AJAX_REQUESTS) dm4c.log("..... " + jq_xhr.status + " " + jq_xhr.statusText +
+                "\n..... exception: " + JSON.stringify(error_thrown))
+            // Note: since at least jQuery 2.0.3 an exception thrown from the "error" callback (as registered in the
+            // $.ajax() settings object) does not reach the calling plugin. (In jQuery 1.7.2 it did.) Apparently the
+            // exception is catched by jQuery. That's why we use the Promise style to register our callbacks (done(),
+            // fail(), always()). An exception thrown from fail() does reach the calling plugin.
+            throw "RESTClientError: " + method + " request failed (" + text_status + ": " + error_thrown + ")"
+        })
+        .always(function(dummy, text_status) {
+            // Note: the signature of the always() callback varies. Depending on the response status it takes
+            // shape either of the done() or the fail() callback.
+            status = text_status
         })
         if (!async && status == "success") {
             return response_data

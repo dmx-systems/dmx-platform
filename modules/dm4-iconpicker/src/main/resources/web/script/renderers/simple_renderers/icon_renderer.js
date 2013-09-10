@@ -12,7 +12,7 @@
         render_form: function(page_model, parent_element) {
             var picked_icon = null                  // a topic of type "dm4.webclient.icon"
             var image = dm4c.render.icon(page_model.value)
-            parent_element.append(image.after(dm4c.ui.button(do_open_iconpicker, "Choose")))
+            parent_element.append(image.add(dm4c.ui.button(do_open_iconpicker, "Choose")))
             //
             return function() {
                 // prevent the field from being updated if no icon has been selected

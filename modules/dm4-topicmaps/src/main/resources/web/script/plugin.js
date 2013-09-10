@@ -85,7 +85,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
                 .append(topicmap_label)
                 .append(topicmap_menu.dom)
             // put in toolbar
-            if ($("#workspace-widget").size()) {
+            if ($("#workspace-widget").length) {
                 $("#workspace-widget").after(topicmap_widget)
             } else {
                 dm4c.toolbar.dom.prepend(topicmap_widget)

@@ -113,10 +113,12 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             var password_input = $("<input>").attr("type", "password")
             var message_div = $("<div>").attr("id", "login-message")
             var dialog_content = $("<div>").addClass("field-label").text("Username")
-                .after(username_input)
-                .after($("<div>").addClass("field-label").text("Password"))
-                .after(password_input)
-                .after(message_div)
+                .add(username_input)
+                .add($("<div>").addClass("field-label").text("Password"))
+                .add(password_input)
+                .add(message_div)
+            // Note: as of jQuery 1.9 you can't add objects to a disconnected (not in a document)
+            // jQuery object with the after() method. Use add() instead.
             login_dialog = dm4c.ui.dialog({
                 title: "Login",
                 content: dialog_content,
