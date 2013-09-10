@@ -3,7 +3,12 @@ DeepaMehta uses a jQuery UI custom build.
 
 Basic Theme: "Smoothness"
 
-Font Settings: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif
+Font Settings:
+    Family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif
+    Weight: normal
+    Size  : 1em
+
+Corner Radius: 0
 
 Components (9):
     Core
@@ -11,12 +16,11 @@ Components (9):
     Mouse
     Position
 
+    Draggable
     Resizable
     Sortable
 
     Autocomplete
     Button
     Dialog
-
-IMPORTANT: the generated CSS file must be adapted manually:
-    \\\"Lucida Grande\\\" -> "Lucida Grande" (2 occurrences)
+    Menu
