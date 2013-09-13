@@ -126,7 +126,9 @@ function Topicmap(topicmap_id, config) {
         if (t) {
             if (LOG_TOPICMAPS) dm4c.log("..... Updating topic " + t.id + " (\"" + t.label + "\") on topicmap " +
                 topicmap_id)
+            // update memory
             t.update(topic)
+            // Note: no DB update here. A topic update doesn't affect the persisted view.
         }
     }
 
@@ -137,7 +139,9 @@ function Topicmap(topicmap_id, config) {
         var a = assocs[assoc.id]
         if (a) {
             if (LOG_TOPICMAPS) dm4c.log("..... Updating association " + a.id + " on topicmap " + topicmap_id)
+            // update memory
             a.update(assoc)
+            // Note: no DB update here. An association update doesn't affect the persisted view.
         }
     }
 
@@ -328,6 +332,7 @@ function Topicmap(topicmap_id, config) {
          * @param   topic   a Topic object
          */
         this.update = function(topic) {
+            this.type_uri = topic.type_uri
             this.label = topic.value
         }
 
