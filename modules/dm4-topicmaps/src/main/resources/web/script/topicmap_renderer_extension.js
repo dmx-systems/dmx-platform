@@ -6,7 +6,7 @@ function TopicmapRendererExtension() {
     // === TopicmapRenderer Topicmaps Extension ===
 
     this.load_topicmap = function(topicmap_id, config) {
-        return new Topicmap(topicmap_id, config)
+        return new TopicmapViewmodel(topicmap_id, config)
     }
 
     /**
@@ -37,8 +37,8 @@ function TopicmapRendererExtension() {
 
         function display_topicmap() {
 
-            dm4c.canvas.clear()
-            dm4c.canvas.translate_by(topicmap.trans_x, topicmap.trans_y)
+            dm4c.topicmap_renderer.clear()
+            dm4c.topicmap_renderer.translate_by(topicmap.trans_x, topicmap.trans_y)
             display_topics()
             display_associations()
             restore_selection()     // includes canvas refreshing
@@ -48,7 +48,7 @@ function TopicmapRendererExtension() {
                     if (topic.visibility) {
                         // Note: canvas.add_topic() expects an topic object with "value" property (not "label")
                         var t = {id: topic.id, type_uri: topic.type_uri, value: topic.label, x: topic.x, y: topic.y}
-                        dm4c.canvas.add_topic(t)
+                        dm4c.topicmap_renderer.add_topic(t)
                     }
                 })
             }
@@ -61,7 +61,7 @@ function TopicmapRendererExtension() {
                         role_1: {topic_id: assoc.topic_id_1},
                         role_2: {topic_id: assoc.topic_id_2}
                     }
-                    dm4c.canvas.add_association(a)
+                    dm4c.topicmap_renderer.add_association(a)
                 })
             }
 

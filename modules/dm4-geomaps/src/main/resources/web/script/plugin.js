@@ -3,8 +3,8 @@ dm4c.add_plugin("de.deepamehta.geomaps", function() {
     dm4c.load_stylesheet("/de.deepamehta.geomaps/script/vendor/openlayers/theme/default/style.css")
 
     dm4c.load_script("/de.deepamehta.geomaps/script/topicmap_renderers/geomap_renderer.js")
-    dm4c.load_script("/de.deepamehta.geomaps/script/model/geomap.js")
-    dm4c.load_script("/de.deepamehta.geomaps/script/view/openlayers_view.js")
+    dm4c.load_script("/de.deepamehta.geomaps/script/topicmap_renderers/geomap_viewmodel.js")
+    dm4c.load_script("/de.deepamehta.geomaps/script/topicmap_renderers/openlayers_view.js")
     dm4c.load_script("/de.deepamehta.geomaps/script/vendor/openlayers/OpenLayers.js")
 
     // === REST Client Extension ===

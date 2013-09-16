@@ -16,7 +16,7 @@ dm4c.add_plugin("de.deepamehta.filemanager", function() {
     // === Files Listeners ===
 
     dm4c.add_listener("process_files_drop", function(files) {
-        dm4c.canvas.start_grid_positioning()
+        dm4c.topicmap_renderer.start_grid_positioning()
         //
         var dir_count = files.get_directory_count()
         for (var i = 0; i < dir_count; i++) {
@@ -26,6 +26,6 @@ dm4c.add_plugin("de.deepamehta.filemanager", function() {
             dm4c.get_plugin("de.deepamehta.files").create_file_topic(files.get_file(i), !dir_count && i == 0)
         }
         //
-        dm4c.canvas.stop_grid_positioning()
+        dm4c.topicmap_renderer.stop_grid_positioning()
     })
 })

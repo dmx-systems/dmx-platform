@@ -116,7 +116,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         }
 
         function do_associate(x, y) {
-            dm4c.canvas.begin_association(topic.id, x, y)
+            dm4c.topicmap_renderer.begin_association(topic.id, x, y)
         }
 
         function do_retype() {

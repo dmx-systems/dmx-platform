@@ -1,13 +1,20 @@
 /**
- * Default topicmap view model: the data needed to render a topicmap.
+ * Default topicmap view model: the data needed to render a topicmap. ### FICDOC
  * 
- * Note: the default topicmap view model is renderer agnostic. It is shared by e.g. the HTML5 Canvas based default
- * renderer and the SVG based 3rd-party renderer.
+ * Note: the default topicmap view model is renderer technology agnostic.
+ * It is shared by e.g. the HTML5 Canvas based default renderer and the SVG based 3rd-party renderer. ### FICDOC
+ *
+ * ### TODO: refactoring.
+ * ### This is not actually a view model but the render technology-specific view, namely the HTML5 Canvas view.
+ * ### The Canvas drawing context (ctx) should be located here again (it was moved to CanvasRenderer).
+ * ### The geometry management (find_topic() ...) and selection model (highlighting) on the other hand should
+ * ### be moved to the view model class, namely TopicmapViewmodel.
+ * ### Note: the dm4-topicmaps module is no longer an optional install then. It is a Webclient dependency.
  */
-DefaultTopicmapViewmodel = function () {
+CanvasView = function () {
 
-    var canvas_topics = {}      // topics displayed on canvas (Object, key: topic ID, value: CanvasTopic)
-    var canvas_assocs = {}      // associations displayed on canvas (Object, key: assoc ID, value: CanvasAssoc)
+    var canvas_topics = {}      // topics displayed on canvas (Object, key: topic ID, value: TopicView)
+    var canvas_assocs = {}      // associations displayed on canvas (Object, key: assoc ID, value: AssociationView)
 
     var highlight_mode = "none" // "none", "topic", "assoc"
     var highlight_id            // ID of the highlighted topic/association. Ignored if highlight mode is "none".
@@ -45,14 +52,14 @@ DefaultTopicmapViewmodel = function () {
      * @param   topic   an object with "id", "type_uri", "value", "x", "y" properties.
      */
     this.add_topic = function(topic) {
-        return canvas_topics[topic.id] = new CanvasTopic(topic)
+        return canvas_topics[topic.id] = new TopicView(topic)
     }
 
     /**
      * @param   assoc   an object with "id", "type_uri", "role_1", "role_2" properties.
      */
     this.add_association = function(assoc) {
-        return canvas_assocs[assoc.id] = new CanvasAssoc(assoc)
+        return canvas_assocs[assoc.id] = new AssociationView(assoc)
     }
 
     // ---
@@ -271,7 +278,7 @@ DefaultTopicmapViewmodel = function () {
      *
      * @param   topic   an object with "id", "type_uri", "value", "x", "y" properties.
      */
-    function CanvasTopic(topic) {
+    function TopicView(topic) {
 
         var self = this
 
@@ -317,7 +324,7 @@ DefaultTopicmapViewmodel = function () {
      *
      * @param   assoc   an object with "id", "type_uri", "role_1", "role_2" properties.
      */
-    function CanvasAssoc(assoc) {
+    function AssociationView(assoc) {
 
         var _self = this    // Note: self is already used in closure
 
@@ -380,7 +387,7 @@ DefaultTopicmapViewmodel = function () {
 
     function Cluster(ca) {
 
-        var cts = []    // array of CanvasTopic
+        var cts = []    // array of TopicView
 
         add_to_cluster(ca.get_topic_1())
 

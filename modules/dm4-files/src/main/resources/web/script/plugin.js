@@ -128,7 +128,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     })
 
     /**
-     * @param   topic   a CanvasTopic object
+     * @param   topic   a TopicView object
      */
     dm4c.add_listener("topic_doubleclicked", function(topic) {
         if (topic.type_uri == "dm4.files.file" ||

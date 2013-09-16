@@ -27,7 +27,7 @@ dm4c.add_simple_renderer("dm4.files.file_content_renderer", {
                             width: "100%", height: dm4c.page_panel.height}))
                         return
                         // return $("<iframe>").attr({src: src, width: "100%",
-                        //     height: dm4c.canvas.canvas_height, frameborder: 0})
+                        //     height: dm4c.topicmap_renderer.canvas_height, frameborder: 0})
                     } else if (js.begins_with(media_type, "audio/")) {
                         render($("<embed>").attr({src: src, width: "95%", height: 64, bgcolor: "#ffffff"})
                             .css("margin-top", "2em"))

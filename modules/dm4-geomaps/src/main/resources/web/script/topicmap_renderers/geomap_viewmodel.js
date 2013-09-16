@@ -1,18 +1,18 @@
 /**
- * A geomap model that is attached to the database. There are methods for:
+ * A geomap view model that is attached to the database. There are methods for:
  *  - loading a geomap from DB
  *  - manipulating the geomap by e.g. adding/removing topics
  *
- * ### TODO: introduce common base class for Geomap and Topicmap (see deepamehta-topicmaps module)
+ * ### TODO: introduce common base class for GeomapViewmodel and TopicmapViewmodel (see dm4-topicmaps module)
  */
-function Geomap(topicmap_id, config) {
+function GeomapViewmodel(topicmap_id, config) {
 
     var LOG_GEOMAPS = false
     var self = this
 
     // Model
     var info                        // The underlying Topicmap topic (a Topic object)
-    var topics = {}                 // topics of this topicmap (key: topic ID, value: GeomapTopic object)
+    var topics = {}                 // topics of this topicmap (key: topic ID, value: GeoTopicViewmodel object)
     this.center                     // map center (an OpenLayers.LonLat object in lon/lat projection)
     this.zoom                       // zoom level (integer)
     this.selected_object_id = -1    // ID of the selected topic, or -1 for no selection
@@ -23,7 +23,7 @@ function Geomap(topicmap_id, config) {
 
 
 
-    // === Topicmap Implementation ===
+    // === TopicmapViewmodel Implementation ===
 
     this.get_id = function() {
         return topicmap_id
@@ -37,11 +37,15 @@ function Geomap(topicmap_id, config) {
         return info.get("dm4.topicmaps.topicmap_renderer_uri")
     }
 
+    // ---
+
     this.iterate_topics = function(visitor_func) {
         for (var id in topics) {
             visitor_func(topics[id])
         }
     }
+
+    // ---
 
     this.add_topic = function(id, type_uri, value, x, y) {
         if (x == undefined || y == undefined) {
@@ -51,53 +55,67 @@ function Geomap(topicmap_id, config) {
         if (!topics[id]) {
             if (LOG_GEOMAPS) dm4c.log("Adding topic " + id + " (type_uri=\"" + type_uri + "\", x=" + x + ", y=" + y +
                 ") to geomap " + topicmap_id)
+            // update memory
+            topics[id] = new GeoTopicViewmodel(id, x, y)
             // update DB
             if (is_writable()) {
                 dm4c.restc.add_topic_to_geomap(topicmap_id, id)
             }
-            // update memory
-            topics[id] = new GeomapTopic(id, x, y)
         }
     }
 
     this.add_association = function(id, type_uri, topic_id_1, topic_id_2) {
     }
 
+    // ---
+
     this.update_topic = function(topic) {
         var t = topics[topic.id]
         if (t) {
             if (LOG_GEOMAPS) dm4c.log("..... Updating topic " + t.id + " (x=" + t.x + ", y=" + t.y + ") on geomap " +
                 topicmap_id)
+            // update memory
             t.update(topic)
-            // ### FIXME: check is_writable()
+            // Note: no DB update here. A topic update doesn't affect the persisted view.
         }
     }
 
     this.update_association = function(assoc) {
     }
 
+    // ---
+
     this.delete_topic = function(id) {
         var topic = topics[id]
         if (topic) {
             if (LOG_GEOMAPS) dm4c.log("..... Deleting topic " + id + " from geomap " + topicmap_id)
+            // update memory
             topic.remove()
-            // ### FIXME: check is_writable()
+            // Note: no DB update here. The "Geotopic Mapcontext" association is already deleted.
         }
     }
 
     this.delete_association = function(id) {
     }
 
+    // ---
+
     this.set_topic_selection = function(topic) {
+        // update memory
         this.selected_object_id = topic.id
+        // Note: no DB update here. The selection is not yet persisted.
     }
 
     this.set_association_selection = function(assoc) {
     }
 
     this.reset_selection = function() {
+        // update memory
         this.selected_object_id = -1
+        // Note: no DB update here. The selection is not yet persisted.
     }
+
+    // ---
 
     this.prepare_topic_for_display = function(topic) {
     }
@@ -131,7 +149,7 @@ function Geomap(topicmap_id, config) {
         function init_topics() {
             for (var i = 0, topic; topic = topicmap.topics[i]; i++) {
                 var pos = GeomapRenderer.position(new Topic(topic))
-                topics[topic.id] = new GeomapTopic(topic.id, pos.x, pos.y)
+                topics[topic.id] = new GeoTopicViewmodel(topic.id, pos.x, pos.y)
             }
         }
 
@@ -155,7 +173,7 @@ function Geomap(topicmap_id, config) {
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
-    function GeomapTopic(id, x, y) {
+    function GeoTopicViewmodel(id, x, y) {
 
         this.id = id
         this.x = x

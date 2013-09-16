@@ -41,7 +41,7 @@ dm4c = new function() {
     // view
     this.split_panel = null         // a SplitPanel object
     this.toolbar = null             // the upper toolbar GUI component (a ToolbarPanel object)
-    this.canvas = null              // the canvas GUI component that displays the topicmap (a TopicmapRenderer object)
+    this.topicmap_renderer = null   // the GUI component that displays the topicmap (a TopicmapRenderer object)
     this.page_panel = null          // the page panel GUI component on the right hand side (a PagePanel object)
 
     var pm = new PluginManager({
@@ -95,11 +95,11 @@ dm4c = new function() {
     this.do_select_topic = function(topic_id, no_history_update) {
         dm4c.page_panel.save()
         //
-        var topics = dm4c.canvas.select_topic(topic_id)
+        var topics = dm4c.topicmap_renderer.select_topic(topic_id)
         // update client model
         set_topic_selection(topics.select, no_history_update)
         // update view
-        dm4c.canvas.refresh()
+        dm4c.topicmap_renderer.refresh()
         dm4c.page_panel.render_page(topics.display)
     }
 
@@ -114,11 +114,11 @@ dm4c = new function() {
     this.do_select_association = function(assoc_id, no_history_update) {
         dm4c.page_panel.save()
         //
-        var assoc = dm4c.canvas.select_association(assoc_id)
+        var assoc = dm4c.topicmap_renderer.select_association(assoc_id)
         // update client model
         set_association_selection(assoc, no_history_update)
         // update view
-        dm4c.canvas.refresh()
+        dm4c.topicmap_renderer.refresh()
         dm4c.page_panel.render_page(assoc)
     }
 
@@ -132,7 +132,7 @@ dm4c = new function() {
         // update client model
         reset_selection(no_history_update)
         // update view
-        dm4c.canvas.reset_selection(true)    // refresh_canvas=true
+        dm4c.topicmap_renderer.reset_selection(true)    // refresh_canvas=true
         dm4c.page_panel.clear()
         // fire event
         var result = dm4c.fire_event("default_page_rendering")
@@ -187,9 +187,9 @@ dm4c = new function() {
      * Fires the "post_hide_topic" event and the "post_hide_association" event (for each association).
      */
     this.do_hide_topic = function(topic) {
-        var assocs = dm4c.canvas.get_associations(topic.id)
+        var assocs = dm4c.topicmap_renderer.get_associations(topic.id)
         for (var i = 0; i < assocs.length; i++) {
-            dm4c.canvas.remove_association(assocs[i].id, false)     // refresh_canvas=false
+            dm4c.topicmap_renderer.remove_association(assocs[i].id, false)     // refresh_canvas=false
             dm4c.fire_event("post_hide_association", assocs[i])     // fire event
         }
         //
@@ -379,12 +379,12 @@ dm4c = new function() {
         // Note: the "pre_show_topic" event allows plugins to manipulate the topic, e.g. by setting coordinates
         dm4c.fire_event("pre_show_topic", topic)                // fire event
         // update view (canvas)
-        var topic_shown = dm4c.canvas.add_topic(topic, do_select)
+        var topic_shown = dm4c.topicmap_renderer.add_topic(topic, do_select)
         if (topic_shown) {
             if (do_center) {
-                dm4c.canvas.scroll_topic_to_center(topic_shown.id)
+                dm4c.topicmap_renderer.scroll_topic_to_center(topic_shown.id)
             }
-            dm4c.canvas.refresh()
+            dm4c.topicmap_renderer.refresh()
             // update client model
             if (do_select) {
                 set_topic_selection(topic_shown)
@@ -405,8 +405,8 @@ dm4c = new function() {
         action = action || "none"   // set default
         var do_select = action != "none"
         // update view (canvas)
-        dm4c.canvas.add_association(assoc, do_select)
-        dm4c.canvas.refresh()
+        dm4c.topicmap_renderer.add_association(assoc, do_select)
+        dm4c.topicmap_renderer.refresh()
         // update client model
         if (do_select) {
             set_association_selection(assoc)
@@ -496,7 +496,7 @@ dm4c = new function() {
         // update client model
         set_topic_selection_conditionally(topic)
         // update view
-        dm4c.canvas.update_topic(topic, true)           // refresh_canvas=true
+        dm4c.topicmap_renderer.update_topic(topic, true)           // refresh_canvas=true
         dm4c.page_panel.render_page_if_selected(topic)
         // fire event
         dm4c.fire_event("post_update_topic", topic)
@@ -514,7 +514,7 @@ dm4c = new function() {
         // update client model
         set_association_selection_conditionally(assoc)
         // update view
-        dm4c.canvas.update_association(assoc, true)     // refresh_canvas=true
+        dm4c.topicmap_renderer.update_association(assoc, true)     // refresh_canvas=true
         stay_in_edit_mode ? dm4c.page_panel.render_form_if_selected(assoc) :
                             dm4c.page_panel.render_page_if_selected(assoc)
         // fire event
@@ -532,7 +532,7 @@ dm4c = new function() {
         // 2) update view
         // Note: the UPDATE_TOPIC_TYPE directive might result from editing a View Configuration topic.
         // In this case the canvas must be refreshed in order to reflect changed topic icons.
-        dm4c.canvas.refresh()
+        dm4c.topicmap_renderer.refresh()
         // 3) fire event
         dm4c.fire_event("post_update_topic", topic_type)
     }
@@ -546,7 +546,7 @@ dm4c = new function() {
         // 2) update view
         // Note: the UPDATE_ASSOCIATION_TYPE directive might result from editing a View Configuration topic.
         // In this case the canvas must be refreshed in order to reflect changed association colors.
-        dm4c.canvas.refresh()
+        dm4c.topicmap_renderer.refresh()
         // 3) fire event
         // ### dm4c.fire_event("post_update_topic", topic_type)
     }
@@ -561,7 +561,7 @@ dm4c = new function() {
      */
     function remove_topic(topic, event_name) {
         // update view (canvas)
-        dm4c.canvas.remove_topic(topic.id, true)            // refresh_canvas=true
+        dm4c.topicmap_renderer.remove_topic(topic.id, true)            // refresh_canvas=true
         // update client model and view
         reset_selection_conditionally(topic.id)
         // fire event
@@ -576,7 +576,7 @@ dm4c = new function() {
      */
     function remove_association(assoc, event_name) {
         // update view (canvas)
-        dm4c.canvas.remove_association(assoc.id, true)      // refresh_canvas=true
+        dm4c.topicmap_renderer.remove_association(assoc.id, true)      // refresh_canvas=true
         // update client model and view
         reset_selection_conditionally(assoc.id)
         // fire event
@@ -991,7 +991,7 @@ dm4c = new function() {
             case "icon":
                 return dm4c.DEFAULT_TOPIC_ICON
             case "color":
-                return dm4c.canvas.DEFAULT_ASSOC_COLOR
+                return dm4c.topicmap_renderer.DEFAULT_ASSOC_COLOR
             case "show_in_create_menu":
                 return false;
             case "input_field_rows":
@@ -1402,8 +1402,8 @@ dm4c = new function() {
         dm4c.page_panel = new PagePanel()
         dm4c.split_panel.set_right_panel(dm4c.page_panel)
         //
-        dm4c.canvas = new DefaultTopicmapRenderer()
-        dm4c.split_panel.set_left_panel(dm4c.canvas)
+        dm4c.topicmap_renderer = new CanvasRenderer()
+        dm4c.split_panel.set_left_panel(dm4c.topicmap_renderer)
         //
         // 2) Setup Load Tracker
         var items_to_load = pm.retrieve_plugin_list()

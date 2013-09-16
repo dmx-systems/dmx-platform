@@ -76,11 +76,11 @@ function GeomapRenderer() {
     // === TopicmapRenderer Topicmaps Extension ===
 
     this.load_topicmap = function(topicmap_id, config) {
-        return new Geomap(topicmap_id, config)
+        return new GeomapViewmodel(topicmap_id, config)
     }
 
     this.display_topicmap = function(topicmap, no_history_update) {
-        dm4c.canvas.clear()
+        dm4c.topicmap_renderer.clear()
         ol_view.set_center(topicmap.center, topicmap.zoom)
         display_topics()
         restore_selection()
@@ -137,7 +137,7 @@ function GeomapRenderer() {
 
 // ------------------------------------------------------------------------------------------------------ Static Methods
 
-// ### FIXME: revise the Geomap model class and make this local functions
+// ### FIXME: revise the GeomapViewmodel class and make this local functions
 
 GeomapRenderer.position = function(geo_facet) {
     return {

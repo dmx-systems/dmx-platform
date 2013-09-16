@@ -3,17 +3,17 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     var LOG_TOPICMAPS = false
     var self = this
 
+    dm4c.load_script("/de.deepamehta.topicmaps/script/topicmap_viewmodel.js")
     dm4c.load_script("/de.deepamehta.topicmaps/script/topicmap_renderer_extension.js")
-    dm4c.load_script("/de.deepamehta.topicmaps/script/model/topicmap.js")
 
-    js.extend(dm4c.canvas, TopicmapRendererExtension)
+    js.extend(dm4c.topicmap_renderer, TopicmapRendererExtension)
 
     // Model
-    var topicmap                    // Selected topicmap (Topicmap object)              \ updated together by
+    var topicmap                    // Selected topicmap (TopicmapViewmodel object)     \ updated together by
     var topicmap_renderer           // The topicmap renderer of the selected topicmap   / set_selected_topicmap()
     var topicmap_renderers = {}     // Registered topicmap renderers (key: renderer URI, value: TopicmapRenderer object)
     var topicmap_topics             // All topicmaps in the DB (object, key: topicmap ID, value: topicmap topic)
-    var topicmap_cache = {}         // Loaded topicmaps (key: topicmap ID, value: Topicmap object)
+    var topicmap_cache = {}         // Loaded topicmaps (key: topicmap ID, value: TopicmapViewmodel object)
 
     // View
     var topicmap_menu               // A GUIToolkit Menu object
@@ -65,7 +65,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
         function register_topicmap_renderers() {
             // default renderer
-            register(dm4c.canvas)
+            register(dm4c.topicmap_renderer)
             // custom renderers
             var renderers = dm4c.fire_event("topicmap_renderer")
             renderers.forEach(function(renderer) {
@@ -189,28 +189,28 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     })
 
     /**
-     * @param   assoc   a CanvasAssoc object
+     * @param   assoc   a AssociationView object
      */
     dm4c.add_listener("post_show_association", function(assoc) {
         topicmap.add_association(assoc.id, assoc.type_uri, assoc.role_1.topic_id, assoc.role_2.topic_id)
     })
 
     /**
-     * @param   topic   a CanvasTopic object
+     * @param   topic   a TopicView object
      */
     dm4c.add_listener("post_hide_topic", function(topic) {
         topicmap.hide_topic(topic.id)
     })
 
     /**
-     * @param   assoc   a CanvasAssoc object
+     * @param   assoc   a AssociationView object
      */
     dm4c.add_listener("post_hide_association", function(assoc) {
         topicmap.hide_association(assoc.id)
     })
 
     /**
-     * @param   topic   a CanvasTopic object
+     * @param   topic   a TopicView object
      */
     dm4c.add_listener("post_move_topic", function(topic) {
         topicmap.move_topic(topic.id, topic.x, topic.y)
@@ -476,7 +476,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      *
      * Prerequisite: the topicmap renderer responsible for loading is already set.
      *
-     * @return  a Topicmap object
+     * @return  a TopicmapViewmodel object
      */
     function load_topicmap(topicmap_id) {
         // prepare config
@@ -563,12 +563,12 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     }
 
     function switch_topicmap_renderer() {
-        var renderer_uri = dm4c.canvas.get_info().uri
+        var renderer_uri = dm4c.topicmap_renderer.get_info().uri
         var new_renderer_uri = topicmap_renderer.get_info().uri
         if (renderer_uri != new_renderer_uri) {
             if (LOG_TOPICMAPS) dm4c.log("Switching topicmap renderer \"" +
                 renderer_uri + "\" => \"" + new_renderer_uri + "\"")
-            dm4c.canvas = topicmap_renderer
+            dm4c.topicmap_renderer = topicmap_renderer
             dm4c.split_panel.set_left_panel(topicmap_renderer)
         }
     }

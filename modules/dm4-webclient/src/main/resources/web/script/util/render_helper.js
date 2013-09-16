@@ -74,7 +74,7 @@ function RenderHelper() {
 
         function click_handler_for(topic, spot) {
             // create no handler for the "icon" spot if the topic is already visible on canvas
-            if (spot == "icon" && dm4c.canvas.topic_exists(topic.id)) {
+            if (spot == "icon" && dm4c.topicmap_renderer.topic_exists(topic.id)) {
                 return
             }
             //
