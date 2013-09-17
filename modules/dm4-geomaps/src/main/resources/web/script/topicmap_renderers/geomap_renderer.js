@@ -54,10 +54,6 @@ function GeomapRenderer() {
         }
     }
 
-    this.clear = function() {
-        ol_view.remove_all_features()
-    }
-
     this.select_topic = function(topic_id) {
         // fetch from DB
         var topic_select = dm4c.fetch_topic(topic_id)
@@ -80,7 +76,7 @@ function GeomapRenderer() {
     }
 
     this.display_topicmap = function(topicmap, no_history_update) {
-        dm4c.topicmap_renderer.clear()
+        ol_view.remove_all_features()
         ol_view.set_center(topicmap.center, topicmap.zoom)
         display_topics()
         restore_selection()

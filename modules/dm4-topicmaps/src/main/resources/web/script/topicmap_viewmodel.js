@@ -1,5 +1,5 @@
 /**
- * A topicmap view model that is attached to the database. There are methods for:
+ * A topicmap viewmodel that is attached to the database. There are methods for:
  *  - loading a topicmap from DB
  *  - manipulating the topicmap by e.g. adding/removing topics and associations
  *
@@ -13,10 +13,15 @@ function TopicmapViewmodel(topicmap_id, config) {
     var info                // The underlying Topicmap topic (a Topic object)
     var topics = {}         // topics of this topicmap (key: topic ID, value: TopicViewmodel object)
     var assocs = {}         // associations of this topicmap (key: association ID, value: AssociationViewmodel object)
+
+    // Translation model
     this.trans_x, this.trans_y      // topicmap translation (in pixel)
+
+    // Selection model
     this.selected_object_id = -1    // ID of the selected topic or association, or -1 for no selection
     this.is_topic_selected          // true indicates topic selection, false indicates association selection
                                     // only evaluated if there is a selection (selected_object_id != -1)
+
     this.background_image   // JavaScript Image object
 
     load()
@@ -33,8 +38,24 @@ function TopicmapViewmodel(topicmap_id, config) {
         return info.get("dm4.topicmaps.topicmap_renderer_uri")
     }
 
+    // ---
+
     this.get_topic = function(id) {
         return topics[id]
+    }
+
+    this.get_association = function(id) {
+        return assocs[id]
+    }
+
+    // ---
+
+    this.topic_exists = function(id) {
+        return this.get_topic(id) != undefined
+    }
+
+    this.association_exists = function(id) {
+        return this.get_association(id) != undefined
     }
 
     // ---
@@ -53,12 +74,14 @@ function TopicmapViewmodel(topicmap_id, config) {
         var topic = topics[id]
         if (!topic) {
             if (LOG_TOPICMAPS) dm4c.log("Adding topic " + id + " (\"" + label + "\") to topicmap " + topicmap_id)
-            // update memory
+            // update viewmodel
             topics[id] = new TopicViewmodel(id, type_uri, label, x, y, true)     // visibility=true
             // update DB
             if (is_writable()) {
                 dm4c.restc.add_topic_to_topicmap(topicmap_id, id, x, y)
             }
+            //
+            return topics[id]
         } else if (!topic.visibility) {
             if (LOG_TOPICMAPS)
                 dm4c.log("Showing topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id)
@@ -180,16 +203,16 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     // ---
 
-    this.set_topic_selection = function(topic) {
+    this.set_topic_selection = function(topic_id) {         // ### param was "topic"
         // update memory
-        this.selected_object_id = topic.id
+        this.selected_object_id = topic_id
         this.is_topic_selected = true
         // Note: no DB update here. The selection is not yet persisted.
     }
 
-    this.set_association_selection = function(assoc) {
+    this.set_association_selection = function(assoc_id) {   // ### param was "assoc"
         // update memory
-        this.selected_object_id = assoc.id
+        this.selected_object_id = assoc_id
         this.is_topic_selected = false
         // Note: no DB update here. The selection is not yet persisted.
     }
@@ -198,6 +221,19 @@ function TopicmapViewmodel(topicmap_id, config) {
         // update memory
         this.selected_object_id = -1
         // Note: no DB update here. The selection is not yet persisted.
+    }
+
+    // ---
+
+    /**
+     * @param   id      A topic ID or an association ID
+     */
+    this.is_selected = function(id) {
+        return this.has_selection() && this.selected_object_id == id
+    }
+
+    this.has_selection = function() {
+        return this.selected_object_id != -1
     }
 
     // ---
@@ -234,6 +270,8 @@ function TopicmapViewmodel(topicmap_id, config) {
         }
     }
 
+    // ---
+
     this.set_translation = function(trans_x, trans_y) {
         // update memory
         this.trans_x = trans_x
@@ -243,6 +281,13 @@ function TopicmapViewmodel(topicmap_id, config) {
             dm4c.restc.set_topicmap_translation(topicmap_id, trans_x, trans_y)
         }
     }
+
+    this.translate_by = function(dx, dy) {
+        this.trans_x += dx
+        this.trans_y += dy
+    }
+
+    // ---
 
     this.draw_background = function(ctx) {
         if (this.background_image) {

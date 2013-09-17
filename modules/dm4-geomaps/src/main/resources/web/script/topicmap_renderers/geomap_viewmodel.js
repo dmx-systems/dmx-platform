@@ -1,5 +1,5 @@
 /**
- * A geomap view model that is attached to the database. There are methods for:
+ * A geomap viewmodel that is attached to the database. There are methods for:
  *  - loading a geomap from DB
  *  - manipulating the geomap by e.g. adding/removing topics
  *

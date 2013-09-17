@@ -17,6 +17,21 @@ function TopicmapRenderer() {
     // ---
 
     /**
+     * @return  the loaded topicmap (a viewmodel).
+     */
+    this.load_topicmap = function(topicmap_id, config) {}
+
+    /**
+     * Called from Topicmaps module (display_topicmap() in plugin main class).
+     *
+     * @param   topicmap            the topicmap to display (a viewmodel).
+     * @param   no_history_update   Optional: boolean.
+     */
+    this.display_topicmap = function(topicmap, no_history_update) {}
+
+    // ---
+
+    /**
      * Adds a topic to the canvas. If the topic is already on the canvas it is not added again.
      * Note: the canvas is not refreshed.
      *
@@ -54,7 +69,7 @@ function TopicmapRenderer() {
      *
      * @return  a boolean
      */
-    this.topic_exists = function(topic_id) {}
+    this.is_topic_visible = function(topic_id) {}
 
     /**
      * Clears the model: removes all topics and associations and resets the selection.
@@ -62,8 +77,10 @@ function TopicmapRenderer() {
      * Note: if the underlying view element handles translation relatively (by distance) the renderer must
      * reset the translation. This applies to the HTML5 canvas (default topicmap renderer) but not to an
      * OpenLayers map (geomaps renderer).
+     *
+     * ### TODO: drop this
      */
-    this.clear = function() {}
+    // ### this.clear = function() {}
 
     // === Selection ===
 
@@ -71,6 +88,8 @@ function TopicmapRenderer() {
      * Selects a topic, that is it is rendered as highlighted.
      * If the topic is not present on the canvas nothing is performed. ### FIXDOC (explain): In this case
      * there is still a value returned.
+     *
+     * Called from Webclient module (do_select_topic()).
      *
      * @return  an object with "select" and "display" properties (both values are Topic objects).
      */
@@ -86,6 +105,7 @@ function TopicmapRenderer() {
 
     this.begin_association = function(topic_id, x, y) {}
 
+    // ### TODO: drop this
     this.refresh = function() {}
 
     this.close_context_menu = function() {}

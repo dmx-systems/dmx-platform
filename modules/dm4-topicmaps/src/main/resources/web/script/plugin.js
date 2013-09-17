@@ -4,9 +4,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     var self = this
 
     dm4c.load_script("/de.deepamehta.topicmaps/script/topicmap_viewmodel.js")
-    dm4c.load_script("/de.deepamehta.topicmaps/script/topicmap_renderer_extension.js")
-
-    js.extend(dm4c.topicmap_renderer, TopicmapRendererExtension)
 
     // Model
     var topicmap                    // Selected topicmap (TopicmapViewmodel object)     \ updated together by
@@ -162,13 +159,13 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         }
     })
 
-    dm4c.add_listener("post_select_topic", function(topic) {
+    /* ### dm4c.add_listener("post_select_topic", function(topic) {
         topicmap.set_topic_selection(topic)
-    })
+    }) */
 
-    dm4c.add_listener("post_select_association", function(assoc) {
+    /* ### dm4c.add_listener("post_select_association", function(assoc) {
         topicmap.set_association_selection(assoc)
-    })
+    }) */
 
     dm4c.add_listener("post_reset_selection", function() {
         topicmap.reset_selection()
@@ -184,9 +181,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     /**
      * @param   topic   a Topic object with additional "x" and "y" properties
      */
-    dm4c.add_listener("post_show_topic", function(topic) {
+    /* ### dm4c.add_listener("post_show_topic", function(topic) {
         topicmap.add_topic(topic.id, topic.type_uri, topic.value, topic.x, topic.y)
-    })
+    }) */
 
     /**
      * @param   assoc   a AssociationView object
