@@ -76,7 +76,7 @@ function GeomapViewmodel(topicmap_id, config) {
                 topicmap_id)
             // update memory
             t.update(topic)
-            // Note: no DB update here. A topic update doesn't affect the persisted view.
+            // Note: no DB update here. A topic update doesn't affect the view data.
         }
     }
 

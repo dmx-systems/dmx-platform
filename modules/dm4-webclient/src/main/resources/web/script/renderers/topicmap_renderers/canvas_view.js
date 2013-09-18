@@ -68,6 +68,7 @@ CanvasView = function() {
 
     // ---
 
+    // ### TODO: move to viewmodel
     this.get_associations = function(topic_id) {
         var cas = []
         this.iterate_associations(function(ca) {
@@ -92,6 +93,22 @@ CanvasView = function() {
      */
     this.add_association = function(assoc) {
         add_association(assoc)
+    }
+
+    // ---
+
+    /**
+     * @param   topic   A TopicViewmodel.
+     */
+    this.update_topic = function(topic) {
+        this.get_topic(topic.id).update(topic)
+    }
+
+    /**
+     * @param   assoc   An AssociationViewmodel.
+     */
+    this.update_association = function(assoc) {
+        this.get_association(assoc.id).update(assoc)
     }
 
     // ---
@@ -348,6 +365,11 @@ CanvasView = function() {
             this.y += dy
         }
 
+        // ---
+
+        /**
+         * @param   topic   A TopicViewmodel.
+         */
         this.update = function(topic) {
             init(topic)
         }
@@ -371,7 +393,7 @@ CanvasView = function() {
     /**
      * Properties:
      *  id, type_uri
-     *  role_1, role_2
+     *  topic_id_1, topic_id_2
      *
      * @param   assoc   An AssociationViewmodel.
      */
@@ -387,20 +409,24 @@ CanvasView = function() {
 
         // ---
 
+        // ### needed?
         this.get_topic_1 = function() {
             return self.get_topic(id1())
         }
 
+        // ### needed?
         this.get_topic_2 = function() {
             return self.get_topic(id2())
         }
 
         // ---
 
+        // ### needed?
         this.is_player_topic = function(topic_id) {
             return id1() == topic_id || id2() == topic_id
         }
 
+        // ### needed?
         this.get_other_topic = function(topic_id) {
             if (id1() == topic_id) {
                 return this.get_topic_2()
@@ -413,6 +439,9 @@ CanvasView = function() {
 
         // ---
 
+        /**
+         * @param   assoc   An AssociationViewmodel.
+         */
         this.update = function(assoc) {
             init(assoc)
         }

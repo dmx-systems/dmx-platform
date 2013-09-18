@@ -359,7 +359,7 @@ dm4c = new function() {
      *     - the topic is not selected
      *     - the topic has no gemetry yet
      *
-     * @param   topic           Topic to add (a Topic object).
+     * @param   topic           The topic to show (a Topic object).
      * @param   action          Optional: the action to perform on the topic, 3 possible values:
      *                              "none" - do not select the topic (page panel doesn't change) -- the default.
      *                              "show" - select the topic and show its info in the page panel.
@@ -401,6 +401,9 @@ dm4c = new function() {
         update_page_panel(topic, action)
     }
 
+    /**
+     * @param   assoc   The association to show (an Association object).
+     */
     this.show_association = function(assoc, action) {
         action = action || "none"   // set default
         var do_select = action != "none"

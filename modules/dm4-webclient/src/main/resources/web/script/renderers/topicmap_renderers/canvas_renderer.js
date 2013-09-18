@@ -143,7 +143,7 @@ function CanvasRenderer() {
      * @param   do_select   Optional: if true, the topic is selected.
      */
     this.add_topic = function(topic, do_select) {
-        if (!topicmap.topic_exists(topic.id)) {     // ### FIXME: rethink "exists" semantics
+        if (!topicmap.topic_exists(topic.id)) {     // ### FIXME: rethink "exists" semantics (visibility?)
             init_position()
             // update viewmodel
             var topic_viewmodel = topicmap.add_topic(topic.id, topic.type_uri, topic.value, topic.x, topic.y)
@@ -152,7 +152,8 @@ function CanvasRenderer() {
         }
         //
         if (do_select) {
-            canvas.set_highlight_topic(topic.id)
+            // update viewmodel
+            topicmap.set_topic_selection(topic.id)
         }
         //
         return topic
@@ -161,8 +162,8 @@ function CanvasRenderer() {
             if (topic.x == undefined || topic.y == undefined) {
                 if (grid_positioning) {
                     var pos = grid_positioning.next_position()
-                } else if (canvas.highlight()) {
-                    var pos = find_free_position(canvas.highlight_pos())
+                } else if (topicmap.has_selection()) {
+                    var pos = find_free_position(topicmap.get_selection_pos())
                 } else {
                     var pos = random_position()
                 }
@@ -190,7 +191,8 @@ function CanvasRenderer() {
         }
         //
         if (do_select) {
-            canvas.set_highlight_association(assoc.id)
+            // update viewmodel
+            topicmap.set_association_selection(assoc.id)
         }
     }
 
@@ -198,33 +200,36 @@ function CanvasRenderer() {
 
     /**
      * Updates a topic. If the topic is not on the canvas nothing is performed.
+     *
+     * @param   topic       A Topic object.
      */
     this.update_topic = function(topic, refresh_canvas) {
-        var ct = canvas.get_topic(topic.id)
-        if (!ct) {
-            return
-        }
-        // update model
-        ct.update(topic)
-        // update GUI
-        if (refresh_canvas) {
-            this.refresh()
+        // update viewmodel
+        var topic_viewmodel = topicmap.update_topic(topic)          // ### FIXME: must update *all* topicmaps
+        // update view
+        if (topic_viewmodel) {
+            canvas.update_topic(topic_viewmodel)
+            if (refresh_canvas) {
+                this.refresh()
+            }
         }
     }
 
     /**
      * Updates an association. If the association is not on the canvas nothing is performed.
+     *
+     * @param   assoc       An Association object.
      */
     this.update_association = function(assoc, refresh_canvas) {
-        var ca = canvas.get_association(assoc.id)
-        if (!ca) {
-            return
-        }
+        // update viewmodel
+        var assoc_viewmodel = topicmap.update_association(assoc)    // ### FIXME: must update *all* topicmaps
         // update model
-        ca.update(assoc)
-        // update GUI
-        if (refresh_canvas) {
-            this.refresh()
+        if (assoc_viewmodel) {
+            canvas.update_association(assoc_viewmodel)
+            // update GUI
+            if (refresh_canvas) {
+                this.refresh()
+            }
         }
     }
 
@@ -290,6 +295,7 @@ function CanvasRenderer() {
         var topic = dm4c.fetch_topic(topic_id)
         // 2) update viewmodel
         topicmap.set_topic_selection(topic_id)
+        // ### FIXME: refresh view?
         //
         return {select: topic, display: topic}
     }
@@ -299,6 +305,7 @@ function CanvasRenderer() {
         var assoc = dm4c.fetch_association(assoc_id)
         // 2) update viewmodel
         topicmap.set_association_selection(assoc_id)
+        // ### FIXME: refresh view?
         //
         return assoc
     }
@@ -790,7 +797,9 @@ function CanvasRenderer() {
         canvas.set_context(ctx) // ### TODO: move creation of the <canvas> element to the view (CanvasView)
         //
         bind_event_handlers()
-        // ### draw()
+        if (topicmap) { // ### TODO: refactor
+            draw()
+        }
     }
 
     function translate_by(dx, dy) {

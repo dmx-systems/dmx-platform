@@ -188,9 +188,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     /**
      * @param   assoc   a AssociationView object
      */
-    dm4c.add_listener("post_show_association", function(assoc) {
+    /* ### dm4c.add_listener("post_show_association", function(assoc) {
         topicmap.add_association(assoc.id, assoc.type_uri, assoc.role_1.topic_id, assoc.role_2.topic_id)
-    })
+    }) */
 
     /**
      * @param   topic   a TopicView object
@@ -217,11 +217,11 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * @param   topic   a Topic object
      */
     dm4c.add_listener("post_update_topic", function(topic) {
-        // 1) Update all topicmap models
+        /* ### 1) Update all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Updating topic " + topic.id + " on all topicmaps")
         all_topicmaps(function(topicmap) {
             topicmap.update_topic(topic)
-        })
+        }) */
         // 2) Update the topicmap menu
         if (topic.type_uri == "dm4.topicmaps.topicmap") {
             refresh_topicmap_menu()
@@ -231,12 +231,12 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     /**
      * @param   assoc       an Association object
      */
-    dm4c.add_listener("post_update_association", function(assoc) {
+    /* ### dm4c.add_listener("post_update_association", function(assoc) {
         if (LOG_TOPICMAPS) dm4c.log("Updating association " + assoc.id + " on all topicmaps")
         all_topicmaps(function(topicmap) {
             topicmap.update_association(assoc)
         })
-    })
+    }) */
 
     /**
      * @param   topic   a Topic object

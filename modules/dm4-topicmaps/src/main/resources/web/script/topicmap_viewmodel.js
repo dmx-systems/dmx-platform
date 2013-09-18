@@ -106,6 +106,8 @@ function TopicmapViewmodel(topicmap_id, config) {
             if (is_writable()) {
                 dm4c.restc.add_association_to_topicmap(topicmap_id, id)
             }
+            //
+            return assocs[id]
         } else {
             if (LOG_TOPICMAPS) dm4c.log("Association " + id + " already in topicmap " + topicmap_id)
         }
@@ -152,7 +154,7 @@ function TopicmapViewmodel(topicmap_id, config) {
     // ---
 
     /**
-     * @param   topic   a Topic object
+     * @param   topic   A Topic object.
      */
     this.update_topic = function(topic) {
         var t = topics[topic.id]
@@ -161,12 +163,14 @@ function TopicmapViewmodel(topicmap_id, config) {
                 topicmap_id)
             // update memory
             t.update(topic)
-            // Note: no DB update here. A topic update doesn't affect the persisted view.
+            // Note: no DB update here. A topic update doesn't affect the view data.
+            //
+            return t
         }
     }
 
     /**
-     * @param   assoc   an Association object
+     * @param   assoc   An Association object.
      */
     this.update_association = function(assoc) {
         var a = assocs[assoc.id]
@@ -174,7 +178,9 @@ function TopicmapViewmodel(topicmap_id, config) {
             if (LOG_TOPICMAPS) dm4c.log("..... Updating association " + a.id + " on topicmap " + topicmap_id)
             // update memory
             a.update(assoc)
-            // Note: no DB update here. An association update doesn't affect the persisted view.
+            // Note: no DB update here. An association update doesn't affect the view data.
+            //
+            return a
         }
     }
 
@@ -232,8 +238,31 @@ function TopicmapViewmodel(topicmap_id, config) {
         return this.has_selection() && this.selected_object_id == id
     }
 
+    /**
+     * Returns true if there is a selection.
+     */
     this.has_selection = function() {
         return this.selected_object_id != -1
+    }
+
+    /**
+     * Precondition: there is a selection.
+     *
+     * @return  an object with "x" and "y" properties.
+     */
+    this.get_selection_pos = function() {
+        if (this.is_topic_selected) {
+            var topic = this.get_topic(this.selected_object_id)
+            return {x: topic.x, y: topic.y}
+        } else {
+            var assoc = this.get_association(this.selected_object_id)
+            var topic_1 = assoc.get_topic_1()
+            var topic_2 = assoc.get_topic_2()
+            return {
+                x: (topic_1.x + topic_2.x) / 2,
+                y: (topic_1.y + topic_2.y) / 2
+            }
+        }
     }
 
     // ---
@@ -285,6 +314,7 @@ function TopicmapViewmodel(topicmap_id, config) {
     this.translate_by = function(dx, dy) {
         this.trans_x += dx
         this.trans_y += dy
+        // ### FIXME: persistence?
     }
 
     // ---
@@ -428,6 +458,18 @@ function TopicmapViewmodel(topicmap_id, config) {
         this.type_uri = type_uri
         this.topic_id_1 = topic_id_1
         this.topic_id_2 = topic_id_2
+
+        // ---
+
+        this.get_topic_1 = function() {
+            return self.get_topic(this.topic_id_1)
+        }
+
+        this.get_topic_2 = function() {
+            return self.get_topic(this.topic_id_2)
+        }
+
+        // ---
 
         this.hide = function() {
             delete assocs[id]
