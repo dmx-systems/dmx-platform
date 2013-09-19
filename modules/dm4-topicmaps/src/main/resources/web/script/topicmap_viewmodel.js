@@ -75,13 +75,14 @@ function TopicmapViewmodel(topicmap_id, config) {
         if (!topic) {
             if (LOG_TOPICMAPS) dm4c.log("Adding topic " + id + " (\"" + label + "\") to topicmap " + topicmap_id)
             // update viewmodel
-            topics[id] = new TopicViewmodel(id, type_uri, label, x, y, true)     // visibility=true
+            topic = new TopicViewmodel(id, type_uri, label, x, y, true)     // visibility=true
+            topics[id] = topic
             // update DB
             if (is_writable()) {
                 dm4c.restc.add_topic_to_topicmap(topicmap_id, id, x, y)
             }
             //
-            return topics[id]
+            return topic
         } else if (!topic.visibility) {
             if (LOG_TOPICMAPS)
                 dm4c.log("Showing topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id)
@@ -91,6 +92,8 @@ function TopicmapViewmodel(topicmap_id, config) {
             if (is_writable()) {
                 dm4c.restc.set_topic_visibility(topicmap_id, id, true)
             }
+            //
+            return topic
         } else {
             if (LOG_TOPICMAPS)
                 dm4c.log("Topic " + id + " (\"" + label + "\") already visible in topicmap " + topicmap_id)
@@ -192,7 +195,7 @@ function TopicmapViewmodel(topicmap_id, config) {
             if (LOG_TOPICMAPS) dm4c.log("..... Deleting topic " + id + " (\"" + topic.label + "\") from topicmap " +
                 topicmap_id)
             // update memory
-            topic.remove()
+            topic.delete()
             // Note: no DB update here. The persisted view is already up-to-date (view data is stored in association).
         }
     }
@@ -202,7 +205,7 @@ function TopicmapViewmodel(topicmap_id, config) {
         if (assoc) {
             if (LOG_TOPICMAPS) dm4c.log("..... Deleting association " + id + " from topicmap " + topicmap_id)
             // update memory
-            assoc.remove()
+            assoc.delete()
             // Note: no DB update here. The persisted view is already up-to-date (view data is stored in association).
         }
     }
@@ -421,7 +424,7 @@ function TopicmapViewmodel(topicmap_id, config) {
 
         this.hide = function() {
             this.visibility = false
-            reset_selection()
+            reset_selection_conditionally()
         }
 
         this.move_to = function(x, y) {
@@ -437,15 +440,15 @@ function TopicmapViewmodel(topicmap_id, config) {
             this.label = topic.value
         }
 
-        this.remove = function() {
+        this.delete = function() {
             // Note: all topic references are deleted already
             delete topics[id]
-            reset_selection()
+            reset_selection_conditionally()
         }
 
         // ---
 
-        function reset_selection() {
+        function reset_selection_conditionally() {
             if (self.is_topic_selected && self.selected_object_id == id) {
                 self.selected_object_id = -1
             }
@@ -473,7 +476,7 @@ function TopicmapViewmodel(topicmap_id, config) {
 
         this.hide = function() {
             delete assocs[id]
-            reset_selection()
+            reset_selection_conditionally()
         }
 
         /**
@@ -483,14 +486,14 @@ function TopicmapViewmodel(topicmap_id, config) {
             this.type_uri = assoc.type_uri
         }
 
-        this.remove = function() {
+        this.delete = function() {
             delete assocs[id]
-            reset_selection()
+            reset_selection_conditionally()
         }
 
         // ---
 
-        function reset_selection() {
+        function reset_selection_conditionally() {
             if (!self.is_topic_selected && self.selected_object_id == id) {
                 self.selected_object_id = -1
             }

@@ -54,15 +54,19 @@ function TopicmapRenderer() {
 
     this.update_association = function(assoc, refresh_canvas) {}
 
-    this.remove_topic = function(topic_id, refresh_canvas) {}
+    this.hide_topic = function(topic_id, refresh_canvas) {}
 
     /**
-     * Removes an association from the canvas (model) and optionally refreshes the canvas (view).
+     * Removes an association from the canvas (model) and optionally refreshes the canvas (view). ### FIXDOC
      * If the association is not present on the canvas nothing is performed.
      *
      * @param   refresh_canvas  Optional - if true, the canvas is refreshed.
      */
-    this.remove_association = function(assoc_id, refresh_canvas) {}
+    this.hide_association = function(assoc_id, refresh_canvas) {}
+
+    this.delete_topic = function(topic_id, refresh_canvas) {}
+
+    this.delete_association = function(assoc_id, refresh_canvas) {}
 
     /**
      * Checks if a topic is visible on the canvas.

@@ -189,11 +189,11 @@ dm4c = new function() {
     this.do_hide_topic = function(topic) {
         var assocs = dm4c.topicmap_renderer.get_associations(topic.id)
         for (var i = 0; i < assocs.length; i++) {
-            dm4c.topicmap_renderer.remove_association(assocs[i].id, false)     // refresh_canvas=false
-            dm4c.fire_event("post_hide_association", assocs[i])     // fire event
+            dm4c.topicmap_renderer.hide_association(assocs[i].id, false)    // refresh_canvas=false
+            dm4c.fire_event("post_hide_association", assocs[i])
         }
         //
-        remove_topic(topic, "post_hide_topic")
+        hide_topic(topic)
     }
 
     /**
@@ -201,7 +201,7 @@ dm4c = new function() {
      * Fires the "post_hide_association" event.
      */
     this.do_hide_association = function(assoc) {
-        remove_association(assoc, "post_hide_association")
+        hide_association(assoc)
     }
 
     // ---
@@ -459,13 +459,13 @@ dm4c = new function() {
                 update_topic(build_topic(directive.arg))
                 break
             case "DELETE_TOPIC":
-                remove_topic(build_topic(directive.arg), "post_delete_topic")
+                delete_topic(build_topic(directive.arg))
                 break
             case "UPDATE_ASSOCIATION":
                 update_association(build_association(directive.arg), stay_in_edit_mode)
                 break
             case "DELETE_ASSOCIATION":
-                remove_association(build_association(directive.arg), "post_delete_association")
+                delete_association(build_association(directive.arg))
                 break
             case "UPDATE_TOPIC_TYPE":
                 update_topic_type(build_topic_type(directive.arg))
@@ -557,34 +557,64 @@ dm4c = new function() {
     // ---
 
     /**
-     * Removes an topic from the view (canvas and page panel).
-     * Fires the "post_hide_topic" or "post_delete_topic" event.
-     *
-     * Processes a DELETE_TOPIC directive.
+     * Removes an topic from the view (canvas and page panel). ### FIXDOC
+     * Fires the "post_hide_topic" event.
      */
-    function remove_topic(topic, event_name) {
+    function hide_topic(topic) {
         // update view (canvas)
-        dm4c.topicmap_renderer.remove_topic(topic.id, true)            // refresh_canvas=true
+        dm4c.topicmap_renderer.hide_topic(topic.id, true)           // refresh_canvas=true
         // update client model and view
         reset_selection_conditionally(topic.id)
         // fire event
-        dm4c.fire_event(event_name, topic)
+        dm4c.fire_event("post_hide_topic", topic)
     }
 
     /**
-     * Removes an association from the view (canvas and page panel).
-     * Fires "post_hide_association" or "post_delete_association" the event.
-     *
-     * Processes a DELETE_ASSOCIATION directive.
+     * Removes an association from the view (canvas and page panel). ### FIXDOC
+     * Fires the "post_hide_association" event.
      */
-    function remove_association(assoc, event_name) {
+    function hide_association(assoc) {
         // update view (canvas)
-        dm4c.topicmap_renderer.remove_association(assoc.id, true)      // refresh_canvas=true
+        dm4c.topicmap_renderer.hide_association(assoc.id, true)     // refresh_canvas=true
         // update client model and view
         reset_selection_conditionally(assoc.id)
         // fire event
-        dm4c.fire_event(event_name, assoc)
+        dm4c.fire_event("post_hide_association", assoc)
     }
+
+    // ---
+
+    /**
+     * Removes an topic from the view (canvas and page panel). ### FIXDOC
+     * Fires the "post_delete_topic" event.
+     *
+     * Processes a DELETE_TOPIC directive.
+     */
+    function delete_topic(topic) {
+        // update view (canvas)
+        dm4c.topicmap_renderer.delete_topic(topic.id, true)         // refresh_canvas=true
+        // update client model and view
+        reset_selection_conditionally(topic.id)
+        // fire event
+        dm4c.fire_event("post_delete_topic", topic)
+    }
+
+    /**
+     * Removes an association from the view (canvas and page panel). ### FIXDOC
+     * Fires the "post_delete_association" event.
+     *
+     * Processes a DELETE_ASSOCIATION directive.
+     */
+    function delete_association(assoc) {
+        // update view (canvas)
+        dm4c.topicmap_renderer.delete_association(assoc.id, true)   // refresh_canvas=true
+        // update client model and view
+        reset_selection_conditionally(assoc.id)
+        // fire event
+        dm4c.fire_event("post_delete_association", assoc)
+    }
+
+    // ---
 
     /**
      * Processes a DELETE_TOPIC_TYPE directive.

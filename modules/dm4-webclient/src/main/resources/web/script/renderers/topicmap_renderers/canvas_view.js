@@ -114,15 +114,15 @@ CanvasView = function() {
     // ---
 
     this.remove_topic = function(id) {
-        var ct = this.get_topic(id)
+        // ### var ct = this.get_topic(id)
         delete canvas_topics[id]
-        return ct
+        // ### return ct
     }
 
     this.remove_association = function(id) {
-        var ca = this.get_association(id)
+        // ### var ca = this.get_association(id)
         delete canvas_assocs[id]
-        return ca
+        // ### return ca
     }
 
     // ---

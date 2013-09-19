@@ -143,11 +143,11 @@ function CanvasRenderer() {
      * @param   do_select   Optional: if true, the topic is selected.
      */
     this.add_topic = function(topic, do_select) {
-        if (!topicmap.topic_exists(topic.id)) {     // ### FIXME: rethink "exists" semantics (visibility?)
-            init_position()
-            // update viewmodel
-            var topic_viewmodel = topicmap.add_topic(topic.id, topic.type_uri, topic.value, topic.x, topic.y)
-            // update view
+        init_position()
+        // update viewmodel
+        var topic_viewmodel = topicmap.add_topic(topic.id, topic.type_uri, topic.value, topic.x, topic.y)
+        // update view
+        if (topic_viewmodel) {
             canvas.add_topic(topic_viewmodel)
         }
         //
@@ -199,7 +199,7 @@ function CanvasRenderer() {
     // ---
 
     /**
-     * Updates a topic. If the topic is not on the canvas nothing is performed.
+     * Updates a topic. If the topic is not on the canvas nothing is performed. ### FIXDOC
      *
      * @param   topic       A Topic object.
      */
@@ -216,17 +216,16 @@ function CanvasRenderer() {
     }
 
     /**
-     * Updates an association. If the association is not on the canvas nothing is performed.
+     * Updates an association. If the association is not on the canvas nothing is performed. ### FIXDOC
      *
      * @param   assoc       An Association object.
      */
     this.update_association = function(assoc, refresh_canvas) {
         // update viewmodel
         var assoc_viewmodel = topicmap.update_association(assoc)    // ### FIXME: must update *all* topicmaps
-        // update model
+        // update view
         if (assoc_viewmodel) {
             canvas.update_association(assoc_viewmodel)
-            // update GUI
             if (refresh_canvas) {
                 this.refresh()
             }
@@ -236,38 +235,54 @@ function CanvasRenderer() {
     // ---
 
     /**
-     * Removes a topic from the canvas (model) and optionally refreshes the canvas (view).
+     * Removes a topic from the canvas (model) and optionally refreshes the canvas (view). ### FIXDOC
      * If the topic is not present on the canvas nothing is performed.
      *
      * @param   refresh_canvas  Optional - if true, the canvas is refreshed.
      */
-    this.remove_topic = function(id, refresh_canvas) {
-        // 1) update model
-        var ct = canvas.remove_topic(id)
-        if (!ct) {
-            return
-        }
-        canvas.reset_highlight_conditionally(id)
-        // 2) update GUI
+    this.hide_topic = function(id, refresh_canvas) {
+        // update viewmodel
+        topicmap.hide_topic(id)
+        // update view
+        canvas.remove_topic(id)
         if (refresh_canvas) {
             this.refresh()
         }
     }
 
     /**
-     * Removes an association from the canvas (model) and optionally refreshes the canvas (view).
+     * Removes an association from the canvas (model) and optionally refreshes the canvas (view). ### FIXDOC
      * If the association is not present on the canvas nothing is performed.
      *
      * @param   refresh_canvas  Optional - if true, the canvas is refreshed.
      */
-    this.remove_association = function(id, refresh_canvas) {
-        // 1) update model
-        var ca = canvas.remove_association(id)
-        if (!ca) {
-            return
+    this.hide_association = function(id, refresh_canvas) {
+        // update viewmodel
+        topicmap.hide_association(id)
+        // update view
+        canvas.remove_association(id)
+        if (refresh_canvas) {
+            this.refresh()
         }
-        canvas.reset_highlight_conditionally(id)
-        // 2) update GUI
+    }
+
+    // ---
+
+    this.delete_topic = function(id, refresh_canvas) {
+        // update viewmodel
+        topicmap.delete_topic(id)           // ### FIXME: must update *all* topicmaps
+        // update view
+        canvas.remove_topic(id)
+        if (refresh_canvas) {
+            this.refresh()
+        }
+    }
+
+    this.delete_association = function(id, refresh_canvas) {
+        // update viewmodel
+        topicmap.delete_association(id)     // ### FIXME: must update *all* topicmaps
+        // update view
+        canvas.remove_association(id)
         if (refresh_canvas) {
             this.refresh()
         }
@@ -630,6 +645,10 @@ function CanvasRenderer() {
     // ---
 
     function end_topic_move() {
+        // update viewmodel
+        topicmap.move_topic(action_topic.id, action_topic.x, action_topic.y)
+        // Note: the view is already up-to-date. It is constantly updated while mouse dragging.
+        //
         // fire event
         dm4c.fire_event("post_move_topic", action_topic)
         //

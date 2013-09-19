@@ -195,23 +195,23 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     /**
      * @param   topic   a TopicView object
      */
-    dm4c.add_listener("post_hide_topic", function(topic) {
+    /* ### dm4c.add_listener("post_hide_topic", function(topic) {
         topicmap.hide_topic(topic.id)
-    })
+    }) */
 
     /**
      * @param   assoc   a AssociationView object
      */
-    dm4c.add_listener("post_hide_association", function(assoc) {
+    /* ### dm4c.add_listener("post_hide_association", function(assoc) {
         topicmap.hide_association(assoc.id)
-    })
+    }) */
 
     /**
      * @param   topic   a TopicView object
      */
-    dm4c.add_listener("post_move_topic", function(topic) {
+    /* ### dm4c.add_listener("post_move_topic", function(topic) {
         topicmap.move_topic(topic.id, topic.x, topic.y)
-    })
+    }) */
 
     /**
      * @param   topic   a Topic object
@@ -242,11 +242,11 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * @param   topic   a Topic object
      */
     dm4c.add_listener("post_delete_topic", function(topic) {
-        // 1) Update all topicmap models
+        /* ### 1) Update all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Deleting topic " + topic.id + " from all topicmaps")
         all_topicmaps(function(topicmap) {
             topicmap.delete_topic(topic.id)
-        })
+        }) */
         // 2) Update the topicmap menu
         if (topic.type_uri == "dm4.topicmaps.topicmap") {
             // remove topicmap model
@@ -270,13 +270,13 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         }
     })
 
-    dm4c.add_listener("post_delete_association", function(assoc) {
+    /* ### dm4c.add_listener("post_delete_association", function(assoc) {
         // Remove association from all topicmap models
         if (LOG_TOPICMAPS) dm4c.log("Deleting association " + assoc.id + " from all topicmaps")
         all_topicmaps(function(topicmap) {
             topicmap.delete_association(assoc.id)
         })
-    })
+    }) */
 
     dm4c.add_listener("pre_push_history", function(history_entry) {
         history_entry.state.topicmap_id = topicmap.get_id()
