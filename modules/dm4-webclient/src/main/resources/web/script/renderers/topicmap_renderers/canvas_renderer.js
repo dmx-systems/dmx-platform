@@ -88,34 +88,8 @@ function CanvasRenderer() {
 
         function display_topicmap() {
 
-            // ### dm4c.topicmap_renderer.clear()
-            // ### dm4c.topicmap_renderer.translate_by(topicmap.trans_x, topicmap.trans_y)
-            // ### display_topics()
-            // ### display_associations()
             canvas.set_topicmap(topicmap)
             restore_selection()     // includes canvas refreshing
-
-            function display_topics() {
-                topicmap.iterate_topics(function(topic) {
-                    if (topic.visibility) {
-                        // Note: topicmap_renderer.add_topic() expects a topic with "value" property (not "label")
-                        var t = {id: topic.id, type_uri: topic.type_uri, value: topic.label, x: topic.x, y: topic.y}
-                        dm4c.topicmap_renderer.add_topic(t)
-                    }
-                })
-            }
-
-            function display_associations() {
-                topicmap.iterate_associations(function(assoc) {
-                    var a = {
-                        id: assoc.id,
-                        type_uri: assoc.type_uri,
-                        role_1: {topic_id: assoc.topic_id_1},
-                        role_2: {topic_id: assoc.topic_id_2}
-                    }
-                    dm4c.topicmap_renderer.add_association(a)
-                })
-            }
 
             function restore_selection() {
                 var id = topicmap.selected_object_id
@@ -143,7 +117,7 @@ function CanvasRenderer() {
      * @param   do_select   Optional: if true, the topic is selected.
      */
     this.add_topic = function(topic, do_select) {
-        init_position()
+        init_topic_position(topic)
         // update viewmodel
         var topic_viewmodel = topicmap.add_topic(topic.id, topic.type_uri, topic.value, topic.x, topic.y)
         // update view
@@ -157,29 +131,6 @@ function CanvasRenderer() {
         }
         //
         return topic
-
-        function init_position() {
-            // restores topic position if topic is already contained in this topicmap but hidden
-            var t = topicmap.get_topic(topic.id)
-            if (t && !t.visibility) {
-                topic.x = t.x
-                topic.y = t.y
-            }
-            //
-            if (topic.x == undefined || topic.y == undefined) {
-                if (grid_positioning) {
-                    var pos = grid_positioning.next_position()
-                } else if (topicmap.has_selection()) {
-                    var pos = find_free_position(topicmap.get_selection_pos())
-                } else {
-                    var pos = random_position()
-                }
-                topic.x = pos.x
-                topic.y = pos.y
-            }
-            topic.x = Math.floor(topic.x)
-            topic.y = Math.floor(topic.y)
-        }
     }
 
     /**
@@ -189,11 +140,11 @@ function CanvasRenderer() {
      * @param   do_select   Optional: if true, the association is selected.
      */
     this.add_association = function(assoc, do_select) {
-        if (!topicmap.association_exists(assoc.id)) {
-            // update viewmodel
-            var assoc_viewmodel = topicmap.add_association(assoc.id, assoc.type_uri, assoc.role_1.topic_id,
-                                                                                     assoc.role_2.topic_id)
-            // update view
+        // update viewmodel
+        var assoc_viewmodel = topicmap.add_association(assoc.id, assoc.type_uri, assoc.role_1.topic_id,
+                                                                                 assoc.role_2.topic_id)
+        // update view
+        if (assoc_viewmodel) {
             canvas.add_association(assoc_viewmodel)
         }
         //
@@ -302,14 +253,6 @@ function CanvasRenderer() {
         return topic && topic.visibility
     }
 
-    /* ### this.clear = function() {
-        // Must reset canvas translation.
-        // See TopicmapRenderer contract.
-        translate_by(-canvas.trans_x, -canvas.trans_y)
-        //
-        canvas.clear()
-    } */
-
     // ---
 
     this.select_topic = function(topic_id) {
@@ -391,11 +334,6 @@ function CanvasRenderer() {
 
 
     // === End of interface implementations ===
-
-    // Called from Topicmap Renderer Extension (Topicmaps plugin).
-    /* ### this.translate_by = function(dx, dy) {
-        translate_by(dx, dy)
-    } */
 
     this.get_associations = function(topic_id) {
         return canvas.get_associations(topic_id)
@@ -927,6 +865,29 @@ function CanvasRenderer() {
                 y: event.originalEvent.layerY - topicmap.trans_y
             }
         }
+    }
+
+    function init_topic_position(topic) {
+        // restores topic position if topic is already contained in this topicmap but hidden
+        var t = topicmap.get_topic(topic.id)
+        if (t && !t.visibility) {
+            topic.x = t.x
+            topic.y = t.y
+        }
+        //
+        if (topic.x == undefined || topic.y == undefined) {
+            if (grid_positioning) {
+                var pos = grid_positioning.next_position()
+            } else if (topicmap.has_selection()) {
+                var pos = find_free_position(topicmap.get_selection_pos())
+            } else {
+                var pos = random_position()
+            }
+            topic.x = pos.x
+            topic.y = pos.y
+        }
+        topic.x = Math.floor(topic.x)
+        topic.y = Math.floor(topic.y)
     }
 
     /**

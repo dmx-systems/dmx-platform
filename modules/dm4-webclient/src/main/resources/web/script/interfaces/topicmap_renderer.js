@@ -75,17 +75,6 @@ function TopicmapRenderer() {
      */
     this.is_topic_visible = function(topic_id) {}
 
-    /**
-     * Clears the model: removes all topics and associations and resets the selection.
-     *
-     * Note: if the underlying view element handles translation relatively (by distance) the renderer must
-     * reset the translation. This applies to the HTML5 canvas (default topicmap renderer) but not to an
-     * OpenLayers map (geomaps renderer).
-     *
-     * ### TODO: drop this
-     */
-    // ### this.clear = function() {}
-
     // === Selection ===
 
     /**

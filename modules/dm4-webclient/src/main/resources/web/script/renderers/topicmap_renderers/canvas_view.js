@@ -1,15 +1,10 @@
 /**
- * Default topicmap viewmodel: the data needed to render a topicmap. ### FIXDOC
- * 
- * Note: the default topicmap viewmodel is renderer technology agnostic.
- * It is shared by e.g. the HTML5 Canvas based default renderer and the SVG based 3rd-party renderer. ### FIXDOC
+ * HTML5 Canvas based topicmap view.
  *
  * ### TODO: refactoring.
- * ### This is not actually a viewmodel but the render technology-specific view, namely the HTML5 Canvas view.
  * ### All Canvas specific code (create, drawing, event handling, resize) should be move here (from CanvasRenderer).
  * ### The geometry management (find_topic() ...) and selection model (highlighting) on the other hand should
  * ### be moved to the viewmodel class, namely TopicmapViewmodel.
- * ### Note: the dm4-topicmaps module is no longer an optional install then. It is a Webclient dependency.
  */
 CanvasView = function() {
 
@@ -19,12 +14,6 @@ CanvasView = function() {
 
     // Viewmodel
     var topicmap                // the viewmodel underlying this view (a TopicmapViewmodel)
-
-    // ### var highlight_mode = "none" // "none", "topic", "assoc"
-    // ### var highlight_id            // ID of the highlighted topic/association. Ignored if highlight mode is "none".
-
-    // ### this.trans_x = 0            // canvas translation (in pixel)
-    // ### this.trans_y = 0            // canvas translation (in pixel)
 
     var self = this
     var ctx                     // the 2D context
@@ -114,26 +103,12 @@ CanvasView = function() {
     // ---
 
     this.remove_topic = function(id) {
-        // ### var ct = this.get_topic(id)
         delete canvas_topics[id]
-        // ### return ct
     }
 
     this.remove_association = function(id) {
-        // ### var ca = this.get_association(id)
         delete canvas_assocs[id]
-        // ### return ca
     }
-
-    // ---
-
-    /* ### this.topic_exists = function(id) {
-        return this.get_topic(id) != undefined
-    }
-
-    this.association_exists = function(id) {
-        return this.get_association(id) != undefined
-    } */
 
     // ---
 
@@ -214,79 +189,7 @@ CanvasView = function() {
     function clear() {
         canvas_topics = {}
         canvas_assocs = {}
-        // ### this.reset_highlight()
     }
-
-
-
-    // === Highlighting ===
-
-    /* ### this.set_highlight_topic = function(topic_id) {
-        highlight_mode = "topic"
-        highlight_id = topic_id
-    }
-
-    this.set_highlight_association = function(assoc_id) {
-        highlight_mode = "assoc"
-        highlight_id = assoc_id
-    }
-
-    // ---
-
-    this.reset_highlight = function() {
-        highlight_mode = "none"
-    }
-
-    this.reset_highlight_conditionally = function(id) {
-        if (this.has_highlight(id)) {
-            this.reset_highlight()
-        }
-    }
-
-    // ---
-
-    this.has_highlight = function(id) {
-        return this.highlight() && highlight_id == id
-    } */
-
-    /**
-     * Returns true if there is a highlight.
-     */
-    /* this.highlight = function() {
-        return highlight_mode != "none"
-    } */
-
-    // ---
-
-    /**
-     * Precondition: there is a highlight.
-     *
-     * @return  an object with "x" and "y" properties.
-     */
-    /* this.highlight_pos = function() {
-        switch (highlight_mode) {
-        case "topic":
-            var ct = get_highlight_topic()
-            return {x: ct.x, y: ct.y}
-        case "assoc":
-            var ca = get_highlight_association()
-            var ct1 = ca.get_topic_1()
-            var ct2 = ca.get_topic_2()
-            return {
-                x: (ct1.x + ct2.x) / 2,
-                y: (ct1.y + ct2.y) / 2
-            }
-        }
-    } */
-
-
-
-    // === Translation ===
-
-    /* this.translate_by = function(dx, dy) {
-        this.trans_x += dx
-        this.trans_y += dy
-    } */
 
 
 
@@ -313,22 +216,6 @@ CanvasView = function() {
     function add_association(assoc) {
         canvas_assocs[assoc.id] = new AssociationView(assoc)
     }
-
-    // ---
-
-    /**
-     * Precondition: a topic is highlighted.
-     */
-    /* ### function get_highlight_topic() {
-        return self.get_topic(highlight_id)
-    } */
-
-    /**
-     * Precondition: an association is highlighted.
-     */
-    /* ### function get_highlight_association() {
-        return self.get_association(highlight_id)
-    } */
 
 
 

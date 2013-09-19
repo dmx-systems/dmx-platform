@@ -50,16 +50,6 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     // ---
 
-    this.topic_exists = function(id) {
-        return this.get_topic(id) != undefined
-    }
-
-    this.association_exists = function(id) {
-        return this.get_association(id) != undefined
-    }
-
-    // ---
-
     this.iterate_topics = function(visitor_func) {
         iterate_topics(visitor_func)
     }
@@ -269,15 +259,6 @@ function TopicmapViewmodel(topicmap_id, config) {
     }
 
     // ---
-
-    /* ### this.prepare_topic_for_display = function(topic) {
-        // restores topic position if topic is already contained in this topicmap but hidden
-        var t = this.get_topic(topic.id)
-        if (t && !t.visibility) {
-            topic.x = t.x
-            topic.y = t.y
-        }
-    } */
 
     this.move_cluster = function(cluster) {
         // update memory
