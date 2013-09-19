@@ -167,16 +167,16 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         topicmap.set_association_selection(assoc)
     }) */
 
-    dm4c.add_listener("post_reset_selection", function() {
+    /* ### dm4c.add_listener("post_reset_selection", function() {
         topicmap.reset_selection()
-    })
+    }) */
 
     /**
      * @param   topic   a Topic object
      */
-    dm4c.add_listener("pre_show_topic", function(topic) {
+    /* ### dm4c.add_listener("pre_show_topic", function(topic) {
         topicmap.prepare_topic_for_display(topic)
-    })
+    }) */
 
     /**
      * @param   topic   a Topic object with additional "x" and "y" properties
@@ -298,13 +298,13 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         }
     })
 
-    dm4c.add_listener("post_move_cluster", function(cluster) {
+    /* ### dm4c.add_listener("post_move_cluster", function(cluster) {
         topicmap.move_cluster(cluster)
-    })
+    }) */
 
-    dm4c.add_listener("post_move_canvas", function(trans_x, trans_y) {
+    /* ### dm4c.add_listener("post_move_canvas", function(trans_x, trans_y) {
         topicmap.set_translation(trans_x, trans_y)
-    })
+    }) */
 
     dm4c.add_listener("pre_draw_canvas", function(ctx) {
         // Note: topicmap is undefined if canvas draw() is performed
@@ -341,6 +341,12 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     this.get_topicmap = function() {
         return topicmap
+    }
+
+    this.iterate_topicmaps = function(visitor_func) {
+        for (var topicmap_id in topicmap_cache) {
+            visitor_func(topicmap_cache[topicmap_id])
+        }
     }
 
 
@@ -528,12 +534,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
 
     // === Topicmap Cache ===
-
-    function all_topicmaps(visitor_func) {
-        for (var topicmap_id in topicmap_cache) {
-            visitor_func(topicmap_cache[topicmap_id])
-        }
-    }
 
     function clear_topicmap_cache() {
         topicmap_cache = {}

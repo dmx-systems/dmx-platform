@@ -42,12 +42,12 @@ CanvasView = function() {
         ctx.translate(topicmap.trans_x, topicmap.trans_y)
         // update view
         clear()
-        topicmap_viewmodel.iterate_topics(function(topic) {
+        topicmap.iterate_topics(function(topic) {
             if (topic.visibility) {
                 add_topic(topic)
             }
         })
-        topicmap_viewmodel.iterate_associations(function(assoc) {
+        topicmap.iterate_associations(function(assoc) {
             add_association(assoc)
         })
     }

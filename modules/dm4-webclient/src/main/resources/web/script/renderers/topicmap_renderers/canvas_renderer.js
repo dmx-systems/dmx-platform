@@ -159,6 +159,13 @@ function CanvasRenderer() {
         return topic
 
         function init_position() {
+            // restores topic position if topic is already contained in this topicmap but hidden
+            var t = topicmap.get_topic(topic.id)
+            if (t && !t.visibility) {
+                topic.x = t.x
+                topic.y = t.y
+            }
+            //
             if (topic.x == undefined || topic.y == undefined) {
                 if (grid_positioning) {
                     var pos = grid_positioning.next_position()
@@ -205,7 +212,7 @@ function CanvasRenderer() {
      */
     this.update_topic = function(topic, refresh_canvas) {
         // update viewmodel
-        var topic_viewmodel = topicmap.update_topic(topic)          // ### FIXME: must update *all* topicmaps
+        var topic_viewmodel = for_all_topicmaps("update_topic", topic)
         // update view
         if (topic_viewmodel) {
             canvas.update_topic(topic_viewmodel)
@@ -222,7 +229,7 @@ function CanvasRenderer() {
      */
     this.update_association = function(assoc, refresh_canvas) {
         // update viewmodel
-        var assoc_viewmodel = topicmap.update_association(assoc)    // ### FIXME: must update *all* topicmaps
+        var assoc_viewmodel = for_all_topicmaps("update_association", assoc)
         // update view
         if (assoc_viewmodel) {
             canvas.update_association(assoc_viewmodel)
@@ -270,7 +277,7 @@ function CanvasRenderer() {
 
     this.delete_topic = function(id, refresh_canvas) {
         // update viewmodel
-        topicmap.delete_topic(id)           // ### FIXME: must update *all* topicmaps
+        for_all_topicmaps("delete_topic", id)
         // update view
         canvas.remove_topic(id)
         if (refresh_canvas) {
@@ -280,7 +287,7 @@ function CanvasRenderer() {
 
     this.delete_association = function(id, refresh_canvas) {
         // update viewmodel
-        topicmap.delete_association(id)     // ### FIXME: must update *all* topicmaps
+        for_all_topicmaps("delete_association", id)
         // update view
         canvas.remove_association(id)
         if (refresh_canvas) {
@@ -306,9 +313,9 @@ function CanvasRenderer() {
     // ---
 
     this.select_topic = function(topic_id) {
-        // 1) fetch from DB
+        // fetch from DB
         var topic = dm4c.fetch_topic(topic_id)
-        // 2) update viewmodel
+        // update viewmodel
         topicmap.set_topic_selection(topic_id)
         // ### FIXME: refresh view?
         //
@@ -316,9 +323,9 @@ function CanvasRenderer() {
     }
 
     this.select_association = function(assoc_id) {
-        // 1) fetch from DB
+        // fetch from DB
         var assoc = dm4c.fetch_association(assoc_id)
-        // 2) update viewmodel
+        // update viewmodel
         topicmap.set_association_selection(assoc_id)
         // ### FIXME: refresh view?
         //
@@ -326,9 +333,9 @@ function CanvasRenderer() {
     }
 
     this.reset_selection = function(refresh_canvas) {
-        // update model
+        // update viewmodel
         topicmap.reset_selection()
-        // update GUI
+        // update view
         if (refresh_canvas) {
             this.refresh()
         }
@@ -395,6 +402,23 @@ function CanvasRenderer() {
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
+
+
+
+    /**
+     * Iterates through all topicmaps and calls the given function with the given argument on them.
+     * Returns the function call's return value for the topicmap that is currently displayed.
+     */
+    function for_all_topicmaps(topicmap_func, arg) {
+        var return_value
+        dm4c.get_plugin("de.deepamehta.topicmaps").iterate_topicmaps(function(_topicmap) {
+            var ret = _topicmap[topicmap_func](arg)
+            if (topicmap.get_id() == _topicmap.get_id()) {
+                return_value = ret
+            }
+        })
+        return return_value
+    }
 
 
 
@@ -657,6 +681,10 @@ function CanvasRenderer() {
     }
 
     function end_cluster_move() {
+        // update viewmodel
+        topicmap.move_cluster(cluster)
+        // Note: the view is already up-to-date. It is constantly updated while mouse dragging.
+        //
         // fire event
         dm4c.fire_event("post_move_cluster", cluster)
         //
@@ -666,6 +694,10 @@ function CanvasRenderer() {
     }
 
     function end_canvas_move() {
+        // update viewmodel
+        topicmap.set_translation(topicmap.trans_x, topicmap.trans_y)
+        // Note: the view is already up-to-date. It is constantly updated while mouse dragging.
+        //
         // fire event
         dm4c.fire_event("post_move_canvas", topicmap.trans_x, topicmap.trans_y)
         //
@@ -823,7 +855,7 @@ function CanvasRenderer() {
 
     function translate_by(dx, dy) {
         // update viewmodel
-        topicmap.translate_by(dx, dy)
+        topicmap.translate_by(dx, dy)   // Note: topicmap.translate_by() doesn't update the DB.
         // update view
         ctx.translate(dx, dy)
     }

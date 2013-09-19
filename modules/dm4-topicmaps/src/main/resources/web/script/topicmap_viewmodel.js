@@ -270,14 +270,14 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     // ---
 
-    this.prepare_topic_for_display = function(topic) {
+    /* ### this.prepare_topic_for_display = function(topic) {
         // restores topic position if topic is already contained in this topicmap but hidden
         var t = this.get_topic(topic.id)
         if (t && !t.visibility) {
             topic.x = t.x
             topic.y = t.y
         }
-    }
+    } */
 
     this.move_cluster = function(cluster) {
         // update memory
@@ -317,7 +317,8 @@ function TopicmapViewmodel(topicmap_id, config) {
     this.translate_by = function(dx, dy) {
         this.trans_x += dx
         this.trans_y += dy
-        // ### FIXME: persistence?
+        // Note: the DB is not updated here.
+        // This method is called repeatedly while moving the canvas.
     }
 
     // ---
