@@ -77,7 +77,7 @@ function TopicmapViewmodel(topicmap_id, config) {
             if (LOG_TOPICMAPS)
                 dm4c.log("Showing topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id)
             // update memory
-            topic.show()
+            topic.set_visibility(true)
             // update DB
             if (is_writable()) {
                 dm4c.restc.set_topic_visibility(topicmap_id, id, true)
@@ -108,15 +108,15 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     // ---
 
-    this.move_topic = function(id, x, y) {
+    this.set_topic_position = function(id, x, y) {
         var topic = topics[id]
         if (LOG_TOPICMAPS) dm4c.log("Moving topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id
             + " to x=" + x + ", y=" + y)
         // update memory
-        topic.move_to(x, y)
+        topic.set_position(x, y)
         // update DB
         if (is_writable()) {
-            dm4c.restc.move_topic(topicmap_id, id, x, y)
+            dm4c.restc.set_topic_position(topicmap_id, id, x, y)
         }
     }
 
@@ -126,7 +126,7 @@ function TopicmapViewmodel(topicmap_id, config) {
         var topic = topics[id]
         if (LOG_TOPICMAPS) dm4c.log("Hiding topic " + id + " (\"" + topic.label + "\") from topicmap " + topicmap_id)
         // update memory
-        topic.hide()
+        topic.set_visibility(false)
         // update DB
         if (is_writable()) {
             dm4c.restc.set_topic_visibility(topicmap_id, id, false)
@@ -137,7 +137,7 @@ function TopicmapViewmodel(topicmap_id, config) {
         var assoc = assocs[id]
         if (LOG_TOPICMAPS) dm4c.log("Hiding association " + id + " from topicmap " + topicmap_id)
         // update memory
-        assoc.hide()
+        assoc.delete()  // Note: a hidden association is removed from the viewmodel, just like a deleted association
         // update DB
         if (is_writable()) {
             dm4c.restc.remove_association_from_topicmap(topicmap_id, id)
@@ -260,31 +260,6 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     // ---
 
-    this.move_cluster = function(cluster) {
-        // update memory
-        cluster.iterate_topics(function(ct) {
-            topics[ct.id].move_to(ct.x, ct.y)
-        })
-        // update DB
-        if (is_writable()) {
-            dm4c.restc.move_cluster(topicmap_id, cluster_coords())
-        }
-
-        function cluster_coords() {
-            var coord = []
-            cluster.iterate_topics(function(ct) {
-                coord.push({
-                    topic_id: ct.id,
-                    x: ct.x,
-                    y: ct.y
-                })
-            })
-            return coord
-        }
-    }
-
-    // ---
-
     this.set_translation = function(trans_x, trans_y) {
         // update memory
         this.trans_x = trans_x
@@ -300,6 +275,47 @@ function TopicmapViewmodel(topicmap_id, config) {
         this.trans_y += dy
         // Note: the DB is not updated here.
         // This method is called repeatedly while moving the canvas.
+    }
+
+    // ---
+
+    this.get_topic_associations = function(topic_id) {
+        var cas = []
+        iterate_associations(function(ca) {
+            if (ca.is_player_topic(topic_id)) {
+                cas.push(ca)
+            }
+        })
+        return cas
+    }
+
+    // ---
+
+    this.create_cluster = function(ca) {
+        return new ClusterViewmodel(ca)
+    }
+
+    this.set_cluster_position = function(cluster) {
+        // update memory
+        cluster.iterate_topics(function(ct) {
+            self.get_topic(ct.id).set_position(ct.x, ct.y)
+        })
+        // update DB
+        if (is_writable()) {
+            dm4c.restc.set_cluster_position(topicmap_id, cluster_coords())
+        }
+
+        function cluster_coords() {
+            var coord = []
+            cluster.iterate_topics(function(ct) {
+                coord.push({
+                    topic_id: ct.id,
+                    x: ct.x,
+                    y: ct.y
+                })
+            })
+            return coord
+        }
     }
 
     // ---
@@ -395,21 +411,20 @@ function TopicmapViewmodel(topicmap_id, config) {
 
         this.id = id
         this.type_uri = type_uri
-        this.label = label      // ### FIXME: rename to "value"
+        this.label = label
         this.x = x
         this.y = y
         this.visibility = visibility
 
-        this.show = function() {
-            this.visibility = true
+        this.set_visibility = function(visibility) {
+            this.visibility = visibility
+            //
+            if (!visibility) {
+                reset_selection_conditionally()
+            }
         }
 
-        this.hide = function() {
-            this.visibility = false
-            reset_selection_conditionally()
-        }
-
-        this.move_to = function(x, y) {
+        this.set_position = function(x, y) {
             this.x = x
             this.y = y
         }
@@ -456,10 +471,21 @@ function TopicmapViewmodel(topicmap_id, config) {
 
         // ---
 
-        this.hide = function() {
-            delete assocs[id]
-            reset_selection_conditionally()
+        this.is_player_topic = function(topic_id) {
+            return topic_id == this.topic_id_1 || topic_id == this.topic_id_2
         }
+
+        this.get_other_topic = function(topic_id) {
+            if (topic_id == this.topic_id_1) {
+                return this.get_topic_2()
+            } else if (topic_id == this.topic_id_2) {
+                return this.get_topic_1()
+            } else {
+                throw "AssociationViewmodelError: topic " + topic_id + " is not a player in " + JSON.stringify(this)
+            }
+        }
+
+        // ---
 
         /**
          * @param   assoc   an Association object
@@ -479,6 +505,37 @@ function TopicmapViewmodel(topicmap_id, config) {
             if (!self.is_topic_selected && self.selected_object_id == id) {
                 self.selected_object_id = -1
             }
+        }
+    }
+
+    function ClusterViewmodel(ca) {
+
+        var cts = []    // array of TopicView
+
+        add_to_cluster(ca.get_topic_1())
+
+        this.iterate_topics = function(visitor_func) {
+            for (var i = 0, ct; ct = cts[i]; i++) {
+                visitor_func(ct)
+            }
+        }
+
+        function add_to_cluster(ct) {
+            if (is_in_cluster(ct)) {
+                return
+            }
+            //
+            cts.push(ct)
+            var cas = self.get_topic_associations(ct.id)
+            for (var i = 0, ca; ca = cas[i]; i++) {
+                add_to_cluster(ca.get_other_topic(ct.id))
+            }
+        }
+
+        function is_in_cluster(ct) {
+            return js.includes(cts, function(cat) {
+                return cat.id == ct.id
+            })
         }
     }
 }

@@ -31,7 +31,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     dm4c.restc.add_association_to_topicmap = function(topicmap_id, assoc_id) {
         this.request("POST", "/topicmap/" + topicmap_id + "/association/" + assoc_id)
     }
-    dm4c.restc.move_topic = function(topicmap_id, topic_id, x, y) {
+    dm4c.restc.set_topic_position = function(topicmap_id, topic_id, x, y) {
         this.request("PUT", "/topicmap/" + topicmap_id + "/topic/" + topic_id + "/" + x + "/" + y)
     }
     dm4c.restc.set_topic_visibility = function(topicmap_id, topic_id, visibility) {
@@ -40,7 +40,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     dm4c.restc.remove_association_from_topicmap = function(topicmap_id, assoc_id) {
         this.request("DELETE", "/topicmap/" + topicmap_id + "/association/" + assoc_id)
     }
-    dm4c.restc.move_cluster = function(topicmap_id, cluster_coords) {
+    dm4c.restc.set_cluster_position = function(topicmap_id, cluster_coords) {
         this.request("PUT", "/topicmap/" + topicmap_id, cluster_coords)
     }
     dm4c.restc.set_topicmap_translation = function(topicmap_id, trans_x, trans_y) {

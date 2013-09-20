@@ -57,19 +57,6 @@ CanvasView = function() {
 
     // ---
 
-    // ### TODO: move to viewmodel
-    this.get_associations = function(topic_id) {
-        var cas = []
-        this.iterate_associations(function(ca) {
-            if (ca.is_player_topic(topic_id)) {
-                cas.push(ca)
-            }
-        })
-        return cas
-    }
-
-    // ---
-
     /**
      * @param   topic   A TopicViewmodel.
      */
@@ -186,17 +173,11 @@ CanvasView = function() {
 
     // ---
 
-    function clear() {
-        canvas_topics = {}
-        canvas_assocs = {}
-    }
-
-
-
-    // === Misc ===
-
-    this.create_cluster = function(ca) {
-        return new Cluster(ca)
+    /**
+     * @param   cluster     A ClusterViewmodel.
+     */
+    this.create_cluster = function(cluster) {
+        return new ClusterView(cluster)
     }
 
 
@@ -215,6 +196,13 @@ CanvasView = function() {
      */
     function add_association(assoc) {
         canvas_assocs[assoc.id] = new AssociationView(assoc)
+    }
+
+    // ---
+
+    function clear() {
+        canvas_topics = {}
+        canvas_assocs = {}
     }
 
 
@@ -242,17 +230,10 @@ CanvasView = function() {
 
         // ---
 
-        this.move_to = function(x, y) {
-            this.x = x
-            this.y = y
-        }
-
         this.move_by = function(dx, dy) {
             this.x += dx
             this.y += dy
         }
-
-        // ---
 
         /**
          * @param   topic   A TopicViewmodel.
@@ -308,24 +289,6 @@ CanvasView = function() {
 
         // ---
 
-        // ### needed?
-        this.is_player_topic = function(topic_id) {
-            return id1() == topic_id || id2() == topic_id
-        }
-
-        // ### needed?
-        this.get_other_topic = function(topic_id) {
-            if (id1() == topic_id) {
-                return this.get_topic_2()
-            } else if (id2() == topic_id) {
-                return this.get_topic_1()
-            } else {
-                throw "CanvasAssocError: topic " + topic_id + " is not a player in " + JSON.stringify(this)
-            }
-        }
-
-        // ---
-
         /**
          * @param   assoc   An AssociationViewmodel.
          */
@@ -350,42 +313,27 @@ CanvasView = function() {
         }
     }
 
-    // ---
+    /**
+     * @param   cluster     A ClusterViewmodel
+     */
+    function ClusterView(cluster) {
 
-    function Cluster(ca) {
+        var topics = []
 
-        var cts = []    // array of TopicView
-
-        add_to_cluster(ca.get_topic_1())
+        cluster.iterate_topics(function(topic) {
+            topics.push(self.get_topic(topic.id))
+        })
 
         this.move_by = function(dx, dy) {
-            this.iterate_topics(function(ct) {
-                ct.move_by(dx, dy)
+            this.iterate_topics(function(topic) {
+                topic.move_by(dx, dy)
             })
         }
 
         this.iterate_topics = function(visitor_func) {
-            for (var i = 0, ct; ct = cts[i]; i++) {
+            for (var i = 0, ct; ct = topics[i]; i++) {
                 visitor_func(ct)
             }
-        }
-
-        function add_to_cluster(ct) {
-            if (is_in_cluster(ct)) {
-                return
-            }
-            //
-            cts.push(ct)
-            var cas = self.get_associations(ct.id)
-            for (var i = 0, ca; ca = cas[i]; i++) {
-                add_to_cluster(ca.get_other_topic(ct.id))
-            }
-        }
-
-        function is_in_cluster(ct) {
-            return js.includes(cts, function(cat) {
-                return cat.id == ct.id
-            })
         }
     }
 }

@@ -187,7 +187,7 @@ dm4c = new function() {
      * Fires the "post_hide_topic" event and the "post_hide_association" event (for each association).
      */
     this.do_hide_topic = function(topic) {
-        var assocs = dm4c.topicmap_renderer.get_associations(topic.id)
+        var assocs = dm4c.topicmap_renderer.get_topic_associations(topic.id)
         for (var i = 0; i < assocs.length; i++) {
             dm4c.topicmap_renderer.hide_association(assocs[i].id, false)    // refresh_canvas=false
             dm4c.fire_event("post_hide_association", assocs[i])

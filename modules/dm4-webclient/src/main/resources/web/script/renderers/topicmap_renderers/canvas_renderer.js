@@ -32,7 +32,7 @@ function CanvasRenderer() {
     var association_in_progress     // true while new association is pulled (boolean)
     var action_topic                // the topic being selected/moved/associated (TopicView)
     var action_assoc                // the association being selected/cluster-moved (AssociationView)
-    var cluster                     // the cluster being moved (Cluster)
+    var cluster                     // the cluster being moved (ClusterView)
     var tmp_x, tmp_y                // coordinates while action is in progress
 
     // Coordinate systems (for mouse event interpretation)
@@ -335,8 +335,8 @@ function CanvasRenderer() {
 
     // === End of interface implementations ===
 
-    this.get_associations = function(topic_id) {
-        return canvas.get_associations(topic_id)
+    this.get_topic_associations = function(topic_id) {
+        return topicmap.get_topic_associations(topic_id)
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions
@@ -538,8 +538,11 @@ function CanvasRenderer() {
             if (canvas_move_in_progress) {
                 translate_by(dx, dy)
             } else if (action_assoc) {
-                cluster_move_in_progress = true
-                cluster = cluster || canvas.create_cluster(action_assoc)
+                if (!cluster_move_in_progress) {
+                    cluster_move_in_progress = true
+                    var cluster_viewmodel = topicmap.create_cluster(action_assoc)
+                    cluster = canvas.create_cluster(cluster_viewmodel)
+                }
                 cluster.move_by(dx, dy)
             } else if (!association_in_progress) {
                 topic_move_in_progress = true
@@ -608,7 +611,7 @@ function CanvasRenderer() {
 
     function end_topic_move() {
         // update viewmodel
-        topicmap.move_topic(action_topic.id, action_topic.x, action_topic.y)
+        topicmap.set_topic_position(action_topic.id, action_topic.x, action_topic.y)
         // Note: the view is already up-to-date. It is constantly updated while mouse dragging.
         //
         // fire event
@@ -620,7 +623,7 @@ function CanvasRenderer() {
 
     function end_cluster_move() {
         // update viewmodel
-        topicmap.move_cluster(cluster)
+        topicmap.set_cluster_position(cluster)
         // Note: the view is already up-to-date. It is constantly updated while mouse dragging.
         //
         // fire event
@@ -628,7 +631,6 @@ function CanvasRenderer() {
         //
         cluster_move_in_progress = false
         action_assoc = null
-        cluster = null
     }
 
     function end_canvas_move() {
