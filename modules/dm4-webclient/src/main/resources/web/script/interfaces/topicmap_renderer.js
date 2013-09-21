@@ -75,6 +75,8 @@ function TopicmapRenderer() {
      */
     this.is_topic_visible = function(topic_id) {}
 
+
+
     // === Selection ===
 
     /**
@@ -101,13 +103,15 @@ function TopicmapRenderer() {
     // ### TODO: drop this
     this.refresh = function() {}
 
-    this.close_context_menu = function() {}
+
 
     // === Grid Positioning ===
 
     this.start_grid_positioning = function() {}
 
     this.stop_grid_positioning = function() {}
+
+
 
     // === Left SplitPanel Component ===
 
