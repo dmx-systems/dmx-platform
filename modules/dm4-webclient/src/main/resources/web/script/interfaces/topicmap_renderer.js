@@ -32,13 +32,12 @@ function TopicmapRenderer() {
     // ---
 
     /**
-     * Adds a topic to the canvas. If the topic is already on the canvas it is not added again.
-     * Note: the canvas is not refreshed.
+     * Adds a topic to the canvas. If the topic is already on the canvas it is not added again. ### FIXDOC
      *
-     * A canvas implementation may decide not to show the given topic but a different one or to show nothing at all.
+     * An implementation may decide not to show the given topic but a different one or to show nothing at all.
      *
      * The given topic may or may not provide a geometry hint ("x" and "y" properties). In any case placement is up
-     * to the canvas implementation.
+     * to the implementation.
      *
      * @param   topic       an object with "id", "type_uri", "value" properties and optional "x", "y" properties.
      * @param   do_select   Optional: if true, the topic is selected.
@@ -46,27 +45,25 @@ function TopicmapRenderer() {
      * @return  the topic actually shown including the geometry where it is actually shown (a Topic object with
      *          "x" and "y" properties) or "undefined" if no topic is shown.
      */
-    this.add_topic = function(topic, do_select) {}
+    this.show_topic = function(topic, do_select) {}
 
-    this.add_association = function(assoc, do_select) {}
+    this.show_association = function(assoc, do_select) {}
 
-    this.update_topic = function(topic, refresh_canvas) {}
+    this.update_topic = function(topic) {}
 
-    this.update_association = function(assoc, refresh_canvas) {}
+    this.update_association = function(assoc) {}
 
-    this.hide_topic = function(topic_id, refresh_canvas) {}
+    this.hide_topic = function(topic_id) {}
 
     /**
      * Removes an association from the canvas (model) and optionally refreshes the canvas (view). ### FIXDOC
      * If the association is not present on the canvas nothing is performed.
-     *
-     * @param   refresh_canvas  Optional - if true, the canvas is refreshed.
      */
-    this.hide_association = function(assoc_id, refresh_canvas) {}
+    this.hide_association = function(assoc_id) {}
 
-    this.delete_topic = function(topic_id, refresh_canvas) {}
+    this.delete_topic = function(topic_id) {}
 
-    this.delete_association = function(assoc_id, refresh_canvas) {}
+    this.delete_association = function(assoc_id) {}
 
     /**
      * Checks if a topic is visible on the canvas.
@@ -92,7 +89,7 @@ function TopicmapRenderer() {
 
     this.select_association = function(assoc_id) {}
 
-    this.reset_selection = function(refresh_canvas) {}
+    this.reset_selection = function() {}
 
     // ---
 
@@ -100,7 +97,6 @@ function TopicmapRenderer() {
 
     this.begin_association = function(topic_id, x, y) {}
 
-    // ### TODO: drop this
     this.refresh = function() {}
 
 

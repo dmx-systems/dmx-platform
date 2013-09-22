@@ -29,21 +29,20 @@ dm4c = new function() {
         var log_window = window.open()
     }
 
-    // utilities
-    this.restc = new RESTClient(CORE_SERVICE_URI)
-    this.ui = new GUIToolkit({pre_open_menu: pre_open_menu})
-    this.render = new RenderHelper()
-
     // client model
     this.selected_object = null     // a Topic or an Association object, or null if there is no selection
     var type_cache = new TypeCache()
 
-    // view
+    // GUI
     this.split_panel = null         // a SplitPanel object
     this.toolbar = null             // the upper toolbar GUI component (a ToolbarPanel object)
     this.topicmap_renderer = null   // the GUI component that displays the topicmap (a TopicmapRenderer object)
     this.page_panel = null          // the page panel GUI component on the right hand side (a PagePanel object)
 
+    // utilities
+    this.restc = new RESTClient(CORE_SERVICE_URI)
+    this.ui = new GUIToolkit({pre_open_menu: pre_open_menu})
+    this.render = new RenderHelper()
     var pm = new PluginManager({
         internal_plugins: ["default_plugin.js", "fulltext_plugin.js", "ckeditor_plugin.js"]
     })
@@ -72,11 +71,11 @@ dm4c = new function() {
 
 
 
-    // Note: the controller methods consistently update the database and the view.
+    // Note: the controller methods consistently update the database, client model, and the GUI.
     // In particular they are responsible for
     //     a) updating the database,
     //     b) updating the client model,
-    //     c) updating the view,
+    //     c) updating the GUI (canvas and page panel),
     //     d) firing events
     // The names of the controller methods begins with "do_".
     //
@@ -98,8 +97,7 @@ dm4c = new function() {
         var topics = dm4c.topicmap_renderer.select_topic(topic_id)
         // update client model
         set_topic_selection(topics.select, no_history_update)
-        // update view
-        dm4c.topicmap_renderer.refresh()
+        // update GUI
         dm4c.page_panel.render_page(topics.display)
     }
 
@@ -117,8 +115,7 @@ dm4c = new function() {
         var assoc = dm4c.topicmap_renderer.select_association(assoc_id)
         // update client model
         set_association_selection(assoc, no_history_update)
-        // update view
-        dm4c.topicmap_renderer.refresh()
+        // update GUI
         dm4c.page_panel.render_page(assoc)
     }
 
@@ -131,8 +128,8 @@ dm4c = new function() {
         if (dm4c.LOG_HISTORY) dm4c.log("Resetting selection (no_history_update=" + no_history_update + ")")
         // update client model
         reset_selection(no_history_update)
-        // update view
-        dm4c.topicmap_renderer.reset_selection(true)    // refresh_canvas=true
+        // update GUI
+        dm4c.topicmap_renderer.reset_selection()
         dm4c.page_panel.clear()
         // fire event
         var result = dm4c.fire_event("default_page_rendering")
@@ -173,7 +170,7 @@ dm4c = new function() {
     this.do_reveal_related_topic = function(topic_id, action) {
         // fetch from DB
         var assocs = dm4c.restc.get_associations(dm4c.selected_object.id, topic_id)
-        // update client model and view
+        // update client model and GUI
         for (var i = 0, assoc; assoc = assocs[i]; i++) {
             dm4c.show_association(assoc)
         }
@@ -183,13 +180,13 @@ dm4c = new function() {
     // ---
 
     /**
-     * Hides a topic and its visible direct associations from the view (canvas and page panel).
+     * Hides a topic and its visible direct associations from the GUI (canvas and page panel).
      * Fires the "post_hide_topic" event and the "post_hide_association" event (for each association).
      */
     this.do_hide_topic = function(topic) {
         var assocs = dm4c.topicmap_renderer.get_topic_associations(topic.id)
         for (var i = 0; i < assocs.length; i++) {
-            dm4c.topicmap_renderer.hide_association(assocs[i].id, false)    // refresh_canvas=false
+            dm4c.topicmap_renderer.hide_association(assocs[i].id)
             dm4c.fire_event("post_hide_association", assocs[i])
         }
         //
@@ -197,7 +194,7 @@ dm4c = new function() {
     }
 
     /**
-     * Hides an association from the view (canvas and page panel).
+     * Hides an association from the GUI (canvas and page panel).
      * Fires the "post_hide_association" event.
      */
     this.do_hide_association = function(assoc) {
@@ -216,7 +213,7 @@ dm4c = new function() {
     this.do_create_topic = function(type_uri, x, y) {
         // update DB
         var topic = dm4c.create_topic(type_uri)
-        // update client model and view
+        // update client model and GUI
         dm4c.show_topic(topic, "edit", {x: x, y: y}, true)      // do_center=true
     }
 
@@ -229,21 +226,21 @@ dm4c = new function() {
             {topic_id: dm4c.selected_object.id, role_type_uri: "dm4.core.default"},
             {topic_id: topic.id,                role_type_uri: "dm4.core.default"}
         )
-        // update client model and view
+        // update client model and GUI
         dm4c.show_association(assoc, "edit")
     }
 
     this.do_create_topic_type = function(topic_type_model) {
         // update DB
         var topic_type = dm4c.create_topic_type(topic_type_model)
-        // update client model and view
+        // update client model and GUI
         dm4c.show_topic(topic_type, "edit", undefined, true)    // coordinates=undefined, do_center=true
     }
 
     this.do_create_association_type = function(assoc_type_model) {
         // update DB
         var assoc_type = dm4c.create_association_type(assoc_type_model)
-        // update client model and view
+        // update client model and GUI
         dm4c.show_topic(assoc_type, "edit", undefined, true)    // coordinates=undefined, do_center=true
     }
 
@@ -261,7 +258,7 @@ dm4c = new function() {
             dm4c.fire_event("pre_update_topic", topic_model)
             // update DB
             var directives = dm4c.restc.update_topic(topic_model)
-            // update GUI (client model and view)
+            // update client model and GUI
             process_directives(directives)
         } else {
             dm4c.page_panel.refresh()
@@ -277,7 +274,7 @@ dm4c = new function() {
     this.do_update_association = function(assoc_model, stay_in_edit_mode) {
         // update DB
         var directives = dm4c.restc.update_association(assoc_model)
-        // update GUI (client model and view)
+        // update client model and GUI
         process_directives(directives, stay_in_edit_mode)
     }
 
@@ -290,7 +287,7 @@ dm4c = new function() {
     this.do_update_topic_type = function(topic_type_model) {
         // update DB
         var directives = dm4c.restc.update_topic_type(topic_type_model)
-        // update GUI (client model and view)
+        // update client model and GUI
         process_directives(directives)
     }
 
@@ -303,7 +300,7 @@ dm4c = new function() {
     this.do_update_association_type = function(assoc_type_model) {
         // update DB
         var directives = dm4c.restc.update_association_type(assoc_type_model)
-        // update GUI (client model and view)
+        // update client model and GUI
         process_directives(directives)
     }
 
@@ -312,7 +309,7 @@ dm4c = new function() {
     this.do_retype_topic = function(topic, type_uri) {
         // update DB
         var directives = dm4c.restc.update_topic({id: topic.id, type_uri: type_uri})
-        // update client model and view
+        // update client model and GUI
         process_directives(directives)
     }
 
@@ -325,7 +322,7 @@ dm4c = new function() {
     this.do_delete_topic = function(topic) {
         // update DB
         var directives = dm4c.restc.delete_topic(topic.id)
-        // update client model and view
+        // update client model and GUI
         process_directives(directives)
     }
 
@@ -337,7 +334,7 @@ dm4c = new function() {
         // update DB
         var directives = dm4c.restc.delete_association(assoc.id)
         // alert("do_delete_association(): directives=" + js.stringify(directives))
-        // update client model and view
+        // update client model and GUI
         process_directives(directives)
     }
 
@@ -378,13 +375,12 @@ dm4c = new function() {
         var do_select = action != "none"
         // Note: the "pre_show_topic" event allows plugins to manipulate the topic, e.g. by setting coordinates
         dm4c.fire_event("pre_show_topic", topic)                // fire event
-        // update view (canvas)
-        var topic_shown = dm4c.topicmap_renderer.add_topic(topic, do_select)
+        // update GUI (canvas)
+        var topic_shown = dm4c.topicmap_renderer.show_topic(topic, do_select)
         if (topic_shown) {
             if (do_center) {
                 dm4c.topicmap_renderer.scroll_topic_to_center(topic_shown.id)
             }
-            dm4c.topicmap_renderer.refresh()
             // update client model
             if (do_select) {
                 set_topic_selection(topic_shown)
@@ -397,7 +393,7 @@ dm4c = new function() {
                 set_topic_selection(topic)
             }
         }
-        // update view (page panel)
+        // update GUI (page panel)
         update_page_panel(topic, action)
     }
 
@@ -407,16 +403,15 @@ dm4c = new function() {
     this.show_association = function(assoc, action) {
         action = action || "none"   // set default
         var do_select = action != "none"
-        // update view (canvas)
-        dm4c.topicmap_renderer.add_association(assoc, do_select)
-        dm4c.topicmap_renderer.refresh()
+        // update GUI (canvas)
+        dm4c.topicmap_renderer.show_association(assoc, do_select)
         // update client model
         if (do_select) {
             set_association_selection(assoc)
         }
         //
         dm4c.fire_event("post_show_association", assoc)    // fire event
-        // update view (page panel)
+        // update GUI (page panel)
         update_page_panel(assoc, action)
     }
 
@@ -448,7 +443,7 @@ dm4c = new function() {
     // ---
 
     /**
-     * Updates the client model and view according to a set of directives received from server.
+     * Updates the client model and GUI according to a set of directives received from server.
      * Precondition: the DB is already up-to-date.
      */
     function process_directives(directives, stay_in_edit_mode) {
@@ -488,7 +483,7 @@ dm4c = new function() {
     // ---
 
     /**
-     * Updates a topic on the view (canvas and page panel).
+     * Updates a topic on the GUI (canvas and page panel).
      * Fires the "post_update_topic" event.
      *
      * Processes an UPDATE_TOPIC directive.
@@ -498,15 +493,15 @@ dm4c = new function() {
     function update_topic(topic) {
         // update client model
         set_topic_selection_conditionally(topic)
-        // update view
-        dm4c.topicmap_renderer.update_topic(topic, true)           // refresh_canvas=true
+        // update GUI
+        dm4c.topicmap_renderer.update_topic(topic)
         dm4c.page_panel.render_page_if_selected(topic)
         // fire event
         dm4c.fire_event("post_update_topic", topic)
     }
 
     /**
-     * Updates an association on the view (canvas and page panel).
+     * Updates an association on the GUI (canvas and page panel).
      * Fires the "post_update_association" event.
      *
      * Processes an UPDATE_ASSOCIATION directive.
@@ -516,8 +511,8 @@ dm4c = new function() {
     function update_association(assoc, stay_in_edit_mode) {
         // update client model
         set_association_selection_conditionally(assoc)
-        // update view
-        dm4c.topicmap_renderer.update_association(assoc, true)     // refresh_canvas=true
+        // update GUI
+        dm4c.topicmap_renderer.update_association(assoc)
         stay_in_edit_mode ? dm4c.page_panel.render_form_if_selected(assoc) :
                             dm4c.page_panel.render_page_if_selected(assoc)
         // fire event
@@ -532,7 +527,7 @@ dm4c = new function() {
         // Note: the type cache must be updated *before* the "post_update_topic" event is fired.
         // Other plugins might rely on an up-to-date type cache (e.g. the Type Search plugin does).
         type_cache.put_topic_type(topic_type)
-        // 2) update view
+        // 2) update GUI
         // Note: the UPDATE_TOPIC_TYPE directive might result from editing a View Configuration topic.
         // In this case the canvas must be refreshed in order to reflect changed topic icons.
         dm4c.topicmap_renderer.refresh()
@@ -546,7 +541,7 @@ dm4c = new function() {
     function update_association_type(assoc_type) {
         // 1) update client model (type cache)
         type_cache.put_association_type(assoc_type)
-        // 2) update view
+        // 2) update GUI
         // Note: the UPDATE_ASSOCIATION_TYPE directive might result from editing a View Configuration topic.
         // In this case the canvas must be refreshed in order to reflect changed association colors.
         dm4c.topicmap_renderer.refresh()
@@ -557,26 +552,26 @@ dm4c = new function() {
     // ---
 
     /**
-     * Removes an topic from the view (canvas and page panel). ### FIXDOC
+     * Removes an topic from the GUI (canvas and page panel). ### FIXDOC
      * Fires the "post_hide_topic" event.
      */
     function hide_topic(topic) {
-        // update view (canvas)
-        dm4c.topicmap_renderer.hide_topic(topic.id, true)           // refresh_canvas=true
-        // update client model and view
+        // update GUI (canvas)
+        dm4c.topicmap_renderer.hide_topic(topic.id)
+        // update client model and GUI
         reset_selection_conditionally(topic.id)
         // fire event
         dm4c.fire_event("post_hide_topic", topic)
     }
 
     /**
-     * Removes an association from the view (canvas and page panel). ### FIXDOC
+     * Removes an association from the GUI (canvas and page panel). ### FIXDOC
      * Fires the "post_hide_association" event.
      */
     function hide_association(assoc) {
-        // update view (canvas)
-        dm4c.topicmap_renderer.hide_association(assoc.id, true)     // refresh_canvas=true
-        // update client model and view
+        // update GUI (canvas)
+        dm4c.topicmap_renderer.hide_association(assoc.id)
+        // update client model and GUI
         reset_selection_conditionally(assoc.id)
         // fire event
         dm4c.fire_event("post_hide_association", assoc)
@@ -585,30 +580,30 @@ dm4c = new function() {
     // ---
 
     /**
-     * Removes an topic from the view (canvas and page panel). ### FIXDOC
+     * Removes an topic from the GUI (canvas and page panel). ### FIXDOC
      * Fires the "post_delete_topic" event.
      *
      * Processes a DELETE_TOPIC directive.
      */
     function delete_topic(topic) {
-        // update view (canvas)
-        dm4c.topicmap_renderer.delete_topic(topic.id, true)         // refresh_canvas=true
-        // update client model and view
+        // update GUI (canvas)
+        dm4c.topicmap_renderer.delete_topic(topic.id)
+        // update client model and GUI
         reset_selection_conditionally(topic.id)
         // fire event
         dm4c.fire_event("post_delete_topic", topic)
     }
 
     /**
-     * Removes an association from the view (canvas and page panel). ### FIXDOC
+     * Removes an association from the GUI (canvas and page panel). ### FIXDOC
      * Fires the "post_delete_association" event.
      *
      * Processes a DELETE_ASSOCIATION directive.
      */
     function delete_association(assoc) {
-        // update view (canvas)
-        dm4c.topicmap_renderer.delete_association(assoc.id, true)   // refresh_canvas=true
-        // update client model and view
+        // update GUI (canvas)
+        dm4c.topicmap_renderer.delete_association(assoc.id)
+        // update client model and GUI
         reset_selection_conditionally(assoc.id)
         // fire event
         dm4c.fire_event("post_delete_association", assoc)
@@ -1183,7 +1178,7 @@ dm4c = new function() {
     // In fact the Geomaps renderer does: the selection model contains the sole "Geo Coordinate" topic while
     // the page panel displays the geo-aware topic, e.g. a Person.
     this.enter_edit_mode = function(topic_or_association) {
-        // update view
+        // update GUI
         dm4c.page_panel.render_form(topic_or_association)
     }
 

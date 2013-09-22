@@ -60,18 +60,18 @@ function CanvasRenderer() {
         function display_topicmap() {
 
             canvas.set_topicmap(topicmap)
-            restore_selection()     // includes canvas refreshing
+            restore_selection()
 
             function restore_selection() {
                 var id = topicmap.selected_object_id
                 if (id != -1) {
                     if (topicmap.is_topic_selected) {
-                        dm4c.do_select_topic(id, no_history_update)         // includes canvas refreshing
+                        dm4c.do_select_topic(id, no_history_update)
                     } else {
-                        dm4c.do_select_association(id, no_history_update)   // includes canvas refreshing
+                        dm4c.do_select_association(id, no_history_update)
                     }
                 } else {
-                    dm4c.do_reset_selection(no_history_update)              // includes canvas refreshing
+                    dm4c.do_reset_selection(no_history_update)
                 }
             }
         }
@@ -80,25 +80,22 @@ function CanvasRenderer() {
     // ---
 
     /**
-     * Adds a topic to the canvas. If the topic is already on the canvas it is not added again.
-     * Note: the canvas is not refreshed.
+     * Adds a topic to the canvas. If the topic is already on the canvas it is not added again. ### FIXDOC
      *
      * @param   topic       A Topic object with optional "x", "y" properties.
      *                      (Instead a Topic any object with "id", "type_uri", and "value" properties is suitable.)
      * @param   do_select   Optional: if true, the topic is selected.
      */
-    this.add_topic = function(topic, do_select) {
+    this.show_topic = function(topic, do_select) {
         canvas.init_topic_position(topic)
         // update viewmodel
         var topic_viewmodel = topicmap.add_topic(topic.id, topic.type_uri, topic.value, topic.x, topic.y)
+        if (do_select) {
+            topicmap.set_topic_selection(topic.id)
+        }
         // update view
         if (topic_viewmodel) {
-            canvas.add_topic(topic_viewmodel)
-        }
-        //
-        if (do_select) {
-            // update viewmodel
-            topicmap.set_topic_selection(topic.id)
+            canvas.show_topic(topic_viewmodel)
         }
         //
         return topic
@@ -110,18 +107,16 @@ function CanvasRenderer() {
      *                      is suitable)
      * @param   do_select   Optional: if true, the association is selected.
      */
-    this.add_association = function(assoc, do_select) {
+    this.show_association = function(assoc, do_select) {
         // update viewmodel
         var assoc_viewmodel = topicmap.add_association(assoc.id, assoc.type_uri, assoc.role_1.topic_id,
                                                                                  assoc.role_2.topic_id)
+        if (do_select) {
+            topicmap.set_association_selection(assoc.id)
+        }
         // update view
         if (assoc_viewmodel) {
-            canvas.add_association(assoc_viewmodel)
-        }
-        //
-        if (do_select) {
-            // update viewmodel
-            topicmap.set_association_selection(assoc.id)
+            canvas.show_association(assoc_viewmodel)
         }
     }
 
@@ -132,15 +127,12 @@ function CanvasRenderer() {
      *
      * @param   topic       A Topic object.
      */
-    this.update_topic = function(topic, refresh_canvas) {
+    this.update_topic = function(topic) {
         // update viewmodel
         var topic_viewmodel = for_all_topicmaps("update_topic", topic)
         // update view
         if (topic_viewmodel) {
             canvas.update_topic(topic_viewmodel)
-            if (refresh_canvas) {
-                this.refresh()
-            }
         }
     }
 
@@ -149,15 +141,12 @@ function CanvasRenderer() {
      *
      * @param   assoc       An Association object.
      */
-    this.update_association = function(assoc, refresh_canvas) {
+    this.update_association = function(assoc) {
         // update viewmodel
         var assoc_viewmodel = for_all_topicmaps("update_association", assoc)
         // update view
         if (assoc_viewmodel) {
             canvas.update_association(assoc_viewmodel)
-            if (refresh_canvas) {
-                this.refresh()
-            }
         }
     }
 
@@ -166,55 +155,39 @@ function CanvasRenderer() {
     /**
      * Removes a topic from the canvas (model) and optionally refreshes the canvas (view). ### FIXDOC
      * If the topic is not present on the canvas nothing is performed.
-     *
-     * @param   refresh_canvas  Optional - if true, the canvas is refreshed.
      */
-    this.hide_topic = function(topic_id, refresh_canvas) {
+    this.hide_topic = function(topic_id) {
         // update viewmodel
         topicmap.hide_topic(topic_id)
         // update view
         canvas.remove_topic(topic_id)
-        if (refresh_canvas) {
-            this.refresh()
-        }
     }
 
     /**
      * Removes an association from the canvas (model) and optionally refreshes the canvas (view). ### FIXDOC
      * If the association is not present on the canvas nothing is performed.
-     *
-     * @param   refresh_canvas  Optional - if true, the canvas is refreshed.
      */
-    this.hide_association = function(assoc_id, refresh_canvas) {
+    this.hide_association = function(assoc_id) {
         // update viewmodel
         topicmap.hide_association(assoc_id)
         // update view
         canvas.remove_association(assoc_id)
-        if (refresh_canvas) {
-            this.refresh()
-        }
     }
 
     // ---
 
-    this.delete_topic = function(topic_id, refresh_canvas) {
+    this.delete_topic = function(topic_id) {
         // update viewmodel
         for_all_topicmaps("delete_topic", topic_id)
         // update view
         canvas.remove_topic(topic_id)
-        if (refresh_canvas) {
-            this.refresh()
-        }
     }
 
-    this.delete_association = function(assoc_id, refresh_canvas) {
+    this.delete_association = function(assoc_id) {
         // update viewmodel
         for_all_topicmaps("delete_association", assoc_id)
         // update view
         canvas.remove_association(assoc_id)
-        if (refresh_canvas) {
-            this.refresh()
-        }
     }
 
     // ---
@@ -231,7 +204,8 @@ function CanvasRenderer() {
         var topic = dm4c.fetch_topic(topic_id)
         // update viewmodel
         topicmap.set_topic_selection(topic_id)
-        // ### FIXME: refresh view?
+        // update view
+        canvas.refresh()
         //
         return {select: topic, display: topic}
     }
@@ -241,25 +215,23 @@ function CanvasRenderer() {
         var assoc = dm4c.fetch_association(assoc_id)
         // update viewmodel
         topicmap.set_association_selection(assoc_id)
-        // ### FIXME: refresh view?
+        // update view
+        canvas.refresh()
         //
         return assoc
     }
 
-    this.reset_selection = function(refresh_canvas) {
+    this.reset_selection = function() {
         // update viewmodel
         topicmap.reset_selection()
         // update view
-        if (refresh_canvas) {
-            this.refresh()
-        }
+        canvas.refresh()
     }
 
     // ---
 
     this.scroll_topic_to_center = function(topic_id) {
-        var ct = canvas.get_topic(topic_id)
-        canvas.scroll_to_center(ct.x + topicmap.trans_x, ct.y + topicmap.trans_y)
+        canvas.scroll_to_center(topic_id)
     }
 
     this.begin_association = function(topic_id, x, y) {

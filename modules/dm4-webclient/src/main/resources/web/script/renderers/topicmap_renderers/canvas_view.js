@@ -68,28 +68,20 @@ CanvasView = function() {
 
     // ---
 
-    this.get_topic = function(id) {
-        return canvas_topics[id]
-    }
-
-    this.get_association = function(id) {
-        return canvas_assocs[id]
-    }
-
-    // ---
-
     /**
      * @param   topic   A TopicViewmodel.
      */
-    this.add_topic = function(topic) {
+    this.show_topic = function(topic) {
         add_topic(topic)
+        show()
     }
 
     /**
      * @param   assoc   An AssociationViewmodel.
      */
-    this.add_association = function(assoc) {
+    this.show_association = function(assoc) {
         add_association(assoc)
+        show()
     }
 
     // ---
@@ -98,24 +90,28 @@ CanvasView = function() {
      * @param   topic   A TopicViewmodel.
      */
     this.update_topic = function(topic) {
-        this.get_topic(topic.id).update(topic)
+        get_topic(topic.id).update(topic)
+        show()
     }
 
     /**
      * @param   assoc   An AssociationViewmodel.
      */
     this.update_association = function(assoc) {
-        this.get_association(assoc.id).update(assoc)
+        get_association(assoc.id).update(assoc)
+        show()
     }
 
     // ---
 
     this.remove_topic = function(id) {
         delete canvas_topics[id]
+        show()
     }
 
     this.remove_association = function(id) {
         delete canvas_assocs[id]
+        show()
     }
 
     // ---
@@ -145,34 +141,16 @@ CanvasView = function() {
 
     this.begin_association = function(topic_id, x, y) {
         association_in_progress = true
-        action_topic = this.get_topic(topic_id)
+        action_topic = get_topic(topic_id)
         //
         tmp_x = x
         tmp_y = y
-        draw()
+        show()
     }
 
-    this.scroll_to_center = function(x, y) {
-        if (x < 0 || x >= width || y < 0 || y >= height) {
-            var dx = (width  / 2 - x) / ANIMATION_STEPS
-            var dy = (height / 2 - y) / ANIMATION_STEPS
-            var step_count = 0;
-            var animation = setInterval(animation_step, ANIMATION_DELAY)
-        }
-
-        function animation_step() {
-            translate_by(dx, dy)
-            draw()
-            if (++step_count == ANIMATION_STEPS) {
-                clearInterval(animation)
-                // Note: the Topicmaps module's setTopicmapTranslation()
-                // resource method expects integers (otherwise 404)
-                topicmap.trans_x = Math.floor(topicmap.trans_x)
-                topicmap.trans_y = Math.floor(topicmap.trans_y)
-                //
-                end_canvas_move()
-            }
-        }
+    this.scroll_to_center = function(topic_id) {
+        var ct = get_topic(topic_id)
+        scroll_to_center(ct.x + topicmap.trans_x, ct.y + topicmap.trans_y)
     }
 
     /**
@@ -203,13 +181,12 @@ CanvasView = function() {
         }
         //
         bind_event_handlers()
-        // ### if (topicmap) {
-        draw()
-        // ### }
+        //
+        show()
     }
 
     this.refresh = function() {
-        draw()
+        show()
     }
 
     // ---
@@ -225,6 +202,16 @@ CanvasView = function() {
 
 
     // ----------------------------------------------------------------------------------------------- Private Functions
+
+    function get_topic(id) {
+        return canvas_topics[id]
+    }
+
+    function get_association(id) {
+        return canvas_assocs[id]
+    }
+
+    // ---
 
     /**
      * @param   topic   A TopicViewmodel.
@@ -244,7 +231,7 @@ CanvasView = function() {
 
     function iterate_topics(visitor_func) {
         for (var id in canvas_topics) {
-            var ret = visitor_func(self.get_topic(id))
+            var ret = visitor_func(get_topic(id))
             if (ret) {
                 return ret
             }
@@ -253,7 +240,7 @@ CanvasView = function() {
 
     function iterate_associations(visitor_func) {
         for (var id in canvas_assocs) {
-            var ret = visitor_func(self.get_association(id))
+            var ret = visitor_func(get_association(id))
             if (ret) {
                 return ret
             }
@@ -275,8 +262,8 @@ CanvasView = function() {
 
 
 
-    function draw() {
-        // Note: we can't draw until a topicmap is available
+    function show() {
+        // Note: we can't show until a topicmap is available
         if (!topicmap) {
             return
         }
@@ -464,7 +451,7 @@ CanvasView = function() {
             }
             tmp_x = p.x
             tmp_y = p.y
-            draw()
+            show()
         }
     }
 
@@ -479,7 +466,7 @@ CanvasView = function() {
             end_canvas_move()
         } else if (association_in_progress) {
             end_association_in_progress()
-            draw()
+            show()
         }
     }
 
@@ -501,7 +488,7 @@ CanvasView = function() {
             }
             //
             end_association_in_progress()
-            draw()
+            show()
         } else {
             if (action_topic) {
                 dm4c.do_select_topic(action_topic.id)
@@ -667,22 +654,11 @@ CanvasView = function() {
 
 
 
-    // ***********
-    // *** GUI ***
-    // ***********
+    // ****************
+    // *** Geometry ***
+    // ****************
 
 
-
-    function translate_by(dx, dy) {
-        // update viewmodel
-        topicmap.translate_by(dx, dy)   // Note: topicmap.translate_by() doesn't update the DB.
-        // update view
-        ctx.translate(dx, dy)
-    }
-
-
-
-    // === Geometry ===
 
     function find_topic(event) {
         var p = pos(event, Coord.CANVAS_SPACE)
@@ -817,6 +793,38 @@ CanvasView = function() {
         }
     }
 
+    // ---
+
+    function translate_by(dx, dy) {
+        // update viewmodel
+        topicmap.translate_by(dx, dy)   // Note: topicmap.translate_by() doesn't update the DB.
+        // update view
+        ctx.translate(dx, dy)
+    }
+
+    function scroll_to_center(x, y) {
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            var dx = (width  / 2 - x) / ANIMATION_STEPS
+            var dy = (height / 2 - y) / ANIMATION_STEPS
+            var step_count = 0;
+            var animation = setInterval(animation_step, ANIMATION_DELAY)
+        }
+
+        function animation_step() {
+            translate_by(dx, dy)
+            show()
+            if (++step_count == ANIMATION_STEPS) {
+                clearInterval(animation)
+                // Note: the Topicmaps module's setTopicmapTranslation()
+                // resource method expects integers (otherwise 404)
+                topicmap.trans_x = Math.floor(topicmap.trans_x)
+                topicmap.trans_y = Math.floor(topicmap.trans_y)
+                //
+                end_canvas_move()
+            }
+        }
+    }
+
 
 
     // ------------------------------------------------------------------------------------------------- Private Classes
@@ -879,7 +887,7 @@ CanvasView = function() {
      */
     function AssociationView(assoc) {
 
-        var _self = this    // Note: self is already used in closure
+        var self = this
 
         this.id = assoc.id
         this.topic_id_1 = assoc.topic_id_1
@@ -889,14 +897,12 @@ CanvasView = function() {
 
         // ---
 
-        // ### needed?
         this.get_topic_1 = function() {
-            return self.get_topic(id1())
+            return get_topic(this.topic_id_1)
         }
 
-        // ### needed?
         this.get_topic_2 = function() {
-            return self.get_topic(id2())
+            return get_topic(this.topic_id_2)
         }
 
         // ---
@@ -910,18 +916,8 @@ CanvasView = function() {
 
         // ---
 
-        function id1() {
-            return _self.topic_id_1
-        }
-
-        function id2() {
-            return _self.topic_id_2
-        }
-
-        // ---
-
         function init(assoc) {
-            _self.type_uri = assoc.type_uri
+            self.type_uri = assoc.type_uri
         }
     }
 
@@ -933,7 +929,7 @@ CanvasView = function() {
         var topics = []
 
         cluster.iterate_topics(function(topic) {
-            topics.push(self.get_topic(topic.id))
+            topics.push(get_topic(topic.id))
         })
 
         this.move_by = function(dx, dy) {
@@ -968,7 +964,7 @@ CanvasView = function() {
         this.next_position = function() {
             var pos = {x: grid_x, y: grid_y}
             if (item_count == 0) {
-                self.scroll_to_center(width / 2, pos.y + topicmap.trans_y)
+                scroll_to_center(width / 2, pos.y + topicmap.trans_y)
             }
             //
             advance_position()

@@ -28,7 +28,7 @@ function GeomapRenderer() {
         }
     }
 
-    this.add_topic = function(topic, do_select) {
+    this.show_topic = function(topic, do_select) {
         var topic_shown = undefined
         //
         var geo_facet = dm4c.get_plugin("de.deepamehta.geomaps").get_geo_facet(topic)
@@ -42,8 +42,8 @@ function GeomapRenderer() {
         return topic_shown
     }
 
-    this.update_topic = function(topic, refresh_canvas) {
-        // ### Compare to add_topic() above. Can we call it from here?
+    this.update_topic = function(topic) {
+        // ### Compare to show_topic() above. Can we call it from here?
         // ### FIXME: or can we call dm4c.show_topic() here?
         var geo_facet = dm4c.get_plugin("de.deepamehta.geomaps").get_geo_facet(topic)
         if (geo_facet) {
