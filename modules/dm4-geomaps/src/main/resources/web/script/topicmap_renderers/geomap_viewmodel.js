@@ -7,10 +7,9 @@
  */
 function GeomapViewmodel(topicmap_id, config) {
 
-    var LOG_GEOMAPS = false
     var self = this
 
-    // Model
+    // Viewmodel
     var info                        // The underlying Topicmap topic (a Topic object)
     var topics = {}                 // topics of this topicmap (key: topic ID, value: GeoTopicViewmodel object)
     this.center                     // map center (an OpenLayers.LonLat object in lon/lat projection)
@@ -20,10 +19,6 @@ function GeomapViewmodel(topicmap_id, config) {
     load()
 
     // ------------------------------------------------------------------------------------------------------ Public API
-
-
-
-    // === TopicmapViewmodel Implementation ===
 
     this.get_id = function() {
         return topicmap_id
@@ -47,66 +42,65 @@ function GeomapViewmodel(topicmap_id, config) {
 
     // ---
 
-    this.add_topic = function(id, type_uri, value, x, y) {
-        if (x == undefined || y == undefined) {
-            throw "GeomapError: no coordinates provided while calling add_topic (topic_id=" + id + ")"
+    /**
+     * @param   geo_coordinate      a Topic object of type dm4.geomaps.geo_coordinate
+     */
+    this.add_topic = function(geo_coordinate) {
+        if (!topics[geo_coordinate.id]) {
+            // update memory and DB
+            return add_geo_coordinate(geo_coordinate)
         }
-        //
-        if (!topics[id]) {
-            if (LOG_GEOMAPS) dm4c.log("Adding topic " + id + " (type_uri=\"" + type_uri + "\", x=" + x + ", y=" + y +
-                ") to geomap " + topicmap_id)
-            // update memory
-            topics[id] = new GeoTopicViewmodel(id, x, y)
-            // update DB
-            if (is_writable()) {
-                dm4c.restc.add_topic_to_geomap(topicmap_id, id)
-            }
-        }
-    }
-
-    this.add_association = function(id, type_uri, topic_id_1, topic_id_2) {
     }
 
     // ---
 
-    this.update_topic = function(topic) {
+    /**
+     * @param   geo_coordinate      a Topic object of type dm4.geomaps.geo_coordinate (### not necessarily)
+     */
+    this.update_topic = function(topic) {           // Note: called from CanvasRenderer ### TODO: rethink
         var t = topics[topic.id]
         if (t) {
-            if (LOG_GEOMAPS) dm4c.log("..... Updating topic " + t.id + " (x=" + t.x + ", y=" + t.y + ") on geomap " +
-                topicmap_id)
             // update memory
             t.update(topic)
             // Note: no DB update here. A topic update doesn't affect the view data.
+            return t
+        } else {
+            // A topic hits the geomap through an update operation. The topic got its geo coordinate only through an
+            // update operation. So it is placed in the geomap for the first time and needs to be selected.
+            // Note: this is different from the standard topicmap behavoir. Its viewmodel is not affected at all if the
+            // updated topic is not contained in the topicmap. A topic never hits a standard topicmap through an update
+            // operation.
+            //
+            // update memory
+            this.set_topic_selection(topic.id)
+            // update memory and DB
+            return add_geo_coordinate(topic)
         }
     }
 
-    this.update_association = function(assoc) {
+    this.update_association = function(assoc) {     // Note: called from CanvasRenderer ### TODO: rethink
     }
 
     // ---
 
-    this.delete_topic = function(id) {
+    this.delete_topic = function(id) {              // Note: called from CanvasRenderer ### TODO: rethink
         var topic = topics[id]
         if (topic) {
-            if (LOG_GEOMAPS) dm4c.log("..... Deleting topic " + id + " from geomap " + topicmap_id)
             // update memory
             topic.remove()
             // Note: no DB update here. The "Geotopic Mapcontext" association is already deleted.
         }
     }
 
-    this.delete_association = function(id) {
+    this.delete_association = function(id) {        // Note: called from CanvasRenderer ### TODO: rethink
     }
 
     // ---
 
-    this.set_topic_selection = function(topic) {
+    this.set_topic_selection = function(topic_id) {
         // update memory
-        this.selected_object_id = topic.id
+        this.selected_object_id = topic_id
         // Note: no DB update here. The selection is not yet persisted.
-    }
-
-    this.set_association_selection = function(assoc) {
     }
 
     this.reset_selection = function() {
@@ -116,11 +110,6 @@ function GeomapViewmodel(topicmap_id, config) {
     }
 
     // ---
-
-    this.prepare_topic_for_display = function(topic) {
-    }
-
-    // ===
 
     /**
      * @param   center      an OpenLayers.LonLat object in lon/lat projection
@@ -148,8 +137,7 @@ function GeomapViewmodel(topicmap_id, config) {
 
         function init_topics() {
             for (var i = 0, topic; topic = topicmap.topics[i]; i++) {
-                var pos = GeomapRenderer.position(new Topic(topic))
-                topics[topic.id] = new GeoTopicViewmodel(topic.id, pos.x, pos.y)
+                topics[topic.id] = new GeoTopicViewmodel(new Topic(topic))
             }
         }
 
@@ -165,6 +153,20 @@ function GeomapViewmodel(topicmap_id, config) {
 
     // ---
 
+    function add_geo_coordinate(geo_coordinate) {
+        // update memory
+        geo_topic = new GeoTopicViewmodel(geo_coordinate)
+        topics[geo_coordinate.id] = geo_topic
+        // update DB
+        if (is_writable()) {
+            dm4c.restc.add_topic_to_geomap(topicmap_id, geo_coordinate.id)
+        }
+        //
+        return geo_topic
+    }
+
+    // ---
+
     function is_writable() {
         return config.is_writable
     }
@@ -173,21 +175,27 @@ function GeomapViewmodel(topicmap_id, config) {
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
-    function GeoTopicViewmodel(id, x, y) {
+    /**
+     * Properties:
+     *  id,
+     *  lon, lat
+     *
+     * @param   geo_coordinate     a Topic object of type dm4.geomaps.geo_coordinate
+     */
+    function GeoTopicViewmodel(geo_coordinate) {
 
-        this.id = id
-        this.x = x
-        this.y = y
+        var _self = this
+
+        this.id = geo_coordinate.id
+        init(geo_coordinate)
 
         /**
-         * @param   topic   a Topic object of type dm4.geomaps.geo_coordinate
+         * @param   geo_coordinate     a Topic object of type dm4.geomaps.geo_coordinate
          */
-        this.update = function(topic) {
+        this.update = function(geo_coordinate) {
             // Note: for a geo topic an update request might result in a geometry change (in case the Address changes).
             // (not so for non-geo topics).
-            var p = GeomapRenderer.position(topic)
-            this.x = p.x
-            this.y = p.y
+            init(geo_coordinate)
         }
 
         this.remove = function() {
@@ -198,9 +206,16 @@ function GeomapViewmodel(topicmap_id, config) {
         // ---
 
         function reset_selection() {
-            if (self.selected_object_id == id) {
-                self.selected_object_id = -1
+            if (self.selected_object_id == _self.id) {
+                self.reset_selection()
             }
+        }
+
+        // ---
+
+        function init(geo_coordinate) {
+            _self.lon = geo_coordinate.get("dm4.geomaps.longitude")
+            _self.lat = geo_coordinate.get("dm4.geomaps.latitude")
         }
     }
 }

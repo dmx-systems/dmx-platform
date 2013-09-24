@@ -447,7 +447,7 @@ function TopicmapViewmodel(topicmap_id, config) {
 
         function reset_selection_conditionally() {
             if (self.is_topic_selected && self.selected_object_id == id) {
-                self.selected_object_id = -1
+                self.reset_selection()
             }
         }
     }
@@ -503,7 +503,7 @@ function TopicmapViewmodel(topicmap_id, config) {
 
         function reset_selection_conditionally() {
             if (!self.is_topic_selected && self.selected_object_id == id) {
-                self.selected_object_id = -1
+                reset_selection()
             }
         }
     }

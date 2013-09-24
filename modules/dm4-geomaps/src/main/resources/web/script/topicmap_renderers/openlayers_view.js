@@ -42,12 +42,15 @@ function OpenLayersView(config) {
 
     // === Features ===
 
-    this.add_feature = function(geo_facet, do_select) {
-        feature_layers["features"].add_feature({lon: geo_facet.x, lat: geo_facet.y}, geo_facet, do_select)
+    /**
+     * @param   geo_topic   A GeoTopicViewmodel object
+     */
+    this.add_feature = function(geo_topic, do_select) {
+        feature_layers["features"].add_feature(geo_topic, do_select)
     }
 
-    this.select_feature = function(geo_facet_id) {
-        feature_layers["features"].select_feature(geo_facet_id)
+    this.select_feature = function(geo_topic_id) {
+        feature_layers["features"].select_feature(geo_topic_id)
     }
 
     this.remove_all_features = function() {
@@ -102,9 +105,9 @@ function OpenLayersView(config) {
     // ------------------------------------------------------------------------------------------------- Private Classes
 
     /**
-     * Wraps an OpenLayers vector layer and binds features to topics. Provides two methods:
-     *     - add_feature(pos, topic)
-     *     - remove_feature(topic_id)
+     * Wraps an OpenLayers vector layer and binds features to "Geo Coordinate" topics. Provides two methods:
+     *     - add_feature(geo_topic)
+     *     - remove_feature(geo_topic_id)
      */
     function FeatureLayer(layer_name) {
         var features = {}   // holds the OpenLayers.Feature.Vector objects, keyed by topic ID
@@ -127,39 +130,41 @@ function OpenLayersView(config) {
 
         // === Public API ===
 
-        this.add_feature = function(pos, topic, do_select) {
+        /**
+         * @param   geo_topic   A GeoTopicViewmodel object
+         */
+        this.add_feature = function(geo_topic, do_select) {
             // remove feature if already on the map
-            if (features[topic.id]) {
-                vector_layer.removeFeatures([features[topic.id]])
+            if (features[geo_topic.id]) {
+                vector_layer.removeFeatures([features[geo_topic.id]])
             }
             // create feature
-            var p = transform_to_map(pos.lon, pos.lat)
+            var p = transform_to_map(geo_topic.lon, geo_topic.lat)
             var geometry = new OpenLayers.Geometry.Point(p.lon, p.lat)
-            var feature = new OpenLayers.Feature.Vector(geometry, {topic_id: topic.id})
-            features[topic.id] = feature
+            var feature = new OpenLayers.Feature.Vector(geometry, {geo_topic_id: geo_topic.id})
+            features[geo_topic.id] = feature
             vector_layer.addFeatures([feature])
             //
             if (do_select) {
-                this.select_feature(topic.id)
+                this.select_feature(geo_topic.id)
             }
         }
 
-        this.select_feature = function(topic_id) {
-            var feature = features[topic_id]
+        this.select_feature = function(geo_topic_id) {
+            var feature = features[geo_topic_id]
             if (feature) {
                 unbind_select_handler()
-                //
                 select_control.clickFeature(feature)
-                //
                 bind_select_handler()
+                //
                 scroll_to_center(feature)
             } else {
-                // ### alert("FeatureLayer: there is no feature for topic " + topic_id)
+                // ### alert("FeatureLayer: there is no feature for topic " + geo_topic_id)
             }
         }
 
-        this.remove_feature = function(topic_id) {
-            vector_layer.removeFeatures([features[topic_id]])
+        this.remove_feature = function(geo_topic_id) {
+            vector_layer.removeFeatures([features[geo_topic_id]])
             // ### TODO: delete from features object
         }
 
@@ -180,7 +185,7 @@ function OpenLayersView(config) {
         // ---
 
         function do_select_feature(event) {
-            dm4c.do_select_topic(event.feature.attributes.topic_id)
+            dm4c.do_select_topic(event.feature.attributes.geo_topic_id)
         }
 
         function scroll_to_center(feature) {

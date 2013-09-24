@@ -35,20 +35,12 @@ dm4c.add_plugin("de.deepamehta.geomaps", function() {
     // ------------------------------------------------------------------------------------------------------ Public API
 
     /**
-     * Returns the geo facet of the given topic.
+     * Returns the geo coordinate of the given domain topic.
      *
-     * @return  A "Geo Coordinate" topic extended with "x" and "y" properties (a Topic object).
+     * @return  A Topic object of type dm4.geomaps.geo_coordinate,
+     *          or undefined if the domain topic has no geo coordinate.
      */
-    this.get_geo_facet = function(topic) {
-        var address = topic.find_child_topic("dm4.contacts.address")
-        if (address) {
-            var geo_facet = address.get("dm4.geomaps.geo_coordinate")
-            if (geo_facet) {
-                var pos = GeomapRenderer.position(geo_facet)
-                geo_facet.x = pos.x
-                geo_facet.y = pos.y
-                return geo_facet
-            }
-        }
+    this.get_geo_coordinate = function(topic) {
+        return topic.find_child_topic("dm4.geomaps.geo_coordinate")
     }
 })

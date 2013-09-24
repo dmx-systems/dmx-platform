@@ -7,12 +7,12 @@ function CanvasRenderer() {
 
     js.extend(this, TopicmapRenderer)
 
-    // Viewmodel
-    var topicmap                    // the topicmap currently rendered (a TopicmapViewmodel).
-                                    // Initialized by display_topicmap().
-
     // View (HTML5 Canvas)
     var canvas = new CanvasView()
+
+    // Viewmodel
+    var topicmap    // the topicmap currently rendered (a TopicmapViewmodel).
+                    // Initialized by display_topicmap().
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
