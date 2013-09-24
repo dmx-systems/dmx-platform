@@ -503,7 +503,7 @@ function TopicmapViewmodel(topicmap_id, config) {
 
         function reset_selection_conditionally() {
             if (!self.is_topic_selected && self.selected_object_id == id) {
-                reset_selection()
+                self.reset_selection()
             }
         }
     }
