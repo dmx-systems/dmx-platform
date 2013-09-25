@@ -17,8 +17,10 @@ dm4c = new function() {
     this.ASSOC_WIDTH = 4
     this.ASSOC_CLICK_TOLERANCE = 0.3
     this.DEFAULT_TOPIC_ICON = "/de.deepamehta.webclient/images/ball-gray.png"
+    this.DEFAULT_ASSOC_COLOR = "#b2b2b2"
     var DEFAULT_INPUT_FIELD_ROWS = 1
 
+    // constants
     var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
     this.REF_PREFIX = "ref_id:"
@@ -1023,7 +1025,7 @@ dm4c = new function() {
             case "icon":
                 return dm4c.DEFAULT_TOPIC_ICON
             case "color":
-                return dm4c.topicmap_renderer.DEFAULT_ASSOC_COLOR
+                return dm4c.DEFAULT_ASSOC_COLOR
             case "show_in_create_menu":
                 return false;
             case "input_field_rows":

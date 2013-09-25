@@ -4,7 +4,6 @@
 CanvasView = function() {
 
     // Settings
-    this.DEFAULT_ASSOC_COLOR = "#b2b2b2"
     var HIGHLIGHT_COLOR = "#0000ff"
     var HIGHLIGHT_BLUR = 16
     var ANIMATION_STEPS = 30
@@ -276,7 +275,7 @@ CanvasView = function() {
         //
         if (association_in_progress) {
             draw_line(action_topic.x, action_topic.y, tmp_x - topicmap.trans_x, tmp_y - topicmap.trans_y,
-                dm4c.ASSOC_WIDTH, self.DEFAULT_ASSOC_COLOR)
+                dm4c.ASSOC_WIDTH, dm4c.DEFAULT_ASSOC_COLOR)
         }
         //
         ctx.fillStyle = LABEL_COLOR     // set label style
