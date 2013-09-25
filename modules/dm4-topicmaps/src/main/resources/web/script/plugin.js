@@ -1,6 +1,5 @@
 dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
-    var LOG_TOPICMAPS = false
     var self = this
 
     dm4c.load_script("/de.deepamehta.topicmaps/script/topicmap_viewmodel.js")
@@ -180,8 +179,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             //
             var topicmap_id = get_topicmap_id_from_menu()
             if (topicmap_id == topic.id) {
-                if (LOG_TOPICMAPS) dm4c.log("..... updating the topicmap menu and selecting the first item " +
-                    "(the deleted topic was the CURRENT topicmap)")
+                // the deleted topic was the CURRENT topicmap:
+                // update the topicmap menu and select the first item
                 if (!js.size(topicmap_cache)) {     // ### FIXME: should check topicmap_topics?
                     create_topicmap_topic("untitled")
                 }
@@ -189,8 +188,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
                 set_selected_topicmap(get_topicmap_id_from_menu())
                 display_topicmap()
             } else {
-                if (LOG_TOPICMAPS) dm4c.log("..... updating the topicmap menu and restoring the selection " +
-                    "(the deleted topic was ANOTHER topicmap)")
+                // the deleted topic was ANOTHER topicmap:
+                // update the topicmap menu and restore the selection
                 refresh_topicmap_menu()
             }
         }
@@ -202,15 +201,12 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     })
 
     dm4c.add_listener("pre_pop_history", function(state) {
-        if (dm4c.LOG_HISTORY) dm4c.log("..... topicmaps_plugin.pre_pop_history()")
         if (state.topicmap_id != topicmap.get_id()) {
-            if (dm4c.LOG_HISTORY) dm4c.log(".......... switch from topicmap " + topicmap.get_id() +
-                " to " + state.topicmap_id)
+            // switch topicmap
             self.do_select_topicmap(state.topicmap_id, true)    // no_history_update=true
             return false
         } else if (!state.topic_id) {
-            if (dm4c.LOG_HISTORY) dm4c.log(".......... topicmap not changed and no topic in popstate " +
-                "=> resetting selection")
+            // topicmap not changed and no topic in popstate
             dm4c.do_reset_selection(true)                       // no_history_update=true
             return false
         }
@@ -361,8 +357,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * Updates the model to reflect the given topicmap is now selected.
      */
     function set_selected_topicmap(topicmap_id) {
-        if (LOG_TOPICMAPS) dm4c.log("Selecting topicmap " + topicmap_id)
-        //
         // 1) update cookie
         // Note: the cookie must be set *before* the topicmap is loaded.
         // Server-side topic loading might depend on the topicmap type.
@@ -410,14 +404,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     function create_topicmap_topic(name, topicmap_renderer_uri) {
         topicmap_renderer_uri = topicmap_renderer_uri || "dm4.webclient.default_topicmap_renderer"
-        //
-        if (LOG_TOPICMAPS) dm4c.log("Creating topicmap \"" + name + "\" (topicmap_renderer_uri=\"" +
-            topicmap_renderer_uri + "\")")
-        //
         var topicmap_topic = dm4c.restc.create_topicmap(name, topicmap_renderer_uri)
-        //
-        if (LOG_TOPICMAPS) dm4c.log("..... " + topicmap_topic.id)
-        //
         return topicmap_topic
     }
 
@@ -473,8 +460,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         var renderer_uri = dm4c.topicmap_renderer.get_info().uri
         var new_renderer_uri = topicmap_renderer.get_info().uri
         if (renderer_uri != new_renderer_uri) {
-            if (LOG_TOPICMAPS) dm4c.log("Switching topicmap renderer \"" +
-                renderer_uri + "\" => \"" + new_renderer_uri + "\"")
+            // switch topicmap renderer
             dm4c.topicmap_renderer = topicmap_renderer
             dm4c.split_panel.set_left_panel(topicmap_renderer)
         }

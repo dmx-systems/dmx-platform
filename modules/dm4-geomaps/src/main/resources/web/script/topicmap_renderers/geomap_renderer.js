@@ -18,8 +18,6 @@ function GeomapRenderer() {
     var geomap      // the geomap currently rendered (a GeomapViewmodel).
                     // Initialized by display_topicmap().
 
-    var LOG_GEOMAPS = false
-
     // ------------------------------------------------------------------------------------------------------ Public API
 
 
@@ -116,7 +114,6 @@ function GeomapRenderer() {
     }
 
     this.resize = function(size) {
-        if (dm4c.LOG_GUI) dm4c.log("Resizing geomap to " + size.width + "x" + size.height)
         this.dom.width(size.width).height(size.height)
     }
 

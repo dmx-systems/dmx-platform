@@ -34,8 +34,8 @@ function SplitPanel() {
         resize_left_panel()
         // Note: resizing takes place *after* replacing. This allows panels to recreate their DOM
         // to realize resizing. Otherwise the panel's event handlers would be lost while replacing.
-        if (dm4c.LOG_GUI) dm4c.log("Setting left panel, dom.width()=" + panel.dom.width() +
-            ", left_panel_width=" + left_panel_width)
+        //
+        // "Setting left panel, dom.width()=" + panel.dom.width() + ", left_panel_width=" + left_panel_width
         //
         // 2) init panel
         var panel_uri = panel.get_info().uri
@@ -55,7 +55,7 @@ function SplitPanel() {
         //
         adjust_right_panel_height()
         right_panel.width = panel.dom.width()
-        if (dm4c.LOG_GUI) dm4c.log("Page panel width=" + right_panel.width)
+        // "Page panel width=" + right_panel.width
         //
         calculate_left_panel_width()
         $("#canvas-panel").resizable({handles: "e", resize: do_resize, stop: do_stop_resize})
@@ -113,8 +113,8 @@ function SplitPanel() {
         // update model
         var w_w = window.innerWidth
         left_panel_width  = w_w - right_panel.width - PADDING_MIDDLE
-        if (dm4c.LOG_GUI) dm4c.log("Canvas width=" + left_panel_width + " (based on window width " + w_w +
-            " and page panel width " + right_panel.width + ")")
+        // "Canvas width=" + left_panel_width + " (based on window width " + w_w +
+        // " and page panel width " + right_panel.width + ")"
     }
 
     function get_left_panel_size() {
@@ -156,8 +156,7 @@ function SplitPanel() {
             var w_h = window.innerHeight
             var t_h = dm4c.toolbar.dom.height()
             panel_height = w_h - t_h - PADDING_BOTTOM
-            if (dm4c.LOG_GUI) dm4c.log("Panel height=" + panel_height + " (based on window height " + w_h +
-                " and toolbar height " + t_h + ")")
+            // "Panel height=" + panel_height + " (based on window height " + w_h + " and toolbar height " + t_h + ")"
         }
     }
 
@@ -169,8 +168,7 @@ function SplitPanel() {
      * Triggered repeatedly while the user moves the split pane's resizable-handle.
      */
     function do_resize(event, ui_event) {
-        if (dm4c.LOG_GUI) dm4c.log("Canvas resized: original with=" + ui_event.originalSize.width +
-                                                   " current with=" + ui_event.size.width)
+        // Canvas resized: original with=" + ui_event.originalSize.width + " current with=" + ui_event.size.width
         set_slider_position(ui_event.size.width)
     }
 

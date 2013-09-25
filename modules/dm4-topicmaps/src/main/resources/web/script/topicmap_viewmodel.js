@@ -7,7 +7,6 @@
  */
 function TopicmapViewmodel(topicmap_id, config) {
 
-    var LOG_TOPICMAPS = false
     var self = this
 
     var info                // The underlying Topicmap topic (a Topic object)
@@ -63,7 +62,6 @@ function TopicmapViewmodel(topicmap_id, config) {
     this.add_topic = function(id, type_uri, label, x, y) {
         var topic = topics[id]
         if (!topic) {
-            if (LOG_TOPICMAPS) dm4c.log("Adding topic " + id + " (\"" + label + "\") to topicmap " + topicmap_id)
             // update memory
             topic = new TopicViewmodel(id, type_uri, label, x, y, true)     // visibility=true
             topics[id] = topic
@@ -74,8 +72,6 @@ function TopicmapViewmodel(topicmap_id, config) {
             //
             return topic
         } else if (!topic.visibility) {
-            if (LOG_TOPICMAPS)
-                dm4c.log("Showing topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id)
             // update memory
             topic.set_visibility(true)
             // update DB
@@ -85,24 +81,24 @@ function TopicmapViewmodel(topicmap_id, config) {
             //
             return topic
         } else {
-            if (LOG_TOPICMAPS)
-                dm4c.log("Topic " + id + " (\"" + label + "\") already visible in topicmap " + topicmap_id)
+            // topic already visible in topicmap
         }
     }
 
     this.add_association = function(id, type_uri, topic_id_1, topic_id_2) {
-        if (!assocs[id]) {
-            if (LOG_TOPICMAPS) dm4c.log("Adding association " + id + " to topicmap " + topicmap_id)
+        var assoc = assocs[id]
+        if (!assoc) {
             // update memory
-            assocs[id] = new AssociationViewmodel(id, type_uri, topic_id_1, topic_id_2)
+            assoc = new AssociationViewmodel(id, type_uri, topic_id_1, topic_id_2)
+            assocs[id] = assoc
             // update DB
             if (is_writable()) {
                 dm4c.restc.add_association_to_topicmap(topicmap_id, id)
             }
             //
-            return assocs[id]
+            return assoc
         } else {
-            if (LOG_TOPICMAPS) dm4c.log("Association " + id + " already in topicmap " + topicmap_id)
+            // association already in topicmap
         }
     }
 
@@ -110,8 +106,6 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     this.set_topic_position = function(id, x, y) {
         var topic = topics[id]
-        if (LOG_TOPICMAPS) dm4c.log("Moving topic " + id + " (\"" + topic.label + "\") on topicmap " + topicmap_id
-            + " to x=" + x + ", y=" + y)
         // update memory
         topic.set_position(x, y)
         // update DB
@@ -124,7 +118,6 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     this.hide_topic = function(id) {
         var topic = topics[id]
-        if (LOG_TOPICMAPS) dm4c.log("Hiding topic " + id + " (\"" + topic.label + "\") from topicmap " + topicmap_id)
         // update memory
         topic.set_visibility(false)
         // update DB
@@ -135,7 +128,6 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     this.hide_association = function(id) {
         var assoc = assocs[id]
-        if (LOG_TOPICMAPS) dm4c.log("Hiding association " + id + " from topicmap " + topicmap_id)
         // update memory
         assoc.delete()  // Note: a hidden association is removed from the viewmodel, just like a deleted association
         // update DB
@@ -152,8 +144,6 @@ function TopicmapViewmodel(topicmap_id, config) {
     this.update_topic = function(topic) {
         var t = topics[topic.id]
         if (t) {
-            if (LOG_TOPICMAPS) dm4c.log("..... Updating topic " + t.id + " (\"" + t.label + "\") on topicmap " +
-                topicmap_id)
             // update memory
             t.update(topic)
             // Note: no DB update here. A topic update doesn't affect the view data.
@@ -168,7 +158,6 @@ function TopicmapViewmodel(topicmap_id, config) {
     this.update_association = function(assoc) {
         var a = assocs[assoc.id]
         if (a) {
-            if (LOG_TOPICMAPS) dm4c.log("..... Updating association " + a.id + " on topicmap " + topicmap_id)
             // update memory
             a.update(assoc)
             // Note: no DB update here. An association update doesn't affect the view data.
@@ -182,8 +171,6 @@ function TopicmapViewmodel(topicmap_id, config) {
     this.delete_topic = function(id) {
         var topic = topics[id]
         if (topic) {
-            if (LOG_TOPICMAPS) dm4c.log("..... Deleting topic " + id + " (\"" + topic.label + "\") from topicmap " +
-                topicmap_id)
             // update memory
             topic.delete()
             // Note: no DB update here. The persisted view is already up-to-date (view data is stored in association).
@@ -193,7 +180,6 @@ function TopicmapViewmodel(topicmap_id, config) {
     this.delete_association = function(id) {
         var assoc = assocs[id]
         if (assoc) {
-            if (LOG_TOPICMAPS) dm4c.log("..... Deleting association " + id + " from topicmap " + topicmap_id)
             // update memory
             assoc.delete()
             // Note: no DB update here. The persisted view is already up-to-date (view data is stored in association).
@@ -332,17 +318,11 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     function load() {
 
-        if (LOG_TOPICMAPS) dm4c.log("Loading topicmap " + topicmap_id)
-
         var topicmap = dm4c.restc.get_topicmap(topicmap_id)
         info = new Topic(topicmap.info)
-
-        if (LOG_TOPICMAPS) dm4c.log("..... " + topicmap.topics.length + " topics")
+        //
         init_topics()
-
-        if (LOG_TOPICMAPS) dm4c.log("..... " + topicmap.assocs.length + " associations")
         init_associations()
-
         init_translation()
         init_background_image()
 
@@ -351,16 +331,12 @@ function TopicmapViewmodel(topicmap_id, config) {
                 var x = topic.visualization["dm4.topicmaps.x"].value
                 var y = topic.visualization["dm4.topicmaps.y"].value
                 var visibility = topic.visualization["dm4.topicmaps.visibility"].value
-                if (LOG_TOPICMAPS) dm4c.log(".......... ID " + topic.id + ": type_uri=\"" + topic.type_uri +
-                    "\", label=\"" + topic.value + "\", x=" + x + ", y=" + y + ", visibility=" + visibility)
                 topics[topic.id] = new TopicViewmodel(topic.id, topic.type_uri, topic.value, x, y, visibility)
             }
         }
 
         function init_associations() {
             for (var i = 0, assoc; assoc = topicmap.assocs[i]; i++) {
-                if (LOG_TOPICMAPS) dm4c.log(".......... ID " + assoc.id + ": type_uri=\"" + assoc.type_uri +
-                    "\", topic_id_1=" + assoc.role_1.topic_id + ", topic_id_2=" + assoc.role_2.topic_id)
                 assocs[assoc.id] = new AssociationViewmodel(assoc.id, assoc.type_uri,
                     assoc.role_1.topic_id, assoc.role_2.topic_id)
             }

@@ -166,7 +166,6 @@ function GUIToolkit(config) {
         // Note: a neater approach would be to let the menu close itself by let its button react on blur.
         // This would work in Firefox but unfortunately Safari doesn't fire blur events for buttons.
         $("body").click(function() {
-            // ### if (dm4c.LOG_GUI) dm4c.log("Body clicked -- close opened menu")
             close_opened_menu()
         })
     })
@@ -343,10 +342,9 @@ function GUIToolkit(config) {
                 //     event.originalEvent.layerX/Y - related to positioned parent
                 if (!is_visible(menu)) {
                     close_opened_menu()
-                    //
-                    if (dm4c.LOG_GUI) dm4c.log("Opening nenu: event.screenY=" + event.screenY +
-                        ", event.clientY=" + event.clientY + ", event.pageY=" + event.pageY +
-                        ", event.originalEvent.layerY=" + event.originalEvent.layerY)
+                    // "Opening nenu: event.screenY=" + event.screenY +
+                    //    ", event.clientY=" + event.clientY + ", event.pageY=" + event.pageY +
+                    //    ", event.originalEvent.layerY=" + event.originalEvent.layerY
                     var mouse_y = event.clientY
                     open_menu(mouse_y)
                 } else {
@@ -465,7 +463,7 @@ function GUIToolkit(config) {
                 window_height = window.innerHeight
                 //
                 if (selection) {
-                    // if (dm4c.LOG_GUI) dm4c.log("Opening nenu (there is a selection): mouse_y=" + mouse_y)
+                    // "Opening nenu (there is a selection): mouse_y=" + mouse_y
                     var item_height = selection.dom.outerHeight()
                     var menu_y = mouse_y - selection.dom.position().top - item_height / 2
                     selection.dom.addClass("hover")

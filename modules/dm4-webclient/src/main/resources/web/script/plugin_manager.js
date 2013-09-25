@@ -16,12 +16,10 @@ function PluginManager(config) {
     this.retrieve_plugin_list = function() {
         // retrieve list of installed plugins from server
         plugin_list = dm4c.restc.get_plugins()
-        //
-        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Plugins installed at server-side: " + plugin_list.length)
+        // "Plugins installed at server-side: " + plugin_list.length
         //
         var items_to_load = count_items_to_load(plugin_list) + config.internal_plugins.length
-        //
-        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("Total items to load: " + items_to_load)
+        // "Total items to load: " + items_to_load
         //
         return items_to_load
     }
@@ -203,7 +201,7 @@ function PluginManager(config) {
     }
 
     function track_load_state(item) {
-        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + item + " complete")
+        // item + " complete"
         load_tracker.track()
     }
 
@@ -242,7 +240,6 @@ function PluginManager(config) {
 
     function load_helper_files(plugin_uri, helper_files) {
         for (var i = 0, helper_file; helper_file = helper_files[i]; i++) {
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... Loading helper file " + helper_file)
             helper_file = "/" + plugin_uri + "/script/helper/" + helper_file
             // Note: helper files are loaded synchronously
             dm4c.load_script(helper_file)
@@ -251,12 +248,8 @@ function PluginManager(config) {
 
     function load_plugin_file_if_exists(plugin_uri, has_plugin_file) {
         if (has_plugin_file) {
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin_uri + "\" -- has plugin file")
             var plugin_file = "/" + plugin_uri + "/script/plugin.js"
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... " + plugin_file)
             load_plugin_file(plugin_file)
-        } else {
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... plugin \"" + plugin_uri + "\" -- no plugin file to be loaded")
         }
     }
 
@@ -266,7 +259,6 @@ function PluginManager(config) {
 
     function load_renderers(plugin_uri, renderer_type, renderer_files) {
         for (var i = 0, renderer_file; renderer_file = renderer_files[i]; i++) {
-            if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... Loading " + renderer_type + " " + renderer_file)
             renderer_file = "/" + plugin_uri + "/script/renderers/" + renderer_type + "/" + renderer_file
             dm4c.load_script(renderer_file, true)   // async=true
         }
@@ -279,7 +271,6 @@ function PluginManager(config) {
     }
 
     function load_stylesheet(stylesheet) {
-        if (dm4c.LOG_PLUGIN_LOADING) dm4c.log("..... Loading CSS " + stylesheet)
         $("head").append($("<link>").attr({rel: "stylesheet", href: stylesheet, type: "text/css"}))
     }
 }

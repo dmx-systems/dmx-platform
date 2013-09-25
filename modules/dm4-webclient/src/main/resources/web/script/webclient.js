@@ -1,14 +1,5 @@
 dm4c = new function() {
 
-    // logger preferences
-    var ENABLE_LOGGING = false
-    //
-    this.LOG_TYPE_LOADING = false
-    this.LOG_PLUGIN_LOADING = false
-    var LOG_IMAGE_LOADING = false
-    this.LOG_GUI = false
-    this.LOG_HISTORY = false
-
     // preferences
     this.MAX_RESULT_SIZE = 100
     this.MAX_TOPIC_LINK_CHARS = 50
@@ -25,11 +16,6 @@ dm4c = new function() {
     this.COMPOSITE_PATH_SEPARATOR = "/"
     this.REF_PREFIX = "ref_id:"
     this.DEL_PREFIX = "del_id:"
-
-    // log window
-    if (ENABLE_LOGGING) {
-        var log_window = window.open()
-    }
 
     // client model
     this.selected_object = null     // a Topic or an Association object, or null if there is no selection
@@ -129,7 +115,6 @@ dm4c = new function() {
      * @param   no_history_update   Optional: boolean.
      */
     this.do_reset_selection = function(no_history_update) {
-        if (dm4c.LOG_HISTORY) dm4c.log("Resetting selection (no_history_update=" + no_history_update + ")")
         // update client model
         reset_selection(no_history_update)
         // update GUI
@@ -1131,8 +1116,6 @@ dm4c = new function() {
      * Note: the types are already loaded as well.
      */
     function setup_gui() {
-        dm4c.log("Setting up GUI")
-        //
         // 1) Setting up the create widget
         // Note: the create menu must be popularized *after* the plugins are loaded.
         // Two events are involved: "post_refresh_create_menu" and "has_create_permission".
@@ -1143,7 +1126,6 @@ dm4c = new function() {
         // does!) the "init" event is fired *after* creating the canvas.
         // Note: for displaying an initial topic (the deepamehta-topicmaps plugin does!) the "init" event must
         // be fired *after* the GUI setup is complete.
-        dm4c.log("Initializing plugins")
         dm4c.fire_event("init")
     }
 
@@ -1254,7 +1236,7 @@ dm4c = new function() {
         img.src = src   // Note: if src is a relative URL JavaScript extends img.src to an absolute URL
         img.onload = function() {
             // Note: "this" is the image. The argument is the "load" event.
-            if (LOG_IMAGE_LOADING) dm4c.log("Image ready: " + src)
+            //
             // notify image tracker
             image_tracker && image_tracker.check()
         }
@@ -1312,18 +1294,6 @@ dm4c = new function() {
         }
     }
 
-    // === Logging ===
-
-    this.log = function(text) {
-        if (ENABLE_LOGGING) {
-            // Note: the log window might be closed meanwhile,
-            // or it might not apened at all due to browser security restrictions.
-            if (log_window && log_window.document) {
-                log_window.document.writeln(js.render_text(text) + "<br>")
-            }
-        }
-    }
-
     // === History ===
 
     /**
@@ -1331,29 +1301,22 @@ dm4c = new function() {
      */
     var history_api_supported = window.history.pushState;
 
-    if (this.LOG_HISTORY) this.log("HTML5 History API " + (history_api_supported ? "*is*" : "is *not*") +
-        " supported by this browser")
-
     if (history_api_supported) {
         window.addEventListener("popstate", function(e) {
             // Note: state is null if a) this is the initial popstate event or
             // b) if back is pressed while the begin of history is reached.
             if (e.state) {
                 pop_history(e.state)
-            } else {
-                if (dm4c.LOG_HISTORY) dm4c.log("Popped history state is " + e.state)
             }
         })
     }
 
     function pop_history(state) {
-        if (dm4c.LOG_HISTORY) dm4c.log("Popping history state: " + JSON.stringify(state))
         var result = dm4c.fire_event("pre_pop_history", state)
+        // plugins can suppress the generic popping behavoir
         if (!js.contains(result, false)) {
             var topic_id = state.topic_id
             dm4c.do_select_topic(topic_id, true)    // no_history_update=true
-        } else {
-            if (dm4c.LOG_HISTORY) dm4c.log("Generic popping behavoir suppressed by plugin")
         }
     }
 
@@ -1375,8 +1338,6 @@ dm4c = new function() {
         // fire event
         dm4c.fire_event("pre_push_history", history_entry)
         //
-        if (dm4c.LOG_HISTORY) dm4c.log("Pushing history state: " + JSON.stringify(history_entry.state) +
-            ", url=\"" + history_entry.url + "\"")
         // push history entry
         history.pushState(history_entry.state, null, history_entry.url)
     }

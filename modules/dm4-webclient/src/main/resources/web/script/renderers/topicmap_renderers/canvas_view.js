@@ -158,7 +158,6 @@ CanvasView = function() {
      * @param   size    the new canvas size.
      */
     this.resize = function(size) {
-        if (dm4c.LOG_GUI) dm4c.log("Resizing canvas to " + JSON.stringify(size))
         width  = size.width
         height = size.height
         //
@@ -399,7 +398,6 @@ CanvasView = function() {
      *                  http://www.w3.org/TR/2003/WD-DOM-Level-3-Events-20030331/ecma-script-binding.html
      */
     function do_mousedown(event) {
-        if (dm4c.LOG_GUI) dm4c.log("Mouse down on canvas!")
         if (association_in_progress) {
             return
         }
@@ -436,7 +434,6 @@ CanvasView = function() {
     }
 
     function do_mousemove(event) {
-        // if (dm4c.LOG_GUI) dm4c.log("Mouse moves on canvas!")
         // Note: action_topic is defined for a) topic move, and b) association in progress
         if (action_topic || action_assoc || canvas_move_in_progress) {
             var p = pos(event)
@@ -462,8 +459,6 @@ CanvasView = function() {
     }
 
     function do_mouseleave(event) {
-        if (dm4c.LOG_GUI) dm4c.log("Mouse leaves canvas!")
-        //
         if (topic_move_in_progress) {
             end_topic_move()
         } else if (cluster_move_in_progress) {
@@ -477,8 +472,6 @@ CanvasView = function() {
     }
 
     function do_mouseup(event) {
-        if (dm4c.LOG_GUI) dm4c.log("Mouse up on canvas!")
-        //
         close_context_menu()
         //
         if (topic_move_in_progress) {
@@ -507,7 +500,6 @@ CanvasView = function() {
     }
 
     function do_doubleclick(event) {
-        if (dm4c.LOG_GUI) dm4c.log("Canvas double clicked!")
         var ct = find_topic(event)
         if (ct) {
             dm4c.fire_event("topic_doubleclicked", ct)
@@ -561,9 +553,8 @@ CanvasView = function() {
     // === Context Menu Events ===
 
     function do_contextmenu(event) {
-        if (dm4c.LOG_GUI) dm4c.log("Contextmenu!")
-        //
         close_context_menu()
+        //
         // 1) assemble commands
         var ct, ca
         if (ct = find_topic(event)) {
@@ -596,9 +587,9 @@ CanvasView = function() {
         // fire event (compare to GUITookit's open_menu())
         dm4c.pre_open_context_menu()
         //
-        if (dm4c.LOG_GUI) dm4c.log("Opening context nenu: event.screenY=" + event.screenY +
-            ", event.clientY=" + event.clientY + ", event.pageY=" + event.pageY +
-            ", event.originalEvent.layerY=" + event.originalEvent.layerY)
+        // "Opening context nenu: event.screenY=" + event.screenY +
+        //    ", event.clientY=" + event.clientY + ", event.pageY=" + event.pageY +
+        //    ", event.originalEvent.layerY=" + event.originalEvent.layerY
         var cm_pos = pos(event, Coord.WINDOW)
         var contextmenu = $("<div>").addClass("menu").css({
             top:  cm_pos.y + "px",
@@ -722,7 +713,6 @@ CanvasView = function() {
                 var g1 = dx1 / dy1
                 var g2 = dx2 / dy2
             }
-            // dm4c.log(g1 + " " + g2 + " -> " + Math.abs(g1 - g2))
             //
             if (Math.abs(g1 - g2) < dm4c.ASSOC_CLICK_TOLERANCE) {
                 return ca

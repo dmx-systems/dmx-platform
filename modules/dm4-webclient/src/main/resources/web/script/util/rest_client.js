@@ -1,7 +1,5 @@
 function RESTClient(core_service_uri) {
 
-    var LOG_AJAX_REQUESTS = false
-
     // -------------------------------------------------------------------------------------------------- Public Methods
 
 
@@ -282,8 +280,6 @@ function RESTClient(core_service_uri) {
         var status          // used only for synchronous request: "success" if request was successful
         var response_data   // used only for synchronous successful request: the response data (response body)
         //
-        if (LOG_AJAX_REQUESTS) dm4c.log(method + " " + request.uri + "\n..... " + JSON.stringify(data))
-        //
         var content_type = request.headers["Content-Type"] || "application/json"       // set default
         if (content_type == "application/json") {
             data = JSON.stringify(data)
@@ -302,16 +298,12 @@ function RESTClient(core_service_uri) {
             async: async
         })
         .done(function(data, text_status, jq_xhr) {
-            if (LOG_AJAX_REQUESTS) dm4c.log("..... " + jq_xhr.status + " " + jq_xhr.statusText +
-                "\n..... " + JSON.stringify(data))
             if (callback) {
                 callback(data)
             }
             response_data = data
         })
         .fail(function(jq_xhr, text_status, error_thrown) {
-            if (LOG_AJAX_REQUESTS) dm4c.log("..... " + jq_xhr.status + " " + jq_xhr.statusText +
-                "\n..... exception: " + JSON.stringify(error_thrown))
             // Note: since at least jQuery 2.0.3 an exception thrown from the "error" callback (as registered in the
             // $.ajax() settings object) does not reach the calling plugin. (In jQuery 1.7.2 it did.) Apparently the
             // exception is catched by jQuery. That's why we use the Promise style to register our callbacks (done(),

@@ -30,7 +30,6 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
             function do_select_workspace(menu_item) {
                 var workspace_id = menu_item.value
-                dm4c.log("Workspace selected: " + workspace_id)
                 update_cookie()
                 if (workspace_id == "_new") {
                     workspace_dialog.open()
