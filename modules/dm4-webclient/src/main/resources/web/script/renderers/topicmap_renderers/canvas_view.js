@@ -37,8 +37,8 @@ CanvasView = function() {
     // Note: constants begin at 1 as 0 could be interpreted as "not set"
     var Coord = {
         WINDOW: 1,          // browser window display area
-        CANVAS: 2,          // canvas display area -- the default
-        CANVAS_SPACE: 3     // canvas space (involves canvas translation)
+        CANVAS: 2,          // physical canvas display area -- the default
+        CANVAS_SPACE: 3     // virtual canvas space (involves canvas translation)
     }
 
     var self = this
@@ -406,6 +406,13 @@ CanvasView = function() {
         }
         //
         if (event.which == 1) {
+            // Note: on a Mac the ctrl key emulates the right mouse button. However, Safari and Chrome for Mac still
+            // return 1 in event.which (left mouse button) on a ctrl-click. We must prevent from interpreting this
+            // as a left-click.
+            if (event.ctrlKey) {
+                return
+            }
+            //
             var p = pos(event)
             tmp_x = p.x
             tmp_y = p.y
@@ -729,7 +736,7 @@ CanvasView = function() {
     /**
      * Interprets a mouse event according to a coordinate system.
      *
-     * @param   coordinate_system   Coord.WINDOW, Coord.CANVAS, Coord.CANVAS_SPACE
+     * @param   coordinate_system   Optional: Coord.WINDOW, Coord.CANVAS (default), Coord.CANVAS_SPACE
      *
      * @return  an object with "x" and "y" properties.
      */
