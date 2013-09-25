@@ -94,10 +94,11 @@ dm4c = new function() {
     this.do_select_topic = function(topic_id, no_history_update) {
         dm4c.page_panel.save()
         //
+        // update GUI (canvas)
         var topics = dm4c.topicmap_renderer.select_topic(topic_id)
         // update client model
         set_topic_selection(topics.select, no_history_update)
-        // update GUI
+        // update GUI (page panel)
         dm4c.page_panel.render_page(topics.display)
     }
 
@@ -112,10 +113,11 @@ dm4c = new function() {
     this.do_select_association = function(assoc_id, no_history_update) {
         dm4c.page_panel.save()
         //
+        // update GUI (canvas)
         var assoc = dm4c.topicmap_renderer.select_association(assoc_id)
         // update client model
         set_association_selection(assoc, no_history_update)
-        // update GUI
+        // update GUI (page panel)
         dm4c.page_panel.render_page(assoc)
     }
 
@@ -185,6 +187,7 @@ dm4c = new function() {
      */
     this.do_hide_topic = function(topic) {
         var assocs = dm4c.topicmap_renderer.get_topic_associations(topic.id)
+        // update client model and GUI
         for (var i = 0; i < assocs.length; i++) {
             dm4c.topicmap_renderer.hide_association(assocs[i].id)
             dm4c.fire_event("post_hide_association", assocs[i])
@@ -198,6 +201,7 @@ dm4c = new function() {
      * Fires the "post_hide_association" event.
      */
     this.do_hide_association = function(assoc) {
+        // update client model and GUI
         hide_association(assoc)
     }
 

@@ -96,6 +96,8 @@ function CanvasRenderer() {
         // update view
         if (topic_viewmodel) {
             canvas.show_topic(topic_viewmodel)
+        } else {
+            canvas.refresh()    // display highlight
         }
         //
         return topic

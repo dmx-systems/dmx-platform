@@ -64,7 +64,7 @@ function TopicmapViewmodel(topicmap_id, config) {
         var topic = topics[id]
         if (!topic) {
             if (LOG_TOPICMAPS) dm4c.log("Adding topic " + id + " (\"" + label + "\") to topicmap " + topicmap_id)
-            // update viewmodel
+            // update memory
             topic = new TopicViewmodel(id, type_uri, label, x, y, true)     // visibility=true
             topics[id] = topic
             // update DB
