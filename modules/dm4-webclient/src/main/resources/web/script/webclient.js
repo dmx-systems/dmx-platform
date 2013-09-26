@@ -1127,6 +1127,8 @@ dm4c = new function() {
         // Note: for displaying an initial topic (the deepamehta-topicmaps plugin does!) the "init" event must
         // be fired *after* the GUI setup is complete.
         dm4c.fire_event("init")
+        dm4c.fire_event("init_2")
+        dm4c.fire_event("init_3")
     }
 
     function adjust_create_widget() {
