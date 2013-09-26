@@ -57,7 +57,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         register_topicmap_renderers()
         create_topicmap_menu()
         create_topicmap_dialog()
-        display_initial_topicmap()
 
         function register_topicmap_renderers() {
             // default renderer
@@ -137,24 +136,30 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
                 return false
             }
         }
+    })
 
-        function display_initial_topicmap() {
-            var groups = location.pathname.match(/\/topicmap\/(\d+)(\/topic\/(\d+))?/)
-            if (groups) {
-                var topicmap_id = groups[1]
-                var topic_id    = groups[3]
-                select_menu_item(topicmap_id)
-            } else {
-                var topicmap_id = get_topicmap_id_from_menu()
-            }
-            // update model
-            set_selected_topicmap(topicmap_id)
-            // update view
-            display_topicmap()                  // ### FIXME: rethink about history update
-            //
-            if (topic_id) {
-                dm4c.do_select_topic(topic_id)  // ### FIXME: rethink about history update
-            }
+    /**
+     * Displays the initial topicmap.
+     *
+     * Note: plugins are supposed to register their topicmap renderer customizers at init_2.
+     * Displaying the initial topicmap at init_3 ensures all customizers are registered already.
+     */
+    dm4c.add_listener("init_3", function() {
+        var groups = location.pathname.match(/\/topicmap\/(\d+)(\/topic\/(\d+))?/)
+        if (groups) {
+            var topicmap_id = groups[1]
+            var topic_id    = groups[3]
+            select_menu_item(topicmap_id)
+        } else {
+            var topicmap_id = get_topicmap_id_from_menu()
+        }
+        // update model
+        set_selected_topicmap(topicmap_id)
+        // update view
+        display_topicmap()                  // ### FIXME: rethink about history update
+        //
+        if (topic_id) {
+            dm4c.do_select_topic(topic_id)  // ### FIXME: rethink about history update
         }
     })
 
@@ -253,6 +258,10 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         for (var topicmap_id in topicmap_cache) {
             visitor_func(topicmap_cache[topicmap_id])
         }
+    }
+
+    this.get_topicmap_renderer = function(renderer_uri) {
+        return get_topicmap_renderer(renderer_uri)
     }
 
 
