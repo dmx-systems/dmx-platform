@@ -260,6 +260,13 @@ var js = {
     TextWrapper: function(text, max_width, line_height, ctx) {
 
         var wrapped_lines = []
+        var box_width = 0, box_height   // size of the bounding box
+
+        // cast if number or boolean
+        if (!text.split) {
+            text = text.toString()
+        }
+        //
         wrap_text()
 
         // ---
@@ -272,29 +279,39 @@ var js = {
             }
         }
 
+        this.get_size = function() {
+            return {width: box_width, height: box_height}
+        }
+
+        this.get_line_height = function() {
+            return line_height
+        }
+
         // ---
 
         function wrap_text() {
-            // do not wrap "text" if it's a number or a boolean
-            if (!text.split) {
-                wrapped_lines.push(text.toString())
-                return
-            }
-            //
-            var line = ""   // current line
-            var width = 0   // width of current line
-            var w           // width of current word
+            var line = ""       // current line
+            var line_width = 0  // width of current line
+            var word_width      // width of current word
+            var sep
+            var space_width = ctx.measureText(" ").width
             var words = text.split(/([ \n])/)
             for (var i = 0; i < words.length; i += 2) {
-                wrap_word(words[i - 1], words[i] + " ")     // Note: words[-1] == undefined
+                sep = separator()
+                wrap_word(words[i - 1] == "\n", words[i])     // Note: words[-1] == undefined
+                //
+                if (line_width > box_width) {
+                    box_width = line_width
+                }
             }
             wrapped_lines.push(line)
+            box_height = wrapped_lines.length * line_height
 
-            function wrap_word(sep, word) {
-                w = ctx.measureText(word).width
-                if (sep == "\n") {
+            function wrap_word(newline, word) {
+                word_width = ctx.measureText(word).width
+                if (newline) {
                     begin_new_line(word)
-                } else if (width + w <= max_width) {
+                } else if (line_width + sep.width + word_width <= max_width) {
                     append_to_line(word)
                 } else {
                     begin_new_line(word)
@@ -302,16 +319,23 @@ var js = {
             }
 
             function append_to_line(word) {
-                line  += word
-                width += w
+                line += sep.char + word
+                line_width += sep.width + word_width
             }
 
             function begin_new_line(word) {
                 if (line) {
                     wrapped_lines.push(line)
                 }
-                line  = word
-                width = w
+                line = word
+                line_width = word_width
+            }
+
+            function separator() {
+                return {
+                    char:  line ? " " : "",
+                    width: line ? space_width : 0
+                }
             }
         }
     },
