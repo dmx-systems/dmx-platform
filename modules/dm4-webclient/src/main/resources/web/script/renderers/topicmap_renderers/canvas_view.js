@@ -1,7 +1,7 @@
 /**
  * A topicmap view based on HTML5 Canvas.
  */
-CanvasView = function() {
+function CanvasView() {
 
     // Settings
     var HIGHLIGHT_COLOR = "#0000ff"
@@ -10,17 +10,20 @@ CanvasView = function() {
     var ANIMATION_DELAY = 10
     var LABEL_FONT = "1em 'Lucida Grande', Verdana, Arial, Helvetica, sans-serif"   // copied from webclient.css
     var LABEL_COLOR = "black"
-    var LABEL_DIST_Y = 4        // in pixel
 
     // View
     var canvas_topics           // topics displayed on canvas (Object, key: topic ID, value: TopicView)
     var canvas_assocs           // associations displayed on canvas (Object, key: assoc ID, value: AssociationView)
-    var ctx                     // canvas 2D drawing context
+    var ctx                     // canvas 2D drawing context. Initialized by this.resize()
     var width, height           // canvas size (in pixel)
     var grid_positioning        // while grid positioning is in progress: a GridPositioning object, null otherwise
 
     // Viewmodel
     var topicmap                // the viewmodel underlying this view (a TopicmapViewmodel)
+
+    // Customization
+    var canvas_default_configuration = new CanvasDefaultConfiguration(canvas_topics, canvas_assocs)
+    var customizers = []
 
     // Short-term interaction state
     var topic_move_in_progress      // true while topic move is in progress (boolean)
@@ -197,6 +200,12 @@ CanvasView = function() {
         grid_positioning = null
     }
 
+    // ---
+
+    this.add_customizer = function(customizer_func) {
+        customizers.push(new customizer_func(canvas_topics, canvas_assocs))
+    }
+
 
 
     // ----------------------------------------------------------------------------------------------- Private Functions
@@ -215,7 +224,7 @@ CanvasView = function() {
      * @param   topic   A TopicViewmodel.
      */
     function add_topic(topic) {
-        canvas_topics[topic.id] = new TopicView(topic)
+        canvas_topics[topic.id] = invoke_single_customizer("create_topic", [topic, ctx])
     }
 
     /**
@@ -285,7 +294,7 @@ CanvasView = function() {
 
     function draw_topics() {
         iterate_topics(function(topic) {
-            draw_object(topic, draw_topic)
+            draw_object(topic, customize_draw_topic)
         })
     }
 
@@ -296,23 +305,6 @@ CanvasView = function() {
     }
 
     // ---
-
-    function draw_topic(ct) {
-        try {
-            // icon
-            var icon = dm4c.get_type_icon(ct.type_uri)
-            var x = ct.x - ct.width / 2
-            var y = ct.y - ct.height / 2
-            ctx.drawImage(icon, x, y)
-            // label
-            ct.label_wrapper.draw(x, y + ct.height + LABEL_DIST_Y + 16, ctx)    // 16px = 1em
-            // Note: the context must be passed to every draw() call.
-            // The context changes when the canvas is resized.
-        } catch (e) {
-            throw "CanvasRendererError (draw_topic): icon.src=" + icon.src + " icon.width=" + icon.width +
-                " icon.height=" + icon.height  + " icon.complete=" + icon.complete /* + " " + JSON.stringify(e) */
-        }
-    }
 
     function draw_association(ca) {
         var ct1 = ca.get_topic_1()
@@ -367,6 +359,40 @@ CanvasView = function() {
             ctx.shadowColor = "rgba(0, 0, 0, 0)"
             ctx.shadowBlur = 0
         }
+    }
+
+
+
+    // === Customization ===
+
+    function customize_draw_topic(ct) {
+        invoke_customizer("draw_topic", [ct, ctx])
+    }
+
+    // ---
+
+    function invoke_customizer(func_name, args) {
+        var do_default = true
+        for (var i = 0, customizer; customizer = customizers[i]; i++) {
+            if (!(customizer[func_name] && customizer[func_name].apply(undefined, args))) {
+                do_default = false
+            }
+        }
+        if (do_default) {
+            canvas_default_configuration[func_name].apply(undefined, args)
+        }
+    }
+
+    function invoke_single_customizer(func_name, args) {
+        var ret_value
+        for (var i = 0, customizer; customizer = customizers[i]; i++) {
+            var ret = customizer[func_name] && customizer[func_name].apply(undefined, args)
+            if (ret_value) {
+                throw "CanvasViewError: more than one customizer feel responsible for \"" + func_name + "\""
+            }
+            ret_value = ret
+        }
+        return ret_value || canvas_default_configuration[func_name].apply(undefined, args)
     }
 
 
@@ -651,9 +677,9 @@ CanvasView = function() {
 
 
 
-    // ****************
-    // *** Geometry ***
-    // ****************
+    // ***************************
+    // *** Geometry Management ***
+    // ***************************
 
 
 
@@ -824,55 +850,6 @@ CanvasView = function() {
 
 
     // ------------------------------------------------------------------------------------------------- Private Classes
-
-    /**
-     * Properties:
-     *  id, type_uri, label
-     *  x, y                    Topic position. Represents the center of the topic's icon.
-     *  width, height           Icon size.
-     *  label_wrapper
-     *
-     * @param   topic   A TopicViewmodel.
-     */
-    function TopicView(topic) {
-
-        var self = this
-
-        this.id = topic.id
-        this.x = topic.x
-        this.y = topic.y
-
-        init(topic);
-
-        // ---
-
-        this.move_by = function(dx, dy) {
-            this.x += dx
-            this.y += dy
-        }
-
-        /**
-         * @param   topic   A TopicViewmodel.
-         */
-        this.update = function(topic) {
-            init(topic)
-        }
-
-        // ---
-
-        function init(topic) {
-            self.type_uri = topic.type_uri
-            self.label    = topic.label
-            //
-            var icon = dm4c.get_type_icon(topic.type_uri)
-            self.width  = icon.width
-            self.height = icon.height
-            //
-            var label = js.truncate(self.label, dm4c.MAX_TOPIC_LABEL_CHARS)
-            self.label_wrapper = new js.TextWrapper(label, dm4c.MAX_TOPIC_LABEL_WIDTH, 19, ctx)
-                                                                    // line height 19px = 1.2em
-        }
-    }
 
     /**
      * Properties:

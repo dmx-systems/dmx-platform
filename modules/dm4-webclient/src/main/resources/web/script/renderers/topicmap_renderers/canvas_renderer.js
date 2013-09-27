@@ -277,6 +277,10 @@ function CanvasRenderer() {
         return topicmap.get_topic_associations(topic_id)
     }
 
+    this.add_customizer = function(customizer) {
+        canvas.add_customizer(customizer)
+    }
+
     // ----------------------------------------------------------------------------------------------- Private Functions
 
 
