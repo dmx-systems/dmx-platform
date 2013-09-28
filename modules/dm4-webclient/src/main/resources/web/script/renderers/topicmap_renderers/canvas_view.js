@@ -225,7 +225,7 @@ function CanvasView() {
      */
     function add_topic(topic) {
         var topic_view = new TopicView(topic)
-        invoke_customizer("modify_topic_view", [topic_view, ctx])
+        invoke_customizer("update_topic", [topic_view, ctx])
         canvas_topics[topic.id] = topic_view
     }
 
@@ -883,7 +883,7 @@ function CanvasView() {
             this.x += dx
             this.y += dy
             //
-            invoke_customizer("on_move_topic", [this])
+            invoke_customizer("move_topic", [this])
         }
 
         /**
@@ -891,6 +891,8 @@ function CanvasView() {
          */
         this.update = function(topic) {
             init(topic)
+            //
+            invoke_customizer("update_topic", [this, ctx])
         }
 
         // ---

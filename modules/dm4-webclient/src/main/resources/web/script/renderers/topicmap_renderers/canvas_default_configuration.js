@@ -15,18 +15,12 @@ function CanvasDefaultConfiguration(canvas_topics, canvas_assocs) {
      * @param   tv      A TopicView object (defined in CanvasView),
      *                  has "id", "type_uri", "label", "x", "y" properties.
      */
-    this.modify_topic_view = function(tv, ctx) {
-        var icon = dm4c.get_type_icon(tv.type_uri)
-        tv.width  = icon.width
-        tv.height = icon.height
-        //
-        var label = js.truncate(tv.label, dm4c.MAX_TOPIC_LABEL_CHARS)
-        tv.label_wrapper = new js.TextWrapper(label, dm4c.MAX_TOPIC_LABEL_WIDTH, 19, ctx)
-        //                                                        // line height 19px = 1.2em
+    this.update_topic = function(tv, ctx) {
+        init_icon_and_label(tv, ctx)
         init_pos(tv)
     }
 
-    this.on_move_topic = function(tv) {
+    this.move_topic = function(tv) {
         init_pos(tv)
     }
 
@@ -43,7 +37,17 @@ function CanvasDefaultConfiguration(canvas_topics, canvas_assocs) {
         // The context changes when the canvas is resized.
     }
 
-    // ---
+    // ----------------------------------------------------------------------------------------------- Private Functions
+
+    function init_icon_and_label(tv, ctx) {
+        var icon = dm4c.get_type_icon(tv.type_uri)
+        tv.width  = icon.width
+        tv.height = icon.height
+        //
+        var label = js.truncate(tv.label, dm4c.MAX_TOPIC_LABEL_CHARS)
+        tv.label_wrapper = new js.TextWrapper(label, dm4c.MAX_TOPIC_LABEL_WIDTH, 19, ctx)
+        //                                                        // line height 19px = 1.2em
+    }
 
     function init_pos(tv) {
         tv.icon_pos = {
