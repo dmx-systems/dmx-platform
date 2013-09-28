@@ -224,7 +224,9 @@ function CanvasView() {
      * @param   topic   A TopicViewmodel.
      */
     function add_topic(topic) {
-        canvas_topics[topic.id] = invoke_single_customizer("create_topic", [topic, ctx])
+        var topic_view = new TopicView(topic)
+        invoke_customizer("modify_topic_view", [topic_view, ctx])
+        canvas_topics[topic.id] = topic_view
     }
 
     /**
@@ -371,6 +373,9 @@ function CanvasView() {
 
     // ---
 
+    /**
+     * @param   args    array of arguments
+     */
     function invoke_customizer(func_name, args) {
         var do_default = true
         for (var i = 0, customizer; customizer = customizers[i]; i++) {
@@ -383,6 +388,7 @@ function CanvasView() {
         }
     }
 
+    /* ### needed?
     function invoke_single_customizer(func_name, args) {
         var ret_value
         for (var i = 0, customizer; customizer = customizers[i]; i++) {
@@ -393,7 +399,7 @@ function CanvasView() {
             ret_value = ret
         }
         return ret_value || canvas_default_configuration[func_name].apply(undefined, args)
-    }
+    } */
 
 
 
@@ -852,6 +858,50 @@ function CanvasView() {
     // ------------------------------------------------------------------------------------------------- Private Classes
 
     /**
+     * A generic topic view, to be enriched by customizers.
+     *
+     * Properties:
+     *  id, type_uri, label
+     *  x, y                    Topic position.
+     *  width, height           To be added by customizer. Generic click detection relies on these.
+     *
+     * @param   topic   A TopicViewmodel.
+     */
+    function TopicView(topic) {
+
+        var self = this
+
+        this.id = topic.id
+        this.x = topic.x
+        this.y = topic.y
+
+        init(topic);
+
+        // ---
+
+        this.move_by = function(dx, dy) {
+            this.x += dx
+            this.y += dy
+            //
+            invoke_customizer("on_move_topic", [this])
+        }
+
+        /**
+         * @param   topic   A TopicViewmodel.
+         */
+        this.update = function(topic) {
+            init(topic)
+        }
+
+        // ---
+
+        function init(topic) {
+            self.type_uri = topic.type_uri
+            self.label    = topic.label
+        }
+    }
+
+    /**
      * Properties:
      *  id, type_uri
      *  topic_id_1, topic_id_2
@@ -899,7 +949,7 @@ function CanvasView() {
      */
     function ClusterView(cluster) {
 
-        var topics = []
+        var topics = []     // array of TopicView
 
         cluster.iterate_topics(function(topic) {
             topics.push(get_topic(topic.id))

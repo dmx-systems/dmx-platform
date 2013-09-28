@@ -1,69 +1,55 @@
+/**
+ * Renders a topic as "icon + label".
+ * The clickable area is the icon.
+ * The label is truncated and line wrapped.
+ */
 function CanvasDefaultConfiguration(canvas_topics, canvas_assocs) {
 
     var LABEL_DIST_Y = 4        // in pixel
 
-    this.create_topic = function(topic_viewmodel, ctx) {
-        return new TopicView(topic_viewmodel, ctx)
+    /**
+     * Adds "width" and "height" properties to the topic view. The CanvasView relies on these for click detection.
+     * Adds "label_wrapper" proprietary property.
+     * Adds "icon_pos", "label_pos_y" proprietary properties. Updated on topic move.
+     *
+     * @param   tv      A TopicView object (defined in CanvasView),
+     *                  has "id", "type_uri", "label", "x", "y" properties.
+     */
+    this.modify_topic_view = function(tv, ctx) {
+        var icon = dm4c.get_type_icon(tv.type_uri)
+        tv.width  = icon.width
+        tv.height = icon.height
+        //
+        var label = js.truncate(tv.label, dm4c.MAX_TOPIC_LABEL_CHARS)
+        tv.label_wrapper = new js.TextWrapper(label, dm4c.MAX_TOPIC_LABEL_WIDTH, 19, ctx)
+        //                                                        // line height 19px = 1.2em
+        init_pos(tv)
     }
 
-    this.draw_topic = function(ct, ctx) {
-        // icon
-        var icon = dm4c.get_type_icon(ct.type_uri)
-        var x = ct.x - ct.width / 2
-        var y = ct.y - ct.height / 2
-        ctx.drawImage(icon, x, y)
-        // label
-        ct.label_wrapper.draw(x, y + ct.height + LABEL_DIST_Y + 16, ctx)    // 16px = 1em
+    this.on_move_topic = function(tv) {
+        init_pos(tv)
+    }
+
+    this.draw_topic = function(tv, ctx) {
+        // 1) render icon
+        // Note: the icon object is not hold in the topic view, but looked up every time. This saves us
+        // from touching all topic view objects once a topic type's icon changes (via view configuration).
+        // Icon lookup is supposed to be a cheap operation.
+        var icon = dm4c.get_type_icon(tv.type_uri)
+        ctx.drawImage(icon, tv.icon_pos.x, tv.icon_pos.y)
+        // 2) render label
+        tv.label_wrapper.draw(tv.icon_pos.x, tv.label_pos_y, ctx)
         // Note: the context must be passed to every draw() call.
         // The context changes when the canvas is resized.
     }
 
-    /**
-     * Properties:
-     *  id, type_uri, label
-     *  x, y                    Topic position. Represents the center of the topic's icon.
-     *  width, height           Icon size.
-     *  label_wrapper
-     *
-     * @param   topic   A TopicViewmodel.
-     */
-    function TopicView(topic, ctx) {
+    // ---
 
-        var self = this
-
-        this.id = topic.id
-        this.x = topic.x
-        this.y = topic.y
-
-        init(topic);
-
-        // ---
-
-        this.move_by = function(dx, dy) {
-            this.x += dx
-            this.y += dy
+    function init_pos(tv) {
+        tv.icon_pos = {
+            x: tv.x - tv.width / 2,
+            y: tv.y - tv.height / 2
         }
-
-        /**
-         * @param   topic   A TopicViewmodel.
-         */
-        this.update = function(topic) {
-            init(topic)
-        }
-
-        // ---
-
-        function init(topic) {
-            self.type_uri = topic.type_uri
-            self.label    = topic.label
-            //
-            var icon = dm4c.get_type_icon(topic.type_uri)
-            self.width  = icon.width
-            self.height = icon.height
-            //
-            var label = js.truncate(self.label, dm4c.MAX_TOPIC_LABEL_CHARS)
-            self.label_wrapper = new js.TextWrapper(label, dm4c.MAX_TOPIC_LABEL_WIDTH, 19, ctx)
-                                                                    // line height 19px = 1.2em
-        }
+        tv.label_pos_y = tv.icon_pos.y + tv.height + LABEL_DIST_Y + 16    // 16px = 1em
     }
 }
