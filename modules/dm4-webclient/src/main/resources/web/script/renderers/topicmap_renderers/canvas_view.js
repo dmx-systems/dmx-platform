@@ -22,7 +22,7 @@ function CanvasView() {
     var topicmap                // the viewmodel underlying this view (a TopicmapViewmodel)
 
     // Customization
-    var canvas_default_configuration = new CanvasDefaultConfiguration(canvas_topics, canvas_assocs)
+    var canvas_default_configuration = new CanvasDefaultConfiguration()
     var customizers = []
 
     // Short-term interaction state
@@ -38,9 +38,9 @@ function CanvasView() {
     // Coordinate systems (for mouse event interpretation)
     // Note: constants begin at 1 as 0 could be interpreted as "not set"
     var Coord = {
-        WINDOW: 1,          // browser window display area
-        CANVAS: 2,          // physical canvas display area -- the default
-        CANVAS_SPACE: 3     // virtual canvas space (involves canvas translation)
+        WINDOW: 1,      // browser window display area
+        CANVAS: 2,      // physical canvas display area -- the default
+        TOPICMAP: 3     // virtual (endless) topicmap space
     }
 
     var self = this
@@ -203,7 +203,9 @@ function CanvasView() {
     // ---
 
     this.add_customizer = function(customizer_func) {
-        customizers.push(new customizer_func(canvas_topics, canvas_assocs))
+        customizers.push(new customizer_func({
+           iterate_topics: iterate_topics 
+        }))
     }
 
 
@@ -442,26 +444,16 @@ function CanvasView() {
                 return
             }
             //
-            var p = pos(event)
-            tmp_x = p.x
-            tmp_y = p.y
+            var canvas_pos = pos(event)
+            var topicmap_pos = pos(event, Coord.TOPICMAP)
             //
-            var ct = find_topic(event)
-            if (ct) {
-                if (event.shiftKey) {
-                    dm4c.do_select_topic(ct.id)
-                    self.begin_association(ct.id, p.x, p.y)
-                } else {
-                    action_topic = ct
-                }
-            } else {
-                var ca = find_association(event)
-                if (ca) {
-                    action_assoc = ca
-                } else if (!association_in_progress) {
-                    canvas_move_in_progress = true
-                }
-            }
+            tmp_x = canvas_pos.x
+            tmp_y = canvas_pos.y
+            //
+            invoke_customizer("on_mousedown", [
+                {canvas: canvas_pos, topicmap: topicmap_pos},
+                {shift: event.shiftKey}
+            ])
         }
     }
 
@@ -598,7 +590,7 @@ function CanvasView() {
             // Note: only dm4c.selected_object has the composite value (the canvas assiation has not)
             var commands = dm4c.get_association_commands(dm4c.selected_object, "context-menu")
         } else {
-            var p = pos(event, Coord.CANVAS_SPACE)
+            var p = pos(event, Coord.TOPICMAP)
             var commands = dm4c.get_canvas_commands(p.x, p.y, "context-menu")
         }
         // 2) show menu
@@ -690,19 +682,19 @@ function CanvasView() {
 
 
     function find_topic(event) {
-        var p = pos(event, Coord.CANVAS_SPACE)
+        var p = pos(event, Coord.TOPICMAP)
         return find_topic_by_position(p)
     }
 
     function find_association(event) {
-        var p = pos(event, Coord.CANVAS_SPACE)
+        var p = pos(event, Coord.TOPICMAP)
         return find_association_by_position(p)
     }
 
     // ---
 
     /**
-     * @param   pos     an object with "x" and "y" properties.
+     * @param   pos     an object with "x" and "y" properties. Coord.TOPICMAP space.
      */
     function find_topic_by_position(pos) {
         return iterate_topics(function(ct) {
@@ -715,7 +707,7 @@ function CanvasView() {
     }
 
     /**
-     * @param   pos     an object with "x" and "y" properties.
+     * @param   pos     an object with "x" and "y" properties. Coord.TOPICMAP space.
      */
     function find_association_by_position(pos) {
         var x = pos.x
@@ -757,7 +749,7 @@ function CanvasView() {
     /**
      * Interprets a mouse event according to a coordinate system.
      *
-     * @param   coordinate_system   Optional: Coord.WINDOW, Coord.CANVAS (default), Coord.CANVAS_SPACE
+     * @param   coordinate_system   Optional: Coord.WINDOW, Coord.CANVAS (default), Coord.TOPICMAP
      *
      * @return  an object with "x" and "y" properties.
      */
@@ -776,7 +768,7 @@ function CanvasView() {
                 x: event.originalEvent.layerX,
                 y: event.originalEvent.layerY
             }
-        case Coord.CANVAS_SPACE:
+        case Coord.TOPICMAP:
             return {
                 x: event.originalEvent.layerX - topicmap.trans_x,
                 y: event.originalEvent.layerY - topicmap.trans_y
@@ -856,6 +848,87 @@ function CanvasView() {
 
 
     // ------------------------------------------------------------------------------------------------- Private Classes
+
+    /**
+     * Renders a topic as "icon + label".
+     * The clickable area is the icon.
+     * The label is truncated and line wrapped.
+     */
+    function CanvasDefaultConfiguration(canvas_topics, canvas_assocs) {
+
+        var LABEL_DIST_Y = 4        // in pixel
+
+        /**
+         * Adds "width" and "height" properties to the topic view. The CanvasView relies on these for click detection.
+         * Adds "label_wrapper" proprietary property.
+         * Adds "icon_pos", "label_pos_y" proprietary properties. Updated on topic move.
+         *
+         * @param   tv      A TopicView object (defined in CanvasView),
+         *                  has "id", "type_uri", "label", "x", "y" properties.
+         */
+        this.update_topic = function(tv, ctx) {
+            update_icon_and_label(tv, ctx)
+            update_geometry(tv)
+        }
+
+        this.move_topic = function(tv) {
+            update_geometry(tv)
+        }
+
+        this.draw_topic = function(tv, ctx) {
+            // 1) render icon
+            // Note: the icon object is not hold in the topic view, but looked up every time. This saves us
+            // from touching all topic view objects once a topic type's icon changes (via view configuration).
+            // Icon lookup is supposed to be a cheap operation.
+            var icon = dm4c.get_type_icon(tv.type_uri)
+            ctx.drawImage(icon, tv.icon_pos.x, tv.icon_pos.y)
+            // 2) render label
+            tv.label_wrapper.draw(tv.icon_pos.x, tv.label_pos_y, ctx)
+            // Note: the context must be passed to every draw() call.
+            // The context changes when the canvas is resized.
+        }
+
+        this.on_mousedown = function(pos, modifier) {
+            var ct = find_topic_by_position(pos.topicmap)
+            if (ct) {
+                if (modifier.shift) {
+                    dm4c.do_select_topic(ct.id)
+                    self.begin_association(ct.id, pos.canvas.x, pos.canvas.y)
+                } else {
+                    action_topic = ct
+                }
+            } else {
+                var ca = find_association_by_position(pos.topicmap)
+                if (ca) {
+                    action_assoc = ca
+                } else {
+                    canvas_move_in_progress = true
+                }
+            }
+        }
+
+        // ---
+
+        function update_icon_and_label(tv, ctx) {
+            var icon = dm4c.get_type_icon(tv.type_uri)
+            tv.width  = icon.width
+            tv.height = icon.height
+            //
+            var label = js.truncate(tv.label, dm4c.MAX_TOPIC_LABEL_CHARS)
+            tv.label_wrapper = new js.TextWrapper(label, dm4c.MAX_TOPIC_LABEL_WIDTH, 19, ctx)
+            //                                                        // line height 19px = 1.2em
+        }
+
+        function update_geometry(tv) {
+            tv.icon_pos = {
+                x: tv.x - tv.width / 2,
+                y: tv.y - tv.height / 2
+            }
+            tv.label_pos_y = tv.icon_pos.y + tv.height + LABEL_DIST_Y + 16    // 16px = 1em
+        }
+    }
+
+    // ---
 
     /**
      * A generic topic view, to be enriched by customizers.
