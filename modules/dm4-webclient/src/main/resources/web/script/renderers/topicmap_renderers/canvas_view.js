@@ -505,7 +505,7 @@ function CanvasView() {
         } else if (canvas_move_in_progress) {
             end_canvas_move()
         } else if (association_in_progress) {
-            var ct = find_topic(event)
+            var ct = detect_topic(event)
             if (ct && ct.id != action_topic.id) {
                 dm4c.do_create_association("dm4.core.association", ct)
             }
@@ -524,7 +524,7 @@ function CanvasView() {
     }
 
     function do_doubleclick(event) {
-        var ct = find_topic(event)
+        var ct = detect_topic(event)
         if (ct) {
             dm4c.fire_event("topic_doubleclicked", ct)
         }
@@ -581,11 +581,11 @@ function CanvasView() {
         //
         // 1) assemble commands
         var ct, ca
-        if (ct = find_topic(event)) {
+        if (ct = detect_topic(event)) {
             dm4c.do_select_topic(ct.id)
             // Note: only dm4c.selected_object has the composite value (the canvas topic has not)
             var commands = dm4c.get_topic_commands(dm4c.selected_object, "context-menu")
-        } else if (ca = find_association(event)) {
+        } else if (ca = detect_association(event)) {
             dm4c.do_select_association(ca.id)
             // Note: only dm4c.selected_object has the composite value (the canvas assiation has not)
             var commands = dm4c.get_association_commands(dm4c.selected_object, "context-menu")
@@ -681,41 +681,47 @@ function CanvasView() {
 
 
 
-    function find_topic(event) {
-        var p = pos(event, Coord.TOPICMAP)
-        return find_topic_by_position(p)
+    function detect_topic(event) {
+        return detect_topic_at(pos(event, Coord.TOPICMAP))
     }
 
-    function find_association(event) {
-        var p = pos(event, Coord.TOPICMAP)
-        return find_association_by_position(p)
+    function detect_association(event) {
+        return detect_association_at(pos(event, Coord.TOPICMAP))
     }
 
     // ---
 
     /**
+     * Detects the topic that is located at a given position.
+     * Detection relies on the topic view's bounding box ("x1", "y1", "x2", "y2" properties).
+     * Note: Topicmap Renderer Customizers are responsible for adding these properties to the topic view.
+     *
      * @param   pos     an object with "x" and "y" properties. Coord.TOPICMAP space.
+     *
+     * @return  The detected topic, or undefined if no topic is located at the given position.
      */
-    function find_topic_by_position(pos) {
+    function detect_topic_at(pos) {
         return iterate_topics(function(ct) {
-            if (pos.x >= ct.x - ct.width  / 2 && pos.x < ct.x + ct.width  / 2 &&
-                pos.y >= ct.y - ct.height / 2 && pos.y < ct.y + ct.height / 2) {
-                //
+            if (pos.x >= ct.x1 && pos.x < ct.x2 && pos.y >= ct.y1 && pos.y < ct.y2) {
                 return ct
             }
         })
     }
 
     /**
+     * Detects the association that is located at a given position.
+     *
      * @param   pos     an object with "x" and "y" properties. Coord.TOPICMAP space.
+     *
+     * @return  The detected association, or undefined if no association is located at the given position.
      */
-    function find_association_by_position(pos) {
+    function detect_association_at(pos) {
         var x = pos.x
         var y = pos.y
         return iterate_associations(function(ca) {
             var ct1 = ca.get_topic_1()
             var ct2 = ca.get_topic_2()
-            // bounding rectangle
+            // bounding box
             var aw2 = dm4c.ASSOC_WIDTH / 2   // buffer to make orthogonal associations selectable
             var bx1 = Math.min(ct1.x, ct2.x) - aw2
             var bx2 = Math.max(ct1.x, ct2.x) + aw2
@@ -859,9 +865,10 @@ function CanvasView() {
         var LABEL_DIST_Y = 4        // in pixel
 
         /**
-         * Adds "width" and "height" properties to the topic view. The CanvasView relies on these for click detection.
-         * Adds "label_wrapper" proprietary property.
-         * Adds "icon_pos", "label_pos_y" proprietary properties. Updated on topic move.
+         * Adds "x1", "y1", "x2", "y2" properties to the topic view. Click detection relies on this bounding box.
+         * Adds "width" and "height" proprietary properties. Updated on topic update (label or type changed).
+         * Adds "label_wrapper" proprietary property.        Updated on topic update (label or type changed).
+         * Adds "label_pos_y" proprietary property.          Updated on topic move.
          *
          * @param   tv      A TopicView object (defined in CanvasView),
          *                  has "id", "type_uri", "label", "x", "y" properties.
@@ -881,15 +888,15 @@ function CanvasView() {
             // from touching all topic view objects once a topic type's icon changes (via view configuration).
             // Icon lookup is supposed to be a cheap operation.
             var icon = dm4c.get_type_icon(tv.type_uri)
-            ctx.drawImage(icon, tv.icon_pos.x, tv.icon_pos.y)
+            ctx.drawImage(icon, tv.x1, tv.y1)
             // 2) render label
-            tv.label_wrapper.draw(tv.icon_pos.x, tv.label_pos_y, ctx)
+            tv.label_wrapper.draw(tv.x1, tv.label_pos_y, ctx)
             // Note: the context must be passed to every draw() call.
             // The context changes when the canvas is resized.
         }
 
         this.on_mousedown = function(pos, modifier) {
-            var ct = find_topic_by_position(pos.topicmap)
+            var ct = detect_topic_at(pos.topicmap)
             if (ct) {
                 if (modifier.shift) {
                     dm4c.do_select_topic(ct.id)
@@ -898,7 +905,7 @@ function CanvasView() {
                     action_topic = ct
                 }
             } else {
-                var ca = find_association_by_position(pos.topicmap)
+                var ca = detect_association_at(pos.topicmap)
                 if (ca) {
                     action_assoc = ca
                 } else {
@@ -920,23 +927,25 @@ function CanvasView() {
         }
 
         function update_geometry(tv) {
-            tv.icon_pos = {
-                x: tv.x - tv.width / 2,
-                y: tv.y - tv.height / 2
-            }
-            tv.label_pos_y = tv.icon_pos.y + tv.height + LABEL_DIST_Y + 16    // 16px = 1em
+            // bounding box
+            tv.x1 = tv.x - tv.width / 2,
+            tv.y1 = tv.y - tv.height / 2
+            tv.x2 = tv.x1 + tv.width
+            tv.y2 = tv.y1 + tv.height
+            //
+            tv.label_pos_y = tv.y2 + LABEL_DIST_Y + 16    // 16px = 1em
         }
     }
 
     // ---
 
     /**
-     * A generic topic view, to be enriched by customizers.
+     * The generic topic view, to be enriched by customizers.
      *
      * Properties:
      *  id, type_uri, label
      *  x, y                    Topic position.
-     *  width, height           To be added by customizer. Generic click detection relies on these.
+     *  x1, y1, x2, y2          Bounding box. Click detection relies on it. To be added by customizer.
      *
      * @param   topic   A TopicViewmodel.
      */
