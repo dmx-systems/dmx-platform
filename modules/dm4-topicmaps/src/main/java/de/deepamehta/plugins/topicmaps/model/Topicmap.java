@@ -1,5 +1,7 @@
 package de.deepamehta.plugins.topicmaps.model;
 
+import de.deepamehta.plugins.topicmaps.ViewmodelCustomizer;
+
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
@@ -13,7 +15,6 @@ import org.codehaus.jettison.json.JSONObject;
 
 import java.awt.Point;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -22,21 +23,24 @@ import java.util.logging.Logger;
 
 
 /**
- * A topicmap model: a collection of topics and associations plus their visualization information.
+ * A topicmap viewmodel: a collection of topics and associations plus their view properties.
  * <p>
  * Features:
  * - load from DB (by constructor).
  * - Serialization to JSON.
+ *
+ * ### TODO: could be renamed to "TopicmapViewmodel"
  */
 public class Topicmap implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected Topic topicmapTopic;
-    protected Map<Long, TopicmapTopic> topics = new HashMap();
-    protected Map<Long, TopicmapAssociation> assocs = new HashMap();
+    private Topic topicmapTopic;
+    private Map<Long, TopicmapTopic> topics = new HashMap();
+    private Map<Long, TopicmapAssociation> assocs = new HashMap();
 
-    protected DeepaMehtaService dms;
+    private DeepaMehtaService dms;
+    private Set<ViewmodelCustomizer> customizers;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -45,9 +49,10 @@ public class Topicmap implements JSONEnabled {
     /**
      * Loads a topicmap from the DB.
      */
-    public Topicmap(long topicmapId, DeepaMehtaService dms) {
+    public Topicmap(long topicmapId, DeepaMehtaService dms, Set<ViewmodelCustomizer> customizers) {
         this.topicmapTopic = dms.getTopic(topicmapId, true);    // fetchComposite=true
         this.dms = dms;
+        this.customizers = customizers;
         //
         logger.info("Loading topicmap " + getId());
         loadTopics();
@@ -59,18 +64,6 @@ public class Topicmap implements JSONEnabled {
     public long getId() {
         return topicmapTopic.getId();
     }
-
-    // ---
-
-    public boolean containsTopic(long topicId) {
-        return topics.get(topicId) != null;
-    }
-
-    public boolean containsAssociation(long assocId) {
-        return assocs.get(assocId) != null;
-    }
-
-    // ---
 
     @Override
     public JSONObject toJSON() {
@@ -92,7 +85,7 @@ public class Topicmap implements JSONEnabled {
 
     // -------------------------------------------------------------------------------------------- Public Inner Classes
 
-    // Note: there is a client-side equivalent in canvas.js (deepamehta-client plugin)
+    // Note: there is a client-side equivalent in canvas_view.js (deepamehta-webclient plugin)
     public class GridPositioning {
 
         // Settings
@@ -159,8 +152,9 @@ public class Topicmap implements JSONEnabled {
             "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, false, true, 0);
             // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=true, maxResultSize=0
         for (RelatedTopic mapTopic : mapTopics) {
-            CompositeValueModel visualizationProps = mapTopic.getRelatingAssociation().getCompositeValue().getModel();
-            addTopic(new TopicmapTopic(mapTopic.getModel(), visualizationProps));
+            CompositeValueModel viewProps = mapTopic.getRelatingAssociation().getCompositeValue().getModel();
+            invokeViewmodelCustomizers(mapTopic, viewProps);
+            addTopic(new TopicmapTopic(mapTopic.getModel(), viewProps));
         }
     }
 
@@ -169,6 +163,14 @@ public class Topicmap implements JSONEnabled {
             "dm4.core.default", "dm4.topicmaps.topicmap_association", null, false, false);
         for (RelatedAssociation mapAssoc : mapAssocs) {
             addAssociation(new TopicmapAssociation(mapAssoc.getModel()));
+        }
+    }
+
+    // ---
+
+    private void invokeViewmodelCustomizers(Topic topic, CompositeValueModel viewProps) {
+        for (ViewmodelCustomizer customizer : customizers) {
+            customizer.modifyViewProperties(topic, viewProps);
         }
     }
 

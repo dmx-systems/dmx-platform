@@ -28,9 +28,11 @@ import javax.ws.rs.Consumes;
 import java.awt.Point;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -55,7 +57,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    Map<String, TopicmapRenderer> topicmapRendererRegistry = new HashMap();
+    Map<String, TopicmapRenderer> topicmapRenderers = new HashMap();
+    Set<ViewmodelCustomizer> viewmodelCustomizers = new HashSet();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -103,7 +106,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public Topicmap getTopicmap(@PathParam("id") long topicmapId) {
         try {
-            return new Topicmap(topicmapId, dms);
+            return new Topicmap(topicmapId, dms, viewmodelCustomizers);
         } catch (Exception e) {
             throw new RuntimeException("Fetching topicmap " + topicmapId + " failed", e);
         }
@@ -196,7 +199,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void registerTopicmapRenderer(TopicmapRenderer renderer) {
         logger.info("### Registering topicmap renderer \"" + renderer.getClass().getName() + "\"");
-        topicmapRendererRegistry.put(renderer.getUri(), renderer);
+        topicmapRenderers.put(renderer.getUri(), renderer);
+    }
+
+    @Override
+    public void registerViewmodelCustomizer(ViewmodelCustomizer customizer) {
+        logger.info("### Registering viewmodel customizer \"" + customizer.getClass().getName() + "\"");
+        viewmodelCustomizers.add(customizer);
     }
 
     // ---
@@ -251,7 +260,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---
 
     private TopicmapRenderer getTopicmapRenderer(String rendererUri) {
-        TopicmapRenderer renderer = topicmapRendererRegistry.get(rendererUri);
+        TopicmapRenderer renderer = topicmapRenderers.get(rendererUri);
         //
         if (renderer == null) {
             throw new RuntimeException("\"" + rendererUri + "\" is an unknown topicmap renderer");

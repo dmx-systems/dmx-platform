@@ -8,7 +8,9 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 /**
- * An association as contained in a topicmap.
+ * An association viewmodel as contained in a topicmap viewmodel.
+ *
+ * ### TODO: could be renamed to "AssociationViewmodel"
  */
 public class TopicmapAssociation extends AssociationModel {
 

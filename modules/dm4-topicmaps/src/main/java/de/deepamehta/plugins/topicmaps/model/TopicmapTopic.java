@@ -11,20 +11,22 @@ import java.util.Map;
 
 
 /**
- * A topic as contained in a topicmap.
- * That is a generic topic enriched by visualization properties ("x", "y", "visibility").
+ * A topic viewmodel as contained in a topicmap viewmodel.
+ * That is a generic topic model enriched by view properties ("x", "y", "visibility").
+ *
+ * ### TODO: could be renamed to "TopicViewmodel"
  */
 public class TopicmapTopic extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private CompositeValueModel visualizationProps;
+    private CompositeValueModel viewProps;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicmapTopic(TopicModel topic, CompositeValueModel visualizationProps) {
+    TopicmapTopic(TopicModel topic, CompositeValueModel viewProps) {
         super(topic);
-        this.visualizationProps = visualizationProps;
+        this.viewProps = viewProps;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -33,7 +35,7 @@ public class TopicmapTopic extends TopicModel {
     public JSONObject toJSON() {
         try {
             JSONObject o = super.toJSON();
-            o.put("visualization", visualizationProps.toJSON());
+            o.put("view", viewProps.toJSON());
             return o;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
@@ -45,14 +47,14 @@ public class TopicmapTopic extends TopicModel {
     public int getX() {
         // Note: coordinates can have both formats: double (through JavaScript) and integer (programmatically placed).
         // ### TODO: store coordinates always as integers
-        Object x = visualizationProps.getObject("x");
+        Object x = viewProps.getObject("x");
         return x instanceof Double ? ((Double) x).intValue() : (Integer) x;
     }
 
     public int getY() {
         // Note: coordinates can have both formats: double (through JavaScript) and integer (programmatically placed).
         // ### TODO: store coordinates always as integers
-        Object y = visualizationProps.getObject("y");
+        Object y = viewProps.getObject("y");
         return y instanceof Double ? ((Double) y).intValue() : (Integer) y;
     }
 }

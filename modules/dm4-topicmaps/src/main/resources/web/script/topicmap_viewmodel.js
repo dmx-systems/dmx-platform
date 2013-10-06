@@ -328,9 +328,9 @@ function TopicmapViewmodel(topicmap_id, config) {
 
         function init_topics() {
             for (var i = 0, topic; topic = topicmap.topics[i]; i++) {
-                var x = topic.visualization["dm4.topicmaps.x"].value
-                var y = topic.visualization["dm4.topicmaps.y"].value
-                var visibility = topic.visualization["dm4.topicmaps.visibility"].value
+                var x = topic.view["dm4.topicmaps.x"].value
+                var y = topic.view["dm4.topicmaps.y"].value
+                var visibility = topic.view["dm4.topicmaps.visibility"].value
                 topics[topic.id] = new TopicViewmodel(topic.id, topic.type_uri, topic.value, x, y, visibility)
             }
         }
