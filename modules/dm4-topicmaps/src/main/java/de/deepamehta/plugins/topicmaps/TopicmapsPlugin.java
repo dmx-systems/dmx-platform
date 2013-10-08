@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.topicmaps;
 
 import de.deepamehta.plugins.topicmaps.model.ClusterCoords;
-import de.deepamehta.plugins.topicmaps.model.Topicmap;
+import de.deepamehta.plugins.topicmaps.model.TopicmapViewmodel;
 import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
 import de.deepamehta.core.Association;
@@ -104,9 +104,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @GET
     @Path("/{id}")
     @Override
-    public Topicmap getTopicmap(@PathParam("id") long topicmapId) {
+    public TopicmapViewmodel getTopicmap(@PathParam("id") long topicmapId) {
         try {
-            return new Topicmap(topicmapId, dms, viewmodelCustomizers);
+            return new TopicmapViewmodel(topicmapId, dms, viewmodelCustomizers);
         } catch (Exception e) {
             throw new RuntimeException("Fetching topicmap " + topicmapId + " failed", e);
         }

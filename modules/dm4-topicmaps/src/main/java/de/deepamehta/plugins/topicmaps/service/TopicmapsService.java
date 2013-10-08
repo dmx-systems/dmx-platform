@@ -3,7 +3,7 @@ package de.deepamehta.plugins.topicmaps.service;
 import de.deepamehta.plugins.topicmaps.TopicmapRenderer;
 import de.deepamehta.plugins.topicmaps.ViewmodelCustomizer;
 import de.deepamehta.plugins.topicmaps.model.ClusterCoords;
-import de.deepamehta.plugins.topicmaps.model.Topicmap;
+import de.deepamehta.plugins.topicmaps.model.TopicmapViewmodel;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.ClientState;
@@ -18,7 +18,7 @@ public interface TopicmapsService extends PluginService {
 
     // ---
 
-    Topicmap getTopicmap(long topicmapId);
+    TopicmapViewmodel getTopicmap(long topicmapId);
 
     // ---
 

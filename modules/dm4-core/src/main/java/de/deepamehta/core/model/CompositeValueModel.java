@@ -293,7 +293,8 @@ public class CompositeValueModel {
     // === Manipulators ===
 
     /**
-     * Puts a single-valued child. An existing value is overwritten.
+     * Puts a value in a single-valued child.
+     * An existing value is overwritten.
      */
     public CompositeValueModel put(String childTypeUri, TopicModel value) {
         try {
@@ -311,7 +312,8 @@ public class CompositeValueModel {
     }
 
     /**
-     * Convenience method to put a single-valued child. An existing value is overwritten.
+     * Convenience method to put a *simple* value in a single-valued child.
+     * An existing value is overwritten.
      *
      * @param   value   a String, Integer, Long, Double, or a Boolean.
      *
@@ -328,7 +330,8 @@ public class CompositeValueModel {
     }
 
     /**
-     * Convenience method to put a single-valued child. An existing value is overwritten.
+     * Convenience method to put a *composite* value in a single-valued child.
+     * An existing value is overwritten.
      *
      * @return  this CompositeValueModel.
      */
@@ -340,7 +343,8 @@ public class CompositeValueModel {
     // ---
 
     /**
-     * Puts a by-ID topic reference for a single-valued child. An existing reference is overwritten.
+     * Puts a by-ID topic reference for a single-valued child.
+     * An existing reference is overwritten.
      *
      * Used to maintain the assigment of an *aggregated* child.
      * Not applicable for a *compositioned* child.
@@ -351,7 +355,8 @@ public class CompositeValueModel {
     }
 
     /**
-     * Puts a by-URI topic reference for a single-valued child. An existing reference is overwritten.
+     * Puts a by-URI topic reference for a single-valued child.
+     * An existing reference is overwritten.
      *
      * Used to maintain the assigment of an *aggregated* child.
      * Not applicable for a *compositioned* child.

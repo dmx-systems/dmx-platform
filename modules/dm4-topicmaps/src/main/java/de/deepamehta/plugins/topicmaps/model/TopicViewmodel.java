@@ -3,20 +3,15 @@ package de.deepamehta.plugins.topicmaps.model;
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-
-import java.util.Map;
 
 
 
 /**
  * A topic viewmodel as contained in a topicmap viewmodel.
  * That is a generic topic model enriched by view properties ("x", "y", "visibility").
- *
- * ### TODO: could be renamed to "TopicViewmodel"
  */
-public class TopicmapTopic extends TopicModel {
+public class TopicViewmodel extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -24,7 +19,7 @@ public class TopicmapTopic extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicmapTopic(TopicModel topic, CompositeValueModel viewProps) {
+    TopicViewmodel(TopicModel topic, CompositeValueModel viewProps) {
         super(topic);
         this.viewProps = viewProps;
     }

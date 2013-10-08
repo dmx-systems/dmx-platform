@@ -28,16 +28,14 @@ import java.util.logging.Logger;
  * Features:
  * - load from DB (by constructor).
  * - Serialization to JSON.
- *
- * ### TODO: could be renamed to "TopicmapViewmodel"
  */
-public class Topicmap implements JSONEnabled {
+public class TopicmapViewmodel implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Topic topicmapTopic;
-    private Map<Long, TopicmapTopic> topics = new HashMap();
-    private Map<Long, TopicmapAssociation> assocs = new HashMap();
+    private Map<Long, TopicViewmodel> topics = new HashMap();
+    private Map<Long, AssociationViewmodel> assocs = new HashMap();
 
     private DeepaMehtaService dms;
     private Set<ViewmodelCustomizer> customizers;
@@ -49,7 +47,7 @@ public class Topicmap implements JSONEnabled {
     /**
      * Loads a topicmap from the DB.
      */
-    public Topicmap(long topicmapId, DeepaMehtaService dms, Set<ViewmodelCustomizer> customizers) {
+    public TopicmapViewmodel(long topicmapId, DeepaMehtaService dms, Set<ViewmodelCustomizer> customizers) {
         this.topicmapTopic = dms.getTopic(topicmapId, true);    // fetchComposite=true
         this.dms = dms;
         this.customizers = customizers;
@@ -125,7 +123,7 @@ public class Topicmap implements JSONEnabled {
 
         private Point findStartPostition() {
             int maxY = MIN_Y;
-            for (TopicmapTopic topic : topics.values()) {
+            for (TopicViewmodel topic : topics.values()) {
                 if (topic.getY() > maxY) {
                     maxY = topic.getY();
                 }
@@ -154,7 +152,7 @@ public class Topicmap implements JSONEnabled {
         for (RelatedTopic mapTopic : mapTopics) {
             CompositeValueModel viewProps = mapTopic.getRelatingAssociation().getCompositeValue().getModel();
             invokeViewmodelCustomizers(mapTopic, viewProps);
-            addTopic(new TopicmapTopic(mapTopic.getModel(), viewProps));
+            addTopic(new TopicViewmodel(mapTopic.getModel(), viewProps));
         }
     }
 
@@ -162,7 +160,7 @@ public class Topicmap implements JSONEnabled {
         Set<RelatedAssociation> mapAssocs = topicmapTopic.getRelatedAssociations("dm4.topicmaps.association_mapcontext",
             "dm4.core.default", "dm4.topicmaps.topicmap_association", null, false, false);
         for (RelatedAssociation mapAssoc : mapAssocs) {
-            addAssociation(new TopicmapAssociation(mapAssoc.getModel()));
+            addAssociation(new AssociationViewmodel(mapAssoc.getModel()));
         }
     }
 
@@ -176,11 +174,11 @@ public class Topicmap implements JSONEnabled {
 
     // ---
 
-    private void addTopic(TopicmapTopic topic) {
+    private void addTopic(TopicViewmodel topic) {
         topics.put(topic.getId(), topic);
     }
 
-    private void addAssociation(TopicmapAssociation assoc) {
+    private void addAssociation(AssociationViewmodel assoc) {
         assocs.put(assoc.getId(), assoc);
     }
 }
