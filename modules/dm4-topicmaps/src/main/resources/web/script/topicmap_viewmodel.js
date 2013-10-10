@@ -97,7 +97,7 @@ function TopicmapViewmodel(topicmap_id, config) {
                 "dm4.topicmaps.y": y,
                 "dm4.topicmaps.visibility": true
             }
-            invoke_customizers("modify_view_properties", [topic, view_props])
+            invoke_customizers("enrich_view_properties", [topic, view_props])
             return view_props
         }
     }

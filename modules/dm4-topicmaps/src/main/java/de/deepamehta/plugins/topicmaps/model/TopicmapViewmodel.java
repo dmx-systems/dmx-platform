@@ -166,18 +166,20 @@ public class TopicmapViewmodel implements JSONEnabled {
 
     // ---
 
+    // ### There is a copy in TopicmapsPlugin
     private void invokeViewmodelCustomizers(Topic topic, CompositeValueModel viewProps) {
         for (ViewmodelCustomizer customizer : customizers) {
             invokeViewmodelCustomizer(customizer, topic, viewProps);
         }
     }
 
+    // ### There is a principal copy in TopicmapsPlugin
     private void invokeViewmodelCustomizer(ViewmodelCustomizer customizer, Topic topic, CompositeValueModel viewProps) {
         try {
-            customizer.modifyViewProperties(topic, viewProps);
+            customizer.enrichViewProperties(topic, viewProps);
         } catch (Exception e) {
-            throw new RuntimeException("Invoking viewmodel customizer for topic " + topic.getId() +
-                " failed (customizer=\"" + customizer.getClass().getName() + "\")", e);
+            throw new RuntimeException("Invoking viewmodel customizer for topic " + topic.getId() + " failed " +
+                "(customizer=\"" + customizer.getClass().getName() + "\", method=\"enrichViewProperties\")", e);
         }
     }
 

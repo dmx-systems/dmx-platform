@@ -7,5 +7,7 @@ import de.deepamehta.core.model.CompositeValueModel;
 
 public interface ViewmodelCustomizer {
 
-    void modifyViewProperties(Topic topic, CompositeValueModel viewProps);
+    void enrichViewProperties(Topic topic, CompositeValueModel viewProps);
+
+    void storeViewProperties(Topic topic, CompositeValueModel viewProps);
 }

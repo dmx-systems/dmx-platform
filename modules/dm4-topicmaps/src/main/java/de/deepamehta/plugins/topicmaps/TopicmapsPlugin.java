@@ -57,8 +57,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    Map<String, TopicmapRenderer> topicmapRenderers = new HashMap();
-    Set<ViewmodelCustomizer> viewmodelCustomizers = new HashSet();
+    private Map<String, TopicmapRenderer> topicmapRenderers = new HashMap();
+    private Set<ViewmodelCustomizer> viewmodelCustomizers = new HashSet();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -124,6 +124,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC),
             viewProps
         ), null);   // FIXME: clientState=null
+        //
+        storeCustomViewProperties(topicmapId, topicId, viewProps);
     }
 
     @POST
@@ -140,8 +142,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Path("/{id}/topic/{topic_id}")
     @Override
     public void updateViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
-        updateStandardViewProperties(topicmapId, topicId, viewProps);
-        // ### TODO: update custom view properties (invoking the viewmodel customizers)
+        storeStandardViewProperties(topicmapId, topicId, viewProps);
+        storeCustomViewProperties(topicmapId, topicId, viewProps);
     }
 
 
@@ -150,7 +152,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void moveTopic(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId, @PathParam("x") int x,
                                                                                                 @PathParam("y") int y) {
-        updateStandardViewProperties(topicmapId, topicId, new CompositeValueModel()
+        storeStandardViewProperties(topicmapId, topicId, new CompositeValueModel()
             .put("dm4.topicmaps.x", x)
             .put("dm4.topicmaps.y", y)
         );
@@ -161,7 +163,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
-        updateStandardViewProperties(topicmapId, topicId, new CompositeValueModel()
+        storeStandardViewProperties(topicmapId, topicId, new CompositeValueModel()
             .put("dm4.topicmaps.visibility", visibility)
         );
     }
@@ -255,9 +257,14 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    public void updateStandardViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
+    private void storeStandardViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
         fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(viewProps, null, new Directives());
     }                                                                           // clientState=null
+
+    private void storeCustomViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
+        invokeViewmodelCustomizers(topicId, viewProps);
+
+    }
 
     // ---
 
@@ -269,6 +276,26 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private Association fetchAssociationRefAssociation(long topicmapId, long assocId) {
         return dms.getAssociationBetweenTopicAndAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
             ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION, false);  // fetchComposite=false
+    }
+
+    // ---
+
+    // ### There is a copy in TopicmapViewmodel
+    private void invokeViewmodelCustomizers(long topicId, CompositeValueModel viewProps) {
+        Topic topic = dms.getTopic(topicId, false);             // fetchComposite=false
+        for (ViewmodelCustomizer customizer : viewmodelCustomizers) {
+            invokeViewmodelCustomizer(customizer, topic, viewProps);
+        }
+    }
+
+    // ### There is a principal copy in TopicmapViewmodel
+    private void invokeViewmodelCustomizer(ViewmodelCustomizer customizer, Topic topic, CompositeValueModel viewProps) {
+        try {
+            customizer.storeViewProperties(topic, viewProps);
+        } catch (Exception e) {
+            throw new RuntimeException("Invoking viewmodel customizer for topic " + topic.getId() + " failed " +
+                "(customizer=\"" + customizer.getClass().getName() + "\", method=\"storeViewProperties\")", e);
+        }
     }
 
     // ---
