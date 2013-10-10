@@ -168,7 +168,16 @@ public class TopicmapViewmodel implements JSONEnabled {
 
     private void invokeViewmodelCustomizers(Topic topic, CompositeValueModel viewProps) {
         for (ViewmodelCustomizer customizer : customizers) {
+            invokeViewmodelCustomizer(customizer, topic, viewProps);
+        }
+    }
+
+    private void invokeViewmodelCustomizer(ViewmodelCustomizer customizer, Topic topic, CompositeValueModel viewProps) {
+        try {
             customizer.modifyViewProperties(topic, viewProps);
+        } catch (Exception e) {
+            throw new RuntimeException("Invoking viewmodel customizer for topic " + topic.getId() +
+                " failed (customizer=\"" + customizer.getClass().getName() + "\")", e);
         }
     }
 

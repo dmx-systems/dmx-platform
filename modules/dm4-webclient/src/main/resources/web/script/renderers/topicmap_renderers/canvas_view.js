@@ -956,6 +956,7 @@ function CanvasView() {
         this.id = topic.id
         this.x = topic.x
         this.y = topic.y
+        this.view_props = topic.view_props
 
         init(topic);
 

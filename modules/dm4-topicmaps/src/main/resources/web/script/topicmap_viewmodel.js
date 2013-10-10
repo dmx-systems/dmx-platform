@@ -59,44 +59,56 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     // ---
 
-    this.add_topic = function(id, type_uri, label, x, y) {
-        var topic = topics[id]
-        if (!topic) {
+    /**
+     * @param   topic   a domain topic (has "id", "type_uri", "value" properties).
+     */
+    this.add_topic = function(topic, x, y) {
+        var _topic = topics[topic.id]
+        if (!_topic) {
             // update memory
-            topic = new TopicViewmodel(id, type_uri, label, x, y, true)     // visibility=true
-            topics[id] = topic
+            _topic = add_topic(topic, view_props())
             // update DB
             if (is_writable()) {
-                dm4c.restc.add_topic_to_topicmap(topicmap_id, id, x, y)
+                dm4c.restc.add_topic_to_topicmap(topicmap_id, topic.id, x, y)
             }
             //
-            return topic
-        } else if (!topic.visibility) {
+            return _topic
+        } else if (!_topic.visibility) {
             // update memory
-            topic.set_visibility(true)
+            _topic.set_visibility(true)
             // update DB
             if (is_writable()) {
-                dm4c.restc.set_topic_visibility(topicmap_id, id, true)
+                dm4c.restc.set_topic_visibility(topicmap_id, topic.id, true)
             }
             //
-            return topic
+            return _topic
         } else {
             // topic already visible in topicmap
         }
+
+        function view_props() {
+            return {
+                "dm4.topicmaps.x": x,
+                "dm4.topicmaps.y": y,
+                "dm4.topicmaps.visibility": true
+            }
+        }
     }
 
-    this.add_association = function(id, type_uri, topic_id_1, topic_id_2) {
-        var assoc = assocs[id]
-        if (!assoc) {
+    /**
+     * @param   assoc   a domain association (has "id", "type_uri", "role_1", "role_2" properties).
+     */
+    this.add_association = function(assoc) {
+        var _assoc = assocs[assoc.id]
+        if (!_assoc) {
             // update memory
-            assoc = new AssociationViewmodel(id, type_uri, topic_id_1, topic_id_2)
-            assocs[id] = assoc
+            _assoc = add_association(assoc)
             // update DB
             if (is_writable()) {
-                dm4c.restc.add_association_to_topicmap(topicmap_id, id)
+                dm4c.restc.add_association_to_topicmap(topicmap_id, assoc.id)
             }
             //
-            return assoc
+            return _assoc
         } else {
             // association already in topicmap
         }
@@ -328,17 +340,14 @@ function TopicmapViewmodel(topicmap_id, config) {
 
         function init_topics() {
             for (var i = 0, topic; topic = topicmap.topics[i]; i++) {
-                var x = topic.view["dm4.topicmaps.x"].value
-                var y = topic.view["dm4.topicmaps.y"].value
-                var visibility = topic.view["dm4.topicmaps.visibility"].value
-                topics[topic.id] = new TopicViewmodel(topic.id, topic.type_uri, topic.value, x, y, visibility)
+                var view_props = simplified_composite_format(topic.view_props)
+                add_topic(topic, view_props)
             }
         }
 
         function init_associations() {
             for (var i = 0, assoc; assoc = topicmap.assocs[i]; i++) {
-                assocs[assoc.id] = new AssociationViewmodel(assoc.id, assoc.type_uri,
-                    assoc.role_1.topic_id, assoc.role_2.topic_id)
+                add_association(assoc)
             }
         }
 
@@ -361,6 +370,24 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     // ---
 
+    function simplified_composite_format(comp_value) {
+        var simple_comp = {}
+        for (var type_uri in comp_value) {
+            var val = comp_value[type_uri]
+            // ### TODO
+            if (js.is_array(val)) {
+                throw "multiple-valued view properties are not supported"
+            } else if (js.size(val.composite)) {
+                throw "composite view properties are not supported"
+            }
+            //
+            simple_comp[type_uri] = val.value
+        }
+        return simple_comp
+    }
+
+    // ---
+
     function iterate_topics(visitor_func) {
         for (var id in topics) {
             visitor_func(topics[id])
@@ -375,6 +402,26 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     // ---
 
+    /**
+     * @param   topic   a domain topic (has "id", "type_uri", "value" properties).
+     */
+    function add_topic(topic, view_props) {
+        var _topic = new TopicViewmodel(topic, view_props)
+        topics[topic.id] = _topic
+        return _topic
+    }
+
+    /**
+     * @param   assoc   a domain association (has "id", "type_uri", "role_1", "role_2" properties).
+     */
+    function add_association(assoc) {
+        var _assoc = new AssociationViewmodel(assoc)
+        assocs[assoc.id] = _assoc
+        return _assoc
+    }
+
+    // ---
+
     function is_writable() {
         return config.is_writable
     }
@@ -383,14 +430,20 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
-    function TopicViewmodel(id, type_uri, label, x, y, visibility) {
+    /**
+     * @param   topic   a domain topic (has "id", "type_uri", "value" properties).
+     */
+    function TopicViewmodel(topic, view_props) {
 
-        this.id = id
-        this.type_uri = type_uri
-        this.label = label
-        this.x = x
-        this.y = y
-        this.visibility = visibility
+        this.id       = topic.id
+        this.type_uri = topic.type_uri
+        this.label    = topic.value
+        // standard view properties
+        this.x          = view_props["dm4.topicmaps.x"]
+        this.y          = view_props["dm4.topicmaps.y"]
+        this.visibility = view_props["dm4.topicmaps.visibility"]
+        // enable access to custom view properties
+        this.view_props = view_props
 
         this.set_visibility = function(visibility) {
             this.visibility = visibility
@@ -406,34 +459,37 @@ function TopicmapViewmodel(topicmap_id, config) {
         }
 
         /**
-         * @param   topic   a Topic object
+         * @param   topic   a domain topic (has "id", "type_uri", "value" properties).
          */
         this.update = function(topic) {
             this.type_uri = topic.type_uri
-            this.label = topic.value
+            this.label    = topic.value
         }
 
         this.delete = function() {
             // Note: all topic references are deleted already
-            delete topics[id]
+            delete topics[topic.id]
             reset_selection_conditionally()
         }
 
         // ---
 
         function reset_selection_conditionally() {
-            if (self.is_topic_selected && self.selected_object_id == id) {
+            if (self.is_topic_selected && self.selected_object_id == topic.id) {
                 self.reset_selection()
             }
         }
     }
 
-    function AssociationViewmodel(id, type_uri, topic_id_1, topic_id_2) {
+    /**
+     * @param   assoc   a domain association (has "id", "type_uri", "role_1", "role_2" properties).
+     */
+    function AssociationViewmodel(assoc) {
 
-        this.id = id
-        this.type_uri = type_uri
-        this.topic_id_1 = topic_id_1
-        this.topic_id_2 = topic_id_2
+        this.id = assoc.id
+        this.type_uri = assoc.type_uri
+        this.topic_id_1 = assoc.role_1.topic_id
+        this.topic_id_2 = assoc.role_2.topic_id
 
         // ---
 
@@ -471,14 +527,14 @@ function TopicmapViewmodel(topicmap_id, config) {
         }
 
         this.delete = function() {
-            delete assocs[id]
+            delete assocs[assoc.id]
             reset_selection_conditionally()
         }
 
         // ---
 
         function reset_selection_conditionally() {
-            if (!self.is_topic_selected && self.selected_object_id == id) {
+            if (!self.is_topic_selected && self.selected_object_id == assoc.id) {
                 self.reset_selection()
             }
         }

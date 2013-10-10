@@ -83,13 +83,13 @@ function CanvasRenderer() {
      * Adds a topic to the canvas. If the topic is already on the canvas it is not added again. ### FIXDOC
      *
      * @param   topic       A Topic object with optional "x", "y" properties.
-     *                      (Instead a Topic any object with "id", "type_uri", and "value" properties is suitable.)
+     *                      (Any object with "id", "type_uri", and "value" properties is suitable.)
      * @param   do_select   Optional: if true, the topic is selected.
      */
     this.show_topic = function(topic, do_select) {
         canvas.init_topic_position(topic)
         // update viewmodel
-        var topic_viewmodel = topicmap.add_topic(topic.id, topic.type_uri, topic.value, topic.x, topic.y)
+        var topic_viewmodel = topicmap.add_topic(topic, topic.x, topic.y)
         if (do_select) {
             topicmap.set_topic_selection(topic.id)
         }
@@ -105,14 +105,12 @@ function CanvasRenderer() {
 
     /**
      * @param   assoc       An Association object.
-     *                      (Instead an Association any object with "id", "type_uri", "role_1", "role_2" properties
-     *                      is suitable)
+     *                      (Any object with "id", "type_uri", "role_1", "role_2" properties is suitable.)
      * @param   do_select   Optional: if true, the association is selected.
      */
     this.show_association = function(assoc, do_select) {
         // update viewmodel
-        var assoc_viewmodel = topicmap.add_association(assoc.id, assoc.type_uri, assoc.role_1.topic_id,
-                                                                                 assoc.role_2.topic_id)
+        var assoc_viewmodel = topicmap.add_association(assoc)
         if (do_select) {
             topicmap.set_association_selection(assoc.id)
         }
