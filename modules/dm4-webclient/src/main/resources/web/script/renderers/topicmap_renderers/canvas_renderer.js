@@ -11,8 +11,8 @@ function CanvasRenderer() {
     var canvas = new CanvasView()
 
     // Viewmodel
-    var topicmap    // the topicmap currently rendered (a TopicmapViewmodel).
-                    // Initialized by display_topicmap().
+    var topicmap    // the topicmap currently rendered (a TopicmapViewmodel). Initialized by display_topicmap().
+    var viewmodel_customizers = []
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -30,6 +30,7 @@ function CanvasRenderer() {
     // ---
 
     this.load_topicmap = function(topicmap_id, config) {
+        config.customizers = viewmodel_customizers
         return new TopicmapViewmodel(topicmap_id, config)
     }
 
@@ -271,12 +272,18 @@ function CanvasRenderer() {
 
     // === End of interface implementations ===
 
-    this.get_topic_associations = function(topic_id) {
-        return topicmap.get_topic_associations(topic_id)
+    this.add_view_customizer = function(customizer_func) {
+        canvas.add_view_customizer(customizer_func)
     }
 
-    this.add_customizer = function(customizer) {
-        canvas.add_customizer(customizer)
+    this.add_viewmodel_customizer = function(customizer_func) {
+        viewmodel_customizers.push(new customizer_func())
+    }
+
+    // ---
+
+    this.get_topic_associations = function(topic_id) {
+        return topicmap.get_topic_associations(topic_id)
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions

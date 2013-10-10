@@ -23,7 +23,7 @@ function CanvasView() {
 
     // Customization
     var canvas_default_configuration = new CanvasDefaultConfiguration()
-    var customizers = []
+    var view_customizers = []
 
     // Short-term interaction state
     var topic_move_in_progress      // true while topic move is in progress (boolean)
@@ -202,8 +202,8 @@ function CanvasView() {
 
     // ---
 
-    this.add_customizer = function(customizer_func) {
-        customizers.push(new customizer_func({
+    this.add_view_customizer = function(customizer_func) {
+        view_customizers.push(new customizer_func({
            iterate_topics: iterate_topics 
         }))
     }
@@ -227,7 +227,7 @@ function CanvasView() {
      */
     function add_topic(topic) {
         var topic_view = new TopicView(topic)
-        invoke_customizer("update_topic", [topic_view, ctx])
+        invoke_customizers("update_topic", [topic_view, ctx])
         canvas_topics[topic.id] = topic_view
     }
 
@@ -370,7 +370,7 @@ function CanvasView() {
     // === Customization ===
 
     function customize_draw_topic(ct) {
-        invoke_customizer("draw_topic", [ct, ctx])
+        invoke_customizers("draw_topic", [ct, ctx])
     }
 
     // ---
@@ -378,9 +378,9 @@ function CanvasView() {
     /**
      * @param   args    array of arguments
      */
-    function invoke_customizer(func_name, args) {
+    function invoke_customizers(func_name, args) {
         var do_default = true
-        for (var i = 0, customizer; customizer = customizers[i]; i++) {
+        for (var i = 0, customizer; customizer = view_customizers[i]; i++) {
             if (!(customizer[func_name] && customizer[func_name].apply(undefined, args))) {
                 do_default = false
             }
@@ -389,19 +389,6 @@ function CanvasView() {
             canvas_default_configuration[func_name].apply(undefined, args)
         }
     }
-
-    /* ### needed?
-    function invoke_single_customizer(func_name, args) {
-        var ret_value
-        for (var i = 0, customizer; customizer = customizers[i]; i++) {
-            var ret = customizer[func_name] && customizer[func_name].apply(undefined, args)
-            if (ret_value) {
-                throw "CanvasViewError: more than one customizer feel responsible for \"" + func_name + "\""
-            }
-            ret_value = ret
-        }
-        return ret_value || canvas_default_configuration[func_name].apply(undefined, args)
-    } */
 
 
 
@@ -450,7 +437,7 @@ function CanvasView() {
             tmp_x = canvas_pos.x
             tmp_y = canvas_pos.y
             //
-            invoke_customizer("on_mousedown", [
+            invoke_customizers("on_mousedown", [
                 {canvas: canvas_pos, topicmap: topicmap_pos},
                 {shift: event.shiftKey}
             ])
@@ -694,7 +681,7 @@ function CanvasView() {
     /**
      * Detects the topic that is located at a given position.
      * Detection relies on the topic view's bounding box ("x1", "y1", "x2", "y2" properties).
-     * Note: Topicmap Renderer Customizers are responsible for adding these properties to the topic view.
+     * Note: View Customizers are responsible for adding these properties to the topic view.
      *
      * @param   pos     an object with "x" and "y" properties. Coord.TOPICMAP space.
      *
@@ -940,7 +927,7 @@ function CanvasView() {
     // ---
 
     /**
-     * The generic topic view, to be enriched by customizers.
+     * The generic topic view, to be enriched by view customizers.
      *
      * Properties:
      *  id, type_uri, label
@@ -966,7 +953,7 @@ function CanvasView() {
             this.x += dx
             this.y += dy
             //
-            invoke_customizer("move_topic", [this])
+            invoke_customizers("move_topic", [this])
         }
 
         /**
@@ -975,7 +962,7 @@ function CanvasView() {
         this.update = function(topic) {
             init(topic)
             //
-            invoke_customizer("update_topic", [this, ctx])
+            invoke_customizers("update_topic", [this, ctx])
         }
 
         // ---

@@ -141,7 +141,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     /**
      * Displays the initial topicmap.
      *
-     * Note: plugins are supposed to register their topicmap renderer customizers at init_2.
+     * Note: plugins are supposed to register their view customizers and viewmodel customizers at init_2.
      * Displaying the initial topicmap at init_3 ensures all customizers are registered already.
      */
     dm4c.add_listener("init_3", function() {

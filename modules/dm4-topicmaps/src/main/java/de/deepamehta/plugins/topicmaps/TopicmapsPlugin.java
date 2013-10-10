@@ -122,10 +122,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         dms.createAssociation(new AssociationModel(TOPIC_MAPCONTEXT,
             new TopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
             new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC),
-            new CompositeValueModel()
-                .put("dm4.topicmaps.x",          viewProps.getInt("dm4.topicmaps.x"))
-                .put("dm4.topicmaps.y",          viewProps.getInt("dm4.topicmaps.y"))
-                .put("dm4.topicmaps.visibility", viewProps.getBoolean("dm4.topicmaps.visibility"))
+            viewProps
         ), null);   // FIXME: clientState=null
     }
 

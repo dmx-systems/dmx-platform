@@ -3,6 +3,10 @@
  *  - loading a topicmap from DB
  *  - manipulating the topicmap by e.g. adding/removing topics and associations
  *
+ * @param   config  an object with 2 properties:
+ *                     "is_writable" (boolean) -- indicates weather changes to this model are supposed to be persistent.
+ *                     "customizers" (array of viewmodel customer instances) -- the registered viewmodel customizers.
+ *
  * ### TODO: introduce common base class for TopicmapViewmodel and GeomapViewmodel (see dm4-geomaps module)
  */
 function TopicmapViewmodel(topicmap_id, config) {
@@ -88,11 +92,13 @@ function TopicmapViewmodel(topicmap_id, config) {
         }
 
         function default_view_props() {
-            return {
+            var view_props = {
                 "dm4.topicmaps.x": x,
                 "dm4.topicmaps.y": y,
                 "dm4.topicmaps.visibility": true
             }
+            invoke_customizers("modify_view_properties", [topic, view_props])
+            return view_props
         }
     }
 
@@ -425,6 +431,19 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     function is_writable() {
         return config.is_writable
+    }
+
+
+
+    // === Customization ===
+
+    /**
+     * @param   args    array of arguments
+     */
+    function invoke_customizers(func_name, args) {
+        for (var i = 0, customizer; customizer = config.customizers[i]; i++) {
+            customizer[func_name] && customizer[func_name].apply(undefined, args)
+        }
     }
 
 
