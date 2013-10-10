@@ -6,6 +6,7 @@ import de.deepamehta.plugins.topicmaps.model.ClusterCoords;
 import de.deepamehta.plugins.topicmaps.model.TopicmapViewmodel;
 
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
 
@@ -22,12 +23,20 @@ public interface TopicmapsService extends PluginService {
 
     // ---
 
-    void addTopicToTopicmap(long topicmapId, long topicId, int x, int y);
+    void addTopicToTopicmap(long topicmapId, long topicId, CompositeValueModel viewProps);
 
     void addAssociationToTopicmap(long topicmapId, long assocId);
 
+    void updateViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps);
+
+    /**
+     * Convenience method to update the "dm4.topicmaps.x" and "dm4.topicmaps.y" standard view properties.
+     */
     void moveTopic(long topicmapId, long topicId, int x, int y);
 
+    /**
+     * Convenience method to update the "dm4.topicmaps.visibility" standard view property.
+     */
     void setTopicVisibility(long topicmapId, long topicId, boolean visibility);
 
     void removeAssociationFromTopicmap(long topicmapId, long assocId);

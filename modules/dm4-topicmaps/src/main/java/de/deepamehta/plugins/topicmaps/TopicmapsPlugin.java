@@ -92,10 +92,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public Topic createTopicmap(String name, String uri, String topicmapRendererUri, ClientState clientState) {
         CompositeValueModel topicmapState = getTopicmapRenderer(topicmapRendererUri).initialTopicmapState();
-        return dms.createTopic(new TopicModel(uri, "dm4.topicmaps.topicmap", new CompositeValueModel().put(
-            "dm4.topicmaps.name", name).put(
-            "dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri).put(
-            "dm4.topicmaps.state", topicmapState)
+        return dms.createTopic(new TopicModel(uri, "dm4.topicmaps.topicmap", new CompositeValueModel()
+            .put("dm4.topicmaps.name", name)
+            .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
+            .put("dm4.topicmaps.state", topicmapState)
         ), clientState);
     }
 
@@ -115,16 +115,17 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---
 
     @POST
-    @Path("/{id}/topic/{topic_id}/{x}/{y}")
+    @Path("/{id}/topic/{topic_id}")
     @Override
     public void addTopicToTopicmap(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
-                                   @PathParam("x") int x, @PathParam("y") int y) {
+                                   CompositeValueModel viewProps) {
         dms.createAssociation(new AssociationModel(TOPIC_MAPCONTEXT,
             new TopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
-            new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC), new CompositeValueModel().put(
-                "dm4.topicmaps.x", x).put(
-                "dm4.topicmaps.y", y).put(
-                "dm4.topicmaps.visibility", true)
+            new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC),
+            new CompositeValueModel()
+                .put("dm4.topicmaps.x",          viewProps.getInt("dm4.topicmaps.x"))
+                .put("dm4.topicmaps.y",          viewProps.getInt("dm4.topicmaps.y"))
+                .put("dm4.topicmaps.visibility", viewProps.getBoolean("dm4.topicmaps.visibility"))
         ), null);   // FIXME: clientState=null
     }
 
@@ -139,14 +140,23 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @PUT
+    @Path("/{id}/topic/{topic_id}")
+    @Override
+    public void updateViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
+        updateStandardViewProperties(topicmapId, topicId, viewProps);
+        // ### TODO: update custom view properties (invoking the viewmodel customizers)
+    }
+
+
+    @PUT
     @Path("/{id}/topic/{topic_id}/{x}/{y}")
     @Override
     public void moveTopic(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId, @PathParam("x") int x,
                                                                                                 @PathParam("y") int y) {
-        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(new CompositeValueModel().put(
-            "dm4.topicmaps.x", x).put(
-            "dm4.topicmaps.y", y
-        ), null, new Directives());    // clientState=null
+        updateStandardViewProperties(topicmapId, topicId, new CompositeValueModel()
+            .put("dm4.topicmaps.x", x)
+            .put("dm4.topicmaps.y", y)
+        );
     }
 
     @PUT
@@ -154,9 +164,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
-        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(new CompositeValueModel().put(
-            "dm4.topicmaps.visibility", visibility
-        ), null, new Directives());  // clientState=null
+        updateStandardViewProperties(topicmapId, topicId, new CompositeValueModel()
+            .put("dm4.topicmaps.visibility", visibility)
+        );
     }
 
     @DELETE
@@ -181,12 +191,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void setTopicmapTranslation(@PathParam("id") long topicmapId, @PathParam("x") int transX,
                                                                          @PathParam("y") int transY) {
         try {
-            CompositeValueModel topicmapState = new CompositeValueModel().put(
-                "dm4.topicmaps.state", new CompositeValueModel().put(
-                    "dm4.topicmaps.translation", new CompositeValueModel().put(
-                        "dm4.topicmaps.translation_x", transX).put(
-                        "dm4.topicmaps.translation_y", transY)
-            ));
+            CompositeValueModel topicmapState = new CompositeValueModel()
+                .put("dm4.topicmaps.state", new CompositeValueModel()
+                    .put("dm4.topicmaps.translation", new CompositeValueModel()
+                        .put("dm4.topicmaps.translation_x", transX)
+                        .put("dm4.topicmaps.translation_y", transY)
+                    )
+                );
             dms.updateTopic(new TopicModel(topicmapId, topicmapState), null);
         } catch (Exception e) {
             throw new RuntimeException("Setting translation of topicmap " + topicmapId + " failed (transX=" +
@@ -247,14 +258,20 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    public void updateStandardViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
+        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(viewProps, null, new Directives());
+    }                                                                           // clientState=null
+
+    // ---
+
     private Association fetchTopicRefAssociation(long topicmapId, long topicId) {
         return dms.getAssociation(TOPIC_MAPCONTEXT, topicmapId, topicId,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC, false);          // fetchComposite=false
+            ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC, false);        // fetchComposite=false
     }
 
     private Association fetchAssociationRefAssociation(long topicmapId, long assocId) {
         return dms.getAssociationBetweenTopicAndAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION, false);    // fetchComposite=false
+            ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION, false);  // fetchComposite=false
     }
 
     // ---

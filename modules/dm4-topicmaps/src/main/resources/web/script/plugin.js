@@ -24,8 +24,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     dm4c.restc.create_topicmap = function(name, topicmap_renderer_uri) {
         return this.request("POST", "/topicmap/" + encodeURIComponent(name) + "/" + topicmap_renderer_uri)
     }
-    dm4c.restc.add_topic_to_topicmap = function(topicmap_id, topic_id, x, y) {
-        this.request("POST", "/topicmap/" + topicmap_id + "/topic/" + topic_id + "/" + x + "/" + y)
+    dm4c.restc.add_topic_to_topicmap = function(topicmap_id, topic_id, view_props) {
+        this.request("POST", "/topicmap/" + topicmap_id + "/topic/" + topic_id, view_props)
     }
     dm4c.restc.add_association_to_topicmap = function(topicmap_id, assoc_id) {
         this.request("POST", "/topicmap/" + topicmap_id + "/association/" + assoc_id)

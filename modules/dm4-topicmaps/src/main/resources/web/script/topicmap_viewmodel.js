@@ -66,10 +66,11 @@ function TopicmapViewmodel(topicmap_id, config) {
         var _topic = topics[topic.id]
         if (!_topic) {
             // update memory
-            _topic = add_topic(topic, view_props())
+            var view_props = default_view_props()
+            _topic = add_topic(topic, view_props)
             // update DB
             if (is_writable()) {
-                dm4c.restc.add_topic_to_topicmap(topicmap_id, topic.id, x, y)
+                dm4c.restc.add_topic_to_topicmap(topicmap_id, topic.id, view_props)
             }
             //
             return _topic
@@ -86,7 +87,7 @@ function TopicmapViewmodel(topicmap_id, config) {
             // topic already visible in topicmap
         }
 
-        function view_props() {
+        function default_view_props() {
             return {
                 "dm4.topicmaps.x": x,
                 "dm4.topicmaps.y": y,
@@ -340,7 +341,7 @@ function TopicmapViewmodel(topicmap_id, config) {
 
         function init_topics() {
             for (var i = 0, topic; topic = topicmap.topics[i]; i++) {
-                var view_props = simplified_composite_format(topic.view_props)
+                var view_props = compact_composite_format(topic.view_props)
                 add_topic(topic, view_props)
             }
         }
@@ -370,7 +371,7 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     // ---
 
-    function simplified_composite_format(comp_value) {
+    function compact_composite_format(comp_value) {
         var simple_comp = {}
         for (var type_uri in comp_value) {
             var val = comp_value[type_uri]
