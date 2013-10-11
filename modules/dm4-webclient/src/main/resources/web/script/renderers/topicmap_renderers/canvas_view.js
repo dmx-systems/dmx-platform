@@ -967,6 +967,9 @@ function CanvasView() {
 
         // ---
 
+        /**
+         * @param   topic   A TopicViewmodel.
+         */
         function init(topic) {
             self.type_uri = topic.type_uri
             self.label    = topic.label
