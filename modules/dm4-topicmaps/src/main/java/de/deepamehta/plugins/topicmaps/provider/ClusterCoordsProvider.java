@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.topicmaps.provider;
 
-import de.deepamehta.plugins.topicmaps.model.ClusterCoords;
+import de.deepamehta.plugins.topicmaps.ClusterCoords;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -18,6 +18,9 @@ import javax.ws.rs.ext.Provider;
 
 
 
+// Note: we can't rely on the generic ObjectProvider (Webservice module) as it
+// intantiates a JSONObject but cluster coordinates are serialzed as JSON array.
+// ### TODO: we could serialze cluster coordinates as a JSON object.
 @Provider
 public class ClusterCoordsProvider implements MessageBodyReader<ClusterCoords> {
 

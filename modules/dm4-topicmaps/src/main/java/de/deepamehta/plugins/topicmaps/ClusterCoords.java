@@ -1,9 +1,8 @@
-package de.deepamehta.plugins.topicmaps.model;
+package de.deepamehta.plugins.topicmaps;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.awt.Point;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;

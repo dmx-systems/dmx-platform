@@ -12,14 +12,14 @@ function CanvasView() {
     var LABEL_COLOR = "black"
 
     // View
-    var canvas_topics           // topics displayed on canvas (Object, key: topic ID, value: TopicView)
-    var canvas_assocs           // associations displayed on canvas (Object, key: assoc ID, value: AssociationView)
-    var ctx                     // canvas 2D drawing context. Initialized by this.resize()
-    var width, height           // canvas size (in pixel)
-    var grid_positioning        // while grid positioning is in progress: a GridPositioning object, null otherwise
+    var topics              // topics displayed on canvas (Object, key: topic ID, value: TopicView)
+    var assocs              // associations displayed on canvas (Object, key: assoc ID, value: AssociationView)
+    var ctx                 // canvas 2D drawing context. Initialized by this.resize()
+    var width, height       // canvas size (in pixel)
+    var grid_positioning    // while grid positioning is in progress: a GridPositioning object, null otherwise
 
     // Viewmodel
-    var topicmap                // the viewmodel underlying this view (a TopicmapViewmodel)
+    var topicmap            // the viewmodel underlying this view (a TopicmapViewmodel)
 
     // Customization
     var canvas_default_configuration = new CanvasDefaultConfiguration()
@@ -107,12 +107,12 @@ function CanvasView() {
     // ---
 
     this.remove_topic = function(id) {
-        delete canvas_topics[id]
+        delete topics[id]
         show()
     }
 
     this.remove_association = function(id) {
-        delete canvas_assocs[id]
+        delete assocs[id]
         show()
     }
 
@@ -213,11 +213,11 @@ function CanvasView() {
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function get_topic(id) {
-        return canvas_topics[id]
+        return topics[id]
     }
 
     function get_association(id) {
-        return canvas_assocs[id]
+        return assocs[id]
     }
 
     // ---
@@ -228,20 +228,20 @@ function CanvasView() {
     function add_topic(topic) {
         var topic_view = new TopicView(topic)
         invoke_customizers("update_topic", [topic_view, ctx])
-        canvas_topics[topic.id] = topic_view
+        topics[topic.id] = topic_view
     }
 
     /**
      * @param   assoc   An AssociationViewmodel.
      */
     function add_association(assoc) {
-        canvas_assocs[assoc.id] = new AssociationView(assoc)
+        assocs[assoc.id] = new AssociationView(assoc)
     }
 
     // ---
 
     function iterate_topics(visitor_func) {
-        for (var id in canvas_topics) {
+        for (var id in topics) {
             var ret = visitor_func(get_topic(id))
             if (ret) {
                 return ret
@@ -250,7 +250,7 @@ function CanvasView() {
     }
 
     function iterate_associations(visitor_func) {
-        for (var id in canvas_assocs) {
+        for (var id in assocs) {
             var ret = visitor_func(get_association(id))
             if (ret) {
                 return ret
@@ -261,8 +261,8 @@ function CanvasView() {
     // ---
 
     function clear() {
-        canvas_topics = {}
-        canvas_assocs = {}
+        topics = {}
+        assocs = {}
     }
 
 
@@ -317,7 +317,7 @@ function CanvasView() {
         if (!ct1 || !ct2) {
             // TODO: deleted associations must be removed from all topicmaps.
             // ### alert("ERROR in draw_associations: association " + this.id + " is missing a topic")
-            // ### delete canvas_assocs[i]
+            // ### delete assocs[i]
             return
         }
         //
@@ -847,7 +847,7 @@ function CanvasView() {
      * The clickable area is the icon.
      * The label is truncated and line wrapped.
      */
-    function CanvasDefaultConfiguration(canvas_topics, canvas_assocs) {
+    function CanvasDefaultConfiguration() {
 
         var LABEL_DIST_Y = 4        // in pixel
 

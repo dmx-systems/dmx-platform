@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.topicmaps;
 
-import de.deepamehta.plugins.topicmaps.model.ClusterCoords;
-import de.deepamehta.plugins.topicmaps.model.TopicmapViewmodel;
+import de.deepamehta.plugins.topicmaps.ClusterCoords;
+import de.deepamehta.plugins.topicmaps.TopicmapViewmodel;
 import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
 import de.deepamehta.core.Association;
