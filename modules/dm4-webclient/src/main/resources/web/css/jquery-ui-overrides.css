@@ -14,6 +14,8 @@
     padding-bottom: 1.1em;
 }
 
+.ui-front,                      /* Used for jQuery UI dialogs.  */
 .ui-resizable-handle {
-    background: #ccc;
+    z-index: 1000 !important;   /* jQuery UI default is 100. OpenLayer's event layer has 999.   */
+                                /* "important" overrides the resizable-handle's style attribute */
 }

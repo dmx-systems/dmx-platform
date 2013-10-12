@@ -259,7 +259,7 @@ body {
     font-weight: bold;
     padding-top: 0.3em;
     padding-bottom: 0.3em;
-    z-index: 2000;  /* jQuery UI's resizable-handle has 1000 */
+    z-index: 1000;  /* OpenLayer's event layer has 999. */
     overflow: hidden;
     display: none;
 }
@@ -291,7 +291,7 @@ body {
     background-repeat: no-repeat;
     background-position: center;
     border: 1px solid darkgray;
-    z-index: 2000;  /* jQuery UI's resizable-handle has 1000 */
+    z-index: 1000;  /* OpenLayer's event layer has 999. */
     display: none;
 }
 
