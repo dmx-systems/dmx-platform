@@ -855,7 +855,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     void postPluginActivatedEvent() {
-        Properties properties = new Properties();
+        Map properties = new HashMap();
         properties.put(EventConstants.BUNDLE_SYMBOLICNAME, pluginUri);
         eventService.postEvent(new Event(PLUGIN_ACTIVATED, properties));
     }
