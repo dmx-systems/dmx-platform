@@ -95,7 +95,7 @@
                 <!-- is noInitialDelay=false, which causes *asynchronous* bundle starts in arbitrary order.        -->
                 <felix.fileinstall.noInitialDelay>true</felix.fileinstall.noInitialDelay>
                 <!-- To see any File Install logging set the level to at least 4.                                  -->
-                <felix.fileinstall.log.level>4</felix.fileinstall.log.level>
+                <felix.fileinstall.log.level>0</felix.fileinstall.log.level>
             </properties>
             <build>
                 <plugins>

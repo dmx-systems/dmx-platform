@@ -22,12 +22,10 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <!--artifactId>osgi_R4_core</artifactId-->
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
-            <!--artifactId>osgi_R4_compendium</artifactId-->
         </dependency>
         <!-- Jersey -->
         <dependency>

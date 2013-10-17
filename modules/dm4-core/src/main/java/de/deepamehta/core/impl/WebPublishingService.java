@@ -31,7 +31,8 @@ public class WebPublishingService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String ROOT_APPLICATION_PATH = "/";
+    // ### Felix HTTP Jetty needs "/" while OPS4J Pax Web needs "/*"
+    private static final String ROOT_APPLICATION_PATH = "/*";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
