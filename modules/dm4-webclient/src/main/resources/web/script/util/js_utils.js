@@ -156,6 +156,12 @@ var js = {
         })
     },
 
+    copy: function(src_obj, dst_obj) {
+        for (var prop in src_obj) {
+            dst_obj[prop] = src_obj[prop]
+        }
+    },
+
     clone: function(obj) {
         try {
             return JSON.parse(JSON.stringify(obj))

@@ -47,7 +47,7 @@ public class TopicmapViewmodel implements JSONEnabled {
     /**
      * Loads a topicmap from the DB.
      */
-    public TopicmapViewmodel(long topicmapId, DeepaMehtaService dms, Set<ViewmodelCustomizer> customizers) {
+    TopicmapViewmodel(long topicmapId, DeepaMehtaService dms, Set<ViewmodelCustomizer> customizers) {
         this.topicmapTopic = dms.getTopic(topicmapId, true);    // fetchComposite=true
         this.dms = dms;
         this.customizers = customizers;
@@ -58,10 +58,6 @@ public class TopicmapViewmodel implements JSONEnabled {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-    public long getId() {
-        return topicmapTopic.getId();
-    }
 
     @Override
     public JSONObject toJSON() {
@@ -79,6 +75,12 @@ public class TopicmapViewmodel implements JSONEnabled {
     @Override
     public String toString() {
         return "topicmap " + getId();
+    }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    long getId() {
+        return topicmapTopic.getId();
     }
 
     // -------------------------------------------------------------------------------------------- Public Inner Classes

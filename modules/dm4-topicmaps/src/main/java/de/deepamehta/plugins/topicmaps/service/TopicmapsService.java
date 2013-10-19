@@ -14,12 +14,12 @@ import de.deepamehta.core.service.PluginService;
 
 public interface TopicmapsService extends PluginService {
 
-    Topic createTopicmap(String name,             String topicmapRendererUri, ClientState clientState);
-    Topic createTopicmap(String name, String uri, String topicmapRendererUri, ClientState clientState);
+    TopicmapViewmodel getTopicmap(long topicmapId);
 
     // ---
 
-    TopicmapViewmodel getTopicmap(long topicmapId);
+    Topic createTopicmap(String name,             String topicmapRendererUri, ClientState clientState);
+    Topic createTopicmap(String name, String uri, String topicmapRendererUri, ClientState clientState);
 
     // ---
 
@@ -27,12 +27,14 @@ public interface TopicmapsService extends PluginService {
 
     void addAssociationToTopicmap(long topicmapId, long assocId);
 
-    void updateViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps);
+    // ---
+
+    void setViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps);
 
     /**
      * Convenience method to update the "dm4.topicmaps.x" and "dm4.topicmaps.y" standard view properties.
      */
-    void moveTopic(long topicmapId, long topicId, int x, int y);
+    void setTopicPosition(long topicmapId, long topicId, int x, int y);
 
     /**
      * Convenience method to update the "dm4.topicmaps.visibility" standard view property.
@@ -41,7 +43,9 @@ public interface TopicmapsService extends PluginService {
 
     void removeAssociationFromTopicmap(long topicmapId, long assocId);
 
-    void moveCluster(long topicmapId, ClusterCoords coords);
+    // ---
+
+    void setClusterPosition(long topicmapId, ClusterCoords coords);
 
     void setTopicmapTranslation(long topicmapId, int trans_x, int trans_y);
 

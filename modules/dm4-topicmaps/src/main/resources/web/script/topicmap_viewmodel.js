@@ -123,6 +123,16 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     // ---
 
+    this.set_view_properties = function(topic_id, view_props) {
+        var topic = this.get_topic(topic_id)
+        // update memory
+        topic.set_view_properties(view_props)
+        // update DB
+        if (is_writable()) {
+            dm4c.restc.set_view_properties(topicmap_id, topic_id, view_props)
+        }
+    }
+
     this.set_topic_position = function(id, x, y) {
         var topic = topics[id]
         // update memory
@@ -476,6 +486,13 @@ function TopicmapViewmodel(topicmap_id, config) {
         this.set_position = function(x, y) {
             this.x = x
             this.y = y
+        }
+
+        this.set_view_properties = function(view_props) {
+            // Note: this has a side effect on the corresponding TopicView object as it holds
+            // a reference to this topic's view_props object (instead of creating another one).
+            // So the CanvasView must not care about updating the TopicView object.
+            js.copy(view_props, this.view_props)
         }
 
         /**
