@@ -204,8 +204,9 @@ function CanvasView() {
 
     this.add_view_customizer = function(customizer_func) {
         view_customizers.push(new customizer_func({
-           iterate_topics: iterate_topics,
-           set_view_properties: set_view_properties
+            get_topic: get_topic,
+            iterate_topics: iterate_topics,
+            set_view_properties: set_view_properties
         }))
     }
 
