@@ -52,6 +52,8 @@ public interface TopicmapsService extends PluginService {
     // ---
 
     void registerTopicmapRenderer(TopicmapRenderer renderer);
+    // ### TODO: unregister needed? Might a renderer hold a stale dms instance?
 
     void registerViewmodelCustomizer(ViewmodelCustomizer customizer);
+    void unregisterViewmodelCustomizer(ViewmodelCustomizer customizer);
 }

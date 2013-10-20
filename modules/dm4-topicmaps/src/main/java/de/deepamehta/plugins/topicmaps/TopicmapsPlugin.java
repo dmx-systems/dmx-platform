@@ -217,10 +217,20 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         topicmapRenderers.put(renderer.getUri(), renderer);
     }
 
+    // ---
+
     @Override
     public void registerViewmodelCustomizer(ViewmodelCustomizer customizer) {
         logger.info("### Registering viewmodel customizer \"" + customizer.getClass().getName() + "\"");
         viewmodelCustomizers.add(customizer);
+    }
+
+    @Override
+    public void unregisterViewmodelCustomizer(ViewmodelCustomizer customizer) {
+        logger.info("### Unregistering viewmodel customizer \"" + customizer.getClass().getName() + "\"");
+        if (!viewmodelCustomizers.remove(customizer)) {
+            throw new RuntimeException("Unregistering viewmodel customizer failed (customizer=" + customizer + ")");
+        }
     }
 
     // ---
@@ -269,7 +279,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ### Note: the topicmapId parameter is not used. Per-topicmap custom view properties not yet supported.
     private void storeCustomViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
         invokeViewmodelCustomizers(topicId, viewProps);
-
     }
 
     // ---
