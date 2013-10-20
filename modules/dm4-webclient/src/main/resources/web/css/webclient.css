@@ -6,7 +6,7 @@ body {
 /*** Main Toolbar ***/
 
 #main-toolbar {
-    background: #ddd;
+    background-color: #e8e8e8;
     padding: 0.3em;
 }
 
@@ -51,10 +51,14 @@ body {
     -webkit-user-select: none;
 }
 
+#split-panel > tbody > tr > td:nth-child(2) {
+    background-color: #f8f8f8;
+}
+
 /*** Canvas ***/
 
 #canvas {
-    background: #f8f8f8;
+    background-color: #fff;
 }
 
 /*** Page Panel ***/
@@ -135,12 +139,12 @@ body {
     margin-top: 1em;
 }
 
-#page-content .box.level0 {background: #ffffff;}
-#page-content .box.level1 {background: #f4f4f4;}
-#page-content .box.level2 {background: #e8e8e8;}
-#page-content .box.level3 {background: #dcdcdc;}
-#page-content .box.level4 {background: #d0d0d0;}
-#page-content .box.level5 {background: #c4c4c4;}
+#page-content .box.level0 {background-color: #f8f8f8;}
+#page-content .box.level1 {background-color: #f0f0f0;}
+#page-content .box.level2 {background-color: #e8e8e8;}
+#page-content .box.level3 {background-color: #e0e0e0;}
+#page-content .box.level4 {background-color: #d8d8d8;}
+#page-content .box.level5 {background-color: #d0d0d0;}
 
 /*** Page Panel Form ***/
 
@@ -213,7 +217,7 @@ body {
 /*** Association Page ***/
 
 .assoc-role {
-    background: #f4f4f4;
+    background-color: #f0f0f0;
     padding: 0.6em;
 }
 
@@ -253,7 +257,7 @@ body {
 
 .menu {
     position: fixed;
-    background: white;
+    background-color: white;
     border: 1px solid darkgray;
     font-size: 85%;
     font-weight: bold;
@@ -276,7 +280,7 @@ body {
 
 .menu a.hover {
     color: white;
-    background: #555;
+    background-color: #555;
 }
 
 .menu hr {
@@ -287,7 +291,7 @@ body {
 .scroll-area {
     position: fixed;
     height: 0.9em;
-    background: #f0f0f0;
+    background-color: #f0f0f0;
     background-repeat: no-repeat;
     background-position: center;
     border: 1px solid darkgray;
@@ -309,7 +313,7 @@ body {
 
 .autocomplete-list {
     position: absolute;
-    background: white;
+    background-color: white;
     border: 1px solid darkgray;
     display: none;
 }
@@ -324,5 +328,5 @@ body {
 
 .autocomplete-list .active {
     color: white;
-    background: #555;
+    background-color: #555;
 }

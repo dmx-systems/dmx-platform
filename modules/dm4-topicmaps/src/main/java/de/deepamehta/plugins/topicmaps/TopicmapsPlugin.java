@@ -80,6 +80,19 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
 
+    @GET
+    @Path("/{id}")
+    @Override
+    public TopicmapViewmodel getTopicmap(@PathParam("id") long topicmapId) {
+        try {
+            return new TopicmapViewmodel(topicmapId, dms, viewmodelCustomizers);
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topicmap " + topicmapId + " failed", e);
+        }
+    }
+
+    // ---
+
     @POST
     @Path("/{name}/{topicmap_renderer_uri}")
     @Override
@@ -97,19 +110,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
             .put("dm4.topicmaps.state", topicmapState)
         ), clientState);
-    }
-
-    // ---
-
-    @GET
-    @Path("/{id}")
-    @Override
-    public TopicmapViewmodel getTopicmap(@PathParam("id") long topicmapId) {
-        try {
-            return new TopicmapViewmodel(topicmapId, dms, viewmodelCustomizers);
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching topicmap " + topicmapId + " failed", e);
-        }
     }
 
     // ---
@@ -138,10 +138,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         ), null);   // FIXME: clientState=null
     }
 
+    // ---
+
     @PUT
     @Path("/{id}/topic/{topic_id}")
     @Override
-    public void updateViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
+    public void setViewProperties(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
+                                                                    CompositeValueModel viewProps) {
         storeStandardViewProperties(topicmapId, topicId, viewProps);
         storeCustomViewProperties(topicmapId, topicId, viewProps);
     }
@@ -150,8 +153,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @PUT
     @Path("/{id}/topic/{topic_id}/{x}/{y}")
     @Override
-    public void moveTopic(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId, @PathParam("x") int x,
-                                                                                                @PathParam("y") int y) {
+    public void setTopicPosition(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
+                                                                   @PathParam("x") int x, @PathParam("y") int y) {
         storeStandardViewProperties(topicmapId, topicId, new CompositeValueModel()
             .put("dm4.topicmaps.x", x)
             .put("dm4.topicmaps.y", y)
@@ -175,12 +178,14 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         fetchAssociationRefAssociation(topicmapId, assocId).delete(new Directives());
     }
 
+    // ---
+
     @PUT
     @Path("/{id}")
     @Override
-    public void moveCluster(@PathParam("id") long topicmapId, ClusterCoords coords) {
+    public void setClusterPosition(@PathParam("id") long topicmapId, ClusterCoords coords) {
         for (ClusterCoords.Entry entry : coords) {
-            moveTopic(topicmapId, entry.topicId, entry.x, entry.y);
+            setTopicPosition(topicmapId, entry.topicId, entry.x, entry.y);
         }
     }
 
@@ -212,10 +217,20 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         topicmapRenderers.put(renderer.getUri(), renderer);
     }
 
+    // ---
+
     @Override
     public void registerViewmodelCustomizer(ViewmodelCustomizer customizer) {
         logger.info("### Registering viewmodel customizer \"" + customizer.getClass().getName() + "\"");
         viewmodelCustomizers.add(customizer);
+    }
+
+    @Override
+    public void unregisterViewmodelCustomizer(ViewmodelCustomizer customizer) {
+        logger.info("### Unregistering viewmodel customizer \"" + customizer.getClass().getName() + "\"");
+        if (!viewmodelCustomizers.remove(customizer)) {
+            throw new RuntimeException("Unregistering viewmodel customizer failed (customizer=" + customizer + ")");
+        }
     }
 
     // ---
@@ -261,9 +276,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(viewProps, null, new Directives());
     }                                                                           // clientState=null
 
+    // ### Note: the topicmapId parameter is not used. Per-topicmap custom view properties not yet supported.
     private void storeCustomViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
         invokeViewmodelCustomizers(topicId, viewProps);
-
     }
 
     // ---

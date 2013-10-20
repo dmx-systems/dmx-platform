@@ -204,7 +204,9 @@ function CanvasView() {
 
     this.add_view_customizer = function(customizer_func) {
         view_customizers.push(new customizer_func({
-           iterate_topics: iterate_topics 
+            get_topic: get_topic,
+            iterate_topics: iterate_topics,
+            set_view_properties: set_view_properties
         }))
     }
 
@@ -373,8 +375,6 @@ function CanvasView() {
         invoke_customizers("draw_topic", [ct, ctx])
     }
 
-    // ---
-
     /**
      * @param   args    array of arguments
      */
@@ -388,6 +388,14 @@ function CanvasView() {
         if (do_default) {
             canvas_default_configuration[func_name].apply(undefined, args)
         }
+    }
+
+    function set_view_properties(topic_id, view_props) {
+        // update viewmodel
+        topicmap.set_view_properties(topic_id, view_props)
+        // update view
+        // Note: the TopicView is already up-to-date. It is updated by viewmodel side effect.
+        show()
     }
 
 

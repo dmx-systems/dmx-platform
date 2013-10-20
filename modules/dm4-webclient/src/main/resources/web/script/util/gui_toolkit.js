@@ -83,7 +83,11 @@ function GUIToolkit(config) {
                 modal: true, autoOpen: false, draggable: false, resizable: false, width: width,
                 title: title, buttons: buttons
             }
-            // Firefox workaround, see http://bugs.jqueryui.com/ticket/3623
+            // Note: a dialog without a close button could be created by setting 2 more options
+            // dialog.dialog("option", "dialogClass",    no_close_button ? "no-close-button" : "")
+            // dialog.dialog("option", "closeOnEscape", !no_close_button)
+            //
+            // Firefox workaround, see http://bugs.jqueryui.com/ticket/3623 ### TODO: still needed?
             options.open = function() {
                 $("body").css("overflow", "hidden")
             }
@@ -91,10 +95,7 @@ function GUIToolkit(config) {
             $("body").append(dialog)
             dialog.dialog(options)
 
-            this.open = function(no_close_button) {
-                dialog.dialog("option", "dialogClass",    no_close_button ? "no-close-button" : "")
-                dialog.dialog("option", "closeOnEscape", !no_close_button)
-                //
+            this.open = function() {
                 dialog.dialog("open")
             }
 

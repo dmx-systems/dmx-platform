@@ -30,6 +30,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     dm4c.restc.add_association_to_topicmap = function(topicmap_id, assoc_id) {
         this.request("POST", "/topicmap/" + topicmap_id + "/association/" + assoc_id)
     }
+    dm4c.restc.set_view_properties = function(topicmap_id, topic_id, view_props) {
+        this.request("PUT", "/topicmap/" + topicmap_id + "/topic/" + topic_id, view_props)
+    }
     dm4c.restc.set_topic_position = function(topicmap_id, topic_id, x, y) {
         this.request("PUT", "/topicmap/" + topicmap_id + "/topic/" + topic_id + "/" + x + "/" + y)
     }
