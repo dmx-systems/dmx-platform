@@ -22,7 +22,7 @@ function CanvasView() {
     var topicmap            // the viewmodel underlying this view (a TopicmapViewmodel)
 
     // Customization
-    var canvas_default_configuration = new CanvasDefaultConfiguration()
+    var default_view_configuration = new DefaultViewConfiguration()
     var view_customizers = []
 
     // Short-term interaction state
@@ -113,6 +113,21 @@ function CanvasView() {
 
     this.remove_association = function(id) {
         delete assocs[id]
+        show()
+    }
+
+    // ---
+
+    this.set_topic_selection = function(topic_id) {
+        // refresh HTML
+        $("#canvas-panel .topic.selected").removeClass("selected")
+        $("#canvas-panel .topic#t-" + topic_id).addClass("selected")
+        // refresh canvas
+        show()
+    }
+
+    this.set_association_selection = function(topic_id) {
+        // refresh canvas
         show()
     }
 
@@ -229,8 +244,42 @@ function CanvasView() {
      */
     function add_topic(topic) {
         var topic_view = new TopicView(topic)
-        invoke_customizers("update_topic", [topic_view, ctx])
         topics[topic.id] = topic_view
+        //
+        var topic_dom = $("<div>")
+        var has_moved
+        if (invoke_customizers("topic_dom", [topic, topic_dom])) {
+            topic_dom.addClass("topic").attr("id", "t-" + topic.id).css({top: topic.y, left: topic.x})
+                .mousedown(function() {
+                    close_context_menu()
+                    has_moved = false
+                })
+                .click(function() {
+                    if (!has_moved) {
+                        dm4c.do_select_topic(topic.id)
+                    }
+                })
+                .contextmenu(function(event) {
+                    dm4c.do_select_topic(topic.id)
+                    // Note: only dm4c.selected_object has the composite value (the TopicView has not)
+                    var commands = dm4c.get_topic_commands(dm4c.selected_object, "context-menu")
+                    open_context_menu(commands, event)
+                    return false
+                })
+            $("#canvas-panel").append(topic_dom)
+            topic_dom.draggable({
+                drag: function(event, ui) {
+                    has_moved = true
+                    // update view
+                    topic_view.move_to(ui.position.left, ui.position.top)
+                    show()
+                },
+                stop: function(event, ui) {
+                    // update viewmodel
+                    topicmap.set_topic_position(topic_view.id, topic_view.x, topic_view.y)
+                }
+            })
+        }
     }
 
     /**
@@ -377,17 +426,25 @@ function CanvasView() {
 
     /**
      * @param   args    array of arguments
+     *
+     * @return  true if the function is defined in any customizer, false otherwise. ### needed?
      */
     function invoke_customizers(func_name, args) {
-        var do_default = true
+        var invoke_default = true
+        var is_func_defined = false
         for (var i = 0, customizer; customizer = view_customizers[i]; i++) {
-            if (!(customizer[func_name] && customizer[func_name].apply(undefined, args))) {
-                do_default = false
+            var func = customizer[func_name]
+            if (func) {
+                is_func_defined = true
+                if (!func.apply(undefined, args)) {
+                    invoke_default = false
+                }
             }
         }
-        if (do_default) {
-            canvas_default_configuration[func_name].apply(undefined, args)
+        if (invoke_default) {
+            default_view_configuration[func_name].apply(undefined, args)
         }
+        return is_func_defined
     }
 
     function set_view_properties(topic_id, view_props) {
@@ -572,26 +629,22 @@ function CanvasView() {
     // === Context Menu Events ===
 
     function do_contextmenu(event) {
-        close_context_menu()
-        //
         // 1) assemble commands
         var ct, ca
         if (ct = detect_topic(event)) {
             dm4c.do_select_topic(ct.id)
-            // Note: only dm4c.selected_object has the composite value (the canvas topic has not)
+            // Note: only dm4c.selected_object has the composite value (the TopicView has not)
             var commands = dm4c.get_topic_commands(dm4c.selected_object, "context-menu")
         } else if (ca = detect_association(event)) {
             dm4c.do_select_association(ca.id)
-            // Note: only dm4c.selected_object has the composite value (the canvas assiation has not)
+            // Note: only dm4c.selected_object has the composite value (the AssociationView has not)
             var commands = dm4c.get_association_commands(dm4c.selected_object, "context-menu")
         } else {
             var p = pos(event, Coord.TOPICMAP)
             var commands = dm4c.get_canvas_commands(p.x, p.y, "context-menu")
         }
         // 2) show menu
-        if (commands.length) {
-            open_context_menu(commands, event)
-        }
+        open_context_menu(commands, event)
         //
         return false
     }
@@ -599,10 +652,15 @@ function CanvasView() {
     /**
      * Builds a context menu from a set of commands and shows it.
      *
-     * @param   commands    Array of commands. Must neither be empty nor null/undefined.
+     * @param   commands    Array of commands. May be empty. Must not null/undefined.
      * @param   event       The mouse event that triggered the context menu.
      */
     function open_context_menu(commands, event) {
+        close_context_menu()
+        //
+        if (!commands.length) {
+            return
+        }
         // fire event (compare to GUITookit's open_menu())
         dm4c.pre_open_context_menu()
         //
@@ -855,7 +913,7 @@ function CanvasView() {
      * The clickable area is the icon.
      * The label is truncated and line wrapped.
      */
-    function CanvasDefaultConfiguration() {
+    function DefaultViewConfiguration() {
 
         var LABEL_DIST_Y = 4        // in pixel
 
@@ -927,7 +985,7 @@ function CanvasView() {
             tv.y1 = tv.y - tv.height / 2
             tv.x2 = tv.x1 + tv.width
             tv.y2 = tv.y1 + tv.height
-            //
+            // label
             tv.label_pos_y = tv.y2 + LABEL_DIST_Y + 16    // 16px = 1em
         }
     }
@@ -940,7 +998,7 @@ function CanvasView() {
      * Properties:
      *  id, type_uri, label
      *  x, y                    Topic position.
-     *  x1, y1, x2, y2          Bounding box. Click detection relies on it. To be added by customizer.
+     *  x1, y1, x2, y2          Bounding box. Click detection relies on it. To be added by view customizer.
      *
      * @param   topic   A TopicViewmodel.
      */
@@ -954,13 +1012,19 @@ function CanvasView() {
         this.view_props = topic.view_props
 
         init(topic);
+        invoke_customizers("update_topic", [this, ctx])
 
         // ---
+
+        this.move_to = function(x, y) {
+            this.x = x
+            this.y = y
+            invoke_customizers("move_topic", [this])
+        }
 
         this.move_by = function(dx, dy) {
             this.x += dx
             this.y += dy
-            //
             invoke_customizers("move_topic", [this])
         }
 
@@ -969,7 +1033,6 @@ function CanvasView() {
          */
         this.update = function(topic) {
             init(topic)
-            //
             invoke_customizers("update_topic", [this, ctx])
         }
 

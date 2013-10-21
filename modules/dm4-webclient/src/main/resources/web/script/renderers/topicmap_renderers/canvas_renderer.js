@@ -206,7 +206,7 @@ function CanvasRenderer() {
         // update viewmodel
         topicmap.set_topic_selection(topic_id)
         // update view
-        canvas.refresh()
+        canvas.set_topic_selection(topic_id)
         //
         return {select: topic, display: topic}
     }
@@ -217,7 +217,7 @@ function CanvasRenderer() {
         // update viewmodel
         topicmap.set_association_selection(assoc_id)
         // update view
-        canvas.refresh()
+        canvas.set_association_selection(assoc_id)
         //
         return assoc
     }

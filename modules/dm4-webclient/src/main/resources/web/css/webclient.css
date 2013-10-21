@@ -61,6 +61,14 @@ body {
     background-color: #fff;
 }
 
+#canvas-panel .topic {
+    position: absolute;
+}
+
+#canvas-panel .topic.selected {
+    box-shadow: 0 0 1em blue;
+}
+
 /*** Page Panel ***/
 
 #page-panel {
