@@ -504,7 +504,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         fetch_topicmap_topics()
         //
         topicmap_menu.empty()
-        var icon_src = dm4c.get_icon_src("dm4.topicmaps.topicmap")
+        var icon_src = dm4c.get_type_icon_src("dm4.topicmaps.topicmap")
         // add topicmaps to menu
         for (var id in topicmap_topics) {
             var topicmap = topicmap_topics[id]

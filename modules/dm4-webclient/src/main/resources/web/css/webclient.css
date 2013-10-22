@@ -57,6 +57,10 @@ body {
 
 /*** Topicmap Panel ***/
 
+#topicmap-panel {
+    overflow: hidden;
+}
+
 #topicmap-panel #canvas {
     background-color: #fff;
 }
@@ -67,6 +71,7 @@ body {
 
 #topicmap-panel .topic {
     position: absolute;
+    max-width: 200px;
 }
 
 #topicmap-panel .topic.selected {

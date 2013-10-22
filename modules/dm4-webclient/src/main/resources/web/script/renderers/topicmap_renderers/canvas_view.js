@@ -58,6 +58,7 @@ function CanvasView() {
         ctx.translate(topicmap.trans_x, topicmap.trans_y)   // canvas
         update_html_translation()                           // HTML topic layer
         // update view
+        empty_topic_layer()                                 // HTML topic layer
         clear()
         topicmap.iterate_topics(function(topic) {
             if (topic.visibility) {
@@ -120,11 +121,8 @@ function CanvasView() {
     // ---
 
     this.set_topic_selection = function(topic_id) {
-        // refresh HTML topic layer
-        $("#topicmap-panel .topic.selected").removeClass("selected")
-        $("#topicmap-panel .topic#t-" + topic_id).addClass("selected")
-        // refresh canvas
-        show()
+        show()                              // canvas ### TODO: needed?
+        update_html_selection(topic_id)     // HTML topic layer
     }
 
     this.set_association_selection = function(topic_id) {
@@ -249,7 +247,7 @@ function CanvasView() {
         //
         var topic_dom = $("<div>")
         var has_moved
-        if (invoke_customizers("topic_dom", [topic, topic_dom])) {
+        if (invoke_customizers("topic_dom", [topic_view, topic_dom])) {
             topic_dom.addClass("topic").attr("id", "t-" + topic.id)
                 .mousedown(function() {
                     close_context_menu()
@@ -269,6 +267,7 @@ function CanvasView() {
                 })
             $("#topic-layer").append(topic_dom)
             position_topic_html(topic_dom, topic.x, topic.y)
+            invoke_customizers("topic_dom_appendix", [topic_view, topic_dom])
             topic_dom.draggable({
                 drag: function(event, ui) {
                     has_moved = true
@@ -912,6 +911,11 @@ function CanvasView() {
 
     // === HTML topic layer ===
 
+    function update_html_selection(topic_id) {
+        $("#topicmap-panel .topic.selected").removeClass("selected")
+        $("#topicmap-panel .topic#t-" + topic_id).addClass("selected")
+    }
+
     function position_topic_html(topic_dom, x, y) {
         var s = topic_html_size(topic_dom)
         topic_dom.css({
@@ -925,6 +929,10 @@ function CanvasView() {
             top:  topicmap.trans_y,
             left: topicmap.trans_x
         })
+    }
+
+    function empty_topic_layer() {
+        $("#topic-layer").empty()
     }
 
     function update_topic_view(topic_view, topic_dom) {

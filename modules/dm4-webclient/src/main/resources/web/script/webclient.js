@@ -919,7 +919,7 @@ dm4c = new function() {
      *
      * @return  The icon source (string).
      */
-    this.get_icon_src = function(type_uri) {
+    this.get_type_icon_src = function(type_uri) {
         return dm4c.get_topic_type(type_uri).get_icon_src()
     }
 
