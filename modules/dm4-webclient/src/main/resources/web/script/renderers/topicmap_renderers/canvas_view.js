@@ -55,7 +55,8 @@ function CanvasView() {
         //
         topicmap = topicmap_viewmodel
         //
-        ctx.translate(topicmap.trans_x, topicmap.trans_y)
+        ctx.translate(topicmap.trans_x, topicmap.trans_y)   // canvas
+        update_html_translation()                           // HTML topic layer
         // update view
         clear()
         topicmap.iterate_topics(function(topic) {
@@ -119,9 +120,9 @@ function CanvasView() {
     // ---
 
     this.set_topic_selection = function(topic_id) {
-        // refresh HTML
-        $("#canvas-panel .topic.selected").removeClass("selected")
-        $("#canvas-panel .topic#t-" + topic_id).addClass("selected")
+        // refresh HTML topic layer
+        $("#topicmap-panel .topic.selected").removeClass("selected")
+        $("#topicmap-panel .topic#t-" + topic_id).addClass("selected")
         // refresh canvas
         show()
     }
@@ -182,21 +183,21 @@ function CanvasView() {
         // 1) create canvas element
         // Note: in order to resize the canvas element we must recreate it.
         // Otherwise the browsers would just distort the canvas rendering.
-        self.dom = $("<canvas>").attr({id: "canvas", width: width, height: height})
+        var canvas_element = $("<canvas>").attr({id: "canvas", width: width, height: height})
         // replace existing canvas element
         // Note: we can't call dm4c.split_panel.set_left_panel() here (-> endless recursion)
-        $("#canvas").remove()
-        $("#canvas-panel").append(self.dom)
+        $(".topicmap-renderer #canvas").remove()
+        $(".topicmap-renderer").append(canvas_element)
         //
         // 2) initialize the 2D context
         // Note: the canvas element must be already on the page
-        ctx = self.dom.get(0).getContext("2d")
+        ctx = canvas_element.get(0).getContext("2d")
         ctx.font = LABEL_FONT   // the canvas font must be set early. Label measurement takes place *before* drawing.
         if (topicmap) { // ### TODO: refactor
             ctx.translate(topicmap.trans_x, topicmap.trans_y)
         }
         //
-        bind_event_handlers()
+        bind_event_handlers(canvas_element)
         //
         show()
     }
@@ -249,7 +250,7 @@ function CanvasView() {
         var topic_dom = $("<div>")
         var has_moved
         if (invoke_customizers("topic_dom", [topic, topic_dom])) {
-            topic_dom.addClass("topic").attr("id", "t-" + topic.id).css({top: topic.y, left: topic.x})
+            topic_dom.addClass("topic").attr("id", "t-" + topic.id)
                 .mousedown(function() {
                     close_context_menu()
                     has_moved = false
@@ -266,12 +267,13 @@ function CanvasView() {
                     open_context_menu(commands, event)
                     return false
                 })
-            $("#canvas-panel").append(topic_dom)
+            $("#topic-layer").append(topic_dom)
+            position_topic_html(topic_dom, topic.x, topic.y)
             topic_dom.draggable({
                 drag: function(event, ui) {
                     has_moved = true
                     // update view
-                    topic_view.move_to(ui.position.left, ui.position.top)
+                    update_topic_view(topic_view, topic_dom)
                     show()
                 },
                 stop: function(event, ui) {
@@ -341,17 +343,18 @@ function CanvasView() {
                 dm4c.ASSOC_WIDTH, dm4c.DEFAULT_ASSOC_COLOR)
         }
         //
-        ctx.fillStyle = LABEL_COLOR     // set label style
-        draw_topics()
+        // ### ctx.fillStyle = LABEL_COLOR     // set label style
+        // ### draw_topics()
     }
 
     // ---
 
+    /* ###
     function draw_topics() {
         iterate_topics(function(topic) {
             draw_object(topic, customize_draw_topic)
         })
-    }
+    } */
 
     function draw_associations() {
         iterate_associations(function(assoc) {
@@ -463,15 +466,15 @@ function CanvasView() {
 
 
 
-    function bind_event_handlers() {
-        self.dom.bind("mousedown",   do_mousedown)
-        self.dom.bind("mouseup",     do_mouseup)
-        self.dom.bind("mousemove",   do_mousemove)
-        self.dom.bind("mouseleave",  do_mouseleave)
-        self.dom.bind("dblclick",    do_doubleclick)
-        self.dom.bind("contextmenu", do_contextmenu)
-        self.dom.bind("dragover",    do_dragover)
-        self.dom.bind("drop",        do_drop)
+    function bind_event_handlers(canvas_element) {
+        canvas_element.bind("mousedown",   do_mousedown)
+        canvas_element.bind("mouseup",     do_mouseup)
+        canvas_element.bind("mousemove",   do_mousemove)
+        canvas_element.bind("mouseleave",  do_mouseleave)
+        canvas_element.bind("dblclick",    do_doubleclick)
+        canvas_element.bind("contextmenu", do_contextmenu)
+        canvas_element.bind("dragover",    do_dragover)
+        canvas_element.bind("drop",        do_drop)
     }
 
 
@@ -682,7 +685,7 @@ function CanvasView() {
                 contextmenu.append(item_dom)
             }
         }
-        $("#canvas-panel").append(contextmenu)
+        $("#topicmap-panel").append(contextmenu)
         contextmenu.show()
 
         function context_menu_handler(handler) {
@@ -707,7 +710,7 @@ function CanvasView() {
 
     function close_context_menu() {
         // remove context menu
-        $("#canvas-panel .menu").remove()
+        $("#topicmap-panel .menu").remove()
     }
 
 
@@ -878,7 +881,8 @@ function CanvasView() {
         // update viewmodel
         topicmap.translate_by(dx, dy)   // Note: topicmap.translate_by() doesn't update the DB.
         // update view
-        ctx.translate(dx, dy)
+        ctx.translate(dx, dy)           // canvas
+        update_html_translation()       // HTML topic layer
     }
 
     function scroll_to_center(x, y) {
@@ -901,6 +905,41 @@ function CanvasView() {
                 //
                 end_canvas_move()
             }
+        }
+    }
+
+
+
+    // === HTML topic layer ===
+
+    function position_topic_html(topic_dom, x, y) {
+        var s = topic_html_size(topic_dom)
+        topic_dom.css({
+            top:  y - s.height / 2,
+            left: x - s.width  / 2
+        })
+    }
+
+    function update_html_translation() {
+        $("#topic-layer").css({         
+            top:  topicmap.trans_y,
+            left: topicmap.trans_x
+        })
+    }
+
+    function update_topic_view(topic_view, topic_dom) {
+        var p = topic_dom.position()
+        var s = topic_html_size(topic_dom)
+        topic_view.move_to(
+            Math.floor(p.left + s.width  / 2),  // for non-integers the update request results in 404
+            Math.floor(p.top  + s.height / 2)
+        )
+    }
+
+    function topic_html_size(topic_dom) {
+        return {
+            width:  topic_dom.outerWidth(),
+            height: topic_dom.outerHeight()
         }
     }
 

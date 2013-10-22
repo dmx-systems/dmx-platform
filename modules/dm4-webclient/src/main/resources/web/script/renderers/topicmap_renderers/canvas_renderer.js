@@ -7,6 +7,10 @@ function CanvasRenderer() {
 
     js.extend(this, TopicmapRenderer)
 
+    this.dom = $("<div>")
+        .append($("<canvas>").attr("id", "canvas"))
+        .append($("<div>").attr("id", "topic-layer"))
+
     // View (HTML5 Canvas)
     var canvas = new CanvasView()
 
