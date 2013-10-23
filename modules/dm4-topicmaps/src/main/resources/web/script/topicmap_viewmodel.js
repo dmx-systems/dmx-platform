@@ -254,6 +254,13 @@ function TopicmapViewmodel(topicmap_id, config) {
     }
 
     /**
+     * Returns the ID of the selected topic, provided a topic is selected, false otherwise.
+     */
+    /* ### this.get_selected_topic_id = function() {
+        return this.has_selection() && this.is_topic_selected && this.selected_object_id
+    } */
+
+    /**
      * Precondition: there is a selection.
      *
      * @return  an object with "x" and "y" properties.

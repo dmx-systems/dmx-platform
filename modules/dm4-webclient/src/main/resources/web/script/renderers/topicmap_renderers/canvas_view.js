@@ -94,8 +94,12 @@ function CanvasView() {
      * @param   topic   A TopicViewmodel.
      */
     this.update_topic = function(topic) {
-        get_topic(topic.id).update(topic)
-        show()
+        // update view
+        var topic_view = get_topic(topic.id)
+        topic_view.update(topic)
+        // render
+        show()                              // canvas
+        reposition_topic_html(topic_view)   // HTML topic layer
     }
 
     /**
@@ -121,13 +125,14 @@ function CanvasView() {
     // ---
 
     this.set_topic_selection = function(topic_id) {
-        show()                              // canvas ### TODO: needed?
+        // render
+        show()                              // canvas
         update_html_selection(topic_id)     // HTML topic layer
     }
 
     this.set_association_selection = function(topic_id) {
-        // refresh canvas
-        show()
+        // render
+        show()                              // canvas
     }
 
     // ---
@@ -245,10 +250,13 @@ function CanvasView() {
         var topic_view = new TopicView(topic)
         topics[topic.id] = topic_view
         //
-        var topic_dom = $("<div>")
+        var topic_dom = $("<div>").addClass("topic")
         var has_moved
         if (invoke_customizers("topic_dom", [topic_view, topic_dom])) {
-            topic_dom.addClass("topic").attr("id", "t-" + topic.id)
+            //
+            topic_view.set_dom(topic_dom)
+            //
+            topic_dom
                 .mousedown(function() {
                     close_context_menu()
                     has_moved = false
@@ -273,6 +281,7 @@ function CanvasView() {
                     has_moved = true
                     // update view
                     update_topic_view(topic_view, topic_dom)
+                    // render
                     show()
                 },
                 stop: function(event, ui) {
@@ -281,6 +290,7 @@ function CanvasView() {
                 }
             })
         }
+        invoke_customizers("update_topic", [topic_view, ctx])
     }
 
     /**
@@ -453,7 +463,8 @@ function CanvasView() {
         // update viewmodel
         topicmap.set_view_properties(topic_id, view_props)
         // update view
-        // Note: the TopicView is already up-to-date. It is updated by viewmodel side effect.
+        //      Note: the TopicView is already up-to-date. It is updated by viewmodel side effect.
+        // render
         show()
     }
 
@@ -879,7 +890,7 @@ function CanvasView() {
     function translate_by(dx, dy) {
         // update viewmodel
         topicmap.translate_by(dx, dy)   // Note: topicmap.translate_by() doesn't update the DB.
-        // update view
+        // render
         ctx.translate(dx, dy)           // canvas
         update_html_translation()       // HTML topic layer
     }
@@ -912,11 +923,25 @@ function CanvasView() {
     // === HTML topic layer ===
 
     function update_html_selection(topic_id) {
+        // 1) remove former selection
         $("#topicmap-panel .topic.selected").removeClass("selected")
-        $("#topicmap-panel .topic#t-" + topic_id).addClass("selected")
+        // Note: the topicmap viewmodel selection is already updated. So we can't get the formerly
+        // selected topic ID and can't use get_topic(). So we do DOM traversal instead.
+        //
+        // 2) set new selection
+        get_topic(topic_id).dom.addClass("selected")
+        // The same via DOM traversal:
+        // $("#topicmap-panel .topic#t-" + topic_id).addClass("selected")
+        // Note: we don't store topic IDs in the DOM anymore.
+        // Meanwhile we store the topic DOM in the TopicView object.
+    }
+
+    function reposition_topic_html(topic_view) {
+        position_topic_html(topic_view.dom, topic_view.x, topic_view.y)
     }
 
     function position_topic_html(topic_dom, x, y) {
+        // ### FIXME: for canvas-only rendering topic_dom is undefined
         var s = topic_html_size(topic_dom)
         topic_dom.css({
             top:  y - s.height / 2,
@@ -1059,7 +1084,12 @@ function CanvasView() {
         this.view_props = topic.view_props
 
         init(topic);
-        invoke_customizers("update_topic", [this, ctx])
+
+        // ---
+
+        this.set_dom = function(dom) {
+            this.dom = dom
+        }
 
         // ---
 
