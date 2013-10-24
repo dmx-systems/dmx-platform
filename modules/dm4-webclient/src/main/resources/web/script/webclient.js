@@ -209,13 +209,13 @@ dm4c = new function() {
     }
 
     /**
-     * Creates an association between the selected topic and the given topic.
+     * Creates an association in the DB, shows it on the canvas and displays the edit form in the page panel.
      */
-    this.do_create_association = function(type_uri, topic) {
+    this.do_create_association = function(type_uri, topic_id_1, topic_id_2) {
         // update DB
         var assoc = dm4c.create_association(type_uri,
-            {topic_id: dm4c.selected_object.id, role_type_uri: "dm4.core.default"},
-            {topic_id: topic.id,                role_type_uri: "dm4.core.default"}
+            {topic_id: topic_id_1, role_type_uri: "dm4.core.default"},
+            {topic_id: topic_id_2, role_type_uri: "dm4.core.default"}
         )
         // update client model and GUI
         dm4c.show_association(assoc, "edit")

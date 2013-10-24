@@ -101,8 +101,9 @@ function CanvasRenderer() {
         // update view
         if (topic_viewmodel) {
             canvas.show_topic(topic_viewmodel)
-        } else {
-            canvas.refresh()    // display highlight
+        }
+        if (do_select) {
+            canvas.set_topic_selection(topic.id)
         }
         //
         return topic

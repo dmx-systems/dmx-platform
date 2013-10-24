@@ -76,7 +76,9 @@ function CanvasView() {
      * @param   topic   A TopicViewmodel.
      */
     this.show_topic = function(topic) {
+        // update view
         add_topic(topic)
+        // render
         show()
     }
 
@@ -84,7 +86,9 @@ function CanvasView() {
      * @param   assoc   An AssociationViewmodel.
      */
     this.show_association = function(assoc) {
+        // update view
         add_association(assoc)
+        // render
         show()
     }
 
@@ -94,8 +98,8 @@ function CanvasView() {
      * @param   topic   A TopicViewmodel.
      */
     this.update_topic = function(topic) {
-        // update view
         var topic_view = get_topic(topic.id)
+        // update view
         topic_view.update(topic)
         // render
         show()                              // canvas
@@ -113,13 +117,24 @@ function CanvasView() {
     // ---
 
     this.remove_topic = function(id) {
-        delete topics[id]
-        show()
+        var topic_view = get_topic(id)
+        if (topic_view) {
+            // update view
+            delete topics[id]
+            // render
+            show()                              // canvas
+            remove_topic_html(topic_view.dom)   // HTML topic layer
+        }
     }
 
     this.remove_association = function(id) {
-        delete assocs[id]
-        show()
+        var assoc_view = get_association(id)
+        if (assoc_view) {
+            // update view
+            delete assocs[id]
+            // render
+            show()
+        }
     }
 
     // ---
@@ -223,9 +238,10 @@ function CanvasView() {
 
     this.add_view_customizer = function(customizer_func) {
         view_customizers.push(new customizer_func({
-            get_topic: get_topic,
-            iterate_topics: iterate_topics,
-            set_view_properties: set_view_properties
+            get_topic:           get_topic,
+            iterate_topics:      iterate_topics,
+            set_view_properties: set_view_properties,
+            pos:                 pos
         }))
     }
 
@@ -261,8 +277,10 @@ function CanvasView() {
                     close_context_menu()
                     has_moved = false
                 })
-                .click(function() {
-                    if (!has_moved) {
+                .mouseup(function() {
+                    if (association_in_progress) {
+                        end_association_in_progress(topic)
+                    } else if (!has_moved) {
                         dm4c.do_select_topic(topic.id)
                     }
                 })
@@ -289,6 +307,18 @@ function CanvasView() {
                     topicmap.set_topic_position(topic_view.id, topic_view.x, topic_view.y)
                 }
             })
+            // configure draggable handle
+            var handles = []
+            invoke_customizers("topic_dom_draggable_handle", [topic_dom, handles])
+            var handle
+            if (handles.length) {
+                if (handles.length > 1) {
+                    console.log("WARNING: more than one draggable handle provided by view customizers. " +
+                        "Only the first is used.")
+                }
+                handle = handles[0]
+                topic_dom.draggable("option", "handle", handle)
+            }
         }
         invoke_customizers("update_topic", [topic_view, ctx])
     }
@@ -342,7 +372,7 @@ function CanvasView() {
         }
         //
         ctx.clearRect(-topicmap.trans_x, -topicmap.trans_y, width, height)
-        // fire event
+        //
         dm4c.fire_event("pre_draw_canvas", ctx)
         //
         draw_associations()
@@ -454,7 +484,10 @@ function CanvasView() {
             }
         }
         if (invoke_default) {
-            default_view_configuration[func_name].apply(undefined, args)
+            var func = default_view_configuration[func_name]
+            if (func) {
+                func.apply(undefined, args)
+            }
         }
         return is_func_defined
     }
@@ -555,8 +588,11 @@ function CanvasView() {
         } else if (canvas_move_in_progress) {
             end_canvas_move()
         } else if (association_in_progress) {
-            end_association_in_progress()
-            show()
+            // only end association if not bumped into a HTML topic
+            // ### FIXME: neutralize topic childs as well
+            if (!$(event.toElement).hasClass("topic")) {
+                end_association_in_progress()
+            }
         }
     }
 
@@ -570,21 +606,13 @@ function CanvasView() {
         } else if (canvas_move_in_progress) {
             end_canvas_move()
         } else if (association_in_progress) {
-            var ct = detect_topic(event)
-            if (ct && ct.id != action_topic.id) {
-                dm4c.do_create_association("dm4.core.association", ct)
-            }
-            //
-            end_association_in_progress()
-            show()
-        } else {
-            if (action_topic) {
-                dm4c.do_select_topic(action_topic.id)
-                action_topic = null
-            } else if (action_assoc) {
-                dm4c.do_select_association(action_assoc.id)
-                action_assoc = null
-            }
+            end_association_in_progress(detect_topic(event))
+        } else if (action_topic) {
+            dm4c.do_select_topic(action_topic.id)
+            action_topic = null
+        } else if (action_assoc) {
+            dm4c.do_select_association(action_assoc.id)
+            action_assoc = null
         }
     }
 
@@ -602,7 +630,6 @@ function CanvasView() {
         topicmap.set_topic_position(action_topic.id, action_topic.x, action_topic.y)
         // Note: the view is already up-to-date. It is constantly updated while mouse dragging.
         //
-        // fire event
         dm4c.fire_event("post_move_topic", action_topic)
         //
         topic_move_in_progress = false
@@ -614,7 +641,6 @@ function CanvasView() {
         topicmap.set_cluster_position(cluster)
         // Note: the view is already up-to-date. It is constantly updated while mouse dragging.
         //
-        // fire event
         dm4c.fire_event("post_move_cluster", cluster)
         //
         cluster_move_in_progress = false
@@ -626,15 +652,19 @@ function CanvasView() {
         topicmap.set_translation(topicmap.trans_x, topicmap.trans_y)
         // Note: the view is already up-to-date. It is constantly updated while mouse dragging.
         //
-        // fire event
         dm4c.fire_event("post_move_canvas", topicmap.trans_x, topicmap.trans_y)
         //
         canvas_move_in_progress = false
     }
 
-    function end_association_in_progress() {
+    function end_association_in_progress(ct) {
+        if (ct && ct.id != action_topic.id) {
+            dm4c.do_create_association("dm4.core.association", action_topic.id, ct.id)
+        }
+        //
         association_in_progress = false
         action_topic = null
+        show()
     }
 
 
@@ -682,8 +712,8 @@ function CanvasView() {
         //    ", event.originalEvent.layerY=" + event.originalEvent.layerY
         var cm_pos = pos(event, Coord.WINDOW)
         var contextmenu = $("<div>").addClass("menu").css({
-            top:  cm_pos.y + "px",
-            left: cm_pos.x + "px"
+            top:  cm_pos.y,
+            left: cm_pos.x
         })
         for (var i = 0, cmd; cmd = commands[i]; i++) {
             if (cmd.is_separator) {
@@ -701,8 +731,8 @@ function CanvasView() {
         function context_menu_handler(handler) {
             return function(event) {
                 // pass the coordinates of the command selecting mouse click to the command handler
-                var item_offset = pos(event)
-                handler(cm_pos.x + item_offset.x, cm_pos.y + item_offset.y)
+                var p = pos(event)
+                handler(p.x, p.y)
                 close_context_menu()
                 return false
             }
@@ -837,13 +867,17 @@ function CanvasView() {
             }
         case Coord.CANVAS:
             return {
-                x: event.originalEvent.layerX,
-                y: event.originalEvent.layerY
+                x: event.clientX,
+                y: event.clientY - $("#topicmap-panel").position().top
+                // ### x: event.originalEvent.layerX,
+                // ### y: event.originalEvent.layerY
             }
         case Coord.TOPICMAP:
             return {
-                x: event.originalEvent.layerX - topicmap.trans_x,
-                y: event.originalEvent.layerY - topicmap.trans_y
+                x: event.clientX - topicmap.trans_x,
+                y: event.clientY - topicmap.trans_y - $("#topicmap-panel").position().top
+                // ### x: event.originalEvent.layerX - topicmap.trans_x,
+                // ### y: event.originalEvent.layerY - topicmap.trans_y
             }
         }
     }
@@ -947,6 +981,10 @@ function CanvasView() {
             top:  y - s.height / 2,
             left: x - s.width  / 2
         })
+    }
+
+    function remove_topic_html(topic_dom) {
+        topic_dom.remove()
     }
 
     function update_html_translation() {
