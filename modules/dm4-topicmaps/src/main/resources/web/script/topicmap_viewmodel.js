@@ -65,6 +65,11 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     /**
      * @param   topic   a domain topic (has "id", "type_uri", "value" properties).
+     *
+     * @return  The topic viewmodel that represents what is about to be added to the view (a TopicViewmodel object).
+     *          This is either a new viewmodel (in case the domain topic was not yet contained in the topicmap) or
+     *          a modified viewmodel (in case the domain topic is already contained in the topicmap but was hidden).
+     *          If the domain topic is already contained in the topicmap and is visible already nothing is returned.
      */
     this.add_topic = function(topic, x, y) {
         var _topic = topics[topic.id]
@@ -252,6 +257,13 @@ function TopicmapViewmodel(topicmap_id, config) {
     this.has_selection = function() {
         return this.selected_object_id != -1
     }
+
+    /**
+     * Returns the ID of the selected topic, provided a topic is selected, false otherwise.
+     */
+    /* ### this.get_selected_topic_id = function() {
+        return this.has_selection() && this.is_topic_selected && this.selected_object_id
+    } */
 
     /**
      * Precondition: there is a selection.

@@ -3,7 +3,7 @@ function SplitPanel() {
     var PADDING_MIDDLE = 25     // 25px = 1.6em = 1.6 * 16px = 25(.6)
     var PADDING_BOTTOM = 60     // was 60px, then 67 (healing login dialog), then 76 (healing datepicker)
 
-    var left_panel_parent  = $("<td>").append($("<div>", {id: "canvas-panel"}))
+    var left_panel_parent  = $("<td>").append($("<div>", {id: "topicmap-panel"}))
     var right_panel_parent = $("<td>")
 
     var left_panel
@@ -28,8 +28,9 @@ function SplitPanel() {
         left_panel = panel
         //
         // 1) add panel to page (by replacing the existing one)
-        $("#canvas").remove()
-        $("#canvas-panel").append(panel.dom)
+        // Note: class "topicmap-renderer" is added in order to address the panel for removal.
+        $("#topicmap-panel .topicmap-renderer").remove()
+        $("#topicmap-panel").append(panel.dom.addClass("topicmap-renderer"))
         // Note: re-added panels must be resized to adapt to possibly changed slider position.
         resize_left_panel()
         // Note: resizing takes place *after* replacing. This allows panels to recreate their DOM
@@ -58,7 +59,7 @@ function SplitPanel() {
         // "Page panel width=" + right_panel.width
         //
         calculate_left_panel_width()
-        $("#canvas-panel").resizable({handles: "e", resize: do_resize, stop: do_stop_resize})
+        $("#topicmap-panel").resizable({handles: "e", resize: do_resize, stop: do_stop_resize})
         //
         $(window).resize(do_window_resize)
     }
@@ -176,10 +177,11 @@ function SplitPanel() {
      * Triggered while the user releases the split pane's resizable-handle.
      */
     function do_stop_resize() {
-        // While resizing-via-handle jQuery UI adds a "style" attribute with absolute size values to the canvas-panel.
+        // While resizing-via-handle jQuery UI adds a "style" attribute with absolute size values to the topicmap-panel.
         // This stops its flexible sizing (that follows the canvas element's size) and breaks the layout once the main
         // window is resized. Removing that style attribute once resizing-via-handle is finished solves that problem.
-        $("#canvas-panel").removeAttr("style")
+        $("#topicmap-panel").removeAttr("style")
+        //
         left_panel.resize_end()
     }
 

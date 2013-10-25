@@ -15,7 +15,7 @@ import javax.ws.rs.ext.Provider;
  * A WebApplicationException's response is returned directly.
  * <p>
  * We don't want Jersey to re-throw anything against the servlet container as this would result
- * in an interspersed illegible stack trace (see #448).
+ * in an interspersed illegible stack trace (see #484).
  */
 @Provider
 public class CatchAllExceptionMapper implements ExceptionMapper<Throwable> {

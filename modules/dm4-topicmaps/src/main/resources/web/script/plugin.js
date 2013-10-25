@@ -158,12 +158,11 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         }
         // update model
         set_selected_topicmap(topicmap_id)
+        if (topic_id) {
+            topicmap.set_topic_selection(topic_id)
+        }
         // update view
         display_topicmap()                  // ### FIXME: rethink about history update
-        //
-        if (topic_id) {
-            dm4c.do_select_topic(topic_id)  // ### FIXME: rethink about history update
-        }
     })
 
     /**
@@ -504,7 +503,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         fetch_topicmap_topics()
         //
         topicmap_menu.empty()
-        var icon_src = dm4c.get_icon_src("dm4.topicmaps.topicmap")
+        var icon_src = dm4c.get_type_icon_src("dm4.topicmaps.topicmap")
         // add topicmaps to menu
         for (var id in topicmap_topics) {
             var topicmap = topicmap_topics[id]

@@ -55,10 +55,27 @@ body {
     background-color: #f8f8f8;
 }
 
-/*** Canvas ***/
+/*** Topicmap Panel ***/
 
-#canvas {
+#topicmap-panel {
+    overflow: hidden;
+}
+
+#topicmap-panel #canvas {
     background-color: #fff;
+}
+
+#topicmap-panel #topic-layer {
+    position: absolute;
+    width: 100000px;    /* avoid early line wrapping */
+}
+
+#topicmap-panel .topic {
+    position: absolute;
+}
+
+#topicmap-panel .topic.selected {
+    box-shadow: 0 0 1em blue;
 }
 
 /*** Page Panel ***/

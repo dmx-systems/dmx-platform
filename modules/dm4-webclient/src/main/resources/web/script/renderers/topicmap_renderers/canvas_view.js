@@ -22,8 +22,10 @@ function CanvasView() {
     var topicmap            // the viewmodel underlying this view (a TopicmapViewmodel)
 
     // Customization
-    var canvas_default_configuration = new CanvasDefaultConfiguration()
+    var default_view_customizer
     var view_customizers = []
+    var CANVAS_FLAVOR = false
+    var HTML_FLAVOR   = false
 
     // Short-term interaction state
     var topic_move_in_progress      // true while topic move is in progress (boolean)
@@ -55,8 +57,10 @@ function CanvasView() {
         //
         topicmap = topicmap_viewmodel
         //
-        ctx.translate(topicmap.trans_x, topicmap.trans_y)
+        ctx.translate(topicmap.trans_x, topicmap.trans_y)   // canvas
+        HTML_FLAVOR && update_html_translation()            // HTML topic layer
         // update view
+        HTML_FLAVOR && empty_topic_layer()                  // HTML topic layer
         clear()
         topicmap.iterate_topics(function(topic) {
             if (topic.visibility) {
@@ -74,7 +78,9 @@ function CanvasView() {
      * @param   topic   A TopicViewmodel.
      */
     this.show_topic = function(topic) {
+        // update view
         add_topic(topic)
+        // render
         show()
     }
 
@@ -82,7 +88,9 @@ function CanvasView() {
      * @param   assoc   An AssociationViewmodel.
      */
     this.show_association = function(assoc) {
+        // update view
         add_association(assoc)
+        // render
         show()
     }
 
@@ -92,27 +100,57 @@ function CanvasView() {
      * @param   topic   A TopicViewmodel.
      */
     this.update_topic = function(topic) {
-        get_topic(topic.id).update(topic)
-        show()
+        var topic_view = get_topic(topic.id)
+        // update view
+        topic_view.update(topic)
+        // render
+        show()                                              // canvas
+        HTML_FLAVOR && reposition_topic_html(topic_view)    // HTML topic layer
     }
 
     /**
      * @param   assoc   An AssociationViewmodel.
      */
     this.update_association = function(assoc) {
+        // update view
         get_association(assoc.id).update(assoc)
+        // render
         show()
     }
 
     // ---
 
     this.remove_topic = function(id) {
-        delete topics[id]
-        show()
+        var topic_view = get_topic(id)
+        if (topic_view) {
+            // update view
+            delete topics[id]
+            // render
+            show()                                          // canvas
+            HTML_FLAVOR && remove_topic_html(topic_view)    // HTML topic layer
+        }
     }
 
     this.remove_association = function(id) {
-        delete assocs[id]
+        var assoc_view = get_association(id)
+        if (assoc_view) {
+            // update view
+            delete assocs[id]
+            // render
+            show()
+        }
+    }
+
+    // ---
+
+    this.set_topic_selection = function(topic_id) {
+        // render
+        show()                                              // canvas
+        HTML_FLAVOR && update_html_selection(topic_id)      // HTML topic layer
+    }
+
+    this.set_association_selection = function(topic_id) {
+        // render
         show()
     }
 
@@ -167,21 +205,21 @@ function CanvasView() {
         // 1) create canvas element
         // Note: in order to resize the canvas element we must recreate it.
         // Otherwise the browsers would just distort the canvas rendering.
-        self.dom = $("<canvas>").attr({id: "canvas", width: width, height: height})
+        var canvas_element = $("<canvas>").attr({id: "canvas", width: width, height: height})
         // replace existing canvas element
         // Note: we can't call dm4c.split_panel.set_left_panel() here (-> endless recursion)
-        $("#canvas").remove()
-        $("#canvas-panel").append(self.dom)
+        $(".topicmap-renderer #canvas").remove()
+        $(".topicmap-renderer").append(canvas_element)
         //
         // 2) initialize the 2D context
         // Note: the canvas element must be already on the page
-        ctx = self.dom.get(0).getContext("2d")
+        ctx = canvas_element.get(0).getContext("2d")
         ctx.font = LABEL_FONT   // the canvas font must be set early. Label measurement takes place *before* drawing.
         if (topicmap) { // ### TODO: refactor
             ctx.translate(topicmap.trans_x, topicmap.trans_y)
         }
         //
-        bind_event_handlers()
+        bind_event_handlers(canvas_element)
         //
         show()
     }
@@ -202,17 +240,21 @@ function CanvasView() {
 
     // ---
 
-    this.add_view_customizer = function(customizer_func) {
-        view_customizers.push(new customizer_func({
-            get_topic: get_topic,
-            iterate_topics: iterate_topics,
-            set_view_properties: set_view_properties
-        }))
+    this.add_view_customizer = function(customizer_constructor) {
+        add_view_customizer(customizer_constructor)
     }
 
 
 
     // ----------------------------------------------------------------------------------------------- Private Functions
+
+
+
+    // *************
+    // *** Model ***
+    // *************
+
+
 
     function get_topic(id) {
         return topics[id]
@@ -229,8 +271,11 @@ function CanvasView() {
      */
     function add_topic(topic) {
         var topic_view = new TopicView(topic)
-        invoke_customizers("update_topic", [topic_view, ctx])
         topics[topic.id] = topic_view
+        //
+        HTML_FLAVOR && create_topic_html(topic_view)        // HTML topic layer
+        //
+        invoke_customizers("update_topic", [topic_view, ctx])
     }
 
     /**
@@ -282,7 +327,7 @@ function CanvasView() {
         }
         //
         ctx.clearRect(-topicmap.trans_x, -topicmap.trans_y, width, height)
-        // fire event
+        //
         dm4c.fire_event("pre_draw_canvas", ctx)
         //
         draw_associations()
@@ -369,7 +414,55 @@ function CanvasView() {
 
 
 
-    // === Customization ===
+    // *********************
+    // *** Customization ***
+    // *********************
+
+
+
+    default_view_customizer = new DefaultViewCustomizer()
+    check_customizer(default_view_customizer)
+
+    function add_view_customizer(customizer_constructor) {
+        var canvas_view_facade = {
+            get_topic:           get_topic,
+            iterate_topics:      iterate_topics,
+            set_view_properties: set_view_properties,
+            pos:                 pos
+        }
+        var customizer = new customizer_constructor(canvas_view_facade)
+        if (check_customizer(customizer)) {
+            view_customizers.push(customizer)
+        }
+    }
+
+    function check_customizer(customizer) {
+        if (detect_customizer_flavors(customizer)) {
+            return true
+        } else {
+            console.log("CanvasViewWarning:", js.class_name(customizer), "is not a valid view customizer -- ignored")
+        }
+    }
+
+    function detect_customizer_flavors(customizer) {
+        var is_valid = false
+        // ### TODO: adapt detector methods when framework progresses
+        if (customizer.draw_topic) {
+            CANVAS_FLAVOR = true
+            is_valid = true
+            log("CANVAS")
+        }
+        if (customizer.topic_dom) {
+            HTML_FLAVOR = true
+            is_valid = true
+            log("HTML")
+        }
+        return is_valid
+
+        function log(flavor) {
+            console.log("CanvasView:", flavor, "flavor detected for view customizer", js.class_name(customizer))
+        }
+    }
 
     function customize_draw_topic(ct) {
         invoke_customizers("draw_topic", [ct, ctx])
@@ -379,14 +472,16 @@ function CanvasView() {
      * @param   args    array of arguments
      */
     function invoke_customizers(func_name, args) {
-        var do_default = true
+        var invoke_default = true
         for (var i = 0, customizer; customizer = view_customizers[i]; i++) {
-            if (!(customizer[func_name] && customizer[func_name].apply(undefined, args))) {
-                do_default = false
+            var func = customizer[func_name]
+            if (!(func && func.apply(undefined, args))) {
+                invoke_default = false
             }
         }
-        if (do_default) {
-            canvas_default_configuration[func_name].apply(undefined, args)
+        if (invoke_default) {
+            var func = default_view_customizer[func_name]
+            func && func.apply(undefined, args)     // ### condition required?
         }
     }
 
@@ -394,7 +489,8 @@ function CanvasView() {
         // update viewmodel
         topicmap.set_view_properties(topic_id, view_props)
         // update view
-        // Note: the TopicView is already up-to-date. It is updated by viewmodel side effect.
+        //      Note: the TopicView is already up-to-date. It is updated by viewmodel side effect.
+        // render
         show()
     }
 
@@ -406,15 +502,15 @@ function CanvasView() {
 
 
 
-    function bind_event_handlers() {
-        self.dom.bind("mousedown",   do_mousedown)
-        self.dom.bind("mouseup",     do_mouseup)
-        self.dom.bind("mousemove",   do_mousemove)
-        self.dom.bind("mouseleave",  do_mouseleave)
-        self.dom.bind("dblclick",    do_doubleclick)
-        self.dom.bind("contextmenu", do_contextmenu)
-        self.dom.bind("dragover",    do_dragover)
-        self.dom.bind("drop",        do_drop)
+    function bind_event_handlers(canvas_element) {
+        canvas_element.bind("mousedown",   do_mousedown)
+        canvas_element.bind("mouseup",     do_mouseup)
+        canvas_element.bind("mousemove",   do_mousemove)
+        canvas_element.bind("mouseleave",  do_mouseleave)
+        canvas_element.bind("dblclick",    do_doubleclick)
+        canvas_element.bind("contextmenu", do_contextmenu)
+        canvas_element.bind("dragover",    do_dragover)
+        canvas_element.bind("drop",        do_drop)
     }
 
 
@@ -485,8 +581,11 @@ function CanvasView() {
         } else if (canvas_move_in_progress) {
             end_canvas_move()
         } else if (association_in_progress) {
-            end_association_in_progress()
-            show()
+            // only end association if not bumped into a HTML topic
+            // ### FIXME: neutralize topic childs as well
+            if (!$(event.toElement).hasClass("topic")) {
+                end_association_in_progress()
+            }
         }
     }
 
@@ -500,21 +599,13 @@ function CanvasView() {
         } else if (canvas_move_in_progress) {
             end_canvas_move()
         } else if (association_in_progress) {
-            var ct = detect_topic(event)
-            if (ct && ct.id != action_topic.id) {
-                dm4c.do_create_association("dm4.core.association", ct)
-            }
-            //
-            end_association_in_progress()
-            show()
-        } else {
-            if (action_topic) {
-                dm4c.do_select_topic(action_topic.id)
-                action_topic = null
-            } else if (action_assoc) {
-                dm4c.do_select_association(action_assoc.id)
-                action_assoc = null
-            }
+            end_association_in_progress(detect_topic(event))
+        } else if (action_topic) {
+            dm4c.do_select_topic(action_topic.id)
+            action_topic = null
+        } else if (action_assoc) {
+            dm4c.do_select_association(action_assoc.id)
+            action_assoc = null
         }
     }
 
@@ -532,7 +623,6 @@ function CanvasView() {
         topicmap.set_topic_position(action_topic.id, action_topic.x, action_topic.y)
         // Note: the view is already up-to-date. It is constantly updated while mouse dragging.
         //
-        // fire event
         dm4c.fire_event("post_move_topic", action_topic)
         //
         topic_move_in_progress = false
@@ -544,7 +634,6 @@ function CanvasView() {
         topicmap.set_cluster_position(cluster)
         // Note: the view is already up-to-date. It is constantly updated while mouse dragging.
         //
-        // fire event
         dm4c.fire_event("post_move_cluster", cluster)
         //
         cluster_move_in_progress = false
@@ -556,15 +645,19 @@ function CanvasView() {
         topicmap.set_translation(topicmap.trans_x, topicmap.trans_y)
         // Note: the view is already up-to-date. It is constantly updated while mouse dragging.
         //
-        // fire event
         dm4c.fire_event("post_move_canvas", topicmap.trans_x, topicmap.trans_y)
         //
         canvas_move_in_progress = false
     }
 
-    function end_association_in_progress() {
+    function end_association_in_progress(ct) {
+        if (ct && ct.id != action_topic.id) {
+            dm4c.do_create_association("dm4.core.association", action_topic.id, ct.id)
+        }
+        //
         association_in_progress = false
         action_topic = null
+        show()
     }
 
 
@@ -572,26 +665,22 @@ function CanvasView() {
     // === Context Menu Events ===
 
     function do_contextmenu(event) {
-        close_context_menu()
-        //
         // 1) assemble commands
         var ct, ca
         if (ct = detect_topic(event)) {
             dm4c.do_select_topic(ct.id)
-            // Note: only dm4c.selected_object has the composite value (the canvas topic has not)
+            // Note: only dm4c.selected_object has the composite value (the TopicView has not)
             var commands = dm4c.get_topic_commands(dm4c.selected_object, "context-menu")
         } else if (ca = detect_association(event)) {
             dm4c.do_select_association(ca.id)
-            // Note: only dm4c.selected_object has the composite value (the canvas assiation has not)
+            // Note: only dm4c.selected_object has the composite value (the AssociationView has not)
             var commands = dm4c.get_association_commands(dm4c.selected_object, "context-menu")
         } else {
             var p = pos(event, Coord.TOPICMAP)
             var commands = dm4c.get_canvas_commands(p.x, p.y, "context-menu")
         }
         // 2) show menu
-        if (commands.length) {
-            open_context_menu(commands, event)
-        }
+        open_context_menu(commands, event)
         //
         return false
     }
@@ -599,10 +688,15 @@ function CanvasView() {
     /**
      * Builds a context menu from a set of commands and shows it.
      *
-     * @param   commands    Array of commands. Must neither be empty nor null/undefined.
+     * @param   commands    Array of commands. May be empty. Must not null/undefined.
      * @param   event       The mouse event that triggered the context menu.
      */
     function open_context_menu(commands, event) {
+        close_context_menu()
+        //
+        if (!commands.length) {
+            return
+        }
         // fire event (compare to GUITookit's open_menu())
         dm4c.pre_open_context_menu()
         //
@@ -611,8 +705,8 @@ function CanvasView() {
         //    ", event.originalEvent.layerY=" + event.originalEvent.layerY
         var cm_pos = pos(event, Coord.WINDOW)
         var contextmenu = $("<div>").addClass("menu").css({
-            top:  cm_pos.y + "px",
-            left: cm_pos.x + "px"
+            top:  cm_pos.y,
+            left: cm_pos.x
         })
         for (var i = 0, cmd; cmd = commands[i]; i++) {
             if (cmd.is_separator) {
@@ -624,14 +718,14 @@ function CanvasView() {
                 contextmenu.append(item_dom)
             }
         }
-        $("#canvas-panel").append(contextmenu)
+        $("#topicmap-panel").append(contextmenu)
         contextmenu.show()
 
         function context_menu_handler(handler) {
             return function(event) {
                 // pass the coordinates of the command selecting mouse click to the command handler
-                var item_offset = pos(event)
-                handler(cm_pos.x + item_offset.x, cm_pos.y + item_offset.y)
+                var p = pos(event)
+                handler(p.x, p.y)
                 close_context_menu()
                 return false
             }
@@ -649,7 +743,7 @@ function CanvasView() {
 
     function close_context_menu() {
         // remove context menu
-        $("#canvas-panel .menu").remove()
+        $("#topicmap-panel .menu").remove()
     }
 
 
@@ -766,13 +860,17 @@ function CanvasView() {
             }
         case Coord.CANVAS:
             return {
-                x: event.originalEvent.layerX,
-                y: event.originalEvent.layerY
+                x: event.clientX,
+                y: event.clientY - $("#topicmap-panel").position().top
+                // ### x: event.originalEvent.layerX,
+                // ### y: event.originalEvent.layerY
             }
         case Coord.TOPICMAP:
             return {
-                x: event.originalEvent.layerX - topicmap.trans_x,
-                y: event.originalEvent.layerY - topicmap.trans_y
+                x: event.clientX - topicmap.trans_x,
+                y: event.clientY - topicmap.trans_y - $("#topicmap-panel").position().top
+                // ### x: event.originalEvent.layerX - topicmap.trans_x,
+                // ### y: event.originalEvent.layerY - topicmap.trans_y
             }
         }
     }
@@ -819,8 +917,9 @@ function CanvasView() {
     function translate_by(dx, dy) {
         // update viewmodel
         topicmap.translate_by(dx, dy)   // Note: topicmap.translate_by() doesn't update the DB.
-        // update view
-        ctx.translate(dx, dy)
+        // render
+        ctx.translate(dx, dy)                       // canvas
+        HTML_FLAVOR && update_html_translation()    // HTML topic layer
     }
 
     function scroll_to_center(x, y) {
@@ -848,6 +947,134 @@ function CanvasView() {
 
 
 
+    // ************************
+    // *** HTML topic layer ***
+    // ************************
+
+
+
+    function create_topic_html(topic_view) {
+
+        var topic_dom = $("<div>").addClass("topic")
+        invoke_customizers("topic_dom", [topic_view, topic_dom])
+        topic_view.set_dom(topic_dom)
+        $("#topic-layer").append(topic_dom)
+        position_topic_html(topic_dom, topic_view.x, topic_view.y)
+        invoke_customizers("topic_dom_appendix", [topic_view, topic_dom])
+        add_event_handlers()
+        configure_draggable_handle()
+
+        function add_event_handlers() {
+            var has_moved
+            topic_dom
+                .mousedown(function() {
+                    close_context_menu()
+                    has_moved = false
+                })
+                .mouseup(function() {
+                    if (association_in_progress) {
+                        end_association_in_progress(topic_view)
+                    } else if (!has_moved) {
+                        dm4c.do_select_topic(topic_view.id)
+                    }
+                })
+                .contextmenu(function(event) {
+                    dm4c.do_select_topic(topic_view.id)
+                    // Note: only dm4c.selected_object has the composite value (the TopicView has not)
+                    var commands = dm4c.get_topic_commands(dm4c.selected_object, "context-menu")
+                    open_context_menu(commands, event)
+                    return false
+                })
+            topic_dom.draggable({
+                drag: function(event, ui) {
+                    has_moved = true
+                    // update view
+                    update_topic_view(topic_view, topic_dom)
+                    // render
+                    show()
+                },
+                stop: function(event, ui) {
+                    // update viewmodel
+                    topicmap.set_topic_position(topic_view.id, topic_view.x, topic_view.y)
+                }
+            })
+        }
+
+        function configure_draggable_handle() {
+            var handles = []
+            invoke_customizers("topic_dom_draggable_handle", [topic_dom, handles])
+            var handle
+            if (handles.length) {
+                if (handles.length > 1) {
+                    console.log("WARNING: more than one draggable handle provided by view customizers. " +
+                        "Only the first is used.")
+                }
+                handle = handles[0]
+                topic_dom.draggable("option", "handle", handle)
+            }
+        }
+    }
+
+    function update_html_selection(topic_id) {
+        // 1) remove former selection
+        $("#topicmap-panel .topic.selected").removeClass("selected")
+        // Note: the topicmap viewmodel selection is already updated. So we can't get the formerly
+        // selected topic ID and can't use get_topic(). So we do DOM traversal instead.
+        //
+        // 2) set new selection
+        get_topic(topic_id).dom.addClass("selected")
+        // The same via DOM traversal:
+        // $("#topicmap-panel .topic#t-" + topic_id).addClass("selected")
+        // Note: we don't store topic IDs in the DOM anymore.
+        // Meanwhile we store the topic DOM in the TopicView object.
+    }
+
+    function reposition_topic_html(topic_view) {
+        position_topic_html(topic_view.dom, topic_view.x, topic_view.y)
+    }
+
+    function position_topic_html(topic_dom, x, y) {
+        // ### FIXME: for canvas-only rendering topic_dom is undefined
+        var s = topic_html_size(topic_dom)
+        topic_dom.css({
+            top:  y - s.height / 2,
+            left: x - s.width  / 2
+        })
+    }
+
+    function remove_topic_html(topic_view) {
+        topic_view.dom.remove()
+    }
+
+    function update_html_translation() {
+        $("#topic-layer").css({         
+            top:  topicmap.trans_y,
+            left: topicmap.trans_x
+        })
+    }
+
+    function empty_topic_layer() {
+        $("#topic-layer").empty()
+    }
+
+    function update_topic_view(topic_view, topic_dom) {
+        var p = topic_dom.position()
+        var s = topic_html_size(topic_dom)
+        topic_view.move_to(
+            Math.floor(p.left + s.width  / 2),  // for non-integers the update request results in 404
+            Math.floor(p.top  + s.height / 2)
+        )
+    }
+
+    function topic_html_size(topic_dom) {
+        return {
+            width:  topic_dom.outerWidth(),
+            height: topic_dom.outerHeight()
+        }
+    }
+
+
+
     // ------------------------------------------------------------------------------------------------- Private Classes
 
     /**
@@ -855,7 +1082,7 @@ function CanvasView() {
      * The clickable area is the icon.
      * The label is truncated and line wrapped.
      */
-    function CanvasDefaultConfiguration() {
+    function DefaultViewCustomizer() {
 
         var LABEL_DIST_Y = 4        // in pixel
 
@@ -927,7 +1154,7 @@ function CanvasView() {
             tv.y1 = tv.y - tv.height / 2
             tv.x2 = tv.x1 + tv.width
             tv.y2 = tv.y1 + tv.height
-            //
+            // label
             tv.label_pos_y = tv.y2 + LABEL_DIST_Y + 16    // 16px = 1em
         }
     }
@@ -940,7 +1167,7 @@ function CanvasView() {
      * Properties:
      *  id, type_uri, label
      *  x, y                    Topic position.
-     *  x1, y1, x2, y2          Bounding box. Click detection relies on it. To be added by customizer.
+     *  x1, y1, x2, y2          Bounding box. Click detection relies on it. To be added by view customizer.
      *
      * @param   topic   A TopicViewmodel.
      */
@@ -957,10 +1184,21 @@ function CanvasView() {
 
         // ---
 
+        this.set_dom = function(dom) {
+            this.dom = dom
+        }
+
+        // ---
+
+        this.move_to = function(x, y) {
+            this.x = x
+            this.y = y
+            invoke_customizers("move_topic", [this])
+        }
+
         this.move_by = function(dx, dy) {
             this.x += dx
             this.y += dy
-            //
             invoke_customizers("move_topic", [this])
         }
 
@@ -969,7 +1207,6 @@ function CanvasView() {
          */
         this.update = function(topic) {
             init(topic)
-            //
             invoke_customizers("update_topic", [this, ctx])
         }
 

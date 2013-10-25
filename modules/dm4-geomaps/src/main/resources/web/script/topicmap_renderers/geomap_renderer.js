@@ -9,7 +9,7 @@ function GeomapRenderer() {
 
     js.extend(this, TopicmapRenderer)
 
-    this.dom = $("<div>", {id: "canvas"})
+    this.dom = $("<div>").attr("id", "geomap-renderer")
 
     // View (OpenLayers based)
     var ol_view = new OpenLayersView({move_handler: on_move})
@@ -110,7 +110,7 @@ function GeomapRenderer() {
     // === Left SplitPanel Component Implementation ===
 
     this.init = function() {
-        ol_view.render("canvas")
+        ol_view.render("geomap-renderer")
     }
 
     this.resize = function(size) {

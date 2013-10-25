@@ -140,7 +140,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         }
         //
         workspace_menu.empty()
-        var icon_src = dm4c.get_icon_src("dm4.workspaces.workspace")
+        var icon_src = dm4c.get_type_icon_src("dm4.workspaces.workspace")
         // add workspaces to menu
         for (var i = 0, workspace; workspace = workspaces[i]; i++) {
             workspace_menu.add_item({label: workspace.value, value: workspace.id, icon: icon_src})

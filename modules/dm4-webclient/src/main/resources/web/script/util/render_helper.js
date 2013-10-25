@@ -159,7 +159,7 @@ function RenderHelper() {
      * @return  An <img> element of CSS class "type-icon" (jQuery object).
      */
     this.type_icon = function(type_uri, title) {
-        var src = dm4c.get_icon_src(type_uri)
+        var src = dm4c.get_type_icon_src(type_uri)
         title = title || dm4c.type_label(type_uri)
         return this.icon(src, title)
     }

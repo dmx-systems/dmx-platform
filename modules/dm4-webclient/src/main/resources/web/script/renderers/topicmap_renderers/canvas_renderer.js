@@ -7,6 +7,10 @@ function CanvasRenderer() {
 
     js.extend(this, TopicmapRenderer)
 
+    this.dom = $("<div>")
+        .append($("<canvas>").attr("id", "canvas"))
+        .append($("<div>").attr("id", "topic-layer"))
+
     // View (HTML5 Canvas)
     var canvas = new CanvasView()
 
@@ -97,8 +101,9 @@ function CanvasRenderer() {
         // update view
         if (topic_viewmodel) {
             canvas.show_topic(topic_viewmodel)
-        } else {
-            canvas.refresh()    // display highlight
+        }
+        if (do_select) {
+            canvas.set_topic_selection(topic.id)
         }
         //
         return topic
@@ -206,7 +211,7 @@ function CanvasRenderer() {
         // update viewmodel
         topicmap.set_topic_selection(topic_id)
         // update view
-        canvas.refresh()
+        canvas.set_topic_selection(topic_id)
         //
         return {select: topic, display: topic}
     }
@@ -217,7 +222,7 @@ function CanvasRenderer() {
         // update viewmodel
         topicmap.set_association_selection(assoc_id)
         // update view
-        canvas.refresh()
+        canvas.set_association_selection(assoc_id)
         //
         return assoc
     }
@@ -272,12 +277,12 @@ function CanvasRenderer() {
 
     // === End of interface implementations ===
 
-    this.add_view_customizer = function(customizer_func) {
-        canvas.add_view_customizer(customizer_func)
+    this.add_view_customizer = function(customizer_constructor) {
+        canvas.add_view_customizer(customizer_constructor)
     }
 
-    this.add_viewmodel_customizer = function(customizer_func) {
-        viewmodel_customizers.push(new customizer_func())
+    this.add_viewmodel_customizer = function(customizer_constructor) {
+        viewmodel_customizers.push(new customizer_constructor())
     }
 
     // ---
