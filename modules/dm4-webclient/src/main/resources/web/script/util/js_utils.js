@@ -185,13 +185,17 @@ var js = {
 
 
     /**
-     * Extends an object with all the methods defined in a superclass.
+     * Extends an instance with all the methods defined in a superclass.
      *
-     * @param   obj         The object to be extended
+     * @param   instance    The object to be extended
      * @param   superclass  The superclass (a function)
      */
-    extend: function(obj, superclass) {
-        superclass.call(obj)
+    extend: function(instance, superclass) {
+        superclass.call(instance)
+    },
+
+    class_name: function(instance) {
+        return instance.__proto__.constructor.name  // ### TODO: is there a better way?
     },
 
 

@@ -66,12 +66,12 @@ body {
 }
 
 #topicmap-panel #topic-layer {
-    position: relative;
+    position: absolute;
+    width: 100000px;    /* avoid early line wrapping */
 }
 
 #topicmap-panel .topic {
     position: absolute;
-    max-width: 200px;
 }
 
 #topicmap-panel .topic.selected {

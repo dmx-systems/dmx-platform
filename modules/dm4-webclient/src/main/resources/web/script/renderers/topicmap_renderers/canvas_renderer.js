@@ -277,12 +277,12 @@ function CanvasRenderer() {
 
     // === End of interface implementations ===
 
-    this.add_view_customizer = function(customizer_func) {
-        canvas.add_view_customizer(customizer_func)
+    this.add_view_customizer = function(customizer_constructor) {
+        canvas.add_view_customizer(customizer_constructor)
     }
 
-    this.add_viewmodel_customizer = function(customizer_func) {
-        viewmodel_customizers.push(new customizer_func())
+    this.add_viewmodel_customizer = function(customizer_constructor) {
+        viewmodel_customizers.push(new customizer_constructor())
     }
 
     // ---

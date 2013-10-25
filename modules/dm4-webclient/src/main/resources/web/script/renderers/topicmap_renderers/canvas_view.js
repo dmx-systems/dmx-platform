@@ -22,8 +22,10 @@ function CanvasView() {
     var topicmap            // the viewmodel underlying this view (a TopicmapViewmodel)
 
     // Customization
-    var default_view_configuration = new DefaultViewConfiguration()
+    var default_view_customizer
     var view_customizers = []
+    var CANVAS_FLAVOR = false
+    var HTML_FLAVOR   = false
 
     // Short-term interaction state
     var topic_move_in_progress      // true while topic move is in progress (boolean)
@@ -56,9 +58,9 @@ function CanvasView() {
         topicmap = topicmap_viewmodel
         //
         ctx.translate(topicmap.trans_x, topicmap.trans_y)   // canvas
-        update_html_translation()                           // HTML topic layer
+        HTML_FLAVOR && update_html_translation()            // HTML topic layer
         // update view
-        empty_topic_layer()                                 // HTML topic layer
+        HTML_FLAVOR && empty_topic_layer()                  // HTML topic layer
         clear()
         topicmap.iterate_topics(function(topic) {
             if (topic.visibility) {
@@ -102,15 +104,17 @@ function CanvasView() {
         // update view
         topic_view.update(topic)
         // render
-        show()                              // canvas
-        reposition_topic_html(topic_view)   // HTML topic layer
+        show()                                              // canvas
+        HTML_FLAVOR && reposition_topic_html(topic_view)    // HTML topic layer
     }
 
     /**
      * @param   assoc   An AssociationViewmodel.
      */
     this.update_association = function(assoc) {
+        // update view
         get_association(assoc.id).update(assoc)
+        // render
         show()
     }
 
@@ -122,8 +126,8 @@ function CanvasView() {
             // update view
             delete topics[id]
             // render
-            show()                              // canvas
-            remove_topic_html(topic_view.dom)   // HTML topic layer
+            show()                                          // canvas
+            HTML_FLAVOR && remove_topic_html(topic_view)    // HTML topic layer
         }
     }
 
@@ -141,13 +145,13 @@ function CanvasView() {
 
     this.set_topic_selection = function(topic_id) {
         // render
-        show()                              // canvas
-        update_html_selection(topic_id)     // HTML topic layer
+        show()                                              // canvas
+        HTML_FLAVOR && update_html_selection(topic_id)      // HTML topic layer
     }
 
     this.set_association_selection = function(topic_id) {
         // render
-        show()                              // canvas
+        show()
     }
 
     // ---
@@ -236,18 +240,21 @@ function CanvasView() {
 
     // ---
 
-    this.add_view_customizer = function(customizer_func) {
-        view_customizers.push(new customizer_func({
-            get_topic:           get_topic,
-            iterate_topics:      iterate_topics,
-            set_view_properties: set_view_properties,
-            pos:                 pos
-        }))
+    this.add_view_customizer = function(customizer_constructor) {
+        add_view_customizer(customizer_constructor)
     }
 
 
 
     // ----------------------------------------------------------------------------------------------- Private Functions
+
+
+
+    // *************
+    // *** Model ***
+    // *************
+
+
 
     function get_topic(id) {
         return topics[id]
@@ -266,60 +273,8 @@ function CanvasView() {
         var topic_view = new TopicView(topic)
         topics[topic.id] = topic_view
         //
-        var topic_dom = $("<div>").addClass("topic")
-        var has_moved
-        if (invoke_customizers("topic_dom", [topic_view, topic_dom])) {
-            //
-            topic_view.set_dom(topic_dom)
-            //
-            topic_dom
-                .mousedown(function() {
-                    close_context_menu()
-                    has_moved = false
-                })
-                .mouseup(function() {
-                    if (association_in_progress) {
-                        end_association_in_progress(topic)
-                    } else if (!has_moved) {
-                        dm4c.do_select_topic(topic.id)
-                    }
-                })
-                .contextmenu(function(event) {
-                    dm4c.do_select_topic(topic.id)
-                    // Note: only dm4c.selected_object has the composite value (the TopicView has not)
-                    var commands = dm4c.get_topic_commands(dm4c.selected_object, "context-menu")
-                    open_context_menu(commands, event)
-                    return false
-                })
-            $("#topic-layer").append(topic_dom)
-            position_topic_html(topic_dom, topic.x, topic.y)
-            invoke_customizers("topic_dom_appendix", [topic_view, topic_dom])
-            topic_dom.draggable({
-                drag: function(event, ui) {
-                    has_moved = true
-                    // update view
-                    update_topic_view(topic_view, topic_dom)
-                    // render
-                    show()
-                },
-                stop: function(event, ui) {
-                    // update viewmodel
-                    topicmap.set_topic_position(topic_view.id, topic_view.x, topic_view.y)
-                }
-            })
-            // configure draggable handle
-            var handles = []
-            invoke_customizers("topic_dom_draggable_handle", [topic_dom, handles])
-            var handle
-            if (handles.length) {
-                if (handles.length > 1) {
-                    console.log("WARNING: more than one draggable handle provided by view customizers. " +
-                        "Only the first is used.")
-                }
-                handle = handles[0]
-                topic_dom.draggable("option", "handle", handle)
-            }
-        }
+        HTML_FLAVOR && create_topic_html(topic_view)        // HTML topic layer
+        //
         invoke_customizers("update_topic", [topic_view, ctx])
     }
 
@@ -382,18 +337,17 @@ function CanvasView() {
                 dm4c.ASSOC_WIDTH, dm4c.DEFAULT_ASSOC_COLOR)
         }
         //
-        // ### ctx.fillStyle = LABEL_COLOR     // set label style
-        // ### draw_topics()
+        ctx.fillStyle = LABEL_COLOR     // set label style
+        draw_topics()
     }
 
     // ---
 
-    /* ###
     function draw_topics() {
         iterate_topics(function(topic) {
             draw_object(topic, customize_draw_topic)
         })
-    } */
+    }
 
     function draw_associations() {
         iterate_associations(function(assoc) {
@@ -460,7 +414,55 @@ function CanvasView() {
 
 
 
-    // === Customization ===
+    // *********************
+    // *** Customization ***
+    // *********************
+
+
+
+    default_view_customizer = new DefaultViewCustomizer()
+    check_customizer(default_view_customizer)
+
+    function add_view_customizer(customizer_constructor) {
+        var canvas_view_facade = {
+            get_topic:           get_topic,
+            iterate_topics:      iterate_topics,
+            set_view_properties: set_view_properties,
+            pos:                 pos
+        }
+        var customizer = new customizer_constructor(canvas_view_facade)
+        if (check_customizer(customizer)) {
+            view_customizers.push(customizer)
+        }
+    }
+
+    function check_customizer(customizer) {
+        if (detect_customizer_flavors(customizer)) {
+            return true
+        } else {
+            console.log("CanvasViewWarning:", js.class_name(customizer), "is not a valid view customizer -- ignored")
+        }
+    }
+
+    function detect_customizer_flavors(customizer) {
+        var is_valid = false
+        // ### TODO: adapt detector methods when framework progresses
+        if (customizer.draw_topic) {
+            CANVAS_FLAVOR = true
+            is_valid = true
+            log("CANVAS")
+        }
+        if (customizer.topic_dom) {
+            HTML_FLAVOR = true
+            is_valid = true
+            log("HTML")
+        }
+        return is_valid
+
+        function log(flavor) {
+            console.log("CanvasView:", flavor, "flavor detected for view customizer", js.class_name(customizer))
+        }
+    }
 
     function customize_draw_topic(ct) {
         invoke_customizers("draw_topic", [ct, ctx])
@@ -468,28 +470,19 @@ function CanvasView() {
 
     /**
      * @param   args    array of arguments
-     *
-     * @return  true if the function is defined in any customizer, false otherwise. ### needed?
      */
     function invoke_customizers(func_name, args) {
         var invoke_default = true
-        var is_func_defined = false
         for (var i = 0, customizer; customizer = view_customizers[i]; i++) {
             var func = customizer[func_name]
-            if (func) {
-                is_func_defined = true
-                if (!func.apply(undefined, args)) {
-                    invoke_default = false
-                }
+            if (!(func && func.apply(undefined, args))) {
+                invoke_default = false
             }
         }
         if (invoke_default) {
-            var func = default_view_configuration[func_name]
-            if (func) {
-                func.apply(undefined, args)
-            }
+            var func = default_view_customizer[func_name]
+            func && func.apply(undefined, args)     // ### condition required?
         }
-        return is_func_defined
     }
 
     function set_view_properties(topic_id, view_props) {
@@ -925,8 +918,8 @@ function CanvasView() {
         // update viewmodel
         topicmap.translate_by(dx, dy)   // Note: topicmap.translate_by() doesn't update the DB.
         // render
-        ctx.translate(dx, dy)           // canvas
-        update_html_translation()       // HTML topic layer
+        ctx.translate(dx, dy)                       // canvas
+        HTML_FLAVOR && update_html_translation()    // HTML topic layer
     }
 
     function scroll_to_center(x, y) {
@@ -954,7 +947,73 @@ function CanvasView() {
 
 
 
-    // === HTML topic layer ===
+    // ************************
+    // *** HTML topic layer ***
+    // ************************
+
+
+
+    function create_topic_html(topic_view) {
+
+        var topic_dom = $("<div>").addClass("topic")
+        invoke_customizers("topic_dom", [topic_view, topic_dom])
+        topic_view.set_dom(topic_dom)
+        $("#topic-layer").append(topic_dom)
+        position_topic_html(topic_dom, topic_view.x, topic_view.y)
+        invoke_customizers("topic_dom_appendix", [topic_view, topic_dom])
+        add_event_handlers()
+        configure_draggable_handle()
+
+        function add_event_handlers() {
+            var has_moved
+            topic_dom
+                .mousedown(function() {
+                    close_context_menu()
+                    has_moved = false
+                })
+                .mouseup(function() {
+                    if (association_in_progress) {
+                        end_association_in_progress(topic_view)
+                    } else if (!has_moved) {
+                        dm4c.do_select_topic(topic_view.id)
+                    }
+                })
+                .contextmenu(function(event) {
+                    dm4c.do_select_topic(topic_view.id)
+                    // Note: only dm4c.selected_object has the composite value (the TopicView has not)
+                    var commands = dm4c.get_topic_commands(dm4c.selected_object, "context-menu")
+                    open_context_menu(commands, event)
+                    return false
+                })
+            topic_dom.draggable({
+                drag: function(event, ui) {
+                    has_moved = true
+                    // update view
+                    update_topic_view(topic_view, topic_dom)
+                    // render
+                    show()
+                },
+                stop: function(event, ui) {
+                    // update viewmodel
+                    topicmap.set_topic_position(topic_view.id, topic_view.x, topic_view.y)
+                }
+            })
+        }
+
+        function configure_draggable_handle() {
+            var handles = []
+            invoke_customizers("topic_dom_draggable_handle", [topic_dom, handles])
+            var handle
+            if (handles.length) {
+                if (handles.length > 1) {
+                    console.log("WARNING: more than one draggable handle provided by view customizers. " +
+                        "Only the first is used.")
+                }
+                handle = handles[0]
+                topic_dom.draggable("option", "handle", handle)
+            }
+        }
+    }
 
     function update_html_selection(topic_id) {
         // 1) remove former selection
@@ -983,8 +1042,8 @@ function CanvasView() {
         })
     }
 
-    function remove_topic_html(topic_dom) {
-        topic_dom.remove()
+    function remove_topic_html(topic_view) {
+        topic_view.dom.remove()
     }
 
     function update_html_translation() {
@@ -1023,7 +1082,7 @@ function CanvasView() {
      * The clickable area is the icon.
      * The label is truncated and line wrapped.
      */
-    function DefaultViewConfiguration() {
+    function DefaultViewCustomizer() {
 
         var LABEL_DIST_Y = 4        // in pixel
 
