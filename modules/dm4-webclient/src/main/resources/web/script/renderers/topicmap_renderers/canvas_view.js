@@ -25,7 +25,7 @@ function CanvasView() {
     var default_view_customizer
     var view_customizers = []
     var CANVAS_FLAVOR = false
-    var HTML_FLAVOR   = false
+    var DOM_FLAVOR    = false
 
     // Short-term interaction state
     var topic_move_in_progress      // true while topic move is in progress (boolean)
@@ -58,9 +58,9 @@ function CanvasView() {
         topicmap = topicmap_viewmodel
         //
         ctx.translate(topicmap.trans_x, topicmap.trans_y)   // canvas
-        HTML_FLAVOR && update_html_translation()            // HTML topic layer
+        DOM_FLAVOR && update_translation_dom()              // topic layer DOM
         // update view
-        HTML_FLAVOR && empty_topic_layer()                  // HTML topic layer
+        DOM_FLAVOR && empty_topic_layer()                   // topic layer DOM
         clear()
         topicmap.iterate_topics(function(topic) {
             if (topic.visibility) {
@@ -105,7 +105,7 @@ function CanvasView() {
         topic_view.update(topic)
         // render
         show()                                              // canvas
-        HTML_FLAVOR && reposition_topic_html(topic_view)    // HTML topic layer
+        DOM_FLAVOR && position_topic_dom(topic_view)        // topic layer DOM
     }
 
     /**
@@ -127,7 +127,7 @@ function CanvasView() {
             delete topics[id]
             // render
             show()                                          // canvas
-            HTML_FLAVOR && remove_topic_html(topic_view)    // HTML topic layer
+            DOM_FLAVOR && remove_topic_dom(topic_view)      // topic layer DOM
         }
     }
 
@@ -146,12 +146,13 @@ function CanvasView() {
     this.set_topic_selection = function(topic_id) {
         // render
         show()                                              // canvas
-        HTML_FLAVOR && update_html_selection(topic_id)      // HTML topic layer
+        DOM_FLAVOR && update_selection_dom(topic_id)        // topic layer DOM
     }
 
     this.set_association_selection = function(topic_id) {
         // render
-        show()
+        show()                                              // canvas
+        DOM_FLAVOR && remove_selection_dom()                // topic layer DOM
     }
 
     // ---
@@ -273,7 +274,7 @@ function CanvasView() {
         var topic_view = new TopicView(topic)
         topics[topic.id] = topic_view
         //
-        HTML_FLAVOR && create_topic_html(topic_view)        // HTML topic layer
+        DOM_FLAVOR && create_topic_dom(topic_view)          // topic layer DOM
         //
         invoke_customizers("update_topic", [topic_view, ctx])
     }
@@ -453,9 +454,9 @@ function CanvasView() {
             log("CANVAS")
         }
         if (customizer.topic_dom) {
-            HTML_FLAVOR = true
+            DOM_FLAVOR = true
             is_valid = true
-            log("HTML")
+            log("DOM")
         }
         return is_valid
 
@@ -489,7 +490,7 @@ function CanvasView() {
         // update viewmodel
         topicmap.set_view_properties(topic_id, view_props)
         // update view
-        //      Note: the TopicView is already up-to-date. It is updated by viewmodel side effect.
+        get_topic(topic_id).set_view_properties(view_props)
         // render
         show()
     }
@@ -581,9 +582,8 @@ function CanvasView() {
         } else if (canvas_move_in_progress) {
             end_canvas_move()
         } else if (association_in_progress) {
-            // only end association if not bumped into a HTML topic
-            // ### FIXME: neutralize topic childs as well
-            if (!$(event.toElement).hasClass("topic")) {
+            // topics (including their childs) are prevented from ending an association in progress
+            if ($(event.relatedTarget).closest(".topic", "#topic-layer").length == 0) {
                 end_association_in_progress()
             }
         }
@@ -916,10 +916,10 @@ function CanvasView() {
 
     function translate_by(dx, dy) {
         // update viewmodel
-        topicmap.translate_by(dx, dy)   // Note: topicmap.translate_by() doesn't update the DB.
+        topicmap.translate_by(dx, dy)               // Note: topicmap.translate_by() doesn't update the DB.
         // render
         ctx.translate(dx, dy)                       // canvas
-        HTML_FLAVOR && update_html_translation()    // HTML topic layer
+        DOM_FLAVOR && update_translation_dom()      // topic layer DOM
     }
 
     function scroll_to_center(x, y) {
@@ -947,19 +947,19 @@ function CanvasView() {
 
 
 
-    // ************************
-    // *** HTML topic layer ***
-    // ************************
+    // ***********************
+    // *** Topic Layer DOM ***
+    // ***********************
 
 
 
-    function create_topic_html(topic_view) {
+    function create_topic_dom(topic_view) {
 
         var topic_dom = $("<div>").addClass("topic")
         invoke_customizers("topic_dom", [topic_view, topic_dom])
         topic_view.set_dom(topic_dom)
         $("#topic-layer").append(topic_dom)
-        position_topic_html(topic_dom, topic_view.x, topic_view.y)
+        position_topic_dom(topic_view)
         invoke_customizers("topic_dom_appendix", [topic_view, topic_dom])
         add_event_handlers()
         configure_draggable_handle()
@@ -1015,13 +1015,11 @@ function CanvasView() {
         }
     }
 
-    function update_html_selection(topic_id) {
-        // 1) remove former selection
-        $("#topicmap-panel .topic.selected").removeClass("selected")
-        // Note: the topicmap viewmodel selection is already updated. So we can't get the formerly
-        // selected topic ID and can't use get_topic(). So we do DOM traversal instead.
+    function update_selection_dom(topic_id) {
+        // remove former selection
+        remove_selection_dom()
         //
-        // 2) set new selection
+        // set new selection
         get_topic(topic_id).dom.addClass("selected")
         // The same via DOM traversal:
         // $("#topicmap-panel .topic#t-" + topic_id).addClass("selected")
@@ -1029,24 +1027,26 @@ function CanvasView() {
         // Meanwhile we store the topic DOM in the TopicView object.
     }
 
-    function reposition_topic_html(topic_view) {
-        position_topic_html(topic_view.dom, topic_view.x, topic_view.y)
+    function remove_selection_dom() {
+        $("#topicmap-panel .topic.selected").removeClass("selected")
+        // Note: the topicmap viewmodel selection is already updated. So we can't get the formerly
+        // selected topic ID and can't use get_topic(). So we do DOM traversal instead.
+        // ### TODO: consider equipping the canvas view with a selection model.
     }
 
-    function position_topic_html(topic_dom, x, y) {
-        // ### FIXME: for canvas-only rendering topic_dom is undefined
-        var s = topic_html_size(topic_dom)
-        topic_dom.css({
-            top:  y - s.height / 2,
-            left: x - s.width  / 2
+    function position_topic_dom(topic_view) {
+        var s = topic_dom_size(topic_view.dom)
+        topic_view.dom.css({
+            top:  topic_view.y - s.height / 2,
+            left: topic_view.x - s.width  / 2
         })
     }
 
-    function remove_topic_html(topic_view) {
+    function remove_topic_dom(topic_view) {
         topic_view.dom.remove()
     }
 
-    function update_html_translation() {
+    function update_translation_dom() {
         $("#topic-layer").css({         
             top:  topicmap.trans_y,
             left: topicmap.trans_x
@@ -1059,14 +1059,14 @@ function CanvasView() {
 
     function update_topic_view(topic_view, topic_dom) {
         var p = topic_dom.position()
-        var s = topic_html_size(topic_dom)
+        var s = topic_dom_size(topic_dom)
         topic_view.move_to(
             Math.floor(p.left + s.width  / 2),  // for non-integers the update request results in 404
             Math.floor(p.top  + s.height / 2)
         )
     }
 
-    function topic_html_size(topic_dom) {
+    function topic_dom_size(topic_dom) {
         return {
             width:  topic_dom.outerWidth(),
             height: topic_dom.outerHeight()
@@ -1120,11 +1120,11 @@ function CanvasView() {
         this.on_mousedown = function(pos, modifier) {
             var ct = detect_topic_at(pos.topicmap)
             if (ct) {
-                if (modifier.shift) {
+                if (!modifier.shift) {
+                    action_topic = ct
+                } else {
                     dm4c.do_select_topic(ct.id)
                     self.begin_association(ct.id, pos.canvas.x, pos.canvas.y)
-                } else {
-                    action_topic = ct
                 }
             } else {
                 var ca = detect_association_at(pos.topicmap)
@@ -1167,7 +1167,8 @@ function CanvasView() {
      * Properties:
      *  id, type_uri, label
      *  x, y                    Topic position.
-     *  x1, y1, x2, y2          Bounding box. Click detection relies on it. To be added by view customizer.
+     *  x1, y1, x2, y2          Bounding box. Canvas click detection relies on these. To be added by view customizer.
+     *                          Not needed for DOM based topic rendering.
      *
      * @param   topic   A TopicViewmodel.
      */
@@ -1208,6 +1209,11 @@ function CanvasView() {
         this.update = function(topic) {
             init(topic)
             invoke_customizers("update_topic", [this, ctx])
+        }
+
+        this.set_view_properties = function(view_props) {
+            // Note: the TopicView is already up-to-date. It is updated by viewmodel side effect.
+            invoke_customizers("update_view_properties", [this])
         }
 
         // ---
@@ -1278,6 +1284,7 @@ function CanvasView() {
         this.move_by = function(dx, dy) {
             this.iterate_topics(function(topic) {
                 topic.move_by(dx, dy)
+                DOM_FLAVOR && position_topic_dom(topic)     // topic layer DOM
             })
         }
 
