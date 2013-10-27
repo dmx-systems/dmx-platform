@@ -298,10 +298,15 @@ function TopicmapViewmodel(topicmap_id, config) {
     }
 
     this.translate_by = function(dx, dy) {
+        // update memory
         this.trans_x += dx
         this.trans_y += dy
-        // Note: the DB is not updated here.
-        // This method is called repeatedly while moving the canvas.
+        // update DB
+        //
+        // Note: the DB is not updated here. This works around the fact that the canvas view does not have its own
+        // translation model. Instead it updates the topicmap viewmodel repeatedly while moving the canvas. We don't
+        // want create many DB update requests while a canvas drag.
+        // ### TODO: consider equipping the canvas view with a translation model.
     }
 
     // ---
