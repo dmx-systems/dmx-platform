@@ -190,8 +190,8 @@ function CanvasView() {
     }
 
     this.scroll_to_center = function(topic_id) {
-        var ct = get_topic(topic_id)
-        scroll_to_center(ct.x + topicmap.trans_x, ct.y + topicmap.trans_y)
+        var tv = get_topic(topic_id)
+        scroll_to_center(tv.x + topicmap.trans_x, tv.y + topicmap.trans_y)
     }
 
     /**
@@ -276,7 +276,7 @@ function CanvasView() {
         //
         DOM_FLAVOR && create_topic_dom(topic_view)          // topic layer DOM
         //
-        invoke_customizers("update_topic", [topic_view, ctx])
+        invoke_customizers("on_update_topic", [topic_view, ctx])
     }
 
     /**
@@ -358,19 +358,19 @@ function CanvasView() {
 
     // ---
 
-    function draw_association(ca) {
-        var ct1 = ca.get_topic_1()
-        var ct2 = ca.get_topic_2()
+    function draw_association(av) {
+        var tv1 = av.get_topic_1()
+        var tv2 = av.get_topic_2()
         // error check
-        if (!ct1 || !ct2) {
+        if (!tv1 || !tv2) {
             // TODO: deleted associations must be removed from all topicmaps.
             // ### alert("ERROR in draw_associations: association " + this.id + " is missing a topic")
             // ### delete assocs[i]
             return
         }
         //
-        var color = dm4c.get_type_color(ca.type_uri)
-        draw_line(ct1.x, ct1.y, ct2.x, ct2.y, dm4c.ASSOC_WIDTH, color)
+        var color = dm4c.get_type_color(av.type_uri)
+        draw_line(tv1.x, tv1.y, tv2.x, tv2.y, dm4c.ASSOC_WIDTH, color)
     }
 
     // ---
@@ -465,8 +465,8 @@ function CanvasView() {
         }
     }
 
-    function customize_draw_topic(ct) {
-        invoke_customizers("draw_topic", [ct, ctx])
+    function customize_draw_topic(tv) {
+        invoke_customizers("draw_topic", [tv, ctx])
     }
 
     /**
@@ -610,9 +610,9 @@ function CanvasView() {
     }
 
     function do_doubleclick(event) {
-        var ct = detect_topic(event)
-        if (ct) {
-            dm4c.fire_event("topic_doubleclicked", ct)
+        var tv = detect_topic(event)
+        if (tv) {
+            dm4c.fire_event("topic_doubleclicked", tv)
         }
     }
 
@@ -650,9 +650,9 @@ function CanvasView() {
         canvas_move_in_progress = false
     }
 
-    function end_association_in_progress(ct) {
-        if (ct && ct.id != action_topic.id) {
-            dm4c.do_create_association("dm4.core.association", action_topic.id, ct.id)
+    function end_association_in_progress(tv) {
+        if (tv && tv.id != action_topic.id) {
+            dm4c.do_create_association("dm4.core.association", action_topic.id, tv.id)
         }
         //
         association_in_progress = false
@@ -666,13 +666,13 @@ function CanvasView() {
 
     function do_contextmenu(event) {
         // 1) assemble commands
-        var ct, ca
-        if (ct = detect_topic(event)) {
-            dm4c.do_select_topic(ct.id)
+        var tv, av
+        if (tv = detect_topic(event)) {
+            dm4c.do_select_topic(tv.id)
             // Note: only dm4c.selected_object has the composite value (the TopicView has not)
             var commands = dm4c.get_topic_commands(dm4c.selected_object, "context-menu")
-        } else if (ca = detect_association(event)) {
-            dm4c.do_select_association(ca.id)
+        } else if (av = detect_association(event)) {
+            dm4c.do_select_association(av.id)
             // Note: only dm4c.selected_object has the composite value (the AssociationView has not)
             var commands = dm4c.get_association_commands(dm4c.selected_object, "context-menu")
         } else {
@@ -790,9 +790,9 @@ function CanvasView() {
      * @return  The detected topic, or undefined if no topic is located at the given position.
      */
     function detect_topic_at(pos) {
-        return iterate_topics(function(ct) {
-            if (pos.x >= ct.x1 && pos.x < ct.x2 && pos.y >= ct.y1 && pos.y < ct.y2) {
-                return ct
+        return iterate_topics(function(tv) {
+            if (pos.x >= tv.x1 && pos.x < tv.x2 && pos.y >= tv.y1 && pos.y < tv.y2) {
+                return tv
             }
         })
     }
@@ -807,24 +807,24 @@ function CanvasView() {
     function detect_association_at(pos) {
         var x = pos.x
         var y = pos.y
-        return iterate_associations(function(ca) {
-            var ct1 = ca.get_topic_1()
-            var ct2 = ca.get_topic_2()
+        return iterate_associations(function(av) {
+            var tv1 = av.get_topic_1()
+            var tv2 = av.get_topic_2()
             // bounding box
             var aw2 = dm4c.ASSOC_WIDTH / 2   // buffer to make orthogonal associations selectable
-            var bx1 = Math.min(ct1.x, ct2.x) - aw2
-            var bx2 = Math.max(ct1.x, ct2.x) + aw2
-            var by1 = Math.min(ct1.y, ct2.y) - aw2
-            var by2 = Math.max(ct1.y, ct2.y) + aw2
+            var bx1 = Math.min(tv1.x, tv2.x) - aw2
+            var bx2 = Math.max(tv1.x, tv2.x) + aw2
+            var by1 = Math.min(tv1.y, tv2.y) - aw2
+            var by2 = Math.max(tv1.y, tv2.y) + aw2
             var in_bounding = x > bx1 && x < bx2 && y > by1 && y < by2
             if (!in_bounding) {
                 return
             }
             // gradient
-            var dx1 = x - ct1.x
-            var dx2 = x - ct2.x
-            var dy1 = y - ct1.y
-            var dy2 = y - ct2.y
+            var dx1 = x - tv1.x
+            var dx2 = x - tv2.x
+            var dy1 = y - tv1.y
+            var dy2 = y - tv2.y
             if (bx2 - bx1 > by2 - by1) {
                 var g1 = dy1 / dx1
                 var g2 = dy2 / dx2
@@ -834,7 +834,7 @@ function CanvasView() {
             }
             //
             if (Math.abs(g1 - g2) < dm4c.ASSOC_CLICK_TOLERANCE) {
-                return ca
+                return av
             }
         })
     }
@@ -956,11 +956,11 @@ function CanvasView() {
     function create_topic_dom(topic_view) {
 
         var topic_dom = $("<div>").addClass("topic")
-        invoke_customizers("topic_dom", [topic_view, topic_dom])
         topic_view.set_dom(topic_dom)
+        invoke_customizers("topic_dom", [topic_view])
         $("#topic-layer").append(topic_dom)
         position_topic_dom(topic_view)
-        invoke_customizers("topic_dom_appendix", [topic_view, topic_dom])
+        invoke_customizers("topic_dom_appendix", [topic_view])
         add_event_handlers()
         configure_draggable_handle()
 
@@ -989,7 +989,7 @@ function CanvasView() {
                 drag: function(event, ui) {
                     has_moved = true
                     // update view
-                    update_topic_view(topic_view, topic_dom)
+                    update_topic_view(topic_view)
                     // render
                     show()
                 },
@@ -1003,14 +1003,12 @@ function CanvasView() {
         function configure_draggable_handle() {
             var handles = []
             invoke_customizers("topic_dom_draggable_handle", [topic_dom, handles])
-            var handle
             if (handles.length) {
                 if (handles.length > 1) {
                     console.log("WARNING: more than one draggable handle provided by view customizers. " +
                         "Only the first is used.")
                 }
-                handle = handles[0]
-                topic_dom.draggable("option", "handle", handle)
+                topic_dom.draggable("option", "handle", handles[0])
             }
         }
     }
@@ -1057,7 +1055,8 @@ function CanvasView() {
         $("#topic-layer").empty()
     }
 
-    function update_topic_view(topic_view, topic_dom) {
+    function update_topic_view(topic_view) {
+        var topic_dom = topic_view.dom
         var p = topic_dom.position()
         var s = topic_dom_size(topic_dom)
         topic_view.move_to(
@@ -1086,25 +1085,33 @@ function CanvasView() {
 
         var LABEL_DIST_Y = 4        // in pixel
 
+
+
+        // === Hook Implementations ===
+
         /**
          * Adds "x1", "y1", "x2", "y2" properties to the topic view. Click detection relies on this bounding box.
-         * Adds "width" and "height" proprietary properties. Updated on topic update (label or type changed).
-         * Adds "label_wrapper" proprietary property.        Updated on topic update (label or type changed).
-         * Adds "label_pos_y" proprietary property.          Updated on topic move.
+         * Adds "width" and "height" custom properties. Updated on topic update (label or type changed).
+         * Adds "label_wrapper" custom property.        Updated on topic update (label or type changed).
+         * Adds "label_pos_y" custom property.          Updated on topic move.
          *
-         * @param   tv      A TopicView object (defined in CanvasView),
-         *                  has "id", "type_uri", "label", "x", "y" properties.
+         * @param   topic_view      A TopicView object.
+         *                          Has "id", "type_uri", "label", "x", "y", "view_props", "dom" properties
+         *                          plus the viewmodel-derived custom properties.
          */
-        this.update_topic = function(tv, ctx) {
-            update_icon_and_label(tv, ctx)
-            update_geometry(tv)
+        this.on_update_topic = function(topic_view, ctx) {
+            sync_icon_and_label(topic_view, ctx)
+            sync_geometry(topic_view)
         }
 
-        this.move_topic = function(tv) {
-            update_geometry(tv)
+        this.on_move_topic = function(topic_view) {
+            sync_geometry(topic_view)
         }
 
-        this.draw_topic = function(tv, ctx) {
+        // ---
+
+        this.draw_topic = function(topic_view, ctx) {
+            var tv = topic_view
             // 1) render icon
             // Note: the icon object is not hold in the topic view, but looked up every time. This saves us
             // from touching all topic view objects once a topic type's icon changes (via view configuration).
@@ -1118,27 +1125,29 @@ function CanvasView() {
         }
 
         this.on_mousedown = function(pos, modifier) {
-            var ct = detect_topic_at(pos.topicmap)
-            if (ct) {
+            var tv = detect_topic_at(pos.topicmap)
+            if (tv) {
                 if (!modifier.shift) {
-                    action_topic = ct
+                    action_topic = tv
                 } else {
-                    dm4c.do_select_topic(ct.id)
-                    self.begin_association(ct.id, pos.canvas.x, pos.canvas.y)
+                    dm4c.do_select_topic(tv.id)
+                    self.begin_association(tv.id, pos.canvas.x, pos.canvas.y)
                 }
             } else {
-                var ca = detect_association_at(pos.topicmap)
-                if (ca) {
-                    action_assoc = ca
+                var av = detect_association_at(pos.topicmap)
+                if (av) {
+                    action_assoc = av
                 } else {
                     canvas_move_in_progress = true
                 }
             }
         }
 
-        // ---
 
-        function update_icon_and_label(tv, ctx) {
+
+        // === Private Methods ===
+
+        function sync_icon_and_label(tv, ctx) {
             var icon = dm4c.get_type_icon(tv.type_uri)
             tv.width  = icon.width
             tv.height = icon.height
@@ -1148,7 +1157,7 @@ function CanvasView() {
             //                                                        // line height 19px = 1.2em
         }
 
-        function update_geometry(tv) {
+        function sync_geometry(tv) {
             // bounding box
             tv.x1 = tv.x - tv.width / 2,
             tv.y1 = tv.y - tv.height / 2
@@ -1194,13 +1203,13 @@ function CanvasView() {
         this.move_to = function(x, y) {
             this.x = x
             this.y = y
-            invoke_customizers("move_topic", [this])
+            invoke_customizers("on_move_topic", [this])
         }
 
         this.move_by = function(dx, dy) {
             this.x += dx
             this.y += dy
-            invoke_customizers("move_topic", [this])
+            invoke_customizers("on_move_topic", [this])
         }
 
         /**
@@ -1208,12 +1217,12 @@ function CanvasView() {
          */
         this.update = function(topic) {
             init(topic)
-            invoke_customizers("update_topic", [this, ctx])
+            invoke_customizers("on_update_topic", [this, ctx])
         }
 
         this.set_view_properties = function(view_props) {
             // Note: the TopicView is already up-to-date. It is updated by viewmodel side effect.
-            invoke_customizers("update_view_properties", [this])
+            invoke_customizers("on_update_view_properties", [this])
         }
 
         // ---
@@ -1289,8 +1298,8 @@ function CanvasView() {
         }
 
         this.iterate_topics = function(visitor_func) {
-            for (var i = 0, ct; ct = topics[i]; i++) {
-                visitor_func(ct)
+            for (var i = 0, tv; tv = topics[i]; i++) {
+                visitor_func(tv)
             }
         }
     }
@@ -1325,9 +1334,9 @@ function CanvasView() {
 
         function find_start_postition() {
             var max_y = MIN_Y
-            iterate_topics(function(ct) {
-                if (ct.y > max_y) {
-                    max_y = ct.y
+            iterate_topics(function(tv) {
+                if (tv.y > max_y) {
+                    max_y = tv.y
                 }
             })
             var x = START_X

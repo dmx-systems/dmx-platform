@@ -182,7 +182,9 @@ function TopicmapViewmodel(topicmap_id, config) {
             t.update(topic)
             // Note: no DB update here. A topic update doesn't affect the view data.
             //
-            return t
+            if (t.visibility) {
+                return t
+            }
         }
     }
 
