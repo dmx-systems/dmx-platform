@@ -989,7 +989,7 @@ function CanvasView() {
                 drag: function(event, ui) {
                     has_moved = true
                     // update view
-                    update_topic_view(topic_view, topic_dom)
+                    update_topic_view(topic_view)
                     // render
                     show()
                 },
@@ -1055,7 +1055,8 @@ function CanvasView() {
         $("#topic-layer").empty()
     }
 
-    function update_topic_view(topic_view, topic_dom) {
+    function update_topic_view(topic_view) {
+        var topic_dom = topic_view.dom
         var p = topic_dom.position()
         var s = topic_dom_size(topic_dom)
         topic_view.move_to(
