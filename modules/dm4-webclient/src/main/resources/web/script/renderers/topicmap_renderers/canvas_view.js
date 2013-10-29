@@ -276,7 +276,7 @@ function CanvasView() {
         //
         DOM_FLAVOR && create_topic_dom(topic_view)          // topic layer DOM
         //
-        invoke_customizers("update_topic", [topic_view, ctx])
+        invoke_customizers("on_update_topic", [topic_view, ctx])
     }
 
     /**
@@ -1084,25 +1084,33 @@ function CanvasView() {
 
         var LABEL_DIST_Y = 4        // in pixel
 
+
+
+        // === Hook Implementations ===
+
         /**
          * Adds "x1", "y1", "x2", "y2" properties to the topic view. Click detection relies on this bounding box.
-         * Adds "width" and "height" proprietary properties. Updated on topic update (label or type changed).
-         * Adds "label_wrapper" proprietary property.        Updated on topic update (label or type changed).
-         * Adds "label_pos_y" proprietary property.          Updated on topic move.
+         * Adds "width" and "height" custom properties. Updated on topic update (label or type changed).
+         * Adds "label_wrapper" custom property.        Updated on topic update (label or type changed).
+         * Adds "label_pos_y" custom property.          Updated on topic move.
          *
-         * @param   tv      A TopicView object (defined in CanvasView),
-         *                  has "id", "type_uri", "label", "x", "y" properties.
+         * @param   topic_view      A TopicView object.
+         *                          Has "id", "type_uri", "label", "x", "y", "view_props", "dom" properties
+         *                          plus the viewmodel-derived custom properties.
          */
-        this.update_topic = function(tv, ctx) {
-            update_icon_and_label(tv, ctx)
-            update_geometry(tv)
+        this.on_update_topic = function(topic_view, ctx) {
+            sync_icon_and_label(topic_view, ctx)
+            sync_geometry(topic_view)
         }
 
-        this.move_topic = function(tv) {
-            update_geometry(tv)
+        this.on_move_topic = function(topic_view) {
+            sync_geometry(topic_view)
         }
 
-        this.draw_topic = function(tv, ctx) {
+        // ---
+
+        this.draw_topic = function(topic_view, ctx) {
+            var tv = topic_view
             // 1) render icon
             // Note: the icon object is not hold in the topic view, but looked up every time. This saves us
             // from touching all topic view objects once a topic type's icon changes (via view configuration).
@@ -1134,9 +1142,11 @@ function CanvasView() {
             }
         }
 
-        // ---
 
-        function update_icon_and_label(tv, ctx) {
+
+        // === Private Methods ===
+
+        function sync_icon_and_label(tv, ctx) {
             var icon = dm4c.get_type_icon(tv.type_uri)
             tv.width  = icon.width
             tv.height = icon.height
@@ -1146,7 +1156,7 @@ function CanvasView() {
             //                                                        // line height 19px = 1.2em
         }
 
-        function update_geometry(tv) {
+        function sync_geometry(tv) {
             // bounding box
             tv.x1 = tv.x - tv.width / 2,
             tv.y1 = tv.y - tv.height / 2
@@ -1192,13 +1202,13 @@ function CanvasView() {
         this.move_to = function(x, y) {
             this.x = x
             this.y = y
-            invoke_customizers("move_topic", [this])
+            invoke_customizers("on_move_topic", [this])
         }
 
         this.move_by = function(dx, dy) {
             this.x += dx
             this.y += dy
-            invoke_customizers("move_topic", [this])
+            invoke_customizers("on_move_topic", [this])
         }
 
         /**
@@ -1206,12 +1216,12 @@ function CanvasView() {
          */
         this.update = function(topic) {
             init(topic)
-            invoke_customizers("update_topic", [this, ctx])
+            invoke_customizers("on_update_topic", [this, ctx])
         }
 
         this.set_view_properties = function(view_props) {
             // Note: the TopicView is already up-to-date. It is updated by viewmodel side effect.
-            invoke_customizers("update_view_properties", [this])
+            invoke_customizers("on_update_view_properties", [this])
         }
 
         // ---
