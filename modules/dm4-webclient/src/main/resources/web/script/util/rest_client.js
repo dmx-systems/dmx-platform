@@ -374,23 +374,16 @@ function RESTClient(core_service_uri) {
 
     function sort_topics(topics, sort) {
         if (sort) {
-            topics.sort(topics_sort_function)
+            topics.sort(compare_topics)
         }
     }
 
-    /**
-     * Compares two topics.
-     * Note: the topics are expected to be "related topics", that is they have an "assoc" property.
-     */
-    function topics_sort_function(topic_1, topic_2) {
-        if (topic_1.assoc.type_uri != topic_2.assoc.type_uri) {
-            // 1st sort criteria: association type
-            return compare(topic_1.assoc.type_uri, topic_2.assoc.type_uri)
-        } else if (topic_1.type_uri != topic_2.type_uri) {
-            // 2nd sort criteria: topic type
+    function compare_topics(topic_1, topic_2) {
+        if (topic_1.type_uri != topic_2.type_uri) {
+            // 1st sort criteria: topic type
             return compare(topic_1.type_uri, topic_2.type_uri)
         } else {
-            // 3rd sort criteria: topic name
+            // 2nd sort criteria: topic name
             return compare(topic_1.value, topic_2.value)
         }
 

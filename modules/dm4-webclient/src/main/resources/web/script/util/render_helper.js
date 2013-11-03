@@ -286,13 +286,13 @@ function RenderHelper() {
     // ---
 
     function group_topics(topics, callback) {
-        var assoc_type_uri      // assoc type URI of current group  - initialized by begin_new_group()
-        var assoc_type_name     // assoc type name of current group - initialized by begin_new_group()
+        var topic_type_uri      // topic type URI of current group  - initialized by begin_new_group()
+        var topic_type_name     // topic type name of current group - initialized by begin_new_group()
         var begin               // begin index of current group     - initialized by begin_new_group()
         //
         begin_new_group(topics[0], 0)
         for (var i = 0, topic; topic = topics[i]; i++) {
-            if (topic.assoc.type_uri == assoc_type_uri) {
+            if (topic.type_uri == topic_type_uri) {
                 continue
             }
             process_group()
@@ -303,14 +303,13 @@ function RenderHelper() {
 
         function process_group() {
             var group = topics.slice(begin, i)
-            var title = assoc_type_name + " (" + group.length + ")"
+            var title = topic_type_name + " (" + group.length + ")"
             callback(title, group)
         }
 
         function begin_new_group(topic, pos) {
-            assoc_type_uri  = topic.assoc.type_uri
-            assoc_type_name = assoc_type_uri ? dm4c.get_association_type(assoc_type_uri).value
-                                             : "Instantiation"  // ### FIXME: for "Instantiation" type URI is ""
+            topic_type_uri = topic.type_uri
+            topic_type_name = dm4c.get_topic_type(topic_type_uri).value
             begin = pos
         }
     }
