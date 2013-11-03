@@ -391,7 +391,7 @@ function RESTClient(core_service_uri) {
             return compare(topic_1.type_uri, topic_2.type_uri)
         } else {
             // 3rd sort criteria: topic name
-            return compare(topic_1.value, topic_2.value)
+            return compare(topic_1.value.toLowerCase(), topic_2.value.toLowerCase())
         }
 
         function compare(val_1, val_2) {
