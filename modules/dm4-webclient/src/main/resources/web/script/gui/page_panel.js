@@ -12,9 +12,9 @@ function PagePanel() {
     var page_renderer                   // The displayed object's page renderer
                                         // (only consulted if displayed_object is not null).
     var page_state = PageState.NONE     // Tracks page state. Used to fire the "post_destroy_form" event in case.
-    var from_processing_function        // The form processing function: called to "submit" the form
+    var form_processing_function        // The form processing function: called to "submit" the form
                                         // (only consulted if a form is displayed).
-    var from_processing_called          // Tracks the form processing function call (boolean).
+    var form_processing_called          // Tracks the form processing function call (boolean).
                                         // Used to ensure the form processing function is called only once.
 
     // View
@@ -84,12 +84,12 @@ function PagePanel() {
             return
         }
         //
-        if (from_processing_called) {
+        if (form_processing_called) {
             throw "PagePanelError: the form processing function has already been called"
         }
         //
-        from_processing_called = true
-        from_processing_function()
+        form_processing_called = true
+        form_processing_function()
     }
 
     this.get_displayed_object = function() {
@@ -123,10 +123,10 @@ function PagePanel() {
     function render_form() {
         clear_page(PageState.FORM)
         prepare_page()
-        from_processing_function = page_renderer.render_form(displayed_object)
+        form_processing_function = page_renderer.render_form(displayed_object)
         render_buttons("detail-panel-edit")
         //
-        from_processing_called = false
+        form_processing_called = false
     }
 
     function render_buttons(context) {
