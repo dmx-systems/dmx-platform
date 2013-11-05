@@ -34,7 +34,7 @@ public interface Type extends Topic {
 
     Collection<AssociationDefinition> getAssocDefs();
 
-    AssociationDefinition getAssocDef(String assocDefUri);
+    AssociationDefinition getAssocDef(String childTypeUri);
 
     void addAssocDef(AssociationDefinitionModel assocDef);
 
@@ -58,7 +58,7 @@ public interface Type extends Topic {
      */
     void updateAssocDef(AssociationDefinitionModel assocDef);
 
-    void removeAssocDef(String assocDefUri);
+    void removeAssocDef(String childTypeUri);
 
     // --- Label Configuration ---
 

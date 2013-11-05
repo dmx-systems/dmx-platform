@@ -91,11 +91,11 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     @Override
-    public AssociationDefinition getAssocDef(String assocDefUri) {
-        AssociationDefinition assocDef = assocDefs.get(assocDefUri);
+    public AssociationDefinition getAssocDef(String childTypeUri) {
+        AssociationDefinition assocDef = assocDefs.get(childTypeUri);
         if (assocDef == null) {
             throw new RuntimeException("Schema violation: association definition \"" +
-                assocDefUri + "\" not found in " + this);
+                childTypeUri + "\" not found in " + this);
         }
         return assocDef;
     }
@@ -123,10 +123,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     @Override
-    public void removeAssocDef(String assocDefUri) {
+    public void removeAssocDef(String childTypeUri) {
         // update memory
-        getModel().removeAssocDef(assocDefUri);                                 // update model
-        AttachedAssociationDefinition assocDef = _removeAssocDef(assocDefUri);  // update attached object cache
+        getModel().removeAssocDef(childTypeUri);                                // update model
+        AttachedAssociationDefinition assocDef = _removeAssocDef(childTypeUri); // update attached object cache
         // update DB
         dms.typeStorage.rebuildSequence(this);
     }
@@ -311,11 +311,11 @@ abstract class AttachedType extends AttachedTopic implements Type {
         assocDefs.put(assocDef.getChildTypeUri(), assocDef);
     }
 
-    private AttachedAssociationDefinition _removeAssocDef(String assocDefUri) {
+    private AttachedAssociationDefinition _removeAssocDef(String childTypeUri) {
         // error check
-        getAssocDef(assocDefUri);
+        getAssocDef(childTypeUri);
         //
-        return (AttachedAssociationDefinition) assocDefs.remove(assocDefUri);
+        return (AttachedAssociationDefinition) assocDefs.remove(childTypeUri);
     }
 
     // ---
