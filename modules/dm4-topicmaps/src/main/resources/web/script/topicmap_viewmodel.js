@@ -64,7 +64,7 @@ function TopicmapViewmodel(topicmap_id, config) {
     // ---
 
     /**
-     * @param   topic   a domain topic (has "id", "type_uri", "value" properties).
+     * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
      *
      * @return  The topic viewmodel that represents what is about to be added to the view (a TopicViewmodel object).
      *          This is either a new viewmodel (in case the domain topic was not yet contained in the topicmap) or
@@ -439,7 +439,7 @@ function TopicmapViewmodel(topicmap_id, config) {
     // ---
 
     /**
-     * @param   topic   a domain topic (has "id", "type_uri", "value" properties).
+     * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
      */
     function add_topic(topic, view_props) {
         var _topic = new TopicViewmodel(topic, view_props)
@@ -480,13 +480,14 @@ function TopicmapViewmodel(topicmap_id, config) {
     // ------------------------------------------------------------------------------------------------- Private Classes
 
     /**
-     * @param   topic   a domain topic (has "id", "type_uri", "value" properties).
+     * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
      */
     function TopicViewmodel(topic, view_props) {
 
-        this.id       = topic.id
-        this.type_uri = topic.type_uri
-        this.label    = topic.value
+        this.id        = topic.id
+        this.type_uri  = topic.type_uri
+        this.label     = topic.value
+        this.composite = topic.composite
         // standard view properties
         this.x          = view_props["dm4.topicmaps.x"]
         this.y          = view_props["dm4.topicmaps.y"]
@@ -515,11 +516,12 @@ function TopicmapViewmodel(topicmap_id, config) {
         }
 
         /**
-         * @param   topic   a domain topic (has "id", "type_uri", "value" properties).
+         * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
          */
         this.update = function(topic) {
-            this.type_uri = topic.type_uri
-            this.label    = topic.value
+            this.type_uri  = topic.type_uri
+            this.label     = topic.value
+            this.composite = topic.composite
         }
 
         this.delete = function() {

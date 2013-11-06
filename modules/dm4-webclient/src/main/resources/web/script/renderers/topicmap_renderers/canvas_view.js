@@ -1175,7 +1175,9 @@ function CanvasView() {
      *
      * Properties:
      *  id, type_uri, label
+     *  composite
      *  x, y                    Topic position.
+     *  view_props
      *  x1, y1, x2, y2          Bounding box. Canvas click detection relies on these. To be added by view customizer.
      *                          Not needed for DOM based topic rendering.
      *
@@ -1231,8 +1233,9 @@ function CanvasView() {
          * @param   topic   A TopicViewmodel.
          */
         function init(topic) {
-            self.type_uri = topic.type_uri
-            self.label    = topic.label
+            self.type_uri  = topic.type_uri
+            self.label     = topic.label
+            self.composite = topic.composite
         }
     }
 
