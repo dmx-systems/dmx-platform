@@ -277,6 +277,7 @@ function CanvasView() {
         DOM_FLAVOR && create_topic_dom(topic_view)          // topic layer DOM
         //
         invoke_customizers("on_update_topic", [topic_view, ctx])
+        invoke_customizers("on_update_view_properties", [topic_view])
     }
 
     /**
@@ -1192,7 +1193,7 @@ function CanvasView() {
         this.y = topic.y
         this.view_props = topic.view_props
 
-        init(topic);
+        init(topic)
 
         // ---
 

@@ -484,16 +484,19 @@ function TopicmapViewmodel(topicmap_id, config) {
      */
     function TopicViewmodel(topic, view_props) {
 
+        var self = this
+
         this.id        = topic.id
-        this.type_uri  = topic.type_uri
-        this.label     = topic.value
-        this.composite = topic.composite
         // standard view properties
         this.x          = view_props["dm4.topicmaps.x"]
         this.y          = view_props["dm4.topicmaps.y"]
         this.visibility = view_props["dm4.topicmaps.visibility"]
         // enable access to custom view properties
         this.view_props = view_props
+
+        init(topic)
+
+        // ---
 
         this.set_visibility = function(visibility) {
             this.visibility = visibility
@@ -519,9 +522,7 @@ function TopicmapViewmodel(topicmap_id, config) {
          * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
          */
         this.update = function(topic) {
-            this.type_uri  = topic.type_uri
-            this.label     = topic.value
-            this.composite = topic.composite
+            init(topic)
         }
 
         this.delete = function() {
@@ -531,6 +532,12 @@ function TopicmapViewmodel(topicmap_id, config) {
         }
 
         // ---
+
+        function init(topic) {
+            self.type_uri  = topic.type_uri
+            self.label     = topic.value
+            self.composite = topic.composite
+        }
 
         function reset_selection_conditionally() {
             if (self.is_topic_selected && self.selected_object_id == topic.id) {
