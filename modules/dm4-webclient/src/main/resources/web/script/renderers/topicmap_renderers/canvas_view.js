@@ -450,9 +450,11 @@ function CanvasView() {
             // update viewmodel
             topicmap.set_view_properties(topic_id, view_props)
             // update view
-            get_topic(topic_id).set_view_properties(view_props)
+            var topic_view = get_topic(topic_id)
+            topic_view.set_view_properties(view_props)
             // render
             show()
+            DOM_FLAVOR && position_topic_dom(topic_view)        // topic layer DOM
         }
     }
 
@@ -1305,7 +1307,9 @@ function CanvasView() {
 
         this.move_by = function(dx, dy) {
             this.iterate_topics(function(topic) {
+                // update view
                 topic.move_by(dx, dy)
+                // render
                 DOM_FLAVOR && position_topic_dom(topic)     // topic layer DOM
             })
         }
