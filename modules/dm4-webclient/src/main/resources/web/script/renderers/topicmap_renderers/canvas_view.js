@@ -277,6 +277,7 @@ function CanvasView() {
         DOM_FLAVOR && create_topic_dom(topic_view)          // topic layer DOM
         //
         invoke_customizers("on_update_topic", [topic_view, ctx])
+        invoke_customizers("on_update_view_properties", [topic_view])
     }
 
     /**
@@ -428,12 +429,32 @@ function CanvasView() {
         var canvas_view_facade = {
             get_topic:           get_topic,
             iterate_topics:      iterate_topics,
+            update_topic:        update_topic,
             set_view_properties: set_view_properties,
             pos:                 pos
         }
         var customizer = new customizer_constructor(canvas_view_facade)
         if (check_customizer(customizer)) {
             view_customizers.push(customizer)
+        }
+
+        // ### compare to canvas_renderer.update_topic()
+        function update_topic(topic) {
+            // update viewmodel
+            var topic_viewmodel = topicmap.update_topic(topic)  // ### TODO: update all topicmaps?
+            // update view
+            self.update_topic(topic_viewmodel)
+        }
+
+        function set_view_properties(topic_id, view_props) {
+            // update viewmodel
+            topicmap.set_view_properties(topic_id, view_props)
+            // update view
+            var topic_view = get_topic(topic_id)
+            topic_view.set_view_properties(view_props)
+            // render
+            show()
+            DOM_FLAVOR && position_topic_dom(topic_view)        // topic layer DOM
         }
     }
 
@@ -484,15 +505,6 @@ function CanvasView() {
             var func = default_view_customizer[func_name]
             func && func.apply(undefined, args)     // ### condition required?
         }
-    }
-
-    function set_view_properties(topic_id, view_props) {
-        // update viewmodel
-        topicmap.set_view_properties(topic_id, view_props)
-        // update view
-        get_topic(topic_id).set_view_properties(view_props)
-        // render
-        show()
     }
 
 
@@ -1175,7 +1187,9 @@ function CanvasView() {
      *
      * Properties:
      *  id, type_uri, label
+     *  composite
      *  x, y                    Topic position.
+     *  view_props
      *  x1, y1, x2, y2          Bounding box. Canvas click detection relies on these. To be added by view customizer.
      *                          Not needed for DOM based topic rendering.
      *
@@ -1190,7 +1204,7 @@ function CanvasView() {
         this.y = topic.y
         this.view_props = topic.view_props
 
-        init(topic);
+        init(topic)
 
         // ---
 
@@ -1231,8 +1245,9 @@ function CanvasView() {
          * @param   topic   A TopicViewmodel.
          */
         function init(topic) {
-            self.type_uri = topic.type_uri
-            self.label    = topic.label
+            self.type_uri  = topic.type_uri
+            self.label     = topic.label
+            self.composite = topic.composite
         }
     }
 
@@ -1292,7 +1307,9 @@ function CanvasView() {
 
         this.move_by = function(dx, dy) {
             this.iterate_topics(function(topic) {
+                // update view
                 topic.move_by(dx, dy)
+                // render
                 DOM_FLAVOR && position_topic_dom(topic)     // topic layer DOM
             })
         }

@@ -95,11 +95,11 @@ public abstract class TypeModel extends TopicModel {
         return assocDefs.values();
     }
 
-    public AssociationDefinitionModel getAssocDef(String assocDefUri) {
-        AssociationDefinitionModel assocDef = assocDefs.get(assocDefUri);
+    public AssociationDefinitionModel getAssocDef(String childTypeUri) {
+        AssociationDefinitionModel assocDef = assocDefs.get(childTypeUri);
         if (assocDef == null) {
             throw new RuntimeException("Schema violation: association definition \"" +
-                assocDefUri + "\" not found in " + this);
+                childTypeUri + "\" not found in " + this);
         }
         return assocDef;
     }
@@ -111,11 +111,11 @@ public abstract class TypeModel extends TopicModel {
                 "Topic type \"" + getUri() + "\" is of data type \"" + getDataTypeUri() + "\". (" + assocDef + ")");
         }
         // error check
-        String assocDefUri = assocDef.getChildTypeUri();
-        AssociationDefinitionModel existing = assocDefs.get(assocDefUri);
+        String childTypeUri = assocDef.getChildTypeUri();
+        AssociationDefinitionModel existing = assocDefs.get(childTypeUri);
         if (existing != null) {
             throw new RuntimeException("Schema ambiguity: topic type \"" + uri +
-                "\" has more than one association definitions with uri \"" + assocDefUri + "\"");
+                "\" has more than one association definitions with uri \"" + childTypeUri + "\"");
         }
         //
         updateAssocDef(assocDef);
@@ -125,11 +125,11 @@ public abstract class TypeModel extends TopicModel {
         assocDefs.put(assocDef.getChildTypeUri(), assocDef);
     }
 
-    public AssociationDefinitionModel removeAssocDef(String assocDefUri) {
+    public AssociationDefinitionModel removeAssocDef(String childTypeUri) {
         // error check
-        getAssocDef(assocDefUri);
+        getAssocDef(childTypeUri);
         //
-        return assocDefs.remove(assocDefUri);
+        return assocDefs.remove(childTypeUri);
     }
 
     public void removeAllAssocDefs() {

@@ -60,13 +60,13 @@ class AttachedCompositeValue implements CompositeValue {
 
     @Override
     public Topic getTopic(String childTypeUri) {
-        requireChildTopics(getAssocDef(childTypeUri));  // lazy load
+        loadChildTopics(childTypeUri);
         return _getTopic(childTypeUri);
     }
 
     @Override
     public Topic getTopic(String childTypeUri, Topic defaultTopic) {
-        requireChildTopics(getAssocDef(childTypeUri));  // lazy load
+        loadChildTopics(childTypeUri);
         return _getTopic(childTypeUri, defaultTopic);
     }
 
@@ -74,13 +74,13 @@ class AttachedCompositeValue implements CompositeValue {
 
     @Override
     public List<Topic> getTopics(String childTypeUri) {
-        requireChildTopics(getAssocDef(childTypeUri));  // lazy load
+        loadChildTopics(childTypeUri);
         return _getTopics(childTypeUri);
     }
 
     @Override
     public List<Topic> getTopics(String childTypeUri, List<Topic> defaultValue) {
-        requireChildTopics(getAssocDef(childTypeUri));  // lazy load
+        loadChildTopics(childTypeUri);
         return _getTopics(childTypeUri, defaultValue);
     }
 
@@ -283,7 +283,7 @@ class AttachedCompositeValue implements CompositeValue {
     void updateChildTopics(TopicModel newChildTopic, List<TopicModel> newChildTopics,
                                    AssociationDefinition assocDef, ClientState clientState, Directives directives) {
         // Note: updating the child topics requires them to be loaded
-        requireChildTopics(assocDef);
+        loadChildTopics(assocDef);
         //
         String assocTypeUri = assocDef.getTypeUri();
         boolean one = newChildTopic != null;
@@ -302,6 +302,12 @@ class AttachedCompositeValue implements CompositeValue {
         } else {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not supported");
         }
+    }
+
+    // ---
+
+    void loadChildTopics(String childTypeUri) {
+        loadChildTopics(getAssocDef(childTypeUri));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -502,7 +508,7 @@ class AttachedCompositeValue implements CompositeValue {
      *                      Note: the association definition must not necessarily originate from this object's
      *                      type definition. It may originate from a facet definition as well.
      */
-    private void requireChildTopics(AssociationDefinition assocDef) {
+    private void loadChildTopics(AssociationDefinition assocDef) {
         String childTypeUri = assocDef.getChildTypeUri();
         if (!has(childTypeUri)) {
             logger.fine("### Lazy-loading \"" + childTypeUri + "\" child topic(s) of " + parent.className() + " " +
@@ -670,8 +676,8 @@ class AttachedCompositeValue implements CompositeValue {
 
     // ---
 
-    private AssociationDefinition getAssocDef(String assocDefUri) {
+    private AssociationDefinition getAssocDef(String childTypeUri) {
         // Note: doesn't work for facets
-        return parent.getType().getAssocDef(assocDefUri);
+        return parent.getType().getAssocDef(childTypeUri);
     }
 }

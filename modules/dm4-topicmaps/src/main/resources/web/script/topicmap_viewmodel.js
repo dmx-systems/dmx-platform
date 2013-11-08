@@ -64,7 +64,7 @@ function TopicmapViewmodel(topicmap_id, config) {
     // ---
 
     /**
-     * @param   topic   a domain topic (has "id", "type_uri", "value" properties).
+     * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
      *
      * @return  The topic viewmodel that represents what is about to be added to the view (a TopicViewmodel object).
      *          This is either a new viewmodel (in case the domain topic was not yet contained in the topicmap) or
@@ -173,7 +173,7 @@ function TopicmapViewmodel(topicmap_id, config) {
     // ---
 
     /**
-     * @param   topic   A Topic object.
+     * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
      */
     this.update_topic = function(topic) {
         var t = topics[topic.id]
@@ -189,7 +189,7 @@ function TopicmapViewmodel(topicmap_id, config) {
     }
 
     /**
-     * @param   assoc   An Association object.
+     * @param   assoc   a domain association (has "id", "type_uri", "role_1", "role_2" properties).
      */
     this.update_association = function(assoc) {
         var a = assocs[assoc.id]
@@ -439,7 +439,7 @@ function TopicmapViewmodel(topicmap_id, config) {
     // ---
 
     /**
-     * @param   topic   a domain topic (has "id", "type_uri", "value" properties).
+     * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
      */
     function add_topic(topic, view_props) {
         var _topic = new TopicViewmodel(topic, view_props)
@@ -480,19 +480,23 @@ function TopicmapViewmodel(topicmap_id, config) {
     // ------------------------------------------------------------------------------------------------- Private Classes
 
     /**
-     * @param   topic   a domain topic (has "id", "type_uri", "value" properties).
+     * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
      */
     function TopicViewmodel(topic, view_props) {
 
-        this.id       = topic.id
-        this.type_uri = topic.type_uri
-        this.label    = topic.value
+        var self = this
+
+        this.id        = topic.id
         // standard view properties
         this.x          = view_props["dm4.topicmaps.x"]
         this.y          = view_props["dm4.topicmaps.y"]
         this.visibility = view_props["dm4.topicmaps.visibility"]
         // enable access to custom view properties
         this.view_props = view_props
+
+        init(topic)
+
+        // ---
 
         this.set_visibility = function(visibility) {
             this.visibility = visibility
@@ -515,11 +519,10 @@ function TopicmapViewmodel(topicmap_id, config) {
         }
 
         /**
-         * @param   topic   a domain topic (has "id", "type_uri", "value" properties).
+         * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
          */
         this.update = function(topic) {
-            this.type_uri = topic.type_uri
-            this.label    = topic.value
+            init(topic)
         }
 
         this.delete = function() {
@@ -529,6 +532,12 @@ function TopicmapViewmodel(topicmap_id, config) {
         }
 
         // ---
+
+        function init(topic) {
+            self.type_uri  = topic.type_uri
+            self.label     = topic.value
+            self.composite = topic.composite
+        }
 
         function reset_selection_conditionally() {
             if (self.is_topic_selected && self.selected_object_id == topic.id) {
@@ -576,7 +585,7 @@ function TopicmapViewmodel(topicmap_id, config) {
         // ---
 
         /**
-         * @param   assoc   an Association object
+         * @param   assoc   a domain association (has "id", "type_uri", "role_1", "role_2" properties).
          */
         this.update = function(assoc) {
             this.type_uri = assoc.type_uri

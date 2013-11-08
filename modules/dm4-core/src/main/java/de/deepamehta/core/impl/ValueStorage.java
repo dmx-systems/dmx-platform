@@ -21,6 +21,9 @@ import java.util.logging.Logger;
 
 
 
+/**
+ * Helper for storing/fetching simple values and composite value models.
+ */
 class ValueStorage {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -62,6 +65,12 @@ class ValueStorage {
         }
     }
 
+    /**
+     * Fetches the child topic models of the specified parent object model according to the specified
+     * association definition and updates the parent object model.
+     * <p>
+     * Works for both, "one" and "many" association definitions.
+     */
     void fetchChildTopics(DeepaMehtaObjectModel parent, AssociationDefinition assocDef) {
         CompositeValueModel comp = parent.getCompositeValueModel();
         String cardinalityUri = assocDef.getChildCardinalityUri();
@@ -176,6 +185,10 @@ class ValueStorage {
 
     // ---
 
+    /**
+     * Convenience method to get the (attached) type of a DeepaMehta object model.
+     * The type is obtained from the core service's type cache.
+     */
     Type getType(DeepaMehtaObjectModel model) {
         if (model instanceof TopicModel) {
             return dms.getTopicType(model.getTypeUri());

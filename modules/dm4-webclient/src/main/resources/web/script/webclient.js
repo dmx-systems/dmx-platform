@@ -1348,10 +1348,12 @@ dm4c = new function() {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
+    // ### TODO: rename to get_topic()
     this.fetch_topic = function(topic_id, fetch_composite) {
         return build_topic(dm4c.restc.get_topic_by_id(topic_id, fetch_composite))
     }
 
+    // ### TODO: rename to get_association()
     this.fetch_association = function(assoc_id, fetch_composite) {
         return build_association(dm4c.restc.get_association_by_id(assoc_id, fetch_composite))
     }
