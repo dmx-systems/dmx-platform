@@ -173,7 +173,7 @@ function TopicmapViewmodel(topicmap_id, config) {
     // ---
 
     /**
-     * @param   topic   A Topic object.
+     * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
      */
     this.update_topic = function(topic) {
         var t = topics[topic.id]
@@ -189,7 +189,7 @@ function TopicmapViewmodel(topicmap_id, config) {
     }
 
     /**
-     * @param   assoc   An Association object.
+     * @param   assoc   a domain association (has "id", "type_uri", "role_1", "role_2" properties).
      */
     this.update_association = function(assoc) {
         var a = assocs[assoc.id]
@@ -585,7 +585,7 @@ function TopicmapViewmodel(topicmap_id, config) {
         // ---
 
         /**
-         * @param   assoc   an Association object
+         * @param   assoc   a domain association (has "id", "type_uri", "role_1", "role_2" properties).
          */
         this.update = function(assoc) {
             this.type_uri = assoc.type_uri

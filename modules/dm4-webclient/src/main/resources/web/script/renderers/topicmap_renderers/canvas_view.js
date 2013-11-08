@@ -429,12 +429,30 @@ function CanvasView() {
         var canvas_view_facade = {
             get_topic:           get_topic,
             iterate_topics:      iterate_topics,
+            update_topic:        update_topic,
             set_view_properties: set_view_properties,
             pos:                 pos
         }
         var customizer = new customizer_constructor(canvas_view_facade)
         if (check_customizer(customizer)) {
             view_customizers.push(customizer)
+        }
+
+        // ### compare to canvas_renderer.update_topic()
+        function update_topic(topic) {
+            // update viewmodel
+            var topic_viewmodel = topicmap.update_topic(topic)  // ### TODO: update all topicmaps?
+            // update view
+            self.update_topic(topic_viewmodel)
+        }
+
+        function set_view_properties(topic_id, view_props) {
+            // update viewmodel
+            topicmap.set_view_properties(topic_id, view_props)
+            // update view
+            get_topic(topic_id).set_view_properties(view_props)
+            // render
+            show()
         }
     }
 
@@ -485,15 +503,6 @@ function CanvasView() {
             var func = default_view_customizer[func_name]
             func && func.apply(undefined, args)     // ### condition required?
         }
-    }
-
-    function set_view_properties(topic_id, view_props) {
-        // update viewmodel
-        topicmap.set_view_properties(topic_id, view_props)
-        // update view
-        get_topic(topic_id).set_view_properties(view_props)
-        // render
-        show()
     }
 
 
