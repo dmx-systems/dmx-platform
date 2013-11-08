@@ -278,6 +278,8 @@ function CanvasView() {
         //
         invoke_customizers("on_update_topic", [topic_view, ctx])
         invoke_customizers("on_update_view_properties", [topic_view])
+        //
+        DOM_FLAVOR && position_topic_dom(topic_view)
     }
 
     /**
@@ -971,7 +973,6 @@ function CanvasView() {
         topic_view.set_dom(topic_dom)
         invoke_customizers("topic_dom", [topic_view])
         $("#topic-layer").append(topic_dom)
-        position_topic_dom(topic_view)
         invoke_customizers("topic_dom_appendix", [topic_view])
         add_event_handlers()
         configure_draggable_handle()
