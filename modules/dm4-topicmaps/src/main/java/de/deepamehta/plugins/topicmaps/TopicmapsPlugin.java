@@ -14,6 +14,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -108,8 +109,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         return dms.createTopic(new TopicModel(uri, "dm4.topicmaps.topicmap", new CompositeValueModel()
             .put("dm4.topicmaps.name", name)
             .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
-            .put("dm4.topicmaps.state", topicmapState)
-        ), clientState);
+            .put("dm4.topicmaps.state", topicmapState)), clientState);
     }
 
     // ---
@@ -119,13 +119,20 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void addTopicToTopicmap(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                    CompositeValueModel viewProps) {
-        dms.createAssociation(new AssociationModel(TOPIC_MAPCONTEXT,
-            new TopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
-            new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC),
-            viewProps
-        ), null);   // FIXME: clientState=null
-        //
-        storeCustomViewProperties(topicmapId, topicId, viewProps);
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            dms.createAssociation(new AssociationModel(TOPIC_MAPCONTEXT,
+                new TopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
+                new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC), viewProps), null); // FIXME: clientState=null
+            storeCustomViewProperties(topicmapId, topicId, viewProps);
+            //
+            tx.success();
+        } catch (Exception e) {
+            throw new RuntimeException("Adding topic " + topicId + " to topicmap " + topicmapId + " failed " +
+                "(viewProps=" + viewProps + ")", e);
+        } finally {
+            tx.finish();
+        }
     }
 
     @POST
@@ -134,8 +141,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void addAssociationToTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
         dms.createAssociation(new AssociationModel(ASSOCIATION_MAPCONTEXT,
             new TopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
-            new AssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
-        ), null);   // FIXME: clientState=null
+            new AssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)), null);       // FIXME: clientState=null
     }
 
     // ---
@@ -145,8 +151,18 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setViewProperties(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                     CompositeValueModel viewProps) {
-        storeStandardViewProperties(topicmapId, topicId, viewProps);
-        storeCustomViewProperties(topicmapId, topicId, viewProps);
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            storeStandardViewProperties(topicmapId, topicId, viewProps);
+            storeCustomViewProperties(topicmapId, topicId, viewProps);
+            //
+            tx.success();
+        } catch (Exception e) {
+            throw new RuntimeException("Storing view properties of topic " + topicId + " failed " +
+                "(viewProps=" + viewProps + ")", e);
+        } finally {
+            tx.finish();
+        }
     }
 
 
@@ -157,8 +173,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                                                    @PathParam("x") int x, @PathParam("y") int y) {
         storeStandardViewProperties(topicmapId, topicId, new CompositeValueModel()
             .put("dm4.topicmaps.x", x)
-            .put("dm4.topicmaps.y", y)
-        );
+            .put("dm4.topicmaps.y", y));
     }
 
     @PUT
@@ -167,8 +182,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
         storeStandardViewProperties(topicmapId, topicId, new CompositeValueModel()
-            .put("dm4.topicmaps.visibility", visibility)
-        );
+            .put("dm4.topicmaps.visibility", visibility));
     }
 
     @DELETE
@@ -199,9 +213,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 .put("dm4.topicmaps.state", new CompositeValueModel()
                     .put("dm4.topicmaps.translation", new CompositeValueModel()
                         .put("dm4.topicmaps.translation_x", transX)
-                        .put("dm4.topicmaps.translation_y", transY)
-                    )
-                );
+                        .put("dm4.topicmaps.translation_y", transY)));
             dms.updateTopic(new TopicModel(topicmapId, topicmapState), null);
         } catch (Exception e) {
             throw new RuntimeException("Setting translation of topicmap " + topicmapId + " failed (transX=" +
