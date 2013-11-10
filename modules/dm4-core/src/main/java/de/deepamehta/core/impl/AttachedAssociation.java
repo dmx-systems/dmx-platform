@@ -126,6 +126,30 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // ---
 
     @Override
+    public Topic getTopic(String roleTypeUri) {
+        Set<Topic> topics = getTopics(roleTypeUri);
+        switch (topics.size()) {
+        case 0:
+            return null;
+        case 1:
+            return topics.iterator().next();
+        default:
+            throw new RuntimeException("Ambiguity in association: " + topics.size() + " topics have role type \"" +
+                roleTypeUri + "\" (" + this + ")");
+        }
+    }
+
+    @Override
+    public Set<Topic> getTopics(String roleTypeUri) {
+        Set<Topic> topics = new HashSet();
+        filterTopic(getRole1(), roleTypeUri, topics);
+        filterTopic(getRole2(), roleTypeUri, topics);
+        return topics;
+    }
+
+    // ---
+
+    @Override
     public Role getRole(RoleModel model) {
         if (getRole1().getModel().refsSameObject(model)) {
             return getRole1();
@@ -170,30 +194,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
 
     // === Traversal ===
-
-    @Override
-    public Topic getTopic(String roleTypeUri) {
-        Set<Topic> topics = getTopics(roleTypeUri);
-        switch (topics.size()) {
-        case 0:
-            return null;
-        case 1:
-            return topics.iterator().next();
-        default:
-            throw new RuntimeException("Ambiguity in association: " + topics.size() + " topics have role type \"" +
-                roleTypeUri + "\" (" + this + ")");
-        }
-    }
-
-    @Override
-    public Set<Topic> getTopics(String roleTypeUri) {
-        Set<Topic> topics = new HashSet();
-        filterTopic(getRole1(), roleTypeUri, topics);
-        filterTopic(getRole2(), roleTypeUri, topics);
-        return topics;
-    }
-
-    // ---
 
     @Override
     public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,

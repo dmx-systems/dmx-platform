@@ -101,6 +101,11 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     @Override
+    public boolean hasAssocDef(String childTypeUri) {
+        return assocDefs.get(childTypeUri) != null;
+    }
+
+    @Override
     public void addAssocDef(AssociationDefinitionModel model) {
         // Note: the predecessor must be determined *before* the memory is updated
         AssociationDefinitionModel predecessor = lastAssocDef();

@@ -1,5 +1,7 @@
 package de.deepamehta.plugins.webclient;
 
+import de.deepamehta.core.Association;
+import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.RelatedTopic;
@@ -21,7 +23,6 @@ import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreUpdateTopicListener;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
-import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -33,11 +34,8 @@ import javax.ws.rs.QueryParam;
 
 import java.awt.Desktop;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -75,7 +73,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
 
     /**
-     * Performs a fulltext search and creates a search result topic (a bucket).
+     * Performs a fulltext search and creates a search result topic.
      */
     @GET
     @Path("/search")
@@ -101,7 +99,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     }
 
     /**
-     * Performs a by-type search and creates a search result topic (a bucket).
+     * Performs a by-type search and creates a search result topic.
      * <p>
      * Note: this resource method is actually part of the Type Search plugin.
      * TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
@@ -128,6 +126,26 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         } finally {
             tx.finish();
         }
+    }
+
+    // ---
+
+    @GET
+    @Path("/topic/{id}/related_topics")
+    public ResultSet getRelatedTopics(@PathParam("id") long topicId) {
+        Topic topic = dms.getTopic(topicId, false);
+        ResultSet<RelatedTopic> topics = topic.getRelatedTopics(null, 0);   // assocTypeUri=null, maxResultSize=0
+        Iterator<RelatedTopic> i = topics.getIterator();
+        int removed = 0;
+        while (i.hasNext()) {
+            RelatedTopic relTopic = i.next();
+            if (isPropertyTopic(relTopic, topic)) {
+                i.remove();
+                removed++;
+            }
+        }
+        logger.info("### " + removed + " topics are removed from result set of topic " + topicId);
+        return topics;
     }
 
 
@@ -218,7 +236,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     }
 
     /**
-     * Creates a "Search" topic (a bucket).
+     * Creates a "Search" topic.
      */
     private Topic createSearchTopic(String searchTerm, Set<? extends Topic> resultItems, ClientState clientState) {
         Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new CompositeValueModel()
@@ -333,5 +351,36 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             port = System.getProperty("org.osgi.service.http.port");
         }
         return protocol + "://localhost:" + port + "/de.deepamehta.webclient/";
+    }
+
+
+
+    // === Misc ===
+
+    private boolean isPropertyTopic(RelatedTopic relTopic, Topic topic) {
+        Association assoc = relTopic.getRelatingAssociation();
+        // association type
+        if (assoc.getTypeUri().equals("dm4.core.composition")) {
+            // association definition
+            TopicType type = dms.getTopicType(topic.getTypeUri());
+            String relTypeUri = relTopic.getTypeUri();
+            if (type.hasAssocDef(relTypeUri)) {
+                AssociationDefinition assocDef = type.getAssocDef(relTypeUri);
+                // association definition type
+                if (assocDef.getInstanceLevelAssocTypeUri().equals("dm4.core.composition")) {
+                    // child type
+                    if (assocDef.getChildTypeUri().equals(relTypeUri)) {
+                        // role types
+                        Set<Topic> parent = assoc.getTopics("dm4.core.parent");
+                        Set<Topic> child  = assoc.getTopics("dm4.core.child");
+                        if (parent.size() == 1 && parent.iterator().next().getId() == topic.getId() &&
+                            child.size()  == 1 && child.iterator().next().getId()  == relTopic.getId()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
