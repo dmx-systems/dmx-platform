@@ -12,6 +12,8 @@ function Topic(topic) {
     this.type_uri  = topic.type_uri
     this.value     = topic.value
     this.composite = build_composite(topic.composite)
+    //
+    this.assoc     = topic.assoc
 }
 
 // ### TODO: create common base class (DeepaMehtaObject) for topics and associations.

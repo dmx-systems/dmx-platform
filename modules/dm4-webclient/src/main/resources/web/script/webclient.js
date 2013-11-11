@@ -915,11 +915,20 @@ dm4c = new function() {
     // ---
 
     /**
-     * Convenience method that returns the topic type's label.
+     * Convenience method that returns the topic type's name.
      */
-    this.type_label = function(type_uri) {
+    this.topic_type_name = function(type_uri) {
         return dm4c.get_topic_type(type_uri).value
     }
+
+    /**
+     * Convenience method that returns the association type's name.
+     */
+    this.association_type_name = function(type_uri) {
+        return dm4c.get_association_type(type_uri).value
+    }
+
+    // ---
 
     /**
      * Convenience method that returns the topic type's icon source.
