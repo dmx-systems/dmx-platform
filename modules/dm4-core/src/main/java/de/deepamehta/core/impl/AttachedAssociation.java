@@ -150,17 +150,24 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // ---
 
     @Override
-    public Role getRole(RoleModel model) {
-        if (getRole1().getModel().refsSameObject(model)) {
+    public Role getRole(RoleModel roleModel) {
+        if (getRole1().getModel().refsSameObject(roleModel)) {
             return getRole1();
-        } else if (getRole2().getModel().refsSameObject(model)) {
+        } else if (getRole2().getModel().refsSameObject(roleModel)) {
             return getRole2();
         }
-        throw new RuntimeException("Role is not part of association (role=" + model + ", association=" + this);
+        throw new RuntimeException("Role is not part of association (role=" + roleModel + ", association=" + this);
+    }
+
+    @Override
+    public boolean isPlayer(TopicRoleModel roleModel) {
+        Set<Topic> topics = getTopics(roleModel.getRoleTypeUri());
+        return topics.size() > 0 && topics.iterator().next().getId() == roleModel.getPlayerId();
     }
 
     // ---
 
+    @Override
     public AssociationModel getModel() {
         return (AssociationModel) super.getModel();
     }

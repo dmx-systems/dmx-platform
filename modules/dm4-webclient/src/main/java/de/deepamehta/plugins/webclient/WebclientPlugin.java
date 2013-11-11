@@ -358,25 +358,20 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // === Misc ===
 
     private boolean isPropertyTopic(RelatedTopic relTopic, Topic topic) {
-        Association assoc = relTopic.getRelatingAssociation();
         // association type
+        Association assoc = relTopic.getRelatingAssociation();
         if (assoc.getTypeUri().equals("dm4.core.composition")) {
             // association definition
             TopicType type = dms.getTopicType(topic.getTypeUri());
-            String relTypeUri = relTopic.getTypeUri();
-            if (type.hasAssocDef(relTypeUri)) {
-                AssociationDefinition assocDef = type.getAssocDef(relTypeUri);
+            String childTypeUri = relTopic.getTypeUri();
+            if (type.hasAssocDef(childTypeUri)) {
                 // association definition type
+                AssociationDefinition assocDef = type.getAssocDef(childTypeUri);
                 if (assocDef.getInstanceLevelAssocTypeUri().equals("dm4.core.composition")) {
-                    // child type
-                    if (assocDef.getChildTypeUri().equals(relTypeUri)) {
-                        // role types
-                        Set<Topic> parent = assoc.getTopics("dm4.core.parent");
-                        Set<Topic> child  = assoc.getTopics("dm4.core.child");
-                        if (parent.size() == 1 && parent.iterator().next().getId() == topic.getId() &&
-                            child.size()  == 1 && child.iterator().next().getId()  == relTopic.getId()) {
-                            return true;
-                        }
+                    // role types
+                    if (assoc.isPlayer(new TopicRoleModel(topic.getId(), "dm4.core.parent")) &&
+                        assoc.isPlayer(new TopicRoleModel(relTopic.getId(), "dm4.core.child"))) {
+                        return true;
                     }
                 }
             }

@@ -261,8 +261,7 @@ function RenderHelper() {
     // === Direct-to-page Rendering ===
 
     this.topic_associations = function(topic_id) {
-        var result = dm4c.restc.get_topic_related_topics(topic_id, undefined, true, dm4c.MAX_RESULT_SIZE)
-                                                                // traversal_filter=undefined, sort=true
+        var result = dm4c.restc.get_related_topics(topic_id, true)  // sort=true
         group_topics(result.items, function(title, group) {
             self.field_label(title)
             self.page(self.topic_list(group))
@@ -270,8 +269,9 @@ function RenderHelper() {
     }
 
     this.association_associations = function(assoc_id) {
+        // ### TODO: filter property topics
         var result = dm4c.restc.get_association_related_topics(assoc_id, undefined, true, dm4c.MAX_RESULT_SIZE)
-                                                                // traversal_filter=undefined, sort=true
+                                                                    // traversal_filter=undefined, sort=true
         group_topics(result.items, function(title, group) {
             self.field_label(title)
             self.page(self.topic_list(group, function(topic, spot) {

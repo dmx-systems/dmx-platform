@@ -48,6 +48,13 @@ dm4c = new function() {
         var params = this.createRequestParameter({max_result_size: max_result_size})
         return this.request("GET", "/webclient/search/by_type/" + type_uri + params.to_query_string())
     }
+    this.restc.get_related_topics = function(topic_id, sort) {
+        var result = this.request("GET", "/webclient/topic/" + topic_id + "/related_topics")
+        if (sort) {
+            this.sort_topics(result.items)
+        }
+        return result
+    }
 
     // ------------------------------------------------------------------------------------------------------ Public API
 

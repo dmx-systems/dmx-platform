@@ -2,6 +2,7 @@ package de.deepamehta.core;
 
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
@@ -35,7 +36,7 @@ public interface Association extends DeepaMehtaObject {
     Topic getTopic(String roleTypeUri);
 
     /**
-     * @teturn  this association's topics which plays the given role.
+     * @teturn  this association's topics which play the given role.
      *          The resulting set can have 0, 1, or 2 elements.
      */
     Set<Topic> getTopics(String roleTypeUri);
@@ -49,7 +50,9 @@ public interface Association extends DeepaMehtaObject {
      * <p>
      * If the object refered by the given role model is not a player in this association an exception is thrown.
      */
-    Role getRole(RoleModel model);
+    Role getRole(RoleModel roleModel);
+
+    boolean isPlayer(TopicRoleModel roleModel);
 
     // ---
 
