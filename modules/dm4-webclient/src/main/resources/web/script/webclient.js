@@ -528,7 +528,7 @@ dm4c = new function() {
         // 2) update GUI
         // Note: the UPDATE_TOPIC_TYPE directive might result from editing a View Configuration topic.
         // In this case the canvas must be refreshed in order to reflect changed topic icons.
-        dm4c.topicmap_renderer.refresh()
+        dm4c.topicmap_renderer.refresh()    // ### FIXME: not sufficient for DOM based renderers
         // 3) fire event
         dm4c.fire_event("post_update_topic", topic_type)
     }
@@ -542,7 +542,7 @@ dm4c = new function() {
         // 2) update GUI
         // Note: the UPDATE_ASSOCIATION_TYPE directive might result from editing a View Configuration topic.
         // In this case the canvas must be refreshed in order to reflect changed association colors.
-        dm4c.topicmap_renderer.refresh()
+        dm4c.topicmap_renderer.refresh()    // ### FIXME: not sufficient for DOM based renderers
         // 3) fire event
         // ### dm4c.fire_event("post_update_topic", topic_type)
     }

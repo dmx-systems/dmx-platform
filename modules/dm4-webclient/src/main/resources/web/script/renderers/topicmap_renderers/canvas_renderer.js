@@ -231,7 +231,7 @@ function CanvasRenderer() {
         // update viewmodel
         topicmap.reset_selection()
         // update view
-        canvas.refresh()
+        canvas.reset_selection()
     }
 
     // ---

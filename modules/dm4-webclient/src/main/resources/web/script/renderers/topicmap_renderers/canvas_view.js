@@ -35,6 +35,7 @@ function CanvasView() {
     var action_topic                // the topic being selected/moved/associated (TopicView)
     var action_assoc                // the association being selected/cluster-moved (AssociationView)
     var cluster                     // the cluster being moved (ClusterView)
+    var mousedown_on_canvas
     var tmp_x, tmp_y                // coordinates while action is in progress
 
     // Coordinate systems (for mouse event interpretation)
@@ -150,6 +151,12 @@ function CanvasView() {
     }
 
     this.set_association_selection = function(topic_id) {
+        // render
+        show()                                              // canvas
+        DOM_FLAVOR && remove_selection_dom()                // topic layer DOM
+    }
+
+    this.reset_selection = function() {
         // render
         show()                                              // canvas
         DOM_FLAVOR && remove_selection_dom()                // topic layer DOM
@@ -565,11 +572,12 @@ function CanvasView() {
 
     function do_mousemove(event) {
         // Note: action_topic is defined for a) topic move, and b) association in progress
-        if (action_topic || action_assoc || canvas_move_in_progress) {
+        if (action_topic || action_assoc || mousedown_on_canvas) {
             var p = pos(event)
             var dx = p.x - tmp_x
             var dy = p.y - tmp_y
-            if (canvas_move_in_progress) {
+            if (mousedown_on_canvas) {
+                canvas_move_in_progress = true
                 translate_by(dx, dy)
             } else if (action_assoc) {
                 if (!cluster_move_in_progress) {
@@ -620,6 +628,9 @@ function CanvasView() {
         } else if (action_assoc) {
             dm4c.do_select_association(action_assoc.id)
             action_assoc = null
+        } else {
+            dm4c.do_reset_selection()
+            mousedown_on_canvas = false
         }
     }
 
@@ -662,6 +673,7 @@ function CanvasView() {
         dm4c.fire_event("post_move_canvas", topicmap.trans_x, topicmap.trans_y)
         //
         canvas_move_in_progress = false
+        mousedown_on_canvas = false
     }
 
     function end_association_in_progress(tv) {
@@ -1151,7 +1163,7 @@ function CanvasView() {
                 if (av) {
                     action_assoc = av
                 } else {
-                    canvas_move_in_progress = true
+                    mousedown_on_canvas = true
                 }
             }
         }
