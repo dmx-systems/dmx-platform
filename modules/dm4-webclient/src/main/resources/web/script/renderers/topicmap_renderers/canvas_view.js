@@ -628,7 +628,7 @@ function CanvasView() {
         } else if (action_assoc) {
             dm4c.do_select_association(action_assoc.id)
             action_assoc = null
-        } else {
+        } else if (mousedown_on_canvas) {   // selection must not be reset if canvas move was aborted through mouseleave
             dm4c.do_reset_selection()
             mousedown_on_canvas = false
         }
