@@ -18,7 +18,7 @@ dm4c = new function() {
     this.DEL_PREFIX = "del_id:"
 
     // client model
-    this.selected_object = null     // a Topic or an Association object, or null if there is no selection
+    this.selected_object = null     // a Topic or an Association object, or null if there is no selection ### needed?
     var type_cache = new TypeCache()
 
     // GUI
@@ -127,11 +127,6 @@ dm4c = new function() {
         // update GUI
         dm4c.topicmap_renderer.reset_selection()
         dm4c.page_panel.clear()
-        // fire event
-        var result = dm4c.fire_event("default_page_rendering")
-        if (!js.contains(result, false)) {
-            dm4c.page_panel.show_splash()
-        }
     }
 
     // ---
@@ -554,9 +549,10 @@ dm4c = new function() {
      * Fires the "post_hide_topic" event.
      */
     function hide_topic(topic) {
-        // update GUI (canvas)
+        // update GUI
         dm4c.topicmap_renderer.hide_topic(topic.id)
-        // update client model and GUI
+        dm4c.page_panel.clear_if_selected(topic)
+        // update client model
         reset_selection_conditionally(topic.id)
         // fire event
         dm4c.fire_event("post_hide_topic", topic)
@@ -567,9 +563,10 @@ dm4c = new function() {
      * Fires the "post_hide_association" event.
      */
     function hide_association(assoc) {
-        // update GUI (canvas)
+        // update GUI
         dm4c.topicmap_renderer.hide_association(assoc.id)
-        // update client model and GUI
+        dm4c.page_panel.clear_if_selected(assoc)
+        // update client model
         reset_selection_conditionally(assoc.id)
         // fire event
         dm4c.fire_event("post_hide_association", assoc)
@@ -584,9 +581,10 @@ dm4c = new function() {
      * Processes a DELETE_TOPIC directive.
      */
     function delete_topic(topic) {
-        // update GUI (canvas)
+        // update GUI
         dm4c.topicmap_renderer.delete_topic(topic.id)
-        // update client model and GUI
+        dm4c.page_panel.clear_if_selected(topic)
+        // update client model
         reset_selection_conditionally(topic.id)
         // fire event
         dm4c.fire_event("post_delete_topic", topic)
@@ -599,9 +597,10 @@ dm4c = new function() {
      * Processes a DELETE_ASSOCIATION directive.
      */
     function delete_association(assoc) {
-        // update GUI (canvas)
+        // update GUI
         dm4c.topicmap_renderer.delete_association(assoc.id)
-        // update client model and GUI
+        dm4c.page_panel.clear_if_selected(assoc)
+        // update client model
         reset_selection_conditionally(assoc.id)
         // fire event
         dm4c.fire_event("post_delete_association", assoc)
@@ -625,7 +624,7 @@ dm4c = new function() {
         type_cache.remove_association_type(assoc_type_uri)
     }
 
-    // ---
+    // --- Client Model Update ---
 
     function set_topic_selection_conditionally(topic) {
         if (topic.id == dm4c.selected_object.id) {
@@ -641,7 +640,7 @@ dm4c = new function() {
 
     function reset_selection_conditionally(object_id) {
         if (object_id == dm4c.selected_object.id) {
-            dm4c.do_reset_selection()
+            reset_selection()                           // ### TODO: history update?
         }
     }
 
@@ -656,31 +655,28 @@ dm4c = new function() {
     // === Selection ===
 
     function set_topic_selection(topic, no_history_update) {
-        // update client model
         dm4c.selected_object = topic
         //
         if (!no_history_update) {
             push_history(topic)
         }
-        // signal model change
+        //
         dm4c.fire_event("post_select_topic", topic)
     }
 
     function set_association_selection(assoc, no_history_update) {
-        // update client model
         dm4c.selected_object = assoc
-        // signal model change
+        //
         dm4c.fire_event("post_select_association", assoc)
     }
 
     function reset_selection(no_history_update) {
-        // update client model
         dm4c.selected_object = null
         //
         if (!no_history_update) {
             push_history()
         }
-        // signal model change
+        //
         dm4c.fire_event("post_reset_selection")
     }
 
