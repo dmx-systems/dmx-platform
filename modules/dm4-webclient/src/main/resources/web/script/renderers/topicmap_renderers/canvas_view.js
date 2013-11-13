@@ -82,7 +82,7 @@ function CanvasView() {
         // update view
         add_topic(topic)
         // render
-        show()
+        refresh()
     }
 
     /**
@@ -92,7 +92,7 @@ function CanvasView() {
         // update view
         add_association(assoc)
         // render
-        show()
+        refresh()
     }
 
     // ---
@@ -105,7 +105,7 @@ function CanvasView() {
         // update view
         topic_view.update(topic)
         // render
-        show()                                              // canvas
+        refresh()                                           // canvas
         DOM_FLAVOR && position_topic_dom(topic_view)        // topic layer DOM
     }
 
@@ -116,7 +116,7 @@ function CanvasView() {
         // update view
         get_association(assoc.id).update(assoc)
         // render
-        show()
+        refresh()
     }
 
     // ---
@@ -127,7 +127,7 @@ function CanvasView() {
             // update view
             delete topics[id]
             // render
-            show()                                          // canvas
+            refresh()                                       // canvas
             DOM_FLAVOR && remove_topic_dom(topic_view)      // topic layer DOM
         }
     }
@@ -138,27 +138,40 @@ function CanvasView() {
             // update view
             delete assocs[id]
             // render
-            show()
+            refresh()
         }
+    }
+
+    //
+
+    this.update_topic_type = function(topic_type) {
+        // render
+        refresh()                                           // canvas
+        DOM_FLAVOR && update_topic_type_dom(topic_type)     // topic layer DOM
+    }
+
+    this.update_association_type = function(assoc_type) {
+        // render
+        refresh()                                           // canvas        
     }
 
     // ---
 
     this.set_topic_selection = function(topic_id) {
         // render
-        show()                                              // canvas
+        refresh()                                           // canvas
         DOM_FLAVOR && update_selection_dom(topic_id)        // topic layer DOM
     }
 
     this.set_association_selection = function(topic_id) {
         // render
-        show()                                              // canvas
+        refresh()                                           // canvas
         DOM_FLAVOR && remove_selection_dom()                // topic layer DOM
     }
 
     this.reset_selection = function() {
         // render
-        show()                                              // canvas
+        refresh()                                           // canvas
         DOM_FLAVOR && remove_selection_dom()                // topic layer DOM
     }
 
@@ -193,7 +206,7 @@ function CanvasView() {
         //
         tmp_x = x
         tmp_y = y
-        show()
+        refresh()
     }
 
     this.scroll_to_center = function(topic_id) {
@@ -229,11 +242,7 @@ function CanvasView() {
         //
         bind_event_handlers(canvas_element)
         //
-        show()
-    }
-
-    this.refresh = function() {
-        show()
+        refresh()
     }
 
     // ---
@@ -331,7 +340,7 @@ function CanvasView() {
 
 
 
-    function show() {
+    function refresh() {
         // Note: we can't show until a topicmap is available
         if (!topicmap) {
             return
@@ -462,7 +471,7 @@ function CanvasView() {
             var topic_view = get_topic(topic_id)
             topic_view.set_view_properties(view_props)
             // render
-            show()
+            refresh()
             DOM_FLAVOR && position_topic_dom(topic_view)        // topic layer DOM
         }
     }
@@ -592,7 +601,7 @@ function CanvasView() {
             }
             tmp_x = p.x
             tmp_y = p.y
-            show()
+            refresh()
         }
     }
 
@@ -683,7 +692,7 @@ function CanvasView() {
         //
         association_in_progress = false
         action_topic = null
-        show()
+        refresh()
     }
 
 
@@ -958,7 +967,7 @@ function CanvasView() {
 
         function animation_step() {
             translate_by(dx, dy)
-            show()
+            refresh()
             if (++step_count == ANIMATION_STEPS) {
                 clearInterval(animation)
                 // Note: the Topicmaps module's setTopicmapTranslation()
@@ -1016,7 +1025,7 @@ function CanvasView() {
                     // update view
                     update_topic_view(topic_view)
                     // render
-                    show()
+                    refresh()
                 },
                 stop: function(event, ui) {
                     // update viewmodel
@@ -1067,6 +1076,14 @@ function CanvasView() {
 
     function remove_topic_dom(topic_view) {
         topic_view.dom.remove()
+    }
+
+    function update_topic_type_dom(topic_type) {
+        iterate_topics(function(topic) {
+            if (topic.type_uri == topic_type.uri) {
+                invoke_customizers("on_update_topic", [topic, ctx])
+            }
+        })
     }
 
     function update_translation_dom() {

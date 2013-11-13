@@ -129,6 +129,30 @@ function CanvasRenderer() {
     // ---
 
     /**
+     * Removes a topic from the canvas (model) and optionally refreshes the canvas (view). ### FIXDOC
+     * If the topic is not present on the canvas nothing is performed.
+     */
+    this.hide_topic = function(topic_id) {
+        // update viewmodel
+        topicmap.hide_topic(topic_id)
+        // update view
+        canvas.remove_topic(topic_id)
+    }
+
+    /**
+     * Removes an association from the canvas (model) and optionally refreshes the canvas (view). ### FIXDOC
+     * If the association is not present on the canvas nothing is performed.
+     */
+    this.hide_association = function(assoc_id) {
+        // update viewmodel
+        topicmap.hide_association(assoc_id)
+        // update view
+        canvas.remove_association(assoc_id)
+    }
+
+    // ---
+
+    /**
      * Updates a topic. If the topic is not on the canvas nothing is performed. ### FIXDOC
      *
      * @param   topic       A Topic object.
@@ -158,30 +182,6 @@ function CanvasRenderer() {
 
     // ---
 
-    /**
-     * Removes a topic from the canvas (model) and optionally refreshes the canvas (view). ### FIXDOC
-     * If the topic is not present on the canvas nothing is performed.
-     */
-    this.hide_topic = function(topic_id) {
-        // update viewmodel
-        topicmap.hide_topic(topic_id)
-        // update view
-        canvas.remove_topic(topic_id)
-    }
-
-    /**
-     * Removes an association from the canvas (model) and optionally refreshes the canvas (view). ### FIXDOC
-     * If the association is not present on the canvas nothing is performed.
-     */
-    this.hide_association = function(assoc_id) {
-        // update viewmodel
-        topicmap.hide_association(assoc_id)
-        // update view
-        canvas.remove_association(assoc_id)
-    }
-
-    // ---
-
     this.delete_topic = function(topic_id) {
         // update viewmodel
         for_all_topicmaps("delete_topic", topic_id)
@@ -194,6 +194,22 @@ function CanvasRenderer() {
         for_all_topicmaps("delete_association", assoc_id)
         // update view
         canvas.remove_association(assoc_id)
+    }
+
+    // ---
+
+    this.update_topic_type = function(topic_type) {
+        // Note: viewmodel update not required
+        //
+        // update view
+        canvas.update_topic_type(topic_type)
+    }
+
+    this.update_association_type = function(assoc_type) {
+        // Note: viewmodel update not required
+        //
+        // update view
+        canvas.update_association_type(assoc_type)
     }
 
     // ---
@@ -242,10 +258,6 @@ function CanvasRenderer() {
 
     this.begin_association = function(topic_id, x, y) {
         canvas.begin_association(topic_id, x, y)
-    }
-
-    this.refresh = function() {
-        canvas.refresh()
     }
 
 

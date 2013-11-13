@@ -49,10 +49,6 @@ function TopicmapRenderer() {
 
     this.show_association = function(assoc, do_select) {}
 
-    this.update_topic = function(topic) {}
-
-    this.update_association = function(assoc) {}
-
     this.hide_topic = function(topic_id) {}
 
     /**
@@ -61,9 +57,17 @@ function TopicmapRenderer() {
      */
     this.hide_association = function(assoc_id) {}
 
+    this.update_topic = function(topic) {}
+
+    this.update_association = function(assoc) {}
+
     this.delete_topic = function(topic_id) {}
 
     this.delete_association = function(assoc_id) {}
+
+    this.update_topic_type = function(topic_type) {}
+
+    this.update_association_type = function(assoc_type) {}
 
     /**
      * Checks if a topic is visible on the canvas.
@@ -96,8 +100,6 @@ function TopicmapRenderer() {
     this.scroll_topic_to_center = function(topic_id) {}
 
     this.begin_association = function(topic_id, x, y) {}
-
-    this.refresh = function() {}
 
 
 
