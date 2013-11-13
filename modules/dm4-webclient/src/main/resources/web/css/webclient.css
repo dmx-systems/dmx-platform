@@ -221,6 +221,12 @@ body {
     cursor: pointer;
 }
 
+.topic-list .assoc-type-label {
+    font-size: 75%;
+    line-height: 1.5em;
+    color: gray;
+}
+
 .topic-list .supplement-text {
     font-size: 75%;
     line-height: 1.5em;

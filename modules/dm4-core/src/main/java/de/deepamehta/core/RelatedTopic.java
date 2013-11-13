@@ -9,7 +9,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
  */
 public interface RelatedTopic extends Topic {
 
-    Association getRelatingAssociation();
+    Association getRelatingAssociation();   // ### TODO: rename to getAssociation()?
 
     RelatedTopicModel getModel();
 }

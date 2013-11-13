@@ -10,6 +10,7 @@ import java.util.Set;
 
 
 
+// ### TODO: move to de.deepamehta.core.service
 public class ResultSet<T extends JSONEnabled> implements Iterable<T>, JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables

@@ -40,6 +40,8 @@ function RenderHelper() {
      *                              "type_uri" -- required to render the icon and tooltip
      *                              "value"    -- required to render the topic link
      *                              "id"       -- only required by the default click handler
+     *                              "uri"      -- Optional. If set it is rendered in the tooltip
+     *                              "assoc"    -- Optional. If set the assoc's type name is rendered beneath the topic
      *
      * @param   click_handler   Optional: the handler called when a topic is clicked. 2 arguments are passed:
      *                              1) the clicked topic (an object)
@@ -56,18 +58,22 @@ function RenderHelper() {
             if (dm4c.get_topic_type(topic.type_uri).is_hidden()) {
                 continue
             }
-            // render supplement text
+            // supplement text
             if (render_handler) {
                 var supplement_text = render_handler(topic)
                 var supplement = $("<div>").addClass("supplement-text").append(supplement_text)
             }
-            // render topic
+            // topic
             var icon_handler = click_handler_for(topic, "icon")
             var label_handler = click_handler_for(topic, "label")
             var title = tooltips(topic, icon_handler == undefined)
             table.append($("<tr>")
                 .append($("<td>").append(this.icon_link(topic, icon_handler, title.icon)))
-                .append($("<td>").append(this.topic_link(topic, label_handler, title.label)).append(supplement))
+                .append($("<td>")
+                    .append(this.topic_link(topic, label_handler, title.label))
+                    .append(assoc_type_label())
+                    .append(supplement)
+                )
             )
         }
         return table
@@ -105,7 +111,19 @@ function RenderHelper() {
             }
 
             function type_info() {
-                return dm4c.type_label(topic.type_uri) + (topic.uri && " (" + topic.uri + ")")
+                var type_info = dm4c.topic_type_name(topic.type_uri)
+                // Note: "abc" + undefined -> "abcundefined"
+                if (topic.uri) {
+                    type_info += " (" + topic.uri + ")"
+                }
+                return type_info
+            }
+        }
+
+        function assoc_type_label() {
+            if (topic.assoc) {
+                return $("<div>").addClass("assoc-type-label")
+                    .text("(" + dm4c.association_type_name(topic.assoc.type_uri) + ")")
             }
         }
     }
@@ -118,7 +136,7 @@ function RenderHelper() {
      */
     this.topic_link = function(topic, handler, title) {
         var text = this.link_text(topic)
-        title = title || dm4c.type_label(topic.type_uri)
+        title = title || dm4c.topic_type_name(topic.type_uri)
         return $("<a>").attr({href: "#", title: title}).append(text).click(handler)
     }
 
@@ -160,7 +178,7 @@ function RenderHelper() {
      */
     this.type_icon = function(type_uri, title) {
         var src = dm4c.get_type_icon_src(type_uri)
-        title = title || dm4c.type_label(type_uri)
+        title = title || dm4c.topic_type_name(type_uri)
         return this.icon(src, title)
     }
 
@@ -261,8 +279,7 @@ function RenderHelper() {
     // === Direct-to-page Rendering ===
 
     this.topic_associations = function(topic_id) {
-        var result = dm4c.restc.get_topic_related_topics(topic_id, undefined, true, dm4c.MAX_RESULT_SIZE)
-                                                                // traversal_filter=undefined, sort=true
+        var result = dm4c.restc.get_related_topics(topic_id, true)  // sort=true
         group_topics(result.items, function(title, group) {
             self.field_label(title)
             self.page(self.topic_list(group))
@@ -270,8 +287,9 @@ function RenderHelper() {
     }
 
     this.association_associations = function(assoc_id) {
+        // ### TODO: filter property topics
         var result = dm4c.restc.get_association_related_topics(assoc_id, undefined, true, dm4c.MAX_RESULT_SIZE)
-                                                                // traversal_filter=undefined, sort=true
+                                                                    // traversal_filter=undefined, sort=true
         group_topics(result.items, function(title, group) {
             self.field_label(title)
             self.page(self.topic_list(group, function(topic, spot) {

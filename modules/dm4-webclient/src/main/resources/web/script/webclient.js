@@ -18,7 +18,7 @@ dm4c = new function() {
     this.DEL_PREFIX = "del_id:"
 
     // client model
-    this.selected_object = null     // a Topic or an Association object, or null if there is no selection
+    this.selected_object = null     // a Topic or an Association object, or null if there is no selection ### needed?
     var type_cache = new TypeCache()
 
     // GUI
@@ -47,6 +47,13 @@ dm4c = new function() {
     this.restc.get_topics_and_create_bucket = function(type_uri, max_result_size) {
         var params = this.createRequestParameter({max_result_size: max_result_size})
         return this.request("GET", "/webclient/search/by_type/" + type_uri + params.to_query_string())
+    }
+    this.restc.get_related_topics = function(topic_id, sort) {
+        var result = this.request("GET", "/webclient/topic/" + topic_id + "/related_topics")
+        if (sort) {
+            this.sort_topics(result.items)
+        }
+        return result
     }
 
     // ------------------------------------------------------------------------------------------------------ Public API
@@ -120,11 +127,6 @@ dm4c = new function() {
         // update GUI
         dm4c.topicmap_renderer.reset_selection()
         dm4c.page_panel.clear()
-        // fire event
-        var result = dm4c.fire_event("default_page_rendering")
-        if (!js.contains(result, false)) {
-            dm4c.page_panel.show_splash()
-        }
     }
 
     // ---
@@ -521,7 +523,7 @@ dm4c = new function() {
         // 2) update GUI
         // Note: the UPDATE_TOPIC_TYPE directive might result from editing a View Configuration topic.
         // In this case the canvas must be refreshed in order to reflect changed topic icons.
-        dm4c.topicmap_renderer.refresh()
+        dm4c.topicmap_renderer.refresh()    // ### FIXME: not sufficient for DOM based renderers
         // 3) fire event
         dm4c.fire_event("post_update_topic", topic_type)
     }
@@ -535,7 +537,7 @@ dm4c = new function() {
         // 2) update GUI
         // Note: the UPDATE_ASSOCIATION_TYPE directive might result from editing a View Configuration topic.
         // In this case the canvas must be refreshed in order to reflect changed association colors.
-        dm4c.topicmap_renderer.refresh()
+        dm4c.topicmap_renderer.refresh()    // ### FIXME: not sufficient for DOM based renderers
         // 3) fire event
         // ### dm4c.fire_event("post_update_topic", topic_type)
     }
@@ -547,9 +549,10 @@ dm4c = new function() {
      * Fires the "post_hide_topic" event.
      */
     function hide_topic(topic) {
-        // update GUI (canvas)
+        // update GUI
         dm4c.topicmap_renderer.hide_topic(topic.id)
-        // update client model and GUI
+        dm4c.page_panel.clear_if_selected(topic)
+        // update client model
         reset_selection_conditionally(topic.id)
         // fire event
         dm4c.fire_event("post_hide_topic", topic)
@@ -560,9 +563,10 @@ dm4c = new function() {
      * Fires the "post_hide_association" event.
      */
     function hide_association(assoc) {
-        // update GUI (canvas)
+        // update GUI
         dm4c.topicmap_renderer.hide_association(assoc.id)
-        // update client model and GUI
+        dm4c.page_panel.clear_if_selected(assoc)
+        // update client model
         reset_selection_conditionally(assoc.id)
         // fire event
         dm4c.fire_event("post_hide_association", assoc)
@@ -577,9 +581,10 @@ dm4c = new function() {
      * Processes a DELETE_TOPIC directive.
      */
     function delete_topic(topic) {
-        // update GUI (canvas)
+        // update GUI
         dm4c.topicmap_renderer.delete_topic(topic.id)
-        // update client model and GUI
+        dm4c.page_panel.clear_if_selected(topic)
+        // update client model
         reset_selection_conditionally(topic.id)
         // fire event
         dm4c.fire_event("post_delete_topic", topic)
@@ -592,9 +597,10 @@ dm4c = new function() {
      * Processes a DELETE_ASSOCIATION directive.
      */
     function delete_association(assoc) {
-        // update GUI (canvas)
+        // update GUI
         dm4c.topicmap_renderer.delete_association(assoc.id)
-        // update client model and GUI
+        dm4c.page_panel.clear_if_selected(assoc)
+        // update client model
         reset_selection_conditionally(assoc.id)
         // fire event
         dm4c.fire_event("post_delete_association", assoc)
@@ -618,7 +624,7 @@ dm4c = new function() {
         type_cache.remove_association_type(assoc_type_uri)
     }
 
-    // ---
+    // --- Client Model Update ---
 
     function set_topic_selection_conditionally(topic) {
         if (topic.id == dm4c.selected_object.id) {
@@ -634,7 +640,7 @@ dm4c = new function() {
 
     function reset_selection_conditionally(object_id) {
         if (object_id == dm4c.selected_object.id) {
-            dm4c.do_reset_selection()
+            reset_selection()                           // ### TODO: history update?
         }
     }
 
@@ -649,31 +655,28 @@ dm4c = new function() {
     // === Selection ===
 
     function set_topic_selection(topic, no_history_update) {
-        // update client model
         dm4c.selected_object = topic
         //
         if (!no_history_update) {
             push_history(topic)
         }
-        // signal model change
+        //
         dm4c.fire_event("post_select_topic", topic)
     }
 
     function set_association_selection(assoc, no_history_update) {
-        // update client model
         dm4c.selected_object = assoc
-        // signal model change
+        //
         dm4c.fire_event("post_select_association", assoc)
     }
 
     function reset_selection(no_history_update) {
-        // update client model
         dm4c.selected_object = null
         //
         if (!no_history_update) {
             push_history()
         }
-        // signal model change
+        //
         dm4c.fire_event("post_reset_selection")
     }
 
@@ -908,11 +911,20 @@ dm4c = new function() {
     // ---
 
     /**
-     * Convenience method that returns the topic type's label.
+     * Convenience method that returns the topic type's name.
      */
-    this.type_label = function(type_uri) {
+    this.topic_type_name = function(type_uri) {
         return dm4c.get_topic_type(type_uri).value
     }
+
+    /**
+     * Convenience method that returns the association type's name.
+     */
+    this.association_type_name = function(type_uri) {
+        return dm4c.get_association_type(type_uri).value
+    }
+
+    // ---
 
     /**
      * Convenience method that returns the topic type's icon source.

@@ -50,7 +50,7 @@ function TypeRenderer() {
         function AssociationDefEditor(assoc_def, label_state) {
             var parent_type_label = $("<span>").addClass("label").text(type.value)
             var child_type_label = $("<span>").addClass("label").addClass("child-type-label")
-                .text(dm4c.type_label(assoc_def.child_type_uri))
+                .text(dm4c.topic_type_name(assoc_def.child_type_uri))
             var parent_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.parent_cardinality_uri)
             var child_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.child_cardinality_uri)
             var assoc_type_label = $("<span>").addClass("label").addClass("field-label").text("Association Type")

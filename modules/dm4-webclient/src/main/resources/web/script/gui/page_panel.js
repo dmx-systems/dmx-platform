@@ -64,7 +64,18 @@ function PagePanel() {
         set_displayed_object(null)
         // update view
         clear_page(PageState.NONE)
+        // fire event
+        var result = dm4c.fire_event("default_page_rendering")
+        if (!js.contains(result, false)) {
+            show_splash()
+        }
     }
+
+    this.clear_if_selected = function(topic_or_association) {
+        render_if_selected(topic_or_association, this.clear)
+    }
+
+    // ---
 
     this.refresh = function() {
         // if page has been cleared before we perform nothing (rendering would fail)
@@ -73,10 +84,6 @@ function PagePanel() {
         }
         // update view
         render_page()
-    }
-
-    this.show_splash = function() {
-        show_splash()
     }
 
     this.save = function() {

@@ -224,14 +224,24 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     // ---
 
-    this.set_topic_selection = function(topic_id) {         // ### param was "topic"
+    this.set_topic_selection = function(topic_id) {
+        var topic = topics[topic_id]
+        if (!topic || !topic.visibility) {
+            throw "TopicmapViewmodelError: set_topic_selection(" + topic_id + ") failed. " +
+                "Topic not in topicmap or not visible."
+        }
         // update memory
         this.selected_object_id = topic_id
         this.is_topic_selected = true
         // Note: no DB update here. The selection is not yet persisted.
     }
 
-    this.set_association_selection = function(assoc_id) {   // ### param was "assoc"
+    this.set_association_selection = function(assoc_id) {
+        var assoc = assocs[assoc_id]
+        if (!assoc) {
+            throw "TopicmapViewmodelError: set_association_selection(" + assoc_id + ") failed. " +
+                "Association not in topicmap."
+        }
         // update memory
         this.selected_object_id = assoc_id
         this.is_topic_selected = false
@@ -484,7 +494,7 @@ function TopicmapViewmodel(topicmap_id, config) {
      */
     function TopicViewmodel(topic, view_props) {
 
-        var self = this
+        var _self = this    // Note: we must not override the outer "self" scope
 
         this.id        = topic.id
         // standard view properties
@@ -534,9 +544,9 @@ function TopicmapViewmodel(topicmap_id, config) {
         // ---
 
         function init(topic) {
-            self.type_uri  = topic.type_uri
-            self.label     = topic.value
-            self.composite = topic.composite
+            _self.type_uri  = topic.type_uri
+            _self.label     = topic.value
+            _self.composite = topic.composite
         }
 
         function reset_selection_conditionally() {

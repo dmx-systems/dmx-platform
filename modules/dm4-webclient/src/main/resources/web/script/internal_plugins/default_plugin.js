@@ -194,9 +194,9 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         // Note: type_uri is undefined if the user has no create permission or has nothing created yet
         var type_uri = dm4c.toolbar.get_recent_type_uri()
         if (type_uri) {
-            var type_label = dm4c.type_label(type_uri)
+            var topic_type_name = dm4c.topic_type_name(type_uri)
             commands.push({
-                label: "Create " + type_label, handler: do_create, context: "context-menu"
+                label: "Create " + topic_type_name, handler: do_create, context: "context-menu"
             })
         }
         return commands
