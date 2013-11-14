@@ -50,7 +50,6 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
 
     dm4c.add_listener("topic_commands", function(topic) {
         var commands = []
-        var is_writable = dm4c.has_write_permission_for_topic(topic)
         //
         commands.push({
             label: "Hide",
@@ -58,25 +57,24 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
             context: "context-menu"
         })
         //
-        if (is_writable) {
-            if (!topic.get_type().is_locked()) {
-                commands.push({is_separator: true, context: "context-menu"})
-                commands.push({
-                    label: "Edit",
-                    handler: do_edit,
-                    context: ["context-menu", "detail-panel-show"],
-                    ui_icon: "pencil"
-                })
-            }
+        if (is_changable(topic)) {
+            commands.push({is_separator: true, context: "context-menu"})
+            commands.push({
+                label: "Edit",
+                handler: do_edit,
+                context: ["context-menu", "detail-panel-show"],
+                ui_icon: "pencil"
+            })
         }
-        //
+        // ### FIXME: check permission
         commands.push({is_separator: true, context: "context-menu"})
         commands.push({
             label: "Associate",
             handler: do_associate,
             context: "context-menu"
         })
-        //
+        // ### FIXME: check locked state as well (at least for retype)
+        var is_writable = dm4c.has_write_permission_for_topic(topic)
         if (is_writable) {
             commands.push({is_separator: true, context: "context-menu"})
             commands.push({
@@ -105,7 +103,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         return commands
 
         // Note: all command handlers receive the coordinates of the command selecting mouse click,
-        // however, most of them doesn't care. See function open_context_menu() in canvas.js
+        // however, most of them doesn't care. See function open_context_menu() in canvas_view.js
 
         function do_hide() {
             dm4c.do_hide_topic(topic)
@@ -205,4 +203,16 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
             dm4c.do_create_topic(type_uri, cx, cy)
         }
     })
+
+    dm4c.add_listener("topic_doubleclicked", function(topic) {
+        if (is_changable(topic)) {
+            dm4c.enter_edit_mode(topic)
+        }
+    })
+
+    // ----------------------------------------------------------------------------------------------- Private Functions
+
+    function is_changable(topic) {
+        return dm4c.has_write_permission_for_topic(topic) && !topic.get_type().is_locked()
+    }
 })

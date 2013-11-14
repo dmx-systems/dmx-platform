@@ -144,7 +144,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
                 removed++;
             }
         }
-        logger.info("### " + removed + " topics are removed from result set of topic " + topicId);
+        logger.fine("### " + removed + " topics are removed from result set of topic " + topicId);
         return topics;
     }
 
