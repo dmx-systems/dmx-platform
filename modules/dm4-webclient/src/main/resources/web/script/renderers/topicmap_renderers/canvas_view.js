@@ -644,9 +644,11 @@ function CanvasView() {
     }
 
     function do_doubleclick(event) {
-        var tv = detect_topic(event)
-        if (tv) {
-            dm4c.fire_event("topic_doubleclicked", tv)
+        if (detect_topic(event)) {
+            // Note: we want pass a Topic to the topic_doubleclicked hook (not a TopicView as returned by detect_topic).
+            // We know the double clicked topic gets selected (actually twice) before topic_doubleclicked is fired so we
+            // can pass dm4c.selected_object here.
+            dm4c.fire_event("topic_doubleclicked", dm4c.selected_object)
         }
     }
 
@@ -822,7 +824,7 @@ function CanvasView() {
      *
      * @param   pos     an object with "x" and "y" properties. Coord.TOPICMAP space.
      *
-     * @return  The detected topic, or undefined if no topic is located at the given position.
+     * @return  The detected topic (a ViewTopic), or undefined if no topic is located at the given position.
      */
     function detect_topic_at(pos) {
         return iterate_topics(function(tv) {
@@ -837,7 +839,8 @@ function CanvasView() {
      *
      * @param   pos     an object with "x" and "y" properties. Coord.TOPICMAP space.
      *
-     * @return  The detected association, or undefined if no association is located at the given position.
+     * @return  The detected association (a AssociationView), or undefined if no association is located
+     *          at the given position.
      */
     function detect_association_at(pos) {
         var x = pos.x
@@ -1011,6 +1014,9 @@ function CanvasView() {
                     } else if (!has_moved) {
                         dm4c.do_select_topic(topic_view.id)
                     }
+                })
+                .dblclick(function() {
+                    dm4c.fire_event("topic_doubleclicked", dm4c.selected_object)
                 })
                 .contextmenu(function(event) {
                     dm4c.do_select_topic(topic_view.id)
