@@ -52,7 +52,9 @@ public class AssociationModel extends DeepaMehtaObjectModel {
     }
 
     public AssociationModel(AssociationModel model) {
-        this(model.getId(), model.getUri(), model.getTypeUri(), model.getRoleModel1(), model.getRoleModel2());
+        super(model);
+        this.roleModel1 = model.getRoleModel1();
+        this.roleModel2 = model.getRoleModel2();
     }
 
     public AssociationModel(JSONObject assocModel) {

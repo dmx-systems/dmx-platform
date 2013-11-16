@@ -34,6 +34,7 @@ var event_names = [
     "default_page_rendering",
     // Canvas
     "topic_doubleclicked",
+    "association_doubleclicked",
     "post_move_topic",
     "post_move_canvas",
     "pre_draw_canvas",

@@ -108,7 +108,7 @@ function PagePanel() {
     // === Model ===
 
     /**
-     * @param   object      a topic or an association, or null if nothing is displayed.
+     * @param   object      a Topic or an Association, or null if nothing is displayed.
      */
     function set_displayed_object(object) {
         displayed_object = object

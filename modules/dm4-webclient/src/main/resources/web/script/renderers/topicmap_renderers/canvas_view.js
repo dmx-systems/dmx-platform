@@ -8,8 +8,10 @@ function CanvasView() {
     var HIGHLIGHT_BLUR = 16
     var ANIMATION_STEPS = 30
     var ANIMATION_DELAY = 10
-    var LABEL_FONT = "1em 'Lucida Grande', Verdana, Arial, Helvetica, sans-serif"   // copied from webclient.css
-    var LABEL_COLOR = "black"
+    var TOPIC_LABEL_FONT = "1em 'Lucida Grande', Verdana, Arial, Helvetica, sans-serif"   // copied from webclient.css
+    var TOPIC_LABEL_COLOR = "black"
+    var ASSOC_LABEL_FONT = "0.75em 'Lucida Grande', Verdana, Arial, Helvetica, sans-serif"
+    var ASSOC_LABEL_COLOR = "gray"
 
     // View
     var topics              // topics displayed on canvas (Object, key: topic ID, value: TopicView)
@@ -82,7 +84,7 @@ function CanvasView() {
         // update view
         add_topic(topic)
         // render
-        show()
+        refresh()
     }
 
     /**
@@ -92,7 +94,7 @@ function CanvasView() {
         // update view
         add_association(assoc)
         // render
-        show()
+        refresh()
     }
 
     // ---
@@ -105,7 +107,7 @@ function CanvasView() {
         // update view
         topic_view.update(topic)
         // render
-        show()                                              // canvas
+        refresh()                                           // canvas
         DOM_FLAVOR && position_topic_dom(topic_view)        // topic layer DOM
     }
 
@@ -116,7 +118,7 @@ function CanvasView() {
         // update view
         get_association(assoc.id).update(assoc)
         // render
-        show()
+        refresh()
     }
 
     // ---
@@ -127,7 +129,7 @@ function CanvasView() {
             // update view
             delete topics[id]
             // render
-            show()                                          // canvas
+            refresh()                                       // canvas
             DOM_FLAVOR && remove_topic_dom(topic_view)      // topic layer DOM
         }
     }
@@ -138,27 +140,40 @@ function CanvasView() {
             // update view
             delete assocs[id]
             // render
-            show()
+            refresh()
         }
+    }
+
+    //
+
+    this.update_topic_type = function(topic_type) {
+        // render
+        refresh()                                           // canvas
+        DOM_FLAVOR && update_topic_type_dom(topic_type)     // topic layer DOM
+    }
+
+    this.update_association_type = function(assoc_type) {
+        // render
+        refresh()                                           // canvas        
     }
 
     // ---
 
     this.set_topic_selection = function(topic_id) {
         // render
-        show()                                              // canvas
+        refresh()                                           // canvas
         DOM_FLAVOR && update_selection_dom(topic_id)        // topic layer DOM
     }
 
     this.set_association_selection = function(topic_id) {
         // render
-        show()                                              // canvas
+        refresh()                                           // canvas
         DOM_FLAVOR && remove_selection_dom()                // topic layer DOM
     }
 
     this.reset_selection = function() {
         // render
-        show()                                              // canvas
+        refresh()                                           // canvas
         DOM_FLAVOR && remove_selection_dom()                // topic layer DOM
     }
 
@@ -193,7 +208,7 @@ function CanvasView() {
         //
         tmp_x = x
         tmp_y = y
-        show()
+        refresh()
     }
 
     this.scroll_to_center = function(topic_id) {
@@ -222,18 +237,13 @@ function CanvasView() {
         // 2) initialize the 2D context
         // Note: the canvas element must be already on the page
         ctx = canvas_element.get(0).getContext("2d")
-        ctx.font = LABEL_FONT   // the canvas font must be set early. Label measurement takes place *before* drawing.
         if (topicmap) { // ### TODO: refactor
             ctx.translate(topicmap.trans_x, topicmap.trans_y)
         }
         //
         bind_event_handlers(canvas_element)
         //
-        show()
-    }
-
-    this.refresh = function() {
-        show()
+        refresh()
     }
 
     // ---
@@ -331,7 +341,7 @@ function CanvasView() {
 
 
 
-    function show() {
+    function refresh() {
         // Note: we can't show until a topicmap is available
         if (!topicmap) {
             return
@@ -348,19 +358,24 @@ function CanvasView() {
                 dm4c.ASSOC_WIDTH, dm4c.DEFAULT_ASSOC_COLOR)
         }
         //
-        ctx.fillStyle = LABEL_COLOR     // set label style
         draw_topics()
     }
 
     // ---
 
     function draw_topics() {
+        ctx.font      = TOPIC_LABEL_FONT
+        ctx.fillStyle = TOPIC_LABEL_COLOR
+        //
         iterate_topics(function(topic) {
             draw_object(topic, customize_draw_topic)
         })
     }
 
     function draw_associations() {
+        ctx.font      = ASSOC_LABEL_FONT
+        ctx.fillStyle = ASSOC_LABEL_COLOR
+        //
         iterate_associations(function(assoc) {
             draw_object(assoc, draw_association)
         })
@@ -379,8 +394,28 @@ function CanvasView() {
             return
         }
         //
-        var color = dm4c.get_type_color(av.type_uri)
-        draw_line(tv1.x, tv1.y, tv2.x, tv2.y, dm4c.ASSOC_WIDTH, color)
+        draw_line(tv1.x, tv1.y, tv2.x, tv2.y, dm4c.ASSOC_WIDTH, dm4c.get_type_color(av.type_uri))
+        draw_label()
+
+        function draw_label() {
+            if (av.label) {
+                var dx = tv2.x - tv1.x
+                var dy = tv2.y - tv1.y
+                var assoc_length = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2))
+                var label_length = ctx.measureText(av.label).width
+                var alpha = Math.asin(dy / assoc_length)
+                var label_x = (assoc_length - label_length) / 2
+                if (dx < 0) {
+                    alpha = -alpha
+                    label_x = label_x - assoc_length
+                }
+                ctx.save()
+                ctx.translate(tv1.x, tv1.y)
+                ctx.rotate(alpha)
+                ctx.fillText(av.label, label_x, - 5)
+                ctx.restore()
+            }
+        }
     }
 
     // ---
@@ -462,7 +497,7 @@ function CanvasView() {
             var topic_view = get_topic(topic_id)
             topic_view.set_view_properties(view_props)
             // render
-            show()
+            refresh()
             DOM_FLAVOR && position_topic_dom(topic_view)        // topic layer DOM
         }
     }
@@ -592,7 +627,7 @@ function CanvasView() {
             }
             tmp_x = p.x
             tmp_y = p.y
-            show()
+            refresh()
         }
     }
 
@@ -629,15 +664,20 @@ function CanvasView() {
             dm4c.do_select_association(action_assoc.id)
             action_assoc = null
         } else if (mousedown_on_canvas) {   // selection must not be reset if canvas move was aborted through mouseleave
+            dm4c.page_panel.save()
             dm4c.do_reset_selection()
             mousedown_on_canvas = false
         }
     }
 
     function do_doubleclick(event) {
-        var tv = detect_topic(event)
-        if (tv) {
-            dm4c.fire_event("topic_doubleclicked", tv)
+        // Note: we want pass a Topic/Association to the doubleclicked hooks (not a TopicView/AssociationView as
+        // returned by the detect methods). We know the double clicked topic/association gets selected (actually
+        // twice) before the doubleclicked event is fired so we can pass dm4c.selected_object here.
+        if (detect_topic(event)) {
+            dm4c.fire_event("topic_doubleclicked", dm4c.selected_object)
+        } else if (detect_association(event)) {
+            dm4c.fire_event("association_doubleclicked", dm4c.selected_object)
         }
     }
 
@@ -683,7 +723,7 @@ function CanvasView() {
         //
         association_in_progress = false
         action_topic = null
-        show()
+        refresh()
     }
 
 
@@ -813,7 +853,7 @@ function CanvasView() {
      *
      * @param   pos     an object with "x" and "y" properties. Coord.TOPICMAP space.
      *
-     * @return  The detected topic, or undefined if no topic is located at the given position.
+     * @return  The detected topic (a TopicView), or undefined if no topic is located at the given position.
      */
     function detect_topic_at(pos) {
         return iterate_topics(function(tv) {
@@ -828,7 +868,8 @@ function CanvasView() {
      *
      * @param   pos     an object with "x" and "y" properties. Coord.TOPICMAP space.
      *
-     * @return  The detected association, or undefined if no association is located at the given position.
+     * @return  The detected association (a AssociationView), or undefined if no association is located
+     *          at the given position.
      */
     function detect_association_at(pos) {
         var x = pos.x
@@ -958,7 +999,7 @@ function CanvasView() {
 
         function animation_step() {
             translate_by(dx, dy)
-            show()
+            refresh()
             if (++step_count == ANIMATION_STEPS) {
                 clearInterval(animation)
                 // Note: the Topicmaps module's setTopicmapTranslation()
@@ -1003,6 +1044,9 @@ function CanvasView() {
                         dm4c.do_select_topic(topic_view.id)
                     }
                 })
+                .dblclick(function() {
+                    dm4c.fire_event("topic_doubleclicked", dm4c.selected_object)
+                })
                 .contextmenu(function(event) {
                     dm4c.do_select_topic(topic_view.id)
                     // Note: only dm4c.selected_object has the composite value (the TopicView has not)
@@ -1016,7 +1060,7 @@ function CanvasView() {
                     // update view
                     update_topic_view(topic_view)
                     // render
-                    show()
+                    refresh()
                 },
                 stop: function(event, ui) {
                     // update viewmodel
@@ -1067,6 +1111,14 @@ function CanvasView() {
 
     function remove_topic_dom(topic_view) {
         topic_view.dom.remove()
+    }
+
+    function update_topic_type_dom(topic_type) {
+        iterate_topics(function(topic) {
+            if (topic.type_uri == topic_type.uri) {
+                invoke_customizers("on_update_topic", [topic, ctx])
+            }
+        })
     }
 
     function update_translation_dom() {
@@ -1178,6 +1230,7 @@ function CanvasView() {
             tv.height = icon.height
             //
             var label = js.truncate(tv.label, dm4c.MAX_TOPIC_LABEL_CHARS)
+            ctx.font = TOPIC_LABEL_FONT     // needed for text measurement
             tv.label_wrapper = new js.TextWrapper(label, dm4c.MAX_TOPIC_LABEL_WIDTH, 19, ctx)
             //                                                        // line height 19px = 1.2em
         }
@@ -1304,6 +1357,7 @@ function CanvasView() {
 
         function init(assoc) {
             self.type_uri = assoc.type_uri
+            self.label    = assoc.label
         }
     }
 
