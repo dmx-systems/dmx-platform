@@ -57,7 +57,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
             context: "context-menu"
         })
         //
-        if (is_changable(topic)) {
+        if (is_topic_changable(topic)) {
             commands.push({is_separator: true, context: "context-menu"})
             commands.push({
                 label: "Edit",
@@ -74,8 +74,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
             context: "context-menu"
         })
         // ### FIXME: check locked state as well (at least for retype)
-        var is_writable = dm4c.has_write_permission_for_topic(topic)
-        if (is_writable) {
+        if (dm4c.has_write_permission_for_topic(topic)) {
             commands.push({is_separator: true, context: "context-menu"})
             commands.push({
                 label: "Retype",
@@ -141,17 +140,17 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
             context: "context-menu"
         })
         //
+        if (is_association_changable(assoc)) {
+            commands.push({is_separator: true, context: "context-menu"})
+            commands.push({
+                label: "Edit",
+                handler: do_edit,
+                context: ["context-menu", "detail-panel-show"],
+                ui_icon: "pencil"
+            })
+        }
+        //
         if (dm4c.has_write_permission_for_association(assoc)) {
-            if (!assoc.get_type().is_locked()) {
-                commands.push({is_separator: true, context: "context-menu"})
-                commands.push({
-                    label: "Edit",
-                    handler: do_edit,
-                    context: ["context-menu", "detail-panel-show"],
-                    ui_icon: "pencil"
-                })
-            }
-            //
             commands.push({is_separator: true, context: "context-menu"})
             commands.push({
                 label: "Delete",
@@ -205,14 +204,24 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
     })
 
     dm4c.add_listener("topic_doubleclicked", function(topic) {
-        if (is_changable(topic)) {
+        if (is_topic_changable(topic)) {
             dm4c.enter_edit_mode(topic)
+        }
+    })
+
+    dm4c.add_listener("association_doubleclicked", function(assoc) {
+        if (is_association_changable(assoc)) {
+            dm4c.enter_edit_mode(assoc)
         }
     })
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function is_changable(topic) {
+    function is_topic_changable(topic) {
         return dm4c.has_write_permission_for_topic(topic) && !topic.get_type().is_locked()
+    }
+
+    function is_association_changable(assoc) {
+        return dm4c.has_write_permission_for_association(assoc) && !assoc.get_type().is_locked()
     }
 })
