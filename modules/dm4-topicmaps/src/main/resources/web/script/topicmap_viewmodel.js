@@ -557,14 +557,17 @@ function TopicmapViewmodel(topicmap_id, config) {
     }
 
     /**
-     * @param   assoc   a domain association (has "id", "type_uri", "role_1", "role_2" properties).
+     * @param   assoc   a domain association (has "id", "type_uri", "value", "role_1", "role_2" properties).
      */
     function AssociationViewmodel(assoc) {
 
+        var _self = this    // Note: we must not override the outer "self" scope
+
         this.id = assoc.id
-        this.type_uri = assoc.type_uri
         this.topic_id_1 = assoc.role_1.topic_id
         this.topic_id_2 = assoc.role_2.topic_id
+
+        init(assoc)
 
         // ---
 
@@ -598,7 +601,7 @@ function TopicmapViewmodel(topicmap_id, config) {
          * @param   assoc   a domain association (has "id", "type_uri", "role_1", "role_2" properties).
          */
         this.update = function(assoc) {
-            this.type_uri = assoc.type_uri
+            init(assoc)
         }
 
         this.delete = function() {
@@ -607,6 +610,11 @@ function TopicmapViewmodel(topicmap_id, config) {
         }
 
         // ---
+
+        function init(assoc) {
+            _self.type_uri = assoc.type_uri
+            _self.label    = assoc.value
+        }
 
         function reset_selection_conditionally() {
             if (!self.is_topic_selected && self.selected_object_id == assoc.id) {

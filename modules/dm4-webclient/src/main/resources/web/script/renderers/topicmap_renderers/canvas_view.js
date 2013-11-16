@@ -8,8 +8,10 @@ function CanvasView() {
     var HIGHLIGHT_BLUR = 16
     var ANIMATION_STEPS = 30
     var ANIMATION_DELAY = 10
-    var LABEL_FONT = "1em 'Lucida Grande', Verdana, Arial, Helvetica, sans-serif"   // copied from webclient.css
-    var LABEL_COLOR = "black"
+    var TOPIC_LABEL_FONT = "1em 'Lucida Grande', Verdana, Arial, Helvetica, sans-serif"   // copied from webclient.css
+    var TOPIC_LABEL_COLOR = "black"
+    var ASSOC_LABEL_FONT = "0.75em 'Lucida Grande', Verdana, Arial, Helvetica, sans-serif"
+    var ASSOC_LABEL_COLOR = "gray"
 
     // View
     var topics              // topics displayed on canvas (Object, key: topic ID, value: TopicView)
@@ -235,7 +237,6 @@ function CanvasView() {
         // 2) initialize the 2D context
         // Note: the canvas element must be already on the page
         ctx = canvas_element.get(0).getContext("2d")
-        ctx.font = LABEL_FONT   // the canvas font must be set early. Label measurement takes place *before* drawing.
         if (topicmap) { // ### TODO: refactor
             ctx.translate(topicmap.trans_x, topicmap.trans_y)
         }
@@ -357,19 +358,24 @@ function CanvasView() {
                 dm4c.ASSOC_WIDTH, dm4c.DEFAULT_ASSOC_COLOR)
         }
         //
-        ctx.fillStyle = LABEL_COLOR     // set label style
         draw_topics()
     }
 
     // ---
 
     function draw_topics() {
+        ctx.font      = TOPIC_LABEL_FONT
+        ctx.fillStyle = TOPIC_LABEL_COLOR
+        //
         iterate_topics(function(topic) {
             draw_object(topic, customize_draw_topic)
         })
     }
 
     function draw_associations() {
+        ctx.font      = ASSOC_LABEL_FONT
+        ctx.fillStyle = ASSOC_LABEL_COLOR
+        //
         iterate_associations(function(assoc) {
             draw_object(assoc, draw_association)
         })
@@ -388,8 +394,28 @@ function CanvasView() {
             return
         }
         //
-        var color = dm4c.get_type_color(av.type_uri)
-        draw_line(tv1.x, tv1.y, tv2.x, tv2.y, dm4c.ASSOC_WIDTH, color)
+        draw_line(tv1.x, tv1.y, tv2.x, tv2.y, dm4c.ASSOC_WIDTH, dm4c.get_type_color(av.type_uri))
+        draw_label()
+
+        function draw_label() {
+            if (av.label) {
+                var dx = tv2.x - tv1.x
+                var dy = tv2.y - tv1.y
+                var assoc_length = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2))
+                var label_length = ctx.measureText(av.label).width
+                var alpha = Math.asin(dy / assoc_length)
+                var label_x = (assoc_length - label_length) / 2
+                if (dx < 0) {
+                    alpha = -alpha
+                    label_x = label_x - assoc_length
+                }
+                ctx.save()
+                ctx.translate(tv1.x, tv1.y)
+                ctx.rotate(alpha)
+                ctx.fillText(av.label, label_x, - 5)
+                ctx.restore()
+            }
+        }
     }
 
     // ---
@@ -1204,6 +1230,7 @@ function CanvasView() {
             tv.height = icon.height
             //
             var label = js.truncate(tv.label, dm4c.MAX_TOPIC_LABEL_CHARS)
+            ctx.font = TOPIC_LABEL_FONT     // needed for text measurement
             tv.label_wrapper = new js.TextWrapper(label, dm4c.MAX_TOPIC_LABEL_WIDTH, 19, ctx)
             //                                                        // line height 19px = 1.2em
         }
@@ -1330,6 +1357,7 @@ function CanvasView() {
 
         function init(assoc) {
             self.type_uri = assoc.type_uri
+            self.label    = assoc.label
         }
     }
 
