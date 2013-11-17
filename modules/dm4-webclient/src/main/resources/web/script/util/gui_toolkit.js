@@ -210,26 +210,26 @@ function GUIToolkit(config) {
             // Note: the surrounding "handler" and "menu_title" are also part of the menu's model.
             var items = []
             var stateful = menu_title == undefined
-            var selection   // selected menu item (object with "value" and "label" properties).
+            var selection   // selected menu item (object with "label", "value", ... properties).
                             // Used only for stateful select-like menus.
 
             // short-term interaction state
             var menu_height
-            var scroller_height
+            // ### var scroller_height
             var window_height
             var scroll_animation
 
             // GUI
             var button = gui.button(do_open_menu, menu_title, "triangle-1-s")
-            var menu            = $("<div>").addClass("menu")
-            var top_scroller    = $("<div>").addClass("scroll-area top")
-            var bottom_scroller = $("<div>").addClass("scroll-area bottom")
+            var menu = $("<ul>")     // ### $("<div>").addClass("menu")
+            // ### var top_scroller    = $("<div>").addClass("scroll-area top")
+            // ### var bottom_scroller = $("<div>").addClass("scroll-area bottom")
             // Note: clicking a scroller is meant to have no effect. However, the event must be consumed
             // in order to avoid it bubbling up to the body (where it would cause the menu to be closed).
-            top_scroller   .hover(create_scroll_handler(+SCROLL_DISTANCE), do_end_scroll).click(consume)
-            bottom_scroller.hover(create_scroll_handler(-SCROLL_DISTANCE), do_end_scroll).click(consume)
+            // ### top_scroller   .hover(create_scroll_handler(+SCROLL_DISTANCE), do_end_scroll).click(consume)
+            // ### bottom_scroller.hover(create_scroll_handler(-SCROLL_DISTANCE), do_end_scroll).click(consume)
             //
-            var dom = $("<span>").append(button).append(menu).append(top_scroller).append(bottom_scroller)
+            var dom = $("<span>").append(button).append(menu.menu()) // ###.append(top_scroller).append(bottom_scroller)
 
             // ---------------------------------------------------------------------------------------------- Public API
 
@@ -250,7 +250,7 @@ function GUIToolkit(config) {
              *                      "is_trigger" (boolean) - Optional: if true this item acts as stateless
              *                          action-trigger within an stateful select-like menu. Default is false.
              *                          Reasonable only for stateful select-like menus.
-             *                          ### FIXME: this property could possibly be dropped. Meanwhile we have optional
+             *                          ### TODO: this property could possibly be dropped. Meanwhile we have optional
              *                          per-item event handlers (see "handler" property).
              *                      "handler" - Optional: the individual handler. One argument is passed to it:
              *                          the selected menu item (an object with "value" and "label" properties).
@@ -371,13 +371,13 @@ function GUIToolkit(config) {
 
             // ---
 
-            function create_scroll_handler(distance) {
+            /* ### function create_scroll_handler(distance) {
                 return function() {
                     scroll_animation = setInterval(function() {
                         move_to(menu.position().top + distance)
                     }, SCROLL_DELAY)
                 }
-            }
+            } */
 
             function do_end_scroll() {
                 clearInterval(scroll_animation)
@@ -390,17 +390,20 @@ function GUIToolkit(config) {
             // === Helper ===
 
             /**
-             * @param   item    object with "value" (optional) and "label" properties.
+             * @param   item    object with "label", "value" (optional), "icon" (optional), "is_trigger" (optional),
+             *                  and "handler" (optional) properties.
              */
             function add_item(item) {
                 // 1) update GUI
-                var item_dom = $("<a>").attr("href", "#").click(create_selection_handler(item))
-                add_hovering()
+                var anchor = $("<a>").attr("href", "#").click(create_selection_handler(item))
+                // ### add_hovering()
                 if (item.icon) {
-                    item_dom.append($("<img>").attr("src", item.icon).addClass("menu-icon"))
+                    anchor.append($("<img>").attr("src", item.icon).addClass("menu-icon"))
                 }
-                item_dom.append(item.label)
+                anchor.append(item.label)
+                var item_dom = $("<li>").append(anchor)
                 menu.append(item_dom)
+                menu.menu("refresh")    // ### TODO: is refresh a cheap operation? It is called for every item.
                 // 2) update model
                 item.dom = item_dom
                 items.push(item)
@@ -411,12 +414,12 @@ function GUIToolkit(config) {
                     select_item(item)
                 }
 
-                function add_hovering() {
+                /* ### function add_hovering() {
                     item_dom.hover(
                         function() {$(this).addClass("hover")},
                         function() {$(this).removeClass("hover")}
                     )
-                }
+                } */
             }
 
             /**
@@ -453,14 +456,14 @@ function GUIToolkit(config) {
                 var button_y = button_pos.top
                 //
                 menu           .css({left: button_x}).show()
-                top_scroller   .css({left: button_x, width: menu.width()})
-                bottom_scroller.css({left: button_x, width: menu.width()})
+                // ### top_scroller   .css({left: button_x, width: menu.width()})
+                // ### bottom_scroller.css({left: button_x, width: menu.width()})
                 // the menu might be trimmed from previous opening
                 reset_top_trim()
                 reset_bottom_trim()
                 //
                 menu_height = menu.outerHeight()
-                scroller_height = top_scroller.outerHeight()
+                // ### scroller_height = top_scroller.outerHeight()
                 window_height = window.innerHeight
                 //
                 if (selection) {
@@ -472,7 +475,7 @@ function GUIToolkit(config) {
                     var menu_y = button_y + button.outerHeight()
                 }
                 //
-                move_to(menu_y)
+                // ### move_to(menu_y)
                 // update global state
                 opened_menu = self
             }
@@ -482,13 +485,13 @@ function GUIToolkit(config) {
              */
             function close_menu() {
                 menu.hide()
-                top_scroller.hide()
-                bottom_scroller.hide()
+                // ### top_scroller.hide()
+                // ### bottom_scroller.hide()
                 // update global state
                 opened_menu = null
             }
 
-            function move_to(menu_y) {
+            /* ### function move_to(menu_y) {
 
                 if (!is_visible(menu)) {
                     alert("WARNING: scroll thread is still running while menu is not shown")
@@ -536,7 +539,7 @@ function GUIToolkit(config) {
                         }
                     }
                 }
-            }
+            } */
 
             function reset_top_trim() {
                 menu.css("clip", "rect(auto, auto, auto, auto)")
