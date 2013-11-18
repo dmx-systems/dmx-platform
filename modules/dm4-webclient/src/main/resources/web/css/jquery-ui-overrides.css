@@ -14,14 +14,19 @@
     padding-bottom: 1.1em;
 }
 
+/* OpenLayer's event layer has z-index 999. */
+
 .ui-menu {
     position: fixed;
     display: none;
-    z-index: 1;
+    overflow: auto;
+    z-index: 1000;
 }
 
-.ui-front,                      /* Used for jQuery UI dialogs.  */
+.ui-front {                     /* Used for jQuery UI dialogs.  */
+    z-index: 1000;              /* jQuery UI default is 100.    */
+}
+
 .ui-resizable-handle {
-    z-index: 1000 !important;   /* jQuery UI default is 100. OpenLayer's event layer has 999.   */
-                                /* "important" overrides the resizable-handle's style attribute */
+    z-index: 1000 !important;   /* "important" overrides the resizable-handle's style attribute */
 }
