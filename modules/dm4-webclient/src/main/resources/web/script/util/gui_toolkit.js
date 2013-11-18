@@ -1,8 +1,8 @@
 /**
- * A generic (DeepaMehta independent) GUI toolkit to create buttons, menus, combo boxes, dialog boxes, and prompts.
- * Based on jQuery UI.
+ * A generic (DeepaMehta independent) GUI toolkit to create buttons, menus, context menus, combo boxes,
+ * dialog boxes, and prompts. Based on jQuery UI.
  *
- * The DeepaMehta Webclient's toolkit instance is accessible as dm4c.ui
+ * The DeepaMehta Webclient's GUIToolkit instance is accessible as dm4c.ui
  */
 function GUIToolkit(config) {
 
@@ -156,10 +156,6 @@ function GUIToolkit(config) {
 
     // === Menu ===
 
-    // Settings
-    var SCROLL_DISTANCE = 8     // distance of one scroll step in pixel
-    var SCROLL_DELAY = 15       // delay between scroll steps in milliseconds
-
     var opened_menu = null      // global state: the menu currently open, or null if no menu is open
 
     $(function() {
@@ -170,6 +166,143 @@ function GUIToolkit(config) {
             close_opened_menu()
         })
     })
+
+    function close_opened_menu() {
+        if (opened_menu) {
+            opened_menu.close()
+        }
+    }
+
+    function BaseMenu(config) {
+
+        var self = this
+
+        // Model
+        var items = []
+
+        // GUI
+        var menu = $("<ul>")
+
+        // -------------------------------------------------------------------------------------------------- Public API
+
+        this.dom = menu.menu()
+
+        /**
+         * @param   item    object with "label", "value" (optional), "icon" (optional), "is_trigger" (optional),
+         *                  and "handler" (optional) properties.
+         */
+        this.add_item = function(item) {
+            // 1) update GUI
+            var anchor = $("<a>").attr("href", "#").click(create_selection_handler(item))
+            if (item.icon) {
+                anchor.append($("<img>").attr("src", item.icon).addClass("menu-icon"))
+            }
+            anchor.append(item.label)
+            var item_dom = $("<li>").append(anchor)
+            menu.append(item_dom)
+            menu.menu("refresh")    // ### TODO: is refresh a cheap operation? It is called for every item.
+            // 2) update model
+            // ### item.dom = item_dom  // ### TODO: needed?
+            items.push(item)
+        }
+
+        this.add_separator = function() {
+            // update GUI
+            menu.append("<hr>")
+        }
+
+        this.empty = function() {
+            // update GUI
+            menu.empty()
+            // update model
+            items = []
+        }
+
+        // ---
+
+        this.open = function(x, y) {
+            menu.css({top: y, left: x})
+            //
+            // measure height
+            menu.show()             // must be visible for measurement
+            menu.height("auto")     // reset trim for proper measurement
+            var menu_height = menu.outerHeight()
+            var window_height = window.innerHeight
+            // console.log("menu_height:", menu_height)
+            //
+            // trim height
+            if (y + menu_height > window_height) {
+                // 8px = menu's top/bottom padding (2 * 0.3em = 9px) - 1px scroller overlap ### FIXME
+                var height = window_height - y - 8 // ### - scroller_height
+                menu.height(height)
+                // console.log("-> trimmed to", height)
+            }
+            // update global state ### TODO: rethink
+            opened_menu = this
+        }
+
+        /**
+         * Closes this menu. Updates global state.
+         * <p>
+         * Not meant to be called by the application developer.
+         * It is a public method anyway to let an outside click perform the closing.
+         */
+        this.close = function() {
+            menu.hide()
+            // update global state
+            opened_menu = null
+        }
+
+        this.is_open = function() {
+            return menu.css("display") != "none"
+        }
+
+        // ---
+
+        this.get_item_count = function() {
+            return items.length
+        }
+
+        /**
+         * Finds a menu item by value.
+         * If there is no such menu item undefined is returned.
+         */
+        this.find_item = function(value) {
+            for (var i = 0, item; item = items[i]; i++) {
+                if (item.value == value) {
+                    return item
+                }
+            }
+        }
+
+        /**
+         * Finds a menu item by label.
+         * If there is no such menu item undefined is returned.
+         */
+        this.find_item_by_label = function(label) {
+            for (var i = 0, item; item = items[i]; i++) {
+                if (item.label == label) {
+                    return item
+                }
+            }
+        }
+
+        // ---
+
+        function create_selection_handler(item) {
+            return function() {
+                // 1) fire event
+                config && config.on_select && config.on_select(item)
+                // 2) close menu
+                self.close()
+                // 3) call handler
+                var h = item.handler || config.handler     // individual item handler has precedence
+                h && h(item)
+                //
+                return false
+            }
+        }
+    }
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -208,16 +341,18 @@ function GUIToolkit(config) {
 
             // Model
             // Note: the surrounding "handler" and "menu_title" are also part of the menu's model.
-            var items = []
             var stateful = menu_title == undefined
             var selection   // selected menu item (object with "label", "value", ... properties).
                             // Used only for stateful select-like menus.
 
             // GUI
             var button = gui.button(do_open_menu, menu_title, "triangle-1-s")
-            var menu = $("<ul>")
+            var base_menu = new BaseMenu({
+                handler: handler,
+                on_select: select_item
+            })
             //
-            var dom = $("<span>").append(button).append(menu.menu())
+            var dom = $("<span>").append(button).append(base_menu.dom)
 
             // ---------------------------------------------------------------------------------------------- Public API
 
@@ -244,20 +379,23 @@ function GUIToolkit(config) {
              *                          the selected menu item (an object with "value" and "label" properties).
              */
             this.add_item = function(item) {
-                add_item(item)
+                base_menu.add_item(item)
+                //
+                // select the item if there is no selection yet
+                if (!selection) {
+                    // Note: this sets also the button label (in case of stateful select-like menus)
+                    select_item(item)
+                }
             }
 
             this.add_separator = function() {
-                // update GUI
-                menu.append("<hr>")
+                base_menu.add_separator()
             }
 
             this.empty = function() {
-                // update GUI
-                menu.empty()
-                // update model
-                items = []
-                remove_selection()
+                base_menu.empty()
+                //
+                reset_selection()
             }
 
             // ---
@@ -273,7 +411,7 @@ function GUIToolkit(config) {
              *                          If there is not such menu item nothing is performed.
              */
             this.select = function(item_value) {
-                select_item(find_item(item_value))
+                select_item(base_menu.find_item(item_value))
             }
 
             // ---
@@ -290,7 +428,7 @@ function GUIToolkit(config) {
             }
 
             this.get_item_count = function() {
-                return items.length
+                return base_menu.get_item_count()
             }
 
             /**
@@ -298,90 +436,38 @@ function GUIToolkit(config) {
              * If there is no such menu item undefined is returned.
              */
             this.find_item_by_label = function(label) {
-                return find_item_by_label(label)
-            }
-
-            /**
-             * Closes this menu.
-             * <p>
-             * Not meant to be called by the application developer.
-             * It is a public method anyway to let an outside click perform the closing.
-             */
-            this.close = function() {
-                close_menu()
+                return base_menu.find_item_by_label(label)
             }
 
             // --------------------------------------------------------------------------------------- Private Functions
-
-
-
-            // === Event Handler ===
 
             /**
              * Called when the menu-triggering button is clicked.
              */
             function do_open_menu() {
-                // W3C DOM level 3 mouse events:
-                // (see http://www.w3.org/TR/2003/WD-DOM-Level-3-Events-20030331/ecma-script-binding.html)
-                //     event.screenX/Y              - related to entire computer screen
-                //     event.clientX/Y              - related to client window display area
-                // Non-normative:
-                //     event.pageX/Y                - related to document (involves scroll position)
-                //                                    (the same as clientX if there is no scrolling)
-                //     event.originalEvent.layerX/Y - related to positioned parent
-                if (!is_visible(menu)) {
-                    close_opened_menu()
-                    // "Opening nenu: event.screenY=" + event.screenY +
-                    //    ", event.clientY=" + event.clientY + ", event.pageY=" + event.pageY +
-                    //    ", event.originalEvent.layerY=" + event.originalEvent.layerY
-                    open_menu()
+                if (base_menu.is_open()) {
+                    base_menu.close()
                 } else {
-                    close_menu()
+                    close_opened_menu()
+                    open_menu()
                 }
                 return false
             }
 
-            function create_selection_handler(item) {
-                return function() {
-                    // 1) remember selection
-                    select_item(item)
-                    // 2) close menu
-                    close_menu()
-                    // 3) call handler
-                    var h = item.handler || handler     // individual item handler has precedence
-                    if (h) {
-                         h(item)
-                    }
-                    return false
-                }
-            }
-
-            // === Helper ===
-
             /**
-             * @param   item    object with "label", "value" (optional), "icon" (optional), "is_trigger" (optional),
-             *                  and "handler" (optional) properties.
+             * Calculates the position of the menu and opens it.
              */
-            function add_item(item) {
-                // 1) update GUI
-                var anchor = $("<a>").attr("href", "#").click(create_selection_handler(item))
-                if (item.icon) {
-                    anchor.append($("<img>").attr("src", item.icon).addClass("menu-icon"))
+            function open_menu() {
+                // fire event
+                if (config.pre_open_menu) {
+                    config.pre_open_menu(self)
                 }
-                anchor.append(item.label)
-                var item_dom = $("<li>").append(anchor)
-                menu.append(item_dom)
-                menu.menu("refresh")    // ### TODO: is refresh a cheap operation? It is called for every item.
-                // 2) update model
-                // ### item.dom = item_dom  // ### TODO: needed?
-                items.push(item)
-                // 3) adjust selection
-                // select the item if there is no selection yet
-                if (!selection) {
-                    // Note: this sets also the button label (in case of stateful select-like menus)
-                    select_item(item)
-                }
+                //
+                var button_pos = button.offset()
+                base_menu.open(button_pos.left, button_pos.top + button.outerHeight())
             }
+
+            // ---
 
             /**
              * Only applicable for stateful select-like menus.
@@ -399,53 +485,8 @@ function GUIToolkit(config) {
                 }
             }
 
-            function remove_selection() {
+            function reset_selection() {
                 selection = null
-            }
-
-            /**
-             * Calculates the position of the menu and opens it. Updates global state.
-             */
-            function open_menu() {
-                // fire event
-                if (config.pre_open_menu) {
-                    config.pre_open_menu(self)
-                }
-                //
-                // position menu
-                var button_pos = button.offset()
-                var menu_y = button_pos.top + button.outerHeight()
-                menu.css({
-                    top: menu_y,
-                    left: button_pos.left
-                })
-                //
-                // measure height
-                menu.show()             // must be visible for measurement
-                menu.height("auto")     // reset trim for proper measurement
-                var menu_height = menu.outerHeight()
-                var window_height = window.innerHeight
-                // console.log("menu_height:", menu_height)
-                //
-                // trim height
-                if (menu_y + menu_height > window_height) {
-                    // 8px = menu's top/bottom padding (2 * 0.3em = 9px) - 1px scroller overlap ### FIXME
-                    var height = window_height - menu_y - 8 // ### - scroller_height
-                    menu.height(height)
-                    // console.log("-> trimmed to", height)
-                }
-                //
-                // update global state ### TODO: rethink
-                opened_menu = self
-            }
-
-            /**
-             * Closes this menu. Updates global state.
-             */
-            function close_menu() {
-                menu.hide()
-                // update global state
-                opened_menu = null
             }
 
             // ---
@@ -455,37 +496,11 @@ function GUIToolkit(config) {
                 // It is false if the button had no label while creation.
                 button.button("option", {label: label, text: true})
             }
-
-            function is_visible(dom) {
-                return dom.css("display") != "none"
-            }
-
-            // ---
-
-            /**
-             * Finds a menu item by value.
-             * If there is no such menu item undefined is returned.
-             */
-            function find_item(value) {
-                for (var i = 0, item; item = items[i]; i++) {
-                    if (item.value == value) {
-                        return item
-                    }
-                }
-            }
-
-            /**
-             * Finds a menu item by label.
-             * If there is no such menu item undefined is returned.
-             */
-            function find_item_by_label(label) {
-                for (var i = 0, item; item = items[i]; i++) {
-                    if (item.label == label) {
-                        return item
-                    }
-                }
-            }
         }
+    }
+
+    // ### TODO
+    this.context_menu = function() {
     }
 
 
@@ -534,16 +549,6 @@ function GUIToolkit(config) {
             function set_input_text(text) {
                 input.val(text)
             }
-        }
-    }
-
-
-
-    // ----------------------------------------------------------------------------------------------- Private Functions
-
-    function close_opened_menu() {
-        if (opened_menu) {
-            opened_menu.close()
         }
     }
 }
