@@ -101,8 +101,8 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         //
         return commands
 
-        // Note: all command handlers receive the coordinates of the command selecting mouse click,
-        // however, most of them doesn't care. See function open_context_menu() in canvas_view.js
+        // Note: all command handlers receive the selected item and the coordinates of the selecting mouse click.
+        // However, most of the handlers don't care. See BaseMenu's create_selection_handler() in gui_toolkit.js
 
         function do_hide() {
             dm4c.do_hide_topic(topic)
@@ -112,7 +112,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
             dm4c.enter_edit_mode(topic)
         }
 
-        function do_associate(x, y) {
+        function do_associate(item, x, y) {
             dm4c.topicmap_renderer.begin_association(topic.id, x, y)
         }
 
