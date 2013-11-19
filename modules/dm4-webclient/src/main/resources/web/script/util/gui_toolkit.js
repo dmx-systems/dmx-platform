@@ -173,6 +173,16 @@ function GUIToolkit(config) {
         }
     }
 
+    /**
+     * @param   config  an object with these properties:
+     *              on_close    Internal close handler (a function)
+     *              on_select   Optional: internal select handler (a function). Receives the selected menu item.
+     *              handler     Optional: user application select handler (a function). Receives the selected menu item
+     *                          and the coordinates of the selecting mouse click.
+     *              parent      Optional: the mouse coordinates passed to the user application select handler
+     *                          are relative to this element (a jQuery object).
+     *                          If not specified the coordinates are relative to the client window.
+     */
     function BaseMenu(config) {
 
         var self = this
@@ -248,7 +258,7 @@ function GUIToolkit(config) {
          * It is a public method anyway to let an outside click perform the closing.
          */
         this.close = function() {
-            menu.hide()
+            config.on_close()
             // update global state
             opened_menu = null
         }
@@ -290,16 +300,32 @@ function GUIToolkit(config) {
         // ---
 
         function create_selection_handler(item) {
-            return function() {
+            return function(event) {
                 // 1) fire event
-                config && config.on_select && config.on_select(item)
+                config.on_select && config.on_select(item)
                 // 2) close menu
                 self.close()
                 // 3) call handler
                 var h = item.handler || config.handler     // individual item handler has precedence
-                h && h(item)
+                if (h) {
+                    var p = pos(event)      // pass coordinates of selecting mouse click to handler
+                    h(item, p.x, p.y)
+                }
                 //
                 return false
+            }
+
+            function pos(event) {
+                var pos = {
+                    x: event.clientX,
+                    y: event.clientY
+                }
+                if (config.parent) {
+                    var pp = config.parent.offset()
+                    pos.x -= pp.left
+                    pos.y -= pp.top
+                }
+                return pos
             }
         }
     }
@@ -349,7 +375,8 @@ function GUIToolkit(config) {
             var button = gui.button(do_open_menu, menu_title, "triangle-1-s")
             var base_menu = new BaseMenu({
                 handler: handler,
-                on_select: select_item
+                on_select: select_item,
+                on_close: on_close
             })
             //
             var dom = $("<span>").append(button).append(base_menu.dom)
@@ -458,13 +485,17 @@ function GUIToolkit(config) {
              * Calculates the position of the menu and opens it.
              */
             function open_menu() {
-                // fire event
+                // fire event ### TODO: move to BaseMenu
                 if (config.pre_open_menu) {
                     config.pre_open_menu(self)
                 }
                 //
                 var button_pos = button.offset()
                 base_menu.open(button_pos.left, button_pos.top + button.outerHeight())
+            }
+
+            function on_close() {
+                base_menu.dom.hide()
             }
 
             // ---
@@ -499,8 +530,40 @@ function GUIToolkit(config) {
         }
     }
 
-    // ### TODO
-    this.context_menu = function() {
+    /**
+     * @param   parent  The element the context menu is appended to (a jQuery object).
+     *                  The mouse coordinates passed to the menu item handlers are relative to this element.
+     */
+    this.context_menu = function(parent) {
+
+        return new ContextMenu()
+
+        function ContextMenu() {
+
+            var base_menu = new BaseMenu({
+                on_close: on_close,
+                parent: parent
+            })
+
+            this.add_item = function(item) {
+                base_menu.add_item(item)
+            }
+
+            this.add_separator = function() {
+                base_menu.add_separator()
+            }
+
+            this.open = function(x, y) {
+                parent.append(base_menu.dom)
+                base_menu.open(x, y)
+            }
+
+            // ---
+
+            function on_close() {
+                base_menu.dom.remove()
+            }
+        }
     }
 
 

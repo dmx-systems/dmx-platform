@@ -647,7 +647,7 @@ function CanvasView() {
     }
 
     function do_mouseup(event) {
-        close_context_menu()
+        // ### close_context_menu()
         //
         if (topic_move_in_progress) {
             end_topic_move()
@@ -758,7 +758,7 @@ function CanvasView() {
      * @param   event       The mouse event that triggered the context menu.
      */
     function open_context_menu(commands, event) {
-        close_context_menu()
+        // ### close_context_menu()
         //
         if (!commands.length) {
             return
@@ -766,51 +766,25 @@ function CanvasView() {
         // fire event (compare to GUITookit's open_menu())
         dm4c.pre_open_context_menu()
         //
-        // "Opening context nenu: event.screenY=" + event.screenY +
-        //    ", event.clientY=" + event.clientY + ", event.pageY=" + event.pageY +
-        //    ", event.originalEvent.layerY=" + event.originalEvent.layerY
-        var cm_pos = pos(event, Coord.WINDOW)
-        var contextmenu = $("<div>").addClass("menu").css({
-            top:  cm_pos.y,
-            left: cm_pos.x
-        })
+        var context_menu = dm4c.ui.context_menu($("#topicmap-panel"))
         for (var i = 0, cmd; cmd = commands[i]; i++) {
             if (cmd.is_separator) {
-                contextmenu.append("<hr>")
+                context_menu.add_separator()
             } else {
-                var handler = context_menu_handler(cmd.handler)
-                var item_dom = $("<a>").attr("href", "#").click(handler).text(cmd.label)
-                add_hovering()
-                contextmenu.append(item_dom)
+                context_menu.add_item({
+                    label: cmd.label,
+                    handler: cmd.handler
+                })
             }
         }
-        $("#topicmap-panel").append(contextmenu)
-        contextmenu.show()
-
-        function context_menu_handler(handler) {
-            return function(event) {
-                // pass the coordinates of the command selecting mouse click to the command handler
-                var p = pos(event)
-                handler(p.x, p.y)
-                close_context_menu()
-                return false
-            }
-        }
-
-        // ### FIXME: copy in GUIToolkit
-        // ### TODO: refactor canvas context menu to make use of GUIToolkit Menu class
-        function add_hovering() {
-            item_dom.hover(
-                function() {$(this).addClass("hover")},
-                function() {$(this).removeClass("hover")}
-            )
-        }
+        var cm_pos = pos(event, Coord.WINDOW)
+        context_menu.open(cm_pos.x, cm_pos.y)
     }
 
-    function close_context_menu() {
+    /* ### function close_context_menu() {
         // remove context menu
         $("#topicmap-panel .menu").remove()
-    }
+    } */
 
 
 
@@ -928,14 +902,14 @@ function CanvasView() {
         case Coord.CANVAS:
             return {
                 x: event.clientX,
-                y: event.clientY - $("#topicmap-panel").position().top
+                y: event.clientY - $("#topicmap-panel").offset().top
                 // ### x: event.originalEvent.layerX,
                 // ### y: event.originalEvent.layerY
             }
         case Coord.TOPICMAP:
             return {
                 x: event.clientX - topicmap.trans_x,
-                y: event.clientY - topicmap.trans_y - $("#topicmap-panel").position().top
+                y: event.clientY - topicmap.trans_y - $("#topicmap-panel").offset().top
                 // ### x: event.originalEvent.layerX - topicmap.trans_x,
                 // ### y: event.originalEvent.layerY - topicmap.trans_y
             }
@@ -1034,7 +1008,7 @@ function CanvasView() {
             var has_moved
             topic_dom
                 .mousedown(function() {
-                    close_context_menu()
+                    // ### close_context_menu()
                     has_moved = false
                 })
                 .mouseup(function() {
