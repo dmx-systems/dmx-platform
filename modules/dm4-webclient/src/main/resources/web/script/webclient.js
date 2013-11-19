@@ -29,7 +29,7 @@ dm4c = new function() {
 
     // utilities
     this.restc = new RESTClient(CORE_SERVICE_URI)
-    this.ui = new GUIToolkit({pre_open_menu: pre_open_menu})
+    this.ui = new GUIToolkit({on_open_menu: on_open_menu})
     this.render = new RenderHelper()
     var pm = new PluginManager({
         internal_plugins: ["default_plugin.js", "fulltext_plugin.js", "ckeditor_plugin.js"]
@@ -1156,18 +1156,11 @@ dm4c = new function() {
      *
      * @param   menu    a GUIToolkit Menu object.
      */
-    function pre_open_menu(menu) {
+    function on_open_menu(menu) {
         // react only on menus that are not part of the page content
         if (menu.dom.parents("#page-content").length == 0) {
             dm4c.page_panel.save()
         }
-    }
-
-    /**
-     * Save the page panel before the user opens the canvas's context menu.
-     */
-    this.pre_open_context_menu = function() {
-        dm4c.page_panel.save()
     }
 
     // ---

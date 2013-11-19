@@ -647,8 +647,6 @@ function CanvasView() {
     }
 
     function do_mouseup(event) {
-        // ### close_context_menu()
-        //
         if (topic_move_in_progress) {
             end_topic_move()
         } else if (cluster_move_in_progress) {
@@ -758,33 +756,22 @@ function CanvasView() {
      * @param   event       The mouse event that triggered the context menu.
      */
     function open_context_menu(commands, event) {
-        // ### close_context_menu()
-        //
-        if (!commands.length) {
-            return
-        }
-        // fire event (compare to GUITookit's open_menu())
-        dm4c.pre_open_context_menu()
-        //
-        var context_menu = dm4c.ui.context_menu($("#topicmap-panel"))
-        for (var i = 0, cmd; cmd = commands[i]; i++) {
-            if (cmd.is_separator) {
-                context_menu.add_separator()
-            } else {
-                context_menu.add_item({
-                    label: cmd.label,
-                    handler: cmd.handler
-                })
+        if (commands.length) {
+            var context_menu = dm4c.ui.context_menu($("#topicmap-panel"))
+            for (var i = 0, cmd; cmd = commands[i]; i++) {
+                if (cmd.is_separator) {
+                    context_menu.add_separator()
+                } else {
+                    context_menu.add_item({
+                        label: cmd.label,
+                        handler: cmd.handler
+                    })
+                }
             }
+            var p = pos(event, Coord.WINDOW)
+            context_menu.open(p.x, p.y)
         }
-        var cm_pos = pos(event, Coord.WINDOW)
-        context_menu.open(cm_pos.x, cm_pos.y)
     }
-
-    /* ### function close_context_menu() {
-        // remove context menu
-        $("#topicmap-panel .menu").remove()
-    } */
 
 
 
@@ -1008,7 +995,6 @@ function CanvasView() {
             var has_moved
             topic_dom
                 .mousedown(function() {
-                    // ### close_context_menu()
                     has_moved = false
                 })
                 .mouseup(function() {

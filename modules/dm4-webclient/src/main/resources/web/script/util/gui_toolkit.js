@@ -3,10 +3,14 @@
  * dialog boxes, and prompts. Based on jQuery UI.
  *
  * The DeepaMehta Webclient's GUIToolkit instance is accessible as dm4c.ui
+ *
+ * @param   config  an object with these properties:
+ *                      on_open_menu        - Optional: the open menu handler (a function). Invoked before a menu is
+ *                                            opened. Receives the menu (a BaseMenu) to be opened.
  */
 function GUIToolkit(config) {
 
-    var gui = this
+    var self = this
 
 
 
@@ -49,16 +53,16 @@ function GUIToolkit(config) {
 
     /**
      * @param   config  an object with these properties:
-     *                      id             - Optional: the dialog content div will get this ID. Useful to style the
-     *                                       dialog with CSS. If not specified no "id" attribute is set.
-     *                      title          - Optional: the dialog title. If not specified an empty string is used.
-     *                      content        - Optional: the dialog content (HTML or jQuery objects). If not specified
-     *                                       the dialog will be empty. It still can have a title and/or a button.
-     *                      width          - Optional: the dialog width (CSS value). If not specified "auto" is used.
-     *                      button_label   - Optional: the button label. If not specified no button appears.
-     *                                       Note: the button label and button handler must be set together.
-     *                      button_handler - Optional: the button handler function. If not specified no button appears.
-     *                                       Note: the button label and button handler must be set together.
+     *                      id              - Optional: the dialog content div will get this ID. Useful to style the
+     *                                        dialog with CSS. If not specified no "id" attribute is set.
+     *                      title           - Optional: the dialog title. If not specified an empty string is used.
+     *                      content         - Optional: the dialog content (HTML or jQuery objects). If not specified
+     *                                        the dialog will be empty. It still can have a title and/or a button.
+     *                      width           - Optional: the dialog width (CSS value). If not specified "auto" is used.
+     *                      button_label    - Optional: the button label. If not specified no button appears.
+     *                                        Note: the button label and button handler must be set together.
+     *                      button_handler  - Optional: the button handler function. If not specified no button appears.
+     *                                        Note: the button label and button handler must be set together.
      */
     this.dialog = function(config) {
 
@@ -163,10 +167,8 @@ function GUIToolkit(config) {
     var opened_menu = null      // the menu currently open (a BaseMenu), or null if no menu is open
 
     $(function() {
-        // Close the open menu when clicked elsewhere.
-        // Note: a neater approach would be to let the menu close itself by let its button react on blur.
-        // This would work in Firefox but unfortunately Safari doesn't fire blur events for buttons.
-        $("body").click(function() {
+        // close open menu when clicked somewhere
+        $("body").mousedown(function() {
             close_opened_menu()
         })
     })
@@ -180,7 +182,7 @@ function GUIToolkit(config) {
     /**
      * Internal class acting as the base for Menu and ContextMenu.
      *
-     * @param   config  an object with these properties:
+     * @param   _config  an object with these properties:
      *              on_close    Internal close handler (a function)
      *              on_select   Optional: internal select handler (a function). Receives the selected menu item.
      *              handler     Optional: user application select handler (a function). Receives the selected menu item
@@ -189,7 +191,7 @@ function GUIToolkit(config) {
      *                          are relative to this element (a jQuery object).
      *                          If not specified the coordinates are relative to the client window.
      */
-    function BaseMenu(config) {
+    function BaseMenu(_config) {
 
         var self = this
 
@@ -209,14 +211,14 @@ function GUIToolkit(config) {
          */
         this.add_item = function(item) {
             // 1) update GUI
-            var anchor = $("<a>").attr("href", "#").click(create_selection_handler(item))
-            if (item.icon) {
-                anchor.append($("<img>").attr("src", item.icon).addClass("menu-icon"))
-            }
+            var anchor = $("<a>").attr("href", "#")
+                .click(create_selection_handler(item))
+                .mousedown(consume_event)   // a bubbled up mousedown event would close the menu prematurely
+            item.icon && anchor.append($("<img>").attr("src", item.icon).addClass("menu-icon"))
             anchor.append(item.label)
-            var item_dom = $("<li>").append(anchor)
-            menu.append(item_dom)
-            menu.menu("refresh")    // ### TODO: is refresh a cheap operation? It is called for every item.
+            //
+            menu.append($("<li>").append(anchor))
+            menu.menu("refresh")
             // 2) update model
             items.push(item)
         }
@@ -236,6 +238,11 @@ function GUIToolkit(config) {
         // ---
 
         this.open = function(x, y) {
+            // fire event
+            if (config.on_open_menu) {
+                config.on_open_menu(this)
+            }
+            //
             menu.css({top: y, left: x}).show()      // must be visible for measurement
             trim_height()
             opened_menu = this                      // update global state
@@ -261,7 +268,7 @@ function GUIToolkit(config) {
          * It is a public method anyway to let an outside click perform the closing.
          */
         this.close = function() {
-            config.on_close()
+            _config.on_close()
             opened_menu = null      // update global state
         }
 
@@ -304,11 +311,11 @@ function GUIToolkit(config) {
         function create_selection_handler(item) {
             return function(event) {
                 // 1) fire event
-                config.on_select && config.on_select(item)
+                _config.on_select && _config.on_select(item)
                 // 2) close menu
                 self.close()
                 // 3) call handler
-                var h = item.handler || config.handler     // individual item handler has precedence
+                var h = item.handler || _config.handler     // individual item handler has precedence
                 if (h) {
                     var p = pos(event)      // pass coordinates of selecting mouse click to handler
                     h(item, p.x, p.y)
@@ -322,8 +329,8 @@ function GUIToolkit(config) {
                     x: event.clientX,
                     y: event.clientY
                 }
-                if (config.parent) {
-                    var pp = config.parent.offset()
+                if (_config.parent) {
+                    var pp = _config.parent.offset()
                     pos.x -= pp.left
                     pos.y -= pp.top
                 }
@@ -365,8 +372,6 @@ function GUIToolkit(config) {
 
         function Menu() {
 
-            var self = this
-
             // Model
             // Note: the surrounding "handler" and "menu_title" are also part of the menu's model.
             var stateful = menu_title == undefined
@@ -374,7 +379,7 @@ function GUIToolkit(config) {
                             // Used only for stateful select-like menus.
 
             // GUI
-            var button = gui.button(do_open_menu, menu_title, "triangle-1-s")
+            var button = self.button(do_open_menu, menu_title, "triangle-1-s")
             var base_menu = new BaseMenu({
                 handler: handler,
                 on_select: select_item,
@@ -487,11 +492,6 @@ function GUIToolkit(config) {
              * Calculates the position of the menu and opens it.
              */
             function open_menu() {
-                // fire event ### TODO: move to BaseMenu
-                if (config.pre_open_menu) {
-                    config.pre_open_menu(self)
-                }
-                //
                 var button_pos = button.offset()
                 base_menu.open(button_pos.left, button_pos.top + button.outerHeight())
             }
@@ -577,7 +577,7 @@ function GUIToolkit(config) {
         return new Combobox()
 
         function Combobox() {
-            var menu = gui.menu(do_select_item, "")
+            var menu = self.menu(do_select_item, "")
             var input = $("<input>").attr("type", "text").addClass("combobox")
             menu.dom.append(input)
             this.dom = menu.dom
@@ -615,5 +615,11 @@ function GUIToolkit(config) {
                 input.val(text)
             }
         }
+    }
+
+    // ---
+
+    function consume_event() {
+        return false
     }
 }
