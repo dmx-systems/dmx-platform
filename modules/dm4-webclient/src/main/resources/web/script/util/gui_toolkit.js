@@ -156,7 +156,11 @@ function GUIToolkit(config) {
 
     // === Menu ===
 
-    var opened_menu = null      // global state: the menu currently open, or null if no menu is open
+    // constant
+    var SCROLLBAR_WIDTH = 15    // ### FIXME: suitable for all OS's?
+
+    // global state
+    var opened_menu = null      // the menu currently open (a BaseMenu), or null if no menu is open
 
     $(function() {
         // Close the open menu when clicked elsewhere.
@@ -174,6 +178,8 @@ function GUIToolkit(config) {
     }
 
     /**
+     * Internal class acting as the base for Menu and ContextMenu.
+     *
      * @param   config  an object with these properties:
      *              on_close    Internal close handler (a function)
      *              on_select   Optional: internal select handler (a function). Receives the selected menu item.
@@ -212,7 +218,6 @@ function GUIToolkit(config) {
             menu.append(item_dom)
             menu.menu("refresh")    // ### TODO: is refresh a cheap operation? It is called for every item.
             // 2) update model
-            // ### item.dom = item_dom  // ### TODO: needed?
             items.push(item)
         }
 
@@ -231,24 +236,22 @@ function GUIToolkit(config) {
         // ---
 
         this.open = function(x, y) {
-            menu.css({top: y, left: x})
-            //
-            // measure height
-            menu.show()             // must be visible for measurement
-            menu.height("auto")     // reset trim for proper measurement
-            var menu_height = menu.outerHeight()
-            var window_height = window.innerHeight
-            // console.log("menu_height:", menu_height)
-            //
-            // trim height
-            if (y + menu_height > window_height) {
-                // 8px = menu's top/bottom padding (2 * 0.3em = 9px) - 1px scroller overlap ### FIXME
-                var height = window_height - y - 8 // ### - scroller_height
-                menu.height(height)
-                // console.log("-> trimmed to", height)
+            menu.css({top: y, left: x}).show()      // must be visible for measurement
+            trim_height()
+            opened_menu = this                      // update global state
+
+            function trim_height() {
+                // measure
+                menu.width("auto").height("auto")   // reset trim for proper measurement
+                var menu_height = menu.outerHeight()
+                var window_height = window.innerHeight
+                // trim
+                if (y + menu_height > window_height) {
+                    var height_trim = y + menu_height - window_height
+                    menu.height(menu.height() - height_trim)
+                    menu.width(menu.width() + SCROLLBAR_WIDTH)
+                }
             }
-            // update global state ### TODO: rethink
-            opened_menu = this
         }
 
         /**
@@ -259,8 +262,7 @@ function GUIToolkit(config) {
          */
         this.close = function() {
             config.on_close()
-            // update global state
-            opened_menu = null
+            opened_menu = null      // update global state
         }
 
         this.is_open = function() {
@@ -346,7 +348,7 @@ function GUIToolkit(config) {
      * The menu's DOM structure is accessible through the menu's "dom" property (a jQuery object).
      *
      * @param   handler     Optional: The callback function. One argument is passed to it:
-     *                      the selected menu item (an object with "value" and "label" properties).
+     *                      the selected menu item (an object with "label", "value", ... properties).
      *                      If not specified your application can not react on the menu selection, which is
      *                      reasonable in case of stateful select-like menus.
      * @param   menu_title  Optional: The menu title (string).
@@ -403,7 +405,7 @@ function GUIToolkit(config) {
              *                          ### TODO: this property could possibly be dropped. Meanwhile we have optional
              *                          per-item event handlers (see "handler" property).
              *                      "handler" - Optional: the individual handler. One argument is passed to it:
-             *                          the selected menu item (an object with "value" and "label" properties).
+             *                          the selected menu item (an object with "label", "value", ... properties).
              */
             this.add_item = function(item) {
                 base_menu.add_item(item)
@@ -444,7 +446,7 @@ function GUIToolkit(config) {
             // ---
 
             /**
-             * Returns the selected menu item (object with "value" and "label" properties).
+             * Returns the selected menu item (object with "label", "value", ... properties).
              * If the menu has no items, undefined/null is returned.
              * <p>
              * Only applicable for stateful select-like menus.
@@ -504,7 +506,7 @@ function GUIToolkit(config) {
              * Only applicable for stateful select-like menus.
              * (For stateless action-trigger menus nothing is performed.)
              *
-             * @param   item    object with "value" and "label" properties. If undefined nothing is performed.
+             * @param   item    object with "label", "value", ... properties. If undefined nothing is performed.
              */
             function select_item(item) {
                 // Note: only stateful select-like menus have selection state.
@@ -589,7 +591,7 @@ function GUIToolkit(config) {
             }
 
             /**
-             * Returns either the selected menu item (object with "value" and "label" properties)
+             * Returns either the selected menu item (object with "label", "value", ... properties)
              * or the text entered in the input field (string).
              * <p>
              * There are 2 cases:
