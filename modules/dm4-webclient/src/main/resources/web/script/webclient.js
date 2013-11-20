@@ -1406,10 +1406,10 @@ dm4c = new function() {
         $("body").append(dm4c.split_panel.dom)
         //
         dm4c.page_panel = new PagePanel()
-        dm4c.split_panel.set_right_panel(dm4c.page_panel)
+        dm4c.split_panel.set_page_panel(dm4c.page_panel)
         //
         dm4c.topicmap_renderer = new CanvasRenderer()
-        dm4c.split_panel.set_left_panel(dm4c.topicmap_renderer)
+        dm4c.split_panel.set_topicmap_renderer(dm4c.topicmap_renderer)
         //
         // 2) Setup Load Tracker
         var items_to_load = pm.retrieve_plugin_list()

@@ -230,7 +230,7 @@ function CanvasView() {
         // Otherwise the browsers would just distort the canvas rendering.
         var canvas_element = $("<canvas>").attr({id: "canvas", width: width, height: height})
         // replace existing canvas element
-        // Note: we can't call dm4c.split_panel.set_left_panel() here (-> endless recursion)
+        // Note: we can't call dm4c.split_panel.set_topicmap_renderer() here (-> endless recursion)
         $(".topicmap-renderer #canvas").remove()
         $(".topicmap-renderer").append(canvas_element)
         //
