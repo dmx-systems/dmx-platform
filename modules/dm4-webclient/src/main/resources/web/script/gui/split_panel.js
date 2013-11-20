@@ -1,6 +1,6 @@
 function SplitPanel() {
 
-    var PADDING_MIDDLE = 25     // 25px = 1.6em = 1.6 * 16px = 25(.6)
+    var PADDING_MIDDLE = 26     // 25px = 1.6em = 1.6 * 16px = 25(.6), Firefox needs 26
     var PADDING_BOTTOM = 60     // was 60px, then 67 (healing login dialog), then 76 (healing datepicker)
 
     var topicmap_renderer_parent = $("<td>").append($("<div>", {id: "topicmap-panel"}))
@@ -9,8 +9,10 @@ function SplitPanel() {
     var topicmap_renderer               // the left panel
     var page_panel                      // the right panel (added first)
 
-    var panel_panel_content_height
+    var page_panel_content_height
+
     var topicmap_renderer_width
+    var topicmap_renderer_height
 
     var topicmap_renderer_uris = []     // keeps track of topicmap renderer initialization
 
@@ -58,7 +60,7 @@ function SplitPanel() {
         adjust_page_panel_height()
         page_panel.width = _page_panel.dom.width()
         //
-        calculate_topicmap_renderer_width()
+        calculate_topicmap_renderer_size()
         $("#topicmap-panel").resizable({handles: "e", resize: do_resize, stop: do_stop_resize})
         //
         $(window).resize(do_window_resize)
@@ -67,7 +69,7 @@ function SplitPanel() {
     // ---
 
     this.get_slider_position = function() {
-        return get_topicmap_renderer_size().width
+        return topicmap_renderer_width
     }
 
     this.set_slider_position = function(pos) {
@@ -84,51 +86,47 @@ function SplitPanel() {
         // Note: the left panel must be updated first. The left panel width is calculated there.
         // Updating the right panel relies on it.
         //
-        // update left panel
+        // left panel
         topicmap_renderer_width = pos
         resize_topicmap_renderer()
-        // update right panel
+        // right panel
         adjust_page_panel_width()
     }
 
     // --- Left Panel ---
 
     /**
-     * Calculates the left panel's width based on window width and right panel's width.
-     * Stores the result in "topicmap_renderer_width".
+     * Calculates the topicmap renderer's size based on window width and page panel's width.
+     * Stores the result in "topicmap_renderer_width" and "topicmap_renderer_height".
      *
      * Called in 2 situations:
      *     1) initial setup
      *     2) the browser window is resized
      */
-    function calculate_topicmap_renderer_width() {
+    function calculate_topicmap_renderer_size() {
         // update model
-        var w_w = window.innerWidth
-        topicmap_renderer_width  = w_w - page_panel.width - PADDING_MIDDLE
-    }
-
-    /**
-     * @return  an object with "width" and "height" properties.
-     */
-    function get_topicmap_renderer_size() {
-        return {width: topicmap_renderer_width, height: panel_panel_content_height}
+        topicmap_renderer_width  = window.innerWidth  - page_panel.width - PADDING_MIDDLE
+        topicmap_renderer_height = window.innerHeight - dm4c.toolbar.dom.outerHeight() - 5  // ### Safari: 3, Firefox: 5
     }
 
     function resize_topicmap_renderer() {
-        topicmap_renderer.resize(get_topicmap_renderer_size())
+        // update view
+        topicmap_renderer.resize({
+            width:  topicmap_renderer_width,
+            height: topicmap_renderer_height
+        })
     }
 
     // --- Right Panel ---
 
     /**
-     * Calculates the right panel's width based on window width and left panel's width.
+     * Calculates the right panel's width based on window width and topicmap renderer's width.
      *
      * Called in 1 situation: the resizable-handle is moved.
      */
     function adjust_page_panel_width() {
         // update model
-        var w_w = window.innerWidth
-        page_panel.width = w_w - topicmap_renderer_width - PADDING_MIDDLE
+        page_panel.width = window.innerWidth - topicmap_renderer_width - PADDING_MIDDLE
         // update view
         $("#page-content").width(page_panel.width)
     }
@@ -140,16 +138,10 @@ function SplitPanel() {
      */
     function adjust_page_panel_height() {
         // update model
-        calculate_panel_height()
-        page_panel.height = panel_panel_content_height
+        page_panel_content_height = window.innerHeight - dm4c.toolbar.dom.outerHeight() - PADDING_BOTTOM
+        page_panel.height = page_panel_content_height
         // update view
-        $("#page-content").height(page_panel.height)
-
-        function calculate_panel_height() {
-            var w_h = window.innerHeight
-            var t_h = dm4c.toolbar.dom.height()
-            panel_panel_content_height = w_h - t_h - PADDING_BOTTOM
-        }
+        $("#page-content").height(page_panel_content_height)
     }
 
 
@@ -160,7 +152,6 @@ function SplitPanel() {
      * Triggered repeatedly while the user moves the split pane's resizable-handle.
      */
     function do_resize(event, ui_event) {
-        // Canvas resized: original with=" + ui_event.originalSize.width + " current with=" + ui_event.size.width
         set_slider_position(ui_event.size.width)
     }
 
@@ -185,10 +176,10 @@ function SplitPanel() {
         // Note: the right panel must be updated first. The panel height is calculated there.
         // Updating the left panel relies on it.
         //
-        // update right panel
+        // right panel
         adjust_page_panel_height()
-        // update left panel
-        calculate_topicmap_renderer_width()
+        // left panel
+        calculate_topicmap_renderer_size()
         resize_topicmap_renderer()
     }
 }
