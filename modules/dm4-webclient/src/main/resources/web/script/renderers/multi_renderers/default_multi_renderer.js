@@ -32,7 +32,7 @@ dm4c.add_multi_renderer("dm4.webclient.default_multi_renderer", {
 
         function render_add_button(page_models, level, parent_element) {
             var topic_type = page_models[0].object_type
-            var add_button = dm4c.ui.button(do_add, "Add " + topic_type.value)
+            var add_button = dm4c.ui.button({on_click: do_add, label: "Add " + topic_type.value})
             var add_button_div = $("<div>").addClass("add-button").append(add_button)
             parent_element.append(add_button_div)
 

@@ -19,29 +19,25 @@ function GUIToolkit(config) {
     /**
      * Creates and returns a jQuery UI button.
      *
-     * @param   handler     The callback function. The generic JavaScript event arguments are passed to it.
-     * @param   label       Optional: the button label (string).
-     * @param   icon        Optional: the button icon (string).
-     * @param   is_submit   Optional: if true a submit button is created (boolean).
+     * @param   config  an object with these properties:
+     *              on_click    - The callback function. The generic JavaScript event arguments are passed to it.
+     *              label       - Optional: the button label (string).
+     *              icon        - Optional: the button icon (string).
+     *              is_submit   - Optional: if true a submit button is created (boolean).
      *
-     * @return              The button (a jQuery object).
+     * @return  The button (a jQuery object).
      */
-    this.button = function(handler, label, icon, is_submit) {
-        //
-        if (!handler) {
-            alert("WARNING (GUIToolkit.button): No handler specified for button");
-        }
-        //
-        var button = $('<button type="' + (is_submit ? "submit" : "button") + '">').click(handler)
+    this.button = function(config) {
+        var button = $('<button type="' + (config.is_submit ? "submit" : "button") + '">').click(config.on_click)
         // build options
         var options = {}
-        if (label) {
-            options.label = label
+        if (config.label) {
+            options.label = config.label
         } else {
             options.text = false
         }
-        if (icon) {
-            options.icons = {primary: "ui-icon-" + icon}
+        if (config.icon) {
+            options.icons = {primary: "ui-icon-" + config.icon}
         }
         // create button
         return button.button(options)
@@ -379,7 +375,11 @@ function GUIToolkit(config) {
                             // Used only for stateful select-like menus.
 
             // GUI
-            var button = self.button(do_open_menu, menu_title, "triangle-1-s")
+            var button = self.button({
+                on_click: do_open_menu,
+                label: menu_title,
+                icon: "triangle-1-s"
+            })
             var base_menu = new BaseMenu({
                 handler: handler,
                 on_select: select_item,

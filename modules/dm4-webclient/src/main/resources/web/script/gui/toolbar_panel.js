@@ -9,14 +9,14 @@ function ToolbarPanel() {
     // create "Search" widget
     var searchmode_menu = dm4c.ui.menu(do_select_searchmode)
     var searchmode_widget = $("<span>")
-    var search_button = dm4c.ui.button(do_search, "Search", "gear")
+    var search_button = dm4c.ui.button({on_click: do_search, label: "Search", icon: "gear"})
     var search_widget = $("<div>").attr("id", "search-widget")
         .append(searchmode_menu.dom)
         .append(searchmode_widget)
         .append(search_button)
     // create "Create" widget
     var create_menu = dm4c.ui.menu(do_create_topic, "Create")
-    var create_another_button = dm4c.ui.button(do_create_another_topic, undefined, "plus")
+    var create_another_button = dm4c.ui.button({on_click: do_create_another_topic, icon: "plus"})
         .button("disable").attr({title: CREATE_ANOTHER_BUTTON_TITLE_DIS, accesskey: "n"})
     var create_widget = $("<div>").attr({id: "create-widget"})
         .append(create_menu.dom)

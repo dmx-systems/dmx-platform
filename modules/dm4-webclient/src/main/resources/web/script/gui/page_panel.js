@@ -139,7 +139,12 @@ function PagePanel() {
     function render_buttons(context) {
         var commands = displayed_object.get_commands(context)
         for (var i = 0, cmd; cmd = commands[i]; i++) {
-            var button = dm4c.ui.button(cmd.handler, cmd.label, cmd.ui_icon, cmd.is_submit)
+            var button = dm4c.ui.button({
+                on_click:  cmd.handler,
+                label:     cmd.label,
+                icon:      cmd.ui_icon,
+                is_submit: cmd.is_submit
+            })
             $("#page-toolbar").append(button)
         }
     }
