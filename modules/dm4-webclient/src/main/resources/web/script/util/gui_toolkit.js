@@ -20,15 +20,17 @@ function GUIToolkit(config) {
      * Creates and returns a jQuery UI button.
      *
      * @param   config  an object with these properties:
-     *              on_click    - The callback function. The generic JavaScript event arguments are passed to it.
-     *              label       - Optional: the button label (string).
-     *              icon        - Optional: the button icon (string).
-     *              is_submit   - Optional: if true a submit button is created (boolean).
+     *              on_click     - Optional: the handler fired on click (function).
+     *              on_mousedown - Optional: the handler fired on mousedown (function).
+     *              label        - Optional: the button label (string).
+     *              icon         - Optional: the button icon (string).
+     *              is_submit    - Optional: if true a submit button is created (boolean).
      *
      * @return  The button (a jQuery object).
      */
     this.button = function(config) {
-        var button = $('<button type="' + (config.is_submit ? "submit" : "button") + '">').click(config.on_click)
+        var button = $('<button type="' + (config.is_submit ? "submit" : "button") + '">')
+            .click(config.on_click).mousedown(config.on_mousedown)
         // build options
         var options = {}
         if (config.label) {
@@ -164,9 +166,13 @@ function GUIToolkit(config) {
 
     $(function() {
         // close open menu when clicked somewhere
-        $("body").mousedown(function() {
-            close_opened_menu()
-        })
+        $("body")
+            /* ### .mousedown(function() {
+                close_opened_menu()
+            }) */
+            .mouseup(function() {
+                close_opened_menu()
+            })
     })
 
     function close_opened_menu() {
@@ -197,7 +203,7 @@ function GUIToolkit(config) {
         // GUI
         var menu = $("<ul>")
 
-        // -------------------------------------------------------------------------------------------------- Public API
+        // ---
 
         this.dom = menu.menu()
 
@@ -208,8 +214,8 @@ function GUIToolkit(config) {
         this.add_item = function(item) {
             // 1) update GUI
             var anchor = $("<a>").attr("href", "#")
-                .click(create_selection_handler(item))
-                .mousedown(consume_event)   // a bubbled up mousedown event would close the menu prematurely
+                .mouseup(create_selection_handler(item))
+                // ### .mousedown(consume_event)   // a bubbled up mousedown event would close the menu prematurely
             item.icon && anchor.append($("<img>").attr("src", item.icon).addClass("menu-icon"))
             anchor.append(item.label)
             //
@@ -309,7 +315,7 @@ function GUIToolkit(config) {
                 // 1) fire event
                 _config.on_select && _config.on_select(item)
                 // 2) close menu
-                self.close()
+                // ### self.close()
                 // 3) call handler
                 var h = item.handler || _config.handler     // individual item handler has precedence
                 if (h) {
@@ -317,7 +323,7 @@ function GUIToolkit(config) {
                     h(item, p.x, p.y)
                 }
                 //
-                return false
+                // ### return false
             }
 
             function pos(event) {
@@ -376,7 +382,7 @@ function GUIToolkit(config) {
 
             // GUI
             var button = self.button({
-                on_click: do_open_menu,
+                on_mousedown: do_open_menu,
                 label: menu_title,
                 icon: "triangle-1-s"
             })
@@ -479,12 +485,12 @@ function GUIToolkit(config) {
              * Called when the menu-triggering button is clicked.
              */
             function do_open_menu() {
-                if (base_menu.is_open()) {
+                /* ### if (base_menu.is_open()) {
                     base_menu.close()
                 } else {
-                    close_opened_menu()
-                    open_menu()
-                }
+                    close_opened_menu() */
+                open_menu()
+                // ### }
                 return false
             }
 
@@ -619,7 +625,7 @@ function GUIToolkit(config) {
 
     // ---
 
-    function consume_event() {
+    /* ### function consume_event() {
         return false
-    }
+    } */
 }
