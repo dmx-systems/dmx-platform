@@ -22,6 +22,7 @@ function GUIToolkit(config) {
      * @param   config  an object with these properties:
      *              on_click     - Optional: the handler fired on click (function).
      *              on_mousedown - Optional: the handler fired on mousedown (function).
+     *              on_mouseup   - Optional: the handler fired on mouseup (function).
      *              label        - Optional: the button label (string).
      *              icon         - Optional: the button icon (string).
      *              is_submit    - Optional: if true a submit button is created (boolean).
@@ -30,7 +31,9 @@ function GUIToolkit(config) {
      */
     this.button = function(config) {
         var button = $('<button type="' + (config.is_submit ? "submit" : "button") + '">')
-            .click(config.on_click).mousedown(config.on_mousedown)
+            .click(config.on_click)
+            .mousedown(config.on_mousedown)
+            .mouseup(config.on_mouseup)
         // build options
         var options = {}
         if (config.label) {
@@ -163,15 +166,21 @@ function GUIToolkit(config) {
 
     // global state
     var opened_menu = null      // the menu currently open (a BaseMenu), or null if no menu is open
+    var tx, ty                  // tracks movement
 
     $(function() {
         // close open menu when clicked somewhere
         $("body")
-            /* ### .mousedown(function() {
+            .mousedown(function(event) {
                 close_opened_menu()
-            }) */
-            .mouseup(function() {
-                close_opened_menu()
+                tx = event.clientX
+                ty = event.clientY
+            })
+            .mouseup(function(event) {
+                // context menus stay open if mouse not moved between mouseup and mousedown
+                if (event.clientX != tx || event.clientY != ty) {
+                    close_opened_menu()
+                }
             })
     })
 
@@ -215,7 +224,7 @@ function GUIToolkit(config) {
             // 1) update GUI
             var anchor = $("<a>").attr("href", "#")
                 .mouseup(create_selection_handler(item))
-                // ### .mousedown(consume_event)   // a bubbled up mousedown event would close the menu prematurely
+                .mousedown(consume_event)   // a bubbled up mousedown event would close the menu prematurely
             item.icon && anchor.append($("<img>").attr("src", item.icon).addClass("menu-icon"))
             anchor.append(item.label)
             //
@@ -314,16 +323,13 @@ function GUIToolkit(config) {
             return function(event) {
                 // 1) fire event
                 _config.on_select && _config.on_select(item)
-                // 2) close menu
-                // ### self.close()
-                // 3) call handler
-                var h = item.handler || _config.handler     // individual item handler has precedence
+                // 2) call handler
+                var h = item.handler || _config.handler // individual item handler has precedence
                 if (h) {
-                    var p = pos(event)      // pass coordinates of selecting mouse click to handler
+                    var p = pos(event)                  // pass coordinates of selecting mouse click to handler
                     h(item, p.x, p.y)
                 }
-                //
-                // ### return false
+                // Note: the menu is closed through the up bubbling mouseup event
             }
 
             function pos(event) {
@@ -383,6 +389,7 @@ function GUIToolkit(config) {
             // GUI
             var button = self.button({
                 on_mousedown: do_open_menu,
+                on_mouseup: consume_event,
                 label: menu_title,
                 icon: "triangle-1-s"
             })
@@ -482,16 +489,15 @@ function GUIToolkit(config) {
             // --------------------------------------------------------------------------------------- Private Functions
 
             /**
-             * Called when the menu-triggering button is clicked.
+             * Called when button fires mousedown.
              */
             function do_open_menu() {
-                /* ### if (base_menu.is_open()) {
-                    base_menu.close()
-                } else {
-                    close_opened_menu() */
-                open_menu()
-                // ### }
-                return false
+                if (!base_menu.is_open()) {
+                    close_opened_menu()
+                    open_menu()
+                    return false    // a bubbled up mousedown event would close the opened menu immediately
+                }
+                // Note: if this button's menu is open already the mousedown event bubbles up and closes it
             }
 
             /**
@@ -625,7 +631,7 @@ function GUIToolkit(config) {
 
     // ---
 
-    /* ### function consume_event() {
+    function consume_event() {
         return false
-    } */
+    }
 }
