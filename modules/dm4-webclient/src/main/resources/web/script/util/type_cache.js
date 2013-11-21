@@ -25,6 +25,24 @@ function TypeCache() {
 
     // ---
 
+    /**
+     * Returns a sorted list of all available topic types, possibly filtered through an indicator function.
+     *
+     * @param   filter_func     Optional: the indicator function. One argument is passed: the topic type
+     *                          (a TopicType object). If not specified no filter is applied.
+     */
+    this.get_topic_types = function(filter_func) {
+        var topic_type_list = []
+        iterate(function(topic_type) {
+            if (!filter_func || filter_func(topic_type)) {
+                topic_type_list.push(topic_type)
+            }
+        }, true)    // sort=true
+        return topic_type_list
+    }
+
+    // ---
+
     this.put_topic_type = function(topic_type) {
         topic_types[topic_type.uri] = topic_type
     }
@@ -55,16 +73,6 @@ function TypeCache() {
         assoc_types = {}
     }
 
-    // ---
-
-    this.iterate = function(visitor_func) {
-        var type_uris = get_type_uris(true)     // sort=true
-        for (var i = 0; i < type_uris.length; i++) {
-            var topic_type = self.get_topic_type(type_uris[i])
-            visitor_func(topic_type)
-        }
-    }
-
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function load_topic_types(tracker) {
@@ -75,7 +83,7 @@ function TypeCache() {
             // - Load type icons -
             // Note: the icons must be loaded *after* loading the topic types.
             // The topic type "dm4.webclient.icon" must be known.
-            self.iterate(function(topic_type) {
+            iterate(function(topic_type) {
                 topic_type.load_icon()
             })
             //
@@ -116,5 +124,13 @@ function TypeCache() {
         }
         //
         return type_uris
+    }
+
+    function iterate(visitor_func, sort) {
+        var type_uris = get_type_uris(sort)
+        for (var i = 0; i < type_uris.length; i++) {
+            var topic_type = self.get_topic_type(type_uris[i])
+            visitor_func(topic_type)
+        }
     }
 }

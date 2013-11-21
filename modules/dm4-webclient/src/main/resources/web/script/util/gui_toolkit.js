@@ -20,9 +20,9 @@ function GUIToolkit(config) {
      * Creates and returns a jQuery UI button.
      *
      * @param   config  an object with these properties:
-     *              on_click     - Optional: the handler fired on click (function).
-     *              on_mousedown - Optional: the handler fired on mousedown (function).
-     *              on_mouseup   - Optional: the handler fired on mouseup (function).
+     *              on_click     - Optional: the handler invoked on click (function).
+     *              on_mousedown - Optional: the handler invoked on mousedown (function).
+     *              on_mouseup   - Optional: the handler invoked on mouseup (function).
      *              label        - Optional: the button label (string).
      *              icon         - Optional: the button icon (string).
      *              is_submit    - Optional: if true a submit button is created (boolean).
@@ -210,11 +210,11 @@ function GUIToolkit(config) {
         var items = []
 
         // GUI
-        var menu = $("<ul>")
+        var menu = $("<ul>").menu()
 
         // ---
 
-        this.dom = menu.menu()
+        this.dom = menu
 
         /**
          * @param   item    object with "label", "value" (optional), "icon" (optional), "is_trigger" (optional),
@@ -236,7 +236,7 @@ function GUIToolkit(config) {
 
         this.add_separator = function() {
             // update GUI
-            menu.append("<hr>")
+            menu.append($("<li>").text("-"))
         }
 
         this.empty = function() {
@@ -249,7 +249,7 @@ function GUIToolkit(config) {
         // ---
 
         this.open = function(x, y) {
-            // fire event
+            // invoke callback
             if (config.on_open_menu) {
                 config.on_open_menu(this)
             }
@@ -321,9 +321,9 @@ function GUIToolkit(config) {
 
         function create_selection_handler(item) {
             return function(event) {
-                // 1) fire event
+                // 1) invoke internal callback
                 _config.on_select && _config.on_select(item)
-                // 2) call handler
+                // 2) invoke application callback
                 var h = item.handler || _config.handler // individual item handler has precedence
                 if (h) {
                     var p = pos(event)                  // pass coordinates of selecting mouse click to handler
@@ -489,7 +489,7 @@ function GUIToolkit(config) {
             // --------------------------------------------------------------------------------------- Private Functions
 
             /**
-             * Called when button fires mousedown.
+             * Called when the button fires mousedown.
              */
             function do_open_menu() {
                 if (!base_menu.is_open()) {

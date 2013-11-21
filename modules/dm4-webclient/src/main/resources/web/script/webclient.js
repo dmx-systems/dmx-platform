@@ -1182,30 +1182,28 @@ dm4c = new function() {
     // ---
 
     /**
-     * Refreshes a type menu to reflect the updated type cache (after adding/removing/renaming a type).
+     * Refreshes a type menu.
      * <p>
-     * Utility method for plugin developers.
+     * Callable by plugins to reflect an updated type cache (after adding/removing/renaming a type).
      *
-     * @param   type_menu       a GUIToolkit Menu object.
-     * @param   filter_func     Optional: a function that filters the topic types to add to the menu.
-     *                          One argument is passed: the topic type (a TopicType object).
-     *                          If not specified no filter is applied (all topic types are added).
+     * @param   type_menu       the type menu to refresh (a GUIToolkit Menu object).
+     * @param   topic_types     Optional: the topic types to add to the menu (array of TopicType).
+     *                          If not specified all available topic types (as existing in the type cache) are added.
      */
-    this.refresh_type_menu = function(type_menu, filter_func) {
+    this.refresh_type_menu = function(type_menu, topic_types) {
         // save selection
         var item = type_menu.get_selection()
         // remove all items
         type_menu.empty()
         // add topic type items
-        type_cache.iterate(function(topic_type) {
-            if (!filter_func || filter_func(topic_type)) {
-                type_menu.add_item({
-                    label: topic_type.value,
-                    value: topic_type.uri,
-                    icon:  topic_type.get_icon_src()
-                })
-            }
-        })
+        var types = topic_types || type_cache.get_topic_types()
+        for (var i = 0, topic_type; topic_type = types[i]; i++) {
+            type_menu.add_item({
+                label: topic_type.value,
+                value: topic_type.uri,
+                icon:  topic_type.get_icon_src()
+            })
+        }
         // restore selection
         if (item) {
             type_menu.select(item.value)
@@ -1218,11 +1216,20 @@ dm4c = new function() {
      * Utility method for plugin developers.
      */
     this.refresh_create_menu = function() {
-        dm4c.refresh_type_menu(dm4c.toolbar.create_menu, function(topic_type) {
+        var type_menu = dm4c.toolbar.create_menu
+        dm4c.refresh_type_menu(type_menu, this.topic_type_list())
+        dm4c.fire_event("post_refresh_create_menu", type_menu)
+    }
+
+    /**
+     * Creates a list of all the topic types the current user is enabled to create instances of.
+     *
+     * @return  the list of topic types.
+     */
+    this.topic_type_list = function() {
+        return type_cache.get_topic_types(function(topic_type) {
             return dm4c.has_create_permission(topic_type.uri) && topic_type.get_menu_config("create-type-menu")
         })
-        //
-        dm4c.fire_event("post_refresh_create_menu", dm4c.toolbar.create_menu)
     }
 
     // ---
