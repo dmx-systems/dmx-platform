@@ -32,13 +32,13 @@ function TypeCache() {
      *                          (a TopicType object). If not specified no filter is applied.
      */
     this.get_topic_types = function(filter_func) {
-        var topic_type_list = []
+        var topic_types = []
         iterate(function(topic_type) {
             if (!filter_func || filter_func(topic_type)) {
-                topic_type_list.push(topic_type)
+                topic_types.push(topic_type)
             }
         }, true)    // sort=true
-        return topic_type_list
+        return topic_types
     }
 
     // ---

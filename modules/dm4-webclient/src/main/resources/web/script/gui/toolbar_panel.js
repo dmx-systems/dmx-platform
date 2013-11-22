@@ -1,9 +1,5 @@
 function ToolbarPanel() {
 
-    var CREATE_ANOTHER_BUTTON_TITLE_DIS = "Once a topic is created this button creates another one of the same type [n]"
-    var CREATE_ANOTHER_BUTTON_TITLE_EN  = "Create another "
-
-    var recent_type_uri
     var self = this
 
     // create "Search" widget
@@ -16,11 +12,8 @@ function ToolbarPanel() {
         .append(search_button)
     // create "Create" widget
     var create_menu = dm4c.ui.menu(do_create_topic, "Create")
-    var create_another_button = dm4c.ui.button({on_click: do_create_another_topic, icon: "plus"})
-        .button("disable").attr({title: CREATE_ANOTHER_BUTTON_TITLE_DIS, accesskey: "n"})
     var create_widget = $("<div>").attr({id: "create-widget"})
         .append(create_menu.dom)
-        .append(create_another_button)
     // create "Special" menu
     var special_menu = dm4c.ui.menu(undefined, "Help")  // renamed "Special" -> "Help" ### TODO: proper concept
     special_menu.dom.attr("id", "help-menu")
@@ -46,10 +39,6 @@ function ToolbarPanel() {
         searchmode_widget.append(dm4c.fire_event("searchmode_widget", searchmode)[0])
     }
 
-    this.get_recent_type_uri = function() {
-        return recent_type_uri
-    }
-
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     // === Event Handler ===
@@ -66,16 +55,7 @@ function ToolbarPanel() {
     // ---
 
     function do_create_topic(menu_item) {
-        var type_uri = menu_item.value
-        dm4c.do_create_topic(type_uri)
-        // enable "create another one"
-        recent_type_uri = type_uri
-        var title = CREATE_ANOTHER_BUTTON_TITLE_EN + menu_item.label + " [n]"
-        create_another_button.button("enable").attr("title", title)
-    }
-
-    function do_create_another_topic() {
-        dm4c.do_create_topic(recent_type_uri)
+        dm4c.do_create_topic(menu_item.value)
     }
 
     // === Helper ===

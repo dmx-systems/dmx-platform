@@ -196,9 +196,9 @@ function GUIToolkit(config) {
      * @param   _config  an object with these properties:
      *              on_close    Internal close handler (a function)
      *              on_select   Optional: internal select handler (a function). Receives the selected menu item.
-     *              handler     Optional: user application select handler (a function). Receives the selected menu item
+     *              handler     Optional: user application item handler (a function). Receives the selected menu item
      *                          and the coordinates of the selecting mouse click.
-     *              parent      Optional: the mouse coordinates passed to the user application select handler
+     *              parent      Optional: the mouse coordinates passed to the user application item handler
      *                          are relative to this element (a jQuery object).
      *                          If not specified the coordinates are relative to the client window.
      */
@@ -217,21 +217,31 @@ function GUIToolkit(config) {
         this.dom = menu
 
         /**
-         * @param   item    object with "label", "value" (optional), "icon" (optional), "is_trigger" (optional),
-         *                  and "handler" (optional) properties.
+         * @param   item    object with "label", "value" (optional), "icon" (optional), "disabled" (optional),
+         *                  "is_trigger" (optional), and "handler" (optional) properties.
          */
         this.add_item = function(item) {
             // 1) update GUI
-            var anchor = $("<a>").attr("href", "#")
-                .mouseup(create_selection_handler(item))
-                .mousedown(consume_event)   // a bubbled up mousedown event would close the menu prematurely
-            item.icon && anchor.append($("<img>").attr("src", item.icon).addClass("menu-icon"))
-            anchor.append(item.label)
-            //
-            menu.append($("<li>").append(anchor))
+            menu.append($("<li>")
+                .toggleClass("ui-state-disabled", item.disabled == true)
+                .append(item_anchor())
+            )
             menu.menu("refresh")
             // 2) update model
             items.push(item)
+
+            function item_anchor() {
+                var anchor = $("<a>").attr("href", "#")
+                    .mouseup(item_handler(item))
+                    .mousedown(consume_event)   // a bubbled up mousedown event would close the menu prematurely
+                if (item.icon) {
+                    anchor.append(
+                        $("<img>").attr("src", item.icon).addClass("menu-icon")
+                    )
+                }
+                anchor.append(item.label)
+                return anchor
+            }
         }
 
         this.add_separator = function() {
@@ -319,11 +329,11 @@ function GUIToolkit(config) {
 
         // ---
 
-        function create_selection_handler(item) {
+        function item_handler(item) {
             return function(event) {
                 // 1) invoke internal callback
                 _config.on_select && _config.on_select(item)
-                // 2) invoke application callback
+                // 2) invoke application item handler
                 var h = item.handler || _config.handler // individual item handler has precedence
                 if (h) {
                     var p = pos(event)                  // pass coordinates of selecting mouse click to handler
@@ -365,11 +375,11 @@ function GUIToolkit(config) {
      * @param   handler     Optional: The callback function. One argument is passed to it:
      *                      the selected menu item (an object with "label", "value", ... properties).
      *                      If not specified your application can not react on the menu selection, which is
-     *                      reasonable in case of stateful select-like menus.
+     *                      reasonable in case of stateful menus.
      * @param   menu_title  Optional: The menu title (string).
      *                      If specified (even if empty string) a stateless action-trigger menu with a static menu title
-     *                      is created. If not specified (undefined or null) a stateful select-like menu is created
-     *                      with the selected item as "menu title".
+     *                      is created. If not specified (undefined or null) a stateful menu is created with the
+     *                      selected item as "menu title".
      *
      * @return              The created menu (a Menu object). The caller can add the menu to the page by accessing the
      *                      menu's "dom" property (a jQuery object).
@@ -384,7 +394,7 @@ function GUIToolkit(config) {
             // Note: the surrounding "handler" and "menu_title" are also part of the menu's model.
             var stateful = menu_title == undefined
             var selection   // selected menu item (object with "label", "value", ... properties).
-                            // Used only for stateful select-like menus.
+                            // Used only for stateful menus.
 
             // GUI
             var button = self.button({
@@ -417,11 +427,10 @@ function GUIToolkit(config) {
              *                          is identified simply by equality (==) check on the values (see find_item()).
              *                          ### Think about: is the caller allowed to change the value afterwards?
              *                      "icon" - Optional: the icon to decorate the item (relative or absolute URL).
-             *                      "is_trigger" (boolean) - Optional: if true this item acts as stateless
-             *                          action-trigger within an stateful select-like menu. Default is false.
-             *                          Reasonable only for stateful select-like menus.
-             *                          ### TODO: this property could possibly be dropped. Meanwhile we have optional
-             *                          per-item event handlers (see "handler" property).
+             *                      "disabled" (boolean) - Optional: if true the item appears as disabled.
+             *                      "is_trigger" (boolean) - Optional: if true the item is not regarded as a state
+             *                          in a stateful menu. Default is false. Meaningless in stateless menus.
+             *                          ### TODO: consider renaming to "not_a_state".
              *                      "handler" - Optional: the individual handler. One argument is passed to it:
              *                          the selected menu item (an object with "label", "value", ... properties).
              */
@@ -430,7 +439,7 @@ function GUIToolkit(config) {
                 //
                 // select the item if there is no selection yet
                 if (!selection) {
-                    // Note: this sets also the button label (in case of stateful select-like menus)
+                    // Note: this sets also the button label (in case of stateful menus)
                     select_item(item)
                 }
             }
@@ -451,7 +460,7 @@ function GUIToolkit(config) {
              * Sets the selected menu item by value.
              * Note: no handler is triggered.
              * <p>
-             * Only applicable for stateful select-like menus.
+             * Only applicable for stateful menus.
              * (For stateless action-trigger menus nothing is performed.)
              *
              * @param   item_value      Value of the menu item to select.
@@ -467,7 +476,7 @@ function GUIToolkit(config) {
              * Returns the selected menu item (object with "label", "value", ... properties).
              * If the menu has no items, undefined/null is returned.
              * <p>
-             * Only applicable for stateful select-like menus.
+             * Only applicable for stateful menus.
              * (Stateless action-trigger menus always return undefined.)
              */
             this.get_selection = function() {
@@ -515,13 +524,13 @@ function GUIToolkit(config) {
             // ---
 
             /**
-             * Only applicable for stateful select-like menus.
+             * Only applicable for stateful menus.
              * (For stateless action-trigger menus nothing is performed.)
              *
              * @param   item    object with "label", "value", ... properties. If undefined nothing is performed.
              */
             function select_item(item) {
-                // Note: only stateful select-like menus have selection state.
+                // Note: only stateful menus have selection state.
                 if (stateful && item && !item.is_trigger) {
                     // update model
                     selection = item

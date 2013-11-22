@@ -763,8 +763,10 @@ function CanvasView() {
                     context_menu.add_separator()
                 } else {
                     context_menu.add_item({
-                        label: cmd.label,
-                        handler: cmd.handler
+                        label:    cmd.label,
+                        icon:     cmd.icon,
+                        handler:  cmd.handler,
+                        disabled: cmd.disabled
                     })
                 }
             }

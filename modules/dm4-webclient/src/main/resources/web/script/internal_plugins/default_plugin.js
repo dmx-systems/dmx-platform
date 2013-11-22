@@ -188,18 +188,28 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
 
     dm4c.add_listener("canvas_commands", function(cx, cy) {
         var commands = []
-        // Note: type_uri is undefined if the user has no create permission or has nothing created yet
-        var type_uri = dm4c.toolbar.get_recent_type_uri()
-        if (type_uri) {
-            var topic_type_name = dm4c.topic_type_name(type_uri)
+        var topic_types = dm4c.topic_type_list()
+        if (topic_types.length) {
             commands.push({
-                label: "Create " + topic_type_name, handler: do_create, context: "context-menu"
+                label: "Create",
+                disabled: true,
+                context: "context-menu"
             })
+            for (var i = 0, topic_type; topic_type = topic_types[i]; i++) {
+                commands.push({
+                    label: topic_type.value,
+                    icon:  topic_type.get_icon_src(),
+                    handler: create_handler(topic_type.uri),
+                    context: "context-menu"
+                })
+            }
         }
         return commands
 
-        function do_create() {
-            dm4c.do_create_topic(type_uri, cx, cy)
+        function create_handler(type_uri) {
+            return function() {
+                dm4c.do_create_topic(type_uri, cx, cy)
+            }
         }
     })
 
