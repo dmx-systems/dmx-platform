@@ -210,7 +210,18 @@ function GUIToolkit(config) {
         var items = []
 
         // GUI
-        var menu = $("<ul>").menu()
+        var menu = $("<ul>").menu({
+            select: function(event, ui) {
+                // Note: we invoke the item handler by triggering a "mouseup" event on the selected menu item.
+                // We must only invoke the handler in case of keyboard selection because the "menuselect" event
+                // is fired for mouse based selection as well, in which case the item handler is already invoked.
+                // (BTW: regarding mouse based selection the "menuselect" event is fired only for stationary menus,
+                // not for context menus. I really don't know why not for context menus.)
+                if (event.keyCode) {
+                    ui.item.mouseup()
+                }
+            }
+        }).off("focus")    // unbinding "focus" prevents auto focusing the first item when the menu gets focus
 
         // ---
 
@@ -222,18 +233,22 @@ function GUIToolkit(config) {
          */
         this.add_item = function(item) {
             // 1) update GUI
-            menu.append($("<li>")
-                .toggleClass("ui-state-disabled", item.disabled == true)
-                .append(item_anchor())
-            )
-            menu.menu("refresh")
+            menu.append(
+                menu_item().append(item_anchor())
+            ).menu("refresh")
             // 2) update model
             items.push(item)
 
-            function item_anchor() {
-                var anchor = $("<a>").attr("href", "#")
+            function menu_item() {
+                var menu_item = $("<li>")
+                    .toggleClass("ui-state-disabled", item.disabled == true)
                     .mouseup(item_handler(item))
                     .mousedown(consume_event)   // a bubbled up mousedown event would close the menu prematurely
+                return menu_item
+            }
+
+            function item_anchor() {
+                var anchor = $("<a>").attr("href", "#")
                 if (item.icon) {
                     anchor.append(
                         $("<img>").attr("src", item.icon).addClass("menu-icon")
@@ -264,13 +279,14 @@ function GUIToolkit(config) {
                 config.on_open_menu(this)
             }
             //
-            menu.css({top: y, left: x}).show()      // must be visible for measurement
+            menu.css({top: y, left: x}).show().focus()  // must be visible for measurement.
+                                                        // focus enables keyboard control.
             trim_height()
-            opened_menu = this                      // update global state
+            opened_menu = this                          // update global state
 
             function trim_height() {
                 // measure
-                menu.width("auto").height("auto")   // reset trim for proper measurement
+                menu.width("auto").height("auto")       // reset trim for proper measurement
                 var menu_height = menu.outerHeight()
                 var window_height = window.innerHeight
                 // trim
@@ -331,15 +347,16 @@ function GUIToolkit(config) {
 
         function item_handler(item) {
             return function(event) {
-                // 1) invoke internal callback
+                // invoke internal callback
                 _config.on_select && _config.on_select(item)
-                // 2) invoke application item handler
-                var h = item.handler || _config.handler // individual item handler has precedence
+                //
+                self.close()                            // required for keyboard item selection
+                // invoke application handler
+                var h = item.handler || _config.handler // individual item handler overrides global menu handler
                 if (h) {
                     var p = pos(event)                  // pass coordinates of selecting mouse click to handler
                     h(item, p.x, p.y)
                 }
-                // Note: the menu is closed through the up bubbling mouseup event
             }
 
             function pos(event) {
@@ -554,7 +571,7 @@ function GUIToolkit(config) {
     }
 
     /**
-     * @param   parent  The element the context menu is appended to (a jQuery object).
+     * @param   parent  The element the context menu is appended to (a jQuery object). ### FIXDOC
      *                  The mouse coordinates passed to the menu item handlers are relative to this element.
      */
     this.context_menu = function(parent) {
@@ -577,14 +594,16 @@ function GUIToolkit(config) {
             }
 
             this.open = function(x, y) {
-                parent.append(base_menu.dom)
+                // Note: we append not to parent but to body. This works around a Safari problem where the
+                // topicmap panel is accidentally translated in case the context menu is height trimmed.
+                $("body").append(base_menu.dom)
                 base_menu.open(x, y)
             }
 
             // ---
 
             function on_close() {
-                base_menu.dom.remove()
+                base_menu.dom.menu("destroy").remove()
             }
         }
     }

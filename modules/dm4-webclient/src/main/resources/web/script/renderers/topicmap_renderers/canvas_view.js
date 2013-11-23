@@ -750,7 +750,7 @@ function CanvasView() {
     }
 
     /**
-     * Builds a context menu from a set of commands and shows it.
+     * Builds a context menu from a set of commands and opens it.
      *
      * @param   commands    Array of commands. May be empty. Must not null/undefined.
      * @param   event       The mouse event that triggered the context menu.
