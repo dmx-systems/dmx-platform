@@ -20,12 +20,21 @@ function GUIToolkit(config) {
      * Creates and returns a jQuery UI button.
      *
      * @param   config  an object with these properties:
-     *              on_click     - Optional: the handler invoked on click (function).
-     *              on_mousedown - Optional: the handler invoked on mousedown (function).
-     *              on_mouseup   - Optional: the handler invoked on mouseup (function).
-     *              label        - Optional: the button label (string).
-     *              icon         - Optional: the button icon (string).
-     *              is_submit    - Optional: if true a submit button is created (boolean).
+     *              on_click
+     *                  Optional: the handler invoked on click (function).
+     *              on_mousedown
+     *                  Optional: the handler invoked on mousedown (function).
+     *              on_mouseup
+     *                  Optional: the handler invoked on mouseup (function).
+     *              label
+     *                  Optional: the button label (string).
+     *                  If not specified the button has no label. It still can have an icon.
+     *              icon
+     *                  Optional: the button icon (string). The value must match a jQuery UI icon class name
+     *                  without the "ui-icon-" prefix. See http://api.jqueryui.com/theming/icons/.
+     *                  If not specified the button has no icon. It still can have a label.
+     *              is_submit
+     *                  Optional: if true a submit button is created (boolean). Default is false.
      *
      * @return  The button (a jQuery object).
      */
@@ -415,8 +424,9 @@ function GUIToolkit(config) {
 
             // GUI
             var button = self.button({
-                on_mousedown: do_open_menu,
-                on_mouseup: consume_event,
+                on_click:     on_button_click,
+                on_mousedown: on_button_mousedown,
+                on_mouseup:   consume_event,
                 label: menu_title,
                 icon: "triangle-1-s"
             })
@@ -536,6 +546,30 @@ function GUIToolkit(config) {
 
             function on_close() {
                 base_menu.dom.hide()
+            }
+
+            // ---
+
+            var track_mousedown
+
+            function on_button_mousedown() {
+                track_mousedown = true
+                return do_open_menu()
+            }
+
+            /**
+             * Enables menu opening via keyboard.
+             */
+            function on_button_click() {
+                // Note: a focused button fires a "click" event when Enter/Space is pressed. There are no prior
+                // "mousedown" and "mouseup" events in this case.
+                // Note: when using the mouse instead we must not invoke the menu twice. We do so by tracking
+                // weather the "click" event is preceded by a "mousedown" event.
+                if (!track_mousedown) {
+                    return do_open_menu()
+                } else {
+                    track_mousedown = false
+                }
             }
 
             // ---
