@@ -483,7 +483,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         if (renderer_uri != new_renderer_uri) {
             // switch topicmap renderer
             dm4c.topicmap_renderer = topicmap_renderer
-            dm4c.split_panel.set_left_panel(topicmap_renderer)
+            dm4c.split_panel.set_topicmap_renderer(topicmap_renderer)
         }
     }
 

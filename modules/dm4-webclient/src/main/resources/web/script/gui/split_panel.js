@@ -1,64 +1,66 @@
 function SplitPanel() {
 
-    var PADDING_MIDDLE = 25     // 25px = 1.6em = 1.6 * 16px = 25(.6)
+    var PADDING_MIDDLE = 26     // 25px = 1.6em = 1.6 * 16px = 25(.6), Firefox needs 26
     var PADDING_BOTTOM = 60     // was 60px, then 67 (healing login dialog), then 76 (healing datepicker)
 
-    var left_panel_parent  = $("<td>").append($("<div>", {id: "topicmap-panel"}))
-    var right_panel_parent = $("<td>")
+    var topicmap_renderer_parent = $("<td>").append($("<div>", {id: "topicmap-panel"}))
+    var page_panel_parent        = $("<td>")
 
-    var left_panel
-    var right_panel
+    var topicmap_renderer               // the left panel
+    var page_panel                      // the right panel (added first)
 
-    var panel_height
-    var left_panel_width
+    var page_panel_content_height
 
-    var left_panel_uris = []    // keeps track of panel initialization
+    var topicmap_renderer_width
+    var topicmap_renderer_height
+
+    var topicmap_renderer_uris = []     // keeps track of topicmap renderer initialization
 
     this.dom = $("<table>", {id: "split-panel"}).append($("<tr>")
-        .append(left_panel_parent)
-        .append(right_panel_parent)
+        .append(topicmap_renderer_parent)
+        .append(page_panel_parent)
     )
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
     /**
-     * @param   panel   an object with a "dom" property and "get_info", "init", "resize", "resize_end" methods.
+     * @param   _topicmap_renderer  By default the CanvasRenderer instance.
+     *                              An object with a "dom" property and "get_info", "init", "resize", "resize_end"
+     *                              methods.
      */
-    this.set_left_panel = function(panel) {
-        left_panel = panel
+    this.set_topicmap_renderer = function(_topicmap_renderer) {
+        topicmap_renderer = _topicmap_renderer
         //
-        // 1) add panel to page (by replacing the existing one)
-        // Note: class "topicmap-renderer" is added in order to address the panel for removal.
+        // 1) add topicmap renderer to page (by replacing the existing one)
+        // Note: class "topicmap-renderer" is added in order to address the topicmap renderer for removal.
         $("#topicmap-panel .topicmap-renderer").remove()
-        $("#topicmap-panel").append(panel.dom.addClass("topicmap-renderer"))
-        // Note: re-added panels must be resized to adapt to possibly changed slider position.
-        resize_left_panel()
-        // Note: resizing takes place *after* replacing. This allows panels to recreate their DOM
-        // to realize resizing. Otherwise the panel's event handlers would be lost while replacing.
+        $("#topicmap-panel").append(_topicmap_renderer.dom.addClass("topicmap-renderer"))
+        // Note: re-added topicmap renderers must be resized to adapt to possibly changed slider position.
+        resize_topicmap_renderer()
+        // Note: resizing takes place *after* replacing. This allows topicmap renderers to recreate their DOM
+        // to realize resizing. Otherwise the topicmap renderer's event handlers would be lost while replacing.
         //
-        // "Setting left panel, dom.width()=" + panel.dom.width() + ", left_panel_width=" + left_panel_width
-        //
-        // 2) init panel
-        var panel_uri = panel.get_info().uri
-        // Note: each panel is initialized only once. We recognize panels by their URIs.
-        if (!js.contains(left_panel_uris, panel_uri)) {
-            left_panel_uris.push(panel_uri)
-            panel.init()
+        // 2) init topicmap renderer
+        var topicmap_renderer_uri = _topicmap_renderer.get_info().uri
+        // Note: each topicmap renderer is initialized only once. We recognize topicmap renderers by their URIs.
+        if (!js.contains(topicmap_renderer_uris, topicmap_renderer_uri)) {
+            topicmap_renderer_uris.push(topicmap_renderer_uri)
+            _topicmap_renderer.init()
         }
     }
 
     /**
-     * @param   panel   an object with a "dom" property.
+     * @param   _page_panel     The PagePanel instance.
+     *                          An object with a "dom" property.
      */
-    this.set_right_panel = function(panel) {
-        right_panel = panel
-        right_panel_parent.append(panel.dom)
+    this.set_page_panel = function(_page_panel) {
+        page_panel = _page_panel
+        page_panel_parent.append(_page_panel.dom)
         //
-        adjust_right_panel_height()
-        right_panel.width = panel.dom.width()
-        // "Page panel width=" + right_panel.width
+        adjust_page_panel_height()
+        page_panel.width = _page_panel.dom.width()
         //
-        calculate_left_panel_width()
+        calculate_topicmap_renderer_size()
         $("#topicmap-panel").resizable({handles: "e", resize: do_resize, stop: do_stop_resize})
         //
         $(window).resize(do_window_resize)
@@ -67,20 +69,11 @@ function SplitPanel() {
     // ---
 
     this.get_slider_position = function() {
-        return get_left_panel_size().width
+        return topicmap_renderer_width
     }
 
     this.set_slider_position = function(pos) {
         set_slider_position(pos)
-    }
-
-    // ---
-
-    /**
-     * @return  an object with "width" and "height" properties.
-     */
-    this.get_left_panel_size = function() {
-        return get_left_panel_size()
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -93,52 +86,49 @@ function SplitPanel() {
         // Note: the left panel must be updated first. The left panel width is calculated there.
         // Updating the right panel relies on it.
         //
-        // update left panel
-        left_panel_width = pos
-        resize_left_panel()
-        // update right panel
-        adjust_right_panel_width()
+        // left panel
+        topicmap_renderer_width = pos
+        resize_topicmap_renderer()
+        // right panel
+        adjust_page_panel_width()
     }
 
     // --- Left Panel ---
 
     /**
-     * Calculates the left panel's width based on window width and right panel's width.
-     * Stores the result in "left_panel_width".
+     * Calculates the topicmap renderer's size based on window width and page panel's width.
+     * Stores the result in "topicmap_renderer_width" and "topicmap_renderer_height".
      *
      * Called in 2 situations:
      *     1) initial setup
      *     2) the browser window is resized
      */
-    function calculate_left_panel_width() {
+    function calculate_topicmap_renderer_size() {
         // update model
-        var w_w = window.innerWidth
-        left_panel_width  = w_w - right_panel.width - PADDING_MIDDLE
-        // "Canvas width=" + left_panel_width + " (based on window width " + w_w +
-        // " and page panel width " + right_panel.width + ")"
+        topicmap_renderer_width  = window.innerWidth  - page_panel.width - PADDING_MIDDLE
+        topicmap_renderer_height = window.innerHeight - dm4c.toolbar.dom.outerHeight() - 5  // ### Safari: 3, Firefox: 5
     }
 
-    function get_left_panel_size() {
-        return {width: left_panel_width, height: panel_height}
-    }
-
-    function resize_left_panel() {
-        left_panel.resize(get_left_panel_size())
+    function resize_topicmap_renderer() {
+        // update view
+        topicmap_renderer.resize({
+            width:  topicmap_renderer_width,
+            height: topicmap_renderer_height
+        })
     }
 
     // --- Right Panel ---
 
     /**
-     * Calculates the right panel's width based on window width and left panel's width.
+     * Calculates the right panel's width based on window width and topicmap renderer's width.
      *
      * Called in 1 situation: the resizable-handle is moved.
      */
-    function adjust_right_panel_width() {
+    function adjust_page_panel_width() {
         // update model
-        var w_w = window.innerWidth
-        right_panel.width = w_w - left_panel_width - PADDING_MIDDLE
+        page_panel.width = window.innerWidth - topicmap_renderer_width - PADDING_MIDDLE
         // update view
-        $("#page-content").width(right_panel.width)
+        $("#page-content").width(page_panel.width)
     }
 
     /**
@@ -146,19 +136,12 @@ function SplitPanel() {
      *     1) initial setup
      *     2) the browser window is resized
      */
-    function adjust_right_panel_height() {
+    function adjust_page_panel_height() {
         // update model
-        calculate_panel_height()
-        right_panel.height = panel_height
+        page_panel_content_height = window.innerHeight - dm4c.toolbar.dom.outerHeight() - PADDING_BOTTOM
+        page_panel.height = page_panel_content_height
         // update view
-        $("#page-content").height(right_panel.height)
-
-        function calculate_panel_height() {
-            var w_h = window.innerHeight
-            var t_h = dm4c.toolbar.dom.height()
-            panel_height = w_h - t_h - PADDING_BOTTOM
-            // "Panel height=" + panel_height + " (based on window height " + w_h + " and toolbar height " + t_h + ")"
-        }
+        $("#page-content").height(page_panel_content_height)
     }
 
 
@@ -169,7 +152,6 @@ function SplitPanel() {
      * Triggered repeatedly while the user moves the split pane's resizable-handle.
      */
     function do_resize(event, ui_event) {
-        // Canvas resized: original with=" + ui_event.originalSize.width + " current with=" + ui_event.size.width
         set_slider_position(ui_event.size.width)
     }
 
@@ -182,7 +164,7 @@ function SplitPanel() {
         // window is resized. Removing that style attribute once resizing-via-handle is finished solves that problem.
         $("#topicmap-panel").removeAttr("style")
         //
-        left_panel.resize_end()
+        topicmap_renderer.resize_end()
     }
 
     // ---
@@ -194,10 +176,10 @@ function SplitPanel() {
         // Note: the right panel must be updated first. The panel height is calculated there.
         // Updating the left panel relies on it.
         //
-        // update right panel
-        adjust_right_panel_height()
-        // update left panel
-        calculate_left_panel_width()
-        resize_left_panel()
+        // right panel
+        adjust_page_panel_height()
+        // left panel
+        calculate_topicmap_renderer_size()
+        resize_topicmap_renderer()
     }
 }

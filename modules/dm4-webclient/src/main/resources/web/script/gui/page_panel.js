@@ -19,8 +19,12 @@ function PagePanel() {
 
     // View
     var dom = $("<div>").attr("id", "page-panel")
-        .append($("<div>").attr("id", "page-content").keyup(do_process_key))
+        .append($("<div>").attr("id", "page-content").keydown(do_process_key))
         .append($("<div>").attr("id", "page-toolbar").addClass("dm-toolbar"))
+    // Note: in conjunction with jQuery UI menu keyboard control "keydown" must be used here.
+    // "keyup" would fire immediately once a "Create" menu item is selected via enter key.
+    // This is because the "menuselect" event is fired early at "keydown" time. At time of
+    // the subsequent "keyup" event the page panel form is already visible and focused.
     show_splash()
 
     this.dom = dom
@@ -139,7 +143,12 @@ function PagePanel() {
     function render_buttons(context) {
         var commands = displayed_object.get_commands(context)
         for (var i = 0, cmd; cmd = commands[i]; i++) {
-            var button = dm4c.ui.button(cmd.handler, cmd.label, cmd.ui_icon, cmd.is_submit)
+            var button = dm4c.ui.button({
+                on_click:  cmd.handler,
+                label:     cmd.label,
+                icon:      cmd.ui_icon,
+                is_submit: cmd.is_submit
+            })
             $("#page-toolbar").append(button)
         }
     }
@@ -188,10 +197,9 @@ function PagePanel() {
     function do_process_key(event) {
         if (event.which == 13 && event.target.nodeName == "INPUT" && event.target.type == "text") {
             var submit_button = $("#page-toolbar button[type=submit]")
-            // alert("do_process_key:\nsubmit button=\"" + submit_button.text() +
-            //    "\"\ntarget.type=" + js.inspect(event.target.type))
             submit_button.click()
         }
-        return false
+        // Note: since we're bound to "keydown" (not "keyup") we must not prevent the default behavoir.
+        // No letter would reach the input field.
     }
 }

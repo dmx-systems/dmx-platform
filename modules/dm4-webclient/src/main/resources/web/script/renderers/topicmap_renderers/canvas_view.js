@@ -230,7 +230,7 @@ function CanvasView() {
         // Otherwise the browsers would just distort the canvas rendering.
         var canvas_element = $("<canvas>").attr({id: "canvas", width: width, height: height})
         // replace existing canvas element
-        // Note: we can't call dm4c.split_panel.set_left_panel() here (-> endless recursion)
+        // Note: we can't call dm4c.split_panel.set_topicmap_renderer() here (-> endless recursion)
         $(".topicmap-renderer #canvas").remove()
         $(".topicmap-renderer").append(canvas_element)
         //
@@ -647,8 +647,6 @@ function CanvasView() {
     }
 
     function do_mouseup(event) {
-        // ### close_context_menu()
-        //
         if (topic_move_in_progress) {
             end_topic_move()
         } else if (cluster_move_in_progress) {
@@ -752,39 +750,30 @@ function CanvasView() {
     }
 
     /**
-     * Builds a context menu from a set of commands and shows it.
+     * Builds a context menu from a set of commands and opens it.
      *
      * @param   commands    Array of commands. May be empty. Must not null/undefined.
      * @param   event       The mouse event that triggered the context menu.
      */
     function open_context_menu(commands, event) {
-        // ### close_context_menu()
-        //
-        if (!commands.length) {
-            return
-        }
-        // fire event (compare to GUITookit's open_menu())
-        dm4c.pre_open_context_menu()
-        //
-        var context_menu = dm4c.ui.context_menu($("#topicmap-panel"))
-        for (var i = 0, cmd; cmd = commands[i]; i++) {
-            if (cmd.is_separator) {
-                context_menu.add_separator()
-            } else {
-                context_menu.add_item({
-                    label: cmd.label,
-                    handler: cmd.handler
-                })
+        if (commands.length) {
+            var context_menu = dm4c.ui.context_menu($("#topicmap-panel"))
+            for (var i = 0, cmd; cmd = commands[i]; i++) {
+                if (cmd.is_separator) {
+                    context_menu.add_separator()
+                } else {
+                    context_menu.add_item({
+                        label:    cmd.label,
+                        icon:     cmd.icon,
+                        handler:  cmd.handler,
+                        disabled: cmd.disabled
+                    })
+                }
             }
+            var p = pos(event, Coord.WINDOW)
+            context_menu.open(p.x, p.y)
         }
-        var cm_pos = pos(event, Coord.WINDOW)
-        context_menu.open(cm_pos.x, cm_pos.y)
     }
-
-    /* ### function close_context_menu() {
-        // remove context menu
-        $("#topicmap-panel .menu").remove()
-    } */
 
 
 
@@ -1008,7 +997,6 @@ function CanvasView() {
             var has_moved
             topic_dom
                 .mousedown(function() {
-                    // ### close_context_menu()
                     has_moved = false
                 })
                 .mouseup(function() {

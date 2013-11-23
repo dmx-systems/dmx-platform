@@ -3,10 +3,14 @@
  * dialog boxes, and prompts. Based on jQuery UI.
  *
  * The DeepaMehta Webclient's GUIToolkit instance is accessible as dm4c.ui
+ *
+ * @param   config  an object with these properties:
+ *                      on_open_menu        - Optional: the open menu handler (a function). Invoked before a menu is
+ *                                            opened. Receives the menu (a BaseMenu) to be opened.
  */
 function GUIToolkit(config) {
 
-    var gui = this
+    var self = this
 
 
 
@@ -15,29 +19,30 @@ function GUIToolkit(config) {
     /**
      * Creates and returns a jQuery UI button.
      *
-     * @param   handler     The callback function. The generic JavaScript event arguments are passed to it.
-     * @param   label       Optional: the button label (string).
-     * @param   icon        Optional: the button icon (string).
-     * @param   is_submit   Optional: if true a submit button is created (boolean).
+     * @param   config  an object with these properties:
+     *              on_click     - Optional: the handler invoked on click (function).
+     *              on_mousedown - Optional: the handler invoked on mousedown (function).
+     *              on_mouseup   - Optional: the handler invoked on mouseup (function).
+     *              label        - Optional: the button label (string).
+     *              icon         - Optional: the button icon (string).
+     *              is_submit    - Optional: if true a submit button is created (boolean).
      *
-     * @return              The button (a jQuery object).
+     * @return  The button (a jQuery object).
      */
-    this.button = function(handler, label, icon, is_submit) {
-        //
-        if (!handler) {
-            alert("WARNING (GUIToolkit.button): No handler specified for button");
-        }
-        //
-        var button = $('<button type="' + (is_submit ? "submit" : "button") + '">').click(handler)
+    this.button = function(config) {
+        var button = $('<button type="' + (config.is_submit ? "submit" : "button") + '">')
+            .click(config.on_click)
+            .mousedown(config.on_mousedown)
+            .mouseup(config.on_mouseup)
         // build options
         var options = {}
-        if (label) {
-            options.label = label
+        if (config.label) {
+            options.label = config.label
         } else {
             options.text = false
         }
-        if (icon) {
-            options.icons = {primary: "ui-icon-" + icon}
+        if (config.icon) {
+            options.icons = {primary: "ui-icon-" + config.icon}
         }
         // create button
         return button.button(options)
@@ -49,16 +54,16 @@ function GUIToolkit(config) {
 
     /**
      * @param   config  an object with these properties:
-     *                      id             - Optional: the dialog content div will get this ID. Useful to style the
-     *                                       dialog with CSS. If not specified no "id" attribute is set.
-     *                      title          - Optional: the dialog title. If not specified an empty string is used.
-     *                      content        - Optional: the dialog content (HTML or jQuery objects). If not specified
-     *                                       the dialog will be empty. It still can have a title and/or a button.
-     *                      width          - Optional: the dialog width (CSS value). If not specified "auto" is used.
-     *                      button_label   - Optional: the button label. If not specified no button appears.
-     *                                       Note: the button label and button handler must be set together.
-     *                      button_handler - Optional: the button handler function. If not specified no button appears.
-     *                                       Note: the button label and button handler must be set together.
+     *                      id              - Optional: the dialog content div will get this ID. Useful to style the
+     *                                        dialog with CSS. If not specified no "id" attribute is set.
+     *                      title           - Optional: the dialog title. If not specified an empty string is used.
+     *                      content         - Optional: the dialog content (HTML or jQuery objects). If not specified
+     *                                        the dialog will be empty. It still can have a title and/or a button.
+     *                      width           - Optional: the dialog width (CSS value). If not specified "auto" is used.
+     *                      button_label    - Optional: the button label. If not specified no button appears.
+     *                                        Note: the button label and button handler must be set together.
+     *                      button_handler  - Optional: the button handler function. If not specified no button appears.
+     *                                        Note: the button label and button handler must be set together.
      */
     this.dialog = function(config) {
 
@@ -161,14 +166,22 @@ function GUIToolkit(config) {
 
     // global state
     var opened_menu = null      // the menu currently open (a BaseMenu), or null if no menu is open
+    var tx, ty                  // tracks movement
 
     $(function() {
-        // Close the open menu when clicked elsewhere.
-        // Note: a neater approach would be to let the menu close itself by let its button react on blur.
-        // This would work in Firefox but unfortunately Safari doesn't fire blur events for buttons.
-        $("body").click(function() {
-            close_opened_menu()
-        })
+        // close open menu when clicked somewhere
+        $("body")
+            .mousedown(function(event) {
+                close_opened_menu()
+                tx = event.clientX
+                ty = event.clientY
+            })
+            .mouseup(function(event) {
+                // context menus stay open if mouse not moved between mouseup and mousedown
+                if (event.clientX != tx || event.clientY != ty) {
+                    close_opened_menu()
+                }
+            })
     })
 
     function close_opened_menu() {
@@ -180,16 +193,16 @@ function GUIToolkit(config) {
     /**
      * Internal class acting as the base for Menu and ContextMenu.
      *
-     * @param   config  an object with these properties:
+     * @param   _config  an object with these properties:
      *              on_close    Internal close handler (a function)
      *              on_select   Optional: internal select handler (a function). Receives the selected menu item.
-     *              handler     Optional: user application select handler (a function). Receives the selected menu item
+     *              handler     Optional: user application item handler (a function). Receives the selected menu item
      *                          and the coordinates of the selecting mouse click.
-     *              parent      Optional: the mouse coordinates passed to the user application select handler
+     *              parent      Optional: the mouse coordinates passed to the user application item handler
      *                          are relative to this element (a jQuery object).
      *                          If not specified the coordinates are relative to the client window.
      */
-    function BaseMenu(config) {
+    function BaseMenu(_config) {
 
         var self = this
 
@@ -197,33 +210,58 @@ function GUIToolkit(config) {
         var items = []
 
         // GUI
-        var menu = $("<ul>")
+        var menu = $("<ul>").menu({
+            select: function(event, ui) {
+                // Note: we invoke the item handler by triggering a "mouseup" event on the selected menu item.
+                // We must only invoke the handler in case of keyboard selection because the "menuselect" event
+                // is fired for mouse based selection as well, in which case the item handler is already invoked.
+                // (BTW: regarding mouse based selection the "menuselect" event is fired only for stationary menus,
+                // not for context menus. I really don't know why not for context menus.)
+                if (event.keyCode) {
+                    ui.item.mouseup()
+                }
+            }
+        }).off("focus")    // unbinding "focus" prevents auto focusing the first item when the menu gets focus
 
-        // -------------------------------------------------------------------------------------------------- Public API
+        // ---
 
-        this.dom = menu.menu()
+        this.dom = menu
 
         /**
-         * @param   item    object with "label", "value" (optional), "icon" (optional), "is_trigger" (optional),
-         *                  and "handler" (optional) properties.
+         * @param   item    object with "label", "value" (optional), "icon" (optional), "disabled" (optional),
+         *                  "is_trigger" (optional), and "handler" (optional) properties.
          */
         this.add_item = function(item) {
             // 1) update GUI
-            var anchor = $("<a>").attr("href", "#").click(create_selection_handler(item))
-            if (item.icon) {
-                anchor.append($("<img>").attr("src", item.icon).addClass("menu-icon"))
-            }
-            anchor.append(item.label)
-            var item_dom = $("<li>").append(anchor)
-            menu.append(item_dom)
-            menu.menu("refresh")    // ### TODO: is refresh a cheap operation? It is called for every item.
+            menu.append(
+                menu_item().append(item_anchor())
+            ).menu("refresh")
             // 2) update model
             items.push(item)
+
+            function menu_item() {
+                var menu_item = $("<li>")
+                    .toggleClass("ui-state-disabled", item.disabled == true)
+                    .mouseup(item_handler(item))
+                    .mousedown(consume_event)   // a bubbled up mousedown event would close the menu prematurely
+                return menu_item
+            }
+
+            function item_anchor() {
+                var anchor = $("<a>").attr("href", "#")
+                if (item.icon) {
+                    anchor.append(
+                        $("<img>").attr("src", item.icon).addClass("menu-icon")
+                    )
+                }
+                anchor.append(item.label)
+                return anchor
+            }
         }
 
         this.add_separator = function() {
             // update GUI
-            menu.append("<hr>")
+            menu.append($("<li>").text("-"))
         }
 
         this.empty = function() {
@@ -236,13 +274,19 @@ function GUIToolkit(config) {
         // ---
 
         this.open = function(x, y) {
-            menu.css({top: y, left: x}).show()      // must be visible for measurement
+            // invoke callback
+            if (config.on_open_menu) {
+                config.on_open_menu(this)
+            }
+            //
+            menu.css({top: y, left: x}).show().focus()  // must be visible for measurement.
+                                                        // focus enables keyboard control.
             trim_height()
-            opened_menu = this                      // update global state
+            opened_menu = this                          // update global state
 
             function trim_height() {
                 // measure
-                menu.width("auto").height("auto")   // reset trim for proper measurement
+                menu.width("auto").height("auto")       // reset trim for proper measurement
                 var menu_height = menu.outerHeight()
                 var window_height = window.innerHeight
                 // trim
@@ -261,7 +305,7 @@ function GUIToolkit(config) {
          * It is a public method anyway to let an outside click perform the closing.
          */
         this.close = function() {
-            config.on_close()
+            _config.on_close()
             opened_menu = null      // update global state
         }
 
@@ -301,20 +345,18 @@ function GUIToolkit(config) {
 
         // ---
 
-        function create_selection_handler(item) {
+        function item_handler(item) {
             return function(event) {
-                // 1) fire event
-                config.on_select && config.on_select(item)
-                // 2) close menu
-                self.close()
-                // 3) call handler
-                var h = item.handler || config.handler     // individual item handler has precedence
+                // invoke internal callback
+                _config.on_select && _config.on_select(item)
+                //
+                self.close()                            // required for keyboard item selection
+                // invoke application handler
+                var h = item.handler || _config.handler // individual item handler overrides global menu handler
                 if (h) {
-                    var p = pos(event)      // pass coordinates of selecting mouse click to handler
+                    var p = pos(event)                  // pass coordinates of selecting mouse click to handler
                     h(item, p.x, p.y)
                 }
-                //
-                return false
             }
 
             function pos(event) {
@@ -322,8 +364,8 @@ function GUIToolkit(config) {
                     x: event.clientX,
                     y: event.clientY
                 }
-                if (config.parent) {
-                    var pp = config.parent.offset()
+                if (_config.parent) {
+                    var pp = _config.parent.offset()
                     pos.x -= pp.left
                     pos.y -= pp.top
                 }
@@ -350,11 +392,11 @@ function GUIToolkit(config) {
      * @param   handler     Optional: The callback function. One argument is passed to it:
      *                      the selected menu item (an object with "label", "value", ... properties).
      *                      If not specified your application can not react on the menu selection, which is
-     *                      reasonable in case of stateful select-like menus.
+     *                      reasonable in case of stateful menus.
      * @param   menu_title  Optional: The menu title (string).
      *                      If specified (even if empty string) a stateless action-trigger menu with a static menu title
-     *                      is created. If not specified (undefined or null) a stateful select-like menu is created
-     *                      with the selected item as "menu title".
+     *                      is created. If not specified (undefined or null) a stateful menu is created with the
+     *                      selected item as "menu title".
      *
      * @return              The created menu (a Menu object). The caller can add the menu to the page by accessing the
      *                      menu's "dom" property (a jQuery object).
@@ -365,16 +407,19 @@ function GUIToolkit(config) {
 
         function Menu() {
 
-            var self = this
-
             // Model
             // Note: the surrounding "handler" and "menu_title" are also part of the menu's model.
             var stateful = menu_title == undefined
             var selection   // selected menu item (object with "label", "value", ... properties).
-                            // Used only for stateful select-like menus.
+                            // Used only for stateful menus.
 
             // GUI
-            var button = gui.button(do_open_menu, menu_title, "triangle-1-s")
+            var button = self.button({
+                on_mousedown: do_open_menu,
+                on_mouseup: consume_event,
+                label: menu_title,
+                icon: "triangle-1-s"
+            })
             var base_menu = new BaseMenu({
                 handler: handler,
                 on_select: select_item,
@@ -399,11 +444,10 @@ function GUIToolkit(config) {
              *                          is identified simply by equality (==) check on the values (see find_item()).
              *                          ### Think about: is the caller allowed to change the value afterwards?
              *                      "icon" - Optional: the icon to decorate the item (relative or absolute URL).
-             *                      "is_trigger" (boolean) - Optional: if true this item acts as stateless
-             *                          action-trigger within an stateful select-like menu. Default is false.
-             *                          Reasonable only for stateful select-like menus.
-             *                          ### TODO: this property could possibly be dropped. Meanwhile we have optional
-             *                          per-item event handlers (see "handler" property).
+             *                      "disabled" (boolean) - Optional: if true the item appears as disabled.
+             *                      "is_trigger" (boolean) - Optional: if true the item is not regarded as a state
+             *                          in a stateful menu. Default is false. Meaningless in stateless menus.
+             *                          ### TODO: consider renaming to "not_a_state".
              *                      "handler" - Optional: the individual handler. One argument is passed to it:
              *                          the selected menu item (an object with "label", "value", ... properties).
              */
@@ -412,7 +456,7 @@ function GUIToolkit(config) {
                 //
                 // select the item if there is no selection yet
                 if (!selection) {
-                    // Note: this sets also the button label (in case of stateful select-like menus)
+                    // Note: this sets also the button label (in case of stateful menus)
                     select_item(item)
                 }
             }
@@ -433,7 +477,7 @@ function GUIToolkit(config) {
              * Sets the selected menu item by value.
              * Note: no handler is triggered.
              * <p>
-             * Only applicable for stateful select-like menus.
+             * Only applicable for stateful menus.
              * (For stateless action-trigger menus nothing is performed.)
              *
              * @param   item_value      Value of the menu item to select.
@@ -449,7 +493,7 @@ function GUIToolkit(config) {
              * Returns the selected menu item (object with "label", "value", ... properties).
              * If the menu has no items, undefined/null is returned.
              * <p>
-             * Only applicable for stateful select-like menus.
+             * Only applicable for stateful menus.
              * (Stateless action-trigger menus always return undefined.)
              */
             this.get_selection = function() {
@@ -471,27 +515,21 @@ function GUIToolkit(config) {
             // --------------------------------------------------------------------------------------- Private Functions
 
             /**
-             * Called when the menu-triggering button is clicked.
+             * Called when the button fires mousedown.
              */
             function do_open_menu() {
-                if (base_menu.is_open()) {
-                    base_menu.close()
-                } else {
+                if (!base_menu.is_open()) {
                     close_opened_menu()
                     open_menu()
+                    return false    // a bubbled up mousedown event would close the opened menu immediately
                 }
-                return false
+                // Note: if this button's menu is open already the mousedown event bubbles up and closes it
             }
 
             /**
              * Calculates the position of the menu and opens it.
              */
             function open_menu() {
-                // fire event ### TODO: move to BaseMenu
-                if (config.pre_open_menu) {
-                    config.pre_open_menu(self)
-                }
-                //
                 var button_pos = button.offset()
                 base_menu.open(button_pos.left, button_pos.top + button.outerHeight())
             }
@@ -503,13 +541,13 @@ function GUIToolkit(config) {
             // ---
 
             /**
-             * Only applicable for stateful select-like menus.
+             * Only applicable for stateful menus.
              * (For stateless action-trigger menus nothing is performed.)
              *
              * @param   item    object with "label", "value", ... properties. If undefined nothing is performed.
              */
             function select_item(item) {
-                // Note: only stateful select-like menus have selection state.
+                // Note: only stateful menus have selection state.
                 if (stateful && item && !item.is_trigger) {
                     // update model
                     selection = item
@@ -533,7 +571,7 @@ function GUIToolkit(config) {
     }
 
     /**
-     * @param   parent  The element the context menu is appended to (a jQuery object).
+     * @param   parent  The element the context menu is appended to (a jQuery object). ### FIXDOC
      *                  The mouse coordinates passed to the menu item handlers are relative to this element.
      */
     this.context_menu = function(parent) {
@@ -556,14 +594,16 @@ function GUIToolkit(config) {
             }
 
             this.open = function(x, y) {
-                parent.append(base_menu.dom)
+                // Note: we append not to parent but to body. This works around a Safari problem where the
+                // topicmap panel is accidentally translated in case the context menu is height trimmed.
+                $("body").append(base_menu.dom)
                 base_menu.open(x, y)
             }
 
             // ---
 
             function on_close() {
-                base_menu.dom.remove()
+                base_menu.dom.menu("destroy").remove()
             }
         }
     }
@@ -577,7 +617,7 @@ function GUIToolkit(config) {
         return new Combobox()
 
         function Combobox() {
-            var menu = gui.menu(do_select_item, "")
+            var menu = self.menu(do_select_item, "")
             var input = $("<input>").attr("type", "text").addClass("combobox")
             menu.dom.append(input)
             this.dom = menu.dom
@@ -615,5 +655,11 @@ function GUIToolkit(config) {
                 input.val(text)
             }
         }
+    }
+
+    // ---
+
+    function consume_event() {
+        return false
     }
 }

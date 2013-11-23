@@ -307,7 +307,7 @@ dm4c.render.page_model = (function() {
              * @param   page_model      The page model of the topic to be removed when the remove button is pressed.
              */
             function render_remove_button(parent_element, page_model) {
-                var remove_button = dm4c.ui.button(do_remove, undefined, "circle-minus")
+                var remove_button = dm4c.ui.button({on_click: do_remove, icon: "circle-minus"})
                 var remove_button_div = $("<div>").addClass("remove-button").append(remove_button)
                 parent_element.append(remove_button_div)
 
