@@ -63,6 +63,7 @@
                         role_type_uri: role_type_menu_2.get_selection().value
                     }
                     //
+                    dm4c.fire_event("pre_submit_form", assoc, assoc_model)
                     dm4c.do_update_association(assoc_model, stay_in_edit_mode)
                 }
             }

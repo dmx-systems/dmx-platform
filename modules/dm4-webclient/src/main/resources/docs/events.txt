@@ -1,49 +1,88 @@
-// ### TODO: move to wiki documentation.
-var event_names = [
-    // Plugin
-    "init",
-    // Commands
-    "topic_commands",
-    "association_commands",
-    "canvas_commands",
-    // Storage (DB updates)
-    "pre_update_topic",
-    "post_create_topic",
-    "post_update_topic",
-    "post_update_association",
-    "post_delete_topic",
-    "post_delete_association",
-    // Selection (client model updates)
-    "post_select_topic",
-    "post_select_association",
-    "post_reset_selection",
-    // Show/Hide (view updates)
-    "pre_show_topic",
-    "post_show_topic",
-    "post_show_association",
-    "post_hide_topic",
-    "post_hide_association",
-    // Toolbar
-    "searchmode_widget",
-    "search",
-    "post_refresh_create_menu",
-    // Page Panel
-    "pre_render_page",
-    "pre_render_form",
-    "post_destroy_form",
-    "default_page_rendering",
-    // Canvas
-    "topic_doubleclicked",
-    "association_doubleclicked",
-    "post_move_topic",
-    "post_move_canvas",
-    "pre_draw_canvas",
-    "process_drop",
-    // History
-    "pre_push_history",
-    "pre_pop_history",
-    // Permissions
-    "has_write_permission_for_topic",
-    "has_write_permission_for_association",
-    "has_create_permission"
-]
+
+Client-side events
+==================
+
+### TODO: move to wiki documentation.
+
+=== Webclient ===
+
+// Plugin
+"init"
+"init_2"
+"init_3"
+
+// Commands
+"topic_commands"
+"association_commands"
+"canvas_commands"
+
+// Storage (DB updates)
+"pre_update_topic"
+"post_create_topic"
+"post_update_topic"
+"post_update_association"
+"post_delete_topic"
+"post_delete_association"
+
+// Selection (client model updates)
+"post_select_topic"
+"post_select_association"
+"post_reset_selection"
+
+// Show/Hide (view updates)
+"pre_show_topic"
+"post_show_topic"
+"post_show_association"
+"post_hide_topic"
+"post_hide_association"
+
+// Toolbar
+"searchmode_widget"
+"search"
+"post_refresh_create_menu"
+
+// Page Panel
+"pre_render_page"
+"pre_render_form"
+"pre_submit_form"
+"post_destroy_form"
+"default_page_rendering"
+"option_topics"
+
+// Canvas
+"topic_doubleclicked"
+"association_doubleclicked"
+"post_move_topic"
+"post_move_cluster"
+"post_move_canvas"
+"pre_draw_canvas"
+"process_drop"
+
+// History
+"pre_push_history"
+"pre_pop_history"
+
+// Permissions
+"has_write_permission_for_topic"
+"has_write_permission_for_association"
+"has_create_permission"
+
+// REST Client
+"pre_send_request"
+
+=== Access Control plugin ===
+"logged_in"
+"logged_out"
+
+=== Topicmaps plugin ===
+"topicmap_renderer"
+
+=== Files plugin ===
+"process_files_drop"
+
+=== Mail plugin (3rd party) ===
+"show_mail"
+"send_mail"
+"copy_mail"
+"render_mail_recipients"
+"render_mail_signature"

@@ -56,8 +56,8 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static String URI_CREATED  = "dm4.time.created";
-    private static String URI_MODIFIED = "dm4.time.modified";
+    private static String PROP_URI_CREATED  = "dm4.time.created";
+    private static String PROP_URI_MODIFIED = "dm4.time.modified";
 
     private static String HEADER_LAST_MODIFIED = "Last-Modified";
 
@@ -84,12 +84,12 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     @Override
     public long getCreationTime(DeepaMehtaObject object) {
-        return object.hasProperty(URI_CREATED) ? (Long) object.getProperty(URI_CREATED) : 0;
+        return object.hasProperty(PROP_URI_CREATED) ? (Long) object.getProperty(PROP_URI_CREATED) : 0;
     }
 
     @Override
     public long getModificationTime(DeepaMehtaObject object) {
-        return object.hasProperty(URI_MODIFIED) ? (Long) object.getProperty(URI_MODIFIED) : 0;
+        return object.hasProperty(PROP_URI_MODIFIED) ? (Long) object.getProperty(PROP_URI_MODIFIED) : 0;
     }
 
 
@@ -101,7 +101,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Topic> getTopicsByCreationTime(@PathParam("from") long from,
                                                      @PathParam("to") long to) {
-        return dms.getTopicsByPropertyRange(URI_CREATED, from, to);
+        return dms.getTopicsByPropertyRange(PROP_URI_CREATED, from, to);
     }
 
     @GET
@@ -109,7 +109,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Topic> getTopicsByModificationTime(@PathParam("from") long from,
                                                          @PathParam("to") long to) {
-        return dms.getTopicsByPropertyRange(URI_MODIFIED, from, to);
+        return dms.getTopicsByPropertyRange(PROP_URI_MODIFIED, from, to);
     }
 
     @GET
@@ -117,7 +117,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Association> getAssociationsByCreationTime(@PathParam("from") long from,
                                                                  @PathParam("to") long to) {
-        return dms.getAssociationsByPropertyRange(URI_CREATED, from, to);
+        return dms.getAssociationsByPropertyRange(PROP_URI_CREATED, from, to);
     }
 
     @GET
@@ -125,7 +125,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Association> getAssociationsByModificationTime(@PathParam("from") long from,
                                                                      @PathParam("to") long to) {
-        return dms.getAssociationsByPropertyRange(URI_MODIFIED, from, to);
+        return dms.getAssociationsByPropertyRange(PROP_URI_MODIFIED, from, to);
     }
 
 
@@ -216,11 +216,11 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     // ---
 
     private void storeCreationTime(DeepaMehtaObject object, long time) {
-        storeTime(object, URI_CREATED, time);
+        storeTime(object, PROP_URI_CREATED, time);
     }
 
     private void storeModificationTime(DeepaMehtaObject object, long time) {
-        storeTime(object, URI_MODIFIED, time);
+        storeTime(object, PROP_URI_MODIFIED, time);
     }
 
     // ---
@@ -241,8 +241,8 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
         long created = getCreationTime(object);
         long modified = getModificationTime(object);
         CompositeValueModel comp = object.getCompositeValue().getModel();
-        comp.put(URI_CREATED, created);
-        comp.put(URI_MODIFIED, modified);
+        comp.put(PROP_URI_CREATED, created);
+        comp.put(PROP_URI_MODIFIED, modified);
         return modified;
     }
 
