@@ -1,10 +1,6 @@
-.dm-toolbar   .ui-widget,
-#page-content .ui-widget {
-    font-size: 75%;
-}
-
 .dm-toolbar   .ui-button,
 #page-content .ui-button {
+    font-size: 0.75em;
     margin: 0;
 }
 
@@ -17,6 +13,7 @@
 /* OpenLayer's event layer has z-index 999. */
 
 .ui-menu {
+    font-size: 0.875em;
     position: fixed;
     display: none;
     overflow: auto;

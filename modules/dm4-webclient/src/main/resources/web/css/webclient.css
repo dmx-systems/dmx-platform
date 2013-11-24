@@ -13,7 +13,7 @@ body {
 #main-toolbar input[type=text] {
     margin: 0;
     height: 1.4em;
-    font-size: 75%;
+    font-size: 0.75em;
 }
 
 #search-widget {
@@ -103,6 +103,7 @@ body {
 
 #page-content {
     width: 30em;
+    padding-right: 0.8em;
 }
 
 /* Note: these styles must match with /script/vendor/ckeditor/css/ckeditor_contents.css */
@@ -120,12 +121,8 @@ body {
     white-space: pre-wrap;
 }
 
-#page-content .menu {
-    line-height: 1.8em;
-}
-
 .field-label {
-    font-size: 75%;
+    font-size: 0.75em;
     color: gray;
     margin-bottom: 0.2em;
 }
@@ -222,13 +219,13 @@ body {
 }
 
 .topic-list .assoc-type-label {
-    font-size: 75%;
+    font-size: 0.75em;
     line-height: 1.5em;
     color: gray;
 }
 
 .topic-list .supplement-text {
-    font-size: 75%;
+    font-size: 0.75em;
     line-height: 1.5em;
 }
 
